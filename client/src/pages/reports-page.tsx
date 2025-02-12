@@ -31,15 +31,18 @@ function downloadCSV(data: any[], filename: string) {
   window.URL.revokeObjectURL(url);
 }
 
-// Moravian University color scheme
+// Change the COLORS array to include more distinct shades
 const COLORS = [
-  '#002147', // Primary blue
-  '#003166', // Darker blue
-  '#004185', // Medium blue
-  '#0052a4', // Lighter blue
-  '#4a5568', // Dark grey
+  '#002147', // Deep blue (Moravian primary)
   '#718096', // Medium grey
+  '#003166', // Navy blue
   '#a0aec0', // Light grey
+  '#004185', // Royal blue
+  '#4a5568', // Dark grey
+  '#0052a4', // Bright blue
+  '#e2e8f0', // Pale grey
+  '#0066cc', // Sky blue
+  '#1a202c', // Almost black
 ];
 
 export default function ReportsPage() {
@@ -132,14 +135,14 @@ export default function ReportsPage() {
                         outerRadius={80}
                         fill="#8884d8"
                         dataKey="value"
-                        label={({ name, percent }) => 
+                        label={({ name, percent }) =>
                           `${name} ${(percent * 100).toFixed(0)}%`
                         }
                       >
-                        {categoryChartData.map((_, index) => (
-                          <Cell 
+                        {categoryChartData.map((entry, index) => (
+                          <Cell
                             key={`cell-${index}`}
-                            fill={COLORS[index % COLORS.length]} 
+                            fill={COLORS[index % COLORS.length]}
                           />
                         ))}
                       </Pie>
@@ -184,14 +187,14 @@ export default function ReportsPage() {
                         outerRadius={80}
                         fill="#8884d8"
                         dataKey="value"
-                        label={({ name, percent }) => 
+                        label={({ name, percent }) =>
                           `${name} ${(percent * 100).toFixed(0)}%`
                         }
                       >
-                        {deadlineChartData.map((_, index) => (
-                          <Cell 
+                        {deadlineChartData.map((entry, index) => (
+                          <Cell
                             key={`cell-${index}`}
-                            fill={COLORS[index % COLORS.length]} 
+                            fill={COLORS[index % COLORS.length]}
                           />
                         ))}
                       </Pie>
