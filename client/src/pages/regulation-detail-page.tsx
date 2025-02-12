@@ -16,12 +16,18 @@ import {
 } from "lucide-react";
 import { format, differenceInDays } from "date-fns";
 
+type StatusType = {
+  icon: JSX.Element;
+  label: string;
+  className: string;
+};
+
 export default function RegulationDetailPage() {
   const { id } = useParams();
   const [_, setLocation] = useLocation();
 
   // Proper regulation ID validation
-  const regulationId = id ? Number(id) : undefined;
+  const regulationId = id ? parseInt(id, 10) : undefined;
 
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
@@ -58,7 +64,7 @@ export default function RegulationDetailPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600 mb-4">
-                  Please select a valid regulation from the regulations list.
+                  The regulation ID provided ({id}) is invalid. Please provide a valid regulation ID.
                 </p>
                 <Button
                   variant="outline"
@@ -111,7 +117,9 @@ export default function RegulationDetailPage() {
     ? regulationDeadlines.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0]
     : null;
 
-  const getDeadlineStatus = (deadline: Deadline) => {
+  const getDeadlineStatus = (deadline: Deadline): StatusType => {
+    const daysUntilDue = differenceInDays(new Date(deadline.dueDate), new Date());
+
     if (deadline.status === "completed") {
       return {
         icon: <CheckCircle className="h-5 w-5 text-green-500" />,
@@ -119,8 +127,6 @@ export default function RegulationDetailPage() {
         className: "text-green-600 bg-green-100"
       };
     }
-
-    const daysUntilDue = differenceInDays(new Date(deadline.dueDate), new Date());
 
     if (deadline.status === "overdue" || daysUntilDue < 0) {
       return {
@@ -130,10 +136,18 @@ export default function RegulationDetailPage() {
       };
     }
 
+    if (daysUntilDue <= 7) {
+      return {
+        icon: <Clock className="h-5 w-5 text-yellow-500" />,
+        label: "Due Soon",
+        className: "text-yellow-600 bg-yellow-100"
+      };
+    }
+
     return {
       icon: <Clock className="h-5 w-5 text-blue-500" />,
-      label: daysUntilDue <= 7 ? "Due Soon" : "Upcoming",
-      className: daysUntilDue <= 7 ? "text-yellow-600 bg-yellow-100" : "text-blue-600 bg-blue-100"
+      label: "Upcoming",
+      className: "text-blue-600 bg-blue-100"
     };
   };
 
