@@ -37,6 +37,13 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
     queryKey: ["/api/deadlines"],
   });
 
+  // Debug data loading
+  console.log('RegulationList - Data:', {
+    regulations: regulations?.length || 0,
+    firstRegulation: regulations?.[0],
+    sampleIds: regulations?.slice(0, 3).map(r => r.id)
+  });
+
   const getDeadlineStatus = (regulationId: number): StatusType | null => {
     if (!deadlines?.length) return null;
 
@@ -133,6 +140,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                 // Debug link generation
                 console.log('RegulationList - Generating link for regulation:', {
                   id: regulation.id,
+                  itemId: regulation.itemId,
                   topic: regulation.topic,
                   url: `/regulations/${regulation.id}`
                 });

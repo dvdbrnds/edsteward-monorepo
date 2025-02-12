@@ -42,7 +42,8 @@ export default function RegulationDetailPage() {
   console.log('RegulationDetailPage - Data:', {
     regulations: regulations?.length || 0,
     deadlines: deadlines?.length || 0,
-    loading: { regulations: regulationsLoading, deadlines: deadlinesLoading }
+    loading: { regulations: regulationsLoading, deadlines: deadlinesLoading },
+    firstRegulation: regulations?.[0]
   });
 
   if (regulationsLoading || deadlinesLoading || !regulations) {
@@ -59,12 +60,13 @@ export default function RegulationDetailPage() {
   }
 
   // Get regulation ID from params and find regulation
-  const regulationId = parseInt(params.id!, 10);
+  const regulationId = params.id ? parseInt(params.id, 10) : null;
   const regulation = regulations.find(r => r.id === regulationId);
 
   // Debug regulation finding
   console.log('RegulationDetailPage - Finding Regulation:', {
     regulationId,
+    params,
     foundRegulation: regulation ? {
       id: regulation.id,
       topic: regulation.topic
@@ -84,7 +86,7 @@ export default function RegulationDetailPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600 mb-4">
-                  The regulation with ID {regulationId} could not be found.
+                  The regulation with ID {regulationId || 'unknown'} could not be found.
                 </p>
                 <Button
                   variant="outline"
