@@ -1,103 +1,174 @@
 import Navigation from "@/components/layout/navigation";
+import RegulationList from "@/components/regulations/regulation-list";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Plus, X } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from "recharts";
 import { useQuery } from "@tanstack/react-query";
 import type { Regulation } from "@shared/schema";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { useState } from "react";
-import { Search } from "lucide-react";
-import { useLocation } from "wouter";
+
+// Moravian University brand colors
+const COLORS = [
+  '#CCCCCC', // Moravian Grey
+  '#00267A', // Moravian Blue
+  '#001B56', // Dark Blue
+  '#666666', // Dark Grey
+  '#078CF5', // Accent Blue
+  '#E58200', // Gold
+  '#BC204B', // Red
+  '#006668', // Deep Green
+];
+
+const CategoryPieChart = ({ 
+  data, 
+  onSegmentClick,
+  activeFilter,
+}: { 
+  data: any[], 
+  onSegmentClick: (name: string) => void,
+  activeFilter: string | null,
+}) => (
+  <Card className="mb-8">
+    <CardHeader>
+      <CardTitle className="flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          Regulations by Category
+          {activeFilter && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="ml-2"
+              onClick={() => onSegmentClick("")}
+            >
+              <X className="h-4 w-4 mr-1" />
+              Clear Filter
+            </Button>
+          )}
+        </div>
+      </CardTitle>
+    </CardHeader>
+    <CardContent>
+      <div className="h-[300px] w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={data}
+              cx="50%"
+              cy="50%"
+              labelLine={false}
+              outerRadius={80}
+              dataKey="value"
+              startAngle={90}
+              endAngle={-270}
+              style={{ outline: 'none' }}
+              isAnimationActive={false}
+              onClick={(entry) => onSegmentClick(entry.name)}
+              className="cursor-pointer"
+            >
+              {data.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={COLORS[index % COLORS.length]}
+                  stroke="white"
+                  strokeWidth={2}
+                  opacity={activeFilter && activeFilter !== entry.name ? 0.5 : 1}
+                />
+              ))}
+            </Pie>
+            <Tooltip
+              contentStyle={{
+                backgroundColor: 'white',
+                border: `1px solid ${COLORS[1]}`,
+                borderRadius: '4px',
+                padding: '8px'
+              }}
+              itemStyle={{ color: COLORS[1] }}
+            />
+            <Legend
+              verticalAlign="bottom"
+              height={36}
+              iconType="circle"
+              formatter={(value) => (
+                <span 
+                  className={`text-[#666666] ml-2 cursor-pointer ${activeFilter === value ? 'font-bold' : ''}`}
+                  onClick={() => onSegmentClick(value as string)}
+                >
+                  {value}
+                </span>
+              )}
+              wrapperStyle={{
+                paddingTop: '20px'
+              }}
+            />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+    </CardContent>
+  </Card>
+);
 
 export default function RegulationsPage() {
-  const [search, setSearch] = useState("");
-  const [_, navigate] = useLocation();
+  const [open, setOpen] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
 
-  const { data: regulations, isLoading } = useQuery<Regulation[]>({
+  const { data: regulations } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
   });
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Navigation />
-        <main className="py-10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            Loading...
-          </div>
-        </main>
-      </div>
-    );
-  }
+  const categorySummary = regulations?.reduce((acc, reg) => {
+    acc[reg.category] = (acc[reg.category] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>) || {};
 
-  const filteredRegulations = regulations?.filter((reg) =>
-    reg.topic.toLowerCase().includes(search.toLowerCase()) ||
-    reg.statute.toLowerCase().includes(search.toLowerCase()) ||
-    reg.itemId.toLowerCase().includes(search.toLowerCase())
-  ) || [];
+  const categoryChartData = Object.entries(categorySummary).map(([name, value]) => ({
+    name,
+    value,
+  }));
 
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
+
       <main className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">
-            Regulations
-          </h1>
+          <div className="flex justify-between items-center mb-8">
+            <h1 className="text-3xl font-bold text-gray-900">
+              Regulations
+            </h1>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="relative mb-6">
-                <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="Search regulations..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                  className="pl-9"
-                />
-              </div>
+            <Dialog open={open} onOpenChange={setOpen}>
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Regulation
+                </Button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Add New Regulation</DialogTitle>
+                </DialogHeader>
+                <div className="p-4">
+                  <p>Regulation form will be added here</p>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
 
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>ID</TableHead>
-                      <TableHead>Topic</TableHead>
-                      <TableHead>Category</TableHead>
-                      <TableHead>Status</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {filteredRegulations.map((regulation) => (
-                      <TableRow
-                        key={regulation.id}
-                        className="cursor-pointer hover:bg-gray-50"
-                        onClick={() => navigate(`/regulation/${regulation.id}`)}
-                      >
-                        <TableCell>{regulation.itemId}</TableCell>
-                        <TableCell>{regulation.topic}</TableCell>
-                        <TableCell>{regulation.category}</TableCell>
-                        <TableCell>Active</TableCell>
-                      </TableRow>
-                    ))}
-                    {filteredRegulations.length === 0 && (
-                      <TableRow>
-                        <TableCell colSpan={4} className="text-center py-4">
-                          No regulations found
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
+          <CategoryPieChart 
+            data={categoryChartData}
+            onSegmentClick={setCategoryFilter}
+            activeFilter={categoryFilter}
+          />
+
+          <RegulationList categoryFilter={categoryFilter} />
         </div>
       </main>
     </div>

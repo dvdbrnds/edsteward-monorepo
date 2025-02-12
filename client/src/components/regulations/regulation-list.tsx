@@ -32,7 +32,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
 
   const handleRowClick = (regulationId: number) => {
     console.log('Navigating to regulation:', regulationId);
-    navigate(`/regulations/${regulationId}`);
+    navigate(`/regulation/${regulationId}`);
   };
 
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
