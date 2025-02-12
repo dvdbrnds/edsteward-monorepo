@@ -11,11 +11,17 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useState } from "react";
-import { Search } from "lucide-react";
+import { Search, ChevronUp, ChevronDown } from "lucide-react";
+
+type SortConfig = {
+  key: keyof Regulation;
+  direction: 'asc' | 'desc';
+} | null;
 
 export default function RegulationList() {
   const [search, setSearch] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("");
+  const [sortConfig, setSortConfig] = useState<SortConfig>(null);
 
   const { data: regulations, isLoading } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
@@ -25,16 +31,66 @@ export default function RegulationList() {
     return <div>Loading...</div>;
   }
 
+  const sortData = (data: Regulation[]) => {
+    if (!sortConfig || !data) return data;
+
+    return [...data].sort((a, b) => {
+      const aValue = a[sortConfig.key];
+      const bValue = b[sortConfig.key];
+
+      // Handle null values
+      if (!aValue && !bValue) return 0;
+      if (!aValue) return 1;
+      if (!bValue) return -1;
+
+      // Special handling for itemId (numeric string comparison)
+      if (sortConfig.key === 'itemId') {
+        const numA = parseInt(aValue as string, 10);
+        const numB = parseInt(bValue as string, 10);
+        if (!isNaN(numA) && !isNaN(numB)) {
+          return sortConfig.direction === 'asc' ? numA - numB : numB - numA;
+        }
+      }
+
+      // Default string comparison
+      const comparison = String(aValue).localeCompare(String(bValue));
+      return sortConfig.direction === 'asc' ? comparison : -comparison;
+    });
+  };
+
+  const requestSort = (key: keyof Regulation) => {
+    setSortConfig(current => {
+      if (!current || current.key !== key) {
+        return { key, direction: 'asc' };
+      }
+      if (current.direction === 'asc') {
+        return { key, direction: 'desc' };
+      }
+      return null;
+    });
+  };
+
+  const getSortIcon = (key: keyof Regulation) => {
+    if (!sortConfig || sortConfig.key !== key) {
+      return <ChevronUp className="h-4 w-4 text-gray-400" />;
+    }
+    return sortConfig.direction === 'asc'
+      ? <ChevronUp className="h-4 w-4" />
+      : <ChevronDown className="h-4 w-4" />;
+  };
+
   const filteredRegulations = regulations?.filter((reg) => {
     const matchesSearch = 
       reg.topic.toLowerCase().includes(search.toLowerCase()) ||
       reg.statute.toLowerCase().includes(search.toLowerCase()) ||
       reg.itemId.toLowerCase().includes(search.toLowerCase());
-    
+
     const matchesCategory = !categoryFilter || reg.category === categoryFilter;
-    
+
     return matchesSearch && matchesCategory;
   });
+
+  const sortedRegulations = sortData(filteredRegulations || []);
 
   const categories = Array.from(
     new Set(regulations?.map((reg) => reg.category))
@@ -71,16 +127,44 @@ export default function RegulationList() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>ID</TableHead>
-                <TableHead>Topic</TableHead>
-                <TableHead>Statute</TableHead>
-                <TableHead>Category</TableHead>
+                <TableHead
+                  className="cursor-pointer hover:bg-gray-50"
+                  onClick={() => requestSort('itemId')}
+                >
+                  <div className="flex items-center gap-2">
+                    ID {getSortIcon('itemId')}
+                  </div>
+                </TableHead>
+                <TableHead
+                  className="cursor-pointer hover:bg-gray-50"
+                  onClick={() => requestSort('topic')}
+                >
+                  <div className="flex items-center gap-2">
+                    Topic {getSortIcon('topic')}
+                  </div>
+                </TableHead>
+                <TableHead
+                  className="cursor-pointer hover:bg-gray-50"
+                  onClick={() => requestSort('statute')}
+                >
+                  <div className="flex items-center gap-2">
+                    Statute {getSortIcon('statute')}
+                  </div>
+                </TableHead>
+                <TableHead
+                  className="cursor-pointer hover:bg-gray-50"
+                  onClick={() => requestSort('category')}
+                >
+                  <div className="flex items-center gap-2">
+                    Category {getSortIcon('category')}
+                  </div>
+                </TableHead>
                 <TableHead>Requirements</TableHead>
                 <TableHead>Deadlines</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredRegulations?.map((regulation) => (
+              {sortedRegulations.map((regulation) => (
                 <TableRow key={regulation.id}>
                   <TableCell className="font-medium">{regulation.itemId}</TableCell>
                   <TableCell>{regulation.topic}</TableCell>
