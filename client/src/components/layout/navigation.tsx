@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 
 // Import the logo using relative path from client's perspective
-import moravianLogo from "../../assets/Moravian-Monogram-MoravianBlue.png";
+import moravianLogo from "../../assets/Screenshot_2025-02-12_at_9.15.57_AM-removebg-preview.png";
 
 export default function Navigation() {
   const { user, logoutMutation } = useAuth();
@@ -35,7 +35,7 @@ export default function Navigation() {
               <img 
                 src={moravianLogo}
                 alt="Moravian University Logo" 
-                className="h-8 w-auto"
+                className="h-8"
               />
               <div className="ml-3">
                 <span className="text-xl font-bold text-white">
