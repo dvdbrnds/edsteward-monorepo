@@ -23,8 +23,8 @@ export default function RegulationForm({ onSuccess }: { onSuccess: () => void })
     resolver: zodResolver(insertRegulationSchema),
     defaultValues: {
       requirements: "",
-      requirementsUrl: "https://www.ecfr.gov/",
-      regulationUrl: "",
+      requirementsUrl: "",
+      regulationUrl: "https://www.ecfr.gov/current/title-45/subtitle-B/chapter-VI/part-617",
       summary: "",
       deadlines: "",
     }
@@ -145,7 +145,7 @@ export default function RegulationForm({ onSuccess }: { onSuccess: () => void })
             <FormItem>
               <FormLabel>Requirements</FormLabel>
               <FormDescription>
-                Enter the regulation citation (e.g., 34 C.F.R. § 110 45 C.F.R. § 90)
+                Enter the regulation citation (e.g., 45 C.F.R. § 617)
               </FormDescription>
               <FormControl>
                 <Textarea {...field} />
@@ -162,7 +162,7 @@ export default function RegulationForm({ onSuccess }: { onSuccess: () => void })
             <FormItem>
               <FormLabel>Regulation URL</FormLabel>
               <FormDescription>
-                Enter the specific ECFR URL for this regulation (e.g., https://www.ecfr.gov/current/title-45/subtitle-B/chapter-VI/part-617)
+                Enter the specific ECFR URL for this regulation
               </FormDescription>
               <FormControl>
                 <Input 
