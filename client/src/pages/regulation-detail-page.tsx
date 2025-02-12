@@ -20,15 +20,8 @@ export default function RegulationDetailPage() {
   const params = useParams();
   const regulationId = parseInt(params.id || "0");
 
-  const { data: regulation, isLoading: regulationLoading } = useQuery<Regulation>({
-    queryKey: ["/api/regulations", regulationId],
-    queryFn: () => fetch(`/api/regulations/${regulationId}`).then(res => {
-      if (!res.ok) {
-        throw new Error('Failed to fetch regulation');
-      }
-      return res.json();
-    }),
-    enabled: regulationId > 0,
+  const { data: regulations, isLoading: regulationLoading } = useQuery<Regulation[]>({
+    queryKey: ["/api/regulations"],
   });
 
   const { data: deadlines, isLoading: deadlinesLoading } = useQuery<Deadline[]>({
@@ -55,6 +48,8 @@ export default function RegulationDetailPage() {
       </div>
     );
   }
+
+  const regulation = regulations?.find(r => r.id === regulationId);
 
   if (!regulation) {
     return (
