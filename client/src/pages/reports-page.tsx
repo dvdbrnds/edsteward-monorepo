@@ -16,7 +16,7 @@ import { Button } from "@/components/ui/button";
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from "recharts";
 import { useState } from "react";
 
-// Moravian University official brand colors - same as compliance-overview.tsx
+// Moravian University official brand colors
 const COLORS = [
   '#CCCCCC', // Moravian Grey
   '#00267A', // Moravian Blue
