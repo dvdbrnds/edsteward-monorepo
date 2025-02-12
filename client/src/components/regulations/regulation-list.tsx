@@ -71,7 +71,7 @@ export default function RegulationList() {
   };
 
   const filteredRegulations = regulations?.filter((reg) => {
-    const matchesSearch = 
+    const matchesSearch =
       reg.topic.toLowerCase().includes(search.toLowerCase()) ||
       reg.statute.toLowerCase().includes(search.toLowerCase()) ||
       reg.itemId.toLowerCase().includes(search.toLowerCase());
@@ -163,9 +163,10 @@ export default function RegulationList() {
                         href={regulation.regulationUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 inline-flex items-center gap-1"
+                        className="text-blue-600 hover:text-blue-800 underline decoration-blue-600/30 hover:decoration-blue-800 inline-flex items-center gap-2 group"
                       >
-                        {regulation.requirements} <ExternalLink className="h-3 w-3" />
+                        <span className="break-words">{regulation.requirements}</span>
+                        <ExternalLink className="h-3 w-3 opacity-50 group-hover:opacity-100 transition-opacity" />
                       </a>
                     ) : (
                       regulation.requirements || "N/A"
