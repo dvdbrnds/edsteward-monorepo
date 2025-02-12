@@ -8,7 +8,7 @@ import type { InsertRegulation } from "@shared/schema";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-async function importRegulations() {
+export async function importRegulations() {
   const csvPath = path.join(__dirname, "..", "attached_assets", "compliance-matrix.csv");
   console.log("Reading CSV file from:", csvPath);
 

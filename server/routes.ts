@@ -3,6 +3,7 @@ import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { insertRegulationSchema, insertNotificationSchema, insertDeadlineSchema } from "@shared/schema";
+import { importRegulations } from "./import-data";
 
 export function registerRoutes(app: Express): Server {
   app.use((req, res, next) => {
@@ -11,6 +12,9 @@ export function registerRoutes(app: Express): Server {
   });
 
   setupAuth(app);
+
+  // Import initial data
+  importRegulations().catch(console.error);
 
   // Regulations endpoints
   app.get("/api/regulations", async (req, res) => {
