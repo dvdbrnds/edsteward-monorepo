@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { format } from "date-fns";
-import { Download, FileText, ChevronUp, ChevronDown } from "lucide-react";
+import { Download, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from "recharts";
 import { useState } from "react";
@@ -179,6 +179,13 @@ export default function ReportsPage() {
     });
   };
 
+  const getColumnStyle = (key: keyof Regulation) => {
+    if (!sortConfig || sortConfig.key !== key) {
+      return "cursor-pointer hover:bg-gray-50";
+    }
+    return "cursor-pointer hover:bg-gray-50 font-bold";
+  };
+
   if (regulationsLoading || deadlinesLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -213,15 +220,6 @@ export default function ReportsPage() {
   }));
 
   const sortedRegulations = regulations ? sortData(regulations) : [];
-
-  const getSortIcon = (key: keyof Regulation) => {
-    if (!sortConfig || sortConfig.key !== key) {
-      return <ChevronUp className="h-4 w-4 text-gray-400" />;
-    }
-    return sortConfig.direction === 'asc'
-      ? <ChevronUp className="h-4 w-4" />
-      : <ChevronDown className="h-4 w-4" />;
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -266,36 +264,28 @@ export default function ReportsPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead
-                      className="cursor-pointer hover:bg-gray-50"
+                      className={getColumnStyle('itemId')}
                       onClick={() => requestSort('itemId')}
                     >
-                      <div className="flex items-center gap-2">
-                        ID {getSortIcon('itemId')}
-                      </div>
+                      ID
                     </TableHead>
                     <TableHead
-                      className="cursor-pointer hover:bg-gray-50"
+                      className={getColumnStyle('topic')}
                       onClick={() => requestSort('topic')}
                     >
-                      <div className="flex items-center gap-2">
-                        Topic {getSortIcon('topic')}
-                      </div>
+                      Topic
                     </TableHead>
                     <TableHead
-                      className="cursor-pointer hover:bg-gray-50"
+                      className={getColumnStyle('category')}
                       onClick={() => requestSort('category')}
                     >
-                      <div className="flex items-center gap-2">
-                        Category {getSortIcon('category')}
-                      </div>
+                      Category
                     </TableHead>
                     <TableHead
-                      className="cursor-pointer hover:bg-gray-50"
+                      className={getColumnStyle('lastUpdated')}
                       onClick={() => requestSort('lastUpdated')}
                     >
-                      <div className="flex items-center gap-2">
-                        Last Updated {getSortIcon('lastUpdated')}
-                      </div>
+                      Last Updated
                     </TableHead>
                   </TableRow>
                 </TableHeader>
