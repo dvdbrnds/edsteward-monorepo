@@ -10,6 +10,9 @@ import {
   Loader2,
 } from "lucide-react";
 
+// Import the logo using relative path from client's perspective
+import moravianLogo from "../../assets/Screenshot_2025-02-12_at_9.15.57_AM-removebg-preview.png";
+
 export default function Navigation() {
   const { user, logoutMutation } = useAuth();
   const [location] = useLocation();
@@ -28,7 +31,7 @@ export default function Navigation() {
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
               <img 
-                src="/attached_assets/Screenshot_2025-02-12_at_9.15.57_AM-removebg-preview.png" 
+                src={moravianLogo}
                 alt="Moravian University Logo" 
                 className="h-8"
               />
