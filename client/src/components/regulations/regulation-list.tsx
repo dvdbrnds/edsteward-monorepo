@@ -13,7 +13,7 @@ import {
 import { useState } from "react";
 import { Search, ExternalLink, CheckCircle, AlertCircle, Clock } from "lucide-react";
 import { differenceInDays, format } from "date-fns";
-import { Link, useLocation } from "wouter";
+//import { Link, useLocation } from "wouter";  Removed as per edit intention.
 
 interface RegulationListProps {
   categoryFilter: string | null;
@@ -28,7 +28,7 @@ type StatusType = {
 
 export default function RegulationList({ categoryFilter }: RegulationListProps) {
   const [search, setSearch] = useState("");
-  const [_, navigate] = useLocation();
+  //const [_, navigate] = useLocation(); Removed as per edit intention.
 
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
@@ -144,7 +144,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                     className="cursor-pointer hover:bg-gray-50"
                     onClick={() => {
                       console.log('Navigating to regulation:', regulation.id);
-                      navigate(`/regulations/${regulation.id}`);
+                      window.location.href = `/regulations/${regulation.id}`;
                     }}
                   >
                     <TableCell className="font-medium">
