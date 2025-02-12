@@ -165,12 +165,10 @@ export default function RegulationList() {
                         rel="noopener noreferrer"
                         className="text-[#00267A] hover:text-[#003166] underline decoration-[#00267A] hover:decoration-[#003166] inline-flex items-center gap-2 group"
                       >
-                        <span className="break-words hover:text-[#003166] transition-colors">{regulation.requirements}</span>
-                        <ExternalLink className="h-3 w-3 text-[#00267A] group-hover:text-[#003166]" />
+                        <span className="break-words">{regulation.requirements}</span>
+                        <ExternalLink className="h-3 w-3 text-[#00267A] group-hover:text-[#003166] transition-colors" />
                       </a>
-                    ) : (
-                      regulation.requirements || "N/A"
-                    )}
+                    ) : regulation.requirements || "N/A"}
                   </TableCell>
                   <TableCell>
                     {regulation.deadlines || "No deadlines"}
