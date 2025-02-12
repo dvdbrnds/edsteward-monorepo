@@ -11,6 +11,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
 
+// Import the new logo
+import moravianLogo from "../assets/Moravian-Monogram-MoravianBlue.png";
+
 export default function AuthPage() {
   const { user, loginMutation, registerMutation } = useAuth();
   const [_, setLocation] = useLocation();
@@ -48,7 +51,16 @@ export default function AuthPage() {
       {/* Form Section */}
       <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-sm lg:w-96">
-          <h1 className="text-3xl font-bold text-[#002147] mb-8">
+          {/* Logo centered above the title */}
+          <div className="flex items-center justify-center mb-8">
+            <img 
+              src={moravianLogo}
+              alt="Moravian University Logo" 
+              className="h-20 w-auto"
+            />
+          </div>
+
+          <h1 className="text-3xl font-bold text-[#002147] mb-8 text-center">
             Moravian University
             <br />
             Compliance Portal
