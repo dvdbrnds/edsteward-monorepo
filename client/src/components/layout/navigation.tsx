@@ -28,7 +28,7 @@ export default function Navigation() {
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
               <img 
-                src="/attached_assets/download.png" 
+                src="/attached_assets/Screenshot_2025-02-12_at_9.15.57_AM-removebg-preview.png" 
                 alt="Moravian University Logo" 
                 className="h-8"
               />
