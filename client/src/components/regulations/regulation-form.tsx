@@ -11,6 +11,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -143,26 +144,11 @@ export default function RegulationForm({ onSuccess }: { onSuccess: () => void })
           render={({ field }) => (
             <FormItem>
               <FormLabel>Requirements</FormLabel>
+              <FormDescription>
+                Enter the regulation citation (e.g., 34 C.F.R. § 110 45 C.F.R. § 90)
+              </FormDescription>
               <FormControl>
                 <Textarea {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="requirementsUrl"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Requirements Source URL</FormLabel>
-              <FormControl>
-                <Input 
-                  {...field} 
-                  type="url" 
-                  placeholder="https://www.ecfr.gov/"
-                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -174,12 +160,15 @@ export default function RegulationForm({ onSuccess }: { onSuccess: () => void })
           name="regulationUrl"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Specific Regulation URL</FormLabel>
+              <FormLabel>Regulation URL</FormLabel>
+              <FormDescription>
+                Enter the specific ECFR URL for this regulation (e.g., https://www.ecfr.gov/current/title-45/subtitle-B/chapter-VI/part-617)
+              </FormDescription>
               <FormControl>
                 <Input 
                   {...field} 
                   type="url" 
-                  placeholder="https://www.ecfr.gov/current/title-34/part-600"
+                  placeholder="https://www.ecfr.gov/current/title-45/subtitle-B/chapter-VI/part-617"
                 />
               </FormControl>
               <FormMessage />

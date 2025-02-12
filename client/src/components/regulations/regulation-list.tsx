@@ -34,12 +34,10 @@ export default function RegulationList() {
       const aValue = a[sortConfig.key];
       const bValue = b[sortConfig.key];
 
-      // Handle null values
       if (!aValue && !bValue) return 0;
       if (!aValue) return 1;
       if (!bValue) return -1;
 
-      // Special handling for itemId (numeric string comparison)
       if (sortConfig.key === 'itemId') {
         const numA = parseInt(aValue as string, 10);
         const numB = parseInt(bValue as string, 10);
@@ -48,7 +46,6 @@ export default function RegulationList() {
         }
       }
 
-      // Default string comparison
       const comparison = String(aValue).localeCompare(String(bValue));
       return sortConfig.direction === 'asc' ? comparison : -comparison;
     });
@@ -84,8 +81,6 @@ export default function RegulationList() {
     return matchesSearch && matchesCategory;
   });
 
-  const sortedRegulations = sortData(filteredRegulations || []);
-
   const categories = Array.from(
     new Set(regulations?.map((reg) => reg.category))
   ).sort();
@@ -93,6 +88,8 @@ export default function RegulationList() {
   if (isLoading) {
     return <div>Loading...</div>;
   }
+
+  const sortedRegulations = sortData(filteredRegulations || []);
 
   return (
     <Card>
@@ -161,37 +158,19 @@ export default function RegulationList() {
                   <TableCell>{regulation.statute}</TableCell>
                   <TableCell>{regulation.category}</TableCell>
                   <TableCell>
-                    {regulation.requirements ? (
-                      <div className="max-w-xs">
-                        {regulation.requirements}
-                        {(regulation.requirementsUrl || regulation.regulationUrl) && (
-                          <div className="mt-2 space-x-2">
-                            {regulation.requirementsUrl && (
-                              <a
-                                href={regulation.requirementsUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 hover:text-blue-800 inline-flex items-center"
-                              >
-                                Source <ExternalLink className="h-3 w-3 ml-1" />
-                              </a>
-                            )}
-                            {regulation.regulationUrl && (
-                              <a
-                                href={regulation.regulationUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 hover:text-blue-800 inline-flex items-center"
-                              >
-                                Regulation <ExternalLink className="h-3 w-3 ml-1" />
-                              </a>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      "N/A"
-                    )}
+                    <div className="max-w-xs space-y-2">
+                      <div>{regulation.requirements}</div>
+                      {regulation.regulationUrl && (
+                        <a
+                          href={regulation.regulationUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800 inline-flex items-center"
+                        >
+                          View on ECFR <ExternalLink className="h-3 w-3 ml-1" />
+                        </a>
+                      )}
+                    </div>
                   </TableCell>
                   <TableCell>
                     {regulation.deadlines || "No deadlines"}
