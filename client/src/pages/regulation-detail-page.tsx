@@ -24,11 +24,8 @@ type StatusType = {
 };
 
 export default function RegulationDetailPage() {
-  const params = useParams();
+  const { id } = useParams();
   const [_, navigate] = useLocation();
-
-  // Debug params
-  console.log('RegulationDetailPage - URL Params:', params);
 
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
@@ -36,14 +33,6 @@ export default function RegulationDetailPage() {
 
   const { data: deadlines, isLoading: deadlinesLoading } = useQuery<Deadline[]>({
     queryKey: ["/api/deadlines"],
-  });
-
-  // Debug data loading
-  console.log('RegulationDetailPage - Data:', {
-    regulations: regulations?.length || 0,
-    deadlines: deadlines?.length || 0,
-    loading: { regulations: regulationsLoading, deadlines: deadlinesLoading },
-    firstRegulation: regulations?.[0]
   });
 
   if (regulationsLoading || deadlinesLoading || !regulations) {
@@ -60,19 +49,14 @@ export default function RegulationDetailPage() {
   }
 
   // Get regulation ID from params and find regulation
-  const regulationId = params.id ? parseInt(params.id, 10) : null;
-  const regulation = regulations.find(r => r.id === regulationId);
-
-  // Debug regulation finding
-  console.log('RegulationDetailPage - Finding Regulation:', {
-    regulationId,
-    params,
-    foundRegulation: regulation ? {
-      id: regulation.id,
-      topic: regulation.topic
-    } : null,
-    allRegulationIds: regulations.map(r => r.id)
+  const regulationId = id ? parseInt(id, 10) : null;
+  console.log('Regulation ID:', {
+    rawId: id,
+    parsedId: regulationId,
+    foundRegulation: regulations.find(r => r.id === regulationId)?.id
   });
+
+  const regulation = regulations.find(r => r.id === regulationId);
 
   if (!regulation) {
     return (
@@ -86,7 +70,7 @@ export default function RegulationDetailPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600 mb-4">
-                  The regulation with ID {regulationId || 'unknown'} could not be found.
+                  The regulation with ID {id || 'unknown'} could not be found.
                 </p>
                 <Button
                   variant="outline"
