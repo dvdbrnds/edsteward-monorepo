@@ -214,10 +214,28 @@ export default function ReportsPage() {
     value,
   }));
 
-  const deadlineChartData = Object.entries(deadlineSummary).map(([name, value]) => ({
-    name,
-    value,
-  }));
+  const deadlineChartData = Object.entries(deadlineSummary).map(([name, value]) => {
+    const displayName = name === "completed"
+      ? "Completed"
+      : name === "overdue"
+      ? "Overdue"
+      : "Pending";
+    return {
+      name: displayName,
+      value,
+    };
+  });
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "completed":
+        return "text-green-600";
+      case "overdue":
+        return "text-red-600";
+      default:
+        return "text-yellow-600";
+    }
+  };
 
   const sortedRegulations = regulations ? sortData(regulations) : [];
 
@@ -295,7 +313,7 @@ export default function ReportsPage() {
                       <TableCell>{regulation.itemId}</TableCell>
                       <TableCell>{regulation.topic}</TableCell>
                       <TableCell>{regulation.category}</TableCell>
-                      <TableCell>
+                      <TableCell className={getStatusColor(regulation.status || "pending")}>
                         {regulation.lastUpdated
                           ? format(new Date(regulation.lastUpdated), "PP")
                           : "N/A"}
