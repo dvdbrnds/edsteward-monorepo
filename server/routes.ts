@@ -5,6 +5,11 @@ import { storage } from "./storage";
 import { insertRegulationSchema, insertNotificationSchema, insertDeadlineSchema } from "@shared/schema";
 
 export function registerRoutes(app: Express): Server {
+  app.use((req, res, next) => {
+    console.log(`${req.method} ${req.path}`);
+    next();
+  });
+
   setupAuth(app);
 
   // Regulations endpoints
