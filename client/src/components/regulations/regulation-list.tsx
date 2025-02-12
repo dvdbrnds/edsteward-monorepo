@@ -134,13 +134,13 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                 console.log('RegulationList - Generating link for regulation:', {
                   id: regulation.id,
                   topic: regulation.topic,
-                  url: `/regulation/${regulation.id}`
+                  url: `/regulations/${regulation.id}`
                 });
 
                 return (
                   <Link 
                     key={regulation.id} 
-                    href={`/regulation/${regulation.id}`}
+                    href={`/regulations/${regulation.id}`}
                     className="block" 
                   >
                     <TableRow className="cursor-pointer hover:bg-gray-50">
