@@ -27,7 +27,7 @@ export default function RegulationDetailPage() {
   const [_, setLocation] = useLocation();
 
   // More robust ID validation
-  const regulationId = id ? parseInt(id) : null;
+  const regulationId = id ? parseInt(id, 10) : null;
 
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
