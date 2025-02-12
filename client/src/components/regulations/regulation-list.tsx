@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useState } from "react";
-import { Search, ChevronUp, ChevronDown } from "lucide-react";
+import { Search } from "lucide-react";
 
 type SortConfig = {
   key: keyof Regulation;
@@ -70,13 +70,11 @@ export default function RegulationList() {
     });
   };
 
-  const getSortIcon = (key: keyof Regulation) => {
+  const getColumnStyle = (key: keyof Regulation) => {
     if (!sortConfig || sortConfig.key !== key) {
-      return <ChevronUp className="h-4 w-4 text-gray-400" />;
+      return "cursor-pointer hover:bg-gray-50";
     }
-    return sortConfig.direction === 'asc'
-      ? <ChevronUp className="h-4 w-4" />
-      : <ChevronDown className="h-4 w-4" />;
+    return "cursor-pointer hover:bg-gray-50 font-bold";
   };
 
   const filteredRegulations = regulations?.filter((reg) => {
@@ -128,36 +126,28 @@ export default function RegulationList() {
             <TableHeader>
               <TableRow>
                 <TableHead
-                  className="cursor-pointer hover:bg-gray-50"
+                  className={getColumnStyle('itemId')}
                   onClick={() => requestSort('itemId')}
                 >
-                  <div className="flex items-center gap-2">
-                    ID {getSortIcon('itemId')}
-                  </div>
+                  ID
                 </TableHead>
                 <TableHead
-                  className="cursor-pointer hover:bg-gray-50"
+                  className={getColumnStyle('topic')}
                   onClick={() => requestSort('topic')}
                 >
-                  <div className="flex items-center gap-2">
-                    Topic {getSortIcon('topic')}
-                  </div>
+                  Topic
                 </TableHead>
                 <TableHead
-                  className="cursor-pointer hover:bg-gray-50"
+                  className={getColumnStyle('statute')}
                   onClick={() => requestSort('statute')}
                 >
-                  <div className="flex items-center gap-2">
-                    Statute {getSortIcon('statute')}
-                  </div>
+                  Statute
                 </TableHead>
                 <TableHead
-                  className="cursor-pointer hover:bg-gray-50"
+                  className={getColumnStyle('category')}
                   onClick={() => requestSort('category')}
                 >
-                  <div className="flex items-center gap-2">
-                    Category {getSortIcon('category')}
-                  </div>
+                  Category
                 </TableHead>
                 <TableHead>Requirements</TableHead>
                 <TableHead>Deadlines</TableHead>
