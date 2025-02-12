@@ -163,10 +163,10 @@ export default function RegulationList() {
                         href={regulation.regulationUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-blue-600 hover:text-blue-800 underline decoration-blue-600/30 hover:decoration-blue-800 inline-flex items-center gap-2 group"
+                        className="text-[#00267A] hover:text-[#003166] underline decoration-[#00267A] hover:decoration-[#003166] inline-flex items-center gap-2 group"
                       >
-                        <span className="break-words">{regulation.requirements}</span>
-                        <ExternalLink className="h-3 w-3 opacity-50 group-hover:opacity-100 transition-opacity" />
+                        <span className="break-words hover:text-[#003166] transition-colors">{regulation.requirements}</span>
+                        <ExternalLink className="h-3 w-3 text-[#00267A] group-hover:text-[#003166]" />
                       </a>
                     ) : (
                       regulation.requirements || "N/A"
