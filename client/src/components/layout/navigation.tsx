@@ -28,7 +28,9 @@ export default function Navigation() {
     <nav className="bg-[#002147] shadow">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
-          <div className="flex">
+          {/* Logo and Navigation Links */}
+          <div className="flex items-center space-x-8">
+            {/* Logo */}
             <div className="flex-shrink-0 flex items-center">
               <img 
                 src={moravianLogo}
@@ -40,41 +42,44 @@ export default function Navigation() {
               </span>
             </div>
 
-            <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
+            {/* Navigation Links */}
+            <div className="hidden sm:flex sm:space-x-4">
               {links.map((link) => {
                 const Icon = link.icon;
+                const isActive = location === link.href;
                 return (
                   <Link key={link.href} href={link.href}>
-                    <a
+                    <Button
+                      variant="ghost"
                       className={`${
-                        location === link.href
-                          ? "border-white text-white"
-                          : "border-transparent text-gray-300 hover:border-gray-300 hover:text-white"
-                      } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors`}
+                        isActive
+                          ? "text-white border-b-2 border-white"
+                          : "text-gray-300 hover:text-white hover:border-b-2 hover:border-gray-300"
+                      } flex items-center space-x-2 rounded-none px-1 h-16`}
                     >
-                      <Icon className="h-4 w-4 mr-2" />
-                      {link.label}
-                    </a>
+                      <Icon className="h-4 w-4" />
+                      <span>{link.label}</span>
+                    </Button>
                   </Link>
                 );
               })}
             </div>
           </div>
 
+          {/* Logout Button */}
           <div className="flex items-center">
             <Button
               variant="ghost"
-              size="sm"
               onClick={() => logoutMutation.mutate()}
               disabled={logoutMutation.isPending}
-              className="text-white hover:text-gray-300"
+              className="text-gray-300 hover:text-white flex items-center space-x-2"
             >
               {logoutMutation.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
               ) : (
                 <>
-                  <LogOut className="h-4 w-4 mr-2" />
-                  Logout
+                  <LogOut className="h-4 w-4" />
+                  <span>Logout</span>
                 </>
               )}
             </Button>
