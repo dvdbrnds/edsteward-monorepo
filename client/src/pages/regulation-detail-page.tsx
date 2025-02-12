@@ -26,9 +26,6 @@ export default function RegulationDetailPage() {
   const { id } = useParams();
   const [_, setLocation] = useLocation();
 
-  // More robust ID validation
-  const regulationId = id ? parseInt(id, 10) : null;
-
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
   });
@@ -37,7 +34,6 @@ export default function RegulationDetailPage() {
     queryKey: ["/api/deadlines"],
   });
 
-  // Show loading state
   if (regulationsLoading || deadlinesLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -51,10 +47,8 @@ export default function RegulationDetailPage() {
     );
   }
 
-  // Find the regulation before any other checks
-  const regulation = regulations?.find(r => r.id === regulationId);
+  const regulation = regulations?.find(r => r.id === Number(id));
 
-  // Handle regulation not found or invalid ID
   if (!regulation) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -67,10 +61,7 @@ export default function RegulationDetailPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600 mb-4">
-                  {!regulationId 
-                    ? "Please select a regulation from the list."
-                    : `The regulation with ID ${regulationId} was not found.`
-                  }
+                  This regulation was not found. Please select a regulation from the list.
                 </p>
                 <Button
                   variant="outline"
@@ -86,7 +77,7 @@ export default function RegulationDetailPage() {
     );
   }
 
-  const regulationDeadlines = deadlines?.filter(d => d.regulationId === regulationId) || [];
+  const regulationDeadlines = deadlines?.filter(d => d.regulationId === regulation.id) || [];
   const nextDeadline = regulationDeadlines.length > 0
     ? regulationDeadlines.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0]
     : null;
