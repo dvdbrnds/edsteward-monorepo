@@ -27,6 +27,22 @@ const COLORS = [
   '#e2e8f0', // Pale grey
 ];
 
+function downloadCSV(data: any[], filename: string) {
+  const headers = Object.keys(data[0]);
+  const csvContent = [
+    headers.join(','),
+    ...data.map(row => headers.map(header => row[header]).join(','))
+  ].join('\n');
+
+  const blob = new Blob([csvContent], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.click();
+  window.URL.revokeObjectURL(url);
+}
+
 const CustomPieChart = ({ data, title }: { data: any[], title: string }) => (
   <Card>
     <CardHeader>
@@ -59,28 +75,36 @@ const CustomPieChart = ({ data, title }: { data: any[], title: string }) => (
               labelLine={false}
               outerRadius={80}
               dataKey="value"
-              fill="none"
-              label={({ name, percent }) => 
-                `${name} ${(percent * 100).toFixed(0)}%`
-              }
+              // Explicitly set sector props to override defaults
+              startAngle={90}
+              endAngle={-270}
+              style={{ outline: 'none' }}
+              isAnimationActive={false} // Disable animation to ensure immediate color application
             >
               {data.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
                   fill={COLORS[index % COLORS.length]}
-                  stroke="none"
+                  stroke="white"
+                  strokeWidth={2}
                 />
               ))}
             </Pie>
-            <Tooltip 
-              contentStyle={{ 
-                backgroundColor: '#fff',
-                border: `1px solid ${COLORS[0]}`
+            <Tooltip
+              contentStyle={{
+                backgroundColor: 'white',
+                border: `1px solid ${COLORS[0]}`,
+                borderRadius: '4px',
+                padding: '8px'
               }}
+              itemStyle={{ color: COLORS[0] }}
             />
             <Legend
+              verticalAlign="bottom"
+              height={36}
+              iconType="circle"
               formatter={(value, entry: any) => (
-                <span style={{ color: entry.color }}>{value}</span>
+                <span style={{ color: entry.color, padding: '0 8px' }}>{value}</span>
               )}
             />
           </PieChart>
@@ -89,22 +113,6 @@ const CustomPieChart = ({ data, title }: { data: any[], title: string }) => (
     </CardContent>
   </Card>
 );
-
-function downloadCSV(data: any[], filename: string) {
-  const headers = Object.keys(data[0]);
-  const csvContent = [
-    headers.join(','),
-    ...data.map(row => headers.map(header => row[header]).join(','))
-  ].join('\n');
-
-  const blob = new Blob([csvContent], { type: 'text/csv' });
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  a.click();
-  window.URL.revokeObjectURL(url);
-}
 
 export default function ReportsPage() {
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
@@ -138,7 +146,6 @@ export default function ReportsPage() {
     return acc;
   }, {} as Record<string, number>) || {};
 
-  // Transform data for PieChart
   const categoryChartData = Object.entries(categorySummary).map(([name, value]) => ({
     name,
     value,
