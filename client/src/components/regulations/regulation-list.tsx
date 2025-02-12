@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useState } from "react";
-import { Search } from "lucide-react";
+import { Search, ExternalLink } from "lucide-react";
 
 type SortConfig = {
   key: keyof Regulation;
@@ -26,10 +26,6 @@ export default function RegulationList() {
   const { data: regulations, isLoading } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
   });
-
-  if (isLoading) {
-    return <div>Loading...</div>;
-  }
 
   const sortData = (data: Regulation[]) => {
     if (!sortConfig || !data) return data;
@@ -93,6 +89,10 @@ export default function RegulationList() {
   const categories = Array.from(
     new Set(regulations?.map((reg) => reg.category))
   ).sort();
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Card>
@@ -162,8 +162,32 @@ export default function RegulationList() {
                   <TableCell>{regulation.category}</TableCell>
                   <TableCell>
                     {regulation.requirements ? (
-                      <div className="max-w-xs truncate">
+                      <div className="max-w-xs">
                         {regulation.requirements}
+                        {(regulation.requirementsUrl || regulation.regulationUrl) && (
+                          <div className="mt-2 space-x-2">
+                            {regulation.requirementsUrl && (
+                              <a
+                                href={regulation.requirementsUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:text-blue-800 inline-flex items-center"
+                              >
+                                Source <ExternalLink className="h-3 w-3 ml-1" />
+                              </a>
+                            )}
+                            {regulation.regulationUrl && (
+                              <a
+                                href={regulation.regulationUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-600 hover:text-blue-800 inline-flex items-center"
+                              >
+                                Regulation <ExternalLink className="h-3 w-3 ml-1" />
+                              </a>
+                            )}
+                          </div>
+                        )}
                       </div>
                     ) : (
                       "N/A"

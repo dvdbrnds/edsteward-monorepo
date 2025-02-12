@@ -20,6 +20,8 @@ export const regulations = pgTable("regulations", {
   statuteIds: text("statute_ids"),
   summary: text("summary"),
   requirements: text("requirements"),
+  requirementsUrl: text("requirements_url"), // New field for the source URL
+  regulationUrl: text("regulation_url"), // New field for specific regulation URL
   deadlines: text("deadlines"),
   category: text("category").notNull(),
   lastUpdated: timestamp("last_updated"),
@@ -53,7 +55,11 @@ export const insertUserSchema = createInsertSchema(users)
   });
 
 // Schema for inserting regulations
-export const insertRegulationSchema = createInsertSchema(regulations);
+export const insertRegulationSchema = createInsertSchema(regulations)
+  .extend({
+    requirementsUrl: z.string().url().optional(),
+    regulationUrl: z.string().url().optional(),
+  });
 
 // Schema for inserting notifications
 export const insertNotificationSchema = createInsertSchema(notifications);

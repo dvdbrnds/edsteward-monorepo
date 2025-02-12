@@ -20,6 +20,13 @@ import { Loader2 } from "lucide-react";
 export default function RegulationForm({ onSuccess }: { onSuccess: () => void }) {
   const form = useForm<InsertRegulation>({
     resolver: zodResolver(insertRegulationSchema),
+    defaultValues: {
+      requirements: "",
+      requirementsUrl: "https://www.ecfr.gov/",
+      regulationUrl: "",
+      summary: "",
+      deadlines: "",
+    }
   });
 
   const createRegulationMutation = useMutation({
@@ -138,6 +145,42 @@ export default function RegulationForm({ onSuccess }: { onSuccess: () => void })
               <FormLabel>Requirements</FormLabel>
               <FormControl>
                 <Textarea {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="requirementsUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Requirements Source URL</FormLabel>
+              <FormControl>
+                <Input 
+                  {...field} 
+                  type="url" 
+                  placeholder="https://www.ecfr.gov/"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="regulationUrl"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Specific Regulation URL</FormLabel>
+              <FormControl>
+                <Input 
+                  {...field} 
+                  type="url" 
+                  placeholder="https://www.ecfr.gov/current/title-34/part-600"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
