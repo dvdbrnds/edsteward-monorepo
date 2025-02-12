@@ -18,7 +18,7 @@ function Router() {
       <Route path="/auth" component={AuthPage} />
       <ProtectedRoute path="/" component={HomePage} />
       <ProtectedRoute path="/regulations" component={RegulationsPage} />
-      <ProtectedRoute path="/regulations/:id" component={RegulationDetailPage} />
+      <ProtectedRoute path="/regulation/:id" component={RegulationDetailPage} />
       <ProtectedRoute path="/notifications" component={NotificationsPage} />
       <ProtectedRoute path="/reports" component={ReportsPage} />
       <Route component={NotFound} />
