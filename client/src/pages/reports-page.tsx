@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { format } from "date-fns";
-import { Download, FileText } from "lucide-react";
+import { Download, FileText, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from "recharts";
 import { useState } from "react";
@@ -49,11 +49,34 @@ function downloadCSV(data: any[], filename: string) {
   window.URL.revokeObjectURL(url);
 }
 
-const CustomPieChart = ({ data, title }: { data: any[], title: string }) => (
+const CustomPieChart = ({ 
+  data, 
+  title, 
+  onSegmentClick,
+  activeFilter,
+}: { 
+  data: any[], 
+  title: string,
+  onSegmentClick: (name: string) => void,
+  activeFilter: string | null,
+}) => (
   <Card>
     <CardHeader>
       <CardTitle className="flex justify-between items-center">
-        {title}
+        <div className="flex items-center gap-2">
+          {title}
+          {activeFilter && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="ml-2"
+              onClick={() => onSegmentClick("")}
+            >
+              <X className="h-4 w-4 mr-1" />
+              Clear Filter
+            </Button>
+          )}
+        </div>
         <Button
           variant="outline"
           size="sm"
@@ -85,13 +108,16 @@ const CustomPieChart = ({ data, title }: { data: any[], title: string }) => (
               endAngle={-270}
               style={{ outline: 'none' }}
               isAnimationActive={false}
+              onClick={(entry) => onSegmentClick(entry.name)}
+              className="cursor-pointer"
             >
-              {data.map((_, index) => (
+              {data.map((entry, index) => (
                 <Cell
                   key={`cell-${index}`}
                   fill={COLORS[index % COLORS.length]}
                   stroke="white"
                   strokeWidth={2}
+                  opacity={activeFilter && activeFilter !== entry.name ? 0.5 : 1}
                 />
               ))}
             </Pie>
@@ -109,7 +135,12 @@ const CustomPieChart = ({ data, title }: { data: any[], title: string }) => (
               height={36}
               iconType="circle"
               formatter={(value) => (
-                <span className="text-[#666666] ml-2">{value}</span>
+                <span 
+                  className={`text-[#666666] ml-2 cursor-pointer ${activeFilter === value ? 'font-bold' : ''}`}
+                  onClick={() => onSegmentClick(value as string)}
+                >
+                  {value}
+                </span>
               )}
               wrapperStyle={{
                 paddingTop: '20px'
@@ -124,6 +155,8 @@ const CustomPieChart = ({ data, title }: { data: any[], title: string }) => (
 
 export default function ReportsPage() {
   const [sortConfig, setSortConfig] = useState<SortConfig>(null);
+  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<string | null>(null);
 
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
@@ -140,19 +173,16 @@ export default function ReportsPage() {
       const aValue = a[sortConfig.key];
       const bValue = b[sortConfig.key];
 
-      // Handle null values
       if (!aValue && !bValue) return 0;
       if (!aValue) return 1;
       if (!bValue) return -1;
 
-      // Special handling for lastUpdated dates
       if (sortConfig.key === 'lastUpdated') {
         const dateA = new Date(aValue as string).getTime();
         const dateB = new Date(bValue as string).getTime();
         return sortConfig.direction === 'asc' ? dateA - dateB : dateB - dateA;
       }
 
-      // Special handling for itemId (numeric string comparison)
       if (sortConfig.key === 'itemId') {
         const numA = parseInt(aValue as string, 10);
         const numB = parseInt(bValue as string, 10);
@@ -161,7 +191,6 @@ export default function ReportsPage() {
         }
       }
 
-      // Default string comparison
       const comparison = String(aValue).localeCompare(String(bValue));
       return sortConfig.direction === 'asc' ? comparison : -comparison;
     });
@@ -237,7 +266,28 @@ export default function ReportsPage() {
     }
   };
 
-  const sortedRegulations = regulations ? sortData(regulations) : [];
+  // Filter regulations based on selected category and status
+  let filteredRegulations = regulations || [];
+
+  if (categoryFilter) {
+    filteredRegulations = filteredRegulations.filter(reg => reg.category === categoryFilter);
+  }
+
+  if (statusFilter) {
+    const statusMap = {
+      "Completed": "completed",
+      "Overdue": "overdue",
+      "Pending": "pending"
+    };
+    const filterStatus = statusMap[statusFilter as keyof typeof statusMap];
+
+    filteredRegulations = filteredRegulations.filter(reg => {
+      const regDeadlines = deadlines?.filter(d => d.regulationId === reg.id) || [];
+      return regDeadlines.some(d => d.status === filterStatus);
+    });
+  }
+
+  const sortedRegulations = sortData(filteredRegulations);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -256,21 +306,34 @@ export default function ReportsPage() {
             <CustomPieChart
               data={categoryChartData}
               title="Regulations by Category"
+              onSegmentClick={setCategoryFilter}
+              activeFilter={categoryFilter}
             />
             <CustomPieChart
               data={deadlineChartData}
               title="Deadlines by Status"
+              onSegmentClick={setStatusFilter}
+              activeFilter={statusFilter}
             />
           </div>
 
           <Card>
             <CardHeader>
               <CardTitle className="flex justify-between items-center">
-                Detailed Regulations Report
+                <div className="flex items-center gap-2">
+                  Detailed Regulations Report
+                  {(categoryFilter || statusFilter) && (
+                    <span className="text-sm font-normal text-gray-500">
+                      {categoryFilter && `Category: ${categoryFilter}`}
+                      {categoryFilter && statusFilter && " | "}
+                      {statusFilter && `Status: ${statusFilter}`}
+                    </span>
+                  )}
+                </div>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => downloadCSV(regulations || [], 'regulations-detailed.csv')}
+                  onClick={() => downloadCSV(sortedRegulations, 'regulations-detailed.csv')}
                 >
                   <Download className="h-4 w-4 mr-2" />
                   Export
@@ -313,7 +376,7 @@ export default function ReportsPage() {
                       <TableCell>{regulation.itemId}</TableCell>
                       <TableCell>{regulation.topic}</TableCell>
                       <TableCell>{regulation.category}</TableCell>
-                      <TableCell className={getStatusColor(regulation.status || "pending")}>
+                      <TableCell>
                         {regulation.lastUpdated
                           ? format(new Date(regulation.lastUpdated), "PP")
                           : "N/A"}
