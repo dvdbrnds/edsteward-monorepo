@@ -17,15 +17,11 @@ import {
 import { format, differenceInDays } from "date-fns";
 
 export default function RegulationDetailPage() {
-  const params = useParams();
+  const { id } = useParams();
   const [_, setLocation] = useLocation();
 
-  // Ensure regulationId is properly parsed and validated
-  const regulationId = (() => {
-    if (!params.id) return null;
-    const parsed = parseInt(params.id, 10);
-    return !isNaN(parsed) && parsed > 0 ? parsed : null;
-  })();
+  // Proper regulation ID validation
+  const regulationId = id ? Number(id) : undefined;
 
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
@@ -42,15 +38,7 @@ export default function RegulationDetailPage() {
         <Navigation />
         <main className="py-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="animate-pulse space-y-4">
-              <div className="h-8 bg-gray-200 rounded w-1/4"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/3"></div>
-              <div className="space-y-3">
-                <div className="h-4 bg-gray-200 rounded"></div>
-                <div className="h-4 bg-gray-200 rounded"></div>
-                <div className="h-4 bg-gray-200 rounded"></div>
-              </div>
-            </div>
+            Loading...
           </div>
         </main>
       </div>
@@ -58,7 +46,7 @@ export default function RegulationDetailPage() {
   }
 
   // Handle invalid regulation ID
-  if (!regulationId) {
+  if (!regulationId || isNaN(regulationId)) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Navigation />
@@ -70,7 +58,7 @@ export default function RegulationDetailPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600 mb-4">
-                  The regulation ID provided ({params.id}) is invalid. Please provide a valid regulation ID.
+                  Please select a valid regulation from the regulations list.
                 </p>
                 <Button
                   variant="outline"
