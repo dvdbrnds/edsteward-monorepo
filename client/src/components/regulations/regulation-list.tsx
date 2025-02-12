@@ -19,9 +19,12 @@ type SortConfig = {
   direction: 'asc' | 'desc';
 } | null;
 
-export default function RegulationList() {
+interface RegulationListProps {
+  categoryFilter: string | null;
+}
+
+export default function RegulationList({ categoryFilter }: RegulationListProps) {
   const [search, setSearch] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState<string>("");
   const [sortConfig, setSortConfig] = useState<SortConfig>(null);
 
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
@@ -158,18 +161,20 @@ export default function RegulationList() {
               className="pl-9"
             />
           </div>
-          <select
-            value={categoryFilter}
-            onChange={(e) => setCategoryFilter(e.target.value)}
-            className="p-2 border rounded-md"
-          >
-            <option value="">All Categories</option>
-            {categories.map((category) => (
-              <option key={category} value={category}>
-                {category}
-              </option>
-            ))}
-          </select>
+          {!categoryFilter && (
+            <select
+              value={categoryFilter || ""}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="p-2 border rounded-md"
+            >
+              <option value="">All Categories</option>
+              {categories.map((category) => (
+                <option key={category} value={category}>
+                  {category}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
 
         <div className="rounded-md border">
