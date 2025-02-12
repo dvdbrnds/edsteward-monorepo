@@ -15,14 +15,18 @@ import { Download, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from "recharts";
 
-// Define custom colors using Moravian's brand colors - same as compliance-overview.tsx
+// Moravian University official brand colors - same as compliance-overview.tsx
 const COLORS = [
-  '#002147', // Deep blue (Moravian primary)
-  '#718096', // Medium grey
-  '#003166', // Navy blue
-  '#a0aec0', // Light grey
-  '#004185', // Royal blue
-  '#4a5568', // Dark grey
+  '#F0F0F0', // Light Grey
+  '#CCCCCC', // Moravian Grey
+  '#E58200', // Gold
+  '#BC204B', // Red
+  '#078CF5', // Accent Blue
+  '#006668', // Deep Green
+  '#00267A', // Moravian Blue
+  '#001B56', // Dark Blue
+  '#666666', // Dark Grey
+  '#000000', // Black
 ];
 
 function downloadCSV(data: any[], filename: string) {
@@ -90,11 +94,11 @@ const CustomPieChart = ({ data, title }: { data: any[], title: string }) => (
             <Tooltip
               contentStyle={{
                 backgroundColor: 'white',
-                border: `1px solid ${COLORS[0]}`,
+                border: `1px solid ${COLORS[6]}`, // Using Moravian Blue for border
                 borderRadius: '4px',
                 padding: '8px'
               }}
-              itemStyle={{ color: COLORS[0] }}
+              itemStyle={{ color: COLORS[6] }} // Using Moravian Blue for text
             />
             <Legend
               verticalAlign="bottom"
@@ -160,7 +164,7 @@ export default function ReportsPage() {
       <main className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center mb-8">
-            <FileText className="h-6 w-6 mr-3 text-[#002147]" />
+            <FileText className="h-6 w-6 mr-3 text-[#00267A]" /> {/* Changed color here */}
             <h1 className="text-3xl font-bold text-gray-900">
               Compliance Reports
             </h1>
