@@ -13,6 +13,7 @@ import {
 import { format } from "date-fns";
 import { Download, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from "recharts";
 
 function downloadCSV(data: any[], filename: string) {
   const headers = Object.keys(data[0]);
@@ -20,7 +21,7 @@ function downloadCSV(data: any[], filename: string) {
     headers.join(','),
     ...data.map(row => headers.map(header => row[header]).join(','))
   ].join('\n');
-  
+
   const blob = new Blob([csvContent], { type: 'text/csv' });
   const url = window.URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -29,6 +30,17 @@ function downloadCSV(data: any[], filename: string) {
   a.click();
   window.URL.revokeObjectURL(url);
 }
+
+// Moravian University color scheme
+const COLORS = [
+  '#002147', // Primary blue
+  '#003166', // Darker blue
+  '#004185', // Medium blue
+  '#0052a4', // Lighter blue
+  '#4a5568', // Dark grey
+  '#718096', // Medium grey
+  '#a0aec0', // Light grey
+];
 
 export default function ReportsPage() {
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
@@ -62,14 +74,25 @@ export default function ReportsPage() {
     return acc;
   }, {} as Record<string, number>) || {};
 
+  // Transform data for PieChart
+  const categoryChartData = Object.entries(categorySummary).map(([name, value]) => ({
+    name,
+    value,
+  }));
+
+  const deadlineChartData = Object.entries(deadlineSummary).map(([name, value]) => ({
+    name,
+    value,
+  }));
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
-      
+
       <main className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center mb-8">
-            <FileText className="h-6 w-6 mr-3 text-blue-500" />
+            <FileText className="h-6 w-6 mr-3 text-[#002147]" />
             <h1 className="text-3xl font-bold text-gray-900">
               Compliance Reports
             </h1>
@@ -98,22 +121,33 @@ export default function ReportsPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Category</TableHead>
-                      <TableHead className="text-right">Count</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {Object.entries(categorySummary).map(([category, count]) => (
-                      <TableRow key={category}>
-                        <TableCell>{category}</TableCell>
-                        <TableCell className="text-right">{count}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                <div className="h-[300px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={categoryChartData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                        label={({ name, percent }) => 
+                          `${name} ${(percent * 100).toFixed(0)}%`
+                        }
+                      >
+                        {categoryChartData.map((_, index) => (
+                          <Cell 
+                            key={`cell-${index}`}
+                            fill={COLORS[index % COLORS.length]} 
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
               </CardContent>
             </Card>
 
@@ -139,22 +173,33 @@ export default function ReportsPage() {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Status</TableHead>
-                      <TableHead className="text-right">Count</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {Object.entries(deadlineSummary).map(([status, count]) => (
-                      <TableRow key={status}>
-                        <TableCell className="capitalize">{status}</TableCell>
-                        <TableCell className="text-right">{count}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
+                <div className="h-[300px] w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={deadlineChartData}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                        label={({ name, percent }) => 
+                          `${name} ${(percent * 100).toFixed(0)}%`
+                        }
+                      >
+                        {deadlineChartData.map((_, index) => (
+                          <Cell 
+                            key={`cell-${index}`}
+                            fill={COLORS[index % COLORS.length]} 
+                          />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
               </CardContent>
             </Card>
           </div>
