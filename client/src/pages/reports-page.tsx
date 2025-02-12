@@ -25,32 +25,70 @@ const COLORS = [
   '#4a5568', // Dark grey
   '#0052a4', // Bright blue
   '#e2e8f0', // Pale grey
-  '#0066cc', // Sky blue
-  '#1a202c', // Almost black
 ];
 
-// Custom render for pie chart slices
-const renderCustomizedLabel = ({ 
-  cx, cy, midAngle, innerRadius, outerRadius, percent, name 
-}: any) => {
-  const RADIAN = Math.PI / 180;
-  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
-  const x = cx + radius * Math.cos(-midAngle * RADIAN);
-  const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-  return (
-    <text
-      x={x}
-      y={y}
-      fill="white"
-      textAnchor={x > cx ? 'start' : 'end'}
-      dominantBaseline="central"
-    >
-      {`${name} ${(percent * 100).toFixed(0)}%`}
-    </text>
-  );
-};
-
+const CustomPieChart = ({ data, title }: { data: any[], title: string }) => (
+  <Card>
+    <CardHeader>
+      <CardTitle className="flex justify-between items-center">
+        {title}
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => downloadCSV(
+            data.map(({ name, value }) => ({
+              [title.toLowerCase().replace(/ /g, '_')]: name,
+              count: value,
+            })),
+            `${title.toLowerCase().replace(/ /g, '-')}.csv`
+          )}
+        >
+          <Download className="h-4 w-4 mr-2" />
+          Export
+        </Button>
+      </CardTitle>
+    </CardHeader>
+    <CardContent>
+      <div className="h-[300px] w-full">
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={data}
+              cx="50%"
+              cy="50%"
+              labelLine={false}
+              outerRadius={80}
+              dataKey="value"
+              fill="none"
+              label={({ name, percent }) => 
+                `${name} ${(percent * 100).toFixed(0)}%`
+              }
+            >
+              {data.map((entry, index) => (
+                <Cell
+                  key={`cell-${index}`}
+                  fill={COLORS[index % COLORS.length]}
+                  stroke="none"
+                />
+              ))}
+            </Pie>
+            <Tooltip 
+              contentStyle={{ 
+                backgroundColor: '#fff',
+                border: `1px solid ${COLORS[0]}`
+              }}
+            />
+            <Legend
+              formatter={(value, entry: any) => (
+                <span style={{ color: entry.color }}>{value}</span>
+              )}
+            />
+          </PieChart>
+        </ResponsiveContainer>
+      </div>
+    </CardContent>
+  </Card>
+);
 
 function downloadCSV(data: any[], filename: string) {
   const headers = Object.keys(data[0]);
@@ -67,8 +105,6 @@ function downloadCSV(data: any[], filename: string) {
   a.click();
   window.URL.revokeObjectURL(url);
 }
-
-// Rest of your imports remain the same...
 
 export default function ReportsPage() {
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
@@ -112,57 +148,6 @@ export default function ReportsPage() {
     name,
     value,
   }));
-
-  const CustomPieChart = ({ data, title }: { data: any[], title: string }) => (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex justify-between items-center">
-          {title}
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => downloadCSV(
-              data.map(({ name, value }) => ({
-                [title.toLowerCase().replace(/ /g, '_')]: name,
-                count: value,
-              })),
-              `${title.toLowerCase().replace(/ /g, '-')}.csv`
-            )}
-          >
-            <Download className="h-4 w-4 mr-2" />
-            Export
-          </Button>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="h-[300px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={data}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                label={renderCustomizedLabel}
-                outerRadius={80}
-                dataKey="value"
-              >
-                {data.map((entry, index) => (
-                  <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
-                    stroke={COLORS[index % COLORS.length]}
-                  />
-                ))}
-              </Pie>
-              <Tooltip />
-              <Legend />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-      </CardContent>
-    </Card>
-  );
 
   return (
     <div className="min-h-screen bg-gray-50">
