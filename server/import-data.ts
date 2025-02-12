@@ -47,20 +47,30 @@ async function importRegulations() {
         record['Regulation 5']
       ].filter(Boolean).join('\n\n');
 
+      // Extract category from Topic field or fallback to default categories based on content
+      let category = "Other";
+      const topic = record['Topic'] || "";
+
+      if (topic.includes("Academic")) category = "Academic Programs";
+      else if (topic.includes("Athletics")) category = "Athletics";
+      else if (topic.includes("Financial") || topic.includes("Accounting")) category = "Accounting";
+      else if (topic.includes("Admission")) category = "Admissions";
+      else if (topic.includes("Safety") || topic.includes("Security")) category = "Campus Safety";
+
       const regulation: InsertRegulation = {
         itemId: record['Item ID'] || String(record['Topic ID'] || ""),
-        topic: record['Topic'] || "",
+        topic: topic,
         statute: record['Statute Name'] || statutes,
         statuteIds: record['Statute IDs'] || "",
         summary: record['Statutory Summary'] || "",
         requirements: requirements || record['Reporting Requirements'] || "",
         deadlines: record['Deadlines'] || "",
-        category: "Academic Programs", // Default category
+        category: category,
         lastUpdated: record['Last Updated'] ? new Date(record['Last Updated']) : new Date()
       };
 
       await storage.createRegulation(regulation);
-      console.log(`Imported regulation: ${regulation.itemId}`);
+      console.log(`Imported regulation: ${regulation.itemId} (${category})`);
     } catch (error) {
       console.error(`Failed to import record:`, error);
       console.error('Record data:', record);
