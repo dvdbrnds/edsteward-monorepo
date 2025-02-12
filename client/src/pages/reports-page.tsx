@@ -15,6 +15,43 @@ import { Download, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from "recharts";
 
+// Define custom colors using Moravian's brand colors
+const COLORS = [
+  '#002147', // Deep blue (Moravian primary)
+  '#718096', // Medium grey
+  '#003166', // Navy blue
+  '#a0aec0', // Light grey
+  '#004185', // Royal blue
+  '#4a5568', // Dark grey
+  '#0052a4', // Bright blue
+  '#e2e8f0', // Pale grey
+  '#0066cc', // Sky blue
+  '#1a202c', // Almost black
+];
+
+// Custom render for pie chart slices
+const renderCustomizedLabel = ({ 
+  cx, cy, midAngle, innerRadius, outerRadius, percent, name 
+}: any) => {
+  const RADIAN = Math.PI / 180;
+  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+  const x = cx + radius * Math.cos(-midAngle * RADIAN);
+  const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+  return (
+    <text
+      x={x}
+      y={y}
+      fill="white"
+      textAnchor={x > cx ? 'start' : 'end'}
+      dominantBaseline="central"
+    >
+      {`${name} ${(percent * 100).toFixed(0)}%`}
+    </text>
+  );
+};
+
+
 function downloadCSV(data: any[], filename: string) {
   const headers = Object.keys(data[0]);
   const csvContent = [
@@ -31,19 +68,7 @@ function downloadCSV(data: any[], filename: string) {
   window.URL.revokeObjectURL(url);
 }
 
-// Change the COLORS array to include more distinct shades
-const COLORS = [
-  '#002147', // Deep blue (Moravian primary)
-  '#718096', // Medium grey
-  '#003166', // Navy blue
-  '#a0aec0', // Light grey
-  '#004185', // Royal blue
-  '#4a5568', // Dark grey
-  '#0052a4', // Bright blue
-  '#e2e8f0', // Pale grey
-  '#0066cc', // Sky blue
-  '#1a202c', // Almost black
-];
+// Rest of your imports remain the same...
 
 export default function ReportsPage() {
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
@@ -88,6 +113,57 @@ export default function ReportsPage() {
     value,
   }));
 
+  const CustomPieChart = ({ data, title }: { data: any[], title: string }) => (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex justify-between items-center">
+          {title}
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => downloadCSV(
+              data.map(({ name, value }) => ({
+                [title.toLowerCase().replace(/ /g, '_')]: name,
+                count: value,
+              })),
+              `${title.toLowerCase().replace(/ /g, '-')}.csv`
+            )}
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Export
+          </Button>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="h-[300px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={data}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                label={renderCustomizedLabel}
+                outerRadius={80}
+                dataKey="value"
+              >
+                {data.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                    stroke={COLORS[index % COLORS.length]}
+                  />
+                ))}
+              </Pie>
+              <Tooltip />
+              <Legend />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
@@ -102,109 +178,14 @@ export default function ReportsPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 mb-8">
-            {/* Category Summary */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex justify-between items-center">
-                  Regulations by Category
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => downloadCSV(
-                      Object.entries(categorySummary).map(([category, count]) => ({
-                        category,
-                        count,
-                      })),
-                      'regulations-by-category.csv'
-                    )}
-                  >
-                    <Download className="h-4 w-4 mr-2" />
-                    Export
-                  </Button>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[300px] w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={categoryChartData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                        label={({ name, percent }) =>
-                          `${name} ${(percent * 100).toFixed(0)}%`
-                        }
-                      >
-                        {categoryChartData.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={COLORS[index % COLORS.length]}
-                          />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                      <Legend />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Deadline Summary */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex justify-between items-center">
-                  Deadlines by Status
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => downloadCSV(
-                      Object.entries(deadlineSummary).map(([status, count]) => ({
-                        status,
-                        count,
-                      })),
-                      'deadlines-by-status.csv'
-                    )}
-                  >
-                    <Download className="h-4 w-4 mr-2" />
-                    Export
-                  </Button>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="h-[300px] w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={deadlineChartData}
-                        cx="50%"
-                        cy="50%"
-                        labelLine={false}
-                        outerRadius={80}
-                        fill="#8884d8"
-                        dataKey="value"
-                        label={({ name, percent }) =>
-                          `${name} ${(percent * 100).toFixed(0)}%`
-                        }
-                      >
-                        {deadlineChartData.map((entry, index) => (
-                          <Cell
-                            key={`cell-${index}`}
-                            fill={COLORS[index % COLORS.length]}
-                          />
-                        ))}
-                      </Pie>
-                      <Tooltip />
-                      <Legend />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-              </CardContent>
-            </Card>
+            <CustomPieChart 
+              data={categoryChartData} 
+              title="Regulations by Category" 
+            />
+            <CustomPieChart 
+              data={deadlineChartData} 
+              title="Deadlines by Status" 
+            />
           </div>
 
           {/* Detailed Regulations Table */}
