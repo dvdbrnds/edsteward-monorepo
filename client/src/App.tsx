@@ -7,6 +7,7 @@ import HomePage from "@/pages/home-page";
 import NotFound from "@/pages/not-found";
 import AuthPage from "@/pages/auth-page";
 import RegulationsPage from "@/pages/regulations-page";
+import RegulationDetailPage from "@/pages/regulation-detail-page";
 import NotificationsPage from "@/pages/notifications-page";
 import ReportsPage from "@/pages/reports-page";
 import { ProtectedRoute } from "./lib/protected-route";
@@ -16,6 +17,7 @@ function Router() {
     <Switch>
       <ProtectedRoute path="/" component={HomePage} />
       <ProtectedRoute path="/regulations" component={RegulationsPage} />
+      <ProtectedRoute path="/regulations/:id" component={RegulationDetailPage} />
       <ProtectedRoute path="/notifications" component={NotificationsPage} />
       <ProtectedRoute path="/reports" component={ReportsPage} />
       <Route path="/auth" component={AuthPage} />
