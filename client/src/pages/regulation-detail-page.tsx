@@ -18,25 +18,7 @@ import { format, differenceInDays } from "date-fns";
 
 export default function RegulationDetailPage() {
   const params = useParams();
-  const id = params.id;
-
-  // Guard against missing ID
-  if (!id) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Navigation />
-        <main className="py-10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-bold text-red-600">
-              Invalid regulation ID
-            </h1>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  const regulationId = parseInt(id);
+  const regulationId = parseInt(params.id || "0");
 
   const { data: regulation, isLoading: regulationLoading } = useQuery<Regulation>({
     queryKey: ["/api/regulations", regulationId],
@@ -52,7 +34,15 @@ export default function RegulationDetailPage() {
         <Navigation />
         <main className="py-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            Loading...
+            <div className="animate-pulse space-y-4">
+              <div className="h-8 bg-gray-200 rounded w-1/4"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+              <div className="space-y-3">
+                <div className="h-4 bg-gray-200 rounded"></div>
+                <div className="h-4 bg-gray-200 rounded"></div>
+                <div className="h-4 bg-gray-200 rounded"></div>
+              </div>
+            </div>
           </div>
         </main>
       </div>
@@ -65,9 +55,22 @@ export default function RegulationDetailPage() {
         <Navigation />
         <main className="py-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h1 className="text-3xl font-bold text-red-600">
-              Regulation not found
-            </h1>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-red-600">Regulation Not Found</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 mb-4">
+                  The regulation you're looking for doesn't exist or has been removed.
+                </p>
+                <Button
+                  variant="outline"
+                  onClick={() => window.history.back()}
+                >
+                  Go Back
+                </Button>
+              </CardContent>
+            </Card>
           </div>
         </main>
       </div>
