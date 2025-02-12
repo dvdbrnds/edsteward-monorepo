@@ -13,6 +13,7 @@ import {
 import { useState } from "react";
 import { Search, ExternalLink, CheckCircle, AlertCircle, Clock } from "lucide-react";
 import { differenceInDays, format } from "date-fns";
+import { useLocation } from "wouter";
 
 interface RegulationListProps {
   categoryFilter: string | null;
@@ -27,6 +28,7 @@ type StatusType = {
 
 export default function RegulationList({ categoryFilter }: RegulationListProps) {
   const [search, setSearch] = useState("");
+  const [_, navigate] = useLocation();
 
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
@@ -128,14 +130,12 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
             <TableBody>
               {filteredRegulations.map((regulation) => {
                 const status = getDeadlineStatus(regulation.id);
-                console.log('Regulation row:', { id: regulation.id, topic: regulation.topic });
                 return (
                   <TableRow 
                     key={regulation.id}
                     className="cursor-pointer hover:bg-gray-50"
                     onClick={() => {
-                      console.log('Clicked regulation:', regulation.id);
-                      window.location.href = `/regulation/${regulation.id}`;
+                      navigate(`/regulation/${regulation.id}`);
                     }}
                   >
                     <TableCell className="font-medium">
