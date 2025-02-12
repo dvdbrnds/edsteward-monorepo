@@ -11,9 +11,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { format } from "date-fns";
-import { Download, FileText } from "lucide-react";
+import { Download, FileText, ChevronUp, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from "recharts";
+import { useState } from "react";
 
 // Moravian University official brand colors - same as compliance-overview.tsx
 const COLORS = [
@@ -26,6 +27,11 @@ const COLORS = [
   '#BC204B', // Red
   '#006668', // Deep Green
 ];
+
+type SortConfig = {
+  key: keyof Regulation;
+  direction: 'asc' | 'desc';
+} | null;
 
 function downloadCSV(data: any[], filename: string) {
   const headers = Object.keys(data[0]);
@@ -117,6 +123,8 @@ const CustomPieChart = ({ data, title }: { data: any[], title: string }) => (
 );
 
 export default function ReportsPage() {
+  const [sortConfig, setSortConfig] = useState<SortConfig>(null);
+
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
   });
@@ -124,6 +132,38 @@ export default function ReportsPage() {
   const { data: deadlines, isLoading: deadlinesLoading } = useQuery<Deadline[]>({
     queryKey: ["/api/deadlines"],
   });
+
+  const sortData = (data: Regulation[]) => {
+    if (!sortConfig) return data;
+
+    return [...data].sort((a, b) => {
+      if (sortConfig.key === 'lastUpdated') {
+        const dateA = a[sortConfig.key] ? new Date(a[sortConfig.key]!).getTime() : 0;
+        const dateB = b[sortConfig.key] ? new Date(b[sortConfig.key]!).getTime() : 0;
+        return sortConfig.direction === 'asc' ? dateA - dateB : dateB - dateA;
+      }
+
+      if (a[sortConfig.key] < b[sortConfig.key]) {
+        return sortConfig.direction === 'asc' ? -1 : 1;
+      }
+      if (a[sortConfig.key] > b[sortConfig.key]) {
+        return sortConfig.direction === 'asc' ? 1 : -1;
+      }
+      return 0;
+    });
+  };
+
+  const requestSort = (key: keyof Regulation) => {
+    setSortConfig(current => {
+      if (!current || current.key !== key) {
+        return { key, direction: 'asc' };
+      }
+      if (current.direction === 'asc') {
+        return { key, direction: 'desc' };
+      }
+      return null;
+    });
+  };
 
   if (regulationsLoading || deadlinesLoading) {
     return (
@@ -157,6 +197,17 @@ export default function ReportsPage() {
     name,
     value,
   }));
+
+  const sortedRegulations = regulations ? sortData(regulations) : [];
+
+  const getSortIcon = (key: keyof Regulation) => {
+    if (!sortConfig || sortConfig.key !== key) {
+      return <ChevronUp className="h-4 w-4 text-gray-400" />;
+    }
+    return sortConfig.direction === 'asc' 
+      ? <ChevronUp className="h-4 w-4" />
+      : <ChevronDown className="h-4 w-4" />;
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -201,14 +252,42 @@ export default function ReportsPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Topic</TableHead>
-                    <TableHead>Category</TableHead>
-                    <TableHead>Last Updated</TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-gray-50"
+                      onClick={() => requestSort('itemId')}
+                    >
+                      <div className="flex items-center">
+                        ID {getSortIcon('itemId')}
+                      </div>
+                    </TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-gray-50"
+                      onClick={() => requestSort('topic')}
+                    >
+                      <div className="flex items-center">
+                        Topic {getSortIcon('topic')}
+                      </div>
+                    </TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-gray-50"
+                      onClick={() => requestSort('category')}
+                    >
+                      <div className="flex items-center">
+                        Category {getSortIcon('category')}
+                      </div>
+                    </TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-gray-50"
+                      onClick={() => requestSort('lastUpdated')}
+                    >
+                      <div className="flex items-center">
+                        Last Updated {getSortIcon('lastUpdated')}
+                      </div>
+                    </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {regulations?.map((regulation) => (
+                  {sortedRegulations.map((regulation) => (
                     <TableRow key={regulation.id}>
                       <TableCell>{regulation.itemId}</TableCell>
                       <TableCell>{regulation.topic}</TableCell>
