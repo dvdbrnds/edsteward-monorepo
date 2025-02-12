@@ -18,7 +18,9 @@ import { format, differenceInDays } from "date-fns";
 
 export default function RegulationDetailPage() {
   const params = useParams();
-  const regulationId = parseInt(params.id || "0");
+  const regulationId = params.id ? parseInt(params.id, 10) : null;
+
+  console.log("Regulation ID from params:", regulationId); // Debug log
 
   const { data: regulations, isLoading: regulationLoading } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
@@ -27,6 +29,8 @@ export default function RegulationDetailPage() {
   const { data: deadlines, isLoading: deadlinesLoading } = useQuery<Deadline[]>({
     queryKey: ["/api/deadlines"],
   });
+
+  console.log("Fetched regulations:", regulations); // Debug log
 
   if (regulationLoading || deadlinesLoading) {
     return (
@@ -49,7 +53,37 @@ export default function RegulationDetailPage() {
     );
   }
 
-  const regulation = regulations?.find(r => r.id === regulationId);
+  // Add type checking and null safety
+  if (!regulationId || !regulations) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        <main className="py-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-red-600">Invalid Regulation ID</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 mb-4">
+                  The regulation ID is invalid or missing.
+                </p>
+                <Button
+                  variant="outline"
+                  onClick={() => window.history.back()}
+                >
+                  Go Back
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  const regulation = regulations.find(r => r.id === regulationId);
+  console.log("Found regulation:", regulation); // Debug log
 
   if (!regulation) {
     return (
@@ -63,7 +97,7 @@ export default function RegulationDetailPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600 mb-4">
-                  The regulation you're looking for doesn't exist or has been removed.
+                  The regulation you're looking for (ID: {regulationId}) doesn't exist or has been removed.
                 </p>
                 <Button
                   variant="outline"
