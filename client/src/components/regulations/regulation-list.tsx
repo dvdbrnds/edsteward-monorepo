@@ -129,8 +129,20 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
             <TableBody>
               {filteredRegulations.map((regulation) => {
                 const status = getDeadlineStatus(regulation.id);
+
+                // Debug link generation
+                console.log('RegulationList - Generating link for regulation:', {
+                  id: regulation.id,
+                  topic: regulation.topic,
+                  url: `/regulation/${regulation.id}`
+                });
+
                 return (
-                  <Link key={regulation.id} href={`/regulation/${regulation.id}`}>
+                  <Link 
+                    key={regulation.id} 
+                    href={`/regulation/${regulation.id}`}
+                    className="block" 
+                  >
                     <TableRow className="cursor-pointer hover:bg-gray-50">
                       <TableCell className="font-medium">
                         {regulation.itemId}

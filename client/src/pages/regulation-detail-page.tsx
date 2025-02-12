@@ -24,8 +24,11 @@ type StatusType = {
 };
 
 export default function RegulationDetailPage() {
-  const { id } = useParams();
+  const params = useParams();
   const [_, navigate] = useLocation();
+
+  // Debug params
+  console.log('RegulationDetailPage - URL Params:', params);
 
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
@@ -35,8 +38,12 @@ export default function RegulationDetailPage() {
     queryKey: ["/api/deadlines"],
   });
 
-  console.log('Regulation Detail Page - Params:', { id });
-  console.log('Regulations loaded:', regulations);
+  // Debug data loading
+  console.log('RegulationDetailPage - Data:', {
+    regulations: regulations?.length || 0,
+    deadlines: deadlines?.length || 0,
+    loading: { regulations: regulationsLoading, deadlines: deadlinesLoading }
+  });
 
   if (regulationsLoading || deadlinesLoading || !regulations) {
     return (
@@ -51,11 +58,19 @@ export default function RegulationDetailPage() {
     );
   }
 
-  // Ensure proper type conversion for comparison
-  const regulationId = parseInt(id!, 10);
+  // Get regulation ID from params and find regulation
+  const regulationId = parseInt(params.id!, 10);
   const regulation = regulations.find(r => r.id === regulationId);
 
-  console.log('Looking for regulation:', { regulationId, found: !!regulation });
+  // Debug regulation finding
+  console.log('RegulationDetailPage - Finding Regulation:', {
+    regulationId,
+    foundRegulation: regulation ? {
+      id: regulation.id,
+      topic: regulation.topic
+    } : null,
+    allRegulationIds: regulations.map(r => r.id)
+  });
 
   if (!regulation) {
     return (
@@ -69,7 +84,7 @@ export default function RegulationDetailPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600 mb-4">
-                  The regulation could not be found. Please select a regulation from the list.
+                  The regulation with ID {regulationId} could not be found.
                 </p>
                 <Button
                   variant="outline"
