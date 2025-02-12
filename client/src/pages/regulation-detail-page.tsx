@@ -22,7 +22,13 @@ export default function RegulationDetailPage() {
 
   const { data: regulation, isLoading: regulationLoading } = useQuery<Regulation>({
     queryKey: ["/api/regulations", regulationId],
-    queryFn: () => fetch(`/api/regulations/${regulationId}`).then(res => res.json()),
+    queryFn: () => fetch(`/api/regulations/${regulationId}`).then(res => {
+      if (!res.ok) {
+        throw new Error('Failed to fetch regulation');
+      }
+      return res.json();
+    }),
+    enabled: regulationId > 0,
   });
 
   const { data: deadlines, isLoading: deadlinesLoading } = useQuery<Deadline[]>({
