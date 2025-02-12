@@ -2,9 +2,12 @@ import { useAuth } from "@/hooks/use-auth";
 import Navigation from "@/components/layout/navigation";
 import ComplianceOverview from "@/components/dashboard/compliance-overview";
 import UpcomingDeadlines from "@/components/dashboard/upcoming-deadlines";
+import RegulationList from "@/components/regulations/regulation-list";
+import { useState } from "react";
 
 export default function HomePage() {
   const { user } = useAuth();
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -16,10 +19,24 @@ export default function HomePage() {
             Welcome, {user?.username}
           </h1>
 
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-            <ComplianceOverview />
-            <UpcomingDeadlines />
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 mb-8">
+            <ComplianceOverview 
+              onCategorySelect={setSelectedCategory}
+              selectedCategory={selectedCategory}
+            />
+            <UpcomingDeadlines 
+              categoryFilter={selectedCategory}
+            />
           </div>
+
+          {selectedCategory && (
+            <div className="mt-8">
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                {selectedCategory} Regulations
+              </h2>
+              <RegulationList categoryFilter={selectedCategory} />
+            </div>
+          )}
         </div>
       </main>
     </div>

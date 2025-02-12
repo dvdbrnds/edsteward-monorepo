@@ -9,6 +9,8 @@ import {
   Legend,
   Tooltip,
 } from "recharts";
+import { Button } from "@/components/ui/button";
+import { X } from "lucide-react";
 
 // Moravian University official brand colors in priority order
 const COLORS = [
@@ -22,7 +24,12 @@ const COLORS = [
   '#006668', // Deep Green
 ];
 
-export default function ComplianceOverview() {
+interface ComplianceOverviewProps {
+  onCategorySelect: (category: string | null) => void;
+  selectedCategory: string | null;
+}
+
+export default function ComplianceOverview({ onCategorySelect, selectedCategory }: ComplianceOverviewProps) {
   const { data: regulations, isLoading } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
   });
@@ -51,7 +58,22 @@ export default function ComplianceOverview() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Compliance Overview</CardTitle>
+        <CardTitle className="flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            Compliance Overview
+            {selectedCategory && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="ml-2"
+                onClick={() => onCategorySelect(null)}
+              >
+                <X className="h-4 w-4 mr-1" />
+                Clear Filter
+              </Button>
+            )}
+          </div>
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="h-[300px]">
@@ -69,31 +91,39 @@ export default function ComplianceOverview() {
                 endAngle={-270}
                 style={{ outline: 'none' }}
                 isAnimationActive={false}
+                onClick={(entry) => onCategorySelect(entry.name)}
+                className="cursor-pointer"
               >
-                {data.map((_, index) => (
+                {data.map((entry, index) => (
                   <Cell
                     key={`cell-${index}`}
                     fill={COLORS[index % COLORS.length]}
                     stroke="white"
                     strokeWidth={2}
+                    opacity={selectedCategory && selectedCategory !== entry.name ? 0.5 : 1}
                   />
                 ))}
               </Pie>
               <Tooltip 
                 contentStyle={{
                   backgroundColor: 'white',
-                  border: `1px solid ${COLORS[1]}`, // Using Moravian Blue for border
+                  border: `1px solid ${COLORS[1]}`,
                   borderRadius: '4px',
                   padding: '8px'
                 }}
-                itemStyle={{ color: COLORS[1] }} // Using Moravian Blue for text
+                itemStyle={{ color: COLORS[1] }}
               />
               <Legend
                 verticalAlign="bottom"
                 height={36}
                 iconType="circle"
                 formatter={(value) => (
-                  <span className="text-[#666666] ml-2">{value}</span>
+                  <span 
+                    className={`text-[#666666] ml-2 cursor-pointer ${selectedCategory === value ? 'font-bold' : ''}`}
+                    onClick={() => onCategorySelect(value as string)}
+                  >
+                    {value}
+                  </span>
                 )}
                 wrapperStyle={{
                   paddingTop: '20px'

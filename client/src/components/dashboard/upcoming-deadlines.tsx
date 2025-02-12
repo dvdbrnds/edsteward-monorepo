@@ -1,15 +1,23 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
-import type { Deadline } from "@shared/schema";
+import type { Deadline, Regulation } from "@shared/schema";
 import { format, differenceInDays } from "date-fns";
 import { AlertCircle, CheckCircle, Clock } from "lucide-react";
 
-export default function UpcomingDeadlines() {
-  const { data: deadlines, isLoading } = useQuery<Deadline[]>({
+interface UpcomingDeadlinesProps {
+  categoryFilter: string | null;
+}
+
+export default function UpcomingDeadlines({ categoryFilter }: UpcomingDeadlinesProps) {
+  const { data: deadlines, isLoading: deadlinesLoading } = useQuery<Deadline[]>({
     queryKey: ["/api/deadlines"],
   });
 
-  if (isLoading || !deadlines) {
+  const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
+    queryKey: ["/api/regulations"],
+  });
+
+  if (deadlinesLoading || regulationsLoading || !deadlines || !regulations) {
     return (
       <Card>
         <CardHeader>
@@ -54,20 +62,40 @@ export default function UpcomingDeadlines() {
     };
   };
 
-  const sortedDeadlines = [...deadlines].sort(
+  let filteredDeadlines = [...deadlines];
+
+  if (categoryFilter) {
+    const regulationIds = regulations
+      .filter(reg => reg.category === categoryFilter)
+      .map(reg => reg.id);
+
+    filteredDeadlines = filteredDeadlines.filter(deadline => 
+      regulationIds.includes(deadline.regulationId)
+    );
+  }
+
+  const sortedDeadlines = filteredDeadlines.sort(
     (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
   );
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Upcoming Deadlines</CardTitle>
+        <CardTitle>
+          Upcoming Deadlines
+          {categoryFilter && (
+            <span className="text-sm font-normal text-gray-500 ml-2">
+              ({categoryFilter})
+            </span>
+          )}
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           {sortedDeadlines.map((deadline) => {
             const { icon, bgColor, textColor } = getStatusDetails(deadline);
             const daysUntilDue = differenceInDays(new Date(deadline.dueDate), new Date());
+            const regulation = regulations.find(r => r.id === deadline.regulationId);
 
             return (
               <div
@@ -78,7 +106,7 @@ export default function UpcomingDeadlines() {
                   {icon}
                   <div>
                     <p className="font-medium text-gray-900">
-                      Regulation #{deadline.regulationId}
+                      {regulation?.topic || `Regulation #${deadline.regulationId}`}
                     </p>
                     <p className="text-sm text-gray-500">
                       Due: {format(new Date(deadline.dueDate), "PP")}
@@ -104,6 +132,11 @@ export default function UpcomingDeadlines() {
               </div>
             );
           })}
+          {sortedDeadlines.length === 0 && (
+            <div className="text-center text-gray-500">
+              No deadlines {categoryFilter ? `for ${categoryFilter}` : ''} found
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
