@@ -26,8 +26,8 @@ export default function RegulationDetailPage() {
   const { id } = useParams();
   const [_, setLocation] = useLocation();
 
-  // Proper regulation ID validation
-  const regulationId = id ? parseInt(id, 10) : undefined;
+  // Improved regulation ID validation
+  const regulationId = id ? parseInt(id, 10) : null;
 
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
@@ -51,8 +51,8 @@ export default function RegulationDetailPage() {
     );
   }
 
-  // Handle invalid regulation ID
-  if (!regulationId || isNaN(regulationId)) {
+  // Handle invalid or missing regulation ID
+  if (!regulationId) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Navigation />
@@ -64,7 +64,7 @@ export default function RegulationDetailPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600 mb-4">
-                  The regulation ID provided ({id}) is invalid. Please provide a valid regulation ID.
+                  The regulation ID is missing or invalid. Please select a regulation from the list.
                 </p>
                 <Button
                   variant="outline"
