@@ -9,8 +9,9 @@ import type {
   Deadline,
   InsertDeadline,
 } from "@shared/schema";
-import session from "express-session";
 import { db } from "./db";
+import { eq } from "drizzle-orm";
+import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
 
@@ -49,18 +50,18 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUser(id: number): Promise<User | undefined> {
-    const results = await db.select().from(users).where(({ id: userId }) => userId.eq(id));
-    return results[0];
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const results = await db.select().from(users).where(({ username: un }) => un.eq(username));
-    return results[0];
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user;
   }
 
-  async createUser(user: InsertUser): Promise<User> {
-    const results = await db.insert(users).values(user).returning();
-    return results[0];
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db.insert(users).values(insertUser).returning();
+    return user;
   }
 
   async getRegulations(): Promise<Regulation[]> {
@@ -68,17 +69,23 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createRegulation(regulation: InsertRegulation): Promise<Regulation> {
-    const results = await db.insert(regulations).values(regulation).returning();
-    return results[0];
+    const [newRegulation] = await db.insert(regulations).values(regulation).returning();
+    return newRegulation;
   }
 
   async getNotificationsByUser(userId: number): Promise<Notification[]> {
-    return await db.select().from(notifications).where(({ userId: uid }) => uid.eq(userId));
+    return await db
+      .select()
+      .from(notifications)
+      .where(eq(notifications.userId, userId));
   }
 
   async createNotification(notification: InsertNotification): Promise<Notification> {
-    const results = await db.insert(notifications).values(notification).returning();
-    return results[0];
+    const [newNotification] = await db
+      .insert(notifications)
+      .values(notification)
+      .returning();
+    return newNotification;
   }
 
   async getDeadlines(): Promise<Deadline[]> {
@@ -86,8 +93,8 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createDeadline(deadline: InsertDeadline): Promise<Deadline> {
-    const results = await db.insert(deadlines).values(deadline).returning();
-    return results[0];
+    const [newDeadline] = await db.insert(deadlines).values(deadline).returning();
+    return newDeadline;
   }
 }
 

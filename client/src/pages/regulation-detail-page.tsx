@@ -35,6 +35,9 @@ export default function RegulationDetailPage() {
     queryKey: ["/api/deadlines"],
   });
 
+  console.log('Regulation Detail Page - Params:', { id });
+  console.log('Regulations loaded:', regulations);
+
   if (regulationsLoading || deadlinesLoading || !regulations) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -48,8 +51,11 @@ export default function RegulationDetailPage() {
     );
   }
 
+  // Ensure proper type conversion for comparison
   const regulationId = parseInt(id!, 10);
   const regulation = regulations.find(r => r.id === regulationId);
+
+  console.log('Looking for regulation:', { regulationId, found: !!regulation });
 
   if (!regulation) {
     return (
