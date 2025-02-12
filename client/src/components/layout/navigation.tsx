@@ -37,9 +37,14 @@ export default function Navigation() {
                 alt="Moravian University Logo" 
                 className="h-8"
               />
-              <span className="ml-3 text-xl font-bold text-white">
-                Compliance Portal
-              </span>
+              <div className="ml-3">
+                <span className="text-xl font-bold text-white">
+                  Compliance Portal
+                </span>
+                <span className="text-xs text-gray-300 ml-2">
+                  Alpha v0.1.0
+                </span>
+              </div>
             </div>
 
             {/* Navigation Links */}
@@ -66,8 +71,11 @@ export default function Navigation() {
             </div>
           </div>
 
-          {/* Logout Button */}
-          <div className="flex items-center">
+          {/* User Info and Logout */}
+          <div className="flex items-center space-x-4">
+            <span className="text-sm text-gray-300 hidden sm:block">
+              {user?.username}
+            </span>
             <Button
               variant="ghost"
               onClick={() => logoutMutation.mutate()}
