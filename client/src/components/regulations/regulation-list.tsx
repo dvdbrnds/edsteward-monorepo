@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import type { Regulation } from "@shared/schema";
+import type { Regulation, Deadline } from "@shared/schema";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
@@ -11,7 +11,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useState } from "react";
-import { Search, ExternalLink } from "lucide-react";
+import { Search, ExternalLink, CheckCircle, AlertCircle, Clock } from "lucide-react";
+import { differenceInDays, format } from "date-fns";
 
 type SortConfig = {
   key: keyof Regulation;
@@ -23,8 +24,12 @@ export default function RegulationList() {
   const [categoryFilter, setCategoryFilter] = useState<string>("");
   const [sortConfig, setSortConfig] = useState<SortConfig>(null);
 
-  const { data: regulations, isLoading } = useQuery<Regulation[]>({
+  const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
+  });
+
+  const { data: deadlines, isLoading: deadlinesLoading } = useQuery<Deadline[]>({
+    queryKey: ["/api/deadlines"],
   });
 
   const sortData = (data: Regulation[]) => {
@@ -70,6 +75,55 @@ export default function RegulationList() {
     return "cursor-pointer hover:bg-gray-50 font-bold";
   };
 
+  const getDeadlineStatus = (regulationId: number) => {
+    if (!deadlines) return null;
+
+    const regulationDeadlines = deadlines.filter(d => d.regulationId === regulationId);
+    if (regulationDeadlines.length === 0) return null;
+
+    // Get the nearest deadline
+    const sortedDeadlines = regulationDeadlines.sort(
+      (a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
+    );
+
+    const nextDeadline = sortedDeadlines[0];
+    const daysUntilDue = differenceInDays(new Date(nextDeadline.dueDate), new Date());
+
+    if (nextDeadline.status === "completed") {
+      return {
+        icon: <CheckCircle className="h-4 w-4 text-green-500" />,
+        label: "Completed",
+        className: "text-green-600",
+        date: format(new Date(nextDeadline.dueDate), "PP")
+      };
+    }
+
+    if (nextDeadline.status === "overdue" || daysUntilDue < 0) {
+      return {
+        icon: <AlertCircle className="h-4 w-4 text-red-500" />,
+        label: "Overdue",
+        className: "text-red-600",
+        date: format(new Date(nextDeadline.dueDate), "PP")
+      };
+    }
+
+    if (daysUntilDue <= 7) {
+      return {
+        icon: <Clock className="h-4 w-4 text-yellow-500" />,
+        label: "Due Soon",
+        className: "text-yellow-600",
+        date: `${format(new Date(nextDeadline.dueDate), "PP")} (${daysUntilDue} ${daysUntilDue === 1 ? 'day' : 'days'} remaining)`
+      };
+    }
+
+    return {
+      icon: <Clock className="h-4 w-4 text-blue-500" />,
+      label: "Upcoming",
+      className: "text-blue-600",
+      date: format(new Date(nextDeadline.dueDate), "PP")
+    };
+  };
+
   const filteredRegulations = regulations?.filter((reg) => {
     const matchesSearch =
       reg.topic.toLowerCase().includes(search.toLowerCase()) ||
@@ -85,7 +139,7 @@ export default function RegulationList() {
     new Set(regulations?.map((reg) => reg.category))
   ).sort();
 
-  if (isLoading) {
+  if (regulationsLoading || deadlinesLoading) {
     return <div>Loading...</div>;
   }
 
@@ -147,34 +201,46 @@ export default function RegulationList() {
                   Category
                 </TableHead>
                 <TableHead>Requirements</TableHead>
-                <TableHead>Deadlines</TableHead>
+                <TableHead>Next Deadline</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedRegulations.map((regulation) => (
-                <TableRow key={regulation.id}>
-                  <TableCell className="font-medium">{regulation.itemId}</TableCell>
-                  <TableCell>{regulation.topic}</TableCell>
-                  <TableCell>{regulation.statute}</TableCell>
-                  <TableCell>{regulation.category}</TableCell>
-                  <TableCell>
-                    {regulation.requirements && regulation.regulationUrl ? (
-                      <a
-                        href={regulation.regulationUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[#00267A] hover:text-[#003166] underline decoration-[#00267A] hover:decoration-[#003166] inline-flex items-center gap-2 group"
-                      >
-                        <span className="break-words">{regulation.requirements}</span>
-                        <ExternalLink className="h-3 w-3 text-[#00267A] group-hover:text-[#003166] transition-colors" />
-                      </a>
-                    ) : regulation.requirements || "N/A"}
-                  </TableCell>
-                  <TableCell>
-                    {regulation.deadlines || "No deadlines"}
-                  </TableCell>
-                </TableRow>
-              ))}
+              {sortedRegulations.map((regulation) => {
+                const deadlineStatus = getDeadlineStatus(regulation.id);
+                return (
+                  <TableRow key={regulation.id}>
+                    <TableCell className="font-medium">{regulation.itemId}</TableCell>
+                    <TableCell>{regulation.topic}</TableCell>
+                    <TableCell>{regulation.statute}</TableCell>
+                    <TableCell>{regulation.category}</TableCell>
+                    <TableCell>
+                      {regulation.requirements && regulation.regulationUrl ? (
+                        <a
+                          href={regulation.regulationUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#00267A] hover:text-[#003166] underline decoration-[#00267A] hover:decoration-[#003166] inline-flex items-center gap-2 group"
+                        >
+                          <span className="break-words">{regulation.requirements}</span>
+                          <ExternalLink className="h-3 w-3 text-[#00267A] group-hover:text-[#003166] transition-colors" />
+                        </a>
+                      ) : regulation.requirements || "N/A"}
+                    </TableCell>
+                    <TableCell>
+                      {deadlineStatus ? (
+                        <div className="flex items-center gap-2">
+                          {deadlineStatus.icon}
+                          <span className={deadlineStatus.className}>
+                            {deadlineStatus.label}: {deadlineStatus.date}
+                          </span>
+                        </div>
+                      ) : (
+                        "No deadlines"
+                      )}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </div>
