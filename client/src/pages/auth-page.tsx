@@ -49,7 +49,7 @@ export default function AuthPage() {
       {/* Form Section */}
       <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-sm lg:w-96">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">
+          <h1 className="text-3xl font-bold text-[#002147] mb-8">
             Moravian University
             <br />
             Compliance Portal
@@ -95,7 +95,7 @@ export default function AuthPage() {
                           </FormItem>
                         )}
                       />
-                      <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
+                      <Button type="submit" className="w-full bg-[#002147] hover:bg-[#003166]" disabled={loginMutation.isPending}>
                         {loginMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         Login
                       </Button>
@@ -169,7 +169,7 @@ export default function AuthPage() {
                           </FormItem>
                         )}
                       />
-                      <Button type="submit" className="w-full" disabled={registerMutation.isPending}>
+                      <Button type="submit" className="w-full bg-[#002147] hover:bg-[#003166]" disabled={registerMutation.isPending}>
                         {registerMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         Register
                       </Button>
@@ -183,8 +183,8 @@ export default function AuthPage() {
       </div>
 
       {/* Hero Section */}
-      <div className="hidden lg:block relative w-0 flex-1 bg-gray-900">
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600 to-blue-800 opacity-90" />
+      <div className="hidden lg:block relative w-0 flex-1 bg-[#002147]">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#002147] to-[#003166] opacity-90" />
         <div className="absolute inset-0 flex items-center justify-center p-12">
           <div className="text-white max-w-2xl">
             <h2 className="text-4xl font-bold mb-6">
