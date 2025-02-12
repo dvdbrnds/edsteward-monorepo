@@ -158,19 +158,18 @@ export default function RegulationList() {
                   <TableCell>{regulation.statute}</TableCell>
                   <TableCell>{regulation.category}</TableCell>
                   <TableCell>
-                    <div className="max-w-xs space-y-2">
-                      <div>{regulation.requirements}</div>
-                      {regulation.regulationUrl && (
-                        <a
-                          href={regulation.regulationUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 inline-flex items-center"
-                        >
-                          View on ECFR <ExternalLink className="h-3 w-3 ml-1" />
-                        </a>
-                      )}
-                    </div>
+                    {regulation.regulationUrl ? (
+                      <a
+                        href={regulation.regulationUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 inline-flex items-center gap-1"
+                      >
+                        {regulation.requirements} <ExternalLink className="h-3 w-3" />
+                      </a>
+                    ) : (
+                      regulation.requirements || "N/A"
+                    )}
                   </TableCell>
                   <TableCell>
                     {regulation.deadlines || "No deadlines"}
