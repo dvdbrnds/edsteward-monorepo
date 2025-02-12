@@ -134,22 +134,36 @@ export default function ReportsPage() {
   });
 
   const sortData = (data: Regulation[]) => {
-    if (!sortConfig) return data;
+    if (!sortConfig || !data) return data;
 
     return [...data].sort((a, b) => {
+      const aValue = a[sortConfig.key];
+      const bValue = b[sortConfig.key];
+
+      // Handle null values
+      if (!aValue && !bValue) return 0;
+      if (!aValue) return 1;
+      if (!bValue) return -1;
+
+      // Special handling for lastUpdated dates
       if (sortConfig.key === 'lastUpdated') {
-        const dateA = a[sortConfig.key] ? new Date(a[sortConfig.key]!).getTime() : 0;
-        const dateB = b[sortConfig.key] ? new Date(b[sortConfig.key]!).getTime() : 0;
+        const dateA = new Date(aValue as string).getTime();
+        const dateB = new Date(bValue as string).getTime();
         return sortConfig.direction === 'asc' ? dateA - dateB : dateB - dateA;
       }
 
-      if (a[sortConfig.key] < b[sortConfig.key]) {
-        return sortConfig.direction === 'asc' ? -1 : 1;
+      // Special handling for itemId (numeric string comparison)
+      if (sortConfig.key === 'itemId') {
+        const numA = parseInt(aValue as string, 10);
+        const numB = parseInt(bValue as string, 10);
+        if (!isNaN(numA) && !isNaN(numB)) {
+          return sortConfig.direction === 'asc' ? numA - numB : numB - numA;
+        }
       }
-      if (a[sortConfig.key] > b[sortConfig.key]) {
-        return sortConfig.direction === 'asc' ? 1 : -1;
-      }
-      return 0;
+
+      // Default string comparison
+      const comparison = String(aValue).localeCompare(String(bValue));
+      return sortConfig.direction === 'asc' ? comparison : -comparison;
     });
   };
 
@@ -204,7 +218,7 @@ export default function ReportsPage() {
     if (!sortConfig || sortConfig.key !== key) {
       return <ChevronUp className="h-4 w-4 text-gray-400" />;
     }
-    return sortConfig.direction === 'asc' 
+    return sortConfig.direction === 'asc'
       ? <ChevronUp className="h-4 w-4" />
       : <ChevronDown className="h-4 w-4" />;
   };
@@ -233,7 +247,6 @@ export default function ReportsPage() {
             />
           </div>
 
-          {/* Detailed Regulations Table */}
           <Card>
             <CardHeader>
               <CardTitle className="flex justify-between items-center">
@@ -252,35 +265,35 @@ export default function ReportsPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead 
+                    <TableHead
                       className="cursor-pointer hover:bg-gray-50"
                       onClick={() => requestSort('itemId')}
                     >
-                      <div className="flex items-center">
+                      <div className="flex items-center gap-2">
                         ID {getSortIcon('itemId')}
                       </div>
                     </TableHead>
-                    <TableHead 
+                    <TableHead
                       className="cursor-pointer hover:bg-gray-50"
                       onClick={() => requestSort('topic')}
                     >
-                      <div className="flex items-center">
+                      <div className="flex items-center gap-2">
                         Topic {getSortIcon('topic')}
                       </div>
                     </TableHead>
-                    <TableHead 
+                    <TableHead
                       className="cursor-pointer hover:bg-gray-50"
                       onClick={() => requestSort('category')}
                     >
-                      <div className="flex items-center">
+                      <div className="flex items-center gap-2">
                         Category {getSortIcon('category')}
                       </div>
                     </TableHead>
-                    <TableHead 
+                    <TableHead
                       className="cursor-pointer hover:bg-gray-50"
                       onClick={() => requestSort('lastUpdated')}
                     >
-                      <div className="flex items-center">
+                      <div className="flex items-center gap-2">
                         Last Updated {getSortIcon('lastUpdated')}
                       </div>
                     </TableHead>
