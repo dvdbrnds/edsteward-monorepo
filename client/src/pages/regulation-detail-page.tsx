@@ -35,6 +35,12 @@ export default function RegulationDetailPage() {
     queryKey: ["/api/deadlines"],
   });
 
+  console.log('Debug - RegulationDetailPage:', {
+    rawId: id,
+    regulations: regulations?.map(r => ({ id: r.id, itemId: r.itemId })),
+    isLoading: { regulations: regulationsLoading, deadlines: deadlinesLoading }
+  });
+
   if (regulationsLoading || deadlinesLoading || !regulations) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -50,13 +56,15 @@ export default function RegulationDetailPage() {
 
   // Get regulation ID from params and find regulation
   const regulationId = id ? parseInt(id, 10) : null;
-  console.log('Regulation ID:', {
+  const regulation = regulations.find(r => r.id === regulationId);
+
+  console.log('Debug - Finding Regulation:', {
     rawId: id,
     parsedId: regulationId,
-    foundRegulation: regulations.find(r => r.id === regulationId)?.id
+    regulationsCount: regulations.length,
+    foundRegulation: regulation ? { id: regulation.id, itemId: regulation.itemId } : null,
+    firstFewRegulations: regulations.slice(0, 3).map(r => ({ id: r.id, itemId: r.itemId }))
   });
-
-  const regulation = regulations.find(r => r.id === regulationId);
 
   if (!regulation) {
     return (
@@ -70,7 +78,8 @@ export default function RegulationDetailPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600 mb-4">
-                  The regulation with ID {id || 'unknown'} could not be found.
+                  The regulation with ID {id} could not be found. 
+                  {regulationId === null ? ' (Invalid ID format)' : ''}
                 </p>
                 <Button
                   variant="outline"

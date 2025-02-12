@@ -50,7 +50,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
     const regulationDeadlines = deadlines.filter(d => d.regulationId === regulationId);
     if (!regulationDeadlines.length) return null;
 
-    const nextDeadline = regulationDeadlines.sort((a, b) => 
+    const nextDeadline = regulationDeadlines.sort((a, b) =>
       new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
     )[0];
 
@@ -146,12 +146,18 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                 });
 
                 return (
-                  <Link 
-                    key={regulation.id} 
+                  <Link
+                    key={regulation.id}
                     href={`/regulations/${regulation.id}`}
-                    className="block" 
+                    className="block"
                   >
-                    <TableRow className="cursor-pointer hover:bg-gray-50">
+                    <TableRow
+                      className="cursor-pointer hover:bg-gray-50"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        console.log('Clicked regulation:', regulation);
+                      }}
+                    >
                       <TableCell className="font-medium">
                         {regulation.itemId}
                       </TableCell>
