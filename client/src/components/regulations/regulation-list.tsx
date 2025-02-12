@@ -30,6 +30,11 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
   const [search, setSearch] = useState("");
   const [_, navigate] = useLocation();
 
+  const handleRowClick = (regulationId: number) => {
+    console.log('Navigating to regulation:', regulationId);
+    navigate(`/regulations/${regulationId}`);
+  };
+
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
   });
@@ -38,9 +43,6 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
     queryKey: ["/api/deadlines"],
   });
 
-  const handleRowClick = (regulationId: number) => {
-    navigate(`/regulations/${regulationId}`);
-  };
 
   const getDeadlineStatus = (regulationId: number): StatusType | null => {
     if (!deadlines?.length) return null;

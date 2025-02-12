@@ -26,6 +26,8 @@ export default function RegulationDetailPage() {
   const { id } = useParams();
   const [_, setLocation] = useLocation();
 
+  console.log('Regulation Detail Page - ID param:', id);
+
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
   });
@@ -34,7 +36,9 @@ export default function RegulationDetailPage() {
     queryKey: ["/api/deadlines"],
   });
 
-  if (regulationsLoading || deadlinesLoading) {
+  console.log('Regulations loaded:', regulations?.length);
+
+  if (regulationsLoading || deadlinesLoading || !regulations) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Navigation />
@@ -47,7 +51,14 @@ export default function RegulationDetailPage() {
     );
   }
 
-  const regulation = regulations?.find(r => r.id === Number(id));
+  // Convert id to number and find regulation
+  const numericId = parseInt(id || '', 10);
+  console.log('Looking for regulation with ID:', numericId);
+
+  const regulation = regulations.find(r => {
+    console.log('Comparing:', r.id, numericId, r.id === numericId);
+    return r.id === numericId;
+  });
 
   if (!regulation) {
     return (
@@ -61,7 +72,7 @@ export default function RegulationDetailPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600 mb-4">
-                  This regulation was not found. Please select a regulation from the list.
+                  The regulation could not be found. Please select a regulation from the list.
                 </p>
                 <Button
                   variant="outline"
