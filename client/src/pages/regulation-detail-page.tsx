@@ -26,8 +26,8 @@ export default function RegulationDetailPage() {
   const { id } = useParams();
   const [_, setLocation] = useLocation();
 
-  // Improved regulation ID validation
-  const regulationId = id ? parseInt(id, 10) : null;
+  // More robust ID validation
+  const regulationId = id ? parseInt(id) : null;
 
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
@@ -51,39 +51,10 @@ export default function RegulationDetailPage() {
     );
   }
 
-  // Handle invalid or missing regulation ID
-  if (!regulationId) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Navigation />
-        <main className="py-10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-red-600">Invalid Regulation ID</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600 mb-4">
-                  The regulation ID is missing or invalid. Please select a regulation from the list.
-                </p>
-                <Button
-                  variant="outline"
-                  onClick={() => setLocation("/regulations")}
-                >
-                  Return to Regulations
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  // Find the regulation
+  // Find the regulation before any other checks
   const regulation = regulations?.find(r => r.id === regulationId);
 
-  // Handle regulation not found
+  // Handle regulation not found or invalid ID
   if (!regulation) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -96,7 +67,10 @@ export default function RegulationDetailPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600 mb-4">
-                  The regulation with ID {regulationId} was not found in the system.
+                  {!regulationId 
+                    ? "Please select a regulation from the list."
+                    : `The regulation with ID ${regulationId} was not found.`
+                  }
                 </p>
                 <Button
                   variant="outline"
