@@ -13,7 +13,7 @@ import {
 import { useState } from "react";
 import { Search, ExternalLink, CheckCircle, AlertCircle, Clock } from "lucide-react";
 import { differenceInDays, format } from "date-fns";
-import { Link } from "wouter";
+import { useLocation } from "wouter";
 
 type SortConfig = {
   key: keyof Regulation;
@@ -27,6 +27,7 @@ interface RegulationListProps {
 export default function RegulationList({ categoryFilter }: RegulationListProps) {
   const [search, setSearch] = useState("");
   const [sortConfig, setSortConfig] = useState<SortConfig>(null);
+  const [_, navigate] = useLocation();
 
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
@@ -200,43 +201,44 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
               {sortedRegulations.map((regulation) => {
                 const deadlineStatus = getDeadlineStatus(regulation.id);
                 return (
-                  <Link
+                  <TableRow
                     key={regulation.id}
-                    href={`/regulations/${regulation.id}`}
+                    className="cursor-pointer hover:bg-gray-50"
+                    onClick={() => navigate(`/regulations/${regulation.id}`)}
                   >
-                    <TableRow className="cursor-pointer hover:bg-gray-50">
-                      <TableCell className="font-medium">{regulation.itemId}</TableCell>
-                      <TableCell>{regulation.topic}</TableCell>
-                      <TableCell>{regulation.statute}</TableCell>
-                      <TableCell>{regulation.category}</TableCell>
-                      <TableCell>
-                        {regulation.requirements && regulation.regulationUrl ? (
-                          <a
-                            href={regulation.regulationUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[#00267A] hover:text-[#003166] underline decoration-[#00267A] hover:decoration-[#003166] inline-flex items-center gap-2 group"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <span className="break-words">{regulation.requirements}</span>
-                            <ExternalLink className="h-3 w-3 text-[#00267A] group-hover:text-[#003166] transition-colors" />
-                          </a>
-                        ) : regulation.requirements || "N/A"}
-                      </TableCell>
-                      <TableCell>
-                        {deadlineStatus ? (
-                          <div className="flex items-center gap-2">
-                            {deadlineStatus.icon}
-                            <span className={deadlineStatus.className}>
-                              {deadlineStatus.label}: {deadlineStatus.date}
-                            </span>
-                          </div>
-                        ) : (
-                          "No deadlines"
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  </Link>
+                    <TableCell className="font-medium">
+                      {regulation.itemId}
+                    </TableCell>
+                    <TableCell>{regulation.topic}</TableCell>
+                    <TableCell>{regulation.statute}</TableCell>
+                    <TableCell>{regulation.category}</TableCell>
+                    <TableCell>
+                      {regulation.requirements && regulation.regulationUrl ? (
+                        <a
+                          href={regulation.regulationUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#00267A] hover:text-[#003166] underline decoration-[#00267A] hover:decoration-[#003166] inline-flex items-center gap-2 group"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <span className="break-words">{regulation.requirements}</span>
+                          <ExternalLink className="h-3 w-3 text-[#00267A] group-hover:text-[#003166] transition-colors" />
+                        </a>
+                      ) : regulation.requirements || "N/A"}
+                    </TableCell>
+                    <TableCell>
+                      {deadlineStatus ? (
+                        <div className="flex items-center gap-2">
+                          {deadlineStatus.icon}
+                          <span className={deadlineStatus.className}>
+                            {deadlineStatus.label}: {deadlineStatus.date}
+                          </span>
+                        </div>
+                      ) : (
+                        "No deadlines"
+                      )}
+                    </TableCell>
+                  </TableRow>
                 );
               })}
             </TableBody>

@@ -20,9 +20,7 @@ export default function RegulationDetailPage() {
   const params = useParams();
   const regulationId = params.id ? parseInt(params.id, 10) : null;
 
-  console.log("Regulation ID from params:", regulationId); // Debug log
-
-  const { data: regulations, isLoading: regulationLoading } = useQuery<Regulation[]>({
+  const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
   });
 
@@ -30,9 +28,7 @@ export default function RegulationDetailPage() {
     queryKey: ["/api/deadlines"],
   });
 
-  console.log("Fetched regulations:", regulations); // Debug log
-
-  if (regulationLoading || deadlinesLoading) {
+  if (regulationsLoading || deadlinesLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Navigation />
@@ -53,7 +49,6 @@ export default function RegulationDetailPage() {
     );
   }
 
-  // Add type checking and null safety
   if (!regulationId || !regulations) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -83,7 +78,6 @@ export default function RegulationDetailPage() {
   }
 
   const regulation = regulations.find(r => r.id === regulationId);
-  console.log("Found regulation:", regulation); // Debug log
 
   if (!regulation) {
     return (
@@ -147,7 +141,6 @@ export default function RegulationDetailPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
-
       <main className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="space-y-8">
@@ -172,11 +165,7 @@ export default function RegulationDetailPage() {
                 <Button
                   variant="outline"
                   className="flex items-center justify-center gap-2"
-                  onClick={() => {
-                    if (regulation.regulationUrl) {
-                      window.open(regulation.regulationUrl, '_blank');
-                    }
-                  }}
+                  onClick={() => window.open(regulation.regulationUrl, '_blank')}
                 >
                   <Globe className="h-4 w-4" />
                   View Regulation Website
@@ -205,9 +194,8 @@ export default function RegulationDetailPage() {
 
             {/* Main Content Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Left Column - Main Information */}
+              {/* Left Column */}
               <div className="lg:col-span-2 space-y-6">
-                {/* Summary Card */}
                 <Card>
                   <CardHeader>
                     <CardTitle>Summary</CardTitle>
@@ -219,10 +207,9 @@ export default function RegulationDetailPage() {
                   </CardContent>
                 </Card>
 
-                {/* Requirements Card */}
                 <Card>
                   <CardHeader>
-                    <CardTitle>Compliance Requirements</CardTitle>
+                    <CardTitle>Requirements</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="prose max-w-none">
@@ -253,7 +240,6 @@ export default function RegulationDetailPage() {
                   </CardContent>
                 </Card>
 
-                {/* Statute Information */}
                 <Card>
                   <CardHeader>
                     <CardTitle>Statutory Reference</CardTitle>
@@ -271,47 +257,48 @@ export default function RegulationDetailPage() {
                 </Card>
               </div>
 
-              {/* Right Column - Timeline and Actions */}
+              {/* Right Column */}
               <div className="space-y-6">
-                {/* Deadlines Card */}
                 <Card>
                   <CardHeader>
                     <CardTitle>Deadlines</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {regulationDeadlines.length > 0 ? (
-                        regulationDeadlines.map((deadline) => {
-                          const status = getDeadlineStatus(deadline);
-                          return (
-                            <div
-                              key={deadline.id}
-                              className="flex items-center justify-between p-3 border rounded-lg"
-                            >
-                              <div className="flex items-center gap-3">
-                                {status.icon}
-                                <div>
-                                  <p className="font-medium">
-                                    Due: {format(new Date(deadline.dueDate), "PP")}
-                                  </p>
-                                  <span
-                                    className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full ${status.className}`}
-                                  >
-                                    {status.label}
-                                  </span>
-                                </div>
+                      {regulationDeadlines.map((deadline) => {
+                        const daysUntilDue = differenceInDays(new Date(deadline.dueDate), new Date());
+                        const status = deadline.status === "completed"
+                          ? { icon: <CheckCircle className="h-5 w-5 text-green-500" />, label: "Completed", className: "text-green-600 bg-green-100" }
+                          : daysUntilDue < 0
+                          ? { icon: <AlertCircle className="h-5 w-5 text-red-500" />, label: "Overdue", className: "text-red-600 bg-red-100" }
+                          : { icon: <Clock className="h-5 w-5 text-blue-500" />, label: daysUntilDue <= 7 ? "Due Soon" : "Upcoming", className: daysUntilDue <= 7 ? "text-yellow-600 bg-yellow-100" : "text-blue-600 bg-blue-100" };
+
+                        return (
+                          <div
+                            key={deadline.id}
+                            className="flex items-center justify-between p-3 border rounded-lg"
+                          >
+                            <div className="flex items-center gap-3">
+                              {status.icon}
+                              <div>
+                                <p className="font-medium">
+                                  Due: {format(new Date(deadline.dueDate), "PP")}
+                                </p>
+                                <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full ${status.className}`}>
+                                  {status.label}
+                                </span>
                               </div>
                             </div>
-                          );
-                        })
-                      ) : (
+                          </div>
+                        );
+                      })}
+                      {regulationDeadlines.length === 0 && (
                         <p className="text-gray-500 italic">No deadlines set</p>
                       )}
                     </div>
                   </CardContent>
                 </Card>
 
-                {/* Action Required Card */}
                 {nextDeadline && nextDeadline.status !== "completed" && (
                   <Card className="border-[#00267A]">
                     <CardHeader>
