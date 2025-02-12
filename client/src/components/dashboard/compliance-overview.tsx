@@ -92,9 +92,12 @@ export default function ComplianceOverview() {
                 verticalAlign="bottom"
                 height={36}
                 iconType="circle"
-                formatter={(value, entry: any) => (
-                  <span style={{ color: entry.color, padding: '0 8px' }}>{value}</span>
+                formatter={(value) => (
+                  <span className="text-[#666666] ml-2">{value}</span>
                 )}
+                wrapperStyle={{
+                  paddingTop: '20px'
+                }}
               />
             </PieChart>
           </ResponsiveContainer>

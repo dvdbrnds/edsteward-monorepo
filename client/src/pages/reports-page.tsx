@@ -92,19 +92,22 @@ const CustomPieChart = ({ data, title }: { data: any[], title: string }) => (
             <Tooltip
               contentStyle={{
                 backgroundColor: 'white',
-                border: `1px solid ${COLORS[1]}`, 
+                border: `1px solid ${COLORS[1]}`,
                 borderRadius: '4px',
                 padding: '8px'
               }}
-              itemStyle={{ color: COLORS[1] }} 
+              itemStyle={{ color: COLORS[1] }}
             />
             <Legend
               verticalAlign="bottom"
               height={36}
               iconType="circle"
-              formatter={(value, entry: any) => (
-                <span style={{ color: entry.color, padding: '0 8px' }}>{value}</span>
+              formatter={(value) => (
+                <span className="text-[#666666] ml-2">{value}</span>
               )}
+              wrapperStyle={{
+                paddingTop: '20px'
+              }}
             />
           </PieChart>
         </ResponsiveContainer>
@@ -162,7 +165,7 @@ export default function ReportsPage() {
       <main className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center mb-8">
-            <FileText className="h-6 w-6 mr-3 text-[#00267A]" /> 
+            <FileText className="h-6 w-6 mr-3 text-[#00267A]" />
             <h1 className="text-3xl font-bold text-gray-900">
               Compliance Reports
             </h1>
