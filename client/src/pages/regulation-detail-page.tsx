@@ -1,4 +1,4 @@
-import { useParams } from "wouter";
+import { useParams, useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import type { Regulation, Deadline } from "@shared/schema";
 import Navigation from "@/components/layout/navigation";
@@ -18,17 +18,48 @@ import { format, differenceInDays } from "date-fns";
 
 export default function RegulationDetailPage() {
   const params = useParams();
+  const [_, setLocation] = useLocation();
   const regulationId = params.id ? parseInt(params.id, 10) : null;
 
-  const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
+  const { data: regulations } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
   });
 
-  const { data: deadlines, isLoading: deadlinesLoading } = useQuery<Deadline[]>({
+  const { data: deadlines } = useQuery<Deadline[]>({
     queryKey: ["/api/deadlines"],
   });
 
-  if (regulationsLoading || deadlinesLoading) {
+  // Early return if no regulation ID
+  if (!regulationId) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        <main className="py-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-red-600">Invalid Regulation ID</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 mb-4">
+                  The regulation ID is invalid or missing.
+                </p>
+                <Button
+                  variant="outline"
+                  onClick={() => setLocation("/regulations")}
+                >
+                  Return to Regulations
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  // Loading state while fetching data
+  if (!regulations || !deadlines) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Navigation />
@@ -49,36 +80,9 @@ export default function RegulationDetailPage() {
     );
   }
 
-  if (!regulationId || !regulations) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Navigation />
-        <main className="py-10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-red-600">Invalid Regulation ID</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600 mb-4">
-                  The regulation ID is invalid or missing.
-                </p>
-                <Button
-                  variant="outline"
-                  onClick={() => window.history.back()}
-                >
-                  Go Back
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
   const regulation = regulations.find(r => r.id === regulationId);
 
+  // Handle regulation not found
   if (!regulation) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -95,9 +99,9 @@ export default function RegulationDetailPage() {
                 </p>
                 <Button
                   variant="outline"
-                  onClick={() => window.history.back()}
+                  onClick={() => setLocation("/regulations")}
                 >
-                  Go Back
+                  Return to Regulations
                 </Button>
               </CardContent>
             </Card>
@@ -107,7 +111,7 @@ export default function RegulationDetailPage() {
     );
   }
 
-  const regulationDeadlines = deadlines?.filter(d => d.regulationId === regulationId) || [];
+  const regulationDeadlines = deadlines.filter(d => d.regulationId === regulationId);
   const nextDeadline = regulationDeadlines.length > 0
     ? regulationDeadlines.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0]
     : null;
@@ -266,13 +270,7 @@ export default function RegulationDetailPage() {
                   <CardContent>
                     <div className="space-y-4">
                       {regulationDeadlines.map((deadline) => {
-                        const daysUntilDue = differenceInDays(new Date(deadline.dueDate), new Date());
-                        const status = deadline.status === "completed"
-                          ? { icon: <CheckCircle className="h-5 w-5 text-green-500" />, label: "Completed", className: "text-green-600 bg-green-100" }
-                          : daysUntilDue < 0
-                          ? { icon: <AlertCircle className="h-5 w-5 text-red-500" />, label: "Overdue", className: "text-red-600 bg-red-100" }
-                          : { icon: <Clock className="h-5 w-5 text-blue-500" />, label: daysUntilDue <= 7 ? "Due Soon" : "Upcoming", className: daysUntilDue <= 7 ? "text-yellow-600 bg-yellow-100" : "text-blue-600 bg-blue-100" };
-
+                        const status = getDeadlineStatus(deadline);
                         return (
                           <div
                             key={deadline.id}

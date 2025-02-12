@@ -37,6 +37,10 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
     queryKey: ["/api/deadlines"],
   });
 
+  const handleRowClick = (regulationId: number) => {
+    navigate(`/regulations/${regulationId}`);
+  };
+
   const sortData = (data: Regulation[]) => {
     if (!sortConfig || !data) return data;
 
@@ -169,30 +173,10 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead
-                  className={getColumnStyle('itemId')}
-                  onClick={() => requestSort('itemId')}
-                >
-                  ID
-                </TableHead>
-                <TableHead
-                  className={getColumnStyle('topic')}
-                  onClick={() => requestSort('topic')}
-                >
-                  Topic
-                </TableHead>
-                <TableHead
-                  className={getColumnStyle('statute')}
-                  onClick={() => requestSort('statute')}
-                >
-                  Statute
-                </TableHead>
-                <TableHead
-                  className={getColumnStyle('category')}
-                  onClick={() => requestSort('category')}
-                >
-                  Category
-                </TableHead>
+                <TableHead>ID</TableHead>
+                <TableHead>Topic</TableHead>
+                <TableHead>Statute</TableHead>
+                <TableHead>Category</TableHead>
                 <TableHead>Requirements</TableHead>
                 <TableHead>Next Deadline</TableHead>
               </TableRow>
@@ -204,7 +188,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                   <TableRow
                     key={regulation.id}
                     className="cursor-pointer hover:bg-gray-50"
-                    onClick={() => navigate(`/regulations/${regulation.id}`)}
+                    onClick={() => handleRowClick(regulation.id)}
                   >
                     <TableCell className="font-medium">
                       {regulation.itemId}
