@@ -27,19 +27,13 @@ export default function Navigation() {
         <div className="flex justify-between h-16">
           <div className="flex">
             <div className="flex-shrink-0 flex items-center">
-              {/* Moravian University Logo - Using SVG for vector scaling */}
-              <svg width="40" height="40" viewBox="0 0 512 512" className="text-white">
-                <path
-                  fill="currentColor"
-                  d="M256 0C114.6 0 0 114.6 0 256s114.6 256 256 256s256-114.6 256-256S397.4 0 256 0zM256 464c-114.7 0-208-93.31-208-208S141.3 48 256 48s208 93.31 208 208S370.7 464 256 464z"
-                />
-                <path
-                  fill="currentColor"
-                  d="M256 128c-70.69 0-128 57.31-128 128s57.31 128 128 128s128-57.31 128-128S326.7 128 256 128zM256 336c-44.13 0-80-35.88-80-80s35.88-80 80-80s80 35.88 80 80S300.1 336 256 336z"
-                />
-              </svg>
+              <img 
+                src="/attached_assets/download.png" 
+                alt="Moravian University Logo" 
+                className="h-8"
+              />
               <span className="ml-3 text-xl font-bold text-white">
-                Moravian Compliance
+                Compliance Portal
               </span>
             </div>
 
