@@ -158,7 +158,7 @@ export default function RegulationList() {
                   <TableCell>{regulation.statute}</TableCell>
                   <TableCell>{regulation.category}</TableCell>
                   <TableCell>
-                    {regulation.regulationUrl ? (
+                    {regulation.requirements && regulation.regulationUrl ? (
                       <a
                         href={regulation.regulationUrl}
                         target="_blank"
