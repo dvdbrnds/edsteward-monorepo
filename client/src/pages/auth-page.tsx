@@ -28,12 +28,11 @@ export default function AuthPage() {
     defaultValues: {
       username: "",
       password: "",
-      role: "user",
+      role: "user" as const,
       department: ""
     }
   });
 
-  // Use useEffect for navigation instead of early return
   useEffect(() => {
     if (user) {
       setLocation("/");
@@ -41,7 +40,7 @@ export default function AuthPage() {
   }, [user, setLocation]);
 
   if (user) {
-    return null; // Render nothing while redirecting
+    return null;
   }
 
   return (

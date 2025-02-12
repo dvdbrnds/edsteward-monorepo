@@ -39,9 +39,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
   });
 
   const handleRowClick = (regulationId: number) => {
-    if (regulationId) {
-      navigate(`/regulations/${regulationId}`);
-    }
+    navigate(`/regulations/${regulationId}`);
   };
 
   const getDeadlineStatus = (regulationId: number): StatusType | null => {
