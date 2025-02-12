@@ -15,7 +15,7 @@ import { Download, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from "recharts";
 
-// Define custom colors using Moravian's brand colors
+// Define custom colors using Moravian's brand colors - same as compliance-overview.tsx
 const COLORS = [
   '#002147', // Deep blue (Moravian primary)
   '#718096', // Medium grey
@@ -23,8 +23,6 @@ const COLORS = [
   '#a0aec0', // Light grey
   '#004185', // Royal blue
   '#4a5568', // Dark grey
-  '#0052a4', // Bright blue
-  '#e2e8f0', // Pale grey
 ];
 
 function downloadCSV(data: any[], filename: string) {
@@ -75,13 +73,12 @@ const CustomPieChart = ({ data, title }: { data: any[], title: string }) => (
               labelLine={false}
               outerRadius={80}
               dataKey="value"
-              // Explicitly set sector props to override defaults
               startAngle={90}
               endAngle={-270}
               style={{ outline: 'none' }}
-              isAnimationActive={false} // Disable animation to ensure immediate color application
+              isAnimationActive={false}
             >
-              {data.map((entry, index) => (
+              {data.map((_, index) => (
                 <Cell
                   key={`cell-${index}`}
                   fill={COLORS[index % COLORS.length]}
@@ -170,13 +167,13 @@ export default function ReportsPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 mb-8">
-            <CustomPieChart 
-              data={categoryChartData} 
-              title="Regulations by Category" 
+            <CustomPieChart
+              data={categoryChartData}
+              title="Regulations by Category"
             />
-            <CustomPieChart 
-              data={deadlineChartData} 
-              title="Deadlines by Status" 
+            <CustomPieChart
+              data={deadlineChartData}
+              title="Deadlines by Status"
             />
           </div>
 

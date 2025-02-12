@@ -10,7 +10,15 @@ import {
   Tooltip,
 } from "recharts";
 
-const COLORS = ["#10B981", "#F59E0B", "#EF4444"];
+// Use Moravian University brand colors (blues and greys)
+const COLORS = [
+  '#002147', // Deep blue (Moravian primary)
+  '#718096', // Medium grey
+  '#003166', // Navy blue
+  '#a0aec0', // Light grey
+  '#004185', // Royal blue
+  '#4a5568', // Dark grey
+];
 
 export default function ComplianceOverview() {
   const { data: regulations, isLoading } = useQuery<Regulation[]>({
@@ -55,16 +63,37 @@ export default function ComplianceOverview() {
                 outerRadius={80}
                 fill="#8884d8"
                 dataKey="value"
+                startAngle={90}
+                endAngle={-270}
+                style={{ outline: 'none' }}
+                isAnimationActive={false}
               >
                 {data.map((_, index) => (
                   <Cell
                     key={`cell-${index}`}
                     fill={COLORS[index % COLORS.length]}
+                    stroke="white"
+                    strokeWidth={2}
                   />
                 ))}
               </Pie>
-              <Tooltip />
-              <Legend />
+              <Tooltip 
+                contentStyle={{
+                  backgroundColor: 'white',
+                  border: `1px solid ${COLORS[0]}`,
+                  borderRadius: '4px',
+                  padding: '8px'
+                }}
+                itemStyle={{ color: COLORS[0] }}
+              />
+              <Legend
+                verticalAlign="bottom"
+                height={36}
+                iconType="circle"
+                formatter={(value, entry: any) => (
+                  <span style={{ color: entry.color, padding: '0 8px' }}>{value}</span>
+                )}
+              />
             </PieChart>
           </ResponsiveContainer>
         </div>
