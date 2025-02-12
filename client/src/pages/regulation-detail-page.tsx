@@ -19,47 +19,24 @@ import { format, differenceInDays } from "date-fns";
 export default function RegulationDetailPage() {
   const params = useParams();
   const [_, setLocation] = useLocation();
-  const regulationId = params.id ? parseInt(params.id, 10) : null;
 
-  const { data: regulations } = useQuery<Regulation[]>({
+  // Ensure regulationId is properly parsed and validated
+  const regulationId = (() => {
+    if (!params.id) return null;
+    const parsed = parseInt(params.id, 10);
+    return !isNaN(parsed) && parsed > 0 ? parsed : null;
+  })();
+
+  const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
   });
 
-  const { data: deadlines } = useQuery<Deadline[]>({
+  const { data: deadlines, isLoading: deadlinesLoading } = useQuery<Deadline[]>({
     queryKey: ["/api/deadlines"],
   });
 
-  // Early return if no regulation ID
-  if (!regulationId) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Navigation />
-        <main className="py-10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-red-600">Invalid Regulation ID</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600 mb-4">
-                  The regulation ID is invalid or missing.
-                </p>
-                <Button
-                  variant="outline"
-                  onClick={() => setLocation("/regulations")}
-                >
-                  Return to Regulations
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
-  // Loading state while fetching data
-  if (!regulations || !deadlines) {
+  // Show loading state
+  if (regulationsLoading || deadlinesLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Navigation />
@@ -80,10 +57,8 @@ export default function RegulationDetailPage() {
     );
   }
 
-  const regulation = regulations.find(r => r.id === regulationId);
-
-  // Handle regulation not found
-  if (!regulation) {
+  // Handle invalid regulation ID
+  if (!regulationId) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Navigation />
@@ -91,11 +66,11 @@ export default function RegulationDetailPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <Card>
               <CardHeader>
-                <CardTitle className="text-red-600">Regulation Not Found</CardTitle>
+                <CardTitle className="text-red-600">Invalid Regulation ID</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600 mb-4">
-                  The regulation you're looking for (ID: {regulationId}) doesn't exist or has been removed.
+                  The regulation ID provided ({params.id}) is invalid. Please provide a valid regulation ID.
                 </p>
                 <Button
                   variant="outline"
@@ -111,7 +86,39 @@ export default function RegulationDetailPage() {
     );
   }
 
-  const regulationDeadlines = deadlines.filter(d => d.regulationId === regulationId);
+  // Find the regulation
+  const regulation = regulations?.find(r => r.id === regulationId);
+
+  // Handle regulation not found
+  if (!regulation) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        <main className="py-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-red-600">Regulation Not Found</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 mb-4">
+                  The regulation with ID {regulationId} was not found in the system.
+                </p>
+                <Button
+                  variant="outline"
+                  onClick={() => setLocation("/regulations")}
+                >
+                  Return to Regulations
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  const regulationDeadlines = deadlines?.filter(d => d.regulationId === regulationId) || [];
   const nextDeadline = regulationDeadlines.length > 0
     ? regulationDeadlines.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0]
     : null;
@@ -169,7 +176,7 @@ export default function RegulationDetailPage() {
                 <Button
                   variant="outline"
                   className="flex items-center justify-center gap-2"
-                  onClick={() => window.open(regulation.regulationUrl, '_blank')}
+                  onClick={() => window.open(regulation.regulationUrl || '', '_blank')}
                 >
                   <Globe className="h-4 w-4" />
                   View Regulation Website
