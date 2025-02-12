@@ -9,13 +9,8 @@ import type {
   Deadline,
   InsertDeadline,
 } from "@shared/schema";
-import { db } from "./db";
-import { eq } from "drizzle-orm";
 import session from "express-session";
-import connectPg from "connect-pg-simple";
-import { pool } from "./db";
-
-const PostgresSessionStore = connectPg(session);
+import MemoryStore from "memorystore";
 
 export interface IStorage {
   // User methods
@@ -39,63 +34,64 @@ export interface IStorage {
   sessionStore: session.Store;
 }
 
-export class DatabaseStorage implements IStorage {
+export class MemoryStorage implements IStorage {
+  private users: User[] = [];
+  private regulations: Regulation[] = [];
+  private notifications: Notification[] = [];
+  private deadlines: Deadline[] = [];
+  private nextId = 1;
   sessionStore: session.Store;
 
   constructor() {
-    this.sessionStore = new PostgresSessionStore({
-      pool,
-      createTableIfMissing: true,
+    const MemoryStoreConstructor = MemoryStore(session);
+    this.sessionStore = new MemoryStoreConstructor({
+      checkPeriod: 86400000 // prune expired entries every 24h
     });
   }
 
   async getUser(id: number): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.id, id));
-    return user;
+    return this.users.find(u => u.id === id);
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
-    return user;
+    return this.users.find(u => u.username === username);
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db.insert(users).values(insertUser).returning();
+    const user: User = { ...insertUser, id: this.nextId++ };
+    this.users.push(user);
     return user;
   }
 
   async getRegulations(): Promise<Regulation[]> {
-    return await db.select().from(regulations);
+    return this.regulations;
   }
 
   async createRegulation(regulation: InsertRegulation): Promise<Regulation> {
-    const [newRegulation] = await db.insert(regulations).values(regulation).returning();
+    const newRegulation: Regulation = { ...regulation, id: this.nextId++ };
+    this.regulations.push(newRegulation);
     return newRegulation;
   }
 
   async getNotificationsByUser(userId: number): Promise<Notification[]> {
-    return await db
-      .select()
-      .from(notifications)
-      .where(eq(notifications.userId, userId));
+    return this.notifications.filter(n => n.userId === userId);
   }
 
   async createNotification(notification: InsertNotification): Promise<Notification> {
-    const [newNotification] = await db
-      .insert(notifications)
-      .values(notification)
-      .returning();
+    const newNotification: Notification = { ...notification, id: this.nextId++ };
+    this.notifications.push(newNotification);
     return newNotification;
   }
 
   async getDeadlines(): Promise<Deadline[]> {
-    return await db.select().from(deadlines);
+    return this.deadlines;
   }
 
   async createDeadline(deadline: InsertDeadline): Promise<Deadline> {
-    const [newDeadline] = await db.insert(deadlines).values(deadline).returning();
+    const newDeadline: Deadline = { ...deadline, id: this.nextId++ };
+    this.deadlines.push(newDeadline);
     return newDeadline;
   }
 }
 
-export const storage = new DatabaseStorage();
+export const storage = new MemoryStorage();
