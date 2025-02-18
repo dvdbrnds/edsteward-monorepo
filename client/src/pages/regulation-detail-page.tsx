@@ -1,4 +1,4 @@
-import { useParams, useLocation } from "wouter";
+import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import type { Regulation, Deadline } from "@shared/schema";
 import Navigation from "@/components/layout/navigation";
@@ -24,19 +24,18 @@ type StatusType = {
   className: string;
 };
 
-export default function RegulationDetailPage() {
-  const params = useParams<{ id: string }>();
-  const [_, navigate] = useLocation();
+interface RegulationDetailPageProps {
+  regulation: Regulation;
+}
 
-  const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
-    queryKey: ["/api/regulations"],
-  });
+export default function RegulationDetailPage({ regulation }: RegulationDetailPageProps) {
+  const [_, navigate] = useLocation();
 
   const { data: deadlines, isLoading: deadlinesLoading } = useQuery<Deadline[]>({
     queryKey: ["/api/deadlines"],
   });
 
-  if (regulationsLoading || deadlinesLoading) {
+  if (deadlinesLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Navigation />
@@ -44,7 +43,7 @@ export default function RegulationDetailPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-center space-x-4">
               <Loader2 className="h-6 w-6 animate-spin text-[#00267A]" />
-              <span>Loading regulation details...</span>
+              <span>Loading deadlines...</span>
             </div>
           </div>
         </main>
@@ -52,42 +51,6 @@ export default function RegulationDetailPage() {
     );
   }
 
-  const regulationId = params?.id ? parseInt(params.id, 10) : null;
-  const regulation = regulationId && !isNaN(regulationId) 
-    ? regulations?.find(r => r.id === regulationId)
-    : null;
-
-  if (!regulation) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Navigation />
-        <main className="py-10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-red-600">Regulation Not Found</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600 mb-4">
-                  {!regulationId || isNaN(regulationId)
-                    ? 'Invalid regulation ID format. Please use a valid numeric ID.'
-                    : `The regulation with ID ${params.id} could not be found.`}
-                </p>
-                <Button
-                  variant="outline"
-                  onClick={() => navigate("/regulations")}
-                  className="flex items-center"
-                >
-                  <ArrowLeft className="h-4 w-4 mr-2" />
-                  Return to Regulations
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        </main>
-      </div>
-    );
-  }
 
   const regulationDeadlines = deadlines?.filter(d => d.regulationId === regulation.id) || [];
   const nextDeadline = regulationDeadlines.length > 0
