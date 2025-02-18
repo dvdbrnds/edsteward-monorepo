@@ -25,8 +25,11 @@ type StatusType = {
 };
 
 export default function RegulationDetailPage() {
-  const { id } = useParams<{ id: string }>();
+  const params = useParams<{ id: string }>();
   const [_, navigate] = useLocation();
+
+  // Debug log
+  console.log('Regulation Detail Page - Params:', params);
 
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
@@ -36,7 +39,13 @@ export default function RegulationDetailPage() {
     queryKey: ["/api/deadlines"],
   });
 
-  // Show loading state while fetching data
+  // Debug log
+  console.log('Regulation Detail Page - Data:', {
+    params,
+    regulationsCount: regulations?.length,
+    isLoading: { regulations: regulationsLoading, deadlines: deadlinesLoading }
+  });
+
   if (regulationsLoading || deadlinesLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -53,8 +62,45 @@ export default function RegulationDetailPage() {
     );
   }
 
-  const regulationId = parseInt(id!, 10);
+  if (!params || !params.id) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        <main className="py-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-red-600">Invalid URL</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 mb-4">
+                  No regulation ID was provided in the URL.
+                </p>
+                <Button
+                  variant="outline"
+                  onClick={() => navigate("/regulations")}
+                  className="flex items-center"
+                >
+                  <ArrowLeft className="h-4 w-4 mr-2" />
+                  Return to Regulations
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  const regulationId = parseInt(params.id, 10);
   const regulation = regulations?.find(r => r.id === regulationId);
+
+  // Debug log
+  console.log('Regulation Detail Page - Found:', {
+    regulationId,
+    regulation,
+    allIds: regulations?.map(r => r.id)
+  });
 
   if (!regulation || !regulations) {
     return (
@@ -70,7 +116,7 @@ export default function RegulationDetailPage() {
                 <p className="text-gray-600 mb-4">
                   {isNaN(regulationId)
                     ? 'Invalid regulation ID format. Please use a valid numeric ID.'
-                    : `The regulation with ID ${id} could not be found.`}
+                    : `The regulation with ID ${params.id} could not be found.`}
                 </p>
                 <Button
                   variant="outline"

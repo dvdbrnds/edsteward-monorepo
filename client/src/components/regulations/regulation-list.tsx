@@ -53,6 +53,11 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
     );
   }
 
+  const handleRegulationClick = (regulation: Regulation) => {
+    console.log('Navigating to regulation:', regulation);
+    navigate(`/regulations/${regulation.id}`);
+  };
+
   const getDeadlineStatus = (regulationId: number): StatusType | null => {
     if (!deadlines?.length) return null;
 
@@ -143,7 +148,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                 <TableRow
                   key={regulation.id}
                   className="cursor-pointer hover:bg-gray-50"
-                  onClick={() => navigate(`/regulations/${regulation.id}`)}
+                  onClick={() => handleRegulationClick(regulation)}
                 >
                   <TableCell className="font-medium">
                     {regulation.itemId}
