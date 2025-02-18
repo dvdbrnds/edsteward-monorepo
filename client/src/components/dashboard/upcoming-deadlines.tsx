@@ -149,9 +149,9 @@ export default function UpcomingDeadlines({ categoryFilter }: UpcomingDeadlinesP
                     <div className="space-y-3">
                       <div>
                         <h4 className="text-sm font-medium text-gray-700">Agency</h4>
-                        {regulation.agencyUrl ? (
+                        {regulation.agency_url ? (
                           <a
-                            href={regulation.agencyUrl}
+                            href={regulation.agency_url}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-sm text-[#00267A] hover:text-[#003166] hover:underline inline-flex items-center gap-1"
