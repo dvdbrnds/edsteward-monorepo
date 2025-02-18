@@ -13,7 +13,7 @@ import {
 import { useState } from "react";
 import { Search, ExternalLink, CheckCircle, AlertCircle, Clock } from "lucide-react";
 import { differenceInDays, format } from "date-fns";
-//import { Link, useLocation } from "wouter";  Removed as per edit intention.
+import { useLocation } from "wouter";
 
 interface RegulationListProps {
   categoryFilter: string | null;
@@ -28,7 +28,7 @@ type StatusType = {
 
 export default function RegulationList({ categoryFilter }: RegulationListProps) {
   const [search, setSearch] = useState("");
-  //const [_, navigate] = useLocation(); Removed as per edit intention.
+  const [_, navigate] = useLocation();
 
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
@@ -36,13 +36,6 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
 
   const { data: deadlines, isLoading: deadlinesLoading } = useQuery<Deadline[]>({
     queryKey: ["/api/deadlines"],
-  });
-
-  // Debug data loading
-  console.log('RegulationList - Data:', {
-    regulations: regulations?.length || 0,
-    firstRegulation: regulations?.[0],
-    sampleIds: regulations?.slice(0, 3).map(r => r.id)
   });
 
   const getDeadlineStatus = (regulationId: number): StatusType | null => {
@@ -143,8 +136,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                     key={regulation.id}
                     className="cursor-pointer hover:bg-gray-50"
                     onClick={() => {
-                      console.log('Navigating to regulation:', regulation.id);
-                      window.location.href = `/regulations/${regulation.id}`;
+                      navigate(`/regulations/${regulation.id}`);
                     }}
                   >
                     <TableCell className="font-medium">

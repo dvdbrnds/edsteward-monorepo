@@ -14,6 +14,7 @@ import {
   CheckCircle,
   AlertCircle,
   ArrowLeft,
+  Loader2,
 } from "lucide-react";
 import { format, differenceInDays } from "date-fns";
 
@@ -35,19 +36,16 @@ export default function RegulationDetailPage() {
     queryKey: ["/api/deadlines"],
   });
 
-  console.log('Debug - RegulationDetailPage:', {
-    rawId: id,
-    regulations: regulations?.map(r => ({ id: r.id, itemId: r.itemId })),
-    isLoading: { regulations: regulationsLoading, deadlines: deadlinesLoading }
-  });
-
   if (regulationsLoading || deadlinesLoading || !regulations) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Navigation />
         <main className="py-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            Loading...
+            <div className="flex items-center space-x-4">
+              <Loader2 className="h-6 w-6 animate-spin text-[#00267A]" />
+              <span>Loading regulation details...</span>
+            </div>
           </div>
         </main>
       </div>
@@ -56,15 +54,7 @@ export default function RegulationDetailPage() {
 
   // Get regulation ID from params and find regulation
   const regulationId = id ? parseInt(id, 10) : null;
-  const regulation = regulations.find(r => r.id === regulationId);
-
-  console.log('Debug - Finding Regulation:', {
-    rawId: id,
-    parsedId: regulationId,
-    regulationsCount: regulations.length,
-    foundRegulation: regulation ? { id: regulation.id, itemId: regulation.itemId } : null,
-    firstFewRegulations: regulations.slice(0, 3).map(r => ({ id: r.id, itemId: r.itemId }))
-  });
+  const regulation = regulationId ? regulations.find(r => r.id === regulationId) : null;
 
   if (!regulation) {
     return (
@@ -78,13 +68,15 @@ export default function RegulationDetailPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600 mb-4">
-                  The regulation with ID {id} could not be found. 
-                  {regulationId === null ? ' (Invalid ID format)' : ''}
+                  {regulationId === null 
+                    ? 'Invalid regulation ID format. Please use a valid numeric ID.'
+                    : `The regulation with ID ${id} could not be found.`}
                 </p>
                 <Button
                   variant="outline"
                   onClick={() => navigate("/regulations")}
                 >
+                  <ArrowLeft className="h-4 w-4 mr-2" />
                   Return to Regulations
                 </Button>
               </CardContent>
