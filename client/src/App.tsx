@@ -11,28 +11,33 @@ import RegulationDetailPage from "@/pages/regulation-detail-page";
 import NotificationsPage from "@/pages/notifications-page";
 import ReportsPage from "@/pages/reports-page";
 import { ProtectedRoute } from "./lib/protected-route";
+import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 function Router() {
   return (
-    <Switch>
-      <Route path="/auth" component={AuthPage} />
-      <ProtectedRoute path="/" component={HomePage} />
-      <ProtectedRoute path="/regulations" component={RegulationsPage} />
-      <ProtectedRoute path="/regulations/:id" component={RegulationDetailPage} />
-      <ProtectedRoute path="/notifications" component={NotificationsPage} />
-      <ProtectedRoute path="/reports" component={ReportsPage} />
-      <Route component={NotFound} />
-    </Switch>
+    <ErrorBoundary>
+      <Switch>
+        <Route path="/auth" component={AuthPage} />
+        <ProtectedRoute path="/" component={HomePage} />
+        <ProtectedRoute path="/regulations" component={RegulationsPage} />
+        <ProtectedRoute path="/regulations/:id" component={RegulationDetailPage} />
+        <ProtectedRoute path="/notifications" component={NotificationsPage} />
+        <ProtectedRoute path="/reports" component={ReportsPage} />
+        <Route component={NotFound} />
+      </Switch>
+    </ErrorBoundary>
   );
 }
 
 export default function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <Router />
-        <Toaster />
-      </AuthProvider>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <Router />
+          <Toaster />
+        </AuthProvider>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }
