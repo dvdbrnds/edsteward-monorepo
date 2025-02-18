@@ -13,19 +13,12 @@ import ReportsPage from "@/pages/reports-page";
 import { ProtectedRoute } from "./lib/protected-route";
 
 function Router() {
-  console.log('Router - Initializing routes');
   return (
     <Switch>
       <Route path="/auth" component={AuthPage} />
       <ProtectedRoute path="/" component={HomePage} />
       <ProtectedRoute path="/regulations" component={RegulationsPage} />
-      <Route 
-        path="/regulations/:id"
-        component={({ params }) => {
-          console.log('Router - Regulation detail route params:', params);
-          return <ProtectedRoute path="/regulations/:id" component={RegulationDetailPage} />;
-        }}
-      />
+      <ProtectedRoute path="/regulations/:id" component={RegulationDetailPage} />
       <ProtectedRoute path="/notifications" component={NotificationsPage} />
       <ProtectedRoute path="/reports" component={ReportsPage} />
       <Route component={NotFound} />
