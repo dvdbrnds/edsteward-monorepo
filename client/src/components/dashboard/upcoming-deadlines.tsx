@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import type { Deadline, Regulation } from "@shared/schema";
 import { format, differenceInDays } from "date-fns";
-import { AlertCircle, CheckCircle, Clock, ChevronDown, ChevronUp } from "lucide-react";
+import { AlertCircle, CheckCircle, Clock, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
 import { Link } from "wouter";
 import { useState } from "react";
 
@@ -153,7 +153,19 @@ export default function UpcomingDeadlines({ categoryFilter }: UpcomingDeadlinesP
                       </div>
                       <div>
                         <h4 className="text-sm font-medium text-gray-700">Regulation</h4>
-                        <p className="text-sm text-gray-600">{regulation.statuteIds}</p>
+                        {regulation.regulationUrl ? (
+                          <a
+                            href={regulation.regulationUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-[#00267A] hover:text-[#003166] hover:underline inline-flex items-center gap-1"
+                          >
+                            {regulation.statuteIds}
+                            <ExternalLink className="h-3 w-3" />
+                          </a>
+                        ) : (
+                          <p className="text-sm text-gray-600">{regulation.statuteIds}</p>
+                        )}
                       </div>
                       <div>
                         <h4 className="text-sm font-medium text-gray-700">Topic</h4>
