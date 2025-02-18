@@ -1,6 +1,6 @@
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
-import type { Regulation, Deadline } from "@shared/schema";
+import type { Regulation, Deadline, Guide } from "@shared/schema";
 import Navigation from "@/components/layout/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -16,7 +16,15 @@ import {
   ArrowLeft,
   Loader2,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { format, differenceInDays } from "date-fns";
+import { marked } from 'marked';
 
 type StatusType = {
   icon: JSX.Element;
@@ -277,7 +285,12 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
                           <Button
                             variant="outline"
                             className="w-full"
-                            onClick={() => window.open('https://moravian.edu/compliance/guide', '_blank')}
+                            onClick={() => {
+                              const dialogTrigger = document.querySelector('[data-guide-dialog-trigger]');
+                              if (dialogTrigger instanceof HTMLButtonElement) {
+                                dialogTrigger.click();
+                              }
+                            }}
                           >
                             View Submission Guide
                           </Button>
@@ -291,6 +304,51 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
           </div>
         </div>
       </main>
+
+      {/* Submission Guide Dialog */}
+      <Dialog>
+        <DialogTrigger asChild>
+          <button data-guide-dialog-trigger className="hidden">
+            Open Guide
+          </button>
+        </DialogTrigger>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Submission Guide</DialogTitle>
+          </DialogHeader>
+          <div className="prose prose-sm mt-4">
+            <GuideContent />
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
+  );
+}
+
+// Guide Content Component
+function GuideContent() {
+  const { data: guides, isLoading } = useQuery<Guide[]>({
+    queryKey: ["/api/guides", { category: "submission" }],
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-4">
+        <Loader2 className="h-6 w-6 animate-spin text-[#00267A]" />
+      </div>
+    );
+  }
+
+  const submissionGuide = guides?.find(guide => guide.category === "submission");
+
+  if (!submissionGuide) {
+    return <div>Guide not found. Please contact the compliance office.</div>;
+  }
+
+  return (
+    <div
+      className="markdown-content"
+      dangerouslySetInnerHTML={{ __html: marked.parse(submissionGuide.content) }}
+    />
   );
 }

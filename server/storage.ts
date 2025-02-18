@@ -1,4 +1,4 @@
-import { users, regulations, notifications, deadlines, comments } from "@shared/schema";
+import { users, regulations, notifications, deadlines, comments, guides } from "@shared/schema";
 import type {
   User,
   InsertUser,
@@ -10,6 +10,8 @@ import type {
   InsertDeadline,
   Comment,
   InsertComment,
+  Guide,
+  InsertGuide,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -42,6 +44,13 @@ export interface IStorage {
   // Deadline methods
   getDeadlines(): Promise<Deadline[]>;
   createDeadline(deadline: InsertDeadline): Promise<Deadline>;
+
+  // Guide methods
+  getGuides(): Promise<Guide[]>;
+  getGuidesByCategory(category: string): Promise<Guide[]>;
+  getGuide(id: number): Promise<Guide | undefined>;
+  createGuide(guide: InsertGuide): Promise<Guide>;
+  updateGuide(id: number, guide: Partial<InsertGuide>): Promise<Guide>;
 
   // Session store
   sessionStore: session.Store;
@@ -128,6 +137,36 @@ export class DatabaseStorage implements IStorage {
   async createDeadline(deadline: InsertDeadline): Promise<Deadline> {
     const [newDeadline] = await db.insert(deadlines).values(deadline).returning();
     return newDeadline;
+  }
+
+  async getGuides(): Promise<Guide[]> {
+    return await db.select().from(guides);
+  }
+
+  async getGuidesByCategory(category: string): Promise<Guide[]> {
+    return await db
+      .select()
+      .from(guides)
+      .where(eq(guides.category, category));
+  }
+
+  async getGuide(id: number): Promise<Guide | undefined> {
+    const [guide] = await db.select().from(guides).where(eq(guides.id, id));
+    return guide;
+  }
+
+  async createGuide(guide: InsertGuide): Promise<Guide> {
+    const [newGuide] = await db.insert(guides).values(guide).returning();
+    return newGuide;
+  }
+
+  async updateGuide(id: number, guide: Partial<InsertGuide>): Promise<Guide> {
+    const [updatedGuide] = await db
+      .update(guides)
+      .set(guide)
+      .where(eq(guides.id, id))
+      .returning();
+    return updatedGuide;
   }
 }
 

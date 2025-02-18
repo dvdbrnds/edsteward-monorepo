@@ -47,6 +47,18 @@ export function registerRoutes(app: Express): Server {
     res.json(deadline);
   });
 
+  // Guides endpoints
+  app.get("/api/guides", async (req, res) => {
+    const { category } = req.query;
+    if (category) {
+      const guides = await storage.getGuidesByCategory(category as string);
+      res.json(guides);
+    } else {
+      const guides = await storage.getGuides();
+      res.json(guides);
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

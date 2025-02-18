@@ -28,9 +28,6 @@ export const regulations = pgTable("regulations", {
 });
 
 // Comments table
-// PREVIOUS STATE: No comments table exists
-// INTENDED CHANGE: Add comments table with relations to users and regulations
-// EXPECTED OUTCOME: Enable threaded comments on regulations with user attribution
 export const comments = pgTable("comments", {
   id: serial("id").primaryKey(),
   regulationId: integer("regulation_id").notNull(),
@@ -57,6 +54,16 @@ export const deadlines = pgTable("deadlines", {
   dueDate: date("due_date").notNull(),
   status: text("status").notNull(),
   assignedTo: integer("assigned_to").notNull(),
+});
+
+// Guides table for storing submission guides and documentation
+export const guides = pgTable("guides", {
+  id: serial("id").primaryKey(),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  category: text("category").notNull(),
+  lastUpdated: timestamp("last_updated").defaultNow(),
+  createdBy: integer("created_by").notNull(),
 });
 
 // Schema for inserting users
@@ -87,6 +94,13 @@ export const insertNotificationSchema = createInsertSchema(notifications);
 // Schema for inserting deadlines
 export const insertDeadlineSchema = createInsertSchema(deadlines);
 
+// Schema for inserting guides
+export const insertGuideSchema = createInsertSchema(guides)
+  .extend({
+    content: z.string().min(1, "Guide content cannot be empty"),
+    category: z.enum(["submission", "compliance", "general"]),
+  });
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -98,3 +112,5 @@ export type Notification = typeof notifications.$inferSelect;
 export type InsertNotification = z.infer<typeof insertNotificationSchema>;
 export type Deadline = typeof deadlines.$inferSelect;
 export type InsertDeadline = z.infer<typeof insertDeadlineSchema>;
+export type Guide = typeof guides.$inferSelect;
+export type InsertGuide = z.infer<typeof insertGuideSchema>;
