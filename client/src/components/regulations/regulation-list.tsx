@@ -42,7 +42,7 @@ const getAgencyName = (url: string | null): string => {
     const hostname = new URL(url).hostname;
     return urlMap[hostname] || hostname;
   } catch {
-    return url;
+    return "N/A";
   }
 };
 
@@ -175,7 +175,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                         <ExternalLink className="h-3 w-3" />
                       </a>
                     ) : (
-                      "N/A"
+                      getAgencyName(null)
                     )}
                   </TableCell>
                   <TableCell>
