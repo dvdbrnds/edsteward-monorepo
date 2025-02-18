@@ -278,7 +278,7 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
                         <div className="flex flex-col gap-3">
                           <Button
                             className="w-full"
-                            onClick={() => window.open('https://moravian.edu/submit-compliance', '_blank')}
+                            onClick={() => navigate(`/compliance-wizard/${regulation.id}`)}
                           >
                             Submit Compliance Report
                           </Button>
