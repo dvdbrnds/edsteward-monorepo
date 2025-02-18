@@ -13,12 +13,15 @@ interface UpcomingDeadlinesProps {
 export default function UpcomingDeadlines({ categoryFilter }: UpcomingDeadlinesProps) {
   const [expandedDeadlineId, setExpandedDeadlineId] = useState<number | null>(null);
 
-  const { data: deadlines, isLoading: deadlinesLoading } = useQuery<Deadline[]>({
-    queryKey: ["/api/deadlines"],
-  });
-
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
+    onSuccess: (data) => {
+      console.log('[UpcomingDeadlines] Loaded regulations:', data);
+    }
+  });
+
+  const { data: deadlines, isLoading: deadlinesLoading } = useQuery<Deadline[]>({
+    queryKey: ["/api/deadlines"],
   });
 
   if (deadlinesLoading || regulationsLoading || !deadlines || !regulations) {
@@ -101,7 +104,12 @@ export default function UpcomingDeadlines({ categoryFilter }: UpcomingDeadlinesP
             const daysUntilDue = differenceInDays(new Date(deadline.dueDate), new Date());
             const regulation = regulations.find(r => r.id === deadline.regulationId);
             const isExpanded = expandedDeadlineId === deadline.id;
-
+            console.log('[UpcomingDeadlines] Processing regulation:', {
+              id: regulation?.id,
+              statute: regulation?.statute,
+              agency_url: regulation?.agency_url,
+              regulationUrl: regulation?.regulationUrl
+            });
             return (
               <div key={deadline.id} className="space-y-2">
                 <div
@@ -155,13 +163,25 @@ export default function UpcomingDeadlines({ categoryFilter }: UpcomingDeadlinesP
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-sm text-[#00267A] hover:text-[#003166] hover:underline inline-flex items-center gap-1"
-                            onClick={(e) => e.stopPropagation()}
+                            onClick={(e) => {
+                              console.log('[UpcomingDeadlines] Agency link clicked:', {
+                                agency_url: regulation.agency_url,
+                                statute: regulation.statute
+                              });
+                              e.stopPropagation();
+                            }}
                           >
                             {regulation.statute}
                             <ExternalLink className="h-3 w-3" />
                           </a>
                         ) : (
-                          <p className="text-sm text-gray-600">{regulation.statute}</p>
+                          <p className="text-sm text-gray-600">
+                            {regulation.statute}
+                            {/* Debug output */}
+                            <span className="hidden">
+                              {console.log('[UpcomingDeadlines] No agency_url for:', regulation.statute)}
+                            </span>
+                          </p>
                         )}
                       </div>
                       <div>
