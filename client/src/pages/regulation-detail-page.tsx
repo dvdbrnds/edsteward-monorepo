@@ -162,10 +162,10 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
                     <CardTitle>Summary</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div 
+                    <div
                       className="text-gray-700"
-                      dangerouslySetInnerHTML={{ 
-                        __html: regulation.summary?.replace(/<li style="[^"]*">/g, '<li>') || "No summary available." 
+                      dangerouslySetInnerHTML={{
+                        __html: regulation.summary?.replace(/<li style="[^"]*">/g, '<li>') || "No summary available."
                       }}
                     />
                   </CardContent>
@@ -277,7 +277,7 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
                           <Button
                             variant="outline"
                             className="w-full"
-                            onClick={() => window.open('/help/compliance-guide', '_blank')}
+                            onClick={() => window.open('https://moravian.edu/compliance/guide', '_blank')}
                           >
                             View Submission Guide
                           </Button>
