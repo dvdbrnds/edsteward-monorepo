@@ -132,18 +132,30 @@ const CustomPieChart = ({
             />
             <Legend
               verticalAlign="bottom"
-              height={36}
+              height={50}
               iconType="circle"
               formatter={(value) => (
                 <span 
-                  className={`text-[#666666] ml-2 cursor-pointer ${activeFilter === value ? 'font-bold' : ''}`}
+                  className={`
+                    text-[#666666] 
+                    ml-2 
+                    cursor-pointer 
+                    max-w-[120px] 
+                    truncate 
+                    inline-block
+                    align-middle
+                    ${activeFilter === value ? 'font-bold' : ''}
+                  `}
+                  title={value as string}
                   onClick={() => onSegmentClick(value as string)}
                 >
                   {value}
                 </span>
               )}
               wrapperStyle={{
-                paddingTop: '20px'
+                paddingTop: '20px',
+                paddingBottom: '10px',
+                overflowX: 'hidden'
               }}
             />
           </PieChart>
