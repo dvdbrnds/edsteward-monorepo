@@ -15,6 +15,8 @@ import { ProtectedRegulationRoute } from "./lib/protected-regulation-route";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 function Router() {
+  console.log('[Router] Initializing router');
+
   return (
     <ErrorBoundary>
       <Switch>
@@ -34,6 +36,8 @@ function Router() {
 }
 
 export default function App() {
+  console.log('[App] Initializing application');
+
   return (
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>

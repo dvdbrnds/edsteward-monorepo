@@ -53,6 +53,11 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
 
   const handleRowClick = (regulation: Regulation) => {
     if (regulation && regulation.id) {
+      console.log('[RegulationList] Clicking regulation:', {
+        id: regulation.id,
+        topic: regulation.topic,
+        navigationPath: `/regulations/${regulation.id}`
+      });
       navigate(`/regulations/${regulation.id}`);
     }
   };
