@@ -131,7 +131,7 @@ export default function UpcomingDeadlines({ categoryFilter }: UpcomingDeadlinesP
                     {icon}
                     <div>
                       <p className="font-medium text-gray-900 hover:text-[#00267A] transition-colors">
-                        {regulation?.topic || `Regulation #${deadline.regulationId}`}
+                        {regulation?.statuteIds || `Regulation #${deadline.regulationId}`}
                       </p>
                       <p className="text-sm text-gray-500">
                         Due: {format(new Date(deadline.dueDate), "PP")}
@@ -183,23 +183,6 @@ export default function UpcomingDeadlines({ categoryFilter }: UpcomingDeadlinesP
                           <p className="text-sm text-gray-600">
                             {getAgencyName(null)}
                           </p>
-                        )}
-                      </div>
-                      <div>
-                        <h4 className="text-sm font-medium text-gray-700">Regulation</h4>
-                        {regulation.regulationUrl ? (
-                          <a
-                            href={regulation.regulationUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-sm text-[#00267A] hover:text-[#003166] hover:underline inline-flex items-center gap-1"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            {regulation.statuteIds}
-                            <ExternalLink className="h-3 w-3" />
-                          </a>
-                        ) : (
-                          <p className="text-sm text-gray-600">{regulation.statuteIds}</p>
                         )}
                       </div>
                       <div>
