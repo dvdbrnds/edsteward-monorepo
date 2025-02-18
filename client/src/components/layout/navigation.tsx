@@ -32,6 +32,14 @@ import moravianLogo from "../../assets/Screenshot_2025-02-12_at_9.15.57_AM-remov
 
 const CHANGELOG = [
   {
+    version: "0.1.3",
+    date: "February 18, 2025",
+    changes: [
+      "Fixed HTML formatting in regulation summaries",
+      "Improved readability of regulation details",
+    ],
+  },
+  {
     version: "0.1.2",
     date: "February 18, 2025",
     changes: [
@@ -92,7 +100,7 @@ export default function Navigation() {
                 <Dialog>
                   <DialogTrigger asChild>
                     <button className="text-xs text-gray-300 ml-2 hover:text-white transition-colors">
-                      Alpha v0.1.2
+                      Alpha v0.1.3
                     </button>
                   </DialogTrigger>
                   <DialogContent>
