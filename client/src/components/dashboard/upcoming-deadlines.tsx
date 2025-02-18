@@ -2,14 +2,17 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import type { Deadline, Regulation } from "@shared/schema";
 import { format, differenceInDays } from "date-fns";
-import { AlertCircle, CheckCircle, Clock } from "lucide-react";
+import { AlertCircle, CheckCircle, Clock, ChevronDown, ChevronUp } from "lucide-react";
 import { Link } from "wouter";
+import { useState } from "react";
 
 interface UpcomingDeadlinesProps {
   categoryFilter: string | null;
 }
 
 export default function UpcomingDeadlines({ categoryFilter }: UpcomingDeadlinesProps) {
+  const [expandedDeadlineId, setExpandedDeadlineId] = useState<number | null>(null);
+
   const { data: deadlines, isLoading: deadlinesLoading } = useQuery<Deadline[]>({
     queryKey: ["/api/deadlines"],
   });
@@ -97,13 +100,12 @@ export default function UpcomingDeadlines({ categoryFilter }: UpcomingDeadlinesP
             const { icon, bgColor, textColor } = getStatusDetails(deadline);
             const daysUntilDue = differenceInDays(new Date(deadline.dueDate), new Date());
             const regulation = regulations.find(r => r.id === deadline.regulationId);
+            const isExpanded = expandedDeadlineId === deadline.id;
 
             return (
-              <Link 
-                key={deadline.id} 
-                href={`/regulations/${deadline.regulationId}`}
-              >
+              <div key={deadline.id} className="space-y-2">
                 <div
+                  onClick={() => setExpandedDeadlineId(isExpanded ? null : deadline.id)}
                   className="flex items-center justify-between p-4 bg-white border rounded-lg hover:border-[#00267A] hover:shadow-sm transition-all cursor-pointer"
                 >
                   <div className="flex items-center space-x-4">
@@ -122,19 +124,55 @@ export default function UpcomingDeadlines({ categoryFilter }: UpcomingDeadlinesP
                       </p>
                     </div>
                   </div>
-                  <span
-                    className={`px-2 py-1 text-xs font-medium rounded-full ${bgColor} ${textColor}`}
-                  >
-                    {deadline.status === "completed" 
-                      ? "Completed"
-                      : daysUntilDue < 0 
-                      ? "Overdue"
-                      : daysUntilDue <= 7 
-                      ? "Due Soon"
-                      : "Upcoming"}
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={`px-2 py-1 text-xs font-medium rounded-full ${bgColor} ${textColor}`}
+                    >
+                      {deadline.status === "completed" 
+                        ? "Completed"
+                        : daysUntilDue < 0 
+                        ? "Overdue"
+                        : daysUntilDue <= 7 
+                        ? "Due Soon"
+                        : "Upcoming"}
+                    </span>
+                    {isExpanded ? (
+                      <ChevronUp className="h-4 w-4 text-gray-500" />
+                    ) : (
+                      <ChevronDown className="h-4 w-4 text-gray-500" />
+                    )}
+                  </div>
                 </div>
-              </Link>
+
+                {/* Expanded Content */}
+                {isExpanded && regulation && (
+                  <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 ml-4">
+                    <div className="space-y-3">
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-700">Category</h4>
+                        <p className="text-sm text-gray-600">{regulation.category}</p>
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-700">Statute</h4>
+                        <p className="text-sm text-gray-600">{regulation.statute}</p>
+                      </div>
+                      {regulation.requirements && (
+                        <div>
+                          <h4 className="text-sm font-medium text-gray-700">Requirements</h4>
+                          <p className="text-sm text-gray-600">{regulation.requirements}</p>
+                        </div>
+                      )}
+                      <div className="pt-2">
+                        <Link href={`/regulations/${regulation.id}`}>
+                          <a className="text-sm text-[#00267A] hover:underline">
+                            View Full Regulation Details
+                          </a>
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
             );
           })}
           {sortedDeadlines.length === 0 && (
