@@ -55,10 +55,10 @@ export default function Navigation() {
 
   return (
     <nav className="bg-[#002147] shadow">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
+      <div className="max-w-[95%] xl:max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
+        <div className="flex items-center justify-between h-16 gap-4">
           {/* Logo and Navigation Links */}
-          <div className="flex items-center space-x-8">
+          <div className="flex items-center min-w-0">
             {/* Logo */}
             <div className="flex-shrink-0 flex items-center">
               <img 
@@ -66,7 +66,7 @@ export default function Navigation() {
                 alt="Moravian University Logo" 
                 className="h-8"
               />
-              <div className="ml-3">
+              <div className="ml-3 whitespace-nowrap">
                 <span className="text-xl font-bold text-white">
                   Compliance Portal
                 </span>
@@ -105,39 +105,41 @@ export default function Navigation() {
             </div>
 
             {/* Navigation Links */}
-            <div className="hidden sm:flex sm:space-x-4">
-              {links.map((link) => {
-                const Icon = link.icon;
-                const isActive = location === link.href;
-                return (
-                  <Link key={link.href} href={link.href}>
-                    <Button
-                      variant="ghost"
-                      className={`${
-                        isActive
-                          ? "text-white border-b-2 border-white"
-                          : "text-gray-300 hover:text-white hover:border-b-2 hover:border-gray-300"
-                      } flex items-center space-x-2 rounded-none px-1 h-16`}
-                    >
-                      <Icon className="h-4 w-4" />
-                      <span>{link.label}</span>
-                    </Button>
-                  </Link>
-                );
-              })}
+            <div className="hidden sm:flex sm:ml-6 overflow-x-auto">
+              <div className="flex space-x-2">
+                {links.map((link) => {
+                  const Icon = link.icon;
+                  const isActive = location === link.href;
+                  return (
+                    <Link key={link.href} href={link.href}>
+                      <Button
+                        variant="ghost"
+                        className={`${
+                          isActive
+                            ? "text-white border-b-2 border-white"
+                            : "text-gray-300 hover:text-white hover:border-b-2 hover:border-gray-300"
+                        } flex items-center space-x-2 rounded-none px-2 h-16 whitespace-nowrap`}
+                      >
+                        <Icon className="h-4 w-4" />
+                        <span>{link.label}</span>
+                      </Button>
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
           {/* User Info and Logout */}
-          <div className="flex items-center space-x-4">
-            <span className="text-sm text-gray-300 hidden sm:block">
+          <div className="flex items-center space-x-4 flex-shrink-0">
+            <span className="text-sm text-gray-300 hidden sm:block truncate max-w-[120px]">
               {user?.username}
             </span>
             <Button
               variant="ghost"
               onClick={() => logoutMutation.mutate()}
               disabled={logoutMutation.isPending}
-              className="text-gray-300 hover:text-white flex items-center space-x-2"
+              className="text-gray-300 hover:text-white flex items-center space-x-2 whitespace-nowrap"
             >
               {logoutMutation.isPending ? (
                 <Loader2 className="h-4 w-4 animate-spin" />
