@@ -32,6 +32,15 @@ import moravianLogo from "../../assets/Screenshot_2025-02-12_at_9.15.57_AM-remov
 
 const CHANGELOG = [
   {
+    version: "0.1.4",
+    date: "February 18, 2025",
+    changes: [
+      "Added in-platform submission guide feature",
+      "Integrated guide system with markdown support",
+      "Fixed external URL dependencies",
+    ],
+  },
+  {
     version: "0.1.3",
     date: "February 18, 2025",
     changes: [
@@ -88,9 +97,9 @@ export default function Navigation() {
           <div className="flex items-center min-w-0">
             {/* Logo */}
             <div className="flex-shrink-0 flex items-center">
-              <img 
+              <img
                 src={moravianLogo}
-                alt="Moravian University Logo" 
+                alt="Moravian University Logo"
                 className="h-8"
               />
               <div className="ml-3 whitespace-nowrap">
@@ -100,7 +109,7 @@ export default function Navigation() {
                 <Dialog>
                   <DialogTrigger asChild>
                     <button className="text-xs text-gray-300 ml-2 hover:text-white transition-colors">
-                      Alpha v0.1.3
+                      Alpha v0.1.4
                     </button>
                   </DialogTrigger>
                   <DialogContent>
@@ -161,8 +170,8 @@ export default function Navigation() {
           <div className="flex items-center flex-shrink-0">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   className="text-gray-300 hover:text-white flex items-center space-x-2"
                 >
                   <User className="h-4 w-4" />
