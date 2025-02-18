@@ -73,7 +73,7 @@ export default function UpcomingDeadlines({ categoryFilter }: UpcomingDeadlinesP
       .filter(reg => reg.category === categoryFilter)
       .map(reg => reg.id);
 
-    filteredDeadlines = filteredDeadlines.filter(deadline => 
+    filteredDeadlines = filteredDeadlines.filter(deadline =>
       regulationIds.includes(deadline.regulationId)
     );
   }
@@ -128,11 +128,11 @@ export default function UpcomingDeadlines({ categoryFilter }: UpcomingDeadlinesP
                     <span
                       className={`px-2 py-1 text-xs font-medium rounded-full ${bgColor} ${textColor}`}
                     >
-                      {deadline.status === "completed" 
+                      {deadline.status === "completed"
                         ? "Completed"
-                        : daysUntilDue < 0 
+                        : daysUntilDue < 0
                         ? "Overdue"
-                        : daysUntilDue <= 7 
+                        : daysUntilDue <= 7
                         ? "Due Soon"
                         : "Upcoming"}
                     </span>
@@ -144,17 +144,25 @@ export default function UpcomingDeadlines({ categoryFilter }: UpcomingDeadlinesP
                   </div>
                 </div>
 
-                {/* Expanded Content */}
                 {isExpanded && regulation && (
                   <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 ml-4">
                     <div className="space-y-3">
                       <div>
-                        <h4 className="text-sm font-medium text-gray-700">Category</h4>
-                        <p className="text-sm text-gray-600">{regulation.category}</p>
+                        <h4 className="text-sm font-medium text-gray-700">Regulation</h4>
+                        <p className="text-sm text-gray-600">{regulation.topic}</p>
                       </div>
                       <div>
-                        <h4 className="text-sm font-medium text-gray-700">Statute</h4>
+                        <h4 className="text-sm font-medium text-gray-700">Regulatory Agency</h4>
                         <p className="text-sm text-gray-600">{regulation.statute}</p>
+                        {regulation.statuteIds && (
+                          <p className="text-xs text-gray-500 mt-1">
+                            Reference ID: {regulation.statuteIds}
+                          </p>
+                        )}
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-700">Category</h4>
+                        <p className="text-sm text-gray-600">{regulation.category}</p>
                       </div>
                       {regulation.requirements && (
                         <div>
