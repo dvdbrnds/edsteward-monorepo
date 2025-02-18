@@ -54,10 +54,16 @@ export default function RegulationDetailPage() {
   }
 
   // Safely parse the ID and find the regulation
-  const regulationId = id ? parseInt(id, 10) : null;
-  const regulation = regulations?.find(r => 
-    regulationId !== null && !isNaN(regulationId) && r.id === regulationId
-  );
+  const parseId = (idStr: string | undefined): number | null => {
+    if (!idStr) return null;
+    const parsed = parseInt(idStr, 10);
+    return !isNaN(parsed) ? parsed : null;
+  };
+
+  const regulationId = parseId(id);
+  const regulation = regulations?.find(reg => {
+    return regulationId !== null && reg.id === regulationId;
+  });
 
   // If no regulation is found or ID is invalid, show error state
   if (!regulation || !regulations) {
@@ -72,7 +78,7 @@ export default function RegulationDetailPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600 mb-4">
-                  {!regulationId || isNaN(regulationId)
+                  {!regulationId
                     ? 'Invalid regulation ID format. Please use a valid numeric ID.'
                     : `The regulation with ID ${id} could not be found.`}
                 </p>
