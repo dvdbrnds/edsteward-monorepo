@@ -14,6 +14,7 @@ import { useState } from "react";
 import { Search, ExternalLink, CheckCircle, AlertCircle, Clock } from "lucide-react";
 import { differenceInDays, format } from "date-fns";
 import { useLocation } from "wouter";
+import { Loader2 } from "lucide-react";
 
 interface RegulationListProps {
   categoryFilter: string | null;
@@ -37,6 +38,27 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
   const { data: deadlines, isLoading: deadlinesLoading } = useQuery<Deadline[]>({
     queryKey: ["/api/deadlines"],
   });
+
+  // Show loading state
+  if (regulationsLoading || deadlinesLoading) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex items-center justify-center space-x-4">
+            <Loader2 className="h-6 w-6 animate-spin text-[#00267A]" />
+            <span>Loading regulations...</span>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Safe navigation handler
+  const handleRegulationClick = (regulationId: number) => {
+    if (regulationId) {
+      navigate(`/regulations/${regulationId}`);
+    }
+  };
 
   const getDeadlineStatus = (regulationId: number): StatusType | null => {
     if (!deadlines?.length) return null;
@@ -96,10 +118,6 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
     return matchesSearch && matchesCategory;
   }) || [];
 
-  if (regulationsLoading || deadlinesLoading) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <Card>
       <CardContent className="p-6">
@@ -136,7 +154,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                     key={regulation.id}
                     className="cursor-pointer hover:bg-gray-50"
                     onClick={() => {
-                      navigate(`/regulations/${regulation.id}`);
+                      handleRegulationClick(regulation.id);
                     }}
                   >
                     <TableCell className="font-medium">

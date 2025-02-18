@@ -25,7 +25,7 @@ type StatusType = {
 };
 
 export default function RegulationDetailPage() {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const [_, navigate] = useLocation();
 
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
@@ -36,13 +36,14 @@ export default function RegulationDetailPage() {
     queryKey: ["/api/deadlines"],
   });
 
-  if (regulationsLoading || deadlinesLoading || !regulations) {
+  // Show loading state while fetching data
+  if (regulationsLoading || deadlinesLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Navigation />
         <main className="py-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center justify-center space-x-4">
               <Loader2 className="h-6 w-6 animate-spin text-[#00267A]" />
               <span>Loading regulation details...</span>
             </div>
@@ -52,11 +53,14 @@ export default function RegulationDetailPage() {
     );
   }
 
-  // Get regulation ID from params and find regulation
+  // Safely parse the ID and find the regulation
   const regulationId = id ? parseInt(id, 10) : null;
-  const regulation = regulationId ? regulations.find(r => r.id === regulationId) : null;
+  const regulation = regulations?.find(r => 
+    regulationId !== null && !isNaN(regulationId) && r.id === regulationId
+  );
 
-  if (!regulation) {
+  // If no regulation is found or ID is invalid, show error state
+  if (!regulation || !regulations) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Navigation />
@@ -68,13 +72,14 @@ export default function RegulationDetailPage() {
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600 mb-4">
-                  {regulationId === null 
+                  {!regulationId || isNaN(regulationId)
                     ? 'Invalid regulation ID format. Please use a valid numeric ID.'
                     : `The regulation with ID ${id} could not be found.`}
                 </p>
                 <Button
                   variant="outline"
                   onClick={() => navigate("/regulations")}
+                  className="flex items-center"
                 >
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Return to Regulations
