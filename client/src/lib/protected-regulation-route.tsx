@@ -17,11 +17,9 @@ export function ProtectedRegulationRoute({
   console.log('[ProtectedRegulationRoute] Initializing with path:', path);
 
   const { user, isLoading: authLoading } = useAuth();
-  const [params] = useParams();
 
   console.log('[ProtectedRegulationRoute] Current state:', {
     path,
-    params,
     hasUser: !!user,
     isAuthLoading: authLoading
   });
@@ -32,8 +30,8 @@ export function ProtectedRegulationRoute({
 
   return (
     <Route path={path}>
-      {(routeParams: { id?: string }) => {
-        console.log('[ProtectedRegulationRoute] Route matched with params:', routeParams);
+      {(params: { id?: string }) => {
+        console.log('[ProtectedRegulationRoute] Route matched with params:', params);
 
         if (authLoading || regulationsLoading) {
           console.log('[ProtectedRegulationRoute] Loading state:', {
@@ -53,7 +51,7 @@ export function ProtectedRegulationRoute({
           return <Redirect to="/auth" />;
         }
 
-        const regulationId = routeParams?.id ? parseInt(routeParams.id, 10) : null;
+        const regulationId = params?.id ? parseInt(params.id, 10) : null;
         const regulation = regulationId && !isNaN(regulationId)
           ? regulations?.find(r => r.id === regulationId)
           : null;
