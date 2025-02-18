@@ -1,7 +1,6 @@
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import type { Regulation } from "@shared/schema";
-import { Button } from "@/components/ui/button";
 import Navigation from "@/components/layout/navigation";
 import {
   Card,
@@ -11,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { useState } from "react";
 
