@@ -8,6 +8,8 @@ import {
   FileText,
   LogOut,
   Loader2,
+  User,
+  Settings,
 } from "lucide-react";
 import {
   Dialog,
@@ -16,6 +18,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 // Import the logo using relative path from client's perspective
 import moravianLogo from "../../assets/Screenshot_2025-02-12_at_9.15.57_AM-removebg-preview.png";
@@ -130,26 +140,47 @@ export default function Navigation() {
             </div>
           </div>
 
-          {/* User Info and Logout */}
-          <div className="flex items-center space-x-4 flex-shrink-0">
-            <span className="text-sm text-gray-300 hidden sm:block truncate max-w-[120px]">
-              {user?.username}
-            </span>
-            <Button
-              variant="ghost"
-              onClick={() => logoutMutation.mutate()}
-              disabled={logoutMutation.isPending}
-              className="text-gray-300 hover:text-white flex items-center space-x-2 whitespace-nowrap"
-            >
-              {logoutMutation.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <>
-                  <LogOut className="h-4 w-4" />
-                  <span>Logout</span>
-                </>
-              )}
-            </Button>
+          {/* User Menu Dropdown */}
+          <div className="flex items-center flex-shrink-0">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  className="text-gray-300 hover:text-white flex items-center space-x-2"
+                >
+                  <User className="h-4 w-4" />
+                  <span className="hidden sm:block truncate max-w-[120px]">
+                    {user?.username}
+                  </span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem disabled className="flex items-center">
+                  <Settings className="mr-2 h-4 w-4" />
+                  <span>Account Settings</span>
+                  <span className="ml-auto text-xs text-muted-foreground">(Coming Soon)</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => logoutMutation.mutate()}
+                  disabled={logoutMutation.isPending}
+                  className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                >
+                  {logoutMutation.isPending ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      <span>Logging out...</span>
+                    </>
+                  ) : (
+                    <>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Logout</span>
+                    </>
+                  )}
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>
