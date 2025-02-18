@@ -149,7 +149,20 @@ export default function UpcomingDeadlines({ categoryFilter }: UpcomingDeadlinesP
                     <div className="space-y-3">
                       <div>
                         <h4 className="text-sm font-medium text-gray-700">Agency</h4>
-                        <p className="text-sm text-gray-600">{regulation.statute}</p>
+                        {regulation.agencyUrl ? (
+                          <a
+                            href={regulation.agencyUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-sm text-[#00267A] hover:text-[#003166] hover:underline inline-flex items-center gap-1"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {regulation.statute}
+                            <ExternalLink className="h-3 w-3" />
+                          </a>
+                        ) : (
+                          <p className="text-sm text-gray-600">{regulation.statute}</p>
+                        )}
                       </div>
                       <div>
                         <h4 className="text-sm font-medium text-gray-700">Regulation</h4>
@@ -159,6 +172,7 @@ export default function UpcomingDeadlines({ categoryFilter }: UpcomingDeadlinesP
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-sm text-[#00267A] hover:text-[#003166] hover:underline inline-flex items-center gap-1"
+                            onClick={(e) => e.stopPropagation()}
                           >
                             {regulation.statuteIds}
                             <ExternalLink className="h-3 w-3" />
