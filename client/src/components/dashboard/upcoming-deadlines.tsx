@@ -14,14 +14,11 @@ export default function UpcomingDeadlines({ categoryFilter }: UpcomingDeadlinesP
   const [expandedDeadlineId, setExpandedDeadlineId] = useState<number | null>(null);
 
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
-    queryKey: ["/api/regulations"],
-    onSuccess: (data) => {
-      console.log('[UpcomingDeadlines] Loaded regulations:', data);
-    }
+    queryKey: ["/api/regulations"]
   });
 
   const { data: deadlines, isLoading: deadlinesLoading } = useQuery<Deadline[]>({
-    queryKey: ["/api/deadlines"],
+    queryKey: ["/api/deadlines"]
   });
 
   if (deadlinesLoading || regulationsLoading || !deadlines || !regulations) {
@@ -34,6 +31,25 @@ export default function UpcomingDeadlines({ categoryFilter }: UpcomingDeadlinesP
       </Card>
     );
   }
+
+  const getAgencyName = (url: string | null): string => {
+    if (!url) return "N/A";
+
+    const urlMap: Record<string, string> = {
+      "www.ed.gov": "Department of Education",
+      "www.eeoc.gov": "Equal Employment Opportunity Commission",
+      "www.justice.gov": "Department of Justice",
+      "www.osha.gov": "Occupational Safety and Health Administration",
+      "www.dhs.gov": "Department of Homeland Security"
+    };
+
+    try {
+      const hostname = new URL(url).hostname;
+      return urlMap[hostname] || hostname;
+    } catch {
+      return "N/A";
+    }
+  };
 
   const getStatusDetails = (deadline: Deadline) => {
     if (deadline.status === "completed") {
@@ -104,12 +120,7 @@ export default function UpcomingDeadlines({ categoryFilter }: UpcomingDeadlinesP
             const daysUntilDue = differenceInDays(new Date(deadline.dueDate), new Date());
             const regulation = regulations.find(r => r.id === deadline.regulationId);
             const isExpanded = expandedDeadlineId === deadline.id;
-            console.log('[UpcomingDeadlines] Processing regulation:', {
-              id: regulation?.id,
-              statute: regulation?.statute,
-              agency_url: regulation?.agency_url,
-              regulationUrl: regulation?.regulationUrl
-            });
+
             return (
               <div key={deadline.id} className="space-y-2">
                 <div
@@ -163,24 +174,14 @@ export default function UpcomingDeadlines({ categoryFilter }: UpcomingDeadlinesP
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-sm text-[#00267A] hover:text-[#003166] hover:underline inline-flex items-center gap-1"
-                            onClick={(e) => {
-                              console.log('[UpcomingDeadlines] Agency link clicked:', {
-                                agency_url: regulation.agency_url,
-                                statute: regulation.statute
-                              });
-                              e.stopPropagation();
-                            }}
+                            onClick={(e) => e.stopPropagation()}
                           >
-                            {regulation.statute}
+                            {getAgencyName(regulation.agency_url)}
                             <ExternalLink className="h-3 w-3" />
                           </a>
                         ) : (
                           <p className="text-sm text-gray-600">
-                            {regulation.statute}
-                            {/* Debug output */}
-                            <span className="hidden">
-                              {console.log('[UpcomingDeadlines] No agency_url for:', regulation.statute)}
-                            </span>
+                            {getAgencyName(null)}
                           </p>
                         )}
                       </div>
