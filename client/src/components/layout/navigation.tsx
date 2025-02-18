@@ -9,9 +9,38 @@ import {
   LogOut,
   Loader2,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 
 // Import the logo using relative path from client's perspective
 import moravianLogo from "../../assets/Screenshot_2025-02-12_at_9.15.57_AM-removebg-preview.png";
+
+const CHANGELOG = [
+  {
+    version: "0.1.1",
+    date: "February 18, 2025",
+    changes: [
+      "Fixed legend formatting in reports page pie charts",
+      "Added changelog tracking system",
+    ],
+  },
+  {
+    version: "0.1.0",
+    date: "February 12, 2025",
+    changes: [
+      "Initial alpha release",
+      "Core authentication system",
+      "Basic compliance tracking",
+      "Department-specific views",
+      "Responsive design implementation",
+    ],
+  },
+];
 
 export default function Navigation() {
   const { user, logoutMutation } = useAuth();
@@ -41,9 +70,37 @@ export default function Navigation() {
                 <span className="text-xl font-bold text-white">
                   Compliance Portal
                 </span>
-                <span className="text-xs text-gray-300 ml-2">
-                  Alpha v0.1.0
-                </span>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <button className="text-xs text-gray-300 ml-2 hover:text-white transition-colors">
+                      Alpha v0.1.1
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Changelog</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-6">
+                      {CHANGELOG.map((release) => (
+                        <div key={release.version}>
+                          <h3 className="text-lg font-semibold flex items-center gap-2">
+                            v{release.version}
+                            <span className="text-sm font-normal text-gray-500">
+                              {release.date}
+                            </span>
+                          </h3>
+                          <ul className="mt-2 list-disc list-inside space-y-1">
+                            {release.changes.map((change, idx) => (
+                              <li key={idx} className="text-sm text-gray-600">
+                                {change}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
 
