@@ -158,16 +158,16 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                   <TableCell>{regulation.category}</TableCell>
                   <TableCell>
                     {regulation.requirements && regulation.regulationUrl ? (
-                      <a
-                        href={regulation.regulationUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.open(regulation.regulationUrl, '_blank');
+                        }}
                         className="text-[#00267A] hover:text-[#003166] underline decoration-[#00267A] hover:decoration-[#003166] inline-flex items-center gap-2 group"
-                        onClick={(e) => e.stopPropagation()}
                       >
                         <span className="break-words">{regulation.requirements}</span>
                         <ExternalLink className="h-3 w-3 text-[#00267A] group-hover:text-[#003166] transition-colors" />
-                      </a>
+                      </button>
                     ) : regulation.requirements || "N/A"}
                   </TableCell>
                   <TableCell>
