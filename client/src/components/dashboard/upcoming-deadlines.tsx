@@ -131,7 +131,18 @@ export default function UpcomingDeadlines({ categoryFilter }: UpcomingDeadlinesP
                     {icon}
                     <div>
                       <p className="font-medium text-gray-900 hover:text-[#00267A] transition-colors">
-                        {regulation?.statuteIds || `Regulation #${deadline.regulationId}`}
+                        {regulation ? (
+                          <>
+                            {regulation.statuteIds}
+                            {regulation.topic && (
+                              <span className="text-gray-600 ml-2">
+                                {regulation.topic}
+                              </span>
+                            )}
+                          </>
+                        ) : (
+                          `Regulation #${deadline.regulationId}`
+                        )}
                       </p>
                       <p className="text-sm text-gray-500">
                         Due: {format(new Date(deadline.dueDate), "PP")}
