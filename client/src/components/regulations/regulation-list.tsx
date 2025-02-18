@@ -1,5 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import type { Regulation, Deadline } from "@shared/schema";
+import { useLocation } from "wouter";
+import { Search, ExternalLink, CheckCircle, AlertCircle, Clock, Loader2 } from "lucide-react";
+import { differenceInDays, format } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
@@ -11,10 +14,6 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useState } from "react";
-import { Search, ExternalLink, CheckCircle, AlertCircle, Clock } from "lucide-react";
-import { differenceInDays, format } from "date-fns";
-import { useLocation } from "wouter";
-import { Loader2 } from "lucide-react";
 
 interface RegulationListProps {
   categoryFilter: string | null;
@@ -39,7 +38,6 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
     queryKey: ["/api/deadlines"],
   });
 
-  // Show loading state
   if (regulationsLoading || deadlinesLoading) {
     return (
       <Card>
@@ -53,9 +51,10 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
     );
   }
 
-  const handleRegulationClick = (regulation: Regulation) => {
-    console.log('Navigating to regulation:', regulation);
-    navigate(`/regulations/${regulation.id}`);
+  const handleRowClick = (regulation: Regulation) => {
+    if (regulation && regulation.id) {
+      navigate(`/regulations/${regulation.id}`);
+    }
   };
 
   const getDeadlineStatus = (regulationId: number): StatusType | null => {
@@ -105,16 +104,6 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
     };
   };
 
-  const filteredRegulations = regulations?.filter((reg) => {
-    const matchesSearch =
-      reg.topic.toLowerCase().includes(search.toLowerCase()) ||
-      reg.statute.toLowerCase().includes(search.toLowerCase()) ||
-      reg.itemId.toLowerCase().includes(search.toLowerCase());
-
-    const matchesCategory = !categoryFilter || reg.category === categoryFilter;
-
-    return matchesSearch && matchesCategory;
-  }) || [];
 
   return (
     <Card>
@@ -144,11 +133,11 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredRegulations.map((regulation) => (
+              {regulations?.map((regulation) => (
                 <TableRow
                   key={regulation.id}
                   className="cursor-pointer hover:bg-gray-50"
-                  onClick={() => handleRegulationClick(regulation)}
+                  onClick={() => handleRowClick(regulation)}
                 >
                   <TableCell className="font-medium">
                     {regulation.itemId}
@@ -158,16 +147,16 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                   <TableCell>{regulation.category}</TableCell>
                   <TableCell>
                     {regulation.requirements && regulation.regulationUrl ? (
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          window.open(regulation.regulationUrl, '_blank');
-                        }}
+                      <a
+                        href={regulation.regulationUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className="text-[#00267A] hover:text-[#003166] underline decoration-[#00267A] hover:decoration-[#003166] inline-flex items-center gap-2 group"
+                        onClick={(e) => e.stopPropagation()}
                       >
                         <span className="break-words">{regulation.requirements}</span>
                         <ExternalLink className="h-3 w-3 text-[#00267A] group-hover:text-[#003166] transition-colors" />
-                      </button>
+                      </a>
                     ) : regulation.requirements || "N/A"}
                   </TableCell>
                   <TableCell>
