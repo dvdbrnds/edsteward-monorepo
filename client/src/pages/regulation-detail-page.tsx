@@ -162,9 +162,12 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
                     <CardTitle>Summary</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-gray-700">
-                      {regulation.summary || "No summary available."}
-                    </p>
+                    <div 
+                      className="text-gray-700"
+                      dangerouslySetInnerHTML={{ 
+                        __html: regulation.summary?.replace(/<li style="[^"]*">/g, '<li>') || "No summary available." 
+                      }}
+                    />
                   </CardContent>
                 </Card>
 
