@@ -20,11 +20,24 @@ export const regulations = pgTable("regulations", {
   statuteIds: text("statute_ids"),
   summary: text("summary"),
   requirements: text("requirements"),
-  requirementsUrl: text("requirements_url"), // New field for the source URL
-  regulationUrl: text("regulation_url"), // New field for specific regulation URL
+  requirementsUrl: text("requirements_url"),
+  regulationUrl: text("regulation_url"),
   deadlines: text("deadlines"),
   category: text("category").notNull(),
   lastUpdated: timestamp("last_updated"),
+});
+
+// Comments table
+// PREVIOUS STATE: No comments table exists
+// INTENDED CHANGE: Add comments table with relations to users and regulations
+// EXPECTED OUTCOME: Enable threaded comments on regulations with user attribution
+export const comments = pgTable("comments", {
+  id: serial("id").primaryKey(),
+  regulationId: integer("regulation_id").notNull(),
+  userId: integer("user_id").notNull(),
+  content: text("content").notNull(),
+  parentId: integer("parent_id"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
 // Notifications table
@@ -32,8 +45,8 @@ export const notifications = pgTable("notifications", {
   id: serial("id").primaryKey(),
   regulationId: integer("regulation_id").notNull(),
   userId: integer("user_id").notNull(),
-  type: text("type").notNull(), // email, sms
-  frequency: text("frequency").notNull(), // daily, weekly, monthly
+  type: text("type").notNull(),
+  frequency: text("frequency").notNull(),
   enabled: boolean("enabled").notNull().default(true),
 });
 
@@ -42,7 +55,7 @@ export const deadlines = pgTable("deadlines", {
   id: serial("id").primaryKey(),
   regulationId: integer("regulation_id").notNull(),
   dueDate: date("due_date").notNull(),
-  status: text("status").notNull(), // pending, completed, overdue
+  status: text("status").notNull(),
   assignedTo: integer("assigned_to").notNull(),
 });
 
@@ -61,6 +74,13 @@ export const insertRegulationSchema = createInsertSchema(regulations)
     regulationUrl: z.string().url().optional(),
   });
 
+// Schema for inserting comments
+export const insertCommentSchema = createInsertSchema(comments)
+  .extend({
+    content: z.string().min(1, "Comment cannot be empty"),
+    parentId: z.number().optional(),
+  });
+
 // Schema for inserting notifications
 export const insertNotificationSchema = createInsertSchema(notifications);
 
@@ -72,6 +92,8 @@ export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type Regulation = typeof regulations.$inferSelect;
 export type InsertRegulation = z.infer<typeof insertRegulationSchema>;
+export type Comment = typeof comments.$inferSelect;
+export type InsertComment = z.infer<typeof insertCommentSchema>;
 export type Notification = typeof notifications.$inferSelect;
 export type InsertNotification = z.infer<typeof insertNotificationSchema>;
 export type Deadline = typeof deadlines.$inferSelect;

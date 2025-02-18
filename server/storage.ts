@@ -1,4 +1,4 @@
-import { users, regulations, notifications, deadlines } from "@shared/schema";
+import { users, regulations, notifications, deadlines, comments } from "@shared/schema";
 import type {
   User,
   InsertUser,
@@ -8,6 +8,8 @@ import type {
   InsertNotification,
   Deadline,
   InsertDeadline,
+  Comment,
+  InsertComment,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -26,6 +28,12 @@ export interface IStorage {
   // Regulation methods
   getRegulations(): Promise<Regulation[]>;
   createRegulation(regulation: InsertRegulation): Promise<Regulation>;
+
+  // Comment methods
+  getCommentsByRegulation(regulationId: number): Promise<Comment[]>;
+  createComment(comment: InsertComment): Promise<Comment>;
+  updateComment(id: number, content: string): Promise<Comment>;
+  deleteComment(id: number): Promise<void>;
 
   // Notification methods
   getNotificationsByUser(userId: number): Promise<Notification[]>;
@@ -71,6 +79,31 @@ export class DatabaseStorage implements IStorage {
   async createRegulation(regulation: InsertRegulation): Promise<Regulation> {
     const [newRegulation] = await db.insert(regulations).values(regulation).returning();
     return newRegulation;
+  }
+
+  async getCommentsByRegulation(regulationId: number): Promise<Comment[]> {
+    return await db
+      .select()
+      .from(comments)
+      .where(eq(comments.regulationId, regulationId));
+  }
+
+  async createComment(comment: InsertComment): Promise<Comment> {
+    const [newComment] = await db.insert(comments).values(comment).returning();
+    return newComment;
+  }
+
+  async updateComment(id: number, content: string): Promise<Comment> {
+    const [updatedComment] = await db
+      .update(comments)
+      .set({ content })
+      .where(eq(comments.id, id))
+      .returning();
+    return updatedComment;
+  }
+
+  async deleteComment(id: number): Promise<void> {
+    await db.delete(comments).where(eq(comments.id, id));
   }
 
   async getNotificationsByUser(userId: number): Promise<Notification[]> {
