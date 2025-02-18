@@ -53,13 +53,6 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
     );
   }
 
-  // Safe navigation handler with type checking
-  const handleRegulationClick = (regulationId: number) => {
-    if (typeof regulationId === 'number' && !isNaN(regulationId)) {
-      navigate(`/regulations/${regulationId}`);
-    }
-  };
-
   const getDeadlineStatus = (regulationId: number): StatusType | null => {
     if (!deadlines?.length) return null;
 
@@ -150,7 +143,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                 <TableRow
                   key={regulation.id}
                   className="cursor-pointer hover:bg-gray-50"
-                  onClick={() => handleRegulationClick(regulation.id)}
+                  onClick={() => navigate(`/regulations/${regulation.id}`)}
                 >
                   <TableCell className="font-medium">
                     {regulation.itemId}
@@ -175,9 +168,9 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                   <TableCell>
                     {getDeadlineStatus(regulation.id) ? (
                       <div className="flex items-center gap-2">
-                        {getDeadlineStatus(regulation.id).icon}
-                        <span className={getDeadlineStatus(regulation.id).className}>
-                          {getDeadlineStatus(regulation.id).label}: {getDeadlineStatus(regulation.id).date}
+                        {getDeadlineStatus(regulation.id)!.icon}
+                        <span className={getDeadlineStatus(regulation.id)!.className}>
+                          {getDeadlineStatus(regulation.id)!.label}: {getDeadlineStatus(regulation.id)!.date}
                         </span>
                       </div>
                     ) : (
