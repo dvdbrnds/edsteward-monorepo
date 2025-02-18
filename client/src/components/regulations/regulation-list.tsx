@@ -26,6 +26,26 @@ type StatusType = {
   date: string;
 };
 
+// Helper function to get agency name from URL
+const getAgencyName = (url: string | null): string => {
+  if (!url) return "N/A";
+
+  const urlMap: Record<string, string> = {
+    "www.ed.gov": "Department of Education",
+    "www.eeoc.gov": "Equal Employment Opportunity Commission",
+    "www.justice.gov": "Department of Justice",
+    "www.osha.gov": "Occupational Safety and Health Administration",
+    "www.dhs.gov": "Department of Homeland Security"
+  };
+
+  try {
+    const hostname = new URL(url).hostname;
+    return urlMap[hostname] || hostname;
+  } catch {
+    return url;
+  }
+};
+
 export default function RegulationList({ categoryFilter }: RegulationListProps) {
   const [search, setSearch] = useState("");
   const [_, navigate] = useLocation();
@@ -53,11 +73,6 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
 
   const handleRowClick = (regulation: Regulation) => {
     if (regulation && regulation.id) {
-      console.log('[RegulationList] Clicking regulation:', {
-        id: regulation.id,
-        topic: regulation.topic,
-        navigationPath: `/regulations/${regulation.id}`
-      });
       navigate(`/regulations/${regulation.id}`);
     }
   };
@@ -131,7 +146,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                 <TableHead>ID</TableHead>
                 <TableHead>Topic</TableHead>
                 <TableHead>Agency</TableHead>
-                <TableHead>Regulation Details</TableHead>
+                <TableHead>Regulation</TableHead>
                 <TableHead>Category</TableHead>
                 <TableHead>Next Deadline</TableHead>
               </TableRow>
@@ -156,27 +171,19 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                         className="text-[#00267A] hover:text-[#003166] underline decoration-[#00267A] hover:decoration-[#003166] inline-flex items-center gap-2 group"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        {regulation.statute}
+                        {getAgencyName(regulation.agency_url)}
                         <ExternalLink className="h-3 w-3 text-[#00267A] group-hover:text-[#003166] transition-colors" />
                       </a>
                     ) : (
-                      regulation.statute
+                      "N/A"
                     )}
                   </TableCell>
                   <TableCell>
-                    {regulation.requirements && regulation.regulationUrl ? (
-                      <a
-                        href={regulation.regulationUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[#00267A] hover:text-[#003166] underline decoration-[#00267A] hover:decoration-[#003166] inline-flex items-center gap-2 group"
-                        onClick={(e) => e.stopPropagation()}
-                      >
+                    {regulation.statute}
+                    {regulation.statuteIds && (
+                      <span className="text-gray-500 text-sm block">
                         {regulation.statuteIds}
-                        <ExternalLink className="h-3 w-3 text-[#00267A] group-hover:text-[#003166] transition-colors" />
-                      </a>
-                    ) : (
-                      regulation.statuteIds || "N/A"
+                      </span>
                     )}
                   </TableCell>
                   <TableCell>{regulation.category}</TableCell>
