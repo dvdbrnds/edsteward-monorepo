@@ -40,103 +40,146 @@ export default function ComplianceWizardPage() {
   }
 
   // Generate steps based on regulation requirements and agency guidelines
+  const getRegulationSpecificSteps = () => {
+    const baseSteps = [
+      {
+        title: `Overview of ${regulation.topic}`,
+        description: "Review specific regulation requirements",
+        content: (
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold">Regulation Details</h3>
+            <p className="text-gray-600">{regulation.requirements}</p>
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <h4 className="font-medium text-blue-800">Requirements Checklist:</h4>
+              <ul className="list-disc list-inside text-sm text-blue-700 mt-2">
+                {regulation.requirements?.split('\n').map((req, index) => (
+                  <li key={index}>{req}</li>
+                ))}
+              </ul>
+            </div>
+            {regulation.regulationUrl && (
+              <div className="mt-4">
+                <a
+                  href={regulation.regulationUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#00267A] hover:underline inline-flex items-center gap-2"
+                >
+                  View Complete Regulation Text
+                  <ArrowRight className="h-4 w-4" />
+                </a>
+              </div>
+            )}
+          </div>
+        ),
+      }
+    ];
+
+    // Add category-specific steps
+    switch (regulation.category) {
+      case "Academic Programs":
+        return [
+          ...baseSteps,
+          {
+            title: "Program Documentation",
+            description: "Gather academic program materials",
+            content: (
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Required Program Documentation</h3>
+                <div className="grid gap-4">
+                  <div className="flex items-start gap-3 p-4 border rounded-lg">
+                    <input type="checkbox" className="mt-1" />
+                    <div>
+                      <p className="font-medium">Course Materials</p>
+                      <p className="text-sm text-gray-600">
+                        Syllabi, course descriptions, and learning objectives
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 p-4 border rounded-lg">
+                    <input type="checkbox" className="mt-1" />
+                    <div>
+                      <p className="font-medium">Faculty Credentials</p>
+                      <p className="text-sm text-gray-600">
+                        Current CVs and teaching certifications
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ),
+          }
+        ];
+      case "Financial Aid":
+        return [
+          ...baseSteps,
+          {
+            title: "Financial Documentation",
+            description: "Prepare financial aid compliance documents",
+            content: (
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Required Financial Documentation</h3>
+                <div className="grid gap-4">
+                  <div className="flex items-start gap-3 p-4 border rounded-lg">
+                    <input type="checkbox" className="mt-1" />
+                    <div>
+                      <p className="font-medium">Aid Distribution Records</p>
+                      <p className="text-sm text-gray-600">
+                        Documentation of financial aid disbursement and policies
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ),
+          }
+        ];
+      default:
+        return [
+          ...baseSteps,
+          {
+            title: "Documentation",
+            description: "Gather supporting documentation",
+            content: (
+              <div className="space-y-4">
+                <h3 className="text-lg font-semibold">Required Documentation</h3>
+                <div className="space-y-4">
+                  <p className="text-gray-600">
+                    Please gather all relevant documentation as specified in the regulation text.
+                  </p>
+                </div>
+              </div>
+            ),
+          }
+        ];
+    }
+  };
+
   const steps = [
-    {
-      title: "Overview",
-      description: "Review regulation requirements",
-      content: (
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Regulation Overview</h3>
-          <p className="text-gray-600">{regulation.requirements}</p>
-          <div className="bg-blue-50 p-4 rounded-lg">
-            <h4 className="font-medium text-blue-800">Before you begin:</h4>
-            <ul className="list-disc list-inside text-sm text-blue-700 mt-2">
-              <li>Review the complete regulation text</li>
-              <li>Gather all necessary documentation</li>
-              <li>Consult with relevant department heads</li>
-            </ul>
-          </div>
-          {regulation.regulationUrl && (
-            <div className="mt-4">
-              <a
-                href={regulation.regulationUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#00267A] hover:underline inline-flex items-center gap-2"
-              >
-                View Complete Regulation Guidelines
-                <ArrowRight className="h-4 w-4" />
-              </a>
-            </div>
-          )}
-        </div>
-      ),
-    },
-    {
-      title: "Required Documentation",
-      description: "Gather necessary documents and evidence",
-      content: (
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Required Documentation</h3>
-          <div className="grid gap-4">
-            {/* Generate checkboxes based on regulation requirements */}
-            <div className="flex items-start gap-3 p-4 border rounded-lg">
-              <input type="checkbox" className="mt-1" />
-              <div>
-                <p className="font-medium">Course Materials</p>
-                <p className="text-sm text-gray-600">
-                  Syllabi, course descriptions, and learning objectives
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3 p-4 border rounded-lg">
-              <input type="checkbox" className="mt-1" />
-              <div>
-                <p className="font-medium">Faculty Credentials</p>
-                <p className="text-sm text-gray-600">
-                  Current CVs and teaching certifications
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3 p-4 border rounded-lg">
-              <input type="checkbox" className="mt-1" />
-              <div>
-                <p className="font-medium">Assessment Data</p>
-                <p className="text-sm text-gray-600">
-                  Student learning outcomes and program evaluation metrics
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      ),
-    },
+    ...getRegulationSpecificSteps(),
     {
       title: "Submission Process",
-      description: "Step-by-step submission guidelines",
+      description: `${regulation.topic} submission guidelines`,
       content: (
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Submission Guidelines</h3>
+          <h3 className="text-lg font-semibold">Submission Guidelines for {regulation.topic}</h3>
           <div className="space-y-6">
             <div className="space-y-2">
               <h4 className="font-medium">Step 1: Document Preparation</h4>
               <p className="text-gray-600">
-                Ensure all documents are in the required format (PDF preferred)
-                and follow the naming convention specified by the agency.
+                Format all documents according to {regulation.statute} requirements.
               </p>
             </div>
             <div className="space-y-2">
               <h4 className="font-medium">Step 2: Data Verification</h4>
               <p className="text-gray-600">
-                Review all data points for accuracy and completeness. Cross-reference
-                with source documentation.
+                Verify all data points against source documentation.
               </p>
             </div>
             <div className="space-y-2">
               <h4 className="font-medium">Step 3: Submit Report</h4>
               <p className="text-gray-600">
-                Upload your completed compliance report through the agency's
-                designated portal or submission system.
+                Submit through the designated compliance portal.
               </p>
             </div>
           </div>
@@ -145,23 +188,23 @@ export default function ComplianceWizardPage() {
     },
     {
       title: "Review & Submit",
-      description: "Final review and submission",
+      description: `Review ${regulation.topic} submission`,
       content: (
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Final Review</h3>
+          <h3 className="text-lg font-semibold">Final Review for {regulation.topic}</h3>
           <div className="space-y-4">
             <p className="text-gray-600">
               Please review all information before final submission. Ensure:
             </p>
             <ul className="list-disc list-inside space-y-2 text-gray-600">
               <li>All required documentation is attached</li>
-              <li>Data accuracy has been verified</li>
-              <li>Supporting evidence is properly referenced</li>
-              <li>Submission deadlines are met</li>
+              <li>Documentation follows {regulation.statute} guidelines</li>
+              <li>Supporting evidence properly references {regulation.statuteIds}</li>
+              <li>Submission meets specified deadlines</li>
             </ul>
             <div className="mt-6">
               <Button className="w-full">
-                Generate Final Report
+                Generate Compliance Report for {regulation.topic}
               </Button>
             </div>
           </div>
@@ -185,11 +228,10 @@ export default function ComplianceWizardPage() {
               Back to Regulation
             </Button>
             <h1 className="text-3xl font-bold text-gray-900">
-              Compliance Report Generator
+              {regulation.topic} - Compliance Report Generator
             </h1>
             <p className="mt-2 text-gray-600">
-              Follow the steps below to generate a compliance report for{" "}
-              {regulation.topic}
+              Follow the steps below to generate a compliance report for {regulation.topic}
             </p>
           </div>
 
