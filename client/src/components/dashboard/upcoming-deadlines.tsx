@@ -121,6 +121,12 @@ export default function UpcomingDeadlines({ categoryFilter }: UpcomingDeadlinesP
             const regulation = regulations.find(r => r.id === deadline.regulationId);
             const isExpanded = expandedDeadlineId === deadline.id;
 
+            const regulationTitle = regulation 
+              ? regulation.statuteIds 
+                ? `${regulation.statuteIds}${regulation.topic ? ` - ${regulation.topic}` : ''}`
+                : regulation.topic || `Regulation #${deadline.regulationId}`
+              : `Regulation #${deadline.regulationId}`;
+
             return (
               <div key={deadline.id} className="space-y-2">
                 <div
@@ -131,18 +137,7 @@ export default function UpcomingDeadlines({ categoryFilter }: UpcomingDeadlinesP
                     {icon}
                     <div>
                       <p className="font-medium text-gray-900 hover:text-[#00267A] transition-colors">
-                        {regulation ? (
-                          <>
-                            {regulation.statuteIds}
-                            {regulation.topic && (
-                              <span className="text-gray-600 ml-2">
-                                {regulation.topic}
-                              </span>
-                            )}
-                          </>
-                        ) : (
-                          `Regulation #${deadline.regulationId}`
-                        )}
+                        {regulationTitle}
                       </p>
                       <p className="text-sm text-gray-500">
                         Due: {format(new Date(deadline.dueDate), "PP")}
