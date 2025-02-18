@@ -32,6 +32,14 @@ import moravianLogo from "../../assets/Screenshot_2025-02-12_at_9.15.57_AM-remov
 
 const CHANGELOG = [
   {
+    version: "0.1.6",
+    date: "February 18, 2025",
+    changes: [
+      "Improved regulation title display in Upcoming Deadlines",
+      "Added combined view of regulation IDs and topics for better clarity",
+    ],
+  },
+  {
     version: "0.1.5",
     date: "February 18, 2025",
     changes: [
@@ -117,7 +125,7 @@ export default function Navigation() {
                 <Dialog>
                   <DialogTrigger asChild>
                     <button className="text-xs text-gray-300 ml-2 hover:text-white transition-colors">
-                      Alpha v0.1.5
+                      Alpha v0.1.6
                     </button>
                   </DialogTrigger>
                   <DialogContent>
