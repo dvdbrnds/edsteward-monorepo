@@ -148,17 +148,16 @@ export default function UpcomingDeadlines({ categoryFilter }: UpcomingDeadlinesP
                   <div className="p-4 bg-gray-50 rounded-lg border border-gray-200 ml-4">
                     <div className="space-y-3">
                       <div>
-                        <h4 className="text-sm font-medium text-gray-700">Regulation</h4>
-                        <p className="text-sm text-gray-600">{regulation.topic}</p>
+                        <h4 className="text-sm font-medium text-gray-700">Agency</h4>
+                        <p className="text-sm text-gray-600">{regulation.statute}</p>
                       </div>
                       <div>
-                        <h4 className="text-sm font-medium text-gray-700">Regulatory Agency</h4>
-                        <p className="text-sm text-gray-600">{regulation.statute}</p>
-                        {regulation.statuteIds && (
-                          <p className="text-xs text-gray-500 mt-1">
-                            Reference ID: {regulation.statuteIds}
-                          </p>
-                        )}
+                        <h4 className="text-sm font-medium text-gray-700">Regulation</h4>
+                        <p className="text-sm text-gray-600">{regulation.statuteIds}</p>
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-medium text-gray-700">Topic</h4>
+                        <p className="text-sm text-gray-600">{regulation.topic}</p>
                       </div>
                       <div>
                         <h4 className="text-sm font-medium text-gray-700">Category</h4>
