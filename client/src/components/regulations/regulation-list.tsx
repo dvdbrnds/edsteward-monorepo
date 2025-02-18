@@ -109,7 +109,6 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
     };
   };
 
-
   return (
     <Card>
       <CardContent className="p-6">
@@ -131,9 +130,9 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
               <TableRow>
                 <TableHead>ID</TableHead>
                 <TableHead>Topic</TableHead>
-                <TableHead>Statute</TableHead>
+                <TableHead>Agency</TableHead>
+                <TableHead>Regulation Details</TableHead>
                 <TableHead>Category</TableHead>
-                <TableHead>Requirements</TableHead>
                 <TableHead>Next Deadline</TableHead>
               </TableRow>
             </TableHeader>
@@ -148,8 +147,22 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                     {regulation.itemId}
                   </TableCell>
                   <TableCell>{regulation.topic}</TableCell>
-                  <TableCell>{regulation.statute}</TableCell>
-                  <TableCell>{regulation.category}</TableCell>
+                  <TableCell>
+                    {regulation.agency_url ? (
+                      <a
+                        href={regulation.agency_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#00267A] hover:text-[#003166] underline decoration-[#00267A] hover:decoration-[#003166] inline-flex items-center gap-2 group"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        {regulation.statute}
+                        <ExternalLink className="h-3 w-3 text-[#00267A] group-hover:text-[#003166] transition-colors" />
+                      </a>
+                    ) : (
+                      regulation.statute
+                    )}
+                  </TableCell>
                   <TableCell>
                     {regulation.requirements && regulation.regulationUrl ? (
                       <a
@@ -159,11 +172,14 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                         className="text-[#00267A] hover:text-[#003166] underline decoration-[#00267A] hover:decoration-[#003166] inline-flex items-center gap-2 group"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        <span className="break-words">{regulation.requirements}</span>
+                        {regulation.statuteIds}
                         <ExternalLink className="h-3 w-3 text-[#00267A] group-hover:text-[#003166] transition-colors" />
                       </a>
-                    ) : regulation.requirements || "N/A"}
+                    ) : (
+                      regulation.statuteIds || "N/A"
+                    )}
                   </TableCell>
+                  <TableCell>{regulation.category}</TableCell>
                   <TableCell>
                     {getDeadlineStatus(regulation.id) ? (
                       <div className="flex items-center gap-2">
