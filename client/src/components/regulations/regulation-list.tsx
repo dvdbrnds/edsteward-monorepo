@@ -168,11 +168,11 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                         href={regulation.agency_url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-[#00267A] hover:text-[#003166] underline decoration-[#00267A] hover:decoration-[#003166] inline-flex items-center gap-2 group"
+                        className="text-[#00267A] hover:text-[#003166] underline inline-flex items-center gap-2 group"
                         onClick={(e) => e.stopPropagation()}
                       >
                         {getAgencyName(regulation.agency_url)}
-                        <ExternalLink className="h-3 w-3 text-[#00267A] group-hover:text-[#003166] transition-colors" />
+                        <ExternalLink className="h-3 w-3" />
                       </a>
                     ) : (
                       "N/A"
