@@ -2,11 +2,12 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { insertRegulationSchema, insertNotificationSchema, insertDeadlineSchema, regulations } from "@shared/schema";
+import { insertRegulationSchema, insertNotificationSchema, insertDeadlineSchema } from "@shared/schema";
 import multer from "multer";
 import { parse } from "csv-parse/sync";
 import { eq } from "drizzle-orm";
 import { db } from "./db";
+import { regulations } from "@shared/schema";
 
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -32,6 +33,7 @@ export function registerRoutes(app: Express): Server {
     }
 
     try {
+      // Parse CSV content
       const fileContent = req.file.buffer.toString('utf-8');
       const records = parse(fileContent, {
         columns: (header: string[]) => {
@@ -46,26 +48,29 @@ export function registerRoutes(app: Express): Server {
       console.log(`Processing ${records.length} records from uploaded CSV`);
 
       let newCount = 0;
-      let updateCount = 0;
       let skipCount = 0;
+      let updateCount = 0;
 
       for (const record of records) {
         try {
+          // Combine multiple statute fields into one
           const statutes = [
             record['Statute 1'],
             record['Statute 2'],
             record['Statute 3'],
             record['Statute 4']
-          ].filter(Boolean);
+          ].filter(Boolean).join('; ');
 
-          const regulationTexts = [
+          // Combine multiple regulation fields
+          const requirements = [
             record['Regulation 1'],
             record['Regulation 2'],
             record['Regulation 3'],
             record['Regulation 4'],
             record['Regulation 5']
-          ].filter(Boolean);
+          ].filter(Boolean).join('\n\n');
 
+          // Extract category from Topic field or fallback to default categories
           let category = "Other";
           const topic = record['Topic'] || "";
           const itemId = record['Item ID'] || String(record['Topic ID'] || "");
@@ -76,48 +81,56 @@ export function registerRoutes(app: Express): Server {
           else if (topic.includes("Admission")) category = "Admissions";
           else if (topic.includes("Safety") || topic.includes("Security")) category = "Campus Safety";
 
+          // Check if regulation already exists
           const [existingRegulation] = await db
             .select()
             .from(regulations)
             .where(eq(regulations.itemId, itemId));
 
-          const regulationData = {
+          if (existingRegulation) {
+            if (
+              existingRegulation.topic !== topic ||
+              existingRegulation.statute !== record['Statute Name'] ||
+              existingRegulation.requirements !== requirements
+            ) {
+              // Update existing regulation if content has changed
+              await db
+                .update(regulations)
+                .set({
+                  topic,
+                  statute: record['Statute Name'] || statutes,
+                  statuteIds: record['Statute IDs'] || "",
+                  summary: record['Statutory Summary'] || "",
+                  requirements: requirements || record['Reporting Requirements'] || "",
+                  deadlines: record['Deadlines'] || "",
+                  category,
+                  lastUpdated: new Date()
+                })
+                .where(eq(regulations.id, existingRegulation.id));
+              updateCount++;
+            } else {
+              skipCount++;
+            }
+            continue;
+          }
+
+          const regulation = {
             itemId,
             topic,
-            topicId: record['Topic ID'] || null,
-            statute: record['Statute Name'] || statutes.join('; '),
-            statuteIds: record['Statute IDs'] || null,
-            summary: record['Statutory Summary'] || null,
-            requirements: regulationTexts.join('\n\n') || record['Reporting Requirements'] || null,
-            deadlines: record['Deadlines'] || null,
+            statute: record['Statute Name'] || statutes,
+            statuteIds: record['Statute IDs'] || "",
+            summary: record['Statutory Summary'] || "",
+            requirements: requirements || record['Reporting Requirements'] || "",
+            deadlines: record['Deadlines'] || "",
             category,
-            lastUpdated: new Date().toISOString(),
-            contactEmail: record['Contact Email'] || null,
-            department: record['Department'] || null,
-            complianceStatus: record['Compliance Status'] || null,
-            reviewFrequency: record['Review Frequency'] || null,
-            nextReviewDate: record['Next Review Date'] || null,
-            notes: record['Notes'] || null,
-            statutes,
-            regulations: regulationTexts,
+            lastUpdated: record['Last Updated'] ? new Date(record['Last Updated']) : new Date()
           };
 
-          if (existingRegulation) {
-            await db
-              .update(regulations)
-              .set(regulationData)
-              .where(eq(regulations.id, existingRegulation.id));
-            updateCount++;
-            console.log(`Updated regulation: ${itemId} (${category})`);
-          } else {
-            await storage.createRegulation(regulationData);
-            newCount++;
-            console.log(`Imported new regulation: ${itemId} (${category})`);
-          }
+          await storage.createRegulation(regulation);
+          newCount++;
         } catch (error) {
           console.error(`Failed to process record:`, error);
           console.error('Record data:', record);
-          skipCount++;
         }
       }
 
@@ -129,7 +142,7 @@ export function registerRoutes(app: Express): Server {
       });
     } catch (error) {
       console.error('Import failed:', error);
-      res.status(500).json({
+      res.status(500).json({ 
         message: 'Failed to import CSV file',
         error: error instanceof Error ? error.message : String(error)
       });

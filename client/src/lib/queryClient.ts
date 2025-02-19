@@ -8,26 +8,14 @@ async function throwIfResNotOk(res: Response) {
 }
 
 export async function apiRequest(
+  method: string,
   url: string,
-  options?: {
-    method?: string;
-    body?: FormData | unknown;
-    headers?: Record<string, string>;
-  }
+  data?: unknown | undefined,
 ): Promise<Response> {
-  // Don't set Content-Type for FormData, let the browser set it with the boundary
-  const headers = options?.body instanceof FormData
-    ? {}
-    : { "Content-Type": "application/json" };
-
   const res = await fetch(url, {
-    method: options?.method || "GET",
-    headers: { ...headers, ...options?.headers },
-    body: options?.body instanceof FormData
-      ? options.body
-      : options?.body
-        ? JSON.stringify(options.body)
-        : undefined,
+    method,
+    headers: data ? { "Content-Type": "application/json" } : {},
+    body: data ? JSON.stringify(data) : undefined,
     credentials: "include",
   });
 

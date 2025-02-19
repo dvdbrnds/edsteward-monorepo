@@ -2,35 +2,6 @@ import { pgTable, text, serial, integer, boolean, date, timestamp } from "drizzl
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Regulations table matching the actual database structure
-export const regulations = pgTable("regulations", {
-  id: serial("id").primaryKey(),
-  itemId: text("item_id").notNull(),
-  topic: text("topic").notNull(),
-  statute: text("statute").notNull(),
-  statuteUrl: text("statute_url"),
-  division: text("division"),
-  category: text("category"),
-  yearOfPassage: text("year_of_passage"),
-  yearOfAmendments: text("year_of_amendments"),
-  governmentLevel: text("government_level"),
-  oversightAgency: text("oversight_agency"),
-  complianceRequirements: text("compliance_requirements"),
-  communityNotifications: text("community_notifications"),
-  submissionRequirements: text("submission_requirements"),
-  relatedDepartments: text("related_departments").array(),
-  associatedLaws: text("associated_laws").array(),
-  noticeUrl: text("notice_url"),
-  policyUrl: text("policy_url"),
-  lastUpdated: timestamp("last_updated"),
-  contactEmail: text("contact_email"),
-  department: text("department"),
-  complianceStatus: text("compliance_status"),
-  reviewFrequency: text("review_frequency"),
-  nextReviewDate: date("next_review_date"),
-  notes: text("notes"),
-});
-
 // Users table
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -38,6 +9,23 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   role: text("role").notNull().default("user"),
   department: text("department"),
+});
+
+// Regulations table
+export const regulations = pgTable("regulations", {
+  id: serial("id").primaryKey(),
+  itemId: text("item_id").notNull(),
+  topic: text("topic").notNull(),
+  statute: text("statute").notNull(),
+  statuteIds: text("statute_ids"),
+  summary: text("summary"),
+  requirements: text("requirements"),
+  requirementsUrl: text("requirements_url"),
+  regulationUrl: text("regulation_url"),
+  agency_url: text("agency_url"),
+  deadlines: text("deadlines"),
+  category: text("category").notNull(),
+  lastUpdated: timestamp("last_updated"),
 });
 
 // Comments table
@@ -79,28 +67,40 @@ export const guides = pgTable("guides", {
   createdBy: integer("created_by").notNull(),
 });
 
-// Update the regulation schema
-export const insertRegulationSchema = createInsertSchema(regulations)
+// Schema for inserting users
+export const insertUserSchema = createInsertSchema(users)
   .extend({
-    statuteUrl: z.string().url().optional(),
-    noticeUrl: z.string().url().optional(),
-    policyUrl: z.string().url().optional(),
-    contactEmail: z.string().email().optional(),
+    password: z.string().min(6),
+    role: z.enum(["admin", "compliance_officer", "user"]),
     department: z.string().optional(),
-    complianceStatus: z.string().optional(),
-    reviewFrequency: z.string().optional(),
-    nextReviewDate: z.string().optional(),
-    notes: z.string().optional(),
-    relatedDepartments: z.array(z.string()).optional(),
-    associatedLaws: z.array(z.string()).optional(),
   });
 
-// Other schemas remain unchanged
-export const insertUserSchema = createInsertSchema(users);
-export const insertCommentSchema = createInsertSchema(comments);
+// Schema for inserting regulations
+export const insertRegulationSchema = createInsertSchema(regulations)
+  .extend({
+    requirementsUrl: z.string().url().optional(),
+    regulationUrl: z.string().url().optional(),
+  });
+
+// Schema for inserting comments
+export const insertCommentSchema = createInsertSchema(comments)
+  .extend({
+    content: z.string().min(1, "Comment cannot be empty"),
+    parentId: z.number().optional(),
+  });
+
+// Schema for inserting notifications
 export const insertNotificationSchema = createInsertSchema(notifications);
+
+// Schema for inserting deadlines
 export const insertDeadlineSchema = createInsertSchema(deadlines);
-export const insertGuideSchema = createInsertSchema(guides);
+
+// Schema for inserting guides
+export const insertGuideSchema = createInsertSchema(guides)
+  .extend({
+    content: z.string().min(1, "Guide content cannot be empty"),
+    category: z.enum(["submission", "compliance", "general"]),
+  });
 
 // Types
 export type User = typeof users.$inferSelect;

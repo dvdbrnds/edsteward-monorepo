@@ -187,7 +187,7 @@ export default function ReportsPage() {
     mutationFn: async (formData: FormData) => {
       const response = await apiRequest("/api/regulations/import", {
         method: "POST",
-        body: formData
+        body: formData,
       });
       return response.json();
     },
@@ -201,7 +201,7 @@ export default function ReportsPage() {
     onError: (error) => {
       toast({
         title: "Import Failed",
-        description: error instanceof Error ? error.message : "Failed to import regulations. Please check your CSV file format.",
+        description: "Failed to import regulations. Please check your CSV file format.",
         variant: "destructive",
       });
     },
@@ -431,134 +431,41 @@ export default function ReportsPage() {
                       className={getColumnStyle('itemId')}
                       onClick={() => requestSort('itemId')}
                     >
-                      <div className="flex items-center gap-2">
-                        ID
-                        {sortConfig?.key === 'itemId' && (
-                          <span>{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
-                        )}
-                      </div>
+                      ID
                     </TableHead>
                     <TableHead
                       className={getColumnStyle('topic')}
                       onClick={() => requestSort('topic')}
                     >
-                      <div className="flex items-center gap-2">
-                        Topic
-                        {sortConfig?.key === 'topic' && (
-                          <span>{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
-                        )}
-                      </div>
+                      Topic
                     </TableHead>
                     <TableHead
-                      className={getColumnStyle('statute')}
-                      onClick={() => requestSort('statute')}
+                      className={getColumnStyle('category')}
+                      onClick={() => requestSort('category')}
                     >
-                      <div className="flex items-center gap-2">
-                        Statute
-                        {sortConfig?.key === 'statute' && (
-                          <span>{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
-                        )}
-                      </div>
-                    </TableHead>
-                    <TableHead
-                      className={getColumnStyle('complianceStatus')}
-                      onClick={() => requestSort('complianceStatus')}
-                    >
-                      <div className="flex items-center gap-2">
-                        Status
-                        {sortConfig?.key === 'complianceStatus' && (
-                          <span>{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
-                        )}
-                      </div>
-                    </TableHead>
-                    <TableHead>Next Deadline</TableHead>
-                    <TableHead
-                      className={getColumnStyle('department')}
-                      onClick={() => requestSort('department')}
-                    >
-                      <div className="flex items-center gap-2">
-                        Department
-                        {sortConfig?.key === 'department' && (
-                          <span>{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
-                        )}
-                      </div>
+                      Category
                     </TableHead>
                     <TableHead
                       className={getColumnStyle('lastUpdated')}
                       onClick={() => requestSort('lastUpdated')}
                     >
-                      <div className="flex items-center gap-2">
-                        Last Updated
-                        {sortConfig?.key === 'lastUpdated' && (
-                          <span>{sortConfig.direction === 'asc' ? '↑' : '↓'}</span>
-                        )}
-                      </div>
+                      Last Updated
                     </TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {sortedRegulations.map((regulation) => {
-                    const regDeadlines = deadlines?.filter(d => d.regulationId === regulation.id) || [];
-                    const nextDeadline = regDeadlines.length > 0
-                      ? regDeadlines.sort((a, b) =>
-                          new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
-                        )[0]
-                      : null;
-
-                    return (
-                      <TableRow key={regulation.id}>
-                        <TableCell>{regulation.itemId}</TableCell>
-                        <TableCell className="max-w-xs">
-                          <div className="truncate" title={regulation.topic}>
-                            {regulation.topic}
-                          </div>
-                        </TableCell>
-                        <TableCell className="max-w-xs">
-                          <div className="truncate" title={regulation.statute}>
-                            {regulation.statute}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
-                            ${regulation.complianceStatus === 'Compliant'
-                              ? 'bg-green-100 text-green-800'
-                              : regulation.complianceStatus === 'Non-Compliant'
-                              ? 'bg-red-100 text-red-800'
-                              : 'bg-yellow-100 text-yellow-800'}`}
-                          >
-                            {regulation.complianceStatus || 'Pending Review'}
-                          </span>
-                        </TableCell>
-                        <TableCell>
-                          {nextDeadline ? (
-                            <div className="text-sm">
-                              <div>{format(new Date(nextDeadline.dueDate), "PP")}</div>
-                              <div className={`text-xs
-                                ${nextDeadline.status === 'completed'
-                                  ? 'text-green-600'
-                                  : nextDeadline.status === 'overdue'
-                                  ? 'text-red-600'
-                                  : 'text-yellow-600'}`}
-                              >
-                                {nextDeadline.status.charAt(0).toUpperCase() +
-                                  nextDeadline.status.slice(1)}
-                              </div>
-                            </div>
-                          ) : (
-                            <span className="text-gray-400">No deadlines</span>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {regulation.department || <span className="text-gray-400">-</span>}
-                        </TableCell>
-                        <TableCell>
-                          {regulation.lastUpdated
-                            ? format(new Date(regulation.lastUpdated), "PP")
-                            : "N/A"}
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
+                  {sortedRegulations.map((regulation) => (
+                    <TableRow key={regulation.id}>
+                      <TableCell>{regulation.itemId}</TableCell>
+                      <TableCell>{regulation.topic}</TableCell>
+                      <TableCell>{regulation.category}</TableCell>
+                      <TableCell>
+                        {regulation.lastUpdated
+                          ? format(new Date(regulation.lastUpdated), "PP")
+                          : "N/A"}
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </CardContent>

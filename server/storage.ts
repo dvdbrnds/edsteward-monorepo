@@ -82,20 +82,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getRegulations(): Promise<Regulation[]> {
-    const results = await db.select().from(regulations);
-    return results.map(reg => ({
-      ...reg,
-      lastUpdated: reg.lastUpdated ? new Date(reg.lastUpdated) : new Date()
-    }));
+    return await db.select().from(regulations);
   }
 
   async createRegulation(regulation: InsertRegulation): Promise<Regulation> {
-    const [newRegulation] = await db.insert(regulations)
-      .values({
-        ...regulation,
-        lastUpdated: regulation.lastUpdated || new Date()
-      })
-      .returning();
+    const [newRegulation] = await db.insert(regulations).values(regulation).returning();
     return newRegulation;
   }
 
