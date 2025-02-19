@@ -4,6 +4,9 @@ import { fileURLToPath } from "url";
 import { parse } from "csv-parse/sync";
 import { storage } from "./storage";
 import type { InsertRegulation } from "@shared/schema";
+import { eq } from "drizzle-orm";
+import { db } from "./db";
+import { regulations } from "@shared/schema";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,6 +31,10 @@ async function importRegulations() {
 
   console.log(`Found ${records.length} records to import`);
 
+  let newCount = 0;
+  let skipCount = 0;
+  let updateCount = 0;
+
   for (const record of records) {
     try {
       // Combine multiple statute fields into one
@@ -50,6 +57,7 @@ async function importRegulations() {
       // Extract category from Topic field or fallback to default categories based on content
       let category = "Other";
       const topic = record['Topic'] || "";
+      const itemId = record['Item ID'] || String(record['Topic ID'] || "");
 
       if (topic.includes("Academic")) category = "Academic Programs";
       else if (topic.includes("Athletics")) category = "Athletics";
@@ -57,26 +65,66 @@ async function importRegulations() {
       else if (topic.includes("Admission")) category = "Admissions";
       else if (topic.includes("Safety") || topic.includes("Security")) category = "Campus Safety";
 
+      // Check if regulation already exists
+      const [existingRegulation] = await db
+        .select()
+        .from(regulations)
+        .where(eq(regulations.itemId, itemId));
+
+      if (existingRegulation) {
+        if (
+          existingRegulation.topic !== topic ||
+          existingRegulation.statute !== record['Statute Name'] ||
+          existingRegulation.requirements !== requirements
+        ) {
+          // Update existing regulation if content has changed
+          await db
+            .update(regulations)
+            .set({
+              topic,
+              statute: record['Statute Name'] || statutes,
+              statuteIds: record['Statute IDs'] || "",
+              summary: record['Statutory Summary'] || "",
+              requirements: requirements || record['Reporting Requirements'] || "",
+              deadlines: record['Deadlines'] || "",
+              category,
+              lastUpdated: new Date()
+            })
+            .where(eq(regulations.id, existingRegulation.id));
+          updateCount++;
+          console.log(`Updated regulation: ${itemId} (${category})`);
+        } else {
+          skipCount++;
+          console.log(`Skipped duplicate regulation: ${itemId}`);
+        }
+        continue;
+      }
+
       const regulation: InsertRegulation = {
-        itemId: record['Item ID'] || String(record['Topic ID'] || ""),
-        topic: topic,
+        itemId,
+        topic,
         statute: record['Statute Name'] || statutes,
         statuteIds: record['Statute IDs'] || "",
         summary: record['Statutory Summary'] || "",
         requirements: requirements || record['Reporting Requirements'] || "",
         deadlines: record['Deadlines'] || "",
-        category: category,
+        category,
         lastUpdated: record['Last Updated'] ? new Date(record['Last Updated']) : new Date()
       };
 
       await storage.createRegulation(regulation);
-      console.log(`Imported regulation: ${regulation.itemId} (${category})`);
+      newCount++;
+      console.log(`Imported new regulation: ${regulation.itemId} (${category})`);
     } catch (error) {
       console.error(`Failed to import record:`, error);
       console.error('Record data:', record);
     }
   }
 
+  console.log('\nImport Summary:');
+  console.log(`New regulations added: ${newCount}`);
+  console.log(`Existing regulations updated: ${updateCount}`);
+  console.log(`Duplicates skipped: ${skipCount}`);
   console.log('Import completed');
 }
 

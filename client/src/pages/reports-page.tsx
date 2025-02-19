@@ -1,5 +1,5 @@
 import Navigation from "@/components/layout/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import type { Regulation, Deadline } from "@shared/schema";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -11,10 +11,12 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { format } from "date-fns";
-import { Download, FileText, X } from "lucide-react";
+import { Download, FileText, Upload, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from "recharts";
-import { useState } from "react";
+import { useState, useRef } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { queryClient, apiRequest } from "@/lib/queryClient";
 
 // Moravian University official brand colors
 const COLORS = [
@@ -49,13 +51,13 @@ function downloadCSV(data: any[], filename: string) {
   window.URL.revokeObjectURL(url);
 }
 
-const CustomPieChart = ({ 
-  data, 
-  title, 
+const CustomPieChart = ({
+  data,
+  title,
   onSegmentClick,
   activeFilter,
-}: { 
-  data: any[], 
+}: {
+  data: any[],
   title: string,
   onSegmentClick: (name: string) => void,
   activeFilter: string | null,
@@ -135,11 +137,11 @@ const CustomPieChart = ({
               height={80}
               iconType="circle"
               formatter={(value) => (
-                <span 
+                <span
                   className={`
-                    text-[#666666] 
-                    ml-2 
-                    cursor-pointer 
+                    text-[#666666]
+                    ml-2
+                    cursor-pointer
                     inline-flex
                     items-center
                     ${value.length > 15 ? 'text-xs' : 'text-sm'}
@@ -170,6 +172,8 @@ export default function ReportsPage() {
   const [sortConfig, setSortConfig] = useState<SortConfig>(null);
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
 
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
@@ -178,6 +182,45 @@ export default function ReportsPage() {
   const { data: deadlines, isLoading: deadlinesLoading } = useQuery<Deadline[]>({
     queryKey: ["/api/deadlines"],
   });
+
+  const importMutation = useMutation({
+    mutationFn: async (formData: FormData) => {
+      const response = await apiRequest("/api/regulations/import", {
+        method: "POST",
+        body: formData,
+      });
+      return response.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/regulations"] });
+      toast({
+        title: "Import Successful",
+        description: `Added ${data.newCount} regulations, updated ${data.updateCount}, and skipped ${data.skipCount} duplicates.`,
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Import Failed",
+        description: "Failed to import regulations. Please check your CSV file format.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    importMutation.mutate(formData);
+
+    // Reset the file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
   const sortData = (data: Regulation[]) => {
     if (!sortConfig || !data) return data;
@@ -308,11 +351,38 @@ export default function ReportsPage() {
 
       <main className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center mb-8">
-            <FileText className="h-6 w-6 mr-3 text-[#00267A]" />
-            <h1 className="text-3xl font-bold text-gray-900">
-              Compliance Reports
-            </h1>
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center">
+              <FileText className="h-6 w-6 mr-3 text-[#00267A]" />
+              <h1 className="text-3xl font-bold text-gray-900">
+                Compliance Reports
+              </h1>
+            </div>
+            <div className="flex items-center gap-4">
+              <input
+                type="file"
+                accept=".csv"
+                onChange={handleFileUpload}
+                className="hidden"
+                ref={fileInputRef}
+                disabled={importMutation.isPending}
+              />
+              <Button
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={importMutation.isPending}
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                {importMutation.isPending ? "Importing..." : "Import CSV"}
+              </Button>
+              <a
+                href="/templates/regulations-template.csv"
+                download
+                className="text-sm text-gray-500 hover:text-gray-700"
+              >
+                Download Template
+              </a>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 mb-8">
