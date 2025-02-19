@@ -11,6 +11,7 @@ import RegulationDetailPage from "@/pages/regulation-detail-page";
 import ComplianceWizardPage from "@/pages/compliance-wizard-page";
 import NotificationsPage from "@/pages/notifications-page";
 import ReportsPage from "@/pages/reports-page";
+import ValidationPage from "@/pages/validation-page";
 import { ProtectedRoute } from "./lib/protected-route";
 import { ProtectedRegulationRoute } from "./lib/protected-regulation-route";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
@@ -24,6 +25,7 @@ function Router() {
         <Route path="/auth" component={AuthPage} />
         <ProtectedRoute path="/" component={HomePage} />
         <ProtectedRoute path="/regulations" component={RegulationsPage} />
+        <ProtectedRoute path="/regulations/validate" component={ValidationPage} />
         <ProtectedRegulationRoute 
           path="/regulations/:id" 
           component={RegulationDetailPage} 

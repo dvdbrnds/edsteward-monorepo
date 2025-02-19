@@ -2,7 +2,7 @@ import Navigation from "@/components/layout/navigation";
 import RegulationList from "@/components/regulations/regulation-list";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, X } from "lucide-react";
+import { Plus, X, FileCheck } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -14,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from "recharts";
 import { useQuery } from "@tanstack/react-query";
 import type { Regulation } from "@shared/schema";
+import { useLocation } from "wouter";
 
 // Moravian University brand colors
 const COLORS = [
@@ -118,6 +119,7 @@ const CategoryPieChart = ({
 export default function RegulationsPage() {
   const [open, setOpen] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+  const [_, navigate] = useLocation();
 
   const { data: regulations } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
@@ -144,22 +146,32 @@ export default function RegulationsPage() {
               Regulations
             </h1>
 
-            <Dialog open={open} onOpenChange={setOpen}>
-              <DialogTrigger asChild>
-                <Button>
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Regulation
-                </Button>
-              </DialogTrigger>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>Add New Regulation</DialogTitle>
-                </DialogHeader>
-                <div className="p-4">
-                  <p>Regulation form will be added here</p>
-                </div>
-              </DialogContent>
-            </Dialog>
+            <div className="space-x-4">
+              <Button 
+                variant="outline"
+                onClick={() => navigate("/regulations/validate")}
+              >
+                <FileCheck className="h-4 w-4 mr-2" />
+                Validate Data
+              </Button>
+
+              <Dialog open={open} onOpenChange={setOpen}>
+                <DialogTrigger asChild>
+                  <Button>
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Regulation
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Add New Regulation</DialogTitle>
+                  </DialogHeader>
+                  <div className="p-4">
+                    <p>Regulation form will be added here</p>
+                  </div>
+                </DialogContent>
+              </Dialog>
+            </div>
           </div>
 
           <CategoryPieChart 
