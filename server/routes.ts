@@ -53,22 +53,22 @@ export function registerRoutes(app: Express): Server {
 
       for (const record of records) {
         try {
-          // Combine multiple statute fields into one
+          // Combine multiple statute fields into an array
           const statutes = [
             record['Statute 1'],
             record['Statute 2'],
             record['Statute 3'],
             record['Statute 4']
-          ].filter(Boolean).join('; ');
+          ].filter(Boolean);
 
-          // Combine multiple regulation fields
-          const requirements = [
+          // Combine multiple regulation fields into an array
+          const regulations = [
             record['Regulation 1'],
             record['Regulation 2'],
             record['Regulation 3'],
             record['Regulation 4'],
             record['Regulation 5']
-          ].filter(Boolean).join('\n\n');
+          ].filter(Boolean);
 
           // Extract category from Topic field or fallback to default categories
           let category = "Other";
@@ -87,47 +87,42 @@ export function registerRoutes(app: Express): Server {
             .from(regulations)
             .where(eq(regulations.itemId, itemId));
 
-          if (existingRegulation) {
-            if (
-              existingRegulation.topic !== topic ||
-              existingRegulation.statute !== record['Statute Name'] ||
-              existingRegulation.requirements !== requirements
-            ) {
-              // Update existing regulation if content has changed
-              await db
-                .update(regulations)
-                .set({
-                  topic,
-                  statute: record['Statute Name'] || statutes,
-                  statuteIds: record['Statute IDs'] || "",
-                  summary: record['Statutory Summary'] || "",
-                  requirements: requirements || record['Reporting Requirements'] || "",
-                  deadlines: record['Deadlines'] || "",
-                  category,
-                  lastUpdated: new Date()
-                })
-                .where(eq(regulations.id, existingRegulation.id));
-              updateCount++;
-            } else {
-              skipCount++;
-            }
-            continue;
-          }
-
-          const regulation = {
+          const regulationData = {
             itemId,
             topic,
-            statute: record['Statute Name'] || statutes,
-            statuteIds: record['Statute IDs'] || "",
-            summary: record['Statutory Summary'] || "",
-            requirements: requirements || record['Reporting Requirements'] || "",
-            deadlines: record['Deadlines'] || "",
+            topicId: record['Topic ID'] || null,
+            statute: record['Statute Name'] || statutes.join('; '),
+            statuteIds: record['Statute IDs'] || null,
+            summary: record['Statutory Summary'] || null,
+            requirements: regulations.join('\n\n') || record['Reporting Requirements'] || null,
+            deadlines: record['Deadlines'] || null,
             category,
-            lastUpdated: record['Last Updated'] ? new Date(record['Last Updated']) : new Date()
+            lastUpdated: record['Last Updated'] ? new Date(record['Last Updated']) : new Date(),
+            // New fields
+            contactEmail: record['Contact Email'] || null,
+            department: record['Department'] || null,
+            complianceStatus: record['Compliance Status'] || null,
+            reviewFrequency: record['Review Frequency'] || null,
+            nextReviewDate: record['Next Review Date'] ? new Date(record['Next Review Date']) : null,
+            notes: record['Notes'] || null,
+            statutes: statutes.length > 0 ? statutes : null,
+            regulations: regulations.length > 0 ? regulations : null
           };
 
-          await storage.createRegulation(regulation);
-          newCount++;
+          if (existingRegulation) {
+            // Update existing regulation if content has changed
+            await db
+              .update(regulations)
+              .set(regulationData)
+              .where(eq(regulations.id, existingRegulation.id));
+            updateCount++;
+            console.log(`Updated regulation: ${itemId} (${category})`);
+          } else {
+            // Create new regulation
+            await storage.createRegulation(regulationData);
+            newCount++;
+            console.log(`Imported new regulation: ${itemId} (${category})`);
+          }
         } catch (error) {
           console.error(`Failed to process record:`, error);
           console.error('Record data:', record);
@@ -142,7 +137,7 @@ export function registerRoutes(app: Express): Server {
       });
     } catch (error) {
       console.error('Import failed:', error);
-      res.status(500).json({ 
+      res.status(500).json({
         message: 'Failed to import CSV file',
         error: error instanceof Error ? error.message : String(error)
       });

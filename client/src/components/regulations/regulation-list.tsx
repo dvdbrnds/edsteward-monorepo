@@ -163,15 +163,15 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                   </TableCell>
                   <TableCell>{regulation.topic}</TableCell>
                   <TableCell>
-                    {regulation.agency_url ? (
+                    {regulation.agencyUrl ? (
                       <a
-                        href={regulation.agency_url}
+                        href={regulation.agencyUrl}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-[#00267A] hover:text-[#003166] underline inline-flex items-center gap-2 group"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        {getAgencyName(regulation.agency_url)}
+                        {getAgencyName(regulation.agencyUrl)}
                         <ExternalLink className="h-3 w-3" />
                       </a>
                     ) : (
