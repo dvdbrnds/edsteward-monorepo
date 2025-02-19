@@ -86,20 +86,30 @@ export class RegulationValidator {
 
   private validateRequiredFields(regulation: Regulation): ValidationError[] {
     const errors: ValidationError[] = [];
-    
+
+    if (!regulation.itemId || regulation.itemId.trim() === '') {
+      errors.push({
+        regulationId: regulation.itemId || 'unknown',
+        field: 'itemId',
+        error: 'Item ID is required',
+        value: regulation.itemId,
+        severity: 'error'
+      });
+    }
+
     if (!regulation.topic || regulation.topic.trim() === '') {
       errors.push({
-        regulationId: regulation.itemId,
+        regulationId: regulation.itemId || 'unknown',
         field: 'topic',
         error: 'Topic is required',
         value: regulation.topic,
         severity: 'error'
       });
     }
-    
+
     if (!regulation.statute || regulation.statute.trim() === '') {
       errors.push({
-        regulationId: regulation.itemId,
+        regulationId: regulation.itemId || 'unknown',
         field: 'statute',
         error: 'Statute is required',
         value: regulation.statute,
@@ -109,14 +119,25 @@ export class RegulationValidator {
 
     if (!regulation.category || regulation.category.trim() === '') {
       errors.push({
-        regulationId: regulation.itemId,
+        regulationId: regulation.itemId || 'unknown',
         field: 'category',
         error: 'Category is required',
         value: regulation.category,
         severity: 'error'
       });
     }
-    
+
+    // Validate URLs if present
+    if (regulation.agency_url && !regulation.agency_url.startsWith('http')) {
+      errors.push({
+        regulationId: regulation.itemId || 'unknown',
+        field: 'agency_url',
+        error: 'Agency URL must start with http:// or https://',
+        value: regulation.agency_url,
+        severity: 'warning'
+      });
+    }
+
     return errors;
   }
 

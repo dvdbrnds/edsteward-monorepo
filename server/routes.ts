@@ -148,12 +148,20 @@ export function registerRoutes(app: Express): Server {
 
   // Add new validation endpoint
   app.post("/api/regulations/validate", async (req, res) => {
-    if (!req.user) return res.sendStatus(401);
-
     try {
+      console.log("Starting validation process...");
       const regulations = await storage.getRegulations();
+      console.log(`Found ${regulations.length} regulations to validate`);
+
       const validator = new RegulationValidator();
       const report = await validator.validateAll(regulations);
+
+      console.log("Validation complete:", {
+        totalRegulations: report.totalRegulations,
+        validRegulations: report.validRegulations,
+        errors: report.errors.length,
+        warnings: report.warnings.length
+      });
 
       res.json(report);
     } catch (error) {
