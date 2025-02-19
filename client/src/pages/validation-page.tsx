@@ -10,9 +10,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Download, AlertTriangle, CheckCircle, XCircle, Loader2 } from "lucide-react";
+import { Download, AlertTriangle, CheckCircle, XCircle, Loader2, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import jsPDF from "jspdf";
+import autoTable from 'jspdf-autotable';
+import { format } from "date-fns";
 
 interface ValidationError {
   regulationId: string;
@@ -51,7 +54,7 @@ export default function ValidationPage() {
     },
   });
 
-  const downloadReport = () => {
+  const downloadCSV = () => {
     if (!report) return;
 
     const allIssues = [
@@ -81,6 +84,86 @@ export default function ValidationPage() {
     window.URL.revokeObjectURL(url);
   };
 
+  const downloadPDF = () => {
+    if (!report) return;
+
+    const doc = new jsPDF();
+    const pageWidth = doc.internal.pageSize.width;
+
+    // Add title
+    doc.setFontSize(20);
+    doc.text("Validation Report", pageWidth / 2, 20, { align: "center" });
+
+    // Add timestamp
+    doc.setFontSize(10);
+    doc.text(`Generated on: ${format(new Date(), "PPpp")}`, pageWidth / 2, 30, { align: "center" });
+
+    // Add summary
+    doc.setFontSize(12);
+    doc.text("Summary", 20, 45);
+
+    const summaryData = [
+      ["Total Regulations", report.totalRegulations.toString()],
+      ["Valid Regulations", report.validRegulations.toString()],
+      ["Total Issues", (report.errors.length + report.warnings.length).toString()],
+      ["Errors", report.errors.length.toString()],
+      ["Warnings", report.warnings.length.toString()]
+    ];
+
+    autoTable(doc, {
+      startY: 50,
+      head: [["Metric", "Count"]],
+      body: summaryData,
+      theme: 'striped',
+      headStyles: { fillColor: [0, 38, 122] } // Moravian Blue
+    });
+
+    // Add issues table if there are any
+    if (report.errors.length > 0 || report.warnings.length > 0) {
+      const allIssues = [
+        ...report.errors.map(e => ({ ...e, type: 'Error' })),
+        ...report.warnings.map(w => ({ ...w, type: 'Warning' }))
+      ].sort((a, b) => {
+        if (a.severity === b.severity) {
+          return a.regulationId.localeCompare(b.regulationId);
+        }
+        return a.severity === 'error' ? -1 : 1;
+      });
+
+      doc.addPage();
+      doc.text("Validation Issues", 20, 20);
+
+      autoTable(doc, {
+        startY: 25,
+        head: [["Type", "Regulation ID", "Field", "Issue", "Current Value"]],
+        body: allIssues.map(issue => [
+          issue.type,
+          issue.regulationId,
+          issue.field,
+          issue.error,
+          String(issue.value)
+        ]),
+        theme: 'striped',
+        headStyles: { fillColor: [0, 38, 122] }, // Moravian Blue
+        columnStyles: {
+          0: { cellWidth: 20 },
+          1: { cellWidth: 30 },
+          2: { cellWidth: 30 },
+          3: { cellWidth: 50 },
+          4: { cellWidth: 'auto' }
+        },
+      });
+    }
+
+    // Save the PDF
+    doc.save(`validation-report-${format(new Date(), "yyyy-MM-dd")}.pdf`);
+
+    toast({
+      title: "PDF Generated",
+      description: "The validation report has been downloaded as a PDF.",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
@@ -93,10 +176,16 @@ export default function ValidationPage() {
             </h1>
             <div className="space-x-4">
               {report && (
-                <Button variant="outline" onClick={downloadReport}>
-                  <Download className="h-4 w-4 mr-2" />
-                  Export Report
-                </Button>
+                <>
+                  <Button variant="outline" onClick={downloadCSV}>
+                    <Download className="h-4 w-4 mr-2" />
+                    Export CSV
+                  </Button>
+                  <Button variant="outline" onClick={downloadPDF}>
+                    <FileText className="h-4 w-4 mr-2" />
+                    Export PDF
+                  </Button>
+                </>
               )}
               <Button 
                 onClick={() => validateMutation.mutate()} 
