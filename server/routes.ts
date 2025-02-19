@@ -2,12 +2,11 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { insertRegulationSchema, insertNotificationSchema, insertDeadlineSchema } from "@shared/schema";
+import { insertRegulationSchema, insertNotificationSchema, insertDeadlineSchema, regulations } from "@shared/schema";
 import multer from "multer";
 import { parse } from "csv-parse/sync";
 import { eq } from "drizzle-orm";
 import { db } from "./db";
-import { regulations } from "@shared/schema";
 
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -48,8 +47,8 @@ export function registerRoutes(app: Express): Server {
       console.log(`Processing ${records.length} records from uploaded CSV`);
 
       let newCount = 0;
-      let skipCount = 0;
       let updateCount = 0;
+      let skipCount = 0;
 
       for (const record of records) {
         try {
@@ -62,7 +61,7 @@ export function registerRoutes(app: Express): Server {
           ].filter(Boolean);
 
           // Combine multiple regulation fields into an array
-          const regulations = [
+          const regulationTexts = [
             record['Regulation 1'],
             record['Regulation 2'],
             record['Regulation 3'],
@@ -81,11 +80,9 @@ export function registerRoutes(app: Express): Server {
           else if (topic.includes("Admission")) category = "Admissions";
           else if (topic.includes("Safety") || topic.includes("Security")) category = "Campus Safety";
 
-          // Check if regulation already exists
-          const [existingRegulation] = await db
-            .select()
-            .from(regulations)
-            .where(eq(regulations.itemId, itemId));
+          const existingRegulation = await db.query.regulations.findFirst({
+            where: eq(regulations.itemId, itemId),
+          });
 
           const regulationData = {
             itemId,
@@ -94,23 +91,21 @@ export function registerRoutes(app: Express): Server {
             statute: record['Statute Name'] || statutes.join('; '),
             statuteIds: record['Statute IDs'] || null,
             summary: record['Statutory Summary'] || null,
-            requirements: regulations.join('\n\n') || record['Reporting Requirements'] || null,
+            requirements: regulationTexts.join('\n\n') || record['Reporting Requirements'] || null,
             deadlines: record['Deadlines'] || null,
             category,
             lastUpdated: record['Last Updated'] ? new Date(record['Last Updated']) : new Date(),
-            // New fields
             contactEmail: record['Contact Email'] || null,
             department: record['Department'] || null,
             complianceStatus: record['Compliance Status'] || null,
             reviewFrequency: record['Review Frequency'] || null,
             nextReviewDate: record['Next Review Date'] ? new Date(record['Next Review Date']) : null,
             notes: record['Notes'] || null,
-            statutes: statutes.length > 0 ? statutes : null,
-            regulations: regulations.length > 0 ? regulations : null
+            statutes: statutes,
+            regulations: regulationTexts,
           };
 
           if (existingRegulation) {
-            // Update existing regulation if content has changed
             await db
               .update(regulations)
               .set(regulationData)
@@ -118,7 +113,6 @@ export function registerRoutes(app: Express): Server {
             updateCount++;
             console.log(`Updated regulation: ${itemId} (${category})`);
           } else {
-            // Create new regulation
             await storage.createRegulation(regulationData);
             newCount++;
             console.log(`Imported new regulation: ${itemId} (${category})`);
@@ -126,6 +120,7 @@ export function registerRoutes(app: Express): Server {
         } catch (error) {
           console.error(`Failed to process record:`, error);
           console.error('Record data:', record);
+          skipCount++;
         }
       }
 
