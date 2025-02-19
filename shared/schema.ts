@@ -2,34 +2,36 @@ import { pgTable, text, serial, integer, boolean, date, timestamp } from "drizzl
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
-// Regulations table with expanded fields
+// Regulations table with expanded fields from survey data
 export const regulations = pgTable("regulations", {
   id: serial("id").primaryKey(),
   itemId: text("item_id").notNull(),
   topic: text("topic").notNull(),
-  topicId: text("topic_id"),
-  statute: text("statute").notNull(),
-  statuteIds: text("statute_ids"),
-  summary: text("summary"),
-  requirements: text("requirements"),
-  requirementsUrl: text("requirements_url"),
-  regulationUrl: text("regulation_url"),
-  agencyUrl: text("agency_url"),
-  deadlines: text("deadlines"),
+  division: text("division"),
   category: text("category").notNull(),
+  statute: text("statute").notNull(),
+  statuteUrl: text("statute_url"),
+  yearOfPassage: text("year_of_passage"),
+  yearOfAmendments: text("year_of_amendments"),
+  governmentLevel: text("government_level"),
+  oversightAgency: text("oversight_agency"),
+  complianceRequirements: text("compliance_requirements"),
+  communityNotifications: text("community_notifications"),
+  submissionRequirements: text("submission_requirements"),
+  relatedDepartments: text("related_departments").array(),
+  associatedLaws: text("associated_laws").array(),
+  noticeUrl: text("notice_url"),
+  policyUrl: text("policy_url"),
   lastUpdated: timestamp("last_updated"),
-  // New fields to capture additional CSV data
   contactEmail: text("contact_email"),
   department: text("department"),
   complianceStatus: text("compliance_status"),
   reviewFrequency: text("review_frequency"),
   nextReviewDate: date("next_review_date"),
   notes: text("notes"),
-  statutes: text("statutes").array(),
-  regulations: text("regulations").array(),
 });
 
-// Users table
+// Other tables remain unchanged
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
@@ -38,7 +40,6 @@ export const users = pgTable("users", {
   department: text("department"),
 });
 
-// Comments table
 export const comments = pgTable("comments", {
   id: serial("id").primaryKey(),
   regulationId: integer("regulation_id").notNull(),
@@ -48,7 +49,6 @@ export const comments = pgTable("comments", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-// Notifications table
 export const notifications = pgTable("notifications", {
   id: serial("id").primaryKey(),
   regulationId: integer("regulation_id").notNull(),
@@ -58,16 +58,17 @@ export const notifications = pgTable("notifications", {
   enabled: boolean("enabled").notNull().default(true),
 });
 
-// Deadlines table
 export const deadlines = pgTable("deadlines", {
   id: serial("id").primaryKey(),
   regulationId: integer("regulation_id").notNull(),
   dueDate: date("due_date").notNull(),
   status: text("status").notNull(),
   assignedTo: integer("assigned_to").notNull(),
+  description: text("description"),
+  notificationType: text("notification_type"),
+  submissionType: text("submission_type"),
 });
 
-// Guides table for storing submission guides and documentation
 export const guides = pgTable("guides", {
   id: serial("id").primaryKey(),
   title: text("title").notNull(),
@@ -77,7 +78,23 @@ export const guides = pgTable("guides", {
   createdBy: integer("created_by").notNull(),
 });
 
-// Schema for inserting users
+// Update schemas
+export const insertRegulationSchema = createInsertSchema(regulations)
+  .extend({
+    statuteUrl: z.string().url().optional(),
+    policyUrl: z.string().url().optional(),
+    noticeUrl: z.string().url().optional(),
+    contactEmail: z.string().email().optional(),
+    department: z.string().optional(),
+    complianceStatus: z.string().optional(),
+    reviewFrequency: z.string().optional(),
+    nextReviewDate: z.string().optional(),
+    notes: z.string().optional(),
+    relatedDepartments: z.array(z.string()).optional(),
+    associatedLaws: z.array(z.string()).optional(),
+  });
+
+// Other insert schemas remain unchanged
 export const insertUserSchema = createInsertSchema(users)
   .extend({
     password: z.string().min(6),
@@ -85,36 +102,16 @@ export const insertUserSchema = createInsertSchema(users)
     department: z.string().optional(),
   });
 
-// Update the regulation schema
-export const insertRegulationSchema = createInsertSchema(regulations)
-  .extend({
-    requirementsUrl: z.string().url().optional(),
-    regulationUrl: z.string().url().optional(),
-    agencyUrl: z.string().url().optional(),
-    contactEmail: z.string().email().optional(),
-    department: z.string().optional(),
-    complianceStatus: z.string().optional(),
-    reviewFrequency: z.string().optional(),
-    nextReviewDate: z.string().optional(),
-    notes: z.string().optional(),
-    statutes: z.array(z.string()).optional(),
-    regulations: z.array(z.string()).optional(),
-  });
-
-// Schema for inserting comments
 export const insertCommentSchema = createInsertSchema(comments)
   .extend({
     content: z.string().min(1, "Comment cannot be empty"),
     parentId: z.number().optional(),
   });
 
-// Schema for inserting notifications
 export const insertNotificationSchema = createInsertSchema(notifications);
 
-// Schema for inserting deadlines
 export const insertDeadlineSchema = createInsertSchema(deadlines);
 
-// Schema for inserting guides
 export const insertGuideSchema = createInsertSchema(guides)
   .extend({
     content: z.string().min(1, "Guide content cannot be empty"),
