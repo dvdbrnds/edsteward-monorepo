@@ -187,7 +187,7 @@ export default function ReportsPage() {
     mutationFn: async (formData: FormData) => {
       const response = await apiRequest("/api/regulations/import", {
         method: "POST",
-        body: formData,
+        body: formData
       });
       return response.json();
     },
@@ -201,7 +201,7 @@ export default function ReportsPage() {
     onError: (error) => {
       toast({
         title: "Import Failed",
-        description: "Failed to import regulations. Please check your CSV file format.",
+        description: error instanceof Error ? error.message : "Failed to import regulations. Please check your CSV file format.",
         variant: "destructive",
       });
     },
