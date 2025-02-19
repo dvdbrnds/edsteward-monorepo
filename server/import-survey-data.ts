@@ -2,6 +2,7 @@ import { parse } from 'csv-parse';
 import { createReadStream } from 'fs';
 import { db } from './db';
 import { regulations } from '@shared/schema';
+import { eq } from 'drizzle-orm';
 import path from 'path';
 
 async function importSurveyData() {
@@ -47,39 +48,67 @@ async function importSurveyData() {
       lastUpdated: new Date(),
     };
 
-    // Debug log the first record
-    if (records.length === 0) {
-      console.log('Sample record data:', {
-        statute: regulationData.statute,
-        oversightAgency: regulationData.oversightAgency,
-        complianceRequirements: regulationData.complianceRequirements.substring(0, 100) + '...',
-      });
+    // Skip empty records
+    if (!regulationData.statute) {
+      continue;
     }
 
     records.push(regulationData);
   }
 
-  console.log(`Found ${records.length} records to import`);
+  console.log(`Found ${records.length} records to process`);
 
-  // Import records into database
+  // Import/Update records in database
   let newCount = 0;
+  let updateCount = 0;
   let errorCount = 0;
 
   for (const record of records) {
     try {
-      const result = await db.insert(regulations).values(record);
-      if (result) {
-        newCount++;
-        console.log(`Imported regulation: ${record.statute}`);
+      // Check if regulation already exists
+      const existingRegulation = await db.select()
+        .from(regulations)
+        .where(eq(regulations.statute, record.statute));
+
+      if (existingRegulation.length > 0) {
+        // Update existing regulation with new data if available
+        const existing = existingRegulation[0];
+        const updatedData = {
+          ...record,
+          // Preserve existing data if new data is empty
+          statuteUrl: record.statuteUrl || existing.statuteUrl,
+          yearOfPassage: record.yearOfPassage || existing.yearOfPassage,
+          yearOfAmendments: record.yearOfAmendments || existing.yearOfAmendments,
+          complianceRequirements: record.complianceRequirements || existing.complianceRequirements,
+          communityNotifications: record.communityNotifications || existing.communityNotifications,
+          submissionRequirements: record.submissionRequirements || existing.submissionRequirements,
+          policyUrl: record.policyUrl || existing.policyUrl,
+          lastUpdated: new Date(),
+        };
+
+        await db.update(regulations)
+          .set(updatedData)
+          .where(eq(regulations.id, existing.id));
+
+        updateCount++;
+        console.log(`Updated regulation: ${record.statute}`);
+      } else {
+        // Insert new regulation
+        const result = await db.insert(regulations).values(record);
+        if (result) {
+          newCount++;
+          console.log(`Imported new regulation: ${record.statute}`);
+        }
       }
     } catch (error: any) {
       errorCount++;
-      console.error(`Error importing regulation ${record.statute}:`, error.message);
+      console.error(`Error processing regulation ${record.statute}:`, error.message);
     }
   }
 
   console.log('\nImport Summary:');
   console.log(`New regulations added: ${newCount}`);
+  console.log(`Existing regulations updated: ${updateCount}`);
   console.log(`Failed imports: ${errorCount}`);
   console.log('Import completed');
 }
