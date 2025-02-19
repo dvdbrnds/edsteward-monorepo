@@ -176,7 +176,7 @@ export default function ValidationPage() {
               Regulation Validation
             </h1>
             <div className="space-x-4">
-              {report && (
+              {report && report.totalRegulations > 0 && (
                 <>
                   <Button variant="outline" onClick={downloadCSV}>
                     <Download className="h-4 w-4 mr-2" />
@@ -192,7 +192,14 @@ export default function ValidationPage() {
                 onClick={() => validateMutation.mutate()} 
                 disabled={validateMutation.isPending}
               >
-                {validateMutation.isPending ? "Validating..." : "Run Validation"}
+                {validateMutation.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Validating...
+                  </>
+                ) : (
+                  "Run Validation"
+                )}
               </Button>
             </div>
           </div>
