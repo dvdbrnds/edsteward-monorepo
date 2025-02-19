@@ -54,7 +54,7 @@ export function setupAuth(app: Express) {
       try {
         const user = await storage.getUserByUsername(username);
         if (!user || !(await comparePasswords(password, user.password))) {
-          return done(null, false);
+          return done(null, false, { message: "Invalid username or password" });
         }
         return done(null, user);
       } catch (error) {
@@ -63,10 +63,16 @@ export function setupAuth(app: Express) {
     }),
   );
 
-  passport.serializeUser((user, done) => done(null, user.id));
+  passport.serializeUser((user, done) => {
+    done(null, user.id);
+  });
+
   passport.deserializeUser(async (id: number, done) => {
     try {
       const user = await storage.getUser(id);
+      if (!user) {
+        return done(null, false);
+      }
       done(null, user);
     } catch (error) {
       done(error);
@@ -101,16 +107,24 @@ export function setupAuth(app: Express) {
 
   // Login
   app.post("/api/login", (req, res, next) => {
-    passport.authenticate("local", (err, user, info) => {
+    if (!req.body.username || !req.body.password) {
+      return res.status(400).json({ message: "Username and password are required" });
+    }
+
+    passport.authenticate("local", (err: Error, user: Express.User | false, info: { message: string }) => {
       if (err) {
+        console.error("Login error:", err);
         return res.status(500).json({ message: "Internal server error" });
       }
+
       if (!user) {
-        return res.status(401).json({ message: "Invalid username or password" });
+        return res.status(401).json({ message: info?.message || "Invalid username or password" });
       }
-      req.login(user, (err) => {
-        if (err) {
-          return res.status(500).json({ message: "Error logging in" });
+
+      req.login(user, (loginErr) => {
+        if (loginErr) {
+          console.error("Login error:", loginErr);
+          return res.status(500).json({ message: "Error during login" });
         }
         return res.json(user);
       });
@@ -119,18 +133,23 @@ export function setupAuth(app: Express) {
 
   // Logout
   app.post("/api/logout", (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ message: "Not logged in" });
+    }
+
     req.logout((err) => {
       if (err) {
-        return res.status(500).json({ message: "Error logging out" });
+        console.error("Logout error:", err);
+        return res.status(500).json({ message: "Error during logout" });
       }
-      res.sendStatus(200);
+      res.json({ message: "Logged out successfully" });
     });
   });
 
   // Get current user
   app.get("/api/user", (req, res) => {
     if (!req.isAuthenticated()) {
-      return res.sendStatus(401);
+      return res.status(401).json({ message: "Not authenticated" });
     }
     res.json(req.user);
   });
