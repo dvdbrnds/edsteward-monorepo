@@ -8,6 +8,7 @@ import type { InsertRegulation } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import { db } from "./db";
 import { regulations } from "@shared/schema";
+import { addMonths, format } from "date-fns";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -60,6 +61,22 @@ async function importRegulations() {
         else if (topic.toLowerCase().includes("admission")) category = "Admissions";
         else if (topic.toLowerCase().includes("safety") || topic.toLowerCase().includes("security")) category = "Campus Safety";
 
+        // Parse and process deadlines
+        let deadlines = record['Deadlines'] || "";
+        if (!deadlines || deadlines === "Not Applicable") {
+          // Set a default deadline based on category
+          const defaultMonths = {
+            "Academic Programs": 6,
+            "Athletics": 3,
+            "Accounting": 4,
+            "Admissions": 5,
+            "Campus Safety": 3,
+            "Other": 6
+          };
+          const futureDate = addMonths(new Date(), defaultMonths[category as keyof typeof defaultMonths]);
+          deadlines = format(futureDate, 'yyyy-MM-dd');
+        }
+
         // Check if regulation already exists
         const [existingRegulation] = await db
           .select()
@@ -81,7 +98,7 @@ async function importRegulations() {
                 statuteIds: record['Statute IDs'] || "",
                 summary: record['Statutory Summary'] || "",
                 requirements: requirements || record['Reporting Requirements'] || "",
-                deadlines: record['Deadlines'] || "",
+                deadlines,
                 category,
                 lastUpdated: new Date()
               })
@@ -102,7 +119,7 @@ async function importRegulations() {
           statuteIds: record['Statute IDs'] || "",
           summary: record['Statutory Summary'] || "",
           requirements: requirements || record['Reporting Requirements'] || "",
-          deadlines: record['Deadlines'] || "",
+          deadlines,
           category,
           lastUpdated: record['Last Updated'] ? new Date(record['Last Updated']) : new Date()
         };

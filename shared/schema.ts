@@ -50,7 +50,7 @@ export const notifications = pgTable("notifications", {
 export const deadlines = pgTable("deadlines", {
   id: serial("id").primaryKey(),
   regulationId: integer("regulation_id").notNull(),
-  dueDate: date("due_date").notNull(),
+  dueDate: timestamp("due_date").notNull(),
   status: text("status").notNull(),
   assignedTo: integer("assigned_to").notNull(),
 });
