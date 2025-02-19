@@ -49,7 +49,20 @@ export const getQueryFn: <T>(options: {
       return null;
     }
 
-    await throwIfResNotOk(res);
+    if (!res.ok) {
+      const contentType = res.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Request failed");
+      }
+      throw new Error(`Request failed with status ${res.status}`);
+    }
+    
+    const contentType = res.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      throw new Error("Invalid response format - expected JSON");
+    }
+    
     return await res.json();
   };
 

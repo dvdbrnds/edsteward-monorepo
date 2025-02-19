@@ -144,7 +144,7 @@ export function setupAuth(app: Express) {
   });
 
   // Login
-  app.post("/api/login", (req, res, next) => {
+  app.post("/api/login", express.json(), (req, res, next) => {
     console.log("Login request received - Raw body:", {
       username: req.body.username,
       passwordLength: req.body.password?.length || 0,
