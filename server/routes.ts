@@ -99,8 +99,6 @@ export function registerRoutes(app: Express): Server {
                 .set({
                   topic,
                   statute: record['Statute Name'] || statutes,
-                  statuteIds: record['Statute IDs'] || "",
-                  summary: record['Statutory Summary'] || "",
                   requirements: requirements || record['Reporting Requirements'] || "",
                   deadlines: record['Deadlines'] || "",
                   category,
@@ -118,8 +116,6 @@ export function registerRoutes(app: Express): Server {
             itemId,
             topic,
             statute: record['Statute Name'] || statutes,
-            statuteIds: record['Statute IDs'] || "",
-            summary: record['Statutory Summary'] || "",
             requirements: requirements || record['Reporting Requirements'] || "",
             deadlines: record['Deadlines'] || "",
             category,
