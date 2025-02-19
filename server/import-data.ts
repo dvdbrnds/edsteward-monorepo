@@ -95,6 +95,8 @@ async function importRegulations() {
                 requirements: requirements || record['Reporting Requirements'] || "",
                 deadlines,
                 category,
+                regulationUrl: record['Regulation URL'] || null,
+                requirementsUrl: record['Requirements URL'] || null,
                 lastUpdated: new Date()
               })
               .where(eq(regulations.id, existingRegulation.id));
@@ -116,10 +118,12 @@ async function importRegulations() {
           requirements: requirements || record['Reporting Requirements'] || "",
           deadlines,
           category,
+          regulationUrl: record['Regulation URL'] || null,
+          requirementsUrl: record['Requirements URL'] || null,
           lastUpdated: record['Last Updated'] ? new Date(record['Last Updated']) : new Date()
         };
 
-        const errors = validator.validateRegulation(regulation as Regulation);
+        const errors = validator.validateRegulation(regulation);
         if (errors.length > 0) {
           console.error(`Validation failed for regulation ${itemId}:`, errors);
           validationErrors++;

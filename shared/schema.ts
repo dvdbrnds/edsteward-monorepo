@@ -24,6 +24,8 @@ export const regulations = pgTable("regulations", {
   category: text("category").notNull(),
   lastUpdated: timestamp("last_updated"),
   agency_url: text("agency_url"),
+  regulationUrl: text("regulation_url"),
+  requirementsUrl: text("requirements_url"),
 });
 
 // Comments table
@@ -76,8 +78,8 @@ export const insertUserSchema = createInsertSchema(users)
 // Schema for inserting regulations
 export const insertRegulationSchema = createInsertSchema(regulations)
   .extend({
-    requirementsUrl: z.string().url().optional(),
-    regulationUrl: z.string().url().optional(),
+    regulationUrl: z.string().url().optional().nullable(),
+    requirementsUrl: z.string().url().optional().nullable(),
   });
 
 // Schema for inserting comments
