@@ -58,31 +58,8 @@ app.use((req, res, next) => {
 
   // ALWAYS serve the app on port 5000
   // this serves both the API and the client
-  const startServer = async (port: number): Promise<void> => {
-    try {
-      await new Promise((resolve, reject) => {
-        server.listen(port, "0.0.0.0")
-          .once('listening', () => {
-            log(`serving on port ${port}`);
-            resolve(void 0);
-          })
-          .once('error', (err: any) => {
-            if (err.code === 'EADDRINUSE') {
-              log(`Port ${port} is busy, trying ${port + 1}`);
-              server.close();
-              startServer(port + 1);
-              resolve(void 0);
-            } else {
-              reject(err);
-            }
-          });
-      });
-    } catch (error) {
-      log(`Failed to start server: ${error}`);
-      process.exit(1);
-    }
-  };
-
-  const PORT = process.env.PORT ? parseInt(process.env.PORT) : 5000;
-  await startServer(PORT);
+  const PORT = 5000;
+  server.listen(PORT, "0.0.0.0", () => {
+    log(`serving on port ${PORT}`);
+  });
 })();

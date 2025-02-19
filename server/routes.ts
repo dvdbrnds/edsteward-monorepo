@@ -8,23 +8,11 @@ import { parse } from "csv-parse/sync";
 import { eq } from "drizzle-orm";
 import { db } from "./db";
 import { regulations } from "@shared/schema";
-import express from "express";
 
 const upload = multer({ storage: multer.memoryStorage() });
 
 export function registerRoutes(app: Express): Server {
-  // Add middleware for parsing JSON bodies
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
-
-  // Set up authentication after body parsing middleware
   setupAuth(app);
-
-  // Add error logging middleware
-  app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-    console.error('Error occurred:', err);
-    res.status(500).json({ message: 'Internal server error', error: err.message });
-  });
 
   // Regulations endpoints
   app.get("/api/regulations", async (req, res) => {
