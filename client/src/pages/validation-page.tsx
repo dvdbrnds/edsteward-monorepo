@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Download, AlertTriangle, CheckCircle, XCircle } from "lucide-react";
+import { Download, AlertTriangle, CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 
@@ -33,6 +33,10 @@ interface ValidationReport {
 export default function ValidationPage() {
   const { toast } = useToast();
 
+  const { data: report, isLoading: reportLoading } = useQuery<ValidationReport>({
+    queryKey: ["/api/regulations/validate"],
+  });
+
   const validateMutation = useMutation({
     mutationFn: async () => {
       const response = await apiRequest("POST", "/api/regulations/validate", {});
@@ -45,11 +49,6 @@ export default function ValidationPage() {
       });
       queryClient.invalidateQueries({ queryKey: ["/api/regulations/validate"] });
     },
-  });
-
-  const { data: report } = useQuery<ValidationReport>({
-    queryKey: ["/api/regulations/validate"],
-    enabled: false,
   });
 
   const downloadReport = () => {
@@ -108,7 +107,16 @@ export default function ValidationPage() {
             </div>
           </div>
 
-          {report && (
+          {reportLoading || validateMutation.isPending ? (
+            <Card>
+              <CardContent className="p-6">
+                <div className="flex items-center justify-center space-x-4">
+                  <Loader2 className="h-6 w-6 animate-spin text-[#00267A]" />
+                  <span>Loading validation results...</span>
+                </div>
+              </CardContent>
+            </Card>
+          ) : report ? (
             <>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-8">
                 <Card>
@@ -205,6 +213,12 @@ export default function ValidationPage() {
                 </Card>
               )}
             </>
+          ) : (
+            <Card>
+              <CardContent className="p-6 text-center">
+                <p>Click "Run Validation" to check your regulations for issues.</p>
+              </CardContent>
+            </Card>
           )}
         </div>
       </main>
