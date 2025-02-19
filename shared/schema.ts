@@ -23,6 +23,7 @@ export const regulations = pgTable("regulations", {
   deadlines: text("deadlines"),
   category: text("category").notNull(),
   lastUpdated: timestamp("last_updated"),
+  agency_url: text("agency_url"),
 });
 
 // Comments table
