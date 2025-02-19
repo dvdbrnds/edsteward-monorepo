@@ -124,6 +124,23 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
     };
   };
 
+  // Filter regulations based on category and search
+  let filteredRegulations = regulations || [];
+
+  if (categoryFilter) {
+    filteredRegulations = filteredRegulations.filter(reg => reg.category === categoryFilter);
+  }
+
+  if (search.trim()) {
+    const searchLower = search.toLowerCase();
+    filteredRegulations = filteredRegulations.filter(reg =>
+      reg.topic.toLowerCase().includes(searchLower) ||
+      reg.itemId.toLowerCase().includes(searchLower) ||
+      reg.category.toLowerCase().includes(searchLower) ||
+      reg.statute.toLowerCase().includes(searchLower)
+    );
+  }
+
   return (
     <Card>
       <CardContent className="p-6">
@@ -152,7 +169,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
               </TableRow>
             </TableHeader>
             <TableBody>
-              {regulations?.map((regulation) => (
+              {filteredRegulations.map((regulation) => (
                 <TableRow
                   key={regulation.id}
                   className="cursor-pointer hover:bg-gray-50"
@@ -201,6 +218,13 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                   </TableCell>
                 </TableRow>
               ))}
+              {filteredRegulations.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={6} className="text-center py-4">
+                    No regulations found
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </div>
