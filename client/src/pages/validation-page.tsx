@@ -36,6 +36,7 @@ interface ValidationReport {
 export default function ValidationPage() {
   const { toast } = useToast();
 
+  // Load validation data immediately when page loads
   const { data: report, isLoading: reportLoading } = useQuery<ValidationReport>({
     queryKey: ["/api/regulations/validate"],
   });
