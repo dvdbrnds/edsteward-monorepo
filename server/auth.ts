@@ -5,7 +5,8 @@ import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
-import { User as SelectUser } from "@shared/schema";
+import { User as SelectUser, insertUserSchema, loginSchema } from "@shared/schema";
+import { ZodError } from "zod";
 
 declare global {
   namespace Express {
@@ -101,14 +102,23 @@ export function setupAuth(app: Express) {
   // Register a new user
   app.post("/api/register", async (req, res) => {
     try {
-      const existingUser = await storage.getUserByUsername(req.body.username);
+      console.log("Registration request received:", {
+        username: req.body.username,
+        hasPassword: !!req.body.password,
+        role: req.body.role
+      });
+
+      // Validate request body against schema
+      const validatedData = insertUserSchema.parse(req.body);
+
+      const existingUser = await storage.getUserByUsername(validatedData.username);
       if (existingUser) {
         return res.status(400).json({ message: "Username already exists" });
       }
 
-      const hashedPassword = await hashPassword(req.body.password);
+      const hashedPassword = await hashPassword(validatedData.password);
       const user = await storage.createUser({
-        ...req.body,
+        ...validatedData,
         password: hashedPassword,
       });
 
@@ -120,39 +130,65 @@ export function setupAuth(app: Express) {
       });
     } catch (error) {
       console.error("Registration error:", error);
+      if (error instanceof ZodError) {
+        return res.status(400).json({
+          message: "Validation error",
+          errors: error.errors.map(e => ({
+            path: e.path.join('.'),
+            message: e.message
+          }))
+        });
+      }
       res.status(500).json({ message: "Error creating user" });
     }
   });
 
   // Login
   app.post("/api/login", (req, res, next) => {
-    console.log("Login request received:", req.body);
+    console.log("Login request received - Raw body:", {
+      username: req.body.username,
+      passwordLength: req.body.password?.length || 0,
+      contentType: req.headers['content-type']
+    });
 
-    if (!req.body.username || !req.body.password) {
-      console.log("Missing credentials in request");
-      return res.status(400).json({ message: "Username and password are required" });
-    }
+    try {
+      // Validate login data
+      const validatedData = loginSchema.parse(req.body);
+      console.log("Login data validated successfully");
 
-    passport.authenticate("local", (err: Error, user: Express.User | false, info: { message: string }) => {
-      if (err) {
-        console.error("Login error:", err);
-        return res.status(500).json({ message: "Internal server error" });
-      }
-
-      if (!user) {
-        console.log("Authentication failed:", info?.message);
-        return res.status(401).json({ message: info?.message || "Invalid username or password" });
-      }
-
-      req.login(user, (loginErr) => {
-        if (loginErr) {
-          console.error("Login session error:", loginErr);
-          return res.status(500).json({ message: "Error during login" });
+      passport.authenticate("local", (err: Error, user: Express.User | false, info: { message: string }) => {
+        if (err) {
+          console.error("Login error:", err);
+          return res.status(500).json({ message: "Internal server error" });
         }
-        console.log("Login successful, sending response");
-        return res.json(user);
-      });
-    })(req, res, next);
+
+        if (!user) {
+          console.log("Authentication failed:", info?.message);
+          return res.status(401).json({ message: info?.message || "Invalid username or password" });
+        }
+
+        req.login(user, (loginErr) => {
+          if (loginErr) {
+            console.error("Login session error:", loginErr);
+            return res.status(500).json({ message: "Error during login" });
+          }
+          console.log("Login successful, sending response");
+          return res.json(user);
+        });
+      })(req, res, next);
+    } catch (error) {
+      console.error("Login validation error:", error);
+      if (error instanceof ZodError) {
+        return res.status(400).json({
+          message: "Validation error",
+          errors: error.errors.map(e => ({
+            path: e.path.join('.'),
+            message: e.message
+          }))
+        });
+      }
+      return res.status(400).json({ message: "Invalid login data" });
+    }
   });
 
   // Logout

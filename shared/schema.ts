@@ -80,10 +80,16 @@ export const guides = pgTable("guides", {
 // Schema for inserting users
 export const insertUserSchema = createInsertSchema(users)
   .extend({
-    password: z.string().min(6),
+    password: z.string().min(6, "Password must be at least 6 characters"),
     role: z.enum(["admin", "compliance_officer", "user"]),
     department: z.string().optional(),
   });
+
+// Login schema for validation
+export const loginSchema = z.object({
+  username: z.string().min(1, "Username is required"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
 
 // Update the regulation schema
 export const insertRegulationSchema = createInsertSchema(regulations)
