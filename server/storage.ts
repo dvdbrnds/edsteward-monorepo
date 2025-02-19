@@ -30,6 +30,7 @@ export interface IStorage {
   // Regulation methods
   getRegulations(): Promise<Regulation[]>;
   createRegulation(regulation: InsertRegulation): Promise<Regulation>;
+  updateRegulation(id: number, regulation: Partial<InsertRegulation>): Promise<Regulation>;
 
   // Comment methods
   getCommentsByRegulation(regulationId: number): Promise<Comment[]>;
@@ -88,6 +89,18 @@ export class DatabaseStorage implements IStorage {
   async createRegulation(regulation: InsertRegulation): Promise<Regulation> {
     const [newRegulation] = await db.insert(regulations).values(regulation).returning();
     return newRegulation;
+  }
+
+  async updateRegulation(id: number, regulation: Partial<InsertRegulation>): Promise<Regulation> {
+    const [updatedRegulation] = await db
+      .update(regulations)
+      .set({
+        ...regulation,
+        lastUpdated: new Date()
+      })
+      .where(eq(regulations.id, id))
+      .returning();
+    return updatedRegulation;
   }
 
   async getCommentsByRegulation(regulationId: number): Promise<Comment[]> {
