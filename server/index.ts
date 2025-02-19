@@ -3,10 +3,32 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { db } from "./db";
 import { users } from "@shared/schema";
+import session from "express-session";
+import { storage } from "./storage";
+import passport from "passport";
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+
+// Session configuration
+app.use(
+  session({
+    store: storage.sessionStore,
+    secret: process.env.SESSION_SECRET || 'your-secret-key',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
+  })
+);
+
+// Initialize passport after session
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Enhanced logging middleware
 app.use((req, res, next) => {
@@ -49,7 +71,7 @@ async function startServer() {
       await db.select().from(users).limit(1);
       log("Database connection successful");
     } catch (error) {
-      log("Database connection failed:", error);
+      log("Database connection failed: " + (error instanceof Error ? error.message : String(error)));
       throw new Error("Database connection failed - please check DATABASE_URL");
     }
 
@@ -85,13 +107,13 @@ async function startServer() {
 
     return server;
   } catch (error) {
-    log("Fatal error during server startup:", error);
+    log("Fatal error during server startup: " + (error instanceof Error ? error.message : String(error)));
     process.exit(1);
   }
 }
 
 // Start the server
 startServer().catch((error) => {
-  log("Unhandled error during server startup:", error);
+  log("Unhandled error during server startup: " + (error instanceof Error ? error.message : String(error)));
   process.exit(1);
 });
