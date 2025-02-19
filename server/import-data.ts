@@ -9,6 +9,7 @@ import { eq } from "drizzle-orm";
 import { db } from "./db";
 import { regulations } from "@shared/schema";
 import { addMonths, format } from "date-fns";
+import { RegulationValidator } from "./validation";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -18,22 +19,22 @@ async function importRegulations() {
   console.log("Reading Excel file from:", excelPath);
 
   try {
-    // Read the Excel file
     const workbook = xlsx.readFile(excelPath);
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
 
-    // Convert to JSON with raw: false to get string values
     const records = xlsx.utils.sheet_to_json(worksheet, { raw: false });
     console.log(`Found ${records.length} records to import from Excel`);
 
     let newCount = 0;
     let skipCount = 0;
     let updateCount = 0;
+    let validationErrors = 0;
+
+    const validator = new RegulationValidator();
 
     for (const record of records as any[]) {
       try {
-        // Combine multiple statute fields into one
         const statutes = [
           record['Statute 1'],
           record['Statute 2'],
@@ -41,7 +42,6 @@ async function importRegulations() {
           record['Statute 4']
         ].filter(Boolean).join('; ');
 
-        // Combine multiple regulation fields
         const requirements = [
           record['Regulation 1'],
           record['Regulation 2'],
@@ -50,7 +50,6 @@ async function importRegulations() {
           record['Regulation 5']
         ].filter(Boolean).join('\n\n');
 
-        // Extract category from Topic field or fallback to default categories
         let category = "Other";
         const topic = record['Topic'] || "";
         const itemId = record['Item ID'] || String(record['Topic ID'] || "");
@@ -61,10 +60,8 @@ async function importRegulations() {
         else if (topic.toLowerCase().includes("admission")) category = "Admissions";
         else if (topic.toLowerCase().includes("safety") || topic.toLowerCase().includes("security")) category = "Campus Safety";
 
-        // Parse and process deadlines
         let deadlines = record['Deadlines'] || "";
         if (!deadlines || deadlines === "Not Applicable") {
-          // Set a default deadline based on category
           const defaultMonths = {
             "Academic Programs": 6,
             "Athletics": 3,
@@ -77,7 +74,6 @@ async function importRegulations() {
           deadlines = format(futureDate, 'yyyy-MM-dd');
         }
 
-        // Check if regulation already exists
         const [existingRegulation] = await db
           .select()
           .from(regulations)
@@ -89,7 +85,6 @@ async function importRegulations() {
             existingRegulation.statute !== record['Statute Name'] ||
             existingRegulation.requirements !== requirements
           ) {
-            // Update existing regulation if content has changed
             await db
               .update(regulations)
               .set({
@@ -124,6 +119,13 @@ async function importRegulations() {
           lastUpdated: record['Last Updated'] ? new Date(record['Last Updated']) : new Date()
         };
 
+        const errors = validator.validateRegulation(regulation as Regulation);
+        if (errors.length > 0) {
+          console.error(`Validation failed for regulation ${itemId}:`, errors);
+          validationErrors++;
+          continue;
+        }
+
         await storage.createRegulation(regulation);
         newCount++;
         console.log(`Imported new regulation: ${regulation.itemId} (${category})`);
@@ -137,6 +139,7 @@ async function importRegulations() {
     console.log(`New regulations added: ${newCount}`);
     console.log(`Existing regulations updated: ${updateCount}`);
     console.log(`Duplicates skipped: ${skipCount}`);
+    console.log(`Validation errors: ${validationErrors}`);
     console.log('Import completed');
 
   } catch (error) {

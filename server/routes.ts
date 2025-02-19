@@ -8,6 +8,7 @@ import { parse } from "csv-parse/sync";
 import { eq } from "drizzle-orm";
 import { db } from "./db";
 import { regulations } from "@shared/schema";
+import { RegulationValidator } from "./validation";
 
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -140,6 +141,25 @@ export function registerRoutes(app: Express): Server {
       console.error('Import failed:', error);
       res.status(500).json({ 
         message: 'Failed to import CSV file',
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  // Add new validation endpoint
+  app.post("/api/regulations/validate", async (req, res) => {
+    if (!req.user) return res.sendStatus(401);
+
+    try {
+      const regulations = await storage.getRegulations();
+      const validator = new RegulationValidator();
+      const report = await validator.validateAll(regulations);
+
+      res.json(report);
+    } catch (error) {
+      console.error('Validation failed:', error);
+      res.status(500).json({ 
+        message: 'Failed to validate regulations',
         error: error instanceof Error ? error.message : String(error)
       });
     }
