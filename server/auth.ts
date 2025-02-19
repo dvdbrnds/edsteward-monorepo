@@ -29,6 +29,8 @@ async function comparePasswords(supplied: string, stored: string) {
 }
 
 export function setupAuth(app: Express) {
+  console.log("Setting up authentication...");
+
   const sessionSettings: session.SessionOptions = {
     secret: process.env.REPL_ID!,
     resave: false,
@@ -52,29 +54,46 @@ export function setupAuth(app: Express) {
   passport.use(
     new LocalStrategy(async (username, password, done) => {
       try {
+        console.log(`Login attempt for user: ${username}`);
         const user = await storage.getUserByUsername(username);
-        if (!user || !(await comparePasswords(password, user.password))) {
+
+        if (!user) {
+          console.log(`User not found: ${username}`);
           return done(null, false, { message: "Invalid username or password" });
         }
+
+        const isValidPassword = await comparePasswords(password, user.password);
+        console.log(`Password validation result for ${username}: ${isValidPassword}`);
+
+        if (!isValidPassword) {
+          return done(null, false, { message: "Invalid username or password" });
+        }
+
+        console.log(`Successful login for user: ${username}`);
         return done(null, user);
       } catch (error) {
+        console.error("Authentication error:", error);
         return done(error);
       }
     }),
   );
 
   passport.serializeUser((user, done) => {
+    console.log(`Serializing user: ${user.id}`);
     done(null, user.id);
   });
 
   passport.deserializeUser(async (id: number, done) => {
     try {
+      console.log(`Deserializing user: ${id}`);
       const user = await storage.getUser(id);
       if (!user) {
+        console.log(`User not found during deserialization: ${id}`);
         return done(null, false);
       }
       done(null, user);
     } catch (error) {
+      console.error("Deserialization error:", error);
       done(error);
     }
   });
@@ -107,7 +126,10 @@ export function setupAuth(app: Express) {
 
   // Login
   app.post("/api/login", (req, res, next) => {
+    console.log("Login request received:", req.body);
+
     if (!req.body.username || !req.body.password) {
+      console.log("Missing credentials in request");
       return res.status(400).json({ message: "Username and password are required" });
     }
 
@@ -118,14 +140,16 @@ export function setupAuth(app: Express) {
       }
 
       if (!user) {
+        console.log("Authentication failed:", info?.message);
         return res.status(401).json({ message: info?.message || "Invalid username or password" });
       }
 
       req.login(user, (loginErr) => {
         if (loginErr) {
-          console.error("Login error:", loginErr);
+          console.error("Login session error:", loginErr);
           return res.status(500).json({ message: "Error during login" });
         }
+        console.log("Login successful, sending response");
         return res.json(user);
       });
     })(req, res, next);
