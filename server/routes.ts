@@ -32,7 +32,6 @@ export function registerRoutes(app: Express): Server {
     }
 
     try {
-      // Parse CSV content
       const fileContent = req.file.buffer.toString('utf-8');
       const records = parse(fileContent, {
         columns: (header: string[]) => {
@@ -52,7 +51,6 @@ export function registerRoutes(app: Express): Server {
 
       for (const record of records) {
         try {
-          // Combine multiple statute fields into an array
           const statutes = [
             record['Statute 1'],
             record['Statute 2'],
@@ -60,7 +58,6 @@ export function registerRoutes(app: Express): Server {
             record['Statute 4']
           ].filter(Boolean);
 
-          // Combine multiple regulation fields into an array
           const regulationTexts = [
             record['Regulation 1'],
             record['Regulation 2'],
@@ -69,7 +66,6 @@ export function registerRoutes(app: Express): Server {
             record['Regulation 5']
           ].filter(Boolean);
 
-          // Extract category from Topic field or fallback to default categories
           let category = "Other";
           const topic = record['Topic'] || "";
           const itemId = record['Item ID'] || String(record['Topic ID'] || "");
@@ -80,9 +76,10 @@ export function registerRoutes(app: Express): Server {
           else if (topic.includes("Admission")) category = "Admissions";
           else if (topic.includes("Safety") || topic.includes("Security")) category = "Campus Safety";
 
-          const existingRegulation = await db.query.regulations.findFirst({
-            where: eq(regulations.itemId, itemId),
-          });
+          const [existingRegulation] = await db
+            .select()
+            .from(regulations)
+            .where(eq(regulations.itemId, itemId));
 
           const regulationData = {
             itemId,
@@ -94,14 +91,14 @@ export function registerRoutes(app: Express): Server {
             requirements: regulationTexts.join('\n\n') || record['Reporting Requirements'] || null,
             deadlines: record['Deadlines'] || null,
             category,
-            lastUpdated: record['Last Updated'] ? new Date(record['Last Updated']) : new Date(),
+            lastUpdated: new Date().toISOString(),
             contactEmail: record['Contact Email'] || null,
             department: record['Department'] || null,
             complianceStatus: record['Compliance Status'] || null,
             reviewFrequency: record['Review Frequency'] || null,
-            nextReviewDate: record['Next Review Date'] ? new Date(record['Next Review Date']) : null,
+            nextReviewDate: record['Next Review Date'] || null,
             notes: record['Notes'] || null,
-            statutes: statutes,
+            statutes,
             regulations: regulationTexts,
           };
 
