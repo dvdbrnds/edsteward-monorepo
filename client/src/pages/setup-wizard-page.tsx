@@ -60,6 +60,15 @@ export default function SetupWizardPage() {
   const [isComplete, setIsComplete] = useState(false);
   const [officerAssignments, setOfficerAssignments] = useState<Record<string, { email: string; name: string }>>({});
 
+  // Query to check if admin exists
+  const { data: hasAdmin, isLoading: checkingAdmin } = useQuery({
+    queryKey: ["/api/setup/has-admin"],
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/setup/has-admin");
+      return response.json();
+    },
+  });
+
   const form = useForm<FormValues>({
     resolver: zodResolver(insertUserSchema),
     defaultValues: {
@@ -108,15 +117,20 @@ export default function SetupWizardPage() {
     return <Redirect to="/admin/settings" />;
   }
 
+  // Skip admin creation if admin already exists
+  if (!checkingAdmin && hasAdmin && currentStep === 0) {
+    setCurrentStep(1);
+  }
+
   const handleOfficerSubmit = (data: { name: string; email: string }) => {
     const currentCategory = REGULATION_CATEGORIES[officerStep];
-    setOfficerAssignments(prev => ({
+    setOfficerAssignments((prev) => ({
       ...prev,
-      [currentCategory]: data
+      [currentCategory]: data,
     }));
 
     if (officerStep < REGULATION_CATEGORIES.length - 1) {
-      setOfficerStep(prev => prev + 1);
+      setOfficerStep((prev) => prev + 1);
       officerForm.reset();
     } else {
       // All categories assigned
@@ -147,25 +161,25 @@ export default function SetupWizardPage() {
             return (
               <Card
                 key={step.id}
-                className={`${
-                  isCurrent ? "ring-2 ring-[#00267A]" : ""
-                } ${
+                className={`${isCurrent ? "ring-2 ring-[#00267A]" : ""} ${
                   isCompleted ? "bg-gray-50" : ""
                 }`}
               >
                 <CardHeader>
                   <CardTitle className="flex items-center gap-3">
-                    <Icon className={`h-6 w-6 ${
-                      isCompleted ? "text-green-500" : "text-[#00267A]"
-                    }`} />
+                    <Icon
+                      className={`h-6 w-6 ${
+                        isCompleted ? "text-green-500" : "text-[#00267A]"
+                      }`}
+                    />
                     {step.title}
-                    {step.required && (
+                    {step.required && !hasAdmin && (
                       <span className="text-sm text-red-500 ml-2">Required</span>
                     )}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {isCurrent && step.id === "admin" && (
+                  {isCurrent && step.id === "admin" && !hasAdmin && (
                     <Form {...form}>
                       <form
                         onSubmit={form.handleSubmit((data) =>
@@ -239,12 +253,17 @@ export default function SetupWizardPage() {
                           Assign Officer for {REGULATION_CATEGORIES[officerStep]}
                         </h3>
                         <p className="text-gray-600">
-                          Assign a compliance officer responsible for {REGULATION_CATEGORIES[officerStep]} regulations.
-                          This person will receive notifications and oversee compliance for this category.
+                          Assign a compliance officer responsible for{" "}
+                          {REGULATION_CATEGORIES[officerStep]} regulations.
+                          This person will receive notifications and oversee
+                          compliance for this category.
                         </p>
 
                         <Form {...officerForm}>
-                          <form onSubmit={officerForm.handleSubmit(handleOfficerSubmit)} className="space-y-4">
+                          <form
+                            onSubmit={officerForm.handleSubmit(handleOfficerSubmit)}
+                            className="space-y-4"
+                          >
                             <FormField
                               control={officerForm.control}
                               name="name"
@@ -252,7 +271,10 @@ export default function SetupWizardPage() {
                                 <FormItem>
                                   <FormLabel>Officer Name</FormLabel>
                                   <FormControl>
-                                    <Input placeholder="Enter officer's full name" {...field} />
+                                    <Input
+                                      placeholder="Enter officer's full name"
+                                      {...field}
+                                    />
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>
@@ -266,7 +288,11 @@ export default function SetupWizardPage() {
                                 <FormItem>
                                   <FormLabel>Officer Email</FormLabel>
                                   <FormControl>
-                                    <Input type="email" placeholder="Enter officer's email" {...field} />
+                                    <Input
+                                      type="email"
+                                      placeholder="Enter officer's email"
+                                      {...field}
+                                    />
                                   </FormControl>
                                   <FormMessage />
                                 </FormItem>

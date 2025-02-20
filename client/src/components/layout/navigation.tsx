@@ -29,6 +29,8 @@ import {
 
 // Import the logo using relative path from client's perspective
 import moravianLogo from "../../assets/Screenshot_2025-02-12_at_9.15.57_AM-removebg-preview.png";
+import { useQuery } from "@tanstack/react-query";
+import { Cog } from "lucide-react";
 
 const CHANGELOG = [
   {
@@ -107,10 +109,20 @@ export default function Navigation() {
   const { user, logoutMutation } = useAuth();
   const [location] = useLocation();
 
+  const { data: setupComplete } = useQuery({
+    queryKey: ["/api/setup/status"],
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/setup/status");
+      return response.json();
+    },
+  });
+
   const links = [
     { href: "/", label: "Dashboard", icon: LayoutDashboard },
     { href: "/regulations", label: "Regulations", icon: Book },
     { href: "/reports", label: "Reports", icon: FileText },
+    // Add setup wizard link if setup is not complete
+    ...(!setupComplete ? [{ href: "/setup", label: "Complete Setup", icon: Cog }] : []),
     // Add admin settings link only for admin users
     ...(user?.role === "admin"
       ? [{ href: "/admin/settings", label: "Admin Settings", icon: Settings }]
