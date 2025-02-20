@@ -104,6 +104,34 @@ export function registerRoutes(app: Express): Server {
         errors: report.errors.length,
         warnings: report.warnings.length
       });
+  });
+
+  // Export endpoints
+  app.get("/api/regulations/export/excel", async (req, res) => {
+    try {
+      const regulations = await storage.getRegulations();
+      const buffer = await exportToExcel(regulations);
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+      res.setHeader('Content-Disposition', 'attachment; filename=regulations.xlsx');
+      res.send(buffer);
+    } catch (error) {
+      console.error('Export failed:', error);
+      res.status(500).json({ success: false, message: 'Export failed' });
+    }
+  });
+
+  app.get("/api/regulations/export/csv", async (req, res) => {
+    try {
+      const regulations = await storage.getRegulations();
+      const csv = await exportToCSV(regulations);
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', 'attachment; filename=regulations.csv');
+      res.send(csv);
+    } catch (error) {
+      console.error('Export failed:', error);
+      res.status(500).json({ success: false, message: 'Export failed' });
+    }
+  });
 
       res.json(report);
     } catch (error) {

@@ -1,9 +1,26 @@
 import { parse } from "csv-parse/sync";
 import xlsx from 'xlsx';
-import type { InsertRegulation } from "@shared/schema";
+import type { InsertRegulation, Regulation } from "@shared/schema";
 import { storage } from "../storage";
 import { RegulationValidator } from "../validation";
 import { addMonths, format } from "date-fns";
+
+export async function exportToExcel(regulations: Regulation[]): Promise<Buffer> {
+  const worksheet = xlsx.utils.json_to_sheet(regulations);
+  const workbook = xlsx.utils.book_new();
+  xlsx.utils.book_append_sheet(workbook, worksheet, 'Regulations');
+  return xlsx.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+}
+
+export async function exportToCSV(regulations: Regulation[]): Promise<string> {
+  const header = Object.keys(regulations[0] || {}).join(',') + '\n';
+  const rows = regulations.map(reg => 
+    Object.values(reg).map(val => 
+      typeof val === 'string' ? `"${val.replace(/"/g, '""')}"` : val
+    ).join(',')
+  ).join('\n');
+  return header + rows;
+}
 
 interface ImportResult {
   newCount: number;
