@@ -4,6 +4,7 @@ import type { Regulation, Deadline, Guide } from "@shared/schema";
 import Navigation from "@/components/layout/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   ExternalLink,
   FileText,
@@ -123,7 +124,6 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
       </div>
     );
   }
-
 
   const regulationDeadlines = deadlines?.filter(d => d.regulationId === regulation.id) || [];
   const nextDeadline = regulationDeadlines.length > 0
@@ -380,7 +380,7 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
                           onSubmit={overrideForm.handleSubmit((data) =>
                             overrideMutation.mutate(data)
                           )}
-                          className="space-y-4"
+                          className="space-y-6"
                         >
                           <FormField
                             control={overrideForm.control}
@@ -389,17 +389,18 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
                               <FormItem>
                                 <FormLabel>Override Email</FormLabel>
                                 <FormControl>
-                                  <input
+                                  <Input
                                     type="email"
                                     placeholder="Enter override email"
+                                    className="w-full"
                                     {...field}
                                     value={field.value || ""}
                                   />
                                 </FormControl>
-                                <FormDescription>
+                                <FormDescription className="text-sm text-gray-500">
                                   Leave empty to use category default
                                 </FormDescription>
-                                <FormMessage />
+                                <FormMessage className="text-sm text-red-500" />
                               </FormItem>
                             )}
                           />
@@ -411,17 +412,18 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
                               <FormItem>
                                 <FormLabel>Override Phone</FormLabel>
                                 <FormControl>
-                                  <input
-                                    type="text"
+                                  <Input
+                                    type="tel"
                                     placeholder="Enter override phone"
+                                    className="w-full"
                                     {...field}
                                     value={field.value || ""}
                                   />
                                 </FormControl>
-                                <FormDescription>
+                                <FormDescription className="text-sm text-gray-500">
                                   Leave empty to use category default
                                 </FormDescription>
-                                <FormMessage />
+                                <FormMessage className="text-sm text-red-500" />
                               </FormItem>
                             )}
                           />
