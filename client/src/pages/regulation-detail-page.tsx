@@ -375,6 +375,14 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
+                      <div className="mb-6 space-y-2">
+                        <p className="text-sm text-gray-700">
+                          Configure regulation-specific notification settings that will override the default category-level notifications.
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Use this feature when you need to route notifications for this specific regulation to different contacts than the category default. Leave fields empty to use category defaults.
+                        </p>
+                      </div>
                       <Form {...overrideForm}>
                         <form
                           onSubmit={overrideForm.handleSubmit((data) =>
@@ -398,7 +406,7 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
                                   />
                                 </FormControl>
                                 <FormDescription className="text-sm text-gray-500">
-                                  Leave empty to use category default
+                                  Email notifications for this regulation will be sent to this address instead of the category default
                                 </FormDescription>
                                 <FormMessage className="text-sm text-red-500" />
                               </FormItem>
@@ -421,7 +429,7 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
                                   />
                                 </FormControl>
                                 <FormDescription className="text-sm text-gray-500">
-                                  Leave empty to use category default
+                                  SMS notifications for this regulation will be sent to this number instead of the category default
                                 </FormDescription>
                                 <FormMessage className="text-sm text-red-500" />
                               </FormItem>
