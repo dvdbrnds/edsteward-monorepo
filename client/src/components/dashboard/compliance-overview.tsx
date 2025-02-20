@@ -75,8 +75,8 @@ export default function ComplianceOverview({ onCategorySelect, selectedCategory 
           </div>
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="h-[300px] relative">
+      <CardContent className="flex flex-col gap-4">
+        <div className="h-[250px]">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -113,31 +113,25 @@ export default function ComplianceOverview({ onCategorySelect, selectedCategory 
                 }}
                 itemStyle={{ color: COLORS[1] }}
               />
-              <Legend
-                verticalAlign="bottom"
-                height={36}
-                iconType="circle"
-                formatter={(value) => (
-                  <span 
-                    className={`text-[#666666] ml-2 cursor-pointer ${selectedCategory === value ? 'font-bold' : ''}`}
-                    onClick={() => onCategorySelect(value as string)}
-                  >
-                    {value}
-                  </span>
-                )}
-                wrapperStyle={{
-                  paddingTop: '20px',
-                  width: '100%',
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  position: 'absolute',
-                  bottom: '-10px'
-                }}
-              />
             </PieChart>
           </ResponsiveContainer>
+        </div>
+        <div className="flex flex-wrap justify-center gap-3 pt-2">
+          {data.map((entry, index) => (
+            <button
+              key={entry.name}
+              onClick={() => onCategorySelect(entry.name)}
+              className={`inline-flex items-center gap-2 px-2 py-1 rounded-md hover:bg-gray-100 transition-colors ${
+                selectedCategory === entry.name ? 'bg-gray-100 font-medium' : ''
+              }`}
+            >
+              <span
+                className="w-3 h-3 rounded-sm"
+                style={{ backgroundColor: COLORS[index % COLORS.length] }}
+              />
+              <span className="text-sm text-gray-700">{entry.name}</span>
+            </button>
+          ))}
         </div>
       </CardContent>
     </Card>
