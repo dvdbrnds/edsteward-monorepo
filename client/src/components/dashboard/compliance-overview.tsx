@@ -76,7 +76,7 @@ export default function ComplianceOverview({ onCategorySelect, selectedCategory 
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px]">
+        <div className="h-[300px] relative">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -126,7 +126,14 @@ export default function ComplianceOverview({ onCategorySelect, selectedCategory 
                   </span>
                 )}
                 wrapperStyle={{
-                  paddingTop: '20px'
+                  paddingTop: '20px',
+                  width: '100%',
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  position: 'absolute',
+                  bottom: '-10px'
                 }}
               />
             </PieChart>
