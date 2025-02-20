@@ -41,13 +41,6 @@ const SETUP_STEPS = [
     icon: UserPlus,
     required: false,
   },
-  {
-    id: "overrides",
-    title: "Configure Notification Overrides",
-    description: "Set up default notification settings for each category. Individual regulations can be customized later.",
-    icon: Settings,
-    required: false,
-  },
 ];
 
 export default function SetupWizardPage() {
@@ -77,7 +70,7 @@ export default function SetupWizardPage() {
     onSuccess: () => {
       toast({
         title: "Admin Account Created",
-        description: "You can now proceed with configuring compliance officers and notification settings.",
+        description: "You can now proceed with configuring compliance officers.",
       });
       setCurrentStep((prev) => prev + 1);
     },
@@ -143,7 +136,7 @@ export default function SetupWizardPage() {
                         onSubmit={form.handleSubmit((data) =>
                           createAdminMutation.mutate(data)
                         )}
-                        className="space-y-4"
+                        className="space-y-6"
                       >
                         <FormField
                           control={form.control}
@@ -205,25 +198,6 @@ export default function SetupWizardPage() {
                       <div className="text-center py-4">
                         <p className="text-sm text-gray-500 mb-4">
                           You can configure officer assignments now or do it later in the admin settings.
-                        </p>
-                        <Button
-                          onClick={() => setCurrentStep((prev) => prev + 1)}
-                          className="mt-4"
-                        >
-                          Skip for Now
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-
-                  {isCurrent && step.id === "overrides" && (
-                    <div className="space-y-4">
-                      <p className="text-gray-600">
-                        Configure default notification settings for each regulation category. These settings can be overridden for individual regulations later.
-                      </p>
-                      <div className="text-center py-4">
-                        <p className="text-sm text-gray-500 mb-4">
-                          You can set up notification defaults now or configure them later in the admin settings.
                         </p>
                         <Button
                           onClick={() => setIsComplete(true)}
