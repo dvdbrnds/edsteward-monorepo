@@ -98,12 +98,38 @@ async function startServer() {
       log("Static serving setup complete");
     }
 
-    // Start the server
-    const PORT = 5000;
-    server.listen(PORT, "0.0.0.0", () => {
-      log(`Server successfully started and listening on port ${PORT}`);
-      log("Application initialization complete");
-    });
+    // Try ports in sequence until one works
+    const ports = [5000, 5001, 5002, 5003];
+    let port: number | null = null;
+
+    for (const testPort of ports) {
+      try {
+        await new Promise((resolve, reject) => {
+          server.listen(testPort, "0.0.0.0", () => {
+            port = testPort;
+            resolve(true);
+          }).on('error', (err: NodeJS.ErrnoException) => {
+            if (err.code === 'EADDRINUSE') {
+              log(`Port ${testPort} is in use, trying next port...`);
+              resolve(false);
+            } else {
+              reject(err);
+            }
+          });
+        });
+
+        if (port) break;
+      } catch (err) {
+        log(`Error trying port ${testPort}: ${err}`);
+      }
+    }
+
+    if (!port) {
+      throw new Error("Could not find an available port");
+    }
+
+    log(`Server successfully started and listening on port ${port}`);
+    log("Application initialization complete");
 
     return server;
   } catch (error) {
