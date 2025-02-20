@@ -82,6 +82,115 @@ export class ETLProcessor {
     this.schemaValidator = new SchemaValidator();
   }
 
+  public async processCSV(
+    fileContent: string,
+    schema: CsvSchema,
+    validationRules: ValidationRule[]
+  ): Promise<ImportResult> {
+    console.log("Starting CSV processing with schema:", {
+      schemaName: schema.name,
+      schemaFields: Object.keys(schema.schema),
+      validationRules: validationRules.length
+    });
+
+    const result: ImportResult = {
+      newCount: 0,
+      updateCount: 0,
+      skipCount: 0,
+      errorCount: 0,
+      errors: []
+    };
+
+    try {
+      console.log("Attempting to parse CSV content...");
+      const records = parse(fileContent, {
+        columns: true,
+        skip_empty_lines: true,
+        trim: true,
+        relaxColumnCount: true,
+        relaxQuotes: true,
+        skipRecordsWithError: true
+      });
+
+      console.log("CSV Parse Result:", {
+        recordCount: records.length,
+        firstRecordKeys: records[0] ? Object.keys(records[0]) : [],
+        sampleRecord: records[0]
+      });
+
+      if (!records.length) {
+        throw new Error("No records found in CSV file");
+      }
+
+      // Validate headers against schema
+      const headers = Object.keys(records[0]);
+      console.log("CSV Headers found:", headers);
+
+      // Type-safe schema validation
+      const schemaFields = Object.entries(schema.schema).map(([field, def]) => ({
+        field,
+        ...def
+      }));
+
+      console.log("Schema fields:", schemaFields);
+
+      const requiredFields = schemaFields
+        .filter(def => def.required)
+        .map(def => def.field);
+
+      console.log("Required fields:", requiredFields);
+
+      const missingFields = requiredFields.filter(field => !headers.includes(field));
+      if (missingFields.length > 0) {
+        throw new Error(`Missing required columns in CSV: ${missingFields.join(', ')}`);
+      }
+
+      // Process records
+      for (let i = 0; i < records.length; i++) {
+        const record = records[i];
+        const rowNumber = i + 2; // Adding 2 for header row and 0-based index
+
+        console.log(`Processing record ${rowNumber}:`, record);
+
+        // Validate record against schema
+        const validationErrors: string[] = [];
+
+        for (const { field, type, required } of schemaFields) {
+          const value = record[field];
+          console.log(`Validating field '${field}':`, { value, type, required });
+
+          const error = this.schemaValidator.validateField(value, { type, required });
+          if (error) {
+            validationErrors.push(`Field '${field}': ${error}`);
+          }
+        }
+
+        if (validationErrors.length > 0) {
+          console.log(`Validation errors for record ${rowNumber}:`, validationErrors);
+          result.errorCount++;
+          result.errors.push({
+            row: rowNumber,
+            error: validationErrors.join('; '),
+            data: record
+          });
+          continue;
+        }
+
+        result.newCount++;
+      }
+
+      console.log("Processing completed:", {
+        processed: result.newCount,
+        errors: result.errorCount,
+        skipped: result.skipCount
+      });
+
+      return result;
+    } catch (error) {
+      console.error("CSV processing failed:", error);
+      throw new Error(`CSV processing failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }
   private async startTransformationLog(
     schemaId: number,
     fileName: string
@@ -126,103 +235,6 @@ export class ETLProcessor {
       .update(transformationLogs)
       .set(updates)
       .where(sql`id = ${logId}`);
-  }
-
-  public async processCSV(
-    fileContent: string,
-    schema: CsvSchema,
-    validationRules: ValidationRule[]
-  ): Promise<ImportResult> {
-    console.log("Starting CSV processing with schema:", {
-      schemaName: schema.name,
-      schemaFields: Object.keys(schema.schema)
-    });
-
-    const result: ImportResult = {
-      newCount: 0,
-      updateCount: 0,
-      skipCount: 0,
-      errorCount: 0,
-      errors: []
-    };
-
-    try {
-      // Parse CSV with forgiving options
-      const records = parse(fileContent, {
-        columns: true,
-        skip_empty_lines: true,
-        trim: true,
-        relaxColumnCount: true,
-        relaxQuotes: true,
-        skipRecordsWithError: true
-      });
-
-      console.log("CSV Parse Result:", {
-        recordCount: records.length,
-        sampleRecord: records[0]
-      });
-
-      // Validate headers against schema
-      const headers = Object.keys(records[0] || {});
-      console.log("CSV Headers:", headers);
-
-      // Type-safe schema validation
-      const schemaEntries = Object.entries(schema.schema);
-      const requiredFields = schemaEntries
-        .filter(([_, def]) => {
-          const typedDef = def as { required: boolean };
-          return typedDef.required;
-        })
-        .map(([field]) => field);
-
-      console.log("Required Fields:", requiredFields);
-
-      const missingFields = requiredFields.filter(field => !headers.includes(field));
-      if (missingFields.length > 0) {
-        throw new Error(`Missing required columns: ${missingFields.join(', ')}`);
-      }
-
-      // Process records
-      for (let i = 0; i < records.length; i++) {
-        const record = records[i];
-        const rowNumber = i + 2; // Adding 2 for header row and 0-based index
-
-        // Validate record against schema
-        const validationErrors: string[] = [];
-
-        for (const [field, definition] of schemaEntries) {
-          const value = record[field];
-          const typedDefinition = definition as { type: string; required: boolean; format?: string };
-
-          const error = this.schemaValidator.validateField(value, typedDefinition);
-          if (error) {
-            validationErrors.push(`Field '${field}': ${error}`);
-          }
-        }
-
-        if (validationErrors.length > 0) {
-          result.errorCount++;
-          result.errors.push({
-            row: rowNumber,
-            error: validationErrors.join('; '),
-            data: record
-          });
-          continue;
-        }
-
-        result.newCount++;
-      }
-
-      console.log("Processing completed:", {
-        processed: result.newCount,
-        errors: result.errorCount
-      });
-
-      return result;
-    } catch (error) {
-      console.error("CSV processing failed:", error);
-      throw error;
-    }
   }
 }
 

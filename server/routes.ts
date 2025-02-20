@@ -94,11 +94,12 @@ export function registerRoutes(app: Express): Server {
       // Create a default schema if not provided
       let schema = await storage.getCsvSchema(1); // Get default schema if exists
       if (!schema) {
+        console.log("Creating default schema for CSV import");
         // Create a basic default schema
         schema = await storage.createCsvSchema({
           name: "Default Regulation Schema",
           description: "Default schema for regulation imports",
-          createdBy: req.user.id, // Add the createdBy field
+          createdBy: req.user.id,
           schema: {
             "Topic": { type: "string", required: true },
             "Item ID": { type: "string", required: true },
@@ -108,13 +109,16 @@ export function registerRoutes(app: Express): Server {
             "Deadlines": { type: "string", required: false }
           }
         });
+        console.log("Created default schema:", schema);
       }
 
       // Get validation rules for the schema
       const validationRules = await storage.getValidationRules(schema.id);
+      console.log("Loaded validation rules:", validationRules);
 
       const fileContent = req.file.buffer.toString('utf-8');
       console.log("Processing CSV import with schema:", schema.name);
+      console.log("File content preview:", fileContent.substring(0, 200));
 
       const result = await etlService.importFromCSV(fileContent, schema, validationRules);
 
@@ -125,10 +129,13 @@ export function registerRoutes(app: Express): Server {
       });
     } catch (error) {
       console.error('Import failed:', error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error('Detailed error:', errorMessage);
+
       res.status(500).json({
         success: false,
-        message: 'Failed to import CSV file. Please check your file format and try again.',
-        error: error instanceof Error ? error.message : String(error)
+        message: `Import failed: ${errorMessage}`,
+        error: errorMessage
       });
     }
   });
