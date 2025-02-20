@@ -34,6 +34,16 @@ import { Cog } from "lucide-react";
 
 const CHANGELOG = [
   {
+    version: "0.1.8",
+    date: "February 20, 2025",
+    changes: [
+      "Updated setup wizard to focus on compliance offices instead of individual officers",
+      "Added support for department distribution lists in compliance assignments",
+      "Improved setup wizard UX with suggested email distribution lists",
+      "Enhanced setup flow with better admin existence detection",
+    ],
+  },
+  {
     version: "0.1.7",
     date: "February 20, 2025",
     changes: [
@@ -151,7 +161,7 @@ export default function Navigation() {
                     <Dialog>
                       <DialogTrigger asChild>
                         <button className="text-xs text-gray-300 ml-2 hover:text-white transition-colors">
-                          Alpha v0.1.7
+                          Alpha v0.1.8
                         </button>
                       </DialogTrigger>
                       <DialogContent>
