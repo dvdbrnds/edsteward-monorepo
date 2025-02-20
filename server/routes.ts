@@ -84,8 +84,31 @@ export function registerRoutes(app: Express): Server {
     }
 
     try {
+      // Create a default schema if not provided
+      let schema = await storage.getCsvSchema(1); // Get default schema if exists
+      if (!schema) {
+        // Create a basic default schema
+        schema = await storage.createCsvSchema({
+          name: "Default Regulation Schema",
+          description: "Default schema for regulation imports",
+          schema: {
+            "Topic": { type: "string", required: true },
+            "Item ID": { type: "string", required: true },
+            "Statute": { type: "string", required: true },
+            "Requirements": { type: "string", required: true },
+            "Category": { type: "string", required: false },
+            "Deadlines": { type: "string", required: false }
+          }
+        });
+      }
+
+      // Get validation rules for the schema
+      const validationRules = await storage.getValidationRules(schema.id);
+
       const fileContent = req.file.buffer.toString('utf-8');
-      const result = await etlService.importFromCSV(fileContent);
+      console.log("Processing CSV import with schema:", schema.name);
+
+      const result = await etlService.importFromCSV(fileContent, schema, validationRules);
 
       res.json({
         success: true,
@@ -96,7 +119,7 @@ export function registerRoutes(app: Express): Server {
       console.error('Import failed:', error);
       res.status(500).json({
         success: false,
-        message: 'Failed to import CSV file',
+        message: 'Failed to import CSV file. Please check your file format and try again.',
         error: error instanceof Error ? error.message : String(error)
       });
     }

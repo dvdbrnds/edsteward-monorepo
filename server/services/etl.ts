@@ -1,8 +1,8 @@
 import { parse } from "csv-parse/sync";
 import xlsx from 'xlsx';
 import { sql } from "drizzle-orm";
-import type { 
-  InsertRegulation, 
+import type {
+  InsertRegulation,
   Regulation,
   CsvSchema,
   ValidationRule,
@@ -312,7 +312,7 @@ export class RegulationETL {
 
       const category = this.determineCategory(topic);
       let deadlines = record['Deadlines']?.trim() || "";
-      
+
       if (!deadlines || deadlines === "Not Applicable") {
         deadlines = this.generateDefaultDeadline(category);
       }
@@ -332,16 +332,16 @@ export class RegulationETL {
 
       const validationErrors = this.validator.validateRegulation(regulation as any);
       if (validationErrors.length > 0) {
-        return { 
-          regulation: null, 
+        return {
+          regulation: null,
           error: `Validation errors: ${validationErrors.map(e => e.error).join(', ')}`
         };
       }
 
       return { regulation };
     } catch (error) {
-      return { 
-        regulation: null, 
+      return {
+        regulation: null,
         error: `Processing error: ${error instanceof Error ? error.message : String(error)}`
       };
     }
@@ -356,8 +356,8 @@ export class RegulationETL {
 
   public async exportToCSV(regulations: Regulation[]): Promise<string> {
     const header = Object.keys(regulations[0] || {}).join(',') + '\n';
-    const rows = regulations.map(reg => 
-      Object.values(reg).map(val => 
+    const rows = regulations.map(reg =>
+      Object.values(reg).map(val =>
         typeof val === 'string' ? `"${val.replace(/"/g, '""')}"` : val
       ).join(',')
     ).join('\n');
@@ -365,7 +365,54 @@ export class RegulationETL {
   }
 
   public async importFromCSV(fileContent: string, schema: CsvSchema, validationRules: ValidationRule[]): Promise<ImportResult> {
-    return this.etlProcessor.processCSV(fileContent, schema, validationRules);
+    console.log("Starting CSV import process with schema:", schema.name);
+    const result: ImportResult = {
+      newCount: 0,
+      updateCount: 0,
+      skipCount: 0,
+      errorCount: 0,
+      errors: []
+    };
+
+    try {
+      // Parse CSV with more forgiving options
+      const records = parse(fileContent, {
+        columns: true,
+        skip_empty_lines: true,
+        trim: true,
+        relaxColumnCount: true,
+        relaxQuotes: true,
+        skipRecordsWithError: true
+      });
+
+      console.log(`Processing ${records.length} records from CSV`);
+
+      // Validate headers against schema
+      const headers = Object.keys(records[0] || {});
+      const requiredFields = Object.entries(schema.schema)
+        .filter(([_, def]) => def.required)
+        .map(([field]) => field);
+
+      const missingFields = requiredFields.filter(field => !headers.includes(field));
+      if (missingFields.length > 0) {
+        throw new Error(`Missing required columns: ${missingFields.join(', ')}`);
+      }
+
+      await this.processRecords(records, result);
+
+      console.log("Import completed:", {
+        new: result.newCount,
+        updated: result.updateCount,
+        skipped: result.skipCount,
+        errors: result.errorCount
+      });
+
+    } catch (error) {
+      console.error('CSV processing failed:', error);
+      throw new Error(`Failed to process CSV: ${error instanceof Error ? error.message : String(error)}`);
+    }
+
+    return result;
   }
 
   public async importFromExcel(workbook: xlsx.WorkBook): Promise<ImportResult> {
@@ -380,7 +427,7 @@ export class RegulationETL {
 
     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
     const records = xlsx.utils.sheet_to_json(worksheet, { raw: false });
-    
+
     console.log(`Processing ${records.length} records from Excel`);
     await this.processRecords(records, result);
 
