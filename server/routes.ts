@@ -2,14 +2,14 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { insertRegulationSchema, insertNotificationSchema, insertDeadlineSchema } from "@shared/schema";
+import { insertRegulationSchema, insertNotificationSchema, insertDeadlineSchema, insertCsvSchemaSchema, insertValidationRuleSchema, insertFieldMappingSchema } from "@shared/schema";
 import multer from "multer";
 import { parse } from "csv-parse/sync";
 import { eq } from "drizzle-orm";
 import { db } from "./db";
 import { regulations } from "@shared/schema";
 import { RegulationValidator } from "./validation";
-import { RegulationETL } from "./services/etl";
+import { RegulationETL, ETLProcessor } from "./services/etl";
 import xlsx from 'xlsx';
 
 const upload = multer({ storage: multer.memoryStorage() });
@@ -77,9 +77,9 @@ export function registerRoutes(app: Express): Server {
   // CSV Import endpoint
   app.post("/api/regulations/import", upload.single('file'), async (req, res) => {
     if (!req.file) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: "No file uploaded" 
+        message: "No file uploaded"
       });
     }
 
@@ -94,7 +94,7 @@ export function registerRoutes(app: Express): Server {
       });
     } catch (error) {
       console.error('Import failed:', error);
-      res.status(500).json({ 
+      res.status(500).json({
         success: false,
         message: 'Failed to import CSV file',
         error: error instanceof Error ? error.message : String(error)
@@ -105,9 +105,9 @@ export function registerRoutes(app: Express): Server {
   // Excel Import endpoint
   app.post("/api/regulations/import/excel", upload.single('file'), async (req, res) => {
     if (!req.file) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: "No file uploaded" 
+        message: "No file uploaded"
       });
     }
 
@@ -122,7 +122,7 @@ export function registerRoutes(app: Express): Server {
       });
     } catch (error) {
       console.error('Import failed:', error);
-      res.status(500).json({ 
+      res.status(500).json({
         success: false,
         message: 'Failed to import Excel file',
         error: error instanceof Error ? error.message : String(error)
@@ -150,7 +150,7 @@ export function registerRoutes(app: Express): Server {
       res.json(report);
     } catch (error) {
       console.error('Validation failed:', error);
-      res.status(500).json({ 
+      res.status(500).json({
         message: 'Failed to validate regulations',
         error: error instanceof Error ? error.message : String(error)
       });
@@ -225,6 +225,133 @@ export function registerRoutes(app: Express): Server {
     } catch (error) {
       console.error("Failed to update notification override:", error);
       res.status(500).json({ message: "Failed to update notification override" });
+    }
+  });
+
+
+  // CSV Schema Management
+  app.post("/api/etl/schemas", async (req, res) => {
+    try {
+      const data = insertCsvSchemaSchema.parse(req.body);
+      const schema = await storage.createCsvSchema(data);
+      res.json(schema);
+    } catch (error) {
+      console.error("Failed to create CSV schema:", error);
+      res.status(500).json({
+        message: "Failed to create CSV schema",
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  app.get("/api/etl/schemas", async (req, res) => {
+    try {
+      const schemas = await storage.getCsvSchemas();
+      res.json(schemas);
+    } catch (error) {
+      console.error("Failed to fetch CSV schemas:", error);
+      res.status(500).json({
+        message: "Failed to fetch CSV schemas",
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  // Validation Rules Management
+  app.post("/api/etl/schemas/:schemaId/rules", async (req, res) => {
+    try {
+      const { schemaId } = req.params;
+      const data = insertValidationRuleSchema.parse({
+        ...req.body,
+        schemaId: parseInt(schemaId, 10)
+      });
+      const rule = await storage.createValidationRule(data);
+      res.json(rule);
+    } catch (error) {
+      console.error("Failed to create validation rule:", error);
+      res.status(500).json({
+        message: "Failed to create validation rule",
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  app.get("/api/etl/schemas/:schemaId/rules", async (req, res) => {
+    try {
+      const { schemaId } = req.params;
+      const rules = await storage.getValidationRules(parseInt(schemaId, 10));
+      res.json(rules);
+    } catch (error) {
+      console.error("Failed to fetch validation rules:", error);
+      res.status(500).json({
+        message: "Failed to fetch validation rules",
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  // Field Mappings Management
+  app.post("/api/etl/schemas/:schemaId/mappings", async (req, res) => {
+    try {
+      const { schemaId } = req.params;
+      const data = insertFieldMappingSchema.parse({
+        ...req.body,
+        schemaId: parseInt(schemaId, 10)
+      });
+      const mapping = await storage.createFieldMapping(data);
+      res.json(mapping);
+    } catch (error) {
+      console.error("Failed to create field mapping:", error);
+      res.status(500).json({
+        message: "Failed to create field mapping",
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  // Process CSV with Schema
+  app.post("/api/etl/process", upload.single('file'), async (req, res) => {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: "No file uploaded"
+      });
+    }
+
+    const schemaId = parseInt(req.body.schemaId, 10);
+    if (isNaN(schemaId)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid schema ID"
+      });
+    }
+
+    try {
+      const schema = await storage.getCsvSchema(schemaId);
+      if (!schema) {
+        return res.status(404).json({
+          success: false,
+          message: "Schema not found"
+        });
+      }
+
+      const validationRules = await storage.getValidationRules(schemaId);
+      const processor = new ETLProcessor();
+      const fileContent = req.file.buffer.toString('utf-8');
+      const result = await processor.processCSV(fileContent, schema, validationRules);
+
+      res.json({
+        success: true,
+        message: 'Processing completed',
+        ...result
+      });
+    } catch (error) {
+      console.error('Processing failed:', error);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to process CSV file',
+        error: error instanceof Error ? error.message : String(error)
+      });
     }
   });
 

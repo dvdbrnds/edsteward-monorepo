@@ -1,26 +1,20 @@
 import { parse } from "csv-parse/sync";
 import xlsx from 'xlsx';
-import type { InsertRegulation, Regulation } from "@shared/schema";
+import type { 
+  InsertRegulation, 
+  Regulation,
+  CsvSchema,
+  ValidationRule,
+  TransformationLog,
+  ErrorRecord,
+  InsertTransformationLog,
+  InsertErrorRecord
+} from "@shared/schema";
 import { storage } from "../storage";
 import { RegulationValidator } from "../validation";
 import { addMonths, format } from "date-fns";
-
-export async function exportToExcel(regulations: Regulation[]): Promise<Buffer> {
-  const worksheet = xlsx.utils.json_to_sheet(regulations);
-  const workbook = xlsx.utils.book_new();
-  xlsx.utils.book_append_sheet(workbook, worksheet, 'Regulations');
-  return xlsx.write(workbook, { type: 'buffer', bookType: 'xlsx' });
-}
-
-export async function exportToCSV(regulations: Regulation[]): Promise<string> {
-  const header = Object.keys(regulations[0] || {}).join(',') + '\n';
-  const rows = regulations.map(reg => 
-    Object.values(reg).map(val => 
-      typeof val === 'string' ? `"${val.replace(/"/g, '""')}"` : val
-    ).join(',')
-  ).join('\n');
-  return header + rows;
-}
+import { db } from "../db";
+import { transformationLogs, errorRecords } from "@shared/schema";
 
 interface ImportResult {
   newCount: number;
@@ -34,11 +28,227 @@ interface ImportResult {
   }>;
 }
 
+export class SchemaValidator {
+  private validateDataType(value: any, type: string): boolean {
+    switch (type) {
+      case 'string':
+        return typeof value === 'string';
+      case 'number':
+        return !isNaN(Number(value));
+      case 'boolean':
+        return typeof value === 'boolean' || ['true', 'false', '0', '1'].includes(String(value).toLowerCase());
+      case 'date':
+        return !isNaN(Date.parse(value));
+      default:
+        return true;
+    }
+  }
+
+  public validateField(value: any, field: { type: string; required: boolean; format?: string }): string | null {
+    if (field.required && (value === undefined || value === null || value === '')) {
+      return `Required field is missing`;
+    }
+
+    if (value !== undefined && value !== null && value !== '') {
+      if (!this.validateDataType(value, field.type)) {
+        return `Invalid data type. Expected ${field.type}`;
+      }
+
+      if (field.format) {
+        try {
+          const regex = new RegExp(field.format);
+          if (!regex.test(String(value))) {
+            return `Value does not match required format`;
+          }
+        } catch (error) {
+          console.error('Invalid format regex:', error);
+        }
+      }
+    }
+
+    return null;
+  }
+}
+
+export class ETLProcessor {
+  private schemaValidator: SchemaValidator;
+
+  constructor() {
+    this.schemaValidator = new SchemaValidator();
+  }
+
+  private async startTransformationLog(
+    schemaId: number,
+    fileName: string
+  ): Promise<TransformationLog> {
+    const log: InsertTransformationLog = {
+      schemaId,
+      fileName,
+      status: "success",
+      recordsProcessed: 0,
+      recordsFailed: 0,
+      startTime: new Date(),
+      metadata: {}
+    };
+
+    const [result] = await db.insert(transformationLogs).values(log).returning();
+    return result;
+  }
+
+  private async logError(
+    transformationLogId: number,
+    rowNumber: number,
+    rawData: any,
+    errorType: "validation" | "transformation" | "schema_mismatch",
+    errorMessage: string
+  ): Promise<void> {
+    const error: InsertErrorRecord = {
+      transformationLogId,
+      rowNumber,
+      rawData,
+      errorType,
+      errorMessage
+    };
+
+    await db.insert(errorRecords).values(error);
+  }
+
+  private async updateTransformationLog(
+    logId: number,
+    updates: Partial<TransformationLog>
+  ): Promise<void> {
+    await db
+      .update(transformationLogs)
+      .set(updates)
+      .where(sql`id = ${logId}`);
+  }
+
+  public async processCSV(
+    fileContent: string,
+    schema: CsvSchema,
+    validationRules: ValidationRule[]
+  ): Promise<ImportResult> {
+    const transformationLog = await this.startTransformationLog(
+      schema.id,
+      "input.csv"
+    );
+
+    const result: ImportResult = {
+      newCount: 0,
+      updateCount: 0,
+      skipCount: 0,
+      errorCount: 0,
+      errors: []
+    };
+
+    try {
+      const records = parse(fileContent, {
+        columns: true,
+        skip_empty_lines: true,
+        trim: true
+      });
+
+      for (let i = 0; i < records.length; i++) {
+        const record = records[i];
+        const rowNumber = i + 2; // Adding 2 to account for header row and 0-based index
+
+        // Validate against schema
+        const validationErrors: string[] = [];
+        for (const [field, definition] of Object.entries(schema.schema)) {
+          const value = record[field];
+          const error = this.schemaValidator.validateField(value, definition as any);
+          if (error) {
+            validationErrors.push(`Field '${field}': ${error}`);
+          }
+        }
+
+        // Apply custom validation rules
+        for (const rule of validationRules) {
+          if (!rule.enabled) continue;
+
+          const value = record[rule.fieldName];
+          const ruleConfig = rule.ruleConfig as any;
+
+          switch (rule.ruleType) {
+            case 'regex':
+              if (ruleConfig.pattern && !new RegExp(ruleConfig.pattern).test(String(value))) {
+                validationErrors.push(`Field '${rule.fieldName}' does not match pattern ${ruleConfig.pattern}`);
+              }
+              break;
+            case 'range':
+              const numValue = Number(value);
+              if (!isNaN(numValue)) {
+                if (ruleConfig.min !== undefined && numValue < ruleConfig.min) {
+                  validationErrors.push(`Field '${rule.fieldName}' is below minimum value ${ruleConfig.min}`);
+                }
+                if (ruleConfig.max !== undefined && numValue > ruleConfig.max) {
+                  validationErrors.push(`Field '${rule.fieldName}' exceeds maximum value ${ruleConfig.max}`);
+                }
+              }
+              break;
+            case 'enum':
+              if (ruleConfig.values && !ruleConfig.values.includes(value)) {
+                validationErrors.push(`Field '${rule.fieldName}' must be one of: ${ruleConfig.values.join(', ')}`);
+              }
+              break;
+          }
+        }
+
+        if (validationErrors.length > 0) {
+          result.errorCount++;
+          result.errors.push({
+            row: rowNumber,
+            error: validationErrors.join('; '),
+            data: record
+          });
+
+          await this.logError(
+            transformationLog.id,
+            rowNumber,
+            record,
+            "validation",
+            validationErrors.join('; ')
+          );
+
+          continue;
+        }
+
+        // Process valid record
+        result.newCount++;
+      }
+
+      await this.updateTransformationLog(transformationLog.id, {
+        status: result.errorCount > 0 ? "partial" : "success",
+        recordsProcessed: records.length,
+        recordsFailed: result.errorCount,
+        endTime: new Date()
+      });
+
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
+      await this.updateTransformationLog(transformationLog.id, {
+        status: "failed",
+        recordsFailed: result.errorCount,
+        endTime: new Date(),
+        metadata: { error: errorMessage }
+      });
+
+      throw new Error(`Failed to process CSV: ${errorMessage}`);
+    }
+
+    return result;
+  }
+}
+
+// Keep the existing RegulationETL class...
 export class RegulationETL {
   private validator: RegulationValidator;
+  private etlProcessor: ETLProcessor;
 
   constructor() {
     this.validator = new RegulationValidator();
+    this.etlProcessor = new ETLProcessor();
   }
 
   private determineCategory(topic: string): string {
@@ -137,34 +347,25 @@ export class RegulationETL {
     }
   }
 
-  public async importFromCSV(fileContent: string): Promise<ImportResult> {
-    console.log("Starting CSV import process...");
-    const result: ImportResult = {
-      newCount: 0,
-      updateCount: 0,
-      skipCount: 0,
-      errorCount: 0,
-      errors: []
-    };
+  public async exportToExcel(regulations: Regulation[]): Promise<Buffer> {
+    const worksheet = xlsx.utils.json_to_sheet(regulations);
+    const workbook = xlsx.utils.book_new();
+    xlsx.utils.book_append_sheet(workbook, worksheet, 'Regulations');
+    return xlsx.write(workbook, { type: 'buffer', bookType: 'xlsx' });
+  }
 
-    try {
-      const records = parse(fileContent, {
-        columns: (header: string[]) => header.map(col => col.trim()).filter(Boolean),
-        skip_empty_lines: true,
-        from_line: 2,
-        relax_column_count: true,
-        trim: true
-      });
+  public async exportToCSV(regulations: Regulation[]): Promise<string> {
+    const header = Object.keys(regulations[0] || {}).join(',') + '\n';
+    const rows = regulations.map(reg => 
+      Object.values(reg).map(val => 
+        typeof val === 'string' ? `"${val.replace(/"/g, '""')}"` : val
+      ).join(',')
+    ).join('\n');
+    return header + rows;
+  }
 
-      console.log(`Processing ${records.length} records from CSV`);
-      await this.processRecords(records, result);
-
-    } catch (error) {
-      console.error('CSV parsing failed:', error);
-      throw new Error(`Failed to parse CSV: ${error instanceof Error ? error.message : String(error)}`);
-    }
-
-    return result;
+  public async importFromCSV(fileContent: string, schema: CsvSchema, validationRules: ValidationRule[]): Promise<ImportResult> {
+    return this.etlProcessor.processCSV(fileContent, schema, validationRules);
   }
 
   public async importFromExcel(workbook: xlsx.WorkBook): Promise<ImportResult> {
@@ -185,6 +386,7 @@ export class RegulationETL {
 
     return result;
   }
+
 
   private async processRecords(records: any[], result: ImportResult) {
     for (let i = 0; i < records.length; i++) {
