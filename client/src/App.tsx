@@ -9,7 +9,6 @@ import AuthPage from "@/pages/auth-page";
 import RegulationsPage from "@/pages/regulations-page";
 import RegulationDetailPage from "@/pages/regulation-detail-page";
 import ComplianceWizardPage from "@/pages/compliance-wizard-page";
-import NotificationsPage from "@/pages/notifications-page";
 import ReportsPage from "@/pages/reports-page";
 import ValidationPage from "@/pages/validation-page";
 import AdminSettingsPage from "@/pages/admin-settings-page";
@@ -35,7 +34,6 @@ function Router() {
           path="/compliance-wizard/:id" 
           component={ComplianceWizardPage} 
         />
-        <ProtectedRoute path="/notifications" component={NotificationsPage} />
         <ProtectedRoute path="/reports" component={ReportsPage} />
         <ProtectedRoute path="/admin/settings" component={AdminSettingsPage} />
         <Route component={NotFound} />

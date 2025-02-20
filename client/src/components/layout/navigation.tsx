@@ -101,7 +101,6 @@ export default function Navigation() {
   const links = [
     { href: "/", label: "Dashboard", icon: LayoutDashboard },
     { href: "/regulations", label: "Regulations", icon: Book },
-    { href: "/notifications", label: "Notifications", icon: Bell },
     { href: "/reports", label: "Reports", icon: FileText },
     // Add admin settings link only for admin users
     ...(user?.role === "admin"
