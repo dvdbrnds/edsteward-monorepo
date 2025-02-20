@@ -102,22 +102,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getRegulations(): Promise<Regulation[]> {
-    // Using raw SQL query to match our new schema
-    const query = `
-      SELECT id, name as topic, description as requirements 
-      FROM regulations
-      ORDER BY id
-    `;
-
-    try {
-      const client = await pool.connect();
-      const result = await client.query(query);
-      client.release();
-      return result.rows;
-    } catch (error) {
-      console.error('Error fetching regulations:', error);
-      throw error;
-    }
+    return await db.select().from(regulations);
   }
 
   async getRegulation(id: number): Promise<Regulation | undefined> {
