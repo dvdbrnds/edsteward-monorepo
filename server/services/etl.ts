@@ -32,6 +32,9 @@ interface ImportResult {
 // Schema validation utilities
 export class SchemaValidator {
   private validateDataType(value: any, type: string): boolean {
+    // Add logging to track validation process
+    console.log(`Validating value type:`, { value, expectedType: type });
+
     switch (type) {
       case 'string':
         return typeof value === 'string';
@@ -47,8 +50,8 @@ export class SchemaValidator {
   }
 
   public validateField(value: any, field: { type: string; required: boolean; format?: string }): string | null {
-    // Log validation attempt
-    console.log(`Validating field:`, { value, field });
+    // Log complete field validation attempt
+    console.log(`Validating field:`, { value, fieldDefinition: field });
 
     if (field.required && (value === undefined || value === null || value === '')) {
       return `Required field is missing`;
@@ -56,17 +59,18 @@ export class SchemaValidator {
 
     if (value !== undefined && value !== null && value !== '') {
       if (!this.validateDataType(value, field.type)) {
-        return `Invalid data type. Expected ${field.type}`;
+        return `Invalid data type. Expected ${field.type}, got ${typeof value}`;
       }
 
       if (field.format) {
         try {
           const regex = new RegExp(field.format);
           if (!regex.test(String(value))) {
-            return `Value does not match required format`;
+            return `Value does not match required format: ${field.format}`;
           }
         } catch (error) {
           console.error('Invalid format regex:', error);
+          return `Invalid format specification`;
         }
       }
     }
@@ -87,10 +91,10 @@ export class ETLProcessor {
     schema: CsvSchema,
     validationRules: ValidationRule[]
   ): Promise<ImportResult> {
+    // Log initial state
     console.log("Starting CSV processing with schema:", {
       schemaName: schema.name,
-      schemaFields: Object.keys(schema.schema),
-      validationRules: validationRules.length
+      schemaStructure: JSON.stringify(schema.schema, null, 2)
     });
 
     const result: ImportResult = {
@@ -102,7 +106,9 @@ export class ETLProcessor {
     };
 
     try {
-      console.log("Attempting to parse CSV content...");
+      // Log raw content sample
+      console.log("CSV content sample:", fileContent.substring(0, 500));
+
       const records = parse(fileContent, {
         columns: true,
         skip_empty_lines: true,
@@ -112,77 +118,81 @@ export class ETLProcessor {
         skipRecordsWithError: true
       });
 
-      console.log("CSV Parse Result:", {
+      if (!records.length) {
+        throw new Error("No valid records found in CSV file. Please check the file format.");
+      }
+
+      // Log parsed records
+      console.log("Parsed CSV structure:", {
         recordCount: records.length,
-        firstRecordKeys: records[0] ? Object.keys(records[0]) : [],
-        sampleRecord: records[0]
+        firstRecord: records[0],
+        headers: Object.keys(records[0] || {})
       });
 
-      if (!records.length) {
-        throw new Error("No records found in CSV file");
+      // Type guard for schema validation
+      if (!schema.schema || typeof schema.schema !== 'object') {
+        throw new Error("Invalid schema structure");
       }
 
-      // Validate headers against schema
-      const headers = Object.keys(records[0]);
-      console.log("CSV Headers found:", headers);
+      // Validate schema structure
+      const schemaFields = Object.entries(schema.schema).map(([field, def]) => {
+        if (!def || typeof def !== 'object') {
+          throw new Error(`Invalid field definition for ${field}`);
+        }
+        return {
+          field,
+          type: (def as any).type || 'string',
+          required: Boolean((def as any).required)
+        };
+      });
 
-      // Type-safe schema validation
-      const schemaFields = Object.entries(schema.schema).map(([field, def]) => ({
-        field,
-        ...def
-      }));
+      // Log schema validation setup
+      console.log("Validated schema fields:", schemaFields);
 
-      console.log("Schema fields:", schemaFields);
-
-      const requiredFields = schemaFields
-        .filter(def => def.required)
-        .map(def => def.field);
-
-      console.log("Required fields:", requiredFields);
-
-      const missingFields = requiredFields.filter(field => !headers.includes(field));
-      if (missingFields.length > 0) {
-        throw new Error(`Missing required columns in CSV: ${missingFields.join(', ')}`);
-      }
-
-      // Process records
+      // Process records with enhanced error handling
       for (let i = 0; i < records.length; i++) {
         const record = records[i];
         const rowNumber = i + 2; // Adding 2 for header row and 0-based index
 
-        console.log(`Processing record ${rowNumber}:`, record);
+        try {
+          const validationErrors: string[] = [];
 
-        // Validate record against schema
-        const validationErrors: string[] = [];
+          for (const fieldDef of schemaFields) {
+            const value = record[fieldDef.field];
+            const error = this.schemaValidator.validateField(value, fieldDef);
 
-        for (const { field, type, required } of schemaFields) {
-          const value = record[field];
-          console.log(`Validating field '${field}':`, { value, type, required });
-
-          const error = this.schemaValidator.validateField(value, { type, required });
-          if (error) {
-            validationErrors.push(`Field '${field}': ${error}`);
+            if (error) {
+              validationErrors.push(`${fieldDef.field}: ${error}`);
+            }
           }
-        }
 
-        if (validationErrors.length > 0) {
-          console.log(`Validation errors for record ${rowNumber}:`, validationErrors);
+          if (validationErrors.length > 0) {
+            result.errorCount++;
+            result.errors.push({
+              row: rowNumber,
+              error: validationErrors.join('; '),
+              data: record
+            });
+            continue;
+          }
+
+          result.newCount++;
+        } catch (recordError) {
+          console.error(`Error processing record ${rowNumber}:`, recordError);
           result.errorCount++;
           result.errors.push({
             row: rowNumber,
-            error: validationErrors.join('; '),
+            error: recordError instanceof Error ? recordError.message : String(recordError),
             data: record
           });
-          continue;
         }
-
-        result.newCount++;
       }
 
+      // Log final results
       console.log("Processing completed:", {
         processed: result.newCount,
         errors: result.errorCount,
-        skipped: result.skipCount
+        errorDetails: result.errors
       });
 
       return result;
@@ -190,51 +200,6 @@ export class ETLProcessor {
       console.error("CSV processing failed:", error);
       throw new Error(`CSV processing failed: ${error instanceof Error ? error.message : String(error)}`);
     }
-  }
-  private async startTransformationLog(
-    schemaId: number,
-    fileName: string
-  ): Promise<TransformationLog> {
-    const log: InsertTransformationLog = {
-      schemaId,
-      fileName,
-      status: "success",
-      recordsProcessed: 0,
-      recordsFailed: 0,
-      startTime: new Date(),
-      metadata: {}
-    };
-
-    const [result] = await db.insert(transformationLogs).values(log).returning();
-    return result;
-  }
-
-  private async logError(
-    transformationLogId: number,
-    rowNumber: number,
-    rawData: any,
-    errorType: "validation" | "transformation" | "schema_mismatch",
-    errorMessage: string
-  ): Promise<void> {
-    const error: InsertErrorRecord = {
-      transformationLogId,
-      rowNumber,
-      rawData,
-      errorType,
-      errorMessage
-    };
-
-    await db.insert(errorRecords).values(error);
-  }
-
-  private async updateTransformationLog(
-    logId: number,
-    updates: Partial<TransformationLog>
-  ): Promise<void> {
-    await db
-      .update(transformationLogs)
-      .set(updates)
-      .where(sql`id = ${logId}`);
   }
 }
 

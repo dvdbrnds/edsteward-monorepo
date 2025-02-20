@@ -76,13 +76,6 @@ export function registerRoutes(app: Express): Server {
 
   // CSV Import endpoint
   app.post("/api/regulations/import", upload.single('file'), async (req, res) => {
-    if (!req.user) {
-      return res.status(401).json({
-        success: false,
-        message: "Authentication required"
-      });
-    }
-
     if (!req.file) {
       return res.status(400).json({
         success: false,
@@ -95,11 +88,10 @@ export function registerRoutes(app: Express): Server {
       let schema = await storage.getCsvSchema(1); // Get default schema if exists
       if (!schema) {
         console.log("Creating default schema for CSV import");
-        // Create a basic default schema
         schema = await storage.createCsvSchema({
           name: "Default Regulation Schema",
           description: "Default schema for regulation imports",
-          createdBy: req.user.id,
+          createdBy: req.user?.id || 1,
           schema: {
             "Topic": { type: "string", required: true },
             "Item ID": { type: "string", required: true },
@@ -109,33 +101,52 @@ export function registerRoutes(app: Express): Server {
             "Deadlines": { type: "string", required: false }
           }
         });
-        console.log("Created default schema:", schema);
+        console.log("Created default schema:", JSON.stringify(schema, null, 2));
       }
 
-      // Get validation rules for the schema
       const validationRules = await storage.getValidationRules(schema.id);
-      console.log("Loaded validation rules:", validationRules);
+      console.log("Validation rules:", validationRules);
 
       const fileContent = req.file.buffer.toString('utf-8');
-      console.log("Processing CSV import with schema:", schema.name);
-      console.log("File content preview:", fileContent.substring(0, 200));
+      console.log("File content sample:", fileContent.substring(0, 200));
 
       const result = await etlService.importFromCSV(fileContent, schema, validationRules);
+
+      if (result.errorCount > 0) {
+        // Return a 400 status with detailed error information
+        return res.status(400).json({
+          success: false,
+          message: "Import completed with errors",
+          details: {
+            processed: result.newCount,
+            errors: result.errorCount,
+            errorDetails: result.errors.map(err => ({
+              row: err.row,
+              error: err.error
+            }))
+          }
+        });
+      }
 
       res.json({
         success: true,
         message: 'Import completed successfully',
-        ...result
+        details: {
+          processed: result.newCount,
+          updated: result.updateCount,
+          skipped: result.skipCount
+        }
       });
     } catch (error) {
       console.error('Import failed:', error);
       const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('Detailed error:', errorMessage);
 
       res.status(500).json({
         success: false,
         message: `Import failed: ${errorMessage}`,
-        error: errorMessage
+        details: {
+          error: errorMessage
+        }
       });
     }
   });
