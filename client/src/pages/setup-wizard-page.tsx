@@ -93,27 +93,6 @@ export default function SetupWizardPage() {
     },
   });
 
-  // Get the appropriate steps based on whether an admin exists
-  const setupSteps = [
-    ...(!hasAdmin ? [{
-      id: "admin",
-      title: "Create Admin Account",
-      description: "Set up the initial administrator account for managing compliance",
-      icon: User,
-      required: true,
-    }] : []),
-    {
-      id: "officers",
-      title: "Assign Compliance Officers",
-      description: "Designate officers responsible for each regulation category. You can modify these assignments later in the admin settings.",
-      icon: UserPlus,
-      required: false,
-    },
-  ];
-
-  const progress = ((currentStep + 1) / setupSteps.length) * 100;
-  const officerProgress = ((officerStep + 1) / REGULATION_CATEGORIES.length) * 100;
-
   if (isComplete) {
     return <Redirect to="/admin/settings" />;
   }
@@ -141,6 +120,39 @@ export default function SetupWizardPage() {
       </div>
     );
   }
+
+  // If there's already an admin, only show the officer assignment step
+  const setupSteps = hasAdmin
+    ? [
+        {
+          id: "officers",
+          title: "Assign Compliance Officers",
+          description:
+            "Designate officers responsible for each regulation category. You can modify these assignments later in the admin settings.",
+          icon: UserPlus,
+          required: false,
+        },
+      ]
+    : [
+        {
+          id: "admin",
+          title: "Create Admin Account",
+          description: "Set up the initial administrator account for managing compliance",
+          icon: User,
+          required: true,
+        },
+        {
+          id: "officers",
+          title: "Assign Compliance Officers",
+          description:
+            "Designate officers responsible for each regulation category. You can modify these assignments later in the admin settings.",
+          icon: UserPlus,
+          required: false,
+        },
+      ];
+
+  const progress = ((currentStep + 1) / setupSteps.length) * 100;
+  const officerProgress = ((officerStep + 1) / REGULATION_CATEGORIES.length) * 100;
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
