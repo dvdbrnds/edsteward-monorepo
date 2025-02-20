@@ -7,6 +7,7 @@ import session from "express-session";
 import { storage } from "./storage";
 import passport from "passport";
 
+// Initialize Express application with middleware
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -30,7 +31,7 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Enhanced logging middleware
+// Enhanced logging middleware for API requests
 app.use((req, res, next) => {
   const start = Date.now();
   const path = req.path;
@@ -49,21 +50,19 @@ app.use((req, res, next) => {
       if (capturedJsonResponse) {
         logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
       }
-
       if (logLine.length > 80) {
         logLine = logLine.slice(0, 79) + "…";
       }
-
       log(logLine);
     }
   });
-
   next();
 });
 
-async function startServer() {
-  let server: ReturnType<typeof express.application.listen> | null = null;
+// Declare server variable at module scope for proper cleanup
+let server: ReturnType<typeof app.listen> | null = null;
 
+async function startServer() {
   try {
     log("Starting server initialization...");
 
@@ -77,6 +76,7 @@ async function startServer() {
       throw new Error("Database connection failed - please check DATABASE_URL");
     }
 
+    // Register routes and create server instance
     log("Registering routes...");
     server = registerRoutes(app);
     log("Routes registered successfully");
@@ -89,7 +89,7 @@ async function startServer() {
       res.status(status).json({ message });
     });
 
-    // Setup Vite or static serving
+    // Setup Vite or static serving based on environment
     if (app.get("env") === "development") {
       log("Setting up Vite development server...");
       await setupVite(app, server);
@@ -100,25 +100,29 @@ async function startServer() {
       log("Static serving setup complete");
     }
 
-    // Attempt to listen on port 5000
     const PORT = 5000;
 
-    // First ensure the port is free
+    // Ensure port is available
     try {
       const temp = express().listen(PORT);
       temp.close();
     } catch (err) {
       const error = err as NodeJS.ErrnoException;
       if (error.code === 'EADDRINUSE') {
-        log(`Port ${PORT} is in use, attempting to force close...`);
+        log(`Port ${PORT} is in use, cleaning up...`);
         throw new Error(`Port ${PORT} is in use. Please ensure no other instances are running.`);
       }
       throw err;
     }
 
-    // Now start the actual server
+    // Start server with proper error handling
     await new Promise<void>((resolve, reject) => {
-      server!.listen(PORT, "0.0.0.0", () => {
+      if (!server) {
+        reject(new Error("Server instance not initialized"));
+        return;
+      }
+
+      server.listen(PORT, "0.0.0.0", () => {
         log(`Server successfully started and listening on port ${PORT}`);
         log("Application initialization complete");
         resolve();
@@ -141,20 +145,32 @@ async function startServer() {
   }
 }
 
-// Graceful shutdown handler
+// Graceful shutdown handlers
 process.on('SIGTERM', () => {
   log("Received SIGTERM signal, shutting down gracefully...");
-  if (server) server.close(() => process.exit(0));
-  else process.exit(0);
+  if (server) {
+    server.close(() => {
+      log("Server closed gracefully on SIGTERM");
+      process.exit(0);
+    });
+  } else {
+    process.exit(0);
+  }
 });
 
 process.on('SIGINT', () => {
   log("Received SIGINT signal, shutting down gracefully...");
-  if (server) server.close(() => process.exit(0));
-  else process.exit(0);
+  if (server) {
+    server.close(() => {
+      log("Server closed gracefully on SIGINT");
+      process.exit(0);
+    });
+  } else {
+    process.exit(0);
+  }
 });
 
-// Start the server
+// Start the server with error handling
 startServer().catch((error) => {
   log("Unhandled error during server startup: " + (error instanceof Error ? error.message : String(error)));
   process.exit(1);
