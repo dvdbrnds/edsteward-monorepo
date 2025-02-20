@@ -78,22 +78,6 @@ export class ETLProcessor {
     schema: CsvSchema,
     validationRules: ValidationRule[]
   ): Promise<ImportResult> {
-    console.log("Starting CSV processing with schema:", {
-      schemaName: schema.name,
-      schemaStructure: schema.schema
-    });
-
-    if (!fileContent.trim()) {
-      throw new Error("CSV file is empty");
-    }
-
-    try {
-      // Validate CSV structure
-      const firstLine = fileContent.split('\n')[0];
-      if (!firstLine) {
-        throw new Error("CSV header is missing");
-      }
-
     const result: ImportResult = {
       newCount: 0,
       updateCount: 0,
@@ -102,14 +86,22 @@ export class ETLProcessor {
       errors: []
     };
 
+    if (!fileContent.trim()) {
+      throw new Error("CSV file is empty");
+    }
+
+    const firstLine = fileContent.split('\n')[0];
+    if (!firstLine) {
+      throw new Error("CSV header is missing");
+    }
+
+    if (!schema.schema || typeof schema.schema !== "object") {
+      throw new Error("Invalid schema structure");
+    }
+
     let processedRows = new Set<string>();
 
     try {
-      if (!schema.schema || typeof schema.schema !== "object") {
-        throw new Error("Invalid schema structure");
-      }
-
-      // Parse CSV with relaxed options
       const records = parse(fileContent, {
         columns: true,
         skip_empty_lines: true,
@@ -122,12 +114,8 @@ export class ETLProcessor {
         throw new Error("No records found in CSV file");
       }
 
-      console.log("First record:", records[0]);
-
-      // Validate headers
       const headers = Object.keys(records[0]);
       const schemaFields = Object.entries(schema.schema) as [string, CsvSchemaField][];
-
       const requiredFields = schemaFields
         .filter(([_, field]) => field.required)
         .map(([name]) => name);
@@ -137,14 +125,12 @@ export class ETLProcessor {
         throw new Error(`Missing required columns: ${missingFields.join(", ")}`);
       }
 
-      // Process records
       for (let i = 0; i < records.length; i++) {
         const record = records[i];
-        const rowNumber = i + 2; // Account for header row and 0-based index
-        const rowKey = JSON.stringify(record); // Create a key for the row
+        const rowNumber = i + 2;
+        const rowKey = JSON.stringify(record);
 
         if (processedRows.has(rowKey)) {
-          console.warn(`Skipping duplicate row ${rowNumber}`);
           result.skipCount++;
           continue;
         }
@@ -152,7 +138,6 @@ export class ETLProcessor {
 
         try {
           const validationErrors: string[] = [];
-
           for (const [fieldName, fieldDef] of schemaFields) {
             const value = record[fieldName];
             const error = this.schemaValidator.validateField(value, fieldDef);
@@ -173,7 +158,6 @@ export class ETLProcessor {
 
           result.newCount++;
         } catch (error) {
-          console.error(`Error processing row ${rowNumber}:`, error);
           result.errorCount++;
           result.errors.push({
             row: rowNumber,
@@ -183,10 +167,9 @@ export class ETLProcessor {
         }
       }
     } catch (error) {
-      console.error("CSV processing failed:", error);
       throw error;
     }
-    
+
     return result;
   }
 }
