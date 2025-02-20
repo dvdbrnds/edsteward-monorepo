@@ -185,9 +185,9 @@ export class ETLProcessor {
     } catch (error) {
       console.error("CSV processing failed:", error);
       throw error;
-    } finally {
-      return result;
     }
+    
+    return result;
   }
 }
 
