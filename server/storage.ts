@@ -1,4 +1,4 @@
-import { users, regulations, notifications, deadlines, comments, guides } from "@shared/schema";
+import { users, regulations, notifications, deadlines, comments, guides, csvSchemas, validationRules, fieldMappings } from "@shared/schema";
 import type {
   User,
   InsertUser,
@@ -12,6 +12,12 @@ import type {
   InsertComment,
   Guide,
   InsertGuide,
+  CsvSchema,
+  InsertCsvSchema,
+  ValidationRule,
+  InsertValidationRule,
+  FieldMapping,
+  InsertFieldMapping,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -54,6 +60,14 @@ export interface IStorage {
   getGuide(id: number): Promise<Guide | undefined>;
   createGuide(guide: InsertGuide): Promise<Guide>;
   updateGuide(id: number, guide: Partial<InsertGuide>): Promise<Guide>;
+
+  // ETL methods
+  getCsvSchemas(): Promise<CsvSchema[]>;
+  getCsvSchema(id: number): Promise<CsvSchema | undefined>;
+  createCsvSchema(schema: InsertCsvSchema): Promise<CsvSchema>;
+  getValidationRules(schemaId: number): Promise<ValidationRule[]>;
+  createValidationRule(rule: InsertValidationRule): Promise<ValidationRule>;
+  createFieldMapping(mapping: InsertFieldMapping): Promise<FieldMapping>;
 
   // Session store
   sessionStore: session.Store;
@@ -210,6 +224,48 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.role, "admin"))
       .limit(1);
     return !!adminUser;
+  }
+  async getCsvSchemas(): Promise<CsvSchema[]> {
+    return await db.select().from(csvSchemas);
+  }
+
+  async getCsvSchema(id: number): Promise<CsvSchema | undefined> {
+    const [schema] = await db
+      .select()
+      .from(csvSchemas)
+      .where(eq(csvSchemas.id, id));
+    return schema;
+  }
+
+  async createCsvSchema(schema: InsertCsvSchema): Promise<CsvSchema> {
+    const [newSchema] = await db
+      .insert(csvSchemas)
+      .values(schema)
+      .returning();
+    return newSchema;
+  }
+
+  async getValidationRules(schemaId: number): Promise<ValidationRule[]> {
+    return await db
+      .select()
+      .from(validationRules)
+      .where(eq(validationRules.schemaId, schemaId));
+  }
+
+  async createValidationRule(rule: InsertValidationRule): Promise<ValidationRule> {
+    const [newRule] = await db
+      .insert(validationRules)
+      .values(rule)
+      .returning();
+    return newRule;
+  }
+
+  async createFieldMapping(mapping: InsertFieldMapping): Promise<FieldMapping> {
+    const [newMapping] = await db
+      .insert(fieldMappings)
+      .values(mapping)
+      .returning();
+    return newMapping;
   }
 }
 

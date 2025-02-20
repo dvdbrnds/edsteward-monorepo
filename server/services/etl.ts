@@ -1,5 +1,6 @@
 import { parse } from "csv-parse/sync";
 import xlsx from 'xlsx';
+import { sql } from "drizzle-orm";
 import type { 
   InsertRegulation, 
   Regulation,
@@ -241,7 +242,6 @@ export class ETLProcessor {
   }
 }
 
-// Keep the existing RegulationETL class...
 export class RegulationETL {
   private validator: RegulationValidator;
   private etlProcessor: ETLProcessor;
