@@ -83,6 +83,17 @@ export class ETLProcessor {
       schemaStructure: schema.schema
     });
 
+    if (!fileContent.trim()) {
+      throw new Error("CSV file is empty");
+    }
+
+    try {
+      // Validate CSV structure
+      const firstLine = fileContent.split('\n')[0];
+      if (!firstLine) {
+        throw new Error("CSV header is missing");
+      }
+
     const result: ImportResult = {
       newCount: 0,
       updateCount: 0,

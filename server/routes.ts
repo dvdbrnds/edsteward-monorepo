@@ -84,6 +84,13 @@ export function registerRoutes(app: Express): Server {
     }
 
     try {
+      if (!req.file.originalname.toLowerCase().endsWith('.csv')) {
+        return res.status(400).json({
+          success: false,
+          message: "Please upload a CSV file"
+        });
+      }
+
       // Create a default schema if not provided
       let schema = await storage.getCsvSchema(1);
       if (!schema) {
@@ -106,7 +113,11 @@ export function registerRoutes(app: Express): Server {
           console.log("Created default schema:", schema);
         } catch (schemaError) {
           console.error("Failed to create schema:", schemaError);
-          throw new Error("Failed to create import schema");
+          return res.status(500).json({
+            success: false,
+            message: "Failed to initialize import schema",
+            details: schemaError instanceof Error ? schemaError.message : String(schemaError)
+          });
         }
       }
 
