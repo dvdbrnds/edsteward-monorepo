@@ -35,15 +35,23 @@ const REGULATION_CATEGORIES = [
   "Research",
 ];
 
+const SUGGESTED_DISTRIBUTION_LISTS = {
+  "Academic Programs": "academicaffairs@moravian.edu",
+  "Financial Aid": "finaid@moravian.edu",
+  "Student Services": "studentlife@moravian.edu",
+  "Athletics": "athletics@moravian.edu",
+  "Campus Safety": "police@moravian.edu",
+  "Research": "research@moravian.edu",
+};
+
 export default function SetupWizardPage() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(0);
-  const [officerStep, setOfficerStep] = useState(0);
+  const [officeStep, setOfficeStep] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
-  const [officerAssignments, setOfficerAssignments] = useState<Record<string, { email: string; name: string }>>({});
+  const [officeAssignments, setOfficeAssignments] = useState<Record<string, { email: string; name: string }>>({});
 
-  // Query to check if admin exists
   const { data: hasAdmin, isLoading: checkingAdmin } = useQuery({
     queryKey: ["/api/setup/has-admin"],
     queryFn: async () => {
@@ -62,7 +70,7 @@ export default function SetupWizardPage() {
     },
   });
 
-  const officerForm = useForm({
+  const officeForm = useForm({
     defaultValues: {
       name: "",
       email: "",
@@ -80,7 +88,7 @@ export default function SetupWizardPage() {
     onSuccess: () => {
       toast({
         title: "Admin Account Created",
-        description: "You can now proceed with configuring compliance officers.",
+        description: "You can now proceed with configuring compliance offices.",
       });
       setCurrentStep((prev) => prev + 1);
     },
@@ -104,18 +112,17 @@ export default function SetupWizardPage() {
     return <Redirect to="/admin/settings" />;
   }
 
-  const handleOfficerSubmit = (data: { name: string; email: string }) => {
-    const currentCategory = REGULATION_CATEGORIES[officerStep];
-    setOfficerAssignments((prev) => ({
+  const handleOfficeSubmit = (data: { name: string; email: string }) => {
+    const currentCategory = REGULATION_CATEGORIES[officeStep];
+    setOfficeAssignments((prev) => ({
       ...prev,
       [currentCategory]: data,
     }));
 
-    if (officerStep < REGULATION_CATEGORIES.length - 1) {
-      setOfficerStep((prev) => prev + 1);
-      officerForm.reset();
+    if (officeStep < REGULATION_CATEGORIES.length - 1) {
+      setOfficeStep((prev) => prev + 1);
+      officeForm.reset();
     } else {
-      // All categories assigned
       setIsComplete(true);
     }
   };
@@ -128,14 +135,14 @@ export default function SetupWizardPage() {
     );
   }
 
-  // If there's already an admin, only show the officer assignment step
+  // If there's already an admin, only show the office assignment step
   const setupSteps = hasAdmin
     ? [
         {
-          id: "officers",
-          title: "Assign Compliance Officers",
+          id: "offices",
+          title: "Assign Compliance Offices",
           description:
-            "Designate officers responsible for each regulation category. You can modify these assignments later in the admin settings.",
+            "Designate offices responsible for each regulation category. You can modify these assignments later in the admin settings.",
           icon: UserPlus,
           required: false,
         },
@@ -149,17 +156,17 @@ export default function SetupWizardPage() {
           required: true,
         },
         {
-          id: "officers",
-          title: "Assign Compliance Officers",
+          id: "offices",
+          title: "Assign Compliance Offices",
           description:
-            "Designate officers responsible for each regulation category. You can modify these assignments later in the admin settings.",
+            "Designate offices responsible for each regulation category. You can modify these assignments later in the admin settings.",
           icon: UserPlus,
           required: false,
         },
       ];
 
   const progress = ((currentStep + 1) / setupSteps.length) * 100;
-  const officerProgress = ((officerStep + 1) / REGULATION_CATEGORIES.length) * 100;
+  const officeProgress = ((officeStep + 1) / REGULATION_CATEGORIES.length) * 100;
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -263,40 +270,40 @@ export default function SetupWizardPage() {
                     </Form>
                   )}
 
-                  {isCurrent && step.id === "officers" && (
+                  {isCurrent && step.id === "offices" && (
                     <div className="space-y-6">
                       <div className="mb-6">
-                        <Progress value={officerProgress} className="mb-2" />
+                        <Progress value={officeProgress} className="mb-2" />
                         <p className="text-sm text-gray-500 text-center">
-                          Step {officerStep + 1} of {REGULATION_CATEGORIES.length}
+                          Step {officeStep + 1} of {REGULATION_CATEGORIES.length}
                         </p>
                       </div>
 
                       <div className="space-y-4">
                         <h3 className="text-lg font-medium">
-                          Assign Officer for {REGULATION_CATEGORIES[officerStep]}
+                          Assign Office for {REGULATION_CATEGORIES[officeStep]}
                         </h3>
                         <p className="text-gray-600">
-                          Assign a compliance officer responsible for{" "}
-                          {REGULATION_CATEGORIES[officerStep]} regulations.
-                          This person will receive notifications and oversee
-                          compliance for this category.
+                          Assign a compliance office responsible for{" "}
+                          {REGULATION_CATEGORIES[officeStep]} regulations.
+                          We recommend using department distribution lists (e.g., {SUGGESTED_DISTRIBUTION_LISTS[REGULATION_CATEGORIES[officeStep]]}) 
+                          to ensure notifications reach the entire team.
                         </p>
 
-                        <Form {...officerForm}>
+                        <Form {...officeForm}>
                           <form
-                            onSubmit={officerForm.handleSubmit(handleOfficerSubmit)}
+                            onSubmit={officeForm.handleSubmit(handleOfficeSubmit)}
                             className="space-y-4"
                           >
                             <FormField
-                              control={officerForm.control}
+                              control={officeForm.control}
                               name="name"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>Officer Name</FormLabel>
+                                  <FormLabel>Office Name</FormLabel>
                                   <FormControl>
                                     <Input
-                                      placeholder="Enter officer's full name"
+                                      placeholder="Enter office or department name"
                                       {...field}
                                     />
                                   </FormControl>
@@ -306,18 +313,21 @@ export default function SetupWizardPage() {
                             />
 
                             <FormField
-                              control={officerForm.control}
+                              control={officeForm.control}
                               name="email"
                               render={({ field }) => (
                                 <FormItem>
-                                  <FormLabel>Officer Email</FormLabel>
+                                  <FormLabel>Office Email</FormLabel>
                                   <FormControl>
                                     <Input
                                       type="email"
-                                      placeholder="Enter officer's email"
+                                      placeholder={`e.g., ${SUGGESTED_DISTRIBUTION_LISTS[REGULATION_CATEGORIES[officeStep]]}`}
                                       {...field}
                                     />
                                   </FormControl>
+                                  <FormDescription>
+                                    Use department distribution lists to ensure the entire team receives notifications
+                                  </FormDescription>
                                   <FormMessage />
                                 </FormItem>
                               )}
@@ -332,7 +342,7 @@ export default function SetupWizardPage() {
                                 Skip Setup
                               </Button>
                               <Button type="submit">
-                                {officerStep === REGULATION_CATEGORIES.length - 1
+                                {officeStep === REGULATION_CATEGORIES.length - 1
                                   ? "Complete Setup"
                                   : "Next Category"}
                               </Button>
