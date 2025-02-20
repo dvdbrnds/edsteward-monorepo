@@ -19,7 +19,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertUserSchema } from "@shared/schema";
 import { Progress } from "@/components/ui/progress";
-import { Loader2, User, UserPlus, Settings } from "lucide-react";
+import { Loader2, User, UserPlus } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Redirect } from "wouter";
 import type { z } from "zod";
@@ -43,11 +43,22 @@ const SETUP_STEPS = [
   },
 ];
 
+const REGULATION_CATEGORIES = [
+  "Academic Programs",
+  "Financial Aid",
+  "Student Services",
+  "Athletics",
+  "Campus Safety",
+  "Research",
+];
+
 export default function SetupWizardPage() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(0);
+  const [officerStep, setOfficerStep] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
+  const [officerAssignments, setOfficerAssignments] = useState<Record<string, { email: string; name: string }>>({});
 
   const form = useForm<FormValues>({
     resolver: zodResolver(insertUserSchema),
@@ -56,6 +67,13 @@ export default function SetupWizardPage() {
       password: "",
       role: "admin",
       department: "Administration",
+    },
+  });
+
+  const officerForm = useForm({
+    defaultValues: {
+      name: "",
+      email: "",
     },
   });
 
@@ -84,10 +102,27 @@ export default function SetupWizardPage() {
   });
 
   const progress = ((currentStep + 1) / SETUP_STEPS.length) * 100;
+  const officerProgress = ((officerStep + 1) / REGULATION_CATEGORIES.length) * 100;
 
   if (isComplete) {
     return <Redirect to="/admin/settings" />;
   }
+
+  const handleOfficerSubmit = (data: { name: string; email: string }) => {
+    const currentCategory = REGULATION_CATEGORIES[officerStep];
+    setOfficerAssignments(prev => ({
+      ...prev,
+      [currentCategory]: data
+    }));
+
+    if (officerStep < REGULATION_CATEGORIES.length - 1) {
+      setOfficerStep(prev => prev + 1);
+      officerForm.reset();
+    } else {
+      // All categories assigned
+      setIsComplete(true);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -191,20 +226,69 @@ export default function SetupWizardPage() {
                   )}
 
                   {isCurrent && step.id === "officers" && (
-                    <div className="space-y-4">
-                      <p className="text-gray-600">
-                        Assign compliance officers to specific regulation categories. This helps organize responsibility and ensures proper oversight.
-                      </p>
-                      <div className="text-center py-4">
-                        <p className="text-sm text-gray-500 mb-4">
-                          You can configure officer assignments now or do it later in the admin settings.
+                    <div className="space-y-6">
+                      <div className="mb-6">
+                        <Progress value={officerProgress} className="mb-2" />
+                        <p className="text-sm text-gray-500 text-center">
+                          Step {officerStep + 1} of {REGULATION_CATEGORIES.length}
                         </p>
-                        <Button
-                          onClick={() => setIsComplete(true)}
-                          className="mt-4"
-                        >
-                          Complete Setup
-                        </Button>
+                      </div>
+
+                      <div className="space-y-4">
+                        <h3 className="text-lg font-medium">
+                          Assign Officer for {REGULATION_CATEGORIES[officerStep]}
+                        </h3>
+                        <p className="text-gray-600">
+                          Assign a compliance officer responsible for {REGULATION_CATEGORIES[officerStep]} regulations.
+                          This person will receive notifications and oversee compliance for this category.
+                        </p>
+
+                        <Form {...officerForm}>
+                          <form onSubmit={officerForm.handleSubmit(handleOfficerSubmit)} className="space-y-4">
+                            <FormField
+                              control={officerForm.control}
+                              name="name"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Officer Name</FormLabel>
+                                  <FormControl>
+                                    <Input placeholder="Enter officer's full name" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={officerForm.control}
+                              name="email"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Officer Email</FormLabel>
+                                  <FormControl>
+                                    <Input type="email" placeholder="Enter officer's email" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <div className="flex justify-between pt-4">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                onClick={() => setIsComplete(true)}
+                              >
+                                Skip Setup
+                              </Button>
+                              <Button type="submit">
+                                {officerStep === REGULATION_CATEGORIES.length - 1
+                                  ? "Complete Setup"
+                                  : "Next Category"}
+                              </Button>
+                            </div>
+                          </form>
+                        </Form>
                       </div>
                     </div>
                   )}
