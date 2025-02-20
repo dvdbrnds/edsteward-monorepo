@@ -29,6 +29,7 @@ interface ImportResult {
   }>;
 }
 
+// Schema validation utilities
 export class SchemaValidator {
   private validateDataType(value: any, type: string): boolean {
     switch (type) {
@@ -46,6 +47,9 @@ export class SchemaValidator {
   }
 
   public validateField(value: any, field: { type: string; required: boolean; format?: string }): string | null {
+    // Log validation attempt
+    console.log(`Validating field:`, { value, field });
+
     if (field.required && (value === undefined || value === null || value === '')) {
       return `Required field is missing`;
     }
@@ -129,10 +133,10 @@ export class ETLProcessor {
     schema: CsvSchema,
     validationRules: ValidationRule[]
   ): Promise<ImportResult> {
-    const transformationLog = await this.startTransformationLog(
-      schema.id,
-      "input.csv"
-    );
+    console.log("Starting CSV processing with schema:", {
+      schemaName: schema.name,
+      schemaFields: Object.keys(schema.schema)
+    });
 
     const result: ImportResult = {
       newCount: 0,
@@ -143,55 +147,56 @@ export class ETLProcessor {
     };
 
     try {
+      // Parse CSV with forgiving options
       const records = parse(fileContent, {
         columns: true,
         skip_empty_lines: true,
-        trim: true
+        trim: true,
+        relaxColumnCount: true,
+        relaxQuotes: true,
+        skipRecordsWithError: true
       });
 
+      console.log("CSV Parse Result:", {
+        recordCount: records.length,
+        sampleRecord: records[0]
+      });
+
+      // Validate headers against schema
+      const headers = Object.keys(records[0] || {});
+      console.log("CSV Headers:", headers);
+
+      // Type-safe schema validation
+      const schemaEntries = Object.entries(schema.schema);
+      const requiredFields = schemaEntries
+        .filter(([_, def]) => {
+          const typedDef = def as { required: boolean };
+          return typedDef.required;
+        })
+        .map(([field]) => field);
+
+      console.log("Required Fields:", requiredFields);
+
+      const missingFields = requiredFields.filter(field => !headers.includes(field));
+      if (missingFields.length > 0) {
+        throw new Error(`Missing required columns: ${missingFields.join(', ')}`);
+      }
+
+      // Process records
       for (let i = 0; i < records.length; i++) {
         const record = records[i];
-        const rowNumber = i + 2; // Adding 2 to account for header row and 0-based index
+        const rowNumber = i + 2; // Adding 2 for header row and 0-based index
 
-        // Validate against schema
+        // Validate record against schema
         const validationErrors: string[] = [];
-        for (const [field, definition] of Object.entries(schema.schema)) {
+
+        for (const [field, definition] of schemaEntries) {
           const value = record[field];
-          const error = this.schemaValidator.validateField(value, definition as any);
+          const typedDefinition = definition as { type: string; required: boolean; format?: string };
+
+          const error = this.schemaValidator.validateField(value, typedDefinition);
           if (error) {
             validationErrors.push(`Field '${field}': ${error}`);
-          }
-        }
-
-        // Apply custom validation rules
-        for (const rule of validationRules) {
-          if (!rule.enabled) continue;
-
-          const value = record[rule.fieldName];
-          const ruleConfig = rule.ruleConfig as any;
-
-          switch (rule.ruleType) {
-            case 'regex':
-              if (ruleConfig.pattern && !new RegExp(ruleConfig.pattern).test(String(value))) {
-                validationErrors.push(`Field '${rule.fieldName}' does not match pattern ${ruleConfig.pattern}`);
-              }
-              break;
-            case 'range':
-              const numValue = Number(value);
-              if (!isNaN(numValue)) {
-                if (ruleConfig.min !== undefined && numValue < ruleConfig.min) {
-                  validationErrors.push(`Field '${rule.fieldName}' is below minimum value ${ruleConfig.min}`);
-                }
-                if (ruleConfig.max !== undefined && numValue > ruleConfig.max) {
-                  validationErrors.push(`Field '${rule.fieldName}' exceeds maximum value ${ruleConfig.max}`);
-                }
-              }
-              break;
-            case 'enum':
-              if (ruleConfig.values && !ruleConfig.values.includes(value)) {
-                validationErrors.push(`Field '${rule.fieldName}' must be one of: ${ruleConfig.values.join(', ')}`);
-              }
-              break;
           }
         }
 
@@ -202,43 +207,22 @@ export class ETLProcessor {
             error: validationErrors.join('; '),
             data: record
           });
-
-          await this.logError(
-            transformationLog.id,
-            rowNumber,
-            record,
-            "validation",
-            validationErrors.join('; ')
-          );
-
           continue;
         }
 
-        // Process valid record
         result.newCount++;
       }
 
-      await this.updateTransformationLog(transformationLog.id, {
-        status: result.errorCount > 0 ? "partial" : "success",
-        recordsProcessed: records.length,
-        recordsFailed: result.errorCount,
-        endTime: new Date()
+      console.log("Processing completed:", {
+        processed: result.newCount,
+        errors: result.errorCount
       });
 
+      return result;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-
-      await this.updateTransformationLog(transformationLog.id, {
-        status: "failed",
-        recordsFailed: result.errorCount,
-        endTime: new Date(),
-        metadata: { error: errorMessage }
-      });
-
-      throw new Error(`Failed to process CSV: ${errorMessage}`);
+      console.error("CSV processing failed:", error);
+      throw error;
     }
-
-    return result;
   }
 }
 
@@ -365,61 +349,8 @@ export class RegulationETL {
   }
 
   public async importFromCSV(fileContent: string, schema: CsvSchema, validationRules: ValidationRule[]): Promise<ImportResult> {
-    console.log("Starting CSV import process with schema:", schema.name);
-    console.log("Schema configuration:", JSON.stringify(schema.schema, null, 2));
-
-    const result: ImportResult = {
-      newCount: 0,
-      updateCount: 0,
-      skipCount: 0,
-      errorCount: 0,
-      errors: []
-    };
-
-    try {
-      // Parse CSV with more forgiving options
-      const records = parse(fileContent, {
-        columns: true,
-        skip_empty_lines: true,
-        trim: true,
-        relaxColumnCount: true,
-        relaxQuotes: true,
-        skipRecordsWithError: true
-      });
-
-      console.log(`Processing ${records.length} records from CSV`);
-      console.log("First record sample:", JSON.stringify(records[0], null, 2));
-
-      // Validate headers against schema
-      const headers = Object.keys(records[0] || {});
-      console.log("CSV headers:", headers);
-
-      const requiredFields = Object.entries(schema.schema)
-        .filter(([_, def]) => (def as any).required)
-        .map(([field]) => field);
-
-      console.log("Required fields:", requiredFields);
-
-      const missingFields = requiredFields.filter(field => !headers.includes(field));
-      if (missingFields.length > 0) {
-        throw new Error(`Missing required columns: ${missingFields.join(', ')}`);
-      }
-
-      await this.processRecords(records, result);
-
-      console.log("Import completed:", {
-        new: result.newCount,
-        updated: result.updateCount,
-        skipped: result.skipCount,
-        errors: result.errorCount
-      });
-
-    } catch (error) {
-      console.error('CSV processing failed:', error);
-      throw new Error(`Failed to process CSV: ${error instanceof Error ? error.message : String(error)}`);
-    }
-
-    return result;
+    console.log("Starting CSV import...");
+    return this.etlProcessor.processCSV(fileContent, schema, validationRules);
   }
 
   public async importFromExcel(workbook: xlsx.WorkBook): Promise<ImportResult> {
