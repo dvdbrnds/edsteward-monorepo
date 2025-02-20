@@ -29,36 +29,40 @@ class ETLService:
     def import_csv(self, file_path, table_name, columns):
         """
         Import data from a CSV file into the specified database table
-        
+
         Args:
             file_path (str): Path to the CSV file
             table_name (str): Name of the target database table
             columns (list): List of column names in the CSV file
         """
         try:
+            # Read CSV data
+            rows = []
             with open(file_path, 'r') as csv_file:
                 csv_reader = csv.DictReader(csv_file)
-                rows = []
                 for row in csv_reader:
                     # Only include specified columns
                     filtered_row = [row[col] for col in columns if col in row]
                     rows.append(filtered_row)
 
+            if not rows:
+                logger.warning("No data found in CSV file")
+                return 0
+
             with self.get_connection() as conn:
                 with conn.cursor() as cur:
-                    # Create placeholders for the INSERT statement
-                    placeholders = ','.join(['%s'] * len(columns))
-                    column_names = ','.join(columns)
-                    
-                    # Prepare the INSERT statement
+                    # Prepare column names for the query
+                    column_names = ', '.join(columns)
+
+                    # Prepare the INSERT statement for execute_values
                     insert_query = f"""
                         INSERT INTO {table_name} ({column_names})
-                        VALUES ({placeholders})
+                        VALUES %s
                     """
-                    
-                    # Execute batch insert
+
+                    # Execute batch insert using execute_values
                     execute_values(cur, insert_query, rows)
-                    
+
                     logger.info(f"Successfully imported {len(rows)} rows into {table_name}")
                     return len(rows)
 
@@ -75,11 +79,11 @@ class ETLService:
     def validate_csv(self, file_path, expected_columns):
         """
         Validate the structure of a CSV file
-        
+
         Args:
             file_path (str): Path to the CSV file
             expected_columns (list): List of expected column names
-        
+
         Returns:
             tuple: (is_valid, error_message)
         """
@@ -87,12 +91,20 @@ class ETLService:
             with open(file_path, 'r') as csv_file:
                 csv_reader = csv.reader(csv_file)
                 headers = next(csv_reader)
-                
+
                 # Check if all expected columns are present
                 missing_columns = [col for col in expected_columns if col not in headers]
                 if missing_columns:
                     return False, f"Missing required columns: {', '.join(missing_columns)}"
-                
+
+                # Validate that there is data in the file
+                try:
+                    first_row = next(csv_reader)
+                    if not first_row:
+                        return False, "CSV file is empty"
+                except StopIteration:
+                    return False, "CSV file contains only headers"
+
                 return True, "CSV structure is valid"
 
         except FileNotFoundError:
