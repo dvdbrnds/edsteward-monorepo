@@ -1,2 +1,2 @@
-// This file is intentionally left empty - CSV import feature has been removed
-// A different import method will be implemented later
+// This file has been deprecated and replaced by etl.py
+// The new implementation uses psycopg2 for direct database access
