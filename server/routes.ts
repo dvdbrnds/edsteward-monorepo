@@ -17,6 +17,33 @@ const upload = multer({ storage: multer.memoryStorage() });
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
 
+  // Setup wizard endpoint
+  app.post("/api/setup/admin", async (req, res) => {
+    if (!req.body.username || !req.body.password) {
+      return res.status(400).json({ message: "Username and password are required" });
+    }
+
+    try {
+      const existingUser = await storage.getUserByUsername(req.body.username);
+      if (existingUser) {
+        return res.status(400).json({ message: "Username already exists" });
+      }
+
+      const user = await storage.createUser({
+        ...req.body,
+        role: "admin", // Force role to be admin for setup wizard
+      });
+
+      req.login(user, (err) => {
+        if (err) return res.status(500).json({ message: "Login failed after creation" });
+        res.status(201).json(user);
+      });
+    } catch (error) {
+      console.error("Setup wizard error:", error);
+      res.status(500).json({ message: "Failed to create admin user" });
+    }
+  });
+
   // Regulations endpoints
   app.get("/api/regulations", async (req, res) => {
     const regulations = await storage.getRegulations();
@@ -87,7 +114,6 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-
   // Add new validation endpoint
   app.post("/api/regulations/validate", async (req, res) => {
     try {
@@ -104,34 +130,6 @@ export function registerRoutes(app: Express): Server {
         errors: report.errors.length,
         warnings: report.warnings.length
       });
-  });
-
-  // Export endpoints
-  app.get("/api/regulations/export/excel", async (req, res) => {
-    try {
-      const regulations = await storage.getRegulations();
-      const buffer = await exportToExcel(regulations);
-      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-      res.setHeader('Content-Disposition', 'attachment; filename=regulations.xlsx');
-      res.send(buffer);
-    } catch (error) {
-      console.error('Export failed:', error);
-      res.status(500).json({ success: false, message: 'Export failed' });
-    }
-  });
-
-  app.get("/api/regulations/export/csv", async (req, res) => {
-    try {
-      const regulations = await storage.getRegulations();
-      const csv = await exportToCSV(regulations);
-      res.setHeader('Content-Type', 'text/csv');
-      res.setHeader('Content-Disposition', 'attachment; filename=regulations.csv');
-      res.send(csv);
-    } catch (error) {
-      console.error('Export failed:', error);
-      res.status(500).json({ success: false, message: 'Export failed' });
-    }
-  });
 
       res.json(report);
     } catch (error) {

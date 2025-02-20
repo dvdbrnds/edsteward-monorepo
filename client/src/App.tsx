@@ -12,6 +12,7 @@ import ComplianceWizardPage from "@/pages/compliance-wizard-page";
 import ReportsPage from "@/pages/reports-page";
 import ValidationPage from "@/pages/validation-page";
 import AdminSettingsPage from "@/pages/admin-settings-page";
+import SetupWizardPage from "@/pages/setup-wizard-page";
 import { ProtectedRoute } from "./lib/protected-route";
 import { ProtectedRegulationRoute } from "./lib/protected-regulation-route";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
@@ -23,6 +24,7 @@ function Router() {
     <ErrorBoundary>
       <Switch>
         <Route path="/auth" component={AuthPage} />
+        <Route path="/setup" component={SetupWizardPage} />
         <ProtectedRoute path="/" component={HomePage} />
         <ProtectedRoute path="/regulations" component={RegulationsPage} />
         <ProtectedRoute path="/regulations/validate" component={ValidationPage} />
