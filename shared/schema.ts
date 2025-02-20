@@ -38,7 +38,7 @@ export const comments = pgTable("comments", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-// Notifications table
+// Notifications table - updated to include phone number
 export const notifications = pgTable("notifications", {
   id: serial("id").primaryKey(),
   regulationId: integer("regulation_id").notNull(),
@@ -46,6 +46,7 @@ export const notifications = pgTable("notifications", {
   type: text("type").notNull(),
   frequency: text("frequency").notNull(),
   enabled: boolean("enabled").notNull().default(true),
+  phoneNumber: text("phone_number"),  // Added for SMS notifications
 });
 
 // Deadlines table
@@ -89,8 +90,11 @@ export const insertCommentSchema = createInsertSchema(comments)
     parentId: z.number().optional(),
   });
 
-// Schema for inserting notifications
-export const insertNotificationSchema = createInsertSchema(notifications);
+// Schema for inserting notifications - updated
+export const insertNotificationSchema = createInsertSchema(notifications)
+  .extend({
+    phoneNumber: z.string().regex(/^\+\d{1,15}$/, "Must be a valid phone number in E.164 format").optional(),
+  });
 
 // Schema for inserting deadlines
 export const insertDeadlineSchema = createInsertSchema(deadlines);
@@ -127,11 +131,29 @@ export const insertEmailConfigSchema = createInsertSchema(emailConfigs)
     smtpPass: z.string().min(1, "SMTP password is required"),
   });
 
+// Twilio Configuration table
+export const twilioConfigs = pgTable("twilio_configs", {
+  id: serial("id").primaryKey(),
+  accountSid: text("account_sid").notNull(),
+  authToken: text("auth_token").notNull(),
+  fromNumber: text("from_number").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  updatedBy: integer("updated_by").notNull(),
+});
+
+// Schema for inserting Twilio config
+export const insertTwilioConfigSchema = createInsertSchema(twilioConfigs)
+  .extend({
+    accountSid: z.string().min(1, "Account SID is required"),
+    authToken: z.string().min(1, "Auth Token is required"),
+    fromNumber: z.string().regex(/^\+\d{1,15}$/, "Must be a valid phone number in E.164 format"),
+  });
+
+
 // Export types
 export type EmailConfig = typeof emailConfigs.$inferSelect;
 export type InsertEmailConfig = z.infer<typeof insertEmailConfigSchema>;
-
-// Re-export existing types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type Regulation = typeof regulations.$inferSelect;
@@ -144,3 +166,5 @@ export type Deadline = typeof deadlines.$inferSelect;
 export type InsertDeadline = z.infer<typeof insertDeadlineSchema>;
 export type Guide = typeof guides.$inferSelect;
 export type InsertGuide = z.infer<typeof insertGuideSchema>;
+export type TwilioConfig = typeof twilioConfigs.$inferSelect;
+export type InsertTwilioConfig = z.infer<typeof insertTwilioConfigSchema>;
