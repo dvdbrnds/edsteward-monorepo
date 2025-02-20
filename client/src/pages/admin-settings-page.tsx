@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -5,7 +6,7 @@ import type { EmailConfig } from "@shared/schema";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertEmailConfigSchema } from "@shared/schema";
-import { insertTwilioConfigSchema } from "@shared/schema"; // Added import for Twilio schema
+import { insertTwilioConfigSchema } from "@shared/schema";
 import Navigation from "@/components/layout/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -20,13 +21,19 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Mail, Loader2, Bell, MessageSquare } from "lucide-react"; // Added Bell and MessageSquare icon imports
+import { Mail, Loader2, Bell, MessageSquare } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Redirect } from "wouter";
 import type { z } from "zod";
-import type { TwilioConfig } from "@shared/schema"; // Added import for TwilioConfig type
-import { Label, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@radix-ui/react-select"; // Added imports for Select components
-
+import type { TwilioConfig } from "@shared/schema";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type FormValues = z.infer<typeof insertEmailConfigSchema>;
 type TwilioFormValues = z.infer<typeof insertTwilioConfigSchema>;
@@ -34,6 +41,7 @@ type TwilioFormValues = z.infer<typeof insertTwilioConfigSchema>;
 export default function AdminSettingsPage() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const [notifications, setNotifications] = useState<any[]>([]);
 
   // Redirect non-admin users
   if (user?.role !== "admin") {
@@ -128,21 +136,20 @@ export default function AdminSettingsPage() {
   };
 
   //This is a placeholder, replace with actual notification data fetching and mutation
-  const [notifications, setNotifications] = React.useState<any[]>([]);
   const updateNotificationMutation = useMutation({
     mutationFn: async (data: any) => {
-        // Placeholder for API call to update notification settings
-        console.log("Updating notification:", data);
-        //Replace with your actual API call
-        return data;
+      // Placeholder for API call to update notification settings
+      console.log("Updating notification:", data);
+      //Replace with your actual API call
+      return data;
     },
     onSuccess: () => {
-        // Placeholder for success handling
-        console.log("Notification updated successfully!");
+      // Placeholder for success handling
+      console.log("Notification updated successfully!");
     },
     onError: (error) => {
-        // Placeholder for error handling
-        console.error("Error updating notification:", error);
+      // Placeholder for error handling
+      console.error("Error updating notification:", error);
     },
   })
 
