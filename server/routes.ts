@@ -4,8 +4,7 @@ import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { insertRegulationSchema } from "@shared/schema";
 import multer from "multer";
-import { etlService } from "./services/etl";
-import xlsx from 'xlsx';
+import { importRegulationsFromCSV } from "./services/etl";
 
 const upload = multer({ storage: multer.memoryStorage() });
 
@@ -35,19 +34,15 @@ export function registerRoutes(app: Express): Server {
 
     try {
       const fileContent = req.file.buffer.toString('utf-8');
-      const result = await etlService.importFromCSV(fileContent);
+      const result = await importRegulationsFromCSV(fileContent);
 
-      if (result.errorCount > 0) {
+      if (result.errors.length > 0) {
         return res.status(400).json({
           success: false,
           message: "Import completed with validation errors",
           details: {
             processed: result.newCount + result.updateCount,
-            errors: result.errorCount,
-            errorList: result.errors.map(err => ({
-              row: err.row,
-              message: err.error
-            }))
+            errors: result.errors
           }
         });
       }
@@ -57,8 +52,7 @@ export function registerRoutes(app: Express): Server {
         message: "Import completed successfully",
         details: {
           new: result.newCount,
-          updated: result.updateCount,
-          skipped: result.skipCount
+          updated: result.updateCount
         }
       });
     } catch (error) {
