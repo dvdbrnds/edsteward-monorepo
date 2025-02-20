@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient, apiRequest } from "@/lib/queryClient";
@@ -93,6 +93,13 @@ export default function SetupWizardPage() {
     },
   });
 
+  // Handle step navigation when hasAdmin changes
+  useEffect(() => {
+    if (hasAdmin && currentStep === 0) {
+      setCurrentStep(0);
+    }
+  }, [hasAdmin]);
+
   if (isComplete) {
     return <Redirect to="/admin/settings" />;
   }
@@ -153,11 +160,6 @@ export default function SetupWizardPage() {
 
   const progress = ((currentStep + 1) / setupSteps.length) * 100;
   const officerProgress = ((officerStep + 1) / REGULATION_CATEGORIES.length) * 100;
-
-  // If there's already an admin, and we're somehow on the admin step, skip to officers
-  if (hasAdmin && currentStep === 0 && setupSteps[0].id === "officers") {
-    setCurrentStep(0); // Reset to first step (which is now officers)
-  }
 
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
