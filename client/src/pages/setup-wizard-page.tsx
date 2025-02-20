@@ -154,6 +154,11 @@ export default function SetupWizardPage() {
   const progress = ((currentStep + 1) / setupSteps.length) * 100;
   const officerProgress = ((officerStep + 1) / REGULATION_CATEGORIES.length) * 100;
 
+  // If there's already an admin, and we're somehow on the admin step, skip to officers
+  if (hasAdmin && currentStep === 0 && setupSteps[0].id === "officers") {
+    setCurrentStep(0); // Reset to first step (which is now officers)
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
       <div className="max-w-2xl w-full px-4">
@@ -196,7 +201,7 @@ export default function SetupWizardPage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {isCurrent && step.id === "admin" && (
+                  {isCurrent && step.id === "admin" && !hasAdmin && (
                     <Form {...form}>
                       <form
                         onSubmit={form.handleSubmit((data) =>
