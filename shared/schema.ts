@@ -151,16 +151,33 @@ export const insertTwilioConfigSchema = createInsertSchema(twilioConfigs)
   });
 
 
-// CSV Schema table
+// Add the specific schema field type definition
+export interface CsvSchemaField {
+  type: "string" | "number" | "boolean" | "date";
+  required: boolean;
+  format?: string;
+}
+
+// Update the csvSchemas table definition to include proper typing
 export const csvSchemas = pgTable("csv_schemas", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   description: text("description"),
-  schema: jsonb("schema").notNull(),  // Stores column definitions
+  schema: jsonb("schema").notNull().$type<Record<string, CsvSchemaField>>(),  // Explicit typing
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
   createdBy: integer("created_by").notNull(),
 });
+
+// Update the insert schema to match the new typing
+export const insertCsvSchemaSchema = createInsertSchema(csvSchemas)
+  .extend({
+    schema: z.record(z.string(), z.object({
+      type: z.enum(["string", "number", "boolean", "date"]),
+      required: z.boolean(),
+      format: z.string().optional()
+    }))
+  });
 
 // Field Mappings table
 export const fieldMappings = pgTable("field_mappings", {
@@ -208,16 +225,6 @@ export const errorRecords = pgTable("error_records", {
   errorMessage: text("error_message").notNull(),
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
-
-// Schema for inserting CSV Schema
-export const insertCsvSchemaSchema = createInsertSchema(csvSchemas)
-  .extend({
-    schema: z.record(z.string(), z.object({
-      type: z.enum(["string", "number", "boolean", "date"]),
-      required: z.boolean().default(false),
-      format: z.string().optional(),
-    })),
-  });
 
 // Schema for inserting Field Mapping
 export const insertFieldMappingSchema = createInsertSchema(fieldMappings);

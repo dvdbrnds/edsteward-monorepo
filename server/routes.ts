@@ -85,10 +85,9 @@ export function registerRoutes(app: Express): Server {
 
     try {
       // Create a default schema if not provided
-      let schema = await storage.getCsvSchema(1); // Get default schema if exists
+      let schema = await storage.getCsvSchema(1);
       if (!schema) {
-        console.log("Creating default schema for CSV import");
-        schema = await storage.createCsvSchema({
+        const defaultSchema = {
           name: "Default Regulation Schema",
           description: "Default schema for regulation imports",
           createdBy: req.user?.id || 1,
@@ -100,29 +99,38 @@ export function registerRoutes(app: Express): Server {
             "Category": { type: "string", required: false },
             "Deadlines": { type: "string", required: false }
           }
-        });
-        console.log("Created default schema:", JSON.stringify(schema, null, 2));
+        };
+
+        try {
+          schema = await storage.createCsvSchema(defaultSchema);
+          console.log("Created default schema:", schema);
+        } catch (schemaError) {
+          console.error("Failed to create schema:", schemaError);
+          throw new Error("Failed to create import schema");
+        }
       }
 
       const validationRules = await storage.getValidationRules(schema.id);
-      console.log("Validation rules:", validationRules);
-
       const fileContent = req.file.buffer.toString('utf-8');
-      console.log("File content sample:", fileContent.substring(0, 200));
+
+      console.log("Processing CSV import with schema:", {
+        schemaId: schema.id,
+        schemaName: schema.name,
+        contentPreview: fileContent.substring(0, 200)
+      });
 
       const result = await etlService.importFromCSV(fileContent, schema, validationRules);
 
       if (result.errorCount > 0) {
-        // Return a 400 status with detailed error information
         return res.status(400).json({
           success: false,
-          message: "Import completed with errors",
+          message: "Import completed with validation errors",
           details: {
             processed: result.newCount,
             errors: result.errorCount,
-            errorDetails: result.errors.map(err => ({
+            errorList: result.errors.map(err => ({
               row: err.row,
-              error: err.error
+              message: err.error
             }))
           }
         });
@@ -130,7 +138,7 @@ export function registerRoutes(app: Express): Server {
 
       res.json({
         success: true,
-        message: 'Import completed successfully',
+        message: "Import completed successfully",
         details: {
           processed: result.newCount,
           updated: result.updateCount,
@@ -138,15 +146,11 @@ export function registerRoutes(app: Express): Server {
         }
       });
     } catch (error) {
-      console.error('Import failed:', error);
-      const errorMessage = error instanceof Error ? error.message : String(error);
-
+      console.error("Import failed:", error);
       res.status(500).json({
         success: false,
-        message: `Import failed: ${errorMessage}`,
-        details: {
-          error: errorMessage
-        }
+        message: error instanceof Error ? error.message : "Import failed",
+        error: error instanceof Error ? error.stack : String(error)
       });
     }
   });

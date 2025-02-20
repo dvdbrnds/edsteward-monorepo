@@ -9,7 +9,8 @@ import type {
   TransformationLog,
   ErrorRecord,
   InsertTransformationLog,
-  InsertErrorRecord
+  InsertErrorRecord,
+  CsvSchemaField
 } from "@shared/schema";
 import { storage } from "../storage";
 import { RegulationValidator } from "../validation";
@@ -32,46 +33,32 @@ interface ImportResult {
 // Schema validation utilities
 export class SchemaValidator {
   private validateDataType(value: any, type: string): boolean {
-    // Add logging to track validation process
-    console.log(`Validating value type:`, { value, expectedType: type });
-
     switch (type) {
-      case 'string':
-        return typeof value === 'string';
-      case 'number':
-        return !isNaN(Number(value));
-      case 'boolean':
-        return typeof value === 'boolean' || ['true', 'false', '0', '1'].includes(String(value).toLowerCase());
-      case 'date':
-        return !isNaN(Date.parse(value));
+      case "string":
+        return typeof value === "string" || value === null;
+      case "number":
+        return !isNaN(Number(value)) || value === null;
+      case "boolean":
+        return typeof value === "boolean" || ["true", "false", "0", "1"].includes(String(value).toLowerCase()) || value === null;
+      case "date":
+        return !isNaN(Date.parse(value)) || value === null;
       default:
-        return true;
+        console.error(`Unknown type: ${type}`);
+        return false;
     }
   }
 
-  public validateField(value: any, field: { type: string; required: boolean; format?: string }): string | null {
-    // Log complete field validation attempt
-    console.log(`Validating field:`, { value, fieldDefinition: field });
+  public validateField(value: any, field: CsvSchemaField): string | null {
+    // Log the validation attempt
+    console.log("Validating field:", { value, field });
 
-    if (field.required && (value === undefined || value === null || value === '')) {
-      return `Required field is missing`;
+    if (field.required && (value === undefined || value === null || value === "")) {
+      return "Required field is missing";
     }
 
-    if (value !== undefined && value !== null && value !== '') {
+    if (value !== undefined && value !== null && value !== "") {
       if (!this.validateDataType(value, field.type)) {
         return `Invalid data type. Expected ${field.type}, got ${typeof value}`;
-      }
-
-      if (field.format) {
-        try {
-          const regex = new RegExp(field.format);
-          if (!regex.test(String(value))) {
-            return `Value does not match required format: ${field.format}`;
-          }
-        } catch (error) {
-          console.error('Invalid format regex:', error);
-          return `Invalid format specification`;
-        }
       }
     }
 
@@ -91,10 +78,9 @@ export class ETLProcessor {
     schema: CsvSchema,
     validationRules: ValidationRule[]
   ): Promise<ImportResult> {
-    // Log initial state
     console.log("Starting CSV processing with schema:", {
       schemaName: schema.name,
-      schemaStructure: JSON.stringify(schema.schema, null, 2)
+      schemaStructure: schema.schema
     });
 
     const result: ImportResult = {
@@ -106,63 +92,51 @@ export class ETLProcessor {
     };
 
     try {
-      // Log raw content sample
-      console.log("CSV content sample:", fileContent.substring(0, 500));
+      if (!schema.schema || typeof schema.schema !== "object") {
+        throw new Error("Invalid schema structure");
+      }
 
+      // Parse CSV with relaxed options
       const records = parse(fileContent, {
         columns: true,
         skip_empty_lines: true,
         trim: true,
         relaxColumnCount: true,
-        relaxQuotes: true,
-        skipRecordsWithError: true
+        relaxQuotes: true
       });
 
       if (!records.length) {
-        throw new Error("No valid records found in CSV file. Please check the file format.");
+        throw new Error("No records found in CSV file");
       }
 
-      // Log parsed records
-      console.log("Parsed CSV structure:", {
-        recordCount: records.length,
-        firstRecord: records[0],
-        headers: Object.keys(records[0] || {})
-      });
+      console.log("First record:", records[0]);
 
-      // Type guard for schema validation
-      if (!schema.schema || typeof schema.schema !== 'object') {
-        throw new Error("Invalid schema structure");
+      // Validate headers
+      const headers = Object.keys(records[0]);
+      const schemaFields = Object.entries(schema.schema) as [string, CsvSchemaField][];
+
+      const requiredFields = schemaFields
+        .filter(([_, field]) => field.required)
+        .map(([name]) => name);
+
+      const missingFields = requiredFields.filter(field => !headers.includes(field));
+      if (missingFields.length > 0) {
+        throw new Error(`Missing required columns: ${missingFields.join(", ")}`);
       }
 
-      // Validate schema structure
-      const schemaFields = Object.entries(schema.schema).map(([field, def]) => {
-        if (!def || typeof def !== 'object') {
-          throw new Error(`Invalid field definition for ${field}`);
-        }
-        return {
-          field,
-          type: (def as any).type || 'string',
-          required: Boolean((def as any).required)
-        };
-      });
-
-      // Log schema validation setup
-      console.log("Validated schema fields:", schemaFields);
-
-      // Process records with enhanced error handling
+      // Process records
       for (let i = 0; i < records.length; i++) {
         const record = records[i];
-        const rowNumber = i + 2; // Adding 2 for header row and 0-based index
+        const rowNumber = i + 2; // Account for header row and 0-based index
 
         try {
           const validationErrors: string[] = [];
 
-          for (const fieldDef of schemaFields) {
-            const value = record[fieldDef.field];
+          for (const [fieldName, fieldDef] of schemaFields) {
+            const value = record[fieldName];
             const error = this.schemaValidator.validateField(value, fieldDef);
-
             if (error) {
-              validationErrors.push(`${fieldDef.field}: ${error}`);
+              validationErrors.push(`${fieldName}: ${error}`);
             }
           }
 
@@ -170,35 +144,28 @@ export class ETLProcessor {
             result.errorCount++;
             result.errors.push({
               row: rowNumber,
-              error: validationErrors.join('; '),
+              error: validationErrors.join("; "),
               data: record
             });
             continue;
           }
 
           result.newCount++;
-        } catch (recordError) {
-          console.error(`Error processing record ${rowNumber}:`, recordError);
+        } catch (error) {
+          console.error(`Error processing row ${rowNumber}:`, error);
           result.errorCount++;
           result.errors.push({
             row: rowNumber,
-            error: recordError instanceof Error ? recordError.message : String(recordError),
+            error: error instanceof Error ? error.message : String(error),
             data: record
           });
         }
       }
 
-      // Log final results
-      console.log("Processing completed:", {
-        processed: result.newCount,
-        errors: result.errorCount,
-        errorDetails: result.errors
-      });
-
       return result;
     } catch (error) {
       console.error("CSV processing failed:", error);
-      throw new Error(`CSV processing failed: ${error instanceof Error ? error.message : String(error)}`);
+      throw error;
     }
   }
 }
