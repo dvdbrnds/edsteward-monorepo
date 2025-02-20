@@ -41,6 +41,7 @@ export interface IStorage {
   // Notification methods
   getNotificationsByUser(userId: number): Promise<Notification[]>;
   createNotification(notification: InsertNotification): Promise<Notification>;
+  sendEmailNotification(userId: number, subject: string, message: string): Promise<boolean>;
 
   // Deadline methods
   getDeadlines(): Promise<Deadline[]>;
@@ -57,8 +58,22 @@ export interface IStorage {
   sessionStore: session.Store;
 }
 
+import { emailService } from './services/email';
+
 export class DatabaseStorage implements IStorage {
   sessionStore: session.Store;
+
+  async sendEmailNotification(userId: number, subject: string, message: string): Promise<boolean> {
+    const user = await this.getUser(userId);
+    if (!user) return false;
+    
+    const userNotifications = await this.getNotificationsByUser(userId);
+    const emailEnabled = userNotifications.some(n => n.type === 'email' && n.enabled);
+    
+    if (!emailEnabled) return false;
+    
+    return emailService.sendEmail(user.email, subject, message);
+  }
 
   constructor() {
     this.sessionStore = new PostgresSessionStore({
