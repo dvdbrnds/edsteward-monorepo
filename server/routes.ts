@@ -76,6 +76,13 @@ export function registerRoutes(app: Express): Server {
 
   // CSV Import endpoint
   app.post("/api/regulations/import", upload.single('file'), async (req, res) => {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        message: "Authentication required"
+      });
+    }
+
     if (!req.file) {
       return res.status(400).json({
         success: false,
@@ -91,6 +98,7 @@ export function registerRoutes(app: Express): Server {
         schema = await storage.createCsvSchema({
           name: "Default Regulation Schema",
           description: "Default schema for regulation imports",
+          createdBy: req.user.id, // Add the createdBy field
           schema: {
             "Topic": { type: "string", required: true },
             "Item ID": { type: "string", required: true },

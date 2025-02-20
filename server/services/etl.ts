@@ -366,6 +366,8 @@ export class RegulationETL {
 
   public async importFromCSV(fileContent: string, schema: CsvSchema, validationRules: ValidationRule[]): Promise<ImportResult> {
     console.log("Starting CSV import process with schema:", schema.name);
+    console.log("Schema configuration:", JSON.stringify(schema.schema, null, 2));
+
     const result: ImportResult = {
       newCount: 0,
       updateCount: 0,
@@ -386,12 +388,17 @@ export class RegulationETL {
       });
 
       console.log(`Processing ${records.length} records from CSV`);
+      console.log("First record sample:", JSON.stringify(records[0], null, 2));
 
       // Validate headers against schema
       const headers = Object.keys(records[0] || {});
+      console.log("CSV headers:", headers);
+
       const requiredFields = Object.entries(schema.schema)
-        .filter(([_, def]) => def.required)
+        .filter(([_, def]) => (def as any).required)
         .map(([field]) => field);
+
+      console.log("Required fields:", requiredFields);
 
       const missingFields = requiredFields.filter(field => !headers.includes(field));
       if (missingFields.length > 0) {
