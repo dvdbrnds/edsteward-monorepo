@@ -164,14 +164,14 @@ export default function Navigation() {
                           Alpha v0.1.8
                         </button>
                       </DialogTrigger>
-                      <DialogContent>
+                      <DialogContent className="max-h-[80vh] overflow-y-auto">
                         <DialogHeader>
                           <DialogTitle>Changelog</DialogTitle>
                         </DialogHeader>
-                        <div className="space-y-6">
+                        <div className="space-y-6 pr-2">
                           {CHANGELOG.map((release) => (
-                            <div key={release.version}>
-                              <h3 className="text-lg font-semibold flex items-center gap-2">
+                            <div key={release.version} className="pb-4">
+                              <h3 className="text-lg font-semibold flex items-center gap-2 sticky top-0 bg-background pt-2">
                                 v{release.version}
                                 <span className="text-sm font-normal text-gray-500">
                                   {release.date}
@@ -179,7 +179,7 @@ export default function Navigation() {
                               </h3>
                               <ul className="mt-2 list-disc list-inside space-y-1">
                                 {release.changes.map((change, idx) => (
-                                  <li key={idx} className="text-sm text-gray-600">
+                                  <li key={idx} className="text-sm text-gray-600 pl-2">
                                     {change}
                                   </li>
                                 ))}
