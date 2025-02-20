@@ -1,6 +1,7 @@
 import { useAuth } from "@/hooks/use-auth";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
+import { apiRequest } from "@/lib/queryClient";  // Added missing import
 import {
   LayoutDashboard,
   Book,

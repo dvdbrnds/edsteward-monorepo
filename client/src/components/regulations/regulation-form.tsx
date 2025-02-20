@@ -22,11 +22,17 @@ export default function RegulationForm({ onSuccess }: { onSuccess: () => void })
   const form = useForm<InsertRegulation>({
     resolver: zodResolver(insertRegulationSchema),
     defaultValues: {
+      itemId: "",
+      topic: "",
+      statute: "",
+      statuteIds: "",
       requirements: "",
       requirementsUrl: "",
       regulationUrl: "https://www.ecfr.gov/current/title-45/subtitle-B/chapter-VI/part-617",
       summary: "",
       deadlines: "",
+      category: "",
+      agency_url: "",
     }
   });
 
@@ -165,9 +171,9 @@ export default function RegulationForm({ onSuccess }: { onSuccess: () => void })
                 Enter the specific ECFR URL for this regulation
               </FormDescription>
               <FormControl>
-                <Input 
-                  {...field} 
-                  type="url" 
+                <Input
+                  {...field}
+                  type="url"
                   placeholder="https://www.ecfr.gov/current/title-45/subtitle-B/chapter-VI/part-617"
                 />
               </FormControl>

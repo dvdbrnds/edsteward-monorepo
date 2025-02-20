@@ -33,16 +33,18 @@ const REGULATION_CATEGORIES = [
   "Athletics",
   "Campus Safety",
   "Research",
-];
+] as const;
 
-const SUGGESTED_DISTRIBUTION_LISTS = {
+type RegulationCategory = typeof REGULATION_CATEGORIES[number];
+
+const SUGGESTED_DISTRIBUTION_LISTS: Record<RegulationCategory, string> = {
   "Academic Programs": "academicaffairs@moravian.edu",
   "Financial Aid": "finaid@moravian.edu",
   "Student Services": "studentlife@moravian.edu",
   "Athletics": "athletics@moravian.edu",
   "Campus Safety": "police@moravian.edu",
   "Research": "research@moravian.edu",
-};
+} as const;
 
 export default function SetupWizardPage() {
   const { user } = useAuth();
@@ -176,7 +178,7 @@ export default function SetupWizardPage() {
             Moravian Compliance Portal Setup
           </h1>
           <p className="text-gray-600">
-            Complete the following steps to set up your compliance portal. 
+            Complete the following steps to set up your compliance portal.{" "}
             {!hasAdmin ? "Admin account creation is required." : ""}
           </p>
         </div>
@@ -286,7 +288,8 @@ export default function SetupWizardPage() {
                         <p className="text-gray-600">
                           Assign a compliance office responsible for{" "}
                           {REGULATION_CATEGORIES[officeStep]} regulations.
-                          We recommend using department distribution lists (e.g., {SUGGESTED_DISTRIBUTION_LISTS[REGULATION_CATEGORIES[officeStep]]}) 
+                          We recommend using department distribution lists (e.g.,{" "}
+                          {SUGGESTED_DISTRIBUTION_LISTS[REGULATION_CATEGORIES[officeStep]]}){" "}
                           to ensure notifications reach the entire team.
                         </p>
 
