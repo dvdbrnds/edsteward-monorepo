@@ -182,11 +182,11 @@ export class ETLProcessor {
           });
         }
       }
-
-      return result;
     } catch (error) {
       console.error("CSV processing failed:", error);
       throw error;
+    } finally {
+      return result;
     }
   }
 }
