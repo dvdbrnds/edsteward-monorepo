@@ -30,21 +30,21 @@ const SETUP_STEPS = [
   {
     id: "admin",
     title: "Create Admin Account",
-    description: "Set up the initial administrator account",
+    description: "Set up the initial administrator account for managing compliance",
     icon: User,
     required: true,
   },
   {
     id: "officers",
     title: "Assign Compliance Officers",
-    description: "Assign officers to regulation categories",
+    description: "Designate officers responsible for each regulation category. You can modify these assignments later in the admin settings.",
     icon: UserPlus,
     required: false,
   },
   {
     id: "overrides",
     title: "Configure Notification Overrides",
-    description: "Set up per-regulation notification overrides",
+    description: "Set up default notification settings for each category. Individual regulations can be customized later.",
     icon: Settings,
     required: false,
   },
@@ -76,14 +76,14 @@ export default function SetupWizardPage() {
     },
     onSuccess: () => {
       toast({
-        title: "Admin account created",
-        description: "You can now proceed with the next steps.",
+        title: "Admin Account Created",
+        description: "You can now proceed with configuring compliance officers and notification settings.",
       });
       setCurrentStep((prev) => prev + 1);
     },
     onError: (error) => {
       toast({
-        title: "Error",
+        title: "Setup Error",
         description: error.message,
         variant: "destructive",
       });
@@ -104,7 +104,7 @@ export default function SetupWizardPage() {
             Moravian Compliance Portal Setup
           </h1>
           <p className="text-gray-600">
-            Complete the following steps to set up your compliance portal
+            Complete the following steps to set up your compliance portal. Only admin account creation is required, other steps can be configured later.
           </p>
         </div>
 
@@ -120,7 +120,7 @@ export default function SetupWizardPage() {
               <Card
                 key={step.id}
                 className={`${
-                  isCurrent ? "ring-2 ring-blue-500" : ""
+                  isCurrent ? "ring-2 ring-[#00267A]" : ""
                 } ${
                   isCompleted ? "bg-gray-50" : ""
                 }`}
@@ -128,11 +128,11 @@ export default function SetupWizardPage() {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-3">
                     <Icon className={`h-6 w-6 ${
-                      isCompleted ? "text-green-500" : "text-blue-500"
+                      isCompleted ? "text-green-500" : "text-[#00267A]"
                     }`} />
                     {step.title}
                     {step.required && (
-                      <span className="text-sm text-red-500">*</span>
+                      <span className="text-sm text-red-500 ml-2">Required</span>
                     )}
                   </CardTitle>
                 </CardHeader>
@@ -154,6 +154,9 @@ export default function SetupWizardPage() {
                               <FormControl>
                                 <Input {...field} />
                               </FormControl>
+                              <FormDescription>
+                                Choose a username for the administrator account
+                              </FormDescription>
                               <FormMessage />
                             </FormItem>
                           )}
@@ -168,6 +171,9 @@ export default function SetupWizardPage() {
                               <FormControl>
                                 <Input type="password" {...field} />
                               </FormControl>
+                              <FormDescription>
+                                Create a secure password for the administrator account
+                              </FormDescription>
                               <FormMessage />
                             </FormItem>
                           )}
@@ -191,28 +197,41 @@ export default function SetupWizardPage() {
                     </Form>
                   )}
 
-                  {/* Placeholder for other steps - will be implemented next */}
                   {isCurrent && step.id === "officers" && (
-                    <div className="text-center py-4">
-                      <p>Officer assignment interface coming soon...</p>
-                      <Button
-                        onClick={() => setCurrentStep((prev) => prev + 1)}
-                        className="mt-4"
-                      >
-                        Skip for Now
-                      </Button>
+                    <div className="space-y-4">
+                      <p className="text-gray-600">
+                        Assign compliance officers to specific regulation categories. This helps organize responsibility and ensures proper oversight.
+                      </p>
+                      <div className="text-center py-4">
+                        <p className="text-sm text-gray-500 mb-4">
+                          You can configure officer assignments now or do it later in the admin settings.
+                        </p>
+                        <Button
+                          onClick={() => setCurrentStep((prev) => prev + 1)}
+                          className="mt-4"
+                        >
+                          Skip for Now
+                        </Button>
+                      </div>
                     </div>
                   )}
 
                   {isCurrent && step.id === "overrides" && (
-                    <div className="text-center py-4">
-                      <p>Override configuration interface coming soon...</p>
-                      <Button
-                        onClick={() => setIsComplete(true)}
-                        className="mt-4"
-                      >
-                        Complete Setup
-                      </Button>
+                    <div className="space-y-4">
+                      <p className="text-gray-600">
+                        Configure default notification settings for each regulation category. These settings can be overridden for individual regulations later.
+                      </p>
+                      <div className="text-center py-4">
+                        <p className="text-sm text-gray-500 mb-4">
+                          You can set up notification defaults now or configure them later in the admin settings.
+                        </p>
+                        <Button
+                          onClick={() => setIsComplete(true)}
+                          className="mt-4"
+                        >
+                          Complete Setup
+                        </Button>
+                      </div>
                     </div>
                   )}
 
