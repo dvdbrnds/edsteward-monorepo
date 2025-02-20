@@ -91,6 +91,8 @@ export class ETLProcessor {
       errors: []
     };
 
+    let processedRows = new Set<string>();
+
     try {
       if (!schema.schema || typeof schema.schema !== "object") {
         throw new Error("Invalid schema structure");
@@ -128,6 +130,14 @@ export class ETLProcessor {
       for (let i = 0; i < records.length; i++) {
         const record = records[i];
         const rowNumber = i + 2; // Account for header row and 0-based index
+        const rowKey = JSON.stringify(record); // Create a key for the row
+
+        if (processedRows.has(rowKey)) {
+          console.warn(`Skipping duplicate row ${rowNumber}`);
+          result.skipCount++;
+          continue;
+        }
+        processedRows.add(rowKey);
 
         try {
           const validationErrors: string[] = [];
