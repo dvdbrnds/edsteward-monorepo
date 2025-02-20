@@ -57,6 +57,7 @@ export interface IStorage {
 
   // Session store
   sessionStore: session.Store;
+  hasAdmin(): Promise<boolean>;
 }
 
 import { emailService } from './services/email';
@@ -201,6 +202,14 @@ export class DatabaseStorage implements IStorage {
       .where(eq(guides.id, id))
       .returning();
     return updatedGuide;
+  }
+  async hasAdmin(): Promise<boolean> {
+    const [adminUser] = await db
+      .select()
+      .from(users)
+      .where(eq(users.role, "admin"))
+      .limit(1);
+    return !!adminUser;
   }
 }
 

@@ -17,6 +17,17 @@ const upload = multer({ storage: multer.memoryStorage() });
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
 
+  // Add this endpoint with the other setup routes
+  app.get("/api/setup/has-admin", async (req, res) => {
+    try {
+      const hasAdmin = await storage.hasAdmin();
+      res.json(hasAdmin);
+    } catch (error) {
+      console.error("Failed to check admin existence:", error);
+      res.status(500).json({ message: "Failed to check admin existence" });
+    }
+  });
+
   // Setup wizard endpoint
   app.post("/api/setup/admin", async (req, res) => {
     if (!req.body.username || !req.body.password) {
@@ -24,6 +35,11 @@ export function registerRoutes(app: Express): Server {
     }
 
     try {
+      const hasAdmin = await storage.hasAdmin();
+      if (hasAdmin) {
+        return res.status(400).json({ message: "Admin already exists" });
+      }
+
       const existingUser = await storage.getUserByUsername(req.body.username);
       if (existingUser) {
         return res.status(400).json({ message: "Username already exists" });
