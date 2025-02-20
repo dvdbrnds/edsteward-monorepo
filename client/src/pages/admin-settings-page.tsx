@@ -20,11 +20,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Mail, Loader2, Bell } from "lucide-react"; // Added Bell icon import
+import { Mail, Loader2, Bell, MessageSquare } from "lucide-react"; // Added Bell and MessageSquare icon imports
 import { useToast } from "@/hooks/use-toast";
 import { Redirect } from "wouter";
 import type { z } from "zod";
 import type { TwilioConfig } from "@shared/schema"; // Added import for TwilioConfig type
+import { Label, Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@radix-ui/react-select"; // Added imports for Select components
 
 
 type FormValues = z.infer<typeof insertEmailConfigSchema>;
@@ -126,6 +127,25 @@ export default function AdminSettingsPage() {
     updateTwilioConfigMutation.mutate(data);
   };
 
+  //This is a placeholder, replace with actual notification data fetching and mutation
+  const [notifications, setNotifications] = React.useState<any[]>([]);
+  const updateNotificationMutation = useMutation({
+    mutationFn: async (data: any) => {
+        // Placeholder for API call to update notification settings
+        console.log("Updating notification:", data);
+        //Replace with your actual API call
+        return data;
+    },
+    onSuccess: () => {
+        // Placeholder for success handling
+        console.log("Notification updated successfully!");
+    },
+    onError: (error) => {
+        // Placeholder for error handling
+        console.error("Error updating notification:", error);
+    },
+  })
+
   if (emailLoading || twilioLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -147,6 +167,123 @@ export default function AdminSettingsPage() {
       <main className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="space-y-8">
+            {/* Notification Settings */}
+            <div>
+              <div className="flex items-center mb-8">
+                <Bell className="h-6 w-6 mr-3 text-blue-500" />
+                <h1 className="text-3xl font-bold text-gray-900">
+                  Notification Settings
+                </h1>
+              </div>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Global Notification Preferences</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Email Notifications */}
+                  <div className="border-b pb-4">
+                    <div className="flex justify-between items-center mb-4">
+                      <div>
+                        <Label className="text-lg font-medium">Email Notifications</Label>
+                        <p className="text-sm text-gray-500">Send compliance updates via email</p>
+                      </div>
+                      <Switch
+                        checked={notifications?.some(n => n.type === 'email' && n.enabled)}
+                        onCheckedChange={(checked) => {
+                          if (notifications) {
+                            const emailNotif = notifications.find(n => n.type === 'email');
+                            if (emailNotif) {
+                              updateNotificationMutation.mutate({
+                                ...emailNotif,
+                                enabled: checked,
+                              });
+                            }
+                          }
+                        }}
+                      />
+                    </div>
+                    <div className="ml-4">
+                      <Label>Default Frequency</Label>
+                      <Select
+                        defaultValue={notifications?.find(n => n.type === 'email')?.frequency || 'daily'}
+                        onValueChange={(value) => {
+                          if (notifications) {
+                            const emailNotif = notifications.find(n => n.type === 'email');
+                            if (emailNotif) {
+                              updateNotificationMutation.mutate({
+                                ...emailNotif,
+                                frequency: value,
+                              });
+                            }
+                          }
+                        }}
+                      >
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Select frequency" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="daily">Daily</SelectItem>
+                          <SelectItem value="weekly">Weekly</SelectItem>
+                          <SelectItem value="monthly">Monthly</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+
+                  {/* SMS Notifications */}
+                  <div className="pt-4">
+                    <div className="flex justify-between items-center mb-4">
+                      <div>
+                        <Label className="text-lg font-medium">SMS Notifications</Label>
+                        <p className="text-sm text-gray-500">Send compliance updates via SMS</p>
+                      </div>
+                      <Switch
+                        checked={notifications?.some(n => n.type === 'sms' && n.enabled)}
+                        onCheckedChange={(checked) => {
+                          if (notifications) {
+                            const smsNotif = notifications.find(n => n.type === 'sms');
+                            if (smsNotif) {
+                              updateNotificationMutation.mutate({
+                                ...smsNotif,
+                                enabled: checked,
+                              });
+                            }
+                          }
+                        }}
+                      />
+                    </div>
+                    <div className="ml-4">
+                      <Label>Default Frequency</Label>
+                      <Select
+                        defaultValue={notifications?.find(n => n.type === 'sms')?.frequency || 'weekly'}
+                        onValueChange={(value) => {
+                          if (notifications) {
+                            const smsNotif = notifications.find(n => n.type === 'sms');
+                            if (smsNotif) {
+                              updateNotificationMutation.mutate({
+                                ...smsNotif,
+                                frequency: value,
+                              });
+                            }
+                          }
+                        }}
+                      >
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Select frequency" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="daily">Daily</SelectItem>
+                          <SelectItem value="weekly">Weekly</SelectItem>
+                          <SelectItem value="monthly">Monthly</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
             {/* Email Configuration */}
             <div>
               <div className="flex items-center mb-8">
@@ -286,9 +423,9 @@ export default function AdminSettingsPage() {
             {/* Twilio Configuration */}
             <div>
               <div className="flex items-center mb-8">
-                <Bell className="h-6 w-6 mr-3 text-blue-500" />
+                <MessageSquare className="h-6 w-6 mr-3 text-blue-500" />
                 <h1 className="text-3xl font-bold text-gray-900">
-                  SMS Configuration
+                  SMS Service Configuration
                 </h1>
               </div>
 
