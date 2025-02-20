@@ -113,47 +113,51 @@ export default function Navigation() {
           <div className="flex items-center min-w-0">
             {/* Logo */}
             <div className="flex-shrink-0 flex items-center">
-              <img
-                src={moravianLogo}
-                alt="Moravian University Logo"
-                className="h-8"
-              />
-              <div className="ml-3 whitespace-nowrap">
-                <span className="text-xl font-bold text-white">
-                  Compliance Portal
-                </span>
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <button className="text-xs text-gray-300 ml-2 hover:text-white transition-colors">
-                      Alpha v0.1.6
-                    </button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Changelog</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-6">
-                      {CHANGELOG.map((release) => (
-                        <div key={release.version}>
-                          <h3 className="text-lg font-semibold flex items-center gap-2">
-                            v{release.version}
-                            <span className="text-sm font-normal text-gray-500">
-                              {release.date}
-                            </span>
-                          </h3>
-                          <ul className="mt-2 list-disc list-inside space-y-1">
-                            {release.changes.map((change, idx) => (
-                              <li key={idx} className="text-sm text-gray-600">
-                                {change}
-                              </li>
-                            ))}
-                          </ul>
+              <Link href="/">
+                <button className="flex items-center focus:outline-none">
+                  <img
+                    src={moravianLogo}
+                    alt="Moravian University Logo"
+                    className="h-8 hover:opacity-80 transition-opacity"
+                  />
+                  <div className="ml-3 whitespace-nowrap">
+                    <span className="text-xl font-bold text-white hover:text-gray-200 transition-colors">
+                      Compliance Portal
+                    </span>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <button className="text-xs text-gray-300 ml-2 hover:text-white transition-colors">
+                          Alpha v0.1.6
+                        </button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Changelog</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-6">
+                          {CHANGELOG.map((release) => (
+                            <div key={release.version}>
+                              <h3 className="text-lg font-semibold flex items-center gap-2">
+                                v{release.version}
+                                <span className="text-sm font-normal text-gray-500">
+                                  {release.date}
+                                </span>
+                              </h3>
+                              <ul className="mt-2 list-disc list-inside space-y-1">
+                                {release.changes.map((change, idx) => (
+                                  <li key={idx} className="text-sm text-gray-600">
+                                    {change}
+                                  </li>
+                                ))}
+                              </ul>
+                            </div>
+                          ))}
                         </div>
-                      ))}
-                    </div>
-                  </DialogContent>
-                </Dialog>
-              </div>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                </button>
+              </Link>
             </div>
 
             {/* Navigation Links */}
