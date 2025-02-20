@@ -29,6 +29,7 @@ export interface IStorage {
 
   // Regulation methods
   getRegulations(): Promise<Regulation[]>;
+  getRegulation(id: number): Promise<Regulation | undefined>;  
   createRegulation(regulation: InsertRegulation): Promise<Regulation>;
   updateRegulation(id: number, regulation: Partial<InsertRegulation>): Promise<Regulation>;
 
@@ -63,18 +64,6 @@ import { emailService } from './services/email';
 export class DatabaseStorage implements IStorage {
   sessionStore: session.Store;
 
-  async sendEmailNotification(userId: number, subject: string, message: string): Promise<boolean> {
-    const user = await this.getUser(userId);
-    if (!user) return false;
-    
-    const userNotifications = await this.getNotificationsByUser(userId);
-    const emailEnabled = userNotifications.some(n => n.type === 'email' && n.enabled);
-    
-    if (!emailEnabled) return false;
-    
-    return emailService.sendEmail(user.email, subject, message);
-  }
-
   constructor() {
     this.sessionStore = new PostgresSessionStore({
       pool,
@@ -99,6 +88,11 @@ export class DatabaseStorage implements IStorage {
 
   async getRegulations(): Promise<Regulation[]> {
     return await db.select().from(regulations);
+  }
+
+  async getRegulation(id: number): Promise<Regulation | undefined> {
+    const [regulation] = await db.select().from(regulations).where(eq(regulations.id, id));
+    return regulation;
   }
 
   async createRegulation(regulation: InsertRegulation): Promise<Regulation> {
@@ -156,6 +150,18 @@ export class DatabaseStorage implements IStorage {
       .values(notification)
       .returning();
     return newNotification;
+  }
+
+  async sendEmailNotification(userId: number, subject: string, message: string): Promise<boolean> {
+    const user = await this.getUser(userId);
+    if (!user) return false;
+    
+    const userNotifications = await this.getNotificationsByUser(userId);
+    const emailEnabled = userNotifications.some(n => n.type === 'email' && n.enabled);
+    
+    if (!emailEnabled) return false;
+    
+    return emailService.sendEmail(user.email, subject, message);
   }
 
   async getDeadlines(): Promise<Deadline[]> {

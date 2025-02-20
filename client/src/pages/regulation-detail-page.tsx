@@ -1,5 +1,5 @@
 import { useLocation } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import type { Regulation, Deadline, Guide } from "@shared/schema";
 import Navigation from "@/components/layout/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -15,6 +15,7 @@ import {
   AlertCircle,
   ArrowLeft,
   Loader2,
+  Bell,
 } from "lucide-react";
 import {
   Dialog,
@@ -25,22 +26,86 @@ import {
 } from "@/components/ui/dialog";
 import { format, differenceInDays } from "date-fns";
 import { marked } from 'marked';
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/auth";
+import { apiRequest } from "@/lib/api";
 
-type StatusType = {
-  icon: JSX.Element;
-  label: string;
-  className: string;
-};
+// Extend Regulation type to include notification override
+interface RegulationWithOverride extends Regulation {
+  notificationOverride?: {
+    email: string | null;
+    phone: string | null;
+  };
+}
 
 interface RegulationDetailPageProps {
-  regulation: Regulation;
+  regulation: RegulationWithOverride;
 }
+
+// Add notification override schema
+const notificationOverrideSchema = z.object({
+  email: z.string().email("Invalid email").optional().nullable(),
+  phone: z.string().regex(/^\+?[\d\s-()]+$/, "Invalid phone number").optional().nullable(),
+});
+
+type NotificationOverride = z.infer<typeof notificationOverrideSchema>;
 
 export default function RegulationDetailPage({ regulation }: RegulationDetailPageProps) {
   const [_, navigate] = useLocation();
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const { data: deadlines, isLoading: deadlinesLoading } = useQuery<Deadline[]>({
     queryKey: ["/api/deadlines"],
+  });
+
+  const overrideForm = useForm<NotificationOverride>({
+    resolver: zodResolver(notificationOverrideSchema),
+    defaultValues: {
+      email: regulation.notificationOverride?.email || "",
+      phone: regulation.notificationOverride?.phone || "",
+    },
+  });
+
+  const overrideMutation = useMutation({
+    mutationFn: async (data: NotificationOverride) => {
+      const response = await apiRequest(
+        "PATCH",
+        `/api/regulations/${regulation.id}/notification-override`,
+        data
+      );
+      if (!response.ok) {
+        throw new Error("Failed to update notification override");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Override Updated",
+        description: "Notification settings have been updated for this regulation.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/regulations", regulation.id] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Update Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
   });
 
   if (deadlinesLoading) {
@@ -299,6 +364,88 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
                     </CardContent>
                   </Card>
                 )}
+
+                {/* Notification Override Section - Only visible to admins */}
+                {user?.role === "admin" && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Bell className="h-5 w-5" />
+                        Notification Override
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <Form {...overrideForm}>
+                        <form
+                          onSubmit={overrideForm.handleSubmit((data) =>
+                            overrideMutation.mutate(data)
+                          )}
+                          className="space-y-4"
+                        >
+                          <FormField
+                            control={overrideForm.control}
+                            name="email"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Override Email</FormLabel>
+                                <FormControl>
+                                  <input
+                                    type="email"
+                                    placeholder="Enter override email"
+                                    {...field}
+                                    value={field.value || ""}
+                                  />
+                                </FormControl>
+                                <FormDescription>
+                                  Leave empty to use category default
+                                </FormDescription>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={overrideForm.control}
+                            name="phone"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Override Phone</FormLabel>
+                                <FormControl>
+                                  <input
+                                    type="text"
+                                    placeholder="Enter override phone"
+                                    {...field}
+                                    value={field.value || ""}
+                                  />
+                                </FormControl>
+                                <FormDescription>
+                                  Leave empty to use category default
+                                </FormDescription>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <Button
+                            type="submit"
+                            className="w-full"
+                            disabled={overrideMutation.isPending}
+                          >
+                            {overrideMutation.isPending ? (
+                              <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Saving...
+                              </>
+                            ) : (
+                              "Save Override Settings"
+                            )}
+                          </Button>
+                        </form>
+                      </Form>
+                    </CardContent>
+                  </Card>
+                )}
+
               </div>
             </div>
           </div>
@@ -352,3 +499,9 @@ function GuideContent() {
     />
   );
 }
+
+type StatusType = {
+  icon: JSX.Element;
+  label: string;
+  className: string;
+};

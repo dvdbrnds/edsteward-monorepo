@@ -181,6 +181,37 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  app.patch("/api/regulations/:id/notification-override", async (req, res) => {
+    if (!req.user || req.user.role !== "admin") {
+      return res.status(403).json({ message: "Only admins can set notification overrides" });
+    }
+
+    try {
+      const regulationId = parseInt(req.params.id, 10);
+      if (isNaN(regulationId)) {
+        return res.status(400).json({ message: "Invalid regulation ID" });
+      }
+
+      const regulation = await storage.getRegulation(regulationId);
+      if (!regulation) {
+        return res.status(404).json({ message: "Regulation not found" });
+      }
+
+      const updatedRegulation = await storage.updateRegulation(regulationId, {
+        ...regulation,
+        notificationOverride: {
+          email: req.body.email || null,
+          phone: req.body.phone || null,
+        },
+      });
+
+      res.json(updatedRegulation);
+    } catch (error) {
+      console.error("Failed to update notification override:", error);
+      res.status(500).json({ message: "Failed to update notification override" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
