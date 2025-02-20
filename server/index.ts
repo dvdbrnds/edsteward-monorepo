@@ -62,6 +62,8 @@ app.use((req, res, next) => {
 });
 
 async function startServer() {
+  let server: ReturnType<typeof express.application.listen> | null = null;
+
   try {
     log("Starting server initialization...");
 
@@ -76,7 +78,7 @@ async function startServer() {
     }
 
     log("Registering routes...");
-    const server = registerRoutes(app);
+    server = registerRoutes(app);
     log("Routes registered successfully");
 
     // Error handling middleware
@@ -98,45 +100,59 @@ async function startServer() {
       log("Static serving setup complete");
     }
 
-    // Try ports in sequence until one works
-    const ports = [5000, 5001, 5002, 5003];
-    let port: number | null = null;
+    // Attempt to listen on port 5000
+    const PORT = 5000;
 
-    for (const testPort of ports) {
-      try {
-        await new Promise((resolve, reject) => {
-          server.listen(testPort, "0.0.0.0", () => {
-            port = testPort;
-            resolve(true);
-          }).on('error', (err: NodeJS.ErrnoException) => {
-            if (err.code === 'EADDRINUSE') {
-              log(`Port ${testPort} is in use, trying next port...`);
-              resolve(false);
-            } else {
-              reject(err);
-            }
-          });
-        });
-
-        if (port) break;
-      } catch (err) {
-        log(`Error trying port ${testPort}: ${err}`);
+    // First ensure the port is free
+    try {
+      const temp = express().listen(PORT);
+      temp.close();
+    } catch (err) {
+      const error = err as NodeJS.ErrnoException;
+      if (error.code === 'EADDRINUSE') {
+        log(`Port ${PORT} is in use, attempting to force close...`);
+        throw new Error(`Port ${PORT} is in use. Please ensure no other instances are running.`);
       }
+      throw err;
     }
 
-    if (!port) {
-      throw new Error("Could not find an available port");
-    }
-
-    log(`Server successfully started and listening on port ${port}`);
-    log("Application initialization complete");
+    // Now start the actual server
+    await new Promise<void>((resolve, reject) => {
+      server!.listen(PORT, "0.0.0.0", () => {
+        log(`Server successfully started and listening on port ${PORT}`);
+        log("Application initialization complete");
+        resolve();
+      }).on('error', (err: NodeJS.ErrnoException) => {
+        reject(err);
+      });
+    });
 
     return server;
   } catch (error) {
     log("Fatal error during server startup: " + (error instanceof Error ? error.message : String(error)));
-    process.exit(1);
+    if (server) {
+      server.close(() => {
+        log("Server closed due to startup error");
+        process.exit(1);
+      });
+    } else {
+      process.exit(1);
+    }
   }
 }
+
+// Graceful shutdown handler
+process.on('SIGTERM', () => {
+  log("Received SIGTERM signal, shutting down gracefully...");
+  if (server) server.close(() => process.exit(0));
+  else process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  log("Received SIGINT signal, shutting down gracefully...");
+  if (server) server.close(() => process.exit(0));
+  else process.exit(0);
+});
 
 // Start the server
 startServer().catch((error) => {
