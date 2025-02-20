@@ -26,23 +26,6 @@ import type { z } from "zod";
 
 type FormValues = z.infer<typeof insertUserSchema>;
 
-const SETUP_STEPS = [
-  {
-    id: "admin",
-    title: "Create Admin Account",
-    description: "Set up the initial administrator account for managing compliance",
-    icon: User,
-    required: true,
-  },
-  {
-    id: "officers",
-    title: "Assign Compliance Officers",
-    description: "Designate officers responsible for each regulation category. You can modify these assignments later in the admin settings.",
-    icon: UserPlus,
-    required: false,
-  },
-];
-
 const REGULATION_CATEGORIES = [
   "Academic Programs",
   "Financial Aid",
@@ -110,16 +93,29 @@ export default function SetupWizardPage() {
     },
   });
 
-  const progress = ((currentStep + 1) / SETUP_STEPS.length) * 100;
+  // Get the appropriate steps based on whether an admin exists
+  const setupSteps = [
+    ...(!hasAdmin ? [{
+      id: "admin",
+      title: "Create Admin Account",
+      description: "Set up the initial administrator account for managing compliance",
+      icon: User,
+      required: true,
+    }] : []),
+    {
+      id: "officers",
+      title: "Assign Compliance Officers",
+      description: "Designate officers responsible for each regulation category. You can modify these assignments later in the admin settings.",
+      icon: UserPlus,
+      required: false,
+    },
+  ];
+
+  const progress = ((currentStep + 1) / setupSteps.length) * 100;
   const officerProgress = ((officerStep + 1) / REGULATION_CATEGORIES.length) * 100;
 
   if (isComplete) {
     return <Redirect to="/admin/settings" />;
-  }
-
-  // Skip admin creation if admin already exists
-  if (!checkingAdmin && hasAdmin && currentStep === 0) {
-    setCurrentStep(1);
   }
 
   const handleOfficerSubmit = (data: { name: string; email: string }) => {
@@ -138,6 +134,14 @@ export default function SetupWizardPage() {
     }
   };
 
+  if (checkingAdmin) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-border" />
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
       <div className="max-w-2xl w-full px-4">
@@ -146,14 +150,15 @@ export default function SetupWizardPage() {
             Moravian Compliance Portal Setup
           </h1>
           <p className="text-gray-600">
-            Complete the following steps to set up your compliance portal. Only admin account creation is required, other steps can be configured later.
+            Complete the following steps to set up your compliance portal. 
+            {!hasAdmin ? "Admin account creation is required." : ""}
           </p>
         </div>
 
         <Progress value={progress} className="mb-8" />
 
         <div className="space-y-6">
-          {SETUP_STEPS.map((step, index) => {
+          {setupSteps.map((step, index) => {
             const Icon = step.icon;
             const isCurrent = index === currentStep;
             const isCompleted = index < currentStep;
@@ -173,13 +178,13 @@ export default function SetupWizardPage() {
                       }`}
                     />
                     {step.title}
-                    {step.required && !hasAdmin && (
+                    {step.required && (
                       <span className="text-sm text-red-500 ml-2">Required</span>
                     )}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  {isCurrent && step.id === "admin" && !hasAdmin && (
+                  {isCurrent && step.id === "admin" && (
                     <Form {...form}>
                       <form
                         onSubmit={form.handleSubmit((data) =>
