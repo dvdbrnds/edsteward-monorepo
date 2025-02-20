@@ -103,6 +103,10 @@ export default function Navigation() {
     { href: "/regulations", label: "Regulations", icon: Book },
     { href: "/notifications", label: "Notifications", icon: Bell },
     { href: "/reports", label: "Reports", icon: FileText },
+    // Add admin settings link only for admin users
+    ...(user?.role === "admin"
+      ? [{ href: "/admin/settings", label: "Admin Settings", icon: Settings }]
+      : []),
   ];
 
   return (

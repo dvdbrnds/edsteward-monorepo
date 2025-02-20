@@ -102,7 +102,36 @@ export const insertGuideSchema = createInsertSchema(guides)
     category: z.enum(["submission", "compliance", "general"]),
   });
 
-// Types
+// Email Configuration table
+export const emailConfigs = pgTable("email_configs", {
+  id: serial("id").primaryKey(),
+  fromEmail: text("from_email").notNull(),
+  smtpHost: text("smtp_host").notNull(),
+  smtpPort: integer("smtp_port").notNull(),
+  smtpSecure: boolean("smtp_secure").notNull().default(true),
+  smtpUser: text("smtp_user").notNull(),
+  smtpPass: text("smtp_pass").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  updatedBy: integer("updated_by").notNull(),
+});
+
+// Schema for inserting email config
+export const insertEmailConfigSchema = createInsertSchema(emailConfigs)
+  .extend({
+    fromEmail: z.string().email("Must be a valid email address"),
+    smtpHost: z.string().min(1, "SMTP host is required"),
+    smtpPort: z.number().int().min(1, "Port must be a positive number"),
+    smtpSecure: z.boolean(),
+    smtpUser: z.string().min(1, "SMTP username is required"),
+    smtpPass: z.string().min(1, "SMTP password is required"),
+  });
+
+// Export types
+export type EmailConfig = typeof emailConfigs.$inferSelect;
+export type InsertEmailConfig = z.infer<typeof insertEmailConfigSchema>;
+
+// Re-export existing types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type Regulation = typeof regulations.$inferSelect;
