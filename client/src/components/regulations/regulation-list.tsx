@@ -134,10 +134,10 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
   if (search.trim()) {
     const searchLower = search.toLowerCase();
     filteredRegulations = filteredRegulations.filter(reg =>
-      reg.topic.toLowerCase().includes(searchLower) ||
-      reg.itemId.toLowerCase().includes(searchLower) ||
-      reg.category.toLowerCase().includes(searchLower) ||
-      reg.statute.toLowerCase().includes(searchLower)
+      reg.topic?.toLowerCase().includes(searchLower) ||
+      reg.itemId?.toLowerCase().includes(searchLower) ||
+      reg.category?.toLowerCase().includes(searchLower) ||
+      reg.statute?.toLowerCase().includes(searchLower)
     );
   }
 
@@ -178,7 +178,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                   <TableCell className="font-medium">
                     {regulation.itemId}
                   </TableCell>
-                  <TableCell>{regulation.topic}</TableCell>
+                  <TableCell>{regulation.topic || 'N/A'}</TableCell>
                   <TableCell>
                     {regulation.agency_url ? (
                       <a
@@ -188,22 +188,22 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                         className="text-[#00267A] hover:text-[#003166] underline inline-flex items-center gap-2 group"
                         onClick={(e) => e.stopPropagation()}
                       >
-                        {getAgencyName(regulation.agency_url)}
+                        {regulation.agency_name || getAgencyName(regulation.agency_url)}
                         <ExternalLink className="h-3 w-3" />
                       </a>
                     ) : (
-                      getAgencyName(null)
+                      'N/A'
                     )}
                   </TableCell>
                   <TableCell>
-                    {regulation.statute}
+                    {regulation.statute || 'N/A'}
                     {regulation.statuteIds && (
                       <span className="text-gray-500 text-sm block">
                         {regulation.statuteIds}
                       </span>
                     )}
                   </TableCell>
-                  <TableCell>{regulation.category}</TableCell>
+                  <TableCell>{regulation.category || 'N/A'}</TableCell>
                   <TableCell>
                     {getDeadlineStatus(regulation.id) ? (
                       <div className="flex items-center gap-2">
