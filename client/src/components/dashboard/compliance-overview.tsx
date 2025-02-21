@@ -14,22 +14,28 @@ import { X } from "lucide-react";
 
 // Moravian University brand colors with expanded palette for categories
 const CATEGORY_COLORS = {
-  "Academic Programs": "#00267A",    // Moravian Blue - Primary
-  "Financial Aid": "#1E40AF",        // Royal Blue
-  "Student Services": "#078CF5",     // Accent Blue
-  "Athletics": "#E58200",           // Gold
-  "Campus Safety": "#BC204B",       // Red
-  "Research": "#006668",            // Deep Green
-  "Other": "#666666",               // Dark Grey
-  "Admissions": "#4B5563",          // Slate Gray
-  "Facilities": "#0E7490",          // Cyan
-  "Human Resources": "#9333EA",      // Purple
-  "Technology": "#0891B2",          // Teal
-  "International": "#D97706",       // Amber
-  "Library": "#15803D",             // Forest Green
-  "Legal": "#BE123C",              // Ruby
-  "Diversity": "#7E22CE"           // Deep Purple
+  "Academic Programs": "#b3c7f7",    // Light blue with black text
+  "Financial Aid": "#8babf1",        // Medium light blue with black text
+  "Student Services": "#0073e6",     // Bright blue with white text
+  "Athletics": "#0461cf",           // Medium blue with white text
+  "Campus Safety": "#054fb9",       // Dark blue with white text
+  "Research": "#b3c7f7",            // Light blue with black text
+  "Other": "#8babf1",               // Medium light blue with black text
+  "Admissions": "#0073e6",          // Bright blue with white text
+  "Facilities": "#0461cf",          // Medium blue with white text
+  "Human Resources": "#054fb9",      // Dark blue with white text
+  "Technology": "#b3c7f7",          // Light blue with black text
+  "International": "#8babf1",       // Medium light blue with black text
+  "Library": "#0073e6",             // Bright blue with white text
+  "Legal": "#0461cf",              // Medium blue with white text
+  "Diversity": "#054fb9"           // Dark blue with white text
 } as const;
+
+// Text color mapping based on background color
+const getTextColor = (categoryName: string) => {
+  const color = CATEGORY_COLORS[categoryName as keyof typeof CATEGORY_COLORS];
+  return ['#b3c7f7', '#8babf1'].includes(color) ? '#000000' : '#ffffff';
+};
 
 interface ComplianceOverviewProps {
   onCategorySelect: (category: string | null) => void;
@@ -60,7 +66,8 @@ export default function ComplianceOverview({ onCategorySelect, selectedCategory 
   const data = Object.entries(categories).map(([name, value]) => ({
     name,
     value,
-    color: CATEGORY_COLORS[name as keyof typeof CATEGORY_COLORS] || "#666666" // Default to grey if category not found
+    color: CATEGORY_COLORS[name as keyof typeof CATEGORY_COLORS] || "#8babf1",
+    textColor: getTextColor(name)
   }));
 
   return (
@@ -139,7 +146,12 @@ export default function ComplianceOverview({ onCategorySelect, selectedCategory 
                 className="w-3 h-3 rounded-sm"
                 style={{ backgroundColor: entry.color }}
               />
-              <span className="text-sm text-gray-700">{entry.name}</span>
+              <span 
+                className="text-sm"
+                style={{ color: entry.textColor }}
+              >
+                {entry.name}
+              </span>
             </button>
           ))}
         </div>
