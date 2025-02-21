@@ -19,7 +19,6 @@ export function registerRoutes(app: Express): Server {
     res.json(regulations);
   });
 
-  // Add new endpoint for fetching individual regulation
   app.get("/api/regulations/:id", async (req, res) => {
     try {
       const regulationId = parseInt(req.params.id);
@@ -45,7 +44,6 @@ export function registerRoutes(app: Express): Server {
     res.json(regulation);
   });
 
-  // Add new route for toggling regulation applicability
   app.patch("/api/regulations/:id/toggle-applicability", async (req, res) => {
     try {
       // Check if user is admin

@@ -9,6 +9,7 @@ import passport from "passport";
 import path from 'path';
 import fs from 'fs';
 import { sql } from 'drizzle-orm';
+import { Server } from 'http';
 
 // Initialize Express application with middleware
 const app = express();
@@ -63,167 +64,113 @@ app.use((req, res, next) => {
 });
 
 // Declare server variable at module scope for proper cleanup
-let server: ReturnType<typeof app.listen> | null = null;
+let server: Server | null = null;
 
-// Get available port with enhanced logging
-const getAvailablePort = async (preferredPort: number, fallbackPorts: number[]): Promise<number> => {
-  const tryPort = (port: number): Promise<number> => {
-    log(`Attempting to bind to port ${port}...`);
-    return new Promise((resolve, reject) => {
-      const testServer = app.listen(port, "0.0.0.0", () => {
-        log(`Successfully bound to port ${port}`);
-        testServer.close(() => {
-          log(`Released port ${port} for main server`);
-          resolve(port);
-        });
-      }).on('error', (err: NodeJS.ErrnoException) => {
-        if (err.code === 'EADDRINUSE') {
-          log(`Port ${port} is in use, will try next port`);
-          reject(new Error(`Port ${port} is in use`));
-        } else {
-          log(`Error binding to port ${port}: ${err.message}`);
-          reject(err);
-        }
-      });
-
-      // Add timeout to prevent hanging
-      setTimeout(() => {
-        testServer.close();
-        reject(new Error(`Timeout while trying to bind to port ${port}`));
-      }, 5000);
-    });
-  };
-
-  log(`Preferred port from environment: ${preferredPort}`);
-  try {
-    return await tryPort(preferredPort);
-  } catch (error) {
-    log(`Failed to bind to preferred port ${preferredPort}, trying fallback ports`);
-    for (const port of fallbackPorts) {
-      try {
-        return await tryPort(port);
-      } catch (error) {
-        continue;
-      }
-    }
-    throw new Error("No available ports found in range");
-  }
-};
-
-async function startServer() {
+async function startServer(): Promise<Server> {
   try {
     log("Starting server initialization...");
-    log(`Environment: ${process.env.NODE_ENV}`);
-    log(`Current working directory: ${process.cwd()}`);
 
-    // Test database connection
-    try {
-      log("Testing database connection...");
-      await db.execute(sql`SELECT 1`);
-      log("Database connection successful");
-    } catch (error) {
-      throw new Error(`Database connection failed: ${error instanceof Error ? error.message : String(error)}`);
+    // Test database connection with retries
+    let dbConnected = false;
+    const maxRetries = 3;
+    for (let i = 0; i < maxRetries; i++) {
+      try {
+        await db.execute(sql`SELECT 1`);
+        dbConnected = true;
+        log("Database connection successful");
+        break;
+      } catch (error) {
+        if (i === maxRetries - 1) {
+          throw new Error(`Database connection failed after ${maxRetries} attempts: ${error instanceof Error ? error.message : String(error)}`);
+        }
+        log(`Database connection attempt ${i + 1} failed, retrying...`);
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second before retry
+      }
     }
 
-    // Initialize server
-    server = app.listen();
+    if (!dbConnected) {
+      throw new Error("Unable to establish database connection");
+    }
 
-    // Register routes before setting up static/Vite middleware
+    // Register routes first
     log("Registering routes...");
-    registerRoutes(app);
+    const httpServer = registerRoutes(app);
     log("Routes registered successfully");
-
 
     // Setup Vite or static serving based on environment
     if (process.env.NODE_ENV !== "production") {
       log("Setting up Vite development server...");
-      await setupVite(app, server);
+      await setupVite(app, httpServer);
       log("Vite setup complete");
     } else {
       log("Setting up static file serving...");
-      const buildPath = path.join(process.cwd(), "client", "dist");
-      if (!fs.existsSync(buildPath)) {
-        log(`Warning: Build directory not found at ${buildPath}`);
-        log("Creating build directory...");
-        fs.mkdirSync(buildPath, { recursive: true });
-      }
-      app.use(express.static(buildPath));
+      serveStatic(app);
       log("Static serving setup complete");
     }
 
-    // Port configuration with timeout handling
-    const preferredPort = parseInt(process.env.PORT || "3001", 10);
-    const fallbackPorts = [3002, 3003, 3004, 3005];
+    // Force port 5000 without fallbacks
+    const PORT = 5000;
+    log(`Starting server on port ${PORT}...`);
 
-    try {
-      const port = await getAvailablePort(preferredPort, fallbackPorts);
-      if (!server) {
-        throw new Error("Server instance not initialized");
-      }
+    return new Promise((resolve, reject) => {
+      // Set timeout before starting server
+      const timeoutId = setTimeout(() => {
+        httpServer.close();
+        reject(new Error("Server startup timed out"));
+      }, 15000);
 
-      // Start the server with timeout
-      const serverStartPromise = new Promise<void>((resolve, reject) => {
-        if (!server) {
-          reject(new Error("Server instance not initialized"));
-          return;
-        }
-
-        const timeoutId = setTimeout(() => {
-          reject(new Error("Server startup timed out after 15 seconds"));
-        }, 15000);
-
-        server.listen(port, "0.0.0.0", () => {
+      // Start server
+      httpServer
+        .listen(PORT, "0.0.0.0")
+        .once('listening', () => {
           clearTimeout(timeoutId);
-          log(`Server successfully started and listening on port ${port}`);
-          log("Application initialization complete");
-          resolve();
-        }).on('error', (err) => {
+          log(`Server successfully started on port ${PORT}`);
+          resolve(httpServer);
+        })
+        .once('error', (err: NodeJS.ErrnoException) => {
           clearTimeout(timeoutId);
+          if (err.code === 'EADDRINUSE') {
+            log(`Error: Port ${PORT} is already in use. Please ensure no other process is using port ${PORT}`);
+            process.exit(1);
+          }
           reject(err);
         });
-      });
-
-      await serverStartPromise;
-      return server;
-    } catch (error) {
-      throw new Error(`Failed to start server: ${error instanceof Error ? error.message : String(error)}`);
-    }
+    });
   } catch (error) {
     log("Fatal error during server startup: " + (error instanceof Error ? error.message : String(error)));
-    if (server) {
-      server.close();
-    }
     throw error;
   }
 }
 
-// Graceful shutdown handlers
-process.on('SIGTERM', () => {
-  log("Received SIGTERM signal, shutting down gracefully...");
+// Graceful shutdown handler
+const cleanup = () => {
   if (server) {
     server.close(() => {
-      log("Server closed gracefully on SIGTERM");
+      log("Server closed gracefully");
       process.exit(0);
     });
   } else {
     process.exit(0);
   }
+};
+
+process.on('SIGTERM', () => {
+  log("Received SIGTERM signal, shutting down gracefully...");
+  cleanup();
 });
 
 process.on('SIGINT', () => {
   log("Received SIGINT signal, shutting down gracefully...");
-  if (server) {
-    server.close(() => {
-      log("Server closed gracefully on SIGINT");
-      process.exit(0);
-    });
-  } else {
-    process.exit(0);
-  }
+  cleanup();
 });
 
-// Start the server with error handling
-startServer().catch((error) => {
-  log("Unhandled error during server startup: " + (error instanceof Error ? error.message : String(error)));
-  process.exit(1);
-});
+// Start the server
+startServer()
+  .then((httpServer) => {
+    server = httpServer;
+    log("Server startup complete");
+  })
+  .catch((error) => {
+    log("Unhandled error during server startup: " + (error instanceof Error ? error.message : String(error)));
+    process.exit(1);
+  });
