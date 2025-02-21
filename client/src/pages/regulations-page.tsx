@@ -18,14 +18,14 @@ import RegulationList from "@/components/regulations/regulation-list";
 
 // Moravian University brand colors
 const COLORS = [
-  '#CCCCCC', // Moravian Grey
-  '#00267A', // Moravian Blue
+  '#00267A', // Moravian Blue - Primary
   '#001B56', // Dark Blue
-  '#666666', // Dark Grey
   '#078CF5', // Accent Blue
   '#E58200', // Gold
   '#BC204B', // Red
   '#006668', // Deep Green
+  '#666666', // Dark Grey
+  '#CCCCCC', // Moravian Grey
 ];
 
 const CategoryPieChart = ({
@@ -87,26 +87,42 @@ const CategoryPieChart = ({
             <Tooltip
               contentStyle={{
                 backgroundColor: 'white',
-                border: `1px solid ${COLORS[1]}`,
-                borderRadius: '4px',
-                padding: '8px'
+                border: '1px solid #e2e8f0',
+                borderRadius: '8px',
+                padding: '12px',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
               }}
-              itemStyle={{ color: COLORS[1] }}
+              itemStyle={{ color: '#1f2937' }}
             />
             <Legend
               verticalAlign="bottom"
-              height={36}
+              height={48}
               iconType="circle"
-              formatter={(value) => (
-                <span
-                  className={`text-[#666666] ml-2 cursor-pointer ${activeFilter === value ? 'font-bold' : ''}`}
+              iconSize={10}
+              formatter={(value, entry: any) => (
+                <div
+                  className={`
+                    inline-flex items-center gap-2 px-3 py-1.5 rounded-lg cursor-pointer
+                    transition-colors duration-200
+                    ${activeFilter === value ? 'bg-[#00267A] text-white' : 'hover:bg-gray-100'}
+                  `}
                   onClick={() => onSegmentClick(value as string)}
                 >
-                  {value}
-                </span>
+                  <span 
+                    className="h-3 w-3 rounded-full"
+                    style={{ backgroundColor: entry.color }}
+                  />
+                  <span className={`text-sm ${activeFilter === value ? 'font-medium' : ''}`}>
+                    {value}
+                  </span>
+                </div>
               )}
               wrapperStyle={{
-                paddingTop: '20px'
+                paddingTop: '24px',
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                gap: '12px'
               }}
             />
           </PieChart>
