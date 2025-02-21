@@ -97,8 +97,8 @@ const CategoryPieChart = ({
             <Legend
               verticalAlign="bottom"
               height={48}
-              iconType="circle"
-              iconSize={8}
+              iconType="square"
+              iconSize={16}
               formatter={(value, entry: any) => (
                 <div
                   className={`
