@@ -19,13 +19,6 @@ interface RegulationListProps {
   categoryFilter: string | null;
 }
 
-type StatusType = {
-  icon: JSX.Element;
-  label: string;
-  className: string;
-  date: string;
-};
-
 // Helper function to get agency name from URL
 const getAgencyName = (url: string | null): string => {
   if (!url) return "N/A";
@@ -78,62 +71,6 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
     }
   };
 
-  // Change the getDeadlineStatus function to better handle null checks
-  const getDeadlineStatus = (regulationId: number): StatusType | null => {
-    if (!deadlines || !deadlines.length) {
-      console.log("No deadlines available");
-      return null;
-    }
-
-    const regulationDeadlines = deadlines.filter(d => d.regulationId === regulationId);
-    if (!regulationDeadlines.length) {
-      console.log(`No deadlines found for regulation ${regulationId}`);
-      return null;
-    }
-
-    console.log(`Found ${regulationDeadlines.length} deadlines for regulation ${regulationId}`);
-
-    const nextDeadline = regulationDeadlines.sort((a, b) =>
-      new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
-    )[0];
-
-    const daysUntilDue = differenceInDays(new Date(nextDeadline.dueDate), new Date());
-
-    if (nextDeadline.status === "completed") {
-      return {
-        icon: <CheckCircle className="h-5 w-5 text-green-500" />,
-        label: "Completed",
-        className: "text-green-600",
-        date: format(new Date(nextDeadline.dueDate), "PP")
-      };
-    }
-
-    if (nextDeadline.status === "overdue" || daysUntilDue < 0) {
-      return {
-        icon: <AlertCircle className="h-5 w-5 text-red-500" />,
-        label: "Overdue",
-        className: "text-red-600",
-        date: format(new Date(nextDeadline.dueDate), "PP")
-      };
-    }
-
-    if (daysUntilDue <= 7) {
-      return {
-        icon: <Clock className="h-5 w-5 text-yellow-500" />,
-        label: "Due Soon",
-        className: "text-yellow-600",
-        date: `${format(new Date(nextDeadline.dueDate), "PP")} (${daysUntilDue} ${daysUntilDue === 1 ? 'day' : 'days'} remaining)`
-      };
-    }
-
-    return {
-      icon: <Clock className="h-5 w-5 text-blue-500" />,
-      label: "Upcoming",
-      className: "text-blue-600",
-      date: format(new Date(nextDeadline.dueDate), "PP")
-    };
-  };
-
   // Filter regulations based on category and search
   let filteredRegulations = regulations || [];
 
@@ -179,55 +116,79 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredRegulations.map((regulation) => (
-                <TableRow
-                  key={regulation.id}
-                  className="cursor-pointer hover:bg-gray-50"
-                  onClick={() => handleRowClick(regulation)}
-                >
-                  <TableCell className="font-medium">
-                    {regulation.itemId}
-                  </TableCell>
-                  <TableCell>{regulation.topic || 'N/A'}</TableCell>
-                  <TableCell>
-                    {regulation.agency_url ? (
-                      <a
-                        href={regulation.agency_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[#00267A] hover:text-[#003166] underline inline-flex items-center gap-2 group"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        {regulation.agency_name || getAgencyName(regulation.agency_url)}
-                        <ExternalLink className="h-3 w-3" />
-                      </a>
-                    ) : (
-                      'N/A'
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    {regulation.statute || 'N/A'}
-                    {regulation.statuteIds && (
-                      <span className="text-gray-500 text-sm block">
-                        {regulation.statuteIds}
-                      </span>
-                    )}
-                  </TableCell>
-                  <TableCell>{regulation.category || 'N/A'}</TableCell>
-                  <TableCell>
-                    {getDeadlineStatus(regulation.id) ? (
-                      <div className="flex items-center gap-2">
-                        {getDeadlineStatus(regulation.id)!.icon}
-                        <span className={getDeadlineStatus(regulation.id)!.className}>
-                          {getDeadlineStatus(regulation.id)!.label}: {getDeadlineStatus(regulation.id)!.date}
-                        </span>
+              {filteredRegulations.map((regulation) => {
+                const regulationDeadlines = deadlines?.filter(d => d.regulationId === regulation.id) || [];
+                const nextDeadline = regulationDeadlines.length > 0
+                  ? regulationDeadlines.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0]
+                  : null;
+
+                return (
+                  <TableRow
+                    key={regulation.id}
+                    className="cursor-pointer hover:bg-gray-50"
+                    onClick={() => handleRowClick(regulation)}
+                  >
+                    <TableCell>{regulation.itemId}</TableCell>
+                    <TableCell>
+                      <div className="text-base font-medium text-gray-900">
+                        {regulation.statute}
                       </div>
-                    ) : (
-                      "No deadlines"
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))}
+                      <div className="text-sm text-gray-500 mt-1">
+                        {regulation.topic}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {regulation.agency_url ? (
+                        <a
+                          href={regulation.agency_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#00267A] hover:text-[#003166] underline inline-flex items-center gap-2 group"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {regulation.agency_name || getAgencyName(regulation.agency_url)}
+                          <ExternalLink className="h-3 w-3" />
+                        </a>
+                      ) : (
+                        'N/A'
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {regulation.statute || 'N/A'}
+                      {regulation.statuteIds && (
+                        <span className="text-gray-500 text-sm block">
+                          {regulation.statuteIds}
+                        </span>
+                      )}
+                    </TableCell>
+                    <TableCell>{regulation.category || 'N/A'}</TableCell>
+                    <TableCell>
+                      {nextDeadline ? (
+                        <div className="flex items-center gap-2">
+                          {nextDeadline.status === "completed" ? (
+                            <CheckCircle className="h-4 w-4 text-green-500" />
+                          ) : nextDeadline.status === "overdue" ? (
+                            <AlertCircle className="h-4 w-4 text-red-500" />
+                          ) : (
+                            <Clock className="h-4 w-4 text-yellow-500" />
+                          )}
+                          <span className={
+                            nextDeadline.status === "completed"
+                              ? "text-green-600"
+                              : nextDeadline.status === "overdue"
+                              ? "text-red-600"
+                              : "text-yellow-600"
+                          }>
+                            {format(new Date(nextDeadline.dueDate), "PP")}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-gray-500">No deadlines</span>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
               {filteredRegulations.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center py-4">
