@@ -6,6 +6,9 @@ import { users } from "@shared/schema";
 import session from "express-session";
 import { storage } from "./storage";
 import passport from "passport";
+import path from 'path';
+import fs from 'fs';
+import { sql } from 'drizzle-orm';
 
 // Initialize Express application with middleware
 const app = express();
@@ -62,96 +65,135 @@ app.use((req, res, next) => {
 // Declare server variable at module scope for proper cleanup
 let server: ReturnType<typeof app.listen> | null = null;
 
+// Get available port with enhanced logging
+const getAvailablePort = async (preferredPort: number, fallbackPorts: number[]): Promise<number> => {
+  const tryPort = (port: number): Promise<number> => {
+    log(`Attempting to bind to port ${port}...`);
+    return new Promise((resolve, reject) => {
+      const testServer = app.listen(port, "0.0.0.0", () => {
+        log(`Successfully bound to port ${port}`);
+        testServer.close(() => {
+          log(`Released port ${port} for main server`);
+          resolve(port);
+        });
+      }).on('error', (err: NodeJS.ErrnoException) => {
+        if (err.code === 'EADDRINUSE') {
+          log(`Port ${port} is in use, will try next port`);
+          reject(new Error(`Port ${port} is in use`));
+        } else {
+          log(`Error binding to port ${port}: ${err.message}`);
+          reject(err);
+        }
+      });
+
+      // Add timeout to prevent hanging
+      setTimeout(() => {
+        testServer.close();
+        reject(new Error(`Timeout while trying to bind to port ${port}`));
+      }, 5000);
+    });
+  };
+
+  log(`Preferred port from environment: ${preferredPort}`);
+  try {
+    return await tryPort(preferredPort);
+  } catch (error) {
+    log(`Failed to bind to preferred port ${preferredPort}, trying fallback ports`);
+    for (const port of fallbackPorts) {
+      try {
+        return await tryPort(port);
+      } catch (error) {
+        continue;
+      }
+    }
+    throw new Error("No available ports found in range");
+  }
+};
+
 async function startServer() {
   try {
     log("Starting server initialization...");
+    log(`Environment: ${process.env.NODE_ENV}`);
+    log(`Current working directory: ${process.cwd()}`);
 
     // Test database connection
     try {
       log("Testing database connection...");
-      await db.select().from(users).limit(1);
+      await db.execute(sql`SELECT 1`);
       log("Database connection successful");
     } catch (error) {
-      log("Database connection failed: " + (error instanceof Error ? error.message : String(error)));
-      throw new Error("Database connection failed - please check DATABASE_URL");
+      throw new Error(`Database connection failed: ${error instanceof Error ? error.message : String(error)}`);
     }
 
-    // Register routes and create server instance
+    // Initialize server
+    server = app.listen();
+
+    // Register routes before setting up static/Vite middleware
     log("Registering routes...");
-    server = registerRoutes(app);
+    registerRoutes(app);
     log("Routes registered successfully");
 
-    // Error handling middleware
-    app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
-      const status = err.status || err.statusCode || 500;
-      const message = err.message || "Internal Server Error";
-      log(`Error: ${status} - ${message}`);
-      res.status(status).json({ message });
-    });
 
     // Setup Vite or static serving based on environment
-    if (app.get("env") === "development") {
+    if (process.env.NODE_ENV !== "production") {
       log("Setting up Vite development server...");
       await setupVite(app, server);
       log("Vite setup complete");
     } else {
       log("Setting up static file serving...");
-      serveStatic(app);
+      const buildPath = path.join(process.cwd(), "client", "dist");
+      if (!fs.existsSync(buildPath)) {
+        log(`Warning: Build directory not found at ${buildPath}`);
+        log("Creating build directory...");
+        fs.mkdirSync(buildPath, { recursive: true });
+      }
+      app.use(express.static(buildPath));
       log("Static serving setup complete");
     }
 
-    // Try different ports if the default port is in use
-    const ports = [3001, 3002, 3003, 3004, 3005];
-    let currentPortIndex = 0;
-    let started = false;
+    // Port configuration with timeout handling
+    const preferredPort = parseInt(process.env.PORT || "3001", 10);
+    const fallbackPorts = [3002, 3003, 3004, 3005];
 
-    while (!started && currentPortIndex < ports.length) {
-      const PORT = ports[currentPortIndex];
-      try {
-        await new Promise<void>((resolve, reject) => {
-          if (!server) {
-            reject(new Error("Server instance not initialized"));
-            return;
-          }
-
-          server.listen(PORT, "0.0.0.0", () => {
-            log(`Server successfully started and listening on port ${PORT}`);
-            log("Application initialization complete");
-            started = true;
-            resolve();
-          }).on('error', (err: NodeJS.ErrnoException) => {
-            if (err.code === 'EADDRINUSE') {
-              log(`Port ${PORT} is already in use, trying next port...`);
-              currentPortIndex++;
-              resolve(); // Continue to next port
-            } else {
-              reject(err);
-            }
-          });
-        });
-      } catch (error) {
-        log(`Failed to start server on port ${PORT}: ${error}`);
-        if (currentPortIndex === ports.length - 1) {
-          throw error; // If we've tried all ports, throw the error
-        }
+    try {
+      const port = await getAvailablePort(preferredPort, fallbackPorts);
+      if (!server) {
+        throw new Error("Server instance not initialized");
       }
-    }
 
-    if (!started) {
-      throw new Error("Failed to start server on any available port");
-    }
+      // Start the server with timeout
+      const serverStartPromise = new Promise<void>((resolve, reject) => {
+        if (!server) {
+          reject(new Error("Server instance not initialized"));
+          return;
+        }
 
-    return server;
+        const timeoutId = setTimeout(() => {
+          reject(new Error("Server startup timed out after 15 seconds"));
+        }, 15000);
+
+        server.listen(port, "0.0.0.0", () => {
+          clearTimeout(timeoutId);
+          log(`Server successfully started and listening on port ${port}`);
+          log("Application initialization complete");
+          resolve();
+        }).on('error', (err) => {
+          clearTimeout(timeoutId);
+          reject(err);
+        });
+      });
+
+      await serverStartPromise;
+      return server;
+    } catch (error) {
+      throw new Error(`Failed to start server: ${error instanceof Error ? error.message : String(error)}`);
+    }
   } catch (error) {
     log("Fatal error during server startup: " + (error instanceof Error ? error.message : String(error)));
     if (server) {
-      server.close(() => {
-        log("Server closed due to startup error");
-        process.exit(1);
-      });
-    } else {
-      process.exit(1);
+      server.close();
     }
+    throw error;
   }
 }
 
