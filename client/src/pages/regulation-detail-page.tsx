@@ -41,7 +41,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/auth";
-//import { apiRequest } from "@/lib/api"; // Removed as fetch is used directly
 import {
   Select,
   SelectContent,
@@ -298,7 +297,7 @@ export default function RegulationDetailPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-gray-700">
-                      {regulation?.summary || "No summary available."}
+                      {regulation?.summary?.replace(/<[^>]*>/g, '') || "No summary available."}
                     </div>
                   </CardContent>
                 </Card>
