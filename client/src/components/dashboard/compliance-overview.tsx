@@ -12,16 +12,23 @@ import {
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 
-// Moravian University brand colors arranged for category consistency
+// Moravian University brand colors with expanded palette for categories
 const CATEGORY_COLORS = {
-  "Academic Programs": "#00267A", // Moravian Blue - Primary
-  "Financial Aid": "#001B56",     // Dark Blue
-  "Student Services": "#078CF5",  // Accent Blue
-  "Athletics": "#E58200",         // Gold
-  "Campus Safety": "#BC204B",     // Red
-  "Research": "#006668",          // Deep Green
-  "Other": "#666666",             // Dark Grey
-  "Admissions": "#CCCCCC",        // Moravian Grey
+  "Academic Programs": "#00267A",    // Moravian Blue - Primary
+  "Financial Aid": "#1E40AF",        // Royal Blue
+  "Student Services": "#078CF5",     // Accent Blue
+  "Athletics": "#E58200",           // Gold
+  "Campus Safety": "#BC204B",       // Red
+  "Research": "#006668",            // Deep Green
+  "Other": "#666666",               // Dark Grey
+  "Admissions": "#4B5563",          // Slate Gray
+  "Facilities": "#0E7490",          // Cyan
+  "Human Resources": "#9333EA",      // Purple
+  "Technology": "#0891B2",          // Teal
+  "International": "#D97706",       // Amber
+  "Library": "#15803D",             // Forest Green
+  "Legal": "#BE123C",              // Ruby
+  "Diversity": "#7E22CE"           // Deep Purple
 } as const;
 
 interface ComplianceOverviewProps {

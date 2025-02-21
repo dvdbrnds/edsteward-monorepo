@@ -16,16 +16,23 @@ import type { Regulation, Deadline } from "@shared/schema";
 import { useLocation } from "wouter";
 import RegulationList from "@/components/regulations/regulation-list";
 
-// Shared category colors
+// Shared category colors with expanded palette
 const CATEGORY_COLORS = {
-  "Academic Programs": "#00267A", // Moravian Blue - Primary
-  "Financial Aid": "#001B56",     // Dark Blue
-  "Student Services": "#078CF5",  // Accent Blue
-  "Athletics": "#E58200",         // Gold
-  "Campus Safety": "#BC204B",     // Red
-  "Research": "#006668",          // Deep Green
-  "Other": "#666666",             // Dark Grey
-  "Admissions": "#CCCCCC",        // Moravian Grey
+  "Academic Programs": "#00267A",    // Moravian Blue - Primary
+  "Financial Aid": "#1E40AF",        // Royal Blue
+  "Student Services": "#078CF5",     // Accent Blue
+  "Athletics": "#E58200",           // Gold
+  "Campus Safety": "#BC204B",       // Red
+  "Research": "#006668",            // Deep Green
+  "Other": "#666666",               // Dark Grey
+  "Admissions": "#4B5563",          // Slate Gray
+  "Facilities": "#0E7490",          // Cyan
+  "Human Resources": "#9333EA",      // Purple
+  "Technology": "#0891B2",          // Teal
+  "International": "#D97706",       // Amber
+  "Library": "#15803D",             // Forest Green
+  "Legal": "#BE123C",              // Ruby
+  "Diversity": "#7E22CE"           // Deep Purple
 } as const;
 
 const CategoryPieChart = ({
@@ -102,8 +109,8 @@ const CategoryPieChart = ({
                 <button
                   onClick={() => onSegmentClick(value)}
                   className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md transition-all ${
-                    activeFilter === value 
-                      ? 'bg-gray-100 font-medium ring-2 ring-[#00267A] ring-opacity-50' 
+                    activeFilter === value
+                      ? 'bg-gray-100 font-medium ring-2 ring-[#00267A] ring-opacity-50'
                       : 'hover:bg-gray-50'
                   }`}
                 >
