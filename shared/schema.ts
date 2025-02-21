@@ -21,24 +21,37 @@ export const regulations = pgTable("regulations", {
   statuteIds: text("statute_ids"),
   summary: text("summary"),
   requirements: text("requirements"),
-  deadlines: text("deadlines"),
   category: text("category").notNull(),
+
+  // Enhanced temporal tracking
+  originationDate: timestamp("origination_date"),  // When the regulation was first enacted
+  effectiveDate: timestamp("effective_date"),      // When the regulation takes effect
   lastUpdated: timestamp("last_updated"),
   lastVerified: timestamp("last_verified"),
+  nextReviewDate: timestamp("next_review_date"),   // When the regulation needs to be reviewed next
 
-  // Enhanced agency information
+  // Deadline tracking
+  filingDeadlines: jsonb("filing_deadlines").$type<{
+    type: string,
+    date: string,
+    frequency: string,
+    description: string
+  }[]>(),
+  reportingFrequency: text("reporting_frequency"),
+
+  // Agency information
   agency_url: text("agency_url"),
   agency_name: text("agency_name"),
   agency_contact: text("agency_contact"),
   agency_department: text("agency_department"),
 
-  // Direct source links
+  // Source links
   regulationUrl: text("regulation_url"),
   requirementsUrl: text("requirements_url"),
   submissionGuideUrl: text("submission_guide_url"),
   formsUrl: text("forms_url"),
 
-  // Detailed content
+  // Content
   submissionGuidelines: text("submission_guidelines"),
   regulationText: text("regulation_text"),
   applicableforms: jsonb("applicable_forms").$type<string[]>(),
@@ -47,7 +60,6 @@ export const regulations = pgTable("regulations", {
   // Compliance tracking
   complianceNotes: text("compliance_notes"),
   verificationMethod: text("verification_method"),
-  reportingFrequency: text("reporting_frequency"),
 });
 
 // Comments table
@@ -102,6 +114,15 @@ export const insertUserSchema = createInsertSchema(users)
 export const insertRegulationSchema = createInsertSchema(regulations)
   .extend({
     name: z.string().min(1, "Regulation name is required"),
+    originationDate: z.date().optional().nullable(),
+    effectiveDate: z.date().optional().nullable(),
+    nextReviewDate: z.date().optional().nullable(),
+    filingDeadlines: z.array(z.object({
+      type: z.string(),
+      date: z.string(),
+      frequency: z.string(),
+      description: z.string()
+    })).optional().nullable(),
     regulationUrl: z.string().url().optional().nullable(),
     requirementsUrl: z.string().url().optional().nullable(),
     submissionGuideUrl: z.string().url().optional().nullable(),

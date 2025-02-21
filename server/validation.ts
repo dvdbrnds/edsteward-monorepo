@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { Regulation } from "@shared/schema";
-import { parse, isValid } from "date-fns";
+import { parse, isValid, isFuture, isPast } from "date-fns";
 
 // Enhanced URL validation
 const urlSchema = z.string().url().optional().or(z.literal(""));
@@ -57,42 +57,79 @@ export class RegulationValidator {
 
   private validateDates(regulation: Regulation): ValidationError[] {
     const errors: ValidationError[] = [];
-    
-    if (regulation.deadlines) {
-      const result = z.string().refine((val) => {
-        if (!val) return true; // Allow empty values
-        if (val.toLowerCase() === "not applicable") return true; // Allow "Not Applicable"
+
+    // Check origination date
+    if (!regulation.originationDate) {
+      errors.push({
+        regulationId: regulation.itemId,
+        field: 'originationDate',
+        error: 'Origination date is required',
+        value: null,
+        severity: 'error'
+      });
+    } else if (!isPast(new Date(regulation.originationDate))) {
+      errors.push({
+        regulationId: regulation.itemId,
+        field: 'originationDate',
+        error: 'Origination date must be in the past',
+        value: regulation.originationDate,
+        severity: 'error'
+      });
+    }
+
+    // Check effective date
+    if (regulation.effectiveDate) {
+      const effectiveDate = new Date(regulation.effectiveDate);
+      const originationDate = regulation.originationDate ? new Date(regulation.originationDate) : null;
+
+      if (originationDate && effectiveDate < originationDate) {
+        errors.push({
+          regulationId: regulation.itemId,
+          field: 'effectiveDate',
+          error: 'Effective date cannot be before origination date',
+          value: regulation.effectiveDate,
+          severity: 'error'
+        });
+      }
+    }
+
+    // Check next review date
+    if (regulation.nextReviewDate && !isFuture(new Date(regulation.nextReviewDate))) {
+      errors.push({
+        regulationId: regulation.itemId,
+        field: 'nextReviewDate',
+        error: 'Next review date must be in the future',
+        value: regulation.nextReviewDate,
+        severity: 'warning'
+      });
+    }
+
+    // Validate filing deadlines
+    if (regulation.filingDeadlines) {
+      regulation.filingDeadlines.forEach((deadline, index) => {
         try {
-          const date = parse(val, 'yyyy-MM-dd', new Date());
-          return isValid(date);
+          const deadlineDate = parse(deadline.date, 'yyyy-MM-dd', new Date());
+          if (!isValid(deadlineDate)) {
+            errors.push({
+              regulationId: regulation.itemId,
+              field: `filingDeadlines[${index}].date`,
+              error: 'Invalid deadline date format',
+              value: deadline.date,
+              severity: 'error'
+            });
+          }
         } catch {
-          return false;
+          errors.push({
+            regulationId: regulation.itemId,
+            field: `filingDeadlines[${index}].date`,
+            error: 'Invalid deadline date',
+            value: deadline.date,
+            severity: 'error'
+          });
         }
-      }, "Invalid date format. Expected yyyy-MM-dd or 'Not Applicable'").safeParse(regulation.deadlines);
-      if (!result.success) {
-        errors.push({
-          regulationId: regulation.itemId,
-          field: 'deadlines',
-          error: 'Invalid deadline date format',
-          value: regulation.deadlines,
-          severity: 'error'
-        });
-      }
+      });
     }
-    
-    if (regulation.lastUpdated) {
-      const date = new Date(regulation.lastUpdated);
-      if (isNaN(date.getTime())) {
-        errors.push({
-          regulationId: regulation.itemId,
-          field: 'lastUpdated',
-          error: 'Invalid lastUpdated date',
-          value: regulation.lastUpdated,
-          severity: 'error'
-        });
-      }
-    }
-    
+
     return errors;
   }
 
@@ -226,14 +263,12 @@ export class RegulationValidator {
       }
     }
 
-    const report: ValidationReport = {
+    return {
       totalRegulations: regulations.length,
       validRegulations: validCount,
       errors: allErrors.filter(e => e.severity === 'error'),
       warnings: allErrors.filter(e => e.severity === 'warning'),
       timestamp: new Date()
     };
-
-    return report;
   }
 }
