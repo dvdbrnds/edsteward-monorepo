@@ -202,15 +202,16 @@ export default function RegulationsPage() {
               </TableHeader>
               <TableBody>
                 {regulations.map((regulation) => (
-                  <TableRow key={regulation.id}>
+                  <TableRow
+                    key={regulation.id}
+                    className="cursor-pointer hover:bg-gray-50"
+                    onClick={() => navigate(`/regulations/${regulation.id}`)}
+                  >
                     <TableCell>{regulation.itemId}</TableCell>
                     <TableCell>
-                      <a
-                        href={`/regulations/${regulation.id}`}
-                        className="text-base font-medium text-blue-600 hover:text-blue-800 hover:underline"
-                      >
+                      <div className="text-base font-medium text-gray-900">
                         {regulation.statute}
-                      </a>
+                      </div>
                       <div className="text-sm text-gray-500 mt-1">
                         {regulation.topic}
                       </div>
@@ -223,6 +224,7 @@ export default function RegulationsPage() {
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-600 hover:text-blue-800 hover:underline"
+                          onClick={(e) => e.stopPropagation()}
                         >
                           {regulation.agency_name || 'View Agency'}
                         </a>

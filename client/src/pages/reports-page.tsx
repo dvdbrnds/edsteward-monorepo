@@ -17,6 +17,8 @@ import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from "recha
 import { useState, useRef } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import { useLocation } from "wouter";
+
 
 // Moravian University official brand colors
 const COLORS = [
@@ -169,6 +171,7 @@ const CustomPieChart = ({
 );
 
 export default function ReportsPage() {
+  const [location, setLocation] = useLocation();
   const [sortConfig, setSortConfig] = useState<SortConfig>(null);
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
@@ -427,49 +430,25 @@ export default function ReportsPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead
-                      className={getColumnStyle('itemId')}
-                      onClick={() => requestSort('itemId')}
-                    >
-                      ID
-                    </TableHead>
-                    <TableHead
-                      className={getColumnStyle('topic')}
-                      onClick={() => requestSort('topic')}
-                    >
-                      Topic
-                    </TableHead>
-                    <TableHead
-                      className={getColumnStyle('category')}
-                      onClick={() => requestSort('category')}
-                    >
-                      Category
-                    </TableHead>
-                    <TableHead
-                      className={getColumnStyle('agency_name')}
-                      onClick={() => requestSort('agency_name')}
-                    >
-                      Agency
-                    </TableHead>
-                    <TableHead
-                      className={getColumnStyle('lastUpdated')}
-                      onClick={() => requestSort('lastUpdated')}
-                    >
-                      Last Updated
-                    </TableHead>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Topic</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Agency</TableHead>
+                    <TableHead>Last Updated</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {sortedRegulations.map((regulation) => (
-                    <TableRow key={regulation.id}>
+                    <TableRow
+                      key={regulation.id}
+                      className="cursor-pointer hover:bg-gray-50"
+                      onClick={() => setLocation(`/regulations/${regulation.id}`)}
+                    >
                       <TableCell>{regulation.itemId}</TableCell>
                       <TableCell>
-                        <a
-                          href={`/regulations/${regulation.id}`}
-                          className="text-base font-medium text-blue-600 hover:text-blue-800 hover:underline"
-                        >
+                        <div className="text-base font-medium text-gray-900">
                           {regulation.statute}
-                        </a>
+                        </div>
                         <div className="text-sm text-gray-500 mt-1">
                           {regulation.topic}
                         </div>
@@ -482,6 +461,7 @@ export default function ReportsPage() {
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-blue-600 hover:text-blue-800 hover:underline"
+                            onClick={(e) => e.stopPropagation()}
                           >
                             {regulation.agency_name || 'View Agency'}
                           </a>
