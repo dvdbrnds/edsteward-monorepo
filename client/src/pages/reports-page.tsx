@@ -446,6 +446,12 @@ export default function ReportsPage() {
                       Category
                     </TableHead>
                     <TableHead
+                      className={getColumnStyle('agency_name')}
+                      onClick={() => requestSort('agency_name')}
+                    >
+                      Agency
+                    </TableHead>
+                    <TableHead
                       className={getColumnStyle('lastUpdated')}
                       onClick={() => requestSort('lastUpdated')}
                     >
@@ -459,6 +465,20 @@ export default function ReportsPage() {
                       <TableCell>{regulation.itemId}</TableCell>
                       <TableCell>{regulation.topic}</TableCell>
                       <TableCell>{regulation.category}</TableCell>
+                      <TableCell>
+                        {regulation.agency_url ? (
+                          <a 
+                            href={regulation.agency_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-blue-600 hover:text-blue-800 hover:underline"
+                          >
+                            {regulation.agency_name || 'View Agency'}
+                          </a>
+                        ) : (
+                          'N/A'
+                        )}
+                      </TableCell>
                       <TableCell>
                         {regulation.lastUpdated
                           ? format(new Date(regulation.lastUpdated), "PP")

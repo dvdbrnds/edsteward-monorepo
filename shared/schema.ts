@@ -24,6 +24,7 @@ export const regulations = pgTable("regulations", {
   category: text("category").notNull(),
   lastUpdated: timestamp("last_updated"),
   agency_url: text("agency_url"),
+  agency_name: text("agency_name"),
   regulationUrl: text("regulation_url"),
   requirementsUrl: text("requirements_url"),
 });

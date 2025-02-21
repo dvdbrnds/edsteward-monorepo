@@ -1,5 +1,4 @@
 import Navigation from "@/components/layout/navigation";
-import RegulationList from "@/components/regulations/regulation-list";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Plus, X, FileCheck } from "lucide-react";
@@ -15,6 +14,16 @@ import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from "recha
 import { useQuery } from "@tanstack/react-query";
 import type { Regulation } from "@shared/schema";
 import { useLocation } from "wouter";
+import { format } from 'date-fns';
+import {
+  Table,
+  TableHeader,
+  TableRow,
+  TableHead,
+  TableBody,
+  TableCell,
+} from "@/components/ui/table";
+
 
 // Moravian University brand colors
 const COLORS = [
@@ -28,12 +37,12 @@ const COLORS = [
   '#006668', // Deep Green
 ];
 
-const CategoryPieChart = ({ 
-  data, 
+const CategoryPieChart = ({
+  data,
   onSegmentClick,
   activeFilter,
-}: { 
-  data: any[], 
+}: {
+  data: any[],
   onSegmentClick: (name: string) => void,
   activeFilter: string | null,
 }) => (
@@ -98,7 +107,7 @@ const CategoryPieChart = ({
               height={36}
               iconType="circle"
               formatter={(value) => (
-                <span 
+                <span
                   className={`text-[#666666] ml-2 cursor-pointer ${activeFilter === value ? 'font-bold' : ''}`}
                   onClick={() => onSegmentClick(value as string)}
                 >
@@ -147,7 +156,7 @@ export default function RegulationsPage() {
             </h1>
 
             <div className="space-x-4">
-              <Button 
+              <Button
                 variant="outline"
                 onClick={() => navigate("/regulations/validate")}
               >
@@ -174,13 +183,53 @@ export default function RegulationsPage() {
             </div>
           </div>
 
-          <CategoryPieChart 
+          <CategoryPieChart
             data={categoryChartData}
             onSegmentClick={setCategoryFilter}
             activeFilter={categoryFilter}
           />
 
-          <RegulationList categoryFilter={categoryFilter} />
+          {regulations && (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>ID</TableHead>
+                  <TableHead>Topic</TableHead>
+                  <TableHead>Category</TableHead>
+                  <TableHead>Agency</TableHead>
+                  <TableHead>Last Updated</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {regulations.map((regulation) => (
+                  <TableRow key={regulation.id}>
+                    <TableCell>{regulation.itemId}</TableCell>
+                    <TableCell>{regulation.topic}</TableCell>
+                    <TableCell>{regulation.category}</TableCell>
+                    <TableCell>
+                      {regulation.agency_url ? (
+                        <a
+                          href={regulation.agency_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:text-blue-800 hover:underline"
+                        >
+                          {regulation.agency_name || 'View Agency'}
+                        </a>
+                      ) : (
+                        'N/A'
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {regulation.lastUpdated
+                        ? format(new Date(regulation.lastUpdated), "PP")
+                        : "N/A"}
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </div>
       </main>
     </div>
