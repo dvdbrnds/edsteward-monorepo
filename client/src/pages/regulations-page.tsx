@@ -98,7 +98,7 @@ const CategoryPieChart = ({
               verticalAlign="bottom"
               height={48}
               iconType="circle"
-              iconSize={10}
+              iconSize={8}
               formatter={(value, entry: any) => (
                 <div
                   className={`
@@ -108,10 +108,6 @@ const CategoryPieChart = ({
                   `}
                   onClick={() => onSegmentClick(value as string)}
                 >
-                  <span 
-                    className="h-3 w-3 rounded-full"
-                    style={{ backgroundColor: entry.color }}
-                  />
                   <span className={`text-sm ${activeFilter === value ? 'font-medium' : ''}`}>
                     {value}
                   </span>
