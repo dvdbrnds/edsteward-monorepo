@@ -192,10 +192,49 @@ function determineCategoryFromDivision(division: string): string {
   return divisionMap[division] || "Other";
 }
 
+const PA_AGENCY_MAP: Record<string, string> = {
+  "www.education.pa.gov": "Pennsylvania Department of Education",
+  "www.dhs.pa.gov": "Pennsylvania Department of Human Services",
+  "www.health.pa.gov": "Pennsylvania Department of Health",
+  "www.dos.pa.gov": "Pennsylvania Department of State",
+  "www.dli.pa.gov": "Pennsylvania Department of Labor & Industry"
+};
+
+// Update the existing getAgencyName function to include PA agencies
+const getAgencyName = (url: string | null): string => {
+  if (!url) return "N/A";
+
+  const urlMap: Record<string, string> = {
+    // Existing federal mappings
+    "www.ed.gov": "Department of Education",
+    "www.eeoc.gov": "Equal Employment Opportunity Commission",
+    "www.justice.gov": "Department of Justice",
+    "www.osha.gov": "Occupational Safety and Health Administration",
+    "www.dhs.gov": "Department of Homeland Security",
+    // Add Pennsylvania state agencies
+    ...PA_AGENCY_MAP
+  };
+
+  try {
+    const hostname = new URL(url).hostname;
+    return urlMap[hostname] || hostname;
+  } catch {
+    return "N/A";
+  }
+};
+
+// Update the category determination to include PA-specific categories
 function determineCategory(topic: string): string {
   if (!topic) return "Other";
 
   const topicLower = topic.toLowerCase();
+
+  // Add Pennsylvania-specific categories
+  if (topicLower.includes("pa code") || topicLower.includes("pennsylvania code")) return "State Regulations";
+  if (topicLower.includes("state board")) return "State Board Requirements";
+  if (topicLower.includes("pa department")) return "State Department Requirements";
+
+  // Existing categories
   if (topicLower.includes("academic")) return "Academic Programs";
   if (topicLower.includes("athletics")) return "Athletics";
   if (topicLower.includes("financial") || topicLower.includes("accounting")) return "Accounting";
@@ -293,7 +332,7 @@ async function importRegulations(filePath?: string) {
             record[COMPLIANCE_SURVEY_FIELDS.REQUIREMENTS],
             record[COMPLIANCE_SURVEY_FIELDS.SUBMISSION]
           ].filter(Boolean).join('\n\n'),
-          deadlines: null,
+          filingDeadlines: null,
           category: determineCategoryFromDivision(record['Please select your division of the institution.']),
           regulationUrl: record[COMPLIANCE_SURVEY_FIELDS.LAW_LINK] || null,
           requirementsUrl: record[COMPLIANCE_SURVEY_FIELDS.PROOF] || null,
@@ -310,11 +349,19 @@ async function importRegulations(filePath?: string) {
             record['Reporting Requirements'] ||
             [record['Regulation 1'], record['Regulation 2'], record['Regulation 3'],
             record['Regulation 4'], record['Regulation 5']].filter(Boolean).join('\n\n'),
-          deadlines: record['Deadlines'] || null,
+          filingDeadlines: record['Deadlines'] ?
+            record['Deadlines'].split(';').map(deadline => ({
+              type: 'submission',
+              date: deadline.trim(),
+              frequency: 'quarterly',
+              description: 'Regulatory filing deadline'
+            })) : null,
           category: determineCategory(record['Topic'] || ''),
           regulationUrl: record['Regulation URL'] || null,
           requirementsUrl: record['Requirements URL'] || null,
           lastUpdated: record['Last Updated'] ? new Date(record['Last Updated']) : new Date(),
+          originationDate: record['Last Updated'] ? new Date(record['Last Updated']) : new Date(),
+          submissionGuidelines: record['Reporting Requirements'] || '',
           agency_url: null
         };
 
