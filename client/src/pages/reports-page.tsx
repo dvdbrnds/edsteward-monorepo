@@ -175,7 +175,6 @@ export default function ReportsPage() {
   const [sortConfig, setSortConfig] = useState<SortConfig>(null);
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
@@ -186,44 +185,6 @@ export default function ReportsPage() {
     queryKey: ["/api/deadlines"],
   });
 
-  const importMutation = useMutation({
-    mutationFn: async (formData: FormData) => {
-      const response = await apiRequest("/api/regulations/import", {
-        method: "POST",
-        body: formData,
-      });
-      return response.json();
-    },
-    onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ["/api/regulations"] });
-      toast({
-        title: "Import Successful",
-        description: `Added ${data.newCount} regulations, updated ${data.updateCount}, and skipped ${data.skipCount} duplicates.`,
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Import Failed",
-        description: "Failed to import regulations. Please check your CSV file format.",
-        variant: "destructive",
-      });
-    },
-  });
-
-  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const formData = new FormData();
-    formData.append("file", file);
-
-    importMutation.mutate(formData);
-
-    // Reset the file input
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
-  };
 
   const sortData = (data: Regulation[]) => {
     if (!sortConfig || !data) return data;
@@ -361,31 +322,7 @@ export default function ReportsPage() {
                 Compliance Reports
               </h1>
             </div>
-            <div className="flex items-center gap-4">
-              <input
-                type="file"
-                accept=".csv"
-                onChange={handleFileUpload}
-                className="hidden"
-                ref={fileInputRef}
-                disabled={importMutation.isPending}
-              />
-              <Button
-                variant="outline"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={importMutation.isPending}
-              >
-                <Upload className="h-4 w-4 mr-2" />
-                {importMutation.isPending ? "Importing..." : "Import CSV"}
-              </Button>
-              <a
-                href="/templates/regulations-template.csv"
-                download
-                className="text-sm text-gray-500 hover:text-gray-700"
-              >
-                Download Template
-              </a>
-            </div>
+
           </div>
 
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 mb-8">
