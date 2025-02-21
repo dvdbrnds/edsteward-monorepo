@@ -100,7 +100,7 @@ async function startServer() {
       log("Static serving setup complete");
     }
 
-    let PORT = 5000;
+    let PORT = 3000;
     const MAX_PORT_ATTEMPTS = 10;
 
     // Try to find an available port
