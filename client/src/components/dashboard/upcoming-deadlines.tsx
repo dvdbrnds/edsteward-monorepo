@@ -3,7 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import type { Deadline, Regulation } from "@shared/schema";
 import { format, differenceInDays } from "date-fns";
 import { AlertCircle, CheckCircle, Clock, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { useState } from "react";
 
 interface UpcomingDeadlinesProps {
@@ -13,6 +13,7 @@ interface UpcomingDeadlinesProps {
 
 export default function UpcomingDeadlines({ categoryFilter, limit }: UpcomingDeadlinesProps) {
   const [expandedDeadlineId, setExpandedDeadlineId] = useState<number | null>(null);
+  const [, setLocation] = useLocation();
 
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"]
@@ -48,9 +49,6 @@ export default function UpcomingDeadlines({ categoryFilter, limit }: UpcomingDea
   const sortedDeadlines = filteredDeadlines
     .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
 
-  // Apply limit if specified
-  //const displayedDeadlines = limit ? sortedDeadlines.slice(0, limit) : sortedDeadlines;
-
   return (
     <Card>
       <CardHeader>
@@ -79,7 +77,11 @@ export default function UpcomingDeadlines({ categoryFilter, limit }: UpcomingDea
             return (
               <div key={deadline.id} className="space-y-2">
                 <div
-                  onClick={() => setExpandedDeadlineId(isExpanded ? null : deadline.id)}
+                  onClick={() => {
+                    if (regulation) {
+                      setLocation(`/regulations/${regulation.id}`);
+                    }
+                  }}
                   className="flex items-center justify-between p-4 bg-white border rounded-lg hover:border-[#00267A] hover:shadow-sm transition-all cursor-pointer"
                 >
                   <div className="flex items-center space-x-4">
@@ -126,11 +128,6 @@ export default function UpcomingDeadlines({ categoryFilter, limit }: UpcomingDea
                         ? "Due Soon"
                         : "Upcoming"}
                     </span>
-                    {isExpanded ? (
-                      <ChevronUp className="h-4 w-4 text-gray-500" />
-                    ) : (
-                      <ChevronDown className="h-4 w-4 text-gray-500" />
-                    )}
                   </div>
                 </div>
               </div>
