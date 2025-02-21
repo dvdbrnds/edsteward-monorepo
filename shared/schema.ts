@@ -9,6 +9,7 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   role: text("role").notNull().default("user"),
   department: text("department"),
+  email: text("email").notNull(),  // Adding email field
 });
 
 // Regulations table
@@ -108,6 +109,7 @@ export const insertUserSchema = createInsertSchema(users)
     password: z.string().min(6),
     role: z.enum(["admin", "compliance_officer", "user"]),
     department: z.string().optional(),
+    email: z.string().email(), //Adding email schema validation
   });
 
 // Schema for inserting regulations
