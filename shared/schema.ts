@@ -23,15 +23,13 @@ export const regulations = pgTable("regulations", {
   summary: text("summary"),
   requirements: text("requirements"),
   category: text("category").notNull(),
+  isApplicable: boolean("is_applicable").notNull().default(true),  // Add this field
 
-  // Enhanced temporal tracking
-  originationDate: timestamp("origination_date"),  // When the regulation was first enacted
-  effectiveDate: timestamp("effective_date"),      // When the regulation takes effect
+  originationDate: timestamp("origination_date"),
+  effectiveDate: timestamp("effective_date"),
   lastUpdated: timestamp("last_updated"),
   lastVerified: timestamp("last_verified"),
-  nextReviewDate: timestamp("next_review_date"),   // When the regulation needs to be reviewed next
-
-  // Deadline tracking
+  nextReviewDate: timestamp("next_review_date"),
   filingDeadlines: jsonb("filing_deadlines").$type<{
     type: string,
     date: string,
@@ -39,26 +37,18 @@ export const regulations = pgTable("regulations", {
     description: string
   }[]>(),
   reportingFrequency: text("reporting_frequency"),
-
-  // Agency information
   agency_url: text("agency_url"),
   agency_name: text("agency_name"),
   agency_contact: text("agency_contact"),
   agency_department: text("agency_department"),
-
-  // Source links
   regulationUrl: text("regulation_url"),
   requirementsUrl: text("requirements_url"),
   submissionGuideUrl: text("submission_guide_url"),
   formsUrl: text("forms_url"),
-
-  // Content
   submissionGuidelines: text("submission_guidelines"),
   regulationText: text("regulation_text"),
   applicableforms: jsonb("applicable_forms").$type<string[]>(),
   relatedRegulations: jsonb("related_regulations").$type<string[]>(),
-
-  // Compliance tracking
   complianceNotes: text("compliance_notes"),
   verificationMethod: text("verification_method"),
 });
@@ -132,6 +122,7 @@ export const insertRegulationSchema = createInsertSchema(regulations)
     applicableforms: z.array(z.string()).optional().nullable(),
     relatedRegulations: z.array(z.string()).optional().nullable(),
     lastVerified: z.date().optional().nullable(),
+    isApplicable: z.boolean().default(true),
   });
 
 // Schema for inserting comments

@@ -100,27 +100,46 @@ async function startServer() {
       log("Static serving setup complete");
     }
 
-    const PORT = 5000;
+    // Try different ports if the default port is in use
+    const ports = [3001, 3002, 3003, 3004, 3005];
+    let currentPortIndex = 0;
+    let started = false;
 
-    // Start server with proper error handling
-    await new Promise<void>((resolve, reject) => {
-      if (!server) {
-        reject(new Error("Server instance not initialized"));
-        return;
-      }
+    while (!started && currentPortIndex < ports.length) {
+      const PORT = ports[currentPortIndex];
+      try {
+        await new Promise<void>((resolve, reject) => {
+          if (!server) {
+            reject(new Error("Server instance not initialized"));
+            return;
+          }
 
-      server.listen(PORT, "0.0.0.0", () => {
-        log(`Server successfully started and listening on port ${PORT}`);
-        log("Application initialization complete");
-        resolve();
-      }).on('error', (err: NodeJS.ErrnoException) => {
-        if (err.code === 'EADDRINUSE') {
-          log(`Port ${PORT} is already in use. Attempting to kill existing process...`);
-          process.exit(1); // Exit with error code to trigger restart
+          server.listen(PORT, "0.0.0.0", () => {
+            log(`Server successfully started and listening on port ${PORT}`);
+            log("Application initialization complete");
+            started = true;
+            resolve();
+          }).on('error', (err: NodeJS.ErrnoException) => {
+            if (err.code === 'EADDRINUSE') {
+              log(`Port ${PORT} is already in use, trying next port...`);
+              currentPortIndex++;
+              resolve(); // Continue to next port
+            } else {
+              reject(err);
+            }
+          });
+        });
+      } catch (error) {
+        log(`Failed to start server on port ${PORT}: ${error}`);
+        if (currentPortIndex === ports.length - 1) {
+          throw error; // If we've tried all ports, throw the error
         }
-        reject(err);
-      });
-    });
+      }
+    }
+
+    if (!started) {
+      throw new Error("Failed to start server on any available port");
+    }
 
     return server;
   } catch (error) {

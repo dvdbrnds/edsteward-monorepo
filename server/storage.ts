@@ -38,6 +38,7 @@ export interface IStorage {
   getRegulation(id: number): Promise<Regulation | undefined>;  
   createRegulation(regulation: InsertRegulation): Promise<Regulation>;
   updateRegulation(id: number, regulation: Partial<InsertRegulation>): Promise<Regulation>;
+  setRegulationApplicability(id: number, isApplicable: boolean): Promise<Regulation>;
 
   // Comment methods
   getCommentsByRegulation(regulationId: number): Promise<Comment[]>;
@@ -126,6 +127,20 @@ export class DatabaseStorage implements IStorage {
       .update(regulations)
       .set({
         ...regulation,
+        lastUpdated: new Date()
+      })
+      .where(eq(regulations.id, id))
+      .returning();
+    console.log("Updated regulation:", updatedRegulation);
+    return updatedRegulation;
+  }
+
+  async setRegulationApplicability(id: number, isApplicable: boolean): Promise<Regulation> {
+    console.log(`Setting regulation ${id} applicability to: ${isApplicable}`);
+    const [updatedRegulation] = await db
+      .update(regulations)
+      .set({
+        isApplicable,
         lastUpdated: new Date()
       })
       .where(eq(regulations.id, id))
