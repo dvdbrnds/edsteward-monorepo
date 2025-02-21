@@ -10,11 +10,11 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from "recharts";
 import { useQuery } from "@tanstack/react-query";
 import type { Regulation, Deadline } from "@shared/schema";
 import { useLocation } from "wouter";
 import RegulationList from "@/components/regulations/regulation-list";
+import CustomPieChart from "@/components/common/custom-pie-chart";
 
 // Nine distinct colors from different parts of the color wheel
 const CATEGORY_COLORS = {
@@ -29,107 +29,6 @@ const CATEGORY_COLORS = {
   "Human Resources": "#FF6600",      // Orange
 } as const;
 
-const CategoryPieChart = ({
-  data,
-  onSegmentClick,
-  activeFilter,
-}: {
-  data: any[],
-  onSegmentClick: (name: string) => void,
-  activeFilter: string | null,
-}) => (
-  <Card className="mb-8">
-    <CardHeader>
-      <CardTitle className="flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          Filter Regulations by Category
-          {activeFilter && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="ml-2"
-              onClick={() => onSegmentClick("")}
-            >
-              <X className="h-4 w-4 mr-1" />
-              Clear Category Filter
-            </Button>
-          )}
-        </div>
-      </CardTitle>
-    </CardHeader>
-    <CardContent>
-      <div className="h-[300px] w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={data}
-              cx="50%"
-              cy="50%"
-              labelLine={false}
-              outerRadius={80}
-              dataKey="value"
-              startAngle={90}
-              endAngle={-270}
-              style={{ outline: 'none' }}
-              isAnimationActive={false}
-              onClick={(entry) => onSegmentClick(entry.name)}
-              className="cursor-pointer"
-            >
-              {data.map((entry) => (
-                <Cell
-                  key={`cell-${entry.name}`}
-                  fill={entry.color}
-                  stroke="white"
-                  strokeWidth={2}
-                  opacity={activeFilter && activeFilter !== entry.name ? 0.5 : 1}
-                />
-              ))}
-            </Pie>
-            <Tooltip
-              contentStyle={{
-                backgroundColor: 'white',
-                border: '1px solid #e2e8f0',
-                borderRadius: '8px',
-                padding: '12px',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
-              }}
-              itemStyle={{ color: '#1f2937' }}
-            />
-            <Legend
-              verticalAlign="bottom"
-              height={80}
-              iconSize={0}
-              formatter={(value) => (
-                <button
-                  onClick={() => onSegmentClick(value)}
-                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md transition-all ${
-                    activeFilter === value
-                      ? 'bg-gray-100 font-medium ring-2 ring-gray-300'
-                      : 'hover:bg-gray-50'
-                  }`}
-                >
-                  <span
-                    className="w-3 h-3 rounded-sm"
-                    style={{ backgroundColor: CATEGORY_COLORS[value as keyof typeof CATEGORY_COLORS] || "#9E9E9E" }}
-                  />
-                  <span className="text-sm text-gray-700">{value}</span>
-                </button>
-              )}
-              wrapperStyle={{
-                paddingTop: '20px',
-                paddingBottom: '10px',
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-                gap: '8px',
-                width: '100%'
-              }}
-            />
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
-    </CardContent>
-  </Card>
-);
 
 export default function RegulationsPage() {
   const [open, setOpen] = useState(false);
@@ -152,7 +51,6 @@ export default function RegulationsPage() {
   const categoryChartData = Object.entries(categorySummary).map(([name, value]) => ({
     name,
     value,
-    color: CATEGORY_COLORS[name as keyof typeof CATEGORY_COLORS] || "#9E9E9E"
   }));
 
   return (
@@ -194,8 +92,9 @@ export default function RegulationsPage() {
             </div>
           </div>
 
-          <CategoryPieChart
+          <CustomPieChart
             data={categoryChartData}
+            title="Regulations by Category"
             onSegmentClick={setCategoryFilter}
             activeFilter={categoryFilter}
           />

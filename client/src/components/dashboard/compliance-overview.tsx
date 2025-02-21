@@ -1,31 +1,9 @@
-
-const COLORS = ['#2563eb', '#16a34a', '#dc2626', '#ca8a04', '#9333ea', '#0891b2', '#be185d', '#ea580c'];
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import type { Regulation } from "@shared/schema";
-import {
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Tooltip,
-} from "recharts";
+import CustomPieChart from "@/components/common/custom-pie-chart";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
-
-// Nine distinct colors from different parts of the color wheel
-const CATEGORY_COLORS = {
-  "Academic Programs": "#FF0000",    // Red
-  "Financial Aid": "#0066FF",        // Blue
-  "Student Services": "#FFD700",     // Yellow
-  "Athletics": "#9400D3",           // Purple
-  "Campus Safety": "#00CC00",       // Green
-  "Research": "#90EE90",            // Lime
-  "Other": "#808080",               // Gray (for misc categories)
-  "Accounting": "#00CCCC",          // Cyan
-  "Human Resources": "#FF6600",      // Orange
-} as const;
 
 interface ComplianceOverviewProps {
   onCategorySelect: (category: string | null) => void;
@@ -56,7 +34,6 @@ export default function ComplianceOverview({ onCategorySelect, selectedCategory 
   const data = Object.entries(categories).map(([name, value]) => ({
     name,
     value,
-    color: CATEGORY_COLORS[name as keyof typeof CATEGORY_COLORS] || "#808080" // Default to gray if category not found
   }));
 
   return (
@@ -80,59 +57,27 @@ export default function ComplianceOverview({ onCategorySelect, selectedCategory 
         </CardTitle>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
-        <div className="h-[250px]">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart>
-              <Pie
-                data={data}
-                cx="50%"
-                cy="50%"
-                labelLine={false}
-                outerRadius={80}
-                fill="#8884d8"
-                dataKey="value"
-                startAngle={90}
-                endAngle={-270}
-                style={{ outline: 'none' }}
-                isAnimationActive={false}
-                onClick={(entry) => onCategorySelect(entry.name)}
-                className="cursor-pointer"
-              >
-                {data.map((entry, index) => (
-                  <Cell
-                    key={`cell-${entry.name}`}
-                    fill={COLORS[index % COLORS.length]}
-                    stroke="white"
-                    strokeWidth={2}
-                    opacity={selectedCategory && selectedCategory !== entry.name ? 0.5 : 1}
-                  />
-                ))}
-              </Pie>
-              <Tooltip 
-                contentStyle={{
-                  backgroundColor: 'white',
-                  border: '1px solid #e2e8f0',
-                  borderRadius: '4px',
-                  padding: '8px'
-                }}
-              />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
+        <CustomPieChart
+          data={data}
+          title="Compliance Overview by Category"
+          onSegmentClick={onCategorySelect}
+          activeFilter={selectedCategory}
+          allowExport={false}
+        />
         <div className="flex flex-wrap justify-center gap-3 pt-2">
           {data.map((entry) => (
             <button
               key={entry.name}
               onClick={() => onCategorySelect(entry.name)}
               className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md transition-all ${
-                selectedCategory === entry.name 
-                  ? 'bg-gray-100 font-medium ring-2 ring-gray-300' 
+                selectedCategory === entry.name
+                  ? 'bg-gray-100 font-medium ring-2 ring-gray-300'
                   : 'hover:bg-gray-50'
               }`}
             >
               <span
                 className="w-3 h-3 rounded-sm"
-                style={{ backgroundColor: COLORS[data.findIndex(d => d.name === entry.name) % COLORS.length] }}
+                style={{ backgroundColor:  "#808080" }} // Default color if no color available
               />
               <span className="text-sm text-gray-700">
                 {entry.name}
