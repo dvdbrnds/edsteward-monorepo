@@ -49,7 +49,7 @@ export default function UpcomingDeadlines({ categoryFilter, limit }: UpcomingDea
     .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
 
   // Apply limit if specified
-  const displayedDeadlines = limit ? sortedDeadlines.slice(0, limit) : sortedDeadlines;
+  //const displayedDeadlines = limit ? sortedDeadlines.slice(0, limit) : sortedDeadlines;
 
   return (
     <Card>
@@ -64,8 +64,8 @@ export default function UpcomingDeadlines({ categoryFilter, limit }: UpcomingDea
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          {displayedDeadlines.map((deadline) => {
+        <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+          {sortedDeadlines.map((deadline) => {
             const regulation = regulations.find(r => r.id === deadline.regulationId);
             const daysUntilDue = differenceInDays(new Date(deadline.dueDate), new Date());
             const isExpanded = expandedDeadlineId === deadline.id;
@@ -136,13 +136,9 @@ export default function UpcomingDeadlines({ categoryFilter, limit }: UpcomingDea
               </div>
             );
           })}
-          {sortedDeadlines.length === 0 ? (
+          {sortedDeadlines.length === 0 && (
             <div className="text-center text-gray-500">
               No deadlines {categoryFilter ? `for ${categoryFilter}` : ''} found
-            </div>
-          ) : limit && sortedDeadlines.length > limit && (
-            <div className="text-center text-sm text-gray-500">
-              + {sortedDeadlines.length - limit} more deadlines
             </div>
           )}
         </div>
