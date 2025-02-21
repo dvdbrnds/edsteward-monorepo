@@ -41,7 +41,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/auth";
-import { apiRequest } from "@/lib/api";
+//import { apiRequest } from "@/lib/api"; // Removed as fetch is used directly
 import {
   Select,
   SelectContent,
@@ -95,7 +95,14 @@ export default function RegulationDetailPage() {
 
   const { data: regulation, isLoading } = useQuery<RegulationWithOverride>({
     queryKey: ["/api/regulations", regulationId],
-    enabled: !!user, // Only fetch when user is authenticated
+    queryFn: async () => {
+      const response = await fetch(`/api/regulations/${regulationId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch regulation');
+      }
+      return response.json();
+    },
+    enabled: !!user && !!regulationId, // Only fetch when user is authenticated and we have an ID
   });
 
   const { toast } = useToast();
@@ -115,10 +122,15 @@ export default function RegulationDetailPage() {
 
   const overrideMutation = useMutation({
     mutationFn: async (data: NotificationOverride) => {
-      const response = await apiRequest(
-        "PATCH",
+      const response = await fetch(
         `/api/regulations/${regulation?.id}/notification-override`,
-        data
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
       );
       if (!response.ok) {
         throw new Error("Failed to update notification override");
@@ -143,10 +155,15 @@ export default function RegulationDetailPage() {
 
   const categoryMutation = useMutation({
     mutationFn: async (category: string) => {
-      const response = await apiRequest(
-        "PATCH",
+      const response = await fetch(
         `/api/regulations/${regulation?.id}/category`,
-        { category }
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ category }),
+        }
       );
       if (!response.ok) {
         throw new Error("Failed to update category");
@@ -641,3 +658,14 @@ type StatusType = {
   label: string;
   className: string;
 };
+
+function getDeadlineStatus(deadline: Deadline): StatusType {
+  const daysLeft = differenceInDays(new Date(deadline.dueDate), new Date());
+  if (daysLeft < 0) {
+    return { icon: <AlertCircle className="h-5 w-5 text-red-500" />, label: "Overdue", className: "bg-red-100 text-red-500" };
+  } else if (daysLeft <= 7) {
+    return { icon: <Clock className="h-5 w-5 text-yellow-500" />, label: "Approaching", className: "bg-yellow-100 text-yellow-500" };
+  } else {
+    return { icon: <CheckCircle className="h-5 w-5 text-green-500" />, label: "Upcoming", className: "bg-green-100 text-green-500" };
+  }
+}
