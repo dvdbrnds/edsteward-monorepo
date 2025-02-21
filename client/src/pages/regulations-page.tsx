@@ -204,7 +204,19 @@ export default function RegulationsPage() {
                 {regulations.map((regulation) => (
                   <TableRow key={regulation.id}>
                     <TableCell>{regulation.itemId}</TableCell>
-                    <TableCell>{regulation.topic}</TableCell>
+                    <TableCell>
+                      <a
+                        href={`/regulations/${regulation.id}`}
+                        className="text-lg font-medium text-blue-600 hover:text-blue-800 hover:underline"
+                      >
+                        {regulation.topic}
+                      </a>
+                      {regulation.statute && regulation.statute !== "N/A" && (
+                        <div className="text-sm text-gray-500 mt-1">
+                          {regulation.statute}
+                        </div>
+                      )}
+                    </TableCell>
                     <TableCell>{regulation.category}</TableCell>
                     <TableCell>
                       {regulation.agency_url ? (
