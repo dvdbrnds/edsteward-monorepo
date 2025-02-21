@@ -1,4 +1,3 @@
-import { CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import type { Regulation } from "@shared/schema";
 import CustomPieChart from "@/components/common/custom-pie-chart";
@@ -30,32 +29,12 @@ export default function ComplianceOverview({ onCategorySelect, selectedCategory 
   }));
 
   return (
-    <>
-      <CardHeader>
-        <CardTitle className="flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            Compliance Overview
-            {selectedCategory && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="ml-2"
-                onClick={() => onCategorySelect(null)}
-              >
-                <X className="h-4 w-4 mr-1" />
-                Clear Filter
-              </Button>
-            )}
-          </div>
-        </CardTitle>
-      </CardHeader>
-      <CustomPieChart
-        data={data}
-        title="Regulations by Category"
-        onSegmentClick={onCategorySelect}
-        activeFilter={selectedCategory}
-        allowExport={false}
-      />
-    </>
+    <CustomPieChart
+      data={data}
+      title="Compliance Overview"
+      onSegmentClick={onCategorySelect}
+      activeFilter={selectedCategory}
+      allowExport={false}
+    />
   );
 }
