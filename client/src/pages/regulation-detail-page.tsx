@@ -42,6 +42,13 @@ import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/auth";
 import { apiRequest } from "@/lib/api";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // Extend Regulation type to include notification override
 interface RegulationWithOverride extends Regulation {
@@ -62,6 +69,18 @@ const notificationOverrideSchema = z.object({
 });
 
 type NotificationOverride = z.infer<typeof notificationOverrideSchema>;
+
+const CATEGORIES = [
+  "Other",
+  "Campus Safety",
+  "Accounting",
+  "Human Resources",
+  "Student Life",
+  "Academic Programs",
+  "Admissions",
+  "Athletics",
+  "Financial Aid",
+];
 
 export default function RegulationDetailPage({ regulation }: RegulationDetailPageProps) {
   const [_, navigate] = useLocation();
@@ -97,6 +116,34 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
       toast({
         title: "Override Updated",
         description: "Notification settings have been updated for this regulation.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/regulations", regulation.id] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Update Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const categoryMutation = useMutation({
+    mutationFn: async (category: string) => {
+      const response = await apiRequest(
+        "PATCH",
+        `/api/regulations/${regulation.id}/category`,
+        { category }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to update category");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Category Updated",
+        description: "The regulation category has been updated successfully.",
       });
       queryClient.invalidateQueries({ queryKey: ["/api/regulations", regulation.id] });
     },
@@ -187,9 +234,27 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
                 <span className="px-2 py-1 bg-gray-100 rounded">
                   ID: {regulation.itemId}
                 </span>
-                <span className="px-2 py-1 bg-gray-100 rounded">
-                  {regulation.category}
-                </span>
+                {user?.role === "admin" ? (
+                  <Select
+                    defaultValue={regulation.category}
+                    onValueChange={(value) => categoryMutation.mutate(value)}
+                  >
+                    <SelectTrigger className="w-[180px] bg-gray-100">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CATEGORIES.map((category) => (
+                        <SelectItem key={category} value={category}>
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <span className="px-2 py-1 bg-gray-100 rounded">
+                    {regulation.category}
+                  </span>
+                )}
               </div>
             </div>
 
