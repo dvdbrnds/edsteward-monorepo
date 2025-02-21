@@ -20,10 +20,8 @@ const CATEGORY_COLORS = {
   "Campus Safety": "#00CC00",       // Green
   "Research": "#90EE90",            // Lime
   "Other": "#808080",               // Gray (for misc categories)
-  "Admissions": "#FF00FF",          // Magenta
   "Accounting": "#00CCCC",          // Cyan
   "Human Resources": "#FF6600",      // Orange
-  "Student Life": "#FFD700"         // Yellow
 } as const;
 
 interface ComplianceOverviewProps {
