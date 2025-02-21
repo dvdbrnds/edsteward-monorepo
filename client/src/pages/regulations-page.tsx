@@ -12,18 +12,9 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from "recharts";
 import { useQuery } from "@tanstack/react-query";
-import type { Regulation } from "@shared/schema";
+import type { Regulation, Deadline } from "@shared/schema";
 import { useLocation } from "wouter";
-import { format } from 'date-fns';
-import {
-  Table,
-  TableHeader,
-  TableRow,
-  TableHead,
-  TableBody,
-  TableCell,
-} from "@/components/ui/table";
-
+import RegulationList from "@/components/regulations/regulation-list";
 
 // Moravian University brand colors
 const COLORS = [
@@ -134,6 +125,10 @@ export default function RegulationsPage() {
     queryKey: ["/api/regulations"],
   });
 
+  const { data: deadlines } = useQuery<Deadline[]>({
+    queryKey: ["/api/deadlines"],
+  });
+
   const categorySummary = regulations?.reduce((acc, reg) => {
     acc[reg.category] = (acc[reg.category] || 0) + 1;
     return acc;
@@ -189,59 +184,7 @@ export default function RegulationsPage() {
             activeFilter={categoryFilter}
           />
 
-          {regulations && (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>ID</TableHead>
-                  <TableHead>Topic</TableHead>
-                  <TableHead>Category</TableHead>
-                  <TableHead>Agency</TableHead>
-                  <TableHead>Last Updated</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {regulations.map((regulation) => (
-                  <TableRow
-                    key={regulation.id}
-                    className="cursor-pointer hover:bg-gray-50"
-                    onClick={() => navigate(`/regulations/${regulation.id}`)}
-                  >
-                    <TableCell>{regulation.itemId}</TableCell>
-                    <TableCell>
-                      <div className="text-base font-medium text-gray-900">
-                        {regulation.statute}
-                      </div>
-                      <div className="text-sm text-gray-500 mt-1">
-                        {regulation.topic}
-                      </div>
-                    </TableCell>
-                    <TableCell>{regulation.category}</TableCell>
-                    <TableCell>
-                      {regulation.agency_url ? (
-                        <a
-                          href={regulation.agency_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 hover:text-blue-800 hover:underline"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          {regulation.agency_name || 'View Agency'}
-                        </a>
-                      ) : (
-                        'N/A'
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {regulation.lastUpdated
-                        ? format(new Date(regulation.lastUpdated), "PP")
-                        : "N/A"}
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          )}
+          <RegulationList regulations={regulations} deadlines={deadlines} categoryFilter={categoryFilter} />
         </div>
       </main>
     </div>
