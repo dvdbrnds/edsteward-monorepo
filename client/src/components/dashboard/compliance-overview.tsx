@@ -98,10 +98,10 @@ export default function ComplianceOverview({ onCategorySelect, selectedCategory 
                 onClick={(entry) => onCategorySelect(entry.name)}
                 className="cursor-pointer"
               >
-                {data.map((entry) => (
+                {data.map((entry, index) => (
                   <Cell
                     key={`cell-${entry.name}`}
-                    fill={entry.color}
+                    fill={COLORS[index % COLORS.length]}
                     stroke="white"
                     strokeWidth={2}
                     opacity={selectedCategory && selectedCategory !== entry.name ? 0.5 : 1}
