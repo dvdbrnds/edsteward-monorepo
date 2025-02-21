@@ -5,14 +5,15 @@ import { parse, isValid } from "date-fns";
 // Validation schemas for specific fields
 const urlSchema = z.string().url().optional().or(z.literal(""));
 const dateSchema = z.string().refine((val) => {
-  if (!val) return false;
+  if (!val) return true; // Allow empty values
+  if (val.toLowerCase() === "not applicable") return true; // Allow "Not Applicable"
   try {
     const date = parse(val, 'yyyy-MM-dd', new Date());
     return isValid(date);
   } catch {
     return false;
   }
-}, "Invalid date format. Expected yyyy-MM-dd");
+}, "Invalid date format. Expected yyyy-MM-dd or 'Not Applicable'");
 
 // Define the shape of a validation error
 interface ValidationError {
