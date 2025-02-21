@@ -97,7 +97,6 @@ const CategoryPieChart = ({
             <Legend
               verticalAlign="bottom"
               height={80}
-              iconType="circle"
               formatter={(value) => (
                 <button
                   onClick={() => onSegmentClick(value)}
