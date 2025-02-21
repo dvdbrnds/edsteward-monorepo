@@ -28,7 +28,9 @@ const CATEGORY_COLORS = {
   "International": "#3F51B5",       // Indigo
   "Library": "#009688",             // Teal
   "Legal": "#FF5722",              // Deep Orange
-  "Diversity": "#8BC34A"           // Light Green
+  "Diversity": "#8BC34A",           // Light Green
+  "Accounting": "#FB8C00",         // Dark Orange
+  "Student Life": "#7B1FA2"        // Deep Purple
 } as const;
 
 interface ComplianceOverviewProps {
