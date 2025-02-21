@@ -1,4 +1,4 @@
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import type { Regulation } from "@shared/schema";
 import CustomPieChart from "@/components/common/custom-pie-chart";
@@ -16,14 +16,7 @@ export default function ComplianceOverview({ onCategorySelect, selectedCategory 
   });
 
   if (isLoading || !regulations) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Compliance Overview</CardTitle>
-        </CardHeader>
-        <CardContent>Loading...</CardContent>
-      </Card>
-    );
+    return <div>Loading...</div>;
   }
 
   const categories = regulations.reduce((acc, reg) => {
@@ -37,7 +30,7 @@ export default function ComplianceOverview({ onCategorySelect, selectedCategory 
   }));
 
   return (
-    <Card>
+    <>
       <CardHeader>
         <CardTitle className="flex justify-between items-center">
           <div className="flex items-center gap-2">
@@ -63,6 +56,6 @@ export default function ComplianceOverview({ onCategorySelect, selectedCategory 
         activeFilter={selectedCategory}
         allowExport={false}
       />
-    </Card>
+    </>
   );
 }
