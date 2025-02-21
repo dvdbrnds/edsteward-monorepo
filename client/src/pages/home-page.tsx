@@ -36,6 +36,7 @@ export default function HomePage() {
                 />
                 <UpcomingDeadlines 
                   categoryFilter={selectedCategory}
+                  limit={3}
                 />
               </div>
             </div>
@@ -53,28 +54,35 @@ export default function HomePage() {
                   {notificationsLoading ? (
                     <p className="text-gray-500 text-center py-4">Loading notifications...</p>
                   ) : notifications && notifications.length > 0 ? (
-                    notifications.map((notification) => (
-                      <div 
-                        key={notification.id}
-                        className="flex items-center justify-between p-3 border rounded-lg"
-                      >
-                        <div className="flex items-center gap-3">
-                          {notification.enabled ? (
-                            <CheckCircle className="h-5 w-5 text-green-500" />
-                          ) : (
-                            <XCircle className="h-5 w-5 text-red-500" />
-                          )}
-                          <div>
-                            <p className="font-medium">
-                              {notification.type === 'email' ? 'Email' : 'SMS'} Notification
-                            </p>
-                            <p className="text-sm text-gray-500">
-                              Frequency: {notification.frequency}
-                            </p>
+                    <>
+                      {notifications.slice(0, 3).map((notification) => (
+                        <div 
+                          key={notification.id}
+                          className="flex items-center justify-between p-3 border rounded-lg"
+                        >
+                          <div className="flex items-center gap-3">
+                            {notification.enabled ? (
+                              <CheckCircle className="h-5 w-5 text-green-500" />
+                            ) : (
+                              <XCircle className="h-5 w-5 text-red-500" />
+                            )}
+                            <div>
+                              <p className="font-medium">
+                                {notification.type === 'email' ? 'Email' : 'SMS'} Notification
+                              </p>
+                              <p className="text-sm text-gray-500">
+                                Frequency: {notification.frequency}
+                              </p>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))
+                      ))}
+                      {notifications.length > 3 && (
+                        <p className="text-sm text-gray-500 text-center">
+                          + {notifications.length - 3} more notifications
+                        </p>
+                      )}
+                    </>
                   ) : (
                     <p className="text-gray-500 text-center py-4">
                       No recent notifications
