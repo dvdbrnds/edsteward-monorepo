@@ -16,17 +16,17 @@ import type { Regulation, Deadline } from "@shared/schema";
 import { useLocation } from "wouter";
 import RegulationList from "@/components/regulations/regulation-list";
 
-// Moravian University brand colors
-const COLORS = [
-  '#00267A', // Moravian Blue - Primary
-  '#001B56', // Dark Blue
-  '#078CF5', // Accent Blue
-  '#E58200', // Gold
-  '#BC204B', // Red
-  '#006668', // Deep Green
-  '#666666', // Dark Grey
-  '#CCCCCC', // Moravian Grey
-];
+// Shared category colors
+const CATEGORY_COLORS = {
+  "Academic Programs": "#00267A", // Moravian Blue - Primary
+  "Financial Aid": "#001B56",     // Dark Blue
+  "Student Services": "#078CF5",  // Accent Blue
+  "Athletics": "#E58200",         // Gold
+  "Campus Safety": "#BC204B",     // Red
+  "Research": "#006668",          // Deep Green
+  "Other": "#666666",             // Dark Grey
+  "Admissions": "#CCCCCC",        // Moravian Grey
+} as const;
 
 const CategoryPieChart = ({
   data,
@@ -41,7 +41,7 @@ const CategoryPieChart = ({
     <CardHeader>
       <CardTitle className="flex justify-between items-center">
         <div className="flex items-center gap-2">
-          Regulations by Category
+          Filter Regulations by Category
           {activeFilter && (
             <Button
               variant="outline"
@@ -50,7 +50,7 @@ const CategoryPieChart = ({
               onClick={() => onSegmentClick("")}
             >
               <X className="h-4 w-4 mr-1" />
-              Clear Filter
+              Clear Category Filter
             </Button>
           )}
         </div>
@@ -74,10 +74,10 @@ const CategoryPieChart = ({
               onClick={(entry) => onSegmentClick(entry.name)}
               className="cursor-pointer"
             >
-              {data.map((entry, index) => (
+              {data.map((entry) => (
                 <Cell
-                  key={`cell-${index}`}
-                  fill={COLORS[index % COLORS.length]}
+                  key={`cell-${entry.name}`}
+                  fill={entry.color}
                   stroke="white"
                   strokeWidth={2}
                   opacity={activeFilter && activeFilter !== entry.name ? 0.5 : 1}
@@ -87,7 +87,7 @@ const CategoryPieChart = ({
             <Tooltip
               contentStyle={{
                 backgroundColor: 'white',
-                border: '1px solid #e2e8f0',
+                border: '1px solid #00267A',
                 borderRadius: '8px',
                 padding: '12px',
                 boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
@@ -101,13 +101,15 @@ const CategoryPieChart = ({
               formatter={(value) => (
                 <button
                   onClick={() => onSegmentClick(value)}
-                  className={`inline-flex items-center gap-2 px-2 py-1 rounded-md hover:bg-gray-100 transition-colors ${
-                    activeFilter === value ? 'bg-gray-100 font-medium' : ''
+                  className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md transition-all ${
+                    activeFilter === value 
+                      ? 'bg-gray-100 font-medium ring-2 ring-[#00267A] ring-opacity-50' 
+                      : 'hover:bg-gray-50'
                   }`}
                 >
                   <span
                     className="w-3 h-3 rounded-sm"
-                    style={{ backgroundColor: COLORS[data.findIndex(d => d.name === value) % COLORS.length] }}
+                    style={{ backgroundColor: CATEGORY_COLORS[value as keyof typeof CATEGORY_COLORS] || "#666666" }}
                   />
                   <span className="text-sm text-gray-700">{value}</span>
                 </button>
@@ -149,6 +151,7 @@ export default function RegulationsPage() {
   const categoryChartData = Object.entries(categorySummary).map(([name, value]) => ({
     name,
     value,
+    color: CATEGORY_COLORS[name as keyof typeof CATEGORY_COLORS] || "#666666"
   }));
 
   return (

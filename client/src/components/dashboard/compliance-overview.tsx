@@ -12,17 +12,17 @@ import {
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 
-// Moravian University official brand colors in priority order
-const COLORS = [
-  '#CCCCCC', // Moravian Grey
-  '#00267A', // Moravian Blue
-  '#001B56', // Dark Blue
-  '#666666', // Dark Grey
-  '#078CF5', // Accent Blue
-  '#E58200', // Gold
-  '#BC204B', // Red
-  '#006668', // Deep Green
-];
+// Moravian University brand colors arranged for category consistency
+const CATEGORY_COLORS = {
+  "Academic Programs": "#00267A", // Moravian Blue - Primary
+  "Financial Aid": "#001B56",     // Dark Blue
+  "Student Services": "#078CF5",  // Accent Blue
+  "Athletics": "#E58200",         // Gold
+  "Campus Safety": "#BC204B",     // Red
+  "Research": "#006668",          // Deep Green
+  "Other": "#666666",             // Dark Grey
+  "Admissions": "#CCCCCC",        // Moravian Grey
+} as const;
 
 interface ComplianceOverviewProps {
   onCategorySelect: (category: string | null) => void;
@@ -53,6 +53,7 @@ export default function ComplianceOverview({ onCategorySelect, selectedCategory 
   const data = Object.entries(categories).map(([name, value]) => ({
     name,
     value,
+    color: CATEGORY_COLORS[name as keyof typeof CATEGORY_COLORS] || "#666666" // Default to grey if category not found
   }));
 
   return (
@@ -60,7 +61,7 @@ export default function ComplianceOverview({ onCategorySelect, selectedCategory 
       <CardHeader>
         <CardTitle className="flex justify-between items-center">
           <div className="flex items-center gap-2">
-            Compliance Overview
+            Compliance Overview by Category
             {selectedCategory && (
               <Button
                 variant="outline"
@@ -94,10 +95,10 @@ export default function ComplianceOverview({ onCategorySelect, selectedCategory 
                 onClick={(entry) => onCategorySelect(entry.name)}
                 className="cursor-pointer"
               >
-                {data.map((entry, index) => (
+                {data.map((entry) => (
                   <Cell
-                    key={`cell-${index}`}
-                    fill={COLORS[index % COLORS.length]}
+                    key={`cell-${entry.name}`}
+                    fill={entry.color}
                     stroke="white"
                     strokeWidth={2}
                     opacity={selectedCategory && selectedCategory !== entry.name ? 0.5 : 1}
@@ -107,27 +108,29 @@ export default function ComplianceOverview({ onCategorySelect, selectedCategory 
               <Tooltip 
                 contentStyle={{
                   backgroundColor: 'white',
-                  border: `1px solid ${COLORS[1]}`,
+                  border: '1px solid #00267A',
                   borderRadius: '4px',
                   padding: '8px'
                 }}
-                itemStyle={{ color: COLORS[1] }}
+                itemStyle={{ color: '#00267A' }}
               />
             </PieChart>
           </ResponsiveContainer>
         </div>
         <div className="flex flex-wrap justify-center gap-3 pt-2">
-          {data.map((entry, index) => (
+          {data.map((entry) => (
             <button
               key={entry.name}
               onClick={() => onCategorySelect(entry.name)}
-              className={`inline-flex items-center gap-2 px-2 py-1 rounded-md hover:bg-gray-100 transition-colors ${
-                selectedCategory === entry.name ? 'bg-gray-100 font-medium' : ''
+              className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md transition-all ${
+                selectedCategory === entry.name 
+                  ? 'bg-gray-100 font-medium ring-2 ring-[#00267A] ring-opacity-50' 
+                  : 'hover:bg-gray-50'
               }`}
             >
               <span
                 className="w-3 h-3 rounded-sm"
-                style={{ backgroundColor: COLORS[index % COLORS.length] }}
+                style={{ backgroundColor: entry.color }}
               />
               <span className="text-sm text-gray-700">{entry.name}</span>
             </button>
