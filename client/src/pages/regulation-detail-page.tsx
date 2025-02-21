@@ -82,9 +82,22 @@ const CATEGORIES = [
   "Financial Aid",
 ];
 
-export default function RegulationDetailPage({ regulation }: RegulationDetailPageProps) {
-  const [_, navigate] = useLocation();
+export default function RegulationDetailPage() {
+  const [location, navigate] = useLocation();
   const { user } = useAuth();
+  const regulationId = location.split("/")[2]; // Extract from /regulations/:id
+
+  // Redirect to login if not authenticated
+  if (!user) {
+    navigate("/auth");
+    return null;
+  }
+
+  const { data: regulation, isLoading } = useQuery<RegulationWithOverride>({
+    queryKey: ["/api/regulations", regulationId],
+    enabled: !!user, // Only fetch when user is authenticated
+  });
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -95,8 +108,8 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
   const overrideForm = useForm<NotificationOverride>({
     resolver: zodResolver(notificationOverrideSchema),
     defaultValues: {
-      email: regulation.notificationOverride?.email || "",
-      phone: regulation.notificationOverride?.phone || "",
+      email: regulation?.notificationOverride?.email || "",
+      phone: regulation?.notificationOverride?.phone || "",
     },
   });
 
@@ -104,7 +117,7 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
     mutationFn: async (data: NotificationOverride) => {
       const response = await apiRequest(
         "PATCH",
-        `/api/regulations/${regulation.id}/notification-override`,
+        `/api/regulations/${regulation?.id}/notification-override`,
         data
       );
       if (!response.ok) {
@@ -117,7 +130,7 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
         title: "Override Updated",
         description: "Notification settings have been updated for this regulation.",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/regulations", regulation.id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/regulations", regulation?.id] });
     },
     onError: (error) => {
       toast({
@@ -132,7 +145,7 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
     mutationFn: async (category: string) => {
       const response = await apiRequest(
         "PATCH",
-        `/api/regulations/${regulation.id}/category`,
+        `/api/regulations/${regulation?.id}/category`,
         { category }
       );
       if (!response.ok) {
@@ -145,7 +158,7 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
         title: "Category Updated",
         description: "The regulation category has been updated successfully.",
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/regulations", regulation.id] });
+      queryClient.invalidateQueries({ queryKey: ["/api/regulations", regulation?.id] });
     },
     onError: (error) => {
       toast({
@@ -156,7 +169,7 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
     },
   });
 
-  if (deadlinesLoading) {
+  if (isLoading || deadlinesLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Navigation />
@@ -164,7 +177,7 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-center space-x-4">
               <Loader2 className="h-6 w-6 animate-spin text-[#00267A]" />
-              <span>Loading deadlines...</span>
+              <span>Loading...</span>
             </div>
           </div>
         </main>
@@ -172,7 +185,7 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
     );
   }
 
-  const regulationDeadlines = deadlines?.filter(d => d.regulationId === regulation.id) || [];
+  const regulationDeadlines = deadlines?.filter(d => d.regulationId === regulation?.id) || [];
   const nextDeadline = regulationDeadlines.length > 0
     ? regulationDeadlines.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0]
     : null;
@@ -228,15 +241,15 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
                 Back to Regulations
               </Button>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                {regulation.topic}
+                {regulation?.topic}
               </h1>
               <div className="flex items-center space-x-2 text-sm text-gray-500">
                 <span className="px-2 py-1 bg-gray-100 rounded">
-                  ID: {regulation.itemId}
+                  ID: {regulation?.itemId}
                 </span>
                 {user?.role === "admin" ? (
                   <Select
-                    defaultValue={regulation.category}
+                    defaultValue={regulation?.category}
                     onValueChange={(value) => categoryMutation.mutate(value)}
                   >
                     <SelectTrigger className="w-[180px] bg-gray-100">
@@ -252,7 +265,7 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
                   </Select>
                 ) : (
                   <span className="px-2 py-1 bg-gray-100 rounded">
-                    {regulation.category}
+                    {regulation?.category}
                   </span>
                 )}
               </div>
@@ -260,7 +273,7 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
 
             {/* Quick Actions */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {regulation.regulationUrl && (
+              {regulation?.regulationUrl && (
                 <Button
                   variant="outline"
                   className="flex items-center justify-center gap-2"
@@ -282,7 +295,7 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
                 variant="outline"
                 className="flex items-center justify-center gap-2"
                 onClick={() => {
-                  const subject = encodeURIComponent(`Regulation ${regulation.itemId} - ${regulation.topic}`);
+                  const subject = encodeURIComponent(`Regulation ${regulation?.itemId} - ${regulation?.topic}`);
                   window.location.href = `mailto:compliance@moravian.edu?subject=${subject}`;
                 }}
               >
@@ -303,7 +316,7 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
                     <div
                       className="text-gray-700"
                       dangerouslySetInnerHTML={{
-                        __html: regulation.summary?.replace(/<li style="[^"]*">/g, '<li>') || "No summary available."
+                        __html: regulation?.summary?.replace(/<li style="[^"]*">/g, '<li>') || "No summary available."
                       }}
                     />
                   </CardContent>
@@ -316,7 +329,7 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
                   <CardContent>
                     <div className="prose max-w-none">
                       <div className="space-y-4">
-                        {regulation.requirements ? (
+                        {regulation?.requirements ? (
                           <>
                             <p className="text-gray-700">{regulation.requirements}</p>
                             {regulation.requirementsUrl && (
@@ -358,8 +371,8 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
                   </CardHeader>
                   <CardContent>
                     <p className="text-gray-700">
-                      {regulation.statute}
-                      {regulation.statuteIds && (
+                      {regulation?.statute}
+                      {regulation?.statuteIds && (
                         <span className="block text-sm text-gray-500 mt-1">
                           Reference: {regulation.statuteIds}
                         </span>
@@ -418,7 +431,7 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
                         <div className="flex flex-col gap-3">
                           <Button
                             className="w-full"
-                            onClick={() => navigate(`/compliance-wizard/${regulation.id}`)}
+                            onClick={() => navigate(`/compliance-wizard/${regulation?.id}`)}
                           >
                             Submit Compliance Report
                           </Button>
