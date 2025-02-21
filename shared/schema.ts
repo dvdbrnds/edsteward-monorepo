@@ -15,7 +15,7 @@ export const users = pgTable("users", {
 export const regulations = pgTable("regulations", {
   id: serial("id").primaryKey(),
   itemId: text("item_id").notNull(),
-  name: text("name").notNull(),  // Adding name field for statute name
+  name: text("name").notNull(),
   topic: text("topic").notNull(),
   statute: text("statute").notNull(),
   statuteIds: text("statute_ids"),
@@ -24,10 +24,30 @@ export const regulations = pgTable("regulations", {
   deadlines: text("deadlines"),
   category: text("category").notNull(),
   lastUpdated: timestamp("last_updated"),
+  lastVerified: timestamp("last_verified"),
+
+  // Enhanced agency information
   agency_url: text("agency_url"),
   agency_name: text("agency_name"),
+  agency_contact: text("agency_contact"),
+  agency_department: text("agency_department"),
+
+  // Direct source links
   regulationUrl: text("regulation_url"),
   requirementsUrl: text("requirements_url"),
+  submissionGuideUrl: text("submission_guide_url"),
+  formsUrl: text("forms_url"),
+
+  // Detailed content
+  submissionGuidelines: text("submission_guidelines"),
+  regulationText: text("regulation_text"),
+  applicableforms: jsonb("applicable_forms").$type<string[]>(),
+  relatedRegulations: jsonb("related_regulations").$type<string[]>(),
+
+  // Compliance tracking
+  complianceNotes: text("compliance_notes"),
+  verificationMethod: text("verification_method"),
+  reportingFrequency: text("reporting_frequency"),
 });
 
 // Comments table
@@ -84,6 +104,11 @@ export const insertRegulationSchema = createInsertSchema(regulations)
     name: z.string().min(1, "Regulation name is required"),
     regulationUrl: z.string().url().optional().nullable(),
     requirementsUrl: z.string().url().optional().nullable(),
+    submissionGuideUrl: z.string().url().optional().nullable(),
+    formsUrl: z.string().url().optional().nullable(),
+    applicableforms: z.array(z.string()).optional().nullable(),
+    relatedRegulations: z.array(z.string()).optional().nullable(),
+    lastVerified: z.date().optional().nullable(),
   });
 
 // Schema for inserting comments

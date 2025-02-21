@@ -2,18 +2,8 @@ import { z } from "zod";
 import type { Regulation } from "@shared/schema";
 import { parse, isValid } from "date-fns";
 
-// Validation schemas for specific fields
+// Enhanced URL validation
 const urlSchema = z.string().url().optional().or(z.literal(""));
-const dateSchema = z.string().refine((val) => {
-  if (!val) return true; // Allow empty values
-  if (val.toLowerCase() === "not applicable") return true; // Allow "Not Applicable"
-  try {
-    const date = parse(val, 'yyyy-MM-dd', new Date());
-    return isValid(date);
-  } catch {
-    return false;
-  }
-}, "Invalid date format. Expected yyyy-MM-dd or 'Not Applicable'");
 
 // Define the shape of a validation error
 interface ValidationError {
@@ -33,23 +23,35 @@ interface ValidationReport {
   timestamp: Date;
 }
 
+// Enhanced validation class
 export class RegulationValidator {
   private validateUrls(regulation: Regulation): ValidationError[] {
     const errors: ValidationError[] = [];
-    
-    if (regulation.agency_url) {
-      const result = urlSchema.safeParse(regulation.agency_url);
-      if (!result.success) {
-        errors.push({
-          regulationId: regulation.itemId,
-          field: 'agency_url',
-          error: 'Invalid URL format',
-          value: regulation.agency_url,
-          severity: 'warning'
-        });
+
+    // Array of URL fields to validate
+    const urlFields = [
+      { field: 'agency_url', value: regulation.agency_url },
+      { field: 'regulationUrl', value: regulation.regulationUrl },
+      { field: 'requirementsUrl', value: regulation.requirementsUrl },
+      { field: 'submissionGuideUrl', value: regulation.submissionGuideUrl },
+      { field: 'formsUrl', value: regulation.formsUrl }
+    ];
+
+    urlFields.forEach(({ field, value }) => {
+      if (value) {
+        const result = urlSchema.safeParse(value);
+        if (!result.success) {
+          errors.push({
+            regulationId: regulation.itemId,
+            field,
+            error: 'Invalid URL format',
+            value,
+            severity: 'warning'
+          });
+        }
       }
-    }
-    
+    });
+
     return errors;
   }
 
@@ -57,7 +59,16 @@ export class RegulationValidator {
     const errors: ValidationError[] = [];
     
     if (regulation.deadlines) {
-      const result = dateSchema.safeParse(regulation.deadlines);
+      const result = z.string().refine((val) => {
+        if (!val) return true; // Allow empty values
+        if (val.toLowerCase() === "not applicable") return true; // Allow "Not Applicable"
+        try {
+          const date = parse(val, 'yyyy-MM-dd', new Date());
+          return isValid(date);
+        } catch {
+          return false;
+        }
+      }, "Invalid date format. Expected yyyy-MM-dd or 'Not Applicable'").safeParse(regulation.deadlines);
       if (!result.success) {
         errors.push({
           regulationId: regulation.itemId,
@@ -82,6 +93,56 @@ export class RegulationValidator {
       }
     }
     
+    return errors;
+  }
+
+  private validateSourceVerification(regulation: Regulation): ValidationError[] {
+    const errors: ValidationError[] = [];
+
+    // Check if source verification is recent (within last 6 months)
+    if (regulation.lastVerified) {
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+
+      const verificationDate = new Date(regulation.lastVerified);
+      if (verificationDate < sixMonthsAgo) {
+        errors.push({
+          regulationId: regulation.itemId,
+          field: 'lastVerified',
+          error: 'Source verification is older than 6 months',
+          value: regulation.lastVerified,
+          severity: 'warning'
+        });
+      }
+    }
+
+    return errors;
+  }
+
+  private validateRequiredContent(regulation: Regulation): ValidationError[] {
+    const errors: ValidationError[] = [];
+
+    // Check for missing critical content
+    if (!regulation.regulationText && !regulation.regulationUrl) {
+      errors.push({
+        regulationId: regulation.itemId,
+        field: 'regulationText',
+        error: 'Either regulation text or URL must be provided',
+        value: null,
+        severity: 'error'
+      });
+    }
+
+    if (!regulation.submissionGuidelines && !regulation.submissionGuideUrl) {
+      errors.push({
+        regulationId: regulation.itemId,
+        field: 'submissionGuidelines',
+        error: 'Either submission guidelines or URL must be provided',
+        value: null,
+        severity: 'warning'
+      });
+    }
+
     return errors;
   }
 
@@ -146,7 +207,9 @@ export class RegulationValidator {
     return [
       ...this.validateUrls(regulation),
       ...this.validateDates(regulation),
-      ...this.validateRequiredFields(regulation)
+      ...this.validateRequiredFields(regulation),
+      ...this.validateSourceVerification(regulation),
+      ...this.validateRequiredContent(regulation)
     ];
   }
 
