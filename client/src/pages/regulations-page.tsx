@@ -96,29 +96,29 @@ const CategoryPieChart = ({
             />
             <Legend
               verticalAlign="bottom"
-              height={48}
-              iconType="square"
-              iconSize={16}
-              formatter={(value, entry: any) => (
-                <div
-                  className={`
-                    inline-flex items-center gap-2 px-3 py-1.5 rounded-lg cursor-pointer
-                    transition-colors duration-200
-                    ${activeFilter === value ? 'bg-[#00267A] text-white' : 'hover:bg-gray-100'}
-                  `}
-                  onClick={() => onSegmentClick(value as string)}
+              height={80}
+              iconType="circle"
+              formatter={(value) => (
+                <button
+                  onClick={() => onSegmentClick(value)}
+                  className={`inline-flex items-center gap-2 px-2 py-1 rounded-md hover:bg-gray-100 transition-colors ${
+                    activeFilter === value ? 'bg-gray-100 font-medium' : ''
+                  }`}
                 >
-                  <span className={`text-sm ${activeFilter === value ? 'font-medium' : ''}`}>
-                    {value}
-                  </span>
-                </div>
+                  <span
+                    className="w-3 h-3 rounded-sm"
+                    style={{ backgroundColor: COLORS[data.findIndex(d => d.name === value) % COLORS.length] }}
+                  />
+                  <span className="text-sm text-gray-700">{value}</span>
+                </button>
               )}
               wrapperStyle={{
-                paddingTop: '24px',
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'center',
-                gap: '12px'
+                paddingTop: '20px',
+                paddingBottom: '10px',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+                gap: '8px',
+                width: '100%'
               }}
             />
           </PieChart>
