@@ -15,6 +15,7 @@ export const users = pgTable("users", {
 export const regulations = pgTable("regulations", {
   id: serial("id").primaryKey(),
   itemId: text("item_id").notNull(),
+  name: text("name").notNull(),  // Adding name field for statute name
   topic: text("topic").notNull(),
   statute: text("statute").notNull(),
   statuteIds: text("statute_ids"),
@@ -80,6 +81,7 @@ export const insertUserSchema = createInsertSchema(users)
 // Schema for inserting regulations
 export const insertRegulationSchema = createInsertSchema(regulations)
   .extend({
+    name: z.string().min(1, "Regulation name is required"),
     regulationUrl: z.string().url().optional().nullable(),
     requirementsUrl: z.string().url().optional().nullable(),
   });

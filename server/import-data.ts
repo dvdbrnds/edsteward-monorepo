@@ -93,7 +93,7 @@ function areSimilarTopics(topic1: string, topic2: string): boolean {
     'clery', 'campus safety', 'security report', 'crime statistics',
     'title ix', 'vawa', 'ferpa', 'ada'
   ];
-  const hasCommonKeyPhrase = keyPhrases.some(phrase => 
+  const hasCommonKeyPhrase = keyPhrases.some(phrase =>
     normalized1.includes(phrase) && normalized2.includes(phrase)
   );
 
@@ -284,6 +284,7 @@ async function importRegulations(filePath?: string) {
         // Extract fields based on format
         const regulation: InsertRegulation = isComplianceSurvey ? {
           itemId,
+          name: record[COMPLIANCE_SURVEY_FIELDS.LAW_NAME] || 'Unknown',
           topic: record[COMPLIANCE_SURVEY_FIELDS.LAW_NAME]?.split('(')[0]?.trim() || 'Unknown',
           statute: record[COMPLIANCE_SURVEY_FIELDS.LAW_LINK] || "N/A",
           statuteIds: record['Year of passage (original)'] || null,
@@ -300,6 +301,7 @@ async function importRegulations(filePath?: string) {
           agency_url: null
         } : {
           itemId: itemId.toString(),
+          name: record['Statute Name'] || record['name'] || record['Topic'] || '',
           topic: record['Topic'] || record['name'] || '',
           statute: record['Statute Name'] || record['Statute 1'] || "N/A",
           statuteIds: record['Statute IDs'] || null,
@@ -307,7 +309,7 @@ async function importRegulations(filePath?: string) {
           requirements: record['description'] ||
             record['Reporting Requirements'] ||
             [record['Regulation 1'], record['Regulation 2'], record['Regulation 3'],
-              record['Regulation 4'], record['Regulation 5']].filter(Boolean).join('\n\n'),
+            record['Regulation 4'], record['Regulation 5']].filter(Boolean).join('\n\n'),
           deadlines: record['Deadlines'] || null,
           category: determineCategory(record['Topic'] || ''),
           regulationUrl: record['Regulation URL'] || null,
