@@ -56,6 +56,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
 
   const { data: deadlines, isLoading: deadlinesLoading } = useQuery<Deadline[]>({
     queryKey: ["/api/deadlines"],
+    staleTime: 1000 * 60, // 1 minute
   });
 
   if (regulationsLoading || deadlinesLoading) {
@@ -77,11 +78,20 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
     }
   };
 
+  // Change the getDeadlineStatus function to better handle null checks
   const getDeadlineStatus = (regulationId: number): StatusType | null => {
-    if (!deadlines?.length) return null;
+    if (!deadlines || !deadlines.length) {
+      console.log("No deadlines available");
+      return null;
+    }
 
     const regulationDeadlines = deadlines.filter(d => d.regulationId === regulationId);
-    if (!regulationDeadlines.length) return null;
+    if (!regulationDeadlines.length) {
+      console.log(`No deadlines found for regulation ${regulationId}`);
+      return null;
+    }
+
+    console.log(`Found ${regulationDeadlines.length} deadlines for regulation ${regulationId}`);
 
     const nextDeadline = regulationDeadlines.sort((a, b) =>
       new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
