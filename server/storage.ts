@@ -102,7 +102,10 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getRegulations(): Promise<Regulation[]> {
-    return await db.select().from(regulations);
+    console.log("Fetching regulations from database...");
+    const result = await db.select().from(regulations);
+    console.log(`Found ${result.length} regulations in database:`, result);
+    return result;
   }
 
   async getRegulation(id: number): Promise<Regulation | undefined> {
@@ -111,11 +114,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createRegulation(regulation: InsertRegulation): Promise<Regulation> {
+    console.log("Creating new regulation:", regulation);
     const [newRegulation] = await db.insert(regulations).values(regulation).returning();
+    console.log("Created regulation:", newRegulation);
     return newRegulation;
   }
 
   async updateRegulation(id: number, regulation: Partial<InsertRegulation>): Promise<Regulation> {
+    console.log(`Updating regulation ${id} with:`, regulation);
     const [updatedRegulation] = await db
       .update(regulations)
       .set({
@@ -124,6 +130,7 @@ export class DatabaseStorage implements IStorage {
       })
       .where(eq(regulations.id, id))
       .returning();
+    console.log("Updated regulation:", updatedRegulation);
     return updatedRegulation;
   }
 
@@ -170,12 +177,12 @@ export class DatabaseStorage implements IStorage {
   async sendEmailNotification(userId: number, subject: string, message: string): Promise<boolean> {
     const user = await this.getUser(userId);
     if (!user) return false;
-    
+
     const userNotifications = await this.getNotificationsByUser(userId);
     const emailEnabled = userNotifications.some(n => n.type === 'email' && n.enabled);
-    
+
     if (!emailEnabled) return false;
-    
+
     return emailService.sendEmail(user.email, subject, message);
   }
 
@@ -217,6 +224,7 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return updatedGuide;
   }
+
   async hasAdmin(): Promise<boolean> {
     const [adminUser] = await db
       .select()
@@ -225,6 +233,7 @@ export class DatabaseStorage implements IStorage {
       .limit(1);
     return !!adminUser;
   }
+
   async getCsvSchemas(): Promise<CsvSchema[]> {
     return await db.select().from(csvSchemas);
   }
