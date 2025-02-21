@@ -190,40 +190,6 @@ export default function RegulationDetailPage() {
     ? regulationDeadlines.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0]
     : null;
 
-  const getDeadlineStatus = (deadline: Deadline): StatusType => {
-    const daysUntilDue = differenceInDays(new Date(deadline.dueDate), new Date());
-
-    if (deadline.status === "completed") {
-      return {
-        icon: <CheckCircle className="h-5 w-5 text-green-500" />,
-        label: "Completed",
-        className: "text-green-600 bg-green-100"
-      };
-    }
-
-    if (deadline.status === "overdue" || daysUntilDue < 0) {
-      return {
-        icon: <AlertCircle className="h-5 w-5 text-red-500" />,
-        label: "Overdue",
-        className: "text-red-600 bg-red-100"
-      };
-    }
-
-    if (daysUntilDue <= 7) {
-      return {
-        icon: <Clock className="h-5 w-5 text-yellow-500" />,
-        label: "Due Soon",
-        className: "text-yellow-600 bg-yellow-100"
-      };
-    }
-
-    return {
-      icon: <Clock className="h-5 w-5 text-blue-500" />,
-      label: "Upcoming",
-      className: "text-blue-600 bg-blue-100"
-    };
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
@@ -241,7 +207,7 @@ export default function RegulationDetailPage() {
                 Back to Regulations
               </Button>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                {regulation?.topic}
+                {regulation?.name || regulation?.topic}
               </h1>
               <div className="flex items-center space-x-2 text-sm text-gray-500">
                 <span className="px-2 py-1 bg-gray-100 rounded">
@@ -308,20 +274,19 @@ export default function RegulationDetailPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Left Column */}
               <div className="lg:col-span-2 space-y-6">
+                {/* Summary Card */}
                 <Card>
                   <CardHeader>
                     <CardTitle>Summary</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div
-                      className="text-gray-700"
-                      dangerouslySetInnerHTML={{
-                        __html: regulation?.summary?.replace(/<li style="[^"]*">/g, '<li>') || "No summary available."
-                      }}
-                    />
+                    <div className="text-gray-700">
+                      {regulation?.summary || "No summary available."}
+                    </div>
                   </CardContent>
                 </Card>
 
+                {/* Requirements Card */}
                 <Card>
                   <CardHeader>
                     <CardTitle>Requirements</CardTitle>
@@ -355,6 +320,120 @@ export default function RegulationDetailPage() {
                   </CardContent>
                 </Card>
 
+                {/* Additional Details Card */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Additional Details</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {/* Statute Information */}
+                      <div>
+                        <h3 className="font-medium text-gray-900">Statute</h3>
+                        <p className="text-gray-700 mt-1">
+                          {regulation?.statute}
+                          {regulation?.statuteIds && (
+                            <span className="block text-sm text-gray-500">
+                              Reference: {regulation.statuteIds}
+                            </span>
+                          )}
+                        </p>
+                      </div>
+
+                      {/* Filing Deadlines */}
+                      {regulation?.filingDeadlines && regulation.filingDeadlines.length > 0 && (
+                        <div>
+                          <h3 className="font-medium text-gray-900">Filing Deadlines</h3>
+                          <ul className="list-disc pl-5 mt-1 space-y-1">
+                            {regulation.filingDeadlines.map((deadline, index) => (
+                              <li key={index} className="text-gray-700">
+                                {deadline.date}: {deadline.description}
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+
+                      {/* Reporting Frequency */}
+                      {regulation?.reportingFrequency && (
+                        <div>
+                          <h3 className="font-medium text-gray-900">Reporting Frequency</h3>
+                          <p className="text-gray-700 mt-1">{regulation.reportingFrequency}</p>
+                        </div>
+                      )}
+
+                      {/* Dates */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {regulation?.originationDate && (
+                          <div>
+                            <h3 className="font-medium text-gray-900">Origination Date</h3>
+                            <p className="text-gray-700 mt-1">
+                              {format(new Date(regulation.originationDate), "PP")}
+                            </p>
+                          </div>
+                        )}
+                        {regulation?.effectiveDate && (
+                          <div>
+                            <h3 className="font-medium text-gray-900">Effective Date</h3>
+                            <p className="text-gray-700 mt-1">
+                              {format(new Date(regulation.effectiveDate), "PP")}
+                            </p>
+                          </div>
+                        )}
+                        {regulation?.lastUpdated && (
+                          <div>
+                            <h3 className="font-medium text-gray-900">Last Updated</h3>
+                            <p className="text-gray-700 mt-1">
+                              {format(new Date(regulation.lastUpdated), "PP")}
+                            </p>
+                          </div>
+                        )}
+                        {regulation?.nextReviewDate && (
+                          <div>
+                            <h3 className="font-medium text-gray-900">Next Review Date</h3>
+                            <p className="text-gray-700 mt-1">
+                              {format(new Date(regulation.nextReviewDate), "PP")}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Agency Information */}
+                      <div>
+                        <h3 className="font-medium text-gray-900">Agency Information</h3>
+                        <div className="mt-2 space-y-2">
+                          {regulation?.agency_name && (
+                            <p className="text-gray-700">
+                              <span className="font-medium">Agency:</span> {regulation.agency_name}
+                            </p>
+                          )}
+                          {regulation?.agency_url && (
+                            <a
+                              href={regulation.agency_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[#00267A] hover:text-[#003166] underline inline-flex items-center gap-2"
+                            >
+                              Visit Agency Website
+                              <ExternalLink className="h-3 w-3" />
+                            </a>
+                          )}
+                          {regulation?.agency_contact && (
+                            <p className="text-gray-700">
+                              <span className="font-medium">Contact:</span> {regulation.agency_contact}
+                            </p>
+                          )}
+                          {regulation?.agency_department && (
+                            <p className="text-gray-700">
+                              <span className="font-medium">Department:</span> {regulation.agency_department}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
                 {/* Submission Guide Section */}
                 <Card>
                   <CardHeader>
@@ -362,22 +441,6 @@ export default function RegulationDetailPage() {
                   </CardHeader>
                   <CardContent>
                     <GuideContent />
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Statutory Reference</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-700">
-                      {regulation?.statute}
-                      {regulation?.statuteIds && (
-                        <span className="block text-sm text-gray-500 mt-1">
-                          Reference: {regulation.statuteIds}
-                        </span>
-                      )}
-                    </p>
                   </CardContent>
                 </Card>
               </div>
