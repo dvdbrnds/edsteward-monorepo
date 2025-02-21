@@ -1,3 +1,6 @@
+
+const COLORS = ['#2563eb', '#16a34a', '#dc2626', '#ca8a04', '#9333ea', '#0891b2', '#be185d', '#ea580c'];
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import type { Regulation } from "@shared/schema";
@@ -129,7 +132,7 @@ export default function ComplianceOverview({ onCategorySelect, selectedCategory 
             >
               <span
                 className="w-3 h-3 rounded-sm"
-                style={{ backgroundColor: entry.color }}
+                style={{ backgroundColor: COLORS[data.findIndex(d => d.name === entry.name) % COLORS.length] }}
               />
               <span className="text-sm text-gray-700">
                 {entry.name}

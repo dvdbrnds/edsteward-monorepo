@@ -34,6 +34,15 @@ const COLORS = [
   '#FF9EBB', // Moravian Light Red
   '#FFB347', // Moravian Light Gold
   '#CCCCCC', // Moravian Light Grey
+  '#2563eb', //Added
+  '#16a34a', //Added
+  '#dc2626', //Added
+  '#ca8a04', //Added
+  '#9333ea', //Added
+  '#0891b2', //Added
+  '#be185d', //Added
+  '#ea580c'  //Added
+
 ];
 
 type SortConfig = {
