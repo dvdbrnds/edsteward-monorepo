@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { format } from "date-fns";
-import { Download, FileText, Upload, X } from "lucide-react";
+import { Download, FileText, Upload, X, CheckCircle, AlertCircle, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from "recharts";
 import { useState, useRef } from "react";
@@ -434,48 +434,80 @@ export default function ReportsPage() {
                     <TableHead>Topic</TableHead>
                     <TableHead>Category</TableHead>
                     <TableHead>Agency</TableHead>
+                    <TableHead>Next Deadline</TableHead>
                     <TableHead>Last Updated</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {sortedRegulations.map((regulation) => (
-                    <TableRow
-                      key={regulation.id}
-                      className="cursor-pointer hover:bg-gray-50"
-                      onClick={() => setLocation(`/regulations/${regulation.id}`)}
-                    >
-                      <TableCell>{regulation.itemId}</TableCell>
-                      <TableCell>
-                        <div className="text-base font-medium text-gray-900">
-                          {regulation.statute}
-                        </div>
-                        <div className="text-sm text-gray-500 mt-1">
-                          {regulation.topic}
-                        </div>
-                      </TableCell>
-                      <TableCell>{regulation.category}</TableCell>
-                      <TableCell>
-                        {regulation.agency_url ? (
-                          <a
-                            href={regulation.agency_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-blue-600 hover:text-blue-800 hover:underline"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            {regulation.agency_name || 'View Agency'}
-                          </a>
-                        ) : (
-                          'N/A'
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {regulation.lastUpdated
-                          ? format(new Date(regulation.lastUpdated), "PP")
-                          : "N/A"}
-                      </TableCell>
-                    </TableRow>
-                  ))}
+                  {sortedRegulations.map((regulation) => {
+                    const regulationDeadlines = deadlines?.filter(d => d.regulationId === regulation.id) || [];
+                    const nextDeadline = regulationDeadlines.length > 0
+                      ? regulationDeadlines.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0]
+                      : null;
+
+                    return (
+                      <TableRow
+                        key={regulation.id}
+                        className="cursor-pointer hover:bg-gray-50"
+                        onClick={() => setLocation(`/regulations/${regulation.id}`)}
+                      >
+                        <TableCell>{regulation.itemId}</TableCell>
+                        <TableCell>
+                          <div className="text-base font-medium text-gray-900">
+                            {regulation.statute}
+                          </div>
+                          <div className="text-sm text-gray-500 mt-1">
+                            {regulation.topic}
+                          </div>
+                        </TableCell>
+                        <TableCell>{regulation.category}</TableCell>
+                        <TableCell>
+                          {regulation.agency_url ? (
+                            <a
+                              href={regulation.agency_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-600 hover:text-blue-800 hover:underline"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {regulation.agency_name || 'View Agency'}
+                            </a>
+                          ) : (
+                            'N/A'
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {nextDeadline ? (
+                            <div className="flex items-center gap-2">
+                              {nextDeadline.status === "completed" ? (
+                                <CheckCircle className="h-4 w-4 text-green-500" />
+                              ) : nextDeadline.status === "overdue" ? (
+                                <AlertCircle className="h-4 w-4 text-red-500" />
+                              ) : (
+                                <Clock className="h-4 w-4 text-yellow-500" />
+                              )}
+                              <span className={
+                                nextDeadline.status === "completed"
+                                  ? "text-green-600"
+                                  : nextDeadline.status === "overdue"
+                                  ? "text-red-600"
+                                  : "text-yellow-600"
+                              }>
+                                {format(new Date(nextDeadline.dueDate), "PP")}
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="text-gray-500">No deadlines</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {regulation.lastUpdated
+                            ? format(new Date(regulation.lastUpdated), "PP")
+                            : "N/A"}
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
                 </TableBody>
               </Table>
             </CardContent>
