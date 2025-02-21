@@ -6,31 +6,22 @@ import {
   Pie,
   Cell,
   ResponsiveContainer,
-  Legend,
   Tooltip,
 } from "recharts";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 
-// Standard pie chart colors
+// Nine distinct colors from different parts of the color wheel
 const CATEGORY_COLORS = {
-  "Academic Programs": "#2196F3",    // Blue
-  "Financial Aid": "#4CAF50",        // Green
-  "Student Services": "#FFC107",     // Amber
-  "Athletics": "#F44336",           // Red
-  "Campus Safety": "#9C27B0",       // Purple
-  "Research": "#00BCD4",            // Cyan
-  "Other": "#795548",               // Brown
-  "Admissions": "#FF9800",          // Orange
-  "Facilities": "#607D8B",          // Blue Grey
-  "Human Resources": "#E91E63",      // Pink
-  "Technology": "#673AB7",          // Deep Purple
-  "International": "#3F51B5",       // Indigo
-  "Library": "#009688",             // Teal
-  "Legal": "#FF5722",              // Deep Orange
-  "Diversity": "#8BC34A",           // Light Green
-  "Accounting": "#FB8C00",         // Dark Orange
-  "Student Life": "#7B1FA2"        // Deep Purple
+  "Academic Programs": "#FF0000",    // Red
+  "Financial Aid": "#0066FF",        // Blue
+  "Student Services": "#FFD700",     // Yellow
+  "Athletics": "#9400D3",           // Purple
+  "Campus Safety": "#00CC00",       // Green
+  "Research": "#FF6600",            // Orange
+  "Other": "#00CCCC",               // Cyan
+  "Admissions": "#FF00FF",          // Magenta
+  "Facilities": "#90EE90",          // Lime
 } as const;
 
 interface ComplianceOverviewProps {
@@ -62,7 +53,7 @@ export default function ComplianceOverview({ onCategorySelect, selectedCategory 
   const data = Object.entries(categories).map(([name, value]) => ({
     name,
     value,
-    color: CATEGORY_COLORS[name as keyof typeof CATEGORY_COLORS] || "#9E9E9E" // Default to grey if category not found
+    color: CATEGORY_COLORS[name as keyof typeof CATEGORY_COLORS] || "#808080" // Default to gray if category not found
   }));
 
   return (
