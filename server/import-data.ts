@@ -28,12 +28,33 @@ function normalizeTopic(topic: string): string {
   const normalized = topic
     .toLowerCase()
     .replace(/\([^)]*\)/g, '') // Remove content in parentheses
-    .replace(/act|law|regulation|disclosure/gi, '')  // Remove common suffixes
+    .replace(/act|law|regulation|disclosure|requirements?/gi, '')  // Remove common suffixes and variations
     .replace(/[^\w\s-]/g, '') // Remove special characters except spaces and hyphens
+    .replace(/\b(the|and|or|of|for|to|in|on|at|by|with)\b/g, '') // Remove common stop words
     .replace(/\s+/g, ' ')      // Normalize whitespace
     .trim();
-  console.log("Normalized topic:", normalized);
-  return normalized;
+
+  // Handle common abbreviations and variations
+  const commonAbbreviations: Record<string, string> = {
+    'clery': 'jeanne clery',
+    'vawa': 'violence against women',
+    'ferpa': 'family educational rights privacy',
+    'ada': 'americans disabilities',
+    'title ix': 'title nine',
+    'campus safety': 'clery',
+    'campus security': 'clery',
+    'crime statistics': 'clery',
+    'annual security report': 'clery'
+  };
+
+  let normalizedText = normalized;
+  Object.entries(commonAbbreviations).forEach(([abbr, full]) => {
+    const pattern = new RegExp(`\\b${abbr}\\b`, 'gi');
+    normalizedText = normalizedText.replace(pattern, full);
+  });
+
+  console.log("Normalized topic:", normalizedText);
+  return normalizedText;
 }
 
 function areSimilarTopics(topic1: string, topic2: string): boolean {
@@ -55,16 +76,34 @@ function areSimilarTopics(topic1: string, topic2: string): boolean {
     return true;
   }
 
-  // Calculate similarity score
+  // Split into words and find common words
   const words1 = normalized1.split(/\s+/);
   const words2 = normalized2.split(/\s+/);
   const commonWords = words1.filter(word => words2.includes(word));
-  const similarity = commonWords.length / Math.max(words1.length, words2.length);
+
+  // Calculate Jaccard similarity
+  const uniqueWords = new Set([...words1, ...words2]);
+  const similarity = commonWords.length / uniqueWords.size;
 
   console.log(`Similarity score: ${similarity}`);
   console.log(`Common words: ${commonWords.join(', ')}`);
 
-  if (similarity > 0.5) {
+  // Check for key phrases that indicate same topic
+  const keyPhrases = [
+    'clery', 'campus safety', 'security report', 'crime statistics',
+    'title ix', 'vawa', 'ferpa', 'ada'
+  ];
+  const hasCommonKeyPhrase = keyPhrases.some(phrase => 
+    normalized1.includes(phrase) && normalized2.includes(phrase)
+  );
+
+  if (hasCommonKeyPhrase) {
+    console.log("✓ Found match through key phrase");
+    return true;
+  }
+
+  // Check content similarity in summary and requirements
+  if (similarity > 0.4) {  // Lowered threshold due to improved normalization
     console.log("✓ Found match through similarity score");
     return true;
   }
