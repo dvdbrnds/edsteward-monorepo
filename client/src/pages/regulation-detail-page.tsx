@@ -296,8 +296,16 @@ export default function RegulationDetailPage() {
                     <CardTitle>Summary</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-gray-700">
-                      {regulation?.summary?.replace(/<[^>]*>/g, '') || "No summary available."}
+                    <div className="prose prose-sm max-w-none text-gray-700">
+                      {regulation?.summary
+                        ?.replace(/<[^>]*>/g, '')  // Remove HTML tags
+                        ?.split(/\n+/)             // Split on one or more newlines
+                        .map((paragraph, index) => (
+                          <p key={index} className="mb-4 leading-relaxed">
+                            {paragraph.trim()}
+                          </p>
+                        ))
+                      || "No summary available."}
                     </div>
                   </CardContent>
                 </Card>
