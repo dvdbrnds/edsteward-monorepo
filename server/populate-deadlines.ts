@@ -72,6 +72,7 @@ async function populateDeadlines() {
               regulationId: regulation.id,
               dueDate: dueDate.toISOString().split('T')[0], // Convert to YYYY-MM-DD string format
               status,
+              completed: false,
               assignedTo: 6, // Assuming user ID 6 is the default compliance officer
             };
 
