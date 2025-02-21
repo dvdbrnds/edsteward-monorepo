@@ -342,6 +342,16 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
                   </CardContent>
                 </Card>
 
+                {/* Submission Guide Section */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Submission Guidelines</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <GuideContent />
+                  </CardContent>
+                </Card>
+
                 <Card>
                   <CardHeader>
                     <CardTitle>Statutory Reference</CardTitle>
@@ -411,18 +421,6 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
                             onClick={() => navigate(`/compliance-wizard/${regulation.id}`)}
                           >
                             Submit Compliance Report
-                          </Button>
-                          <Button
-                            variant="outline"
-                            className="w-full"
-                            onClick={() => {
-                              const dialogTrigger = document.querySelector('[data-guide-dialog-trigger]');
-                              if (dialogTrigger instanceof HTMLButtonElement) {
-                                dialogTrigger.click();
-                              }
-                            }}
-                          >
-                            View Submission Guide
                           </Button>
                         </div>
                       </div>
@@ -520,29 +518,11 @@ export default function RegulationDetailPage({ regulation }: RegulationDetailPag
                     </CardContent>
                   </Card>
                 )}
-
               </div>
             </div>
           </div>
         </div>
       </main>
-
-      {/* Submission Guide Dialog */}
-      <Dialog>
-        <DialogTrigger asChild>
-          <button data-guide-dialog-trigger className="hidden">
-            Open Guide
-          </button>
-        </DialogTrigger>
-        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Submission Guide</DialogTitle>
-          </DialogHeader>
-          <div className="prose prose-sm mt-4">
-            <GuideContent />
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
@@ -564,12 +544,17 @@ function GuideContent() {
   const submissionGuide = guides?.find(guide => guide.category === "submission");
 
   if (!submissionGuide) {
-    return <div>Guide not found. Please contact the compliance office.</div>;
+    return (
+      <div className="p-4 text-gray-600">
+        <p>No submission guidelines available for this regulation.</p>
+        <p className="mt-2">Please contact the compliance office for assistance with your submission.</p>
+      </div>
+    );
   }
 
   return (
     <div
-      className="markdown-content"
+      className="prose prose-sm max-w-none"
       dangerouslySetInnerHTML={{ __html: marked.parse(submissionGuide.content) }}
     />
   );
