@@ -466,7 +466,7 @@ export default function ReportsPage() {
                       <TableCell>
                         <a
                           href={`/regulations/${regulation.id}`}
-                          className="text-lg font-medium text-blue-600 hover:text-blue-800 hover:underline"
+                          className="text-base font-medium text-blue-600 hover:text-blue-800 hover:underline"
                         >
                           {regulation.statute}
                         </a>
