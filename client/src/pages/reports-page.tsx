@@ -287,17 +287,30 @@ export default function ReportsPage() {
     value,
   }));
 
-  const deadlineChartData = Object.entries(deadlineSummary).map(([name, value]) => {
-    const displayName = name === "completed"
-      ? "Completed"
-      : name === "overdue"
-      ? "Overdue"
-      : "Pending";
-    return {
-      name: displayName,
-      value,
-    };
-  });
+  const calculateDeadlineStatus = (deadline: any) => {
+  const today = new Date();
+  const dueDate = new Date(deadline.dueDate);
+  if (deadline.status === "completed") return "completed";
+  return dueDate < today ? "overdue" : "pending";
+};
+
+const deadlineSummary = deadlines?.reduce((acc: Record<string, number>, deadline) => {
+  const status = calculateDeadlineStatus(deadline);
+  acc[status] = (acc[status] || 0) + 1;
+  return acc;
+}, {});
+
+const deadlineChartData = Object.entries(deadlineSummary || {}).map(([name, value]) => {
+  const displayName = name === "completed"
+    ? "Completed"
+    : name === "overdue"
+    ? "Overdue"
+    : "Pending";
+  return {
+    name: displayName,
+    value,
+  };
+});
 
   const getStatusColor = (status: string) => {
     switch (status) {
