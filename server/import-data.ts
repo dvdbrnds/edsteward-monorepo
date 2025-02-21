@@ -89,7 +89,7 @@ async function findExistingRegulation(topic: string): Promise<Regulation | undef
   return undefined;
 }
 
-function mergeRegulations(existing: Regulation, newData: InsertRegulation): Partial<InsertRegulation> {
+async function mergeRegulations(existing: Regulation, newData: InsertRegulation): Promise<Partial<InsertRegulation>> {
   console.log("\nMerging regulations:");
   console.log("Existing regulation:", {
     topic: existing.topic,
@@ -104,13 +104,13 @@ function mergeRegulations(existing: Regulation, newData: InsertRegulation): Part
 
   const merged = {
     ...existing,
-    // Combine summaries if they're different
-    summary: existing.summary && newData.summary && existing.summary !== newData.summary
+    // Keep the most detailed summary
+    summary: existing.summary && newData.summary
       ? `${existing.summary}\n\nAdditional Information:\n${newData.summary}`
       : existing.summary || newData.summary,
 
     // Combine requirements if they're different
-    requirements: existing.requirements && newData.requirements && existing.requirements !== newData.requirements
+    requirements: existing.requirements && newData.requirements
       ? `${existing.requirements}\n\nAdditional Requirements:\n${newData.requirements}`
       : existing.requirements || newData.requirements,
 
@@ -124,11 +124,11 @@ function mergeRegulations(existing: Regulation, newData: InsertRegulation): Part
     statuteIds: existing.statuteIds || newData.statuteIds,
     statute: existing.statute || newData.statute,
     category: existing.category || newData.category,
-    agency_url: existing.agency_url || null,
 
-    // Combine URLs if they're different
+    // Merge URLs, keeping the non-null values
     regulationUrl: newData.regulationUrl || existing.regulationUrl,
     requirementsUrl: newData.requirementsUrl || existing.requirementsUrl,
+    agency_url: existing.agency_url || null,
   };
 
   console.log("Merged result:", {
@@ -199,8 +199,8 @@ async function importRegulations(filePath?: string) {
 
     // Filter out empty records and explanatory rows
     records = records.filter(record => {
-      const hasContent = Object.values(record).some(value => 
-        value && String(value).trim() !== '' && 
+      const hasContent = Object.values(record).some(value =>
+        value && String(value).trim() !== '' &&
         !String(value).startsWith('Example:') &&
         String(value) !== 'Timestamp' &&
         String(value) !== 'Email Address'
@@ -232,7 +232,7 @@ async function importRegulations(filePath?: string) {
 
         // Generate a unique itemId
         const timestamp = record['Timestamp'];
-        const itemId = timestamp ? 
+        const itemId = timestamp ?
           `REG-${timestamp.replace(/\D/g, '').substring(0, 12)}` :
           record['Item ID'] || record['id'] || '';
 
@@ -265,10 +265,10 @@ async function importRegulations(filePath?: string) {
           statute: record['Statute Name'] || record['Statute 1'] || "N/A",
           statuteIds: record['Statute IDs'] || null,
           summary: record['Statutory Summary'] || null,
-          requirements: record['description'] || 
-                      record['Reporting Requirements'] || 
-                      [record['Regulation 1'], record['Regulation 2'], record['Regulation 3'], 
-                        record['Regulation 4'], record['Regulation 5']].filter(Boolean).join('\n\n'),
+          requirements: record['description'] ||
+            record['Reporting Requirements'] ||
+            [record['Regulation 1'], record['Regulation 2'], record['Regulation 3'],
+              record['Regulation 4'], record['Regulation 5']].filter(Boolean).join('\n\n'),
           deadlines: record['Deadlines'] || null,
           category: determineCategory(record['Topic'] || ''),
           regulationUrl: record['Regulation URL'] || null,
@@ -285,7 +285,7 @@ async function importRegulations(filePath?: string) {
         if (existingRegulation) {
           console.log(`\nExisting regulation found:`, existingRegulation);
           // Merge the regulations
-          const mergedRegulation = mergeRegulations(existingRegulation, regulation);
+          const mergedRegulation = await mergeRegulations(existingRegulation, regulation);
           console.log(`\nMerged regulation:`, mergedRegulation);
 
           // Validate merged regulation
