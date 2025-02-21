@@ -100,29 +100,7 @@ async function startServer() {
       log("Static serving setup complete");
     }
 
-    let PORT = 3000;
-    const MAX_PORT_ATTEMPTS = 10;
-
-    // Try to find an available port
-    async function findAvailablePort(startPort: number): Promise<number> {
-      for (let port = startPort; port < startPort + MAX_PORT_ATTEMPTS; port++) {
-        try {
-          const temp = express().listen(port);
-          await new Promise(resolve => temp.close(resolve));
-          return port;
-        } catch (err) {
-          if (port === startPort + MAX_PORT_ATTEMPTS - 1) {
-            throw err;
-          }
-          // Continue to next port
-          continue;
-        }
-      }
-      throw new Error('No available ports found');
-    }
-
-    // Find and set available port
-    PORT = await findAvailablePort(PORT);
+    const PORT = 5000;
 
     // Start server with proper error handling
     await new Promise<void>((resolve, reject) => {
@@ -136,6 +114,10 @@ async function startServer() {
         log("Application initialization complete");
         resolve();
       }).on('error', (err: NodeJS.ErrnoException) => {
+        if (err.code === 'EADDRINUSE') {
+          log(`Port ${PORT} is already in use. Attempting to kill existing process...`);
+          process.exit(1); // Exit with error code to trigger restart
+        }
         reject(err);
       });
     });

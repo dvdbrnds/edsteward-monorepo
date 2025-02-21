@@ -35,6 +35,15 @@ import { Cog } from "lucide-react";
 
 const CHANGELOG = [
   {
+    version: "0.1.9",
+    date: "February 21, 2025",
+    changes: [
+      "Updated pie chart colors to use 9 distinct colors from different parts of the color wheel",
+      "Unified Student Services category colors",
+      "Improved color consistency across compliance overview and regulations page",
+    ],
+  },
+  {
     version: "0.1.8",
     date: "February 20, 2025",
     changes: [
@@ -114,7 +123,7 @@ const CHANGELOG = [
       "Responsive design implementation",
     ],
   },
-];
+] as const;
 
 export default function Navigation() {
   const { user, logoutMutation } = useAuth();
@@ -162,7 +171,7 @@ export default function Navigation() {
                     <Dialog>
                       <DialogTrigger asChild>
                         <button className="text-xs text-gray-300 ml-2 hover:text-white transition-colors">
-                          Alpha v0.1.8
+                          Alpha v0.1.9
                         </button>
                       </DialogTrigger>
                       <DialogContent className="max-h-[80vh] overflow-y-auto">
