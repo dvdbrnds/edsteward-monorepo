@@ -19,6 +19,17 @@ export function registerRoutes(app: Express): Server {
     res.json(regulation);
   });
 
+  // Deadlines endpoints
+  app.get("/api/deadlines", async (req, res) => {
+    try {
+      const deadlines = await storage.getDeadlines();
+      res.json(deadlines);
+    } catch (error) {
+      console.error("Failed to fetch deadlines:", error);
+      res.status(500).json({ error: "Failed to fetch deadlines" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
