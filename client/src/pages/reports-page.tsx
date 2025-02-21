@@ -20,16 +20,28 @@ import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 
 
-// Moravian University official brand colors
+// Extended color palette with Moravian brand colors and complementary shades
 const COLORS = [
-  '#CCCCCC', // Moravian Grey
   '#00267A', // Moravian Blue
+  '#BC204B', // Moravian Red
+  '#E58200', // Moravian Gold
+  '#006668', // Deep Green
+  '#CCCCCC', // Moravian Grey
+  '#078CF5', // Accent Blue
   '#001B56', // Dark Blue
   '#666666', // Dark Grey
-  '#078CF5', // Accent Blue
-  '#E58200', // Gold
-  '#BC204B', // Red
-  '#006668', // Deep Green
+  '#FF9EBB', // Light Red
+  '#FFB347', // Light Orange
+  '#00A3A7', // Light Teal
+  '#4DB6FF', // Light Blue
+  '#334C8A', // Medium Blue
+  '#8B0000', // Dark Red
+  '#C17000', // Dark Gold
+  '#004446', // Dark Green
+  '#999999', // Medium Grey
+  '#0066CC', // Royal Blue
+  '#E63946', // Bright Red
+  '#FFB703', // Bright Gold
 ];
 
 type SortConfig = {
@@ -63,112 +75,124 @@ const CustomPieChart = ({
   title: string,
   onSegmentClick: (name: string) => void,
   activeFilter: string | null,
-}) => (
-  <Card>
-    <CardHeader>
-      <CardTitle className="flex justify-between items-center">
-        <div className="flex items-center gap-2">
-          {title}
-          {activeFilter && (
-            <Button
-              variant="outline"
-              size="sm"
-              className="ml-2"
-              onClick={() => onSegmentClick("")}
-            >
-              <X className="h-4 w-4 mr-1" />
-              Clear Filter
-            </Button>
-          )}
+}) => {
+  // Sort data by value for the pie chart while keeping a separate sorted copy for the legend
+  const sortedData = [...data].sort((a, b) => b.value - a.value);
+  const legendData = [...data].sort((a, b) => a.name.localeCompare(b.name));
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex justify-between items-center">
+          <div className="flex items-center gap-2">
+            {title}
+            {activeFilter && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="ml-2"
+                onClick={() => onSegmentClick("")}
+              >
+                <X className="h-4 w-4 mr-1" />
+                Clear Filter
+              </Button>
+            )}
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => downloadCSV(
+              data.map(({ name, value }) => ({
+                [title.toLowerCase().replace(/ /g, '_')]: name,
+                count: value,
+              })),
+              `${title.toLowerCase().replace(/ /g, '-')}.csv`
+            )}
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Export
+          </Button>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="h-[300px] w-full">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
+                data={sortedData}
+                cx="50%"
+                cy="50%"
+                labelLine={false}
+                outerRadius={80}
+                dataKey="value"
+                startAngle={90}
+                endAngle={-270}
+                style={{ outline: 'none' }}
+                isAnimationActive={false}
+                onClick={(entry) => onSegmentClick(entry.name)}
+                className="cursor-pointer"
+              >
+                {sortedData.map((entry, index) => (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                    stroke="white"
+                    strokeWidth={2}
+                    opacity={activeFilter && activeFilter !== entry.name ? 0.5 : 1}
+                  />
+                ))}
+              </Pie>
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'white',
+                  border: `1px solid ${COLORS[0]}`,
+                  borderRadius: '4px',
+                  padding: '8px'
+                }}
+                itemStyle={{ color: COLORS[0] }}
+              />
+              <Legend
+                verticalAlign="bottom"
+                height={80}
+                iconType="circle"
+                payload={legendData.map((entry, index) => ({
+                  value: entry.name,
+                  type: 'circle',
+                  color: COLORS[sortedData.findIndex(d => d.name === entry.name) % COLORS.length],
+                  id: entry.name
+                }))}
+                formatter={(value) => (
+                  <span
+                    className={`
+                      text-[#666666]
+                      ml-2
+                      cursor-pointer
+                      inline-flex
+                      items-center
+                      ${value.length > 15 ? 'text-xs' : 'text-sm'}
+                      ${activeFilter === value ? 'font-bold' : ''}
+                    `}
+                    onClick={() => onSegmentClick(value as string)}
+                  >
+                    {value}
+                  </span>
+                )}
+                wrapperStyle={{
+                  paddingTop: '20px',
+                  paddingBottom: '10px',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
+                  gap: '8px',
+                  width: '100%'
+                }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
         </div>
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => downloadCSV(
-            data.map(({ name, value }) => ({
-              [title.toLowerCase().replace(/ /g, '_')]: name,
-              count: value,
-            })),
-            `${title.toLowerCase().replace(/ /g, '-')}.csv`
-          )}
-        >
-          <Download className="h-4 w-4 mr-2" />
-          Export
-        </Button>
-      </CardTitle>
-    </CardHeader>
-    <CardContent>
-      <div className="h-[300px] w-full">
-        <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={data}
-              cx="50%"
-              cy="50%"
-              labelLine={false}
-              outerRadius={80}
-              dataKey="value"
-              startAngle={90}
-              endAngle={-270}
-              style={{ outline: 'none' }}
-              isAnimationActive={false}
-              onClick={(entry) => onSegmentClick(entry.name)}
-              className="cursor-pointer"
-            >
-              {data.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={COLORS[index % COLORS.length]}
-                  stroke="white"
-                  strokeWidth={2}
-                  opacity={activeFilter && activeFilter !== entry.name ? 0.5 : 1}
-                />
-              ))}
-            </Pie>
-            <Tooltip
-              contentStyle={{
-                backgroundColor: 'white',
-                border: `1px solid ${COLORS[1]}`,
-                borderRadius: '4px',
-                padding: '8px'
-              }}
-              itemStyle={{ color: COLORS[1] }}
-            />
-            <Legend
-              verticalAlign="bottom"
-              height={80}
-              iconType="circle"
-              formatter={(value) => (
-                <span
-                  className={`
-                    text-[#666666]
-                    ml-2
-                    cursor-pointer
-                    inline-flex
-                    items-center
-                    ${value.length > 15 ? 'text-xs' : 'text-sm'}
-                    ${activeFilter === value ? 'font-bold' : ''}
-                  `}
-                  onClick={() => onSegmentClick(value as string)}
-                >
-                  {value}
-                </span>
-              )}
-              wrapperStyle={{
-                paddingTop: '20px',
-                paddingBottom: '10px',
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-                gap: '8px',
-                width: '100%'
-              }}
-            />
-          </PieChart>
-        </ResponsiveContainer>
-      </div>
-    </CardContent>
-  </Card>
-);
+      </CardContent>
+    </Card>
+  );
+};
 
 export default function ReportsPage() {
   const [location, setLocation] = useLocation();
@@ -184,7 +208,6 @@ export default function ReportsPage() {
   const { data: deadlines, isLoading: deadlinesLoading } = useQuery<Deadline[]>({
     queryKey: ["/api/deadlines"],
   });
-
 
   const sortData = (data: Regulation[]) => {
     if (!sortConfig || !data) return data;
