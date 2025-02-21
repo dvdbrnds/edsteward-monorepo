@@ -22,26 +22,18 @@ import { useLocation } from "wouter";
 
 // Extended color palette with Moravian brand colors and complementary shades
 const COLORS = [
-  '#00267A', // Moravian Blue
-  '#BC204B', // Moravian Red
-  '#E58200', // Moravian Gold
-  '#006668', // Deep Green
-  '#CCCCCC', // Moravian Grey
-  '#078CF5', // Accent Blue
-  '#001B56', // Dark Blue
-  '#666666', // Dark Grey
-  '#FF9EBB', // Light Red
-  '#FFB347', // Light Orange
-  '#00A3A7', // Light Teal
-  '#4DB6FF', // Light Blue
-  '#334C8A', // Medium Blue
-  '#8B0000', // Dark Red
-  '#C17000', // Dark Gold
-  '#004446', // Dark Green
-  '#999999', // Medium Grey
-  '#0066CC', // Royal Blue
-  '#E63946', // Bright Red
-  '#FFB703', // Bright Gold
+  '#00267A', // Moravian Primary Blue
+  '#BC204B', // Moravian Primary Red
+  '#E58200', // Moravian Primary Gold
+  '#434343', // Moravian Primary Grey
+  '#001B56', // Moravian Dark Blue
+  '#8B0000', // Moravian Dark Red
+  '#C17000', // Moravian Dark Gold
+  '#666666', // Moravian Dark Grey
+  '#4DB6FF', // Moravian Light Blue
+  '#FF9EBB', // Moravian Light Red
+  '#FFB347', // Moravian Light Gold
+  '#CCCCCC', // Moravian Light Grey
 ];
 
 type SortConfig = {
