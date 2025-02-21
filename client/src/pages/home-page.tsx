@@ -85,14 +85,13 @@ export default function HomePage() {
             </Card>
           </div>
 
-          {selectedCategory && (
-            <div className="mt-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                {selectedCategory} Regulations
-              </h2>
-              <RegulationList categoryFilter={selectedCategory} />
-            </div>
-          )}
+          {/* Regulations List Section */}
+          <div className="mt-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              {selectedCategory ? `${selectedCategory} Regulations` : 'All Regulations'}
+            </h2>
+            <RegulationList categoryFilter={selectedCategory} />
+          </div>
         </div>
       </main>
     </div>
