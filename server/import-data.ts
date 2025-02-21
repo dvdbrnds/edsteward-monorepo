@@ -7,15 +7,13 @@ import { storage } from "./storage";
 import type { InsertRegulation } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import { db } from "./db";
-import { regulations } from "@shared/schema";
-import { addMonths, format } from "date-fns";
+import { addMonths, format, parse as dateParse } from "date-fns";
 import { RegulationValidator } from "./validation";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 async function importRegulations(filePath?: string) {
-  // If no file path provided, use the default Excel file
   if (!filePath) {
     filePath = path.join(__dirname, "..", "attached_assets", "compliance-matrix.xlsx");
   }
@@ -24,7 +22,6 @@ async function importRegulations(filePath?: string) {
   try {
     let records: any[];
 
-    // Determine file type and parse accordingly
     if (filePath.endsWith('.xlsx')) {
       const workbook = xlsx.readFile(filePath);
       const sheetName = workbook.SheetNames[0];
@@ -35,13 +32,27 @@ async function importRegulations(filePath?: string) {
       records = parse(content, {
         columns: true,
         skip_empty_lines: true,
-        trim: true
+        trim: true,
+        quote: '"',
+        escape: '"',
+        relax_column_count: true
       });
     } else {
       throw new Error('Unsupported file type. Please use .xlsx or .csv files.');
     }
 
-    console.log(`Found ${records.length} records to import`);
+    // Filter out empty records and explanatory rows
+    records = records.filter(record => {
+      const hasContent = Object.values(record).some(value => 
+        value && String(value).trim() !== '' && 
+        !String(value).startsWith('Example:') &&
+        String(value) !== 'Timestamp' &&
+        String(value) !== 'Email Address'
+      );
+      return hasContent;
+    });
+
+    console.log(`Found ${records.length} valid records to import`);
 
     let newCount = 0;
     let updateCount = 0;
@@ -52,30 +63,52 @@ async function importRegulations(filePath?: string) {
 
     for (const record of records) {
       try {
-        // Extract common fields or set defaults
-        const itemId = record['Item ID'] || record['id'] || '';
-        const topic = record['Topic'] || record['name'] || '';
-        const requirements = record['description'] || 
-                           record['Reporting Requirements'] || 
-                           [record['Regulation 1'], record['Regulation 2'], record['Regulation 3'], 
-                            record['Regulation 4'], record['Regulation 5']].filter(Boolean).join('\n\n');
+        // Check if this is the compliance survey format
+        const isComplianceSurvey = record['Name of law/regulation'] !== undefined;
 
-        let category = "Other";
-        if (topic.toLowerCase().includes("academic")) category = "Academic Programs";
-        else if (topic.toLowerCase().includes("athletics")) category = "Athletics";
-        else if (topic.toLowerCase().includes("financial") || topic.toLowerCase().includes("accounting")) category = "Accounting";
-        else if (topic.toLowerCase().includes("admission")) category = "Admissions";
-        else if (topic.toLowerCase().includes("safety") || topic.toLowerCase().includes("security")) category = "Campus Safety";
+        // Generate a unique itemId for survey responses
+        let itemId = '';
+        if (isComplianceSurvey) {
+          const timestamp = record['Timestamp'];
+          if (timestamp) {
+            // Convert timestamp to a format suitable for itemId
+            const date = new Date(timestamp);
+            itemId = `REG-${date.getFullYear()}${(date.getMonth() + 1).toString().padStart(2, '0')}${date.getDate().toString().padStart(2, '0')}-${date.getTime().toString().slice(-4)}`;
+          }
+        } else {
+          itemId = record['Item ID'] || record['id'] || '';
+        }
 
-        const regulation: InsertRegulation = {
+        if (!itemId) continue; // Skip records without a valid ID
+
+        // Extract common fields or set defaults based on the file format
+        const regulation: InsertRegulation = isComplianceSurvey ? {
+          itemId,
+          topic: record['Name of law/regulation']?.split('(')[0]?.trim() || 'Unknown',
+          statute: record['Provide a web link to the law/regulation'] || "N/A",
+          statuteIds: record['Year of passage (original)'] || null,
+          summary: record['Briefly describe what Moravian must do to comply with the law.'] || null,
+          requirements: [
+            record['Briefly describe what we must tell our community to be compliant.'],
+            record['Briefly describe what we must submit to the regulatory agency to be compliant.']
+          ].filter(Boolean).join('\n\n'),
+          deadlines: null,
+          category: determineCategoryFromDivision(record['Please select your division of the institution.']),
+          regulationUrl: record['Provide a web link to the law/regulation'] || null,
+          requirementsUrl: record['Please attach the most recent copy of any notice sent to the community.'] || null,
+          lastUpdated: new Date()
+        } : {
           itemId: itemId.toString(),
-          topic,
+          topic: record['Topic'] || record['name'] || '',
           statute: record['Statute Name'] || record['Statute 1'] || "N/A",
           statuteIds: record['Statute IDs'] || null,
           summary: record['Statutory Summary'] || null,
-          requirements,
+          requirements: record['description'] || 
+                       record['Reporting Requirements'] || 
+                       [record['Regulation 1'], record['Regulation 2'], record['Regulation 3'], 
+                        record['Regulation 4'], record['Regulation 5']].filter(Boolean).join('\n\n'),
           deadlines: record['Deadlines'] || null,
-          category,
+          category: determineCategory(record['Topic'] || ''),
           regulationUrl: record['Regulation URL'] || null,
           requirementsUrl: record['Requirements URL'] || null,
           lastUpdated: record['Last Updated'] ? new Date(record['Last Updated']) : new Date()
@@ -96,7 +129,7 @@ async function importRegulations(filePath?: string) {
       } catch (error: any) {
         if (error?.code === '23505') { // Duplicate key error
           skipCount++;
-          console.log(`Skipped duplicate regulation: ${record['Item ID'] || record['id']}`);
+          console.log(`Skipped duplicate regulation: ${record['Item ID'] || record['id'] || record['Timestamp']}`);
         } else {
           console.error(`Failed to import record:`, error);
           console.error('Record data:', JSON.stringify(record, null, 2));
@@ -117,6 +150,33 @@ async function importRegulations(filePath?: string) {
     console.error('Failed to read or process file:', error);
     throw error;
   }
+}
+
+function determineCategoryFromDivision(division: string): string {
+  if (!division) return "Other";
+
+  const divisionMap: Record<string, string> = {
+    "Academic Affairs": "Academic Programs",
+    "University/Student Life": "Student Life",
+    "Administration and Finance": "Administration",
+    "Enrollment Management": "Admissions",
+    "Athletics": "Athletics"
+  };
+
+  return divisionMap[division] || "Other";
+}
+
+function determineCategory(topic: string): string {
+  if (!topic) return "Other";
+
+  const topicLower = topic.toLowerCase();
+  if (topicLower.includes("academic")) return "Academic Programs";
+  if (topicLower.includes("athletics")) return "Athletics";
+  if (topicLower.includes("financial") || topicLower.includes("accounting")) return "Accounting";
+  if (topicLower.includes("admission")) return "Admissions";
+  if (topicLower.includes("safety") || topicLower.includes("security")) return "Campus Safety";
+
+  return "Other";
 }
 
 if (process.argv[2]) {
