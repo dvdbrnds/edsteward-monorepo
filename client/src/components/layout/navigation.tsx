@@ -35,6 +35,17 @@ import { Cog } from "lucide-react";
 
 const CHANGELOG = [
   {
+    version: "0.2.0",
+    date: "February 21, 2025",
+    changes: [
+      "Added comprehensive submission guidelines system with markdown support",
+      "Enhanced compliance wizard with category-specific requirements",
+      "Added regulation-specific notification override for admins",
+      "Improved deadline tracking and status visualization",
+      "Enhanced regulation detail page with better document organization",
+    ],
+  },
+  {
     version: "0.1.9",
     date: "February 21, 2025",
     changes: [
@@ -171,7 +182,7 @@ export default function Navigation() {
                     <Dialog>
                       <DialogTrigger asChild>
                         <button className="text-xs text-gray-300 ml-2 hover:text-white transition-colors">
-                          Alpha v0.1.9
+                          Alpha v0.2.0
                         </button>
                       </DialogTrigger>
                       <DialogContent className="max-h-[80vh] overflow-y-auto">
