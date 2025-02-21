@@ -277,16 +277,6 @@ export default function ReportsPage() {
     return acc;
   }, {} as Record<string, number>) || {};
 
-  const deadlineSummary = deadlines?.reduce((acc, deadline) => {
-    acc[deadline.status] = (acc[deadline.status] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>) || {};
-
-  const categoryChartData = Object.entries(categorySummary).map(([name, value]) => ({
-    name,
-    value,
-  }));
-
   const calculateDeadlineStatus = (deadline: any) => {
   const today = new Date();
   const dueDate = new Date(deadline.dueDate);
@@ -294,23 +284,28 @@ export default function ReportsPage() {
   return dueDate < today ? "overdue" : "pending";
 };
 
-const deadlineSummary = deadlines?.reduce((acc: Record<string, number>, deadline) => {
-  const status = calculateDeadlineStatus(deadline);
-  acc[status] = (acc[status] || 0) + 1;
-  return acc;
-}, {});
+  const deadlineSummary = deadlines?.reduce((acc: Record<string, number>, deadline) => {
+    const status = calculateDeadlineStatus(deadline);
+    acc[status] = (acc[status] || 0) + 1;
+    return acc;
+  }, {});
 
-const deadlineChartData = Object.entries(deadlineSummary || {}).map(([name, value]) => {
-  const displayName = name === "completed"
-    ? "Completed"
-    : name === "overdue"
-    ? "Overdue"
-    : "Pending";
-  return {
-    name: displayName,
+  const categoryChartData = Object.entries(categorySummary).map(([name, value]) => ({
+    name,
     value,
-  };
-});
+  }));
+
+  const deadlineChartData = Object.entries(deadlineSummary || {}).map(([name, value]) => {
+    const displayName = name === "completed"
+      ? "Completed"
+      : name === "overdue"
+      ? "Overdue"
+      : "Pending";
+    return {
+      name: displayName,
+      value,
+    };
+  });
 
   const getStatusColor = (status: string) => {
     switch (status) {
