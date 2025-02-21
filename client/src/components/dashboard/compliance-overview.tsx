@@ -12,30 +12,24 @@ import {
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 
-// Moravian University brand colors with expanded palette for categories
+// Standard pie chart colors
 const CATEGORY_COLORS = {
-  "Academic Programs": "#b3c7f7",    // Light blue with black text
-  "Financial Aid": "#8babf1",        // Medium light blue with black text
-  "Student Services": "#0073e6",     // Bright blue with white text
-  "Athletics": "#0461cf",           // Medium blue with white text
-  "Campus Safety": "#054fb9",       // Dark blue with white text
-  "Research": "#b3c7f7",            // Light blue with black text
-  "Other": "#8babf1",               // Medium light blue with black text
-  "Admissions": "#0073e6",          // Bright blue with white text
-  "Facilities": "#0461cf",          // Medium blue with white text
-  "Human Resources": "#054fb9",      // Dark blue with white text
-  "Technology": "#b3c7f7",          // Light blue with black text
-  "International": "#8babf1",       // Medium light blue with black text
-  "Library": "#0073e6",             // Bright blue with white text
-  "Legal": "#0461cf",              // Medium blue with white text
-  "Diversity": "#054fb9"           // Dark blue with white text
+  "Academic Programs": "#2196F3",    // Blue
+  "Financial Aid": "#4CAF50",        // Green
+  "Student Services": "#FFC107",     // Amber
+  "Athletics": "#F44336",           // Red
+  "Campus Safety": "#9C27B0",       // Purple
+  "Research": "#00BCD4",            // Cyan
+  "Other": "#795548",               // Brown
+  "Admissions": "#FF9800",          // Orange
+  "Facilities": "#607D8B",          // Blue Grey
+  "Human Resources": "#E91E63",      // Pink
+  "Technology": "#673AB7",          // Deep Purple
+  "International": "#3F51B5",       // Indigo
+  "Library": "#009688",             // Teal
+  "Legal": "#FF5722",              // Deep Orange
+  "Diversity": "#8BC34A"           // Light Green
 } as const;
-
-// Text color mapping based on background color
-const getTextColor = (categoryName: string) => {
-  const color = CATEGORY_COLORS[categoryName as keyof typeof CATEGORY_COLORS];
-  return ['#b3c7f7', '#8babf1'].includes(color) ? '#000000' : '#ffffff';
-};
 
 interface ComplianceOverviewProps {
   onCategorySelect: (category: string | null) => void;
@@ -66,8 +60,7 @@ export default function ComplianceOverview({ onCategorySelect, selectedCategory 
   const data = Object.entries(categories).map(([name, value]) => ({
     name,
     value,
-    color: CATEGORY_COLORS[name as keyof typeof CATEGORY_COLORS] || "#8babf1",
-    textColor: getTextColor(name)
+    color: CATEGORY_COLORS[name as keyof typeof CATEGORY_COLORS] || "#9E9E9E" // Default to grey if category not found
   }));
 
   return (
@@ -122,11 +115,10 @@ export default function ComplianceOverview({ onCategorySelect, selectedCategory 
               <Tooltip 
                 contentStyle={{
                   backgroundColor: 'white',
-                  border: '1px solid #00267A',
+                  border: '1px solid #e2e8f0',
                   borderRadius: '4px',
                   padding: '8px'
                 }}
-                itemStyle={{ color: '#00267A' }}
               />
             </PieChart>
           </ResponsiveContainer>
@@ -138,7 +130,7 @@ export default function ComplianceOverview({ onCategorySelect, selectedCategory 
               onClick={() => onCategorySelect(entry.name)}
               className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-md transition-all ${
                 selectedCategory === entry.name 
-                  ? 'bg-gray-100 font-medium ring-2 ring-[#00267A] ring-opacity-50' 
+                  ? 'bg-gray-100 font-medium ring-2 ring-gray-300' 
                   : 'hover:bg-gray-50'
               }`}
             >
@@ -146,10 +138,7 @@ export default function ComplianceOverview({ onCategorySelect, selectedCategory 
                 className="w-3 h-3 rounded-sm"
                 style={{ backgroundColor: entry.color }}
               />
-              <span 
-                className="text-sm"
-                style={{ color: entry.textColor }}
-              >
+              <span className="text-sm text-gray-700">
                 {entry.name}
               </span>
             </button>
