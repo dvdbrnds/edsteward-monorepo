@@ -35,6 +35,16 @@ import { Cog } from "lucide-react";
 
 const CHANGELOG = [
   {
+    version: "0.2.1",
+    date: "February 24, 2025",
+    changes: [
+      "Added jurisdiction filtering for federal and state regulations",
+      "Implemented sortable columns in regulations table",
+      "Fixed user registration workflow with proper email field validation",
+      "Enhanced table UI with sort indicators and improved column headers"
+    ],
+  },
+  {
     version: "0.2.0",
     date: "February 21, 2025",
     changes: [
@@ -182,7 +192,7 @@ export default function Navigation() {
                     <Dialog>
                       <DialogTrigger asChild>
                         <button className="text-xs text-gray-300 ml-2 hover:text-white transition-colors">
-                          Alpha v0.2.0
+                          Alpha v0.2.1
                         </button>
                       </DialogTrigger>
                       <DialogContent className="max-h-[80vh] overflow-y-auto">
