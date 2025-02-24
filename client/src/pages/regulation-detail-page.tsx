@@ -306,7 +306,7 @@ export default function RegulationDetailPage() {
                             {paragraph.trim()}
                           </p>
                         ))
-                      || "No summary available."}
+                        || "No summary available."}
                     </div>
                   </CardContent>
                 </Card>
@@ -473,7 +473,44 @@ export default function RegulationDetailPage() {
               {/* Right Column */}
               <div className="space-y-6">
                 {/* Add Health Score at the top of the right column */}
-                <RegulationHealthScore regulation={regulation} />
+                {regulation && (
+                  <RegulationHealthScore
+                    regulation={{
+                      id: regulation.id,
+                      itemId: regulation.itemId,
+                      name: regulation.name,
+                      topic: regulation.topic,
+                      statute: regulation.statute,
+                      statuteIds: regulation.statuteIds,
+                      summary: regulation.summary,
+                      requirements: regulation.requirements,
+                      category: regulation.category,
+                      jurisdiction: regulation.jurisdiction,
+                      isApplicable: regulation.isApplicable,
+                      filingDeadlines: regulation.filingDeadlines,
+                      agency_url: regulation.agency_url,
+                      agency_name: regulation.agency_name,
+                      agency_contact: regulation.agency_contact,
+                      agency_department: regulation.agency_department,
+                      regulationUrl: regulation.regulationUrl,
+                      requirementsUrl: regulation.requirementsUrl,
+                      submissionGuideUrl: regulation.submissionGuideUrl,
+                      formsUrl: regulation.formsUrl,
+                      submissionGuidelines: regulation.submissionGuidelines,
+                      regulationText: regulation.regulationText,
+                      applicableforms: regulation.applicableforms,
+                      relatedRegulations: regulation.relatedRegulations,
+                      complianceNotes: regulation.complianceNotes,
+                      verificationMethod: regulation.verificationMethod,
+                      originationDate: regulation.originationDate,
+                      effectiveDate: regulation.effectiveDate,
+                      lastUpdated: regulation.lastUpdated,
+                      lastVerified: regulation.lastVerified,
+                      nextReviewDate: regulation.nextReviewDate,
+                      reportingFrequency: regulation.reportingFrequency,
+                    }}
+                  />
+                )}
 
                 <Card>
                   <CardHeader>
