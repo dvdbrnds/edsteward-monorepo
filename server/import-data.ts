@@ -454,11 +454,12 @@ async function importRegulations(filePath?: string) {
           agency_name: record['Agency Name'] || getAgencyName(record['Agency URL']),
           regulationText: buildRegulationText(record) || "Regulation details to be added",
           filingDeadlines: record['Deadlines'] ?
-            JSON.stringify(record['Deadlines'].split(';').map((d: string) => ({
-              date: d.trim(),
+            JSON.parse(JSON.stringify(record['Deadlines'].split(';').map((d: string) => ({
               type: 'submission',
+              date: d.trim(),
+              frequency: 'one-time',
               description: 'Regulatory filing deadline'
-            }))) : null,
+            })))) : null,
           submissionGuidelines: record['Submission Guidelines'] || record['Reporting Requirements'] || 'No specific submission guidelines provided',
           // Set dates with default values using updated parseDate function
           originationDate: parseDate(record['Origination Date'] || record['Last Updated']),
