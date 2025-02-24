@@ -2,22 +2,27 @@ from services.etl import ETLService
 
 def test_etl():
     etl_service = ETLService()
-    
-    # Test CSV validation
+
+    # Test CSV validation with correct column mapping
+    required_columns = [
+        'item_id', 'name', 'topic', 'statute', 'requirements', 
+        'category', 'jurisdiction'
+    ]
+
     is_valid, message = etl_service.validate_csv(
-        'test_data.csv',
-        ['id', 'name', 'description']
+        'attached_assets/compliance-matrix.xlsx',
+        required_columns
     )
     print(f"Validation result: {is_valid}")
     print(f"Validation message: {message}")
-    
+
     if is_valid:
-        # Test CSV import
+        # Test import
         try:
             rows_imported = etl_service.import_csv(
-                'test_data.csv',
+                'attached_assets/compliance-matrix.xlsx',
                 'regulations',
-                ['id', 'name', 'description']
+                required_columns
             )
             print(f"Successfully imported {rows_imported} rows")
         except Exception as e:
