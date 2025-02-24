@@ -108,6 +108,7 @@ export class DatabaseStorage implements IStorage {
     const result = await db.select({
       id: regulations.id,
       itemId: regulations.itemId,
+      name: regulations.name,
       topic: regulations.topic,
       statute: regulations.statute,
       statuteIds: regulations.statuteIds,
