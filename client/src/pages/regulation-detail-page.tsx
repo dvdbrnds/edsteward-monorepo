@@ -48,6 +48,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import RegulationHealthScore from "@/components/regulations/regulation-health-score";
 
 // Extend Regulation type to include notification override
 interface RegulationWithOverride extends Regulation {
@@ -471,6 +472,9 @@ export default function RegulationDetailPage() {
 
               {/* Right Column */}
               <div className="space-y-6">
+                {/* Add Health Score at the top of the right column */}
+                <RegulationHealthScore regulation={regulation} />
+
                 <Card>
                   <CardHeader>
                     <CardTitle>Deadlines</CardTitle>
