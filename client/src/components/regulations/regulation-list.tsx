@@ -197,7 +197,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
       <Card>
         <CardContent className="p-6">
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
-            <div className="relative flex-1 animate-fade-in"> {/* Added animation class */}
+            <div className="relative flex-1"> 
               <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input
                 placeholder="Search regulations..."
@@ -308,12 +308,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                   return (
                     <TableRow
                       key={regulation.id}
-                      className={cn(
-                        "cursor-pointer hover:bg-gray-50 color-transition hover-lift active-press animate-fade-in",
-                        {
-                          "opacity-75":  false, //createRegulationMutation.isPending,  -  Removed due to absence in original code.
-                        }
-                      )}
+                      className="cursor-pointer hover:bg-gray-50"
                       onClick={() => handleRowClick(regulation)}
                     >
                       <TableCell>{regulation.itemId}</TableCell>
@@ -385,7 +380,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                 })}
                 {filteredRegulations.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={8} className="text-center py-4 animate-fade-in"> {/* Added animation class */}
+                    <TableCell colSpan={8} className="text-center py-4"> 
                       No regulations found
                     </TableCell>
                   </TableRow>

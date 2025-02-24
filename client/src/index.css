@@ -11,35 +11,3 @@
     @apply font-sans antialiased bg-background text-foreground;
   }
 }
-
-@layer utilities {
-  /* Fade in animation */
-  .animate-fade-in {
-    @apply opacity-0 animate-in fade-in duration-300;
-  }
-
-  /* Slide up animation */
-  .animate-slide-up {
-    @apply translate-y-4 opacity-0 animate-in slide-in-from-bottom-4 duration-300;
-  }
-
-  /* Scale animation */
-  .animate-scale {
-    @apply scale-95 opacity-0 animate-in zoom-in duration-300;
-  }
-
-  /* Hover effect for interactive elements */
-  .hover-lift {
-    @apply transition-transform duration-200 hover:-translate-y-0.5;
-  }
-
-  /* Click effect */
-  .active-press {
-    @apply active:scale-95 transition-transform duration-100;
-  }
-
-  /* Smooth color transitions */
-  .color-transition {
-    @apply transition-colors duration-200;
-  }
-}
