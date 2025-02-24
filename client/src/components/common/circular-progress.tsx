@@ -41,29 +41,43 @@ export default function CircularProgress({
   return (
     <div className={cn("relative inline-flex items-center justify-center", sizeClasses[size], className)}>
       <svg className="transform -rotate-90 w-full h-full">
+        <defs>
+          <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="currentColor" stopOpacity="0.1" />
+            <stop offset={`${normalizedProgress}%`} stopColor="currentColor" />
+          </linearGradient>
+        </defs>
         {/* Background circle */}
         <circle
-          className="text-gray-100"
+          className="text-gray-100 transition-all duration-500 ease-in-out"
           strokeWidth={strokeWidth}
           stroke="currentColor"
-          fill="currentColor"
+          fill="transparent"
           r={radius}
           cx="50%"
           cy="50%"
         />
         {/* Progress circle */}
         <circle
-          className={cn("transition-all duration-300 ease-in-out", getColor(normalizedProgress))}
+          className={cn("transition-all duration-500 ease-in-out", getColor(normalizedProgress))}
           strokeWidth={strokeWidth}
           strokeDasharray={circumference}
           strokeDashoffset={offset}
           strokeLinecap="round"
-          stroke="currentColor"
-          fill="currentColor"
+          stroke="url(#progressGradient)"
+          fill="transparent"
           r={radius}
           cx="50%"
           cy="50%"
-        />
+        >
+          <animate
+            attributeName="stroke-dashoffset"
+            from={circumference}
+            to={offset}
+            dur="1s"
+            fill="freeze"
+          />
+        </circle>
       </svg>
       {showPercentage && (
         <div className={cn(
