@@ -115,7 +115,7 @@ export default function RegulationHealthScore({ regulation }: RegulationHealthSc
             <div className="text-center">
               <div className="relative inline-flex items-center justify-center">
                 <svg
-                  className="transform -rotate-90 w-32 h-32 animate-fade-in"
+                  className="transform -rotate-90 w-32 h-32"
                   viewBox={`0 0 ${CIRCLE_SIZE} ${CIRCLE_SIZE}`}
                 >
                   {/* Background circle */}
@@ -123,7 +123,7 @@ export default function RegulationHealthScore({ regulation }: RegulationHealthSc
                     cx={CIRCLE_SIZE / 2}
                     cy={CIRCLE_SIZE / 2}
                     r={RADIUS}
-                    className="stroke-gray-200 transition-all duration-500"
+                    className="stroke-gray-200"
                     strokeWidth={STROKE_WIDTH}
                     fill="none"
                   />
@@ -132,7 +132,7 @@ export default function RegulationHealthScore({ regulation }: RegulationHealthSc
                     cx={CIRCLE_SIZE / 2}
                     cy={CIRCLE_SIZE / 2}
                     r={RADIUS}
-                    className={`${getScoreBorderColor(overallScore)} transition-all duration-700 ease-in-out`}
+                    className={`${getScoreBorderColor(overallScore)} transition-all duration-300 ease-in-out`}
                     strokeWidth={STROKE_WIDTH}
                     strokeDasharray={CIRCUMFERENCE}
                     strokeDashoffset={getProgressOffset(overallScore)}
@@ -150,12 +150,8 @@ export default function RegulationHealthScore({ regulation }: RegulationHealthSc
 
             {/* Individual Metrics */}
             <div className="space-y-4">
-              {healthMetrics.map((metric, index) => (
-                <div 
-                  key={metric.name} 
-                  className="space-y-2 animate-slide-up"
-                  style={{ animationDelay: `${index * 100}ms` }}
-                >
+              {healthMetrics.map((metric) => (
+                <div key={metric.name} className="space-y-2">
                   <div className="flex justify-between items-center">
                     <Tooltip>
                       <TooltipTrigger className="text-sm font-medium">

@@ -194,202 +194,202 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
 
   return (
     <TooltipProvider>
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex flex-col sm:flex-row gap-4 mb-6">
-            <div className="relative flex-1"> 
-              <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="Search regulations..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-9 hover-lift color-transition focus:border-primary"
-              />
-            </div>
+    <Card>
+      <CardContent className="p-6">
+        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Input
+              placeholder="Search regulations..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-9"
+            />
           </div>
+        </div>
 
-          <div className="rounded-md border">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead {...getColumnHeaderProps("itemId")}>
-                    <Tooltip>
-                      <TooltipTrigger className="flex items-center gap-2">
-                        ID
-                        <ArrowUpDown className="h-4 w-4" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p className="max-w-xs">{COLUMN_TOOLTIPS.id}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TableHead>
-                  <TableHead>
-                    <Tooltip>
-                      <TooltipTrigger>Health</TooltipTrigger>
-                      <TooltipContent>
-                        <p className="max-w-xs">{COLUMN_TOOLTIPS.health}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TableHead>
-                  <TableHead {...getColumnHeaderProps("jurisdiction")}>
-                    <Tooltip>
-                      <TooltipTrigger className="flex items-center gap-2">
-                        Jurisdiction
-                        <ArrowUpDown className="h-4 w-4" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p className="max-w-xs">{COLUMN_TOOLTIPS.jurisdiction}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TableHead>
-                  <TableHead {...getColumnHeaderProps("topic")}>
-                    <Tooltip>
-                      <TooltipTrigger className="flex items-center gap-2">
-                        Topic
-                        <ArrowUpDown className="h-4 w-4" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p className="max-w-xs">{COLUMN_TOOLTIPS.topic}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TableHead>
-                  <TableHead {...getColumnHeaderProps("agency_name")}>
-                    <Tooltip>
-                      <TooltipTrigger className="flex items-center gap-2">
-                        Agency
-                        <ArrowUpDown className="h-4 w-4" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p className="max-w-xs">{COLUMN_TOOLTIPS.agency}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TableHead>
-                  <TableHead {...getColumnHeaderProps("statute")}>
-                    <Tooltip>
-                      <TooltipTrigger className="flex items-center gap-2">
-                        Regulation
-                        <ArrowUpDown className="h-4 w-4" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p className="max-w-xs">{COLUMN_TOOLTIPS.regulation}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TableHead>
-                  <TableHead {...getColumnHeaderProps("category")}>
-                    <Tooltip>
-                      <TooltipTrigger className="flex items-center gap-2">
-                        Category
-                        <ArrowUpDown className="h-4 w-4" />
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p className="max-w-xs">{COLUMN_TOOLTIPS.category}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TableHead>
-                  <TableHead>
-                    <Tooltip>
-                      <TooltipTrigger>Next Deadline</TooltipTrigger>
-                      <TooltipContent>
-                        <p className="max-w-xs">{COLUMN_TOOLTIPS.deadline}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredRegulations.map((regulation) => {
-                  const regulationDeadlines = deadlines?.filter(d => d.regulationId === regulation.id) || [];
-                  const nextDeadline = regulationDeadlines.length > 0
-                    ? regulationDeadlines.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0]
-                    : null;
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead {...getColumnHeaderProps("itemId")}>
+                  <Tooltip>
+                    <TooltipTrigger className="flex items-center gap-2">
+                      ID
+                      <ArrowUpDown className="h-4 w-4" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">{COLUMN_TOOLTIPS.id}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TableHead>
+                <TableHead>
+                  <Tooltip>
+                    <TooltipTrigger>Health</TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">{COLUMN_TOOLTIPS.health}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TableHead>
+                <TableHead {...getColumnHeaderProps("jurisdiction")}>
+                  <Tooltip>
+                    <TooltipTrigger className="flex items-center gap-2">
+                      Jurisdiction
+                      <ArrowUpDown className="h-4 w-4" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">{COLUMN_TOOLTIPS.jurisdiction}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TableHead>
+                <TableHead {...getColumnHeaderProps("topic")}>
+                  <Tooltip>
+                    <TooltipTrigger className="flex items-center gap-2">
+                      Topic
+                      <ArrowUpDown className="h-4 w-4" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">{COLUMN_TOOLTIPS.topic}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TableHead>
+                <TableHead {...getColumnHeaderProps("agency_name")}>
+                  <Tooltip>
+                    <TooltipTrigger className="flex items-center gap-2">
+                      Agency
+                      <ArrowUpDown className="h-4 w-4" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">{COLUMN_TOOLTIPS.agency}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TableHead>
+                <TableHead {...getColumnHeaderProps("statute")}>
+                  <Tooltip>
+                    <TooltipTrigger className="flex items-center gap-2">
+                      Regulation
+                      <ArrowUpDown className="h-4 w-4" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">{COLUMN_TOOLTIPS.regulation}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TableHead>
+                <TableHead {...getColumnHeaderProps("category")}>
+                  <Tooltip>
+                    <TooltipTrigger className="flex items-center gap-2">
+                      Category
+                      <ArrowUpDown className="h-4 w-4" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">{COLUMN_TOOLTIPS.category}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TableHead>
+                <TableHead>
+                  <Tooltip>
+                    <TooltipTrigger>Next Deadline</TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">{COLUMN_TOOLTIPS.deadline}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredRegulations.map((regulation) => {
+                const regulationDeadlines = deadlines?.filter(d => d.regulationId === regulation.id) || [];
+                const nextDeadline = regulationDeadlines.length > 0
+                  ? regulationDeadlines.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0]
+                  : null;
 
-                  const healthScore = calculateHealthScore(regulation);
+                const healthScore = calculateHealthScore(regulation);
 
-                  return (
-                    <TableRow
-                      key={regulation.id}
-                      className="cursor-pointer hover:bg-gray-50"
-                      onClick={() => handleRowClick(regulation)}
-                    >
-                      <TableCell>{regulation.itemId}</TableCell>
-                      <TableCell>
-                        <HealthScoreIndicator score={healthScore} size="sm" />
-                      </TableCell>
-                      <TableCell>
-                        <span className="capitalize">{regulation.jurisdiction}</span>
-                      </TableCell>
-                      <TableCell>
-                        <div className="text-base font-medium text-gray-900">
-                          {regulation.statute}
-                        </div>
-                        <div className="text-sm text-gray-500 mt-1">
-                          {regulation.topic}
-                        </div>
-                      </TableCell>
-                      <TableCell>
-                        {regulation.agency_url ? (
-                          <a
-                            href={regulation.agency_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[#00267A] hover:text-[#003166] underline inline-flex items-center gap-2 group"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            {regulation.agency_name || getAgencyName(regulation.agency_url)}
-                            <ExternalLink className="h-3 w-3" />
-                          </a>
-                        ) : (
-                          'N/A'
-                        )}
-                      </TableCell>
-                      <TableCell>
-                        {regulation.statute || 'N/A'}
-                        {regulation.statuteIds && (
-                          <span className="text-gray-500 text-sm block">
-                            {regulation.statuteIds}
+                return (
+                  <TableRow
+                    key={regulation.id}
+                    className="cursor-pointer hover:bg-gray-50"
+                    onClick={() => handleRowClick(regulation)}
+                  >
+                    <TableCell>{regulation.itemId}</TableCell>
+                    <TableCell>
+                      <HealthScoreIndicator score={healthScore} size="sm" />
+                    </TableCell>
+                    <TableCell>
+                      <span className="capitalize">{regulation.jurisdiction}</span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="text-base font-medium text-gray-900">
+                        {regulation.statute}
+                      </div>
+                      <div className="text-sm text-gray-500 mt-1">
+                        {regulation.topic}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {regulation.agency_url ? (
+                        <a
+                          href={regulation.agency_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#00267A] hover:text-[#003166] underline inline-flex items-center gap-2 group"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {regulation.agency_name || getAgencyName(regulation.agency_url)}
+                          <ExternalLink className="h-3 w-3" />
+                        </a>
+                      ) : (
+                        'N/A'
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {regulation.statute || 'N/A'}
+                      {regulation.statuteIds && (
+                        <span className="text-gray-500 text-sm block">
+                          {regulation.statuteIds}
+                        </span>
+                      )}
+                    </TableCell>
+                    <TableCell>{regulation.category || 'N/A'}</TableCell>
+                    <TableCell>
+                      {nextDeadline ? (
+                        <div className="flex items-center gap-2">
+                          {nextDeadline.status === "completed" ? (
+                            <CheckCircle className="h-4 w-4 text-green-500" />
+                          ) : nextDeadline.status === "overdue" ? (
+                            <AlertCircle className="h-4 w-4 text-red-500" />
+                          ) : (
+                            <Clock className="h-4 w-4 text-yellow-500" />
+                          )}
+                          <span className={
+                            nextDeadline.status === "completed"
+                              ? "text-green-600"
+                              : nextDeadline.status === "overdue"
+                              ? "text-red-600"
+                              : "text-yellow-600"
+                          }>
+                            {format(new Date(nextDeadline.dueDate), "PP")}
                           </span>
-                        )}
-                      </TableCell>
-                      <TableCell>{regulation.category || 'N/A'}</TableCell>
-                      <TableCell>
-                        {nextDeadline ? (
-                          <div className="flex items-center gap-2">
-                            {nextDeadline.status === "completed" ? (
-                              <CheckCircle className="h-4 w-4 text-green-500" />
-                            ) : nextDeadline.status === "overdue" ? (
-                              <AlertCircle className="h-4 w-4 text-red-500" />
-                            ) : (
-                              <Clock className="h-4 w-4 text-yellow-500" />
-                            )}
-                            <span className={
-                              nextDeadline.status === "completed"
-                                ? "text-green-600"
-                                : nextDeadline.status === "overdue"
-                                ? "text-red-600"
-                                : "text-yellow-600"
-                            }>
-                              {format(new Date(nextDeadline.dueDate), "PP")}
-                            </span>
-                          </div>
-                        ) : (
-                          <span className="text-gray-500">No deadlines</span>
-                        )}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-                {filteredRegulations.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={8} className="text-center py-4"> 
-                      No regulations found
+                        </div>
+                      ) : (
+                        <span className="text-gray-500">No deadlines</span>
+                      )}
                     </TableCell>
                   </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </CardContent>
-      </Card>
+                );
+              })}
+              {filteredRegulations.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={8} className="text-center py-4">
+                    No regulations found
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+      </CardContent>
+    </Card>
     </TooltipProvider>
   );
 }
