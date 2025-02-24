@@ -108,6 +108,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
             <TableHeader>
               <TableRow>
                 <TableHead>ID</TableHead>
+                <TableHead>Jurisdiction</TableHead>
                 <TableHead>Topic</TableHead>
                 <TableHead>Agency</TableHead>
                 <TableHead>Regulation</TableHead>
@@ -129,6 +130,9 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                     onClick={() => handleRowClick(regulation)}
                   >
                     <TableCell>{regulation.itemId}</TableCell>
+                    <TableCell>
+                      <span className="capitalize">{regulation.jurisdiction}</span>
+                    </TableCell>
                     <TableCell>
                       <div className="text-base font-medium text-gray-900">
                         {regulation.statute}
@@ -191,7 +195,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
               })}
               {filteredRegulations.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center py-4">
+                  <TableCell colSpan={7} className="text-center py-4">
                     No regulations found
                   </TableCell>
                 </TableRow>
