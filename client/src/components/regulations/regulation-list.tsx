@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type { Regulation, Deadline } from "@shared/schema";
 import { useLocation } from "wouter";
-import { Search, ExternalLink, CheckCircle, AlertCircle, Clock, Loader2 } from "lucide-react";
+import { Search, ExternalLink, CheckCircle, AlertCircle, Clock, Loader2, ArrowUpDown } from "lucide-react";
 import { differenceInDays, format } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -14,10 +14,16 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface RegulationListProps {
   categoryFilter: string | null;
 }
+
+type SortConfig = {
+  key: keyof Regulation;
+  direction: 'asc' | 'desc';
+} | null;
 
 // Helper function to get agency name from URL
 const getAgencyName = (url: string | null): string => {
@@ -41,6 +47,7 @@ const getAgencyName = (url: string | null): string => {
 
 export default function RegulationList({ categoryFilter }: RegulationListProps) {
   const [search, setSearch] = useState("");
+  const [sortConfig, setSortConfig] = useState<SortConfig>(null);
   const [_, navigate] = useLocation();
 
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
@@ -51,6 +58,34 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
     queryKey: ["/api/deadlines"],
     staleTime: 1000 * 60, // 1 minute
   });
+
+  const requestSort = (key: keyof Regulation) => {
+    setSortConfig(current => {
+      if (!current || current.key !== key) {
+        return { key, direction: 'asc' };
+      }
+      if (current.direction === 'asc') {
+        return { key, direction: 'desc' };
+      }
+      return null;
+    });
+  };
+
+  const sortData = (data: Regulation[]) => {
+    if (!sortConfig || !data) return data;
+
+    return [...data].sort((a, b) => {
+      const aValue = a[sortConfig.key];
+      const bValue = b[sortConfig.key];
+
+      if (!aValue && !bValue) return 0;
+      if (!aValue) return 1;
+      if (!bValue) return -1;
+
+      const comparison = String(aValue).localeCompare(String(bValue));
+      return sortConfig.direction === 'asc' ? comparison : -comparison;
+    });
+  };
 
   if (regulationsLoading || deadlinesLoading) {
     return (
@@ -88,6 +123,17 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
     );
   }
 
+  // Apply sorting
+  filteredRegulations = sortData(filteredRegulations);
+
+  const getColumnHeaderProps = (key: keyof Regulation) => ({
+    onClick: () => requestSort(key),
+    className: cn(
+      "cursor-pointer select-none",
+      sortConfig?.key === key && "font-bold"
+    ),
+  });
+
   return (
     <Card>
       <CardContent className="p-6">
@@ -107,12 +153,42 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>ID</TableHead>
-                <TableHead>Jurisdiction</TableHead>
-                <TableHead>Topic</TableHead>
-                <TableHead>Agency</TableHead>
-                <TableHead>Regulation</TableHead>
-                <TableHead>Category</TableHead>
+                <TableHead {...getColumnHeaderProps("itemId")}>
+                  <div className="flex items-center gap-2">
+                    ID
+                    <ArrowUpDown className="h-4 w-4" />
+                  </div>
+                </TableHead>
+                <TableHead {...getColumnHeaderProps("jurisdiction")}>
+                  <div className="flex items-center gap-2">
+                    Jurisdiction
+                    <ArrowUpDown className="h-4 w-4" />
+                  </div>
+                </TableHead>
+                <TableHead {...getColumnHeaderProps("topic")}>
+                  <div className="flex items-center gap-2">
+                    Topic
+                    <ArrowUpDown className="h-4 w-4" />
+                  </div>
+                </TableHead>
+                <TableHead {...getColumnHeaderProps("agency_name")}>
+                  <div className="flex items-center gap-2">
+                    Agency
+                    <ArrowUpDown className="h-4 w-4" />
+                  </div>
+                </TableHead>
+                <TableHead {...getColumnHeaderProps("statute")}>
+                  <div className="flex items-center gap-2">
+                    Regulation
+                    <ArrowUpDown className="h-4 w-4" />
+                  </div>
+                </TableHead>
+                <TableHead {...getColumnHeaderProps("category")}>
+                  <div className="flex items-center gap-2">
+                    Category
+                    <ArrowUpDown className="h-4 w-4" />
+                  </div>
+                </TableHead>
                 <TableHead>Next Deadline</TableHead>
               </TableRow>
             </TableHeader>
