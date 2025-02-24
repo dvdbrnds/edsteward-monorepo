@@ -6,6 +6,7 @@ import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
+  TooltipProvider,
 } from "@/components/ui/tooltip";
 import type { Regulation } from "@shared/schema";
 
@@ -67,56 +68,58 @@ export default function RegulationHealthScore({ regulation }: RegulationHealthSc
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          Regulation Health Score
-          <Tooltip>
-            <TooltipTrigger>
-              <Info className="h-4 w-4 text-gray-400" />
-            </TooltipTrigger>
-            <TooltipContent>
-              <p className="max-w-xs">
-                A composite score indicating the overall health and compliance status of this regulation
-              </p>
-            </TooltipContent>
-          </Tooltip>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-6">
-          {/* Overall Score */}
-          <div className="text-center">
-            <div className="inline-flex items-center justify-center w-32 h-32 rounded-full border-8 border-gray-100">
-              <div className="text-4xl font-bold">{overallScore}</div>
+    <TooltipProvider>
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            Regulation Health Score
+            <Tooltip>
+              <TooltipTrigger>
+                <Info className="h-4 w-4 text-gray-400" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="max-w-xs">
+                  A composite score indicating the overall health and compliance status of this regulation
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-6">
+            {/* Overall Score */}
+            <div className="text-center">
+              <div className="inline-flex items-center justify-center w-32 h-32 rounded-full border-8 border-gray-100">
+                <div className="text-4xl font-bold">{overallScore}</div>
+              </div>
+            </div>
+
+            {/* Individual Metrics */}
+            <div className="space-y-4">
+              {healthMetrics.map((metric) => (
+                <div key={metric.name} className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <Tooltip>
+                      <TooltipTrigger className="text-sm font-medium">
+                        {metric.name}
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p className="max-w-xs">{metric.details}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                    <span className="text-sm">{metric.score}%</span>
+                  </div>
+                  <Progress
+                    value={metric.score}
+                    className={getScoreColor(metric.score)}
+                  />
+                </div>
+              ))}
             </div>
           </div>
-
-          {/* Individual Metrics */}
-          <div className="space-y-4">
-            {healthMetrics.map((metric) => (
-              <div key={metric.name} className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <Tooltip>
-                    <TooltipTrigger className="text-sm font-medium">
-                      {metric.name}
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="max-w-xs">{metric.details}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                  <span className="text-sm">{metric.score}%</span>
-                </div>
-                <Progress
-                  value={metric.score}
-                  className={getScoreColor(metric.score)}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </TooltipProvider>
   );
 }
 
