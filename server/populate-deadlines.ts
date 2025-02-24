@@ -1,6 +1,6 @@
 import { storage } from "./storage";
 import type { InsertDeadline } from "@shared/schema";
-import { parse, isBefore } from "date-fns";
+import { parse, isBefore, addYears } from "date-fns";
 
 async function populateDeadlines() {
   try {
@@ -11,78 +11,92 @@ async function populateDeadlines() {
     console.log(`Found ${regulations.length} regulations to process`);
 
     let deadlinesCreated = 0;
+    let defaultDeadlinesCreated = 0;
 
     for (const regulation of regulations) {
       try {
-        if (!regulation.filingDeadlines || regulation.filingDeadlines.length === 0) {
-          console.log(`No filing deadlines for regulation ${regulation.itemId}`);
-          continue;
-        }
+        // Process explicit filing deadlines if they exist
+        if (regulation.filingDeadlines && regulation.filingDeadlines.length > 0) {
+          console.log(`Processing explicit deadlines for regulation ${regulation.itemId}`);
 
-        console.log(`Processing deadlines for regulation ${regulation.itemId}:`, regulation.filingDeadlines);
+          for (const filing of regulation.filingDeadlines) {
+            try {
+              // Parse the deadline date from the date field
+              let dueDate: Date | null = null;
+              const dateFormats = [
+                'yyyy-MM-dd',
+                'MM/dd/yyyy',
+                'MM-dd-yyyy'
+              ];
 
-        // Process each filing deadline from the JSONB array
-        for (const filing of regulation.filingDeadlines) {
-          try {
-            // Parse the deadline date from the date field
-            let dueDate: Date | null = null;
-            const dateFormats = [
-              'yyyy-MM-dd',
-              'MM/dd/yyyy',
-              'MM-dd-yyyy'
-            ];
-
-            // First try to match a date in yyyy-MM-dd format
-            const isoMatch = filing.date.match(/\d{4}[-/]\d{2}[-/]\d{2}/);
-            if (isoMatch) {
-              try {
-                dueDate = parse(isoMatch[0], 'yyyy-MM-dd', new Date());
-              } catch (e) {
-                console.log(`Failed to parse ISO date ${isoMatch[0]}`);
+              // First try to match a date in yyyy-MM-dd format
+              const isoMatch = filing.date.match(/\d{4}[-/]\d{2}[-/]\d{2}/);
+              if (isoMatch) {
+                try {
+                  dueDate = parse(isoMatch[0], 'yyyy-MM-dd', new Date());
+                } catch (e) {
+                  console.log(`Failed to parse ISO date ${isoMatch[0]}`);
+                }
               }
-            }
 
-            // If no ISO date found, try other formats
-            if (!dueDate) {
-              const anyDateMatch = filing.date.match(/\d{1,2}[-/]\d{1,2}[-/]\d{4}/);
-              if (anyDateMatch) {
-                for (const format of dateFormats) {
-                  try {
-                    dueDate = parse(anyDateMatch[0], format, new Date());
-                    if (dueDate && !isNaN(dueDate.getTime())) {
-                      break;
+              // If no ISO date found, try other formats
+              if (!dueDate) {
+                const anyDateMatch = filing.date.match(/\d{1,2}[-/]\d{1,2}[-/]\d{4}/);
+                if (anyDateMatch) {
+                  for (const format of dateFormats) {
+                    try {
+                      dueDate = parse(anyDateMatch[0], format, new Date());
+                      if (dueDate && !isNaN(dueDate.getTime())) {
+                        break;
+                      }
+                    } catch (e) {
+                      continue;
                     }
-                  } catch (e) {
-                    continue;
                   }
                 }
               }
+
+              if (!dueDate) {
+                console.log(`No valid date found in filing deadline: ${filing.date}`);
+                continue;
+              }
+
+              // Set status based on due date
+              const today = new Date();
+              const status = isBefore(dueDate, today) ? "overdue" : "pending";
+
+              const deadline: InsertDeadline = {
+                regulationId: regulation.id,
+                dueDate: dueDate.toISOString().split('T')[0], // Convert to YYYY-MM-DD string format
+                status,
+                assignedTo: 1, // Default to first user
+              };
+
+              await storage.createDeadline(deadline);
+              deadlinesCreated++;
+              console.log(`Created explicit deadline for regulation ${regulation.itemId} (${deadline.dueDate})`);
+            } catch (error) {
+              console.error(`Failed to process filing deadline for regulation ${regulation.itemId}:`, error);
+              console.error('Filing deadline content:', filing);
             }
-
-            if (!dueDate) {
-              console.log(`No valid date found in filing deadline: ${filing.date}`);
-              continue;
-            }
-
-            // Set status based on due date
-            const today = new Date();
-            const status = isBefore(dueDate, today) ? "overdue" : "pending";
-
-            const deadline: InsertDeadline = {
-              regulationId: regulation.id,
-              dueDate: dueDate.toISOString().split('T')[0], // Convert to YYYY-MM-DD string format
-              status,
-              completed: false,
-              assignedTo: 6, // Assuming user ID 6 is the default compliance officer
-            };
-
-            await storage.createDeadline(deadline);
-            deadlinesCreated++;
-            console.log(`Created deadline for regulation ${regulation.itemId} (${deadline.dueDate})`);
-          } catch (error) {
-            console.error(`Failed to process filing deadline for regulation ${regulation.itemId}:`, error);
-            console.error('Filing deadline content:', filing);
           }
+        } else {
+          // Create default annual review deadline if no explicit deadlines exist
+          console.log(`Creating default annual review deadline for regulation ${regulation.itemId}`);
+
+          // Set default review date to one year from now
+          const defaultDueDate = addYears(new Date(), 1);
+
+          const defaultDeadline: InsertDeadline = {
+            regulationId: regulation.id,
+            dueDate: defaultDueDate.toISOString().split('T')[0],
+            status: "pending",
+            assignedTo: 1, // Default to first user
+          };
+
+          await storage.createDeadline(defaultDeadline);
+          defaultDeadlinesCreated++;
+          console.log(`Created default annual review deadline for regulation ${regulation.itemId}`);
         }
       } catch (error) {
         console.error(`Failed to process regulation ${regulation.itemId}:`, error);
@@ -93,7 +107,9 @@ async function populateDeadlines() {
     }
 
     console.log('\nDeadlines Population Summary:');
-    console.log(`Total deadlines created: ${deadlinesCreated}`);
+    console.log(`Total explicit deadlines created: ${deadlinesCreated}`);
+    console.log(`Total default deadlines created: ${defaultDeadlinesCreated}`);
+    console.log(`Total regulations processed: ${regulations.length}`);
     console.log('Population completed');
 
   } catch (error) {
