@@ -5,6 +5,7 @@ import { Search, ExternalLink, CheckCircle, AlertCircle, Clock, Loader2, ArrowUp
 import { differenceInDays, format } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import CircularProgress from "@/components/common/circular-progress";
 import {
   Table,
   TableBody,
@@ -25,7 +26,6 @@ type SortConfig = {
   direction: 'asc' | 'desc';
 } | null;
 
-// Helper function to get agency name from URL
 const getAgencyName = (url: string | null): string => {
   if (!url) return "N/A";
 
@@ -106,7 +106,6 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
     }
   };
 
-  // Filter regulations based on category and search
   let filteredRegulations = regulations || [];
 
   if (categoryFilter) {
@@ -123,7 +122,6 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
     );
   }
 
-  // Apply sorting
   filteredRegulations = sortData(filteredRegulations);
 
   const getColumnHeaderProps = (key: keyof Regulation) => ({
@@ -133,6 +131,15 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
       sortConfig?.key === key && "font-bold"
     ),
   });
+
+  // Calculate completion percentage based on deadlines
+  const calculateCompletionPercentage = (regulation: Regulation) => {
+    const regulationDeadlines = deadlines?.filter(d => d.regulationId === regulation.id) || [];
+    if (regulationDeadlines.length === 0) return 0;
+
+    const completedDeadlines = regulationDeadlines.filter(d => d.status === "completed").length;
+    return Math.round((completedDeadlines / regulationDeadlines.length) * 100);
+  };
 
   return (
     <Card>
@@ -153,6 +160,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead>Status</TableHead>
                 <TableHead {...getColumnHeaderProps("itemId")}>
                   <div className="flex items-center gap-2">
                     ID
@@ -198,6 +206,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                 const nextDeadline = regulationDeadlines.length > 0
                   ? regulationDeadlines.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0]
                   : null;
+                const completionPercentage = calculateCompletionPercentage(regulation);
 
                 return (
                   <TableRow
@@ -205,6 +214,15 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                     className="cursor-pointer hover:bg-gray-50"
                     onClick={() => handleRowClick(regulation)}
                   >
+                    <TableCell>
+                      <div className="flex items-center justify-center">
+                        <CircularProgress
+                          progress={completionPercentage}
+                          size="sm"
+                          showPercentage={true}
+                        />
+                      </div>
+                    </TableCell>
                     <TableCell>{regulation.itemId}</TableCell>
                     <TableCell>
                       <span className="capitalize">{regulation.jurisdiction}</span>
@@ -271,7 +289,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
               })}
               {filteredRegulations.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-4">
+                  <TableCell colSpan={8} className="text-center py-4">
                     No regulations found
                   </TableCell>
                 </TableRow>
