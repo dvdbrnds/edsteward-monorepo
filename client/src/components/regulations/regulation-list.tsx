@@ -187,7 +187,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                 </TableHead>
                 <TableHead {...getColumnHeaderProps("agency_name")}>
                   <div className="flex items-center gap-2">
-                    Agency
+                    Agency Info
                     <ArrowUpDown className="h-4 w-4" />
                   </div>
                 </TableHead>
@@ -238,20 +238,35 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                       </div>
                     </TableCell>
                     <TableCell>
-                      {regulation.agency_url ? (
-                        <a
-                          href={regulation.agency_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[#00267A] hover:text-[#003166] underline inline-flex items-center gap-2 group"
-                          onClick={(e) => e.stopPropagation()}
-                        >
+                      <div className="flex flex-col gap-1">
+                        <div className="text-sm">
                           {regulation.agency_name || getAgencyName(regulation.agency_url)}
-                          <ExternalLink className="h-3 w-3" />
-                        </a>
-                      ) : (
-                        'N/A'
-                      )}
+                        </div>
+                        {regulation.agency_url && (
+                          <a
+                            href={regulation.agency_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[#00267A] hover:text-[#003166] underline inline-flex items-center gap-1 text-sm group"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            View Agency Page
+                            <ExternalLink className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
+                          </a>
+                        )}
+                        {regulation.regulationUrl && (
+                          <a
+                            href={regulation.regulationUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[#00267A] hover:text-[#003166] underline inline-flex items-center gap-1 text-sm group"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            View Regulation
+                            <ExternalLink className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
+                          </a>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell>{regulation.category || 'N/A'}</TableCell>
                     <TableCell>

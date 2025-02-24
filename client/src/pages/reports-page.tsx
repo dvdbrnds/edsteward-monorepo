@@ -11,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { format } from "date-fns";
-import { Download, FileText, Upload, X, CheckCircle, AlertCircle, Clock } from "lucide-react";
+import { Download, FileText, Upload, X, CheckCircle, AlertCircle, Clock, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from "recharts";
 import { useState, useRef } from "react";
@@ -350,6 +350,14 @@ export default function ReportsPage() {
 
   const sortedRegulations = sortData(filteredRegulations);
 
+  const getAgencyName = (url: string | undefined): string => {
+    // Implement logic to extract agency name from URL if needed.  This is a placeholder.
+    if (!url) return "N/A";
+    //  Add your logic to extract name from url
+    return "Agency Name from URL";
+  };
+
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
@@ -412,7 +420,7 @@ export default function ReportsPage() {
                     <TableHead>Name</TableHead>
                     <TableHead>Topic</TableHead>
                     <TableHead>Category</TableHead>
-                    <TableHead>Agency</TableHead>
+                    <TableHead>Agency Info</TableHead>
                     <TableHead>Next Deadline</TableHead>
                     <TableHead>Last Updated</TableHead>
                   </TableRow>
@@ -439,19 +447,35 @@ export default function ReportsPage() {
                         </TableCell>
                         <TableCell>{regulation.category}</TableCell>
                         <TableCell>
-                          {regulation.agency_url ? (
-                            <a
-                              href={regulation.agency_url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-blue-600 hover:text-blue-800 hover:underline"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              {regulation.agency_name || 'View Agency'}
-                            </a>
-                          ) : (
-                            'N/A'
-                          )}
+                          <div className="flex flex-col gap-1">
+                            <div className="text-sm">
+                              {regulation.agency_name || getAgencyName(regulation.agency_url)}
+                            </div>
+                            {regulation.agency_url && (
+                              <a
+                                href={regulation.agency_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-[#00267A] hover:text-[#003166] underline inline-flex items-center gap-1 text-sm group"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                View Agency Page
+                                <ExternalLink className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
+                              </a>
+                            )}
+                            {regulation.regulationUrl && (
+                              <a
+                                href={regulation.regulationUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-[#00267A] hover:text-[#003166] underline inline-flex items-center gap-1 text-sm group"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                View Regulation
+                                <ExternalLink className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
+                              </a>
+                            )}
+                          </div>
                         </TableCell>
                         <TableCell>
                           {nextDeadline ? (
