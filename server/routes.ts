@@ -84,11 +84,21 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  // Deadlines endpoints
+  // Enhanced deadlines endpoint with error handling and sorting
   app.get("/api/deadlines", async (req, res) => {
     try {
+      console.log("Fetching deadlines...");
       const deadlines = await storage.getDeadlines();
-      res.json(deadlines);
+
+      // Sort deadlines by due date
+      const sortedDeadlines = deadlines.sort((a, b) => {
+        if (!a.dueDate) return 1;
+        if (!b.dueDate) return -1;
+        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime();
+      });
+
+      console.log(`Found ${sortedDeadlines.length} deadlines`);
+      res.json(sortedDeadlines);
     } catch (error) {
       console.error("Failed to fetch deadlines:", error);
       res.status(500).json({ error: "Failed to fetch deadlines" });
