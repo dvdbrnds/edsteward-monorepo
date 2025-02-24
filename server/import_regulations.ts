@@ -6,6 +6,105 @@ import path from 'path';
 import fs from 'fs';
 import { parse as parseDate, isValid, isFuture } from 'date-fns';
 
+// Map topics to main categories
+const topicToCategory: Record<string, string> = {
+  // Academic Programs
+  'Academic Programs': 'Academic Programs',
+  'Admissions': 'Academic Programs',
+  'Program Integrity Rules': 'Academic Programs',
+  'Accreditation': 'Academic Programs',
+  'Athletics': 'Academic Programs',
+  'Academic Programs,Financial Aid': 'Academic Programs',
+  'HEA Compliance Obligations': 'Academic Programs',
+  'Title IV Programs': 'Academic Programs',
+  'Student Services': 'Academic Programs',
+  'Education Records': 'Academic Programs',
+  'Education': 'Academic Programs',
+  'Student Privacy': 'Academic Programs',
+  'Student Life': 'Academic Programs',
+  'Program Requirements': 'Academic Programs',
+  'Academic Standards': 'Academic Programs',
+  'Academic Integrity': 'Academic Programs',
+  'Student Records': 'Academic Programs',
+  'Privacy / Student Records': 'Academic Programs',
+  'Education Administration': 'Academic Programs',
+  'Educational Programs': 'Academic Programs',
+  'Higher Education': 'Academic Programs',
+  'Higher Education Act': 'Academic Programs',
+  'Title IV': 'Academic Programs',
+  'Title IX': 'Academic Programs',
+  'Program Administration': 'Academic Programs',
+
+  // Finance
+  'Financial Aid': 'Finance',
+  'Tax': 'Finance',
+  'Accounting': 'Finance',
+  'Contracts & Procurement': 'Finance',
+  'Fundraising & Development': 'Finance',
+  'Auxiliary Services': 'Finance',
+  'Banking': 'Finance',
+  'Charitable Giving': 'Finance',
+  'Investment': 'Finance',
+  'Financial Management': 'Finance',
+  'Insurance': 'Finance',
+  'Purchasing': 'Finance',
+  'Wages': 'Finance',
+
+  // Human Resources
+  'Human Resources': 'Human Resources',
+  'Employee Benefits': 'Human Resources',
+  'Recruitment Hiring & Termination': 'Human Resources',
+  'Retirement': 'Human Resources',
+  'Unions': 'Human Resources',
+  'Health Care and Insurance': 'Human Resources',
+  'Discrimination': 'Human Resources',
+  'Discrimination,Human Resources': 'Human Resources',
+  'Diversity/Affirmative Action': 'Human Resources',
+  'Ethics': 'Human Resources',
+  'Immigration': 'Human Resources',
+  'Immigration,Recruitment Hiring & Termination': 'Human Resources',
+  'Disabilities': 'Human Resources',
+  'Employment': 'Human Resources',
+  'Labor Relations': 'Human Resources',
+
+  // Information Technology
+  'Information Technology': 'Information Technology',
+  'Privacy & Information Security': 'Information Technology',
+  'Copyright & Trademark': 'Information Technology',
+  'Telecommunications': 'Information Technology',
+  'Data Protection': 'Information Technology',
+  'Information Security': 'Information Technology',
+  'Technology': 'Information Technology',
+
+  // Research
+  'Research': 'Research',
+  'Export Controls': 'Research',
+  'Intellectual Property and Technology Transfer': 'Research',
+  'Grants Management': 'Research',
+  'Research Compliance': 'Research',
+  'Laboratory Safety': 'Research',
+  'Research Ethics': 'Research',
+  'Research Administration': 'Research',
+
+  // Campus Safety
+  'Campus Safety': 'Campus Safety',
+  'Environmental Health and Safety': 'Campus Safety',
+  'Sexual Misconduct': 'Campus Safety',
+  'Public Safety': 'Campus Safety',
+  'Emergency Management': 'Campus Safety',
+  'Safety & Security': 'Campus Safety',
+  'Health & Safety': 'Campus Safety',
+  'Emergency Response': 'Campus Safety',
+
+  // Default to Other
+  'International Activities and Programs': 'Other',
+  'Governance': 'Other',
+  'Housing': 'Other',
+  'Lobbying and Political Activities': 'Other',
+  'General Administration': 'Other',
+  'Institutional': 'Other'
+};
+
 async function parseDeadline(deadlineText: string): Promise<{ dueDate: Date | null; status: string }> {
   if (!deadlineText || deadlineText.toLowerCase() === 'not applicable') {
     return { dueDate: null, status: 'not_applicable' };
@@ -117,15 +216,27 @@ async function importRegulations() {
 
         console.log(`Processing regulation with Item ID: ${itemId}`);
 
+        // Get topic and map to category, with special handling for education-related topics
+        let topic = String(row['Topic'] || '').trim();
+        let category = topicToCategory[topic] || 'Other';
+
+        // Check if the name contains education-related terms and override category if needed
+        const name = String(row['Statute Name'] || row['Name'] || '').trim();
+        if (name.toLowerCase().includes('higher education act') || 
+            name.toLowerCase().includes('education amendment') ||
+            name.toLowerCase().includes('academic program')) {
+          category = 'Academic Programs';
+        }
+
         const regulation = {
           itemId: itemId,
-          name: String(row['Statute Name'] || row['Name'] || '').trim() || 'Untitled Regulation',
-          topic: String(row['Topic'] || '').trim(),
+          name: name || 'Untitled Regulation',
+          topic: topic,
           statute: String(row['Statute 1'] || row['Statute'] || '').trim(),
           statuteIds: String(row['Statute IDs'] || '').trim(),
           summary: String(row['Statutory Summary'] || row['Summary'] || '').trim(),
           requirements: String(row['Reporting Requirements'] || '').trim(),
-          category: String(row['Additional Resources 1'] || '').trim() || 'Uncategorized',
+          category: category,
           jurisdiction: 'federal',
           isApplicable: true,
           originationDate: null,
