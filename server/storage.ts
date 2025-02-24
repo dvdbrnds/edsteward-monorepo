@@ -105,22 +105,7 @@ export class DatabaseStorage implements IStorage {
 
   async getRegulations(): Promise<Regulation[]> {
     console.log("Fetching regulations from database...");
-    const result = await db.select({
-      id: regulations.id,
-      itemId: regulations.itemId,
-      name: regulations.name,
-      topic: regulations.topic,
-      statute: regulations.statute,
-      statuteIds: regulations.statuteIds,
-      summary: regulations.summary,
-      requirements: regulations.requirements,
-      category: regulations.category,
-      jurisdiction: regulations.jurisdiction,
-      isApplicable: regulations.isApplicable,
-      regulationUrl: regulations.regulationUrl,
-      requirementsUrl: regulations.requirementsUrl,
-      submissionGuidelines: regulations.submissionGuidelines
-    }).from(regulations);
+    const result = await db.select().from(regulations);
     console.log(`Found ${result.length} regulations in database:`, result);
     return result;
   }

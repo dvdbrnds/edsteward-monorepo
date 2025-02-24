@@ -15,7 +15,6 @@ import {
 } from "@/components/ui/table";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import HealthScoreIndicator from "./health-score-indicator";
 
 interface RegulationListProps {
   categoryFilter: string | null;
@@ -25,46 +24,6 @@ type SortConfig = {
   key: keyof Regulation;
   direction: 'asc' | 'desc';
 } | null;
-
-// Helper functions for health score calculation
-function calculateHealthScore(regulation: Regulation): number {
-  const requiredFields = [
-    'itemId',
-    'topic',
-    'statute',
-    'requirements',
-    'category',
-    'summary'
-  ];
-
-  const completedFields = requiredFields.filter(field => 
-    regulation[field as keyof Regulation] != null && 
-    regulation[field as keyof Regulation] !== ''
-  );
-
-  const dataCompleteness = Math.round((completedFields.length / requiredFields.length) * 100);
-
-  // Add weights to different aspects of health
-  const weights = {
-    dataCompleteness: 0.4,
-    hasDeadlines: 0.2,
-    hasAgencyInfo: 0.2,
-    hasUrls: 0.2
-  };
-
-  const hasDeadlines = regulation.filingDeadlines && regulation.filingDeadlines.length > 0 ? 100 : 0;
-  const hasAgencyInfo = (regulation.agency_name && regulation.agency_url) ? 100 : 0;
-  const hasUrls = (regulation.regulationUrl || regulation.requirementsUrl) ? 100 : 0;
-
-  const score = (
-    dataCompleteness * weights.dataCompleteness +
-    hasDeadlines * weights.hasDeadlines +
-    hasAgencyInfo * weights.hasAgencyInfo +
-    hasUrls * weights.hasUrls
-  );
-
-  return Math.round(score);
-}
 
 // Helper function to get agency name from URL
 const getAgencyName = (url: string | null): string => {
@@ -200,7 +159,6 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                     <ArrowUpDown className="h-4 w-4" />
                   </div>
                 </TableHead>
-                <TableHead>Health</TableHead>
                 <TableHead {...getColumnHeaderProps("jurisdiction")}>
                   <div className="flex items-center gap-2">
                     Jurisdiction
@@ -241,8 +199,6 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                   ? regulationDeadlines.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0]
                   : null;
 
-                const healthScore = calculateHealthScore(regulation);
-
                 return (
                   <TableRow
                     key={regulation.id}
@@ -250,9 +206,6 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                     onClick={() => handleRowClick(regulation)}
                   >
                     <TableCell>{regulation.itemId}</TableCell>
-                    <TableCell>
-                      <HealthScoreIndicator score={healthScore} size="sm" />
-                    </TableCell>
                     <TableCell>
                       <span className="capitalize">{regulation.jurisdiction}</span>
                     </TableCell>
@@ -318,7 +271,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
               })}
               {filteredRegulations.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={8} className="text-center py-4">
+                  <TableCell colSpan={7} className="text-center py-4">
                     No regulations found
                   </TableCell>
                 </TableRow>
