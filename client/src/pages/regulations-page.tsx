@@ -15,6 +15,7 @@ import type { Regulation, Deadline } from "@shared/schema";
 import { useLocation } from "wouter";
 import RegulationList from "@/components/regulations/regulation-list";
 import CustomPieChart from "@/components/common/custom-pie-chart";
+import RegulationWizard from "@/components/regulations/regulation-wizard";
 
 // Nine distinct colors from different parts of the color wheel
 const CATEGORY_COLORS = {
@@ -28,7 +29,6 @@ const CATEGORY_COLORS = {
   "Accounting": "#00CCCC",          // Cyan
   "Human Resources": "#FF6600",      // Orange
 } as const;
-
 
 export default function RegulationsPage() {
   const [open, setOpen] = useState(false);
@@ -80,13 +80,11 @@ export default function RegulationsPage() {
                     Add Regulation
                   </Button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="max-w-4xl">
                   <DialogHeader>
                     <DialogTitle>Add New Regulation</DialogTitle>
                   </DialogHeader>
-                  <div className="p-4">
-                    <p>Regulation form will be added here</p>
-                  </div>
+                  <RegulationWizard onSuccess={() => setOpen(false)} />
                 </DialogContent>
               </Dialog>
             </div>
@@ -99,7 +97,11 @@ export default function RegulationsPage() {
             activeFilter={categoryFilter}
           />
 
-          <RegulationList regulations={regulations} deadlines={deadlines} categoryFilter={categoryFilter} />
+          <RegulationList 
+            regulations={regulations || []} 
+            deadlines={deadlines} 
+            categoryFilter={categoryFilter} 
+          />
         </div>
       </main>
     </div>
