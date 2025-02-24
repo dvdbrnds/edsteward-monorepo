@@ -35,6 +35,16 @@ import { Cog } from "lucide-react";
 
 const CHANGELOG = [
   {
+    version: "0.2.2",
+    date: "February 24, 2025",
+    changes: [
+      "Added interactive health score dashboard with collapsible category details",
+      "Implemented dynamic circular progress indicators for compliance scores",
+      "Enhanced category breakdown visualization with expandable insights",
+      "Improved overall compliance health score calculation"
+    ],
+  },
+  {
     version: "0.2.1",
     date: "February 24, 2025",
     changes: [
@@ -192,7 +202,7 @@ export default function Navigation() {
                     <Dialog>
                       <DialogTrigger asChild>
                         <button className="text-xs text-gray-300 ml-2 hover:text-white transition-colors">
-                          Alpha v0.2.1
+                          Alpha v0.2.2
                         </button>
                       </DialogTrigger>
                       <DialogContent className="max-h-[80vh] overflow-y-auto">
