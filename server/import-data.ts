@@ -230,7 +230,10 @@ function determineCategory(topic: string): string {
   const topicLower = topic.toLowerCase();
 
   // Add Pennsylvania-specific categories
-  if (topicLower.includes("pa code") || topicLower.includes("pennsylvania code")) return "State Regulations";
+  if (topicLower.includes("pa code") || topicLower.includes("pennsylvania code")) {
+    regulation.jurisdiction = "state";
+    return "State Regulations";
+  }
   if (topicLower.includes("state board")) return "State Board Requirements";
   if (topicLower.includes("pa department")) return "State Department Requirements";
 
