@@ -5,8 +5,8 @@ import { Info } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
-  TooltipTrigger,
   TooltipProvider,
+  TooltipTrigger,
 } from "@/components/ui/tooltip";
 import type { Regulation } from "@shared/schema";
 
@@ -62,9 +62,24 @@ export default function RegulationHealthScore({ regulation }: RegulationHealthSc
   }, [healthMetrics]);
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return "bg-green-500";
-    if (score >= 60) return "bg-yellow-500";
+    if (score >= 80) return "bg-emerald-500";
+    if (score >= 60) return "bg-amber-500";
+    if (score >= 40) return "bg-orange-500";
     return "bg-red-500";
+  };
+
+  const getScoreBorderColor = (score: number) => {
+    if (score >= 80) return "border-emerald-500";
+    if (score >= 60) return "border-amber-500";
+    if (score >= 40) return "border-orange-500";
+    return "border-red-500";
+  };
+
+  const getScoreTextColor = (score: number) => {
+    if (score >= 80) return "text-emerald-600";
+    if (score >= 60) return "text-amber-600";
+    if (score >= 40) return "text-orange-600";
+    return "text-red-600";
   };
 
   return (
@@ -89,8 +104,10 @@ export default function RegulationHealthScore({ regulation }: RegulationHealthSc
           <div className="space-y-6">
             {/* Overall Score */}
             <div className="text-center">
-              <div className="inline-flex items-center justify-center w-32 h-32 rounded-full border-8 border-gray-100">
-                <div className="text-4xl font-bold">{overallScore}</div>
+              <div className={`inline-flex items-center justify-center w-32 h-32 rounded-full border-8 ${getScoreBorderColor(overallScore)} transition-colors duration-200`}>
+                <div className={`text-4xl font-bold ${getScoreTextColor(overallScore)}`}>
+                  {overallScore}
+                </div>
               </div>
             </div>
 
@@ -107,7 +124,9 @@ export default function RegulationHealthScore({ regulation }: RegulationHealthSc
                         <p className="max-w-xs">{metric.details}</p>
                       </TooltipContent>
                     </Tooltip>
-                    <span className="text-sm">{metric.score}%</span>
+                    <span className={`text-sm ${getScoreTextColor(metric.score)}`}>
+                      {metric.score}%
+                    </span>
                   </div>
                   <Progress
                     value={metric.score}
