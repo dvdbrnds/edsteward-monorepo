@@ -14,16 +14,12 @@ export default function CircularProgress({
   className
 }: CircularProgressProps) {
   const normalizedProgress = Math.min(Math.max(progress, 0), 100);
-  const strokeWidth = size === "sm" ? 3 : size === "md" ? 4 : 6;
-  const radius = size === "sm" ? 16 : size === "md" ? 24 : 32;
-  const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (normalizedProgress / 100) * circumference;
 
-  // Color transitions based on progress
-  const getColor = (progress: number) => {
-    if (progress < 30) return "text-red-500";
-    if (progress < 70) return "text-yellow-500";
-    return "text-green-500";
+  // Calculate color based on progress from red to green
+  const getProgressColor = (progress: number) => {
+    // Convert progress (0-100) to hue (0-120, where 0 is red and 120 is green)
+    const hue = (progress * 120) / 100;
+    return `hsl(${hue}, 100%, 40%)`;
   };
 
   const sizeClasses = {
@@ -38,53 +34,52 @@ export default function CircularProgress({
     lg: "text-sm"
   };
 
+  // Calculate the coordinates for the arc
+  const getArcPath = (percentage: number) => {
+    const angle = (percentage / 100) * 360;
+    const radius = 50; // SVG viewBox is 100x100, so radius is 50
+    const centerX = 50;
+    const centerY = 50;
+
+    // Convert angle to radians
+    const angleRad = (angle - 90) * Math.PI / 180;
+
+    // Calculate end point
+    const endX = centerX + radius * Math.cos(angleRad);
+    const endY = centerY + radius * Math.sin(angleRad);
+
+    // Create arc flag (0 for < 180 degrees, 1 for > 180 degrees)
+    const largeArcFlag = angle > 180 ? 1 : 0;
+
+    // Move to center, draw line to top, then arc to end point
+    return `M ${centerX} ${centerY} L ${centerX} ${centerY - radius} A ${radius} ${radius} 0 ${largeArcFlag} 1 ${endX} ${endY} Z`;
+  };
+
   return (
     <div className={cn("relative inline-flex items-center justify-center", sizeClasses[size], className)}>
-      <svg className="transform -rotate-90 w-full h-full">
-        <defs>
-          <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="currentColor" stopOpacity="0.1" />
-            <stop offset={`${normalizedProgress}%`} stopColor="currentColor" />
-          </linearGradient>
-        </defs>
+      <svg viewBox="0 0 100 100" className="w-full h-full -rotate-90">
         {/* Background circle */}
         <circle
-          className="text-gray-100 transition-all duration-500 ease-in-out"
-          strokeWidth={strokeWidth}
-          stroke="currentColor"
-          fill="transparent"
-          r={radius}
-          cx="50%"
-          cy="50%"
+          className="text-gray-100"
+          cx="50"
+          cy="50"
+          r="48"
+          fill="currentColor"
         />
-        {/* Progress circle */}
-        <circle
-          className={cn("transition-all duration-500 ease-in-out", getColor(normalizedProgress))}
-          strokeWidth={strokeWidth}
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          strokeLinecap="round"
-          stroke="url(#progressGradient)"
-          fill="transparent"
-          r={radius}
-          cx="50%"
-          cy="50%"
-        >
-          <animate
-            attributeName="stroke-dashoffset"
-            from={circumference}
-            to={offset}
-            dur="1s"
-            fill="freeze"
-          />
-        </circle>
+        {/* Progress fill */}
+        <path
+          d={getArcPath(normalizedProgress)}
+          fill={getProgressColor(normalizedProgress)}
+        />
       </svg>
       {showPercentage && (
-        <div className={cn(
-          "absolute inset-0 flex items-center justify-center font-medium",
-          textSizes[size],
-          getColor(normalizedProgress)
-        )}>
+        <div 
+          className={cn(
+            "absolute inset-0 flex items-center justify-center font-medium rotate-0",
+            textSizes[size]
+          )}
+          style={{ color: getProgressColor(normalizedProgress) }}
+        >
           {normalizedProgress}%
         </div>
       )}
