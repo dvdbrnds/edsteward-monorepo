@@ -285,12 +285,19 @@ export default function ReportsPage() {
 };
 
   const deadlineSummary = deadlines?.reduce((acc: Record<string, number>, deadline) => {
-    const today = new Date();
-    const dueDate = new Date(deadline.dueDate);
-    const status = dueDate < today ? "overdue" : "pending";
-    acc[status] = (acc[status] || 0) + 1;
+    if (!acc.completed) acc.completed = 0;
+    if (!acc.overdue) acc.overdue = 0;
+    if (!acc.pending) acc.pending = 0;
+    
+    if (deadline.status === "completed") {
+      acc.completed += 1;
+    } else {
+      const today = new Date();
+      const dueDate = new Date(deadline.dueDate);
+      acc[dueDate < today ? "overdue" : "pending"] += 1;
+    }
     return acc;
-  }, { completed: 0, overdue: 0, pending: 0 });
+  }, {} as Record<string, number>);
 
   const categoryChartData = Object.entries(categorySummary).map(([name, value]) => ({
     name,
