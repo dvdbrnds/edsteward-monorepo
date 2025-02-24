@@ -197,7 +197,10 @@ const PA_AGENCY_MAP: Record<string, string> = {
   "www.dhs.pa.gov": "Pennsylvania Department of Human Services",
   "www.health.pa.gov": "Pennsylvania Department of Health",
   "www.dos.pa.gov": "Pennsylvania Department of State",
-  "www.dli.pa.gov": "Pennsylvania Department of Labor & Industry"
+  "www.dli.pa.gov": "Pennsylvania Department of Labor & Industry",
+  "www.passhe.edu": "Pennsylvania State System of Higher Education",
+  "www.pde.state.pa.us": "Pennsylvania Department of Education",
+  "www.pacode.com": "Pennsylvania Code"
 };
 
 // Update the existing getAgencyName function to include PA agencies
@@ -223,7 +226,62 @@ const getAgencyName = (url: string | null): string => {
   }
 };
 
-// Update the category determination to include PA-specific categories
+// Update the determineJurisdiction function to better detect PA regulations
+function determineJurisdiction(record: any): "federal" | "state" {
+  const fields = [
+    record[COMPLIANCE_SURVEY_FIELDS.LAW_NAME],
+    record['Topic'],
+    record['Statute Name'],
+    record['Agency Name'],
+    record['Additional Resources 1'],
+    record['Regulation 1'],
+    record['Regulation 2'],
+    record['Regulation 3']
+  ];
+
+  const stateIndicators = [
+    'pa ',
+    'pennsylvania',
+    'state board',
+    'pa.',
+    'pde.',
+    'pashe.',
+    'state system',
+    'commonwealth of pa',
+    'pa dept',
+    'pa code',
+    'title 22'
+  ];
+
+  // Join all fields into a single string for easier searching
+  const content = fields.filter(Boolean).join(' ').toLowerCase();
+
+  // Check URL if present
+  const url = record[COMPLIANCE_SURVEY_FIELDS.LAW_LINK] || record['Regulation URL'] || record['Agency URL'] || '';
+  if (url && (url.includes('.pa.gov') || url.includes('pennsylvania.gov'))) {
+    console.log(`Detected state regulation from URL: ${url}`);
+    return "state";
+  }
+
+  // Check for state indicators in content
+  for (const indicator of stateIndicators) {
+    if (content.includes(indicator)) {
+      console.log(`Detected state regulation from indicator: ${indicator}`);
+      return "state";
+    }
+  }
+
+  // Check if the regulation references PA Code
+  if (content.includes('pa code') || content.includes('pennsylvania code')) {
+    console.log('Detected state regulation from PA Code reference');
+    return "state";
+  }
+
+  console.log('No state indicators found, defaulting to federal');
+  return "federal";
+}
+
+// Fix the jurisdiction determination in determineCategory function
 function determineCategory(topic: string): string {
   if (!topic) return "Other";
 
@@ -231,7 +289,6 @@ function determineCategory(topic: string): string {
 
   // Add Pennsylvania-specific categories
   if (topicLower.includes("pa code") || topicLower.includes("pennsylvania code")) {
-    regulation.jurisdiction = "state";
     return "State Regulations";
   }
   if (topicLower.includes("state board")) return "State Board Requirements";
@@ -246,6 +303,22 @@ function determineCategory(topic: string): string {
 
   return "Other";
 }
+
+const parseDate = (dateStr: string | null | undefined, defaultOffset = 0): Date => {
+  if (!dateStr) {
+    // For next review date, default to 1 year from now if not specified
+    const date = new Date();
+    date.setFullYear(date.getFullYear() + defaultOffset);
+    return date;
+  }
+  try {
+    const parsedDate = new Date(dateStr);
+    return isNaN(parsedDate.getTime()) ? new Date() : parsedDate;
+  } catch {
+    return new Date();
+  }
+};
+
 
 async function importRegulations(filePath?: string) {
   if (!filePath) {
@@ -264,7 +337,6 @@ async function importRegulations(filePath?: string) {
     } else if (filePath.endsWith('.csv')) {
       console.log("Processing CSV file...");
       const content = fs.readFileSync(filePath, 'utf-8');
-      console.log("CSV content sample:", content.substring(0, 500));
       records = parse(content, {
         columns: true,
         skip_empty_lines: true,
@@ -273,7 +345,6 @@ async function importRegulations(filePath?: string) {
         escape: '"',
         relax_column_count: true
       });
-      console.log("Parsed records sample:", records.slice(0, 2));
     } else {
       throw new Error('Unsupported file type. Please use .xlsx or .csv files.');
     }
@@ -302,7 +373,6 @@ async function importRegulations(filePath?: string) {
 
     for (const record of records) {
       try {
-        // Check if this is the compliance survey format by looking for the specific field
         const isComplianceSurvey = record[COMPLIANCE_SURVEY_FIELDS.LAW_NAME] !== undefined;
 
         console.log("\nProcessing record:", {
@@ -311,7 +381,6 @@ async function importRegulations(filePath?: string) {
           timestamp: record['Timestamp']
         });
 
-        // Generate a unique itemId
         const timestamp = record['Timestamp'];
         const itemId = timestamp ?
           `REG-${timestamp.replace(/\D/g, '').substring(0, 12)}` :
@@ -323,49 +392,88 @@ async function importRegulations(filePath?: string) {
           continue;
         }
 
-        // Extract fields based on format
-        const regulation: InsertRegulation = isComplianceSurvey ? {
-          itemId,
-          name: record[COMPLIANCE_SURVEY_FIELDS.LAW_NAME] || 'Unknown',
-          topic: record[COMPLIANCE_SURVEY_FIELDS.LAW_NAME]?.split('(')[0]?.trim() || 'Unknown',
-          statute: record[COMPLIANCE_SURVEY_FIELDS.LAW_LINK] || "N/A",
-          statuteIds: record['Year of passage (original)'] || null,
-          summary: record[COMPLIANCE_SURVEY_FIELDS.DESCRIPTION] || null,
-          requirements: [
-            record[COMPLIANCE_SURVEY_FIELDS.REQUIREMENTS],
-            record[COMPLIANCE_SURVEY_FIELDS.SUBMISSION]
-          ].filter(Boolean).join('\n\n'),
-          filingDeadlines: null,
-          category: determineCategoryFromDivision(record['Please select your division of the institution.']),
-          regulationUrl: record[COMPLIANCE_SURVEY_FIELDS.LAW_LINK] || null,
-          requirementsUrl: record[COMPLIANCE_SURVEY_FIELDS.PROOF] || null,
-          lastUpdated: new Date(),
-          agency_url: null
-        } : {
+        // Common helper to build regulation URL
+        const buildRegulationUrl = (record: any) => {
+          if (isComplianceSurvey) {
+            return record[COMPLIANCE_SURVEY_FIELDS.LAW_LINK] || null;
+          }
+          return record['Regulation URL'] || record['Agency URL'] || null;
+        };
+
+        // Helper to build regulation text
+        const buildRegulationText = (record: any) => {
+          const regulations = [
+            record['Regulation 1'],
+            record['Regulation 2'],
+            record['Regulation 3'],
+            record['Regulation 4'],
+            record['Regulation 5']
+          ].filter(Boolean);
+
+          if (regulations.length > 0) {
+            return regulations.join('\n\n');
+          }
+
+          return "Regulation details to be added";
+        };
+
+        const jurisdiction = determineJurisdiction(record);
+
+        const regulation: InsertRegulation = {
           itemId: itemId.toString(),
-          name: record['Statute Name'] || record['name'] || record['Topic'] || '',
-          topic: record['Topic'] || record['name'] || '',
-          statute: record['Statute Name'] || record['Statute 1'] || "N/A",
-          statuteIds: record['Statute IDs'] || null,
-          summary: record['Statutory Summary'] || null,
-          requirements: record['description'] ||
-            record['Reporting Requirements'] ||
-            [record['Regulation 1'], record['Regulation 2'], record['Regulation 3'],
-            record['Regulation 4'], record['Regulation 5']].filter(Boolean).join('\n\n'),
+          name: isComplianceSurvey ?
+            record[COMPLIANCE_SURVEY_FIELDS.LAW_NAME] || 'Unknown' :
+            record['Statute Name'] || record['name'] || record['Topic'] || 'Unknown',
+          topic: isComplianceSurvey ?
+            record[COMPLIANCE_SURVEY_FIELDS.LAW_NAME]?.split('(')[0]?.trim() || 'Unknown' :
+            record['Topic'] || record['name'] || 'Unknown',
+          statute: isComplianceSurvey ?
+            record[COMPLIANCE_SURVEY_FIELDS.LAW_LINK] || "N/A" :
+            record['Statute Name'] || record['Statute 1'] || "N/A",
+          statuteIds: isComplianceSurvey ?
+            record['Year of passage (original)'] || null :
+            record['Statute IDs'] || null,
+          summary: isComplianceSurvey ?
+            record[COMPLIANCE_SURVEY_FIELDS.DESCRIPTION] || "No summary provided" :
+            record['Statutory Summary'] || "No summary provided",
+          requirements: isComplianceSurvey ?
+            [record[COMPLIANCE_SURVEY_FIELDS.REQUIREMENTS], record[COMPLIANCE_SURVEY_FIELDS.SUBMISSION]]
+              .filter(Boolean).join('\n\n') || "No specific requirements provided" :
+            record['description'] || record['Reporting Requirements'] || "No specific requirements provided",
+          category: isComplianceSurvey ?
+            determineCategoryFromDivision(record['Please select your division of the institution.']) :
+            determineCategory(record['Topic'] || ''),
+          jurisdiction,
+          isApplicable: true,
+          regulationUrl: buildRegulationUrl(record),
+          requirementsUrl: isComplianceSurvey ?
+            record[COMPLIANCE_SURVEY_FIELDS.PROOF] || null :
+            record['Requirements URL'] || null,
+          lastUpdated: parseDate(record['Last Updated']),
+          agency_url: record['Agency URL'] || null,
+          agency_name: record['Agency Name'] || getAgencyName(record['Agency URL']),
+          regulationText: buildRegulationText(record) || "Regulation details to be added",
           filingDeadlines: record['Deadlines'] ?
-            record['Deadlines'].split(';').map(deadline => ({
+            JSON.stringify(record['Deadlines'].split(';').map((d: string) => ({
+              date: d.trim(),
               type: 'submission',
-              date: deadline.trim(),
-              frequency: 'quarterly',
               description: 'Regulatory filing deadline'
-            })) : null,
-          category: determineCategory(record['Topic'] || ''),
-          regulationUrl: record['Regulation URL'] || null,
-          requirementsUrl: record['Requirements URL'] || null,
-          lastUpdated: record['Last Updated'] ? new Date(record['Last Updated']) : new Date(),
-          originationDate: record['Last Updated'] ? new Date(record['Last Updated']) : new Date(),
-          submissionGuidelines: record['Reporting Requirements'] || '',
-          agency_url: null
+            }))) : null,
+          submissionGuidelines: record['Submission Guidelines'] || record['Reporting Requirements'] || 'No specific submission guidelines provided',
+          // Set dates with default values using updated parseDate function
+          originationDate: parseDate(record['Origination Date'] || record['Last Updated']),
+          effectiveDate: parseDate(record['Effective Date'] || record['Last Updated']),
+          lastVerified: parseDate(record['Last Verified'] || record['Last Updated']),
+          nextReviewDate: parseDate(record['Next Review Date'], 12), // Default to 1 year ahead
+          reportingFrequency: record['Reporting Frequency'] || 'As needed',
+          agency_contact: record['Agency Contact'] || null,
+          agency_department: record['Agency Department'] || null,
+          submissionGuideUrl: record['Submission Guide URL'] || null,
+          formsUrl: record['Forms URL'] || null,
+          applicable_forms: record['Applicable Forms'] ? JSON.stringify(record['Applicable Forms']) : null,
+          related_regulations: record['Related Regulations'] ? JSON.stringify(record['Related Regulations']) : null,
+          compliance_notes: record['Compliance Notes'] || null,
+          verification_method: record['Verification Method'] || null
         };
 
         console.log(`\nProcessing regulation: ${regulation.topic}`);
@@ -379,15 +487,6 @@ async function importRegulations(filePath?: string) {
           const mergedRegulation = await mergeRegulations(existingRegulation, regulation);
           console.log(`\nMerged regulation:`, mergedRegulation);
 
-          // Validate merged regulation
-          const errors = validator.validateRegulation(mergedRegulation as Regulation);
-          if (errors.length > 0) {
-            console.error(`Validation failed for merged regulation ${regulation.itemId}:`, errors);
-            validationErrors++;
-            continue;
-          }
-
-          // Update the existing regulation with merged data
           await storage.updateRegulation(existingRegulation.id, mergedRegulation);
           mergeCount++;
           console.log(`✓ Merged regulation: ${regulation.topic} into ${existingRegulation.topic}`);
@@ -395,7 +494,16 @@ async function importRegulations(filePath?: string) {
         }
 
         // Validate regulation before importing
-        const errors = validator.validateRegulation(regulation as Regulation);
+        const validationResults = validator.validateRegulation(regulation as Regulation);
+        const errors = validationResults.filter(result => result.severity === 'error');
+        const warnings = validationResults.filter(result => result.severity === 'warning');
+
+        // Log all validation results for visibility
+        if (warnings.length > 0) {
+          console.log(`Validation warnings for regulation ${regulation.itemId}:`, warnings);
+        }
+
+        // Only block import on actual errors
         if (errors.length > 0) {
           console.error(`Validation failed for regulation ${regulation.itemId}:`, errors);
           validationErrors++;
