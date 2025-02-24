@@ -1,6 +1,6 @@
 import { useLocation } from "wouter";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import type { Regulation, Deadline, Guide } from "@shared/schema";
+import type { Regulation, Deadline } from "@shared/schema";
 import Navigation from "@/components/layout/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ import {
   Loader2,
   Bell,
 } from "lucide-react";
+import CircularProgress from "@/components/common/circular-progress"; 
 import {
   Dialog,
   DialogContent,
@@ -49,7 +50,58 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-// Extend Regulation type to include notification override
+function calculateComplianceScore(regulation: Regulation | undefined, deadlines: Deadline[] = []): {
+  score: number;
+  breakdown: {
+    deadlines: number;
+    documentation: number;
+    review: number;
+  };
+} {
+  if (!regulation) {
+    return {
+      score: 0,
+      breakdown: {
+        deadlines: 0,
+        documentation: 0,
+        review: 0
+      }
+    };
+  }
+
+  // Calculate deadline completion rate (40% of total score)
+  const completedDeadlines = deadlines.filter(d => d.status === "completed").length;
+  const deadlineScore = deadlines.length > 0
+    ? (completedDeadlines / deadlines.length) * 40
+    : 0;
+
+  // Calculate documentation score (30% of total score)
+  const documentationFields = [
+    regulation.requirements,
+    regulation.regulationUrl,
+    regulation.requirementsUrl,
+    regulation.submissionGuidelines
+  ];
+  const filledFields = documentationFields.filter(field => field && field.length > 0).length;
+  const documentationScore = (filledFields / documentationFields.length) * 30;
+
+  // Calculate review status score (30% of total score)
+  const reviewScore = regulation.lastUpdated
+    ? Math.max(0, 30 - Math.floor(differenceInDays(new Date(), new Date(regulation.lastUpdated)) / 30))
+    : 0;
+
+  const totalScore = Math.round(deadlineScore + documentationScore + reviewScore);
+
+  return {
+    score: totalScore,
+    breakdown: {
+      deadlines: Math.round(deadlineScore),
+      documentation: Math.round(documentationScore),
+      review: Math.round(reviewScore)
+    }
+  };
+}
+
 interface RegulationWithOverride extends Regulation {
   notificationOverride?: {
     email: string | null;
@@ -57,11 +109,6 @@ interface RegulationWithOverride extends Regulation {
   };
 }
 
-interface RegulationDetailPageProps {
-  regulation: RegulationWithOverride;
-}
-
-// Add notification override schema
 const notificationOverrideSchema = z.object({
   email: z.string().email("Invalid email").optional().nullable(),
   phone: z.string().regex(/^\+?[\d\s-()]+$/, "Invalid phone number").optional().nullable(),
@@ -84,9 +131,8 @@ const CATEGORIES = [
 export default function RegulationDetailPage() {
   const [location, navigate] = useLocation();
   const { user } = useAuth();
-  const regulationId = location.split("/")[2]; // Extract from /regulations/:id
+  const regulationId = location.split("/")[2]; 
 
-  // Redirect to login if not authenticated
   if (!user) {
     navigate("/auth");
     return null;
@@ -101,7 +147,7 @@ export default function RegulationDetailPage() {
       }
       return response.json();
     },
-    enabled: !!user && !!regulationId, // Only fetch when user is authenticated and we have an ID
+    enabled: !!user && !!regulationId, 
   });
 
   const { toast } = useToast();
@@ -206,13 +252,14 @@ export default function RegulationDetailPage() {
     ? regulationDeadlines.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0]
     : null;
 
+  const complianceScore = calculateComplianceScore(regulation, regulationDeadlines);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
       <main className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="space-y-8">
-            {/* Header Section */}
             <div>
               <Button
                 variant="ghost"
@@ -253,7 +300,6 @@ export default function RegulationDetailPage() {
               </div>
             </div>
 
-            {/* Quick Actions */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {regulation?.regulationUrl && (
                 <Button
@@ -286,11 +332,54 @@ export default function RegulationDetailPage() {
               </Button>
             </div>
 
-            {/* Main Content Grid */}
+            <div className="mb-8">
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-6">
+                      <div className="flex items-center justify-center w-24 h-24">
+                        <CircularProgress
+                          progress={complianceScore.score}
+                          size="lg"
+                          showPercentage={true}
+                        />
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          Overall Compliance Score
+                        </h3>
+                        <div className="mt-2 grid grid-cols-3 gap-4 text-sm">
+                          <div>
+                            <p className="text-gray-500">Deadlines</p>
+                            <p className="font-medium">{complianceScore.breakdown.deadlines}%</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-500">Documentation</p>
+                            <p className="font-medium">{complianceScore.breakdown.documentation}%</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-500">Review Status</p>
+                            <p className="font-medium">{complianceScore.breakdown.review}%</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm text-gray-500">Last updated</p>
+                      <p className="text-sm font-medium">
+                        {regulation?.lastUpdated
+                          ? format(new Date(regulation.lastUpdated), "PP")
+                          : "Not reviewed"}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Left Column */}
               <div className="lg:col-span-2 space-y-6">
-                {/* Summary Card */}
                 <Card>
                   <CardHeader>
                     <CardTitle>Summary</CardTitle>
@@ -298,19 +387,18 @@ export default function RegulationDetailPage() {
                   <CardContent>
                     <div className="prose prose-sm max-w-none text-gray-700">
                       {regulation?.summary
-                        ?.replace(/<[^>]*>/g, '')  // Remove HTML tags
-                        ?.split(/\n+/)             // Split on one or more newlines
+                        ?.replace(/<[^>]*>/g, '')  
+                        ?.split(/\n+/)             
                         .map((paragraph, index) => (
                           <p key={index} className="mb-4 leading-relaxed">
                             {paragraph.trim()}
                           </p>
                         ))
-                      || "No summary available."}
+                        || "No summary available."}
                     </div>
                   </CardContent>
                 </Card>
 
-                {/* Requirements Card */}
                 <Card>
                   <CardHeader>
                     <CardTitle>Requirements</CardTitle>
@@ -344,14 +432,12 @@ export default function RegulationDetailPage() {
                   </CardContent>
                 </Card>
 
-                {/* Additional Details Card */}
                 <Card>
                   <CardHeader>
                     <CardTitle>Additional Details</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {/* Statute Information */}
                       <div>
                         <h3 className="font-medium text-gray-900">Statute</h3>
                         <p className="text-gray-700 mt-1">
@@ -364,7 +450,6 @@ export default function RegulationDetailPage() {
                         </p>
                       </div>
 
-                      {/* Filing Deadlines */}
                       {regulation?.filingDeadlines && regulation.filingDeadlines.length > 0 && (
                         <div>
                           <h3 className="font-medium text-gray-900">Filing Deadlines</h3>
@@ -378,7 +463,6 @@ export default function RegulationDetailPage() {
                         </div>
                       )}
 
-                      {/* Reporting Frequency */}
                       {regulation?.reportingFrequency && (
                         <div>
                           <h3 className="font-medium text-gray-900">Reporting Frequency</h3>
@@ -386,7 +470,6 @@ export default function RegulationDetailPage() {
                         </div>
                       )}
 
-                      {/* Dates */}
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {regulation?.originationDate && (
                           <div>
@@ -422,7 +505,6 @@ export default function RegulationDetailPage() {
                         )}
                       </div>
 
-                      {/* Agency Information */}
                       <div>
                         <h3 className="font-medium text-gray-900">Agency Information</h3>
                         <div className="mt-2 space-y-2">
@@ -458,7 +540,6 @@ export default function RegulationDetailPage() {
                   </CardContent>
                 </Card>
 
-                {/* Submission Guide Section */}
                 <Card>
                   <CardHeader>
                     <CardTitle>Submission Guidelines</CardTitle>
@@ -469,7 +550,6 @@ export default function RegulationDetailPage() {
                 </Card>
               </div>
 
-              {/* Right Column */}
               <div className="space-y-6">
                 <Card>
                   <CardHeader>
@@ -528,7 +608,6 @@ export default function RegulationDetailPage() {
                   </Card>
                 )}
 
-                {/* Notification Override Section - Only visible to admins */}
                 {user?.role === "admin" && (
                   <Card>
                     <CardHeader>
@@ -627,7 +706,6 @@ export default function RegulationDetailPage() {
   );
 }
 
-// Guide Content Component
 function GuideContent() {
   const { data: guides, isLoading } = useQuery<Guide[]>({
     queryKey: ["/api/guides", { category: "submission" }],
