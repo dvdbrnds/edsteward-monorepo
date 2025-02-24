@@ -1,7 +1,7 @@
 import { useAuth } from "@/hooks/use-auth";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { apiRequest } from "@/lib/queryClient";
+import { apiRequest } from "@/lib/queryClient";  // Added missing import
 import {
   LayoutDashboard,
   Book,
@@ -34,17 +34,6 @@ import { useQuery } from "@tanstack/react-query";
 import { Cog } from "lucide-react";
 
 const CHANGELOG = [
-  {
-    version: "0.2.2",
-    date: "February 24, 2025",
-    changes: [
-      "Added regulation health score visualization with circular progress indicators",
-      "Implemented detailed health score breakdown in regulation details",
-      "Added comprehensive contextual tooltips across regulation management interfaces",
-      "Enhanced user experience with helpful field descriptions in regulation wizard",
-      "Added tooltips to table headers for better column understanding"
-    ],
-  },
   {
     version: "0.2.1",
     date: "February 24, 2025",
@@ -203,7 +192,7 @@ export default function Navigation() {
                     <Dialog>
                       <DialogTrigger asChild>
                         <button className="text-xs text-gray-300 ml-2 hover:text-white transition-colors">
-                          Alpha v0.2.2
+                          Alpha v0.2.1
                         </button>
                       </DialogTrigger>
                       <DialogContent className="max-h-[80vh] overflow-y-auto">

@@ -30,9 +30,8 @@ export default function RegulationForm({ onSuccess }: { onSuccess: () => void })
       requirementsUrl: "",
       regulationUrl: "https://www.ecfr.gov/current/title-45/subtitle-B/chapter-VI/part-617",
       summary: "",
+      deadlines: "",
       category: "",
-      jurisdiction: "federal",
-      isApplicable: true,
       agency_url: "",
     }
   });
@@ -124,26 +123,6 @@ export default function RegulationForm({ onSuccess }: { onSuccess: () => void })
                   <option value="Admissions">Admissions</option>
                   <option value="Athletics">Athletics</option>
                   <option value="Campus Safety">Campus Safety</option>
-                </select>
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="jurisdiction"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Jurisdiction</FormLabel>
-              <FormControl>
-                <select
-                  {...field}
-                  className="w-full p-2 border rounded-md"
-                >
-                  <option value="federal">Federal</option>
-                  <option value="state">State</option>
                 </select>
               </FormControl>
               <FormMessage />

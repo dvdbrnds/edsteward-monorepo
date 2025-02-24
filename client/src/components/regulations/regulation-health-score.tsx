@@ -5,8 +5,8 @@ import { Info } from "lucide-react";
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
+  TooltipProvider,
 } from "@/components/ui/tooltip";
 import type { Regulation } from "@shared/schema";
 
@@ -20,11 +20,6 @@ interface HealthMetric {
   weight: number;
   details: string;
 }
-
-const CIRCLE_SIZE = 128; // Size of the circle in pixels
-const STROKE_WIDTH = 8; // Width of the progress stroke
-const RADIUS = (CIRCLE_SIZE - STROKE_WIDTH) / 2;
-const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
 export default function RegulationHealthScore({ regulation }: RegulationHealthScoreProps) {
   const healthMetrics = useMemo(() => {
@@ -67,28 +62,9 @@ export default function RegulationHealthScore({ regulation }: RegulationHealthSc
   }, [healthMetrics]);
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return "bg-emerald-500";
-    if (score >= 60) return "bg-amber-500";
-    if (score >= 40) return "bg-orange-500";
+    if (score >= 80) return "bg-green-500";
+    if (score >= 60) return "bg-yellow-500";
     return "bg-red-500";
-  };
-
-  const getScoreBorderColor = (score: number) => {
-    if (score >= 80) return "stroke-emerald-500";
-    if (score >= 60) return "stroke-amber-500";
-    if (score >= 40) return "stroke-orange-500";
-    return "stroke-red-500";
-  };
-
-  const getScoreTextColor = (score: number) => {
-    if (score >= 80) return "text-emerald-600";
-    if (score >= 60) return "text-amber-600";
-    if (score >= 40) return "text-orange-600";
-    return "text-red-600";
-  };
-
-  const getProgressOffset = (percentage: number) => {
-    return CIRCUMFERENCE - (percentage / 100) * CIRCUMFERENCE;
   };
 
   return (
@@ -113,38 +89,8 @@ export default function RegulationHealthScore({ regulation }: RegulationHealthSc
           <div className="space-y-6">
             {/* Overall Score */}
             <div className="text-center">
-              <div className="relative inline-flex items-center justify-center">
-                <svg
-                  className="transform -rotate-90 w-32 h-32"
-                  viewBox={`0 0 ${CIRCLE_SIZE} ${CIRCLE_SIZE}`}
-                >
-                  {/* Background circle */}
-                  <circle
-                    cx={CIRCLE_SIZE / 2}
-                    cy={CIRCLE_SIZE / 2}
-                    r={RADIUS}
-                    className="stroke-gray-200"
-                    strokeWidth={STROKE_WIDTH}
-                    fill="none"
-                  />
-                  {/* Progress circle */}
-                  <circle
-                    cx={CIRCLE_SIZE / 2}
-                    cy={CIRCLE_SIZE / 2}
-                    r={RADIUS}
-                    className={`${getScoreBorderColor(overallScore)} transition-all duration-300 ease-in-out`}
-                    strokeWidth={STROKE_WIDTH}
-                    strokeDasharray={CIRCUMFERENCE}
-                    strokeDashoffset={getProgressOffset(overallScore)}
-                    strokeLinecap="round"
-                    fill="none"
-                  />
-                </svg>
-                <div className="absolute">
-                  <div className={`text-4xl font-bold ${getScoreTextColor(overallScore)}`}>
-                    {overallScore}
-                  </div>
-                </div>
+              <div className="inline-flex items-center justify-center w-32 h-32 rounded-full border-8 border-gray-100">
+                <div className="text-4xl font-bold">{overallScore}</div>
               </div>
             </div>
 
@@ -161,9 +107,7 @@ export default function RegulationHealthScore({ regulation }: RegulationHealthSc
                         <p className="max-w-xs">{metric.details}</p>
                       </TooltipContent>
                     </Tooltip>
-                    <span className={`text-sm ${getScoreTextColor(metric.score)}`}>
-                      {metric.score}%
-                    </span>
+                    <span className="text-sm">{metric.score}%</span>
                   </div>
                   <Progress
                     value={metric.score}
@@ -179,6 +123,7 @@ export default function RegulationHealthScore({ regulation }: RegulationHealthSc
   );
 }
 
+// Scoring Functions
 function calculateDataCompleteness(regulation: Regulation): number {
   const requiredFields = [
     'itemId',
