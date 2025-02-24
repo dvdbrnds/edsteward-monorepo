@@ -278,17 +278,17 @@ export default function ReportsPage() {
   }, {} as Record<string, number>) || {};
 
   const calculateDeadlineStatus = (deadline: any) => {
-  const today = new Date();
-  const dueDate = new Date(deadline.dueDate);
-  if (deadline.status === "completed") return "completed";
-  return dueDate < today ? "overdue" : "pending";
-};
+    const today = new Date();
+    const dueDate = new Date(deadline.dueDate);
+    if (deadline.status === "completed") return "completed";
+    return dueDate < today ? "overdue" : "pending";
+  };
 
   const deadlineSummary = deadlines?.reduce((acc: Record<string, number>, deadline) => {
     if (!acc.completed) acc.completed = 0;
     if (!acc.overdue) acc.overdue = 0;
     if (!acc.pending) acc.pending = 0;
-    
+
     if (deadline.status === "completed") {
       acc.completed += 1;
     } else {
@@ -409,6 +409,7 @@ export default function ReportsPage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>ID</TableHead>
+                    <TableHead>Name</TableHead>
                     <TableHead>Topic</TableHead>
                     <TableHead>Category</TableHead>
                     <TableHead>Agency</TableHead>
@@ -430,10 +431,8 @@ export default function ReportsPage() {
                         onClick={() => setLocation(`/regulations/${regulation.id}`)}
                       >
                         <TableCell>{regulation.itemId}</TableCell>
+                        <TableCell>{regulation.name || regulation.statute}</TableCell>
                         <TableCell>
-                          <div className="text-base font-medium text-gray-900">
-                            {regulation.statute}
-                          </div>
                           <div className="text-sm text-gray-500 mt-1">
                             {regulation.topic}
                           </div>

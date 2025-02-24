@@ -167,6 +167,12 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                     <ArrowUpDown className="h-4 w-4" />
                   </div>
                 </TableHead>
+                <TableHead {...getColumnHeaderProps("statute")}>
+                  <div className="flex items-center gap-2">
+                    Name
+                    <ArrowUpDown className="h-4 w-4" />
+                  </div>
+                </TableHead>
                 <TableHead {...getColumnHeaderProps("jurisdiction")}>
                   <div className="flex items-center gap-2">
                     Jurisdiction
@@ -182,12 +188,6 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                 <TableHead {...getColumnHeaderProps("agency_name")}>
                   <div className="flex items-center gap-2">
                     Agency
-                    <ArrowUpDown className="h-4 w-4" />
-                  </div>
-                </TableHead>
-                <TableHead {...getColumnHeaderProps("statute")}>
-                  <div className="flex items-center gap-2">
-                    Regulation
                     <ArrowUpDown className="h-4 w-4" />
                   </div>
                 </TableHead>
@@ -225,13 +225,15 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                     </TableCell>
                     <TableCell>{regulation.itemId}</TableCell>
                     <TableCell>
+                      <div className="text-base font-medium text-gray-900">
+                        {regulation.name || regulation.statute}
+                      </div>
+                    </TableCell>
+                    <TableCell>
                       <span className="capitalize">{regulation.jurisdiction}</span>
                     </TableCell>
                     <TableCell>
-                      <div className="text-base font-medium text-gray-900">
-                        {regulation.statute}
-                      </div>
-                      <div className="text-sm text-gray-500 mt-1">
+                      <div className="text-sm text-gray-500">
                         {regulation.topic}
                       </div>
                     </TableCell>
@@ -249,14 +251,6 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                         </a>
                       ) : (
                         'N/A'
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {regulation.statute || 'N/A'}
-                      {regulation.statuteIds && (
-                        <span className="text-gray-500 text-sm block">
-                          {regulation.statuteIds}
-                        </span>
                       )}
                     </TableCell>
                     <TableCell>{regulation.category || 'N/A'}</TableCell>
