@@ -10,6 +10,7 @@ import path from 'path';
 import fs from 'fs';
 import { sql } from 'drizzle-orm';
 import { Server } from 'http';
+import net from 'net'; // Added import for net module
 
 // Initialize Express application with middleware
 const app = express();
@@ -68,6 +69,28 @@ let server: Server | null = null;
 
 async function startServer(): Promise<Server> {
   try {
+    // Kill any existing processes on port 5000 before starting
+    try {
+      const existingProcess = await new Promise((resolve) => {
+        const tester = net.createServer()
+          .once('error', () => resolve(true))
+          .once('listening', () => {
+            tester.once('close', () => resolve(false)).close();
+          })
+          .listen(5000);
+      });
+
+      if (existingProcess) {
+        log("Port 5000 is in use, attempting to free it...");
+        // Try to close the server if we have a reference
+        if (server) {
+          await new Promise((resolve) => server?.close(resolve));
+        }
+      }
+    } catch (error) {
+      log("Error checking port status: " + error);
+    }
+
     log("Starting server initialization...");
 
     // Test database connection with retries
@@ -119,7 +142,7 @@ async function startServer(): Promise<Server> {
         reject(new Error("Server startup timed out"));
       }, 15000);
 
-      // Start server
+      // Start server with proper error handling
       httpServer
         .listen(PORT, "0.0.0.0")
         .once('listening', () => {
