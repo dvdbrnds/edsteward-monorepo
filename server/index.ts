@@ -143,12 +143,16 @@ async function startServer(): Promise<Server> {
 }
 
 // Graceful shutdown handler
-const cleanup = () => {
+const cleanup = async () => {
   if (server) {
-    server.close(() => {
-      log("Server closed gracefully");
-      process.exit(0);
+    await new Promise((resolve) => {
+      server.close(() => {
+        log("Server closed gracefully");
+        resolve(null);
+      });
     });
+    await db.end();
+    process.exit(0);
   } else {
     process.exit(0);
   }
