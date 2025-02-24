@@ -39,6 +39,7 @@ export interface IStorage {
   createRegulation(regulation: InsertRegulation): Promise<Regulation>;
   updateRegulation(id: number, regulation: Partial<InsertRegulation>): Promise<Regulation>;
   setRegulationApplicability(id: number, isApplicable: boolean): Promise<Regulation>;
+  getRegulationsByJurisdiction(jurisdiction: string): Promise<Regulation[]>; // Added method
 
   // Comment methods
   getCommentsByRegulation(regulationId: number): Promise<Comment[]>;
@@ -290,6 +291,16 @@ export class DatabaseStorage implements IStorage {
       .values(mapping)
       .returning();
     return newMapping;
+  }
+
+  async getRegulationsByJurisdiction(jurisdiction: string): Promise<Regulation[]> {
+    console.log(`Fetching regulations with jurisdiction: ${jurisdiction}`);
+    const result = await db
+      .select()
+      .from(regulations)
+      .where(eq(regulations.jurisdiction, jurisdiction));
+    console.log(`Found ${result.length} ${jurisdiction} regulations`);
+    return result;
   }
 }
 

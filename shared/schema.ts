@@ -23,8 +23,8 @@ export const regulations = pgTable("regulations", {
   summary: text("summary"),
   requirements: text("requirements"),
   category: text("category").notNull(),
-  isApplicable: boolean("is_applicable").notNull().default(true),  // Add this field
-
+  jurisdiction: text("jurisdiction").notNull().default("federal"), // Add jurisdiction field
+  isApplicable: boolean("is_applicable").notNull().default(true),
   originationDate: timestamp("origination_date"),
   effectiveDate: timestamp("effective_date"),
   lastUpdated: timestamp("last_updated"),
@@ -106,6 +106,7 @@ export const insertUserSchema = createInsertSchema(users)
 export const insertRegulationSchema = createInsertSchema(regulations)
   .extend({
     name: z.string().min(1, "Regulation name is required"),
+    jurisdiction: z.enum(["federal", "state"]),
     originationDate: z.date().optional().nullable(),
     effectiveDate: z.date().optional().nullable(),
     nextReviewDate: z.date().optional().nullable(),

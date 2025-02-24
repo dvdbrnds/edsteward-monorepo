@@ -13,10 +13,23 @@ const toggleApplicabilitySchema = z.object({
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
 
-  // Regulations endpoints
+  // Update regulations endpoint to support jurisdiction filter
   app.get("/api/regulations", async (req, res) => {
-    const regulations = await storage.getRegulations();
-    res.json(regulations);
+    try {
+      const jurisdiction = req.query.jurisdiction as string | undefined;
+      let regulations;
+
+      if (jurisdiction && (jurisdiction === 'federal' || jurisdiction === 'state')) {
+        regulations = await storage.getRegulationsByJurisdiction(jurisdiction);
+      } else {
+        regulations = await storage.getRegulations();
+      }
+
+      res.json(regulations);
+    } catch (error) {
+      console.error("Failed to fetch regulations:", error);
+      res.status(500).json({ error: "Failed to fetch regulations" });
+    }
   });
 
   app.get("/api/regulations/:id", async (req, res) => {
