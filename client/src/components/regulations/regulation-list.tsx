@@ -16,6 +16,12 @@ import {
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import HealthScoreIndicator from "./health-score-indicator";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface RegulationListProps {
   categoryFilter: string | null;
@@ -37,8 +43,8 @@ function calculateHealthScore(regulation: Regulation): number {
     'summary'
   ];
 
-  const completedFields = requiredFields.filter(field => 
-    regulation[field as keyof Regulation] != null && 
+  const completedFields = requiredFields.filter(field =>
+    regulation[field as keyof Regulation] != null &&
     regulation[field as keyof Regulation] !== ''
   );
 
@@ -84,6 +90,17 @@ const getAgencyName = (url: string | null): string => {
   } catch {
     return "N/A";
   }
+};
+
+const COLUMN_TOOLTIPS = {
+  id: "Unique identifier for the regulation",
+  health: "Overall health score based on data completeness and compliance status",
+  jurisdiction: "The governing authority level (federal, state, etc.)",
+  topic: "Main subject area of the regulation",
+  agency: "Regulatory body responsible for enforcement",
+  regulation: "Official regulation name and reference numbers",
+  category: "Department responsible for compliance",
+  deadline: "Next upcoming compliance deadline"
 };
 
 export default function RegulationList({ categoryFilter }: RegulationListProps) {
@@ -176,6 +193,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
   });
 
   return (
+    <TooltipProvider>
     <Card>
       <CardContent className="p-6">
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
@@ -195,43 +213,87 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
             <TableHeader>
               <TableRow>
                 <TableHead {...getColumnHeaderProps("itemId")}>
-                  <div className="flex items-center gap-2">
-                    ID
-                    <ArrowUpDown className="h-4 w-4" />
-                  </div>
+                  <Tooltip>
+                    <TooltipTrigger className="flex items-center gap-2">
+                      ID
+                      <ArrowUpDown className="h-4 w-4" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">{COLUMN_TOOLTIPS.id}</p>
+                    </TooltipContent>
+                  </Tooltip>
                 </TableHead>
-                <TableHead>Health</TableHead>
+                <TableHead>
+                  <Tooltip>
+                    <TooltipTrigger>Health</TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">{COLUMN_TOOLTIPS.health}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TableHead>
                 <TableHead {...getColumnHeaderProps("jurisdiction")}>
-                  <div className="flex items-center gap-2">
-                    Jurisdiction
-                    <ArrowUpDown className="h-4 w-4" />
-                  </div>
+                  <Tooltip>
+                    <TooltipTrigger className="flex items-center gap-2">
+                      Jurisdiction
+                      <ArrowUpDown className="h-4 w-4" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">{COLUMN_TOOLTIPS.jurisdiction}</p>
+                    </TooltipContent>
+                  </Tooltip>
                 </TableHead>
                 <TableHead {...getColumnHeaderProps("topic")}>
-                  <div className="flex items-center gap-2">
-                    Topic
-                    <ArrowUpDown className="h-4 w-4" />
-                  </div>
+                  <Tooltip>
+                    <TooltipTrigger className="flex items-center gap-2">
+                      Topic
+                      <ArrowUpDown className="h-4 w-4" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">{COLUMN_TOOLTIPS.topic}</p>
+                    </TooltipContent>
+                  </Tooltip>
                 </TableHead>
                 <TableHead {...getColumnHeaderProps("agency_name")}>
-                  <div className="flex items-center gap-2">
-                    Agency
-                    <ArrowUpDown className="h-4 w-4" />
-                  </div>
+                  <Tooltip>
+                    <TooltipTrigger className="flex items-center gap-2">
+                      Agency
+                      <ArrowUpDown className="h-4 w-4" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">{COLUMN_TOOLTIPS.agency}</p>
+                    </TooltipContent>
+                  </Tooltip>
                 </TableHead>
                 <TableHead {...getColumnHeaderProps("statute")}>
-                  <div className="flex items-center gap-2">
-                    Regulation
-                    <ArrowUpDown className="h-4 w-4" />
-                  </div>
+                  <Tooltip>
+                    <TooltipTrigger className="flex items-center gap-2">
+                      Regulation
+                      <ArrowUpDown className="h-4 w-4" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">{COLUMN_TOOLTIPS.regulation}</p>
+                    </TooltipContent>
+                  </Tooltip>
                 </TableHead>
                 <TableHead {...getColumnHeaderProps("category")}>
-                  <div className="flex items-center gap-2">
-                    Category
-                    <ArrowUpDown className="h-4 w-4" />
-                  </div>
+                  <Tooltip>
+                    <TooltipTrigger className="flex items-center gap-2">
+                      Category
+                      <ArrowUpDown className="h-4 w-4" />
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">{COLUMN_TOOLTIPS.category}</p>
+                    </TooltipContent>
+                  </Tooltip>
                 </TableHead>
-                <TableHead>Next Deadline</TableHead>
+                <TableHead>
+                  <Tooltip>
+                    <TooltipTrigger>Next Deadline</TooltipTrigger>
+                    <TooltipContent>
+                      <p className="max-w-xs">{COLUMN_TOOLTIPS.deadline}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -328,5 +390,6 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
         </div>
       </CardContent>
     </Card>
+    </TooltipProvider>
   );
 }
