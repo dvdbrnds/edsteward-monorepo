@@ -10,7 +10,7 @@ import path from 'path';
 import fs from 'fs';
 import { sql } from 'drizzle-orm';
 import { Server } from 'http';
-import net from 'net'; // Added import for net module
+import net from 'net';
 
 // Initialize Express application with middleware
 const app = express();
@@ -64,31 +64,48 @@ app.use((req, res, next) => {
   next();
 });
 
+// Check if port is in use
+async function isPortInUse(port: number): Promise<boolean> {
+  return new Promise((resolve) => {
+    const tester = net.createServer()
+      .once('error', (err: NodeJS.ErrnoException) => {
+        if (err.code === 'EADDRINUSE') {
+          log(`Port ${port} is in use`);
+          resolve(true);
+        } else {
+          resolve(false);
+        }
+      })
+      .once('listening', () => {
+        tester.once('close', () => resolve(false)).close();
+      })
+      .listen(port);
+
+    // Add timeout to avoid hanging
+    setTimeout(() => {
+      try {
+        tester.close();
+      } catch (e) {
+        // Ignore close errors
+      }
+      resolve(true);
+    }, 1000);
+  });
+}
+
 // Declare server variable at module scope for proper cleanup
 let server: Server | null = null;
 
 async function startServer(): Promise<Server> {
   try {
-    // Kill any existing processes on port 5000 before starting
-    try {
-      const existingProcess = await new Promise((resolve) => {
-        const tester = net.createServer()
-          .once('error', () => resolve(true))
-          .once('listening', () => {
-            tester.once('close', () => resolve(false)).close();
-          })
-          .listen(5000);
-      });
+    const PORT = 5000;
+    log("Checking port status...");
 
-      if (existingProcess) {
-        log("Port 5000 is in use, attempting to free it...");
-        // Try to close the server if we have a reference
-        if (server) {
-          await new Promise((resolve) => server?.close(resolve));
-        }
-      }
-    } catch (error) {
-      log("Error checking port status: " + error);
+    // Check if port is in use
+    const portInUse = await isPortInUse(PORT);
+    if (portInUse) {
+      log(`Port ${PORT} is in use. Exiting process...`);
+      process.exit(1);
     }
 
     log("Starting server initialization...");
@@ -107,7 +124,7 @@ async function startServer(): Promise<Server> {
           throw new Error(`Database connection failed after ${maxRetries} attempts: ${error instanceof Error ? error.message : String(error)}`);
         }
         log(`Database connection attempt ${i + 1} failed, retrying...`);
-        await new Promise(resolve => setTimeout(resolve, 1000)); // Wait 1 second before retry
+        await new Promise(resolve => setTimeout(resolve, 1000));
       }
     }
 
@@ -131,16 +148,13 @@ async function startServer(): Promise<Server> {
       log("Static serving setup complete");
     }
 
-    // Force port 5000 without fallbacks
-    const PORT = 5000;
-    log(`Starting server on port ${PORT}...`);
-
     return new Promise((resolve, reject) => {
-      // Set timeout before starting server
+      // Set timeout for server startup
       const timeoutId = setTimeout(() => {
+        log("Server startup timed out");
         httpServer.close();
-        reject(new Error("Server startup timed out"));
-      }, 15000);
+        process.exit(1);
+      }, 10000);
 
       // Start server with proper error handling
       httpServer
@@ -153,7 +167,7 @@ async function startServer(): Promise<Server> {
         .once('error', (err: NodeJS.ErrnoException) => {
           clearTimeout(timeoutId);
           if (err.code === 'EADDRINUSE') {
-            log(`Error: Port ${PORT} is already in use. Please ensure no other process is using port ${PORT}`);
+            log(`Error: Port ${PORT} is already in use`);
             process.exit(1);
           }
           reject(err);
@@ -161,29 +175,43 @@ async function startServer(): Promise<Server> {
     });
   } catch (error) {
     log("Fatal error during server startup: " + (error instanceof Error ? error.message : String(error)));
-    throw error;
+    process.exit(1);
   }
 }
 
 // Graceful shutdown handler
-const cleanup = () => {
+function cleanup() {
+  log("Starting cleanup process...");
   if (server) {
     server.close(() => {
       log("Server closed gracefully");
       process.exit(0);
     });
+
+    // Force exit after 3 seconds if graceful shutdown fails
+    setTimeout(() => {
+      log("Forcing process exit after timeout");
+      process.exit(1);
+    }, 3000);
   } else {
     process.exit(0);
   }
-};
+}
 
+// Handle termination signals
 process.on('SIGTERM', () => {
-  log("Received SIGTERM signal, shutting down gracefully...");
+  log("Received SIGTERM signal");
   cleanup();
 });
 
 process.on('SIGINT', () => {
-  log("Received SIGINT signal, shutting down gracefully...");
+  log("Received SIGINT signal");
+  cleanup();
+});
+
+// Catch unhandled rejections
+process.on('unhandledRejection', (reason) => {
+  log("Unhandled rejection: " + String(reason));
   cleanup();
 });
 
