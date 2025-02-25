@@ -215,23 +215,41 @@ const getAgencyName = (url: string | null): string => {
 const getCongressUrl = (statute: string): string | null => {
   if (!statute) return null;
 
-  // Handle U.S. Code citations
-  const uscMatch = statute.match(/(\d+)\s*U\.?S\.?C\.?\s*[§§\s]*(\d+(?:-\d+)?)/i);
-  if (uscMatch) {
-    const [_, title, section] = uscMatch;
-    // If there's a range, use the first number
-    const mainSection = section.split('-')[0];
-    return `https://www.congress.gov/uscode/text/${title}/${mainSection}`;
-  }
+  try {
+    console.log('Processing statute:', statute);
 
-  // Handle Public Law citations
-  const publicLawMatch = statute.match(/Public\s+Law\s+(?:No\.)?\s*(\d+)-(\d+)/i);
-  if (publicLawMatch) {
-    const [_, congress, lawNumber] = publicLawMatch;
-    return `https://www.congress.gov/public-laws/${congress}/${lawNumber}`;
-  }
+    // Handle U.S. Code citations
+    // Match patterns like: "20 U.S.C. § 1232g" or "29 USC 621-634" or "29 U.S.C. §§ 621-634"
+    const uscMatch = statute.match(/(\d+)\s*U\.?S\.?C\.?\s*(?:§+|\s+)?(\d+)(?:[a-z])?(?:-\d+)?/i);
+    if (uscMatch) {
+      const [_, title, section] = uscMatch;
+      // Clean up the title and section numbers
+      const cleanTitle = title.trim();
+      const cleanSection = section.trim().split('-')[0]; // Take first number if range
+      const url = `https://www.govinfo.gov/content/pkg/USCODE-2021-title${cleanTitle}/pdf/USCODE-2021-title${cleanTitle}-chapter${cleanSection}.pdf`;
+      console.log('Generated USC URL:', url);
+      return url;
+    }
 
-  return null;
+    // Handle Public Law citations
+    // Match patterns like: "Public Law 110-233" or "Pub. L. No. 110-233"
+    const publicLawMatch = statute.match(/(?:Public\s+Law|Pub\.\s*L\.)\s*(?:No\.)?\s*(\d+)-(\d+)/i);
+    if (publicLawMatch) {
+      const [_, congress, lawNumber] = publicLawMatch;
+      // Clean up the numbers and format properly for congress.gov
+      const cleanCongress = congress.trim();
+      const cleanLawNumber = lawNumber.trim().padStart(3, '0');
+      const url = `https://www.govinfo.gov/content/pkg/PLAW-${cleanCongress}publ${cleanLawNumber}/pdf/PLAW-${cleanCongress}publ${cleanLawNumber}.pdf`;
+      console.log('Generated Public Law URL:', url);
+      return url;
+    }
+
+    console.log('No matching citation pattern found for statute:', statute);
+    return null;
+  } catch (error) {
+    console.error('Error processing statute citation:', error);
+    return null;
+  }
 };
 
 export default function ReportsPage() {
@@ -504,7 +522,7 @@ export default function ReportsPage() {
                                 className="text-[#00267A] hover:text-[#003166] underline inline-flex items-center gap-1 text-sm group"
                                 onClick={(e) => e.stopPropagation()}
                               >
-                                View on Congress.gov
+                                View on govinfo.gov
                                 <ExternalLink className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
                               </a>
                             )}
