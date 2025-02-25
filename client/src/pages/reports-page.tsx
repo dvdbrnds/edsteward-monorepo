@@ -19,7 +19,6 @@ import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { useLocation } from "wouter";
 
-
 // Extended color palette with Moravian brand colors and complementary shades
 const COLORS = [
   '#00267A', // Moravian Primary Blue
@@ -42,7 +41,6 @@ const COLORS = [
   '#0891b2', //Added
   '#be185d', //Added
   '#ea580c'  //Added
-
 ];
 
 type SortConfig = {
@@ -214,6 +212,28 @@ const getAgencyName = (url: string | null): string => {
   }
 };
 
+const getCongressUrl = (statute: string): string | null => {
+  if (!statute) return null;
+
+  // Handle U.S. Code citations
+  const uscMatch = statute.match(/(\d+)\s*U\.?S\.?C\.?\s*[§§\s]*(\d+(?:-\d+)?)/i);
+  if (uscMatch) {
+    const [_, title, section] = uscMatch;
+    // If there's a range, use the first number
+    const mainSection = section.split('-')[0];
+    return `https://www.congress.gov/uscode/text/${title}/${mainSection}`;
+  }
+
+  // Handle Public Law citations
+  const publicLawMatch = statute.match(/Public\s+Law\s+(?:No\.)?\s*(\d+)-(\d+)/i);
+  if (publicLawMatch) {
+    const [_, congress, lawNumber] = publicLawMatch;
+    return `https://www.congress.gov/public-laws/${congress}/${lawNumber}`;
+  }
+
+  return null;
+};
+
 export default function ReportsPage() {
   const [location, setLocation] = useLocation();
   const [sortConfig, setSortConfig] = useState<SortConfig>(null);
@@ -369,7 +389,6 @@ export default function ReportsPage() {
 
   const sortedRegulations = sortData(filteredRegulations);
 
-
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
@@ -444,6 +463,8 @@ export default function ReportsPage() {
                       ? regulationDeadlines.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0]
                       : null;
 
+                    const congressUrl = getCongressUrl(regulation.statute);
+
                     return (
                       <TableRow
                         key={regulation.id}
@@ -475,15 +496,15 @@ export default function ReportsPage() {
                                 <ExternalLink className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
                               </a>
                             )}
-                            {(regulation.regulationUrl || regulation.statute) && (
+                            {congressUrl && (
                               <a
-                                href={regulation.regulationUrl || `https://www.law.cornell.edu/uscode/${regulation.statute.replace(/\s/g, '')}`}
+                                href={congressUrl}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-[#00267A] hover:text-[#003166] underline inline-flex items-center gap-1 text-sm group"
                                 onClick={(e) => e.stopPropagation()}
                               >
-                                View Regulation Text
+                                View on Congress.gov
                                 <ExternalLink className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
                               </a>
                             )}

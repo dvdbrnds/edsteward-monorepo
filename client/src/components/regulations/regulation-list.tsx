@@ -45,6 +45,28 @@ const getAgencyName = (url: string | null): string => {
   }
 };
 
+const getCongressUrl = (statute: string): string | null => {
+  if (!statute) return null;
+
+  // Handle U.S. Code citations
+  const uscMatch = statute.match(/(\d+)\s*U\.?S\.?C\.?\s*[§§\s]*(\d+(?:-\d+)?)/i);
+  if (uscMatch) {
+    const [_, title, section] = uscMatch;
+    // If there's a range, use the first number
+    const mainSection = section.split('-')[0];
+    return `https://www.congress.gov/uscode/text/${title}/${mainSection}`;
+  }
+
+  // Handle Public Law citations
+  const publicLawMatch = statute.match(/Public\s+Law\s+(?:No\.)?\s*(\d+)-(\d+)/i);
+  if (publicLawMatch) {
+    const [_, congress, lawNumber] = publicLawMatch;
+    return `https://www.congress.gov/public-laws/${congress}/${lawNumber}`;
+  }
+
+  return null;
+};
+
 export default function RegulationList({ categoryFilter }: RegulationListProps) {
   const [search, setSearch] = useState("");
   const [sortConfig, setSortConfig] = useState<SortConfig>(null);
@@ -208,9 +230,8 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                   : null;
                 const completionPercentage = calculateCompletionPercentage(regulation);
 
-                // Create regulation URL if it doesn't exist
-                const regulationUrl = regulation.regulationUrl || 
-                  (regulation.statute ? `https://www.law.cornell.edu/uscode/${regulation.statute.replace(/\s/g, '')}` : null);
+                // Get Congress.gov URL for the regulation
+                const congressUrl = getCongressUrl(regulation.statute);
 
                 return (
                   <TableRow
@@ -258,15 +279,15 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                             <ExternalLink className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
                           </a>
                         )}
-                        {regulationUrl && (
+                        {congressUrl && (
                           <a
-                            href={regulationUrl}
+                            href={congressUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-[#00267A] hover:text-[#003166] underline inline-flex items-center gap-1 text-sm group"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            View Regulation Text
+                            View on Congress.gov
                             <ExternalLink className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
                           </a>
                         )}
