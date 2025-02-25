@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { insertRegulationSchema } from "@shared/schema";
+import { insertRegulationSchema, insertCommentSchema } from "@shared/schema";
 import { z } from "zod";
 
 // Define a schema for the toggle request
@@ -55,6 +55,70 @@ export function registerRoutes(app: Express): Server {
     const data = insertRegulationSchema.parse(req.body);
     const regulation = await storage.createRegulation(data);
     res.json(regulation);
+  });
+
+  // Comments endpoints
+  app.get("/api/comments/:regulationId", async (req, res) => {
+    try {
+      const regulationId = parseInt(req.params.regulationId);
+      if (isNaN(regulationId)) {
+        return res.status(400).json({ error: "Invalid regulation ID" });
+      }
+
+      const comments = await storage.getCommentsByRegulation(regulationId);
+      res.json(comments);
+    } catch (error) {
+      console.error("Failed to fetch comments:", error);
+      res.status(500).json({ error: "Failed to fetch comments" });
+    }
+  });
+
+  app.post("/api/comments", async (req, res) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ error: "Must be logged in to comment" });
+      }
+
+      const data = insertCommentSchema.parse({
+        ...req.body,
+        userId: req.user.id,
+      });
+
+      const comment = await storage.createComment(data);
+      res.status(201).json(comment);
+    } catch (error) {
+      console.error("Failed to create comment:", error);
+      res.status(500).json({ error: "Failed to create comment" });
+    }
+  });
+
+  app.delete("/api/comments/:id", async (req, res) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ error: "Must be logged in to delete comments" });
+      }
+
+      const commentId = parseInt(req.params.id);
+      if (isNaN(commentId)) {
+        return res.status(400).json({ error: "Invalid comment ID" });
+      }
+
+      const comment = await storage.getComment(commentId);
+      if (!comment) {
+        return res.status(404).json({ error: "Comment not found" });
+      }
+
+      // Only allow admins or the comment author to delete
+      if (req.user.role !== "admin" && comment.userId !== req.user.id) {
+        return res.status(403).json({ error: "Not authorized to delete this comment" });
+      }
+
+      await storage.deleteComment(commentId);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Failed to delete comment:", error);
+      res.status(500).json({ error: "Failed to delete comment" });
+    }
   });
 
   app.patch("/api/regulations/:id/toggle-applicability", async (req, res) => {

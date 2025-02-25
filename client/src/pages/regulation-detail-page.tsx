@@ -1,8 +1,8 @@
 import { useLocation } from "wouter";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import type { Regulation, Deadline } from "@shared/schema";
+import type { Regulation, Deadline, Guide } from "@shared/schema";
 import Navigation from "@/components/layout/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -18,7 +18,7 @@ import {
   Loader2,
   Bell,
 } from "lucide-react";
-import CircularProgress from "@/components/common/circular-progress"; 
+import CircularProgress from "@/components/common/circular-progress";
 import {
   Dialog,
   DialogContent,
@@ -49,6 +49,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import CommentSection from "@/components/regulations/comment-section";
 
 function calculateComplianceScore(regulation: Regulation | undefined, deadlines: Deadline[] = []): {
   score: number;
@@ -131,7 +132,7 @@ const CATEGORIES = [
 export default function RegulationDetailPage() {
   const [location, navigate] = useLocation();
   const { user } = useAuth();
-  const regulationId = location.split("/")[2]; 
+  const regulationId = location.split("/")[2];
 
   if (!user) {
     navigate("/auth");
@@ -147,7 +148,7 @@ export default function RegulationDetailPage() {
       }
       return response.json();
     },
-    enabled: !!user && !!regulationId, 
+    enabled: !!user && !!regulationId,
   });
 
   const { toast } = useToast();
@@ -387,8 +388,8 @@ export default function RegulationDetailPage() {
                   <CardContent>
                     <div className="prose prose-sm max-w-none text-gray-700">
                       {regulation?.summary
-                        ?.replace(/<[^>]*>/g, '')  
-                        ?.split(/\n+/)             
+                        ?.replace(/<[^>]*>/g, '')
+                        ?.split(/\n+/)
                         .map((paragraph, index) => (
                           <p key={index} className="mb-4 leading-relaxed">
                             {paragraph.trim()}
@@ -546,6 +547,17 @@ export default function RegulationDetailPage() {
                   </CardHeader>
                   <CardContent>
                     <GuideContent />
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Comments</CardTitle>
+                    <CardDescription>
+                      Discuss and share insights about this regulation
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <CommentSection regulationId={regulation?.id} />
                   </CardContent>
                 </Card>
               </div>
