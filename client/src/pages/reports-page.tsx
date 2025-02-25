@@ -195,6 +195,25 @@ const CustomPieChart = ({
   );
 };
 
+const getAgencyName = (url: string | null): string => {
+  if (!url) return "N/A";
+
+  const urlMap: Record<string, string> = {
+    "www.ed.gov": "Department of Education",
+    "www.eeoc.gov": "Equal Employment Opportunity Commission",
+    "www.justice.gov": "Department of Justice",
+    "www.osha.gov": "Occupational Safety and Health Administration",
+    "www.dhs.gov": "Department of Homeland Security"
+  };
+
+  try {
+    const hostname = new URL(url).hostname;
+    return urlMap[hostname] || hostname;
+  } catch {
+    return url;
+  }
+};
+
 export default function ReportsPage() {
   const [location, setLocation] = useLocation();
   const [sortConfig, setSortConfig] = useState<SortConfig>(null);
@@ -350,13 +369,6 @@ export default function ReportsPage() {
 
   const sortedRegulations = sortData(filteredRegulations);
 
-  const getAgencyName = (url: string | undefined): string => {
-    // Implement logic to extract agency name from URL if needed.  This is a placeholder.
-    if (!url) return "N/A";
-    //  Add your logic to extract name from url
-    return "Agency Name from URL";
-  };
-
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -463,15 +475,15 @@ export default function ReportsPage() {
                                 <ExternalLink className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
                               </a>
                             )}
-                            {regulation.regulationUrl && (
+                            {(regulation.regulationUrl || regulation.statute) && (
                               <a
-                                href={regulation.regulationUrl}
+                                href={regulation.regulationUrl || `https://www.law.cornell.edu/uscode/${regulation.statute.replace(/\s/g, '')}`}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="text-[#00267A] hover:text-[#003166] underline inline-flex items-center gap-1 text-sm group"
                                 onClick={(e) => e.stopPropagation()}
                               >
-                                View Regulation
+                                View Regulation Text
                                 <ExternalLink className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
                               </a>
                             )}

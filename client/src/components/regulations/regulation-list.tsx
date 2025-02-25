@@ -41,7 +41,7 @@ const getAgencyName = (url: string | null): string => {
     const hostname = new URL(url).hostname;
     return urlMap[hostname] || hostname;
   } catch {
-    return "N/A";
+    return url;
   }
 };
 
@@ -208,6 +208,10 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                   : null;
                 const completionPercentage = calculateCompletionPercentage(regulation);
 
+                // Create regulation URL if it doesn't exist
+                const regulationUrl = regulation.regulationUrl || 
+                  (regulation.statute ? `https://www.law.cornell.edu/uscode/${regulation.statute.replace(/\s/g, '')}` : null);
+
                 return (
                   <TableRow
                     key={regulation.id}
@@ -254,15 +258,15 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                             <ExternalLink className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
                           </a>
                         )}
-                        {regulation.regulationUrl && (
+                        {regulationUrl && (
                           <a
-                            href={regulation.regulationUrl}
+                            href={regulationUrl}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-[#00267A] hover:text-[#003166] underline inline-flex items-center gap-1 text-sm group"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            View Regulation
+                            View Regulation Text
                             <ExternalLink className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
                           </a>
                         )}
