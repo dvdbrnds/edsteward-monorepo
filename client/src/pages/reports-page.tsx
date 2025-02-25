@@ -218,30 +218,48 @@ const getCongressUrl = (statute: string): string | null => {
   try {
     console.log('Processing statute:', statute);
 
-    // Handle U.S. Code citations
-    // Match patterns like: "20 U.S.C. § 1232g" or "29 USC 621-634" or "29 U.S.C. §§ 621-634"
-    const uscMatch = statute.match(/(\d+)\s*U\.?S\.?C\.?\s*(?:§+|\s+)?(\d+)(?:[a-z])?(?:-\d+)?/i);
+    // Check for common acts first using the lookup table from congress-gov-links.md
+    const commonActs: Record<string, string> = {
+      'Higher Education Act': 'https://www.congress.gov/browse/uscode/20/section/1092',
+      'Higher Education Act: Textbook Information': 'https://www.congress.gov/browse/uscode/20/section/1015',
+      'Section 504 of The Rehabilitation Act': 'https://www.congress.gov/browse/uscode/29/section/794',
+      'Drug Free Schools and Communities Act': 'https://www.congress.gov/browse/uscode/20/section/1011i',
+      'Family Educational Rights and Privacy Act': 'https://www.congress.gov/browse/uscode/20/section/1232g',
+      'FERPA': 'https://www.congress.gov/browse/uscode/20/section/1232g',
+      'Americans with Disabilities Act': 'https://www.congress.gov/browse/uscode/42/section/12101',
+      'Title IX': 'https://www.congress.gov/browse/uscode/20/sections/1681-1688'
+    };
+
+    for (const [actName, url] of Object.entries(commonActs)) {
+      if (statute.toLowerCase().includes(actName.toLowerCase())) {
+        return url;
+      }
+    }
+
+    // Handle U.S. Code citations with section ranges
+    // Match patterns like: "42 U.S.C. §§ 12101-12213"
+    const rangeMatch = statute.match(/(\d+)\s*U\.?S\.?C\.?\s*§§\s*(\d+)-(\d+)/i);
+    if (rangeMatch) {
+      const [_, title, start] = rangeMatch;
+      return `https://www.congress.gov/browse/uscode/${title.trim()}/sections/${start.trim()}-${rangeMatch[3].trim()}`;
+    }
+
+    // Handle single U.S. Code citations
+    // Match patterns like: "20 U.S.C. § 1232g" or "29 USC 621"
+    const uscMatch = statute.match(/(\d+)\s*U\.?S\.?C\.?\s*(?:§+|\s+)?(\d+[a-z]?)(?:-\d+)?/i);
     if (uscMatch) {
       const [_, title, section] = uscMatch;
-      // Clean up the title and section numbers
-      const cleanTitle = title.trim();
-      const cleanSection = section.trim().split('-')[0]; // Take first number if range
-      const url = `https://www.congress.gov/uscode/text/title-${cleanTitle}/section-${cleanSection}`;
-      console.log('Generated USC URL:', url);
-      return url;
+      return `https://www.congress.gov/browse/uscode/${title.trim()}/section/${section.trim()}`;
     }
 
     // Handle Public Law citations
-    // Match patterns like: "Public Law 110-233" or "Pub. L. No. 110-233"
+    // Match patterns like: "Public Law 110-315" or "Pub. L. No. 110-315"
     const publicLawMatch = statute.match(/(?:Public\s+Law|Pub\.\s*L\.)\s*(?:No\.)?\s*(\d+)-(\d+)/i);
     if (publicLawMatch) {
       const [_, congress, lawNumber] = publicLawMatch;
-      // Clean up the numbers
       const cleanCongress = congress.trim();
-      const cleanLawNumber = lawNumber.trim();
-      const url = `https://www.congress.gov/bill/${cleanCongress}th-congress/public-law/${cleanLawNumber}`;
-      console.log('Generated Public Law URL:', url);
-      return url;
+      const cleanLawNumber = lawNumber.trim().padStart(3, '0');
+      return `https://www.congress.gov/public-laws/${cleanCongress}th-congress/public-law/${cleanLawNumber}`;
     }
 
     console.log('No matching citation pattern found for statute:', statute);
