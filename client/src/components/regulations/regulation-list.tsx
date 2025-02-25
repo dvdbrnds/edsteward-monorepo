@@ -59,7 +59,7 @@ const getCongressUrl = (statute: string): string | null => {
       // Clean up the title and section numbers
       const cleanTitle = title.trim();
       const cleanSection = section.trim().split('-')[0]; // Take first number if range
-      const url = `https://www.govinfo.gov/content/pkg/USCODE-2021-title${cleanTitle}/pdf/USCODE-2021-title${cleanTitle}-chapter${cleanSection}.pdf`;
+      const url = `https://www.congress.gov/uscode/text/title-${cleanTitle}/section-${cleanSection}`;
       console.log('Generated USC URL:', url);
       return url;
     }
@@ -69,10 +69,10 @@ const getCongressUrl = (statute: string): string | null => {
     const publicLawMatch = statute.match(/(?:Public\s+Law|Pub\.\s*L\.)\s*(?:No\.)?\s*(\d+)-(\d+)/i);
     if (publicLawMatch) {
       const [_, congress, lawNumber] = publicLawMatch;
-      // Clean up the numbers and format properly for congress.gov
+      // Clean up the numbers
       const cleanCongress = congress.trim();
-      const cleanLawNumber = lawNumber.trim().padStart(3, '0');
-      const url = `https://www.govinfo.gov/content/pkg/PLAW-${cleanCongress}publ${cleanLawNumber}/pdf/PLAW-${cleanCongress}publ${cleanLawNumber}.pdf`;
+      const cleanLawNumber = lawNumber.trim();
+      const url = `https://www.congress.gov/bill/${cleanCongress}th-congress/public-law/${cleanLawNumber}`;
       console.log('Generated Public Law URL:', url);
       return url;
     }
@@ -305,7 +305,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                             className="text-[#00267A] hover:text-[#003166] underline inline-flex items-center gap-1 text-sm group"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            View on govinfo.gov
+                            View on congress.gov
                             <ExternalLink className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
                           </a>
                         )}
