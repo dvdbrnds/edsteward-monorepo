@@ -43,15 +43,29 @@ export default function ValidationPage() {
 
   const validateMutation = useMutation({
     mutationFn: async () => {
+      toast({
+        title: "Starting Validation",
+        description: "Running compliance checks on all regulations...",
+      });
       const response = await apiRequest("POST", "/api/regulations/validate", {});
+      if (!response.ok) {
+        throw new Error('Validation failed');
+      }
       return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast({
         title: "Validation Complete",
-        description: "The validation report has been generated.",
+        description: `Checked ${data.totalRegulations} regulations. Found ${data.errors.length} errors and ${data.warnings.length} warnings.`,
       });
       queryClient.invalidateQueries({ queryKey: ["/api/regulations/validate"] });
+    },
+    onError: (error) => {
+      toast({
+        title: "Validation Failed",
+        description: "There was an error running the validation. Please try again.",
+        variant: "destructive",
+      });
     },
   });
 
