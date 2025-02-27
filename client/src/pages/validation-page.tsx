@@ -1,4 +1,4 @@
-import Navigation from "@/components/layout/navigation";
+import { useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Download, AlertTriangle, CheckCircle, XCircle, Loader2, FileText } from "lucide-react";
+import { Download, AlertTriangle, CheckCircle, XCircle, Loader2, FileText, Shield } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
 import { ConsoleView } from "@/components/common/console-view";
@@ -18,6 +18,7 @@ import jsPDF from "jspdf";
 import autoTable from 'jspdf-autotable';
 import { format } from "date-fns";
 import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
 
 interface ValidationError {
   regulationId: string;
@@ -25,6 +26,8 @@ interface ValidationError {
   error: string;
   value: any;
   severity: 'error' | 'warning';
+  category: 'required_fields' | 'dates' | 'urls' | 'content' | 'documentation' | 'references';
+  priority: 1 | 2 | 3;
 }
 
 interface ValidationReport {
@@ -40,6 +43,27 @@ interface ConsoleLog {
   type: 'info' | 'error' | 'warning' | 'success';
   timestamp: string;
 }
+
+const categoryColors = {
+  required_fields: 'bg-red-100 text-red-800',
+  dates: 'bg-blue-100 text-blue-800',
+  urls: 'bg-purple-100 text-purple-800',
+  content: 'bg-green-100 text-green-800',
+  documentation: 'bg-yellow-100 text-yellow-800',
+  references: 'bg-orange-100 text-orange-800'
+};
+
+const priorityLabels = {
+  1: 'Critical',
+  2: 'Important',
+  3: 'Low'
+};
+
+const priorityColors = {
+  1: 'bg-red-100 text-red-800',
+  2: 'bg-yellow-100 text-yellow-800',
+  3: 'bg-blue-100 text-blue-800'
+};
 
 export default function ValidationPage() {
   const { toast } = useToast();
@@ -72,13 +96,18 @@ export default function ValidationPage() {
       addLog(`Validation complete. Checked ${data.totalRegulations} regulations.`, "success");
       addLog(`Found ${data.errors.length} errors and ${data.warnings.length} warnings.`, "info");
 
-      // Add detailed logs for each issue
-      data.errors.forEach(error => {
-        addLog(`Error in ${error.regulationId}: ${error.field} - ${error.error}`, "error");
-      });
+      // Group and log issues by category
+      const issuesByCategory = [...data.errors, ...data.warnings].reduce((acc, issue) => {
+        acc[issue.category] = acc[issue.category] || [];
+        acc[issue.category].push(issue);
+        return acc;
+      }, {} as Record<string, ValidationError[]>);
 
-      data.warnings.forEach(warning => {
-        addLog(`Warning in ${warning.regulationId}: ${warning.field} - ${warning.error}`, "warning");
+      Object.entries(issuesByCategory).forEach(([category, issues]) => {
+        addLog(`${category}: ${issues.length} issues found`, issues[0].severity);
+        issues.forEach(issue => {
+          addLog(`  - ${issue.regulationId}: ${issue.error}`, issue.severity);
+        });
       });
 
       toast({
@@ -106,10 +135,12 @@ export default function ValidationPage() {
     ];
 
     const csv = [
-      ['Type', 'Regulation ID', 'Field', 'Error', 'Current Value'].join(','),
+      ['Type', 'Priority', 'Category', 'Regulation ID', 'Field', 'Error', 'Current Value'].join(','),
       ...allIssues.map(issue => 
         [
           issue.type,
+          priorityLabels[issue.priority],
+          issue.category,
           issue.regulationId,
           issue.field,
           issue.error,
@@ -167,10 +198,16 @@ export default function ValidationPage() {
         ...report.errors.map(e => ({ ...e, type: 'Error' })),
         ...report.warnings.map(w => ({ ...w, type: 'Warning' }))
       ].sort((a, b) => {
-        if (a.severity === b.severity) {
-          return a.regulationId.localeCompare(b.regulationId);
+        // Sort first by priority
+        if (a.priority !== b.priority) {
+          return a.priority - b.priority;
         }
-        return a.severity === 'error' ? -1 : 1;
+        // Then by severity
+        if (a.severity !== b.severity) {
+          return a.severity === 'error' ? -1 : 1;
+        }
+        // Finally by regulation ID
+        return a.regulationId.localeCompare(b.regulationId);
       });
 
       doc.addPage();
@@ -178,9 +215,11 @@ export default function ValidationPage() {
 
       autoTable(doc, {
         startY: 25,
-        head: [["Type", "Regulation ID", "Field", "Issue", "Current Value"]],
+        head: [["Type", "Priority", "Category", "Regulation ID", "Field", "Issue", "Current Value"]],
         body: allIssues.map(issue => [
           issue.type,
+          priorityLabels[issue.priority],
+          issue.category,
           issue.regulationId,
           issue.field,
           issue.error,
@@ -193,7 +232,9 @@ export default function ValidationPage() {
           1: { cellWidth: 30 },
           2: { cellWidth: 30 },
           3: { cellWidth: 50 },
-          4: { cellWidth: 'auto' }
+          4: { cellWidth: 'auto' },
+          5: { cellWidth: 50 },
+          6: { cellWidth: 'auto' }
         },
       });
     }
@@ -209,14 +250,17 @@ export default function ValidationPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navigation />
-
       <main className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">
-              Regulation Validation
-            </h1>
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">
+                Regulation Validation
+              </h1>
+              <p className="mt-1 text-sm text-gray-500">
+                Validate regulations against compliance rules and standards
+              </p>
+            </div>
             <div className="space-x-4">
               {report && report.totalRegulations > 0 && (
                 <>
@@ -250,7 +294,10 @@ export default function ValidationPage() {
             {/* Console View */}
             <Card>
               <CardHeader>
-                <CardTitle>Validation Console</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <Shield className="h-5 w-5" />
+                  Validation Console
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <ConsoleView logs={consoleLogs} className="min-h-[300px]" />
@@ -308,6 +355,8 @@ export default function ValidationPage() {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Severity</TableHead>
+                        <TableHead>Priority</TableHead>
+                        <TableHead>Category</TableHead>
                         <TableHead>Regulation ID</TableHead>
                         <TableHead>Field</TableHead>
                         <TableHead>Issue</TableHead>
@@ -317,10 +366,16 @@ export default function ValidationPage() {
                     <TableBody>
                       {[...report.errors, ...report.warnings]
                         .sort((a, b) => {
-                          if (a.severity === b.severity) {
-                            return a.regulationId.localeCompare(b.regulationId);
+                          // Sort first by priority
+                          if (a.priority !== b.priority) {
+                            return a.priority - b.priority;
                           }
-                          return a.severity === 'error' ? -1 : 1;
+                          // Then by severity
+                          if (a.severity !== b.severity) {
+                            return a.severity === 'error' ? -1 : 1;
+                          }
+                          // Finally by regulation ID
+                          return a.regulationId.localeCompare(b.regulationId);
                         })
                         .map((issue, index) => (
                           <TableRow key={index}>
@@ -339,6 +394,22 @@ export default function ValidationPage() {
                                   {issue.severity === 'error' ? 'Error' : 'Warning'}
                                 </span>
                               </div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge
+                                className={priorityColors[issue.priority]}
+                                variant="secondary"
+                              >
+                                {priorityLabels[issue.priority]}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <Badge
+                                className={categoryColors[issue.category]}
+                                variant="secondary"
+                              >
+                                {issue.category.replace('_', ' ')}
+                              </Badge>
                             </TableCell>
                             <TableCell>{issue.regulationId}</TableCell>
                             <TableCell>{issue.field}</TableCell>

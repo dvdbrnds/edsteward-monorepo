@@ -1,3 +1,37 @@
+/**
+ * @module RegulationValidator
+ * @description Validates regulations against defined compliance rules
+ * 
+ * Validation Rules:
+ * 
+ * ERRORS (Critical issues that must be fixed):
+ * 1. Missing Required Fields
+ *    - ItemID, Name, Topic, Statute, Category are mandatory
+ *    - Missing values trigger errors
+ * 
+ * 2. Date Validation
+ *    - Origination date must be in the past
+ *    - Effective date must be after origination date
+ *    - Next review date must be in the future
+ * 
+ * 3. URL Format
+ *    - All URLs must be valid and accessible
+ *    - Agency URLs must be official (.gov, .edu domains)
+ * 
+ * WARNINGS (Issues that should be reviewed):
+ * 1. Content Completeness
+ *    - Missing summary or requirements (at least one should be present)
+ *    - Missing submission guidelines
+ * 
+ * 2. Documentation Currency
+ *    - Source verification older than 6 months
+ *    - Last review date approaching or passed
+ * 
+ * 3. Reference Integrity
+ *    - Missing statute IDs
+ *    - Incomplete agency information
+ */
+
 import { z } from "zod";
 import type { Regulation } from "@shared/schema";
 import { parse, isValid, isFuture, isPast } from "date-fns";
@@ -12,6 +46,8 @@ interface ValidationError {
   error: string;
   value: any;
   severity: 'error' | 'warning';
+  category: 'required_fields' | 'dates' | 'urls' | 'content' | 'documentation' | 'references';
+  priority: 1 | 2 | 3; // 1 = highest, 3 = lowest
 }
 
 // Define the shape of a validation report
@@ -48,7 +84,22 @@ export class RegulationValidator {
             field,
             error: 'Invalid URL format',
             value,
-            severity: 'warning'
+            severity: 'error',
+            category: 'urls',
+            priority: 2
+          });
+        }
+
+        // Check for official domains in agency URLs
+        if (field === 'agency_url' && !value.match(/\.(gov|edu)$/)) {
+          errors.push({
+            regulationId: regulation.itemId,
+            field,
+            error: 'Agency URL should use .gov or .edu domain',
+            value,
+            severity: 'warning',
+            category: 'urls',
+            priority: 3
           });
         }
       }
@@ -68,7 +119,9 @@ export class RegulationValidator {
         field: 'originationDate',
         error: 'Origination date is required',
         value: null,
-        severity: 'error'
+        severity: 'error',
+        category: 'dates',
+        priority: 1
       });
     } else if (!isPast(new Date(regulation.originationDate))) {
       errors.push({
@@ -76,7 +129,9 @@ export class RegulationValidator {
         field: 'originationDate',
         error: 'Origination date must be in the past',
         value: regulation.originationDate,
-        severity: 'error'
+        severity: 'error',
+        category: 'dates',
+        priority: 1
       });
     }
 
@@ -91,7 +146,9 @@ export class RegulationValidator {
           field: 'effectiveDate',
           error: 'Effective date cannot be before origination date',
           value: regulation.effectiveDate,
-          severity: 'error'
+          severity: 'error',
+          category: 'dates',
+          priority: 1
         });
       }
     }
@@ -103,7 +160,9 @@ export class RegulationValidator {
         field: 'nextReviewDate',
         error: 'Next review date must be in the future',
         value: regulation.nextReviewDate,
-        severity: 'warning'
+        severity: 'error',
+        category: 'dates',
+        priority: 2
       });
     }
 
@@ -129,7 +188,9 @@ export class RegulationValidator {
           field,
           error: `${field} is required`,
           value,
-          severity: 'error'
+          severity: 'error',
+          category: 'required_fields',
+          priority: 1
         });
       }
     });
@@ -141,20 +202,36 @@ export class RegulationValidator {
     console.log(`Validating content for regulation ${regulation.itemId}`);
     const errors: ValidationError[] = [];
 
+    // Check for either summary or requirements
     if (!regulation.summary && !regulation.requirements) {
       errors.push({
         regulationId: regulation.itemId,
         field: 'content',
         error: 'Either summary or requirements must be provided',
         value: null,
-        severity: 'warning'
+        severity: 'warning',
+        category: 'content',
+        priority: 2
+      });
+    }
+
+    // Check minimum content length
+    if (regulation.summary && regulation.summary.length < 50) {
+      errors.push({
+        regulationId: regulation.itemId,
+        field: 'summary',
+        error: 'Summary should be at least 50 characters',
+        value: regulation.summary,
+        severity: 'warning',
+        category: 'content',
+        priority: 3
       });
     }
 
     return errors;
   }
 
-    private validateSourceVerification(regulation: Regulation): ValidationError[] {
+  private validateSourceVerification(regulation: Regulation): ValidationError[] {
     const errors: ValidationError[] = [];
 
     // Check if source verification is recent (within last 6 months)
@@ -169,7 +246,9 @@ export class RegulationValidator {
           field: 'lastVerified',
           error: 'Source verification is older than 6 months',
           value: regulation.lastVerified,
-          severity: 'warning'
+          severity: 'warning',
+          category: 'documentation',
+          priority: 2
         });
       }
     }
@@ -187,23 +266,40 @@ export class RegulationValidator {
         field: 'regulationText',
         error: 'Either regulation text or URL must be provided',
         value: null,
-        severity: 'error'
+        severity: 'error',
+        category: 'content',
+        priority: 1
       });
     }
 
+    // Check for submission guidelines
     if (!regulation.submissionGuidelines && !regulation.submissionGuideUrl) {
       errors.push({
         regulationId: regulation.itemId,
         field: 'submissionGuidelines',
         error: 'Either submission guidelines or URL must be provided',
         value: null,
-        severity: 'warning'
+        severity: 'warning',
+        category: 'content',
+        priority: 2
+      });
+    }
+
+    // Check for reference integrity
+    if (!regulation.statuteIds) {
+      errors.push({
+        regulationId: regulation.itemId,
+        field: 'statuteIds',
+        error: 'Statute reference ID should be provided',
+        value: null,
+        severity: 'warning',
+        category: 'references',
+        priority: 3
       });
     }
 
     return errors;
   }
-
 
   public validateRegulation(regulation: Regulation): ValidationError[] {
     console.log(`Starting validation for regulation ${regulation.itemId}`);
@@ -215,6 +311,10 @@ export class RegulationValidator {
       ...this.validateRequiredContent(regulation),
       ...this.validateContent(regulation)
     ];
+
+    // Sort errors by priority
+    errors.sort((a, b) => a.priority - b.priority);
+
     console.log(`Validation complete for regulation ${regulation.itemId}. Found ${errors.length} issues.`);
     return errors;
   }
