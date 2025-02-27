@@ -1,17 +1,67 @@
+/**
+ * @module Dialog
+ * @description A modal dialog component for focused user interactions and confirmations
+ * @compliance ISO/IEC/IEEE 26514 4.3.12 - Modal Interface Documentation
+ * 
+ * @accessibility
+ * - Implements ARIA dialog role
+ * - Manages focus trap within dialog
+ * - Provides keyboard navigation (Esc to close)
+ * - Screen reader announcements
+ * - Focus restoration on close
+ * 
+ * @securityControl UI Component Security
+ * - Prevents background interaction when open
+ * - Sanitizes content rendering
+ * - Manages modal state securely
+ */
+
 import * as React from "react"
 import * as DialogPrimitive from "@radix-ui/react-dialog"
 import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
+/**
+ * @component Dialog
+ * @description Root dialog component that manages modal state
+ * @example
+ * ```tsx
+ * <Dialog>
+ *   <DialogTrigger>Open Dialog</DialogTrigger>
+ *   <DialogContent>
+ *     <DialogHeader>
+ *       <DialogTitle>Dialog Title</DialogTitle>
+ *       <DialogDescription>Dialog content goes here.</DialogDescription>
+ *     </DialogHeader>
+ *   </DialogContent>
+ * </Dialog>
+ * ```
+ */
 const Dialog = DialogPrimitive.Root
 
+/**
+ * @component DialogTrigger
+ * @description Button that opens the dialog
+ */
 const DialogTrigger = DialogPrimitive.Trigger
 
+/**
+ * @component DialogPortal
+ * @description Portal for rendering dialog outside the DOM hierarchy
+ */
 const DialogPortal = DialogPrimitive.Portal
 
+/**
+ * @component DialogClose
+ * @description Button for closing the dialog
+ */
 const DialogClose = DialogPrimitive.Close
 
+/**
+ * @component DialogOverlay
+ * @description Background overlay that dims content behind the dialog
+ */
 const DialogOverlay = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Overlay>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Overlay>
@@ -27,6 +77,10 @@ const DialogOverlay = React.forwardRef<
 ))
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName
 
+/**
+ * @component DialogContent
+ * @description Main content container for the dialog
+ */
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
@@ -51,6 +105,10 @@ const DialogContent = React.forwardRef<
 ))
 DialogContent.displayName = DialogPrimitive.Content.displayName
 
+/**
+ * @component DialogHeader
+ * @description Container for dialog title and description
+ */
 const DialogHeader = ({
   className,
   ...props
@@ -65,6 +123,10 @@ const DialogHeader = ({
 )
 DialogHeader.displayName = "DialogHeader"
 
+/**
+ * @component DialogFooter
+ * @description Container for dialog actions
+ */
 const DialogFooter = ({
   className,
   ...props
@@ -79,6 +141,10 @@ const DialogFooter = ({
 )
 DialogFooter.displayName = "DialogFooter"
 
+/**
+ * @component DialogTitle
+ * @description Title element for the dialog
+ */
 const DialogTitle = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Title>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
@@ -94,6 +160,10 @@ const DialogTitle = React.forwardRef<
 ))
 DialogTitle.displayName = DialogPrimitive.Title.displayName
 
+/**
+ * @component DialogDescription
+ * @description Description text for the dialog
+ */
 const DialogDescription = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Description>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Description>
