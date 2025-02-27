@@ -1,7 +1,7 @@
 import { useLocation } from "wouter";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -126,6 +126,27 @@ export default function ValidationPage() {
     },
   });
 
+  const getCategoryStats = (report: ValidationReport) => {
+    console.log("Generating category stats for report:", report);
+    const allIssues = [...report.errors, ...report.warnings];
+    const stats = Object.entries(categoryColors).reduce((acc, [category, color]) => {
+      const categoryIssues = allIssues.filter(issue => issue.category === category);
+      const errors = categoryIssues.filter(issue => issue.severity === 'error').length;
+      const warnings = categoryIssues.filter(issue => issue.severity === 'warning').length;
+
+      acc[category] = {
+        errors,
+        warnings,
+        total: errors + warnings,
+        color
+      };
+      return acc;
+    }, {} as Record<string, { errors: number; warnings: number; total: number; color: string }>);
+
+    console.log("Generated category stats:", stats);
+    return stats;
+  };
+
   const downloadCSV = () => {
     if (!report) return;
 
@@ -248,26 +269,6 @@ export default function ValidationPage() {
     });
   };
 
-  const getCategoryStats = (report: ValidationReport) => {
-    console.log("Generating category stats for report:", report);
-    const allIssues = [...report.errors, ...report.warnings];
-    const stats = Object.entries(categoryColors).reduce((acc, [category, color]) => {
-      const categoryIssues = allIssues.filter(issue => issue.category === category);
-      const errors = categoryIssues.filter(issue => issue.severity === 'error').length;
-      const warnings = categoryIssues.filter(issue => issue.severity === 'warning').length;
-
-      acc[category] = {
-        errors,
-        warnings,
-        total: errors + warnings,
-        color
-      };
-      return acc;
-    }, {} as Record<string, { errors: number; warnings: number; total: number; color: string }>);
-
-    console.log("Generated category stats:", stats);
-    return stats;
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -301,7 +302,7 @@ export default function ValidationPage() {
               >
                 {validateMutation.isPending ? (
                   <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Validating...
                   </>
                 ) : (
@@ -316,7 +317,7 @@ export default function ValidationPage() {
             {report && (
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
                 {Object.entries(getCategoryStats(report)).map(([category, stats]) => (
-                  <Card key={category} className="border-2 hover:shadow-md transition-shadow">
+                  <Card key={category} className="border-2 border-[#5B2C8F] shadow-md bg-purple-50/30 relative hover:bg-purple-50/50 transition-colors">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm font-medium capitalize">
                         {category.replace(/_/g, ' ')}
@@ -474,7 +475,7 @@ export default function ValidationPage() {
                                 className={categoryColors[issue.category]}
                                 variant="secondary"
                               >
-                                {issue.category.replace('_', ' ')}
+                                {issue.category.replace(/_/g, ' ')}
                               </Badge>
                             </TableCell>
                             <TableCell>{issue.regulationId}</TableCell>
