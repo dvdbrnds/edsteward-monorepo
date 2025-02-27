@@ -1,7 +1,7 @@
 import { useAuth } from "@/hooks/use-auth";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { apiRequest } from "@/lib/queryClient";  // Added missing import
+import { apiRequest } from "@/lib/queryClient";
 import {
   LayoutDashboard,
   Book,
@@ -211,7 +211,13 @@ export default function Navigation() {
                     </span>
                     <Dialog>
                       <DialogTrigger asChild>
-                        <button className="text-xs text-gray-300 ml-2 hover:text-white transition-colors">
+                        <button 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                          }} 
+                          className="text-xs text-gray-300 ml-2 hover:text-white transition-colors"
+                        >
                           Alpha v0.2.3
                         </button>
                       </DialogTrigger>
