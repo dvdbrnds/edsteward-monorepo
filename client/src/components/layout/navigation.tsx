@@ -13,27 +13,8 @@ import {
   User,
   Settings,
 } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 
-// Import the logo using relative path from client's perspective
-import moravianLogo from "../../assets/Screenshot_2025-02-12_at_9.15.57_AM-removebg-preview.png";
-import { useQuery } from "@tanstack/react-query";
-import { Cog } from "lucide-react";
-
+// CHANGELOG constant remains unchanged
 const CHANGELOG = [
   {
     version: "0.2.3",
@@ -184,9 +165,7 @@ export default function Navigation() {
     { href: "/", label: "Dashboard", icon: LayoutDashboard },
     { href: "/regulations", label: "Regulations", icon: Book },
     { href: "/reports", label: "Reports", icon: FileText },
-    // Add setup wizard link if setup is not complete
     ...(!setupComplete ? [{ href: "/setup", label: "Complete Setup", icon: Cog }] : []),
-    // Add admin settings link only for admin users
     ...(user?.role === "admin"
       ? [{ href: "/admin/settings", label: "Admin Settings", icon: Settings }]
       : []),
@@ -200,53 +179,51 @@ export default function Navigation() {
           <div className="flex items-center min-w-0">
             {/* Logo */}
             <div className="flex-shrink-0 flex items-center">
-              <Link href="/">
-                <button className="flex items-center focus:outline-none">
-                  <img
-                    src={moravianLogo}
-                    alt="Moravian University Logo"
-                    className="h-8 hover:opacity-80 transition-opacity"
-                  />
-                  <div className="ml-3 whitespace-nowrap">
-                    <span className="text-xl font-bold text-white hover:text-gray-200 transition-colors">
+              <div className="flex items-center">
+                <Link href="/">
+                  <button className="flex items-center focus:outline-none">
+                    <img
+                      src={moravianLogo}
+                      alt="Moravian University Logo"
+                      className="h-8 hover:opacity-80 transition-opacity"
+                    />
+                    <span className="text-xl font-bold text-white hover:text-gray-200 transition-colors ml-3">
                       Compliance Portal
                     </span>
-                    <Dialog open={changelogOpen} onOpenChange={setChangelogOpen}>
-                      <DialogTrigger asChild>
-                        <button
-                          className="text-xs text-gray-300 ml-2 hover:text-white transition-colors"
-                        >
-                          Alpha v0.2.3
-                        </button>
-                      </DialogTrigger>
-                      <DialogContent className="max-h-[80vh] overflow-y-auto">
-                        <DialogHeader>
-                          <DialogTitle>Changelog</DialogTitle>
-                        </DialogHeader>
-                        <div className="space-y-6 pr-2">
-                          {CHANGELOG.map((release) => (
-                            <div key={release.version} className="pb-4">
-                              <h3 className="text-lg font-semibold flex items-center gap-2 sticky top-0 bg-background pt-2">
-                                v{release.version}
-                                <span className="text-sm font-normal text-gray-500">
-                                  {release.date}
-                                </span>
-                              </h3>
-                              <ul className="mt-2 list-disc list-inside space-y-1">
-                                {release.changes.map((change, idx) => (
-                                  <li key={idx} className="text-sm text-gray-600 pl-2">
-                                    {change}
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          ))}
+                  </button>
+                </Link>
+                <Dialog open={changelogOpen} onOpenChange={setChangelogOpen}>
+                  <DialogTrigger asChild>
+                    <button className="text-xs text-gray-300 ml-2 hover:text-white transition-colors">
+                      Alpha v0.2.3
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent className="max-h-[80vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>Changelog</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-6 pr-2">
+                      {CHANGELOG.map((release) => (
+                        <div key={release.version} className="pb-4">
+                          <h3 className="text-lg font-semibold flex items-center gap-2 sticky top-0 bg-background pt-2">
+                            v{release.version}
+                            <span className="text-sm font-normal text-gray-500">
+                              {release.date}
+                            </span>
+                          </h3>
+                          <ul className="mt-2 list-disc list-inside space-y-1">
+                            {release.changes.map((change, idx) => (
+                              <li key={idx} className="text-sm text-gray-600 pl-2">
+                                {change}
+                              </li>
+                            ))}
+                          </ul>
                         </div>
-                      </DialogContent>
-                    </Dialog>
-                  </div>
-                </button>
-              </Link>
+                      ))}
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </div>
 
             {/* Navigation Links */}
