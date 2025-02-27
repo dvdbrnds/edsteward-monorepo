@@ -34,7 +34,7 @@ import { useQuery } from "@tanstack/react-query";
 // Import the logo using relative path from client's perspective
 import moravianLogo from "@/assets/Screenshot_2025-02-12_at_9.15.57_AM-removebg-preview.png";
 
-// CHANGELOG constant remains unchanged
+// CHANGELOG constant
 const CHANGELOG = [
   {
     version: "0.2.3",
@@ -44,6 +44,7 @@ const CHANGELOG = [
       "Added password reset functionality for existing users",
       "Improved user editing interface with better validation",
       "Added secure password management for admin users",
+      "Fixed version number dialog to work correctly from all pages",
     ],
   },
   {
