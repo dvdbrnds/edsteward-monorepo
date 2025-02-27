@@ -52,6 +52,17 @@ import moravianLogo from "@/assets/Screenshot_2025-02-12_at_9.15.57_AM-removebg-
  */
 const CHANGELOG = [
   {
+    version: "0.2.4",
+    date: "February 27, 2025",
+    changes: [
+      "Added comprehensive JSDoc documentation to core UI components",
+      "Enhanced developer experience with detailed component documentation",
+      "Improved code maintainability with standardized documentation format",
+      "Added accessibility and compliance documentation to UI components",
+      "Included usage examples in component documentation"
+    ],
+  },
+  {
     version: "0.2.3",
     date: "February 27, 2025",
     changes: [
@@ -249,7 +260,7 @@ export default function Navigation() {
                         setChangelogOpen(true);
                       }}
                     >
-                      Alpha v0.2.3
+                      Alpha v0.2.4
                     </button>
                   </DialogTrigger>
                   <DialogContent className="max-h-[80vh] overflow-y-auto">
