@@ -130,14 +130,17 @@ export default function ValidationPage() {
     if (!report) return null;
 
     const allIssues = [...report.errors, ...report.warnings];
-    const categories = Object.entries(categoryColors).map(([category, color]) => {
+    const categories = Object.entries(categoryColors).map(([category, colorClass]) => {
       const categoryIssues = allIssues.filter(issue => issue.category === category);
       const errors = categoryIssues.filter(issue => issue.severity === 'error').length;
       const warnings = categoryIssues.filter(issue => issue.severity === 'warning').length;
       const total = errors + warnings;
 
       return (
-        <Card key={category} className="border-2 border-[#5B2C8F] shadow-md bg-purple-50/30">
+        <Card 
+          key={category} 
+          className="border-2 border-[#5B2C8F] shadow-md bg-purple-50/30 relative hover:bg-purple-50/50 transition-colors"
+        >
           <CardHeader className="pb-2">
             <CardTitle className="text-sm font-medium capitalize">
               {category.replace(/_/g, ' ')}
@@ -165,7 +168,7 @@ export default function ValidationPage() {
                   </div>
                 )}
               </div>
-              <Badge className={color} variant="secondary">
+              <Badge className={colorClass} variant="secondary">
                 {total}
               </Badge>
             </div>
@@ -347,10 +350,50 @@ export default function ValidationPage() {
             </div>
           </div>
 
-          <div className="space-y-8">
-            {/* Category Summary */}
-            {report && renderCategorySummary()}
+          {/* Statistics Cards */}
+          {!reportLoading && report && (
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Total Regulations</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-2xl font-bold">{report.totalRegulations}</p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    Valid Regulations
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-2xl font-bold text-green-600">
+                    {report.validRegulations}
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                    Issues Found
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-2xl font-bold text-yellow-600">
+                    {report.errors.length + report.warnings.length}
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          )}
 
+          {/* Category Summary Cards */}
+          {report && renderCategorySummary()}
+
+          <div className="space-y-8">
             {/* Console View */}
             <Card>
               <CardHeader>
@@ -363,46 +406,6 @@ export default function ValidationPage() {
                 <ConsoleView logs={consoleLogs} className="min-h-[300px]" />
               </CardContent>
             </Card>
-
-            {/* Statistics Cards */}
-            {!reportLoading && report && (
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Total Regulations</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-2xl font-bold">{report.totalRegulations}</p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <CheckCircle className="h-5 w-5 text-green-500" />
-                      Valid Regulations
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-2xl font-bold text-green-600">
-                      {report.validRegulations}
-                    </p>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <AlertTriangle className="h-5 w-5 text-yellow-500" />
-                      Issues Found
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-2xl font-bold text-yellow-600">
-                      {report.errors.length + report.warnings.length}
-                    </p>
-                  </CardContent>
-                </Card>
-              </div>
-            )}
 
             {/* Results Table */}
             {report && (report.errors.length > 0 || report.warnings.length > 0) && (
