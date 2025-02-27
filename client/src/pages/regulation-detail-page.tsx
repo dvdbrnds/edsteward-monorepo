@@ -17,6 +17,7 @@ import {
   ArrowLeft,
   Loader2,
   Bell,
+  Shield,
 } from "lucide-react";
 import CircularProgress from "@/components/common/circular-progress";
 import {
@@ -297,12 +298,17 @@ export default function RegulationDetailPage() {
                 <span className="px-2 py-1 bg-gray-100 rounded">
                   ID: {regulation?.itemId}
                 </span>
+                {/* In the category selector section */}
                 {user?.role === "admin" ? (
                   <Select
                     defaultValue={regulation?.category}
                     onValueChange={(value) => categoryMutation.mutate(value)}
                   >
-                    <SelectTrigger className="w-[180px] bg-gray-100 border-2 border-[#5B2C8F] rounded-md">
+                    <SelectTrigger className="w-[180px] bg-gray-100 border-2 border-[#5B2C8F] rounded-md relative group hover:bg-purple-50/50 transition-colors">
+                      <div className="absolute -top-2 -right-2 bg-[#5B2C8F] text-white text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
+                        <Shield className="h-3 w-3" />
+                        Admin
+                      </div>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -640,10 +646,15 @@ export default function RegulationDetailPage() {
                   </Card>
                 )}
 
+                {/* In the notification settings card section */}
                 {user?.role === "admin" && (
-                  <Card className="border-2 border-[#5B2C8F] shadow-sm">
+                  <Card className="border-2 border-[#5B2C8F] shadow-md bg-purple-50/30 relative hover:bg-purple-50/50 transition-colors">
+                    <div className="absolute top-3 right-3 bg-[#5B2C8F] text-white text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
+                      <Shield className="h-3 w-3" />
+                      Admin Only
+                    </div>
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
+                      <CardTitle className="flex items-center gap-2 text-[#5B2C8F]">
                         <Bell className="h-5 w-5" />
                         Notification Settings
                       </CardTitle>
