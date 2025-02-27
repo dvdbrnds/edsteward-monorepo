@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { insertRegulationSchema, insertCommentSchema } from "@shared/schema";
+import { insertRegulationSchema, insertCommentSchema, insertUserSchema } from "@shared/schema";
 import { z } from "zod";
 
 // Define a schema for the toggle request
@@ -12,6 +12,79 @@ const toggleApplicabilitySchema = z.object({
 
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
+
+  // User Management Routes
+  app.get("/api/admin/users", async (req, res) => {
+    try {
+      // Check if user is admin
+      if (req.user?.role !== "admin") {
+        return res.status(403).json({ error: "Only administrators can access user management" });
+      }
+
+      const users = await storage.getAllUsers();
+      res.json(users);
+    } catch (error) {
+      console.error("Failed to fetch users:", error);
+      res.status(500).json({ error: "Failed to fetch users" });
+    }
+  });
+
+  app.post("/api/admin/users", async (req, res) => {
+    try {
+      // Check if user is admin
+      if (req.user?.role !== "admin") {
+        return res.status(403).json({ error: "Only administrators can create users" });
+      }
+
+      const data = insertUserSchema.parse(req.body);
+      const user = await storage.createUser(data);
+      res.status(201).json(user);
+    } catch (error) {
+      console.error("Failed to create user:", error);
+      res.status(500).json({ error: "Failed to create user" });
+    }
+  });
+
+  app.patch("/api/admin/users/:id", async (req, res) => {
+    try {
+      // Check if user is admin
+      if (req.user?.role !== "admin") {
+        return res.status(403).json({ error: "Only administrators can update users" });
+      }
+
+      const userId = parseInt(req.params.id);
+      if (isNaN(userId)) {
+        return res.status(400).json({ error: "Invalid user ID" });
+      }
+
+      const data = insertUserSchema.partial().parse(req.body);
+      const user = await storage.updateUser(userId, data);
+      res.json(user);
+    } catch (error) {
+      console.error("Failed to update user:", error);
+      res.status(500).json({ error: "Failed to update user" });
+    }
+  });
+
+  app.delete("/api/admin/users/:id", async (req, res) => {
+    try {
+      // Check if user is admin
+      if (req.user?.role !== "admin") {
+        return res.status(403).json({ error: "Only administrators can delete users" });
+      }
+
+      const userId = parseInt(req.params.id);
+      if (isNaN(userId)) {
+        return res.status(400).json({ error: "Invalid user ID" });
+      }
+
+      await storage.deleteUser(userId);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Failed to delete user:", error);
+      res.status(500).json({ error: "Failed to delete user" });
+    }
+  });
 
   // Update regulations endpoint to support jurisdiction filter
   app.get("/api/regulations", async (req, res) => {
