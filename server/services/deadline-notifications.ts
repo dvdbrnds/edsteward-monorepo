@@ -3,12 +3,12 @@ import { emailService } from '../services/email';
 import { differenceInDays, differenceInHours, format } from 'date-fns';
 import type { Deadline, Regulation, User } from '@shared/schema';
 
-// Notification schedules based on deadline proximity
-const NOTIFICATION_SCHEDULES = {
-  INITIAL_REMINDER: 90, // days before
-  WEEKLY_REMINDER: 30, // start weekly reminders
-  DAILY_REMINDER: 7, // start daily reminders
-  FINAL_DAY_REMINDERS: 1, // three times on the final day
+// Default notification schedules if not specified in regulation
+const DEFAULT_NOTIFICATION_SCHEDULES = {
+  initialReminder: 90, // days before
+  weeklyReminder: 30, // start weekly reminders
+  dailyReminder: 7,   // start daily reminders
+  finalDayReminders: true // three times on the final day
 } as const;
 
 interface NotificationContext {
@@ -55,7 +55,7 @@ async function sendDeadlineNotification(context: NotificationContext) {
   const { deadline, regulation, assignedUser, daysRemaining } = context;
 
   // Determine if we should send a notification based on the schedule
-  if (!shouldSendNotification(daysRemaining)) return;
+  if (!shouldSendNotification(daysRemaining, regulation)) return;
 
   const subject = `Regulation Deadline Reminder: ${regulation.name}`;
   const dueDate = format(new Date(deadline.dueDate), 'PPPP');
@@ -88,23 +88,24 @@ async function sendDeadlineNotification(context: NotificationContext) {
   console.log(`Sent ${urgencyLevel} deadline notification to ${assignedUser.email} for regulation ${regulation.id}`);
 }
 
-function shouldSendNotification(daysRemaining: number): boolean {
+function shouldSendNotification(daysRemaining: number, regulation: Regulation): boolean {
+  const schedules = regulation.notificationSchedule || DEFAULT_NOTIFICATION_SCHEDULES;
   const hoursRemaining = daysRemaining * 24;
 
-  // Initial 90-day reminder
-  if (daysRemaining === NOTIFICATION_SCHEDULES.INITIAL_REMINDER) return true;
+  // Initial reminder
+  if (daysRemaining === schedules.initialReminder) return true;
 
-  // Weekly reminders between 30 and 7 days
-  if (daysRemaining <= NOTIFICATION_SCHEDULES.WEEKLY_REMINDER &&
-      daysRemaining > NOTIFICATION_SCHEDULES.DAILY_REMINDER &&
+  // Weekly reminders between weekly threshold and daily threshold
+  if (daysRemaining <= schedules.weeklyReminder &&
+      daysRemaining > schedules.dailyReminder &&
       daysRemaining % 7 === 0) return true;
 
-  // Daily reminders in the last week
-  if (daysRemaining <= NOTIFICATION_SCHEDULES.DAILY_REMINDER &&
-      daysRemaining > NOTIFICATION_SCHEDULES.FINAL_DAY_REMINDERS) return true;
+  // Daily reminders in the final week
+  if (daysRemaining <= schedules.dailyReminder &&
+      daysRemaining > 1) return true;
 
-  // Three times on the last day (morning, afternoon, evening)
-  if (daysRemaining <= NOTIFICATION_SCHEDULES.FINAL_DAY_REMINDERS) {
+  // Three times on the last day if enabled
+  if (daysRemaining <= 1 && schedules.finalDayReminders) {
     const hour = new Date().getHours();
     return hour === 9 || hour === 13 || hour === 17;
   }

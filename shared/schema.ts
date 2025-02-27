@@ -51,6 +51,12 @@ export const regulations = pgTable("regulations", {
   relatedRegulations: jsonb("related_regulations").$type<string[]>(),
   complianceNotes: text("compliance_notes"),
   verificationMethod: text("verification_method"),
+  notificationSchedule: jsonb("notification_schedule").$type<{
+    initialReminder: number, // days before
+    weeklyReminder: number, // start weekly reminders
+    dailyReminder: number,  // start daily reminders
+    finalDayReminders: boolean // three times on final day
+  }>(),
 });
 
 // Comments table
@@ -124,6 +130,12 @@ export const insertRegulationSchema = createInsertSchema(regulations)
     relatedRegulations: z.array(z.string()).optional().nullable(),
     lastVerified: z.date().optional().nullable(),
     isApplicable: z.boolean().default(true),
+    notificationSchedule: z.object({
+      initialReminder: z.number().min(1).max(365).default(90),
+      weeklyReminder: z.number().min(1).max(90).default(30),
+      dailyReminder: z.number().min(1).max(30).default(7),
+      finalDayReminders: z.boolean().default(true)
+    }).optional().nullable(),
   });
 
 // Schema for inserting comments
