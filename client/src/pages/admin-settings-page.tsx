@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertEmailConfigSchema } from "@shared/schema";
 import { insertTwilioConfigSchema } from "@shared/schema";
+import { z } from "zod"; // Add this import
 import Navigation from "@/components/layout/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -24,7 +25,6 @@ import { Switch } from "@/components/ui/switch";
 import { Mail, Loader2, Bell, MessageSquare } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Redirect } from "wouter";
-import type { z } from "zod";
 import type { TwilioConfig } from "@shared/schema";
 import { Label } from "@/components/ui/label";
 import {
@@ -54,6 +54,7 @@ import { UserPlus, Users, Pencil, Trash2 } from "lucide-react";
 import { insertUserSchema } from "@shared/schema";
 
 
+// Type definitions using the imported z
 type FormValues = z.infer<typeof insertEmailConfigSchema>;
 type TwilioFormValues = z.infer<typeof insertTwilioConfigSchema>;
 
