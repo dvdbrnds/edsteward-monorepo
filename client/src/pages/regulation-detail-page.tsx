@@ -302,7 +302,7 @@ export default function RegulationDetailPage() {
                     defaultValue={regulation?.category}
                     onValueChange={(value) => categoryMutation.mutate(value)}
                   >
-                    <SelectTrigger className="w-[180px] bg-gray-100">
+                    <SelectTrigger className="w-[180px] bg-gray-100 border-2 border-[#5B2C8F] rounded-md">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -641,7 +641,7 @@ export default function RegulationDetailPage() {
                 )}
 
                 {user?.role === "admin" && (
-                  <Card>
+                  <Card className="border-2 border-[#5B2C8F] shadow-sm">
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <Bell className="h-5 w-5" />
