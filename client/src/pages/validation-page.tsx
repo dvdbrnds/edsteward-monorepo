@@ -249,8 +249,9 @@ export default function ValidationPage() {
   };
 
   const getCategoryStats = (report: ValidationReport) => {
+    console.log("Generating category stats for report:", report);
     const allIssues = [...report.errors, ...report.warnings];
-    return Object.entries(categoryColors).reduce((acc, [category, color]) => {
+    const stats = Object.entries(categoryColors).reduce((acc, [category, color]) => {
       const categoryIssues = allIssues.filter(issue => issue.category === category);
       const errors = categoryIssues.filter(issue => issue.severity === 'error').length;
       const warnings = categoryIssues.filter(issue => issue.severity === 'warning').length;
@@ -263,6 +264,9 @@ export default function ValidationPage() {
       };
       return acc;
     }, {} as Record<string, { errors: number; warnings: number; total: number; color: string }>);
+
+    console.log("Generated category stats:", stats);
+    return stats;
   };
 
   return (
@@ -310,12 +314,12 @@ export default function ValidationPage() {
           <div className="space-y-8">
             {/* Category Summary Cards */}
             {report && (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
                 {Object.entries(getCategoryStats(report)).map(([category, stats]) => (
-                  <Card key={category} className="hover:shadow-md transition-shadow">
+                  <Card key={category} className="border-2 hover:shadow-md transition-shadow">
                     <CardHeader className="pb-2">
                       <CardTitle className="text-sm font-medium capitalize">
-                        {category.replace('_', ' ')}
+                        {category.replace(/_/g, ' ')}
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
@@ -341,7 +345,7 @@ export default function ValidationPage() {
                           )}
                         </div>
                         <Badge
-                          className={stats.color}
+                          className={`${categoryColors[category]} shadow-sm`}
                           variant="secondary"
                         >
                           {stats.total}
