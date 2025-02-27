@@ -12,7 +12,27 @@ import {
   Loader2,
   User,
   Settings,
+  Cog,
 } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useQuery } from "@tanstack/react-query";
+
+// Import the logo using relative path from client's perspective
+import moravianLogo from "@/assets/Screenshot_2025-02-12_at_9.15.57_AM-removebg-preview.png";
 
 // CHANGELOG constant remains unchanged
 const CHANGELOG = [
@@ -194,7 +214,14 @@ export default function Navigation() {
                 </Link>
                 <Dialog open={changelogOpen} onOpenChange={setChangelogOpen}>
                   <DialogTrigger asChild>
-                    <button className="text-xs text-gray-300 ml-2 hover:text-white transition-colors">
+                    <button 
+                      className="text-xs text-gray-300 ml-2 hover:text-white transition-colors"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        setChangelogOpen(true);
+                      }}
+                    >
                       Alpha v0.2.3
                     </button>
                   </DialogTrigger>
