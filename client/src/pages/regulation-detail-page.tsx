@@ -1,3 +1,20 @@
+/**
+ * @module RegulationDetailPage
+ * @description Displays detailed information about a specific regulation and provides administrative controls
+ * @compliance ISO/IEC/IEEE 26514 4.3.2 - User Interface Documentation
+ * 
+ * @securityControl Access Control
+ * - Implements role-based access control for admin features
+ * - Restricts notification settings to admin users
+ * - Validates user authentication status
+ * 
+ * @component
+ * @example
+ * ```tsx
+ * <RegulationDetailPage />
+ * ```
+ */
+
 import { useLocation } from "wouter";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import type { Regulation, Deadline, Guide } from "@shared/schema";
@@ -54,6 +71,30 @@ import CommentSection from "@/components/regulations/comment-section";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 
+/**
+ * @interface RegulationWithOverride
+ * @extends {Regulation}
+ * @description Extends the base Regulation type with notification override capabilities
+ */
+interface RegulationWithOverride extends Regulation {
+  notificationOverride?: {
+    email: string | null;
+    phone: string | null;
+  };
+  notificationSchedule?: {
+    initialReminder: number;
+    weeklyReminder: number;
+    dailyReminder: number;
+    finalDayReminders: boolean;
+  }
+}
+
+/**
+ * Calculates the compliance score for a regulation based on various factors
+ * @param {Regulation | undefined} regulation - The regulation to calculate the score for
+ * @param {Deadline[]} deadlines - Associated deadlines for the regulation
+ * @returns {Object} The calculated score and breakdown
+ */
 function calculateComplianceScore(regulation: Regulation | undefined, deadlines: Deadline[] = []): {
   score: number;
   breakdown: {
@@ -104,19 +145,6 @@ function calculateComplianceScore(regulation: Regulation | undefined, deadlines:
       review: Math.round(reviewScore)
     }
   };
-}
-
-interface RegulationWithOverride extends Regulation {
-  notificationOverride?: {
-    email: string | null;
-    phone: string | null;
-  };
-  notificationSchedule?: {
-    initialReminder: number;
-    weeklyReminder: number;
-    dailyReminder: number;
-    finalDayReminders: boolean;
-  }
 }
 
 const notificationOverrideSchema = z.object({
