@@ -74,15 +74,22 @@ export default function AdminSettingsPage() {
     queryKey: ["/api/admin/users"],
   });
 
-  // User form setup
-  const userForm = useForm<z.infer<typeof insertUserSchema>>({
-    resolver: zodResolver(insertUserSchema),
+  // User form setup with added resetPassword field
+  const userForm = useForm<z.infer<typeof insertUserSchema> & { resetPassword?: string }>({
+    resolver: zodResolver(
+      selectedUser
+        ? insertUserSchema.omit({ password: true }).extend({
+            resetPassword: z.string().min(6, "Password must be at least 6 characters").optional()
+          })
+        : insertUserSchema
+    ),
     defaultValues: {
       username: "",
       password: "",
       role: "user",
       department: "",
       email: "",
+      resetPassword: "",
     },
   });
 
@@ -110,8 +117,15 @@ export default function AdminSettingsPage() {
   });
 
   const updateUserMutation = useMutation({
-    mutationFn: async (data: Partial<User> & { id: number }) => {
-      return apiRequest("PATCH", `/api/admin/users/${data.id}`, data);
+    mutationFn: async (data: Partial<User> & { id: number; resetPassword?: string }) => {
+      // If resetPassword is provided, include it in the update
+      const updateData = data.resetPassword
+        ? { ...data, password: data.resetPassword }
+        : data;
+
+      // Remove resetPassword from the payload
+      const { resetPassword, ...cleanData } = updateData;
+      return apiRequest("PATCH", `/api/admin/users/${data.id}`, cleanData);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
@@ -335,7 +349,7 @@ export default function AdminSettingsPage() {
                           )}
                         />
 
-                        {!selectedUser && (
+                        {!selectedUser ? (
                           <FormField
                             control={userForm.control}
                             name="password"
@@ -345,6 +359,27 @@ export default function AdminSettingsPage() {
                                 <FormControl>
                                   <Input type="password" {...field} />
                                 </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        ) : (
+                          <FormField
+                            control={userForm.control}
+                            name="resetPassword"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Reset Password</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    type="password"
+                                    placeholder="Enter new password to reset"
+                                    {...field}
+                                  />
+                                </FormControl>
+                                <FormDescription>
+                                  Leave blank to keep the current password
+                                </FormDescription>
                                 <FormMessage />
                               </FormItem>
                             )}
