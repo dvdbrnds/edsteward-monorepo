@@ -136,7 +136,7 @@ export default function ValidationPage() {
 
     const csv = [
       ['Type', 'Priority', 'Category', 'Regulation ID', 'Field', 'Error', 'Current Value'].join(','),
-      ...allIssues.map(issue => 
+      ...allIssues.map(issue =>
         [
           issue.type,
           priorityLabels[issue.priority],
@@ -248,6 +248,23 @@ export default function ValidationPage() {
     });
   };
 
+  const getCategoryStats = (report: ValidationReport) => {
+    const allIssues = [...report.errors, ...report.warnings];
+    return Object.entries(categoryColors).reduce((acc, [category, color]) => {
+      const categoryIssues = allIssues.filter(issue => issue.category === category);
+      const errors = categoryIssues.filter(issue => issue.severity === 'error').length;
+      const warnings = categoryIssues.filter(issue => issue.severity === 'warning').length;
+
+      acc[category] = {
+        errors,
+        warnings,
+        total: errors + warnings,
+        color
+      };
+      return acc;
+    }, {} as Record<string, { errors: number; warnings: number; total: number; color: string }>);
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <main className="py-10">
@@ -274,8 +291,8 @@ export default function ValidationPage() {
                   </Button>
                 </>
               )}
-              <Button 
-                onClick={() => validateMutation.mutate()} 
+              <Button
+                onClick={() => validateMutation.mutate()}
                 disabled={validateMutation.isPending}
               >
                 {validateMutation.isPending ? (
@@ -291,6 +308,51 @@ export default function ValidationPage() {
           </div>
 
           <div className="space-y-8">
+            {/* Category Summary Cards */}
+            {report && (
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {Object.entries(getCategoryStats(report)).map(([category, stats]) => (
+                  <Card key={category} className="hover:shadow-md transition-shadow">
+                    <CardHeader className="pb-2">
+                      <CardTitle className="text-sm font-medium capitalize">
+                        {category.replace('_', ' ')}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex justify-between items-center">
+                        <div className="space-y-1">
+                          {stats.errors > 0 && (
+                            <div className="flex items-center gap-1 text-red-600">
+                              <XCircle className="h-4 w-4" />
+                              <span className="text-sm">{stats.errors} Errors</span>
+                            </div>
+                          )}
+                          {stats.warnings > 0 && (
+                            <div className="flex items-center gap-1 text-yellow-600">
+                              <AlertTriangle className="h-4 w-4" />
+                              <span className="text-sm">{stats.warnings} Warnings</span>
+                            </div>
+                          )}
+                          {stats.total === 0 && (
+                            <div className="flex items-center gap-1 text-green-600">
+                              <CheckCircle className="h-4 w-4" />
+                              <span className="text-sm">All Clear</span>
+                            </div>
+                          )}
+                        </div>
+                        <Badge
+                          className={stats.color}
+                          variant="secondary"
+                        >
+                          {stats.total}
+                        </Badge>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
+
             {/* Console View */}
             <Card>
               <CardHeader>
@@ -387,7 +449,7 @@ export default function ValidationPage() {
                                   <AlertTriangle className="h-5 w-5 text-yellow-500" />
                                 )}
                                 <span className={
-                                  issue.severity === 'error' 
+                                  issue.severity === 'error'
                                     ? 'text-red-600 font-medium'
                                     : 'text-yellow-600 font-medium'
                                 }>
