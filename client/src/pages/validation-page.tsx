@@ -126,25 +126,59 @@ export default function ValidationPage() {
     },
   });
 
-  const getCategoryStats = (report: ValidationReport) => {
-    console.log("Generating category stats for report:", report);
+  const renderCategorySummary = () => {
+    if (!report) return null;
+
     const allIssues = [...report.errors, ...report.warnings];
-    const stats = Object.entries(categoryColors).reduce((acc, [category, color]) => {
+    const categories = Object.entries(categoryColors).map(([category, color]) => {
       const categoryIssues = allIssues.filter(issue => issue.category === category);
       const errors = categoryIssues.filter(issue => issue.severity === 'error').length;
       const warnings = categoryIssues.filter(issue => issue.severity === 'warning').length;
+      const total = errors + warnings;
 
-      acc[category] = {
-        errors,
-        warnings,
-        total: errors + warnings,
-        color
-      };
-      return acc;
-    }, {} as Record<string, { errors: number; warnings: number; total: number; color: string }>);
+      return (
+        <Card key={category} className="border-2 border-[#5B2C8F] shadow-md bg-purple-50/30">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium capitalize">
+              {category.replace(/_/g, ' ')}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="flex justify-between items-center">
+              <div className="space-y-1">
+                {errors > 0 && (
+                  <div className="flex items-center gap-1 text-red-600">
+                    <XCircle className="h-4 w-4" />
+                    <span className="text-sm">{errors} Errors</span>
+                  </div>
+                )}
+                {warnings > 0 && (
+                  <div className="flex items-center gap-1 text-yellow-600">
+                    <AlertTriangle className="h-4 w-4" />
+                    <span className="text-sm">{warnings} Warnings</span>
+                  </div>
+                )}
+                {total === 0 && (
+                  <div className="flex items-center gap-1 text-green-600">
+                    <CheckCircle className="h-4 w-4" />
+                    <span className="text-sm">All Clear</span>
+                  </div>
+                )}
+              </div>
+              <Badge className={color} variant="secondary">
+                {total}
+              </Badge>
+            </div>
+          </CardContent>
+        </Card>
+      );
+    });
 
-    console.log("Generated category stats:", stats);
-    return stats;
+    return (
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+        {categories}
+      </div>
+    );
   };
 
   const downloadCSV = () => {
@@ -274,6 +308,7 @@ export default function ValidationPage() {
     <div className="min-h-screen bg-gray-50">
       <main className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header */}
           <div className="flex justify-between items-center mb-8">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
@@ -313,50 +348,8 @@ export default function ValidationPage() {
           </div>
 
           <div className="space-y-8">
-            {/* Category Summary Cards */}
-            {report && (
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-                {Object.entries(getCategoryStats(report)).map(([category, stats]) => (
-                  <Card key={category} className="border-2 border-[#5B2C8F] shadow-md bg-purple-50/30 relative hover:bg-purple-50/50 transition-colors">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-sm font-medium capitalize">
-                        {category.replace(/_/g, ' ')}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="flex justify-between items-center">
-                        <div className="space-y-1">
-                          {stats.errors > 0 && (
-                            <div className="flex items-center gap-1 text-red-600">
-                              <XCircle className="h-4 w-4" />
-                              <span className="text-sm">{stats.errors} Errors</span>
-                            </div>
-                          )}
-                          {stats.warnings > 0 && (
-                            <div className="flex items-center gap-1 text-yellow-600">
-                              <AlertTriangle className="h-4 w-4" />
-                              <span className="text-sm">{stats.warnings} Warnings</span>
-                            </div>
-                          )}
-                          {stats.total === 0 && (
-                            <div className="flex items-center gap-1 text-green-600">
-                              <CheckCircle className="h-4 w-4" />
-                              <span className="text-sm">All Clear</span>
-                            </div>
-                          )}
-                        </div>
-                        <Badge
-                          className={`${categoryColors[category]} shadow-sm`}
-                          variant="secondary"
-                        >
-                          {stats.total}
-                        </Badge>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
+            {/* Category Summary */}
+            {report && renderCategorySummary()}
 
             {/* Console View */}
             <Card>
