@@ -26,6 +26,7 @@ interface ValidationReport {
 // Enhanced validation class
 export class RegulationValidator {
   private validateUrls(regulation: Regulation): ValidationError[] {
+    console.log(`Validating URLs for regulation ${regulation.itemId}`);
     const errors: ValidationError[] = [];
 
     // Array of URL fields to validate
@@ -39,6 +40,7 @@ export class RegulationValidator {
 
     urlFields.forEach(({ field, value }) => {
       if (value) {
+        console.log(`Checking URL for ${field}: ${value}`);
         const result = urlSchema.safeParse(value);
         if (!result.success) {
           errors.push({
@@ -56,6 +58,7 @@ export class RegulationValidator {
   }
 
   private validateDates(regulation: Regulation): ValidationError[] {
+    console.log(`Validating dates for regulation ${regulation.itemId}`);
     const errors: ValidationError[] = [];
 
     // Check origination date
@@ -104,36 +107,54 @@ export class RegulationValidator {
       });
     }
 
-    // Validate filing deadlines
-    if (regulation.filingDeadlines) {
-      regulation.filingDeadlines.forEach((deadline, index) => {
-        try {
-          const deadlineDate = parse(deadline.date, 'yyyy-MM-dd', new Date());
-          if (!isValid(deadlineDate)) {
-            errors.push({
-              regulationId: regulation.itemId,
-              field: `filingDeadlines[${index}].date`,
-              error: 'Invalid deadline date format',
-              value: deadline.date,
-              severity: 'error'
-            });
-          }
-        } catch {
-          errors.push({
-            regulationId: regulation.itemId,
-            field: `filingDeadlines[${index}].date`,
-            error: 'Invalid deadline date',
-            value: deadline.date,
-            severity: 'error'
-          });
-        }
+    return errors;
+  }
+
+  private validateRequiredFields(regulation: Regulation): ValidationError[] {
+    console.log(`Validating required fields for regulation ${regulation.itemId}`);
+    const errors: ValidationError[] = [];
+
+    const requiredFields = [
+      { field: 'itemId', value: regulation.itemId },
+      { field: 'name', value: regulation.name },
+      { field: 'topic', value: regulation.topic },
+      { field: 'statute', value: regulation.statute },
+      { field: 'category', value: regulation.category }
+    ];
+
+    requiredFields.forEach(({ field, value }) => {
+      if (!value || value.trim() === '') {
+        errors.push({
+          regulationId: regulation.itemId || 'unknown',
+          field,
+          error: `${field} is required`,
+          value,
+          severity: 'error'
+        });
+      }
+    });
+
+    return errors;
+  }
+
+  private validateContent(regulation: Regulation): ValidationError[] {
+    console.log(`Validating content for regulation ${regulation.itemId}`);
+    const errors: ValidationError[] = [];
+
+    if (!regulation.summary && !regulation.requirements) {
+      errors.push({
+        regulationId: regulation.itemId,
+        field: 'content',
+        error: 'Either summary or requirements must be provided',
+        value: null,
+        severity: 'warning'
       });
     }
 
     return errors;
   }
 
-  private validateSourceVerification(regulation: Regulation): ValidationError[] {
+    private validateSourceVerification(regulation: Regulation): ValidationError[] {
     const errors: ValidationError[] = [];
 
     // Check if source verification is recent (within last 6 months)
@@ -183,74 +204,23 @@ export class RegulationValidator {
     return errors;
   }
 
-  private validateRequiredFields(regulation: Regulation): ValidationError[] {
-    const errors: ValidationError[] = [];
-
-    if (!regulation.itemId || regulation.itemId.trim() === '') {
-      errors.push({
-        regulationId: regulation.itemId || 'unknown',
-        field: 'itemId',
-        error: 'Item ID is required',
-        value: regulation.itemId,
-        severity: 'error'
-      });
-    }
-
-    if (!regulation.topic || regulation.topic.trim() === '') {
-      errors.push({
-        regulationId: regulation.itemId || 'unknown',
-        field: 'topic',
-        error: 'Topic is required',
-        value: regulation.topic,
-        severity: 'error'
-      });
-    }
-
-    if (!regulation.statute || regulation.statute.trim() === '') {
-      errors.push({
-        regulationId: regulation.itemId || 'unknown',
-        field: 'statute',
-        error: 'Statute is required',
-        value: regulation.statute,
-        severity: 'error'
-      });
-    }
-
-    if (!regulation.category || regulation.category.trim() === '') {
-      errors.push({
-        regulationId: regulation.itemId || 'unknown',
-        field: 'category',
-        error: 'Category is required',
-        value: regulation.category,
-        severity: 'error'
-      });
-    }
-
-    // Validate URLs if present
-    if (regulation.agency_url && !regulation.agency_url.startsWith('http')) {
-      errors.push({
-        regulationId: regulation.itemId || 'unknown',
-        field: 'agency_url',
-        error: 'Agency URL must start with http:// or https://',
-        value: regulation.agency_url,
-        severity: 'warning'
-      });
-    }
-
-    return errors;
-  }
 
   public validateRegulation(regulation: Regulation): ValidationError[] {
-    return [
+    console.log(`Starting validation for regulation ${regulation.itemId}`);
+    const errors = [
       ...this.validateUrls(regulation),
       ...this.validateDates(regulation),
       ...this.validateRequiredFields(regulation),
       ...this.validateSourceVerification(regulation),
-      ...this.validateRequiredContent(regulation)
+      ...this.validateRequiredContent(regulation),
+      ...this.validateContent(regulation)
     ];
+    console.log(`Validation complete for regulation ${regulation.itemId}. Found ${errors.length} issues.`);
+    return errors;
   }
 
   public async validateAll(regulations: Regulation[]): Promise<ValidationReport> {
+    console.log(`Starting batch validation for ${regulations.length} regulations`);
     const allErrors: ValidationError[] = [];
     let validCount = 0;
 
@@ -263,12 +233,15 @@ export class RegulationValidator {
       }
     }
 
-    return {
+    const report = {
       totalRegulations: regulations.length,
       validRegulations: validCount,
       errors: allErrors.filter(e => e.severity === 'error'),
       warnings: allErrors.filter(e => e.severity === 'warning'),
       timestamp: new Date()
     };
+
+    console.log(`Validation complete. ${validCount} valid regulations out of ${regulations.length}`);
+    return report;
   }
 }
