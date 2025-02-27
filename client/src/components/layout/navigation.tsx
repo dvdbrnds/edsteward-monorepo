@@ -1,12 +1,6 @@
 /**
  * @module Navigation
  * @description Main navigation component providing routing and user management controls
- * @compliance ISO/IEC/IEEE 26514 4.3.5 - Navigation Documentation
- * 
- * @securityControl User Interface & Access Control
- * - Implements role-based navigation visibility
- * - Manages user session controls
- * - Provides version tracking and changelog
  */
 
 import { useAuth } from "@/hooks/use-auth";
@@ -222,7 +216,6 @@ export default function Navigation() {
   const links = [
     { href: "/", label: "Dashboard", icon: LayoutDashboard },
     { href: "/regulations", label: "Regulations", icon: Book },
-    { href: "/reports", label: "Reports", icon: FileText },
     ...(!setupComplete ? [{ href: "/setup", label: "Complete Setup", icon: Cog }] : []),
     ...(user?.role === "admin"
       ? [{ href: "/admin/settings", label: "Admin Settings", icon: Settings }]
