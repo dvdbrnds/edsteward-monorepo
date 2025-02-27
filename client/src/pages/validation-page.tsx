@@ -19,6 +19,7 @@ import autoTable from 'jspdf-autotable';
 import { format } from "date-fns";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { BugReportButton } from "@/components/common/bug-report-button";
 
 interface ValidationError {
   regulationId: string;
@@ -137,8 +138,8 @@ export default function ValidationPage() {
       const total = errors + warnings;
 
       return (
-        <Card 
-          key={category} 
+        <Card
+          key={category}
           className="border-2 border-[#5B2C8F] shadow-md bg-purple-50/30 relative hover:bg-purple-50/50 transition-colors"
         >
           <CardHeader className="pb-2">
@@ -321,7 +322,8 @@ export default function ValidationPage() {
                 Validate regulations against compliance rules and standards
               </p>
             </div>
-            <div className="space-x-4">
+            <div className="flex items-center space-x-4">
+              <BugReportButton />
               {report && report.totalRegulations > 0 && (
                 <>
                   <Button variant="outline" onClick={downloadCSV}>
