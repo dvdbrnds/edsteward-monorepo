@@ -45,6 +45,7 @@ const CHANGELOG = [
       "Improved user editing interface with better validation",
       "Added secure password management for admin users",
       "Fixed version number dialog to work correctly from all pages",
+      "Enhanced admin section visibility with purple highlighting",
     ],
   },
   {
