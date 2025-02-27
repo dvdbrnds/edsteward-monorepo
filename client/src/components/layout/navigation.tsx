@@ -2,6 +2,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { apiRequest } from "@/lib/queryClient";
+import { useState } from "react";
 import {
   LayoutDashboard,
   Book,
@@ -169,6 +170,7 @@ const CHANGELOG = [
 export default function Navigation() {
   const { user, logoutMutation } = useAuth();
   const [location] = useLocation();
+  const [changelogOpen, setChangelogOpen] = useState(false);
 
   const { data: setupComplete } = useQuery({
     queryKey: ["/api/setup/status"],
@@ -209,13 +211,9 @@ export default function Navigation() {
                     <span className="text-xl font-bold text-white hover:text-gray-200 transition-colors">
                       Compliance Portal
                     </span>
-                    <Dialog>
+                    <Dialog open={changelogOpen} onOpenChange={setChangelogOpen}>
                       <DialogTrigger asChild>
-                        <button 
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                          }} 
+                        <button
                           className="text-xs text-gray-300 ml-2 hover:text-white transition-colors"
                         >
                           Alpha v0.2.3
