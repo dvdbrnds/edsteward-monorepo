@@ -165,16 +165,19 @@ async function startServer(): Promise<Server> {
           clearTimeout(timeoutId);
           log(`Server successfully started on port ${PORT}`);
 
-          // Start deadline notification check interval
-          log("Starting deadline notification checker...");
-          deadlineCheckInterval = setInterval(async () => {
-            try {
-              await checkAndSendDeadlineNotifications();
-              log("Deadline notifications check completed");
-            } catch (error) {
-              log("Error checking deadline notifications: " + error);
-            }
-          }, 60 * 60 * 1000); // Check every hour
+          // Start deadline notification check interval after a delay
+          log("Starting server successfully, will initialize deadline checker in 30 seconds...");
+          setTimeout(() => {
+            log("Initializing deadline notification checker...");
+            deadlineCheckInterval = setInterval(async () => {
+              try {
+                await checkAndSendDeadlineNotifications();
+                log("Deadline notifications check completed");
+              } catch (error) {
+                log("Error checking deadline notifications: " + error);
+              }
+            }, 60 * 60 * 1000); // Check every hour
+          }, 30000); // Wait 30 seconds before starting the checker
 
           resolve(httpServer);
         })
