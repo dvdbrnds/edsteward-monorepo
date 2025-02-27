@@ -1,3 +1,14 @@
+/**
+ * @module HealthScoreDashboard
+ * @description A sophisticated dashboard component that displays compliance health scores and metrics
+ * @compliance ISO/IEC/IEEE 26514 4.3.4 - Data Visualization Documentation
+ * 
+ * @securityControl Data Presentation & Analytics
+ * - Implements secure data visualization
+ * - Provides category-based compliance scoring
+ * - Handles real-time score calculations
+ */
+
 import { useQuery } from "@tanstack/react-query";
 import type { Regulation, Deadline } from "@shared/schema";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -7,20 +18,40 @@ import { differenceInDays } from "date-fns";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 
+/**
+ * @interface CategoryScore
+ * @description Represents the compliance score and metrics for a specific category
+ */
 interface CategoryScore {
+  /** The name of the category */
   category: string;
+  /** Overall compliance score for the category (0-100) */
   score: number;
+  /** Detailed breakdown of the score components */
   breakdown: {
+    /** Score based on deadline completion (0-40) */
     deadlines: number;
+    /** Score based on documentation completeness (0-30) */
     documentation: number;
+    /** Score based on review status (0-30) */
     review: number;
   };
+  /** Total number of regulations in this category */
   regulations: number;
+  /** Number of regulations with score >= 90 */
   completed: number;
+  /** Number of regulations with score > 0 and < 90 */
   inProgress: number;
+  /** Number of regulations with score = 0 */
   notStarted: number;
 }
 
+/**
+ * Calculates the compliance score for a specific regulation
+ * @param {Regulation} regulation - The regulation to calculate the score for
+ * @param {Deadline[]} deadlines - Associated deadlines for the regulation
+ * @returns {Object} The calculated score and its breakdown
+ */
 function calculateRegulationScore(regulation: Regulation, deadlines: Deadline[]): {
   score: number;
   breakdown: { deadlines: number; documentation: number; review: number };
@@ -59,6 +90,12 @@ function calculateRegulationScore(regulation: Regulation, deadlines: Deadline[])
   };
 }
 
+/**
+ * Calculates compliance scores for all categories
+ * @param {Regulation[]} regulations - List of all regulations
+ * @param {Deadline[]} deadlines - List of all deadlines
+ * @returns {CategoryScore[]} Array of category scores
+ */
 function calculateCategoryScores(regulations: Regulation[], deadlines: Deadline[]): CategoryScore[] {
   const categoryMap = new Map<string, CategoryScore>();
 
@@ -82,7 +119,7 @@ function calculateCategoryScores(regulations: Regulation[], deadlines: Deadline[
 
     // Update breakdown averages
     Object.keys(breakdown).forEach(key => {
-      existing.breakdown[key] = (existing.breakdown[key] * (existing.regulations - 1) + breakdown[key]) / existing.regulations;
+      existing.breakdown[key as keyof typeof breakdown] = (existing.breakdown[key as keyof typeof breakdown] * (existing.regulations - 1) + breakdown[key as keyof typeof breakdown]) / existing.regulations;
     });
 
     if (score >= 90) existing.completed += 1;
@@ -95,6 +132,16 @@ function calculateCategoryScores(regulations: Regulation[], deadlines: Deadline[
   return Array.from(categoryMap.values());
 }
 
+/**
+ * @component HealthScoreDashboard
+ * @description Main dashboard component showing compliance health metrics
+ * @returns {JSX.Element} The rendered dashboard
+ * 
+ * @example
+ * ```tsx
+ * <HealthScoreDashboard />
+ * ```
+ */
 export default function HealthScoreDashboard() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);

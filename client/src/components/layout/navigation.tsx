@@ -1,3 +1,14 @@
+/**
+ * @module Navigation
+ * @description Main navigation component providing routing and user management controls
+ * @compliance ISO/IEC/IEEE 26514 4.3.5 - Navigation Documentation
+ * 
+ * @securityControl User Interface & Access Control
+ * - Implements role-based navigation visibility
+ * - Manages user session controls
+ * - Provides version tracking and changelog
+ */
+
 import { useAuth } from "@/hooks/use-auth";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
@@ -34,7 +45,11 @@ import { useQuery } from "@tanstack/react-query";
 // Import the logo using relative path from client's perspective
 import moravianLogo from "@/assets/Screenshot_2025-02-12_at_9.15.57_AM-removebg-preview.png";
 
-// CHANGELOG constant
+/**
+ * @constant CHANGELOG
+ * @description Version history and feature changelog for the application
+ * @type {Array<{version: string, date: string, changes: string[]}>}
+ */
 const CHANGELOG = [
   {
     version: "0.2.3",
@@ -170,6 +185,16 @@ const CHANGELOG = [
   },
 ] as const;
 
+/**
+ * @component Navigation
+ * @description Main navigation component with role-based access control
+ * @returns {JSX.Element} The rendered navigation bar
+ * 
+ * @example
+ * ```tsx
+ * <Navigation />
+ * ```
+ */
 export default function Navigation() {
   const { user, logoutMutation } = useAuth();
   const [location] = useLocation();
