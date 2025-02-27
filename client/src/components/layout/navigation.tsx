@@ -35,6 +35,16 @@ import { Cog } from "lucide-react";
 
 const CHANGELOG = [
   {
+    version: "0.2.3",
+    date: "February 27, 2025",
+    changes: [
+      "Enhanced user management in admin settings",
+      "Added password reset functionality for existing users",
+      "Improved user editing interface with better validation",
+      "Added secure password management for admin users",
+    ],
+  },
+  {
     version: "0.2.2",
     date: "February 24, 2025",
     changes: [
@@ -202,7 +212,7 @@ export default function Navigation() {
                     <Dialog>
                       <DialogTrigger asChild>
                         <button className="text-xs text-gray-300 ml-2 hover:text-white transition-colors">
-                          Alpha v0.2.2
+                          Alpha v0.2.3
                         </button>
                       </DialogTrigger>
                       <DialogContent className="max-h-[80vh] overflow-y-auto">
