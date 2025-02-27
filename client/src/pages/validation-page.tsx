@@ -13,9 +13,11 @@ import {
 import { Download, AlertTriangle, CheckCircle, XCircle, Loader2, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient, apiRequest } from "@/lib/queryClient";
+import { ConsoleView } from "@/components/common/console-view";
 import jsPDF from "jspdf";
 import autoTable from 'jspdf-autotable';
 import { format } from "date-fns";
+import { useState } from "react";
 
 interface ValidationError {
   regulationId: string;
@@ -33,8 +35,23 @@ interface ValidationReport {
   timestamp: Date;
 }
 
+interface ConsoleLog {
+  message: string;
+  type: 'info' | 'error' | 'warning' | 'success';
+  timestamp: string;
+}
+
 export default function ValidationPage() {
   const { toast } = useToast();
+  const [consoleLogs, setConsoleLogs] = useState<ConsoleLog[]>([]);
+
+  const addLog = (message: string, type: 'info' | 'error' | 'warning' | 'success' = 'info') => {
+    setConsoleLogs(prev => [...prev, {
+      message,
+      type,
+      timestamp: format(new Date(), 'HH:mm:ss')
+    }]);
+  };
 
   // Load validation data immediately when page loads
   const { data: report, isLoading: reportLoading } = useQuery<ValidationReport>({
@@ -43,10 +60,8 @@ export default function ValidationPage() {
 
   const validateMutation = useMutation({
     mutationFn: async () => {
-      toast({
-        title: "Starting Validation",
-        description: "Running compliance checks on all regulations...",
-      });
+      setConsoleLogs([]);
+      addLog("Starting validation process...", "info");
       const response = await apiRequest("POST", "/api/regulations/validate", {});
       if (!response.ok) {
         throw new Error('Validation failed');
@@ -54,6 +69,18 @@ export default function ValidationPage() {
       return response.json();
     },
     onSuccess: (data) => {
+      addLog(`Validation complete. Checked ${data.totalRegulations} regulations.`, "success");
+      addLog(`Found ${data.errors.length} errors and ${data.warnings.length} warnings.`, "info");
+
+      // Add detailed logs for each issue
+      data.errors.forEach(error => {
+        addLog(`Error in ${error.regulationId}: ${error.field} - ${error.error}`, "error");
+      });
+
+      data.warnings.forEach(warning => {
+        addLog(`Warning in ${warning.regulationId}: ${warning.field} - ${warning.error}`, "warning");
+      });
+
       toast({
         title: "Validation Complete",
         description: `Checked ${data.totalRegulations} regulations. Found ${data.errors.length} errors and ${data.warnings.length} warnings.`,
@@ -61,6 +88,7 @@ export default function ValidationPage() {
       queryClient.invalidateQueries({ queryKey: ["/api/regulations/validate"] });
     },
     onError: (error) => {
+      addLog("Validation failed: " + error.message, "error");
       toast({
         title: "Validation Failed",
         description: "There was an error running the validation. Please try again.",
@@ -218,18 +246,20 @@ export default function ValidationPage() {
             </div>
           </div>
 
-          {reportLoading || validateMutation.isPending ? (
+          <div className="space-y-8">
+            {/* Console View */}
             <Card>
-              <CardContent className="p-6">
-                <div className="flex items-center justify-center space-x-4">
-                  <Loader2 className="h-6 w-6 animate-spin text-[#00267A]" />
-                  <span>Loading validation results...</span>
-                </div>
+              <CardHeader>
+                <CardTitle>Validation Console</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ConsoleView logs={consoleLogs} className="min-h-[300px]" />
               </CardContent>
             </Card>
-          ) : report ? (
-            <>
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 mb-8">
+
+            {/* Statistics Cards */}
+            {!reportLoading && report && (
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <Card>
                   <CardHeader>
                     <CardTitle>Total Regulations</CardTitle>
@@ -265,72 +295,67 @@ export default function ValidationPage() {
                   </CardContent>
                 </Card>
               </div>
+            )}
 
-              {(report.errors.length > 0 || report.warnings.length > 0) && (
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Validation Issues</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Severity</TableHead>
-                          <TableHead>Regulation ID</TableHead>
-                          <TableHead>Field</TableHead>
-                          <TableHead>Issue</TableHead>
-                          <TableHead>Current Value</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {[...report.errors, ...report.warnings]
-                          .sort((a, b) => {
-                            if (a.severity === b.severity) {
-                              return a.regulationId.localeCompare(b.regulationId);
-                            }
-                            return a.severity === 'error' ? -1 : 1;
-                          })
-                          .map((issue, index) => (
-                            <TableRow key={index}>
-                              <TableCell>
-                                <div className="flex items-center gap-2">
-                                  {issue.severity === 'error' ? (
-                                    <XCircle className="h-5 w-5 text-red-500" />
-                                  ) : (
-                                    <AlertTriangle className="h-5 w-5 text-yellow-500" />
-                                  )}
-                                  <span className={
-                                    issue.severity === 'error' 
-                                      ? 'text-red-600 font-medium'
-                                      : 'text-yellow-600 font-medium'
-                                  }>
-                                    {issue.severity === 'error' ? 'Error' : 'Warning'}
-                                  </span>
-                                </div>
-                              </TableCell>
-                              <TableCell>{issue.regulationId}</TableCell>
-                              <TableCell>{issue.field}</TableCell>
-                              <TableCell>{issue.error}</TableCell>
-                              <TableCell>
-                                <code className="px-2 py-1 bg-gray-100 rounded">
-                                  {String(issue.value)}
-                                </code>
-                              </TableCell>
-                            </TableRow>
-                          ))}
-                      </TableBody>
-                    </Table>
-                  </CardContent>
-                </Card>
-              )}
-            </>
-          ) : (
-            <Card>
-              <CardContent className="p-6 text-center">
-                <p>Click "Run Validation" to check your regulations for issues.</p>
-              </CardContent>
-            </Card>
-          )}
+            {/* Results Table */}
+            {report && (report.errors.length > 0 || report.warnings.length > 0) && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Validation Issues</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Severity</TableHead>
+                        <TableHead>Regulation ID</TableHead>
+                        <TableHead>Field</TableHead>
+                        <TableHead>Issue</TableHead>
+                        <TableHead>Current Value</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {[...report.errors, ...report.warnings]
+                        .sort((a, b) => {
+                          if (a.severity === b.severity) {
+                            return a.regulationId.localeCompare(b.regulationId);
+                          }
+                          return a.severity === 'error' ? -1 : 1;
+                        })
+                        .map((issue, index) => (
+                          <TableRow key={index}>
+                            <TableCell>
+                              <div className="flex items-center gap-2">
+                                {issue.severity === 'error' ? (
+                                  <XCircle className="h-5 w-5 text-red-500" />
+                                ) : (
+                                  <AlertTriangle className="h-5 w-5 text-yellow-500" />
+                                )}
+                                <span className={
+                                  issue.severity === 'error' 
+                                    ? 'text-red-600 font-medium'
+                                    : 'text-yellow-600 font-medium'
+                                }>
+                                  {issue.severity === 'error' ? 'Error' : 'Warning'}
+                                </span>
+                              </div>
+                            </TableCell>
+                            <TableCell>{issue.regulationId}</TableCell>
+                            <TableCell>{issue.field}</TableCell>
+                            <TableCell>{issue.error}</TableCell>
+                            <TableCell>
+                              <code className="px-2 py-1 bg-gray-100 rounded">
+                                {String(issue.value)}
+                              </code>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            )}
+          </div>
         </div>
       </main>
     </div>
