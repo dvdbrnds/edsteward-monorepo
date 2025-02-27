@@ -10,8 +10,11 @@ import path from 'path';
 import fs from 'fs';
 import { sql } from 'drizzle-orm';
 import { Server } from 'http';
-import net from 'net';
+import { exec as execCallback } from 'child_process';
+import { promisify } from 'util';
 import { checkAndSendDeadlineNotifications } from './services/deadline-notifications';
+
+const exec = promisify(execCallback);
 
 // Initialize Express application with middleware
 const app = express();
@@ -65,35 +68,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Check if port is in use
-async function isPortInUse(port: number): Promise<boolean> {
-  return new Promise((resolve) => {
-    const tester = net.createServer()
-      .once('error', (err: NodeJS.ErrnoException) => {
-        if (err.code === 'EADDRINUSE') {
-          log(`Port ${port} is in use`);
-          resolve(true);
-        } else {
-          resolve(false);
-        }
-      })
-      .once('listening', () => {
-        tester.once('close', () => resolve(false)).close();
-      })
-      .listen(port);
-
-    // Add timeout to avoid hanging
-    setTimeout(() => {
-      try {
-        tester.close();
-      } catch (e) {
-        // Ignore close errors
-      }
-      resolve(true);
-    }, 1000);
-  });
-}
-
 // Declare server variable at module scope for proper cleanup
 let server: Server | null = null;
 let deadlineCheckInterval: NodeJS.Timeout | null = null;
@@ -101,13 +75,16 @@ let deadlineCheckInterval: NodeJS.Timeout | null = null;
 async function startServer(): Promise<Server> {
   try {
     const PORT = 5000;
-    log("Checking port status...");
+    log("Forcefully killing any process on port 5000...");
 
-    // Check if port is in use
-    const portInUse = await isPortInUse(PORT);
-    if (portInUse) {
-      log(`Port ${PORT} is in use. Exiting process...`);
-      process.exit(1);
+    // Kill any existing process on port 5000
+    try {
+      await exec('fuser -k 5000/tcp');
+      // Wait for port to be freed
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    } catch (error) {
+      // Ignore any errors from fuser command
+      log("Note: fuser command error (this is usually fine)");
     }
 
     log("Starting server initialization...");
