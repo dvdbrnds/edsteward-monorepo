@@ -11,6 +11,7 @@ import fs from 'fs';
 import { sql } from 'drizzle-orm';
 import { Server } from 'http';
 import net from 'net';
+import { checkAndSendDeadlineNotifications } from './services/deadline-notifications';
 
 // Initialize Express application with middleware
 const app = express();
@@ -95,6 +96,7 @@ async function isPortInUse(port: number): Promise<boolean> {
 
 // Declare server variable at module scope for proper cleanup
 let server: Server | null = null;
+let deadlineCheckInterval: NodeJS.Timeout | null = null;
 
 async function startServer(): Promise<Server> {
   try {
@@ -162,6 +164,18 @@ async function startServer(): Promise<Server> {
         .once('listening', () => {
           clearTimeout(timeoutId);
           log(`Server successfully started on port ${PORT}`);
+
+          // Start deadline notification check interval
+          log("Starting deadline notification checker...");
+          deadlineCheckInterval = setInterval(async () => {
+            try {
+              await checkAndSendDeadlineNotifications();
+              log("Deadline notifications check completed");
+            } catch (error) {
+              log("Error checking deadline notifications: " + error);
+            }
+          }, 60 * 60 * 1000); // Check every hour
+
           resolve(httpServer);
         })
         .once('error', (err: NodeJS.ErrnoException) => {
@@ -182,6 +196,13 @@ async function startServer(): Promise<Server> {
 // Graceful shutdown handler
 function cleanup() {
   log("Starting cleanup process...");
+
+  // Clear the deadline check interval
+  if (deadlineCheckInterval) {
+    clearInterval(deadlineCheckInterval);
+    log("Deadline check interval cleared");
+  }
+
   if (server) {
     server.close(() => {
       log("Server closed gracefully");

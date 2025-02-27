@@ -54,6 +54,7 @@ export interface IStorage {
 
   // Deadline methods
   getDeadlines(): Promise<Deadline[]>;
+  getAllIncompleteDeadlines(): Promise<Deadline[]>;  // Add this new method
   createDeadline(deadline: InsertDeadline): Promise<Deadline>;
 
   // Guide methods
@@ -219,6 +220,13 @@ export class DatabaseStorage implements IStorage {
 
   async getDeadlines(): Promise<Deadline[]> {
     return await db.select().from(deadlines);
+  }
+
+  async getAllIncompleteDeadlines(): Promise<Deadline[]> {
+    return await db
+      .select()
+      .from(deadlines)
+      .where(eq(deadlines.status, "pending"));
   }
 
   async createDeadline(deadline: InsertDeadline): Promise<Deadline> {
