@@ -4,6 +4,7 @@ import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { insertRegulationSchema, insertCommentSchema, insertUserSchema } from "@shared/schema";
 import { z } from "zod";
+import { RegulationValidator } from "./validation";
 
 // Define a schema for the toggle request
 const toggleApplicabilitySchema = z.object({
@@ -239,6 +240,52 @@ export function registerRoutes(app: Express): Server {
     } catch (error) {
       console.error("Failed to fetch deadlines:", error);
       res.status(500).json({ error: "Failed to fetch deadlines" });
+    }
+  });
+
+  app.post("/api/regulations/validate", async (req, res) => {
+    try {
+      // Check if user is authenticated
+      if (!req.user) {
+        return res.status(401).json({ error: "Must be logged in to validate regulations" });
+      }
+
+      console.log("Starting regulation validation...");
+      const validator = new RegulationValidator();
+      const regulations = await storage.getRegulations();
+
+      let errors = [];
+      let warnings = [];
+
+      console.log(`Validating ${regulations.length} regulations...`);
+      for (const regulation of regulations) {
+        const validationResults = validator.validateRegulation(regulation);
+        const validationErrors = validationResults.filter(result => result.severity === 'error');
+        const validationWarnings = validationResults.filter(result => result.severity === 'warning');
+
+        errors.push(...validationErrors.map(error => ({
+          regulationId: regulation.id,
+          regulationName: regulation.name,
+          ...error
+        })));
+
+        warnings.push(...validationWarnings.map(warning => ({
+          regulationId: regulation.id,
+          regulationName: regulation.name,
+          ...warning
+        })));
+      }
+
+      console.log(`Validation complete. Found ${errors.length} errors and ${warnings.length} warnings`);
+      res.json({
+        totalRegulations: regulations.length,
+        errors,
+        warnings,
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error("Validation failed:", error);
+      res.status(500).json({ error: "Failed to validate regulations" });
     }
   });
 
