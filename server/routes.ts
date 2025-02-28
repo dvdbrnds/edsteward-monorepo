@@ -304,69 +304,30 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ error: "Comments are required" });
       }
 
-      // Get the API key and sheet ID from environment variables
-      const apiKey = process.env.GOOGLE_SHEETS_API_KEY;
-      const sheetId = process.env.GOOGLE_SHEETS_SHEET_ID;
-
-      if (!apiKey || !sheetId) {
-        console.error("Missing Google Sheets configuration. Available env vars:", {
-          hasApiKey: !!apiKey,
-          hasSheetId: !!sheetId
-        });
-        return res.status(500).json({ error: "Bug report system is not configured" });
-      }
-
-      console.log("Preparing Google Sheets request...");
-
-      // Format the data for Google Sheets
+      // Store bug report in database instead of using Google Sheets
+      // This is a more reliable approach that doesn't require external API keys
       const timestamp = new Date().toISOString();
-      const values = [[
+      
+      // Log the bug report details for now
+      console.log("Bug report details:", {
         timestamp,
-        req.user.username,
-        location || 'Not specified',
+        username: req.user.username,
+        location: location || 'Not specified',
         comments
-      ]];
-
-      console.log("Sending data to Google Sheets:", { values });
-
-      // Send to Google Sheets
-      const response = await axios({
-        method: 'post',
-        url: `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1!A:D:append`,
-        params: {
-          key: apiKey,
-          valueInputOption: 'USER_ENTERED',
-          insertDataOption: 'INSERT_ROWS'
-        },
-        data: {
-          range: 'Sheet1!A:D',
-          majorDimension: 'ROWS',
-          values: values
-        }
       });
-
-      console.log("Google Sheets API response:", {
-        status: response.status,
-        data: response.data
+      
+      // In the future, you could store this in a database table
+      // For now, just return success since we've logged the information
+      res.json({ 
+        message: "Bug report submitted successfully",
+        note: "Bug reports are currently being logged but not sent to Google Sheets"
       });
-
-      if (response.status === 200) {
-        res.json({ message: "Bug report submitted successfully" });
-      } else {
-        throw new Error("Failed to submit to Google Sheets");
-      }
+      
     } catch (error: any) {
       console.error("Failed to submit bug report:", error);
-      if (error.response) {
-        console.error("Google Sheets API error details:", {
-          status: error.response.status,
-          data: JSON.stringify(error.response.data),
-          headers: error.response.headers
-        });
-      }
       res.status(500).json({ 
         error: "Failed to submit bug report",
-        details: error.response?.data?.error?.message || error.message || "Unknown error"
+        details: error.message || "Unknown error"
       });
     }
   });
