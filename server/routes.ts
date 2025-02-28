@@ -336,7 +336,7 @@ export function registerRoutes(app: Express): Server {
 
       console.log("Sending data to Google Sheets:", { values });
       console.log("Google Sheet ID:", sheetId);
-      
+
       try {
         // First, check if we can access the spreadsheet
         const testResponse = await axios({
@@ -346,16 +346,16 @@ export function registerRoutes(app: Express): Server {
             key: apiKey
           }
         });
-        
+
         console.log("Spreadsheet access check:", {
           status: testResponse.status,
           sheetTitles: testResponse.data?.sheets?.map((s: any) => s.properties?.title)
         });
-        
+
         // Get the first sheet name rather than assuming "Sheet1"
         const firstSheetName = testResponse.data?.sheets?.[0]?.properties?.title || "Sheet1";
         console.log("Using sheet name:", firstSheetName);
-        
+
         // Send to Google Sheets with the correct sheet name
         const response = await axios({
           method: 'post',
@@ -382,38 +382,13 @@ export function registerRoutes(app: Express): Server {
         } else {
           throw new Error("Failed to submit to Google Sheets");
         }
-      } finally {
-        // This empty finally block ensures the try block is properly closed
-      }
-    } catch (error: any) {
-      console.error("Failed to submit bug report:", error);
-      // Provide more detailed error information
-      if (error.response) {
-        console.error("Google Sheets API error details:", {
-          status: error.response.status,
-          data: JSON.stringify(error.response.data),
-          headers: error.response.headers
-        });
-        
-        // Check for specific error codes
-        const errorCode = error.response.data?.error?.code;
-        const errorMessage = error.response.data?.error?.message || '';
-        
-        if (errorCode === 403) {
-          console.error("Permission denied. Make sure the Google Sheet is shared with the API service account or is public.");
-        } else if (errorCode === 404) {
-          console.error("Sheet not found. Check if the sheet ID is correct and the sheet exists.");
-        } else if (errorMessage.includes("Unable to parse range")) {
-          console.error("Range error. The sheet name might be incorrect.");
-        }
-      } else {
-        console.error("Network or other error:", error.message);
-      }
-      
+      } catch (error: any) {
+      console.error("Failed to process bug report:", error);
+
+      // Return a user-friendly error message
       res.status(500).json({ 
         error: "Failed to submit bug report",
-        details: error.response?.data?.error?.message || error.message || "Unknown error",
-        suggestion: "Please check server logs for more details"
+        details: error.message || "Unknown error"
       });
     }
   });
