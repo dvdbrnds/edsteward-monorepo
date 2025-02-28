@@ -7,12 +7,24 @@ import { z } from "zod";
 import { RegulationValidator } from "./validation";
 import axios from 'axios';
 import { Request } from "express";
+import { google } from 'googleapis';
+import { OAuth2Client } from 'google-auth-library';
 
 // Add this helper function before registerRoutes
 function getRedirectUri(req: Request): string {
   const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
   const host = req.get('host') || '';
   return `${protocol}://${host}/api/auth/google/callback`;
+}
+
+// Add OAuth2 setup before registerRoutes
+function getGoogleAuthClient(req: Request): OAuth2Client {
+  const redirectUri = getRedirectUri(req);
+  return new google.auth.OAuth2(
+    process.env.GOOGLE_CLIENT_ID,
+    process.env.GOOGLE_CLIENT_SECRET,
+    redirectUri
+  );
 }
 
 // Define a schema for the toggle request
@@ -298,7 +310,7 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  // Add more detailed console logging for the bug report endpoint
+  // Update bug report endpoint
   app.post("/api/bug-report", async (req, res) => {
     try {
       if (!req.user) {
@@ -313,25 +325,22 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ error: "Comments are required" });
       }
 
-      // Get the API key and sheet ID from environment variables
-      const apiKey = process.env.GOOGLE_SHEETS_API_KEY;
+      // Get the sheet ID from environment variables
       const sheetId = process.env.GOOGLE_SHEETS_SHEET_ID;
 
-      console.log("Google Sheets environment variables:", {
-        apiKey: apiKey ? apiKey.substring(0, 3) + "..." : "not set",
-        sheetId: sheetId ? sheetId.substring(0, 3) + "..." : "not set",
-        allEnvVars: Object.keys(process.env).join(", ")
-      });
-
-      if (!apiKey || !sheetId) {
-        console.error("Missing Google Sheets configuration.", {
-          hasApiKey: !!apiKey,
-          hasSheetId: !!sheetId
+      if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET || !sheetId) {
+        console.error("Missing Google OAuth2 configuration.", {
+          hasClientId: !!process.env.GOOGLE_CLIENT_ID,
+          hasClientSecret: !!process.env.GOOGLE_CLIENT_SECRET,
+          hasSheetId: !!sheetId,
+          allEnvVars: Object.keys(process.env).join(", ")
         });
         return res.status(500).json({ error: "Bug report system is not configured" });
       }
 
-      console.log("Preparing Google Sheets request...");
+      console.log("Setting up Google Sheets API client...");
+      const auth = getGoogleAuthClient(req);
+      const sheets = google.sheets({ version: 'v4', auth });
 
       // Format the data for Google Sheets
       const timestamp = new Date().toISOString();
@@ -342,54 +351,41 @@ export function registerRoutes(app: Express): Server {
         comments
       ]];
 
-      console.log("Sending data to Google Sheets:", { values });
-      console.log("Google Sheet ID:", sheetId);
+      console.log("Attempting to append data to Google Sheet...");
+      console.log("Sheet ID:", sheetId);
 
       try {
         // First, check if we can access the spreadsheet
-        const testResponse = await axios({
-          method: 'get',
-          url: `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?fields=sheets.properties.title`,
-          params: {
-            key: apiKey
-          }
+        const spreadsheet = await sheets.spreadsheets.get({
+          spreadsheetId: sheetId,
+          fields: 'sheets.properties.title'
         });
 
         console.log("Spreadsheet access check:", {
-          status: testResponse.status,
-          sheetTitles: testResponse.data?.sheets?.map((s: any) => s.properties?.title)
+          status: spreadsheet.status,
+          sheetTitles: spreadsheet.data.sheets?.map(s => s.properties?.title)
         });
 
-        // Get the first sheet name rather than assuming "Sheet1"
-        const firstSheetName = testResponse.data?.sheets?.[0]?.properties?.title || "Sheet1";
+        // Get the first sheet name
+        const firstSheetName = spreadsheet.data.sheets?.[0]?.properties?.title || "Sheet1";
         console.log("Using sheet name:", firstSheetName);
 
-        // Send to Google Sheets with the correct sheet name
-        const response = await axios({
-          method: 'post',
-          url: `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${firstSheetName}!A:D:append`,
-          params: {
-            key: apiKey,
-            valueInputOption: 'USER_ENTERED',
-            insertDataOption: 'INSERT_ROWS'
-          },
-          data: {
-            range: `${firstSheetName}!A:D`,
-            majorDimension: 'ROWS',
-            values: values
+        // Append the data
+        const appendResponse = await sheets.spreadsheets.values.append({
+          spreadsheetId: sheetId,
+          range: `${firstSheetName}!A:D`,
+          valueInputOption: 'USER_ENTERED',
+          requestBody: {
+            values
           }
         });
 
         console.log("Google Sheets API response:", {
-          status: response.status,
-          data: response.data
+          status: appendResponse.status,
+          data: appendResponse.data
         });
 
-        if (response.status === 200) {
-          res.json({ message: "Bug report submitted successfully" });
-        } else {
-          throw new Error("Failed to submit to Google Sheets");
-        }
+        res.json({ message: "Bug report submitted successfully" });
       } catch (error: any) {
         console.error("Failed to process bug report:", error);
 
