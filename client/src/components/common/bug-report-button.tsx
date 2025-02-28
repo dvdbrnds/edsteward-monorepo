@@ -55,8 +55,10 @@ export function BugReportButton() {
         }),
       });
 
+      const result = await response.json();
+
       if (!response.ok) {
-        throw new Error("Failed to submit bug report");
+        throw new Error(result.error || "Failed to submit bug report");
       }
 
       toast({
@@ -66,9 +68,10 @@ export function BugReportButton() {
       setIsOpen(false);
       form.reset();
     } catch (error) {
+      console.error("Bug report submission error:", error);
       toast({
         title: "Error",
-        description: "Failed to submit bug report. Please try again.",
+        description: error.message || "Failed to submit bug report. Please try again.",
         variant: "destructive",
       });
     }

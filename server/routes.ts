@@ -322,23 +322,20 @@ export function registerRoutes(app: Express): Server {
       ]];
 
       // Send to Google Sheets
-      const response = await axios.post(
-        `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/A1:D1:append`,
-        {
-          values,
-          range: 'A1:D1',
-          majorDimension: 'ROWS',
+      const response = await axios({
+        method: 'post',
+        url: `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1!A:D:append`,
+        params: {
+          key: apiKey,
           valueInputOption: 'USER_ENTERED',
           insertDataOption: 'INSERT_ROWS'
         },
-        {
-          params: {
-            key: apiKey,
-            valueInputOption: 'USER_ENTERED',
-            insertDataOption: 'INSERT_ROWS'
-          }
+        data: {
+          range: 'Sheet1!A:D',
+          majorDimension: 'ROWS',
+          values: values
         }
-      );
+      });
 
       if (response.status === 200) {
         res.json({ message: "Bug report submitted successfully" });
@@ -347,6 +344,9 @@ export function registerRoutes(app: Express): Server {
       }
     } catch (error) {
       console.error("Failed to submit bug report:", error);
+      if (error.response) {
+        console.error("Google Sheets API error:", error.response.data);
+      }
       res.status(500).json({ error: "Failed to submit bug report" });
     }
   });
