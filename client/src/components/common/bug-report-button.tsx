@@ -48,6 +48,10 @@ export function BugReportButton() {
       setIsSubmitting(true);
       console.log("Submitting bug report:", { location, comments: data.comments });
 
+      // Store the current location before checking auth
+      localStorage.setItem('bugReport_returnTo', location);
+      localStorage.setItem('bugReport_data', JSON.stringify(data));
+
       // First check if we need Google auth
       const authCheckResponse = await fetch("/api/auth/check-google-auth");
       const authCheckResult = await authCheckResponse.json();
@@ -61,33 +65,42 @@ export function BugReportButton() {
         throw new Error(authCheckResult.error || "Failed to check authentication status");
       }
 
-      const response = await fetch("/api/bug-report", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          location,
-          comments: data.comments,
-        }),
-      });
+      // If we have auth, proceed with submission
+      const savedData = localStorage.getItem('bugReport_data');
+      if (savedData) {
+        const bugReportData = JSON.parse(savedData);
+        const response = await fetch("/api/bug-report", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            location: localStorage.getItem('bugReport_returnTo') || location,
+            comments: bugReportData.comments,
+          }),
+        });
 
-      const result = await response.json();
-      console.log("Bug report submission response:", result);
+        const result = await response.json();
+        console.log("Bug report submission response:", result);
 
-      if (!response.ok) {
-        const errorMessage = typeof result.error === 'object' 
-          ? JSON.stringify(result.error)
-          : result.error || result.details || "Failed to submit bug report";
-        throw new Error(errorMessage);
+        if (!response.ok) {
+          const errorMessage = typeof result.error === 'object' 
+            ? JSON.stringify(result.error)
+            : result.error || result.details || "Failed to submit bug report";
+          throw new Error(errorMessage);
+        }
+
+        // Clear stored data after successful submission
+        localStorage.removeItem('bugReport_data');
+        localStorage.removeItem('bugReport_returnTo');
+
+        toast({
+          title: "Bug Report Submitted",
+          description: "Thank you for helping us improve the system.",
+        });
+        setIsOpen(false);
+        form.reset();
       }
-
-      toast({
-        title: "Bug Report Submitted",
-        description: "Thank you for helping us improve the system.",
-      });
-      setIsOpen(false);
-      form.reset();
     } catch (error: any) {
       console.error("Bug report submission error:", error);
       const errorMessage = error.message && typeof error.message === 'string'

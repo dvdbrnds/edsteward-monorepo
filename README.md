@@ -1,4 +1,4 @@
-# Moravian University Compliance Portal (Alpha v0.1.0)
+# Moravian University Compliance Portal (Alpha v0.1.1)
 
 A comprehensive compliance management platform designed for Moravian University to streamline regulation tracking and management across institutional departments.
 
@@ -86,6 +86,11 @@ Please report any issues or provide feedback by:
 3. Sending feedback through the application's feedback form
 
 ## Version History
+
+- v0.1.1 (Alpha) - February 2025
+  - Fixed OAuth2 configuration for Google Sheets integration
+  - Improved setup wizard with optional OAuth2 configuration
+  - Enhanced error handling for authentication flows
 
 - v0.1.0 (Alpha) - February 2025
   - Initial alpha release

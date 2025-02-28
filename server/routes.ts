@@ -13,7 +13,9 @@ import { OAuth2Client } from 'google-auth-library';
 function getRedirectUri(req: Request): string {
   const host = req.get('host') || '';
   const protocol = req.protocol || 'https';
-  return `${protocol}://${host}/api/auth/google/callback`;
+  // Remove trailing slash if present and ensure consistent format
+  const baseUri = `${protocol}://${host}`;
+  return `${baseUri}/api/auth/google/callback`;
 }
 
 // Update the getGoogleAuthClient function to handle missing credentials
@@ -21,17 +23,11 @@ function getGoogleAuthClient(req: Request): OAuth2Client {
   const redirectUri = getRedirectUri(req);
 
   if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
-    console.error("OAuth2 configuration check:", {
-      hasClientId: !!process.env.GOOGLE_CLIENT_ID,
-      hasClientSecret: !!process.env.GOOGLE_CLIENT_SECRET,
-      allEnvVars: Object.keys(process.env).join(", ")
-    });
     throw new Error("Missing OAuth2 credentials. Please configure GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET");
   }
 
   // Validate client ID format
   if (!process.env.GOOGLE_CLIENT_ID.endsWith('.apps.googleusercontent.com')) {
-    console.error("Invalid Google Client ID format");
     throw new Error("Invalid Google Client ID format. It should end with .apps.googleusercontent.com");
   }
 
@@ -512,6 +508,7 @@ export function registerRoutes(app: Express): Server {
       // Store tokens in session
       req.session.googleTokens = tokens;
 
+      // Redirect back to the original page if available
       res.redirect('/');
     } catch (error) {
       console.error('OAuth callback error:', error);
