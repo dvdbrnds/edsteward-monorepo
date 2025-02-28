@@ -27,11 +27,6 @@ function getGoogleAuthClient(req: Request): OAuth2Client {
   );
 }
 
-// Define a schema for the toggle request
-const toggleApplicabilitySchema = z.object({
-  isApplicable: z.boolean()
-});
-
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
 
@@ -310,7 +305,7 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  // Update bug report endpoint
+  // Update bug report endpoint with better error handling and logging
   app.post("/api/bug-report", async (req, res) => {
     try {
       if (!req.user) {
@@ -389,6 +384,14 @@ export function registerRoutes(app: Express): Server {
       } catch (error: any) {
         console.error("Failed to process bug report:", error);
 
+        if (error.response) {
+          console.error("Google Sheets API error details:", {
+            status: error.response.status,
+            data: JSON.stringify(error.response.data),
+            headers: error.response.headers
+          });
+        }
+
         // Return a user-friendly error message
         res.status(500).json({
           error: "Failed to submit bug report",
@@ -404,7 +407,40 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  // Add this route inside registerRoutes
+
+  // Add auth routes for Google OAuth2
+  app.get("/api/auth/google", (req, res) => {
+    const auth = getGoogleAuthClient(req);
+    const authUrl = auth.generateAuthUrl({
+      access_type: 'offline',
+      scope: ['https://www.googleapis.com/auth/spreadsheets']
+    });
+    res.redirect(authUrl);
+  });
+
+  app.get("/api/auth/google/callback", async (req, res) => {
+    try {
+      const auth = getGoogleAuthClient(req);
+      const { code } = req.query;
+
+      if (typeof code !== 'string') {
+        throw new Error('No auth code provided');
+      }
+
+      const { tokens } = await auth.getToken(code);
+      auth.setCredentials(tokens);
+
+      // Store tokens in session
+      req.session.googleTokens = tokens;
+
+      res.redirect('/');
+    } catch (error) {
+      console.error('OAuth callback error:', error);
+      res.status(500).send('Authentication failed');
+    }
+  });
+
+  // Add this route inside registerRoutes to help with setup
   app.get("/api/auth/redirect-uri", (req, res) => {
     const redirectUri = getRedirectUri(req);
     res.json({
