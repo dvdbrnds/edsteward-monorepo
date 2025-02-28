@@ -308,6 +308,12 @@ export function registerRoutes(app: Express): Server {
       const apiKey = process.env.GOOGLE_SHEETS_API_KEY;
       const sheetId = process.env.GOOGLE_SHEETS_SHEET_ID;
 
+      console.log("Google Sheets environment variables:", {
+        apiKey: apiKey ? apiKey.substring(0, 3) + "..." : "not set",
+        sheetId: sheetId ? sheetId.substring(0, 3) + "..." : "not set",
+        allEnvVars: Object.keys(process.env).join(", ")
+      });
+
       if (!apiKey || !sheetId) {
         console.error("Missing Google Sheets configuration. Available env vars:", {
           hasApiKey: !!apiKey,
