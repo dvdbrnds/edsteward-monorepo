@@ -383,13 +383,14 @@ export function registerRoutes(app: Express): Server {
           throw new Error("Failed to submit to Google Sheets");
         }
       } catch (error: any) {
-      console.error("Failed to process bug report:", error);
+        console.error("Failed to process bug report:", error);
 
-      // Return a user-friendly error message
-      res.status(500).json({ 
-        error: "Failed to submit bug report",
-        details: error.message || "Unknown error"
-      });
+        // Return a user-friendly error message
+        res.status(500).json({ 
+          error: "Failed to submit bug report",
+          details: error.message || "Unknown error"
+        });
+      }
     }
   });
 
