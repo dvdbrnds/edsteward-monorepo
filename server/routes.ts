@@ -6,6 +6,14 @@ import { insertRegulationSchema, insertCommentSchema, insertUserSchema } from "@
 import { z } from "zod";
 import { RegulationValidator } from "./validation";
 import axios from 'axios';
+import { Request } from "express";
+
+// Add this helper function before registerRoutes
+function getRedirectUri(req: Request): string {
+  const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
+  const host = req.get('host') || '';
+  return `${protocol}://${host}/api/auth/google/callback`;
+}
 
 // Define a schema for the toggle request
 const toggleApplicabilitySchema = z.object({
@@ -386,19 +394,29 @@ export function registerRoutes(app: Express): Server {
         console.error("Failed to process bug report:", error);
 
         // Return a user-friendly error message
-        res.status(500).json({ 
+        res.status(500).json({
           error: "Failed to submit bug report",
           details: error.message || "Unknown error"
         });
       }
     } catch (error) {
       console.error("Failed to submit bug report:", error);
-      res.status(500).json({ 
+      res.status(500).json({
         error: "Failed to submit bug report",
         details: "Unknown error"
       });
     }
   });
+
+  // Add this route inside registerRoutes
+  app.get("/api/auth/redirect-uri", (req, res) => {
+    const redirectUri = getRedirectUri(req);
+    res.json({
+      redirectUri,
+      message: "Use this URI as your authorized redirect URI in Google Cloud Console"
+    });
+  });
+
 
   const httpServer = createServer(app);
   return httpServer;
