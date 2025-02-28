@@ -12,15 +12,7 @@ import { OAuth2Client } from 'google-auth-library';
 // Update the getRedirectUri function to handle different environments properly
 function getRedirectUri(req: Request): string {
   const host = req.get('host') || '';
-
-  // For development environment
-  if (process.env.NODE_ENV !== 'production') {
-    const protocol = 'http';
-    return `${protocol}://${host}/api/auth/google/callback`;
-  }
-
-  // For production environment
-  const protocol = 'https';
+  const protocol = req.protocol || 'https';
   return `${protocol}://${host}/api/auth/google/callback`;
 }
 
@@ -35,6 +27,12 @@ function getGoogleAuthClient(req: Request): OAuth2Client {
       allEnvVars: Object.keys(process.env).join(", ")
     });
     throw new Error("Missing OAuth2 credentials. Please configure GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET");
+  }
+
+  // Validate client ID format
+  if (!process.env.GOOGLE_CLIENT_ID.endsWith('.apps.googleusercontent.com')) {
+    console.error("Invalid Google Client ID format");
+    throw new Error("Invalid Google Client ID format. It should end with .apps.googleusercontent.com");
   }
 
   return new google.auth.OAuth2(
@@ -476,18 +474,6 @@ export function registerRoutes(app: Express): Server {
   // Add auth routes for Google OAuth2
   app.get("/api/auth/google", (req, res) => {
     try {
-      if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
-        console.error("OAuth2 configuration error:", {
-          hasClientId: !!process.env.GOOGLE_CLIENT_ID,
-          hasClientSecret: !!process.env.GOOGLE_CLIENT_SECRET,
-          allEnvVars: Object.keys(process.env).join(", ")
-        });
-        return res.status(500).json({
-          error: "OAuth2 not configured",
-          details: "Missing client credentials"
-        });
-      }
-
       const auth = getGoogleAuthClient(req);
       const authUrl = auth.generateAuthUrl({
         access_type: 'offline',
@@ -498,12 +484,11 @@ export function registerRoutes(app: Express): Server {
         redirectUri: getRedirectUri(req),
         hasAuth: !!auth,
         authUrl: authUrl,
-        clientIdLength: process.env.GOOGLE_CLIENT_ID.length,
-        clientSecretLength: process.env.GOOGLE_CLIENT_SECRET.length
+        clientIdFormat: process.env.GOOGLE_CLIENT_ID.endsWith('.apps.googleusercontent.com') ? 'valid' : 'invalid'
       });
 
       res.redirect(authUrl);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to generate auth URL:", error);
       res.status(500).json({
         error: "Failed to initiate authentication",
