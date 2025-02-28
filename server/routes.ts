@@ -5,6 +5,7 @@ import { storage } from "./storage";
 import { insertRegulationSchema, insertCommentSchema, insertUserSchema } from "@shared/schema";
 import { z } from "zod";
 import { RegulationValidator } from "./validation";
+import axios from 'axios';
 
 // Define a schema for the toggle request
 const toggleApplicabilitySchema = z.object({
@@ -286,6 +287,67 @@ export function registerRoutes(app: Express): Server {
     } catch (error) {
       console.error("Validation failed:", error);
       res.status(500).json({ error: "Failed to validate regulations" });
+    }
+  });
+
+  app.post("/api/bug-report", async (req, res) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ error: "Must be logged in to submit bug reports" });
+      }
+
+      const { location, comments } = req.body;
+
+      // Validate required fields
+      if (!comments) {
+        return res.status(400).json({ error: "Comments are required" });
+      }
+
+      // Get the API key and sheet ID from environment variables
+      const apiKey = process.env.GOOGLE_SHEETS_API_KEY;
+      const sheetId = process.env.GOOGLE_SHEETS_SHEET_ID;
+
+      if (!apiKey || !sheetId) {
+        console.error("Missing Google Sheets configuration");
+        return res.status(500).json({ error: "Bug report system is not configured" });
+      }
+
+      // Format the data for Google Sheets
+      const timestamp = new Date().toISOString();
+      const values = [[
+        timestamp,
+        req.user.username,
+        location || 'Not specified',
+        comments
+      ]];
+
+      // Send to Google Sheets
+      const response = await axios.post(
+        `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/A1:D1:append`,
+        {
+          values,
+          range: 'A1:D1',
+          majorDimension: 'ROWS',
+          valueInputOption: 'USER_ENTERED',
+          insertDataOption: 'INSERT_ROWS'
+        },
+        {
+          params: {
+            key: apiKey,
+            valueInputOption: 'USER_ENTERED',
+            insertDataOption: 'INSERT_ROWS'
+          }
+        }
+      );
+
+      if (response.status === 200) {
+        res.json({ message: "Bug report submitted successfully" });
+      } else {
+        throw new Error("Failed to submit to Google Sheets");
+      }
+    } catch (error) {
+      console.error("Failed to submit bug report:", error);
+      res.status(500).json({ error: "Failed to submit bug report" });
     }
   });
 

@@ -17,7 +17,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,9 +25,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 
 const bugReportSchema = z.object({
-  title: z.string().min(1, "Please provide a brief description"),
-  description: z.string().min(10, "Please provide more details about the issue"),
-  stepsToReproduce: z.string().optional(),
+  comments: z.string().min(10, "Please provide more details about the issue"),
 });
 
 type BugReport = z.infer<typeof bugReportSchema>;
@@ -41,23 +38,20 @@ export function BugReportButton() {
   const form = useForm<BugReport>({
     resolver: zodResolver(bugReportSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      stepsToReproduce: "",
+      comments: "",
     },
   });
 
   const onSubmit = async (data: BugReport) => {
     try {
-      const response = await fetch("/api/bug-reports", {
+      const response = await fetch("/api/bug-report", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          ...data,
-          page: location,
-          timestamp: new Date().toISOString(),
+          location,
+          comments: data.comments,
         }),
       });
 
@@ -103,43 +97,13 @@ export function BugReportButton() {
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
-              name="title"
+              name="comments"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Brief Description</FormLabel>
-                  <FormControl>
-                    <Input placeholder="What's the issue?" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="description"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Detailed Description</FormLabel>
+                  <FormLabel>Description</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Please describe the issue in detail..."
-                      className="min-h-[100px]"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="stepsToReproduce"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Steps to Reproduce (Optional)</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      placeholder="How can we reproduce this issue?"
+                      placeholder="Please describe the issue..."
                       className="min-h-[100px]"
                       {...field}
                     />
