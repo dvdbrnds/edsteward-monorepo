@@ -32,6 +32,7 @@ type BugReport = z.infer<typeof bugReportSchema>;
 
 export function BugReportButton() {
   const [isOpen, setIsOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
   const [location] = useLocation();
 
@@ -44,6 +45,9 @@ export function BugReportButton() {
 
   const onSubmit = async (data: BugReport) => {
     try {
+      setIsSubmitting(true);
+      console.log("Submitting bug report:", { location, comments: data.comments });
+
       const response = await fetch("/api/bug-report", {
         method: "POST",
         headers: {
@@ -56,9 +60,10 @@ export function BugReportButton() {
       });
 
       const result = await response.json();
+      console.log("Bug report submission response:", result);
 
       if (!response.ok) {
-        throw new Error(result.error || "Failed to submit bug report");
+        throw new Error(result.details || result.error || "Failed to submit bug report");
       }
 
       toast({
@@ -67,13 +72,15 @@ export function BugReportButton() {
       });
       setIsOpen(false);
       form.reset();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Bug report submission error:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to submit bug report. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -109,6 +116,7 @@ export function BugReportButton() {
                       placeholder="Please describe the issue..."
                       className="min-h-[100px]"
                       {...field}
+                      disabled={isSubmitting}
                     />
                   </FormControl>
                   <FormMessage />
@@ -120,10 +128,13 @@ export function BugReportButton() {
                 type="button"
                 variant="outline"
                 onClick={() => setIsOpen(false)}
+                disabled={isSubmitting}
               >
                 Cancel
               </Button>
-              <Button type="submit">Submit Report</Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? "Submitting..." : "Submit Report"}
+              </Button>
             </div>
           </form>
         </Form>

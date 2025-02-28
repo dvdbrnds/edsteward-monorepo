@@ -297,6 +297,7 @@ export function registerRoutes(app: Express): Server {
       }
 
       const { location, comments } = req.body;
+      console.log("Bug report received:", { location, comments, user: req.user.username });
 
       // Validate required fields
       if (!comments) {
@@ -308,9 +309,14 @@ export function registerRoutes(app: Express): Server {
       const sheetId = process.env.GOOGLE_SHEETS_SHEET_ID;
 
       if (!apiKey || !sheetId) {
-        console.error("Missing Google Sheets configuration");
+        console.error("Missing Google Sheets configuration. Available env vars:", {
+          hasApiKey: !!apiKey,
+          hasSheetId: !!sheetId
+        });
         return res.status(500).json({ error: "Bug report system is not configured" });
       }
+
+      console.log("Preparing Google Sheets request...");
 
       // Format the data for Google Sheets
       const timestamp = new Date().toISOString();
@@ -320,6 +326,8 @@ export function registerRoutes(app: Express): Server {
         location || 'Not specified',
         comments
       ]];
+
+      console.log("Sending data to Google Sheets:", { values });
 
       // Send to Google Sheets
       const response = await axios({
@@ -337,17 +345,29 @@ export function registerRoutes(app: Express): Server {
         }
       });
 
+      console.log("Google Sheets API response:", {
+        status: response.status,
+        data: response.data
+      });
+
       if (response.status === 200) {
         res.json({ message: "Bug report submitted successfully" });
       } else {
         throw new Error("Failed to submit to Google Sheets");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Failed to submit bug report:", error);
       if (error.response) {
-        console.error("Google Sheets API error:", error.response.data);
+        console.error("Google Sheets API error details:", {
+          status: error.response.status,
+          data: error.response.data,
+          headers: error.response.headers
+        });
       }
-      res.status(500).json({ error: "Failed to submit bug report" });
+      res.status(500).json({ 
+        error: "Failed to submit bug report",
+        details: error.response?.data?.error || error.message 
+      });
     }
   });
 
