@@ -48,6 +48,19 @@ export function BugReportButton() {
       setIsSubmitting(true);
       console.log("Submitting bug report:", { location, comments: data.comments });
 
+      // First check if we need Google auth
+      const authCheckResponse = await fetch("/api/auth/check-google-auth");
+      const authCheckResult = await authCheckResponse.json();
+
+      if (!authCheckResponse.ok) {
+        if (authCheckResult.needsAuth) {
+          // Redirect to Google auth
+          window.location.href = "/api/auth/google";
+          return;
+        }
+        throw new Error(authCheckResult.error || "Failed to check authentication status");
+      }
+
       const response = await fetch("/api/bug-report", {
         method: "POST",
         headers: {

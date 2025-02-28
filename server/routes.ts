@@ -5,7 +5,6 @@ import { storage } from "./storage";
 import { insertRegulationSchema, insertCommentSchema, insertUserSchema } from "@shared/schema";
 import { z } from "zod";
 import { RegulationValidator } from "./validation";
-import axios from 'axios';
 import { Request } from "express";
 import { google } from 'googleapis';
 import { OAuth2Client } from 'google-auth-library';
@@ -25,6 +24,24 @@ function getGoogleAuthClient(req: Request): OAuth2Client {
     process.env.GOOGLE_CLIENT_SECRET,
     redirectUri
   );
+}
+
+// Define schemas
+const toggleApplicabilitySchema = z.object({
+  isApplicable: z.boolean()
+});
+
+// Extend express session
+declare module 'express-session' {
+  interface SessionData {
+    googleTokens?: {
+      access_token?: string;
+      refresh_token?: string;
+      scope?: string;
+      token_type?: string;
+      expiry_date?: number;
+    };
+  }
 }
 
 export function registerRoutes(app: Express): Server {
@@ -312,6 +329,13 @@ export function registerRoutes(app: Express): Server {
         return res.status(401).json({ error: "Must be logged in to submit bug reports" });
       }
 
+      if (!req.session.googleTokens) {
+        return res.status(401).json({ 
+          error: "Google authentication required",
+          needsAuth: true
+        });
+      }
+
       const { location, comments } = req.body;
       console.log("Bug report received:", { location, comments, user: req.user.username });
 
@@ -335,6 +359,7 @@ export function registerRoutes(app: Express): Server {
 
       console.log("Setting up Google Sheets API client...");
       const auth = getGoogleAuthClient(req);
+      auth.setCredentials(req.session.googleTokens);
       const sheets = google.sheets({ version: 'v4', auth });
 
       // Format the data for Google Sheets
@@ -407,6 +432,28 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Add auth check endpoint
+  app.get("/api/auth/check-google-auth", (req, res) => {
+    try {
+      if (!req.session.googleTokens) {
+        return res.status(401).json({ needsAuth: true });
+      }
+
+      const auth = getGoogleAuthClient(req);
+      auth.setCredentials(req.session.googleTokens);
+
+      // Check token expiry
+      const expiryDate = req.session.googleTokens.expiry_date;
+      if (!expiryDate || Date.now() >= expiryDate) {
+        return res.status(401).json({ needsAuth: true });
+      }
+
+      res.json({ needsAuth: false });
+    } catch (error) {
+      console.error("Auth check error:", error);
+      res.status(500).json({ error: "Failed to check authentication status" });
+    }
+  });
 
   // Add auth routes for Google OAuth2
   app.get("/api/auth/google", (req, res) => {
