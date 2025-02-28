@@ -290,6 +290,7 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Add more detailed console logging for the bug report endpoint
   app.post("/api/bug-report", async (req, res) => {
     try {
       if (!req.user) {
@@ -315,7 +316,7 @@ export function registerRoutes(app: Express): Server {
       });
 
       if (!apiKey || !sheetId) {
-        console.error("Missing Google Sheets configuration. Available env vars:", {
+        console.error("Missing Google Sheets configuration.", {
           hasApiKey: !!apiKey,
           hasSheetId: !!sheetId
         });
