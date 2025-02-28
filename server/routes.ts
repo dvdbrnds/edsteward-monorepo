@@ -9,10 +9,18 @@ import { Request } from "express";
 import { google } from 'googleapis';
 import { OAuth2Client } from 'google-auth-library';
 
-// Add this helper function before registerRoutes
+// Update the getRedirectUri function to handle different environments properly
 function getRedirectUri(req: Request): string {
-  const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
   const host = req.get('host') || '';
+
+  // For development environment
+  if (process.env.NODE_ENV !== 'production') {
+    const protocol = 'http';
+    return `${protocol}://${host}/api/auth/google/callback`;
+  }
+
+  // For production environment
+  const protocol = 'https';
   return `${protocol}://${host}/api/auth/google/callback`;
 }
 
