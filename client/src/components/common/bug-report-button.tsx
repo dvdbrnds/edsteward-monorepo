@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { BugIcon } from "lucide-react";
+import { BugIcon, Loader2 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -140,7 +140,14 @@ export function BugReportButton() {
                 Cancel
               </Button>
               <Button type="submit" disabled={isSubmitting}>
-                {isSubmitting ? "Submitting..." : "Submit Report"}
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Creating...
+                  </>
+                ) : (
+                  "Submit Report"
+                )}
               </Button>
             </div>
           </form>
