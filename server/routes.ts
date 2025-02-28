@@ -372,15 +372,16 @@ export function registerRoutes(app: Express): Server {
           }
         });
 
-      console.log("Google Sheets API response:", {
-        status: response.status,
-        data: response.data
-      });
+        console.log("Google Sheets API response:", {
+          status: response.status,
+          data: response.data
+        });
 
-      if (response.status === 200) {
-        res.json({ message: "Bug report submitted successfully" });
-      } else {
-        throw new Error("Failed to submit to Google Sheets");
+        if (response.status === 200) {
+          res.json({ message: "Bug report submitted successfully" });
+        } else {
+          throw new Error("Failed to submit to Google Sheets");
+        }
       }
     } catch (error: any) {
       console.error("Failed to submit bug report:", error);
