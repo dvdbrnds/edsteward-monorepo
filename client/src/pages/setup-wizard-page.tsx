@@ -159,9 +159,9 @@ export default function SetupWizardPage() {
           id: "oauth2",
           title: "Configure OAuth2",
           description:
-            "Set up OAuth2 credentials for Google Sheets integration across different environments.",
+            "Set up OAuth2 credentials for Google Sheets integration across different environments. This can be configured later in admin settings.",
           icon: Key,
-          required: true,
+          required: false,
         },
         {
           id: "offices",
@@ -184,9 +184,9 @@ export default function SetupWizardPage() {
           id: "oauth2",
           title: "Configure OAuth2",
           description:
-            "Set up OAuth2 credentials for Google Sheets integration across different environments.",
+            "Set up OAuth2 credentials for Google Sheets integration across different environments. This can be configured later in admin settings.",
           icon: Key,
-          required: true,
+          required: false,
         },
         {
           id: "offices",
