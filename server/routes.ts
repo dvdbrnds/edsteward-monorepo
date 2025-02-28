@@ -335,22 +335,42 @@ export function registerRoutes(app: Express): Server {
       ]];
 
       console.log("Sending data to Google Sheets:", { values });
-
-      // Send to Google Sheets
-      const response = await axios({
-        method: 'post',
-        url: `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1!A:D:append`,
-        params: {
-          key: apiKey,
-          valueInputOption: 'USER_ENTERED',
-          insertDataOption: 'INSERT_ROWS'
-        },
-        data: {
-          range: 'Sheet1!A:D',
-          majorDimension: 'ROWS',
-          values: values
-        }
-      });
+      console.log("Google Sheet ID:", sheetId);
+      
+      try {
+        // First, check if we can access the spreadsheet
+        const testResponse = await axios({
+          method: 'get',
+          url: `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?fields=sheets.properties.title`,
+          params: {
+            key: apiKey
+          }
+        });
+        
+        console.log("Spreadsheet access check:", {
+          status: testResponse.status,
+          sheetTitles: testResponse.data?.sheets?.map((s: any) => s.properties?.title)
+        });
+        
+        // Get the first sheet name rather than assuming "Sheet1"
+        const firstSheetName = testResponse.data?.sheets?.[0]?.properties?.title || "Sheet1";
+        console.log("Using sheet name:", firstSheetName);
+        
+        // Send to Google Sheets with the correct sheet name
+        const response = await axios({
+          method: 'post',
+          url: `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${firstSheetName}!A:D:append`,
+          params: {
+            key: apiKey,
+            valueInputOption: 'USER_ENTERED',
+            insertDataOption: 'INSERT_ROWS'
+          },
+          data: {
+            range: `${firstSheetName}!A:D`,
+            majorDimension: 'ROWS',
+            values: values
+          }
+        });
 
       console.log("Google Sheets API response:", {
         status: response.status,
@@ -364,16 +384,33 @@ export function registerRoutes(app: Express): Server {
       }
     } catch (error: any) {
       console.error("Failed to submit bug report:", error);
+      // Provide more detailed error information
       if (error.response) {
         console.error("Google Sheets API error details:", {
           status: error.response.status,
           data: JSON.stringify(error.response.data),
           headers: error.response.headers
         });
+        
+        // Check for specific error codes
+        const errorCode = error.response.data?.error?.code;
+        const errorMessage = error.response.data?.error?.message || '';
+        
+        if (errorCode === 403) {
+          console.error("Permission denied. Make sure the Google Sheet is shared with the API service account or is public.");
+        } else if (errorCode === 404) {
+          console.error("Sheet not found. Check if the sheet ID is correct and the sheet exists.");
+        } else if (errorMessage.includes("Unable to parse range")) {
+          console.error("Range error. The sheet name might be incorrect.");
+        }
+      } else {
+        console.error("Network or other error:", error.message);
       }
+      
       res.status(500).json({ 
         error: "Failed to submit bug report",
-        details: error.response?.data?.error?.message || error.message || "Unknown error"
+        details: error.response?.data?.error?.message || error.message || "Unknown error",
+        suggestion: "Please check server logs for more details"
       });
     }
   });
