@@ -63,7 +63,10 @@ export function BugReportButton() {
       console.log("Bug report submission response:", result);
 
       if (!response.ok) {
-        throw new Error(result.details || result.error || "Failed to submit bug report");
+        const errorMessage = typeof result.error === 'object' 
+          ? JSON.stringify(result.error)
+          : result.error || result.details || "Failed to submit bug report";
+        throw new Error(errorMessage);
       }
 
       toast({
@@ -74,9 +77,13 @@ export function BugReportButton() {
       form.reset();
     } catch (error: any) {
       console.error("Bug report submission error:", error);
+      const errorMessage = error.message && typeof error.message === 'string'
+        ? error.message
+        : "Failed to submit bug report. Please try again.";
+
       toast({
         title: "Error",
-        description: error.message || "Failed to submit bug report. Please try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {

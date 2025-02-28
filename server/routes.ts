@@ -360,13 +360,13 @@ export function registerRoutes(app: Express): Server {
       if (error.response) {
         console.error("Google Sheets API error details:", {
           status: error.response.status,
-          data: error.response.data,
+          data: JSON.stringify(error.response.data),
           headers: error.response.headers
         });
       }
       res.status(500).json({ 
         error: "Failed to submit bug report",
-        details: error.response?.data?.error || error.message 
+        details: error.response?.data?.error?.message || error.message || "Unknown error"
       });
     }
   });
