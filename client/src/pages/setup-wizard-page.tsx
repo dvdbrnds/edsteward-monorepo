@@ -19,9 +19,10 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { insertUserSchema } from "@shared/schema";
 import { Progress } from "@/components/ui/progress";
-import { Loader2, User, UserPlus } from "lucide-react";
+import { Loader2, User, UserPlus, Key } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Redirect } from "wouter";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { z } from "zod";
 
 type FormValues = z.infer<typeof insertUserSchema>;
@@ -53,6 +54,22 @@ export default function SetupWizardPage() {
   const [officeStep, setOfficeStep] = useState(0);
   const [isComplete, setIsComplete] = useState(false);
   const [officeAssignments, setOfficeAssignments] = useState<Record<string, { email: string; name: string }>>({});
+  const [redirectUri, setRedirectUri] = useState("");
+
+  // Query for redirect URI
+  const { data: redirectUriData } = useQuery({
+    queryKey: ["/api/auth/redirect-uri"],
+    queryFn: async () => {
+      const response = await apiRequest("GET", "/api/auth/redirect-uri");
+      return response.json();
+    },
+  });
+
+  useEffect(() => {
+    if (redirectUriData?.redirectUri) {
+      setRedirectUri(redirectUriData.redirectUri);
+    }
+  }, [redirectUriData]);
 
   const { data: hasAdmin, isLoading: checkingAdmin } = useQuery({
     queryKey: ["/api/setup/has-admin"],
@@ -103,10 +120,9 @@ export default function SetupWizardPage() {
     },
   });
 
-  // Handle step navigation when hasAdmin changes
   useEffect(() => {
     if (hasAdmin && currentStep === 0) {
-      setCurrentStep(0);
+      setCurrentStep(1);
     }
   }, [hasAdmin]);
 
@@ -137,14 +153,21 @@ export default function SetupWizardPage() {
     );
   }
 
-  // If there's already an admin, only show the office assignment step
   const setupSteps = hasAdmin
     ? [
+        {
+          id: "oauth2",
+          title: "Configure OAuth2",
+          description:
+            "Set up OAuth2 credentials for Google Sheets integration across different environments.",
+          icon: Key,
+          required: true,
+        },
         {
           id: "offices",
           title: "Assign Compliance Offices",
           description:
-            "Designate offices responsible for each regulation category. You can modify these assignments later in the admin settings.",
+            "Designate offices responsible for each regulation category.",
           icon: UserPlus,
           required: false,
         },
@@ -158,10 +181,18 @@ export default function SetupWizardPage() {
           required: true,
         },
         {
+          id: "oauth2",
+          title: "Configure OAuth2",
+          description:
+            "Set up OAuth2 credentials for Google Sheets integration across different environments.",
+          icon: Key,
+          required: true,
+        },
+        {
           id: "offices",
           title: "Assign Compliance Offices",
           description:
-            "Designate offices responsible for each regulation category. You can modify these assignments later in the admin settings.",
+            "Designate offices responsible for each regulation category.",
           icon: UserPlus,
           required: false,
         },
@@ -178,8 +209,7 @@ export default function SetupWizardPage() {
             Moravian Compliance Portal Setup
           </h1>
           <p className="text-gray-600">
-            Complete the following steps to set up your compliance portal.{" "}
-            {!hasAdmin ? "Admin account creation is required." : ""}
+            Complete the following steps to set up your compliance portal.
           </p>
         </div>
 
@@ -270,6 +300,68 @@ export default function SetupWizardPage() {
                         </Button>
                       </form>
                     </Form>
+                  )}
+
+                  {isCurrent && step.id === "oauth2" && (
+                    <div className="space-y-6">
+                      <Tabs defaultValue="development" className="w-full">
+                        <TabsList className="grid w-full grid-cols-2">
+                          <TabsTrigger value="development">Development</TabsTrigger>
+                          <TabsTrigger value="production">Production</TabsTrigger>
+                        </TabsList>
+                        <TabsContent value="development" className="space-y-4">
+                          <div className="rounded-lg bg-slate-50 p-4 border border-slate-200">
+                            <h3 className="font-medium mb-2">Development Setup</h3>
+                            <ol className="list-decimal list-inside space-y-2 text-sm">
+                              <li>Go to Google Cloud Console</li>
+                              <li>Create a new project or select existing one</li>
+                              <li>Enable Google Sheets API</li>
+                              <li>Create OAuth2 credentials:
+                                <ul className="list-disc list-inside ml-4 mt-1">
+                                  <li>Application type: Web application</li>
+                                  <li>Redirect URI (Development):</li>
+                                  <code className="block bg-slate-100 p-2 my-1 rounded text-xs break-all">
+                                    {redirectUri}
+                                  </code>
+                                </ul>
+                              </li>
+                            </ol>
+                          </div>
+                        </TabsContent>
+                        <TabsContent value="production" className="space-y-4">
+                          <div className="rounded-lg bg-slate-50 p-4 border border-slate-200">
+                            <h3 className="font-medium mb-2">Production Setup</h3>
+                            <ol className="list-decimal list-inside space-y-2 text-sm">
+                              <li>Create new OAuth2 credentials for production</li>
+                              <li>Use your production domain for redirect URI:
+                                <code className="block bg-slate-100 p-2 my-1 rounded text-xs">
+                                  https://compliance.moravian.edu/api/auth/google/callback
+                                </code>
+                              </li>
+                              <li>Update environment variables in production:
+                                <pre className="bg-slate-100 p-2 my-1 rounded text-xs">
+                                  GOOGLE_CLIENT_ID=prod_client_id{"\n"}
+                                  GOOGLE_CLIENT_SECRET=prod_client_secret{"\n"}
+                                  GOOGLE_SHEETS_SHEET_ID=your_sheet_id
+                                </pre>
+                              </li>
+                            </ol>
+                          </div>
+                        </TabsContent>
+                      </Tabs>
+                      <div className="flex justify-between pt-4">
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          onClick={() => setCurrentStep((prev) => prev + 1)}
+                        >
+                          Skip OAuth2 Setup
+                        </Button>
+                        <Button onClick={() => setCurrentStep((prev) => prev + 1)}>
+                          Continue
+                        </Button>
+                      </div>
+                    </div>
                   )}
 
                   {isCurrent && step.id === "offices" && (

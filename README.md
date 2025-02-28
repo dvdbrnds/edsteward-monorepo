@@ -35,9 +35,28 @@ This is an alpha release of the Compliance Portal. While the core functionality 
    ```
    DATABASE_URL=your_database_url
    SESSION_SECRET=your_session_secret
+
+   # For development
+   GOOGLE_CLIENT_ID=your_development_client_id
+   GOOGLE_CLIENT_SECRET=your_development_client_secret
+   GOOGLE_SHEETS_SHEET_ID=your_sheet_id
+
+   # For production, use different OAuth2 credentials
+   # GOOGLE_CLIENT_ID=your_production_client_id
+   # GOOGLE_CLIENT_SECRET=your_production_client_secret
    ```
 
-4. Start the development server:
+4. Set up Google OAuth2 credentials:
+   a. For Development:
+      - Use the Google Cloud Console to create OAuth2 credentials
+      - Set redirect URI to your development URL (e.g., https://your-repl-name.username.repl.co/api/auth/google/callback)
+
+   b. For Production:
+      - Create separate OAuth2 credentials
+      - Set redirect URI to your production domain (e.g., https://compliance.moravian.edu/api/auth/google/callback)
+      - Update environment variables with production credentials
+
+5. Start the development server:
    ```bash
    npm run dev
    ```
