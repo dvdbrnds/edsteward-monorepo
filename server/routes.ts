@@ -391,7 +391,7 @@ export function registerRoutes(app: Express): Server {
           details: error.message || "Unknown error"
         });
       }
-    }
+    });
   });
 
   const httpServer = createServer(app);
