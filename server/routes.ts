@@ -29,6 +29,11 @@ function getGoogleAuthClient(req: Request): OAuth2Client {
   const redirectUri = getRedirectUri(req);
 
   if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+    console.error("OAuth2 configuration check:", {
+      hasClientId: !!process.env.GOOGLE_CLIENT_ID,
+      hasClientSecret: !!process.env.GOOGLE_CLIENT_SECRET,
+      allEnvVars: Object.keys(process.env).join(", ")
+    });
     throw new Error("Missing OAuth2 credentials. Please configure GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET");
   }
 
@@ -472,7 +477,11 @@ export function registerRoutes(app: Express): Server {
   app.get("/api/auth/google", (req, res) => {
     try {
       if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
-        console.error("Missing OAuth2 credentials");
+        console.error("OAuth2 configuration error:", {
+          hasClientId: !!process.env.GOOGLE_CLIENT_ID,
+          hasClientSecret: !!process.env.GOOGLE_CLIENT_SECRET,
+          allEnvVars: Object.keys(process.env).join(", ")
+        });
         return res.status(500).json({
           error: "OAuth2 not configured",
           details: "Missing client credentials"
@@ -485,7 +494,14 @@ export function registerRoutes(app: Express): Server {
         scope: ['https://www.googleapis.com/auth/spreadsheets']
       });
 
-      console.log("Redirecting to Google OAuth URL:", authUrl);
+      console.log("Google OAuth2 configuration:", {
+        redirectUri: getRedirectUri(req),
+        hasAuth: !!auth,
+        authUrl: authUrl,
+        clientIdLength: process.env.GOOGLE_CLIENT_ID.length,
+        clientSecretLength: process.env.GOOGLE_CLIENT_SECRET.length
+      });
+
       res.redirect(authUrl);
     } catch (error) {
       console.error("Failed to generate auth URL:", error);
