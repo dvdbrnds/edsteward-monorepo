@@ -382,6 +382,8 @@ export function registerRoutes(app: Express): Server {
         } else {
           throw new Error("Failed to submit to Google Sheets");
         }
+      } finally {
+        // This empty finally block ensures the try block is properly closed
       }
     } catch (error: any) {
       console.error("Failed to submit bug report:", error);
