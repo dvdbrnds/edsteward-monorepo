@@ -24,9 +24,14 @@ function getRedirectUri(req: Request): string {
   return `${protocol}://${host}/api/auth/google/callback`;
 }
 
-// Add OAuth2 setup before registerRoutes
+// Update the getGoogleAuthClient function to handle missing credentials
 function getGoogleAuthClient(req: Request): OAuth2Client {
   const redirectUri = getRedirectUri(req);
+
+  if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+    throw new Error("Missing OAuth2 credentials. Please configure GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET");
+  }
+
   return new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
@@ -338,7 +343,7 @@ export function registerRoutes(app: Express): Server {
       }
 
       if (!req.session.googleTokens) {
-        return res.status(401).json({ 
+        return res.status(401).json({
           error: "Google authentication required",
           needsAuth: true
         });
@@ -465,12 +470,30 @@ export function registerRoutes(app: Express): Server {
 
   // Add auth routes for Google OAuth2
   app.get("/api/auth/google", (req, res) => {
-    const auth = getGoogleAuthClient(req);
-    const authUrl = auth.generateAuthUrl({
-      access_type: 'offline',
-      scope: ['https://www.googleapis.com/auth/spreadsheets']
-    });
-    res.redirect(authUrl);
+    try {
+      if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+        console.error("Missing OAuth2 credentials");
+        return res.status(500).json({
+          error: "OAuth2 not configured",
+          details: "Missing client credentials"
+        });
+      }
+
+      const auth = getGoogleAuthClient(req);
+      const authUrl = auth.generateAuthUrl({
+        access_type: 'offline',
+        scope: ['https://www.googleapis.com/auth/spreadsheets']
+      });
+
+      console.log("Redirecting to Google OAuth URL:", authUrl);
+      res.redirect(authUrl);
+    } catch (error) {
+      console.error("Failed to generate auth URL:", error);
+      res.status(500).json({
+        error: "Failed to initiate authentication",
+        details: error.message
+      });
+    }
   });
 
   app.get("/api/auth/google/callback", async (req, res) => {
