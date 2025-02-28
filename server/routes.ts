@@ -391,7 +391,13 @@ export function registerRoutes(app: Express): Server {
           details: error.message || "Unknown error"
         });
       }
-    });
+    } catch (error) {
+      console.error("Failed to submit bug report:", error);
+      res.status(500).json({ 
+        error: "Failed to submit bug report",
+        details: "Unknown error"
+      });
+    }
   });
 
   const httpServer = createServer(app);
