@@ -9,7 +9,7 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   role: text("role").notNull().default("user"),
   department: text("department"),
-  email: text("email").notNull(),  // Adding email field
+  email: text("email").notNull(),
 });
 
 // Regulations table
@@ -23,7 +23,7 @@ export const regulations = pgTable("regulations", {
   summary: text("summary"),
   requirements: text("requirements"),
   category: text("category").notNull(),
-  jurisdiction: text("jurisdiction").notNull().default("federal"), // Add jurisdiction field
+  jurisdiction: text("jurisdiction").notNull().default("federal"),
   isApplicable: boolean("is_applicable").notNull().default(true),
   originationDate: timestamp("origination_date"),
   effectiveDate: timestamp("effective_date"),
@@ -31,10 +31,10 @@ export const regulations = pgTable("regulations", {
   lastVerified: timestamp("last_verified"),
   nextReviewDate: timestamp("next_review_date"),
   filingDeadlines: jsonb("filing_deadlines").$type<{
-    type: string,
-    date: string,
-    frequency: string,
-    description: string
+    type: string;
+    date: string;
+    frequency: string;
+    description: string;
   }[]>(),
   reportingFrequency: text("reporting_frequency"),
   agency_url: text("agency_url"),
@@ -52,24 +52,14 @@ export const regulations = pgTable("regulations", {
   complianceNotes: text("compliance_notes"),
   verificationMethod: text("verification_method"),
   notificationSchedule: jsonb("notification_schedule").$type<{
-    initialReminder: number, // days before
-    weeklyReminder: number, // start weekly reminders
-    dailyReminder: number,  // start daily reminders
-    finalDayReminders: boolean // three times on final day
+    initialReminder: number;
+    weeklyReminder: number;
+    dailyReminder: number;
+    finalDayReminders: boolean;
   }>(),
 });
 
-// Comments table
-export const comments = pgTable("comments", {
-  id: serial("id").primaryKey(),
-  regulationId: integer("regulation_id").notNull(),
-  userId: integer("user_id").notNull(),
-  content: text("content").notNull(),
-  parentId: integer("parent_id"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-});
-
-// Notifications table - updated to include phone number
+// Notifications table
 export const notifications = pgTable("notifications", {
   id: serial("id").primaryKey(),
   regulationId: integer("regulation_id").notNull(),
@@ -77,14 +67,14 @@ export const notifications = pgTable("notifications", {
   type: text("type").notNull(),
   frequency: text("frequency").notNull(),
   enabled: boolean("enabled").notNull().default(true),
-  phoneNumber: text("phone_number"),  // Added for SMS notifications
+  phoneNumber: text("phone_number"),
 });
 
 // Deadlines table
 export const deadlines = pgTable("deadlines", {
   id: serial("id").primaryKey(),
   regulationId: integer("regulation_id").notNull(),
-  dueDate: date("due_date").notNull(),  // Keep as date instead of timestamp
+  dueDate: date("due_date").notNull(),
   status: text("status").notNull(),
   assignedTo: integer("assigned_to").notNull(),
 });
@@ -100,66 +90,58 @@ export const guides = pgTable("guides", {
 });
 
 // Schema for inserting users
-export const insertUserSchema = createInsertSchema(users)
-  .extend({
-    password: z.string().min(6),
-    role: z.enum(["admin", "compliance_officer", "user"]),
-    department: z.string().optional(),
-    email: z.string().email(), //Adding email schema validation
-  });
+export const insertUserSchema = createInsertSchema(users).extend({
+  password: z.string().min(6),
+  role: z.enum(["admin", "compliance_officer", "user"]),
+  department: z.string().optional(),
+  email: z.string().email(),
+});
 
 // Schema for inserting regulations
-export const insertRegulationSchema = createInsertSchema(regulations)
-  .extend({
-    name: z.string().min(1, "Regulation name is required"),
-    jurisdiction: z.enum(["federal", "state"]),
-    originationDate: z.date().optional().nullable(),
-    effectiveDate: z.date().optional().nullable(),
-    nextReviewDate: z.date().optional().nullable(),
-    filingDeadlines: z.array(z.object({
-      type: z.string(),
-      date: z.string(),
-      frequency: z.string(),
-      description: z.string()
-    })).optional().nullable(),
-    regulationUrl: z.string().url().optional().nullable(),
-    requirementsUrl: z.string().url().optional().nullable(),
-    submissionGuideUrl: z.string().url().optional().nullable(),
-    formsUrl: z.string().url().optional().nullable(),
-    applicableforms: z.array(z.string()).optional().nullable(),
-    relatedRegulations: z.array(z.string()).optional().nullable(),
-    lastVerified: z.date().optional().nullable(),
-    isApplicable: z.boolean().default(true),
-    notificationSchedule: z.object({
-      initialReminder: z.number().min(1).max(365).default(90),
-      weeklyReminder: z.number().min(1).max(90).default(30),
-      dailyReminder: z.number().min(1).max(30).default(7),
-      finalDayReminders: z.boolean().default(true)
-    }).optional().nullable(),
-  });
+export const insertRegulationSchema = createInsertSchema(regulations).extend({
+  name: z.string().min(1, "Regulation name is required"),
+  jurisdiction: z.enum(["federal", "state"]),
+  originationDate: z.date().optional().nullable(),
+  effectiveDate: z.date().optional().nullable(),
+  nextReviewDate: z.date().optional().nullable(),
+  filingDeadlines: z.array(z.object({
+    type: z.string(),
+    date: z.string(),
+    frequency: z.string(),
+    description: z.string(),
+  })).optional().nullable(),
+  regulationUrl: z.string().url().optional().nullable(),
+  requirementsUrl: z.string().url().optional().nullable(),
+  submissionGuideUrl: z.string().url().optional().nullable(),
+  formsUrl: z.string().url().optional().nullable(),
+  applicableforms: z.array(z.string()).optional().nullable(),
+  relatedRegulations: z.array(z.string()).optional().nullable(),
+  lastVerified: z.date().optional().nullable(),
+  isApplicable: z.boolean().default(true),
+  notificationSchedule: z.object({
+    initialReminder: z.number().min(1).max(365).default(90),
+    weeklyReminder: z.number().min(1).max(90).default(30),
+    dailyReminder: z.number().min(1).max(30).default(7),
+    finalDayReminders: z.boolean().default(true),
+  }).optional().nullable(),
+});
 
-// Schema for inserting comments
-export const insertCommentSchema = createInsertSchema(comments)
-  .extend({
-    content: z.string().min(1, "Comment cannot be empty"),
-    parentId: z.number().optional(),
-  });
-
-// Schema for inserting notifications - updated
-export const insertNotificationSchema = createInsertSchema(notifications)
-  .extend({
-    phoneNumber: z.string().regex(/^\+\d{1,15}$/, "Must be a valid phone number in E.164 format").optional(),
-  });
+// Schema for inserting notifications
+export const insertNotificationSchema = createInsertSchema(notifications).extend({
+  phoneNumber: z
+    .string()
+    .regex(/^\+\d{1,15}$/, "Must be a valid phone number in E.164 format")
+    .optional(),
+});
 
 // Schema for inserting deadlines
 export const insertDeadlineSchema = createInsertSchema(deadlines);
 
 // Schema for inserting guides
-export const insertGuideSchema = createInsertSchema(guides)
-  .extend({
-    content: z.string().min(1, "Guide content cannot be empty"),
-    category: z.enum(["submission", "compliance", "general"]),
-  });
+export const insertGuideSchema = createInsertSchema(guides).extend({
+  content: z.string().min(1, "Guide content cannot be empty"),
+  category: z.enum(["submission", "compliance", "general"]),
+});
 
 // Email Configuration table
 export const emailConfigs = pgTable("email_configs", {
@@ -176,15 +158,14 @@ export const emailConfigs = pgTable("email_configs", {
 });
 
 // Schema for inserting email config
-export const insertEmailConfigSchema = createInsertSchema(emailConfigs)
-  .extend({
-    fromEmail: z.string().email("Must be a valid email address"),
-    smtpHost: z.string().min(1, "SMTP host is required"),
-    smtpPort: z.number().int().min(1, "Port must be a positive number"),
-    smtpSecure: z.boolean(),
-    smtpUser: z.string().min(1, "SMTP username is required"),
-    smtpPass: z.string().min(1, "SMTP password is required"),
-  });
+export const insertEmailConfigSchema = createInsertSchema(emailConfigs).extend({
+  fromEmail: z.string().email("Must be a valid email address"),
+  smtpHost: z.string().min(1, "SMTP host is required"),
+  smtpPort: z.number().int().min(1, "Port must be a positive number"),
+  smtpSecure: z.boolean(),
+  smtpUser: z.string().min(1, "SMTP username is required"),
+  smtpPass: z.string().min(1, "SMTP password is required"),
+});
 
 // Twilio Configuration table
 export const twilioConfigs = pgTable("twilio_configs", {
@@ -198,13 +179,11 @@ export const twilioConfigs = pgTable("twilio_configs", {
 });
 
 // Schema for inserting Twilio config
-export const insertTwilioConfigSchema = createInsertSchema(twilioConfigs)
-  .extend({
-    accountSid: z.string().min(1, "Account SID is required"),
-    authToken: z.string().min(1, "Auth Token is required"),
-    fromNumber: z.string().regex(/^\+\d{1,15}$/, "Must be a valid phone number in E.164 format"),
-  });
-
+export const insertTwilioConfigSchema = createInsertSchema(twilioConfigs).extend({
+  accountSid: z.string().min(1, "Account SID is required"),
+  authToken: z.string().min(1, "Auth Token is required"),
+  fromNumber: z.string().regex(/^\+\d{1,15}$/, "Must be a valid phone number in E.164 format"),
+});
 
 // Add the specific schema field type definition
 export interface CsvSchemaField {
@@ -218,21 +197,20 @@ export const csvSchemas = pgTable("csv_schemas", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   description: text("description"),
-  schema: jsonb("schema").notNull().$type<Record<string, CsvSchemaField>>(),  // Explicit typing
+  schema: jsonb("schema").notNull().$type<Record<string, CsvSchemaField>>(), // Explicit typing
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
   createdBy: integer("created_by").notNull(),
 });
 
 // Update the insert schema to match the new typing
-export const insertCsvSchemaSchema = createInsertSchema(csvSchemas)
-  .extend({
-    schema: z.record(z.string(), z.object({
-      type: z.enum(["string", "number", "boolean", "date"]),
-      required: z.boolean(),
-      format: z.string().optional()
-    }))
-  });
+export const insertCsvSchemaSchema = createInsertSchema(csvSchemas).extend({
+  schema: z.record(z.string(), z.object({
+    type: z.enum(["string", "number", "boolean", "date"]),
+    required: z.boolean(),
+    format: z.string().optional(),
+  })),
+});
 
 // Field Mappings table
 export const fieldMappings = pgTable("field_mappings", {
@@ -250,7 +228,7 @@ export const validationRules = pgTable("validation_rules", {
   id: serial("id").primaryKey(),
   schemaId: integer("schema_id").notNull(),
   fieldName: text("field_name").notNull(),
-  ruleType: text("rule_type").notNull(),  // e.g., "regex", "range", "required"
+  ruleType: text("rule_type").notNull(), // e.g., "regex", "range", "required"
   ruleConfig: jsonb("rule_config").notNull(),
   enabled: boolean("enabled").notNull().default(true),
   createdAt: timestamp("created_at").notNull().defaultNow(),
@@ -262,7 +240,7 @@ export const transformationLogs = pgTable("transformation_logs", {
   id: serial("id").primaryKey(),
   schemaId: integer("schema_id").notNull(),
   fileName: text("file_name").notNull(),
-  status: text("status").notNull(),  // "success", "partial", "failed"
+  status: text("status").notNull(), // "success", "partial", "failed"
   recordsProcessed: integer("records_processed").notNull(),
   recordsFailed: integer("records_failed").notNull(),
   startTime: timestamp("start_time").notNull(),
@@ -285,30 +263,27 @@ export const errorRecords = pgTable("error_records", {
 export const insertFieldMappingSchema = createInsertSchema(fieldMappings);
 
 // Schema for inserting Validation Rule
-export const insertValidationRuleSchema = createInsertSchema(validationRules)
-  .extend({
-    ruleType: z.enum(["regex", "range", "required", "enum", "custom"]),
-    ruleConfig: z.object({
-      pattern: z.string().optional(),
-      min: z.number().optional(),
-      max: z.number().optional(),
-      values: z.array(z.string()).optional(),
-      customValidation: z.string().optional(),
-    }),
-  });
+export const insertValidationRuleSchema = createInsertSchema(validationRules).extend({
+  ruleType: z.enum(["regex", "range", "required", "enum", "custom"]),
+  ruleConfig: z.object({
+    pattern: z.string().optional(),
+    min: z.number().optional(),
+    max: z.number().optional(),
+    values: z.array(z.string()).optional(),
+    customValidation: z.string().optional(),
+  }),
+});
 
 // Schema for inserting Transformation Log
-export const insertTransformationLogSchema = createInsertSchema(transformationLogs)
-  .extend({
-    status: z.enum(["success", "partial", "failed"]),
-    metadata: z.record(z.string(), z.unknown()).optional(),
-  });
+export const insertTransformationLogSchema = createInsertSchema(transformationLogs).extend({
+  status: z.enum(["success", "partial", "failed"]),
+  metadata: z.record(z.string(), z.unknown()).optional(),
+});
 
 // Schema for inserting Error Record
-export const insertErrorRecordSchema = createInsertSchema(errorRecords)
-  .extend({
-    errorType: z.enum(["validation", "transformation", "schema_mismatch"]),
-  });
+export const insertErrorRecordSchema = createInsertSchema(errorRecords).extend({
+  errorType: z.enum(["validation", "transformation", "schema_mismatch"]),
+});
 
 // Additional type exports
 export type CsvSchema = typeof csvSchemas.$inferSelect;
@@ -327,8 +302,6 @@ export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type Regulation = typeof regulations.$inferSelect;
 export type InsertRegulation = z.infer<typeof insertRegulationSchema>;
-export type Comment = typeof comments.$inferSelect;
-export type InsertComment = z.infer<typeof insertCommentSchema>;
 export type Notification = typeof notifications.$inferSelect;
 export type InsertNotification = z.infer<typeof insertNotificationSchema>;
 export type Deadline = typeof deadlines.$inferSelect;

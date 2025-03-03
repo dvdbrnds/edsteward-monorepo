@@ -1,4 +1,4 @@
-import { users, regulations, notifications, deadlines, comments, guides, csvSchemas, validationRules, fieldMappings } from "@shared/schema";
+import { users, regulations, notifications, deadlines, guides, csvSchemas, validationRules, fieldMappings } from "@shared/schema";
 import type {
   User,
   InsertUser,
@@ -8,8 +8,6 @@ import type {
   InsertNotification,
   Deadline,
   InsertDeadline,
-  Comment,
-  InsertComment,
   Guide,
   InsertGuide,
   CsvSchema,
@@ -42,13 +40,7 @@ export interface IStorage {
   createRegulation(regulation: InsertRegulation): Promise<Regulation>;
   updateRegulation(id: number, regulation: Partial<InsertRegulation>): Promise<Regulation>;
   setRegulationApplicability(id: number, isApplicable: boolean): Promise<Regulation>;
-  getRegulationsByJurisdiction(jurisdiction: string): Promise<Regulation[]>; // Added method
-
-  // Comment methods
-  getCommentsByRegulation(regulationId: number): Promise<Comment[]>;
-  createComment(comment: InsertComment): Promise<Comment>;
-  updateComment(id: number, content: string): Promise<Comment>;
-  deleteComment(id: number): Promise<void>;
+  getRegulationsByJurisdiction(jurisdiction: string): Promise<Regulation[]>;
 
   // Notification methods
   getNotificationsByUser(userId: number): Promise<Notification[]>;
@@ -57,7 +49,7 @@ export interface IStorage {
 
   // Deadline methods
   getDeadlines(): Promise<Deadline[]>;
-  getAllIncompleteDeadlines(): Promise<Deadline[]>;  // Add this new method
+  getAllIncompleteDeadlines(): Promise<Deadline[]>;
   createDeadline(deadline: InsertDeadline): Promise<Deadline>;
 
   // Guide methods
@@ -107,24 +99,26 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
+  async getAllUsers(): Promise<User[]> {
+    return await db.select().from(users);
+  }
+
+  async updateUser(id: number, userData: Partial<InsertUser>): Promise<User> {
+    const [user] = await db
+      .update(users)
+      .set(userData)
+      .where(eq(users.id, id))
+      .returning();
+    return user;
+  }
+
+  async deleteUser(id: number): Promise<void> {
+    await db.delete(users).where(eq(users.id, id));
+  }
+
   async getRegulations(): Promise<Regulation[]> {
     console.log("Fetching regulations from database...");
-    const result = await db.select({
-      id: regulations.id,
-      itemId: regulations.itemId,
-      name: regulations.name,
-      topic: regulations.topic,
-      statute: regulations.statute,
-      statuteIds: regulations.statuteIds,
-      summary: regulations.summary,
-      requirements: regulations.requirements,
-      category: regulations.category,
-      jurisdiction: regulations.jurisdiction,
-      isApplicable: regulations.isApplicable,
-      regulationUrl: regulations.regulationUrl,
-      requirementsUrl: regulations.requirementsUrl,
-      submissionGuidelines: regulations.submissionGuidelines
-    }).from(regulations);
+    const result = await db.select().from(regulations);
     console.log(`Found ${result.length} regulations in database:`, result);
     return result;
   }
@@ -169,29 +163,14 @@ export class DatabaseStorage implements IStorage {
     return updatedRegulation;
   }
 
-  async getCommentsByRegulation(regulationId: number): Promise<Comment[]> {
-    return await db
+  async getRegulationsByJurisdiction(jurisdiction: string): Promise<Regulation[]> {
+    console.log(`Fetching regulations with jurisdiction: ${jurisdiction}`);
+    const result = await db
       .select()
-      .from(comments)
-      .where(eq(comments.regulationId, regulationId));
-  }
-
-  async createComment(comment: InsertComment): Promise<Comment> {
-    const [newComment] = await db.insert(comments).values(comment).returning();
-    return newComment;
-  }
-
-  async updateComment(id: number, content: string): Promise<Comment> {
-    const [updatedComment] = await db
-      .update(comments)
-      .set({ content })
-      .where(eq(comments.id, id))
-      .returning();
-    return updatedComment;
-  }
-
-  async deleteComment(id: number): Promise<void> {
-    await db.delete(comments).where(eq(comments.id, id));
+      .from(regulations)
+      .where(eq(regulations.jurisdiction, jurisdiction));
+    console.log(`Found ${result.length} ${jurisdiction} regulations`);
+    return result;
   }
 
   async getNotificationsByUser(userId: number): Promise<Notification[]> {
@@ -327,23 +306,6 @@ export class DatabaseStorage implements IStorage {
       .where(eq(regulations.jurisdiction, jurisdiction));
     console.log(`Found ${result.length} ${jurisdiction} regulations`);
     return result;
-  }
-
-  async getAllUsers(): Promise<User[]> {
-    return await db.select().from(users);
-  }
-
-  async updateUser(id: number, userData: Partial<InsertUser>): Promise<User> {
-    const [user] = await db
-      .update(users)
-      .set(userData)
-      .where(eq(users.id, id))
-      .returning();
-    return user;
-  }
-
-  async deleteUser(id: number): Promise<void> {
-    await db.delete(users).where(eq(users.id, id));
   }
 }
 

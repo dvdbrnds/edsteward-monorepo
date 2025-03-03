@@ -603,17 +603,6 @@ export default function RegulationDetailPage() {
                     <GuideContent />
                   </CardContent>
                 </Card>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Comments</CardTitle>
-                    <CardDescription>
-                      Discuss and share insights about this regulation
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <CommentSection regulationId={regulation?.id} />
-                  </CardContent>
-                </Card>
               </div>
 
               <div className="space-y-6">
