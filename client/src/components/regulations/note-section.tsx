@@ -287,7 +287,8 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
       </div>
 
       <div>
-        <h3 className="text-lg font-medium mb-4">Regulation Diary Entries</h3> {/* Changed header text */}
+        <h3 className="text-lg font-medium mb-4">Diary</h3>
+        <p className="text-sm text-muted-foreground mb-4">This is where compliance officers and administrators can document how your institution addresses this regulation requirement.</p>
         {isLoading ? (
           <p>Loading entries...</p>
         ) : error ? (
