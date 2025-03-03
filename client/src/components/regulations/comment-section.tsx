@@ -57,11 +57,24 @@ export default function CommentSection({ regulationId }: CommentSectionProps) {
       if (!user) {
         throw new Error("Must be logged in to comment");
       }
-      return apiRequest("POST", "/api/comments", {
-        ...data,
-        userId: user.id,
-        regulationId,
+      const response = await fetch("/api/comments", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          content: data.content,
+          regulationId,
+          parentId: null,
+        }),
       });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to create comment");
+      }
+
+      return response.json();
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/comments", regulationId] });
