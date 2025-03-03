@@ -17,6 +17,14 @@ import { Loader2, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 
+interface CommentWithUser extends Comment {
+  user?: {
+    id: number;
+    name: string;
+    username: string;
+  } | null;
+}
+
 interface CommentSectionProps {
   regulationId: number;
 }
@@ -26,7 +34,7 @@ export default function CommentSection({ regulationId }: CommentSectionProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const { data: comments, isLoading } = useQuery<Comment[]>({
+  const { data: comments, isLoading } = useQuery<CommentWithUser[]>({
     queryKey: ["/api/comments", regulationId],
     queryFn: async () => {
       const response = await fetch(`/api/comments/${regulationId}`);
@@ -137,19 +145,21 @@ export default function CommentSection({ regulationId }: CommentSectionProps) {
       )}
 
       <div className="space-y-4">
-        {comments?.length === 0 ? (
+        {!comments || comments.length === 0 ? (
           <p className="text-center text-gray-500 italic">
             No comments yet. Be the first to comment!
           </p>
         ) : (
-          comments?.map((comment) => (
+          comments.map((comment) => (
             <div
               key={comment.id}
               className="border rounded-lg p-4 space-y-2 bg-white"
             >
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="font-medium">{comment.user?.name}</p>
+                  <p className="font-medium">
+                    {comment.user?.name || 'Anonymous'}
+                  </p>
                   <p className="text-sm text-gray-500">
                     {format(new Date(comment.createdAt), "PPp")}
                   </p>

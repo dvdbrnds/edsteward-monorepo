@@ -185,7 +185,21 @@ export function registerRoutes(app: Express): Server {
       }
 
       const comments = await storage.getCommentsByRegulation(regulationId);
-      res.json(comments);
+      const commentsWithUsers = await Promise.all(
+        comments.map(async (comment) => {
+          const user = await storage.getUser(comment.userId);
+          return {
+            ...comment,
+            user: user ? { 
+              id: user.id,
+              name: user.name,
+              username: user.username
+            } : null
+          };
+        })
+      );
+
+      res.json(commentsWithUsers);
     } catch (error) {
       console.error("Failed to fetch comments:", error);
       res.status(500).json({ error: "Failed to fetch comments" });
