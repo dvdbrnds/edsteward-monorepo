@@ -63,7 +63,10 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({
+          ...data,
+          regulationId,
+        }),
       });
       if (!response.ok) {
         const error = await response.json();
