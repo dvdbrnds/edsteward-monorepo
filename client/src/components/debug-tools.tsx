@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -13,19 +12,22 @@ export function NoteDebugger() {
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [schemaInfo, setSchemaInfo] = useState<any>(null); //Added state for schema info
+  const [reqResponse, setReqResponse] = useState<any>(null); //Added state for request response
+
 
   const createNote = async () => {
     setLoading(true);
     setError(null);
     setResult(null);
-    
+
     try {
       console.log('DEBUG TOOL: Creating note with data:', {
         regulationId: parseInt(regulationId),
         title,
         content,
       });
-      
+
       const response = await fetch('/api/notes', {
         method: 'POST',
         headers: {
@@ -41,9 +43,9 @@ export function NoteDebugger() {
         }),
         credentials: 'include',
       });
-      
+
       console.log('DEBUG TOOL: Response status:', response.status);
-      
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error('DEBUG TOOL: Error response:', errorText);
@@ -55,7 +57,7 @@ export function NoteDebugger() {
         });
         return;
       }
-      
+
       const data = await response.json();
       console.log('DEBUG TOOL: Success response:', data);
       setResult(data);
@@ -80,16 +82,16 @@ export function NoteDebugger() {
     setLoading(true);
     setError(null);
     setResult(null);
-    
+
     try {
       console.log('DEBUG TOOL: Getting notes for regulation:', regulationId);
-      
+
       const response = await fetch(`/api/notes/regulation/${regulationId}`, {
         credentials: 'include',
       });
-      
+
       console.log('DEBUG TOOL: Response status:', response.status);
-      
+
       if (!response.ok) {
         const errorText = await response.text();
         console.error('DEBUG TOOL: Error response:', errorText);
@@ -101,7 +103,7 @@ export function NoteDebugger() {
         });
         return;
       }
-      
+
       const data = await response.json();
       console.log('DEBUG TOOL: Success response:', data);
       setResult(data);
@@ -154,13 +156,13 @@ export function NoteDebugger() {
             rows={3}
           />
         </div>
-        
+
         {error && (
           <div className="p-3 bg-red-50 border border-red-200 rounded-md text-red-800 text-sm">
             {error}
           </div>
         )}
-        
+
         {result && (
           <div className="p-3 bg-gray-50 border border-gray-200 rounded-md">
             <h4 className="font-medium text-sm mb-1">Result:</h4>
@@ -169,20 +171,97 @@ export function NoteDebugger() {
             </pre>
           </div>
         )}
+        {schemaInfo && (
+          <div className="p-3 bg-gray-50 border border-gray-200 rounded-md">
+            <h4 className="font-medium text-sm mb-1">Schema Info:</h4>
+            <pre className="text-xs overflow-auto max-h-40">
+              {JSON.stringify(schemaInfo, null, 2)}
+            </pre>
+          </div>
+        )}
+        {reqResponse && (
+          <div className="p-3 bg-gray-50 border border-gray-200 rounded-md">
+            <h4 className="font-medium text-sm mb-1">Request Response:</h4>
+            <pre className="text-xs overflow-auto max-h-40">
+              {JSON.stringify(reqResponse, null, 2)}
+            </pre>
+          </div>
+        )}
       </CardContent>
-      <CardFooter className="flex justify-between">
-        <Button
-          onClick={createNote}
-          disabled={loading}
-        >
-          {loading ? 'Creating...' : 'Create Note'}
-        </Button>
+      <CardFooter className="flex flex-wrap justify-end gap-2">
         <Button
           variant="outline"
           onClick={getNotes}
           disabled={loading}
         >
           {loading ? 'Loading...' : 'Get Notes'}
+        </Button>
+        <Button 
+          variant="outline" 
+          onClick={async () => {
+            setLoading(true);
+            try {
+              const response = await fetch('/api/debug/note-schemas');
+              const data = await response.json();
+              setSchemaInfo(data);
+              setError(null);
+            } catch (err) {
+              setError(err instanceof Error ? err.message : String(err));
+            } finally {
+              setLoading(false);
+            }
+          }}
+        >
+          Test Schema
+        </Button>
+        <Button onClick={createNote} disabled={loading}>
+          {loading ? 'Creating...' : 'Create Note'}
+        </Button>
+        <Button
+          variant="secondary"
+          onClick={async () => {
+            setLoading(true);
+            try {
+              const response = await fetch('/api/notes', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  regulationId: parseInt(regulationId),
+                  title,
+                  content,
+                  isPrivate: false,
+                }),
+              });
+
+              setReqResponse({
+                status: response.status,
+                headers: {
+                  contentType: response.headers.get('content-type'),
+                }
+              });
+
+              const data = await response.json();
+              setResult(data);
+              setError(null);
+
+              if (!response.ok) {
+                setError(`API Error: ${response.status} - ${data.error || 'Unknown error'}`);
+              } else {
+                toast({
+                  title: "Success",
+                  description: "Note created successfully",
+                });
+              }
+            } catch (err) {
+              setError(err instanceof Error ? err.message : String(err));
+            } finally {
+              setLoading(false);
+            }
+          }}
+        >
+          Create (Full Debug)
         </Button>
       </CardFooter>
     </Card>

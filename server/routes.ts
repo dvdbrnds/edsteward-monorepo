@@ -384,23 +384,59 @@ export function registerRoutes(app: Express): Server {
   // Debug endpoints
   app.get("/api/debug/note-schemas", (req, res) => {
     try {
+      // Import the debug logger
+      const { DebugLogger } = require('./services/debug-logger');
+      DebugLogger.log('DEBUG_API', 'Checking note schema information');
+      
       // This endpoint helps us debug schema issues
+      let schemaStructure;
+      try {
+        schemaStructure = Object.keys(insertNoteSchema._def?.shape() || {});
+      } catch (e) {
+        schemaStructure = `Error getting schema structure: ${e.message}`;
+      }
+      
+      // Recreate a schema for testing
+      const testSchema = z.object({
+        regulationId: z.number().positive(),
+        userId: z.number().positive(),
+        title: z.string().min(1),
+        content: z.string().min(1),
+        isPrivate: z.boolean().optional()
+      });
+      
+      const testData = {
+        regulationId: 3869,
+        userId: 1,
+        title: "Test Note",
+        content: "Test Content"
+      };
+      
       const schemaInfo = {
-        insertNoteSchema: {
-          shape: Object.keys(insertNoteSchema.shape || {}),
-          safeParse: insertNoteSchema.safeParse({
-            regulationId: 3869,
-            userId: 1,
-            title: "Test Note",
-            content: "Test Content"
-          })
+        originalSchemaType: typeof insertNoteSchema,
+        originalSchemaShape: schemaStructure,
+        testSchemaResult: testSchema.safeParse(testData),
+        originalSchemaTest: insertNoteSchema.safeParse(testData),
+        reconstructedSchema: {
+          description: "Testing if we can create a new schema from scratch",
+          result: z.object({
+            regulationId: z.number().positive(),
+            userId: z.number(),
+            title: z.string().min(1),
+            content: z.string().min(1)
+          }).safeParse(testData)
         }
       };
       
+      DebugLogger.log('DEBUG_API', 'Schema information generated', schemaInfo);
       res.json(schemaInfo);
     } catch (error) {
       console.error("Debug schema error:", error);
-      res.status(500).json({ error: "Failed to get schema info" });
+      res.status(500).json({ 
+        error: "Failed to get schema info", 
+        details: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      });
     }
   });
   
@@ -535,11 +571,11 @@ export function registerRoutes(app: Express): Server {
       DebugLogger.log('NOTES_API', 'Validating note data...');
       
       try {
-        // Add debug to see the schema structure
-        DebugLogger.log('NOTES_API', 'Schema structure:', {
-          regulationId: typeof insertNoteSchema.shape?.regulationId,
-          title: typeof insertNoteSchema.shape?.title,
-          content: typeof insertNoteSchema.shape?.content
+        // Inspect schema for debugging
+        DebugLogger.log('NOTES_API', 'Schema details:', {
+          schemaType: typeof insertNoteSchema,
+          hasShape: !!insertNoteSchema.shape,
+          properties: Object.keys(insertNoteSchema._def?.shape() || {}),
         });
         
         // Add user ID to the data
@@ -552,8 +588,18 @@ export function registerRoutes(app: Express): Server {
         
         // Add try/catch specifically around the schema parsing
         try {
-          // Perform the validation
-          const data = insertNoteSchema.parse(dataWithUserId);
+          // Perform the validation with safe parse to get detailed errors
+          const result = insertNoteSchema.safeParse(dataWithUserId);
+          
+          if (!result.success) {
+            DebugLogger.log('NOTES_API', 'Validation failed with errors:', result.error);
+            return res.status(400).json({
+              error: "Note data validation failed",
+              details: result.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
+            });
+          }
+          
+          const data = result.data;
           DebugLogger.log('NOTES_API', 'Data validation successful:', data);
           
           // Create the note in the database
