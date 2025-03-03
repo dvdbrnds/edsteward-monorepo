@@ -1,4 +1,3 @@
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -71,36 +70,40 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
         },
         body: JSON.stringify(data),
       });
-      
+
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || "Failed to create note");
       }
-      
-      return await response.json();
+      return response.json();
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      // Show success message
       toast({
-        title: "Note saved",
+        title: "Note Saved",
         description: "Your note has been saved successfully.",
+        variant: "default",
       });
+
+      // Reset the form
       form.reset({
         title: "",
         content: "",
         category: "general",
         status: "active",
-        isPrivate: false,
-        regulationId,
+        isPrivate: false
       });
-      queryClient.invalidateQueries({ queryKey: ["/api/notes/regulation", regulationId] });
+
+      // Refetch notes to update the list
+      queryClient.invalidateQueries({ queryKey: ["notes", regulationId] });
     },
     onError: (error) => {
       toast({
-        title: "Error saving note",
-        description: error.message || "An error occurred while saving your note.",
+        title: "Error",
+        description: error.message || "Failed to save note. Please try again.",
         variant: "destructive",
       });
-    },
+    }
   });
 
   const onSubmit = (data: InsertNote) => {
