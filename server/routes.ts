@@ -570,81 +570,52 @@ export function registerRoutes(app: Express): Server {
       // Validate input data
       DebugLogger.log('NOTES_API', 'Validating note data...');
 
-      try {
-        // Inspect schema for debugging
-        DebugLogger.log('NOTES_API', 'Schema details:', {
-          schemaType: typeof insertNoteSchema,
-          hasShape: !!insertNoteSchema.shape,
-          properties: Object.keys(insertNoteSchema._def?.shape() || {}),
+      // Add user ID to the data
+      const dataWithUserId = {
+        ...req.body,
+        userId: req.user.id,
+      };
+
+      DebugLogger.log('NOTES_API', 'Data before processing:', dataWithUserId);
+
+      // Create a simple validation schema directly
+      const noteSchema = z.object({
+        regulationId: z.number().positive("Regulation ID must be positive"),
+        userId: z.number().positive("User ID must be positive"),
+        title: z.string().min(1, "Title is required"),
+        content: z.string().min(1, "Content is required"),
+        category: z.string().default("general"),
+        status: z.string().default("active"),
+        isPrivate: z.boolean().default(false)
+      });
+
+      // Validate with the directly created schema
+      const result = noteSchema.safeParse(dataWithUserId);
+
+      if (!result.success) {
+        DebugLogger.log('NOTES_API', 'Validation failed with errors:', result.error);
+        return res.status(400).json({
+          error: "Note data validation failed",
+          details: result.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
         });
+      }
 
-        // Add user ID to the data
-        const dataWithUserId = {
-          ...req.body,
-          userId: req.user.id,
-        };
+      const validatedData = result.data;
+      DebugLogger.log('NOTES_API', 'Data validation successful:', validatedData);
 
-        DebugLogger.log('NOTES_API', 'Data before validation:', dataWithUserId);
+      // Create the note in the database
+      DebugLogger.log('NOTES_API', 'Creating note in database...');
+      try {
+        const note = await storage.createNote(validatedData);
+        DebugLogger.log('NOTES_API', 'Note created successfully:', note);
 
-        // Add try/catch specifically around the schema parsing
-        try {
-          // Perform the validation with safe parse to get detailed errors
-          const result = insertNoteSchema.safeParse(dataWithUserId);
-
-          if (!result.success) {
-            DebugLogger.log('NOTES_API', 'Validation failed with errors:', result.error);
-            return res.status(400).json({
-              error: "Note data validation failed",
-              details: result.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
-            });
-          }
-
-          const data = result.data;
-          DebugLogger.log('NOTES_API', 'Data validation successful:', data);
-
-          // Create the note in the database
-          DebugLogger.log('NOTES_API', 'Creating note in database...');
-          try {
-            const note = await storage.createNote(data);
-            DebugLogger.log('NOTES_API', 'Note created successfully:', note);
-
-            // Send successful response
-            DebugLogger.logResponse(res, 'NOTES_API', note);
-            return res.status(201).json(note);
-          } catch (storageError) {
-            DebugLogger.logError('NOTES_API_STORAGE', storageError);
-            return res.status(500).json({ 
-              error: "Database operation failed", 
-              details: storageError instanceof Error ? storageError.message : String(storageError)
-            });
-          }
-        } catch (parseError) {
-          DebugLogger.logError('NOTES_API_PARSE', parseError);
-
-          // More detailed error from zod validation
-          const formattedError = parseError instanceof Error ? parseError.message : String(parseError);
-
-          return res.status(400).json({ 
-            error: "Schema validation failed", 
-            details: formattedError
-          });
-        }
-      } catch (validationError) {
-        DebugLogger.logError('NOTES_API_VALIDATION', validationError);
-
-        // More detailed error information for debugging
-        let errorDetails = "Unknown validation error";
-        if (validationError && typeof validationError === 'object' && 'errors' in validationError) {
-          errorDetails = JSON.stringify(validationError.errors);
-        } else if (validationError instanceof Error) {
-          errorDetails = validationError.message;
-        } else {
-          errorDetails = String(validationError);
-        }
-
-        return res.status(400).json({ 
-          error: "Invalid note data", 
-          details: errorDetails
+        // Send successful response
+        return res.status(201).json(note);
+      } catch (storageError) {
+        DebugLogger.logError('NOTES_API_STORAGE', storageError);
+        return res.status(500).json({ 
+          error: "Database operation failed", 
+          details: storageError instanceof Error ? storageError.message : String(storageError)
         });
       }
     } catch (error) {
