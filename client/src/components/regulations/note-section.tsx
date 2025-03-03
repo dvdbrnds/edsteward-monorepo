@@ -238,7 +238,7 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium">Create Regulation Diary Entry</h3> {/* Changed header text */}
+        <h3 className="text-lg font-medium">Create Regulation Diary Entry</h3>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-2">
             <FormField
@@ -280,7 +280,7 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
               disabled={createMutation.isPending}
               className="mt-2"
             >
-              {createMutation.isPending ? "Saving..." : "Save Entry"} {/* Changed button text */}
+              {createMutation.isPending ? "Saving..." : "Save Entry"}
             </Button>
           </form>
         </Form>
@@ -288,7 +288,7 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
 
       <div>
         <h3 className="text-lg font-medium mb-4">Diary</h3>
-        <p className="text-sm text-muted-foreground mb-4">This is where compliance officers and administrators can document how your institution addresses this regulation requirement.</p>
+        <p className="text-sm text-muted-foreground mb-4">Keep track of important updates, compliance status, and deadlines for this regulation. This is where compliance officers and administrators can document how your institution addresses this requirement.</p>
         {isLoading ? (
           <p>Loading entries...</p>
         ) : error ? (
