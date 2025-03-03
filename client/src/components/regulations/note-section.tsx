@@ -335,26 +335,7 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
               />
             </div>
 
-            <FormField
-              control={form.control}
-              name="isPrivate"
-              render={({ field }) => (
-                <FormItem className="flex flex-row items-center space-x-3 space-y-0">
-                  <FormControl>
-                    <Switch
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <div className="space-y-1 leading-none">
-                    <FormLabel>Private Note</FormLabel>
-                    <p className="text-sm text-muted-foreground">
-                      Only you will be able to see this note
-                    </p>
-                  </div>
-                </FormItem>
-              )}
-            />
+            {/* Private note switch temporarily removed */}
 
             <Button
               type="submit"
