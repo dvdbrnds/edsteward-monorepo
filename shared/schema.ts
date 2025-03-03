@@ -115,19 +115,10 @@ export const insertUserSchema = createInsertSchema(users).extend({
 
 // Notes insertion schema with detailed logging
 console.log("Creating note insertion schema with validation rules");
-export const insertNoteSchema = createInsertSchema(notes, {
-  regulationId: (schema) => {
-    console.log("Adding regulation ID validation: must be positive");
-    return schema.regulationId.positive("Regulation ID must be a positive number");
-  },
-  title: (schema) => {
-    console.log("Adding title validation: minimum length 1");
-    return schema.title.min(1, "Title is required");
-  },
-  content: (schema) => {
-    console.log("Adding content validation: minimum length 1");
-    return schema.content.min(1, "Content is required");
-  },
+export const insertNoteSchema = createInsertSchema(notes).extend({
+  regulationId: z.number().positive("Regulation ID must be a positive number"),
+  title: z.string().min(1, "Title is required"),
+  content: z.string().min(1, "Content is required"),
 });
 console.log("Note insertion schema created successfully");
 
