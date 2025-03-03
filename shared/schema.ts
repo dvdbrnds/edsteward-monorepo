@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, date, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, timestamp, boolean, date, jsonb } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -10,6 +10,20 @@ export const users = pgTable("users", {
   role: text("role").notNull().default("user"),
   department: text("department"),
   email: text("email").notNull(),
+});
+
+// Add notes table after users table
+export const notes = pgTable("notes", {
+  id: serial("id").primaryKey(),
+  regulationId: integer("regulation_id").notNull(),
+  userId: integer("user_id").notNull(),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  category: text("category").notNull().default("general"),
+  status: text("status").notNull().default("active"),
+  isPrivate: boolean("is_private").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
 // Regulations table
@@ -95,6 +109,15 @@ export const insertUserSchema = createInsertSchema(users).extend({
   role: z.enum(["admin", "compliance_officer", "user"]),
   department: z.string().optional(),
   email: z.string().email(),
+});
+
+// Add notes schema after user schema
+export const insertNoteSchema = createInsertSchema(notes).extend({
+  title: z.string().min(1, "Title is required"),
+  content: z.string().min(1, "Note content cannot be empty"),
+  category: z.enum(["general", "compliance", "deadline", "update", "question"]),
+  status: z.enum(["active", "archived", "resolved"]),
+  isPrivate: z.boolean().default(false),
 });
 
 // Schema for inserting regulations
@@ -310,3 +333,5 @@ export type Guide = typeof guides.$inferSelect;
 export type InsertGuide = z.infer<typeof insertGuideSchema>;
 export type TwilioConfig = typeof twilioConfigs.$inferSelect;
 export type InsertTwilioConfig = z.infer<typeof insertTwilioConfigSchema>;
+export type Note = typeof notes.$inferSelect;
+export type InsertNote = z.infer<typeof insertNoteSchema>;

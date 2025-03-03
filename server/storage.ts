@@ -1,4 +1,4 @@
-import { users, regulations, notifications, deadlines, guides, csvSchemas, validationRules, fieldMappings } from "@shared/schema";
+import { users, regulations, notifications, deadlines, guides, csvSchemas, validationRules, fieldMappings, notes } from "@shared/schema";
 import type {
   User,
   InsertUser,
@@ -16,9 +16,11 @@ import type {
   InsertValidationRule,
   FieldMapping,
   InsertFieldMapping,
+  Note,
+  InsertNote,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
@@ -70,6 +72,14 @@ export interface IStorage {
   // Session store
   sessionStore: session.Store;
   hasAdmin(): Promise<boolean>;
+
+  // Note methods
+  getNotesByRegulation(regulationId: number): Promise<Note[]>;
+  getNotesByUser(userId: number): Promise<Note[]>;
+  getNote(id: number): Promise<Note | undefined>;
+  createNote(note: InsertNote): Promise<Note>;
+  updateNote(id: number, note: Partial<InsertNote>): Promise<Note>;
+  deleteNote(id: number): Promise<void>;
 }
 
 import { emailService } from './services/email';
@@ -298,6 +308,53 @@ export class DatabaseStorage implements IStorage {
     return newMapping;
   }
 
+  async getNotesByRegulation(regulationId: number): Promise<Note[]> {
+    return await db
+      .select()
+      .from(notes)
+      .where(eq(notes.regulationId, regulationId))
+      .orderBy(desc(notes.updatedAt));
+  }
+
+  async getNotesByUser(userId: number): Promise<Note[]> {
+    return await db
+      .select()
+      .from(notes)
+      .where(eq(notes.userId, userId))
+      .orderBy(desc(notes.updatedAt));
+  }
+
+  async getNote(id: number): Promise<Note | undefined> {
+    const [note] = await db
+      .select()
+      .from(notes)
+      .where(eq(notes.id, id));
+    return note;
+  }
+
+  async createNote(note: InsertNote): Promise<Note> {
+    const [newNote] = await db
+      .insert(notes)
+      .values(note)
+      .returning();
+    return newNote;
+  }
+
+  async updateNote(id: number, noteData: Partial<InsertNote>): Promise<Note> {
+    const [updatedNote] = await db
+      .update(notes)
+      .set({
+        ...noteData,
+        updatedAt: new Date()
+      })
+      .where(eq(notes.id, id))
+      .returning();
+    return updatedNote;
+  }
+
+  async deleteNote(id: number): Promise<void> {
+    await db.delete(notes).where(eq(notes.id, id));
+  }
   async getRegulationsByJurisdiction(jurisdiction: string): Promise<Regulation[]> {
     console.log(`Fetching regulations with jurisdiction: ${jurisdiction}`);
     const result = await db

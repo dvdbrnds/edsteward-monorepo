@@ -2,7 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
-import { insertRegulationSchema, insertUserSchema } from "@shared/schema";
+import { insertRegulationSchema, insertUserSchema, insertNoteSchema } from "@shared/schema";
 import { z } from "zod";
 import { RegulationValidator } from "./validation";
 import { Request } from "express";
@@ -462,6 +462,110 @@ export function registerRoutes(app: Express): Server {
     });
   });
 
+
+  // Notes endpoints
+  app.get("/api/notes/regulation/:regulationId", async (req, res) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ error: "Must be logged in to view notes" });
+      }
+
+      const regulationId = parseInt(req.params.regulationId);
+      if (isNaN(regulationId)) {
+        return res.status(400).json({ error: "Invalid regulation ID" });
+      }
+
+      const notes = await storage.getNotesByRegulation(regulationId);
+
+      // Filter out private notes that don't belong to the current user
+      const filteredNotes = notes.filter(note =>
+        !note.isPrivate || note.userId === req.user!.id
+      );
+
+      res.json(filteredNotes);
+    } catch (error) {
+      console.error("Failed to fetch notes:", error);
+      res.status(500).json({ error: "Failed to fetch notes" });
+    }
+  });
+
+  app.post("/api/notes", async (req, res) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ error: "Must be logged in to create notes" });
+      }
+
+      const data = insertNoteSchema.parse({
+        ...req.body,
+        userId: req.user.id,
+      });
+
+      const note = await storage.createNote(data);
+      res.status(201).json(note);
+    } catch (error) {
+      console.error("Failed to create note:", error);
+      res.status(500).json({ error: "Failed to create note" });
+    }
+  });
+
+  app.patch("/api/notes/:id", async (req, res) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ error: "Must be logged in to update notes" });
+      }
+
+      const noteId = parseInt(req.params.id);
+      if (isNaN(noteId)) {
+        return res.status(400).json({ error: "Invalid note ID" });
+      }
+
+      const existingNote = await storage.getNote(noteId);
+      if (!existingNote) {
+        return res.status(404).json({ error: "Note not found" });
+      }
+
+      // Only allow note owner or admin to update
+      if (existingNote.userId !== req.user.id && req.user.role !== "admin") {
+        return res.status(403).json({ error: "Not authorized to update this note" });
+      }
+
+      const data = insertNoteSchema.partial().parse(req.body);
+      const note = await storage.updateNote(noteId, data);
+      res.json(note);
+    } catch (error) {
+      console.error("Failed to update note:", error);
+      res.status(500).json({ error: "Failed to update note" });
+    }
+  });
+
+  app.delete("/api/notes/:id", async (req, res) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ error: "Must be logged in to delete notes" });
+      }
+
+      const noteId = parseInt(req.params.id);
+      if (isNaN(noteId)) {
+        return res.status(400).json({ error: "Invalid note ID" });
+      }
+
+      const note = await storage.getNote(noteId);
+      if (!note) {
+        return res.status(404).json({ error: "Note not found" });
+      }
+
+      // Only allow note owner or admin to delete
+      if (note.userId !== req.user.id && req.user.role !== "admin") {
+        return res.status(403).json({ error: "Not authorized to delete this note" });
+      }
+
+      await storage.deleteNote(noteId);
+      res.status(204).send();
+    } catch (error) {
+      console.error("Failed to delete note:", error);
+      res.status(500).json({ error: "Failed to delete note" });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;

@@ -67,9 +67,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import CommentSection from "@/components/regulations/comment-section";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
+import { NoteSection } from "@/components/regulations/note-section";
 
 /**
  * @interface RegulationWithOverride
