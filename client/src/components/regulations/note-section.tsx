@@ -63,19 +63,32 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
 
   const createNoteMutation = useMutation({
     mutationFn: async (data: InsertNote) => {
-      const response = await fetch("/api/notes", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      console.log("Attempting to save note with data:", data);
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Failed to create note");
+      try {
+        const response = await fetch("/api/notes", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        });
+
+        console.log("Note save response status:", response.status);
+
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error("Error saving note:", errorData);
+          throw new Error(errorData.error || "Failed to create note");
+        }
+
+        const responseData = await response.json();
+        console.log("Note saved successfully:", responseData);
+        return responseData;
+      } catch (error) {
+        console.error("Exception during note save:", error);
+        throw error;
       }
-      return response.json();
     },
     onSuccess: (data) => {
       // Show success message

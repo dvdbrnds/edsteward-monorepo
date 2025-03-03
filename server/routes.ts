@@ -491,20 +491,39 @@ export function registerRoutes(app: Express): Server {
 
   app.post("/api/notes", async (req, res) => {
     try {
+      console.log("Note creation request received:", req.body);
+      console.log("User from session:", req.user);
+      
       if (!req.user) {
+        console.log("Note creation rejected: No authenticated user");
         return res.status(401).json({ error: "Must be logged in to create notes" });
       }
 
-      const data = insertNoteSchema.parse({
-        ...req.body,
-        userId: req.user.id,
-      });
-
-      const note = await storage.createNote(data);
-      res.status(201).json(note);
+      try {
+        const data = insertNoteSchema.parse({
+          ...req.body,
+          userId: req.user.id,
+        });
+        
+        console.log("Validated note data:", data);
+        
+        const note = await storage.createNote(data);
+        console.log("Note created successfully:", note);
+        
+        res.status(201).json(note);
+      } catch (validationError) {
+        console.error("Note validation failed:", validationError);
+        return res.status(400).json({ 
+          error: "Invalid note data", 
+          details: validationError instanceof Error ? validationError.message : String(validationError)
+        });
+      }
     } catch (error) {
       console.error("Failed to create note:", error);
-      res.status(500).json({ error: "Failed to create note" });
+      res.status(500).json({ 
+        error: "Failed to create note",
+        details: error instanceof Error ? error.message : "Unknown error"
+      });
     }
   });
 
