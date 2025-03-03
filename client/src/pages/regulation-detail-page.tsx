@@ -603,6 +603,18 @@ export default function RegulationDetailPage() {
                     <GuideContent />
                   </CardContent>
                 </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Notes</CardTitle>
+                    <CardDescription>
+                      Keep track of important updates, compliance status, and deadlines for this regulation
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <NoteSection regulationId={Number(regulationId)} />
+                  </CardContent>
+                </Card>
               </div>
 
               <div className="space-y-6">
