@@ -54,7 +54,14 @@ export default function CommentSection({ regulationId }: CommentSectionProps) {
 
   const createCommentMutation = useMutation({
     mutationFn: async (data: any) => {
-      return apiRequest("POST", "/api/comments", data);
+      if (!user) {
+        throw new Error("Must be logged in to comment");
+      }
+      return apiRequest("POST", "/api/comments", {
+        ...data,
+        userId: user.id,
+        regulationId,
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/comments", regulationId] });
@@ -101,15 +108,15 @@ export default function CommentSection({ regulationId }: CommentSectionProps) {
     );
   }
 
-  const onSubmit = form.handleSubmit((data) => {
+  const onSubmit = (data: any) => {
     createCommentMutation.mutate(data);
-  });
+  };
 
   return (
     <div className="space-y-6">
       {user && (
         <Form {...form}>
-          <form onSubmit={onSubmit} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
               name="content"
