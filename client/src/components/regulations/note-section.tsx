@@ -33,8 +33,6 @@ const noteFormSchema = z.object({
   regulationId: z.number().positive(),
   title: z.string().min(1, "Title is required"),
   content: z.string().min(1, "Content is required"),
-  category: z.string().default("general"),
-  status: z.string().default("active"),
   isPrivate: z.boolean().default(false)
 });
 
@@ -78,8 +76,6 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
       regulationId: regulationId,
       title: "",
       content: "",
-      category: "general",
-      status: "active",
       isPrivate: false
     }
   });
@@ -185,8 +181,6 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
         regulationId: regulationId,
         title: "",
         content: "",
-        category: "general",
-        status: "active",
         isPrivate: false
       });
 
@@ -261,6 +255,8 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
               )}
             />
 
+            {/* Category and status fields removed */}
+
             <FormField
               control={form.control}
               name="content"
@@ -278,63 +274,6 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
                 </FormItem>
               )}
             />
-
-            <div className="flex flex-wrap gap-4">
-              <FormField
-                control={form.control}
-                name="category"
-                render={({ field }) => (
-                  <FormItem className="flex-1 min-w-[200px]">
-                    <FormLabel>Category</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a category" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="general">General</SelectItem>
-                        <SelectItem value="compliance">Compliance</SelectItem>
-                        <SelectItem value="deadline">Deadline</SelectItem>
-                        <SelectItem value="issue">Issue</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="status"
-                render={({ field }) => (
-                  <FormItem className="flex-1 min-w-[200px]">
-                    <FormLabel>Status</FormLabel>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select a status" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        <SelectItem value="active">Active</SelectItem>
-                        <SelectItem value="completed">Completed</SelectItem>
-                        <SelectItem value="archived">Archived</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-
-            {/* Private note switch temporarily removed */}
 
             <Button
               type="submit"
@@ -372,19 +311,12 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
                         {format(new Date(note.updatedAt), "MMM d, yyyy")}
                       </CardDescription>
                     </div>
-                    <div className="flex space-x-2">
-                      <div className="text-xs px-2 py-1 rounded-full bg-muted">
-                        {note.category}
+                    {/* Removed category and status divs */}
+                    {note.isPrivate && (
+                      <div className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800">
+                        Private
                       </div>
-                      <div className="text-xs px-2 py-1 rounded-full bg-muted">
-                        {note.status}
-                      </div>
-                      {note.isPrivate && (
-                        <div className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800">
-                          Private
-                        </div>
-                      )}
-                    </div>
+                    )}
                   </div>
                 </CardHeader>
                 <CardContent>
