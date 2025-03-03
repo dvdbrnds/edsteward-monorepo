@@ -1,3 +1,4 @@
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -54,6 +55,11 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
       if (!response.ok) throw new Error("Failed to fetch notes");
       return response.json();
     },
+    onError: (error) => {
+      console.error("Failed to fetch notes:", error);
+      // Return empty array on error to prevent UI issues
+      return [];
+    }
   });
 
   const createNoteMutation = useMutation({
@@ -65,30 +71,38 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
         },
         body: JSON.stringify(data),
       });
+      
       if (!response.ok) {
         const error = await response.json();
         throw new Error(error.error || "Failed to create note");
       }
-      return response.json();
+      
+      return await response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/notes/regulation", regulationId] });
       toast({
-        title: "Note Created",
+        title: "Note saved",
         description: "Your note has been saved successfully.",
       });
-      form.reset();
+      form.reset({
+        title: "",
+        content: "",
+        category: "general",
+        status: "active",
+        isPrivate: false,
+        regulationId,
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/notes/regulation", regulationId] });
     },
-    onError: (error: Error) => {
+    onError: (error) => {
       toast({
+        title: "Error saving note",
+        description: error.message || "An error occurred while saving your note.",
         variant: "destructive",
-        title: "Error",
-        description: error.message,
       });
     },
   });
 
-  // Add onSubmit function
   const onSubmit = (data: InsertNote) => {
     if (!user) {
       toast({
@@ -110,8 +124,17 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
 
   if (!user) {
     return (
-      <div className="text-center p-4 bg-gray-50 rounded-lg">
-        Please log in to view and create notes.
+      <div className="rounded-md bg-yellow-50 p-4 my-6">
+        <div className="flex">
+          <div className="ml-3">
+            <h3 className="text-sm font-medium text-yellow-800">
+              Authentication Required
+            </h3>
+            <div className="mt-2 text-sm text-yellow-700">
+              <p>You must be logged in to add or view notes.</p>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
@@ -154,61 +177,59 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
             )}
           />
 
-          <div className="flex gap-4">
-            <FormField
-              control={form.control}
-              name="category"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>Category</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a category" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="general">General</SelectItem>
-                      <SelectItem value="compliance">Compliance</SelectItem>
-                      <SelectItem value="deadline">Deadline</SelectItem>
-                      <SelectItem value="update">Update</SelectItem>
-                      <SelectItem value="question">Question</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <FormField
+            control={form.control}
+            name="category"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Category</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="general">General</SelectItem>
+                    <SelectItem value="compliance">Compliance</SelectItem>
+                    <SelectItem value="deadline">Deadline</SelectItem>
+                    <SelectItem value="update">Update</SelectItem>
+                    <SelectItem value="question">Question</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>Status</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a status" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="archived">Archived</SelectItem>
-                      <SelectItem value="resolved">Resolved</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+          <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Status</FormLabel>
+                <Select
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                >
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a status" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="archived">Archived</SelectItem>
+                    <SelectItem value="resolved">Resolved</SelectItem>
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
           <FormField
             control={form.control}
