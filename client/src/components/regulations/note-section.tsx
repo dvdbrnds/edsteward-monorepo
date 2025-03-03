@@ -23,7 +23,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { insertNoteSchema } from "@shared/schema";
-import type { Note } from "@shared/schema";
+import type { Note, InsertNote } from "@shared/schema";
 import { Switch } from "@/components/ui/switch";
 
 interface NoteSectionProps {
@@ -57,16 +57,13 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
   });
 
   const createNoteMutation = useMutation({
-    mutationFn: async (data: any) => {
+    mutationFn: async (data: InsertNote) => {
       const response = await fetch("/api/notes", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          ...data,
-          regulationId,
-        }),
+        body: JSON.stringify(data),
       });
       if (!response.ok) {
         const error = await response.json();
@@ -91,8 +88,24 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
     },
   });
 
-  const onSubmit = (data: any) => {
-    createNoteMutation.mutate(data);
+  // Add onSubmit function
+  const onSubmit = (data: InsertNote) => {
+    if (!user) {
+      toast({
+        title: "Authentication required",
+        description: "You must be logged in to add notes.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Make sure regulationId is included
+    const noteData = {
+      ...data,
+      regulationId,
+    };
+
+    createNoteMutation.mutate(noteData);
   };
 
   if (!user) {
@@ -105,6 +118,8 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
 
   return (
     <div className="space-y-6">
+      <h2 className="text-2xl font-bold">Notes</h2>
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField
