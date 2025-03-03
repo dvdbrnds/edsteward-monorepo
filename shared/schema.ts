@@ -111,20 +111,7 @@ export const insertUserSchema = createInsertSchema(users).extend({
   email: z.string().email(),
 });
 
-// Add notes schema after user schema
-// Notes schema
-export const notes = pgTable("notes", {
-  id: serial("id").primaryKey(),
-  regulationId: integer("regulation_id").notNull(),
-  userId: integer("user_id").notNull(),
-  title: text("title").notNull(),
-  content: text("content").notNull(),
-  category: text("category").notNull().default("general"),
-  status: text("status").notNull().default("active"),
-  isPrivate: boolean("is_private").notNull().default(false),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
+// Notes schema is already defined above
 
 // Notes insertion schema with detailed logging
 console.log("Creating note insertion schema with validation rules");
