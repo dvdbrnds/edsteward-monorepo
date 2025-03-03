@@ -65,30 +65,61 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
     mutationFn: async (data: InsertNote) => {
       console.log("Attempting to save note with data:", data);
 
-      try {
-        const response = await fetch("/api/notes", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(data),
-        });
-
-        console.log("Note save response status:", response.status);
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          console.error("Error saving note:", errorData);
-          throw new Error(errorData.error || "Failed to create note");
-        }
-
-        const responseData = await response.json();
-        console.log("Note saved successfully:", responseData);
-        return responseData;
-      } catch (error) {
-        console.error("Exception during note save:", error);
-        throw error;
+      // Ensure regulationId is a number
+      const numericRegulationId = Number(data.regulationId);
+      if (isNaN(numericRegulationId)) {
+        console.error("Invalid regulation ID:", data.regulationId);
+        throw new Error("Invalid regulation ID. Please try again.");
       }
+
+      const noteData = {
+        ...data,
+        regulationId: numericRegulationId,
+      };
+
+      console.log("Sending POST request to /api/notes with data:", JSON.stringify(noteData));
+
+      const response = await fetch('/api/notes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(noteData),
+        credentials: 'include' // Ensure cookies are sent with the request
+      });
+
+      console.log("Response received:", {
+        status: response.status,
+        statusText: response.statusText,
+        headers: Object.fromEntries([...response.headers.entries()]),
+        ok: response.ok
+      });
+
+      const responseText = await response.text();
+      console.log("Response body:", responseText);
+
+      if (!response.ok) {
+        console.error("Failed to save note:", responseText);
+        let errorMessage = `Failed to save note: ${response.status} ${response.statusText}`;
+        try {
+          const errorData = JSON.parse(responseText);
+          errorMessage = errorData.error || errorMessage;
+        } catch (parseError) {
+          console.error("Error parsing error response:", parseError);
+        }
+        throw new Error(errorMessage);
+      }
+
+      // Parse the response if it's JSON
+      let savedNote;
+      try {
+        savedNote = JSON.parse(responseText);
+        console.log("Note saved successfully:", savedNote);
+      } catch (parseError) {
+        console.error("Error parsing response:", parseError);
+        throw new Error("Received invalid response from server");
+      }
+      return savedNote;
     },
     onSuccess: (data) => {
       // Show success message
@@ -129,13 +160,7 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
       return;
     }
 
-    // Make sure regulationId is included
-    const noteData = {
-      ...data,
-      regulationId,
-    };
-
-    createNoteMutation.mutate(noteData);
+    createNoteMutation.mutate(data);
   };
 
   if (!user) {

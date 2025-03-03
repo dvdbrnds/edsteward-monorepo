@@ -112,13 +112,40 @@ export const insertUserSchema = createInsertSchema(users).extend({
 });
 
 // Add notes schema after user schema
-export const insertNoteSchema = createInsertSchema(notes).extend({
-  title: z.string().min(1, "Title is required"),
-  content: z.string().min(1, "Note content cannot be empty"),
-  category: z.enum(["general", "compliance", "deadline", "update", "question"]),
-  status: z.enum(["active", "archived", "resolved"]),
-  isPrivate: z.boolean().default(false),
+// Notes schema
+export const notes = pgTable("notes", {
+  id: serial("id").primaryKey(),
+  regulationId: integer("regulation_id").notNull(),
+  userId: integer("user_id").notNull(),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  category: text("category").notNull().default("general"),
+  status: text("status").notNull().default("active"),
+  isPrivate: boolean("is_private").notNull().default(false),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
+
+// Notes insertion schema with detailed logging
+console.log("Creating note insertion schema with validation rules");
+export const insertNoteSchema = createInsertSchema(notes, {
+  regulationId: (schema) => {
+    console.log("Adding regulation ID validation: must be positive");
+    return schema.regulationId.positive("Regulation ID must be a positive number");
+  },
+  title: (schema) => {
+    console.log("Adding title validation: minimum length 1");
+    return schema.title.min(1, "Title is required");
+  },
+  content: (schema) => {
+    console.log("Adding content validation: minimum length 1");
+    return schema.content.min(1, "Content is required");
+  },
+});
+console.log("Note insertion schema created successfully");
+
+// Log schema structure for debugging
+console.log("Note schema fields:", Object.keys(notes));
 
 // Schema for inserting regulations
 export const insertRegulationSchema = createInsertSchema(regulations).extend({

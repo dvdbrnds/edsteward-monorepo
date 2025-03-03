@@ -490,41 +490,110 @@ export function registerRoutes(app: Express): Server {
   });
 
   app.post("/api/notes", async (req, res) => {
+    console.log("======= NOTE CREATION REQUEST START =======");
+    console.log("Incoming request data:", {
+      body: req.body,
+      headers: req.headers,
+      cookies: req.cookies,
+      session: req.session,
+      method: req.method,
+      path: req.path
+    });
+    
     try {
-      console.log("Note creation request received:", req.body);
-      console.log("User from session:", req.user);
+      // Check authentication
+      console.log("Checking authentication...");
+      console.log("User in request:", req.user ? {
+        id: req.user.id,
+        username: req.user.username,
+        role: req.user.role
+      } : "No user found");
       
       if (!req.user) {
-        console.log("Note creation rejected: No authenticated user");
+        console.log("Authentication check failed: No user in request");
         return res.status(401).json({ error: "Must be logged in to create notes" });
       }
-
+      
+      console.log("Authentication check passed");
+      
+      // Validate input data
+      console.log("Validating note data...");
       try {
-        const data = insertNoteSchema.parse({
-          ...req.body,
-          userId: req.user.id,
+        // Log the exact schema we're validating against
+        console.log("Schema definition:", {
+          regulationId: "number (required)",
+          title: "string (required)",
+          content: "string (required)",
+          isPrivate: "boolean (optional, default: false)",
+          category: "string (optional, default: 'general')",
+          status: "string (optional, default: 'active')"
         });
         
-        console.log("Validated note data:", data);
+        // Add user ID to the data
+        const dataWithUserId = {
+          ...req.body,
+          userId: req.user.id,
+        };
         
-        const note = await storage.createNote(data);
-        console.log("Note created successfully:", note);
+        console.log("Data before validation:", dataWithUserId);
         
-        res.status(201).json(note);
+        // Perform the validation
+        const data = insertNoteSchema.parse(dataWithUserId);
+        console.log("Data validation successful:", data);
+        
+        // Create the note in the database
+        console.log("Creating note in database...");
+        try {
+          const note = await storage.createNote(data);
+          console.log("Note created successfully:", note);
+          
+          // Send successful response
+          console.log("Sending successful response...");
+          res.status(201).json(note);
+          console.log("Response sent successfully");
+        } catch (storageError) {
+          console.error("Database operation failed:", storageError);
+          return res.status(500).json({ 
+            error: "Database operation failed", 
+            details: storageError instanceof Error ? storageError.message : String(storageError)
+          });
+        }
       } catch (validationError) {
-        console.error("Note validation failed:", validationError);
+        console.error("Validation error details:", validationError);
+        
+        // More detailed error information for debugging
+        let errorDetails = "Unknown validation error";
+        if (validationError && typeof validationError === 'object' && 'errors' in validationError) {
+          errorDetails = JSON.stringify(validationError.errors);
+        } else if (validationError instanceof Error) {
+          errorDetails = validationError.message;
+        } else {
+          errorDetails = String(validationError);
+        }
+        
+        console.log("Sending validation error response:", errorDetails);
         return res.status(400).json({ 
           error: "Invalid note data", 
-          details: validationError instanceof Error ? validationError.message : String(validationError)
+          details: errorDetails
         });
       }
     } catch (error) {
-      console.error("Failed to create note:", error);
+      console.error("Unhandled exception during note creation:", error);
+      
+      let errorMessage = "Unknown error";
+      if (error instanceof Error) {
+        errorMessage = `${error.name}: ${error.message}`;
+        if (error.stack) {
+          console.error("Error stack trace:", error.stack);
+        }
+      }
+      
       res.status(500).json({ 
         error: "Failed to create note",
-        details: error instanceof Error ? error.message : "Unknown error"
+        details: errorMessage
       });
     }
+    console.log("======= NOTE CREATION REQUEST END =======");
   });
 
   app.patch("/api/notes/:id", async (req, res) => {
