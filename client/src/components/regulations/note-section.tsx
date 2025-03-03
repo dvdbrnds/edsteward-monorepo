@@ -63,19 +63,85 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
 
   const createNoteMutation = useMutation({
     mutationFn: async (data: InsertNote) => {
-      console.log("Attempting to save note with data:", data);
+      console.log("NOTE CREATION: Attempting to save note with data:", data);
 
       // Ensure regulationId is a number
       const numericRegulationId = Number(data.regulationId);
       if (isNaN(numericRegulationId)) {
-        console.error("Invalid regulation ID:", data.regulationId);
+        console.error("NOTE CREATION ERROR: Invalid regulation ID:", data.regulationId);
         throw new Error("Invalid regulation ID. Please try again.");
       }
 
+      console.log("NOTE CREATION: Using regulation ID:", numericRegulationId);
+      
       const noteData = {
         ...data,
         regulationId: numericRegulationId,
       };
+      
+      console.log("NOTE CREATION: Final note data:", JSON.stringify(noteData, null, 2));
+      
+      try {
+        const response = await fetch("/api/notes", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(noteData),
+          credentials: "include"
+        });
+        
+        console.log("NOTE CREATION: Response status:", response.status);
+
+  const onSubmit = async (data: InsertNote) => {
+    console.log("NOTE FORM: Submit triggered with data:", data);
+    
+    try {
+      console.log("NOTE FORM: Calling createNoteMutation.mutateAsync");
+      await createNoteMutation.mutateAsync(data);
+      
+      console.log("NOTE FORM: Note created successfully, resetting form");
+      form.reset({
+        title: "",
+        content: "",
+        category: "general",
+        status: "active",
+        isPrivate: false,
+        regulationId,
+      });
+      
+      toast({
+        title: "Note Added",
+        description: "Your note has been added successfully.",
+      });
+      
+      // Refresh the notes list
+      console.log("NOTE FORM: Invalidating query to refresh notes list");
+      queryClient.invalidateQueries({ queryKey: ["/api/notes/regulation", regulationId] });
+    } catch (error) {
+      console.error("NOTE FORM ERROR: Failed to create note:", error);
+      toast({
+        title: "Error",
+        description: error instanceof Error ? error.message : "Failed to create note. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
+
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error("NOTE CREATION ERROR: Server response error:", errorText);
+          throw new Error(`Server error: ${response.status} - ${errorText}`);
+        }
+        
+        const result = await response.json();
+        console.log("NOTE CREATION: Success response:", result);
+        return result;
+      } catch (error) {
+        console.error("NOTE CREATION ERROR: Exception during fetch:", error);
+        throw error;
+      }
 
       console.log("Sending POST request to /api/notes with data:", JSON.stringify(noteData));
 
