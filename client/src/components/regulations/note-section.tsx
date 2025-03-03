@@ -1,4 +1,3 @@
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -124,7 +123,7 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
   const createMutation = useMutation({
     mutationFn: async (noteData: NoteFormValues) => {
       console.log("Creating note with data:", noteData);
-      
+
       try {
         // Send the POST request
         const response = await fetch('/api/notes', {
@@ -206,7 +205,7 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
 
   const onSubmit = (values: NoteFormValues) => {
     console.log("Form submitted with values:", values);
-    
+
     if (!user) {
       console.error("Cannot submit note: User not logged in");
       toast({
@@ -245,7 +244,7 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium">Create Note</h3>
+        <h3 className="text-lg font-medium">Create Regulation Diary Entry</h3> {/* Changed header text */}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-2">
             <FormField
@@ -255,7 +254,7 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
                 <FormItem>
                   <FormLabel>Title</FormLabel>
                   <FormControl>
-                    <Input placeholder="Note title" {...field} />
+                    <Input placeholder="Regulation Diary Entry title" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -342,22 +341,22 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
               disabled={createMutation.isPending}
               className="mt-2"
             >
-              {createMutation.isPending ? "Saving..." : "Save Note"}
+              {createMutation.isPending ? "Saving..." : "Save Entry"} {/* Changed button text */}
             </Button>
           </form>
         </Form>
       </div>
 
       <div>
-        <h3 className="text-lg font-medium mb-4">Notes</h3>
+        <h3 className="text-lg font-medium mb-4">Regulation Diary Entries</h3> {/* Changed header text */}
         {isLoading ? (
-          <p>Loading notes...</p>
+          <p>Loading entries...</p>
         ) : error ? (
           <Alert variant="destructive">
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Error</AlertTitle>
             <AlertDescription>
-              Failed to load notes. Please try again.
+              Failed to load entries. Please try again.
             </AlertDescription>
           </Alert>
         ) : notes && notes.length > 0 ? (
@@ -395,7 +394,7 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
             ))}
           </div>
         ) : (
-          <p className="text-muted-foreground">No notes found for this regulation.</p>
+          <p className="text-muted-foreground">No entries found for this regulation.</p>
         )}
       </div>
     </div>
