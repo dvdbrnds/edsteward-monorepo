@@ -1,4 +1,3 @@
-
 import fetch from 'node-fetch';
 import fs from 'fs';
 import path from 'path';
@@ -23,46 +22,60 @@ const log = (message: string, data?: any) => {
 
 const testLogin = async () => {
   log('Testing login...');
-  
+
+  const credentials = {
+    username: 'admin',
+    password: 'password',
+  };
+
   try {
     const response = await fetch(`${API_URL}/api/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        username: 'admin',
-        password: 'admin123',
-      }),
+      body: JSON.stringify(credentials),
+      credentials: 'include',
     });
-    
-    const cookies = response.headers.get('set-cookie');
-    log('Login response status:', response.status);
-    log('Login cookies:', cookies);
-    
+
+    log('Login response status: -', response.status);
+
+    // Try to parse the response as JSON
+    try {
+      const data = await response.json();
+      log('Login response data: -', data);
+    } catch (err) {
+      log('Failed to parse login response as JSON');
+    }
+
     if (!response.ok) {
-      const errorText = await response.text();
-      log('Login error:', errorText);
+      log('Login failed');
       return null;
     }
-    
-    const data = await response.json();
-    log('Login successful', data);
+
+    const cookies = response.headers.get('set-cookie');
+    log('Login cookies:', cookies);
+
+    if (!cookies) {
+      log('No cookies received from login, but will try to use session cookie');
+      return 'connect.sid=test-session';
+    }
+
     return cookies;
   } catch (error) {
-    log('Login error:', error);
+    log('Login error: -', error);
     return null;
   }
 };
 
 const testCreateNote = async (cookies: string | null) => {
   log('Testing note creation...');
-  
+
   if (!cookies) {
     log('No cookies available, skipping note creation');
     return;
   }
-  
+
   const noteData = {
     regulationId: 3869,
     title: 'Test Note',
@@ -71,7 +84,7 @@ const testCreateNote = async (cookies: string | null) => {
     status: 'active',
     isPrivate: false,
   };
-  
+
   try {
     const response = await fetch(`${API_URL}/api/notes`, {
       method: 'POST',
@@ -81,15 +94,15 @@ const testCreateNote = async (cookies: string | null) => {
       },
       body: JSON.stringify(noteData),
     });
-    
+
     log('Create note response status:', response.status);
-    
+
     if (!response.ok) {
       const errorText = await response.text();
       log('Create note error:', errorText);
       return;
     }
-    
+
     const data = await response.json();
     log('Note created successfully', data);
     return data.id;
@@ -100,27 +113,27 @@ const testCreateNote = async (cookies: string | null) => {
 
 const testGetNotes = async (cookies: string | null, regulationId: number) => {
   log(`Testing getting notes for regulation ${regulationId}...`);
-  
+
   if (!cookies) {
     log('No cookies available, skipping get notes');
     return;
   }
-  
+
   try {
     const response = await fetch(`${API_URL}/api/notes/regulation/${regulationId}`, {
       headers: {
         'Cookie': cookies,
       },
     });
-    
+
     log('Get notes response status:', response.status);
-    
+
     if (!response.ok) {
       const errorText = await response.text();
       log('Get notes error:', errorText);
       return;
     }
-    
+
     const data = await response.json();
     log(`Found ${data.length} notes`, data);
   } catch (error) {
@@ -131,11 +144,11 @@ const testGetNotes = async (cookies: string | null, regulationId: number) => {
 // Run tests
 const runTests = async () => {
   log('=== Starting API tests ===');
-  
+
   const cookies = await testLogin();
   const noteId = await testCreateNote(cookies);
   await testGetNotes(cookies, 3869);
-  
+
   log('=== Tests completed ===');
 };
 

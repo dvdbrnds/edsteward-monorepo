@@ -76,7 +76,7 @@ export interface IStorage {
   // Note methods
   getNotesByRegulation(regulationId: number): Promise<Note[]>;
   getNotesByUser(userId: number): Promise<Note[]>;
-  getNote(id: number): Promise<Note | undefined>;
+  getNote(id: number): Promise<Note | null>;
   createNote(note: InsertNote): Promise<Note>;
   updateNote(id: number, note: Partial<InsertNote>): Promise<Note>;
   deleteNote(id: number): Promise<void>;
@@ -324,12 +324,13 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(notes.updatedAt));
   }
 
-  async getNote(id: number): Promise<Note | undefined> {
-    const [note] = await db
+  async getNote(id: number): Promise<Note | null> {
+    const result = await db
       .select()
       .from(notes)
-      .where(eq(notes.id, id));
-    return note;
+      .where(eq(notes.id, id))
+      .then((res) => res[0]);
+    return result || null;
   }
 
   async createNote(note: InsertNote): Promise<Note> {

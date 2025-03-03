@@ -387,7 +387,7 @@ export function registerRoutes(app: Express): Server {
       // Import the debug logger
       const { DebugLogger } = require('./services/debug-logger');
       DebugLogger.log('DEBUG_API', 'Checking note schema information');
-      
+
       // This endpoint helps us debug schema issues
       let schemaStructure;
       try {
@@ -395,7 +395,7 @@ export function registerRoutes(app: Express): Server {
       } catch (e) {
         schemaStructure = `Error getting schema structure: ${e.message}`;
       }
-      
+
       // Recreate a schema for testing
       const testSchema = z.object({
         regulationId: z.number().positive(),
@@ -404,14 +404,14 @@ export function registerRoutes(app: Express): Server {
         content: z.string().min(1),
         isPrivate: z.boolean().optional()
       });
-      
+
       const testData = {
         regulationId: 3869,
         userId: 1,
         title: "Test Note",
         content: "Test Content"
       };
-      
+
       const schemaInfo = {
         originalSchemaType: typeof insertNoteSchema,
         originalSchemaShape: schemaStructure,
@@ -427,7 +427,7 @@ export function registerRoutes(app: Express): Server {
           }).safeParse(testData)
         }
       };
-      
+
       DebugLogger.log('DEBUG_API', 'Schema information generated', schemaInfo);
       res.json(schemaInfo);
     } catch (error) {
@@ -439,7 +439,7 @@ export function registerRoutes(app: Express): Server {
       });
     }
   });
-  
+
   // Add auth check endpoint
   app.get("/api/auth/check-google-auth", (req, res) => {
     try {
@@ -551,25 +551,25 @@ export function registerRoutes(app: Express): Server {
   app.post("/api/notes", async (req, res) => {
     // Import the debug logger
     const { DebugLogger } = await import('./services/debug-logger');
-    
+
     DebugLogger.log('NOTES_API', '======= NOTE CREATION REQUEST START =======');
     DebugLogger.logRequest(req, 'NOTES_API');
-    
+
     try {
       // Check authentication
       DebugLogger.log('NOTES_API', 'Checking authentication...');
       DebugLogger.log('NOTES_API', 'User in request:', req.user);
-      
+
       if (!req.user) {
         DebugLogger.log('NOTES_API', 'Authentication check failed: No user in request');
         return res.status(401).json({ error: "Must be logged in to create notes" });
       }
-      
+
       DebugLogger.log('NOTES_API', 'Authentication check passed');
-      
+
       // Validate input data
       DebugLogger.log('NOTES_API', 'Validating note data...');
-      
+
       try {
         // Inspect schema for debugging
         DebugLogger.log('NOTES_API', 'Schema details:', {
@@ -577,20 +577,20 @@ export function registerRoutes(app: Express): Server {
           hasShape: !!insertNoteSchema.shape,
           properties: Object.keys(insertNoteSchema._def?.shape() || {}),
         });
-        
+
         // Add user ID to the data
         const dataWithUserId = {
           ...req.body,
           userId: req.user.id,
         };
-        
+
         DebugLogger.log('NOTES_API', 'Data before validation:', dataWithUserId);
-        
+
         // Add try/catch specifically around the schema parsing
         try {
           // Perform the validation with safe parse to get detailed errors
           const result = insertNoteSchema.safeParse(dataWithUserId);
-          
+
           if (!result.success) {
             DebugLogger.log('NOTES_API', 'Validation failed with errors:', result.error);
             return res.status(400).json({
@@ -598,16 +598,16 @@ export function registerRoutes(app: Express): Server {
               details: result.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
             });
           }
-          
+
           const data = result.data;
           DebugLogger.log('NOTES_API', 'Data validation successful:', data);
-          
+
           // Create the note in the database
           DebugLogger.log('NOTES_API', 'Creating note in database...');
           try {
             const note = await storage.createNote(data);
             DebugLogger.log('NOTES_API', 'Note created successfully:', note);
-            
+
             // Send successful response
             DebugLogger.logResponse(res, 'NOTES_API', note);
             return res.status(201).json(note);
@@ -620,10 +620,10 @@ export function registerRoutes(app: Express): Server {
           }
         } catch (parseError) {
           DebugLogger.logError('NOTES_API_PARSE', parseError);
-          
+
           // More detailed error from zod validation
           const formattedError = parseError instanceof Error ? parseError.message : String(parseError);
-          
+
           return res.status(400).json({ 
             error: "Schema validation failed", 
             details: formattedError
@@ -631,7 +631,7 @@ export function registerRoutes(app: Express): Server {
         }
       } catch (validationError) {
         DebugLogger.logError('NOTES_API_VALIDATION', validationError);
-        
+
         // More detailed error information for debugging
         let errorDetails = "Unknown validation error";
         if (validationError && typeof validationError === 'object' && 'errors' in validationError) {
@@ -641,7 +641,7 @@ export function registerRoutes(app: Express): Server {
         } else {
           errorDetails = String(validationError);
         }
-        
+
         return res.status(400).json({ 
           error: "Invalid note data", 
           details: errorDetails
@@ -649,12 +649,12 @@ export function registerRoutes(app: Express): Server {
       }
     } catch (error) {
       DebugLogger.logError('NOTES_API_UNHANDLED', error);
-      
+
       let errorMessage = "Unknown error";
       if (error instanceof Error) {
         errorMessage = `${error.name}: ${error.message}`;
       }
-      
+
       return res.status(500).json({ 
         error: "Failed to create note",
         details: errorMessage
@@ -722,6 +722,44 @@ export function registerRoutes(app: Express): Server {
       res.status(500).json({ error: "Failed to delete note" });
     }
   });
+
+  app.post("/api/auth/login", async (req, res) => {
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+      return res.status(400).json({ error: "Username and password are required" });
+    }
+
+    try {
+      const user = await db
+        .select()
+        .from(users)
+        .where(eq(users.username, username))
+        .then((res) => res[0]);
+
+      if (!user) {
+        return res.status(400).json({ error: "Invalid username or password" });
+      }
+
+      const passwordMatch = await bcrypt.compare(password, user.password);
+
+      if (!passwordMatch) {
+        return res.status(400).json({ error: "Invalid username or password" });
+      }
+
+      const sessionToken = crypto.randomBytes(64).toString("hex");
+
+      req.session.userId = user.id;
+      req.session.role = user.role;
+      req.session.username = user.username;
+
+      return res.status(200).json({ message: "Login successful", user: { id: user.id, username: user.username, role: user.role } });
+    } catch (error) {
+      console.error("Login error:", error);
+      return res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
 
   const httpServer = createServer(app);
   return httpServer;
