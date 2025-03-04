@@ -73,7 +73,7 @@ export default function LogsPage() {
     queryFn: async () => {
       const params = new URLSearchParams();
       if (search) params.append("search", search);
-      if (level) params.append("level", level);
+      if (level && level !== "all") params.append("level", level);
       if (facility) params.append("facility", facility);
       if (startDate) params.append("startDate", startDate.toISOString());
       if (endDate) params.append("endDate", endDate.toISOString());
@@ -128,7 +128,7 @@ export default function LogsPage() {
                   <SelectValue placeholder="Select level" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Levels</SelectItem>
+                  <SelectItem value="all">All Levels</SelectItem>
                   {Object.entries(LOG_LEVELS).map(([value, label]) => (
                     <SelectItem key={value} value={value}>
                       {label}
