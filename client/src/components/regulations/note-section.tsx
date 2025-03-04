@@ -219,6 +219,11 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
                   <h4 className="text-md font-medium">{note.title}</h4>
                   <div className="text-xs text-gray-500">
                     {note.user && `By ${note.user.firstName} ${note.user.lastName}`}
+                    {note.createdAt && (
+                      <span className="ml-2">
+                        {new Date(note.createdAt).toLocaleString()}
+                      </span>
+                    )}
                     {note.isPrivate && <span className="ml-2">(Private)</span>}
                   </div>
                 </div>
