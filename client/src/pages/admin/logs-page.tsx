@@ -228,29 +228,30 @@ export default function LogsPage() {
               >
                 My Activity
               </Button>
-              <Card className="col-span-12 lg:col-span-4">
-                <CardHeader>
-                  <CardTitle>Log Information</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 gap-4">
-                    <p className="text-sm text-muted-foreground">
-                      The system automatically logs all user activities, including:
-                    </p>
-                    <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
-                      <li>Authentication events (login/logout)</li>
-                      <li>Regulation access and updates</li>
-                      <li>Compliance status changes</li>
-                      <li>Report generation</li>
-                      <li>System configuration changes</li>
-                    </ul>
-                    <p className="text-sm text-muted-foreground mt-2">
-                      Use the filters to find specific log entries.
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
             </div>
+          </div>
+
+          {/* Log Information Card - Properly positioned */}
+          <Card className="mb-6 mt-2">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm flex items-center">
+                <Activity className="h-4 w-4 mr-2" />
+                Log Information
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <p className="text-xs text-muted-foreground mb-2">
+                The system automatically logs all user activities, including:
+              </p>
+              <ul className="list-disc pl-5 text-xs text-muted-foreground space-y-1 mb-0">
+                <li>Authentication events (login/logout)</li>
+                <li>Regulation access and updates</li>
+                <li>Compliance status changes</li>
+                <li>Report generation</li>
+                <li>System configuration changes</li>
+              </ul>
+            </CardContent>
+          </Card>
             <div className="space-y-2">
               <label className="text-sm font-medium">Date Range</label>
               <div className="flex gap-2">
