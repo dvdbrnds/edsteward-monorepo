@@ -216,7 +216,42 @@ export default function LogsPage() {
                 }} 
                 variant="outline"
               >
-                Generate Log Events
+                Generate Test Logs
+              </Button>
+              <Button 
+                onClick={async () => {
+                  try {
+                    const response = await fetch('/api/admin/user-activity', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json'
+                      },
+                      body: JSON.stringify({
+                        username: 'dvdbrnds',
+                        activities: [
+                          "Logged in to system",
+                          "Viewed regulation REG1785",
+                          "Updated compliance status for Title IX regulation",
+                          "Added note to ADA compliance record",
+                          "Exported compliance report",
+                          "Updated user profile settings"
+                        ]
+                      })
+                    });
+                    if (response.ok) {
+                      alert('User activity logs generated successfully!');
+                      refetch();
+                    } else {
+                      alert('Failed to generate user activity logs');
+                    }
+                  } catch (error) {
+                    console.error('Error generating user logs:', error);
+                    alert('Error generating user logs');
+                  }
+                }} 
+                variant="outline"
+              >
+                Generate User Activity
               </Button>
             </div>
             <div className="space-y-2">

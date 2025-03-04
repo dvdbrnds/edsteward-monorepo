@@ -1074,6 +1074,39 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Add user activity logs generation endpoint
+  app.post("/api/admin/user-activity", async (req, res) => {
+    try {
+      if (req.user?.role !== "admin") {
+        return res.status(403).json({ error: "Only administrators can generate user activity logs" });
+      }
+
+      const { username, activities } = req.body;
+      
+      if (!username || !activities || !Array.isArray(activities)) {
+        return res.status(400).json({ error: "Invalid request format" });
+      }
+
+      // Log each activity with user information
+      for (const activity of activities) {
+        await syslog.info(activity, { 
+          username: username,
+          user: username,
+          ip: req.ip || req.headers['x-forwarded-for'] || '127.0.0.1',
+          userAgent: req.headers['user-agent'] || 'Unknown',
+          context: 'USER_ACTIVITY',
+          type: 'user_action',
+          test: false
+        });
+      }
+
+      res.json({ message: "User activity logs generated successfully" });
+    } catch (error) {
+      console.error("Failed to generate user activity logs:", error);
+      res.status(500).json({ error: "Failed to generate user activity logs" });
+    }
+  });
+
   // Add logging to the routes for testing
   app.get("/api/test-logs", async (req, res) => {
     try {
