@@ -1,27 +1,17 @@
-
-import fs from 'fs';
-import path from 'path';
+import { syslog, LogLevel, LogFacility } from './syslog';
 import { Request, Response } from 'express';
-
-const LOG_DIR = path.join(process.cwd(), 'logs');
-const DEBUG_LOG_FILE = path.join(LOG_DIR, 'debug.log');
-
-// Ensure log directory exists
-if (!fs.existsSync(LOG_DIR)) {
-  fs.mkdirSync(LOG_DIR, { recursive: true });
-}
 
 export class DebugLogger {
   static log(context: string, message: string, data?: any): void {
-    const timestamp = new Date().toISOString();
-    const logEntry = `[${timestamp}] [${context}] ${message}${data ? ` - ${JSON.stringify(data, null, 2)}` : ''}\n`;
-    
-    console.log(logEntry);
-    
-    // Append to file
-    fs.appendFileSync(DEBUG_LOG_FILE, logEntry);
+    syslog.log(LogFacility.LOCAL0, LogLevel.DEBUG, message, {
+      id: 'DEBUG',
+      parameters: {
+        context,
+        ...(data ? { data: JSON.stringify(data) } : {})
+      }
+    });
   }
-  
+
   static logRequest(req: Request, context: string): void {
     const requestInfo = {
       method: req.method,
@@ -32,26 +22,58 @@ export class DebugLogger {
       query: req.query,
       user: req.user || 'Not authenticated'
     };
-    
-    this.log(context, 'Request received', requestInfo);
+
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Request received: ${req.method} ${req.path}`, {
+      id: 'REQUEST',
+      parameters: {
+        context,
+        requestInfo: JSON.stringify(requestInfo)
+      }
+    });
   }
-  
+
   static logResponse(res: Response, context: string, data: any): void {
     const responseInfo = {
       statusCode: res.statusCode,
       data
     };
-    
-    this.log(context, 'Response sent', responseInfo);
+
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Response sent: ${res.statusCode}`, {
+      id: 'RESPONSE',
+      parameters: {
+        context,
+        responseInfo: JSON.stringify(responseInfo)
+      }
+    });
   }
-  
+
   static logError(context: string, error: any): void {
     const errorInfo = {
       message: error instanceof Error ? error.message : String(error),
       stack: error instanceof Error ? error.stack : undefined,
       name: error instanceof Error ? error.name : 'Unknown Error'
     };
-    
-    this.log(context, 'ERROR', errorInfo);
+
+    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Error in ${context}: ${errorInfo.message}`, {
+      id: 'ERROR',
+      parameters: {
+        context,
+        errorInfo: JSON.stringify(errorInfo)
+      }
+    });
+  }
+
+  static logSecurity(context: string, message: string, data?: any): void {
+    syslog.logSecurityEvent(LogLevel.NOTICE, message, {
+      context,
+      ...(data || {})
+    });
+  }
+
+  static logAudit(context: string, message: string, data?: any): void {
+    syslog.logAuditEvent(LogLevel.INFO, message, {
+      context,
+      ...(data || {})
+    });
   }
 }
