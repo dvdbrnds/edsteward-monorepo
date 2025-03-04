@@ -231,63 +231,42 @@ export default function LogsPage() {
             </div>
           </div>
 
-          {/* Log Information Card - Properly positioned */}
-          <Card className="mb-6 mt-2">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm flex items-center">
-                <Activity className="h-4 w-4 mr-2" />
-                Log Information
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <p className="text-xs text-muted-foreground mb-2">
-                The system automatically logs all user activities, including:
-              </p>
-              <ul className="list-disc pl-5 text-xs text-muted-foreground space-y-1 mb-0">
-                <li>Authentication events (login/logout)</li>
-                <li>Regulation access and updates</li>
-                <li>Compliance status changes</li>
-                <li>Report generation</li>
-                <li>System configuration changes</li>
-              </ul>
-            </CardContent>
-          </Card>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Date Range</label>
-              <div className="flex gap-2">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-start">
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {startDate ? format(startDate, "MMM d, yyyy") : "Start date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={startDate}
-                      onSelect={setStartDate}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button variant="outline" className="w-full justify-start">
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {endDate ? format(endDate, "MMM d, yyyy") : "End date"}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={endDate}
-                      onSelect={setEndDate}
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-              </div>
+          {/* Date range section */}
+          <div className="space-y-2 mb-6">
+            <label className="text-sm font-medium">Date Range</label>
+            <div className="flex gap-2">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-start">
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {startDate ? format(startDate, "MMM d, yyyy") : "Start date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={startDate}
+                    onSelect={setStartDate}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="w-full justify-start">
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {endDate ? format(endDate, "MMM d, yyyy") : "End date"}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={endDate}
+                    onSelect={setEndDate}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
 
@@ -355,6 +334,7 @@ export default function LogsPage() {
                     size="sm"
                     title="Refresh logs"
                   >
+                    <RefreshCw className="h-4 w-4 mr-2" />
                     Refresh
                   </Button>
                   <Button
@@ -377,6 +357,6 @@ export default function LogsPage() {
           )}
         </CardContent>
       </Card>
-    </div>iv>
+    </div>
   );
 }

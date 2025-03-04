@@ -1,4 +1,4 @@
-import type { Express, Request, Response } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
@@ -802,30 +802,29 @@ export function registerRoutes(app: Express): Server {
     const { username, password } = req.body;
     const { DebugLogger } = require('./services/debug-logger');
 
+    // Capture request information
+    const requestInfo = {
+      ip: req.get('x-forwarded-for') || req.ip,
+      userAgent: req.get('user-agent'),
+      hostname: req.hostname,
+      timestamp: new Date().toISOString()
+    };
+
     try {
       DebugLogger.logRequest(req, 'AUTH_LOGIN');
-
-      // Debug log for request information
-      const requestInfo = {
-        ip: req.get('x-forwarded-for') || req.ip,
-        userAgent: req.get('user-agent'),
-        hostname: req.hostname,
-        protocol: req.protocol
-      };
-
       console.log('[AUTH] Login attempt starting:', { username, ...requestInfo });
 
       if (!username || !password) {
-        await syslog.warning("Login attempt with missing credentials", { 
-          username,
+        const authData = {
+          username: username || 'unknown',
           ...requestInfo,
-          context: 'AUTH_LOGIN',
-          type: 'login_attempt'
-        });
-        await DebugLogger.logAuthAttempt('AUTH_LOGIN', false, username || 'unknown', { 
-          reason: 'missing_credentials',
-          ...requestInfo
-        });
+          event: 'login_attempt',
+          status: 'failed',
+          reason: 'missing_credentials'
+        };
+
+        await syslog.logAuthEvent(LogLevel.WARNING, "Login attempt with missing credentials", undefined, username, authData);
+        await DebugLogger.logAuthAttempt('AUTH_LOGIN', false, username || 'unknown', authData);
         return res.status(400).json({ error: "Username and password are required" });
       }
 
@@ -836,34 +835,32 @@ export function registerRoutes(app: Express): Server {
         .then((res) => res[0]);
 
       if (!user) {
-        console.log('[AUTH] User not found:', username);
-        await syslog.warning("Failed login attempt - user not found", { 
+        const authData = {
           username,
           ...requestInfo,
-          context: 'AUTH_LOGIN',
-          type: 'login_failure'
-        });
-        await DebugLogger.logAuthAttempt('AUTH_LOGIN', false, username, { 
-          reason: 'user_not_found',
-          ...requestInfo
-        });
+          event: 'login_attempt',
+          status: 'failed',
+          reason: 'user_not_found'
+        };
+
+        await syslog.logAuthEvent(LogLevel.WARNING, "Failed login attempt - user not found", undefined, username, authData);
+        await DebugLogger.logAuthAttempt('AUTH_LOGIN', false, username, authData);
         return res.status(400).json({ error: "Invalid username or password" });
       }
 
       const passwordMatch = await bcrypt.compare(password, user.password);
 
       if (!passwordMatch) {
-        console.log('[AUTH] Invalid password for user:', username);
-        await syslog.warning("Failed login attempt - incorrect password", { 
+        const authData = {
           username,
           ...requestInfo,
-          context: 'AUTH_LOGIN',
-          type: 'login_failure'
-        });
-        await DebugLogger.logAuthAttempt('AUTH_LOGIN', false, username, { 
-          reason: 'invalid_password',
-          ...requestInfo
-        });
+          event: 'login_attempt',
+          status: 'failed',
+          reason: 'invalid_password'
+        };
+
+        await syslog.logAuthEvent(LogLevel.WARNING, "Failed login attempt - incorrect password", undefined, username, authData);
+        await DebugLogger.logAuthAttempt('AUTH_LOGIN', false, username, authData);
         return res.status(400).json({ error: "Invalid username or password" });
       }
 
@@ -885,9 +882,8 @@ export function registerRoutes(app: Express): Server {
         userId: user.id,
         role: user.role,
         ...requestInfo,
-        context: 'AUTH_LOGIN',
-        type: 'login_success',
-        timestamp: new Date().toISOString()
+        event: 'login',
+        status: 'success'
       };
 
       await syslog.logAuthEvent(LogLevel.INFO, `User ${user.username} logged in successfully`, user.id, user.username, authData);
@@ -904,11 +900,15 @@ export function registerRoutes(app: Express): Server {
         } 
       });
     } catch (error) {
-      console.error("Login error:", error);
-      await syslog.error("Login system error", { 
+      const errorData = {
         error: error instanceof Error ? error.message : String(error),
-        ...requestInfo
-      });
+        ...requestInfo,
+        event: 'login_attempt',
+        status: 'error'
+      };
+
+      console.error("Login error:", error);
+      await syslog.logAuthEvent(LogLevel.ERROR, "Login system error", undefined, username, errorData);
       await DebugLogger.logError('AUTH_LOGIN', error);
       return res.status(500).json({ error: "Internal server error" });
     }
@@ -925,7 +925,8 @@ export function registerRoutes(app: Express): Server {
       const requestInfo = {
         ip: req.get('x-forwarded-for') || req.ip,
         userAgent: req.get('user-agent'),
-        hostname: req.hostname
+        hostname: req.hostname,
+        timestamp: new Date().toISOString()
       };
 
       if (req.session.userId) {
@@ -934,11 +935,16 @@ export function registerRoutes(app: Express): Server {
 
         console.log('[AUTH] Logging out user:', { userId, username, ...requestInfo });
 
-        await syslog.logAuthEvent(LogLevel.INFO, "User logged out", userId, username, requestInfo);
-        await DebugLogger.logAuthAttempt('AUTH_LOGOUT', true, username || 'unknown', { 
+        const authData = {
           userId,
-          ...requestInfo
-        });
+          username,
+          ...requestInfo,
+          event: 'logout',
+          status: 'success'
+        };
+
+        await syslog.logAuthEvent(LogLevel.INFO, "User logged out", userId, username, authData);
+        await DebugLogger.logAuthAttempt('AUTH_LOGOUT', true, username || 'unknown', authData);
       } else {
         console.log('[AUTH] Logout attempt without active session');
         await syslog.warning("Logout attempt without active session", requestInfo);
@@ -952,11 +958,15 @@ export function registerRoutes(app: Express): Server {
         res.status(200).json({ message: "Logged out successfully" });
       });
     } catch (error) {
-      console.error("Logout error:", error);
-      await syslog.error("Logout system error", { 
+      const errorData = {
         error: error instanceof Error ? error.message : String(error),
-        ...requestInfo
-      });
+        ...requestInfo,
+        event: 'logout',
+        status: 'error'
+      };
+
+      console.error("Logout error:", error);
+      await syslog.logAuthEvent(LogLevel.ERROR, "Logout system error", undefined, req.session.username, errorData);
       await DebugLogger.logError('AUTH_LOGOUT', error);
       res.status(500).json({ error: "Internal server error" });
     }
@@ -1132,6 +1142,7 @@ export function registerRoutes(app: Express): Server {
   app.use('/api/auth/login', logUserActivity('Authentication'));
   app.use('/api/auth/logout', logUserActivity('Authentication'));
   
+
   // Log all API requests for comprehensive activity tracking
   app.use('/api/*', async (req, res, next) => {
     if (req.user) {
@@ -1159,6 +1170,7 @@ export function registerRoutes(app: Express): Server {
     next();
   });
   
+
   // Enhanced validation logging
   app.use('/api/regulations/validate', async (req, res, next) => {
     if (req.user) {
