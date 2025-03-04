@@ -608,7 +608,7 @@ export default function RegulationDetailPage() {
                   <CardHeader>
                     <CardTitle>Diary</CardTitle>
                     <CardDescription>
-                      Document and track regulatory compliance activities, updates, and key milestones
+                      Keep a running journal of how this regulation affects your institution. Use this space to document observations, challenges, and progress in meeting compliance requirements.
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
