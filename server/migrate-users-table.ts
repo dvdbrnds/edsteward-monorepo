@@ -78,6 +78,23 @@ async function migrateUsersTable() {
       console.log("external_id column already exists");
     }
     
+    // Check for provider_id column
+    const checkProviderId = await db.execute(sql`
+      SELECT column_name FROM information_schema.columns 
+      WHERE table_name = 'users' AND column_name = 'provider_id'
+    `);
+    
+    if (checkProviderId.rows.length === 0) {
+      console.log("Adding provider_id column...");
+      await db.execute(sql`
+        ALTER TABLE users 
+        ADD COLUMN "provider_id" TEXT
+      `);
+      console.log("Added provider_id column");
+    } else {
+      console.log("provider_id column already exists");
+    }
+    
     console.log("Migration completed successfully");
   } catch (error) {
     console.error("Migration failed:", error);
