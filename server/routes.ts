@@ -1168,6 +1168,226 @@ export function registerRoutes(app: Express): Server {
       res.status(500).json({ error: "Failed to generate specific user logs" });
     }
   });
+  
+  // Add enhanced debug endpoint for user logs with more detailed information
+  app.post("/api/admin/specific-user-logs-debug", async (req, res) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ error: "Must be logged in to generate debug logs" });
+      }
+      
+      console.log("Generating debug logs for user:", req.user);
+      
+      const { debug = true, count = 5 } = req.body;
+      const username = req.user.username;
+      const userId = req.user.id;
+      const timestamp = new Date();
+      const logIds = [];
+      
+      // Log full user information for debugging
+      console.log("User details:", {
+        id: userId,
+        username: username,
+        role: req.user.role,
+        fullDetails: req.user
+      });
+      
+      // First check if we have any existing logs for this user
+      const existingLogs = await db
+        .select({
+          count: sql<number>`count(*)`
+        })
+        .from(systemLogs)
+        .where(
+          or(
+            sql`${systemLogs.structuredData}->>'username' = ${username}`,
+            sql`${systemLogs.structuredData}->>'user' = ${username}`
+          )
+        );
+      
+      const existingCount = Number(existingLogs[0]?.count || 0);
+      console.log(`Found ${existingCount} existing logs for user ${username}`);
+      
+      // Log an auth event with debug flag
+      const authLogId = await syslog.logAuthEvent(
+        LogLevel.INFO, 
+        `DEBUG: User ${username} generated test logs at ${timestamp.toISOString()}`, 
+        userId, 
+        username, 
+        {
+          ip: req.ip || req.headers['x-forwarded-for'] || '127.0.0.1',
+          userAgent: req.headers['user-agent'] || 'Unknown',
+          context: 'DEBUG',
+          type: 'debug_log',
+          debug: true,
+          timestamp: timestamp.toISOString()
+        }
+      );
+      
+      if (authLogId) logIds.push(authLogId);
+      console.log("Generated auth log with ID:", authLogId);
+      
+      // Log a series of debug activities with detailed data
+      const activities = [
+        `DEBUG: User ${username} viewed dashboard`,
+        `DEBUG: User ${username} accessed regulation REG1785 (Age Discrimination Act)`,
+        `DEBUG: User ${username} updated compliance status for Title IX regulation`,
+        `DEBUG: User ${username} added note to compliance record`,
+        `DEBUG: User ${username} exported compliance report at ${timestamp.toISOString()}`,
+        `DEBUG: User ${username} viewed system logs`,
+        `DEBUG: User ${username} created a new filter for federal regulations`,
+        `DEBUG: User ${username} modified settings`,
+        `DEBUG: User ${username} checked deadlines`,
+        `DEBUG: User ${username} submitted bug report`
+      ];
+      
+      // Generate specified number of logs
+      const logsToGenerate = Math.min(count, activities.length);
+      console.log(`Generating ${logsToGenerate} activity logs...`);
+      
+      for (let i = 0; i < logsToGenerate; i++) {
+        const activity = activities[i];
+        const logTime = new Date(timestamp.getTime() + (i * 1000)); // Space logs 1 second apart
+        
+        // Add detailed user data to make sure these logs show up
+        const logId = await syslog.info(activity, {
+          username: username,
+          user: username, 
+          userId: userId,
+          sessionId: req.sessionID,
+          ip: req.ip || req.headers['x-forwarded-for'] || '127.0.0.1',
+          userAgent: req.headers['user-agent'] || 'Unknown',
+          context: 'DEBUG_USER_ACTIVITY',
+          type: 'debug_action',
+          timestamp: logTime.toISOString(),
+          test: false,
+          debug: true
+        });
+        
+        if (logId) logIds.push(logId);
+        console.log(`Generated activity log ID ${logId} for activity: ${activity}`);
+      }
+      
+      // Verify logs were created
+      const newLogs = await db
+        .select({
+          count: sql<number>`count(*)`
+        })
+        .from(systemLogs)
+        .where(
+          or(
+            sql`${systemLogs.structuredData}->>'username' = ${username}`,
+            sql`${systemLogs.structuredData}->>'user' = ${username}`
+          )
+        );
+      
+      const newCount = Number(newLogs[0]?.count || 0);
+      const addedLogs = newCount - existingCount;
+      
+      console.log(`After generating logs: ${newCount} total logs for user ${username} (added ${addedLogs})`);
+      
+      res.json({ 
+        message: "Debug user logs generated successfully",
+        username: username,
+        userId: userId,
+        count: addedLogs,
+        totalUserLogs: newCount,
+        logIds: logIds,
+        requestInfo: {
+          ip: req.ip || req.headers['x-forwarded-for'],
+          userAgent: req.headers['user-agent'],
+          sessionId: req.sessionID
+        }
+      });
+    } catch (error) {
+      console.error("Failed to generate debug user logs:", error);
+      res.status(500).json({ 
+        error: "Failed to generate debug user logs",
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+  
+  // Add debug endpoint to directly check logs for a specific user
+  app.get("/api/admin/debug-user-logs/:username", async (req, res) => {
+    try {
+      // Check if user is admin
+      if (req.user?.role !== "admin") {
+        return res.status(403).json({ error: "Only administrators can access debug logs" });
+      }
+      
+      const { username } = req.params;
+      
+      if (!username) {
+        return res.status(400).json({ error: "Username is required" });
+      }
+      
+      console.log(`Debugging logs for username: ${username}`);
+      
+      // Direct query to find any logs with this username
+      const logs = await db
+        .select({
+          id: systemLogs.id,
+          timestamp: systemLogs.timestamp,
+          facility: systemLogs.facility,
+          severity: systemLogs.severity,
+          message: systemLogs.message,
+          structuredData: systemLogs.structuredData,
+        })
+        .from(systemLogs)
+        .where(
+          or(
+            sql`${systemLogs.structuredData}->>'username' = ${username}`,
+            sql`${systemLogs.structuredData}->>'user' = ${username}`
+          )
+        )
+        .orderBy(desc(systemLogs.timestamp))
+        .limit(20);
+      
+      // Format logs for display
+      const formattedLogs = logs.map(log => ({
+        ...log,
+        timestamp: new Date(log.timestamp).toISOString(),
+        level: LogLevelNames[log.severity as LogLevel] || log.severity,
+        facility: LogFacilityNames[log.facility as LogFacility] || log.facility,
+        structuredUsername: log.structuredData?.username || log.structuredData?.user || null,
+      }));
+      
+      console.log(`Found ${logs.length} logs for user ${username}`);
+      
+      // Also get the database query count
+      const countResult = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(systemLogs)
+        .where(
+          or(
+            sql`${systemLogs.structuredData}->>'username' = ${username}`,
+            sql`${systemLogs.structuredData}->>'user' = ${username}`
+          )
+        );
+      
+      const totalCount = Number(countResult[0]?.count || 0);
+      
+      res.json({
+        username,
+        found: logs.length > 0,
+        totalCount,
+        logs: formattedLogs,
+        query: {
+          conditions: [
+            `systemLogs.structuredData->>'username' = '${username}'`,
+            `systemLogs.structuredData->>'user' = '${username}'`
+          ]
+        }
+      });
+    } catch (error) {
+      console.error("Debug logs error:", error);
+      res.status(500).json({ 
+        error: "Failed to debug user logs",
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
 
   // Add logging to the routes for testing
   app.get("/api/test-logs", async (req, res) => {
