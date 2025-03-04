@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 
 export class DebugLogger {
   static log(context: string, message: string, data?: any): void {
+    console.log(`[DEBUG][${context}] ${message}`, data || '');
     syslog.log(LogFacility.LOCAL0, LogLevel.DEBUG, message, {
       id: 'DEBUG',
       parameters: {
@@ -20,9 +21,15 @@ export class DebugLogger {
       body: req.body,
       params: req.params,
       query: req.query,
-      user: req.user || 'Not authenticated'
+      user: req.user || 'Not authenticated',
+      session: {
+        userId: req.session?.userId,
+        username: req.session?.username,
+        role: req.session?.role
+      }
     };
 
+    console.log(`[REQUEST][${context}] ${req.method} ${req.path}`, requestInfo);
     syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Request received: ${req.method} ${req.path}`, {
       id: 'REQUEST',
       parameters: {
@@ -38,6 +45,7 @@ export class DebugLogger {
       data
     };
 
+    console.log(`[RESPONSE][${context}] Status: ${res.statusCode}`, responseInfo);
     syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Response sent: ${res.statusCode}`, {
       id: 'RESPONSE',
       parameters: {
@@ -54,6 +62,7 @@ export class DebugLogger {
       name: error instanceof Error ? error.name : 'Unknown Error'
     };
 
+    console.error(`[ERROR][${context}]`, errorInfo);
     syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Error in ${context}: ${errorInfo.message}`, {
       id: 'ERROR',
       parameters: {
@@ -64,6 +73,7 @@ export class DebugLogger {
   }
 
   static logSecurity(context: string, message: string, data?: any): void {
+    console.log(`[SECURITY][${context}] ${message}`, data || '');
     syslog.logSecurityEvent(LogLevel.NOTICE, message, {
       context,
       ...(data || {})
@@ -71,9 +81,25 @@ export class DebugLogger {
   }
 
   static logAudit(context: string, message: string, data?: any): void {
+    console.log(`[AUDIT][${context}] ${message}`, data || '');
     syslog.logAuditEvent(LogLevel.INFO, message, {
       context,
       ...(data || {})
     });
+  }
+
+  static async logAuthAttempt(context: string, success: boolean, username: string, data?: any): Promise<void> {
+    const level = success ? LogLevel.INFO : LogLevel.WARNING;
+    const status = success ? "successful" : "failed";
+    const authInfo = {
+      status,
+      username,
+      userId: data?.userId,
+      reason: data?.reason,
+      timestamp: new Date().toISOString()
+    };
+
+    console.log(`[AUTH][${context}] Authentication ${status}`, authInfo);
+    await syslog.logAuthEvent(level, `Authentication ${status} for user ${username}`, data?.userId, username);
   }
 }

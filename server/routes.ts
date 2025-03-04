@@ -1,11 +1,10 @@
-import type { Express } from "express";
+import type { Express, Request, Response } from "express";
 import { createServer, type Server } from "http";
 import { setupAuth } from "./auth";
 import { storage } from "./storage";
 import { insertRegulationSchema, insertUserSchema, insertNoteSchema } from "@shared/schema";
 import { z } from "zod";
 import { RegulationValidator } from "./validation";
-import { Request } from "express";
 import { google } from 'googleapis';
 import { OAuth2Client } from 'google-auth-library';
 import path from 'path';
@@ -69,6 +68,17 @@ declare module 'express-session' {
 
 export function registerRoutes(app: Express): Server {
   setupAuth(app);
+
+  // Add this error handler middleware to catch syslog errors
+  app.use(async (err: Error, req: Request, res: Response, next: Function) => {
+    await syslog.error("Unhandled error", { 
+      error: err.message,
+      stack: err.stack,
+      path: req.path,
+      method: req.method
+    });
+    next(err);
+  });
 
   // User Management Routes
   app.get("/api/admin/users", async (req, res) => {
@@ -279,6 +289,116 @@ export function registerRoutes(app: Express): Server {
     } catch (error) {
       console.error("Validation failed:", error);
       res.status(500).json({ error: "Failed to validate regulations" });
+    }
+  });
+
+  // Update bug report endpoint with better error handling and logging
+  app.post("/api/bug-report", async (req, res) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ error: "Must be logged in to submit bug reports" });
+      }
+
+      if (!req.session.googleTokens) {
+        return res.status(401).json({
+          error: "Google authentication required",
+          needsAuth: true
+        });
+      }
+
+      const { location, comments } = req.body;
+      console.log("Bug report received:", { location, comments, user: req.user.username });
+
+      // Validate required fields
+      if (!comments) {
+        return res.status(400).json({ error: "Comments are required" });
+      }
+
+      // Get the sheet ID from environment variables
+      const sheetId = process.env.GOOGLE_SHEETS_SHEET_ID;
+
+      if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET || !sheetId) {
+        console.error("Missing Google OAuth2 configuration.", {
+          hasClientId: !!process.env.GOOGLE_CLIENT_ID,
+          hasClientSecret: !!process.env.GOOGLE_CLIENT_SECRET,
+          hasSheetId: !!sheetId,
+          allEnvVars: Object.keys(process.env).join(", ")
+        });
+        return res.status(500).json({ error: "Bug report system is not configured" });
+      }
+
+      console.log("Setting up Google Sheets API client...");
+      const auth = getGoogleAuthClient(req);
+      auth.setCredentials(req.session.googleTokens);
+      const sheets = google.sheets({ version: 'v4', auth });
+
+      // Format the data for Google Sheets
+      const timestamp = new Date().toISOString();
+      const values = [[
+        timestamp,
+        req.user.username,
+        location || 'Not specified',
+        comments
+      ]];
+
+      console.log("Attempting to append data to Google Sheet...");
+      console.log("Sheet ID:", sheetId);
+
+      try {
+        // First, check if we can access the spreadsheet
+        const spreadsheet = await sheets.spreadsheets.get({
+          spreadsheetId: sheetId,
+          fields: 'sheets.properties.title'
+        });
+
+        console.log("Spreadsheet access check:", {
+          status: spreadsheet.status,
+          sheetTitles: spreadsheet.data.sheets?.map(s => s.properties?.title)
+        });
+
+        // Get the first sheet name
+        const firstSheetName = spreadsheet.data.sheets?.[0]?.properties?.title || "Sheet1";
+        console.log("Using sheet name:", firstSheetName);
+
+        // Append the data
+        const appendResponse = await sheets.spreadsheets.values.append({
+          spreadsheetId: sheetId,
+          range: `${firstSheetName}!A:D`,
+          valueInputOption: 'USER_ENTERED',
+          requestBody: {
+            values
+          }
+        });
+
+        console.log("Google Sheets API response:", {
+          status: appendResponse.status,
+          data: appendResponse.data
+        });
+
+        res.json({ message: "Bug report submitted successfully" });
+      } catch (error: any) {
+        console.error("Failed to process bug report:", error);
+
+        if (error.response) {
+          console.error("Google Sheets API error details:", {
+            status: error.response.status,
+            data: JSON.stringify(error.response.data),
+            headers: error.response.headers
+          });
+        }
+
+        // Return a user-friendly error message
+        res.status(500).json({
+          error: "Failed to submit bug report",
+          details: error.message || "Unknown error"
+        });
+      }
+    } catch (error) {
+      console.error("Failed to submit bug report:", error);
+      res.status(500).json({
+        error: "Failed to submit bug report",
+        details: "Unknown error"
+      });
     }
   });
 
@@ -661,15 +781,21 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Update auth routes with better logging
   app.post("/api/auth/login", async (req, res) => {
     const { username, password } = req.body;
-
-    if (!username || !password) {
-      await syslog.warning("Login attempt with missing credentials", { username });
-      return res.status(400).json({ error: "Username and password are required" });
-    }
+    const { DebugLogger } = require('./services/debug-logger');
 
     try {
+      DebugLogger.logRequest(req, 'AUTH_LOGIN');
+      console.log('[AUTH] Login attempt starting for user:', username);
+
+      if (!username || !password) {
+        await syslog.warning("Login attempt with missing credentials", { username });
+        await DebugLogger.logAuthAttempt('AUTH_LOGIN', false, username || 'unknown', { reason: 'missing_credentials' });
+        return res.status(400).json({ error: "Username and password are required" });
+      }
+
       const user = await db
         .select()
         .from(users)
@@ -677,24 +803,38 @@ export function registerRoutes(app: Express): Server {
         .then((res) => res[0]);
 
       if (!user) {
+        console.log('[AUTH] User not found:', username);
         await syslog.warning("Failed login attempt - user not found", { username });
+        await DebugLogger.logAuthAttempt('AUTH_LOGIN', false, username, { reason: 'user_not_found' });
         return res.status(400).json({ error: "Invalid username or password" });
       }
 
       const passwordMatch = await bcrypt.compare(password, user.password);
 
       if (!passwordMatch) {
+        console.log('[AUTH] Invalid password for user:', username);
         await syslog.warning("Failed login attempt - incorrect password", { username });
+        await DebugLogger.logAuthAttempt('AUTH_LOGIN', false, username, { reason: 'invalid_password' });
         return res.status(400).json({ error: "Invalid username or password" });
       }
 
       const sessionToken = crypto.randomBytes(64).toString("hex");
+
+      // Log session data before setting
+      console.log('[AUTH] Setting session data:', {
+        userId: user.id,
+        role: user.role,
+        username: user.username
+      });
 
       req.session.userId = user.id;
       req.session.role = user.role;
       req.session.username = user.username;
 
       await syslog.logAuthEvent(LogLevel.INFO, "User logged in successfully", user.id, user.username);
+      await DebugLogger.logAuthAttempt('AUTH_LOGIN', true, username, { userId: user.id });
+
+      console.log('[AUTH] Login successful for user:', username);
 
       return res.status(200).json({ 
         message: "Login successful", 
@@ -707,7 +847,41 @@ export function registerRoutes(app: Express): Server {
     } catch (error) {
       console.error("Login error:", error);
       await syslog.error("Login system error", { error: error instanceof Error ? error.message : String(error) });
+      await DebugLogger.logError('AUTH_LOGIN', error);
       return res.status(500).json({ error: "Internal server error" });
+    }
+  });
+
+  // Add logging to logout route
+  app.post("/api/auth/logout", async (req, res) => {
+    const { DebugLogger } = require('./services/debug-logger');
+
+    try {
+      DebugLogger.logRequest(req, 'AUTH_LOGOUT');
+      console.log('[AUTH] Logout attempt starting');
+
+      if (req.session.userId) {
+        const userId = req.session.userId;
+        const username = req.session.username;
+
+        console.log('[AUTH] Logging out user:', { userId, username });
+
+        await syslog.logAuthEvent(LogLevel.INFO, "User logged out", userId, username);
+        await DebugLogger.logAuthAttempt('AUTH_LOGOUT', true, username || 'unknown', { userId });
+      }
+
+      req.session.destroy((err) => {
+        if (err) {
+          throw err;
+        }
+        console.log('[AUTH] Session destroyed successfully');
+        res.status(200).json({ message: "Logged out successfully" });
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+      await syslog.error("Logout system error", { error: error instanceof Error ? error.message : String(error) });
+      await DebugLogger.logError('AUTH_LOGOUT', error);
+      res.status(500).json({ error: "Internal server error" });
     }
   });
 
@@ -831,7 +1005,7 @@ export function registerRoutes(app: Express): Server {
       syslog.critical("Test critical message", { test: true });
       syslog.error("Test error message", { test: true });
       syslog.warning("Test warning message", { test: true });
-      syslog.notice("Test notice message", { test: true });
+      syslog.notice("Test notice message", { test: true }); 
       syslog.info("Test info message", { test: true });
       syslog.debug("Test debug message", { test: true });
 
