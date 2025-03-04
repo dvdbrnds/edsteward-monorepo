@@ -225,6 +225,7 @@ export default function LogsPage() {
                   <TableHeader>
                     <TableRow>
                       <TableHead>Timestamp</TableHead>
+                      <TableHead>Username</TableHead>
                       <TableHead>Level</TableHead>
                       <TableHead>Facility</TableHead>
                       <TableHead>Message</TableHead>
@@ -237,6 +238,9 @@ export default function LogsPage() {
                       <TableRow key={index}>
                         <TableCell>
                           {format(new Date(log.timestamp), "MMM d, yyyy HH:mm:ss")}
+                        </TableCell>
+                        <TableCell className="font-medium">
+                          {log.username || 'system'}
                         </TableCell>
                         <TableCell className={LOG_LEVELS[log.severity as keyof typeof LOG_LEVELS]?.color || ""}>
                           {LOG_LEVELS[log.severity as keyof typeof LOG_LEVELS]?.name || log.level}
