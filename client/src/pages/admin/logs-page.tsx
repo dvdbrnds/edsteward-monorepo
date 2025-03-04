@@ -196,6 +196,15 @@ export default function LogsPage() {
               </Select>
             </div>
             <div className="flex items-end space-x-2">
+              <Button
+                onClick={() => {
+                  setSearch(`username:${user?.username || 'dvdbrnds'}`);
+                  setPage(1);
+                }}
+                variant="outline"
+              >
+                My Activity
+              </Button>
               <Button 
                 onClick={async () => {
                   try {
