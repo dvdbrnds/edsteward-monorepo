@@ -29,8 +29,11 @@ const noteFormSchema = z.object({
   isPrivate: z.boolean().default(false)
 });
 
-// Try to get the API key from environment variables
+// Try to get the API key from environment variables with fallback strategy
 const apiKey = import.meta.env.VITE_TINY_MCE_API_KEY || '';
+
+// For development, we can use a fallback mechanism if needed
+const useTinyMCE = true; // Set to false to use a simple textarea as fallback
 
 // Log a helpful message if the API key is missing
 if (!apiKey) {
@@ -225,27 +228,33 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
                 <FormItem>
                   <FormLabel>Content</FormLabel>
                   <FormControl>
-                    <Editor
-                      apiKey={apiKey}
+                    {useTinyMCE ? (
+                      <Editor
+                        apiKey={apiKey}
+                        onEditorChange={(content) => {
+                          field.onChange(content);
+                        }}
+                        onError={(e) => {
+                          console.error("TinyMCE error:", e);
+                        }}
                       init={{
                         promotion: false,
                         height: 300,
-                        menubar: true,
+                        menubar: false, // Simplified menu for more stability
                         plugins: [
-                          'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
-                          'preview', 'anchor', 'searchreplace', 'visualblocks', 'code',
-                          'fullscreen', 'insertdatetime', 'media', 'table', 'help', 'wordcount'
-                        ],
+                          'autolink', 'lists', 'link', 
+                          'searchreplace', 'code',
+                          'fullscreen', 'help', 'wordcount'
+                        ], // Reduced plugins for stability
                         toolbar: 'undo redo | blocks | ' +
-                          'bold italic forecolor | alignleft aligncenter ' +
-                          'alignright alignjustify | bullist numlist outdent indent | ' +
+                          'bold italic | bullist numlist | ' +
                           'removeformat | help',
                         content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; }',
-                        // Disable branding notice that appears when API key is invalid
                         branding: false,
-                        // Disable plugins that require a verified API key
+                        statusbar: false, // Hide status bar for cleaner UI
                         setup: (editor) => {
                           editor.on('init', () => {
+</old_str>
                             if (!apiKey) {
                               console.log('TinyMCE running in community mode without an API key');
                             }
@@ -260,6 +269,14 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
                         field.onChange(content);
                       }}
                     />
+                    ) : (
+                      <textarea
+                        className="w-full h-64 p-2 border rounded"
+                        value={field.value}
+                        onChange={(e) => field.onChange(e.target.value)}
+                        placeholder="Enter note content here..."
+                      />
+                    )}
                   </FormControl>
                   <FormMessage />
                 </FormItem>
