@@ -432,8 +432,8 @@ export function registerRoutes(app: Express): Server {
       res.json(schemaInfo);
     } catch (error) {
       console.error("Debug schema error:", error);
-      res.status(500).json({ 
-        error: "Failed to get schema info", 
+      res.status(500).json({
+        error: "Failed to get schema info",
         details: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined
       });
@@ -546,8 +546,7 @@ export function registerRoutes(app: Express): Server {
             return {
               ...note,
               user: noteUser ? {
-                username: noteUser.username,
-                name: noteUser.name
+                username: noteUser.username
               } : undefined
             };
           })
@@ -577,8 +576,7 @@ export function registerRoutes(app: Express): Server {
       const noteWithUser = {
         ...note,
         user: {
-          username: req.user.username,
-          name: req.user.name
+          username: req.user.username
         }
       };
 

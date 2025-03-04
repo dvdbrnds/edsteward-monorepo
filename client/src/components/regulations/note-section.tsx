@@ -5,14 +5,6 @@ import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
-import { Switch } from "@/components/ui/switch";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   Form,
   FormControl,
@@ -21,13 +13,13 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { AlertCircle, Clock } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { z } from "zod";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertCircle, Clock, User } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 // Create a schema for note form validation
 const noteFormSchema = z.object({
@@ -39,28 +31,18 @@ const noteFormSchema = z.object({
 
 type NoteFormValues = z.infer<typeof noteFormSchema>;
 
-// Define Note type
 interface Note {
   id: number;
   regulationId: number;
   userId: number;
   title: string;
   content: string;
-  category: string;
-  status: string;
   isPrivate: boolean;
   createdAt: string;
   updatedAt: string;
   user?: {
     username: string;
-    name: string;
   };
-}
-
-interface User {
-  id: number;
-  username: string;
-  name: string;
 }
 
 type NoteSectionProps = {
@@ -71,6 +53,22 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
   const { toast } = useToast();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+
+  // Get initials from username (e.g., "John Doe" -> "JD", "johndoe" -> "JO")
+  const getInitials = (username?: string) => {
+    if (!username) return "??";
+    // Take first two characters of username if no space
+    if (!username.includes(' ')) {
+      return username.substring(0, 2).toUpperCase();
+    }
+    // Otherwise take first character of each word
+    return username
+      .split(' ')
+      .map(part => part[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
 
   // Form setup
   const form = useForm<NoteFormValues>({
@@ -170,18 +168,6 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
     createMutation.mutate(values);
   };
 
-  // Get initials from username
-  const getInitials = (name?: string) => {
-    if (!name) return "??";
-
-    return name
-      .split(' ')
-      .map(part => part[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
-
   // If user is not logged in, show message
   if (!user) {
     return (
@@ -270,7 +256,7 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
                       <div className="flex items-center gap-3 mt-2">
                         <Avatar className="h-6 w-6">
                           <AvatarFallback className="bg-primary text-xs">
-                            {note.user ? getInitials(note.user.name) : "?? "}
+                            {getInitials(note.user?.username)}
                           </AvatarFallback>
                         </Avatar>
                         <CardDescription className="flex items-center">
