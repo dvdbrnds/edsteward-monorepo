@@ -84,7 +84,7 @@ export default function LogsPage() {
   const [endDate, setEndDate] = useState<Date>();
   const [page, setPage] = useState(1);
 
-  const { data, isLoading, error } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["/api/admin/logs", { search, level, facility, startDate, endDate, page }],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -129,13 +129,39 @@ export default function LogsPage() {
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div className="lg:col-span-4 flex justify-end">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => {
+                  setSearch("");
+                  setLevel(undefined);
+                  setFacility(undefined);
+                  setStartDate(undefined);
+                  setEndDate(undefined);
+                  setPage(1);
+                }}
+              >
+                Clear All Filters
+              </Button>
+            </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Search</label>
-              <Input
-                placeholder="Search logs..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-              />
+              <div className="flex space-x-2">
+                <Input
+                  placeholder="Search logs..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                />
+                <Button 
+                  variant="outline" 
+                  onClick={() => setSearch("dvdbrnds")}
+                  title="Show only your logs"
+                  size="sm"
+                >
+                  My Activity
+                </Button>
+              </div>
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Log Level</label>
@@ -168,6 +194,30 @@ export default function LogsPage() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="flex items-end space-x-2">
+              <Button 
+                onClick={async () => {
+                  try {
+                    const response = await fetch('/api/admin/generate-test-logs', {
+                      method: 'POST',
+                    });
+                    if (response.ok) {
+                      alert('Log events generated successfully!');
+                      // Refresh data
+                      refetch();
+                    } else {
+                      alert('Failed to generate log events');
+                    }
+                  } catch (error) {
+                    console.error('Error generating logs:', error);
+                    alert('Error generating logs');
+                  }
+                }} 
+                variant="outline"
+              >
+                Generate Log Events
+              </Button>
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Date Range</label>
@@ -266,6 +316,14 @@ export default function LogsPage() {
                   Showing {data?.logs.length} of {data?.total} logs
                 </div>
                 <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => refetch()}
+                    size="sm"
+                    title="Refresh logs"
+                  >
+                    Refresh
+                  </Button>
                   <Button
                     variant="outline"
                     disabled={page === 1}
