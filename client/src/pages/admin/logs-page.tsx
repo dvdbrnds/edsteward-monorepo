@@ -1,6 +1,9 @@
+import { useState, useEffect } from "react";
+import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { useState, useEffect } from "react";
+import Navigation from "@/components/layout/navigation";
+import { PageLayout } from "@/components/layout/page-layout";
 import {
   Card,
   CardContent,
@@ -31,9 +34,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useAuth } from "@/hooks/use-auth";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, Calendar as CalendarIcon, RefreshCw, Activity } from "lucide-react";
+import { AlertCircle, Calendar as CalendarIcon, RefreshCw } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 
 // Map log levels to human-readable names and colors
@@ -118,245 +120,251 @@ export default function LogsPage() {
 
   if (user?.role !== "admin") {
     return (
-      <div className="p-4">
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Access Denied</AlertTitle>
-          <AlertDescription>
-            Only administrators can access the system logs.
-          </AlertDescription>
-        </Alert>
-      </div>
+      <PageLayout>
+        <Navigation />
+        <div className="p-4">
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Access Denied</AlertTitle>
+            <AlertDescription>
+              Only administrators can access the system logs.
+            </AlertDescription>
+          </Alert>
+        </div>
+      </PageLayout>
     );
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-8">
-      <Card>
-        <CardHeader className="pb-2">
-          <CardTitle>System Logs</CardTitle>
-          <CardDescription>
-            View and filter system logs. Use the filters below to narrow down the results.
-          </CardDescription>
-          <div className="text-xs text-muted-foreground mt-1 flex flex-wrap gap-x-4 gap-y-1 border rounded-md p-2 bg-muted/20">
-            <span>• Authentication events (login/logout)</span>
-            <span>• Regulation access and updates</span>
-            <span>• Compliance status changes</span>
-            <span>• Report generation</span>
-            <span>• System configuration changes</span>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-2 mb-4 flex-wrap items-center">
-            <Button 
-              variant="outline" 
-              size="sm"
-              className="ml-auto"
-              onClick={() => {
-                setSearch("");
-                setLevel(undefined);
-                setFacility(undefined);
-                setStartDate(undefined);
-                setEndDate(undefined);
-                setPage(1);
-              }}
-            >
-              Clear All Filters
-            </Button>
-            <Switch checked={autoRefresh} onCheckedChange={setAutoRefresh}>
-              Auto Refresh
-            </Switch>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Search</label>
-              <div className="flex space-x-2">
-                <Input
-                  placeholder="Search logs..."
-                  value={search}
-                  onChange={(e) => setSearch(e.target.value)}
-                />
-                <Button 
-                  variant="outline" 
-                  onClick={() => setSearch("")}
-                  title="Show all logs"
-                  size="sm"
+    <PageLayout>
+      <Navigation />
+      <div className="container mx-auto py-8 space-y-8">
+        <Card>
+          <CardHeader className="pb-2">
+            <CardTitle>System Logs</CardTitle>
+            <CardDescription>
+              View and filter system logs. Use the filters below to narrow down the results.
+            </CardDescription>
+            <div className="text-xs text-muted-foreground mt-1 flex flex-wrap gap-x-4 gap-y-1 border rounded-md p-2 bg-muted/20">
+              <span>• Authentication events (login/logout)</span>
+              <span>• Regulation access and updates</span>
+              <span>• Compliance status changes</span>
+              <span>• Report generation</span>
+              <span>• System configuration changes</span>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="flex gap-2 mb-4 flex-wrap items-center">
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="ml-auto"
+                onClick={() => {
+                  setSearch("");
+                  setLevel(undefined);
+                  setFacility(undefined);
+                  setStartDate(undefined);
+                  setEndDate(undefined);
+                  setPage(1);
+                }}
+              >
+                Clear All Filters
+              </Button>
+              <Switch checked={autoRefresh} onCheckedChange={setAutoRefresh}>
+                Auto Refresh
+              </Switch>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Search</label>
+                <div className="flex space-x-2">
+                  <Input
+                    placeholder="Search logs..."
+                    value={search}
+                    onChange={(e) => setSearch(e.target.value)}
+                  />
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setSearch("")}
+                    title="Show all logs"
+                    size="sm"
+                  >
+                    All Logs
+                  </Button>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Log Level</label>
+                <Select value={level} onValueChange={setLevel}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select level" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Levels</SelectItem>
+                    {Object.entries(LOG_LEVELS).map(([value, { name }]) => (
+                      <SelectItem key={value} value={value}>
+                        {name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Facility</label>
+                <Select value={facility} onValueChange={setFacility}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select facility" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Facilities</SelectItem>
+                    {Object.entries(LOG_FACILITIES).map(([value, label]) => (
+                      <SelectItem key={value} value={value}>
+                        {label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="flex items-end space-x-2">
+                <Button
+                  onClick={() => {
+                    setSearch(`username:${user?.username || 'dvdbrnds'}`);
+                    setPage(1);
+                  }}
+                  variant="outline"
                 >
-                  All Logs
+                  My Activity
                 </Button>
               </div>
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Log Level</label>
-              <Select value={level} onValueChange={setLevel}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select level" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Levels</SelectItem>
-                  {Object.entries(LOG_LEVELS).map(([value, { name }]) => (
-                    <SelectItem key={value} value={value}>
-                      {name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Facility</label>
-              <Select value={facility} onValueChange={setFacility}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Select facility" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Facilities</SelectItem>
-                  {Object.entries(LOG_FACILITIES).map(([value, label]) => (
-                    <SelectItem key={value} value={value}>
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex items-end space-x-2">
-              <Button
-                onClick={() => {
-                  setSearch(`username:${user?.username || 'dvdbrnds'}`);
-                  setPage(1);
-                }}
-                variant="outline"
-              >
-                My Activity
-              </Button>
-            </div>
-          </div>
 
-          {/* Date range section */}
-          <div className="space-y-2 mb-6">
-            <label className="text-sm font-medium">Date Range</label>
-            <div className="flex gap-2">
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full justify-start">
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {startDate ? format(startDate, "MMM d, yyyy") : "Start date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={startDate}
-                    onSelect={setStartDate}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button variant="outline" className="w-full justify-start">
-                    <CalendarIcon className="mr-2 h-4 w-4" />
-                    {endDate ? format(endDate, "MMM d, yyyy") : "End date"}
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-auto p-0" align="start">
-                  <Calendar
-                    mode="single"
-                    selected={endDate}
-                    onSelect={setEndDate}
-                    initialFocus
-                  />
-                </PopoverContent>
-              </Popover>
+            {/* Date range section */}
+            <div className="space-y-2 mb-6">
+              <label className="text-sm font-medium">Date Range</label>
+              <div className="flex gap-2">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full justify-start">
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {startDate ? format(startDate, "MMM d, yyyy") : "Start date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={startDate}
+                      onSelect={setStartDate}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline" className="w-full justify-start">
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {endDate ? format(endDate, "MMM d, yyyy") : "End date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={endDate}
+                      onSelect={setEndDate}
+                      initialFocus
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
             </div>
-          </div>
 
-          {isLoading ? (
-            <div className="text-center py-8">Loading logs...</div>
-          ) : error ? (
-            <Alert variant="destructive">
-              <AlertCircle className="h-4 w-4" />
-              <AlertTitle>Error</AlertTitle>
-              <AlertDescription>
-                Failed to load logs. Please try again.
-              </AlertDescription>
-            </Alert>
-          ) : (
-            <>
-              <div className="rounded-md border">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Timestamp</TableHead>
-                      <TableHead>Username</TableHead>
-                      <TableHead>Level</TableHead>
-                      <TableHead>Facility</TableHead>
-                      <TableHead>Message</TableHead>
-                      <TableHead>IP Address</TableHead>
-                      <TableHead>User Agent</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {data?.logs.map((log: any, index: number) => (
-                      <TableRow key={index}>
-                        <TableCell>
-                          {format(new Date(log.timestamp), "MMM d, yyyy HH:mm:ss")}
-                        </TableCell>
-                        <TableCell className="font-medium">
-                          {log.username || 'system'}
-                        </TableCell>
-                        <TableCell className={LOG_LEVELS[log.severity as keyof typeof LOG_LEVELS]?.color || ""}>
-                          {LOG_LEVELS[log.severity as keyof typeof LOG_LEVELS]?.name || log.level}
-                        </TableCell>
-                        <TableCell>{LOG_FACILITIES[log.facility as keyof typeof LOG_FACILITIES] || log.facility}</TableCell>
-                        <TableCell className="font-mono text-sm whitespace-pre-wrap max-w-md">
-                          {log.message}
-                        </TableCell>
-                        <TableCell className="font-mono text-sm">
-                          {log.ip}
-                        </TableCell>
-                        <TableCell className="font-mono text-sm truncate max-w-xs" title={log.userAgent}>
-                          {log.userAgent}
-                        </TableCell>
+            {isLoading ? (
+              <div className="text-center py-8">Loading logs...</div>
+            ) : error ? (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>
+                  Failed to load logs. Please try again.
+                </AlertDescription>
+              </Alert>
+            ) : (
+              <>
+                <div className="rounded-md border">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Timestamp</TableHead>
+                        <TableHead>Username</TableHead>
+                        <TableHead>Level</TableHead>
+                        <TableHead>Facility</TableHead>
+                        <TableHead>Message</TableHead>
+                        <TableHead>IP Address</TableHead>
+                        <TableHead>User Agent</TableHead>
                       </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </div>
+                    </TableHeader>
+                    <TableBody>
+                      {data?.logs.map((log: any, index: number) => (
+                        <TableRow key={index}>
+                          <TableCell>
+                            {format(new Date(log.timestamp), "MMM d, yyyy HH:mm:ss")}
+                          </TableCell>
+                          <TableCell className="font-medium">
+                            {log.username || 'system'}
+                          </TableCell>
+                          <TableCell className={LOG_LEVELS[log.severity as keyof typeof LOG_LEVELS]?.color || ""}>
+                            {LOG_LEVELS[log.severity as keyof typeof LOG_LEVELS]?.name || log.level}
+                          </TableCell>
+                          <TableCell>{LOG_FACILITIES[log.facility as keyof typeof LOG_FACILITIES] || log.facility}</TableCell>
+                          <TableCell className="font-mono text-sm whitespace-pre-wrap max-w-md">
+                            {log.message}
+                          </TableCell>
+                          <TableCell className="font-mono text-sm">
+                            {log.ip}
+                          </TableCell>
+                          <TableCell className="font-mono text-sm truncate max-w-xs" title={log.userAgent}>
+                            {log.userAgent}
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
 
-              <div className="mt-4 flex justify-between items-center">
-                <div className="text-sm text-muted-foreground">
-                  Showing {data?.logs.length} of {data?.total} logs
+                <div className="mt-4 flex justify-between items-center">
+                  <div className="text-sm text-muted-foreground">
+                    Showing {data?.logs.length} of {data?.total} logs
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => refetch()}
+                      size="sm"
+                      title="Refresh logs"
+                    >
+                      <RefreshCw className="h-4 w-4 mr-2" />
+                      Refresh
+                    </Button>
+                    <Button
+                      variant="outline"
+                      disabled={page === 1}
+                      onClick={() => setPage(p => p - 1)}
+                    >
+                      Previous
+                    </Button>
+                    <Button
+                      variant="outline"
+                      disabled={page === data?.totalPages}
+                      onClick={() => setPage(p => p + 1)}
+                    >
+                      Next
+                    </Button>
+                  </div>
                 </div>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => refetch()}
-                    size="sm"
-                    title="Refresh logs"
-                  >
-                    <RefreshCw className="h-4 w-4 mr-2" />
-                    Refresh
-                  </Button>
-                  <Button
-                    variant="outline"
-                    disabled={page === 1}
-                    onClick={() => setPage(p => p - 1)}
-                  >
-                    Previous
-                  </Button>
-                  <Button
-                    variant="outline"
-                    disabled={page === data?.totalPages}
-                    onClick={() => setPage(p => p + 1)}
-                  >
-                    Next
-                  </Button>
-                </div>
-              </div>
-            </>
-          )}
-        </CardContent>
-      </Card>
-    </div>
+              </>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+    </PageLayout>
   );
 }
