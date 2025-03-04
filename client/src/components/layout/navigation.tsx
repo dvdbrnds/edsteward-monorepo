@@ -52,7 +52,10 @@ const CHANGELOG = [
       "Added CSV export functionality to system logs for administrators",
       "Enhanced system logs display with improved column formatting",
       "Added IP address and user agent tracking to log entries",
-      "Improved log entry readability with color-coded severity levels"
+      "Improved log entry readability with color-coded severity levels",
+      "Replaced deprecated comments section with comprehensive diary functionality",
+      "Added structured diary entries for better compliance tracking",
+      "Implemented automated diary entry timestamps and user attribution"
     ],
   },
   {

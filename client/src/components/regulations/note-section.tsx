@@ -3,8 +3,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
+import { Editor } from '@tinymce/tinymce-react';
 import {
   Form,
   FormControl,
@@ -182,7 +182,7 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
   if (!user) {
     return (
       <div className="p-4">
-        <Alert variant="warning">
+        <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Authentication Required</AlertTitle>
           <AlertDescription>
@@ -220,10 +220,25 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
                 <FormItem>
                   <FormLabel>Content</FormLabel>
                   <FormControl>
-                    <Textarea
-                      placeholder="Add your notes here..."
-                      className="min-h-[100px]"
-                      {...field}
+                    <Editor
+                      apiKey="no-api-key"
+                      init={{
+                        height: 300,
+                        menubar: false,
+                        plugins: [
+                          'advlist', 'autolink', 'lists', 'link', 'charmap',
+                          'searchreplace', 'emoticons', 'paste', 'table'
+                        ],
+                        toolbar: 'undo redo | formatselect | ' +
+                          'bold italic | alignleft aligncenter ' +
+                          'alignright alignjustify | bullist numlist | ' +
+                          'removeformat | help',
+                        content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; }'
+                      }}
+                      value={field.value}
+                      onEditorChange={(content) => {
+                        field.onChange(content);
+                      }}
                     />
                   </FormControl>
                   <FormMessage />
@@ -283,7 +298,10 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <p className="whitespace-pre-wrap">{note.content}</p>
+                  <div 
+                    className="prose prose-sm max-w-none"
+                    dangerouslySetInnerHTML={{ __html: note.content }}
+                  />
                 </CardContent>
               </Card>
             ))}
