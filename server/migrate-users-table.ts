@@ -112,6 +112,23 @@ async function migrateUsersTable() {
       console.log("identity_provider column already exists");
     }
     
+    // Check for last_login column
+    const checkLastLogin = await db.execute(sql`
+      SELECT column_name FROM information_schema.columns 
+      WHERE table_name = 'users' AND column_name = 'last_login'
+    `);
+    
+    if (checkLastLogin.rows.length === 0) {
+      console.log("Adding last_login column...");
+      await db.execute(sql`
+        ALTER TABLE users 
+        ADD COLUMN "last_login" TIMESTAMP
+      `);
+      console.log("Added last_login column");
+    } else {
+      console.log("last_login column already exists");
+    }
+    
     console.log("Migration completed successfully");
   } catch (error) {
     console.error("Migration failed:", error);
