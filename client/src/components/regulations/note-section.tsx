@@ -179,6 +179,7 @@ export function NoteSection({ onSubmit, initialData, isSubmitting = false }: Not
             )}
           />
 
+          {/* Private note option temporarily removed 
           <FormField
             control={form.control}
             name="isPrivate"
@@ -199,6 +200,7 @@ export function NoteSection({ onSubmit, initialData, isSubmitting = false }: Not
               </FormItem>
             )}
           />
+          */}
 
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Saving..." : "Save Note"}
