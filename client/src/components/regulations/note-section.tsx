@@ -97,7 +97,7 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
   });
 
   // Query for fetching notes
-  const { data: notes, isLoading, error, refetch } = useQuery<Note[]>({
+  const { data: notes, isLoading, error } = useQuery<Note[]>({
     queryKey: ["notes", regulationId],
     queryFn: async () => {
       if (!user) {
@@ -131,10 +131,7 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          ...noteData,
-          regulationId,
-        }),
+        body: JSON.stringify(noteData),
         credentials: 'include'
       });
 
@@ -159,7 +156,7 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
         isPrivate: false
       });
 
-      refetch();
+      queryClient.invalidateQueries({ queryKey: ["notes", regulationId] });
     },
     onError: (error: any) => {
       toast({
@@ -228,17 +225,22 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
                     <Editor
                       apiKey={apiKey}
                       init={{
+                        promotion: false,
                         height: 300,
-                        menubar: false,
+                        menubar: true,
                         plugins: [
-                          'advlist', 'autolink', 'lists', 'link', 'charmap',
-                          'searchreplace', 'emoticons', 'paste', 'table'
+                          'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
+                          'preview', 'anchor', 'searchreplace', 'visualblocks', 'code',
+                          'fullscreen', 'insertdatetime', 'media', 'table', 'help', 'wordcount'
                         ],
-                        toolbar: 'undo redo | formatselect | ' +
-                          'bold italic | alignleft aligncenter ' +
-                          'alignright alignjustify | bullist numlist | ' +
+                        toolbar: 'undo redo | blocks | ' +
+                          'bold italic forecolor | alignleft aligncenter ' +
+                          'alignright alignjustify | bullist numlist outdent indent | ' +
                           'removeformat | help',
                         content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; }'
+                      }}
+                      onInit={(evt, editor) => {
+                        console.log('TinyMCE initialized with API key:', apiKey ? 'present' : 'missing');
                       }}
                       value={field.value}
                       onEditorChange={(content) => {
