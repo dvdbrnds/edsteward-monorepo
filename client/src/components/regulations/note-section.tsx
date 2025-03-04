@@ -35,6 +35,7 @@ interface NoteSectionProps {
 export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [notes, setNotes] = React.useState([]); // Added state for notes
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -75,14 +76,30 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
         throw new Error(errorData.error || "Failed to save note");
       }
 
+      // Refresh notes after successful submission
+      const updatedResponse = await fetch(`/api/notes/regulation/${regulationId}`);
+      if (updatedResponse.ok) {
+        const updatedData = await updatedResponse.json();
+        setNotes(updatedData);
+      }
+
+      // Reset form if creating a new note
+      if (!initialData?.id) {
+        form.reset({
+          title: "",
+          content: "",
+          category: "",
+          status: "draft",
+          isPrivate: false,
+        });
+      }
+
       toast({
         title: "Success",
         description: initialData?.id
           ? "Note updated successfully"
           : "Note created successfully",
       });
-
-      //router.refresh(); // Removed as useRouter is no longer imported.  Refresh functionality needs a different solution if required.
     } catch (error) {
       toast({
         title: "Error",
@@ -216,6 +233,33 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
           </Button>
         </form>
       </Form>
+
+      {/* Display existing notes */}
+      <div className="mt-8">
+        <h3 className="text-lg font-medium mb-4">Diary Entries</h3>
+        {notes.length === 0 ? (
+          <p className="text-sm text-gray-500">No notes found for this regulation.</p>
+        ) : (
+          <div className="space-y-4">
+            {notes.map((note) => (
+              <div key={note.id} className="border p-4 rounded-md">
+                <div className="flex justify-between items-start">
+                  <h4 className="text-md font-medium">{note.title}</h4>
+                  <div className="text-xs text-gray-500">
+                    {note.user && `By ${note.user.firstName} ${note.user.lastName}`}
+                    {note.isPrivate && <span className="ml-2">(Private)</span>}
+                  </div>
+                </div>
+                <p className="mt-2 text-sm">{note.content}</p>
+                <div className="mt-2 text-xs text-gray-500">
+                  {note.category && <span className="mr-2">Category: {note.category}</span>}
+                  {note.status && <span>Status: {note.status}</span>}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
