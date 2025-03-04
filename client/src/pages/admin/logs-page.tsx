@@ -83,8 +83,6 @@ export default function LogsPage() {
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
   const [page, setPage] = useState(1);
-  const [debugLogs, setDebugLogs] = useState<any[]>([]); // Added state for debug logs
-
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["/api/admin/logs", { search, level, facility, startDate, endDate, page }],
@@ -105,21 +103,6 @@ export default function LogsPage() {
     },
     enabled: user?.role === "admin"
   });
-
-  const fetchDebugLogs = async () => {
-    try {
-      const response = await fetch('/api/admin/debug-logs/dvdbrnds'); //Added debug logs fetch
-      if (!response.ok) {
-        throw new Error(`Failed to fetch debug logs: ${response.status}`);
-      }
-      const debugData = await response.json();
-      setDebugLogs(debugData.logs || []);
-    } catch (err) {
-      console.error("Error fetching debug logs:", err);
-      //Handle error appropriately, e.g., show an error message
-    }
-  };
-
 
   if (user?.role !== "admin") {
     return (
@@ -222,64 +205,28 @@ export default function LogsPage() {
               >
                 My Activity
               </Button>
-              <Button 
-                onClick={async () => {
-                  try {
-                    const response = await fetch('/api/admin/generate-test-logs', {
-                      method: 'POST',
-                    });
-                    if (response.ok) {
-                      alert('Log events generated successfully!');
-                      // Refresh data
-                      refetch();
-                    } else {
-                      alert('Failed to generate log events');
-                    }
-                  } catch (error) {
-                    console.error('Error generating logs:', error);
-                    alert('Error generating logs');
-                  }
-                }} 
-                variant="outline"
-              >
-                Generate Test Logs
-              </Button>
-              <Button 
-                onClick={async () => {
-                  try {
-                    const response = await fetch('/api/admin/user-activity', {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json'
-                      },
-                      body: JSON.stringify({
-                        username: 'dvdbrnds',
-                        activities: [
-                          "Logged in to system",
-                          "Viewed regulation REG1785",
-                          "Updated compliance status for Title IX regulation",
-                          "Added note to ADA compliance record",
-                          "Exported compliance report",
-                          "Updated user profile settings"
-                        ]
-                      })
-                    });
-                    if (response.ok) {
-                      alert('User activity logs generated successfully!');
-                      refetch();
-                    } else {
-                      alert('Failed to generate user activity logs');
-                    }
-                  } catch (error) {
-                    console.error('Error generating user logs:', error);
-                    alert('Error generating user logs');
-                  }
-                }} 
-                variant="outline"
-              >
-                Generate User Activity
-              </Button>
-              <Button onClick={fetchDebugLogs} variant="outline">Fetch Debug Logs</Button> {/* Added button to fetch debug logs */}
+              <Card className="col-span-12 lg:col-span-4">
+                <CardHeader>
+                  <CardTitle>Log Information</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-1 gap-4">
+                    <p className="text-sm text-muted-foreground">
+                      The system automatically logs all user activities, including:
+                    </p>
+                    <ul className="list-disc pl-5 text-sm text-muted-foreground space-y-1">
+                      <li>Authentication events (login/logout)</li>
+                      <li>Regulation access and updates</li>
+                      <li>Compliance status changes</li>
+                      <li>Report generation</li>
+                      <li>System configuration changes</li>
+                    </ul>
+                    <p className="text-sm text-muted-foreground mt-2">
+                      Use the filters to find specific log entries.
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Date Range</label>
@@ -372,30 +319,6 @@ export default function LogsPage() {
                   </TableBody>
                 </Table>
               </div>
-
-              {/* Added section to display debug logs */}
-              <h2>Debug Logs for dvdbrnds</h2>
-              {debugLogs.length > 0 ? (
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Timestamp</TableHead>
-                      <TableHead>Message</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {debugLogs.map((log, index) => (
-                      <TableRow key={index}>
-                        <TableCell>{log.timestamp}</TableCell>
-                        <TableCell>{log.message}</TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              ) : (
-                <p>No debug logs found.</p>
-              )}
-
 
               <div className="mt-4 flex justify-between items-center">
                 <div className="text-sm text-muted-foreground">

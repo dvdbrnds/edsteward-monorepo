@@ -218,6 +218,22 @@ export function registerRoutes(app: Express): Server {
         return res.status(404).json({ error: "Regulation not found" });
       }
 
+      // Log the applicability change
+      await syslog.info(
+        `User ${req.user.username} changed applicability of regulation ${regulation.itemId} (${regulation.name}) to ${data.isApplicable ? 'applicable' : 'not applicable'}`,
+        {
+          username: req.user.username,
+          userId: req.user.id,
+          regulationId: regulation.id,
+          regulationName: regulation.name,
+          regulationItemId: regulation.itemId,
+          newValue: data.isApplicable,
+          context: 'COMPLIANCE_CHANGE',
+          type: 'applicability_update',
+          timestamp: new Date().toISOString()
+        }
+      );
+
       res.json(regulation);
     } catch (error) {
       console.error("Failed to toggle regulation applicability:", error);
@@ -1064,329 +1080,67 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  // Add test logs generation endpoint
-  app.post("/api/admin/generate-test-logs", async (req, res) => {
-    try {
-      if (req.user?.role !== "admin") {
-        return res.status(403).json({ error: "Only administrators can generate test logs" });
-      }
-
-      await syslog.emergency("Test emergency message", { test: true });
-      await syslog.alert("Test alert message", { test: true });
-      await syslog.critical("Test critical message", { test: true });
-      await syslog.error("Test error message", { test: true });
-      await syslog.warning("Test warning message", { test: true });
-      await syslog.notice("Test notice message", { test: true });
-      await syslog.info("Test info message", { test: true });
-      await syslog.debug("Test debug message", { test: true });
-
-      res.json({ message: "Test logs generated successfully" });
-    } catch (error) {
-      console.error("Failed to generate test logs:", error);
-      res.status(500).json({ error: "Failed to generate test logs" });
-    }
-  });
-
-  // Add user activity logs generation endpoint
-  app.post("/api/admin/user-activity", async (req, res) => {
-    try {
-      if (req.user?.role !== "admin") {
-        return res.status(403).json({ error: "Only administrators can generate user activity logs" });
-      }
-
-      const { username, activities } = req.body;
-      
-      if (!username || !activities || !Array.isArray(activities)) {
-        return res.status(400).json({ error: "Invalid request format" });
-      }
-
-      // Log each activity with user information
-      for (const activity of activities) {
-        await syslog.info(activity, { 
-          username: username,
-          user: username,
-          ip: req.ip || req.headers['x-forwarded-for'] || '127.0.0.1',
-          userAgent: req.headers['user-agent'] || 'Unknown',
-          context: 'USER_ACTIVITY',
-          type: 'user_action',
-          test: false
-        });
-      }
-
-      res.json({ message: "User activity logs generated successfully" });
-    } catch (error) {
-      console.error("Failed to generate user activity logs:", error);
-      res.status(500).json({ error: "Failed to generate user activity logs" });
-    }
-  });
-  
-  // Add specific user logs endpoint that directly logs auth events and activities
-  app.post("/api/admin/specific-user-logs", async (req, res) => {
-    try {
-      if (!req.user) {
-        return res.status(401).json({ error: "Must be logged in to generate user logs" });
-      }
-      
-      const username = req.user.username;
-      const userId = req.user.id;
-      const timestamp = new Date();
-      
-      // Log direct user activities for the current logged in user
-      await syslog.logAuthEvent(LogLevel.INFO, `User ${username} logged in at ${timestamp.toISOString()}`, userId, username, {
-        ip: req.ip || req.headers['x-forwarded-for'] || '127.0.0.1',
-        userAgent: req.headers['user-agent'] || 'Unknown',
-        context: 'AUTH',
-        type: 'login'
-      });
-      
-      // Log a series of realistic user activities
-      const activities = [
-        `User ${username} viewed dashboard`,
-        `User ${username} accessed regulation REG1832 (Section 504)`,
-        `User ${username} updated compliance status for Title IX regulation`,
-        `User ${username} exported compliance report at ${timestamp.toISOString()}`,
-        `User ${username} viewed system logs`
-      ];
-      
-      for (const activity of activities) {
-        await syslog.info(activity, {
-          username: username,
-          user: username, 
-          userId: userId,
-          ip: req.ip || req.headers['x-forwarded-for'] || '127.0.0.1',
-          userAgent: req.headers['user-agent'] || 'Unknown',
-          context: 'USER_ACTIVITY',
-          type: 'user_action',
-          timestamp: new Date(timestamp.getTime() + Math.floor(Math.random() * 5000)).toISOString(),
-          test: false
-        });
-      }
-      
-      res.json({ message: "Specific user logs generated successfully" });
-    } catch (error) {
-      console.error("Failed to generate specific user logs:", error);
-      res.status(500).json({ error: "Failed to generate specific user logs" });
-    }
-  });
-  
-  // Add enhanced debug endpoint for user logs with more detailed information
-  app.post("/api/admin/specific-user-logs-debug", async (req, res) => {
-    try {
-      if (!req.user) {
-        return res.status(401).json({ error: "Must be logged in to generate debug logs" });
-      }
-      
-      console.log("Generating debug logs for user:", req.user);
-      
-      const { debug = true, count = 5 } = req.body;
-      const username = req.user.username;
-      const userId = req.user.id;
-      const timestamp = new Date();
-      const logIds = [];
-      
-      // Log full user information for debugging
-      console.log("User details:", {
-        id: userId,
-        username: username,
-        role: req.user.role,
-        fullDetails: req.user
-      });
-      
-      // First check if we have any existing logs for this user
-      const existingLogs = await db
-        .select({
-          count: sql<number>`count(*)`
-        })
-        .from(systemLogs)
-        .where(
-          or(
-            sql`${systemLogs.structuredData}->>'username' = ${username}`,
-            sql`${systemLogs.structuredData}->>'user' = ${username}`
-          )
-        );
-      
-      const existingCount = Number(existingLogs[0]?.count || 0);
-      console.log(`Found ${existingCount} existing logs for user ${username}`);
-      
-      // Log an auth event with debug flag
-      const authLogId = await syslog.logAuthEvent(
-        LogLevel.INFO, 
-        `DEBUG: User ${username} generated test logs at ${timestamp.toISOString()}`, 
-        userId, 
-        username, 
-        {
-          ip: req.ip || req.headers['x-forwarded-for'] || '127.0.0.1',
-          userAgent: req.headers['user-agent'] || 'Unknown',
-          context: 'DEBUG',
-          type: 'debug_log',
-          debug: true,
-          timestamp: timestamp.toISOString()
+  // Enhanced logging middleware for key routes
+  const logUserActivity = (activityType: string) => {
+    return async (req: Request, res: Response, next: NextFunction) => {
+      const originalSend = res.send;
+      res.send = function(body) {
+        if (req.user && res.statusCode >= 200 && res.statusCode < 300) {
+          const activity = `${activityType} - ${req.method} ${req.path}`;
+          const contextMap: Record<string, string> = {
+            '/api/regulations': 'REGULATION_ACCESS',
+            '/api/notes': 'NOTE_MANAGEMENT',
+            '/api/deadlines': 'DEADLINE_REVIEW',
+            '/api/admin/users': 'USER_MANAGEMENT',
+            '/api/bug-report': 'BUG_REPORT'
+          };
+          
+          // Determine the context based on the path
+          let context = 'USER_ACTIVITY';
+          for (const key in contextMap) {
+            if (req.path.startsWith(key)) {
+              context = contextMap[key];
+              break;
+            }
+          }
+          
+          syslog.info(activity, {
+            username: req.user.username,
+            user: req.user.username,
+            userId: req.user.id,
+            ip: req.ip || req.headers['x-forwarded-for'] || '127.0.0.1',
+            userAgent: req.headers['user-agent'] || 'Unknown',
+            context: context,
+            type: 'user_action',
+            path: req.path,
+            method: req.method,
+            timestamp: new Date().toISOString()
+          }).catch(err => console.error('Error logging user activity:', err));
         }
-      );
-      
-      if (authLogId) logIds.push(authLogId);
-      console.log("Generated auth log with ID:", authLogId);
-      
-      // Log a series of debug activities with detailed data
-      const activities = [
-        `DEBUG: User ${username} viewed dashboard`,
-        `DEBUG: User ${username} accessed regulation REG1785 (Age Discrimination Act)`,
-        `DEBUG: User ${username} updated compliance status for Title IX regulation`,
-        `DEBUG: User ${username} added note to compliance record`,
-        `DEBUG: User ${username} exported compliance report at ${timestamp.toISOString()}`,
-        `DEBUG: User ${username} viewed system logs`,
-        `DEBUG: User ${username} created a new filter for federal regulations`,
-        `DEBUG: User ${username} modified settings`,
-        `DEBUG: User ${username} checked deadlines`,
-        `DEBUG: User ${username} submitted bug report`
-      ];
-      
-      // Generate specified number of logs
-      const logsToGenerate = Math.min(count, activities.length);
-      console.log(`Generating ${logsToGenerate} activity logs...`);
-      
-      for (let i = 0; i < logsToGenerate; i++) {
-        const activity = activities[i];
-        const logTime = new Date(timestamp.getTime() + (i * 1000)); // Space logs 1 second apart
-        
-        // Add detailed user data to make sure these logs show up
-        const logId = await syslog.info(activity, {
-          username: username,
-          user: username, 
-          userId: userId,
-          sessionId: req.sessionID,
-          ip: req.ip || req.headers['x-forwarded-for'] || '127.0.0.1',
-          userAgent: req.headers['user-agent'] || 'Unknown',
-          context: 'DEBUG_USER_ACTIVITY',
-          type: 'debug_action',
-          timestamp: logTime.toISOString(),
-          test: false,
-          debug: true
-        });
-        
-        if (logId) logIds.push(logId);
-        console.log(`Generated activity log ID ${logId} for activity: ${activity}`);
-      }
-      
-      // Verify logs were created
-      const newLogs = await db
-        .select({
-          count: sql<number>`count(*)`
-        })
-        .from(systemLogs)
-        .where(
-          or(
-            sql`${systemLogs.structuredData}->>'username' = ${username}`,
-            sql`${systemLogs.structuredData}->>'user' = ${username}`
-          )
-        );
-      
-      const newCount = Number(newLogs[0]?.count || 0);
-      const addedLogs = newCount - existingCount;
-      
-      console.log(`After generating logs: ${newCount} total logs for user ${username} (added ${addedLogs})`);
-      
-      res.json({ 
-        message: "Debug user logs generated successfully",
-        username: username,
-        userId: userId,
-        count: addedLogs,
-        totalUserLogs: newCount,
-        logIds: logIds,
-        requestInfo: {
-          ip: req.ip || req.headers['x-forwarded-for'],
-          userAgent: req.headers['user-agent'],
-          sessionId: req.sessionID
-        }
-      });
-    } catch (error) {
-      console.error("Failed to generate debug user logs:", error);
-      res.status(500).json({ 
-        error: "Failed to generate debug user logs",
-        details: error instanceof Error ? error.message : String(error)
-      });
-    }
-  });
+        return originalSend.call(this, body);
+      };
+      next();
+    };
+  };
+
+  // Apply activity logging middleware to key routes
+  app.use('/api/regulations*', logUserActivity('Regulation access'));
+  app.use('/api/notes*', logUserActivity('Note management'));
+  app.use('/api/deadlines*', logUserActivity('Deadline review'));
+  app.use('/api/bug-report', logUserActivity('Bug report submission'));
+  app.use('/api/admin/users*', logUserActivity('User management'));
   
-  // Add debug endpoint to directly check logs for a specific user
-  app.get("/api/admin/debug-user-logs/:username", async (req, res) => {
-    try {
-      // Check if user is admin
-      if (req.user?.role !== "admin") {
-        return res.status(403).json({ error: "Only administrators can access debug logs" });
-      }
-      
-      const { username } = req.params;
-      
-      if (!username) {
-        return res.status(400).json({ error: "Username is required" });
-      }
-      
-      console.log(`Debugging logs for username: ${username}`);
-      
-      // Direct query to find any logs with this username
-      const logs = await db
-        .select({
-          id: systemLogs.id,
-          timestamp: systemLogs.timestamp,
-          facility: systemLogs.facility,
-          severity: systemLogs.severity,
-          message: systemLogs.message,
-          structuredData: systemLogs.structuredData,
-        })
-        .from(systemLogs)
-        .where(
-          or(
-            sql`${systemLogs.structuredData}->>'username' = ${username}`,
-            sql`${systemLogs.structuredData}->>'user' = ${username}`
-          )
-        )
-        .orderBy(desc(systemLogs.timestamp))
-        .limit(20);
-      
-      // Format logs for display
-      const formattedLogs = logs.map(log => ({
-        ...log,
-        timestamp: new Date(log.timestamp).toISOString(),
-        level: LogLevelNames[log.severity as LogLevel] || log.severity,
-        facility: LogFacilityNames[log.facility as LogFacility] || log.facility,
-        structuredUsername: log.structuredData?.username || log.structuredData?.user || null,
-      }));
-      
-      console.log(`Found ${logs.length} logs for user ${username}`);
-      
-      // Also get the database query count
-      const countResult = await db
-        .select({ count: sql<number>`count(*)` })
-        .from(systemLogs)
-        .where(
-          or(
-            sql`${systemLogs.structuredData}->>'username' = ${username}`,
-            sql`${systemLogs.structuredData}->>'user' = ${username}`
-          )
-        );
-      
-      const totalCount = Number(countResult[0]?.count || 0);
-      
-      res.json({
-        username,
-        found: logs.length > 0,
-        totalCount,
-        logs: formattedLogs,
-        query: {
-          conditions: [
-            `systemLogs.structuredData->>'username' = '${username}'`,
-            `systemLogs.structuredData->>'user' = '${username}'`
-          ]
-        }
-      });
-    } catch (error) {
-      console.error("Debug logs error:", error);
-      res.status(500).json({ 
-        error: "Failed to debug user logs",
-        details: error instanceof Error ? error.message : String(error)
-      });
+  // Enhanced validation logging
+  app.use('/api/regulations/validate', async (req, res, next) => {
+    if (req.user) {
+      await syslog.info(`User ${req.user.username} initiated regulation validation`, {
+        username: req.user.username,
+        userId: req.user.id,
+        context: 'REGULATION_VALIDATION',
+        type: 'user_action'
+      }).catch(err => console.error('Error logging validation activity:', err));
     }
+    next();
   });
 
   // Add logging to the routes for testing
