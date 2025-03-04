@@ -64,7 +64,7 @@ export default function AdminSettingsPage() {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [userDialogOpen, setUserDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [selectedRegType, setSelectedRegType] = useState<string>('all-types'); //Fixed initial state
+  const [selectedRegType, setSelectedRegType] = useState<string>('all-types'); //Fixed initial state with non-empty value
 
   // Redirect non-admin users
   if (user?.role !== "admin") {
@@ -457,8 +457,8 @@ export default function AdminSettingsPage() {
                             <FormItem>
                               <FormLabel>Role</FormLabel>
                               <Select
-                                onValueChange={field.onChange}
-                                defaultValue={field.value}
+                                onValueChange={(value) => field.onChange(value || 'user')} // Ensure no empty values
+                                defaultValue={field.value || 'user'} // Ensure default value is never empty
                               >
                                 <FormControl>
                                   <SelectTrigger>
@@ -864,7 +864,7 @@ export default function AdminSettingsPage() {
                             if (emailNotif) {
                               updateNotificationMutation.mutate({
                                 ...emailNotif,
-                                frequency: value,
+                                frequency: value || 'daily', // Ensure value is never empty
                               });
                             }
                           }
@@ -918,7 +918,7 @@ export default function AdminSettingsPage() {
                                 frequency: value,
                               });
                             } else {
-                              handleAddNotification({ type: 'sms', frequency: value });
+                              handleAddNotification({ type: 'sms', frequency: value || 'never' }); // Ensure value is never empty
                             }
                           }
                         }}
