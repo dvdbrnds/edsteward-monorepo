@@ -74,7 +74,7 @@ export default function LogsPage() {
       const params = new URLSearchParams();
       if (search) params.append("search", search);
       if (level && level !== "all") params.append("level", level);
-      if (facility) params.append("facility", facility);
+      if (facility && facility !== "all") params.append("facility", facility);
       if (startDate) params.append("startDate", startDate.toISOString());
       if (endDate) params.append("endDate", endDate.toISOString());
       params.append("page", String(page));
@@ -144,7 +144,7 @@ export default function LogsPage() {
                   <SelectValue placeholder="Select facility" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Facilities</SelectItem>
+                  <SelectItem value="all">All Facilities</SelectItem>
                   {Object.entries(LOG_FACILITIES).map(([value, label]) => (
                     <SelectItem key={value} value={value}>
                       {label}
