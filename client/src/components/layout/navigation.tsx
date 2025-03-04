@@ -218,7 +218,10 @@ export default function Navigation() {
     { href: "/regulations", label: "Regulations", icon: Book },
     ...(!setupComplete ? [{ href: "/setup", label: "Complete Setup", icon: Cog }] : []),
     ...(user?.role === "admin"
-      ? [{ href: "/admin/settings", label: "Admin Settings", icon: Settings }]
+      ? [
+          { href: "/admin/settings", label: "Admin Settings", icon: Settings },
+          { href: "/admin/logs", label: "System Logs", icon: FileText }
+        ]
       : []),
   ];
 

@@ -13,6 +13,7 @@ import ComplianceWizardPage from "@/pages/compliance-wizard-page";
 import ReportsPage from "@/pages/reports-page";
 import ValidationPage from "@/pages/validation-page";
 import AdminSettingsPage from "@/pages/admin-settings-page";
+import LogsPage from "@/pages/admin/logs-page";
 import SetupWizardPage from "@/pages/setup-wizard-page";
 import { ProtectedRoute } from "./lib/protected-route";
 import { ProtectedRegulationRoute } from "./lib/protected-regulation-route";
@@ -40,6 +41,7 @@ function Router() {
           />
           <ProtectedRoute path="/reports" component={ReportsPage} />
           <ProtectedRoute path="/admin/settings" component={AdminSettingsPage} />
+          <ProtectedRoute path="/admin/logs" component={LogsPage} />
           <Route component={NotFound} />
         </Switch>
       </PageLayout>

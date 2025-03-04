@@ -8,6 +8,8 @@ import { RegulationValidator } from "./validation";
 import { Request } from "express";
 import { google } from 'googleapis';
 import { OAuth2Client } from 'google-auth-library';
+import path from 'path';
+import fs from 'fs';
 
 // Update the getRedirectUri function to handle different environments properly
 function getRedirectUri(req: Request): string {
@@ -687,6 +689,100 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Add logs endpoints
+  app.get("/api/admin/logs", async (req, res) => {
+    try {
+      // Check if user is admin
+      if (req.user?.role !== "admin") {
+        return res.status(403).json({ error: "Only administrators can access logs" });
+      }
+
+      const { level, facility, startDate, endDate, search, page = 1, limit = 100 } = req.query;
+
+      // Read the log file
+      const logDir = path.join(process.cwd(), 'logs');
+      const logFile = path.join(logDir, 'system.log');
+
+      if (!fs.existsSync(logFile)) {
+        return res.json({ logs: [], total: 0 });
+      }
+
+      // Read and parse log file
+      const logs = fs.readFileSync(logFile, 'utf-8')
+        .split('\n')
+        .filter(line => line.trim())
+        .map(line => {
+          try {
+            // Parse syslog format: <PRI>VERSION TIMESTAMP HOSTNAME APP-NAME PROCID MSGID STRUCTURED-DATA MSG
+            const match = line.match(/<(\d+)>1 ([^ ]+) ([^ ]+) ([^ ]+) ([^ ]+) - ({.*?}) (.*)/);
+            if (!match) return null;
+
+            const [, pri, timestamp, hostname, appName, procId, structuredData, message] = match;
+            const priNum = parseInt(pri);
+            const facility = Math.floor(priNum / 8);
+            const level = priNum % 8;
+
+            return {
+              timestamp,
+              facility,
+              level,
+              hostname,
+              appName,
+              procId,
+              structuredData: JSON.parse(structuredData),
+              message
+            };
+          } catch (e) {
+            return null;
+          }
+        })
+        .filter(log => log !== null);
+
+      // Apply filters
+      let filteredLogs = logs;
+
+      if (level !== undefined) {
+        filteredLogs = filteredLogs.filter(log => log.level === parseInt(level as string));
+      }
+
+      if (facility !== undefined) {
+        filteredLogs = filteredLogs.filter(log => log.facility === parseInt(facility as string));
+      }
+
+      if (startDate) {
+        filteredLogs = filteredLogs.filter(log => new Date(log.timestamp) >= new Date(startDate as string));
+      }
+
+      if (endDate) {
+        filteredLogs = filteredLogs.filter(log => new Date(log.timestamp) <= new Date(endDate as string));
+      }
+
+      if (search) {
+        const searchTerm = (search as string).toLowerCase();
+        filteredLogs = filteredLogs.filter(log =>
+          log.message.toLowerCase().includes(searchTerm) ||
+          JSON.stringify(log.structuredData).toLowerCase().includes(searchTerm)
+        );
+      }
+
+      // Sort by timestamp descending
+      filteredLogs.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+      // Paginate results
+      const startIndex = (parseInt(page as string) - 1) * parseInt(limit as string);
+      const paginatedLogs = filteredLogs.slice(startIndex, startIndex + parseInt(limit as string));
+
+      res.json({
+        logs: paginatedLogs,
+        total: filteredLogs.length,
+        page: parseInt(page as string),
+        totalPages: Math.ceil(filteredLogs.length / parseInt(limit as string))
+      });
+    } catch (error) {
+      console.error("Failed to fetch logs:", error);
+      res.status(500).json({ error: "Failed to fetch logs" });
+    }
+  });
 
   const httpServer = createServer(app);
   return httpServer;
