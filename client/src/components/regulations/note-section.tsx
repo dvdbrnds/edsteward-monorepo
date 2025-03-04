@@ -1,56 +1,46 @@
+
 import React from "react";
+import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { api } from "@/lib/api";
+import { useToast } from "@/components/ui/use-toast";
+import { useRouter } from "next/navigation";
 
-const noteFormSchema = z.object({
-  title: z.string().min(3, {
-    message: "Title must be at least 3 characters.",
-  }),
-  content: z.string().min(1, {
-    message: "Content cannot be empty.",
-  }),
-  category: z.string().min(1, {
-    message: "Please select a category.",
-  }),
-  status: z.string().min(1, {
-    message: "Please select a status.",
-  }),
-  isPrivate: z.boolean().default(false)
+const formSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  content: z.string().min(1, "Content is required"),
+  category: z.string().optional(),
+  status: z.enum(["draft", "published", "archived"]),
+  isPrivate: z.boolean().default(false),
 });
 
-export type NoteFormData = z.infer<typeof noteFormSchema>;
+type FormValues = z.infer<typeof formSchema>;
 
 interface NoteSectionProps {
-  onSubmit: (data: NoteFormData) => void;
-  initialData?: Partial<NoteFormData>;
-  isSubmitting?: boolean;
+  regulationId: string;
+  initialData?: Partial<FormValues> & { id?: string };
 }
 
-export function NoteSection({ onSubmit, initialData, isSubmitting = false }: NoteSectionProps) {
-  const form = useForm<NoteFormData>({
-    resolver: zodResolver(noteFormSchema),
+export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
+  const { toast } = useToast();
+  const router = useRouter();
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
     defaultValues: {
       title: initialData?.title || "",
       content: initialData?.content || "",
@@ -60,18 +50,64 @@ export function NoteSection({ onSubmit, initialData, isSubmitting = false }: Not
     },
   });
 
-  const handleFormSubmit = form.handleSubmit(onSubmit);
-  
+  const onSubmit = async (data: FormValues) => {
+    try {
+      setIsSubmitting(true);
+      
+      const endpoint = initialData?.id
+        ? `/api/notes/${initialData.id}`
+        : "/api/notes";
+      
+      const method = initialData?.id ? "PUT" : "POST";
+      
+      const payload = {
+        ...data,
+        regulationId,
+      };
+      
+      const response = await api(endpoint, {
+        method,
+        body: JSON.stringify(payload),
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to save note");
+      }
+      
+      toast({
+        title: "Success",
+        description: initialData?.id
+          ? "Note updated successfully"
+          : "Note created successfully",
+      });
+      
+      router.refresh();
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save note",
+        variant: "destructive",
+      });
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium">Note Information</h3>
+        <h3 className="text-lg font-medium">
+          {initialData?.id ? "Edit Note" : "Add Note"}
+        </h3>
         <p className="text-sm text-muted-foreground">
-          Enter the details for this regulation note.
+          {initialData?.id
+            ? "Update your note for this regulation"
+            : "Add a note to this regulation for future reference"}
         </p>
       </div>
       <Form {...form}>
-        <form onSubmit={handleFormSubmit} className="space-y-4">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField
             control={form.control}
             name="title"
@@ -79,78 +115,12 @@ export function NoteSection({ onSubmit, initialData, isSubmitting = false }: Not
               <FormItem>
                 <FormLabel>Title</FormLabel>
                 <FormControl>
-                  <Input placeholder="Note title" {...field} />
+                  <Input {...field} />
                 </FormControl>
-                <FormDescription>
-                  A clear, concise title for this note.
-                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
-
-          <div className="grid grid-cols-2 gap-4">
-            <FormField
-              control={form.control}
-              name="category"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Category</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a category" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="general">General</SelectItem>
-                      <SelectItem value="compliance">Compliance</SelectItem>
-                      <SelectItem value="requirement">Requirement</SelectItem>
-                      <SelectItem value="deadline">Deadline</SelectItem>
-                      <SelectItem value="contact">Contact</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormDescription>
-                    The category helps organize notes.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="status"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Status</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a status" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="draft">Draft</SelectItem>
-                      <SelectItem value="active">Active</SelectItem>
-                      <SelectItem value="archived">Archived</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <FormDescription>
-                    The current status of this note.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
 
           <FormField
             control={form.control}
@@ -181,6 +151,41 @@ export function NoteSection({ onSubmit, initialData, isSubmitting = false }: Not
             )}
           />
 
+          <FormField
+            control={form.control}
+            name="category"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Category (Optional)</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="status"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Status</FormLabel>
+                <FormControl>
+                  <select
+                    {...field}
+                    className="w-full p-2 border rounded-md"
+                  >
+                    <option value="draft">Draft</option>
+                    <option value="published">Published</option>
+                    <option value="archived">Archived</option>
+                  </select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           {/* Private note option temporarily removed 
           <FormField
             control={form.control}
@@ -188,16 +193,17 @@ export function NoteSection({ onSubmit, initialData, isSubmitting = false }: Not
             render={({ field }) => (
               <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
                 <FormControl>
-                  <Checkbox
+                  <input
+                    type="checkbox"
                     checked={field.value}
-                    onCheckedChange={field.onChange}
+                    onChange={field.onChange}
                   />
                 </FormControl>
                 <div className="space-y-1 leading-none">
                   <FormLabel>Private Note</FormLabel>
-                  <FormDescription>
-                    Private notes are only visible to you and admins.
-                  </FormDescription>
+                  <p className="text-sm text-muted-foreground">
+                    Only you will be able to see this note
+                  </p>
                 </div>
               </FormItem>
             )}
