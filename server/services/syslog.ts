@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as os from 'os';
 import { db } from '../db';
 import { systemLogs } from '@shared/schema';
+import { eq } from 'drizzle-orm';
 
 // Log levels based on syslog protocol (RFC 5424)
 export enum LogLevel {
@@ -55,34 +56,6 @@ export enum LogFacility {
   LOCAL6 = 22,    // Local use 6
   LOCAL7 = 23     // Local use 7
 }
-
-// Map facilities to human-readable strings
-const LogFacilityNames: Record<LogFacility, string> = {
-  [LogFacility.KERNEL]: 'KERNEL',
-  [LogFacility.USER]: 'USER',
-  [LogFacility.MAIL]: 'MAIL',
-  [LogFacility.SYSTEM]: 'SYSTEM',
-  [LogFacility.SECURITY]: 'SECURITY',
-  [LogFacility.INTERNAL]: 'INTERNAL',
-  [LogFacility.PRINTER]: 'PRINTER',
-  [LogFacility.NETWORK]: 'NETWORK',
-  [LogFacility.UUCP]: 'UUCP',
-  [LogFacility.CLOCK]: 'CLOCK',
-  [LogFacility.AUTH]: 'AUTH',
-  [LogFacility.FTP]: 'FTP',
-  [LogFacility.NTP]: 'NTP',
-  [LogFacility.AUDIT]: 'AUDIT',
-  [LogFacility.ALERT]: 'ALERT',
-  [LogFacility.CRON]: 'CRON',
-  [LogFacility.LOCAL0]: 'LOCAL0',
-  [LogFacility.LOCAL1]: 'LOCAL1',
-  [LogFacility.LOCAL2]: 'LOCAL2',
-  [LogFacility.LOCAL3]: 'LOCAL3',
-  [LogFacility.LOCAL4]: 'LOCAL4',
-  [LogFacility.LOCAL5]: 'LOCAL5',
-  [LogFacility.LOCAL6]: 'LOCAL6',
-  [LogFacility.LOCAL7]: 'LOCAL7'
-};
 
 // Interface for structured data in log messages
 interface StructuredData {
@@ -203,8 +176,8 @@ export class SysLogger {
     const hostname = os.hostname();
     const pid = process.pid;
 
-    // Store in database according to RFC 5424
     try {
+      // Store in database according to RFC 5424
       await db.insert(systemLogs).values({
         timestamp,
         facility,
@@ -216,111 +189,99 @@ export class SysLogger {
         structuredData: structuredData?.parameters || null,
         message,
       });
-    } catch (error) {
-      console.error('Failed to store log in database:', error);
-    }
 
-    // Also keep file logging as backup
-    if (this.config.logToFile) {
-      // Check log rotation
-      if (this.shouldRotateLog()) {
-        this.rotateLog();
-      }
-
-      // Calculate priority value (PRI) as per syslog RFC
-      const pri = facility * 8 + level;
-
-      // Format structured data according to RFC 5424
-      let structuredDataStr = '-';
-      if (structuredData) {
-        structuredDataStr = `[${structuredData.id}`;
-        for (const [key, value] of Object.entries(structuredData.parameters)) {
-          structuredDataStr += ` ${key}="${value}"`;
+      // Also write to file for backup
+      if (this.config.logToFile && this.fileStream) {
+        const pri = facility * 8 + level;
+        let structuredDataStr = '-';
+        if (structuredData) {
+          structuredDataStr = `[${structuredData.id}`;
+          for (const [key, value] of Object.entries(structuredData.parameters)) {
+            structuredDataStr += ` ${key}="${value}"`;
+          }
+          structuredDataStr += ']';
         }
-        structuredDataStr += ']';
-      }
 
-      // Format according to syslog RFC 5424
-      const syslogMessage = `<${pri}>1 ${timestamp.toISOString()} ${hostname} ${this.config.applicationName} ${pid} - ${structuredDataStr} ${message}\n`;
-
-      if (this.fileStream) {
+        const syslogMessage = `<${pri}>1 ${timestamp.toISOString()} ${hostname} ${this.config.applicationName} ${pid} - ${structuredDataStr} ${message}\n`;
         this.fileStream.write(syslogMessage);
       }
-    }
 
-    // Log to console if enabled
-    if (this.config.logToConsole) {
-      const humanReadable = `${timestamp.toISOString()} [${LogFacilityNames[facility]}:${LogLevelNames[level]}] [${pid}] ${message}`;
-
-      if (level <= LogLevel.ERROR) {
-        console.error(humanReadable);
-      } else if (level === LogLevel.WARNING) {
-        console.warn(humanReadable);
-      } else {
-        console.log(humanReadable);
+      // Log to console if enabled
+      if (this.config.logToConsole) {
+        const humanReadable = `${timestamp.toISOString()} [${LogLevelNames[level]}] ${message}`;
+        if (level <= LogLevel.ERROR) {
+          console.error(humanReadable);
+        } else if (level === LogLevel.WARNING) {
+          console.warn(humanReadable);
+        } else {
+          console.log(humanReadable);
+        }
       }
+    } catch (error) {
+      console.error('Failed to log message:', error);
+      // If database logging fails, ensure we at least have console output
+      console.error(`LOGGING_FAILURE: ${message}`);
     }
   }
 
-  emergency(message: string, metadata?: Record<string, any>): void {
-    this.log(LogFacility.USER, LogLevel.EMERGENCY, message, {
+  async emergency(message: string, metadata?: Record<string, any>): Promise<void> {
+    await this.log(LogFacility.USER, LogLevel.EMERGENCY, message, {
       id: 'EMERGENCY',
       parameters: metadata || {}
     });
   }
 
-  alert(message: string, metadata?: Record<string, any>): void {
-    this.log(LogFacility.USER, LogLevel.ALERT, message, {
+  async alert(message: string, metadata?: Record<string, any>): Promise<void> {
+    await this.log(LogFacility.USER, LogLevel.ALERT, message, {
       id: 'ALERT',
       parameters: metadata || {}
     });
   }
 
-  critical(message: string, metadata?: Record<string, any>): void {
-    this.log(LogFacility.USER, LogLevel.CRITICAL, message, {
+  async critical(message: string, metadata?: Record<string, any>): Promise<void> {
+    await this.log(LogFacility.USER, LogLevel.CRITICAL, message, {
       id: 'CRITICAL',
       parameters: metadata || {}
     });
   }
 
-  error(message: string, metadata?: Record<string, any>): void {
-    this.log(LogFacility.USER, LogLevel.ERROR, message, {
+  async error(message: string, metadata?: Record<string, any>): Promise<void> {
+    await this.log(LogFacility.USER, LogLevel.ERROR, message, {
       id: 'ERROR',
       parameters: metadata || {}
     });
   }
 
-  warning(message: string, metadata?: Record<string, any>): void {
-    this.log(LogFacility.USER, LogLevel.WARNING, message, {
+  async warning(message: string, metadata?: Record<string, any>): Promise<void> {
+    await this.log(LogFacility.USER, LogLevel.WARNING, message, {
       id: 'WARNING',
       parameters: metadata || {}
     });
   }
 
-  notice(message: string, metadata?: Record<string, any>): void {
-    this.log(LogFacility.USER, LogLevel.NOTICE, message, {
+  async notice(message: string, metadata?: Record<string, any>): Promise<void> {
+    await this.log(LogFacility.USER, LogLevel.NOTICE, message, {
       id: 'NOTICE',
       parameters: metadata || {}
     });
   }
 
-  info(message: string, metadata?: Record<string, any>): void {
-    this.log(LogFacility.USER, LogLevel.INFO, message, {
+  async info(message: string, metadata?: Record<string, any>): Promise<void> {
+    await this.log(LogFacility.USER, LogLevel.INFO, message, {
       id: 'INFO',
       parameters: metadata || {}
     });
   }
 
-  debug(message: string, metadata?: Record<string, any>): void {
-    this.log(LogFacility.USER, LogLevel.DEBUG, message, {
+  async debug(message: string, metadata?: Record<string, any>): Promise<void> {
+    await this.log(LogFacility.USER, LogLevel.DEBUG, message, {
       id: 'DEBUG',
       parameters: metadata || {}
     });
   }
 
-  // System-specific logging methods
-  logAuthEvent(level: LogLevel, message: string, userId?: number, username?: string): void {
-    this.log(LogFacility.AUTH, level, message, {
+  async logAuthEvent(level: LogLevel, message: string, userId?: number, username?: string): Promise<void> {
+    await this.log(LogFacility.AUTH, level, message, {
       id: 'AUTH',
       parameters: {
         userId: userId || 'none',
@@ -329,22 +290,22 @@ export class SysLogger {
     });
   }
 
-  logSystemEvent(level: LogLevel, message: string, metadata?: Record<string, any>): void {
-    this.log(LogFacility.SYSTEM, level, message, {
+  async logSystemEvent(level: LogLevel, message: string, metadata?: Record<string, any>): Promise<void> {
+    await this.log(LogFacility.SYSTEM, level, message, {
       id: 'SYSTEM',
       parameters: metadata || {}
     });
   }
 
-  logSecurityEvent(level: LogLevel, message: string, metadata?: Record<string, any>): void {
-    this.log(LogFacility.SECURITY, level, message, {
+  async logSecurityEvent(level: LogLevel, message: string, metadata?: Record<string, any>): Promise<void> {
+    await this.log(LogFacility.SECURITY, level, message, {
       id: 'SECURITY',
       parameters: metadata || {}
     });
   }
 
-  logAuditEvent(level: LogLevel, message: string, metadata?: Record<string, any>): void {
-    this.log(LogFacility.AUDIT, level, message, {
+  async logAuditEvent(level: LogLevel, message: string, metadata?: Record<string, any>): Promise<void> {
+    await this.log(LogFacility.AUDIT, level, message, {
       id: 'AUDIT',
       parameters: metadata || {}
     });

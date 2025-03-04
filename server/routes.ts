@@ -14,6 +14,8 @@ import { desc, eq, like, or, sql, and, gte, lte } from "drizzle-orm";
 import { db } from "./db";
 import { systemLogs, users } from "@shared/schema";
 import { syslog, LogLevel, LogFacility } from './services/syslog';
+import bcrypt from 'bcrypt';
+import crypto from 'crypto';
 
 // Update the getRedirectUri function to handle different environments properly
 function getRedirectUri(req: Request): string {
@@ -59,6 +61,9 @@ declare module 'express-session' {
       token_type?: string;
       expiry_date?: number;
     };
+    userId?: number;
+    role?: string;
+    username?: string;
   }
 }
 
@@ -660,6 +665,7 @@ export function registerRoutes(app: Express): Server {
     const { username, password } = req.body;
 
     if (!username || !password) {
+      await syslog.warning("Login attempt with missing credentials", { username });
       return res.status(400).json({ error: "Username and password are required" });
     }
 
@@ -671,12 +677,14 @@ export function registerRoutes(app: Express): Server {
         .then((res) => res[0]);
 
       if (!user) {
+        await syslog.warning("Failed login attempt - user not found", { username });
         return res.status(400).json({ error: "Invalid username or password" });
       }
 
       const passwordMatch = await bcrypt.compare(password, user.password);
 
       if (!passwordMatch) {
+        await syslog.warning("Failed login attempt - incorrect password", { username });
         return res.status(400).json({ error: "Invalid username or password" });
       }
 
@@ -686,9 +694,19 @@ export function registerRoutes(app: Express): Server {
       req.session.role = user.role;
       req.session.username = user.username;
 
-      return res.status(200).json({ message: "Login successful", user: { id: user.id, username: user.username, role: user.role } });
+      await syslog.logAuthEvent(LogLevel.INFO, "User logged in successfully", user.id, user.username);
+
+      return res.status(200).json({ 
+        message: "Login successful", 
+        user: { 
+          id: user.id, 
+          username: user.username, 
+          role: user.role 
+        } 
+      });
     } catch (error) {
       console.error("Login error:", error);
+      await syslog.error("Login system error", { error: error instanceof Error ? error.message : String(error) });
       return res.status(500).json({ error: "Internal server error" });
     }
   });
@@ -772,7 +790,7 @@ export function registerRoutes(app: Express): Server {
       });
     } catch (error) {
       console.error("Failed to fetch logs:", error);
-      res.status(500).json({ error: "Failed to fetch logs" });
+      res.status(500).json({ error: "Failed to fetch logs", details: error instanceof Error ? error.message : String(error) });
     }
   });
 
