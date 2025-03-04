@@ -46,6 +46,16 @@ import moravianLogo from "@/assets/Screenshot_2025-02-12_at_9.15.57_AM-removebg-
  */
 const CHANGELOG = [
   {
+    version: "0.2.5",
+    date: "March 4, 2025",
+    changes: [
+      "Added CSV export functionality to system logs for administrators",
+      "Enhanced system logs display with improved column formatting",
+      "Added IP address and user agent tracking to log entries",
+      "Improved log entry readability with color-coded severity levels"
+    ],
+  },
+  {
     version: "0.2.4",
     date: "February 27, 2025",
     changes: [
@@ -256,7 +266,7 @@ export default function Navigation() {
                         setChangelogOpen(true);
                       }}
                     >
-                      Alpha v0.2.4
+                      Alpha v0.2.5
                     </button>
                   </DialogTrigger>
                   <DialogContent className="max-h-[80vh] overflow-y-auto">
