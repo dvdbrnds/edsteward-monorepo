@@ -14,7 +14,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { fetchApi } from "@/lib/api";
+import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
@@ -62,9 +62,9 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
         regulationId,
       };
 
-      const response = await fetchApi(endpoint, {
+      const response = await apiRequest(endpoint, {
         method,
-        body: JSON.stringify(payload),
+        body: payload,
       });
 
       if (!response.ok) {
