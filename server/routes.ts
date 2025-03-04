@@ -784,6 +784,40 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Add logging to the routes for testing
+  app.get("/api/test-logs", async (req, res) => {
+    try {
+      // Check if user is admin
+      if (req.user?.role !== "admin") {
+        return res.status(403).json({ error: "Only administrators can test logs" });
+      }
+
+      const syslog = require('./services/syslog').syslog;
+      const { LogLevel, LogFacility } = require('./services/syslog');
+
+      // Generate test logs at different levels
+      syslog.emergency("Test emergency message", { test: true });
+      syslog.alert("Test alert message", { test: true });
+      syslog.critical("Test critical message", { test: true });
+      syslog.error("Test error message", { test: true });
+      syslog.warning("Test warning message", { test: true });
+      syslog.notice("Test notice message", { test: true });
+      syslog.info("Test info message", { test: true });
+      syslog.debug("Test debug message", { test: true });
+
+      // Test specific event logging
+      syslog.logAuthEvent(LogLevel.INFO, "User login test", 1, "testuser");
+      syslog.logSecurityEvent(LogLevel.WARNING, "Security test", { event: "test" });
+      syslog.logAuditEvent(LogLevel.INFO, "Audit test", { action: "test" });
+      syslog.logSystemEvent(LogLevel.NOTICE, "System test", { component: "test" });
+
+      res.json({ message: "Test logs generated successfully" });
+    } catch (error) {
+      console.error("Failed to generate test logs:", error);
+      res.status(500).json({ error: "Failed to generate test logs" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
