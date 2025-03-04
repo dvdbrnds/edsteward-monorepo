@@ -61,6 +61,23 @@ async function migrateUsersTable() {
       }
     }
     
+    // Check for external_id column
+    const checkExternalId = await db.execute(sql`
+      SELECT column_name FROM information_schema.columns 
+      WHERE table_name = 'users' AND column_name = 'external_id'
+    `);
+    
+    if (checkExternalId.rows.length === 0) {
+      console.log("Adding external_id column...");
+      await db.execute(sql`
+        ALTER TABLE users 
+        ADD COLUMN "external_id" TEXT UNIQUE
+      `);
+      console.log("Added external_id column");
+    } else {
+      console.log("external_id column already exists");
+    }
+    
     console.log("Migration completed successfully");
   } catch (error) {
     console.error("Migration failed:", error);
