@@ -221,7 +221,7 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
                   <FormLabel>Content</FormLabel>
                   <FormControl>
                     <Editor
-                      apiKey="no-api-key"
+                      apiKey={import.meta.env.VITE_TINY_MCE_API_KEY}
                       init={{
                         height: 300,
                         menubar: false,
@@ -298,7 +298,7 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div 
+                  <div
                     className="prose prose-sm max-w-none"
                     dangerouslySetInnerHTML={{ __html: note.content }}
                   />
