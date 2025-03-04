@@ -788,11 +788,26 @@ export function registerRoutes(app: Express): Server {
 
     try {
       DebugLogger.logRequest(req, 'AUTH_LOGIN');
-      console.log('[AUTH] Login attempt starting for user:', username);
+
+      // Debug log for request information
+      const requestInfo = {
+        ip: req.get('x-forwarded-for') || req.ip,
+        userAgent: req.get('user-agent'),
+        hostname: req.hostname,
+        protocol: req.protocol
+      };
+
+      console.log('[AUTH] Request details:', requestInfo);
 
       if (!username || !password) {
-        await syslog.warning("Login attempt with missing credentials", { username });
-        await DebugLogger.logAuthAttempt('AUTH_LOGIN', false, username || 'unknown', { reason: 'missing_credentials' });
+        await syslog.warning("Login attempt with missing credentials", { 
+          username,
+          ...requestInfo
+        });
+        await DebugLogger.logAuthAttempt('AUTH_LOGIN', false, username || 'unknown', { 
+          reason: 'missing_credentials',
+          ...requestInfo
+        });
         return res.status(400).json({ error: "Username and password are required" });
       }
 
@@ -804,8 +819,14 @@ export function registerRoutes(app: Express): Server {
 
       if (!user) {
         console.log('[AUTH] User not found:', username);
-        await syslog.warning("Failed login attempt - user not found", { username });
-        await DebugLogger.logAuthAttempt('AUTH_LOGIN', false, username, { reason: 'user_not_found' });
+        await syslog.warning("Failed login attempt - user not found", { 
+          username,
+          ...requestInfo
+        });
+        await DebugLogger.logAuthAttempt('AUTH_LOGIN', false, username, { 
+          reason: 'user_not_found',
+          ...requestInfo
+        });
         return res.status(400).json({ error: "Invalid username or password" });
       }
 
@@ -813,8 +834,14 @@ export function registerRoutes(app: Express): Server {
 
       if (!passwordMatch) {
         console.log('[AUTH] Invalid password for user:', username);
-        await syslog.warning("Failed login attempt - incorrect password", { username });
-        await DebugLogger.logAuthAttempt('AUTH_LOGIN', false, username, { reason: 'invalid_password' });
+        await syslog.warning("Failed login attempt - incorrect password", { 
+          username,
+          ...requestInfo
+        });
+        await DebugLogger.logAuthAttempt('AUTH_LOGIN', false, username, { 
+          reason: 'invalid_password',
+          ...requestInfo
+        });
         return res.status(400).json({ error: "Invalid username or password" });
       }
 
@@ -824,15 +851,19 @@ export function registerRoutes(app: Express): Server {
       console.log('[AUTH] Setting session data:', {
         userId: user.id,
         role: user.role,
-        username: user.username
+        username: user.username,
+        ...requestInfo
       });
 
       req.session.userId = user.id;
       req.session.role = user.role;
       req.session.username = user.username;
 
-      await syslog.logAuthEvent(LogLevel.INFO, "User logged in successfully", user.id, user.username);
-      await DebugLogger.logAuthAttempt('AUTH_LOGIN', true, username, { userId: user.id });
+      await syslog.logAuthEvent(LogLevel.INFO, "User logged in successfully", user.id, user.username, requestInfo);
+      await DebugLogger.logAuthAttempt('AUTH_LOGIN', true, username, { 
+        userId: user.id,
+        ...requestInfo
+      });
 
       console.log('[AUTH] Login successful for user:', username);
 
@@ -846,7 +877,10 @@ export function registerRoutes(app: Express): Server {
       });
     } catch (error) {
       console.error("Login error:", error);
-      await syslog.error("Login system error", { error: error instanceof Error ? error.message : String(error) });
+      await syslog.error("Login system error", { 
+        error: error instanceof Error ? error.message : String(error),
+        ...requestInfo
+      });
       await DebugLogger.logError('AUTH_LOGIN', error);
       return res.status(500).json({ error: "Internal server error" });
     }
@@ -860,16 +894,28 @@ export function registerRoutes(app: Express): Server {
       DebugLogger.logRequest(req, 'AUTH_LOGOUT');
       console.log('[AUTH] Logout attempt starting');
 
+      const requestInfo = {
+        ip: req.get('x-forwarded-for') || req.ip,
+        userAgent: req.get('user-agent'),
+        hostname: req.hostname
+      };
+
       if (req.session.userId) {
         const userId = req.session.userId;
         const username = req.session.username;
 
-        console.log('[AUTH] Logging out user:', { userId, username });
+        console.log('[AUTH] Logging out user:', { userId, username, ...requestInfo });
 
-        await syslog.logAuthEvent(LogLevel.INFO, "User logged out", userId, username);
-        await DebugLogger.logAuthAttempt('AUTH_LOGOUT', true, username || 'unknown', { userId });
+        await syslog.logAuthEvent(LogLevel.INFO, "User logged out", userId, username, requestInfo);
+        await DebugLogger.logAuthAttempt('AUTH_LOGOUT', true, username || 'unknown', { 
+          userId,
+          ...requestInfo
+        });
+      } else {
+        console.log('[AUTH] Logout attempt without active session');
+        await syslog.warning("Logout attempt without active session", requestInfo);
+        res.status(200).json({ message: "No active session to logout" });
       }
-
       req.session.destroy((err) => {
         if (err) {
           throw err;
@@ -879,7 +925,10 @@ export function registerRoutes(app: Express): Server {
       });
     } catch (error) {
       console.error("Logout error:", error);
-      await syslog.error("Logout system error", { error: error instanceof Error ? error.message : String(error) });
+      await syslog.error("Logout system error", { 
+        error: error instanceof Error ? error.message : String(error),
+        ...requestInfo
+      });
       await DebugLogger.logError('AUTH_LOGOUT', error);
       res.status(500).json({ error: "Internal server error" });
     }
@@ -888,7 +937,7 @@ export function registerRoutes(app: Express): Server {
   // Update the logs endpoint to use database
   app.get("/api/admin/logs", async (req, res) => {
     try {
-      // Check if user is admin
+      // Check ifuser is admin
       if (req.user?.role !== "admin") {
         return res.status(403).json({ error: "Only administrators can access logs" });
       }
@@ -896,7 +945,29 @@ export function registerRoutes(app: Express): Server {
       const { level, facility, startDate, endDate, search, page = 1, limit = 100 } = req.query;
 
       // Build the query
-      let query = db.select().from(systemLogs);
+      let query = db
+        .select({
+          id: systemLogs.id,
+          timestamp: systemLogs.timestamp,
+          facility: systemLogs.facility,
+          severity: systemLogs.severity,
+          message: systemLogs.message,
+          msgId: systemLogs.msgId,
+          structuredData: systemLogs.structuredData,
+          username: sql<string>`COALESCE(
+            ${systemLogs.structuredData}->>'username',
+            ${systemLogs.structuredData}->>'user',
+            'system'
+          )`,
+          context: sql<string>`COALESCE(
+            ${systemLogs.structuredData}->>'context',
+            ${systemLogs.msgId},
+            'general'
+          )`,
+          ip: sql<string>`${systemLogs.structuredData}->>'ip'`,
+          userAgent: sql<string>`${systemLogs.structuredData}->>'userAgent'`
+        })
+        .from(systemLogs);
 
       // Apply filters
       if (level !== undefined) {
@@ -937,27 +1008,20 @@ export function registerRoutes(app: Express): Server {
         .limit(parseInt(limit as string))
         .offset((parseInt(page as string) - 1) * parseInt(limit as string));
 
-      // Generate some test logs if there are none
-      if (totalCount === 0) {
-        await syslog.info("System initialized", { service: "Compliance Manager" });
-        await syslog.logAuthEvent(LogLevel.INFO, "Admin accessed logs page", req.user?.id, req.user?.username);
-
-        // Fetch logs again after generating test entries
-        const updatedLogs = await query
-          .orderBy(desc(systemLogs.timestamp))
-          .limit(parseInt(limit as string))
-          .offset((parseInt(page as string) - 1) * parseInt(limit as string));
-
-        return res.json({
-          logs: updatedLogs,
-          total: 2, // We just added 2 log entries
-          page: parseInt(page as string),
-          totalPages: Math.ceil(2 / parseInt(limit as string))
-        });
-      }
+      // Format the logs to include username and additional context
+      const formattedLogs = logs.map(log => ({
+        ...log,
+        timestamp: new Date(log.timestamp).toLocaleString(),
+        username: log.username || 'system',
+        level: LogLevelNames[log.severity as LogLevel],
+        facility: LogFacilityNames[log.facility as LogFacility],
+        context: log.context || 'general',
+        ip: log.ip || undefined,
+        userAgent: log.userAgent || undefined
+      }));
 
       res.json({
-        logs,
+        logs: formattedLogs,
         total: totalCount,
         page: parseInt(page as string),
         totalPages: Math.ceil(totalCount / parseInt(limit as string))
@@ -1025,3 +1089,37 @@ export function registerRoutes(app: Express): Server {
   const httpServer = createServer(app);
   return httpServer;
 }
+
+const LogLevelNames: Record<LogLevel, string> = {
+  0: 'EMERG',
+  1: 'ALERT',
+  2: 'CRIT',
+  3: 'ERR',
+  4: 'WARNING',
+  5: 'NOTICE',
+  6: 'INFO',
+  7: 'DEBUG'
+};
+
+const LogFacilityNames: Record<LogFacility, string> = {
+  0: 'KERN',
+  1: 'USER',
+  2: 'MAIL',
+  3: 'DAEMON',
+  4: 'AUTH',
+  5: 'SYSLOG',
+  6: 'LPR',
+  7: 'NEWS',
+  8: 'UUCP',
+  9: 'CRON',
+  10: 'AUTHPRIV',
+  11: 'FTP',
+  12: 'LOCAL0',
+  13: 'LOCAL1',
+  14: 'LOCAL2',
+  15: 'LOCAL3',
+  16: 'LOCAL4',
+  17: 'LOCAL5',
+  18: 'LOCAL6',
+  19: 'LOCAL7'
+};
