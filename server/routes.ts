@@ -1031,7 +1031,7 @@ export function registerRoutes(app: Express): Server {
               sql`${systemLogs.structuredData}->>'user' = ${username}`
             )
           );
-        } else {
+        } else if (search.trim() !== '') {  // Only filter if search is not empty
           // Regular search
           const searchTerm = `%${search}%`;
           query = query.where(

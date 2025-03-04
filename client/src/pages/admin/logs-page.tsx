@@ -121,30 +121,38 @@ export default function LogsPage() {
   return (
     <div className="container mx-auto py-8 space-y-8">
       <Card>
-        <CardHeader>
+        <CardHeader className="pb-2">
           <CardTitle>System Logs</CardTitle>
           <CardDescription>
             View and filter system logs. Use the filters below to narrow down the results.
           </CardDescription>
+          <div className="text-xs text-muted-foreground mt-1 flex flex-wrap gap-x-4 gap-y-1 border rounded-md p-2 bg-muted/20">
+            <span>• Authentication events (login/logout)</span>
+            <span>• Regulation access and updates</span>
+            <span>• Compliance status changes</span>
+            <span>• Report generation</span>
+            <span>• System configuration changes</span>
+          </div>
         </CardHeader>
         <CardContent>
+          <div className="flex gap-2 mb-4 flex-wrap items-center">
+            <Button 
+              variant="outline" 
+              size="sm"
+              className="ml-auto"
+              onClick={() => {
+                setSearch("");
+                setLevel(undefined);
+                setFacility(undefined);
+                setStartDate(undefined);
+                setEndDate(undefined);
+                setPage(1);
+              }}
+            >
+              Clear All Filters
+            </Button>
+          </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div className="lg:col-span-4 flex justify-end">
-              <Button 
-                variant="outline" 
-                size="sm"
-                onClick={() => {
-                  setSearch("");
-                  setLevel(undefined);
-                  setFacility(undefined);
-                  setStartDate(undefined);
-                  setEndDate(undefined);
-                  setPage(1);
-                }}
-              >
-                Clear All Filters
-              </Button>
-            </div>
             <div className="space-y-2">
               <label className="text-sm font-medium">Search</label>
               <div className="flex space-x-2">
@@ -155,11 +163,11 @@ export default function LogsPage() {
                 />
                 <Button 
                   variant="outline" 
-                  onClick={() => setSearch("dvdbrnds")}
-                  title="Show only your logs"
+                  onClick={() => setSearch("")}
+                  title="Show all logs"
                   size="sm"
                 >
-                  My Activity
+                  All Logs
                 </Button>
               </div>
             </div>
