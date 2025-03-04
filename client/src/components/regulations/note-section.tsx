@@ -29,6 +29,11 @@ const noteFormSchema = z.object({
   isPrivate: z.boolean().default(false)
 });
 
+const apiKey = import.meta.env.VITE_TINY_MCE_API_KEY;
+if (!apiKey) {
+  console.error('TinyMCE API key is missing. Make sure VITE_TINY_MCE_API_KEY is set in your environment.');
+}
+
 type NoteFormValues = z.infer<typeof noteFormSchema>;
 
 interface Note {
@@ -221,7 +226,7 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
                   <FormLabel>Content</FormLabel>
                   <FormControl>
                     <Editor
-                      apiKey={import.meta.env.VITE_TINY_MCE_API_KEY}
+                      apiKey={apiKey}
                       init={{
                         height: 300,
                         menubar: false,
