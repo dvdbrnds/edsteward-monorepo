@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,8 +33,14 @@ interface NoteSectionProps {
 export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const [notes, setNotes] = React.useState([]); // Added state for notes
+  const [notes, setNotes] = useState<any[]>([]);
 
+  // Fetch notes when component loads
+  useEffect(() => {
+    fetchNotes();
+  }, [regulationId]);
+
+  // Use form hook
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
