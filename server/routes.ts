@@ -1129,6 +1129,35 @@ export function registerRoutes(app: Express): Server {
   app.use('/api/deadlines*', logUserActivity('Deadline review'));
   app.use('/api/bug-report', logUserActivity('Bug report submission'));
   app.use('/api/admin/users*', logUserActivity('User management'));
+  app.use('/api/auth/login', logUserActivity('Authentication'));
+  app.use('/api/auth/logout', logUserActivity('Authentication'));
+  
+  // Log all API requests for comprehensive activity tracking
+  app.use('/api/*', async (req, res, next) => {
+    if (req.user) {
+      const username = req.user.username || 'unknown';
+      const userId = req.user.id;
+      const path = req.path;
+      const method = req.method;
+      const ip = req.ip || req.headers['x-forwarded-for'] || 'unknown';
+      
+      try {
+        await syslog.info(`API request: ${method} ${path}`, {
+          username,
+          userId,
+          path,
+          method,
+          ip,
+          userAgent: req.headers['user-agent'] || 'unknown',
+          timestamp: new Date().toISOString(),
+          context: 'API_REQUEST'
+        });
+      } catch (error) {
+        console.error('Failed to log API request:', error);
+      }
+    }
+    next();
+  });
   
   // Enhanced validation logging
   app.use('/api/regulations/validate', async (req, res, next) => {

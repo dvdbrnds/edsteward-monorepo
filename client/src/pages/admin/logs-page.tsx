@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -33,7 +33,8 @@ import {
 } from "@/components/ui/table";
 import { useAuth } from "@/hooks/use-auth";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, Calendar as CalendarIcon } from "lucide-react";
+import { AlertCircle, Calendar as CalendarIcon, RefreshCw, Activity } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 
 // Map log levels to human-readable names and colors
 const LOG_LEVELS = {
@@ -83,6 +84,8 @@ export default function LogsPage() {
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
   const [page, setPage] = useState(1);
+  const [autoRefresh, setAutoRefresh] = useState(false);
+  const refreshInterval = 10000; // 10 seconds
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["/api/admin/logs", { search, level, facility, startDate, endDate, page }],
@@ -103,6 +106,15 @@ export default function LogsPage() {
     },
     enabled: user?.role === "admin"
   });
+
+  useEffect(() => {
+    if (autoRefresh) {
+      const intervalId = setInterval(() => {
+        refetch();
+      }, refreshInterval);
+      return () => clearInterval(intervalId);
+    }
+  }, [autoRefresh, refetch]);
 
   if (user?.role !== "admin") {
     return (
@@ -151,6 +163,9 @@ export default function LogsPage() {
             >
               Clear All Filters
             </Button>
+            <Switch checked={autoRefresh} onCheckedChange={setAutoRefresh}>
+              Auto Refresh
+            </Switch>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div className="space-y-2">
