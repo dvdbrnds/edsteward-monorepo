@@ -129,6 +129,40 @@ async function migrateUsersTable() {
       console.log("last_login column already exists");
     }
     
+    // Check for created_at column
+    const checkCreatedAt = await db.execute(sql`
+      SELECT column_name FROM information_schema.columns 
+      WHERE table_name = 'users' AND column_name = 'created_at'
+    `);
+    
+    if (checkCreatedAt.rows.length === 0) {
+      console.log("Adding created_at column...");
+      await db.execute(sql`
+        ALTER TABLE users 
+        ADD COLUMN "created_at" TIMESTAMP DEFAULT NOW()
+      `);
+      console.log("Added created_at column");
+    } else {
+      console.log("created_at column already exists");
+    }
+    
+    // Check for updated_at column
+    const checkUpdatedAt = await db.execute(sql`
+      SELECT column_name FROM information_schema.columns 
+      WHERE table_name = 'users' AND column_name = 'updated_at'
+    `);
+    
+    if (checkUpdatedAt.rows.length === 0) {
+      console.log("Adding updated_at column...");
+      await db.execute(sql`
+        ALTER TABLE users 
+        ADD COLUMN "updated_at" TIMESTAMP DEFAULT NOW()
+      `);
+      console.log("Added updated_at column");
+    } else {
+      console.log("updated_at column already exists");
+    }
+    
     console.log("Migration completed successfully");
   } catch (error) {
     console.error("Migration failed:", error);
