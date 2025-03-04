@@ -20,7 +20,6 @@ import { useToast } from "@/hooks/use-toast";
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
   content: z.string().min(1, "Content is required"),
-  category: z.string().optional(),
   status: z.enum(["draft", "published", "archived"]),
   isPrivate: z.boolean().default(false),
 });
@@ -42,7 +41,6 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
     defaultValues: {
       title: initialData?.title || "",
       content: initialData?.content || "",
-      category: initialData?.category || "",
       status: initialData?.status || "draft",
       isPrivate: initialData?.isPrivate || false,
     },
@@ -88,7 +86,6 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
         form.reset({
           title: "",
           content: "",
-          category: "",
           status: "draft",
           isPrivate: false,
         });
@@ -169,19 +166,6 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="category"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Category (Optional)</FormLabel>
-                <FormControl>
-                  <Input {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
 
           <FormField
             control={form.control}
