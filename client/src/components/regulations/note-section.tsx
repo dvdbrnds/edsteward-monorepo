@@ -1,4 +1,3 @@
-
 import React from "react";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
@@ -17,7 +16,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { api } from "@/lib/api";
 import { useToast } from "@/components/ui/use-toast";
-import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -36,7 +34,6 @@ interface NoteSectionProps {
 
 export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
   const { toast } = useToast();
-  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   const form = useForm<FormValues>({
@@ -53,35 +50,35 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
   const onSubmit = async (data: FormValues) => {
     try {
       setIsSubmitting(true);
-      
+
       const endpoint = initialData?.id
         ? `/api/notes/${initialData.id}`
         : "/api/notes";
-      
+
       const method = initialData?.id ? "PUT" : "POST";
-      
+
       const payload = {
         ...data,
         regulationId,
       };
-      
+
       const response = await api(endpoint, {
         method,
         body: JSON.stringify(payload),
       });
-      
+
       if (!response.ok) {
         throw new Error("Failed to save note");
       }
-      
+
       toast({
         title: "Success",
         description: initialData?.id
           ? "Note updated successfully"
           : "Note created successfully",
       });
-      
-      router.refresh();
+
+      //router.refresh(); // Removed as useRouter is no longer imported.  Refresh functionality needs a different solution if required.
     } catch (error) {
       toast({
         title: "Error",
