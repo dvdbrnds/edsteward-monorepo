@@ -42,11 +42,11 @@ const noteFormSchema = z.object({
 // Try to get the API key from environment variables with fallback strategy
 const apiKey = import.meta.env.VITE_TINY_MCE_API_KEY || '';
 
-// For development, we can use a fallback mechanism if needed
-// Since we're experiencing API key issues, default to using the textarea
-const useTinyMCE = true; // Enable TinyMCE rich text editor
+// Always use TinyMCE, but configure it to work with or without an API key
+const useTinyMCE = true;
 
 // Log a helpful message if the API key is missing
+console.log("TinyMCE API key check:", apiKey ? "present" : "missing");
 if (!apiKey) {
   console.warn('TinyMCE API key is missing. The editor will run in limited mode. Add VITE_TINY_MCE_API_KEY to your environment variables for full functionality.');
 }
@@ -192,8 +192,9 @@ export function NoteSection({ onSubmit, initialData, isSubmitting = false }: Not
                         content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; }',
                         branding: false,
                         statusbar: false, // Hide status bar for cleaner UI
-                        // Fall back to community edition if no API key
+                        // Use community edition if no API key
                         suffix: '.min',
+                        promotion: false,
                         setup: (editor) => {
                           editor.on('init', () => {
                             if (!apiKey) {
