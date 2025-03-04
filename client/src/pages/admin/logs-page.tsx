@@ -35,7 +35,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle, Calendar as CalendarIcon, RefreshCw } from "lucide-react";
+import { AlertCircle, Calendar as CalendarIcon, RefreshCw, Download } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 
 // Map log levels to human-readable names and colors
@@ -135,6 +135,35 @@ export default function LogsPage() {
     );
   }
 
+  const downloadCSV = () => {
+    if (!data?.logs) return;
+
+    // Prepare CSV content
+    const csvContent = [
+      // CSV Header
+      ['Timestamp', 'Username', 'Level', 'Facility', 'Message', 'IP Address', 'User Agent'].join(','),
+      // CSV Data
+      ...data.logs.map(log => [
+        format(new Date(log.timestamp), "yyyy-MM-dd HH:mm:ss"),
+        log.username || 'system',
+        LOG_LEVELS[log.severity as keyof typeof LOG_LEVELS]?.name || log.level,
+        LOG_FACILITIES[log.facility as keyof typeof LOG_FACILITIES] || log.facility,
+        `"${log.message.replace(/"/g, '""')}"`, // Escape quotes in message
+        log.ip,
+        `"${log.userAgent?.replace(/"/g, '""') || ''}"` // Escape quotes in user agent
+      ].join(','))
+    ].join('\n');
+
+    // Create and trigger download
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.setAttribute('download', `system-logs-${format(new Date(), 'yyyy-MM-dd')}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <PageLayout>
       <Navigation />
@@ -155,8 +184,8 @@ export default function LogsPage() {
           </CardHeader>
           <CardContent>
             <div className="flex gap-2 mb-4 flex-wrap items-center">
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 size="sm"
                 className="ml-auto"
                 onClick={() => {
@@ -183,8 +212,8 @@ export default function LogsPage() {
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                   />
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     onClick={() => setSearch("")}
                     title="Show all logs"
                     size="sm"
@@ -335,6 +364,16 @@ export default function LogsPage() {
                     Showing {data?.logs.length} of {data?.total} logs
                   </div>
                   <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={downloadCSV}
+                      size="sm"
+                      title="Export logs as CSV"
+                      disabled={!data?.logs?.length}
+                    >
+                      <Download className="h-4 w-4 mr-2" />
+                      Export CSV
+                    </Button>
                     <Button
                       variant="outline"
                       onClick={() => refetch()}
