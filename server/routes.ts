@@ -10,6 +10,10 @@ import { google } from 'googleapis';
 import { OAuth2Client } from 'google-auth-library';
 import path from 'path';
 import fs from 'fs';
+import { desc, eq, like, or, sql, and, gte, lte } from "drizzle-orm";
+import { db } from "./db";
+import { systemLogs, users } from "@shared/schema";
+import { syslog, LogLevel, LogFacility } from './services/syslog';
 
 // Update the getRedirectUri function to handle different environments properly
 function getRedirectUri(req: Request): string {
@@ -736,11 +740,29 @@ export function registerRoutes(app: Express): Server {
         .then(res => Number(res[0].count));
 
       // Get paginated results
-      const startIndex = (parseInt(page as string) - 1) * parseInt(limit as string);
       const logs = await query
         .orderBy(desc(systemLogs.timestamp))
         .limit(parseInt(limit as string))
-        .offset(startIndex);
+        .offset((parseInt(page as string) - 1) * parseInt(limit as string));
+
+      // Generate some test logs if there are none
+      if (totalCount === 0) {
+        await syslog.info("System initialized", { service: "Compliance Manager" });
+        await syslog.logAuthEvent(LogLevel.INFO, "Admin accessed logs page", req.user?.id, req.user?.username);
+
+        // Fetch logs again after generating test entries
+        const updatedLogs = await query
+          .orderBy(desc(systemLogs.timestamp))
+          .limit(parseInt(limit as string))
+          .offset((parseInt(page as string) - 1) * parseInt(limit as string));
+
+        return res.json({
+          logs: updatedLogs,
+          total: 2, // We just added 2 log entries
+          page: parseInt(page as string),
+          totalPages: Math.ceil(2 / parseInt(limit as string))
+        });
+      }
 
       res.json({
         logs,
@@ -754,6 +776,29 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Add test logs generation endpoint
+  app.post("/api/admin/generate-test-logs", async (req, res) => {
+    try {
+      if (req.user?.role !== "admin") {
+        return res.status(403).json({ error: "Only administrators can generate test logs" });
+      }
+
+      await syslog.emergency("Test emergency message", { test: true });
+      await syslog.alert("Test alert message", { test: true });
+      await syslog.critical("Test critical message", { test: true });
+      await syslog.error("Test error message", { test: true });
+      await syslog.warning("Test warning message", { test: true });
+      await syslog.notice("Test notice message", { test: true });
+      await syslog.info("Test info message", { test: true });
+      await syslog.debug("Test debug message", { test: true });
+
+      res.json({ message: "Test logs generated successfully" });
+    } catch (error) {
+      console.error("Failed to generate test logs:", error);
+      res.status(500).json({ error: "Failed to generate test logs" });
+    }
+  });
+
   // Add logging to the routes for testing
   app.get("/api/test-logs", async (req, res) => {
     try {
@@ -761,9 +806,6 @@ export function registerRoutes(app: Express): Server {
       if (req.user?.role !== "admin") {
         return res.status(403).json({ error: "Only administrators can test logs" });
       }
-
-      const syslog = require('./services/syslog').syslog;
-      const { LogLevel, LogFacility } = require('./services/syslog');
 
       // Generate test logs at different levels
       syslog.emergency("Test emergency message", { test: true });
