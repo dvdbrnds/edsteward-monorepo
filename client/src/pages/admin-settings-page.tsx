@@ -273,6 +273,22 @@ export default function AdminSettingsPage() {
     },
   })
 
+  const handleUpdateNotification = (updatedNotification: any) => {
+    setNotifications((prevNotifications) => {
+      const updatedNotifications = prevNotifications.map((notification) => {
+        if (notification.type === updatedNotification.type) {
+          return updatedNotification;
+        }
+        return notification;
+      });
+      return updatedNotifications;
+    });
+  };
+
+  const handleAddNotification = (newNotification: any) => {
+    setNotifications((prevNotifications) => [...prevNotifications, newNotification]);
+  };
+
   if (emailLoading || twilioLoading || usersLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -860,6 +876,7 @@ export default function AdminSettingsPage() {
                           <SelectItem value="daily">Daily</SelectItem>
                           <SelectItem value="weekly">Weekly</SelectItem>
                           <SelectItem value="monthly">Monthly</SelectItem>
+                          <SelectItem value="never">Never</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -890,7 +907,7 @@ export default function AdminSettingsPage() {
                     <div className="ml-4">
                       <Label>Default Frequency</Label>
                       <Select
-                        defaultValue={notifications?.find(n => n.type === 'sms')?.frequency || 'daily'}
+                        defaultValue={notifications?.find(n => n.type === 'sms')?.frequency || "never"}
                         onValueChange={(value) => {
                           if (notifications) {
                             const smsNotif = notifications.find(n => n.type === 'sms');
@@ -899,6 +916,8 @@ export default function AdminSettingsPage() {
                                 ...smsNotif,
                                 frequency: value,
                               });
+                            } else {
+                              handleAddNotification({ type: 'sms', frequency: value });
                             }
                           }
                         }}
@@ -907,10 +926,10 @@ export default function AdminSettingsPage() {
                           <SelectValue placeholder="Select frequency" />
                         </SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="never">Never</SelectItem>
                           <SelectItem value="daily">Daily</SelectItem>
                           <SelectItem value="weekly">Weekly</SelectItem>
                           <SelectItem value="monthly">Monthly</SelectItem>
-                          <SelectItem value="never">Never</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
