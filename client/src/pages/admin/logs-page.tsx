@@ -35,16 +35,16 @@ import { useAuth } from "@/hooks/use-auth";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { AlertCircle, Calendar as CalendarIcon } from "lucide-react";
 
-// Map log levels to human-readable names
+// Map log levels to human-readable names and colors
 const LOG_LEVELS = {
-  0: "Emergency",
-  1: "Alert",
-  2: "Critical",
-  3: "Error",
-  4: "Warning",
-  5: "Notice",
-  6: "Info",
-  7: "Debug"
+  0: { name: "Emergency", color: "text-red-600 font-bold" },
+  1: { name: "Alert", color: "text-red-500 font-bold" },
+  2: { name: "Critical", color: "text-red-500" },
+  3: { name: "Error", color: "text-red-400" },
+  4: { name: "Warning", color: "text-yellow-500" },
+  5: { name: "Notice", color: "text-blue-500" },
+  6: { name: "Info", color: "text-blue-400" },
+  7: { name: "Debug", color: "text-gray-400" }
 };
 
 // Map facilities to human-readable names
@@ -129,9 +129,9 @@ export default function LogsPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Levels</SelectItem>
-                  {Object.entries(LOG_LEVELS).map(([value, label]) => (
+                  {Object.entries(LOG_LEVELS).map(([value, { name }]) => (
                     <SelectItem key={value} value={value}>
-                      {label}
+                      {name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -212,6 +212,8 @@ export default function LogsPage() {
                       <TableHead>Level</TableHead>
                       <TableHead>Facility</TableHead>
                       <TableHead>Message</TableHead>
+                      <TableHead>IP Address</TableHead>
+                      <TableHead>User Agent</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -220,10 +222,18 @@ export default function LogsPage() {
                         <TableCell>
                           {format(new Date(log.timestamp), "MMM d, yyyy HH:mm:ss")}
                         </TableCell>
-                        <TableCell>{LOG_LEVELS[log.level as keyof typeof LOG_LEVELS]}</TableCell>
-                        <TableCell>{LOG_FACILITIES[log.facility as keyof typeof LOG_FACILITIES]}</TableCell>
-                        <TableCell className="font-mono text-sm">
+                        <TableCell className={LOG_LEVELS[log.severity as keyof typeof LOG_LEVELS]?.color || ""}>
+                          {log.level}
+                        </TableCell>
+                        <TableCell>{log.facility}</TableCell>
+                        <TableCell className="font-mono text-sm whitespace-pre-wrap max-w-md">
                           {log.message}
+                        </TableCell>
+                        <TableCell className="font-mono text-sm">
+                          {log.ip}
+                        </TableCell>
+                        <TableCell className="font-mono text-sm truncate max-w-xs" title={log.userAgent}>
+                          {log.userAgent}
                         </TableCell>
                       </TableRow>
                     ))}
