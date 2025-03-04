@@ -20,7 +20,6 @@ import { useToast } from "@/hooks/use-toast";
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
   content: z.string().min(1, "Content is required"),
-  status: z.enum(["draft", "published", "archived"]),
   isPrivate: z.boolean().default(false),
 });
 
@@ -41,7 +40,6 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
     defaultValues: {
       title: initialData?.title || "",
       content: initialData?.content || "",
-      status: initialData?.status || "draft",
       isPrivate: initialData?.isPrivate || false,
     },
   });
@@ -86,7 +84,6 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
         form.reset({
           title: "",
           content: "",
-          status: "draft",
           isPrivate: false,
         });
       }
@@ -167,27 +164,6 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
           />
 
 
-          <FormField
-            control={form.control}
-            name="status"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Status</FormLabel>
-                <FormControl>
-                  <select
-                    {...field}
-                    className="w-full p-2 border rounded-md"
-                  >
-                    <option value="draft">Draft</option>
-                    <option value="published">Published</option>
-                    <option value="archived">Archived</option>
-                  </select>
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
           {/* Private note option temporarily removed 
           <FormField
             control={form.control}
@@ -224,9 +200,9 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
         {notes.length === 0 ? (
           <p className="text-sm text-gray-500">No notes found for this regulation.</p>
         ) : (
-          <div className="space-y-4">
+          <ul className="space-y-4"> {/* Changed to ul for better list rendering */}
             {notes.map((note) => (
-              <div key={note.id} className="border p-4 rounded-md">
+              <li key={note.id} className="border p-4 rounded-md"> {/* Changed to li */}
                 <div className="flex justify-between items-start">
                   <h4 className="text-md font-medium">{note.title}</h4>
                   <div className="text-xs text-gray-500">
@@ -235,13 +211,10 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
                   </div>
                 </div>
                 <p className="mt-2 text-sm">{note.content}</p>
-                <div className="mt-2 text-xs text-gray-500">
-                  {note.category && <span className="mr-2">Category: {note.category}</span>}
-                  {note.status && <span>Status: {note.status}</span>}
-                </div>
-              </div>
+                {/* Removed status display */}
+              </li>
             ))}
-          </div>
+          </ul>
         )}
       </div>
     </div>
