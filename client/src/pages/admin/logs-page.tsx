@@ -49,14 +49,30 @@ const LOG_LEVELS = {
 
 // Map facilities to human-readable names
 const LOG_FACILITIES = {
-  0: "Kernel",
-  1: "User",
-  2: "Mail",
-  3: "System",
-  4: "Security",
-  5: "Internal",
-  10: "Auth",
-  13: "Audit"
+  0: "KERNEL",
+  1: "USER",
+  2: "MAIL",
+  3: "SYSTEM",
+  4: "SECURITY",
+  5: "INTERNAL",
+  6: "PRINTER",
+  7: "NETWORK",
+  8: "UUCP",
+  9: "CLOCK",
+  10: "AUTHPRIV",
+  11: "FTP",
+  12: "NTP",
+  13: "AUDIT",
+  14: "ALERT",
+  15: "CRON",
+  16: "LOCAL0",
+  17: "LOCAL1",
+  18: "LOCAL2",
+  19: "LOCAL3",
+  20: "LOCAL4",
+  21: "LOCAL5",
+  22: "LOCAL6",
+  23: "LOCAL7"
 };
 
 export default function LogsPage() {
@@ -223,9 +239,9 @@ export default function LogsPage() {
                           {format(new Date(log.timestamp), "MMM d, yyyy HH:mm:ss")}
                         </TableCell>
                         <TableCell className={LOG_LEVELS[log.severity as keyof typeof LOG_LEVELS]?.color || ""}>
-                          {log.level}
+                          {LOG_LEVELS[log.severity as keyof typeof LOG_LEVELS]?.name || log.level}
                         </TableCell>
-                        <TableCell>{log.facility}</TableCell>
+                        <TableCell>{LOG_FACILITIES[log.facility as keyof typeof LOG_FACILITIES] || log.facility}</TableCell>
                         <TableCell className="font-mono text-sm whitespace-pre-wrap max-w-md">
                           {log.message}
                         </TableCell>
