@@ -171,7 +171,9 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
   };
 
   // Get initials from username
-  const getInitials = (name: string) => {
+  const getInitials = (name?: string) => {
+    if (!name) return "??";
+
     return name
       .split(' ')
       .map(part => part[0])
@@ -268,7 +270,7 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
                       <div className="flex items-center gap-3 mt-2">
                         <Avatar className="h-6 w-6">
                           <AvatarFallback className="bg-primary text-xs">
-                            {note.user ? getInitials(note.user.name) : "??"}
+                            {note.user ? getInitials(note.user.name) : "?? "}
                           </AvatarFallback>
                         </Avatar>
                         <CardDescription className="flex items-center">
