@@ -60,6 +60,8 @@ export function NoteSection({ onSubmit, initialData, isSubmitting = false }: Not
     },
   });
 
+  const handleFormSubmit = form.handleSubmit(onSubmit);
+  
   return (
     <div className="space-y-6">
       <div>
@@ -69,7 +71,7 @@ export function NoteSection({ onSubmit, initialData, isSubmitting = false }: Not
         </p>
       </div>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        <form onSubmit={handleFormSubmit} className="space-y-4">
           <FormField
             control={form.control}
             name="title"
