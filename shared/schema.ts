@@ -354,3 +354,36 @@ export type TwilioConfig = typeof twilioConfigs.$inferSelect;
 export type InsertTwilioConfig = z.infer<typeof insertTwilioConfigSchema>;
 export type Note = typeof notes.$inferSelect;
 export type InsertNote = z.infer<typeof insertNoteSchema>;
+
+// Add after the existing tables
+// System Logs table according to RFC 5424 syslog standard
+export const systemLogs = pgTable("system_logs", {
+  id: serial("id").primaryKey(),
+  timestamp: timestamp("timestamp").notNull().defaultNow(),
+  facility: integer("facility").notNull(),
+  severity: integer("severity").notNull(),
+  version: integer("version").notNull().default(1),
+  hostname: text("hostname").notNull(),
+  appName: text("app_name").notNull(),
+  procId: text("proc_id").notNull(),
+  msgId: text("msg_id"),
+  structuredData: jsonb("structured_data").$type<Record<string, any>>(),
+  message: text("message").notNull(),
+});
+
+// Schema for inserting system logs
+export const insertSystemLogSchema = createInsertSchema(systemLogs).extend({
+  facility: z.number().min(0).max(23),
+  severity: z.number().min(0).max(7),
+  version: z.number().default(1),
+  hostname: z.string(),
+  appName: z.string(),
+  procId: z.string(),
+  msgId: z.string().optional(),
+  structuredData: z.record(z.string(), z.unknown()).optional(),
+  message: z.string(),
+});
+
+// Add to the type exports
+export type SystemLog = typeof systemLogs.$inferSelect;
+export type InsertSystemLog = z.infer<typeof insertSystemLogSchema>;

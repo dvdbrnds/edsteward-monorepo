@@ -1,6 +1,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
+import { db } from '../db';
+import { systemLogs } from '@shared/schema';
 
 // Log levels based on syslog protocol (RFC 5424)
 export enum LogLevel {
@@ -129,18 +131,6 @@ export class SysLogger {
 
     // Set up file stream for logging
     this.setupFileStream();
-
-    // Log system startup
-    this.log(LogFacility.SYSTEM, LogLevel.NOTICE, 'System logger initialized', {
-      id: 'LOGGER_INIT',
-      parameters: {
-        logLevel: LogLevelNames[this.config.logLevel],
-        logFile: this.config.logFilePath,
-        maxFileSize: this.config.maxFileSize,
-        maxFiles: this.config.maxFiles,
-        rotateDaily: this.config.rotateDaily
-      }
-    });
   }
 
   private setupFileStream(): void {
@@ -204,42 +194,64 @@ export class SysLogger {
   /**
    * Log a message with the specified facility and level
    */
-  log(facility: LogFacility, level: LogLevel, message: string, structuredData?: StructuredData): void {
+  async log(facility: LogFacility, level: LogLevel, message: string, structuredData?: StructuredData): Promise<void> {
     if (level > this.config.logLevel) {
       return; // Skip if level is higher than configured level
     }
 
-    // Check log rotation
-    if (this.shouldRotateLog()) {
-      this.rotateLog();
-    }
-
-    const timestamp = new Date().toISOString();
+    const timestamp = new Date();
     const hostname = os.hostname();
     const pid = process.pid;
 
-    // Calculate priority value (PRI) as per syslog RFC
-    const pri = facility * 8 + level;
-
-    // Format structured data according to RFC 5424
-    let structuredDataStr = '-';
-    if (structuredData) {
-      structuredDataStr = `[${structuredData.id}`;
-      for (const [key, value] of Object.entries(structuredData.parameters)) {
-        structuredDataStr += ` ${key}="${value}"`;
-      }
-      structuredDataStr += ']';
+    // Store in database according to RFC 5424
+    try {
+      await db.insert(systemLogs).values({
+        timestamp,
+        facility,
+        severity: level,
+        hostname,
+        appName: this.config.applicationName,
+        procId: pid.toString(),
+        msgId: structuredData?.id || null,
+        structuredData: structuredData?.parameters || null,
+        message,
+      });
+    } catch (error) {
+      console.error('Failed to store log in database:', error);
     }
 
-    // Format according to syslog RFC 5424
-    // <PRI>VERSION TIMESTAMP HOSTNAME APP-NAME PROCID MSGID STRUCTURED-DATA MSG
-    const syslogMessage = `<${pri}>1 ${timestamp} ${hostname} ${this.config.applicationName} ${pid} - ${structuredDataStr} ${message}\n`;
+    // Also keep file logging as backup
+    if (this.config.logToFile) {
+      // Check log rotation
+      if (this.shouldRotateLog()) {
+        this.rotateLog();
+      }
 
-    // Human-readable format for console
-    const humanReadable = `${timestamp} [${LogFacilityNames[facility]}:${LogLevelNames[level]}] [${pid}] ${message}`;
+      // Calculate priority value (PRI) as per syslog RFC
+      const pri = facility * 8 + level;
+
+      // Format structured data according to RFC 5424
+      let structuredDataStr = '-';
+      if (structuredData) {
+        structuredDataStr = `[${structuredData.id}`;
+        for (const [key, value] of Object.entries(structuredData.parameters)) {
+          structuredDataStr += ` ${key}="${value}"`;
+        }
+        structuredDataStr += ']';
+      }
+
+      // Format according to syslog RFC 5424
+      const syslogMessage = `<${pri}>1 ${timestamp.toISOString()} ${hostname} ${this.config.applicationName} ${pid} - ${structuredDataStr} ${message}\n`;
+
+      if (this.fileStream) {
+        this.fileStream.write(syslogMessage);
+      }
+    }
 
     // Log to console if enabled
     if (this.config.logToConsole) {
+      const humanReadable = `${timestamp.toISOString()} [${LogFacilityNames[facility]}:${LogLevelNames[level]}] [${pid}] ${message}`;
+
       if (level <= LogLevel.ERROR) {
         console.error(humanReadable);
       } else if (level === LogLevel.WARNING) {
@@ -248,14 +260,8 @@ export class SysLogger {
         console.log(humanReadable);
       }
     }
-
-    // Log to file if enabled
-    if (this.config.logToFile && this.fileStream) {
-      this.fileStream.write(syslogMessage);
-    }
   }
 
-  // Convenience methods for different log levels
   emergency(message: string, metadata?: Record<string, any>): void {
     this.log(LogFacility.USER, LogLevel.EMERGENCY, message, {
       id: 'EMERGENCY',
