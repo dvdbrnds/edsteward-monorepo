@@ -351,7 +351,7 @@ export default function AdminSettingsPage() {
                             </FormItem>
                           )}
                         />
-                        
+
                         <div className="grid grid-cols-2 gap-4">
                           <FormField
                             control={userForm.control}
@@ -366,7 +366,7 @@ export default function AdminSettingsPage() {
                               </FormItem>
                             )}
                           />
-                          
+
                           <FormField
                             control={userForm.control}
                             name="lastName"
@@ -890,7 +890,7 @@ export default function AdminSettingsPage() {
                     <div className="ml-4">
                       <Label>Default Frequency</Label>
                       <Select
-                        defaultValue={notifications?.find(n => n.type === 'sms')?.frequency || 'weekly'}
+                        defaultValue={notifications?.find(n => n.type === 'sms')?.frequency || 'daily'}
                         onValueChange={(value) => {
                           if (notifications) {
                             const smsNotif = notifications.find(n => n.type === 'sms');
@@ -910,6 +910,7 @@ export default function AdminSettingsPage() {
                           <SelectItem value="daily">Daily</SelectItem>
                           <SelectItem value="weekly">Weekly</SelectItem>
                           <SelectItem value="monthly">Monthly</SelectItem>
+                          <SelectItem value="never">Never</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
