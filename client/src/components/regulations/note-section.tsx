@@ -2,7 +2,8 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Editor } from "@tinymce/tinymce-react";
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import {
   Form,
   FormControl,
@@ -38,18 +39,6 @@ const noteFormSchema = z.object({
   }),
   isPrivate: z.boolean().default(false)
 });
-
-// Try to get the API key from environment variables with fallback strategy
-const apiKey = import.meta.env.VITE_TINY_MCE_API_KEY || '';
-
-// Always use TinyMCE, but configure it to work with or without an API key
-const useTinyMCE = true;
-
-// Log a helpful message if the API key is missing
-console.log("TinyMCE API key check:", apiKey ? "present" : "missing");
-if (!apiKey) {
-  console.warn('TinyMCE API key is missing. The editor will run in limited mode. Add VITE_TINY_MCE_API_KEY to your environment variables for full functionality.');
-}
 
 export type NoteFormData = z.infer<typeof noteFormSchema>;
 
@@ -168,62 +157,22 @@ export function NoteSection({ onSubmit, initialData, isSubmitting = false }: Not
               <FormItem>
                 <FormLabel>Content</FormLabel>
                 <FormControl>
-                  {useTinyMCE ? (
-                    <Editor
-                      apiKey={apiKey}
-                      onEditorChange={(content) => {
-                        field.onChange(content);
-                      }}
-                      onError={(e) => {
-                        console.error("TinyMCE error:", e);
-                      }}
-                      init={{
-                        promotion: false,
-                        height: 300,
-                        menubar: false, // Simplified menu for more stability
-                        plugins: [
-                          'autolink', 'lists', 'link', 
-                          'searchreplace', 'code',
-                          'fullscreen', 'help', 'wordcount'
-                        ], // Reduced plugins for stability
-                        toolbar: 'undo redo | blocks | ' +
-                          'bold italic | bullist numlist | ' +
-                          'removeformat | help',
-                        content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; }',
-                        branding: false,
-                        statusbar: false, // Hide status bar for cleaner UI
-                        // Use community edition if no API key
-                        suffix: '.min',
-                        promotion: false,
-                        setup: (editor) => {
-                          editor.on('init', () => {
-                            if (!apiKey) {
-                              console.log('TinyMCE running in community mode without an API key');
-                            }
-                          });
-                        }
-                      }}
-                      onInit={(evt, editor) => {
-                        console.log('TinyMCE initialized with API key:', apiKey ? 'present' : 'missing');
-                        // Add notification in UI if running in community mode
-                        if (!apiKey) {
-                          editor.notificationManager.open({
-                            text: 'TinyMCE is running in community mode. For full functionality, please add an API key.',
-                            type: 'info',
-                            timeout: 5000
-                          });
-                        }
-                      }}
+                  <div className="rich-text-editor">
+                    <ReactQuill
+                      theme="snow"
                       value={field.value}
+                      onChange={field.onChange}
+                      modules={{
+                        toolbar: [
+                          [{ 'header': [1, 2, 3, false] }],
+                          ['bold', 'italic', 'underline', 'strike'],
+                          [{'list': 'ordered'}, {'list': 'bullet'}],
+                          ['link', 'clean']
+                        ],
+                      }}
+                      style={{ height: '300px', marginBottom: '50px' }}
                     />
-                  ) : (
-                    <textarea
-                      className="w-full h-64 p-2 border rounded"
-                      value={field.value}
-                      onChange={(e) => field.onChange(e.target.value)}
-                      placeholder="Enter note content here..."
-                    />
-                  )}
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>
