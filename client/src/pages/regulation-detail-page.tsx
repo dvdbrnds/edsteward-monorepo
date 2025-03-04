@@ -606,9 +606,9 @@ export default function RegulationDetailPage() {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>Notes</CardTitle>
+                    <CardTitle>Diary</CardTitle>
                     <CardDescription>
-                      Keep track of important updates, compliance status, and deadlines for this regulation
+                      Document and track regulatory compliance activities, updates, and key milestones
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
