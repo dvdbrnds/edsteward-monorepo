@@ -216,7 +216,10 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
                     {note.isPrivate && <span className="ml-2">(Private)</span>}
                   </div>
                 </div>
-                <p className="mt-2 text-sm">{note.content}</p>
+                <div 
+                  className="mt-2 text-sm" 
+                  dangerouslySetInnerHTML={{ __html: note.content }}
+                />
                 {/* Removed status display */}
               </li>
             ))}
