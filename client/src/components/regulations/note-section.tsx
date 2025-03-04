@@ -44,7 +44,7 @@ const apiKey = import.meta.env.VITE_TINY_MCE_API_KEY || '';
 
 // For development, we can use a fallback mechanism if needed
 // Since we're experiencing API key issues, default to using the textarea
-const useTinyMCE = false; // Using textarea fallback until API key is configured
+const useTinyMCE = true; // Enable TinyMCE rich text editor
 
 // Log a helpful message if the API key is missing
 if (!apiKey) {
@@ -192,6 +192,8 @@ export function NoteSection({ onSubmit, initialData, isSubmitting = false }: Not
                         content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; }',
                         branding: false,
                         statusbar: false, // Hide status bar for cleaner UI
+                        // Fall back to community edition if no API key
+                        suffix: '.min',
                         setup: (editor) => {
                           editor.on('init', () => {
                             if (!apiKey) {
@@ -202,6 +204,14 @@ export function NoteSection({ onSubmit, initialData, isSubmitting = false }: Not
                       }}
                       onInit={(evt, editor) => {
                         console.log('TinyMCE initialized with API key:', apiKey ? 'present' : 'missing');
+                        // Add notification in UI if running in community mode
+                        if (!apiKey) {
+                          editor.notificationManager.open({
+                            text: 'TinyMCE is running in community mode. For full functionality, please add an API key.',
+                            type: 'info',
+                            timeout: 5000
+                          });
+                        }
                       }}
                       value={field.value}
                     />
