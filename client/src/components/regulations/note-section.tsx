@@ -27,6 +27,7 @@ import { z } from "zod";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { AlertCircle, Clock, User } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 // Create a schema for note form validation
 const noteFormSchema = z.object({
@@ -50,11 +51,16 @@ interface Note {
   isPrivate: boolean;
   createdAt: string;
   updatedAt: string;
+  user?: {
+    username: string;
+    name: string;
+  };
 }
 
 interface User {
   id: number;
   username: string;
+  name: string;
 }
 
 type NoteSectionProps = {
@@ -65,9 +71,6 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
   const { toast } = useToast();
   const { user } = useAuth();
   const queryClient = useQueryClient();
-
-  console.log("NoteSection rendering with regulationId:", regulationId);
-  console.log("Current user:", user);
 
   // Form setup
   const form = useForm<NoteFormValues>({
@@ -84,20 +87,13 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
   const { data: notes, isLoading, error, refetch } = useQuery<Note[]>({
     queryKey: ["notes", regulationId],
     queryFn: async () => {
-      console.log(`Fetching notes for regulation ${regulationId}`);
       if (!user) {
-        console.log("No user logged in, cannot fetch notes");
         return [];
       }
 
       try {
         const response = await fetch(`/api/notes/regulation/${regulationId}`, {
-          credentials: 'include' // Important: Include cookies for auth
-        });
-
-        console.log("Notes fetch response:", {
-          status: response.status,
-          ok: response.ok
+          credentials: 'include'
         });
 
         if (!response.ok) {
@@ -105,7 +101,6 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
         }
 
         const data = await response.json();
-        console.log(`Retrieved ${data.length} notes:`, data);
         return data;
       } catch (error) {
         console.error("Error fetching notes:", error);
@@ -118,65 +113,32 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
   // Mutation for creating notes
   const createMutation = useMutation({
     mutationFn: async (noteData: NoteFormValues) => {
-      console.log("Creating note with data:", noteData);
+      const response = await fetch('/api/notes', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...noteData,
+          regulationId,
+        }),
+        credentials: 'include'
+      });
 
-      try {
-        // Send the POST request
-        const response = await fetch('/api/notes', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(noteData),
-          credentials: 'include' // Ensure cookies are sent with the request
-        });
-
-        console.log("Response received:", {
-          status: response.status,
-          statusText: response.statusText,
-          headers: Object.fromEntries([...response.headers.entries()]),
-          ok: response.ok
-        });
-
-        const responseText = await response.text();
-        console.log("Response body:", responseText);
-
-        if (!response.ok) {
-          console.error("Failed to save note:", responseText);
-          let errorMessage = `Failed to save note: ${response.status} ${response.statusText}`;
-          try {
-            const errorData = JSON.parse(responseText);
-            errorMessage = errorData.error || errorMessage;
-          } catch (parseError) {
-            console.error("Error parsing error response:", parseError);
-          }
-          throw new Error(errorMessage);
-        }
-
-        // Parse the response if it's JSON
-        let savedNote;
-        try {
-          savedNote = JSON.parse(responseText);
-          console.log("Note saved successfully:", savedNote);
-        } catch (parseError) {
-          console.error("Error parsing response:", parseError);
-          throw new Error("Received invalid response from server");
-        }
-        return savedNote;
-      } catch (error) {
-        console.error("Note creation failed:", error);
-        throw error;
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to save note');
       }
+
+      return await response.json();
     },
     onSuccess: () => {
-      // Show success message
       toast({
-        title: "Note Saved",
-        description: "Your note has been saved successfully.",
+        title: "Entry Saved",
+        description: "Your diary entry has been saved successfully.",
         variant: "default",
       });
 
-      // Reset the form
       form.reset({
         regulationId: regulationId,
         title: "",
@@ -184,40 +146,38 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
         isPrivate: false
       });
 
-      // Refetch notes to update the list
       refetch();
     },
     onError: (error: any) => {
-      // Show error message
       toast({
         title: "Error",
-        description: error.message || "Failed to save note. Please try again.",
+        description: error.message || "Failed to save entry. Please try again.",
         variant: "destructive",
       });
     }
   });
 
   const onSubmit = (values: NoteFormValues) => {
-    console.log("Form submitted with values:", values);
-
     if (!user) {
-      console.error("Cannot submit note: User not logged in");
       toast({
         title: "Authentication Required",
-        description: "You must be logged in to save notes.",
+        description: "You must be logged in to save entries.",
         variant: "destructive",
       });
       return;
     }
 
-    // Add regulationId to ensure it's included
-    const noteData = {
-      ...values,
-      regulationId: regulationId
-    };
+    createMutation.mutate(values);
+  };
 
-    console.log("Submitting note data:", noteData);
-    createMutation.mutate(noteData);
+  // Get initials from username
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(part => part[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
   };
 
   // If user is not logged in, show message
@@ -228,7 +188,7 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Authentication Required</AlertTitle>
           <AlertDescription>
-            You must be logged in to view and create notes.
+            You must be logged in to view and create entries.
           </AlertDescription>
         </Alert>
       </div>
@@ -254,8 +214,6 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
                 </FormItem>
               )}
             />
-
-            {/* Category and status fields removed */}
 
             <FormField
               control={form.control}
@@ -288,7 +246,7 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
 
       <div>
         <h3 className="text-lg font-medium mb-4">Diary</h3>
-        <p className="text-sm text-muted-foreground mb-4">Keep track of important updates, compliance status, and deadlines for this regulation. This is where compliance officers and administrators can document how your institution addresses this requirement.</p>
+        <p className="text-sm text-muted-foreground mb-4">Keep a running journal of how this regulation affects your institution. Use this space to document observations, challenges, and progress in meeting compliance requirements.</p>
         {isLoading ? (
           <p>Loading entries...</p>
         ) : error ? (
@@ -307,12 +265,18 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
                   <div className="flex justify-between items-start">
                     <div>
                       <CardTitle>{note.title}</CardTitle>
-                      <CardDescription className="flex items-center mt-1">
-                        <Clock className="h-3 w-3 mr-1" />
-                        {format(new Date(note.updatedAt), "MMM d, yyyy")}
-                      </CardDescription>
+                      <div className="flex items-center gap-3 mt-2">
+                        <Avatar className="h-6 w-6">
+                          <AvatarFallback className="bg-primary text-xs">
+                            {note.user ? getInitials(note.user.name) : "??"}
+                          </AvatarFallback>
+                        </Avatar>
+                        <CardDescription className="flex items-center">
+                          <Clock className="h-3 w-3 mr-1" />
+                          {format(new Date(note.updatedAt), "MMM d, yyyy")}
+                        </CardDescription>
+                      </div>
                     </div>
-                    {/* Removed category and status divs */}
                     {note.isPrivate && (
                       <div className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800">
                         Private

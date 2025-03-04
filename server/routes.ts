@@ -537,8 +537,20 @@ export function registerRoutes(app: Express): Server {
       const notes = await storage.getNotesByRegulation(regulationId);
 
       // Filter out private notes that don't belong to the current user
-      const filteredNotes = notes.filter(note =>
-        !note.isPrivate || note.userId === req.user!.id
+      // and enrich notes with user information
+      const filteredNotes = await Promise.all(
+        notes
+          .filter(note => !note.isPrivate || note.userId === req.user!.id)
+          .map(async (note) => {
+            const noteUser = await storage.getUser(note.userId);
+            return {
+              ...note,
+              user: noteUser ? {
+                username: noteUser.username,
+                name: noteUser.name
+              } : undefined
+            };
+          })
       );
 
       res.json(filteredNotes);
@@ -549,89 +561,31 @@ export function registerRoutes(app: Express): Server {
   });
 
   app.post("/api/notes", async (req, res) => {
-    // Import the debug logger
-    const { DebugLogger } = await import('./services/debug-logger');
-
-    DebugLogger.log('NOTES_API', '======= NOTE CREATION REQUEST START =======');
-    DebugLogger.logRequest(req, 'NOTES_API');
-
     try {
-      // Check authentication
-      DebugLogger.log('NOTES_API', 'Checking authentication...');
-      DebugLogger.log('NOTES_API', 'User in request:', req.user);
-
       if (!req.user) {
-        DebugLogger.log('NOTES_API', 'Authentication check failed: No user in request');
         return res.status(401).json({ error: "Must be logged in to create notes" });
       }
 
-      DebugLogger.log('NOTES_API', 'Authentication check passed');
-
-      // Validate input data
-      DebugLogger.log('NOTES_API', 'Validating note data...');
-
-      // Add user ID to the data
-      const dataWithUserId = {
+      const data = insertNoteSchema.parse({
         ...req.body,
         userId: req.user.id,
+      });
+
+      const note = await storage.createNote(data);
+
+      // Include user information in the response
+      const noteWithUser = {
+        ...note,
+        user: {
+          username: req.user.username,
+          name: req.user.name
+        }
       };
 
-      DebugLogger.log('NOTES_API', 'Data before processing:', dataWithUserId);
-
-      // Create a simple validation schema directly
-      const noteSchema = z.object({
-        regulationId: z.number().positive("Regulation ID must be positive"),
-        userId: z.number().positive("User ID must be positive"),
-        title: z.string().min(1, "Title is required"),
-        content: z.string().min(1, "Content is required"),
-        category: z.string().default("general"),
-        status: z.string().default("active"),
-        isPrivate: z.boolean().default(false)
-      });
-
-      // Validate with the directly created schema
-      const result = noteSchema.safeParse(dataWithUserId);
-
-      if (!result.success) {
-        DebugLogger.log('NOTES_API', 'Validation failed with errors:', result.error);
-        return res.status(400).json({
-          error: "Note data validation failed",
-          details: result.error.errors.map(e => `${e.path.join('.')}: ${e.message}`).join(', ')
-        });
-      }
-
-      const validatedData = result.data;
-      DebugLogger.log('NOTES_API', 'Data validation successful:', validatedData);
-
-      // Create the note in the database
-      DebugLogger.log('NOTES_API', 'Creating note in database...');
-      try {
-        const note = await storage.createNote(validatedData);
-        DebugLogger.log('NOTES_API', 'Note created successfully:', note);
-
-        // Send successful response
-        return res.status(201).json(note);
-      } catch (storageError) {
-        DebugLogger.logError('NOTES_API_STORAGE', storageError);
-        return res.status(500).json({ 
-          error: "Database operation failed", 
-          details: storageError instanceof Error ? storageError.message : String(storageError)
-        });
-      }
+      res.status(201).json(noteWithUser);
     } catch (error) {
-      DebugLogger.logError('NOTES_API_UNHANDLED', error);
-
-      let errorMessage = "Unknown error";
-      if (error instanceof Error) {
-        errorMessage = `${error.name}: ${error.message}`;
-      }
-
-      return res.status(500).json({ 
-        error: "Failed to create note",
-        details: errorMessage
-      });
-    } finally {
-      DebugLogger.log('NOTES_API', '======= NOTE CREATION REQUEST END =======');
+      console.error("Failed to create note:", error);
+      res.status(500).json({ error: "Failed to create note" });
     }
   });
 
