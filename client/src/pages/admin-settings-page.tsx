@@ -90,6 +90,8 @@ export default function AdminSettingsPage() {
       role: "user",
       department: "",
       email: "",
+      firstName: "",
+      lastName: "",
       resetPassword: "",
     },
   });
@@ -349,6 +351,36 @@ export default function AdminSettingsPage() {
                             </FormItem>
                           )}
                         />
+                        
+                        <div className="grid grid-cols-2 gap-4">
+                          <FormField
+                            control={userForm.control}
+                            name="firstName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>First Name</FormLabel>
+                                <FormControl>
+                                  <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <FormField
+                            control={userForm.control}
+                            name="lastName"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Last Name</FormLabel>
+                                <FormControl>
+                                  <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                        </div>
 
                         {!selectedUser ? (
                           <FormField

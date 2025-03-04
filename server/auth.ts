@@ -6,6 +6,7 @@ import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
 import { User as SelectUser } from "@shared/schema";
+import { syslog, LogLevel } from "./services/syslog";
 
 declare global {
   namespace Express {
@@ -76,7 +77,13 @@ export function setupAuth(app: Express) {
         console.error(`User with ID ${id} not found during deserialization`);
         return done(null, false);
       }
-      console.log(`User deserialized successfully: ${user.id}, ${user.username}`);
+      console.log(`User deserialized successfully: ${user.id}, ${user.username}, First: ${user.firstName || 'N/A'}, Last: ${user.lastName || 'N/A'}`);
+      
+      // Check if user has complete profile
+      if (!user.firstName || !user.lastName) {
+        console.warn(`User ${user.username} has incomplete profile (missing name information)`);
+      }
+      
       done(null, user);
     } catch (error) {
       console.error(`Error deserializing user ${id}:`, error);
@@ -107,19 +114,47 @@ export function setupAuth(app: Express) {
 
   app.post("/api/login", (req, res, next) => {
     passport.authenticate("local", (err, user, info) => {
-      if (err) return next(err);
-      if (!user) return res.status(401).json({ error: "Invalid credentials" });
+      if (err) {
+        syslog.authEvent(LogLevel.ERROR, "Login error", undefined, req.body.username);
+        return next(err);
+      }
+      
+      if (!user) {
+        syslog.authEvent(LogLevel.WARNING, "Failed login attempt", undefined, req.body.username);
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
 
       req.login(user, (err) => {
-        if (err) return next(err);
-        res.status(200).json(user);
+        if (err) {
+          syslog.authEvent(LogLevel.ERROR, "Session creation error", user.id, user.username);
+          return next(err);
+        }
+        
+        // Update last login timestamp
+        storage.updateUser(user.id, { lastLogin: new Date() })
+          .then(() => {
+            syslog.authEvent(LogLevel.INFO, "User logged in successfully", user.id, user.username);
+            res.status(200).json(user);
+          })
+          .catch(error => {
+            syslog.error("Failed to update last login timestamp", { userId: user.id, error });
+            // Still return success to the user
+            res.status(200).json(user);
+          });
       });
     })(req, res, next);
   });
 
   app.post("/api/logout", (req, res, next) => {
+    const userId = req.user?.id;
+    const username = req.user?.username;
+    
     req.logout((err) => {
-      if (err) return next(err);
+      if (err) {
+        syslog.authEvent(LogLevel.ERROR, "Logout error", userId, username);
+        return next(err);
+      }
+      syslog.authEvent(LogLevel.INFO, "User logged out", userId, username);
       res.sendStatus(200);
     });
   });
