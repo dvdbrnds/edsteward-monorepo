@@ -44,6 +44,15 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
     },
   });
 
+  const fetchNotes = async () => {
+    const updatedResponse = await fetch(`/api/notes/regulation/${regulationId}`);
+    if (updatedResponse.ok) {
+      const updatedData = await updatedResponse.json();
+      setNotes(updatedData);
+    }
+  };
+
+
   const onSubmit = async (data: FormValues) => {
     try {
       setIsSubmitting(true);
@@ -73,11 +82,8 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
       }
 
       // Refresh notes after successful submission
-      const updatedResponse = await fetch(`/api/notes/regulation/${regulationId}`);
-      if (updatedResponse.ok) {
-        const updatedData = await updatedResponse.json();
-        setNotes(updatedData);
-      }
+      await fetchNotes();
+
 
       // Reset form if creating a new note
       if (!initialData?.id) {
@@ -189,7 +195,7 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
           */}
 
           <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Saving..." : "Save Note"}
+            {isSubmitting ? "Saving..." : "Save Entry"}
           </Button>
         </form>
       </Form>
