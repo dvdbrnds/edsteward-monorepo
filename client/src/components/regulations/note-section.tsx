@@ -43,7 +43,8 @@ const noteFormSchema = z.object({
 const apiKey = import.meta.env.VITE_TINY_MCE_API_KEY || '';
 
 // For development, we can use a fallback mechanism if needed
-const useTinyMCE = true; // Set to false to use a simple textarea as fallback
+// Since we're experiencing API key issues, default to using the textarea
+const useTinyMCE = false; // Using textarea fallback until API key is configured
 
 // Log a helpful message if the API key is missing
 if (!apiKey) {
