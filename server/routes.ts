@@ -937,7 +937,7 @@ export function registerRoutes(app: Express): Server {
   // Update the logs endpoint to use database
   app.get("/api/admin/logs", async (req, res) => {
     try {
-      // Check ifuser is admin
+      // Check if user is admin
       if (req.user?.role !== "admin") {
         return res.status(403).json({ error: "Only administrators can access logs" });
       }
@@ -964,8 +964,14 @@ export function registerRoutes(app: Express): Server {
             ${systemLogs.msgId},
             'general'
           )`,
-          ip: sql<string>`${systemLogs.structuredData}->>'ip'`,
-          userAgent: sql<string>`${systemLogs.structuredData}->>'userAgent'`
+          ip: sql<string>`COALESCE(
+            ${systemLogs.structuredData}->>'ip',
+            'N/A'
+          )`,
+          userAgent: sql<string>`COALESCE(
+            ${systemLogs.structuredData}->>'userAgent',
+            'N/A'
+          )`
         })
         .from(systemLogs);
 
@@ -1000,9 +1006,9 @@ export function registerRoutes(app: Express): Server {
       const totalCount = await db
         .select({ count: sql<number>`count(*)` })
         .from(systemLogs)
-        .then(res => Number(res[0].count));
+        .then((res) => Number(res[0].count));
 
-      // Get paginated results
+      // Execute the query with pagination
       const logs = await query
         .orderBy(desc(systemLogs.timestamp))
         .limit(parseInt(limit as string))
@@ -1016,8 +1022,8 @@ export function registerRoutes(app: Express): Server {
         level: LogLevelNames[log.severity as LogLevel],
         facility: LogFacilityNames[log.facility as LogFacility],
         context: log.context || 'general',
-        ip: log.ip || undefined,
-        userAgent: log.userAgent || undefined
+        ip: log.ip || 'N/A',
+        userAgent: log.userAgent || 'N/A'
       }));
 
       res.json({
@@ -1026,9 +1032,10 @@ export function registerRoutes(app: Express): Server {
         page: parseInt(page as string),
         totalPages: Math.ceil(totalCount / parseInt(limit as string))
       });
+
     } catch (error) {
       console.error("Failed to fetch logs:", error);
-      res.status(500).json({ error: "Failed to fetch logs", details: error instanceof Error ? error.message : String(error) });
+      res.status(500).json({ error: "Failed to fetch logs" });
     }
   });
 
