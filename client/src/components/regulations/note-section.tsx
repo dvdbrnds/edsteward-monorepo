@@ -59,16 +59,20 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
 
       const payload = {
         ...data,
-        regulationId,
+        regulationId: parseInt(regulationId), //Attempt to parse regulationId.  Error handling would be needed in production.
       };
 
-      const response = await apiRequest(endpoint, {
+      const response = await fetch(endpoint, {
         method,
-        body: payload,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to save note");
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to save note");
       }
 
       toast({
@@ -82,7 +86,7 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
     } catch (error) {
       toast({
         title: "Error",
-        description: "Failed to save note",
+        description: error instanceof Error ? error.message : "Failed to save note",
         variant: "destructive",
       });
       console.error(error);
