@@ -265,7 +265,7 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
                       <CardTitle>{note.title}</CardTitle>
                       <div className="flex items-center gap-3 mt-2">
                         <Avatar className="h-6 w-6">
-                          <AvatarFallback className="bg-primary text-xs">
+                          <AvatarFallback className="bg-primary text-white text-xs">
                             {getInitials(note.user)}
                           </AvatarFallback>
                         </Avatar>
