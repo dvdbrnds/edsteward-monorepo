@@ -64,6 +64,7 @@ export default function AdminSettingsPage() {
   const [notifications, setNotifications] = useState<any[]>([]);
   const [userDialogOpen, setUserDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedRegType, setSelectedRegType] = useState<string>('all-types'); //Fixed initial state
 
   // Redirect non-admin users
   if (user?.role !== "admin") {
@@ -839,7 +840,7 @@ export default function AdminSettingsPage() {
                         <p className="text-sm text-gray-500">Send compliance updates via email</p>
                       </div>
                       <Switch
-                        checked={notifications?.some(n => n.type === 'email' && n.enabled)}
+                        checked={notifications?.some(n => n.type === 'email' && n.enabled) ?? false}
                         onCheckedChange={(checked) => {
                           if (notifications) {
                             const emailNotif = notifications.find(n => n.type === 'email');
@@ -873,10 +874,10 @@ export default function AdminSettingsPage() {
                           <SelectValue placeholder="Select frequency" />
                         </SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="all">All</SelectItem>
                           <SelectItem value="daily">Daily</SelectItem>
                           <SelectItem value="weekly">Weekly</SelectItem>
                           <SelectItem value="monthly">Monthly</SelectItem>
-                          <SelectItem value="never">Never</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
