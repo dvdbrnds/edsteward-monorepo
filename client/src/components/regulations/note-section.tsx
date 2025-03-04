@@ -58,6 +58,7 @@ export function NoteSection({ onSubmit, initialData, isSubmitting = false }: Not
       status: initialData?.status || "draft",
       isPrivate: initialData?.isPrivate || false,
     },
+    mode: "onChange",
   });
 
   return (
