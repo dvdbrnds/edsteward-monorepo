@@ -74,12 +74,12 @@ let deadlineCheckInterval: NodeJS.Timeout | null = null;
 
 async function startServer(): Promise<Server> {
   try {
-    const PORT = 5000;
-    log("Forcefully killing any process on port 5000...");
+    const PORT = 3000;
+    log("Forcefully killing any process on port 3000...");
 
-    // Kill any existing process on port 5000
+    // Kill any existing process on port 3000
     try {
-      await exec('fuser -k 5000/tcp');
+      await exec('fuser -k 3000/tcp');
       // Wait for port to be freed
       await new Promise(resolve => setTimeout(resolve, 1000));
     } catch (error) {
