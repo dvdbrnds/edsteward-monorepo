@@ -214,17 +214,32 @@ export class SysLogger {
 
   // Auth specific logging methods
   async logAuthEvent(level: LogLevel, message: string, userId?: number, username?: string, metadata?: Record<string, any>): Promise<void> {
-    await this.log(LogFacility.AUTH, level, message, {
-      id: 'AUTH',
-      parameters: {
+    try {
+      console.log('Logging auth event:', { level, message, userId, username, metadata });
+
+      // Prepare structured data for database
+      const eventData = {
         userId: userId || 'none',
         username: username || 'unknown',
         timestamp: new Date().toISOString(),
         event: message.toLowerCase().includes('login') ? 'login' :
                message.toLowerCase().includes('logout') ? 'logout' : 'auth',
-        ...(metadata || {})  // Include any additional metadata like IP and user agent
-      }
-    });
+        ip: metadata?.ip || 'N/A',
+        userAgent: metadata?.userAgent || 'N/A',
+        context: metadata?.context || 'AUTH',
+        type: metadata?.type || 'auth_event',
+        ...(metadata || {})
+      };
+
+      await this.log(LogFacility.AUTH, level, message, {
+        id: 'AUTH',
+        parameters: eventData
+      });
+    } catch (error) {
+      console.error('Failed to log auth event:', error);
+      // Ensure we at least have console output if database fails
+      console.error(`AUTH_EVENT: ${message}`, { userId, username, metadata });
+    }
   }
 
   // Security specific logging methods

@@ -797,12 +797,14 @@ export function registerRoutes(app: Express): Server {
         protocol: req.protocol
       };
 
-      console.log('[AUTH] Request details:', requestInfo);
+      console.log('[AUTH] Login attempt starting:', { username, ...requestInfo });
 
       if (!username || !password) {
         await syslog.warning("Login attempt with missing credentials", { 
           username,
-          ...requestInfo
+          ...requestInfo,
+          context: 'AUTH_LOGIN',
+          type: 'login_attempt'
         });
         await DebugLogger.logAuthAttempt('AUTH_LOGIN', false, username || 'unknown', { 
           reason: 'missing_credentials',
@@ -821,7 +823,9 @@ export function registerRoutes(app: Express): Server {
         console.log('[AUTH] User not found:', username);
         await syslog.warning("Failed login attempt - user not found", { 
           username,
-          ...requestInfo
+          ...requestInfo,
+          context: 'AUTH_LOGIN',
+          type: 'login_failure'
         });
         await DebugLogger.logAuthAttempt('AUTH_LOGIN', false, username, { 
           reason: 'user_not_found',
@@ -836,7 +840,9 @@ export function registerRoutes(app: Express): Server {
         console.log('[AUTH] Invalid password for user:', username);
         await syslog.warning("Failed login attempt - incorrect password", { 
           username,
-          ...requestInfo
+          ...requestInfo,
+          context: 'AUTH_LOGIN',
+          type: 'login_failure'
         });
         await DebugLogger.logAuthAttempt('AUTH_LOGIN', false, username, { 
           reason: 'invalid_password',
@@ -844,8 +850,6 @@ export function registerRoutes(app: Express): Server {
         });
         return res.status(400).json({ error: "Invalid username or password" });
       }
-
-      const sessionToken = crypto.randomBytes(64).toString("hex");
 
       // Log session data before setting
       console.log('[AUTH] Setting session data:', {
@@ -859,11 +863,19 @@ export function registerRoutes(app: Express): Server {
       req.session.role = user.role;
       req.session.username = user.username;
 
-      await syslog.logAuthEvent(LogLevel.INFO, "User logged in successfully", user.id, user.username, requestInfo);
-      await DebugLogger.logAuthAttempt('AUTH_LOGIN', true, username, { 
+      // Create structured data for successful login
+      const authData = {
+        username: user.username,
         userId: user.id,
-        ...requestInfo
-      });
+        role: user.role,
+        ...requestInfo,
+        context: 'AUTH_LOGIN',
+        type: 'login_success',
+        timestamp: new Date().toISOString()
+      };
+
+      await syslog.logAuthEvent(LogLevel.INFO, `User ${user.username} logged in successfully`, user.id, user.username, authData);
+      await DebugLogger.logAuthAttempt('AUTH_LOGIN', true, username, authData);
 
       console.log('[AUTH] Login successful for user:', username);
 
