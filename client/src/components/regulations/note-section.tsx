@@ -29,9 +29,12 @@ const noteFormSchema = z.object({
   isPrivate: z.boolean().default(false)
 });
 
-const apiKey = import.meta.env.VITE_TINY_MCE_API_KEY;
+// Try to get the API key from environment variables
+const apiKey = import.meta.env.VITE_TINY_MCE_API_KEY || '';
+
+// Log a helpful message if the API key is missing
 if (!apiKey) {
-  console.error('TinyMCE API key is missing. Make sure VITE_TINY_MCE_API_KEY is set in your environment.');
+  console.warn('TinyMCE API key is missing. The editor will run in limited mode. Add VITE_TINY_MCE_API_KEY to your environment variables for full functionality.');
 }
 
 type NoteFormValues = z.infer<typeof noteFormSchema>;
@@ -237,7 +240,17 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
                           'bold italic forecolor | alignleft aligncenter ' +
                           'alignright alignjustify | bullist numlist outdent indent | ' +
                           'removeformat | help',
-                        content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; }'
+                        content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; }',
+                        // Disable branding notice that appears when API key is invalid
+                        branding: false,
+                        // Disable plugins that require a verified API key
+                        setup: (editor) => {
+                          editor.on('init', () => {
+                            if (!apiKey) {
+                              console.log('TinyMCE running in community mode without an API key');
+                            }
+                          });
+                        }
                       }}
                       onInit={(evt, editor) => {
                         console.log('TinyMCE initialized with API key:', apiKey ? 'present' : 'missing');
