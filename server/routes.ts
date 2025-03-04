@@ -546,7 +546,9 @@ export function registerRoutes(app: Express): Server {
             return {
               ...note,
               user: noteUser ? {
-                username: noteUser.username
+                username: noteUser.username,
+                firstName: noteUser.firstName,
+                lastName: noteUser.lastName
               } : undefined
             };
           })
@@ -576,7 +578,9 @@ export function registerRoutes(app: Express): Server {
       const noteWithUser = {
         ...note,
         user: {
-          username: req.user.username
+          username: req.user.username,
+          firstName: req.user.firstName,
+          lastName: req.user.lastName
         }
       };
 

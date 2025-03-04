@@ -10,6 +10,28 @@ export const users = pgTable("users", {
   role: text("role").notNull().default("user"),
   department: text("department"),
   email: text("email").notNull(),
+  firstName: text("first_name"),
+  lastName: text("last_name"),
+  // SAML 2.0 fields
+  externalId: text("external_id").unique(),
+  providerId: text("provider_id"),
+  identityProvider: text("identity_provider"),
+  lastLogin: timestamp("last_login"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// Schema for inserting users
+export const insertUserSchema = createInsertSchema(users).extend({
+  password: z.string().min(6).optional(), // Optional because SAML users won't have password
+  role: z.enum(["admin", "compliance_officer", "user"]),
+  department: z.string().optional(),
+  email: z.string().email(),
+  firstName: z.string().min(1, "First name is required"),
+  lastName: z.string().min(1, "Last name is required"),
+  externalId: z.string().optional(),
+  providerId: z.string().optional(),
+  identityProvider: z.string().optional(),
 });
 
 // Add notes table after users table
@@ -101,14 +123,6 @@ export const guides = pgTable("guides", {
   category: text("category").notNull(),
   lastUpdated: timestamp("last_updated").defaultNow(),
   createdBy: integer("created_by").notNull(),
-});
-
-// Schema for inserting users
-export const insertUserSchema = createInsertSchema(users).extend({
-  password: z.string().min(6),
-  role: z.enum(["admin", "compliance_officer", "user"]),
-  department: z.string().optional(),
-  email: z.string().email(),
 });
 
 // Notes schema is already defined above

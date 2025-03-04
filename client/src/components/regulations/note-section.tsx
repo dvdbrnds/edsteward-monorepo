@@ -42,6 +42,8 @@ interface Note {
   updatedAt: string;
   user?: {
     username: string;
+    firstName?: string;
+    lastName?: string;
   };
 }
 
@@ -54,9 +56,17 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  // Get initials from username (e.g., "John Doe" -> "JD", "johndoe" -> "JO")
-  const getInitials = (username?: string) => {
-    if (!username) return "??";
+  // Get initials from name or username
+  const getInitials = (user?: { firstName?: string; lastName?: string; username: string }) => {
+    if (!user) return "??";
+
+    // If we have first and last name, use those
+    if (user.firstName && user.lastName) {
+      return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
+    }
+
+    // Fallback to username
+    const username = user.username;
     // Take first two characters of username if no space
     if (!username.includes(' ')) {
       return username.substring(0, 2).toUpperCase();
@@ -256,7 +266,7 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
                       <div className="flex items-center gap-3 mt-2">
                         <Avatar className="h-6 w-6">
                           <AvatarFallback className="bg-primary text-xs">
-                            {getInitials(note.user?.username)}
+                            {getInitials(note.user)}
                           </AvatarFallback>
                         </Avatar>
                         <CardDescription className="flex items-center">
