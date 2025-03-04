@@ -377,6 +377,6 @@ export default function LogsPage() {
           )}
         </CardContent>
       </Card>
-    </div>iv>
+    </div>
   );
 }
