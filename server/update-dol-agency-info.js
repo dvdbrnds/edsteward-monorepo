@@ -1,7 +1,7 @@
 
-const { db } = require('./db');
-const { regulations } = require('../shared/schema');
-const { eq, like } = require('drizzle-orm');
+import { db } from './db.js';
+import { regulations } from '../shared/schema.js';
+import { eq, like } from 'drizzle-orm';
 
 async function updateDOLAgencyInfo() {
   try {
