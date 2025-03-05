@@ -243,6 +243,26 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Add this endpoint before the regulations collect endpoint
+  app.get("/api/regulations/ids", async (req, res) => {
+    try {
+      if (req.user?.role !== "admin") {
+        return res.status(403).json({ error: "Only administrators can access regulation IDs" });
+      }
+
+      const regulations = await storage.getRegulations();
+      const ids = regulations.map(reg => reg.itemId);
+
+      res.json({ 
+        count: ids.length,
+        ids
+      });
+    } catch (error) {
+      console.error("Failed to fetch regulation IDs:", error);
+      res.status(500).json({ error: "Failed to fetch regulation IDs" });
+    }
+  });
+
   // Add this endpoint after the existing regulations endpoints
   app.get("/api/regulations/check-openai", async (req, res) => {
     try {
@@ -903,8 +923,7 @@ export function registerRoutes(app: Express): Server {
       ip: req.get('x-forwarded-for') || req.ip,
       userAgent: req.get('user-agent'),
       hostname: req.hostname,
-      timestamp: new Date().toISOString()
-    };
+      timestamp: new Date().toISOString()    };
 
     try {
       DebugLogger.logRequest(req, 'AUTH_LOGIN');

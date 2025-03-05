@@ -291,7 +291,7 @@ export function RegulationImportDebugger() {
     }
   };
 
-  const startImport = async () => {
+  const startAnalysis = async () => {
     setLoading(true);
     setImportStatus('running');
     try {
@@ -325,7 +325,7 @@ export function RegulationImportDebugger() {
         description: 'Regulation analysis process started successfully',
       });
     } catch (error) {
-      console.error('Import error:', error);
+      console.error('Analysis error:', error);
       setImportStatus('error');
       setLogs(prev => [...prev, `${new Date().toISOString()} - Error: ${error instanceof Error ? error.message : String(error)}`]);
       toast({
@@ -334,6 +334,35 @@ export function RegulationImportDebugger() {
         variant: 'destructive',
       });
     } finally {
+      setLoading(false);
+    }
+  };
+
+  const analyzeAllRegulations = async () => {
+    try {
+      setLoading(true);
+      setLogs(prev => [...prev, `${new Date().toISOString()} - Fetching all regulation IDs...`]);
+
+      const response = await fetch('/api/regulations/ids');
+      if (!response.ok) {
+        throw new Error(`Failed to fetch regulation IDs: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setRegulationIds(data.ids);
+      setLogs(prev => [...prev, `${new Date().toISOString()} - Found ${data.count} regulations to analyze`]);
+
+      // Start analysis with all regulation IDs
+      await startAnalysis();
+    } catch (error) {
+      console.error('Error analyzing all regulations:', error);
+      setImportStatus('error');
+      setLogs(prev => [...prev, `${new Date().toISOString()} - Error: ${error instanceof Error ? error.message : String(error)}`]);
+      toast({
+        title: 'Error',
+        description: 'Failed to analyze all regulations',
+        variant: 'destructive',
+      });
       setLoading(false);
     }
   };
@@ -364,7 +393,7 @@ export function RegulationImportDebugger() {
             <p>Instructions:</p>
             <ul className="list-disc pl-4 space-y-1">
               <li>First check the OpenAI API status</li>
-              <li>Enter regulation IDs separated by commas (e.g., "REG1001, REG1002")</li>
+              <li>Enter regulation IDs separated by commas (e.g., "REG1001, REG1002") or use "Analyze All" button</li>
               <li>Click "Start Analysis" to begin the AI-powered analysis</li>
               <li>Monitor the analysis progress and results below</li>
               <li>Use "Download Logs" to save the analysis history</li>
@@ -393,6 +422,24 @@ export function RegulationImportDebugger() {
               Check API Status
             </Button>
           </div>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={analyzeAllRegulations}
+            disabled={loading || openAiStatus !== 'ready'}
+          >
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Processing All...
+              </>
+            ) : (
+              <>
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Analyze All
+              </>
+            )}
+          </Button>
         </div>
 
         <div className="flex items-center gap-4 mb-4">
@@ -402,11 +449,12 @@ export function RegulationImportDebugger() {
               value={regulationIds.join(', ')}
               onChange={(e) => setRegulationIds(e.target.value.split(',').map(id => id.trim()))}
               placeholder="Enter regulation IDs (e.g., REG1001, REG1002)"
+              disabled={loading}
             />
           </div>
           <div className="flex items-end gap-2">
             <Button
-              onClick={startImport}
+              onClick={startAnalysis}
               disabled={loading || !regulationIds.length || openAiStatus !== 'ready'}
             >
               {loading ? (
