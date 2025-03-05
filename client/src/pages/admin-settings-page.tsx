@@ -58,7 +58,7 @@ import { insertUserSchema } from "@shared/schema";
 type FormValues = z.infer<typeof insertEmailConfigSchema>;
 type TwilioFormValues = z.infer<typeof insertTwilioConfigSchema>;
 
-export default function AdminSettingsPage() {
+export default function SystemSettingsPage() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [notifications, setNotifications] = useState<any[]>([]);
