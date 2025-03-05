@@ -138,8 +138,24 @@ export default function RegulationWizard({ onSuccess }: RegulationWizardProps) {
       fields: [
         {
           name: "agency_name",
-          label: "Agency Name",
+          label: "Agency Name (Required)",
           type: "text",
+          required: true,
+          description: "The issuing agency for this regulation"
+        },
+        {
+          name: "regulationUrl",
+          label: "Regulation URL (Required)",
+          type: "url",
+          required: true,
+          description: "URL to the regulation on congress.gov"
+        },
+        {
+          name: "originationDate",
+          label: "Origination Date (Required)",
+          type: "date",
+          required: true,
+          description: "The date when the regulation was first issued"
         },
         {
           name: "agency_url",
