@@ -15,9 +15,9 @@
  * ```
  */
 
-import { useParams, useNavigate } from "react-router-dom";
+import { useLocation } from "wouter";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import type { Regulation, Deadline } from "@shared/schema";
+import type { Regulation, Deadline, Guide } from "@shared/schema";
 import Navigation from "@/components/layout/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -81,12 +81,12 @@ interface RegulationWithOverride extends Regulation {
     email: string | null;
     phone: string | null;
   };
-  notificationSchedule: {
+  notificationSchedule?: {
     initialReminder: number;
     weeklyReminder: number;
     dailyReminder: number;
     finalDayReminders: boolean;
-  } | null;
+  }
 }
 
 /**
@@ -173,79 +173,33 @@ const CATEGORIES = [
 ];
 
 export default function RegulationDetailPage() {
-  const { id: regulationId } = useParams<{ id: string }>();
-  const navigate = useNavigate();
+  const [location, navigate] = useLocation();
   const { user } = useAuth();
-  const { toast } = useToast();
+  const regulationId = location.split("/")[2];
 
   if (!user) {
     navigate("/auth");
     return null;
   }
 
-  const { data: regulation, isLoading, error } = useQuery<RegulationWithOverride>({
+  const { data: regulation, isLoading } = useQuery<RegulationWithOverride>({
     queryKey: ["/api/regulations", regulationId],
     queryFn: async () => {
-      try {
-        const response = await fetch(`/api/regulations/${regulationId}`);
-        if (!response.ok) {
-          if (response.status === 429) {
-            throw new Error('Rate limit exceeded. Please try again in a few moments.');
-          }
-          throw new Error('Failed to fetch regulation data');
-        }
-        return response.json();
-      } catch (error) {
-        console.error('Error fetching regulation:', error);
-        throw error;
+      const response = await fetch(`/api/regulations/${regulationId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch regulation');
       }
+      return response.json();
     },
-    retry: 3,
-    retryDelay: attemptIndex => Math.min(1000 * Math.pow(2, attemptIndex), 30000),
-    onError: (error: Error) => {
-      toast({
-        title: "Error Loading Regulation",
-        description: error.message,
-        variant: "destructive"
-      });
-    }
+    enabled: !!user && !!regulationId,
   });
 
-  const { data: deadlines, isLoading: deadlinesLoading, error: deadlinesError } = useQuery<Deadline[]>({
-    queryKey: ["/api/deadlines"],
-    retry: 3,
-    retryDelay: attemptIndex => Math.min(1000 * Math.pow(2, attemptIndex), 30000),
-    onError: (error: Error) => {
-      toast({
-        title: "Error Loading Deadlines",
-        description: error.message,
-        variant: "destructive"
-      });
-    }
-  });
-
-  // Show error state if both queries failed
-  if (error && deadlinesError) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Navigation />
-        <main className="py-10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center">
-              <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-              <h2 className="text-2xl font-semibold text-gray-900 mb-2">Error Loading Data</h2>
-              <p className="text-gray-600 mb-4">{error.message}</p>
-              <Button onClick={() => navigate("/regulations")}>
-                Return to Regulations List
-              </Button>
-            </div>
-          </div>
-        </main>
-      </div>
-    );
-  }
-
+  const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  const { data: deadlines, isLoading: deadlinesLoading } = useQuery<Deadline[]>({
+    queryKey: ["/api/deadlines"],
+  });
 
   const overrideForm = useForm<NotificationOverride>({
     resolver: zodResolver(notificationOverrideSchema),
@@ -646,7 +600,7 @@ export default function RegulationDetailPage() {
                     <CardTitle>Submission Guidelines</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <GuideContent regulationId={regulationId} />
+                    <GuideContent />
                   </CardContent>
                 </Card>
 
@@ -865,65 +819,51 @@ export default function RegulationDetailPage() {
   );
 }
 
-/**
- * Helper function to get the deadline status display information
- */
-function getDeadlineStatus(deadline: Deadline): { icon: JSX.Element; label: string; className: string } {
-  const now = new Date();
-  const dueDate = new Date(deadline.dueDate);
-  const daysDiff = differenceInDays(dueDate, now);
-
-  if (deadline.status === "completed") {
-    return {
-      label: "Completed",
-      className: "bg-green-100 text-green-800",
-      icon: <CheckCircle className="h-5 w-5 text-green-500" />
-    };
-  }
-
-  if (daysDiff < 0) {
-    return {
-      label: "Overdue",
-      className: "bg-red-100 text-red-800",
-      icon: <AlertCircle className="h-5 w-5 text-red-500" />
-    };
-  }
-
-  if (daysDiff <= 7) {
-    return {
-      label: "Due Soon",
-      className: "bg-yellow-100 text-yellow-800",
-      icon: <Clock className="h-5 w-5 text-yellow-500" />
-    };
-  }
-
-  return {
-    label: "Upcoming",
-    className: "bg-blue-100 text-blue-800",
-    icon: <Clock className="h-5 w-5 text-blue-500" />
-  };
-}
-
-function GuideContent({ regulationId }: { regulationId: string }) {
-  const { data: regulation } = useQuery<RegulationWithOverride>({
-    queryKey: ["/api/regulations", regulationId],
+function GuideContent() {
+  const { data: guides, isLoading } = useQuery<Guide[]>({
+    queryKey: ["/api/guides", { category: "submission" }],
   });
 
-  if (!regulation?.submissionGuidelines) {
+  if (isLoading) {
     return (
-      <p className="text-gray-500 italic">
-        No submission guidelines available.
-      </p>
+      <div className="flex items-center justify-center p-4">
+        <Loader2 className="h-6 w-6 animate-spin text-[#00267A]" />
+      </div>
+    );
+  }
+
+  const submissionGuide = guides?.find(guide => guide.category === "submission");
+
+  if (!submissionGuide) {
+    return (
+      <div className="p-4 text-gray-600">
+        <p>No submission guidelines available for this regulation.</p>
+        <p className="mt-2">Please contact the compliance office for assistance with your submission.</p>
+      </div>
     );
   }
 
   return (
-    <div className="prose max-w-none">
-      <div
-        dangerouslySetInnerHTML={{
-          __html: marked(regulation.submissionGuidelines)
-        }}
-      />
-    </div>
+    <div
+      className="prose prose-sm max-w-none"
+      dangerouslySetInnerHTML={{ __html: marked.parse(submissionGuide.content) }}
+    />
   );
+}
+
+type StatusType = {
+  icon: JSX.Element;
+  label: string;
+  className: string;
+};
+
+function getDeadlineStatus(deadline: Deadline): StatusType {
+  const daysLeft = differenceInDays(new Date(deadline.dueDate), new Date());
+  if (daysLeft < 0) {
+    return { icon: <AlertCircle className="h-5 w-5 text-red-500" />, label: "Overdue", className: "bg-red-100 text-red-500" };
+  } else if (daysLeft <= 7) {
+    return { icon: <Clock className="h-5 w-5 text-yellow-500" />, label: "Approaching", className: "bg-yellow-100 text-yellow-500" };
+  } else {
+    return { icon: <CheckCircle className="h-5 w-5 text-green-500" />, label: "Upcoming", className: "bg-green-100 text-green-500" };
+  }
 }

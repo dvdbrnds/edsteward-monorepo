@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Switch, Route } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -25,25 +25,25 @@ function Router() {
   return (
     <ErrorBoundary>
       <PageLayout>
-        <Routes>
-          <Route path="/auth" element={<AuthPage />} />
-          <Route path="/setup" element={<SetupWizardPage />} />
-          <Route path="/" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
-          <Route path="/regulations" element={<ProtectedRoute><RegulationsPage /></ProtectedRoute>} />
-          <Route path="/regulations/validate" element={<ProtectedRoute><ValidationPage /></ProtectedRoute>} />
-          <Route 
+        <Switch>
+          <Route path="/auth" component={AuthPage} />
+          <Route path="/setup" component={SetupWizardPage} />
+          <ProtectedRoute path="/" component={HomePage} />
+          <ProtectedRoute path="/regulations" component={RegulationsPage} />
+          <ProtectedRoute path="/regulations/validate" component={ValidationPage} />
+          <ProtectedRegulationRoute 
             path="/regulations/:id" 
-            element={<ProtectedRegulationRoute><RegulationDetailPage /></ProtectedRegulationRoute>} 
+            component={RegulationDetailPage} 
           />
-          <Route 
+          <ProtectedRegulationRoute 
             path="/compliance-wizard/:id" 
-            element={<ProtectedRegulationRoute><ComplianceWizardPage /></ProtectedRegulationRoute>} 
+            component={ComplianceWizardPage} 
           />
-          <Route path="/reports" element={<ProtectedRoute><ReportsPage /></ProtectedRoute>} />
-          <Route path="/admin/settings" element={<ProtectedRoute><AdminSettingsPage /></ProtectedRoute>} />
-          <Route path="/admin/logs" element={<ProtectedRoute><LogsPage /></ProtectedRoute>} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+          <ProtectedRoute path="/reports" component={ReportsPage} />
+          <ProtectedRoute path="/admin/settings" component={AdminSettingsPage} />
+          <ProtectedRoute path="/admin/logs" component={LogsPage} />
+          <Route component={NotFound} />
+        </Switch>
       </PageLayout>
     </ErrorBoundary>
   );
@@ -56,10 +56,8 @@ export default function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
-          <BrowserRouter>
-            <Router />
-            <Toaster />
-          </BrowserRouter>
+          <Router />
+          <Toaster />
         </AuthProvider>
       </QueryClientProvider>
     </ErrorBoundary>
