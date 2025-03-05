@@ -2,6 +2,9 @@ import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
 async function throwIfResNotOk(res: Response) {
   if (!res.ok) {
+    if (res.status === 429) {
+      throw new Error('Rate limit exceeded. Please try again in a few moments.');
+    }
     const text = (await res.text()) || res.statusText;
     throw new Error(`${res.status}: ${text}`);
   }
@@ -48,10 +51,14 @@ export const queryClient = new QueryClient({
       refetchInterval: false,
       refetchOnWindowFocus: false,
       staleTime: Infinity,
-      retry: false,
+      retry: 3,
+      retryDelay: attemptIndex => 
+        Math.min(1000 * Math.pow(2, attemptIndex), 30000), // exponential backoff capped at 30 seconds
     },
     mutations: {
-      retry: false,
+      retry: 3,
+      retryDelay: attemptIndex => 
+        Math.min(1000 * Math.pow(2, attemptIndex), 30000),
     },
   },
 });

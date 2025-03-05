@@ -15,9 +15,9 @@
  * ```
  */
 
-import { useLocation } from "wouter";
+import { useParams, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import type { Regulation, Deadline, Guide } from "@shared/schema";
+import type { Regulation, Deadline } from "@shared/schema";
 import Navigation from "@/components/layout/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -173,33 +173,79 @@ const CATEGORIES = [
 ];
 
 export default function RegulationDetailPage() {
-  const [location, navigate] = useLocation();
+  const { id: regulationId } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { user } = useAuth();
-  const regulationId = location.split("/")[2];
+  const { toast } = useToast();
 
   if (!user) {
     navigate("/auth");
     return null;
   }
 
-  const { data: regulation, isLoading } = useQuery<RegulationWithOverride>({
+  const { data: regulation, isLoading, error } = useQuery<RegulationWithOverride>({
     queryKey: ["/api/regulations", regulationId],
     queryFn: async () => {
-      const response = await fetch(`/api/regulations/${regulationId}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch regulation');
+      try {
+        const response = await fetch(`/api/regulations/${regulationId}`);
+        if (!response.ok) {
+          if (response.status === 429) {
+            throw new Error('Rate limit exceeded. Please try again in a few moments.');
+          }
+          throw new Error('Failed to fetch regulation data');
+        }
+        return response.json();
+      } catch (error) {
+        console.error('Error fetching regulation:', error);
+        throw error;
       }
-      return response.json();
     },
-    enabled: !!user && !!regulationId,
+    retry: 3,
+    retryDelay: attemptIndex => Math.min(1000 * Math.pow(2, attemptIndex), 30000),
+    onError: (error: Error) => {
+      toast({
+        title: "Error Loading Regulation",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
   });
 
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-
-  const { data: deadlines, isLoading: deadlinesLoading } = useQuery<Deadline[]>({
+  const { data: deadlines, isLoading: deadlinesLoading, error: deadlinesError } = useQuery<Deadline[]>({
     queryKey: ["/api/deadlines"],
+    retry: 3,
+    retryDelay: attemptIndex => Math.min(1000 * Math.pow(2, attemptIndex), 30000),
+    onError: (error: Error) => {
+      toast({
+        title: "Error Loading Deadlines",
+        description: error.message,
+        variant: "destructive"
+      });
+    }
   });
+
+  // Show error state if both queries failed
+  if (error && deadlinesError) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        <main className="py-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <AlertCircle className="h-12 w-12 text-red-500 mx-auto mb-4" />
+              <h2 className="text-2xl font-semibold text-gray-900 mb-2">Error Loading Data</h2>
+              <p className="text-gray-600 mb-4">{error.message}</p>
+              <Button onClick={() => navigate("/regulations")}>
+                Return to Regulations List
+              </Button>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  const queryClient = useQueryClient();
 
   const overrideForm = useForm<NotificationOverride>({
     resolver: zodResolver(notificationOverrideSchema),
