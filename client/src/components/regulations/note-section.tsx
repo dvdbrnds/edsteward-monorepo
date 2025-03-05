@@ -2,8 +2,7 @@ import React, { useState, useEffect } from "react";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import { Editor } from '@tinymce/tinymce-react';
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -14,8 +13,9 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -32,15 +32,10 @@ interface NoteSectionProps {
 
 export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
   const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [notes, setNotes] = useState<any[]>([]);
+  const [editorError, setEditorError] = useState<string | null>(null);
 
-  // Fetch notes when component loads
-  useEffect(() => {
-    fetchNotes();
-  }, [regulationId]);
-
-  // Use form hook
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -50,28 +45,33 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
     },
   });
 
+  useEffect(() => {
+    fetchNotes();
+  }, [regulationId]);
+
   const fetchNotes = async () => {
-    const updatedResponse = await fetch(`/api/notes/regulation/${regulationId}`);
-    if (updatedResponse.ok) {
-      const updatedData = await updatedResponse.json();
-      setNotes(updatedData);
+    try {
+      const response = await fetch(`/api/notes/regulation/${regulationId}`);
+      if (response.ok) {
+        const data = await response.json();
+        setNotes(data);
+      }
+    } catch (error) {
+      console.error('Error fetching notes:', error);
     }
   };
-
 
   const onSubmit = async (data: FormValues) => {
     try {
       setIsSubmitting(true);
-
       const endpoint = initialData?.id
         ? `/api/notes/${initialData.id}`
         : "/api/notes";
 
       const method = initialData?.id ? "PUT" : "POST";
-
       const payload = {
         ...data,
-        regulationId: parseInt(regulationId), //Attempt to parse regulationId.  Error handling would be needed in production.
+        regulationId: parseInt(regulationId),
       };
 
       const response = await fetch(endpoint, {
@@ -80,18 +80,15 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
+        credentials: 'include'
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || "Failed to save note");
+        throw new Error('Failed to save note');
       }
 
-      // Refresh notes after successful submission
       await fetchNotes();
 
-
-      // Reset form if creating a new note
       if (!initialData?.id) {
         form.reset({
           title: "",
@@ -102,9 +99,7 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
 
       toast({
         title: "Success",
-        description: initialData?.id
-          ? "Note updated successfully"
-          : "Note created successfully",
+        description: initialData?.id ? "Note updated successfully" : "Note created successfully",
       });
     } catch (error) {
       toast({
@@ -112,7 +107,6 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
         description: error instanceof Error ? error.message : "Failed to save note",
         variant: "destructive",
       });
-      console.error(error);
     } finally {
       setIsSubmitting(false);
     }
@@ -130,6 +124,15 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
             : "Add a note to this regulation for future reference"}
         </p>
       </div>
+
+      {editorError && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Editor Error</AlertTitle>
+          <AlertDescription>{editorError}</AlertDescription>
+        </Alert>
+      )}
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
           <FormField
@@ -153,52 +156,36 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
               <FormItem>
                 <FormLabel>Content</FormLabel>
                 <FormControl>
-                  <div className="rich-text-editor">
-                    <ReactQuill
-                      theme="snow"
-                      value={field.value}
-                      onChange={field.onChange}
-                      modules={{
-                        toolbar: [
-                          [{ 'header': [1, 2, 3, false] }],
-                          ['bold', 'italic', 'underline', 'strike'],
-                          [{'list': 'ordered'}, {'list': 'bullet'}],
-                          ['link', 'clean']
-                        ],
-                      }}
-                      style={{ height: '300px', marginBottom: '50px' }}
-                    />
-                  </div>
+                  <Editor
+                    apiKey={import.meta.env.VITE_TINY_MCE_API_KEY}
+                    onInit={(evt, editor) => {
+                      if (!import.meta.env.VITE_TINY_MCE_API_KEY) {
+                        setEditorError("TinyMCE API key is missing. Please check your environment configuration.");
+                      }
+                    }}
+                    init={{
+                      height: 300,
+                      menubar: false,
+                      plugins: [
+                        'lists', 'link', 'table', 'help', 'wordcount'
+                      ],
+                      toolbar: 'undo redo | formatselect | ' +
+                        'bold italic | bullist numlist | ' +
+                        'removeformat | help',
+                      content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; }',
+                      branding: false,
+                      promotion: false
+                    }}
+                    value={field.value}
+                    onEditorChange={(content) => {
+                      field.onChange(content);
+                    }}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
           />
-
-
-          {/* Private note option temporarily removed 
-          <FormField
-            control={form.control}
-            name="isPrivate"
-            render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
-                <FormControl>
-                  <input
-                    type="checkbox"
-                    checked={field.value}
-                    onChange={field.onChange}
-                  />
-                </FormControl>
-                <div className="space-y-1 leading-none">
-                  <FormLabel>Private Note</FormLabel>
-                  <p className="text-sm text-muted-foreground">
-                    Only you will be able to see this note
-                  </p>
-                </div>
-              </FormItem>
-            )}
-          />
-          */}
 
           <Button type="submit" disabled={isSubmitting}>
             {isSubmitting ? "Saving..." : "Save Entry"}
@@ -206,35 +193,30 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
         </form>
       </Form>
 
-      {/* Display existing notes */}
       <div className="mt-8">
         <h3 className="text-lg font-medium mb-4">Diary Entries</h3>
         {notes.length === 0 ? (
           <p className="text-sm text-gray-500">No notes found for this regulation.</p>
         ) : (
-          <ul className="space-y-4"> {/* Changed to ul for better list rendering */}
+          <div className="space-y-4">
             {notes.map((note) => (
-              <li key={note.id} className="border p-4 rounded-md"> {/* Changed to li */}
+              <div key={note.id} className="border p-4 rounded-md">
                 <div className="flex justify-between items-start">
                   <h4 className="text-md font-medium">{note.title}</h4>
                   <div className="text-xs text-gray-500">
                     {note.user && `By ${note.user.firstName} ${note.user.lastName}`}
-                    {note.createdAt && (
-                      <span className="ml-2">
-                        {new Date(note.createdAt).toLocaleString()}
-                      </span>
-                    )}
-                    {note.isPrivate && <span className="ml-2">(Private)</span>}
+                    <span className="ml-2">
+                      {new Date(note.createdAt).toLocaleString()}
+                    </span>
                   </div>
                 </div>
                 <div 
-                  className="mt-2 text-sm" 
+                  className="mt-2 prose prose-sm max-w-none"
                   dangerouslySetInnerHTML={{ __html: note.content }}
                 />
-                {/* Removed status display */}
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </div>
     </div>
