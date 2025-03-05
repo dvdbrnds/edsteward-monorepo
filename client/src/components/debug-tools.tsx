@@ -280,6 +280,9 @@ export function RegulationImportDebugger() {
     setLoading(true);
     setImportStatus('running');
     try {
+      // Add initial log entry
+      setLogs(prev => [...prev, `${new Date().toISOString()} - Starting import for IDs: ${regulationIds.join(', ')}`]);
+
       const response = await fetch('/api/regulations/import', {
         method: 'POST',
         headers: {
@@ -293,7 +296,11 @@ export function RegulationImportDebugger() {
       }
 
       const data = await response.json();
-      setLogs(prev => [...prev, `Import started for ${regulationIds.length} regulations`]);
+      setLogs(prev => [
+        ...prev, 
+        `${new Date().toISOString()} - Import process started successfully`,
+        `${new Date().toISOString()} - Processing ${regulationIds.length} regulations`
+      ]);
       setImportStatus('completed');
       toast({
         title: 'Success',
@@ -302,7 +309,7 @@ export function RegulationImportDebugger() {
     } catch (error) {
       console.error('Import error:', error);
       setImportStatus('error');
-      setLogs(prev => [...prev, `Error: ${error instanceof Error ? error.message : String(error)}`]);
+      setLogs(prev => [...prev, `${new Date().toISOString()} - Error: ${error instanceof Error ? error.message : String(error)}`]);
       toast({
         title: 'Error',
         description: 'Failed to start regulation import',
@@ -333,7 +340,18 @@ export function RegulationImportDebugger() {
     <Card className="w-[800px] mx-auto my-8">
       <CardHeader>
         <CardTitle>Regulation Import Debug Console</CardTitle>
-        <CardDescription>Monitor and control the AI-powered regulation import process</CardDescription>
+        <CardDescription>
+          Monitor and control the AI-powered regulation import process.
+          <div className="mt-2 text-sm text-muted-foreground">
+            <p>Instructions:</p>
+            <ul className="list-disc pl-4 space-y-1">
+              <li>Enter regulation IDs separated by commas (e.g., "REG1001, REG1002")</li>
+              <li>Click "Start Import" to begin the import process</li>
+              <li>Monitor the progress in the logs section below</li>
+              <li>Use "Download Logs" to save the import history</li>
+            </ul>
+          </div>
+        </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         <div className="flex items-center gap-4 mb-4">
@@ -342,7 +360,7 @@ export function RegulationImportDebugger() {
             <Input
               value={regulationIds.join(', ')}
               onChange={(e) => setRegulationIds(e.target.value.split(',').map(id => id.trim()))}
-              placeholder="Enter regulation IDs (comma-separated)"
+              placeholder="Enter regulation IDs (e.g., REG1001, REG1002)"
             />
           </div>
           <div className="flex items-end gap-2">
