@@ -1,6 +1,8 @@
 /**
  * @module Navigation
  * @description Main navigation component providing routing and user management controls
+ * Note: System Logs route (/admin/logs) is available but hidden from navigation.
+ * Can be re-enabled by uncommenting the logs entry in the links array below.
  */
 
 import { useAuth } from "@/hooks/use-auth";
@@ -232,7 +234,9 @@ export default function Navigation() {
     ...(user?.role === "admin"
       ? [
           { href: "/admin/settings", label: "System Settings", icon: Settings },
-          { href: "/admin/logs", label: "System Logs", icon: FileText }
+          // System Logs route is available at /admin/logs but hidden from navigation
+          // Uncomment the following line to show it in the navigation:
+          // { href: "/admin/logs", label: "System Logs", icon: FileText }
         ]
       : []),
   ];
