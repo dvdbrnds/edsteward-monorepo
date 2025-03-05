@@ -15,6 +15,7 @@ import { systemLogs, users } from "@shared/schema";
 import { syslog, LogLevel, LogFacility } from './services/syslog';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
+import { format } from 'date-fns';
 
 // Update the getRedirectUri function to handle different environments properly
 function getRedirectUri(req: Request): string {
@@ -1230,6 +1231,57 @@ export function registerRoutes(app: Express): Server {
     } catch (error) {
       console.error("Failed to fetch console logs:", error);
       res.status(500).json({ error: "Failed to fetch console logs" });
+    }
+  });
+
+  // Add download endpoint for console logs
+  app.get("/api/admin/console-logs/download", async (req, res) => {
+    try {
+      // Check if user is admin
+      if (req.user?.role !== "admin") {
+        return res.status(403).json({ error: "Only administrators can download console logs" });
+      }
+
+      const logs = await syslog.getConsoleLogs();
+      const timestamp = format(new Date(), 'yyyy-MM-dd-HH-mm-ss');
+      const filename = `console-logs-${timestamp}.txt`;
+
+      res.setHeader('Content-Type', 'text/plain');
+      res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+      res.send(logs.join('\n'));
+    } catch (error) {
+      console.error("Failed to download console logs:", error);
+      res.status(500).json({ error: "Failed to download console logs" });
+    }
+  });
+
+  // Add filtered console logs endpoint
+  app.get("/api/admin/console-logs/filtered", async (req, res) => {
+    try {
+      // Check if user is admin
+      if (req.user?.role !== "admin") {
+        return res.status(403).json({ error: "Only administrators can access console logs" });
+      }
+
+      const { level, search } = req.query;
+      const maxLines = req.query.maxLines ? parseInt(req.query.maxLines as string) : 1000;
+      let logs = await syslog.getConsoleLogs(maxLines);
+
+      // Filter by log level if specified
+      if (level) {
+        logs = logs.filter(log => log.includes(`[${level.toString().toUpperCase()}]`));
+      }
+
+      // Filter by search term if specified
+      if (search) {
+        const searchTerm = search.toString().toLowerCase();
+        logs = logs.filter(log => log.toLowerCase().includes(searchTerm));
+      }
+
+      res.json({ logs });
+    } catch (error) {
+      console.error("Failed to fetch filtered console logs:", error);
+      res.status(500).json({ error: "Failed to fetch filtered console logs" });
     }
   });
 

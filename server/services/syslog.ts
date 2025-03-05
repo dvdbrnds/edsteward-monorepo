@@ -467,6 +467,31 @@ export class SysLogger {
     }
   }
 
+  // Add new method to get filtered console logs
+  async getFilteredConsoleLogs(options: {
+    maxLines?: number;
+    level?: string;
+    search?: string;
+  }): Promise<string[]> {
+    try {
+      let logs = await this.getConsoleLogs(options.maxLines);
+
+      if (options.level) {
+        logs = logs.filter(log => log.includes(`[${options.level.toUpperCase()}]`));
+      }
+
+      if (options.search) {
+        const searchTerm = options.search.toLowerCase();
+        logs = logs.filter(log => log.toLowerCase().includes(searchTerm));
+      }
+
+      return logs;
+    } catch (error) {
+      console.error('Error filtering console logs:', error);
+      return [];
+    }
+  }
+
   // Clean up resources
   close(): void {
     if (this.fileStream) {
