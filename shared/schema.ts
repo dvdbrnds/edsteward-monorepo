@@ -143,9 +143,7 @@ console.log("Note schema fields:", Object.keys(notes));
 export const insertRegulationSchema = createInsertSchema(regulations).extend({
   name: z.string().min(1, "Regulation name is required"),
   jurisdiction: z.enum(["federal", "state"]),
-  agency_name: z.string().min(1, "Issuing agency name is required"),
-  regulationUrl: z.string().url("A valid regulation URL is required").min(1, "Regulation URL is required"),
-  originationDate: z.date().refine(val => val !== null, { message: "Origination date is required" }),
+  originationDate: z.date().optional().nullable(),
   effectiveDate: z.date().optional().nullable(),
   nextReviewDate: z.date().optional().nullable(),
   filingDeadlines: z.array(z.object({

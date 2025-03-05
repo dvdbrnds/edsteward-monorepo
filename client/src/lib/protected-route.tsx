@@ -1,7 +1,7 @@
 import { useAuth } from "@/hooks/use-auth";
+import { Loader2 } from "lucide-react";
 import { Redirect, Route } from "wouter";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
-import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 export function ProtectedRoute({
   path,
@@ -16,7 +16,7 @@ export function ProtectedRoute({
     return (
       <Route path={path}>
         <div className="flex items-center justify-center min-h-screen">
-          <LoadingSpinner size="lg" text="Loading your account..." />
+          <Loader2 className="h-8 w-8 animate-spin text-border" />
         </div>
       </Route>
     );

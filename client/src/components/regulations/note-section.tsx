@@ -1,11 +1,10 @@
+import React, { useState, useEffect } from "react";
+import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { format } from "date-fns";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
+import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
@@ -14,307 +13,228 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { AlertCircle, Clock } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
+import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useAuth } from "@/hooks/use-auth";
-import { z } from "zod";
 
-// Create a schema for note form validation
-const noteFormSchema = z.object({
-  regulationId: z.number().positive(),
+const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
   content: z.string().min(1, "Content is required"),
-  isPrivate: z.boolean().default(false)
+  isPrivate: z.boolean().default(false),
 });
 
-type NoteFormValues = z.infer<typeof noteFormSchema>;
+type FormValues = z.infer<typeof formSchema>;
 
-interface Note {
-  id: number;
-  regulationId: number;
-  userId: number;
-  title: string;
-  content: string;
-  isPrivate: boolean;
-  createdAt: string;
-  updatedAt: string;
-  user?: {
-    username: string;
-    firstName?: string;
-    lastName?: string;
-  };
+interface NoteSectionProps {
+  regulationId: string;
+  initialData?: Partial<FormValues> & { id?: string };
 }
 
-type NoteSectionProps = {
-  regulationId: number;
-};
-
-// Quill editor modules configuration
-const quillModules = {
-  toolbar: [
-    [{ 'header': [1, 2, 3, false] }],
-    ['bold', 'italic', 'underline', 'strike'],
-    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
-    [{ 'color': [] }, { 'background': [] }],
-    ['link'],
-    ['clean']
-  ]
-};
-
-const quillFormats = [
-  'header',
-  'bold', 'italic', 'underline', 'strike',
-  'list', 'bullet',
-  'color', 'background',
-  'link'
-];
-
-export function NoteSection({ regulationId }: NoteSectionProps) {
+export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
   const { toast } = useToast();
-  const { user } = useAuth();
-  const queryClient = useQueryClient();
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [notes, setNotes] = useState<any[]>([]);
 
-  // Get initials from name or username
-  const getInitials = (user?: { firstName?: string; lastName?: string; username: string }) => {
-    if (!user) return "??";
+  // Fetch notes when component loads
+  useEffect(() => {
+    fetchNotes();
+  }, [regulationId]);
 
-    // If we have first and last name, use those
-    if (user.firstName && user.lastName) {
-      return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
+  // Use form hook
+  const form = useForm<FormValues>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      title: initialData?.title || "",
+      content: initialData?.content || "",
+      isPrivate: initialData?.isPrivate || false,
+    },
+  });
+
+  const fetchNotes = async () => {
+    const updatedResponse = await fetch(`/api/notes/regulation/${regulationId}`);
+    if (updatedResponse.ok) {
+      const updatedData = await updatedResponse.json();
+      setNotes(updatedData);
     }
-
-    // Fallback to username
-    const username = user.username;
-    // Take first two characters of username if no space
-    if (!username.includes(' ')) {
-      return username.substring(0, 2).toUpperCase();
-    }
-    // Otherwise take first character of each word
-    return username
-      .split(' ')
-      .map(part => part[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
   };
 
-  // Form setup
-  const form = useForm<NoteFormValues>({
-    resolver: zodResolver(noteFormSchema),
-    defaultValues: {
-      regulationId: regulationId,
-      title: "",
-      content: "",
-      isPrivate: false
-    }
-  });
 
-  // Query for fetching notes
-  const { data: notes, isLoading, error } = useQuery<Note[]>({
-    queryKey: ["notes", regulationId],
-    queryFn: async () => {
-      if (!user) {
-        return [];
-      }
+  const onSubmit = async (data: FormValues) => {
+    try {
+      setIsSubmitting(true);
 
-      try {
-        const response = await fetch(`/api/notes/regulation/${regulationId}`, {
-          credentials: 'include'
-        });
+      const endpoint = initialData?.id
+        ? `/api/notes/${initialData.id}`
+        : "/api/notes";
 
-        if (!response.ok) {
-          throw new Error(`Failed to fetch notes: ${response.status}`);
-        }
+      const method = initialData?.id ? "PUT" : "POST";
 
-        const data = await response.json();
-        return data;
-      } catch (error) {
-        console.error("Error fetching notes:", error);
-        throw error;
-      }
-    },
-    enabled: !!user && !!regulationId
-  });
+      const payload = {
+        ...data,
+        regulationId: parseInt(regulationId), //Attempt to parse regulationId.  Error handling would be needed in production.
+      };
 
-  // Mutation for creating notes
-  const createMutation = useMutation({
-    mutationFn: async (noteData: NoteFormValues) => {
-      const response = await fetch('/api/notes', {
-        method: 'POST',
+      const response = await fetch(endpoint, {
+        method,
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(noteData),
-        credentials: 'include'
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to save note');
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to save note");
       }
 
-      return await response.json();
-    },
-    onSuccess: () => {
+      // Refresh notes after successful submission
+      await fetchNotes();
+
+
+      // Reset form if creating a new note
+      if (!initialData?.id) {
+        form.reset({
+          title: "",
+          content: "",
+          isPrivate: false,
+        });
+      }
+
       toast({
-        title: "Entry Saved",
-        description: "Your diary entry has been saved successfully.",
-        variant: "default",
+        title: "Success",
+        description: initialData?.id
+          ? "Note updated successfully"
+          : "Note created successfully",
       });
-
-      form.reset({
-        regulationId: regulationId,
-        title: "",
-        content: "",
-        isPrivate: false
-      });
-
-      queryClient.invalidateQueries({ queryKey: ["notes", regulationId] });
-    },
-    onError: (error: any) => {
+    } catch (error) {
       toast({
         title: "Error",
-        description: error.message || "Failed to save entry. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to save note",
         variant: "destructive",
       });
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
     }
-  });
-
-  const onSubmit = (values: NoteFormValues) => {
-    if (!user) {
-      toast({
-        title: "Authentication Required",
-        description: "You must be logged in to save entries.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    createMutation.mutate(values);
   };
-
-  // If user is not logged in, show message
-  if (!user) {
-    return (
-      <div className="p-4">
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertTitle>Authentication Required</AlertTitle>
-          <AlertDescription>
-            You must be logged in to view and create entries.
-          </AlertDescription>
-        </Alert>
-      </div>
-    );
-  }
 
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-medium">Create Regulation Diary Entry</h3>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 mt-2">
-            <FormField
-              control={form.control}
-              name="title"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Title</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Regulation Diary Entry title" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+        <h3 className="text-lg font-medium">
+          {initialData?.id ? "Edit Note" : "Add Note"}
+        </h3>
+        <p className="text-sm text-muted-foreground">
+          {initialData?.id
+            ? "Update your note for this regulation"
+            : "Add a note to this regulation for future reference"}
+        </p>
+      </div>
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <FormField
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Title</FormLabel>
+                <FormControl>
+                  <Input {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <FormField
-              control={form.control}
-              name="content"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Content</FormLabel>
-                  <div className="h-[300px] relative">
+          <FormField
+            control={form.control}
+            name="content"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Content</FormLabel>
+                <FormControl>
+                  <div className="rich-text-editor">
                     <ReactQuill
                       theme="snow"
-                      modules={quillModules}
-                      formats={quillFormats}
                       value={field.value}
                       onChange={field.onChange}
-                      className="h-[250px]"
-                      placeholder="Add your diary entry content here..."
+                      modules={{
+                        toolbar: [
+                          [{ 'header': [1, 2, 3, false] }],
+                          ['bold', 'italic', 'underline', 'strike'],
+                          [{'list': 'ordered'}, {'list': 'bullet'}],
+                          ['link', 'clean']
+                        ],
+                      }}
+                      style={{ height: '300px', marginBottom: '50px' }}
                     />
                   </div>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <Button
-              type="submit"
-              disabled={createMutation.isPending}
-              className="mt-2"
-            >
-              {createMutation.isPending ? "Saving..." : "Save Entry"}
-            </Button>
-          </form>
-        </Form>
-      </div>
 
-      <div>
-        <h3 className="text-lg font-medium mb-4">Diary</h3>
-        <p className="text-sm text-muted-foreground mb-4">Keep a running journal of how this regulation affects your institution. Use this space to document observations, challenges, and progress in meeting compliance requirements.</p>
-        {isLoading ? (
-          <p>Loading entries...</p>
-        ) : error ? (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>
-              Failed to load entries. Please try again.
-            </AlertDescription>
-          </Alert>
-        ) : notes && notes.length > 0 ? (
-          <div className="space-y-4">
-            {notes.map((note) => (
-              <Card key={note.id}>
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle>{note.title}</CardTitle>
-                      <div className="flex items-center gap-3 mt-2">
-                        <Avatar className="h-6 w-6">
-                          <AvatarFallback className="bg-primary text-white text-xs">
-                            {getInitials(note.user)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <CardDescription className="flex items-center">
-                          <Clock className="h-3 w-3 mr-1" />
-                          {format(new Date(note.updatedAt), "MMM d, yyyy")}
-                        </CardDescription>
-                      </div>
-                    </div>
-                    {note.isPrivate && (
-                      <div className="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-800">
-                        Private
-                      </div>
-                    )}
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div
-                    className="prose prose-sm max-w-none"
-                    dangerouslySetInnerHTML={{ __html: note.content }}
+          {/* Private note option temporarily removed 
+          <FormField
+            control={form.control}
+            name="isPrivate"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                <FormControl>
+                  <input
+                    type="checkbox"
+                    checked={field.value}
+                    onChange={field.onChange}
                   />
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel>Private Note</FormLabel>
+                  <p className="text-sm text-muted-foreground">
+                    Only you will be able to see this note
+                  </p>
+                </div>
+              </FormItem>
+            )}
+          />
+          */}
+
+          <Button type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Saving..." : "Save Entry"}
+          </Button>
+        </form>
+      </Form>
+
+      {/* Display existing notes */}
+      <div className="mt-8">
+        <h3 className="text-lg font-medium mb-4">Diary Entries</h3>
+        {notes.length === 0 ? (
+          <p className="text-sm text-gray-500">No notes found for this regulation.</p>
         ) : (
-          <p className="text-muted-foreground">No entries found for this regulation.</p>
+          <ul className="space-y-4"> {/* Changed to ul for better list rendering */}
+            {notes.map((note) => (
+              <li key={note.id} className="border p-4 rounded-md"> {/* Changed to li */}
+                <div className="flex justify-between items-start">
+                  <h4 className="text-md font-medium">{note.title}</h4>
+                  <div className="text-xs text-gray-500">
+                    {note.user && `By ${note.user.firstName} ${note.user.lastName}`}
+                    {note.createdAt && (
+                      <span className="ml-2">
+                        {new Date(note.createdAt).toLocaleString()}
+                      </span>
+                    )}
+                    {note.isPrivate && <span className="ml-2">(Private)</span>}
+                  </div>
+                </div>
+                <div 
+                  className="mt-2 text-sm" 
+                  dangerouslySetInnerHTML={{ __html: note.content }}
+                />
+                {/* Removed status display */}
+              </li>
+            ))}
+          </ul>
         )}
       </div>
     </div>

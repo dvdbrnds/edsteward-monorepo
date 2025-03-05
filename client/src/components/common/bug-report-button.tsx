@@ -24,35 +24,13 @@ import { z } from "zod";
 import { useToast } from "@/hooks/use-toast";
 import { useLocation } from "wouter";
 
-// Define interface for error details
-interface ErrorDetails {
-  message?: string;
-  stack?: string;
-  componentStack?: string | null;
-  errorType?: string;
-  severity?: 'warning' | 'error' | 'critical';
-}
-
-// Props interface for the component
-interface BugReportButtonProps {
-  errorDetails?: ErrorDetails;
-  variant?: 'default' | 'subtle';
-  size?: 'sm' | 'md' | 'lg';
-}
-
 const bugReportSchema = z.object({
   comments: z.string().min(10, "Please provide more details about the issue"),
-  errorType: z.string().optional(),
-  severity: z.enum(['warning', 'error', 'critical']).optional(),
 });
 
 type BugReport = z.infer<typeof bugReportSchema>;
 
-export function BugReportButton({ 
-  errorDetails,
-  variant = 'default',
-  size = 'sm' 
-}: BugReportButtonProps) {
+export function BugReportButton() {
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -62,28 +40,17 @@ export function BugReportButton({
     resolver: zodResolver(bugReportSchema),
     defaultValues: {
       comments: "",
-      errorType: errorDetails?.errorType,
-      severity: errorDetails?.severity,
     },
   });
 
   const onSubmit = async (data: BugReport) => {
     try {
       setIsSubmitting(true);
-      console.log("Submitting bug report:", { 
-        location, 
-        ...data,
-        errorDetails 
-      });
+      console.log("Submitting bug report:", { location, comments: data.comments });
 
       // Store the current location and form data
       localStorage.setItem('bugReport_returnTo', location);
-      localStorage.setItem('bugReport_data', JSON.stringify({
-        ...data,
-        timestamp: new Date().toISOString(),
-        userAgent: navigator.userAgent,
-        errorDetails
-      }));
+      localStorage.setItem('bugReport_data', JSON.stringify(data));
 
       // First check if we need Google auth
       const authCheckResponse = await fetch("/api/auth/check-google-auth");
@@ -108,12 +75,8 @@ export function BugReportButton({
         bugReportData = JSON.parse(savedData);
       } catch (parseError) {
         console.error("Failed to parse saved bug report data:", parseError);
-        bugReportData = {
-          ...data,
-          timestamp: new Date().toISOString(),
-          userAgent: navigator.userAgent,
-          errorDetails
-        };
+        // If we can't parse saved data, use current form data
+        bugReportData = data;
       }
 
       const returnTo = localStorage.getItem('bugReport_returnTo') || location;
@@ -125,11 +88,12 @@ export function BugReportButton({
         },
         body: JSON.stringify({
           location: returnTo,
-          ...bugReportData
+          comments: bugReportData.comments,
         }),
       });
 
       const result = await response.json().catch(() => ({ error: "Failed to parse server response" }));
+      console.log("Bug report submission response:", result);
 
       if (!response.ok) {
         const errorMessage = result.error 
@@ -164,18 +128,13 @@ export function BugReportButton({
     }
   };
 
-  const buttonVariant = variant === 'subtle' ? 'ghost' : 'outline';
-  const buttonStyle = variant === 'subtle' 
-    ? "text-red-600 hover:bg-red-50"
-    : "gap-2 border-red-200 hover:border-red-300 hover:bg-red-50";
-
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button
-          variant={buttonVariant}
-          size={size}
-          className={buttonStyle}
+          variant="outline"
+          size="sm"
+          className="gap-2 border-red-200 hover:border-red-300 hover:bg-red-50"
         >
           <BugIcon className="h-4 w-4 text-red-500" />
           <span className="text-red-600">Report Bug</span>
@@ -186,12 +145,6 @@ export function BugReportButton({
           <DialogTitle>Report a Bug</DialogTitle>
           <DialogDescription>
             Help us improve by reporting any issues you encounter.
-            {errorDetails?.message && (
-              <div className="mt-2 p-2 bg-red-50 border border-red-100 rounded-md">
-                <p className="text-sm font-medium text-red-800">Error Details:</p>
-                <p className="text-sm text-red-600">{errorDetails.message}</p>
-              </div>
-            )}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -227,7 +180,7 @@ export function BugReportButton({
                 {isSubmitting ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Submitting...
+                    Creating...
                   </>
                 ) : (
                   "Submit Report"

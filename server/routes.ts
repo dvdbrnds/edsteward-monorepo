@@ -15,7 +15,6 @@ import { systemLogs, users } from "@shared/schema";
 import { syslog, LogLevel, LogFacility } from './services/syslog';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
-import { format } from 'date-fns';
 
 // Update the getRedirectUri function to handle different environments properly
 function getRedirectUri(req: Request): string {
@@ -72,31 +71,12 @@ export function registerRoutes(app: Express): Server {
 
   // Add this error handler middleware to catch syslog errors
   app.use(async (err: Error, req: Request, res: Response, next: Function) => {
-    // Truncate long response bodies for logging
-    const truncateBody = (body: any): any => {
-      if (typeof body === 'string' && body.length > 500) {
-        return body.substring(0, 500) + '...';
-      }
-      if (Array.isArray(body)) {
-        return `Array[${body.length} items]`;
-      }
-      if (typeof body === 'object' && body !== null) {
-        return '{Object}';
-      }
-      return body;
-    };
-
-    // Create a cleaner log entry
-    const logEntry = {
+    await syslog.error("Unhandled error", { 
       error: err.message,
+      stack: err.stack,
       path: req.path,
-      method: req.method,
-      body: truncateBody(req.body),
-      query: truncateBody(req.query),
-      stack: err.stack?.split('\n').slice(0, 3).join('\n') // Only keep first 3 lines of stack trace
-    };
-
-    await syslog.error("Unhandled error", logEntry);
+      method: req.method
+    });
     next(err);
   });
 
@@ -553,37 +533,56 @@ export function registerRoutes(app: Express): Server {
     try {
       // Import the debug logger
       const { DebugLogger } = require('./services/debug-logger');
+      DebugLogger.log('DEBUG_API', 'Checking note schema information');
 
       // This endpoint helps us debug schema issues
-      let schemaInfo;
+      let schemaStructure;
       try {
-        const schemaStructure = Object.keys(insertNoteSchema._def?.shape() || {});
-
-        // Only log if schema structure is unexpected
-        if (!schemaStructure.includes('regulationId') || !schemaStructure.includes('content')) {
-          DebugLogger.log('DEBUG_API', 'Schema validation warning: Missing required fields', {
-            presentFields: schemaStructure
-          });
-        }
-
-        schemaInfo = {
-          status: 'valid',
-          fields: schemaStructure
-        };
-      } catch (error) {
-        schemaInfo = {
-          status: 'error',
-          message: error instanceof Error ? error.message : String(error)
-        };
-        DebugLogger.log('DEBUG_API', 'Schema validation error', schemaInfo);
+        schemaStructure = Object.keys(insertNoteSchema._def?.shape() || {});
+      } catch (e) {
+        schemaStructure = `Error getting schema structure: ${e.message}`;
       }
 
+      // Recreate a schema for testing
+      const testSchema = z.object({
+        regulationId: z.number().positive(),
+        userId: z.number().positive(),
+        title: z.string().min(1),
+        content: z.string().min(1),
+        isPrivate: z.boolean().optional()
+      });
+
+      const testData = {
+        regulationId: 3869,
+        userId: 1,
+        title: "Test Note",
+        content: "Test Content"
+      };
+
+      const schemaInfo = {
+        originalSchemaType: typeof insertNoteSchema,
+        originalSchemaShape: schemaStructure,
+        testSchemaResult: testSchema.safeParse(testData),
+        originalSchemaTest: insertNoteSchema.safeParse(testData),
+        reconstructedSchema: {
+          description: "Testing if we can create a new schema from scratch",
+          result: z.object({
+            regulationId: z.number().positive(),
+            userId: z.number(),
+            title: z.string().min(1),
+            content: z.string().min(1)
+          }).safeParse(testData)
+        }
+      };
+
+      DebugLogger.log('DEBUG_API', 'Schema information generated', schemaInfo);
       res.json(schemaInfo);
     } catch (error) {
       console.error("Debug schema error:", error);
       res.status(500).json({
         error: "Failed to get schema info",
-        details: error instanceof Error ? error.message : String(error)
+        details: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
       });
     }
   });
@@ -892,13 +891,13 @@ export function registerRoutes(app: Express): Server {
 
       console.log('[AUTH] Login successful for user:', username);
 
-      return res.status(200).json({
-        message: "Login successful",
-        user: {
-          id: user.id,
-          username: user.username,
-          role: user.role
-        }
+      return res.status(200).json({ 
+        message: "Login successful", 
+        user: { 
+          id: user.id, 
+          username: user.username, 
+          role: user.role 
+        } 
       });
     } catch (error) {
       const errorData = {
@@ -911,9 +910,11 @@ export function registerRoutes(app: Express): Server {
       console.error("Login error:", error);
       await syslog.logAuthEvent(LogLevel.ERROR, "Login system error", undefined, username, errorData);
       await DebugLogger.logError('AUTH_LOGIN', error);
-      return res.status(500).json({ error:"Internal server error" });
+      return res.status(500).json({ error: "Internal server error" });
     }
-  });  // Add logging to logout route
+  });
+
+  // Add logging to logout route
   app.post("/api/auth/logout", async (req, res) => {
     const { DebugLogger } = require('./services/debug-logger');
 
@@ -1103,7 +1104,7 @@ export function registerRoutes(app: Express): Server {
             '/api/admin/users': 'USER_MANAGEMENT',
             '/api/bug-report': 'BUG_REPORT'
           };
-
+          
           // Determine the context based on the path
           let context = 'USER_ACTIVITY';
           for (const key in contextMap) {
@@ -1112,7 +1113,7 @@ export function registerRoutes(app: Express): Server {
               break;
             }
           }
-
+          
           syslog.info(activity, {
             username: req.user.username,
             user: req.user.username,
@@ -1140,7 +1141,7 @@ export function registerRoutes(app: Express): Server {
   app.use('/api/admin/users*', logUserActivity('User management'));
   app.use('/api/auth/login', logUserActivity('Authentication'));
   app.use('/api/auth/logout', logUserActivity('Authentication'));
-
+  
 
   // Log all API requests for comprehensive activity tracking
   app.use('/api/*', async (req, res, next) => {
@@ -1150,7 +1151,7 @@ export function registerRoutes(app: Express): Server {
       const path = req.path;
       const method = req.method;
       const ip = req.ip || req.headers['x-forwarded-for'] || 'unknown';
-
+      
       try {
         await syslog.info(`API request: ${method} ${path}`, {
           username,
@@ -1168,7 +1169,7 @@ export function registerRoutes(app: Express): Server {
     }
     next();
   });
-
+  
 
   // Enhanced validation logging
   app.use('/api/regulations/validate', async (req, res, next) => {
@@ -1197,7 +1198,7 @@ export function registerRoutes(app: Express): Server {
       syslog.critical("Test critical message", { test: true });
       syslog.error("Test error message", { test: true });
       syslog.warning("Test warning message", { test: true });
-      syslog.notice("Test notice message", { test: true });
+      syslog.notice("Test notice message", { test: true }); 
       syslog.info("Test info message", { test: true });
       syslog.debug("Test debug message", { test: true });
 
@@ -1211,83 +1212,6 @@ export function registerRoutes(app: Express): Server {
     } catch (error) {
       console.error("Failed to generate test logs:", error);
       res.status(500).json({ error: "Failed to generate test logs" });
-    }
-  });
-
-  // Add console logs endpoint
-  app.get("/api/admin/console-logs", async (req, res) => {
-    try {
-      // Check if user is admin
-      if (req.user?.role !== "admin") {
-        return res.status(403).json({ error: "Only administrators can access console logs" });
-      }
-
-      const maxLines = req.query.maxLines ? parseInt(req.query.maxLines as string) : 1000;
-      const logs = await syslog.getConsoleLogs(maxLines);
-
-      res.json({ logs });
-    } catch (error) {
-      console.error("Failed to fetch console logs:", error);
-      res.status(500).json({ error: "Failed to fetch console logs" });
-    }
-  });
-
-  // Add download endpoint for console logs
-  app.get("/api/admin/console-logs/download", async (req, res) => {
-    try {
-      // Check if user is admin
-      if (req.user?.role !== "admin") {
-        return res.status(403).json({ error: "Only administrators can download console logs" });
-      }
-
-      const logs = await syslog.getConsoleLogs();
-      const timestamp = format(new Date(), 'yyyy-MM-dd-HH-mm-ss');
-      const filename = `console-logs-${timestamp}.txt`;
-
-      res.setHeader('Content-Type', 'text/plain');
-      res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
-      res.send(logs.join('\n'));
-    } catch (error) {
-      console.error("Failed to download console logs:", error);
-      res.status(500).json({ error: "Failed to download console logs" });
-    }
-  });
-
-  // Update filtered console logs endpoint
-  app.get("/api/admin/console-logs/filtered", async (req, res) => {
-    try {
-      // Check if user is admin
-      if (req.user?.role !== "admin") {
-        return res.status(403).json({ error: "Only administrators can access console logs" });
-      }
-
-      const { level, search, startTime, endTime } = req.query;
-      const maxLines = req.query.maxLines ? parseInt(req.query.maxLines as string) : 1000;
-
-      const options = {
-        maxLines,
-        level: level as string | undefined,
-        search: search as string | undefined,
-        startTime: startTime ? new Date(startTime as string) : undefined,
-        endTime: endTime ? new Date(endTime as string) : undefined
-      };
-
-      const logs = await syslog.getFilteredConsoleLogs(options);
-
-      res.json({
-        total: logs.length,
-        logs,
-        filters: {
-          level,
-          search,
-          startTime,
-          endTime,
-          maxLines
-        }
-      });
-    } catch (error) {
-      console.error("Failed to fetch filtered console logs:", error);
-      res.status(500).json({ error: "Failed to fetch filtered console logs" });
     }
   });
 

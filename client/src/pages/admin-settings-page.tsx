@@ -296,18 +296,8 @@ export default function AdminSettingsPage() {
         <Navigation />
         <main className="py-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="space-y-8">
-              <div className="flex items-center justify-center flex-col gap-4">
-                <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
-                <p className="text-lg text-gray-600">
-                  Loading configuration settings...
-                </p>
-                <p className="text-sm text-gray-500">
-                  {emailLoading && "• Fetching email settings"}
-                  {twilioLoading && "• Fetching SMS settings"}
-                  {usersLoading && "• Loading user data"}
-                </p>
-              </div>
+            <div className="flex items-center justify-center">
+              <Loader2 className="h-6 w-6 animate-spin text-[#00267A]" />
             </div>
           </div>
         </main>
@@ -505,14 +495,17 @@ export default function AdminSettingsPage() {
                         <Button
                           type="submit"
                           className="w-full"
-                          disabled={createUserMutation.isPending || updateUserMutation.isPending}
+                          disabled={
+                            createUserMutation.isPending ||
+                            updateUserMutation.isPending
+                          }
                         >
-                          {createUserMutation.isPending || updateUserMutation.isPending ? (
-                            <div className="flex items-center justify-center">
+                          {createUserMutation.isPending ||
+                          updateUserMutation.isPending ? (
+                            <>
                               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              <span>{selectedUser ? "Updating..." : "Creating..."}</span>
-                              <span className="text-xs ml-2 text-gray-400">Please wait</span>
-                            </div>
+                              {selectedUser ? "Updating..." : "Creating..."}
+                            </>
                           ) : (
                             selectedUser ? "Update User" : "Create User"
                           )}
@@ -538,20 +531,17 @@ export default function AdminSettingsPage() {
                     <TableBody>
                       {usersLoading ? (
                         <TableRow>
-                          <TableCell colSpan={5} className="text-center py-8">
-                            <div className="flex flex-col items-center gap-2">
-                              <Loader2 className="h-6 w-6 animate-spin text-blue-500" />
-                              <p className="text-sm text-gray-500">Loading user data...</p>
-                            </div>
+                          <TableCell colSpan={5} className="text-center py-4">
+                            <Loader2 className="h-6 w-6 animate-spin mx-auto" />
                           </TableCell>
                         </TableRow>
                       ) : users?.length === 0 ? (
                         <TableRow>
-                          <TableCell colSpan={5} className="text-center text-gray-500 py-8">
-                            <p className="text-base">No users found</p>
-                            <p className="text-sm text-gray-400 mt-1">
-                              Click the "Add User" button to create a new user
-                            </p>
+                          <TableCell
+                            colSpan={5}
+                            className="text-center text-gray-500 py-4"
+                          >
+                            No users found
                           </TableCell>
                         </TableRow>
                       ) : (
@@ -728,11 +718,10 @@ export default function AdminSettingsPage() {
                         disabled={updateEmailConfigMutation.isPending}
                       >
                         {updateEmailConfigMutation.isPending ? (
-                          <div className="flex items-center justify-center">
+                          <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            <span>Saving changes</span>
-                            <span className="text-xs ml-2 text-gray-400">Please wait</span>
-                          </div>
+                            Saving...
+                          </>
                         ) : (
                           "Save Configuration"
                         )}
@@ -816,11 +805,10 @@ export default function AdminSettingsPage() {
                         disabled={updateTwilioConfigMutation.isPending}
                       >
                         {updateTwilioConfigMutation.isPending ? (
-                          <div className="flex items-center justify-center">
+                          <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            <span>Saving changes</span>
-                            <span className="text-xs ml-2 text-gray-400">Please wait</span>
-                          </div>
+                            Saving...
+                          </>
                         ) : (
                           "Save Configuration"
                         )}
