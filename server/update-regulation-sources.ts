@@ -11,6 +11,9 @@ async function main() {
 
     // Get regulations that need updating (not updated in the last 7 days)
     const regulations = await storage.getRegulations();
+    console.log('Fetching regulations from database...');
+    console.log(`Found ${regulations.length} regulations in database:`, regulations);
+
     const outdatedRegulations = regulations.filter(reg => {
       const lastUpdate = reg.lastUpdated ? new Date(reg.lastUpdated) : new Date(0);
       const daysSinceUpdate = Math.floor((Date.now() - lastUpdate.getTime()) / (1000 * 60 * 60 * 24));
@@ -19,7 +22,14 @@ async function main() {
 
     console.log(`Found ${outdatedRegulations.length} regulations that need updating`);
 
-    await updateRegulationsFromSources(outdatedRegulations);
+    // For testing, only process the first regulation that has an agency name
+    const testRegulation = outdatedRegulations.find(reg => reg.agency_name);
+    if (testRegulation) {
+      console.log(`Testing with regulation: ${testRegulation.itemId} - ${testRegulation.name}`);
+      await updateRegulationsFromSources([testRegulation]);
+    } else {
+      console.log('No regulations with agency names found for testing');
+    }
 
     console.log('Regulation source update completed successfully');
 

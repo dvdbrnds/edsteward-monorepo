@@ -258,7 +258,7 @@ async function importRegulations() {
 
         console.log(`Processing regulation with Item ID: ${itemId}`);
 
-        // Get topic and map to category, with special handling for education-related topics
+        // Get topic and map to category
         let topic = String(row['Topic'] || '').trim();
         let category = topicToCategory[topic] || 'Other';
 
@@ -271,7 +271,7 @@ async function importRegulations() {
         }
 
         // Determine agency
-        const agencyName = await determineAgency({
+        const agency_name = await determineAgency({
           name: String(row['Statute Name'] || row['Name'] || '').trim(),
           statute: String(row['Statute 1'] || row['Statute'] || '').trim(),
           topic: String(row['Topic'] || '').trim(),
@@ -296,11 +296,11 @@ async function importRegulations() {
           nextReviewDate: null,
           filingDeadlines: null,
           reportingFrequency: String(row['Reporting Requirements'] || '').trim(),
-          agency_url: agencyName === 'Department of Labor' ? 'https://www.dol.gov' :
-            agencyName === 'Department of Education' ? 'https://www.ed.gov' : '',
-          agencyName: agencyName,
-          agencyContact: '',
-          agencyDepartment: '',
+          agency_url: agency_name === 'Department of Labor' ? 'https://www.dol.gov' :
+            agency_name === 'Department of Education' ? 'https://www.ed.gov' : '',
+          agency_name: agency_name, 
+          agency_contact: '',
+          agency_department: '',
           regulationUrl: '',
           requirementsUrl: '',
           submissionGuideUrl: '',
