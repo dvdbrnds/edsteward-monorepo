@@ -237,18 +237,17 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Content</FormLabel>
-                  <FormControl>
-                    <div className="border rounded-md">
-                      <ReactQuill
-                        theme="snow"
-                        modules={quillModules}
-                        formats={quillFormats}
-                        value={field.value}
-                        onChange={field.onChange}
-                        className="min-h-[200px]"
-                      />
-                    </div>
-                  </FormControl>
+                  <div className="h-[300px] relative">
+                    <ReactQuill
+                      theme="snow"
+                      modules={quillModules}
+                      formats={quillFormats}
+                      value={field.value}
+                      onChange={field.onChange}
+                      className="h-[250px]"
+                      placeholder="Add your diary entry content here..."
+                    />
+                  </div>
                   <FormMessage />
                 </FormItem>
               )}
