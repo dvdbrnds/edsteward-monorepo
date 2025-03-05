@@ -467,11 +467,13 @@ export class SysLogger {
     }
   }
 
-  // Add new method to get filtered console logs
+  // Add new method to get filtered console logs with time range
   async getFilteredConsoleLogs(options: {
     maxLines?: number;
     level?: string;
     search?: string;
+    startTime?: Date;
+    endTime?: Date;
   }): Promise<string[]> {
     try {
       let logs = await this.getConsoleLogs(options.maxLines);
@@ -483,6 +485,18 @@ export class SysLogger {
       if (options.search) {
         const searchTerm = options.search.toLowerCase();
         logs = logs.filter(log => log.toLowerCase().includes(searchTerm));
+      }
+
+      if (options.startTime || options.endTime) {
+        logs = logs.filter(log => {
+          const match = log.match(/\[(.*?)\]/);
+          if (!match) return false;
+
+          const logTime = new Date(match[1]);
+          if (options.startTime && logTime < options.startTime) return false;
+          if (options.endTime && logTime > options.endTime) return false;
+          return true;
+        });
       }
 
       return logs;

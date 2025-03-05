@@ -911,7 +911,7 @@ export function registerRoutes(app: Express): Server {
       console.error("Login error:", error);
       await syslog.logAuthEvent(LogLevel.ERROR, "Login system error", undefined, username, errorData);
       await DebugLogger.logError('AUTH_LOGIN', error);
-      return res.status(500).json({ error: "Internal server error" });
+      return res.status(500).json({ error:"Internal server error" });
     }
   });
 
@@ -1255,7 +1255,7 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  // Add filtered console logs endpoint
+  // Update filtered console logs endpoint
   app.get("/api/admin/console-logs/filtered", async (req, res) => {
     try {
       // Check if user is admin
@@ -1263,22 +1263,30 @@ export function registerRoutes(app: Express): Server {
         return res.status(403).json({ error: "Only administrators can access console logs" });
       }
 
-      const { level, search } = req.query;
+      const { level, search, startTime, endTime } = req.query;
       const maxLines = req.query.maxLines ? parseInt(req.query.maxLines as string) : 1000;
-      let logs = await syslog.getConsoleLogs(maxLines);
 
-      // Filter by log level if specified
-      if (level) {
-        logs = logs.filter(log => log.includes(`[${level.toString().toUpperCase()}]`));
-      }
+      const options = {
+        maxLines,
+        level: level as string | undefined,
+        search: search as string | undefined,
+        startTime: startTime ? new Date(startTime as string) : undefined,
+        endTime: endTime ? new Date(endTime as string) : undefined
+      };
 
-      // Filter by search term if specified
-      if (search) {
-        const searchTerm = search.toString().toLowerCase();
-        logs = logs.filter(log => log.toLowerCase().includes(searchTerm));
-      }
+      const logs = await syslog.getFilteredConsoleLogs(options);
 
-      res.json({ logs });
+      res.json({ 
+        total: logs.length,
+        logs,
+        filters: {
+          level,
+          search,
+          startTime,
+          endTime,
+          maxLines
+        }
+      });
     } catch (error) {
       console.error("Failed to fetch filtered console logs:", error);
       res.status(500).json({ error: "Failed to fetch filtered console logs" });
