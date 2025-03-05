@@ -4,6 +4,9 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/hooks/use-toast';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { AlertCircle, Download, Loader2, RefreshCw } from "lucide-react";
 
 export function NoteDebugger() {
   const [regulationId, setRegulationId] = useState('3869');
@@ -12,9 +15,8 @@ export function NoteDebugger() {
   const [result, setResult] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [schemaInfo, setSchemaInfo] = useState<any>(null); //Added state for schema info
-  const [reqResponse, setReqResponse] = useState<any>(null); //Added state for request response
-
+  const [schemaInfo, setSchemaInfo] = useState<any>(null); 
+  const [reqResponse, setReqResponse] = useState<any>(null); 
 
   const createNote = async () => {
     setLoading(true);
@@ -265,5 +267,166 @@ export function NoteDebugger() {
         </Button>
       </CardFooter>
     </Card>
+  );
+}
+
+export function RegulationImportDebugger() {
+  const [regulationIds, setRegulationIds] = useState<string[]>([]);
+  const [importStatus, setImportStatus] = useState<'idle' | 'running' | 'completed' | 'error'>('idle');
+  const [logs, setLogs] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  const startImport = async () => {
+    setLoading(true);
+    setImportStatus('running');
+    try {
+      const response = await fetch('/api/regulations/import', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ regulationIds }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      setLogs(prev => [...prev, `Import started for ${regulationIds.length} regulations`]);
+      setImportStatus('completed');
+      toast({
+        title: 'Success',
+        description: 'Regulation import process started successfully',
+      });
+    } catch (error) {
+      console.error('Import error:', error);
+      setImportStatus('error');
+      setLogs(prev => [...prev, `Error: ${error instanceof Error ? error.message : String(error)}`]);
+      toast({
+        title: 'Error',
+        description: 'Failed to start regulation import',
+        variant: 'destructive',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const clearLogs = () => {
+    setLogs([]);
+  };
+
+  const downloadLogs = () => {
+    const blob = new Blob([logs.join('\n')], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `regulation-import-logs-${new Date().toISOString()}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  return (
+    <Card className="w-[800px] mx-auto my-8">
+      <CardHeader>
+        <CardTitle>Regulation Import Debug Console</CardTitle>
+        <CardDescription>Monitor and control the AI-powered regulation import process</CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="flex-1">
+            <label className="block text-sm font-medium mb-1">Regulation IDs</label>
+            <Input
+              value={regulationIds.join(', ')}
+              onChange={(e) => setRegulationIds(e.target.value.split(',').map(id => id.trim()))}
+              placeholder="Enter regulation IDs (comma-separated)"
+            />
+          </div>
+          <div className="flex items-end gap-2">
+            <Button
+              onClick={startImport}
+              disabled={loading || !regulationIds.length}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                'Start Import'
+              )}
+            </Button>
+          </div>
+        </div>
+
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <label className="block text-sm font-medium">Import Status</label>
+            <Badge
+              variant={
+                importStatus === 'completed' ? 'default' :
+                importStatus === 'error' ? 'destructive' :
+                importStatus === 'running' ? 'secondary' : 'outline'
+              }
+            >
+              {importStatus.toUpperCase()}
+            </Badge>
+          </div>
+          <div className="border rounded-md p-4 bg-muted/10 min-h-[300px] max-h-[300px] overflow-auto font-mono text-sm">
+            {logs.length === 0 ? (
+              <div className="text-muted-foreground text-center py-8">
+                No logs available. Start an import to see logs here.
+              </div>
+            ) : (
+              logs.map((log, index) => (
+                <div key={index} className="py-1">
+                  {log}
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+      </CardContent>
+      <CardFooter className="flex justify-end gap-2">
+        <Button
+          variant="outline"
+          onClick={clearLogs}
+          disabled={!logs.length}
+        >
+          Clear Logs
+        </Button>
+        <Button
+          variant="outline"
+          onClick={downloadLogs}
+          disabled={!logs.length}
+        >
+          <Download className="mr-2 h-4 w-4" />
+          Download Logs
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+}
+
+export default function DebugTools() {
+  return (
+    <div className="container mx-auto py-8">
+      <h1 className="text-3xl font-bold mb-8">Debug Tools</h1>
+      <Tabs defaultValue="notes">
+        <TabsList className="mb-8">
+          <TabsTrigger value="notes">Note API Debug</TabsTrigger>
+          <TabsTrigger value="regulations">Regulation Import Debug</TabsTrigger>
+        </TabsList>
+        <TabsContent value="notes">
+          <NoteDebugger />
+        </TabsContent>
+        <TabsContent value="regulations">
+          <RegulationImportDebugger />
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 }

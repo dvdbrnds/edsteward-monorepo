@@ -241,6 +241,75 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Add this section after the existing regulations endpoints
+  app.post("/api/regulations/import", async (req, res) => {
+    try {
+      // Check if user is admin
+      if (req.user?.role !== "admin") {
+        return res.status(403).json({ error: "Only administrators can import regulations" });
+      }
+
+      const { regulationIds } = req.body;
+
+      if (!Array.isArray(regulationIds) || regulationIds.length === 0) {
+        return res.status(400).json({ error: "Please provide an array of regulation IDs" });
+      }
+
+      // Log the start of import process
+      await syslog.info(
+        `Starting regulation import for ${regulationIds.length} regulations`,
+        {
+          username: req.user.username,
+          userId: req.user.id,
+          regulationIds,
+          context: 'REGULATION_IMPORT',
+          type: 'import_start'
+        }
+      );
+
+      // Import regulations using the regulation data collector service
+      const { populateRegulationData } = require('./services/regulation-data-collector');
+      await populateRegulationData(regulationIds);
+
+      // Log successful import
+      await syslog.info(
+        `Successfully started import for ${regulationIds.length} regulations`,
+        {
+          username: req.user.username,
+          userId: req.user.id,
+          regulationIds,
+          context: 'REGULATION_IMPORT',
+          type: 'import_success'
+        }
+      );
+
+      res.json({ 
+        message: "Regulation import process started",
+        count: regulationIds.length
+      });
+
+    } catch (error) {
+      console.error("Failed to import regulations:", error);
+
+      // Log the error
+      await syslog.error(
+        `Failed to import regulations: ${error instanceof Error ? error.message : String(error)}`,
+        {
+          username: req.user?.username,
+          userId: req.user?.id,
+          error: error instanceof Error ? error.message : String(error),
+          context: 'REGULATION_IMPORT',
+          type: 'import_error'
+        }
+      );
+
+      res.status(500).json({ 
+        error: "Failed to import regulations",
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
   // Enhanced deadlines endpoint with error handling and sorting
   app.get("/api/deadlines", async (req, res) => {
     try {
