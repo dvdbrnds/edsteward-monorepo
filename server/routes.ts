@@ -1173,6 +1173,59 @@ export function registerRoutes(app: Express): Server {
 
   // Enhanced validation logging
   app.use('/api/regulations/validate', async (req, res, next) => {
+
+  // Add route to analyze regulation URLs
+  app.post("/api/regulations/analyze-url", async (req, res) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ error: "Must be logged in to analyze URLs" });
+      }
+      
+      const { url } = req.body;
+      
+      if (!url) {
+        return res.status(400).json({ error: "URL is required" });
+      }
+      
+      const analysis = await UrlPatternAnalyzer.findSimilarRegulations(url);
+      res.json(analysis);
+      
+    } catch (error) {
+      console.error("Failed to analyze URL:", error);
+      res.status(500).json({ error: "Failed to analyze URL" });
+    }
+  });
+  
+  // Add route to get URL analysis for a regulation
+  app.get("/api/regulations/:id/similar-urls", async (req, res) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ error: "Must be logged in to find similar regulations" });
+      }
+      
+      const regulationId = parseInt(req.params.id);
+      if (isNaN(regulationId)) {
+        return res.status(400).json({ error: "Invalid regulation ID" });
+      }
+      
+      const regulation = await storage.getRegulation(regulationId);
+      if (!regulation) {
+        return res.status(404).json({ error: "Regulation not found" });
+      }
+      
+      if (!regulation.agency_url) {
+        return res.status(404).json({ error: "Regulation does not have an agency URL" });
+      }
+      
+      const analysis = await UrlPatternAnalyzer.findSimilarRegulations(regulation.agency_url);
+      res.json(analysis);
+      
+    } catch (error) {
+      console.error("Failed to find similar regulations:", error);
+      res.status(500).json({ error: "Failed to find similar regulations" });
+    }
+  });
+
     if (req.user) {
       await syslog.info(`User ${req.user.username} initiated regulation validation`, {
         username: req.user.username,
