@@ -10,11 +10,20 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { AlertCircle, Download, Loader2 } from "lucide-react";
+import { AlertCircle, Download, Loader2, RefreshCw } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import Navigation from "@/components/layout/navigation";
 import { apiRequest } from "@/lib/api";
 import { useQuery } from '@tanstack/react-query';
+import { format } from "date-fns";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 const LOG_FACILITIES = {
   0: "KERNEL",
@@ -41,6 +50,17 @@ const LOG_FACILITIES = {
   21: "LOCAL5",
   22: "LOCAL6",
   23: "LOCAL7"
+};
+
+const LOG_LEVELS = {
+  0: { name: "Emergency", color: "text-red-600 font-bold" },
+  1: { name: "Alert", color: "text-red-500 font-bold" },
+  2: { name: "Critical", color: "text-red-500" },
+  3: { name: "Error", color: "text-red-400" },
+  4: { name: "Warning", color: "text-yellow-500" },
+  5: { name: "Notice", color: "text-blue-500" },
+  6: { name: "Info", color: "text-blue-400" },
+  7: { name: "Debug", color: "text-gray-400" }
 };
 
 const insertEmailConfigSchema = z.object({
@@ -258,15 +278,18 @@ export default function SystemSettingsPage() {
   const downloadCSV = () => {
     if (!data?.logs) return;
 
-    const headers = ["Timestamp", "Level", "Facility", "Message"];
+    const headers = ["Timestamp", "Username", "Level", "Facility", "Message", "IP Address", "User Agent"];
     const csvContent = [
       headers.join(","),
       ...data.logs.map((log: any) => {
         return [
-          new Date(log.timestamp).toLocaleString(),
+          format(new Date(log.timestamp), "MMM d, yyyy HH:mm:ss"),
+          log.username || 'system',
           log.level,
           LOG_FACILITIES[log.facility as keyof typeof LOG_FACILITIES] || log.facility,
-          `"${log.message.replace(/"/g, '""')}"`
+          `"${log.message.replace(/"/g, '""')}"` ,
+          log.ip,
+          `"${log.userAgent.replace(/"/g, '""')}"`
         ].join(",");
       })
     ].join("\n");
@@ -524,52 +547,39 @@ export default function SystemSettingsPage() {
                       <Switch checked={autoRefresh} onCheckedChange={setAutoRefresh}>
                         Auto Refresh
                       </Switch>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={downloadCSV}
-                        className="flex items-center gap-1"
-                      >
-                        <Download className="h-4 w-4" /> Export CSV
-                      </Button>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                       <div className="space-y-2">
-                        <label className="text-sm font-medium" htmlFor="log-search">Search</label>
-                        <Input
-                          id="log-search"
-                          placeholder="Search logs..."
-                          value={search}
-                          onChange={(e) => setSearch(e.target.value)}
-                        />
+                        <label className="text-sm font-medium">Search</label>
+                        <div className="flex space-x-2">
+                          <Input
+                            placeholder="Search logs..."
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                          />
+                          <Button
+                            variant="outline"
+                            onClick={() => setSearch("")}
+                            title="Show all logs"
+                            size="sm"
+                          >
+                            All Logs
+                          </Button>
+                        </div>
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-medium" htmlFor="log-level">Level</label>
+                        <label className="text-sm font-medium">Log Level</label>
                         <Select value={level} onValueChange={setLevel}>
-                          <SelectTrigger id="log-level">
+                          <SelectTrigger>
                             <SelectValue placeholder="Select level" />
                           </SelectTrigger>
                           <SelectContent>
-                            <SelectItem value="INFO">INFO</SelectItem>
-                            <SelectItem value="WARNING">WARNING</SelectItem>
-                            <SelectItem value="ERROR">ERROR</SelectItem>
-                            <SelectItem value="DEBUG">DEBUG</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="space-y-2">
-                        <label className="text-sm font-medium" htmlFor="log-facility">Facility</label>
-                        <Select value={facility} onValueChange={setFacility}>
-                          <SelectTrigger id="log-facility">
-                            <SelectValue placeholder="Select facility" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {Object.entries(LOG_FACILITIES).map(([key, value]) => (
-                              <SelectItem key={key} value={key}>
-                                {value}
+                            <SelectItem value="all">All Levels</SelectItem>
+                            {Object.entries(LOG_LEVELS).map(([value, { name }]) => (
+                              <SelectItem key={value} value={value}>
+                                {name}
                               </SelectItem>
                             ))}
                           </SelectContent>
@@ -577,93 +587,130 @@ export default function SystemSettingsPage() {
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-sm font-medium invisible">Apply</label>
-                        <Button onClick={fetchLogs} className="w-full">
-                          Apply Filters
+                        <label className="text-sm font-medium">Facility</label>
+                        <Select value={facility} onValueChange={setFacility}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select facility" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="all">All Facilities</SelectItem>
+                            {Object.entries(LOG_FACILITIES).map(([value, label]) => (
+                              <SelectItem key={value} value={value}>
+                                {label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="flex items-end space-x-2">
+                        <Button
+                          onClick={() => {
+                            setSearch(`username:${user?.username}`);
+                            setPage(1);
+                          }}
+                          variant="outline"
+                        >
+                          My Activity
                         </Button>
                       </div>
                     </div>
 
-                    <div className="border rounded">
-                      <div className="overflow-auto max-h-[500px]">
-                        <table className="min-w-full divide-y divide-gray-200">
-                          <thead className="bg-gray-50">
-                            <tr>
-                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Timestamp
-                              </th>
-                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Level
-                              </th>
-                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Facility
-                              </th>
-                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                Message
-                              </th>
-                            </tr>
-                          </thead>
-                          <tbody className="bg-white divide-y divide-gray-200">
-                            {isLoading ? (
-                              <tr>
-                                <td colSpan={4} className="px-6 py-4 text-center text-sm">
-                                  <div className="flex justify-center">
-                                    <Loader2 className="h-6 w-6 animate-spin text-gray-500" />
-                                  </div>
-                                </td>
-                              </tr>
-                            ) : error ? (
-                              <tr>
-                                <td colSpan={4} className="px-6 py-4 text-center text-sm text-red-500">
-                                  Error loading logs: {error instanceof Error ? error.message : 'Unknown error'}
-                                </td>
-                              </tr>
-                            ) : data?.logs && data.logs.length > 0 ? (
-                              data.logs.map((log: any, index: number) => (
-                                <tr key={index}>
-                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {new Date(log.timestamp).toLocaleString()}
-                                  </td>
-                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {log.severity}
-                                  </td>
-                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    {LOG_FACILITIES[log.facility as keyof typeof LOG_FACILITIES] || log.facility}
-                                  </td>
-                                  <td className="px-6 py-4 text-sm text-gray-500">
+                    {isLoading ? (
+                      <div className="text-center py-8">Loading logs...</div>
+                    ) : error ? (
+                      <Alert variant="destructive">
+                        <AlertCircle className="h-4 w-4" />
+                        <AlertTitle>Error</AlertTitle>
+                        <AlertDescription>
+                          Failed to load logs. Please try again.
+                        </AlertDescription>
+                      </Alert>
+                    ) : (
+                      <>
+                        <div className="rounded-md border">
+                          <Table>
+                            <TableHeader>
+                              <TableRow>
+                                <TableHead>Timestamp</TableHead>
+                                <TableHead>Username</TableHead>
+                                <TableHead>Level</TableHead>
+                                <TableHead>Facility</TableHead>
+                                <TableHead>Message</TableHead>
+                                <TableHead>IP Address</TableHead>
+                                <TableHead>User Agent</TableHead>
+                              </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                              {data?.logs.map((log: any, index: number) => (
+                                <TableRow key={index}>
+                                  <TableCell>
+                                    {format(new Date(log.timestamp), "MMM d, yyyy HH:mm:ss")}
+                                  </TableCell>
+                                  <TableCell className="font-medium">
+                                    {log.username || 'system'}
+                                  </TableCell>
+                                  <TableCell className={LOG_LEVELS[log.severity as keyof typeof LOG_LEVELS]?.color || ""}>
+                                    {LOG_LEVELS[log.severity as keyof typeof LOG_LEVELS]?.name || log.level}
+                                  </TableCell>
+                                  <TableCell>{LOG_FACILITIES[log.facility as keyof typeof LOG_FACILITIES] || log.facility}</TableCell>
+                                  <TableCell className="font-mono text-sm whitespace-pre-wrap max-w-md">
                                     {log.message}
-                                  </td>
-                                </tr>
-                              ))
-                            ) : (
-                              <tr>
-                                <td colSpan={4} className="px-6 py-4 text-center text-sm text-gray-500">
-                                  No logs found
-                                </td>
-                              </tr>
-                            )}
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
+                                  </TableCell>
+                                  <TableCell className="font-mono text-sm">
+                                    {log.ip}
+                                  </TableCell>
+                                  <TableCell className="font-mono text-sm truncate max-w-xs" title={log.userAgent}>
+                                    {log.userAgent}
+                                  </TableCell>
+                                </TableRow>
+                              ))}
+                            </TableBody>
+                          </Table>
+                        </div>
 
-                    <div className="flex justify-between items-center">
-                      <Button
-                        variant="outline"
-                        onClick={() => setPage((p) => Math.max(1, p - 1))}
-                        disabled={page === 1}
-                      >
-                        Previous
-                      </Button>
-                      <span className="py-2">Page {page}</span>
-                      <Button
-                        variant="outline"
-                        onClick={() => setPage((p) => p + 1)}
-                        disabled={!data?.logs || data.logs.length === 0}
-                      >
-                        Next
-                      </Button>
-                    </div>
+                        <div className="mt-4 flex justify-between items-center">
+                          <div className="text-sm text-muted-foreground">
+                            Showing {data?.logs.length} of {data?.total} logs
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              onClick={downloadCSV}
+                              size="sm"
+                              title="Export logs as CSV"
+                              disabled={!data?.logs?.length}
+                            >
+                              <Download className="h-4 w-4 mr-2" />
+                              Export CSV
+                            </Button>
+                            <Button
+                              variant="outline"
+                              onClick={() => refetch()}
+                              size="sm"
+                              title="Refresh logs"
+                            >
+                              <RefreshCw className="h-4 w-4 mr-2" />
+                              Refresh
+                            </Button>
+                            <Button
+                              variant="outline"
+                              disabled={page === 1}
+                              onClick={() => setPage(p => p - 1)}
+                            >
+                              Previous
+                            </Button>
+                            <Button
+                              variant="outline"
+                              disabled={page === data?.totalPages}
+                              onClick={() => setPage(p => p + 1)}
+                            >
+                              Next
+                            </Button>
+                          </div>
+                        </div>
+                      </>
+                    )}
                   </div>
                 </CardContent>
               </Card>
