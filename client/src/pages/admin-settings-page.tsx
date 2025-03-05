@@ -1,50 +1,18 @@
-Reasoning:
-
-1. The edited code provides a complete new implementation of `SystemSettingsPage`, including a new tab for system logs.  It uses React hooks, form handling, and data fetching to display and filter logs.  This requires replacing a significant portion of the original code.
-
-2. The original code has sections for user management, email configuration, notification settings, and SMS configuration which will need to be integrated with the new tab structure provided by the edited code.  The original code's notification handling will likely be replaced, as the new code uses a different approach to fetch and handle those settings.
-
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useToast } from "@/components/ui/use-toast";
-import PageLayout from "@/components/layout/page-layout";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import Navigation from "@/components/layout/navigation";
-import { useAuth } from "@/hooks/auth";
-import { insertEmailConfigSchema, insertTwilioConfigSchema } from "@shared/schema";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Switch } from "@/components/ui/switch";
+import { z } from "zod";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { format } from "date-fns";
-import { Alert, AlertCircle, AlertDescription, AlertTitle } from "@/components/ui";
-import { useQuery } from "@tanstack/react-query";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-
-type FormValues = z.infer<typeof insertEmailConfigSchema>;
-type TwilioFormValues = z.infer<typeof insertTwilioConfigSchema>;
-
-// Log level definitions copied from logs-page
-const LOG_LEVELS = {
-  0: { name: "EMERGENCY", color: "text-red-700 font-bold" },
-  1: { name: "ALERT", color: "text-red-600 font-bold" },
-  2: { name: "CRITICAL", color: "text-red-500 font-bold" },
-  3: { name: "ERROR", color: "text-red-400" },
-  4: { name: "WARNING", color: "text-amber-500" },
-  5: { name: "NOTICE", color: "text-blue-500" },
-  6: { name: "INFO", color: "text-gray-600" },
-  7: { name: "DEBUG", color: "text-gray-400" },
-};
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
+import { useToast } from "@/components/ui/use-toast";
+import { Loader2 } from "lucide-react";
+import { useAuth } from "@/lib/auth";
+import { apiRequest } from "@/lib/api";
 
 const LOG_FACILITIES = {
   0: "KERNEL",
@@ -73,6 +41,24 @@ const LOG_FACILITIES = {
   23: "LOCAL7"
 };
 
+// Form schemas
+const insertEmailConfigSchema = z.object({
+  host: z.string().min(1, "Host is required"),
+  port: z.number().int().positive(),
+  username: z.string().min(1, "Username is required"),
+  password: z.string().min(1, "Password is required"),
+  from: z.string().email("Must be a valid email address"),
+});
+
+const insertTwilioConfigSchema = z.object({
+  accountSid: z.string().min(1, "Account SID is required"),
+  authToken: z.string().min(1, "Auth Token is required"),
+  phoneNumber: z.string().min(1, "Phone number is required"),
+});
+
+type FormValues = z.infer<typeof insertEmailConfigSchema>;
+type TwilioFormValues = z.infer<typeof insertTwilioConfigSchema>;
+
 export default function SystemSettingsPage() {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -86,6 +72,7 @@ export default function SystemSettingsPage() {
   const [endDate, setEndDate] = useState<Date>();
   const [page, setPage] = useState(1);
   const [autoRefresh, setAutoRefresh] = useState(false);
+  const [logs, setLogs] = useState<any[]>([]);
   const refreshInterval = 10000; // 10 seconds
 
   const form = useForm<FormValues>({
@@ -146,58 +133,49 @@ export default function SystemSettingsPage() {
     fetchTwilioConfig();
   }, [twilioForm]);
 
-  // Fetch logs data
-  const { data: logsData, isLoading: logsLoading, error: logsError, refetch: refetchLogs } = useQuery({
-    queryKey: ["/api/admin/logs", { search, level, facility, startDate, endDate, page }],
-    queryFn: async () => {
+  // Fetch logs
+  const fetchLogs = async () => {
+    try {
       const params = new URLSearchParams();
-      if (search) params.append("search", search);
-      if (level && level !== "all") params.append("level", level);
-      if (facility && facility !== "all") params.append("facility", facility);
-      if (startDate) params.append("startDate", startDate.toISOString());
-      if (endDate) params.append("endDate", endDate.toISOString());
-      params.append("page", String(page));
+      if (search) params.append('search', search);
+      if (level) params.append('level', level);
+      if (facility) params.append('facility', facility);
+      if (startDate) params.append('startDate', startDate.toISOString());
+      if (endDate) params.append('endDate', endDate.toISOString());
+      params.append('page', page.toString());
 
-      const response = await fetch(`/api/admin/logs?${params}`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch logs");
+      const response = await fetch(`/api/admin/logs?${params.toString()}`);
+      if (response.ok) {
+        const data = await response.json();
+        setLogs(data);
       }
-      return response.json();
-    },
-    enabled: activeTab === "logs" && user?.role === "admin"
-  });
+    } catch (error) {
+      console.error("Failed to fetch logs:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === "logs") {
+      fetchLogs();
+    }
+  }, [activeTab, search, level, facility, startDate, endDate, page]);
 
   // Auto-refresh logs
   useEffect(() => {
+    let interval: NodeJS.Timeout | null = null;
+
     if (autoRefresh && activeTab === "logs") {
-      const intervalId = setInterval(() => {
-        refetchLogs();
+      interval = setInterval(() => {
+        fetchLogs();
       }, refreshInterval);
-      return () => clearInterval(intervalId);
     }
-  }, [autoRefresh, refetchLogs, activeTab]);
 
-  // Load notifications settings
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const response = await fetch("/api/admin/notifications");
-        if (response.ok) {
-          const data = await response.json();
-          setNotifications(data);
-          // Check if notifications are enabled
-          const globalSetting = data.find((n: any) => n.key === "notifications_enabled");
-          setNotificationEnabled(globalSetting?.value === "true");
-        }
-      } catch (error) {
-        console.error("Failed to fetch notifications:", error);
-      }
+    return () => {
+      if (interval) clearInterval(interval);
     };
+  }, [autoRefresh, activeTab, search, level, facility, startDate, endDate, page]);
 
-    fetchNotifications();
-  }, []);
-
-  const onEmailSubmit = async (data: FormValues) => {
+  const onSubmitEmailConfig = async (data: FormValues) => {
     try {
       const response = await fetch("/api/admin/email-config", {
         method: "POST",
@@ -209,27 +187,22 @@ export default function SystemSettingsPage() {
 
       if (response.ok) {
         toast({
-          title: "Success",
-          description: "Email configuration updated successfully",
+          title: "Email Configuration Updated",
+          description: "The email configuration has been updated successfully.",
         });
       } else {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to update email configuration",
-        });
+        throw new Error("Failed to update email configuration");
       }
     } catch (error) {
-      console.error("Failed to update email configuration:", error);
       toast({
-        variant: "destructive",
         title: "Error",
-        description: "An unexpected error occurred",
+        description: error instanceof Error ? error.message : "An error occurred",
+        variant: "destructive",
       });
     }
   };
 
-  const onTwilioSubmit = async (data: TwilioFormValues) => {
+  const onSubmitTwilioConfig = async (data: TwilioFormValues) => {
     try {
       const response = await fetch("/api/admin/twilio-config", {
         method: "POST",
@@ -241,450 +214,366 @@ export default function SystemSettingsPage() {
 
       if (response.ok) {
         toast({
-          title: "Success",
-          description: "Twilio configuration updated successfully",
+          title: "Twilio Configuration Updated",
+          description: "The Twilio configuration has been updated successfully.",
         });
       } else {
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to update Twilio configuration",
-        });
+        throw new Error("Failed to update Twilio configuration");
       }
     } catch (error) {
-      console.error("Failed to update Twilio configuration:", error);
       toast({
-        variant: "destructive",
         title: "Error",
-        description: "An unexpected error occurred",
+        description: error instanceof Error ? error.message : "An error occurred",
+        variant: "destructive",
       });
     }
   };
-
-  const toggleNotifications = async () => {
-    try {
-      const newValue = !notificationEnabled;
-      setNotificationEnabled(newValue);
-
-      const response = await fetch("/api/admin/notifications/toggle", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ enabled: newValue }),
-      });
-
-      if (!response.ok) {
-        setNotificationEnabled(!newValue); // Revert if failed
-        toast({
-          variant: "destructive",
-          title: "Error",
-          description: "Failed to update notification settings",
-        });
-      }
-    } catch (error) {
-      console.error("Failed to toggle notifications:", error);
-      setNotificationEnabled(!notificationEnabled); // Revert if failed
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "An unexpected error occurred",
-      });
-    }
-  };
-
-  // Download logs as CSV
-  const downloadCSV = () => {
-    if (!logsData?.logs) return;
-
-    const headers = ["Timestamp", "Username", "Level", "Facility", "Message", "IP", "User Agent"];
-    const rows = logsData.logs.map((log: any) => [
-      log.timestamp,
-      log.username,
-      LOG_LEVELS[log.severity as keyof typeof LOG_LEVELS]?.name || log.level,
-      LOG_FACILITIES[log.facility as keyof typeof LOG_FACILITIES] || log.facility,
-      log.message,
-      log.ip,
-      log.userAgent
-    ]);
-
-    const csvContent = [
-      headers.join(","),
-      ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(","))
-    ].join("\n");
-
-    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.setAttribute("href", url);
-    link.setAttribute("download", `system_logs_${new Date().toISOString().split("T")[0]}.csv`);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  if (user?.role !== "admin") {
-    return (
-      <PageLayout>
-        <Navigation />
-        <div className="p-4">
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Access Denied</AlertTitle>
-            <AlertDescription>
-              Only administrators can access system settings.
-            </AlertDescription>
-          </Alert>
-        </div>
-      </PageLayout>
-    );
-  }
 
   return (
-    <PageLayout>
-      <Navigation />
-      <div className="container mx-auto py-8">
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle>System Settings</CardTitle>
-            <CardDescription>
-              Configure system-wide settings for your compliance management platform.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Tabs defaultValue="email" value={activeTab} onValueChange={setActiveTab}>
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="email">Email Settings</TabsTrigger>
-                <TabsTrigger value="twilio">SMS Settings</TabsTrigger>
-                <TabsTrigger value="logs">System Logs</TabsTrigger>
-              </TabsList>
+    <div className="container mx-auto py-8">
+      <h1 className="text-2xl font-bold mb-4">System Settings</h1>
 
-              <TabsContent value="email" className="py-4">
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onEmailSubmit)} className="space-y-4">
-                    <div className="flex items-center justify-between mb-4">
-                      <div>
-                        <h3 className="text-lg font-medium">Email Configuration</h3>
-                        <p className="text-sm text-gray-500">
-                          Configure SMTP settings for sending email notifications.
-                        </p>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <Switch
-                          checked={notificationEnabled}
-                          onCheckedChange={toggleNotifications}
-                          id="notifications-enabled"
-                        />
-                        <label
-                          htmlFor="notifications-enabled"
-                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                        >
-                          Enable Notifications
-                        </label>
-                      </div>
-                    </div>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid grid-cols-4 mb-4">
+          <TabsTrigger value="email">Email</TabsTrigger>
+          <TabsTrigger value="sms">SMS</TabsTrigger>
+          <TabsTrigger value="notifications">Notifications</TabsTrigger>
+          <TabsTrigger value="logs">System Logs</TabsTrigger>
+        </TabsList>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="host"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>SMTP Host</FormLabel>
-                            <FormControl>
-                              <Input placeholder="smtp.example.com" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+        <TabsContent value="email">
+          <Card>
+            <CardHeader>
+              <CardTitle>Email Configuration</CardTitle>
+              <CardDescription>
+                Configure the email server settings for notifications.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmitEmailConfig)} className="space-y-4">
+                  <FormField
+                    control={form.control}
+                    name="host"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>SMTP Host</FormLabel>
+                        <FormControl>
+                          <Input placeholder="smtp.example.com" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                      <FormField
-                        control={form.control}
-                        name="port"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>SMTP Port</FormLabel>
-                            <FormControl>
-                              <Input
-                                type="number"
-                                placeholder="587"
-                                {...field}
-                                onChange={(e) => field.onChange(parseInt(e.target.value))}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+                  <FormField
+                    control={form.control}
+                    name="port"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Port</FormLabel>
+                        <FormControl>
+                          <Input 
+                            type="number" 
+                            {...field} 
+                            onChange={(e) => field.onChange(parseInt(e.target.value))}
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <FormField
-                        control={form.control}
-                        name="username"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>SMTP Username</FormLabel>
-                            <FormControl>
-                              <Input placeholder="user@example.com" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                  <FormField
+                    control={form.control}
+                    name="username"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Username</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                      <FormField
-                        control={form.control}
-                        name="password"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>SMTP Password</FormLabel>
-                            <FormControl>
-                              <Input
-                                type="password"
-                                placeholder="••••••••"
-                                {...field}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input type="password" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                    <FormField
-                      control={form.control}
-                      name="from"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>From Email</FormLabel>
-                          <FormControl>
-                            <Input
-                              placeholder="compliance@yourcompany.com"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                  <FormField
+                    control={form.control}
+                    name="from"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>From Address</FormLabel>
+                        <FormControl>
+                          <Input type="email" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                    <Button type="submit">Save Email Settings</Button>
-                  </form>
-                </Form>
-              </TabsContent>
+                  <Button type="submit">
+                    Save Email Configuration
+                  </Button>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-              <TabsContent value="twilio" className="py-4">
-                <Form {...twilioForm}>
-                  <form onSubmit={twilioForm.handleSubmit(onTwilioSubmit)} className="space-y-4">
-                    <div>
-                      <h3 className="text-lg font-medium">Twilio SMS Configuration</h3>
-                      <p className="text-sm text-gray-500">
-                        Configure Twilio settings for sending SMS notifications.
-                      </p>
-                    </div>
+        <TabsContent value="sms">
+          <Card>
+            <CardHeader>
+              <CardTitle>SMS Configuration (Twilio)</CardTitle>
+              <CardDescription>
+                Configure Twilio for SMS notifications.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Form {...twilioForm}>
+                <form onSubmit={twilioForm.handleSubmit(onSubmitTwilioConfig)} className="space-y-4">
+                  <FormField
+                    control={twilioForm.control}
+                    name="accountSid"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Account SID</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                    <FormField
-                      control={twilioForm.control}
-                      name="accountSid"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Account SID</FormLabel>
-                          <FormControl>
-                            <Input placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxx" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                  <FormField
+                    control={twilioForm.control}
+                    name="authToken"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Auth Token</FormLabel>
+                        <FormControl>
+                          <Input type="password" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                    <FormField
-                      control={twilioForm.control}
-                      name="authToken"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Auth Token</FormLabel>
-                          <FormControl>
-                            <Input
-                              type="password"
-                              placeholder="••••••••"
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                  <FormField
+                    control={twilioForm.control}
+                    name="phoneNumber"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Phone Number</FormLabel>
+                        <FormControl>
+                          <Input placeholder="+1234567890" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-                    <FormField
-                      control={twilioForm.control}
-                      name="phoneNumber"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>From Phone Number</FormLabel>
-                          <FormControl>
-                            <Input placeholder="+15551234567" {...field} />
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
+                  <Button type="submit">
+                    Save SMS Configuration
+                  </Button>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-                    <Button type="submit">Save Twilio Settings</Button>
-                  </form>
-                </Form>
-              </TabsContent>
-
-              <TabsContent value="logs" className="py-4">
-                <div>
-                  <div className="flex flex-col space-y-2 mb-4">
-                    <h3 className="text-lg font-medium">System Logs</h3>
-                    <p className="text-sm text-gray-500">
-                      View and filter system logs. Use the filters below to narrow down the results.
-                    </p>
-                    <div className="text-xs text-muted-foreground mt-1 flex flex-wrap gap-x-4 gap-y-1 border rounded-md p-2 bg-muted/20">
-                      <span>• Authentication events (login/logout)</span>
-                      <span>• Regulation access and updates</span>
-                      <span>• Compliance status changes</span>
-                      <span>• Report generation</span>
-                      <span>• System configuration changes</span>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2 mb-4 flex-wrap items-center">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="ml-auto"
-                      onClick={() => {
-                        setSearch("");
-                        setLevel(undefined);
-                        setFacility(undefined);
-                        setStartDate(undefined);
-                        setEndDate(undefined);
-                        setPage(1);
-                      }}
-                    >
-                      Clear All Filters
-                    </Button>
-                    <Switch checked={autoRefresh} onCheckedChange={setAutoRefresh}>
-                      Auto Refresh
-                    </Switch>
-                  </div>
-
-                  <div className="flex justify-between mb-4">
-                    <div className="flex gap-2">
-                      <Input
-                        placeholder="Search logs..."
-                        value={search}
-                        onChange={(e) => setSearch(e.target.value)}
-                        className="w-64"
-                      />
-                      <select
-                        value={level || ""}
-                        onChange={(e) => setLevel(e.target.value || undefined)}
-                        className="px-3 py-2 rounded-md border border-input"
-                      >
-                        <option value="">All Levels</option>
-                        {Object.entries(LOG_LEVELS).map(([key, { name }]) => (
-                          <option key={key} value={key}>
-                            {name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <Button onClick={downloadCSV} size="sm" variant="outline">
-                      Export CSV
-                    </Button>
-                  </div>
-
-                  {logsLoading ? (
-                    <div className="text-center py-8">Loading logs...</div>
-                  ) : logsError ? (
-                    <Alert variant="destructive">
-                      <AlertCircle className="h-4 w-4" />
-                      <AlertTitle>Error</AlertTitle>
-                      <AlertDescription>
-                        Failed to load logs. Please try again.
-                      </AlertDescription>
-                    </Alert>
-                  ) : (
-                    <>
-                      <div className="rounded-md border">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Timestamp</TableHead>
-                              <TableHead>Username</TableHead>
-                              <TableHead>Level</TableHead>
-                              <TableHead>Facility</TableHead>
-                              <TableHead>Message</TableHead>
-                              <TableHead>IP Address</TableHead>
-                              <TableHead>User Agent</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {logsData?.logs.map((log: any, index: number) => (
-                              <TableRow key={index}>
-                                <TableCell>
-                                  {format(new Date(log.timestamp), "MMM d, yyyy HH:mm:ss")}
-                                </TableCell>
-                                <TableCell className="font-medium">
-                                  {log.username || 'system'}
-                                </TableCell>
-                                <TableCell className={LOG_LEVELS[log.severity as keyof typeof LOG_LEVELS]?.color || ""}>
-                                  {LOG_LEVELS[log.severity as keyof typeof LOG_LEVELS]?.name || log.level}
-                                </TableCell>
-                                <TableCell>{LOG_FACILITIES[log.facility as keyof typeof LOG_FACILITIES] || log.facility}</TableCell>
-                                <TableCell className="font-mono text-sm whitespace-pre-wrap max-w-md">
-                                  {log.message}
-                                </TableCell>
-                                <TableCell className="font-mono text-sm">
-                                  {log.ip}
-                                </TableCell>
-                                <TableCell className="font-mono text-sm truncate max-w-xs" title={log.userAgent}>
-                                  {log.userAgent}
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </div>
-
-                      <div className="flex items-center justify-between mt-4">
-                        <div className="text-sm text-muted-foreground">
-                          Showing {logsData?.logs.length || 0} of {logsData?.total || 0} logs
-                        </div>
-                        <div className="flex gap-1">
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setPage((old) => Math.max(old - 1, 1))}
-                            disabled={page === 1}
-                          >
-                            Previous
-                          </Button>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setPage((old) => old + 1)}
-                            disabled={
-                              !logsData?.totalPages || page >= logsData.totalPages
-                            }
-                          >
-                            Next
-                          </Button>
-                        </div>
-                      </div>
-                    </>
-                  )}
+        <TabsContent value="notifications">
+          <Card>
+            <CardHeader>
+              <CardTitle>Notification Settings</CardTitle>
+              <CardDescription>
+                Configure system-wide notification settings.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="notification-enabled"
+                    checked={notificationEnabled}
+                    onCheckedChange={setNotificationEnabled}
+                  />
+                  <label
+                    htmlFor="notification-enabled"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Enable System Notifications
+                  </label>
                 </div>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
-      </div>
-    </PageLayout>
+
+                {/* Additional notification settings would go here */}
+
+                <Button>
+                  Save Notification Settings
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="logs">
+          <Card>
+            <CardHeader>
+              <CardTitle>System Logs</CardTitle>
+              <CardDescription>
+                View and filter system logs.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2">
+                  <Switch
+                    id="auto-refresh"
+                    checked={autoRefresh}
+                    onCheckedChange={setAutoRefresh}
+                  />
+                  <label
+                    htmlFor="auto-refresh"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  >
+                    Auto-refresh logs
+                  </label>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  <div>
+                    <label className="text-sm font-medium">Search</label>
+                    <Input
+                      placeholder="Search logs..."
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium">Level</label>
+                    <Select value={level} onValueChange={setLevel}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select level" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="INFO">INFO</SelectItem>
+                        <SelectItem value="WARNING">WARNING</SelectItem>
+                        <SelectItem value="ERROR">ERROR</SelectItem>
+                        <SelectItem value="DEBUG">DEBUG</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <label className="text-sm font-medium">Facility</label>
+                    <Select value={facility} onValueChange={setFacility}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select facility" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {Object.entries(LOG_FACILITIES).map(([key, value]) => (
+                          <SelectItem key={key} value={key}>
+                            {value}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Button onClick={fetchLogs} className="mt-5">
+                      Apply Filters
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="border rounded">
+                  <div className="overflow-auto max-h-[500px]">
+                    <table className="min-w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Timestamp
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Level
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Facility
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Message
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {logs.length > 0 ? (
+                          logs.map((log, index) => (
+                            <tr key={index}>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {new Date(log.timestamp).toLocaleString()}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {log.level}
+                              </td>
+                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                {LOG_FACILITIES[log.facility as keyof typeof LOG_FACILITIES] || log.facility}
+                              </td>
+                              <td className="px-6 py-4 text-sm text-gray-500">
+                                {log.message}
+                              </td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr>
+                            <td colSpan={4} className="px-6 py-4 text-center text-sm text-gray-500">
+                              No logs found
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div className="flex justify-between">
+                  <Button
+                    variant="outline"
+                    onClick={() => setPage((p) => Math.max(1, p - 1))}
+                    disabled={page === 1}
+                  >
+                    Previous
+                  </Button>
+                  <span className="py-2">Page {page}</span>
+                  <Button
+                    variant="outline"
+                    onClick={() => setPage((p) => p + 1)}
+                    disabled={logs.length === 0}
+                  >
+                    Next
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 }
