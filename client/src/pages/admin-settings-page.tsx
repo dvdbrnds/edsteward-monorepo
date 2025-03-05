@@ -12,6 +12,7 @@ import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
+import Navigation from "@/components/layout/navigation";
 import { apiRequest } from "@/lib/api";
 
 const LOG_FACILITIES = {
@@ -231,6 +232,7 @@ export default function SystemSettingsPage() {
 
   return (
     <div className="container mx-auto py-8">
+      <Navigation/> {/* Added Navigation component */}
       <h1 className="text-2xl font-bold mb-4">System Settings</h1>
 
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
