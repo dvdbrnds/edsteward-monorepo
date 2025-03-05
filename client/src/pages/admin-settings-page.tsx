@@ -15,7 +15,6 @@ import { useAuth } from "@/hooks/use-auth";
 import Navigation from "@/components/layout/navigation";
 import { apiRequest } from "@/lib/api";
 import { useQuery } from '@tanstack/react-query';
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const LOG_FACILITIES = {
   0: "KERNEL",
@@ -44,7 +43,6 @@ const LOG_FACILITIES = {
   23: "LOCAL7"
 };
 
-// Form schemas
 const insertEmailConfigSchema = z.object({
   host: z.string().min(1, "Host is required"),
   port: z.number().int().positive(),
@@ -98,7 +96,6 @@ export default function SystemSettingsPage() {
     },
   });
 
-  // Load email configuration
   useEffect(() => {
     const fetchEmailConfig = async () => {
       try {
@@ -117,7 +114,6 @@ export default function SystemSettingsPage() {
     fetchEmailConfig();
   }, [form]);
 
-  // Load Twilio configuration
   useEffect(() => {
     const fetchTwilioConfig = async () => {
       try {
@@ -136,7 +132,6 @@ export default function SystemSettingsPage() {
     fetchTwilioConfig();
   }, [twilioForm]);
 
-  // Fetch logs
   const fetchLogs = async () => {
     try {
       const params = new URLSearchParams();
@@ -163,7 +158,6 @@ export default function SystemSettingsPage() {
     }
   }, [activeTab, search, level, facility, startDate, endDate, page]);
 
-  // Auto-refresh logs
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 
@@ -264,7 +258,6 @@ export default function SystemSettingsPage() {
   const downloadCSV = () => {
     if (!data?.logs) return;
 
-    // Create CSV content
     const headers = ["Timestamp", "Level", "Facility", "Message"];
     const csvContent = [
       headers.join(","),
@@ -278,7 +271,6 @@ export default function SystemSettingsPage() {
       })
     ].join("\n");
 
-    // Create blob and download
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
@@ -291,389 +283,394 @@ export default function SystemSettingsPage() {
   };
 
   return (
-    <div className="container mx-auto py-8">
-      <Navigation/> {/* Added Navigation component */}
-      <h1 className="text-2xl font-bold mb-4">System Settings</h1>
+    <div className="min-h-screen bg-gray-50">
+      <Navigation />
 
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-4 mb-4">
-          <TabsTrigger value="email">Email</TabsTrigger>
-          <TabsTrigger value="sms">SMS</TabsTrigger>
-          <TabsTrigger value="notifications">Notifications</TabsTrigger>
-          <TabsTrigger value="logs">System Logs</TabsTrigger>
-        </TabsList>
+      <main className="py-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-8">System Settings</h1>
 
-        <TabsContent value="email">
-          <Card>
-            <CardHeader>
-              <CardTitle>Email Configuration</CardTitle>
-              <CardDescription>
-                Configure the email server settings for notifications.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit(onSubmitEmailConfig)} className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="host"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>SMTP Host</FormLabel>
-                        <FormControl>
-                          <Input placeholder="smtp.example.com" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+            <TabsList className="grid grid-cols-4 mb-4">
+              <TabsTrigger value="email">Email</TabsTrigger>
+              <TabsTrigger value="sms">SMS</TabsTrigger>
+              <TabsTrigger value="notifications">Notifications</TabsTrigger>
+              <TabsTrigger value="logs">System Logs</TabsTrigger>
+            </TabsList>
 
-                  <FormField
-                    control={form.control}
-                    name="port"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Port</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="number"
-                            {...field}
-                            onChange={(e) => field.onChange(parseInt(e.target.value))}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+            <TabsContent value="email">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Email Configuration</CardTitle>
+                  <CardDescription>
+                    Configure the email server settings for notifications.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Form {...form}>
+                    <form onSubmit={form.handleSubmit(onSubmitEmailConfig)} className="space-y-4">
+                      <FormField
+                        control={form.control}
+                        name="host"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>SMTP Host</FormLabel>
+                            <FormControl>
+                              <Input placeholder="smtp.example.com" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                  <FormField
-                    control={form.control}
-                    name="username"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Username</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                      <FormField
+                        control={form.control}
+                        name="port"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Port</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                {...field}
+                                onChange={(e) => field.onChange(parseInt(e.target.value))}
+                              />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                  <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Password</FormLabel>
-                        <FormControl>
-                          <Input type="password" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                      <FormField
+                        control={form.control}
+                        name="username"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Username</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                  <FormField
-                    control={form.control}
-                    name="from"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>From Address</FormLabel>
-                        <FormControl>
-                          <Input type="email" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                      <FormField
+                        control={form.control}
+                        name="password"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Password</FormLabel>
+                            <FormControl>
+                              <Input type="password" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                  <Button type="submit">
-                    Save Email Configuration
-                  </Button>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
-        </TabsContent>
+                      <FormField
+                        control={form.control}
+                        name="from"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>From Address</FormLabel>
+                            <FormControl>
+                              <Input type="email" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-        <TabsContent value="sms">
-          <Card>
-            <CardHeader>
-              <CardTitle>SMS Configuration (Twilio)</CardTitle>
-              <CardDescription>
-                Configure Twilio for SMS notifications.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Form {...twilioForm}>
-                <form onSubmit={twilioForm.handleSubmit(onSubmitTwilioConfig)} className="space-y-4">
-                  <FormField
-                    control={twilioForm.control}
-                    name="accountSid"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Account SID</FormLabel>
-                        <FormControl>
-                          <Input {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                      <Button type="submit">
+                        Save Email Configuration
+                      </Button>
+                    </form>
+                  </Form>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-                  <FormField
-                    control={twilioForm.control}
-                    name="authToken"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Auth Token</FormLabel>
-                        <FormControl>
-                          <Input type="password" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+            <TabsContent value="sms">
+              <Card>
+                <CardHeader>
+                  <CardTitle>SMS Configuration (Twilio)</CardTitle>
+                  <CardDescription>
+                    Configure Twilio for SMS notifications.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <Form {...twilioForm}>
+                    <form onSubmit={twilioForm.handleSubmit(onSubmitTwilioConfig)} className="space-y-4">
+                      <FormField
+                        control={twilioForm.control}
+                        name="accountSid"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Account SID</FormLabel>
+                            <FormControl>
+                              <Input {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                  <FormField
-                    control={twilioForm.control}
-                    name="phoneNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Phone Number</FormLabel>
-                        <FormControl>
-                          <Input placeholder="+1234567890" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                      <FormField
+                        control={twilioForm.control}
+                        name="authToken"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Auth Token</FormLabel>
+                            <FormControl>
+                              <Input type="password" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-                  <Button type="submit">
-                    Save SMS Configuration
-                  </Button>
-                </form>
-              </Form>
-            </CardContent>
-          </Card>
-        </TabsContent>
+                      <FormField
+                        control={twilioForm.control}
+                        name="phoneNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Phone Number</FormLabel>
+                            <FormControl>
+                              <Input placeholder="+1234567890" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
 
-        <TabsContent value="notifications">
-          <Card>
-            <CardHeader>
-              <CardTitle>Notification Settings</CardTitle>
-              <CardDescription>
-                Configure system-wide notification settings.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="notification-enabled"
-                    checked={notificationEnabled}
-                    onCheckedChange={setNotificationEnabled}
-                  />
-                  <label
-                    htmlFor="notification-enabled"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Enable System Notifications
-                  </label>
-                </div>
+                      <Button type="submit">
+                        Save SMS Configuration
+                      </Button>
+                    </form>
+                  </Form>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-                {/* Additional notification settings would go here */}
+            <TabsContent value="notifications">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Notification Settings</CardTitle>
+                  <CardDescription>
+                    Configure system-wide notification settings.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center space-x-2">
+                      <Switch
+                        id="notification-enabled"
+                        checked={notificationEnabled}
+                        onCheckedChange={setNotificationEnabled}
+                      />
+                      <label
+                        htmlFor="notification-enabled"
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                      >
+                        Enable System Notifications
+                      </label>
+                    </div>
 
-                <Button>
-                  Save Notification Settings
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
+                    {/* Additional notification settings would go here */}
 
-        <TabsContent value="logs">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle>System Logs</CardTitle>
-              <CardDescription>
-                View and filter system logs. Use the filters below to narrow down the results.
-              </CardDescription>
-              <div className="text-xs text-muted-foreground mt-1 flex flex-wrap gap-x-4 gap-y-1 border rounded-md p-2 bg-muted/20">
-                <span>• Authentication events (login/logout)</span>
-                <span>• Regulation access and updates</span>
-                <span>• Compliance status changes</span>
-                <span>• Report generation</span>
-                <span>• System configuration changes</span>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex gap-2 mb-4 flex-wrap items-center">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="ml-auto"
-                    onClick={() => {
-                      setSearch("");
-                      setLevel(undefined);
-                      setFacility(undefined);
-                      setStartDate(undefined);
-                      setEndDate(undefined);
-                      setPage(1);
-                    }}
-                  >
-                    Clear All Filters
-                  </Button>
-                  <Switch checked={autoRefresh} onCheckedChange={setAutoRefresh}>
-                    Auto Refresh
-                  </Switch>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={downloadCSV}
-                    className="flex items-center gap-1"
-                  >
-                    <Download className="h-4 w-4" /> Export CSV
-                  </Button>
-                </div>
-
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium" htmlFor="log-search">Search</label>
-                    <Input
-                      id="log-search"
-                      placeholder="Search logs..."
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium" htmlFor="log-level">Level</label>
-                    <Select value={level} onValueChange={setLevel}>
-                      <SelectTrigger id="log-level">
-                        <SelectValue placeholder="Select level" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="INFO">INFO</SelectItem>
-                        <SelectItem value="WARNING">WARNING</SelectItem>
-                        <SelectItem value="ERROR">ERROR</SelectItem>
-                        <SelectItem value="DEBUG">DEBUG</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium" htmlFor="log-facility">Facility</label>
-                    <Select value={facility} onValueChange={setFacility}>
-                      <SelectTrigger id="log-facility">
-                        <SelectValue placeholder="Select facility" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {Object.entries(LOG_FACILITIES).map(([key, value]) => (
-                          <SelectItem key={key} value={key}>
-                            {value}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-sm font-medium invisible">Apply</label>
-                    <Button onClick={fetchLogs} className="w-full">
-                      Apply Filters
+                    <Button>
+                      Save Notification Settings
                     </Button>
                   </div>
-                </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
 
-                <div className="border rounded">
-                  <div className="overflow-auto max-h-[500px]">
-                    <table className="min-w-full divide-y divide-gray-200">
-                      <thead className="bg-gray-50">
-                        <tr>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Timestamp
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Level
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Facility
-                          </th>
-                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Message
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="bg-white divide-y divide-gray-200">
-                        {isLoading ? (
-                          <tr>
-                            <td colSpan={4} className="px-6 py-4 text-center text-sm">
-                              <div className="flex justify-center">
-                                <Loader2 className="h-6 w-6 animate-spin text-gray-500" />
-                              </div>
-                            </td>
-                          </tr>
-                        ) : error ? (
-                          <tr>
-                            <td colSpan={4} className="px-6 py-4 text-center text-sm text-red-500">
-                              Error loading logs: {error instanceof Error ? error.message : 'Unknown error'}
-                            </td>
-                          </tr>
-                        ) : data?.logs && data.logs.length > 0 ? (
-                          data.logs.map((log: any, index: number) => (
-                            <tr key={index}>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {new Date(log.timestamp).toLocaleString()}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {log.severity}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {LOG_FACILITIES[log.facility as keyof typeof LOG_FACILITIES] || log.facility}
-                              </td>
-                              <td className="px-6 py-4 text-sm text-gray-500">
-                                {log.message}
-                              </td>
-                            </tr>
-                          ))
-                        ) : (
-                          <tr>
-                            <td colSpan={4} className="px-6 py-4 text-center text-sm text-gray-500">
-                              No logs found
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
+            <TabsContent value="logs">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle>System Logs</CardTitle>
+                  <CardDescription>
+                    View and filter system logs. Use the filters below to narrow down the results.
+                  </CardDescription>
+                  <div className="text-xs text-muted-foreground mt-1 flex flex-wrap gap-x-4 gap-y-1 border rounded-md p-2 bg-muted/20">
+                    <span>• Authentication events (login/logout)</span>
+                    <span>• Regulation access and updates</span>
+                    <span>• Compliance status changes</span>
+                    <span>• Report generation</span>
+                    <span>• System configuration changes</span>
                   </div>
-                </div>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex gap-2 mb-4 flex-wrap items-center">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="ml-auto"
+                        onClick={() => {
+                          setSearch("");
+                          setLevel(undefined);
+                          setFacility(undefined);
+                          setStartDate(undefined);
+                          setEndDate(undefined);
+                          setPage(1);
+                        }}
+                      >
+                        Clear All Filters
+                      </Button>
+                      <Switch checked={autoRefresh} onCheckedChange={setAutoRefresh}>
+                        Auto Refresh
+                      </Switch>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={downloadCSV}
+                        className="flex items-center gap-1"
+                      >
+                        <Download className="h-4 w-4" /> Export CSV
+                      </Button>
+                    </div>
 
-                <div className="flex justify-between items-center">
-                  <Button
-                    variant="outline"
-                    onClick={() => setPage((p) => Math.max(1, p - 1))}
-                    disabled={page === 1}
-                  >
-                    Previous
-                  </Button>
-                  <span className="py-2">Page {page}</span>
-                  <Button
-                    variant="outline"
-                    onClick={() => setPage((p) => p + 1)}
-                    disabled={!data?.logs || data.logs.length === 0}
-                  >
-                    Next
-                  </Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium" htmlFor="log-search">Search</label>
+                        <Input
+                          id="log-search"
+                          placeholder="Search logs..."
+                          value={search}
+                          onChange={(e) => setSearch(e.target.value)}
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium" htmlFor="log-level">Level</label>
+                        <Select value={level} onValueChange={setLevel}>
+                          <SelectTrigger id="log-level">
+                            <SelectValue placeholder="Select level" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="INFO">INFO</SelectItem>
+                            <SelectItem value="WARNING">WARNING</SelectItem>
+                            <SelectItem value="ERROR">ERROR</SelectItem>
+                            <SelectItem value="DEBUG">DEBUG</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium" htmlFor="log-facility">Facility</label>
+                        <Select value={facility} onValueChange={setFacility}>
+                          <SelectTrigger id="log-facility">
+                            <SelectValue placeholder="Select facility" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {Object.entries(LOG_FACILITIES).map(([key, value]) => (
+                              <SelectItem key={key} value={key}>
+                                {value}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium invisible">Apply</label>
+                        <Button onClick={fetchLogs} className="w-full">
+                          Apply Filters
+                        </Button>
+                      </div>
+                    </div>
+
+                    <div className="border rounded">
+                      <div className="overflow-auto max-h-[500px]">
+                        <table className="min-w-full divide-y divide-gray-200">
+                          <thead className="bg-gray-50">
+                            <tr>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Timestamp
+                              </th>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Level
+                              </th>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Facility
+                              </th>
+                              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Message
+                              </th>
+                            </tr>
+                          </thead>
+                          <tbody className="bg-white divide-y divide-gray-200">
+                            {isLoading ? (
+                              <tr>
+                                <td colSpan={4} className="px-6 py-4 text-center text-sm">
+                                  <div className="flex justify-center">
+                                    <Loader2 className="h-6 w-6 animate-spin text-gray-500" />
+                                  </div>
+                                </td>
+                              </tr>
+                            ) : error ? (
+                              <tr>
+                                <td colSpan={4} className="px-6 py-4 text-center text-sm text-red-500">
+                                  Error loading logs: {error instanceof Error ? error.message : 'Unknown error'}
+                                </td>
+                              </tr>
+                            ) : data?.logs && data.logs.length > 0 ? (
+                              data.logs.map((log: any, index: number) => (
+                                <tr key={index}>
+                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {new Date(log.timestamp).toLocaleString()}
+                                  </td>
+                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {log.severity}
+                                  </td>
+                                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    {LOG_FACILITIES[log.facility as keyof typeof LOG_FACILITIES] || log.facility}
+                                  </td>
+                                  <td className="px-6 py-4 text-sm text-gray-500">
+                                    {log.message}
+                                  </td>
+                                </tr>
+                              ))
+                            ) : (
+                              <tr>
+                                <td colSpan={4} className="px-6 py-4 text-center text-sm text-gray-500">
+                                  No logs found
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-between items-center">
+                      <Button
+                        variant="outline"
+                        onClick={() => setPage((p) => Math.max(1, p - 1))}
+                        disabled={page === 1}
+                      >
+                        Previous
+                      </Button>
+                      <span className="py-2">Page {page}</span>
+                      <Button
+                        variant="outline"
+                        onClick={() => setPage((p) => p + 1)}
+                        disabled={!data?.logs || data.logs.length === 0}
+                      >
+                        Next
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </main>
     </div>
   );
 }
