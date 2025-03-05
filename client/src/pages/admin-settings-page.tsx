@@ -667,6 +667,7 @@ export default function SystemSettingsPage() {
                   </Button>
                 </div>
               </div>
+            </div>
             </CardContent>
           </Card>
         </TabsContent>
