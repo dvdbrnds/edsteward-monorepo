@@ -20,7 +20,6 @@ import {
   User,
   Settings,
   Cog,
-  Bug,
 } from "lucide-react";
 import {
   Dialog,
@@ -235,7 +234,6 @@ export default function Navigation() {
     ...(user?.role === "admin"
       ? [
           { href: "/admin/settings", label: "System Settings", icon: Settings },
-          { href: "/admin/debug", label: "Debug Tools", icon: Bug },
           // System Logs route is available at /admin/logs but hidden from navigation
           // Uncomment the following line to show it in the navigation:
           // { href: "/admin/logs", label: "System Logs", icon: FileText }

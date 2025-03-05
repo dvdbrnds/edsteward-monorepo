@@ -1,3 +1,4 @@
+import DebugTools from "@/components/debug-tools";
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -314,11 +315,12 @@ export default function SystemSettingsPage() {
           <h1 className="text-3xl font-bold text-gray-900 mb-8">System Settings</h1>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-4 mb-4">
+            <TabsList className="grid grid-cols-5 mb-4">
               <TabsTrigger value="email">Email</TabsTrigger>
               <TabsTrigger value="sms">SMS</TabsTrigger>
               <TabsTrigger value="notifications">Notifications</TabsTrigger>
               <TabsTrigger value="logs">System Logs</TabsTrigger>
+              <TabsTrigger value="debug">Debug Tools</TabsTrigger>
             </TabsList>
 
             <TabsContent value="email">
@@ -712,6 +714,20 @@ export default function SystemSettingsPage() {
                       </>
                     )}
                   </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="debug">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Debug Tools</CardTitle>
+                  <CardDescription>
+                    Access system debugging and maintenance tools
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <DebugTools />
                 </CardContent>
               </Card>
             </TabsContent>
