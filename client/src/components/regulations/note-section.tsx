@@ -4,7 +4,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Editor } from '@tinymce/tinymce-react';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import {
   Form,
   FormControl,
@@ -29,11 +30,6 @@ const noteFormSchema = z.object({
   isPrivate: z.boolean().default(false)
 });
 
-const apiKey = import.meta.env.VITE_TINY_MCE_API_KEY;
-if (!apiKey) {
-  console.error('TinyMCE API key is missing. Make sure VITE_TINY_MCE_API_KEY is set in your environment.');
-}
-
 type NoteFormValues = z.infer<typeof noteFormSchema>;
 
 interface Note {
@@ -55,6 +51,26 @@ interface Note {
 type NoteSectionProps = {
   regulationId: number;
 };
+
+// Quill editor modules configuration
+const quillModules = {
+  toolbar: [
+    [{ 'header': [1, 2, 3, false] }],
+    ['bold', 'italic', 'underline', 'strike'],
+    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+    [{ 'color': [] }, { 'background': [] }],
+    ['link'],
+    ['clean']
+  ]
+};
+
+const quillFormats = [
+  'header',
+  'bold', 'italic', 'underline', 'strike',
+  'list', 'bullet',
+  'color', 'background',
+  'link'
+];
 
 export function NoteSection({ regulationId }: NoteSectionProps) {
   const { toast } = useToast();
@@ -222,31 +238,16 @@ export function NoteSection({ regulationId }: NoteSectionProps) {
                 <FormItem>
                   <FormLabel>Content</FormLabel>
                   <FormControl>
-                    <Editor
-                      apiKey={apiKey}
-                      init={{
-                        promotion: false,
-                        height: 300,
-                        menubar: true,
-                        plugins: [
-                          'advlist', 'autolink', 'lists', 'link', 'image', 'charmap',
-                          'preview', 'anchor', 'searchreplace', 'visualblocks', 'code',
-                          'fullscreen', 'insertdatetime', 'media', 'table', 'help', 'wordcount'
-                        ],
-                        toolbar: 'undo redo | blocks | ' +
-                          'bold italic forecolor | alignleft aligncenter ' +
-                          'alignright alignjustify | bullist numlist outdent indent | ' +
-                          'removeformat | help',
-                        content_style: 'body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; font-size: 14px; }'
-                      }}
-                      onInit={(evt, editor) => {
-                        console.log('TinyMCE initialized with API key:', apiKey ? 'present' : 'missing');
-                      }}
-                      value={field.value}
-                      onEditorChange={(content) => {
-                        field.onChange(content);
-                      }}
-                    />
+                    <div className="border rounded-md">
+                      <ReactQuill
+                        theme="snow"
+                        modules={quillModules}
+                        formats={quillFormats}
+                        value={field.value}
+                        onChange={field.onChange}
+                        className="min-h-[200px]"
+                      />
+                    </div>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
