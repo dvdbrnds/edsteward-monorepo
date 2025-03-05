@@ -20,6 +20,8 @@ import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
 import { Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
+import { Redirect } from "wouter";
 
 interface RegulationData {
   id: number;
@@ -32,13 +34,18 @@ interface RegulationData {
   category: string;
   jurisdiction: string;
   lastUpdated: string;
-  // Add other fields as needed
 }
 
 export function RegulationViewer() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState<string>("");
   const { toast } = useToast();
+  const { user } = useAuth();
+
+  // Check for admin access
+  if (!user || user.role !== "admin") {
+    return <Redirect to="/" />;
+  }
 
   // Fetch regulations
   const { data: regulations, isLoading } = useQuery<RegulationData[]>({

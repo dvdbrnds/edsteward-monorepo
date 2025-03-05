@@ -14,8 +14,8 @@ import ReportsPage from "@/pages/reports-page";
 import ValidationPage from "@/pages/validation-page";
 import AdminSettingsPage from "@/pages/admin-settings-page";
 import LogsPage from "@/pages/admin/logs-page";
+import { RegulationViewer } from "@/pages/RegulationViewer";
 import SetupWizardPage from "@/pages/setup-wizard-page";
-import UtilitiesPage from "@/pages/utilities";
 import { ProtectedRoute } from "./lib/protected-route";
 import { ProtectedRegulationRoute } from "./lib/protected-regulation-route";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
@@ -41,9 +41,9 @@ function Router() {
             component={ComplianceWizardPage} 
           />
           <ProtectedRoute path="/reports" component={ReportsPage} />
-          <ProtectedRoute path="/utilities" component={UtilitiesPage} />
           <ProtectedRoute path="/admin/settings" component={AdminSettingsPage} />
           <ProtectedRoute path="/admin/logs" component={LogsPage} />
+          <ProtectedRoute path="/admin/regulations" component={RegulationViewer} />
           <Route component={NotFound} />
         </Switch>
       </PageLayout>
