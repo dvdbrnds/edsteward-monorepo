@@ -1,6 +1,6 @@
 
 import { db } from './db.js';
-import { regulations } from '../shared/schema.js';
+import { regulations } from '../shared/schema.ts';
 import { eq, like, or } from 'drizzle-orm';
 
 async function updateDOLAgencyInfo() {
