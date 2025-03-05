@@ -7,6 +7,7 @@ import { toast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { AlertCircle, Download, Loader2, RefreshCw } from "lucide-react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export function NoteDebugger() {
   const [regulationId, setRegulationId] = useState('3869');
@@ -275,15 +276,28 @@ export function RegulationImportDebugger() {
   const [importStatus, setImportStatus] = useState<'idle' | 'running' | 'completed' | 'error'>('idle');
   const [logs, setLogs] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
+  const [openAiStatus, setOpenAiStatus] = useState<'unchecked' | 'ready' | 'error'>('unchecked');
+  const [analysisResult, setAnalysisResult] = useState<any>(null);
+
+  const checkOpenAiStatus = async () => {
+    try {
+      const response = await fetch('/api/regulations/check-openai');
+      const data = await response.json();
+      setOpenAiStatus(data.status === 'ok' ? 'ready' : 'error');
+      setLogs(prev => [...prev, `${new Date().toISOString()} - OpenAI API Status: ${data.status}`]);
+    } catch (error) {
+      setOpenAiStatus('error');
+      setLogs(prev => [...prev, `${new Date().toISOString()} - OpenAI API Error: ${error instanceof Error ? error.message : String(error)}`]);
+    }
+  };
 
   const startImport = async () => {
     setLoading(true);
     setImportStatus('running');
     try {
-      // Add initial log entry
-      setLogs(prev => [...prev, `${new Date().toISOString()} - Starting import for IDs: ${regulationIds.join(', ')}`]);
+      setLogs(prev => [...prev, `${new Date().toISOString()} - Starting AI analysis for regulation IDs: ${regulationIds.join(', ')}`]);
 
-      const response = await fetch('/api/regulations/import', {
+      const response = await fetch('/api/regulations/collect', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -296,15 +310,19 @@ export function RegulationImportDebugger() {
       }
 
       const data = await response.json();
+      setAnalysisResult(data);
+
       setLogs(prev => [
-        ...prev, 
-        `${new Date().toISOString()} - Import process started successfully`,
-        `${new Date().toISOString()} - Processing ${regulationIds.length} regulations`
+        ...prev,
+        `${new Date().toISOString()} - AI analysis started successfully`,
+        `${new Date().toISOString()} - Processing ${regulationIds.length} regulations`,
+        `${new Date().toISOString()} - Analysis details: ${JSON.stringify(data.summary, null, 2)}`
       ]);
+
       setImportStatus('completed');
       toast({
         title: 'Success',
-        description: 'Regulation import process started successfully',
+        description: 'Regulation analysis process started successfully',
       });
     } catch (error) {
       console.error('Import error:', error);
@@ -312,7 +330,7 @@ export function RegulationImportDebugger() {
       setLogs(prev => [...prev, `${new Date().toISOString()} - Error: ${error instanceof Error ? error.message : String(error)}`]);
       toast({
         title: 'Error',
-        description: 'Failed to start regulation import',
+        description: 'Failed to start regulation analysis',
         variant: 'destructive',
       });
     } finally {
@@ -339,21 +357,44 @@ export function RegulationImportDebugger() {
   return (
     <Card className="w-[800px] mx-auto my-8">
       <CardHeader>
-        <CardTitle>Regulation Import Debug Console</CardTitle>
+        <CardTitle>AI Regulation Analysis Console</CardTitle>
         <CardDescription>
-          Monitor and control the AI-powered regulation import process.
+          Monitor and control the AI-powered regulation analysis process.
           <div className="mt-2 text-sm text-muted-foreground">
             <p>Instructions:</p>
             <ul className="list-disc pl-4 space-y-1">
+              <li>First check the OpenAI API status</li>
               <li>Enter regulation IDs separated by commas (e.g., "REG1001, REG1002")</li>
-              <li>Click "Start Import" to begin the import process</li>
-              <li>Monitor the progress in the logs section below</li>
-              <li>Use "Download Logs" to save the import history</li>
+              <li>Click "Start Analysis" to begin the AI-powered analysis</li>
+              <li>Monitor the analysis progress and results below</li>
+              <li>Use "Download Logs" to save the analysis history</li>
             </ul>
           </div>
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-2">
+            <Badge
+              variant={
+                openAiStatus === 'ready' ? 'default' :
+                openAiStatus === 'error' ? 'destructive' :
+                'outline'
+              }
+            >
+              OpenAI API: {openAiStatus.toUpperCase()}
+            </Badge>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={checkOpenAiStatus}
+              disabled={loading}
+            >
+              Check API Status
+            </Button>
+          </div>
+        </div>
+
         <div className="flex items-center gap-4 mb-4">
           <div className="flex-1">
             <label className="block text-sm font-medium mb-1">Regulation IDs</label>
@@ -366,7 +407,7 @@ export function RegulationImportDebugger() {
           <div className="flex items-end gap-2">
             <Button
               onClick={startImport}
-              disabled={loading || !regulationIds.length}
+              disabled={loading || !regulationIds.length || openAiStatus !== 'ready'}
             >
               {loading ? (
                 <>
@@ -374,15 +415,27 @@ export function RegulationImportDebugger() {
                   Processing...
                 </>
               ) : (
-                'Start Import'
+                'Start Analysis'
               )}
             </Button>
           </div>
         </div>
 
+        {analysisResult && (
+          <Alert>
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Analysis Results</AlertTitle>
+            <AlertDescription>
+              <pre className="mt-2 whitespace-pre-wrap text-sm">
+                {JSON.stringify(analysisResult, null, 2)}
+              </pre>
+            </AlertDescription>
+          </Alert>
+        )}
+
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className="block text-sm font-medium">Import Status</label>
+            <label className="block text-sm font-medium">Analysis Status</label>
             <Badge
               variant={
                 importStatus === 'completed' ? 'default' :
@@ -396,7 +449,7 @@ export function RegulationImportDebugger() {
           <div className="border rounded-md p-4 bg-muted/10 min-h-[300px] max-h-[300px] overflow-auto font-mono text-sm">
             {logs.length === 0 ? (
               <div className="text-muted-foreground text-center py-8">
-                No logs available. Start an import to see logs here.
+                No logs available. Start an analysis to see logs here.
               </div>
             ) : (
               logs.map((log, index) => (

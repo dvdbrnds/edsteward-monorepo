@@ -133,11 +133,12 @@ async function enrichRegulationData(regulation: RegulationResponse): Promise<Ins
   return enrichedData;
 }
 
-export async function populateRegulationData(regulationIds: string[]): Promise<void> {
+export async function populateRegulationData(regulationIds: string[]): Promise<any> {
   console.log(`Starting regulation data population for ${regulationIds.length} regulations`);
 
   let successCount = 0;
   let failureCount = 0;
+  let results = [];
 
   for (const regulationId of regulationIds) {
     try {
@@ -147,6 +148,11 @@ export async function populateRegulationData(regulationIds: string[]): Promise<v
       if (!regulationData) {
         console.error(`Failed to gather data for regulation ${regulationId}`);
         failureCount++;
+        results.push({
+          regulationId,
+          status: 'failed',
+          error: 'Failed to gather regulation data'
+        });
         continue;
       }
 
@@ -156,17 +162,37 @@ export async function populateRegulationData(regulationIds: string[]): Promise<v
       const newRegulation = await storage.createRegulation(enrichedData);
       console.log('Created regulation:', newRegulation);
 
+      results.push({
+        regulationId,
+        status: 'success',
+        data: {
+          name: newRegulation.name,
+          topic: newRegulation.topic,
+          category: newRegulation.category
+        }
+      });
+
       console.log(`Successfully populated data for regulation ${regulationId}`);
       successCount++;
 
     } catch (error) {
       console.error(`Error processing regulation ${regulationId}:`, error);
       failureCount++;
+      results.push({
+        regulationId,
+        status: 'error',
+        error: error instanceof Error ? error.message : String(error)
+      });
     }
   }
 
-  console.log('\nRegulation Population Summary:');
-  console.log(`Total regulations processed: ${regulationIds.length}`);
-  console.log(`Successfully populated: ${successCount}`);
-  console.log(`Failed to populate: ${failureCount}`);
+  const summary = {
+    totalProcessed: regulationIds.length,
+    successful: successCount,
+    failed: failureCount,
+    results
+  };
+
+  console.log('\nRegulation Population Summary:', summary);
+  return summary;
 }

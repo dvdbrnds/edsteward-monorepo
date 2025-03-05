@@ -15,6 +15,8 @@ import { systemLogs, users } from "@shared/schema";
 import { syslog, LogLevel, LogFacility } from './services/syslog';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
+import { OpenAI } from 'openai';
+import { UrlPatternAnalyzer } from './url-pattern-analyzer';
 
 // Update the getRedirectUri function to handle different environments properly
 function getRedirectUri(req: Request): string {
@@ -241,12 +243,36 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  // Add this section after the existing regulations endpoints
-  app.post("/api/regulations/import", async (req, res) => {
+  // Add this endpoint after the existing regulations endpoints
+  app.get("/api/regulations/check-openai", async (req, res) => {
     try {
-      // Check if user is admin
+      if (!process.env.OPENAI_API_KEY) {
+        return res.json({ status: 'error', message: 'OpenAI API key not configured' });
+      }
+
+      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      // Simple test call to verify API access
+      await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [{ role: "user", content: "test" }],
+        max_tokens: 5
+      });
+
+      res.json({ status: 'ok' });
+    } catch (error) {
+      console.error("OpenAI API check failed:", error);
+      res.json({ 
+        status: 'error', 
+        message: error instanceof Error ? error.message : 'Failed to connect to OpenAI API'
+      });
+    }
+  });
+
+  // Update the collection endpoint to provide more detailed feedback
+  app.post("/api/regulations/collect", async (req, res) => {
+    try {
       if (req.user?.role !== "admin") {
-        return res.status(403).json({ error: "Only administrators can import regulations" });
+        return res.status(403).json({ error: "Only administrators can analyze regulations" });
       }
 
       const { regulationIds } = req.body;
@@ -255,56 +281,57 @@ export function registerRoutes(app: Express): Server {
         return res.status(400).json({ error: "Please provide an array of regulation IDs" });
       }
 
-      // Log the start of import process
+      // Log the start of analysis process
       await syslog.info(
-        `Starting regulation import for ${regulationIds.length} regulations`,
+        `Starting regulation analysis for ${regulationIds.length} regulations`,
         {
           username: req.user.username,
           userId: req.user.id,
           regulationIds,
-          context: 'REGULATION_IMPORT',
-          type: 'import_start'
+          context: 'REGULATION_ANALYSIS',
+          type: 'analysis_start'
         }
       );
 
       // Import regulations using the regulation data collector service
       const { populateRegulationData } = require('./services/regulation-data-collector');
-      await populateRegulationData(regulationIds);
+      const analysisResults = await populateRegulationData(regulationIds);
 
-      // Log successful import
+      // Log successful analysis
       await syslog.info(
-        `Successfully started import for ${regulationIds.length} regulations`,
+        `Successfully completed analysis for ${regulationIds.length} regulations`,
         {
           username: req.user.username,
           userId: req.user.id,
           regulationIds,
-          context: 'REGULATION_IMPORT',
-          type: 'import_success'
+          context: 'REGULATION_ANALYSIS',
+          type: 'analysis_success'
         }
       );
 
       res.json({ 
-        message: "Regulation import process started",
-        count: regulationIds.length
+        message: "Regulation analysis completed",
+        count: regulationIds.length,
+        summary: analysisResults
       });
 
     } catch (error) {
-      console.error("Failed to import regulations:", error);
+      console.error("Failed to analyze regulations:", error);
 
       // Log the error
       await syslog.error(
-        `Failed to import regulations: ${error instanceof Error ? error.message : String(error)}`,
+        `Failed to analyze regulations: ${error instanceof Error ? error.message : String(error)}`,
         {
           username: req.user?.username,
           userId: req.user?.id,
           error: error instanceof Error ? error.message : String(error),
-          context: 'REGULATION_IMPORT',
-          type: 'import_error'
+          context: 'REGULATION_ANALYSIS',
+          type: 'analysis_error'
         }
       );
 
       res.status(500).json({ 
-        error: "Failed to import regulations",
+        error: "Failed to analyze regulations",
         details: error instanceof Error ? error.message : String(error)
       });
     }
@@ -1242,6 +1269,16 @@ export function registerRoutes(app: Express): Server {
 
   // Enhanced validation logging
   app.use('/api/regulations/validate', async (req, res, next) => {
+    if (req.user) {
+      await syslog.info(`User ${req.user.username} initiated regulation validation`, {
+        username: req.user.username,
+        userId: req.user.id,
+        context: 'REGULATION_VALIDATION',
+        type: 'user_action'
+      }).catch(err => console.error('Error logging validation activity:', err));
+    }
+    next();
+  });
 
   // Add route to analyze regulation URLs
   app.post("/api/regulations/analyze-url", async (req, res) => {
@@ -1293,17 +1330,6 @@ export function registerRoutes(app: Express): Server {
       console.error("Failed to find similar regulations:", error);
       res.status(500).json({ error: "Failed to find similar regulations" });
     }
-  });
-
-    if (req.user) {
-      await syslog.info(`User ${req.user.username} initiated regulation validation`, {
-        username: req.user.username,
-        userId: req.user.id,
-        context: 'REGULATION_VALIDATION',
-        type: 'user_action'
-      }).catch(err => console.error('Error logging validation activity:', err));
-    }
-    next();
   });
 
   // Add logging to the routes for testing
