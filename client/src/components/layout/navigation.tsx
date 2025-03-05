@@ -229,7 +229,6 @@ export default function Navigation() {
   const links = [
     { href: "/", label: "Dashboard", icon: LayoutDashboard },
     { href: "/regulations", label: "Regulations", icon: Book },
-    ...(!setupComplete ? [{ href: "/setup", label: "Complete Setup", icon: Cog }] : []),
     ...(user?.role === "admin"
       ? [
           { href: "/admin/settings", label: "Admin Settings", icon: Settings },
