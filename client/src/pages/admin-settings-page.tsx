@@ -9,7 +9,7 @@ import { insertEmailConfigSchema } from "@shared/schema";
 import { insertTwilioConfigSchema } from "@shared/schema";
 import { z } from "zod"; // Add this import
 import Navigation from "@/components/layout/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import {
   Form,
   FormControl,
@@ -22,7 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Mail, Loader2, Bell, MessageSquare } from "lucide-react";
+import { Mail, Loader2, Bell, MessageSquare, MessageCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Redirect } from "wouter";
 import type { TwilioConfig } from "@shared/schema";
@@ -52,6 +52,7 @@ import {
 } from "@/components/ui/dialog";
 import { UserPlus, Users, Pencil, Trash2 } from "lucide-react";
 import { insertUserSchema } from "@shared/schema";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 
 // Type definitions using the imported z
@@ -65,6 +66,8 @@ export default function SystemSettingsPage() {
   const [userDialogOpen, setUserDialogOpen] = useState(false);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [selectedRegType, setSelectedRegType] = useState<string>('all-types'); //Fixed initial state with non-empty value
+  const [activeTab, setActiveTab] = useState('users');
+
 
   // Redirect non-admin users
   if (user?.role !== "admin") {
@@ -311,71 +314,406 @@ export default function SystemSettingsPage() {
       <main className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="space-y-8">
-            {/* User Management Section */}
-            <div>
-              <div className="flex items-center justify-between mb-8">
-                <div className="flex items-center">
-                  <Users className="h-6 w-6 mr-3 text-blue-500" />
-                  <h1 className="text-3xl font-bold text-gray-900">
-                    User Management
-                  </h1>
-                </div>
-                <Dialog open={userDialogOpen} onOpenChange={setUserDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button
-                      onClick={() => {
-                        setSelectedUser(null);
-                        userForm.reset();
-                      }}
-                    >
-                      <UserPlus className="h-4 w-4 mr-2" />
-                      Add User
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>
-                        {selectedUser ? "Edit User" : "Create New User"}
-                      </DialogTitle>
-                      <DialogDescription>
-                        {selectedUser
-                          ? "Update user account details"
-                          : "Add a new user to the system"}
-                      </DialogDescription>
-                    </DialogHeader>
-                    <Form {...userForm}>
-                      <form
-                        onSubmit={userForm.handleSubmit((data) =>
-                          selectedUser
-                            ? updateUserMutation.mutate({
-                                ...data,
-                                id: selectedUser.id,
-                              })
-                            : createUserMutation.mutate(data)
-                        )}
-                        className="space-y-4"
-                      >
-                        <FormField
-                          control={userForm.control}
-                          name="username"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Username</FormLabel>
-                              <FormControl>
-                                <Input {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+              <TabsList className="grid w-full grid-cols-4">
+                <TabsTrigger value="users">
+                  <Users className="h-4 w-4 mr-2" />
+                  Users
+                </TabsTrigger>
+                <TabsTrigger value="email">
+                  <Mail className="h-4 w-4 mr-2" />
+                  Email
+                </TabsTrigger>
+                <TabsTrigger value="notifications">
+                  <Bell className="h-4 w-4 mr-2" />
+                  Notifications
+                </TabsTrigger>
+                <TabsTrigger value="sms">
+                  <MessageCircle className="h-4 w-4 mr-2" />
+                  SMS
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="users">
+                <div>
+                  <div className="flex items-center justify-between mb-8">
+                    <div className="flex items-center">
+                      <Users className="h-6 w-6 mr-3 text-blue-500" />
+                      <h1 className="text-3xl font-bold text-gray-900">
+                        User Management
+                      </h1>
+                    </div>
+                    <Dialog open={userDialogOpen} onOpenChange={setUserDialogOpen}>
+                      <DialogTrigger asChild>
+                        <Button
+                          onClick={() => {
+                            setSelectedUser(null);
+                            userForm.reset();
+                          }}
+                        >
+                          <UserPlus className="h-4 w-4 mr-2" />
+                          Add User
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>
+                            {selectedUser ? "Edit User" : "Create New User"}
+                          </DialogTitle>
+                          <DialogDescription>
+                            {selectedUser
+                              ? "Update user account details"
+                              : "Add a new user to the system"}
+                          </DialogDescription>
+                        </DialogHeader>
+                        <Form {...userForm}>
+                          <form
+                            onSubmit={userForm.handleSubmit((data) =>
+                              selectedUser
+                                ? updateUserMutation.mutate({
+                                    ...data,
+                                    id: selectedUser.id,
+                                  })
+                                : createUserMutation.mutate(data)
+                            )}
+                            className="space-y-4"
+                          >
+                            <FormField
+                              control={userForm.control}
+                              name="username"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Username</FormLabel>
+                                  <FormControl>
+                                    <Input {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <FormField
+                                control={userForm.control}
+                                name="firstName"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>First Name</FormLabel>
+                                    <FormControl>
+                                      <Input {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+
+                              <FormField
+                                control={userForm.control}
+                                name="lastName"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Last Name</FormLabel>
+                                    <FormControl>
+                                      <Input {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+
+                            {!selectedUser ? (
+                              <FormField
+                                control={userForm.control}
+                                name="password"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Password</FormLabel>
+                                    <FormControl>
+                                      <Input type="password" {...field} />
+                                    </FormControl>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            ) : (
+                              <FormField
+                                control={userForm.control}
+                                name="resetPassword"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Reset Password</FormLabel>
+                                    <FormControl>
+                                      <Input
+                                        type="password"
+                                        placeholder="Enter new password to reset"
+                                        {...field}
+                                      />
+                                    </FormControl>
+                                    <FormDescription>
+                                      Leave blank to keep the current password
+                                    </FormDescription>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            )}
+
+                            <FormField
+                              control={userForm.control}
+                              name="email"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Email</FormLabel>
+                                  <FormControl>
+                                    <Input type="email" {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={userForm.control}
+                              name="role"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Role</FormLabel>
+                                  <Select
+                                    onValueChange={(value) => field.onChange(value || 'user')} // Ensure no empty values
+                                    defaultValue={field.value || 'user'} // Ensure default value is never empty
+                                  >
+                                    <FormControl>
+                                      <SelectTrigger>
+                                        <SelectValue placeholder="Select a role" />
+                                      </SelectTrigger>
+                                    </FormControl>
+                                    <SelectContent>
+                                      <SelectItem value="user">User</SelectItem>
+                                      <SelectItem value="compliance_officer">
+                                        Compliance Officer
+                                      </SelectItem>
+                                      <SelectItem value="admin">Admin</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={userForm.control}
+                              name="department"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Department</FormLabel>
+                                  <FormControl>
+                                    <Input {...field} />
+                                  </FormControl>
+                                  <FormMessage />
+                                </FormItem>
+                              )}
+                            />
+
+                            <Button
+                              type="submit"
+                              className="w-full"
+                              disabled={
+                                createUserMutation.isPending ||
+                                updateUserMutation.isPending
+                              }
+                            >
+                              {createUserMutation.isPending ||
+                              updateUserMutation.isPending ? (
+                                <>
+                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                  {selectedUser ? "Updating..." : "Creating..."}
+                                </>
+                              ) : (
+                                selectedUser ? "Update User" : "Create User"
+                              )}
+                            </Button>
+                          </form>
+                        </Form>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+
+                  <Card>
+                    <CardContent className="p-0">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Username</TableHead>
+                            <TableHead>Email</TableHead>
+                            <TableHead>Role</TableHead>
+                            <TableHead>Department</TableHead>
+                            <TableHead className="text-right">Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {usersLoading ? (
+                            <TableRow>
+                              <TableCell colSpan={5} className="text-center py-4">
+                                <Loader2 className="h-6 w-6 animate-spin mx-auto" />
+                              </TableCell>
+                            </TableRow>
+                          ) : users?.length === 0 ? (
+                            <TableRow>
+                              <TableCell
+                                colSpan={5}
+                                className="text-center text-gray-500 py-4"
+                              >
+                                No users found
+                              </TableCell>
+                            </TableRow>
+                          ) : (
+                            users?.map((u) => (
+                              <TableRow key={u.id}>
+                                <TableCell>{u.username}</TableCell>
+                                <TableCell>{u.email}</TableCell>
+                                <TableCell className="capitalize">
+                                  {u.role.replace("_", " ")}
+                                </TableCell>
+                                <TableCell>{u.department}</TableCell>
+                                <TableCell className="text-right space-x-2">
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => {
+                                      setSelectedUser(u);
+                                      userForm.reset({
+                                        username: u.username,
+                                        email: u.email,
+                                        role: u.role,
+                                        department: u.department || "",
+                                      });
+                                      setUserDialogOpen(true);
+                                    }}
+                                  >
+                                    <Pencil className="h-4 w-4" />
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={() => {
+                                      if (
+                                        window.confirm(
+                                          "Are you sure you want to delete this user?"
+                                        )
+                                      ) {
+                                        deleteUserMutation.mutate(u.id);
+                                      }
+                                    }}
+                                    disabled={u.id === user?.id}
+                                  >
+                                    <Trash2 className="h-4 w-4 text-red-500" />
+                                  </Button>
+                                </TableCell>
+                              </TableRow>
+                            ))
                           )}
-                        />
+                        </TableBody>
+                      </Table>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
 
-                        <div className="grid grid-cols-2 gap-4">
+              <TabsContent value="email">
+                <div>
+                  <div className="flex items-center mb-8">
+                    <Mail className="h-6 w-6 mr-3 text-blue-500" />
+                    <h1 className="text-3xl font-bold text-gray-900">
+                      Email Configuration
+                    </h1>
+                  </div>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>SMTP Settings</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <Form {...emailForm}>
+                        <form onSubmit={emailForm.handleSubmit(onEmailSubmit)} className="space-y-6">
                           <FormField
-                            control={userForm.control}
-                            name="firstName"
+                            control={emailForm.control}
+                            name="fromEmail"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>First Name</FormLabel>
+                                <FormLabel>From Email Address</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="compliance@university.edu" {...field} />
+                                </FormControl>
+                                <FormDescription>
+                                  This email address will be used as the sender for all notifications
+                                </FormDescription>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={emailForm.control}
+                            name="smtpHost"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>SMTP Host</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="smtp.university.edu" {...field} />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={emailForm.control}
+                            name="smtpPort"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>SMTP Port</FormLabel>
+                                <FormControl>
+                                  <Input
+                                    type="number"
+                                    {...field}
+                                    onChange={(e) => field.onChange(parseInt(e.target.value))}
+                                  />
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={emailForm.control}
+                            name="smtpSecure"
+                            render={({ field }) => (
+                              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
+                                <div className="space-y-0.5">
+                                  <FormLabel className="text-base">
+                                    Use Secure Connection (TLS)
+                                  </FormLabel>
+                                  <FormDescription>
+                                    Enable TLS encryption for secure email transmission
+                                  </FormDescription>
+                                </div>
+                                <FormControl>
+                                  <Switch
+                                    checked={field.value}
+                                    onCheckedChange={field.onChange}
+                                  />
+                                </FormControl>
+                              </FormItem>
+                            )}
+                          />
+
+                          <FormField
+                            control={emailForm.control}
+                            name="smtpUser"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>SMTP Username</FormLabel>
                                 <FormControl>
                                   <Input {...field} />
                                 </FormControl>
@@ -385,27 +723,11 @@ export default function SystemSettingsPage() {
                           />
 
                           <FormField
-                            control={userForm.control}
-                            name="lastName"
+                            control={emailForm.control}
+                            name="smtpPass"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Last Name</FormLabel>
-                                <FormControl>
-                                  <Input {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-
-                        {!selectedUser ? (
-                          <FormField
-                            control={userForm.control}
-                            name="password"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Password</FormLabel>
+                                <FormLabel>SMTP Password</FormLabel>
                                 <FormControl>
                                   <Input type="password" {...field} />
                                 </FormControl>
@@ -413,531 +735,240 @@ export default function SystemSettingsPage() {
                               </FormItem>
                             )}
                           />
-                        ) : (
+
+                          <Button
+                            type="submit"
+                            className="w-full"
+                            disabled={updateEmailConfigMutation.isPending}
+                          >
+                            {updateEmailConfigMutation.isPending ? (
+                              <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Saving...
+                              </>
+                            ) : (
+                              "Save Configuration"
+                            )}
+                          </Button>
+                        </form>
+                      </Form>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="notifications">
+                <div>
+                  <div className="flex items-center mb-8">
+                    <Bell className="h-6 w-6 mr-3 text-blue-500" />
+                    <h1 className="text-3xl font-bold text-gray-900">
+                      Notification Settings
+                    </h1>
+                  </div>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Global Notification Preferences</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                      {/* Email Notifications */}
+                      <div className="border-b pb-4">
+                        <div className="flex justify-between items-center mb-4">
+                          <div>
+                            <Label className="text-lg font-medium">Email Notifications</Label>
+                            <p className="text-sm text-gray-500">Send compliance updates via email</p>
+                          </div>
+                          <Switch
+                            checked={notifications?.some(n => n.type === 'email' && n.enabled) ?? false}
+                            onCheckedChange={(checked) => {
+                              if (notifications) {
+                                const emailNotif = notifications.find(n => n.type === 'email');
+                                if (emailNotif) {
+                                  updateNotificationMutation.mutate({
+                                    ...emailNotif,
+                                    enabled: checked,
+                                  });
+                                }
+                              }
+                            }}
+                          />
+                        </div>
+                        <div className="ml-4">
+                          <Label>Default Frequency</Label>
+                          <Select
+                            defaultValue={notifications?.find(n => n.type === 'email')?.frequency || 'daily'}
+                            onValueChange={(value) => {
+                              if (notifications) {
+                                const emailNotif = notifications.find(n => n.type === 'email');
+                                if (emailNotif) {
+                                  updateNotificationMutation.mutate({
+                                    ...emailNotif,
+                                    frequency: value || 'daily', // Ensure value is never empty
+                                  });
+                                }
+                              }
+                            }}
+                          >
+                            <SelectTrigger className="w-[180px]">
+                              <SelectValue placeholder="Select frequency" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="all">All</SelectItem>
+                              <SelectItem value="daily">Daily</SelectItem>
+                              <SelectItem value="weekly">Weekly</SelectItem>
+                              <SelectItem value="monthly">Monthly</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+
+                      {/* SMS Notifications */}
+                      <div className="pt-4">
+                        <div className="flex justify-between items-center mb-4">
+                          <div>
+                            <Label className="text-lg font-medium">SMS Notifications</Label>
+                            <p className="text-sm text-gray-500">Send compliance updates via SMS</p>
+                          </div>
+                          <Switch
+                            checked={notifications?.some(n => n.type === 'sms' && n.enabled)}
+                            onCheckedChange={(checked) => {
+                              if (notifications) {
+                                const smsNotif = notifications.find(n => n.type === 'sms');
+                                if (smsNotif) {
+                                  updateNotificationMutation.mutate({
+                                    ...smsNotif,
+                                    enabled: checked,
+                                  });
+                                }
+                              }
+                            }}
+                          />
+                        </div>
+                        <div className="ml-4">
+                          <Label>Default Frequency</Label>
+                          <Select
+                            defaultValue={notifications?.find(n => n.type === 'sms')?.frequency || "never"}
+                            onValueChange={(value) => {
+                              if (notifications) {
+                                const smsNotif = notifications.find(n => n.type === 'sms');
+                                if (smsNotif) {
+                                  updateNotificationMutation.mutate({
+                                    ...smsNotif,
+                                    frequency: value,
+                                  });
+                                } else {
+                                  handleAddNotification({ type: 'sms', frequency: value || 'never' }); // Ensure value is never empty
+                                }
+                              }
+                            }}
+                          >
+                            <SelectTrigger className="w-[180px]">
+                              <SelectValue placeholder="Select frequency" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="never">Never</SelectItem>
+                              <SelectItem value="daily">Daily</SelectItem>
+                              <SelectItem value="weekly">Weekly</SelectItem>
+                              <SelectItem value="monthly">Monthly</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="sms">
+                <div>
+                  <div className="flex items-center mb-8">
+                    <MessageSquare className="h-6 w-6 mr-3 text-blue-500" />
+                    <h1 className="text-3xl font-bold text-gray-900">
+                      SMS Service Configuration
+                    </h1>
+                  </div>
+
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Twilio Settings</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <Form {...twilioForm}>
+                        <form onSubmit={twilioForm.handleSubmit(onTwilioSubmit)} className="space-y-6">
                           <FormField
-                            control={userForm.control}
-                            name="resetPassword"
+                            control={twilioForm.control}
+                            name="accountSid"
                             render={({ field }) => (
                               <FormItem>
-                                <FormLabel>Reset Password</FormLabel>
+                                <FormLabel>Account SID</FormLabel>
                                 <FormControl>
-                                  <Input
-                                    type="password"
-                                    placeholder="Enter new password to reset"
-                                    {...field}
-                                  />
+                                  <Input {...field} />
                                 </FormControl>
                                 <FormDescription>
-                                  Leave blank to keep the current password
+                                  Your Twilio Account SID from the Twilio Console
                                 </FormDescription>
                                 <FormMessage />
                               </FormItem>
                             )}
                           />
-                        )}
 
-                        <FormField
-                          control={userForm.control}
-                          name="email"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Email</FormLabel>
-                              <FormControl>
-                                <Input type="email" {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-
-                        <FormField
-                          control={userForm.control}
-                          name="role"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Role</FormLabel>
-                              <Select
-                                onValueChange={(value) => field.onChange(value || 'user')} // Ensure no empty values
-                                defaultValue={field.value || 'user'} // Ensure default value is never empty
-                              >
+                          <FormField
+                            control={twilioForm.control}
+                            name="authToken"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Auth Token</FormLabel>
                                 <FormControl>
-                                  <SelectTrigger>
-                                    <SelectValue placeholder="Select a role" />
-                                  </SelectTrigger>
+                                  <Input type="password" {...field} />
                                 </FormControl>
-                                <SelectContent>
-                                  <SelectItem value="user">User</SelectItem>
-                                  <SelectItem value="compliance_officer">
-                                    Compliance Officer
-                                  </SelectItem>
-                                  <SelectItem value="admin">Admin</SelectItem>
-                                </SelectContent>
-                              </Select>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                                <FormDescription>
+                                  Your Twilio Auth Token from the Twilio Console
+                                </FormDescription>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
 
-                        <FormField
-                          control={userForm.control}
-                          name="department"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormLabel>Department</FormLabel>
-                              <FormControl>
-                                <Input {...field} />
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
+                          <FormField
+                            control={twilioForm.control}
+                            name="fromNumber"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>From Phone Number</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="+1234567890" {...field} />
+                                </FormControl>
+                                <FormDescription>
+                                  Your Twilio phone number in E.164 format (e.g., +1234567890)
+                                </FormDescription>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
 
-                        <Button
-                          type="submit"
-                          className="w-full"
-                          disabled={
-                            createUserMutation.isPending ||
-                            updateUserMutation.isPending
-                          }
-                        >
-                          {createUserMutation.isPending ||
-                          updateUserMutation.isPending ? (
-                            <>
-                              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                              {selectedUser ? "Updating..." : "Creating..."}
-                            </>
-                          ) : (
-                            selectedUser ? "Update User" : "Create User"
-                          )}
-                        </Button>
-                      </form>
-                    </Form>
-                  </DialogContent>
-                </Dialog>
-              </div>
-
-              <Card>
-                <CardContent className="p-0">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Username</TableHead>
-                        <TableHead>Email</TableHead>
-                        <TableHead>Role</TableHead>
-                        <TableHead>Department</TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {usersLoading ? (
-                        <TableRow>
-                          <TableCell colSpan={5} className="text-center py-4">
-                            <Loader2 className="h-6 w-6 animate-spin mx-auto" />
-                          </TableCell>
-                        </TableRow>
-                      ) : users?.length === 0 ? (
-                        <TableRow>
-                          <TableCell
-                            colSpan={5}
-                            className="text-center text-gray-500 py-4"
+                          <Button
+                            type="submit"
+                            className="w-full"
+                            disabled={updateTwilioConfigMutation.isPending}
                           >
-                            No users found
-                          </TableCell>
-                        </TableRow>
-                      ) : (
-                        users?.map((u) => (
-                          <TableRow key={u.id}>
-                            <TableCell>{u.username}</TableCell>
-                            <TableCell>{u.email}</TableCell>
-                            <TableCell className="capitalize">
-                              {u.role.replace("_", " ")}
-                            </TableCell>
-                            <TableCell>{u.department}</TableCell>
-                            <TableCell className="text-right space-x-2">
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                  setSelectedUser(u);
-                                  userForm.reset({
-                                    username: u.username,
-                                    email: u.email,
-                                    role: u.role,
-                                    department: u.department || "",
-                                  });
-                                  setUserDialogOpen(true);
-                                }}
-                              >
-                                <Pencil className="h-4 w-4" />
-                              </Button>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => {
-                                  if (
-                                    window.confirm(
-                                      "Are you sure you want to delete this user?"
-                                    )
-                                  ) {
-                                    deleteUserMutation.mutate(u.id);
-                                  }
-                                }}
-                                disabled={u.id === user?.id}
-                              >
-                                <Trash2 className="h-4 w-4 text-red-500" />
-                              </Button>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      )}
-                    </TableBody>
-                  </Table>
-                </CardContent>
-              </Card>
-            </div>
+                            {updateTwilioConfigMutation.isPending ? (
+                              <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Saving...
+                              </>
+                            ) : (
+                              "Save Configuration"
+                            )}
+                          </Button>
+                        </form>
+                      </Form>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+            </Tabs>
 
-            {/* Email Configuration */}
-            <div>
-              <div className="flex items-center mb-8">
-                <Mail className="h-6 w-6 mr-3 text-blue-500" />
-                <h1 className="text-3xl font-bold text-gray-900">
-                  Email Configuration
-                </h1>
-              </div>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>SMTP Settings</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Form {...emailForm}>
-                    <form onSubmit={emailForm.handleSubmit(onEmailSubmit)} className="space-y-6">
-                      <FormField
-                        control={emailForm.control}
-                        name="fromEmail"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>From Email Address</FormLabel>
-                            <FormControl>
-                              <Input placeholder="compliance@university.edu" {...field} />
-                            </FormControl>
-                            <FormDescription>
-                              This email address will be used as the sender for all notifications
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={emailForm.control}
-                        name="smtpHost"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>SMTP Host</FormLabel>
-                            <FormControl>
-                              <Input placeholder="smtp.university.edu" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={emailForm.control}
-                        name="smtpPort"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>SMTP Port</FormLabel>
-                            <FormControl>
-                              <Input
-                                type="number"
-                                {...field}
-                                onChange={(e) => field.onChange(parseInt(e.target.value))}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={emailForm.control}
-                        name="smtpSecure"
-                        render={({ field }) => (
-                          <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                            <div className="space-y-0.5">
-                              <FormLabel className="text-base">
-                                Use Secure Connection (TLS)
-                              </FormLabel>
-                              <FormDescription>
-                                Enable TLS encryption for secure email transmission
-                              </FormDescription>
-                            </div>
-                            <FormControl>
-                              <Switch
-                                checked={field.value}
-                                onCheckedChange={field.onChange}
-                              />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={emailForm.control}
-                        name="smtpUser"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>SMTP Username</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={emailForm.control}
-                        name="smtpPass"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>SMTP Password</FormLabel>
-                            <FormControl>
-                              <Input type="password" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <Button
-                        type="submit"
-                        className="w-full"
-                        disabled={updateEmailConfigMutation.isPending}
-                      >
-                        {updateEmailConfigMutation.isPending ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Saving...
-                          </>
-                        ) : (
-                          "Save Configuration"
-                        )}
-                      </Button>
-                    </form>
-                  </Form>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Twilio Configuration */}
-            <div>
-              <div className="flex items-center mb-8">
-                <MessageSquare className="h-6 w-6 mr-3 text-blue-500" />
-                <h1 className="text-3xl font-bold text-gray-900">
-                  SMS Service Configuration
-                </h1>
-              </div>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Twilio Settings</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Form {...twilioForm}>
-                    <form onSubmit={twilioForm.handleSubmit(onTwilioSubmit)} className="space-y-6">
-                      <FormField
-                        control={twilioForm.control}
-                        name="accountSid"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Account SID</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormDescription>
-                              Your Twilio Account SID from the Twilio Console
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={twilioForm.control}
-                        name="authToken"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Auth Token</FormLabel>
-                            <FormControl>
-                              <Input type="password" {...field} />
-                            </FormControl>
-                            <FormDescription>
-                              Your Twilio Auth Token from the Twilio Console
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <FormField
-                        control={twilioForm.control}
-                        name="fromNumber"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>From Phone Number</FormLabel>
-                            <FormControl>
-                              <Input placeholder="+1234567890" {...field} />
-                            </FormControl>
-                            <FormDescription>
-                              Your Twilio phone number in E.164 format (e.g., +1234567890)
-                            </FormDescription>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-
-                      <Button
-                        type="submit"
-                        className="w-full"
-                        disabled={updateTwilioConfigMutation.isPending}
-                      >
-                        {updateTwilioConfigMutation.isPending ? (
-                          <>
-                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                            Saving...
-                          </>
-                        ) : (
-                          "Save Configuration"
-                        )}
-                      </Button>
-                    </form>
-                  </Form>
-                </CardContent>
-              </Card>
-            </div>
-            {/* Notification Settings */}
-            <div>
-              <div className="flex items-center mb-8">
-                <Bell className="h-6 w-6 mr-3 text-blue-500" />
-                <h1 className="text-3xl font-bold text-gray-900">
-                  Notification Settings
-                </h1>
-              </div>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Global Notification Preferences</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  {/* Email Notifications */}
-                  <div className="border-b pb-4">
-                    <div className="flex justify-between items-center mb-4">
-                      <div>
-                        <Label className="text-lg font-medium">Email Notifications</Label>
-                        <p className="text-sm text-gray-500">Send compliance updates via email</p>
-                      </div>
-                      <Switch
-                        checked={notifications?.some(n => n.type === 'email' && n.enabled) ?? false}
-                        onCheckedChange={(checked) => {
-                          if (notifications) {
-                            const emailNotif = notifications.find(n => n.type === 'email');
-                            if (emailNotif) {
-                              updateNotificationMutation.mutate({
-                                ...emailNotif,
-                                enabled: checked,
-                              });
-                            }
-                          }
-                        }}
-                      />
-                    </div>
-                    <div className="ml-4">
-                      <Label>Default Frequency</Label>
-                      <Select
-                        defaultValue={notifications?.find(n => n.type === 'email')?.frequency || 'daily'}
-                        onValueChange={(value) => {
-                          if (notifications) {
-                            const emailNotif = notifications.find(n => n.type === 'email');
-                            if (emailNotif) {
-                              updateNotificationMutation.mutate({
-                                ...emailNotif,
-                                frequency: value || 'daily', // Ensure value is never empty
-                              });
-                            }
-                          }
-                        }}
-                      >
-                        <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder="Select frequency" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="all">All</SelectItem>
-                          <SelectItem value="daily">Daily</SelectItem>
-                          <SelectItem value="weekly">Weekly</SelectItem>
-                          <SelectItem value="monthly">Monthly</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  {/* SMS Notifications */}
-                  <div className="pt-4">
-                    <div className="flex justify-between items-center mb-4">
-                      <div>
-                        <Label className="text-lg font-medium">SMS Notifications</Label>
-                        <p className="text-sm text-gray-500">Send compliance updates via SMS</p>
-                      </div>
-                      <Switch
-                        checked={notifications?.some(n => n.type === 'sms' && n.enabled)}
-                        onCheckedChange={(checked) => {
-                          if (notifications) {
-                            const smsNotif = notifications.find(n => n.type === 'sms');
-                            if (smsNotif) {
-                              updateNotificationMutation.mutate({
-                                ...smsNotif,
-                                enabled: checked,
-                              });
-                            }
-                          }
-                        }}
-                      />
-                    </div>
-                    <div className="ml-4">
-                      <Label>Default Frequency</Label>
-                      <Select
-                        defaultValue={notifications?.find(n => n.type === 'sms')?.frequency || "never"}
-                        onValueChange={(value) => {
-                          if (notifications) {
-                            const smsNotif = notifications.find(n => n.type === 'sms');
-                            if (smsNotif) {
-                              updateNotificationMutation.mutate({
-                                ...smsNotif,
-                                frequency: value,
-                              });
-                            } else {
-                              handleAddNotification({ type: 'sms', frequency: value || 'never' }); // Ensure value is never empty
-                            }
-                          }
-                        }}
-                      >
-                        <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder="Select frequency" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="never">Never</SelectItem>
-                          <SelectItem value="daily">Daily</SelectItem>
-                          <SelectItem value="weekly">Weekly</SelectItem>
-                          <SelectItem value="monthly">Monthly</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+            {/* User Dialog */}
           </div>
         </div>
       </main>
