@@ -105,29 +105,6 @@ const topicToCategory: Record<string, string> = {
   'Institutional': 'Other'
 };
 
-const AGENCY_MAPPINGS = {
-  // Education related
-  'Education Amendment': 'Department of Education',
-  'Higher Education Act': 'Department of Education',
-  'Education Records': 'Department of Education',
-  'Student Privacy': 'Department of Education',
-  'Educational Programs': 'Department of Education',
-
-  // Labor related
-  'Employment': 'Department of Labor',
-  'Labor Relations': 'Department of Labor',
-  'Wages': 'Department of Labor',
-  'Workplace': 'Department of Labor',
-  'Workers': 'Department of Labor',
-  'OSHA': 'Department of Labor',
-
-  // Default agency mappings based on categories
-  'Academic Programs': 'Department of Education',
-  'Human Resources': 'Department of Labor',
-  'Campus Safety': 'Department of Education',
-  'Financial Aid': 'Department of Education'
-};
-
 async function parseDeadline(deadlineText: string): Promise<{ dueDate: Date | null; status: string }> {
   if (!deadlineText || deadlineText.toLowerCase() === 'not applicable') {
     return { dueDate: null, status: 'not_applicable' };
@@ -168,8 +145,8 @@ async function parseDeadline(deadlineText: string): Promise<{ dueDate: Date | nu
           }
         } else {
           // If MM/DD or MM/DD/YYYY format
-          dueDate = dateStr.includes('/') ?
-            (dateStr.length <= 5 ?
+          dueDate = dateStr.includes('/') ? 
+            (dateStr.length <= 5 ? 
               parseDate(dateStr + '/' + new Date().getFullYear(), 'MM/dd/yyyy', new Date()) :
               parseDate(dateStr, 'MM/dd/yyyy', new Date())
             ) : new Date(dateStr);
@@ -192,34 +169,15 @@ async function parseDeadline(deadlineText: string): Promise<{ dueDate: Date | nu
   }
 
   // If no valid date found but text indicates a deadline exists
-  if (deadlineText.toLowerCase().includes('deadline') ||
-    deadlineText.toLowerCase().includes('due') ||
-    deadlineText.toLowerCase().includes('submit')) {
+  if (deadlineText.toLowerCase().includes('deadline') || 
+      deadlineText.toLowerCase().includes('due') ||
+      deadlineText.toLowerCase().includes('submit')) {
     // Set to end of current year as a fallback
     const endOfYear = new Date(new Date().getFullYear(), 11, 31);
     return { dueDate: endOfYear, status: 'pending' };
   }
 
   return { dueDate: null, status: 'not_applicable' };
-}
-
-async function determineAgency(regulation: any): Promise<string | null> {
-  // Check name and statute for agency indicators
-  const textToCheck = `${regulation.name} ${regulation.statute} ${regulation.topic}`.toLowerCase();
-
-  // Try to match based on keywords
-  for (const [keyword, agency] of Object.entries(AGENCY_MAPPINGS)) {
-    if (textToCheck.includes(keyword.toLowerCase())) {
-      return agency;
-    }
-  }
-
-  // Default mappings based on category
-  if (regulation.category && AGENCY_MAPPINGS[regulation.category]) {
-    return AGENCY_MAPPINGS[regulation.category];
-  }
-
-  return null;
 }
 
 async function importRegulations() {
@@ -252,31 +210,23 @@ async function importRegulations() {
     for (const row of data) {
       try {
         // Generate a unique itemId based on the Excel Item ID or a random string
-        const itemId = row['Item ID'] ?
-          `REG${String(row['Item ID']).padStart(4, '0')}` :
+        const itemId = row['Item ID'] ? 
+          `REG${String(row['Item ID']).padStart(4, '0')}` : 
           `REG${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
 
         console.log(`Processing regulation with Item ID: ${itemId}`);
 
-        // Get topic and map to category
+        // Get topic and map to category, with special handling for education-related topics
         let topic = String(row['Topic'] || '').trim();
         let category = topicToCategory[topic] || 'Other';
 
         // Check if the name contains education-related terms and override category if needed
         const name = String(row['Statute Name'] || row['Name'] || '').trim();
-        if (name.toLowerCase().includes('higher education act') ||
-          name.toLowerCase().includes('education amendment') ||
-          name.toLowerCase().includes('academic program')) {
+        if (name.toLowerCase().includes('higher education act') || 
+            name.toLowerCase().includes('education amendment') ||
+            name.toLowerCase().includes('academic program')) {
           category = 'Academic Programs';
         }
-
-        // Determine agency
-        const agency_name = await determineAgency({
-          name: String(row['Statute Name'] || row['Name'] || '').trim(),
-          statute: String(row['Statute 1'] || row['Statute'] || '').trim(),
-          topic: String(row['Topic'] || '').trim(),
-          category: category
-        });
 
         const regulation = {
           itemId: itemId,
@@ -296,11 +246,10 @@ async function importRegulations() {
           nextReviewDate: null,
           filingDeadlines: null,
           reportingFrequency: String(row['Reporting Requirements'] || '').trim(),
-          agency_url: agency_name === 'Department of Labor' ? 'https://www.dol.gov' :
-            agency_name === 'Department of Education' ? 'https://www.ed.gov' : '',
-          agency_name: agency_name, 
-          agency_contact: '',
-          agency_department: '',
+          agency_url: '',
+          agencyName: '',
+          agencyContact: '',
+          agencyDepartment: '',
           regulationUrl: '',
           requirementsUrl: '',
           submissionGuideUrl: '',
