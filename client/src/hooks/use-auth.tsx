@@ -1,15 +1,9 @@
 /**
  * @module useAuth
  * @description Authentication context and hook for managing user authentication state
- * @compliance ISO/IEC/IEEE 26514 4.3.3 - Authentication Documentation
- * 
- * @securityControl Authentication & Session Management
- * - Implements secure session-based authentication
- * - Manages user login/logout state
- * - Handles registration process
  */
 
-import { createContext, ReactNode, useContext } from "react";
+import { createContext, ReactNode, useContext, useEffect } from "react";
 import {
   useQuery,
   useMutation,
@@ -19,59 +13,80 @@ import { insertUserSchema, User as SelectUser, InsertUser } from "@shared/schema
 import { getQueryFn, apiRequest, queryClient } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
-/**
- * @interface AuthContextType
- * @description Context type definition for authentication state and operations
- */
 type AuthContextType = {
-  /** Currently authenticated user or null if not authenticated */
   user: SelectUser | null;
-  /** Loading state for authentication operations */
   isLoading: boolean;
-  /** Any error that occurred during authentication */
   error: Error | null;
-  /** Mutation for handling user login */
   loginMutation: UseMutationResult<SelectUser, Error, LoginData>;
-  /** Mutation for handling user logout */
   logoutMutation: UseMutationResult<void, Error, void>;
-  /** Mutation for handling user registration */
   registerMutation: UseMutationResult<SelectUser, Error, InsertUser>;
 };
 
-/**
- * @interface LoginData
- * @description Required data for user login
- */
 type LoginData = Pick<InsertUser, "username" | "password">;
 
 export const AuthContext = createContext<AuthContextType | null>(null);
 
-/**
- * @component AuthProvider
- * @description Provider component for authentication context
- * @param {Object} props - Component props
- * @param {ReactNode} props.children - Child components to be wrapped
- */
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
+
+  // Add logging for debugging
+  useEffect(() => {
+    console.log('[AuthProvider] Initializing authentication provider');
+    return () => {
+      console.log('[AuthProvider] Cleaning up authentication provider');
+    };
+  }, []);
+
   const {
     data: user,
     error,
     isLoading,
-  } = useQuery<SelectUser | undefined, Error>({
+  } = useQuery<SelectUser | null>({
     queryKey: ["/api/user"],
-    queryFn: getQueryFn({ on401: "returnNull" }),
+    queryFn: async ({ queryKey }) => {
+      try {
+        console.log('[AuthProvider] Fetching user data');
+        const response = await fetch(queryKey[0], {
+          credentials: "include"
+        });
+
+        if (response.status === 401) {
+          console.log('[AuthProvider] User not authenticated');
+          return null;
+        }
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch user: ${response.status}`);
+        }
+
+        const userData = await response.json();
+        console.log('[AuthProvider] User data fetched:', userData);
+        return userData;
+      } catch (error) {
+        console.error('[AuthProvider] Error fetching user:', error);
+        throw error;
+      }
+    },
+    retry: 1,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginData) => {
+      console.log('[AuthProvider] Attempting login');
       const res = await apiRequest("POST", "/api/login", credentials);
       return await res.json();
     },
     onSuccess: (user: SelectUser) => {
+      console.log('[AuthProvider] Login successful');
       queryClient.setQueryData(["/api/user"], user);
+      toast({
+        title: "Welcome back!",
+        description: `Logged in as ${user.username}`,
+      });
     },
     onError: (error: Error) => {
+      console.error('[AuthProvider] Login failed:', error);
       toast({
         title: "Login failed",
         description: error.message,
@@ -82,13 +97,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const registerMutation = useMutation({
     mutationFn: async (credentials: InsertUser) => {
+      console.log('[AuthProvider] Attempting registration');
       const res = await apiRequest("POST", "/api/register", credentials);
       return await res.json();
     },
     onSuccess: (user: SelectUser) => {
+      console.log('[AuthProvider] Registration successful');
       queryClient.setQueryData(["/api/user"], user);
     },
     onError: (error: Error) => {
+      console.error('[AuthProvider] Registration failed:', error);
       toast({
         title: "Registration failed",
         description: error.message,
@@ -99,12 +117,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logoutMutation = useMutation({
     mutationFn: async () => {
+      console.log('[AuthProvider] Attempting logout');
       await apiRequest("POST", "/api/logout");
     },
     onSuccess: () => {
+      console.log('[AuthProvider] Logout successful');
       queryClient.setQueryData(["/api/user"], null);
     },
     onError: (error: Error) => {
+      console.error('[AuthProvider] Logout failed:', error);
       toast({
         title: "Logout failed",
         description: error.message,
@@ -112,6 +133,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
     },
   });
+
+  console.log('[AuthProvider] Current state:', { user, isLoading, error });
 
   return (
     <AuthContext.Provider
@@ -129,28 +152,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 }
 
-/**
- * @hook useAuth
- * @description Custom hook for accessing authentication context
- * @throws {Error} If used outside of AuthProvider
- * @returns {AuthContextType} Authentication context value
- * 
- * @example
- * ```tsx
- * function LoginButton() {
- *   const { loginMutation } = useAuth();
- *   
- *   const handleLogin = () => {
- *     loginMutation.mutate({ username: "user", password: "pass" });
- *   };
- *   
- *   return <button onClick={handleLogin}>Login</button>;
- * }
- * ```
- */
 export function useAuth() {
   const context = useContext(AuthContext);
   if (!context) {
+    console.error('[useAuth] Hook used outside of AuthProvider');
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
