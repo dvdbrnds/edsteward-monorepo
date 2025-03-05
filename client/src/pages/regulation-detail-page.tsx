@@ -81,12 +81,12 @@ interface RegulationWithOverride extends Regulation {
     email: string | null;
     phone: string | null;
   };
-  notificationSchedule?: {
+  notificationSchedule: {
     initialReminder: number;
     weeklyReminder: number;
     dailyReminder: number;
     finalDayReminders: boolean;
-  }
+  } | null;
 }
 
 /**
@@ -600,7 +600,7 @@ export default function RegulationDetailPage() {
                     <CardTitle>Submission Guidelines</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <GuideContent />
+                    <GuideContent regulationId={regulationId} />
                   </CardContent>
                 </Card>
 
@@ -819,51 +819,65 @@ export default function RegulationDetailPage() {
   );
 }
 
-function GuideContent() {
-  const { data: guides, isLoading } = useQuery<Guide[]>({
-    queryKey: ["/api/guides", { category: "submission" }],
-  });
+/**
+ * Helper function to get the deadline status display information
+ */
+function getDeadlineStatus(deadline: Deadline): { icon: JSX.Element; label: string; className: string } {
+  const now = new Date();
+  const dueDate = new Date(deadline.dueDate);
+  const daysDiff = differenceInDays(dueDate, now);
 
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center p-4">
-        <Loader2 className="h-6 w-6 animate-spin text-[#00267A]" />
-      </div>
-    );
+  if (deadline.status === "completed") {
+    return {
+      label: "Completed",
+      className: "bg-green-100 text-green-800",
+      icon: <CheckCircle className="h-5 w-5 text-green-500" />
+    };
   }
 
-  const submissionGuide = guides?.find(guide => guide.category === "submission");
+  if (daysDiff < 0) {
+    return {
+      label: "Overdue",
+      className: "bg-red-100 text-red-800",
+      icon: <AlertCircle className="h-5 w-5 text-red-500" />
+    };
+  }
 
-  if (!submissionGuide) {
+  if (daysDiff <= 7) {
+    return {
+      label: "Due Soon",
+      className: "bg-yellow-100 text-yellow-800",
+      icon: <Clock className="h-5 w-5 text-yellow-500" />
+    };
+  }
+
+  return {
+    label: "Upcoming",
+    className: "bg-blue-100 text-blue-800",
+    icon: <Clock className="h-5 w-5 text-blue-500" />
+  };
+}
+
+function GuideContent({ regulationId }: { regulationId: string }) {
+  const { data: regulation } = useQuery<RegulationWithOverride>({
+    queryKey: ["/api/regulations", regulationId],
+  });
+
+  if (!regulation?.submissionGuidelines) {
     return (
-      <div className="p-4 text-gray-600">
-        <p>No submission guidelines available for this regulation.</p>
-        <p className="mt-2">Please contact the compliance office for assistance with your submission.</p>
-      </div>
+      <p className="text-gray-500 italic">
+        No submission guidelines available.
+      </p>
     );
   }
 
   return (
-    <div
-      className="prose prose-sm max-w-none"
-      dangerouslySetInnerHTML={{ __html: marked.parse(submissionGuide.content) }}
-    />
+    <div className="prose max-w-none">
+      <div
+        dangerouslySetInnerHTML={{
+          __html: marked(regulation.submissionGuidelines)
+        }}
+      />
+    </div>
   );
-}
-
-type StatusType = {
-  icon: JSX.Element;
-  label: string;
-  className: string;
-};
-
-function getDeadlineStatus(deadline: Deadline): StatusType {
-  const daysLeft = differenceInDays(new Date(deadline.dueDate), new Date());
-  if (daysLeft < 0) {
-    return { icon: <AlertCircle className="h-5 w-5 text-red-500" />, label: "Overdue", className: "bg-red-100 text-red-500" };
-  } else if (daysLeft <= 7) {
-    return { icon: <Clock className="h-5 w-5 text-yellow-500" />, label: "Approaching", className: "bg-yellow-100 text-yellow-500" };
-  } else {
-    return { icon: <CheckCircle className="h-5 w-5 text-green-500" />, label: "Upcoming", className: "bg-green-100 text-green-500" };
-  }
 }
