@@ -16,5 +16,7 @@ if (!dbUrl) {
   );
 }
 
+console.log(`Connecting to database in ${process.env.NODE_ENV || 'development'} mode`);
+
 export const pool = new Pool({ connectionString: dbUrl });
 export const db = drizzle({ client: pool, schema });
