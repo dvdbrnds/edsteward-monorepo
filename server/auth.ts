@@ -16,6 +16,14 @@ declare global {
 
 const scryptAsync = promisify(scrypt);
 
+// Add user cache
+const userCache = new Map<number, {
+  user: SelectUser;
+  timestamp: number;
+}>();
+
+const CACHE_TTL = 60000; // 1 minute cache TTL
+
 async function hashPassword(password: string) {
   const salt = randomBytes(16).toString("hex");
   const buf = (await scryptAsync(password, salt, 64)) as Buffer;
@@ -55,11 +63,16 @@ export function setupAuth(app: Express) {
       try {
         const user = await storage.getUserByUsername(username);
         if (!user || !(await comparePasswords(password, user.password))) {
+          await syslog.logAuthEvent(LogLevel.WARNING, "Failed login attempt", undefined, username, {
+            reason: !user ? "user_not_found" : "invalid_password"
+          });
           return done(null, false);
         } else {
+          await syslog.logAuthEvent(LogLevel.INFO, "Successful login", user.id, username);
           return done(null, user);
         }
       } catch (error) {
+        await syslog.logAuthEvent(LogLevel.ERROR, "Login error", undefined, username, { error });
         return done(error);
       }
     }),
@@ -71,22 +84,30 @@ export function setupAuth(app: Express) {
 
   passport.deserializeUser(async (id: number, done) => {
     try {
-      console.log(`Deserializing user with ID: ${id}`);
+      // Check cache first
+      const cached = userCache.get(id);
+      if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+        return done(null, cached.user);
+      }
+
       const user = await storage.getUser(id);
       if (!user) {
-        console.error(`User with ID ${id} not found during deserialization`);
+        await syslog.logAuthEvent(LogLevel.WARNING, "User not found during deserialization", undefined, undefined, { userId: id });
         return done(null, false);
       }
-      console.log(`User deserialized successfully: ${user.id}, ${user.username}, First: ${user.firstName || 'N/A'}, Last: ${user.lastName || 'N/A'}`);
-      
-      // Check if user has complete profile
-      if (!user.firstName || !user.lastName) {
-        console.warn(`User ${user.username} has incomplete profile (missing name information)`);
-      }
-      
+
+      // Update cache
+      userCache.set(id, {
+        user,
+        timestamp: Date.now()
+      });
+
       done(null, user);
     } catch (error) {
-      console.error(`Error deserializing user ${id}:`, error);
+      await syslog.logAuthEvent(LogLevel.ERROR, "Deserialization error", undefined, undefined, { 
+        userId: id,
+        error: error instanceof Error ? error.message : String(error)
+      });
       done(error);
     }
   });
@@ -103,37 +124,39 @@ export function setupAuth(app: Express) {
         password: await hashPassword(req.body.password),
       });
 
+      await syslog.logAuthEvent(LogLevel.INFO, "New user registered", user.id, user.username);
+
       req.login(user, (err) => {
         if (err) return next(err);
         res.status(201).json(user);
       });
     } catch (error) {
+      await syslog.logAuthEvent(LogLevel.ERROR, "Registration error", undefined, req.body.username);
       next(error);
     }
   });
 
   app.post("/api/login", (req, res, next) => {
-    passport.authenticate("local", (err, user, info) => {
+    passport.authenticate("local", async (err, user, info) => {
       if (err) {
-        syslog.authEvent(LogLevel.ERROR, "Login error", undefined, req.body.username);
+        await syslog.logAuthEvent(LogLevel.ERROR, "Login error", undefined, req.body.username);
         return next(err);
       }
-      
+
       if (!user) {
-        syslog.authEvent(LogLevel.WARNING, "Failed login attempt", undefined, req.body.username);
+        await syslog.logAuthEvent(LogLevel.WARNING, "Failed login attempt", undefined, req.body.username);
         return res.status(401).json({ error: "Invalid credentials" });
       }
 
-      req.login(user, (err) => {
+      req.login(user, async (err) => {
         if (err) {
-          syslog.authEvent(LogLevel.ERROR, "Session creation error", user.id, user.username);
+          await syslog.logAuthEvent(LogLevel.ERROR, "Session creation error", user.id, user.username);
           return next(err);
         }
-        
+
         // Update last login timestamp
         storage.updateUser(user.id, { lastLogin: new Date() })
           .then(() => {
-            syslog.authEvent(LogLevel.INFO, "User logged in successfully", user.id, user.username);
             res.status(200).json(user);
           })
           .catch(error => {
@@ -148,13 +171,18 @@ export function setupAuth(app: Express) {
   app.post("/api/logout", (req, res, next) => {
     const userId = req.user?.id;
     const username = req.user?.username;
-    
+
+    // Clear user from cache on logout
+    if (userId) {
+      userCache.delete(userId);
+    }
+
     req.logout((err) => {
       if (err) {
-        syslog.authEvent(LogLevel.ERROR, "Logout error", userId, username);
+        syslog.logAuthEvent(LogLevel.ERROR, "Logout error", userId, username);
         return next(err);
       }
-      syslog.authEvent(LogLevel.INFO, "User logged out", userId, username);
+      syslog.logAuthEvent(LogLevel.INFO, "User logged out", userId, username);
       res.sendStatus(200);
     });
   });

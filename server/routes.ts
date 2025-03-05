@@ -72,12 +72,31 @@ export function registerRoutes(app: Express): Server {
 
   // Add this error handler middleware to catch syslog errors
   app.use(async (err: Error, req: Request, res: Response, next: Function) => {
-    await syslog.error("Unhandled error", { 
+    // Truncate long response bodies for logging
+    const truncateBody = (body: any): any => {
+      if (typeof body === 'string' && body.length > 500) {
+        return body.substring(0, 500) + '...';
+      }
+      if (Array.isArray(body)) {
+        return `Array[${body.length} items]`;
+      }
+      if (typeof body === 'object' && body !== null) {
+        return '{Object}';
+      }
+      return body;
+    };
+
+    // Create a cleaner log entry
+    const logEntry = {
       error: err.message,
-      stack: err.stack,
       path: req.path,
-      method: req.method
-    });
+      method: req.method,
+      body: truncateBody(req.body),
+      query: truncateBody(req.query),
+      stack: err.stack?.split('\n').slice(0, 3).join('\n') // Only keep first 3 lines of stack trace
+    };
+
+    await syslog.error("Unhandled error", logEntry);
     next(err);
   });
 
@@ -892,13 +911,13 @@ export function registerRoutes(app: Express): Server {
 
       console.log('[AUTH] Login successful for user:', username);
 
-      return res.status(200).json({ 
-        message: "Login successful", 
-        user: { 
-          id: user.id, 
-          username: user.username, 
-          role: user.role 
-        } 
+      return res.status(200).json({
+        message: "Login successful",
+        user: {
+          id: user.id,
+          username: user.username,
+          role: user.role
+        }
       });
     } catch (error) {
       const errorData = {
@@ -1105,7 +1124,7 @@ export function registerRoutes(app: Express): Server {
             '/api/admin/users': 'USER_MANAGEMENT',
             '/api/bug-report': 'BUG_REPORT'
           };
-          
+
           // Determine the context based on the path
           let context = 'USER_ACTIVITY';
           for (const key in contextMap) {
@@ -1114,7 +1133,7 @@ export function registerRoutes(app: Express): Server {
               break;
             }
           }
-          
+
           syslog.info(activity, {
             username: req.user.username,
             user: req.user.username,
@@ -1142,7 +1161,7 @@ export function registerRoutes(app: Express): Server {
   app.use('/api/admin/users*', logUserActivity('User management'));
   app.use('/api/auth/login', logUserActivity('Authentication'));
   app.use('/api/auth/logout', logUserActivity('Authentication'));
-  
+
 
   // Log all API requests for comprehensive activity tracking
   app.use('/api/*', async (req, res, next) => {
@@ -1152,7 +1171,7 @@ export function registerRoutes(app: Express): Server {
       const path = req.path;
       const method = req.method;
       const ip = req.ip || req.headers['x-forwarded-for'] || 'unknown';
-      
+
       try {
         await syslog.info(`API request: ${method} ${path}`, {
           username,
@@ -1170,7 +1189,7 @@ export function registerRoutes(app: Express): Server {
     }
     next();
   });
-  
+
 
   // Enhanced validation logging
   app.use('/api/regulations/validate', async (req, res, next) => {
@@ -1199,7 +1218,7 @@ export function registerRoutes(app: Express): Server {
       syslog.critical("Test critical message", { test: true });
       syslog.error("Test error message", { test: true });
       syslog.warning("Test warning message", { test: true });
-      syslog.notice("Test notice message", { test: true }); 
+      syslog.notice("Test notice message", { test: true });
       syslog.info("Test info message", { test: true });
       syslog.debug("Test debug message", { test: true });
 
@@ -1276,7 +1295,7 @@ export function registerRoutes(app: Express): Server {
 
       const logs = await syslog.getFilteredConsoleLogs(options);
 
-      res.json({ 
+      res.json({
         total: logs.length,
         logs,
         filters: {
