@@ -263,7 +263,7 @@ export default function SystemSettingsPage() {
 
   const downloadCSV = () => {
     if (!data?.logs) return;
-    
+
     // Create CSV content
     const headers = ["Timestamp", "Level", "Facility", "Message"];
     const csvContent = [
@@ -277,7 +277,7 @@ export default function SystemSettingsPage() {
         ].join(",");
       })
     ].join("\n");
-    
+
     // Create blob and download
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
@@ -335,9 +335,9 @@ export default function SystemSettingsPage() {
                       <FormItem>
                         <FormLabel>Port</FormLabel>
                         <FormControl>
-                          <Input 
-                            type="number" 
-                            {...field} 
+                          <Input
+                            type="number"
+                            {...field}
                             onChange={(e) => field.onChange(parseInt(e.target.value))}
                           />
                         </FormControl>
@@ -529,8 +529,8 @@ export default function SystemSettingsPage() {
                   <Switch checked={autoRefresh} onCheckedChange={setAutoRefresh}>
                     Auto Refresh
                   </Switch>
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     onClick={downloadCSV}
                     className="flex items-center gap-1"
@@ -540,18 +540,20 @@ export default function SystemSettingsPage() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <div>
-                    <label className="text-sm font-medium">Search</label>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium" htmlFor="log-search">Search</label>
                     <Input
+                      id="log-search"
                       placeholder="Search logs..."
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
                     />
+                  </div>
 
-                  <div>
-                    <label className="text-sm font-medium">Level</label>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium" htmlFor="log-level">Level</label>
                     <Select value={level} onValueChange={setLevel}>
-                      <SelectTrigger>
+                      <SelectTrigger id="log-level">
                         <SelectValue placeholder="Select level" />
                       </SelectTrigger>
                       <SelectContent>
@@ -563,10 +565,10 @@ export default function SystemSettingsPage() {
                     </Select>
                   </div>
 
-                  <div>
-                    <label className="text-sm font-medium">Facility</label>
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium" htmlFor="log-facility">Facility</label>
                     <Select value={facility} onValueChange={setFacility}>
-                      <SelectTrigger>
+                      <SelectTrigger id="log-facility">
                         <SelectValue placeholder="Select facility" />
                       </SelectTrigger>
                       <SelectContent>
@@ -579,8 +581,9 @@ export default function SystemSettingsPage() {
                     </Select>
                   </div>
 
-                  <div>
-                    <Button onClick={fetchLogs} className="mt-5">
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium invisible">Apply</label>
+                    <Button onClick={fetchLogs} className="w-full">
                       Apply Filters
                     </Button>
                   </div>
@@ -649,7 +652,7 @@ export default function SystemSettingsPage() {
                   </div>
                 </div>
 
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center">
                   <Button
                     variant="outline"
                     onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -667,7 +670,6 @@ export default function SystemSettingsPage() {
                   </Button>
                 </div>
               </div>
-            </div>
             </CardContent>
           </Card>
         </TabsContent>
