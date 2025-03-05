@@ -4,6 +4,29 @@ import * as os from 'os';
 import { db } from '../db';
 import { systemLogs } from '@shared/schema';
 import { eq } from 'drizzle-orm';
+import { format } from 'date-fns';
+
+// Add console output specific configuration
+interface ConsoleLogConfig {
+  enabled: boolean;
+  logDirectory: string;
+  filename: string;
+  maxFileSize: number; // in bytes
+  maxFiles: number;
+}
+
+// Extend LogConfig to include console output settings
+interface LogConfig {
+  logToConsole: boolean;
+  logToFile: boolean;
+  logLevel: LogLevel;
+  logFilePath: string;
+  applicationName: string;
+  maxFileSize: number;
+  maxFiles: number;
+  rotateDaily: boolean;
+  consoleOutput: ConsoleLogConfig;
+}
 
 // Log levels based on syslog protocol (RFC 5424)
 export enum LogLevel {
@@ -91,21 +114,13 @@ interface StructuredData {
   parameters: Record<string, any>;
 }
 
-interface LogConfig {
-  logToConsole: boolean;
-  logToFile: boolean;
-  logLevel: LogLevel;
-  logFilePath: string;
-  applicationName: string;
-  maxFileSize: number;     // Maximum size of log file in bytes
-  maxFiles: number;        // Maximum number of rotated log files to keep
-  rotateDaily: boolean;    // Whether to rotate logs daily
-}
 
 export class SysLogger {
   private config: LogConfig;
   private fileStream: fs.WriteStream | null = null;
+  private consoleStream: fs.WriteStream | null = null;
   private currentLogFile: string;
+  private currentConsoleFile: string;
   private lastRotateCheck: Date;
 
   constructor(config?: Partial<LogConfig>) {
@@ -118,29 +133,149 @@ export class SysLogger {
       maxFileSize: 10 * 1024 * 1024, // 10MB
       maxFiles: 5,
       rotateDaily: true,
+      consoleOutput: {
+        enabled: true,
+        logDirectory: path.join(process.cwd(), 'logs', 'console'),
+        filename: 'console.log',
+        maxFileSize: 5 * 1024 * 1024, // 5MB
+        maxFiles: 3
+      },
       ...config
     };
 
     this.currentLogFile = this.config.logFilePath;
+    this.currentConsoleFile = path.join(
+      this.config.consoleOutput.logDirectory,
+      this.config.consoleOutput.filename
+    );
     this.lastRotateCheck = new Date();
 
-    // Ensure logs directory exists
+    // Ensure logs directories exist
     const logsDir = path.dirname(this.config.logFilePath);
+    const consoleLogsDir = this.config.consoleOutput.logDirectory;
+
     if (!fs.existsSync(logsDir)) {
       fs.mkdirSync(logsDir, { recursive: true });
     }
+    if (!fs.existsSync(consoleLogsDir)) {
+      fs.mkdirSync(consoleLogsDir, { recursive: true });
+    }
 
-    this.setupFileStream();
+    this.setupStreams();
+    this.interceptConsole();
   }
 
-  private setupFileStream(): void {
+  private setupStreams(): void {
     if (this.config.logToFile) {
       this.fileStream = fs.createWriteStream(this.currentLogFile, { flags: 'a' });
       this.fileStream.on('error', (error) => {
         console.error('Error writing to log file:', error);
       });
     }
+
+    if (this.config.consoleOutput.enabled) {
+      this.consoleStream = fs.createWriteStream(this.currentConsoleFile, { flags: 'a' });
+      this.consoleStream.on('error', (error) => {
+        console.error('Error writing to console log file:', error);
+      });
+    }
   }
+
+  private interceptConsole(): void {
+    if (!this.config.consoleOutput.enabled) return;
+
+    const originalConsole = {
+      log: console.log,
+      info: console.info,
+      warn: console.warn,
+      error: console.error,
+      debug: console.debug
+    };
+
+    // Helper to format console output
+    const formatConsoleOutput = (level: string, args: any[]): string => {
+      const timestamp = new Date().toISOString();
+      const message = args.map(arg =>
+        typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+      ).join(' ');
+      return `[${timestamp}] [${level.toUpperCase()}] ${message}\n`;
+    };
+
+    // Intercept console methods
+    console.log = (...args: any[]) => {
+      const output = formatConsoleOutput('log', args);
+      this.consoleStream?.write(output);
+      originalConsole.log.apply(console, args);
+    };
+
+    console.info = (...args: any[]) => {
+      const output = formatConsoleOutput('info', args);
+      this.consoleStream?.write(output);
+      originalConsole.info.apply(console, args);
+    };
+
+    console.warn = (...args: any[]) => {
+      const output = formatConsoleOutput('warn', args);
+      this.consoleStream?.write(output);
+      originalConsole.warn.apply(console, args);
+    };
+
+    console.error = (...args: any[]) => {
+      const output = formatConsoleOutput('error', args);
+      this.consoleStream?.write(output);
+      originalConsole.error.apply(console, args);
+    };
+
+    console.debug = (...args: any[]) => {
+      const output = formatConsoleOutput('debug', args);
+      this.consoleStream?.write(output);
+      originalConsole.debug.apply(console, args);
+    };
+  }
+
+  private async rotateConsoleLog(): Promise<void> {
+    if (!this.config.consoleOutput.enabled || !this.consoleStream) return;
+
+    try {
+      const stats = await fs.promises.stat(this.currentConsoleFile);
+      if (stats.size >= this.config.consoleOutput.maxFileSize) {
+        // Close current stream
+        this.consoleStream.end();
+
+        // Rotate files
+        const timestamp = format(new Date(), 'yyyy-MM-dd-HH-mm-ss');
+        const rotatedFilename = `console-${timestamp}.log`;
+        const rotatedFilePath = path.join(
+          this.config.consoleOutput.logDirectory,
+          rotatedFilename
+        );
+
+        await fs.promises.rename(this.currentConsoleFile, rotatedFilePath);
+
+        // Clean up old files if we exceed maxFiles
+        const files = await fs.promises.readdir(this.config.consoleOutput.logDirectory);
+        const logFiles = files
+          .filter(f => f.startsWith('console-'))
+          .sort()
+          .reverse();
+
+        while (logFiles.length >= this.config.consoleOutput.maxFiles) {
+          const oldFile = logFiles.pop();
+          if (oldFile) {
+            await fs.promises.unlink(
+              path.join(this.config.consoleOutput.logDirectory, oldFile)
+            );
+          }
+        }
+
+        // Create new stream
+        this.consoleStream = fs.createWriteStream(this.currentConsoleFile, { flags: 'a' });
+      }
+    } catch (error) {
+      console.error('Error rotating console log file:', error);
+    }
+  }
+
 
   /**
    * Log a message with the specified facility and level
@@ -181,8 +316,8 @@ export class SysLogger {
       const pri = facility * 8 + level;
       const structuredDataStr = structuredData
         ? `[${structuredData.id} ${Object.entries(structuredData.parameters)
-            .map(([key, value]) => `${key}="${value}"`)
-            .join(' ')}]`
+          .map(([key, value]) => `${key}="${value}"`)
+          .join(' ')}]`
         : '-';
 
       const syslogMessage = `<${pri}>1 ${timestamp.toISOString()} ${hostname} ${
@@ -223,7 +358,7 @@ export class SysLogger {
         username: username || 'unknown',
         timestamp: new Date().toISOString(),
         event: message.toLowerCase().includes('login') ? 'login' :
-               message.toLowerCase().includes('logout') ? 'logout' : 'auth',
+          message.toLowerCase().includes('logout') ? 'logout' : 'auth',
         ip: metadata?.ip || 'N/A',
         userAgent: metadata?.userAgent || 'N/A',
         context: metadata?.context || 'AUTH',
@@ -321,11 +456,26 @@ export class SysLogger {
     });
   }
 
+  // Add new method to get console logs
+  async getConsoleLogs(maxLines: number = 1000): Promise<string[]> {
+    try {
+      const content = await fs.promises.readFile(this.currentConsoleFile, 'utf8');
+      return content.split('\n').slice(-maxLines);
+    } catch (error) {
+      console.error('Error reading console logs:', error);
+      return [];
+    }
+  }
+
   // Clean up resources
   close(): void {
     if (this.fileStream) {
       this.fileStream.end();
       this.fileStream = null;
+    }
+    if (this.consoleStream) {
+      this.consoleStream.end();
+      this.consoleStream = null;
     }
   }
 }

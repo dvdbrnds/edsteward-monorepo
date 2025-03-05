@@ -1215,6 +1215,24 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
+  // Add console logs endpoint
+  app.get("/api/admin/console-logs", async (req, res) => {
+    try {
+      // Check if user is admin
+      if (req.user?.role !== "admin") {
+        return res.status(403).json({ error: "Only administrators can access console logs" });
+      }
+
+      const maxLines = req.query.maxLines ? parseInt(req.query.maxLines as string) : 1000;
+      const logs = await syslog.getConsoleLogs(maxLines);
+
+      res.json({ logs });
+    } catch (error) {
+      console.error("Failed to fetch console logs:", error);
+      res.status(500).json({ error: "Failed to fetch console logs" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }
