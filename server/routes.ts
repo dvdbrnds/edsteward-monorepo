@@ -553,56 +553,37 @@ export function registerRoutes(app: Express): Server {
     try {
       // Import the debug logger
       const { DebugLogger } = require('./services/debug-logger');
-      DebugLogger.log('DEBUG_API', 'Checking note schema information');
 
       // This endpoint helps us debug schema issues
-      let schemaStructure;
+      let schemaInfo;
       try {
-        schemaStructure = Object.keys(insertNoteSchema._def?.shape() || {});
-      } catch (e) {
-        schemaStructure = `Error getting schema structure: ${e.message}`;
+        const schemaStructure = Object.keys(insertNoteSchema._def?.shape() || {});
+
+        // Only log if schema structure is unexpected
+        if (!schemaStructure.includes('regulationId') || !schemaStructure.includes('content')) {
+          DebugLogger.log('DEBUG_API', 'Schema validation warning: Missing required fields', {
+            presentFields: schemaStructure
+          });
+        }
+
+        schemaInfo = {
+          status: 'valid',
+          fields: schemaStructure
+        };
+      } catch (error) {
+        schemaInfo = {
+          status: 'error',
+          message: error instanceof Error ? error.message : String(error)
+        };
+        DebugLogger.log('DEBUG_API', 'Schema validation error', schemaInfo);
       }
 
-      // Recreate a schema for testing
-      const testSchema = z.object({
-        regulationId: z.number().positive(),
-        userId: z.number().positive(),
-        title: z.string().min(1),
-        content: z.string().min(1),
-        isPrivate: z.boolean().optional()
-      });
-
-      const testData = {
-        regulationId: 3869,
-        userId: 1,
-        title: "Test Note",
-        content: "Test Content"
-      };
-
-      const schemaInfo = {
-        originalSchemaType: typeof insertNoteSchema,
-        originalSchemaShape: schemaStructure,
-        testSchemaResult: testSchema.safeParse(testData),
-        originalSchemaTest: insertNoteSchema.safeParse(testData),
-        reconstructedSchema: {
-          description: "Testing if we can create a new schema from scratch",
-          result: z.object({
-            regulationId: z.number().positive(),
-            userId: z.number(),
-            title: z.string().min(1),
-            content: z.string().min(1)
-          }).safeParse(testData)
-        }
-      };
-
-      DebugLogger.log('DEBUG_API', 'Schema information generated', schemaInfo);
       res.json(schemaInfo);
     } catch (error) {
       console.error("Debug schema error:", error);
       res.status(500).json({
         error: "Failed to get schema info",
-        details: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined
+        details: error instanceof Error ? error.message : String(error)
       });
     }
   });
@@ -932,9 +913,7 @@ export function registerRoutes(app: Express): Server {
       await DebugLogger.logError('AUTH_LOGIN', error);
       return res.status(500).json({ error:"Internal server error" });
     }
-  });
-
-  // Add logging to logout route
+  });  // Add logging to logout route
   app.post("/api/auth/logout", async (req, res) => {
     const { DebugLogger } = require('./services/debug-logger');
 
