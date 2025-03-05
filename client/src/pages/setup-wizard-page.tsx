@@ -429,6 +429,7 @@ export default function SetupWizardPage() {
                             />
 
                             <div className="flex justify-between pt-4">
+                              {/* Temporarily removed Skip Setup button
                               <Button
                                 type="button"
                                 variant="ghost"
@@ -436,6 +437,7 @@ export default function SetupWizardPage() {
                               >
                                 Skip Setup
                               </Button>
+                              */}
                               <Button type="submit">
                                 {officeStep === REGULATION_CATEGORIES.length - 1
                                   ? "Complete Setup"
