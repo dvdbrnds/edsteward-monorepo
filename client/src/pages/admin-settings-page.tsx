@@ -10,10 +10,12 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2 } from "lucide-react";
+import { AlertCircle, Download, Loader2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import Navigation from "@/components/layout/navigation";
 import { apiRequest } from "@/lib/api";
+import { useQuery } from '@tanstack/react-query';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const LOG_FACILITIES = {
   0: "KERNEL",
@@ -230,6 +232,64 @@ export default function SystemSettingsPage() {
     }
   };
 
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ["/api/admin/logs", { search, level, facility, startDate, endDate, page }],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (search) params.append("search", search);
+      if (level && level !== "all") params.append("level", level);
+      if (facility && facility !== "all") params.append("facility", facility);
+      if (startDate) params.append("startDate", startDate.toISOString());
+      if (endDate) params.append("endDate", endDate.toISOString());
+      params.append("page", String(page));
+
+      const response = await fetch(`/api/admin/logs?${params}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch logs");
+      }
+      return response.json();
+    },
+    enabled: user?.role === "admin"
+  });
+
+  useEffect(() => {
+    if (autoRefresh) {
+      const intervalId = setInterval(() => {
+        refetch();
+      }, refreshInterval);
+      return () => clearInterval(intervalId);
+    }
+  }, [autoRefresh, refetch]);
+
+  const downloadCSV = () => {
+    if (!data?.logs) return;
+    
+    // Create CSV content
+    const headers = ["Timestamp", "Level", "Facility", "Message"];
+    const csvContent = [
+      headers.join(","),
+      ...data.logs.map((log: any) => {
+        return [
+          new Date(log.timestamp).toLocaleString(),
+          log.level,
+          LOG_FACILITIES[log.facility as keyof typeof LOG_FACILITIES] || log.facility,
+          `"${log.message.replace(/"/g, '""')}"`
+        ].join(",");
+      })
+    ].join("\n");
+    
+    // Create blob and download
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `system-logs-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <div className="container mx-auto py-8">
       <Navigation/> {/* Added Navigation component */}
@@ -435,26 +495,48 @@ export default function SystemSettingsPage() {
 
         <TabsContent value="logs">
           <Card>
-            <CardHeader>
+            <CardHeader className="pb-2">
               <CardTitle>System Logs</CardTitle>
               <CardDescription>
-                View and filter system logs.
+                View and filter system logs. Use the filters below to narrow down the results.
               </CardDescription>
+              <div className="text-xs text-muted-foreground mt-1 flex flex-wrap gap-x-4 gap-y-1 border rounded-md p-2 bg-muted/20">
+                <span>• Authentication events (login/logout)</span>
+                <span>• Regulation access and updates</span>
+                <span>• Compliance status changes</span>
+                <span>• Report generation</span>
+                <span>• System configuration changes</span>
+              </div>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="auto-refresh"
-                    checked={autoRefresh}
-                    onCheckedChange={setAutoRefresh}
-                  />
-                  <label
-                    htmlFor="auto-refresh"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                <div className="flex gap-2 mb-4 flex-wrap items-center">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="ml-auto"
+                    onClick={() => {
+                      setSearch("");
+                      setLevel(undefined);
+                      setFacility(undefined);
+                      setStartDate(undefined);
+                      setEndDate(undefined);
+                      setPage(1);
+                    }}
                   >
-                    Auto-refresh logs
-                  </label>
+                    Clear All Filters
+                  </Button>
+                  <Switch checked={autoRefresh} onCheckedChange={setAutoRefresh}>
+                    Auto Refresh
+                  </Switch>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={downloadCSV}
+                    className="flex items-center gap-1"
+                  >
+                    <Download className="h-4 w-4" /> Export CSV
+                  </Button>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -465,7 +547,6 @@ export default function SystemSettingsPage() {
                       value={search}
                       onChange={(e) => setSearch(e.target.value)}
                     />
-                  </div>
 
                   <div>
                     <label className="text-sm font-medium">Level</label>
@@ -525,14 +606,28 @@ export default function SystemSettingsPage() {
                         </tr>
                       </thead>
                       <tbody className="bg-white divide-y divide-gray-200">
-                        {logs.length > 0 ? (
-                          logs.map((log, index) => (
+                        {isLoading ? (
+                          <tr>
+                            <td colSpan={4} className="px-6 py-4 text-center text-sm">
+                              <div className="flex justify-center">
+                                <Loader2 className="h-6 w-6 animate-spin text-gray-500" />
+                              </div>
+                            </td>
+                          </tr>
+                        ) : error ? (
+                          <tr>
+                            <td colSpan={4} className="px-6 py-4 text-center text-sm text-red-500">
+                              Error loading logs: {error instanceof Error ? error.message : 'Unknown error'}
+                            </td>
+                          </tr>
+                        ) : data?.logs && data.logs.length > 0 ? (
+                          data.logs.map((log: any, index: number) => (
                             <tr key={index}>
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {new Date(log.timestamp).toLocaleString()}
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                {log.level}
+                                {log.severity}
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                 {LOG_FACILITIES[log.facility as keyof typeof LOG_FACILITIES] || log.facility}
@@ -566,7 +661,7 @@ export default function SystemSettingsPage() {
                   <Button
                     variant="outline"
                     onClick={() => setPage((p) => p + 1)}
-                    disabled={logs.length === 0}
+                    disabled={!data?.logs || data.logs.length === 0}
                   >
                     Next
                   </Button>
