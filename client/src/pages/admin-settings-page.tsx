@@ -1,977 +1,690 @@
-import { useState } from "react";
-import { useAuth } from "@/hooks/use-auth";
-import { useQuery, useMutation } from "@tanstack/react-query";
-import { queryClient, apiRequest } from "@/lib/queryClient";
-import type { EmailConfig, User } from "@shared/schema";
+Reasoning:
+
+1. The edited code provides a complete new implementation of `SystemSettingsPage`, including a new tab for system logs.  It uses React hooks, form handling, and data fetching to display and filter logs.  This requires replacing a significant portion of the original code.
+
+2. The original code has sections for user management, email configuration, notification settings, and SMS configuration which will need to be integrated with the new tab structure provided by the edited code.  The original code's notification handling will likely be replaced, as the new code uses a different approach to fetch and handle those settings.
+
+import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertEmailConfigSchema } from "@shared/schema";
-import { insertTwilioConfigSchema } from "@shared/schema";
-import { z } from "zod"; // Add this import
-import Navigation from "@/components/layout/navigation";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { useToast } from "@/components/ui/use-toast";
+import PageLayout from "@/components/layout/page-layout";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
+import Navigation from "@/components/layout/navigation";
+import { useAuth } from "@/hooks/auth";
+import { insertEmailConfigSchema, insertTwilioConfigSchema } from "@shared/schema";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Switch } from "@/components/ui/switch";
-import { Mail, Loader2, Bell, MessageSquare, MessageCircle } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { Redirect } from "wouter";
-import type { TwilioConfig } from "@shared/schema";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { UserPlus, Users, Pencil, Trash2 } from "lucide-react";
-import { insertUserSchema } from "@shared/schema";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { format } from "date-fns";
+import { Alert, AlertCircle, AlertDescription, AlertTitle } from "@/components/ui";
+import { useQuery } from "@tanstack/react-query";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
-
-// Type definitions using the imported z
 type FormValues = z.infer<typeof insertEmailConfigSchema>;
 type TwilioFormValues = z.infer<typeof insertTwilioConfigSchema>;
+
+// Log level definitions copied from logs-page
+const LOG_LEVELS = {
+  0: { name: "EMERGENCY", color: "text-red-700 font-bold" },
+  1: { name: "ALERT", color: "text-red-600 font-bold" },
+  2: { name: "CRITICAL", color: "text-red-500 font-bold" },
+  3: { name: "ERROR", color: "text-red-400" },
+  4: { name: "WARNING", color: "text-amber-500" },
+  5: { name: "NOTICE", color: "text-blue-500" },
+  6: { name: "INFO", color: "text-gray-600" },
+  7: { name: "DEBUG", color: "text-gray-400" },
+};
+
+const LOG_FACILITIES = {
+  0: "KERNEL",
+  1: "USER",
+  2: "MAIL",
+  3: "SYSTEM",
+  4: "SECURITY",
+  5: "INTERNAL",
+  6: "PRINTER",
+  7: "NETWORK",
+  8: "UUCP",
+  9: "CLOCK",
+  10: "AUTHPRIV",
+  11: "FTP",
+  12: "NTP",
+  13: "AUDIT",
+  14: "ALERT",
+  15: "CRON",
+  16: "LOCAL0",
+  17: "LOCAL1",
+  18: "LOCAL2",
+  19: "LOCAL3",
+  20: "LOCAL4",
+  21: "LOCAL5",
+  22: "LOCAL6",
+  23: "LOCAL7"
+};
 
 export default function SystemSettingsPage() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [notifications, setNotifications] = useState<any[]>([]);
-  const [userDialogOpen, setUserDialogOpen] = useState(false);
-  const [selectedUser, setSelectedUser] = useState<User | null>(null);
-  const [selectedRegType, setSelectedRegType] = useState<string>('all-types'); //Fixed initial state with non-empty value
-  const [activeTab, setActiveTab] = useState('users');
+  const [activeTab, setActiveTab] = useState("email");
+  const [notificationEnabled, setNotificationEnabled] = useState(false);
+  const [search, setSearch] = useState("");
+  const [level, setLevel] = useState<string>();
+  const [facility, setFacility] = useState<string>();
+  const [startDate, setStartDate] = useState<Date>();
+  const [endDate, setEndDate] = useState<Date>();
+  const [page, setPage] = useState(1);
+  const [autoRefresh, setAutoRefresh] = useState(false);
+  const refreshInterval = 10000; // 10 seconds
 
-
-  // Redirect non-admin users
-  if (user?.role !== "admin") {
-    return <Redirect to="/" />;
-  }
-
-  // Fetch all users
-  const { data: users, isLoading: usersLoading } = useQuery<User[]>({
-    queryKey: ["/api/admin/users"],
-  });
-
-  // User form setup with added resetPassword field
-  const userForm = useForm<z.infer<typeof insertUserSchema> & { resetPassword?: string }>({
-    resolver: zodResolver(
-      selectedUser
-        ? insertUserSchema.omit({ password: true }).extend({
-            resetPassword: z.string().min(6, "Password must be at least 6 characters").optional()
-          })
-        : insertUserSchema
-    ),
-    defaultValues: {
-      username: "",
-      password: "",
-      role: "user",
-      department: "",
-      email: "",
-      firstName: "",
-      lastName: "",
-      resetPassword: "",
-    },
-  });
-
-  // User management mutations
-  const createUserMutation = useMutation({
-    mutationFn: async (data: z.infer<typeof insertUserSchema>) => {
-      return apiRequest("POST", "/api/admin/users", data);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
-      setUserDialogOpen(false);
-      userForm.reset();
-      toast({
-        title: "User created",
-        description: "New user account has been created successfully.",
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const updateUserMutation = useMutation({
-    mutationFn: async (data: Partial<User> & { id: number; resetPassword?: string }) => {
-      // If resetPassword is provided, include it in the update
-      const updateData = data.resetPassword
-        ? { ...data, password: data.resetPassword }
-        : data;
-
-      // Remove resetPassword from the payload
-      const { resetPassword, ...cleanData } = updateData;
-      return apiRequest("PATCH", `/api/admin/users/${data.id}`, cleanData);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
-      setUserDialogOpen(false);
-      setSelectedUser(null);
-      toast({
-        title: "User updated",
-        description: "User account has been updated successfully.",
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const deleteUserMutation = useMutation({
-    mutationFn: async (userId: number) => {
-      return apiRequest("DELETE", `/api/admin/users/${userId}`);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/users"] });
-      toast({
-        title: "User deleted",
-        description: "User account has been deleted successfully.",
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const { data: emailConfig, isLoading: emailLoading } = useQuery<EmailConfig>({
-    queryKey: ["/api/admin/email-config"],
-  });
-
-  const { data: twilioConfig, isLoading: twilioLoading } = useQuery<TwilioConfig>({
-    queryKey: ["/api/admin/twilio-config"],
-  });
-
-  const emailForm = useForm<FormValues>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(insertEmailConfigSchema),
     defaultValues: {
-      fromEmail: emailConfig?.fromEmail || "",
-      smtpHost: emailConfig?.smtpHost || "",
-      smtpPort: emailConfig?.smtpPort || 587,
-      smtpSecure: emailConfig?.smtpSecure || true,
-      smtpUser: emailConfig?.smtpUser || "",
-      smtpPass: emailConfig?.smtpPass || "",
-      updatedBy: user?.id || 0,
+      host: "",
+      port: 587,
+      username: "",
+      password: "",
+      from: "",
     },
   });
 
   const twilioForm = useForm<TwilioFormValues>({
     resolver: zodResolver(insertTwilioConfigSchema),
     defaultValues: {
-      accountSid: twilioConfig?.accountSid || "",
-      authToken: twilioConfig?.authToken || "",
-      fromNumber: twilioConfig?.fromNumber || "",
-      updatedBy: user?.id || 0,
+      accountSid: "",
+      authToken: "",
+      phoneNumber: "",
     },
   });
 
-  const updateEmailConfigMutation = useMutation({
-    mutationFn: async (data: FormValues) => {
-      const response = await apiRequest("POST", "/api/admin/email-config", data);
-      if (!response.ok) {
-        throw new Error("Failed to update email configuration");
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/email-config"] });
-      toast({
-        title: "Email configuration updated",
-        description: "Your email settings have been saved successfully.",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const updateTwilioConfigMutation = useMutation({
-    mutationFn: async (data: TwilioFormValues) => {
-      const response = await apiRequest("POST", "/api/admin/twilio-config", data);
-      if (!response.ok) {
-        throw new Error("Failed to update Twilio configuration");
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/twilio-config"] });
-      toast({
-        title: "Twilio configuration updated",
-        description: "Your SMS settings have been saved successfully.",
-      });
-    },
-    onError: (error) => {
-      toast({
-        title: "Error",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const onEmailSubmit = (data: FormValues) => {
-    updateEmailConfigMutation.mutate(data);
-  };
-
-  const onTwilioSubmit = (data: TwilioFormValues) => {
-    updateTwilioConfigMutation.mutate(data);
-  };
-
-  //This is a placeholder, replace with actual notification data fetching and mutation
-  const updateNotificationMutation = useMutation({
-    mutationFn: async (data: any) => {
-      // Placeholder for API call to update notification settings
-      console.log("Updating notification:", data);
-      //Replace with your actual API call
-      return data;
-    },
-    onSuccess: () => {
-      // Placeholder for success handling
-      console.log("Notification updated successfully!");
-    },
-    onError: (error) => {
-      // Placeholder for error handling
-      console.error("Error updating notification:", error);
-    },
-  })
-
-  const handleUpdateNotification = (updatedNotification: any) => {
-    setNotifications((prevNotifications) => {
-      const updatedNotifications = prevNotifications.map((notification) => {
-        if (notification.type === updatedNotification.type) {
-          return updatedNotification;
+  // Load email configuration
+  useEffect(() => {
+    const fetchEmailConfig = async () => {
+      try {
+        const response = await fetch("/api/admin/email-config");
+        if (response.ok) {
+          const data = await response.json();
+          if (data) {
+            form.reset(data);
+          }
         }
-        return notification;
+      } catch (error) {
+        console.error("Failed to fetch email configuration:", error);
+      }
+    };
+
+    fetchEmailConfig();
+  }, [form]);
+
+  // Load Twilio configuration
+  useEffect(() => {
+    const fetchTwilioConfig = async () => {
+      try {
+        const response = await fetch("/api/admin/twilio-config");
+        if (response.ok) {
+          const data = await response.json();
+          if (data) {
+            twilioForm.reset(data);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch Twilio configuration:", error);
+      }
+    };
+
+    fetchTwilioConfig();
+  }, [twilioForm]);
+
+  // Fetch logs data
+  const { data: logsData, isLoading: logsLoading, error: logsError, refetch: refetchLogs } = useQuery({
+    queryKey: ["/api/admin/logs", { search, level, facility, startDate, endDate, page }],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (search) params.append("search", search);
+      if (level && level !== "all") params.append("level", level);
+      if (facility && facility !== "all") params.append("facility", facility);
+      if (startDate) params.append("startDate", startDate.toISOString());
+      if (endDate) params.append("endDate", endDate.toISOString());
+      params.append("page", String(page));
+
+      const response = await fetch(`/api/admin/logs?${params}`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch logs");
+      }
+      return response.json();
+    },
+    enabled: activeTab === "logs" && user?.role === "admin"
+  });
+
+  // Auto-refresh logs
+  useEffect(() => {
+    if (autoRefresh && activeTab === "logs") {
+      const intervalId = setInterval(() => {
+        refetchLogs();
+      }, refreshInterval);
+      return () => clearInterval(intervalId);
+    }
+  }, [autoRefresh, refetchLogs, activeTab]);
+
+  // Load notifications settings
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await fetch("/api/admin/notifications");
+        if (response.ok) {
+          const data = await response.json();
+          setNotifications(data);
+          // Check if notifications are enabled
+          const globalSetting = data.find((n: any) => n.key === "notifications_enabled");
+          setNotificationEnabled(globalSetting?.value === "true");
+        }
+      } catch (error) {
+        console.error("Failed to fetch notifications:", error);
+      }
+    };
+
+    fetchNotifications();
+  }, []);
+
+  const onEmailSubmit = async (data: FormValues) => {
+    try {
+      const response = await fetch("/api/admin/email-config", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
       });
-      return updatedNotifications;
-    });
+
+      if (response.ok) {
+        toast({
+          title: "Success",
+          description: "Email configuration updated successfully",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to update email configuration",
+        });
+      }
+    } catch (error) {
+      console.error("Failed to update email configuration:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "An unexpected error occurred",
+      });
+    }
   };
 
-  const handleAddNotification = (newNotification: any) => {
-    setNotifications((prevNotifications) => [...prevNotifications, newNotification]);
+  const onTwilioSubmit = async (data: TwilioFormValues) => {
+    try {
+      const response = await fetch("/api/admin/twilio-config", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (response.ok) {
+        toast({
+          title: "Success",
+          description: "Twilio configuration updated successfully",
+        });
+      } else {
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to update Twilio configuration",
+        });
+      }
+    } catch (error) {
+      console.error("Failed to update Twilio configuration:", error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "An unexpected error occurred",
+      });
+    }
   };
 
-  if (emailLoading || twilioLoading || usersLoading) {
+  const toggleNotifications = async () => {
+    try {
+      const newValue = !notificationEnabled;
+      setNotificationEnabled(newValue);
+
+      const response = await fetch("/api/admin/notifications/toggle", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ enabled: newValue }),
+      });
+
+      if (!response.ok) {
+        setNotificationEnabled(!newValue); // Revert if failed
+        toast({
+          variant: "destructive",
+          title: "Error",
+          description: "Failed to update notification settings",
+        });
+      }
+    } catch (error) {
+      console.error("Failed to toggle notifications:", error);
+      setNotificationEnabled(!notificationEnabled); // Revert if failed
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "An unexpected error occurred",
+      });
+    }
+  };
+
+  // Download logs as CSV
+  const downloadCSV = () => {
+    if (!logsData?.logs) return;
+
+    const headers = ["Timestamp", "Username", "Level", "Facility", "Message", "IP", "User Agent"];
+    const rows = logsData.logs.map((log: any) => [
+      log.timestamp,
+      log.username,
+      LOG_LEVELS[log.severity as keyof typeof LOG_LEVELS]?.name || log.level,
+      LOG_FACILITIES[log.facility as keyof typeof LOG_FACILITIES] || log.facility,
+      log.message,
+      log.ip,
+      log.userAgent
+    ]);
+
+    const csvContent = [
+      headers.join(","),
+      ...rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(","))
+    ].join("\n");
+
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", `system_logs_${new Date().toISOString().split("T")[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  if (user?.role !== "admin") {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <PageLayout>
         <Navigation />
-        <main className="py-10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-center">
-              <Loader2 className="h-6 w-6 animate-spin text-[#00267A]" />
-            </div>
-          </div>
-        </main>
-      </div>
+        <div className="p-4">
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Access Denied</AlertTitle>
+            <AlertDescription>
+              Only administrators can access system settings.
+            </AlertDescription>
+          </Alert>
+        </div>
+      </PageLayout>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <PageLayout>
       <Navigation />
-      <main className="py-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="space-y-8">
-            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-              <TabsList className="grid w-full grid-cols-4">
-                <TabsTrigger value="users">
-                  <Users className="h-4 w-4 mr-2" />
-                  Users
-                </TabsTrigger>
-                <TabsTrigger value="email">
-                  <Mail className="h-4 w-4 mr-2" />
-                  Email
-                </TabsTrigger>
-                <TabsTrigger value="notifications">
-                  <Bell className="h-4 w-4 mr-2" />
-                  Notifications
-                </TabsTrigger>
-                <TabsTrigger value="sms">
-                  <MessageCircle className="h-4 w-4 mr-2" />
-                  SMS
-                </TabsTrigger>
+      <div className="container mx-auto py-8">
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle>System Settings</CardTitle>
+            <CardDescription>
+              Configure system-wide settings for your compliance management platform.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Tabs defaultValue="email" value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="email">Email Settings</TabsTrigger>
+                <TabsTrigger value="twilio">SMS Settings</TabsTrigger>
+                <TabsTrigger value="logs">System Logs</TabsTrigger>
               </TabsList>
 
-              <TabsContent value="users">
-                <div>
-                  <div className="flex items-center justify-between mb-8">
-                    <div className="flex items-center">
-                      <Users className="h-6 w-6 mr-3 text-blue-500" />
-                      <h1 className="text-3xl font-bold text-gray-900">
-                        User Management
-                      </h1>
-                    </div>
-                    <Dialog open={userDialogOpen} onOpenChange={setUserDialogOpen}>
-                      <DialogTrigger asChild>
-                        <Button
-                          onClick={() => {
-                            setSelectedUser(null);
-                            userForm.reset();
-                          }}
+              <TabsContent value="email" className="py-4">
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onEmailSubmit)} className="space-y-4">
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h3 className="text-lg font-medium">Email Configuration</h3>
+                        <p className="text-sm text-gray-500">
+                          Configure SMTP settings for sending email notifications.
+                        </p>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <Switch
+                          checked={notificationEnabled}
+                          onCheckedChange={toggleNotifications}
+                          id="notifications-enabled"
+                        />
+                        <label
+                          htmlFor="notifications-enabled"
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                         >
-                          <UserPlus className="h-4 w-4 mr-2" />
-                          Add User
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>
-                            {selectedUser ? "Edit User" : "Create New User"}
-                          </DialogTitle>
-                          <DialogDescription>
-                            {selectedUser
-                              ? "Update user account details"
-                              : "Add a new user to the system"}
-                          </DialogDescription>
-                        </DialogHeader>
-                        <Form {...userForm}>
-                          <form
-                            onSubmit={userForm.handleSubmit((data) =>
-                              selectedUser
-                                ? updateUserMutation.mutate({
-                                    ...data,
-                                    id: selectedUser.id,
-                                  })
-                                : createUserMutation.mutate(data)
-                            )}
-                            className="space-y-4"
-                          >
-                            <FormField
-                              control={userForm.control}
-                              name="username"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>Username</FormLabel>
-                                  <FormControl>
-                                    <Input {...field} />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
+                          Enable Notifications
+                        </label>
+                      </div>
+                    </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                              <FormField
-                                control={userForm.control}
-                                name="firstName"
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>First Name</FormLabel>
-                                    <FormControl>
-                                      <Input {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="host"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>SMTP Host</FormLabel>
+                            <FormControl>
+                              <Input placeholder="smtp.example.com" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="port"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>SMTP Port</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="number"
+                                placeholder="587"
+                                {...field}
+                                onChange={(e) => field.onChange(parseInt(e.target.value))}
                               />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
 
-                              <FormField
-                                control={userForm.control}
-                                name="lastName"
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>Last Name</FormLabel>
-                                    <FormControl>
-                                      <Input {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <FormField
+                        control={form.control}
+                        name="username"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>SMTP Username</FormLabel>
+                            <FormControl>
+                              <Input placeholder="user@example.com" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={form.control}
+                        name="password"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>SMTP Password</FormLabel>
+                            <FormControl>
+                              <Input
+                                type="password"
+                                placeholder="••••••••"
+                                {...field}
                               />
-                            </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
 
-                            {!selectedUser ? (
-                              <FormField
-                                control={userForm.control}
-                                name="password"
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>Password</FormLabel>
-                                    <FormControl>
-                                      <Input type="password" {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
-                              />
-                            ) : (
-                              <FormField
-                                control={userForm.control}
-                                name="resetPassword"
-                                render={({ field }) => (
-                                  <FormItem>
-                                    <FormLabel>Reset Password</FormLabel>
-                                    <FormControl>
-                                      <Input
-                                        type="password"
-                                        placeholder="Enter new password to reset"
-                                        {...field}
-                                      />
-                                    </FormControl>
-                                    <FormDescription>
-                                      Leave blank to keep the current password
-                                    </FormDescription>
-                                    <FormMessage />
-                                  </FormItem>
-                                )}
-                              />
-                            )}
-
-                            <FormField
-                              control={userForm.control}
-                              name="email"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>Email</FormLabel>
-                                  <FormControl>
-                                    <Input type="email" {...field} />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
+                    <FormField
+                      control={form.control}
+                      name="from"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>From Email</FormLabel>
+                          <FormControl>
+                            <Input
+                              placeholder="compliance@yourcompany.com"
+                              {...field}
                             />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                            <FormField
-                              control={userForm.control}
-                              name="role"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>Role</FormLabel>
-                                  <Select
-                                    onValueChange={(value) => field.onChange(value || 'user')} // Ensure no empty values
-                                    defaultValue={field.value || 'user'} // Ensure default value is never empty
-                                  >
-                                    <FormControl>
-                                      <SelectTrigger>
-                                        <SelectValue placeholder="Select a role" />
-                                      </SelectTrigger>
-                                    </FormControl>
-                                    <SelectContent>
-                                      <SelectItem value="user">User</SelectItem>
-                                      <SelectItem value="compliance_officer">
-                                        Compliance Officer
-                                      </SelectItem>
-                                      <SelectItem value="admin">Admin</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
+                    <Button type="submit">Save Email Settings</Button>
+                  </form>
+                </Form>
+              </TabsContent>
+
+              <TabsContent value="twilio" className="py-4">
+                <Form {...twilioForm}>
+                  <form onSubmit={twilioForm.handleSubmit(onTwilioSubmit)} className="space-y-4">
+                    <div>
+                      <h3 className="text-lg font-medium">Twilio SMS Configuration</h3>
+                      <p className="text-sm text-gray-500">
+                        Configure Twilio settings for sending SMS notifications.
+                      </p>
+                    </div>
+
+                    <FormField
+                      control={twilioForm.control}
+                      name="accountSid"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Account SID</FormLabel>
+                          <FormControl>
+                            <Input placeholder="ACxxxxxxxxxxxxxxxxxxxxxxxxxxxx" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={twilioForm.control}
+                      name="authToken"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Auth Token</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="password"
+                              placeholder="••••••••"
+                              {...field}
                             />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                            <FormField
-                              control={userForm.control}
-                              name="department"
-                              render={({ field }) => (
-                                <FormItem>
-                                  <FormLabel>Department</FormLabel>
-                                  <FormControl>
-                                    <Input {...field} />
-                                  </FormControl>
-                                  <FormMessage />
-                                </FormItem>
-                              )}
-                            />
+                    <FormField
+                      control={twilioForm.control}
+                      name="phoneNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>From Phone Number</FormLabel>
+                          <FormControl>
+                            <Input placeholder="+15551234567" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
 
-                            <Button
-                              type="submit"
-                              className="w-full"
-                              disabled={
-                                createUserMutation.isPending ||
-                                updateUserMutation.isPending
-                              }
-                            >
-                              {createUserMutation.isPending ||
-                              updateUserMutation.isPending ? (
-                                <>
-                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                  {selectedUser ? "Updating..." : "Creating..."}
-                                </>
-                              ) : (
-                                selectedUser ? "Update User" : "Create User"
-                              )}
-                            </Button>
-                          </form>
-                        </Form>
-                      </DialogContent>
-                    </Dialog>
+                    <Button type="submit">Save Twilio Settings</Button>
+                  </form>
+                </Form>
+              </TabsContent>
+
+              <TabsContent value="logs" className="py-4">
+                <div>
+                  <div className="flex flex-col space-y-2 mb-4">
+                    <h3 className="text-lg font-medium">System Logs</h3>
+                    <p className="text-sm text-gray-500">
+                      View and filter system logs. Use the filters below to narrow down the results.
+                    </p>
+                    <div className="text-xs text-muted-foreground mt-1 flex flex-wrap gap-x-4 gap-y-1 border rounded-md p-2 bg-muted/20">
+                      <span>• Authentication events (login/logout)</span>
+                      <span>• Regulation access and updates</span>
+                      <span>• Compliance status changes</span>
+                      <span>• Report generation</span>
+                      <span>• System configuration changes</span>
+                    </div>
                   </div>
 
-                  <Card>
-                    <CardContent className="p-0">
-                      <Table>
-                        <TableHeader>
-                          <TableRow>
-                            <TableHead>Username</TableHead>
-                            <TableHead>Email</TableHead>
-                            <TableHead>Role</TableHead>
-                            <TableHead>Department</TableHead>
-                            <TableHead className="text-right">Actions</TableHead>
-                          </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                          {usersLoading ? (
+                  <div className="flex gap-2 mb-4 flex-wrap items-center">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="ml-auto"
+                      onClick={() => {
+                        setSearch("");
+                        setLevel(undefined);
+                        setFacility(undefined);
+                        setStartDate(undefined);
+                        setEndDate(undefined);
+                        setPage(1);
+                      }}
+                    >
+                      Clear All Filters
+                    </Button>
+                    <Switch checked={autoRefresh} onCheckedChange={setAutoRefresh}>
+                      Auto Refresh
+                    </Switch>
+                  </div>
+
+                  <div className="flex justify-between mb-4">
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Search logs..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className="w-64"
+                      />
+                      <select
+                        value={level || ""}
+                        onChange={(e) => setLevel(e.target.value || undefined)}
+                        className="px-3 py-2 rounded-md border border-input"
+                      >
+                        <option value="">All Levels</option>
+                        {Object.entries(LOG_LEVELS).map(([key, { name }]) => (
+                          <option key={key} value={key}>
+                            {name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <Button onClick={downloadCSV} size="sm" variant="outline">
+                      Export CSV
+                    </Button>
+                  </div>
+
+                  {logsLoading ? (
+                    <div className="text-center py-8">Loading logs...</div>
+                  ) : logsError ? (
+                    <Alert variant="destructive">
+                      <AlertCircle className="h-4 w-4" />
+                      <AlertTitle>Error</AlertTitle>
+                      <AlertDescription>
+                        Failed to load logs. Please try again.
+                      </AlertDescription>
+                    </Alert>
+                  ) : (
+                    <>
+                      <div className="rounded-md border">
+                        <Table>
+                          <TableHeader>
                             <TableRow>
-                              <TableCell colSpan={5} className="text-center py-4">
-                                <Loader2 className="h-6 w-6 animate-spin mx-auto" />
-                              </TableCell>
+                              <TableHead>Timestamp</TableHead>
+                              <TableHead>Username</TableHead>
+                              <TableHead>Level</TableHead>
+                              <TableHead>Facility</TableHead>
+                              <TableHead>Message</TableHead>
+                              <TableHead>IP Address</TableHead>
+                              <TableHead>User Agent</TableHead>
                             </TableRow>
-                          ) : users?.length === 0 ? (
-                            <TableRow>
-                              <TableCell
-                                colSpan={5}
-                                className="text-center text-gray-500 py-4"
-                              >
-                                No users found
-                              </TableCell>
-                            </TableRow>
-                          ) : (
-                            users?.map((u) => (
-                              <TableRow key={u.id}>
-                                <TableCell>{u.username}</TableCell>
-                                <TableCell>{u.email}</TableCell>
-                                <TableCell className="capitalize">
-                                  {u.role.replace("_", " ")}
+                          </TableHeader>
+                          <TableBody>
+                            {logsData?.logs.map((log: any, index: number) => (
+                              <TableRow key={index}>
+                                <TableCell>
+                                  {format(new Date(log.timestamp), "MMM d, yyyy HH:mm:ss")}
                                 </TableCell>
-                                <TableCell>{u.department}</TableCell>
-                                <TableCell className="text-right space-x-2">
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => {
-                                      setSelectedUser(u);
-                                      userForm.reset({
-                                        username: u.username,
-                                        email: u.email,
-                                        role: u.role,
-                                        department: u.department || "",
-                                      });
-                                      setUserDialogOpen(true);
-                                    }}
-                                  >
-                                    <Pencil className="h-4 w-4" />
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => {
-                                      if (
-                                        window.confirm(
-                                          "Are you sure you want to delete this user?"
-                                        )
-                                      ) {
-                                        deleteUserMutation.mutate(u.id);
-                                      }
-                                    }}
-                                    disabled={u.id === user?.id}
-                                  >
-                                    <Trash2 className="h-4 w-4 text-red-500" />
-                                  </Button>
+                                <TableCell className="font-medium">
+                                  {log.username || 'system'}
+                                </TableCell>
+                                <TableCell className={LOG_LEVELS[log.severity as keyof typeof LOG_LEVELS]?.color || ""}>
+                                  {LOG_LEVELS[log.severity as keyof typeof LOG_LEVELS]?.name || log.level}
+                                </TableCell>
+                                <TableCell>{LOG_FACILITIES[log.facility as keyof typeof LOG_FACILITIES] || log.facility}</TableCell>
+                                <TableCell className="font-mono text-sm whitespace-pre-wrap max-w-md">
+                                  {log.message}
+                                </TableCell>
+                                <TableCell className="font-mono text-sm">
+                                  {log.ip}
+                                </TableCell>
+                                <TableCell className="font-mono text-sm truncate max-w-xs" title={log.userAgent}>
+                                  {log.userAgent}
                                 </TableCell>
                               </TableRow>
-                            ))
-                          )}
-                        </TableBody>
-                      </Table>
-                    </CardContent>
-                  </Card>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="email">
-                <div>
-                  <div className="flex items-center mb-8">
-                    <Mail className="h-6 w-6 mr-3 text-blue-500" />
-                    <h1 className="text-3xl font-bold text-gray-900">
-                      Email Configuration
-                    </h1>
-                  </div>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>SMTP Settings</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <Form {...emailForm}>
-                        <form onSubmit={emailForm.handleSubmit(onEmailSubmit)} className="space-y-6">
-                          <FormField
-                            control={emailForm.control}
-                            name="fromEmail"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>From Email Address</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="compliance@university.edu" {...field} />
-                                </FormControl>
-                                <FormDescription>
-                                  This email address will be used as the sender for all notifications
-                                </FormDescription>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <FormField
-                            control={emailForm.control}
-                            name="smtpHost"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>SMTP Host</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="smtp.university.edu" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <FormField
-                            control={emailForm.control}
-                            name="smtpPort"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>SMTP Port</FormLabel>
-                                <FormControl>
-                                  <Input
-                                    type="number"
-                                    {...field}
-                                    onChange={(e) => field.onChange(parseInt(e.target.value))}
-                                  />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <FormField
-                            control={emailForm.control}
-                            name="smtpSecure"
-                            render={({ field }) => (
-                              <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                                <div className="space-y-0.5">
-                                  <FormLabel className="text-base">
-                                    Use Secure Connection (TLS)
-                                  </FormLabel>
-                                  <FormDescription>
-                                    Enable TLS encryption for secure email transmission
-                                  </FormDescription>
-                                </div>
-                                <FormControl>
-                                  <Switch
-                                    checked={field.value}
-                                    onCheckedChange={field.onChange}
-                                  />
-                                </FormControl>
-                              </FormItem>
-                            )}
-                          />
-
-                          <FormField
-                            control={emailForm.control}
-                            name="smtpUser"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>SMTP Username</FormLabel>
-                                <FormControl>
-                                  <Input {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <FormField
-                            control={emailForm.control}
-                            name="smtpPass"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>SMTP Password</FormLabel>
-                                <FormControl>
-                                  <Input type="password" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <Button
-                            type="submit"
-                            className="w-full"
-                            disabled={updateEmailConfigMutation.isPending}
-                          >
-                            {updateEmailConfigMutation.isPending ? (
-                              <>
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Saving...
-                              </>
-                            ) : (
-                              "Save Configuration"
-                            )}
-                          </Button>
-                        </form>
-                      </Form>
-                    </CardContent>
-                  </Card>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="notifications">
-                <div>
-                  <div className="flex items-center mb-8">
-                    <Bell className="h-6 w-6 mr-3 text-blue-500" />
-                    <h1 className="text-3xl font-bold text-gray-900">
-                      Notification Settings
-                    </h1>
-                  </div>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Global Notification Preferences</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-6">
-                      {/* Email Notifications */}
-                      <div className="border-b pb-4">
-                        <div className="flex justify-between items-center mb-4">
-                          <div>
-                            <Label className="text-lg font-medium">Email Notifications</Label>
-                            <p className="text-sm text-gray-500">Send compliance updates via email</p>
-                          </div>
-                          <Switch
-                            checked={notifications?.some(n => n.type === 'email' && n.enabled) ?? false}
-                            onCheckedChange={(checked) => {
-                              if (notifications) {
-                                const emailNotif = notifications.find(n => n.type === 'email');
-                                if (emailNotif) {
-                                  updateNotificationMutation.mutate({
-                                    ...emailNotif,
-                                    enabled: checked,
-                                  });
-                                }
-                              }
-                            }}
-                          />
-                        </div>
-                        <div className="ml-4">
-                          <Label>Default Frequency</Label>
-                          <Select
-                            defaultValue={notifications?.find(n => n.type === 'email')?.frequency || 'daily'}
-                            onValueChange={(value) => {
-                              if (notifications) {
-                                const emailNotif = notifications.find(n => n.type === 'email');
-                                if (emailNotif) {
-                                  updateNotificationMutation.mutate({
-                                    ...emailNotif,
-                                    frequency: value || 'daily', // Ensure value is never empty
-                                  });
-                                }
-                              }
-                            }}
-                          >
-                            <SelectTrigger className="w-[180px]">
-                              <SelectValue placeholder="Select frequency" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="all">All</SelectItem>
-                              <SelectItem value="daily">Daily</SelectItem>
-                              <SelectItem value="weekly">Weekly</SelectItem>
-                              <SelectItem value="monthly">Monthly</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
+                            ))}
+                          </TableBody>
+                        </Table>
                       </div>
 
-                      {/* SMS Notifications */}
-                      <div className="pt-4">
-                        <div className="flex justify-between items-center mb-4">
-                          <div>
-                            <Label className="text-lg font-medium">SMS Notifications</Label>
-                            <p className="text-sm text-gray-500">Send compliance updates via SMS</p>
-                          </div>
-                          <Switch
-                            checked={notifications?.some(n => n.type === 'sms' && n.enabled)}
-                            onCheckedChange={(checked) => {
-                              if (notifications) {
-                                const smsNotif = notifications.find(n => n.type === 'sms');
-                                if (smsNotif) {
-                                  updateNotificationMutation.mutate({
-                                    ...smsNotif,
-                                    enabled: checked,
-                                  });
-                                }
-                              }
-                            }}
-                          />
+                      <div className="flex items-center justify-between mt-4">
+                        <div className="text-sm text-muted-foreground">
+                          Showing {logsData?.logs.length || 0} of {logsData?.total || 0} logs
                         </div>
-                        <div className="ml-4">
-                          <Label>Default Frequency</Label>
-                          <Select
-                            defaultValue={notifications?.find(n => n.type === 'sms')?.frequency || "never"}
-                            onValueChange={(value) => {
-                              if (notifications) {
-                                const smsNotif = notifications.find(n => n.type === 'sms');
-                                if (smsNotif) {
-                                  updateNotificationMutation.mutate({
-                                    ...smsNotif,
-                                    frequency: value,
-                                  });
-                                } else {
-                                  handleAddNotification({ type: 'sms', frequency: value || 'never' }); // Ensure value is never empty
-                                }
-                              }
-                            }}
+                        <div className="flex gap-1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setPage((old) => Math.max(old - 1, 1))}
+                            disabled={page === 1}
                           >
-                            <SelectTrigger className="w-[180px]">
-                              <SelectValue placeholder="Select frequency" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="never">Never</SelectItem>
-                              <SelectItem value="daily">Daily</SelectItem>
-                              <SelectItem value="weekly">Weekly</SelectItem>
-                              <SelectItem value="monthly">Monthly</SelectItem>
-                            </SelectContent>
-                          </Select>
+                            Previous
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setPage((old) => old + 1)}
+                            disabled={
+                              !logsData?.totalPages || page >= logsData.totalPages
+                            }
+                          >
+                            Next
+                          </Button>
                         </div>
                       </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              </TabsContent>
-
-              <TabsContent value="sms">
-                <div>
-                  <div className="flex items-center mb-8">
-                    <MessageSquare className="h-6 w-6 mr-3 text-blue-500" />
-                    <h1 className="text-3xl font-bold text-gray-900">
-                      SMS Service Configuration
-                    </h1>
-                  </div>
-
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Twilio Settings</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <Form {...twilioForm}>
-                        <form onSubmit={twilioForm.handleSubmit(onTwilioSubmit)} className="space-y-6">
-                          <FormField
-                            control={twilioForm.control}
-                            name="accountSid"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Account SID</FormLabel>
-                                <FormControl>
-                                  <Input {...field} />
-                                </FormControl>
-                                <FormDescription>
-                                  Your Twilio Account SID from the Twilio Console
-                                </FormDescription>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <FormField
-                            control={twilioForm.control}
-                            name="authToken"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>Auth Token</FormLabel>
-                                <FormControl>
-                                  <Input type="password" {...field} />
-                                </FormControl>
-                                <FormDescription>
-                                  Your Twilio Auth Token from the Twilio Console
-                                </FormDescription>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <FormField
-                            control={twilioForm.control}
-                            name="fromNumber"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel>From Phone Number</FormLabel>
-                                <FormControl>
-                                  <Input placeholder="+1234567890" {...field} />
-                                </FormControl>
-                                <FormDescription>
-                                  Your Twilio phone number in E.164 format (e.g., +1234567890)
-                                </FormDescription>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-
-                          <Button
-                            type="submit"
-                            className="w-full"
-                            disabled={updateTwilioConfigMutation.isPending}
-                          >
-                            {updateTwilioConfigMutation.isPending ? (
-                              <>
-                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                                Saving...
-                              </>
-                            ) : (
-                              "Save Configuration"
-                            )}
-                          </Button>
-                        </form>
-                      </Form>
-                    </CardContent>
-                  </Card>
+                    </>
+                  )}
                 </div>
               </TabsContent>
             </Tabs>
-
-            {/* User Dialog */}
-          </div>
-        </div>
-      </main>
-    </div>
+          </CardContent>
+        </Card>
+      </div>
+    </PageLayout>
   );
 }
