@@ -14,6 +14,7 @@ import ReportsPage from "@/pages/reports-page";
 import ValidationPage from "@/pages/validation-page";
 import AdminSettingsPage from "@/pages/admin-settings-page";
 import LogsPage from "@/pages/admin/logs-page";
+import DebugToolsPage from "@/pages/admin/debug-tools-page";
 import { RegulationViewer } from "@/pages/RegulationViewer";
 import SetupWizardPage from "@/pages/setup-wizard-page";
 import { ProtectedRoute } from "./lib/protected-route";
@@ -43,6 +44,7 @@ function Router() {
           <ProtectedRoute path="/reports" component={ReportsPage} />
           <ProtectedRoute path="/admin/settings" component={AdminSettingsPage} />
           <ProtectedRoute path="/admin/logs" component={LogsPage} />
+          <ProtectedRoute path="/admin/debug" component={DebugToolsPage} />
           <ProtectedRoute path="/admin/regulations" component={RegulationViewer} />
           <Route component={NotFound} />
         </Switch>
