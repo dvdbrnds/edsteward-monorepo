@@ -1,5 +1,5 @@
 import { Component, ErrorInfo, ReactNode } from "react";
-import { AlertCircle, RefreshCcw, Bug } from "lucide-react";
+import { AlertCircle, RefreshCcw } from "lucide-react";
 import { Button } from "./button";
 import {
   Alert,
@@ -50,6 +50,9 @@ export class ErrorBoundary extends Component<Props, State> {
         return this.props.fallback;
       }
 
+      // Determine error severity based on error type or message
+      const severity = this.state.error?.name === 'TypeError' ? 'warning' : 'error';
+
       return (
         <div className="min-h-[200px] flex items-center justify-center p-4">
           <Alert variant="destructive" className="max-w-xl">
@@ -77,10 +80,21 @@ export class ErrorBoundary extends Component<Props, State> {
                     errorDetails={{
                       message: this.state.error?.message,
                       stack: this.state.error?.stack,
-                      componentStack: this.state.errorInfo?.componentStack
+                      componentStack: this.state.errorInfo?.componentStack,
+                      errorType: this.state.error?.name,
+                      severity
                     }}
+                    variant="subtle"
                   />
                 </div>
+
+                {process.env.NODE_ENV === 'development' && this.state.errorInfo?.componentStack && (
+                  <div className="mt-4 p-2 bg-gray-100 rounded-md">
+                    <p className="text-xs font-mono whitespace-pre-wrap">
+                      {this.state.errorInfo.componentStack}
+                    </p>
+                  </div>
+                )}
               </div>
             </AlertDescription>
           </Alert>
