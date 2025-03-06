@@ -289,7 +289,7 @@ export function RegulationImportDebugger() {
       const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
 
       try {
-        const response = await fetch('/api/regulations/check-openai', {
+        const response = await fetch('/api/system/check-openai', {
           signal: controller.signal,
           headers: {
             'Cache-Control': 'no-cache',

@@ -263,9 +263,8 @@ export function registerRoutes(app: Express): Server {
     }
   });
 
-  // Add this endpoint after the existing regulations endpoints
-  // Separate standalone endpoint for OpenAI API checks
-  app.get("/api/regulations/check-openai", async (req, res) => {
+  // Completely separate endpoint for OpenAI API checks
+  app.get("/api/system/check-openai", async (req, res) => {
     try {
       console.log("Checking OpenAI API configuration...");
       
