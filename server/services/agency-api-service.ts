@@ -3,24 +3,15 @@ import { syslog, LogLevel, LogFacility } from './syslog';
 
 interface AgencyAPIConfig {
   baseUrl: string;
-  endpoints: {
-    metadata: string;
-    data: string;
-  };
-  headers?: Record<string, string>;
+  agency: string;
+  endpoint: string;
 }
 
 const AGENCY_APIS = {
   'DOL': {
-    baseUrl: 'https://apiprod.dol.gov/v4',
-    endpoints: {
-      metadata: '/get/regulations/json/metadata',
-      data: '/get/regulations/json'
-    },
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json'
-    }
+    baseUrl: 'https://apiprod.dol.gov/v4/get',
+    agency: 'OASAM',
+    endpoint: 'regulatory/statutes'
   }
 };
 
@@ -42,61 +33,37 @@ export async function fetchRegulationFromAPI(regulationId: string): Promise<any>
     }
 
     const config = AGENCY_APIS[agency];
+    const apiKey = process.env.DOL_API_KEY.trim();
 
     try {
-      // First fetch metadata to understand the structure
-      syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
-        'Fetching regulation metadata');
-
-      const metadataResponse = await axios.get(
-        `${config.baseUrl}${config.endpoints.metadata}`,
-        {
-          params: {
-            'X-API-KEY': process.env.DOL_API_KEY
-          },
-          headers: {
-            ...config.headers,
-            'Accept': 'application/json'
-          },
-          timeout: 10000
-        }
-      );
-
-      syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
-        'Received metadata response:', {
-          id: "METADATA_RESPONSE",
-          parameters: {
-            status: metadataResponse.status,
-            contentType: metadataResponse.headers['content-type'],
-            data: metadataResponse.data
-          }
-        });
-
       // Extract regulation number from ID (e.g., "2024-001" from "DOL-2024-001")
       const regulationNumber = regulationId.split('-').slice(1).join('-');
 
-      // Now fetch the actual regulation data
-      const regulationResponse = await axios.get(
-        `${config.baseUrl}${config.endpoints.data}`,
-        {
-          params: {
-            'X-API-KEY': process.env.DOL_API_KEY,
-            'regulation_number': regulationNumber
-          },
-          headers: config.headers,
-          timeout: 10000
-        }
-      );
+      // Build filter object according to DOL API guide format
+      const filterObject = {
+        field: "regulation_number",
+        operator: "eq",
+        value: regulationNumber
+      };
+
+      // Construct URL according to DOL API guide template
+      const dataUrl = `${config.baseUrl}/${config.agency}/${config.endpoint}/json`;
 
       syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
-        'Received regulation data response:', {
-          id: "REGULATION_RESPONSE",
-          parameters: {
-            status: regulationResponse.status,
-            contentType: regulationResponse.headers['content-type'],
-            data: regulationResponse.data
-          }
+        'Fetching regulation data:', {
+          url: dataUrl.replace(apiKey, '***'),
+          filterObject
         });
+
+      const regulationResponse = await axios.get(dataUrl, {
+        params: {
+          'filter_object': JSON.stringify(filterObject)
+        },
+        headers: {
+          'Accept': 'application/json',
+          'X-API-KEY': apiKey
+        }
+      });
 
       return regulationResponse.data;
 
@@ -104,12 +71,13 @@ export async function fetchRegulationFromAPI(regulationId: string): Promise<any>
       const errorDetails = axios.isAxiosError(error) ? {
         status: error.response?.status,
         statusText: error.response?.statusText,
-        data: error.response?.data,
         headers: error.response?.headers,
+        data: error.response?.data,
         request: {
           method: error.config?.method,
-          url: error.config?.url,
-          headers: error.config?.headers
+          url: error.config?.url?.replace(apiKey, '***'),
+          headers: error.config?.headers,
+          params: error.config?.params
         }
       } : {};
 
