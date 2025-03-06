@@ -11,7 +11,7 @@ function generateTestSignature(method: string, path: string, apiKey: string): vo
     // Step 1: Create canonical request
     const canonicalHeaders = `host:api.dol.gov\nx-amz-date:${timestamp}\n`;
     const signedHeaders = 'host;x-amz-date';
-    
+
     const canonicalRequest = [
       method,
       path,
@@ -48,7 +48,8 @@ function generateTestSignature(method: string, path: string, apiKey: string): vo
 
     // Step 4: Create authorization header
     const authHeader = [
-      `AWS4-HMAC-SHA256 Credential=${apiKey}/${scope}`,
+      'AWS4-HMAC-SHA256',
+      `Credential=${apiKey}/${scope}`,
       `SignedHeaders=${signedHeaders}`,
       `Signature=${signature}`
     ].join(', ');

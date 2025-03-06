@@ -28,37 +28,56 @@ const AGENCY_APIS = {
   }
 };
 
-function signDOLRequest(method: string, path: string, apiKey: string): string {
-  // DOL API uses AWS-style signing
+function signDOLRequest(method: string, path: string, apiKey: string): { headers: Record<string, string> } {
   const timestamp = new Date().toISOString();
   const date = timestamp.split('T')[0].replace(/-/g, '');
+  const region = 'us-east-1';
+  const service = 'execute-api';
 
   // Create canonical request
+  const canonicalHeaders = `host:api.dol.gov\nx-amz-date:${timestamp}\n`;
+  const signedHeaders = 'host;x-amz-date';
+
   const canonicalRequest = [
     method,
     path,
-    '', // Query string
-    `host:api.dol.gov\n`,
-    'host', // Signed headers
-    crypto.createHash('sha256').update('').digest('hex') // Empty body hash
+    '', // Query string already in path
+    canonicalHeaders,
+    signedHeaders,
+    crypto.createHash('sha256').update('').digest('hex')
   ].join('\n');
 
   // Create string to sign
+  const scope = `${date}/${region}/${service}/aws4_request`;
   const stringToSign = [
     'AWS4-HMAC-SHA256',
     timestamp,
-    `${date}/us-east-1/execute-api/aws4_request`,
+    scope,
     crypto.createHash('sha256').update(canonicalRequest).digest('hex')
   ].join('\n');
 
   // Calculate signature
   const kDate = crypto.createHmac('sha256', `AWS4${apiKey}`).update(date).digest();
-  const kRegion = crypto.createHmac('sha256', kDate).update('us-east-1').digest();
-  const kService = crypto.createHmac('sha256', kRegion).update('execute-api').digest();
+  const kRegion = crypto.createHmac('sha256', kDate).update(region).digest();
+  const kService = crypto.createHmac('sha256', kRegion).update(service).digest();
   const kSigning = crypto.createHmac('sha256', kService).update('aws4_request').digest();
   const signature = crypto.createHmac('sha256', kSigning).update(stringToSign).digest('hex');
 
-  return `AWS4-HMAC-SHA256 Credential=${apiKey}/${date}/us-east-1/execute-api/aws4_request, SignedHeaders=host, Signature=${signature}`;
+  // Create authorization header
+  const authHeader = [
+    'AWS4-HMAC-SHA256',
+    `Credential=${apiKey}/${scope}`,
+    `SignedHeaders=${signedHeaders}`,
+    `Signature=${signature}`
+  ].join(', ');
+
+  return {
+    headers: {
+      'Authorization': authHeader,
+      'Host': 'api.dol.gov',
+      'x-amz-date': timestamp
+    }
+  };
 }
 
 export async function fetchRegulationFromAPI(regulationId: string): Promise<any> {
@@ -93,7 +112,7 @@ export async function fetchRegulationFromAPI(regulationId: string): Promise<any>
 
       try {
         const path = `/V1/regulations/search?regulationNumber=${regulationNumber}&format=json`;
-        const authHeader = signDOLRequest('GET', path, apiKey);
+        const { headers: authHeaders } = signDOLRequest('GET', path, apiKey);
 
         syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
           `Making DOL API request`, {
@@ -101,23 +120,18 @@ export async function fetchRegulationFromAPI(regulationId: string): Promise<any>
             parameters: {
               method: 'GET',
               path,
-              headers: ['Authorization', 'Accept', 'Content-Type'],
-              authPreview: authHeader.substring(0, 50) + '...'
+              headers: Object.keys(authHeaders),
+              authPreview: authHeaders.Authorization.substring(0, 50) + '...'
             }
           });
 
         // Make the API request
         const regulationResponse = await axios.get(
-          `${config.baseUrl}${config.endpoints.regulations}`,
+          `${config.baseUrl}${path}`,
           {
             headers: {
               ...config.headers,
-              'Authorization': authHeader,
-              'Host': 'api.dol.gov'
-            },
-            params: {
-              regulationNumber,
-              format: 'json'
+              ...authHeaders
             },
             timeout: 10000,
             validateStatus: null // Allow all status codes for error logging
