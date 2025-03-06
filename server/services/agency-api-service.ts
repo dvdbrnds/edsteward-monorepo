@@ -1,24 +1,21 @@
 import axios from 'axios';
 import { syslog, LogLevel, LogFacility } from './syslog';
-import * as crypto from 'crypto';
 
 interface AgencyAPIConfig {
   baseUrl: string;
   endpoints: {
-    regulations: string;
-    requirements?: string;
-    guidance?: string;
+    metadata: string;
+    data: string;
   };
   headers?: Record<string, string>;
 }
 
 const AGENCY_APIS = {
   'DOL': {
-    baseUrl: 'https://api.dol.gov/V1',
+    baseUrl: 'https://apiprod.dol.gov/v4',
     endpoints: {
-      regulations: '/regulations/search',
-      requirements: '/compliance/requirements',
-      guidance: '/compliance/guidance'
+      metadata: '/get/regulations/json/metadata',
+      data: '/get/regulations/json'
     },
     headers: {
       'Accept': 'application/json',
@@ -26,98 +23,6 @@ const AGENCY_APIS = {
     }
   }
 };
-
-function signDOLRequest(method: string, path: string, queryParams: Record<string, string>, apiKey: string): { headers: Record<string, string> } {
-  const timestamp = new Date().toISOString();
-  const date = timestamp.split('T')[0].replace(/-/g, '');
-  const region = 'us-east-1';
-  const service = 'execute-api';
-  const cleanApiKey = apiKey.trim();
-
-  // Sort and encode query parameters according to AWS v4 specs
-  const canonicalQueryString = Object.entries(queryParams)
-    .sort(([a], [b]) => a.localeCompare(b))
-    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
-    .join('&');
-
-  // Ensure headers are lowercase and trimmed per AWS v4 specs
-  const canonicalHeaders = [
-    'content-type:application/json',
-    'host:api.dol.gov',
-    `x-amz-date:${timestamp}`,
-    `x-amz-security-token:${cleanApiKey}`  // Add security token header
-  ].join('\n') + '\n';
-
-  const signedHeaders = 'content-type;host;x-amz-date;x-amz-security-token';
-
-  const canonicalRequest = [
-    method,
-    path,
-    canonicalQueryString,
-    canonicalHeaders,
-    signedHeaders,
-    crypto.createHash('sha256').update('').digest('hex')
-  ].join('\n');
-
-  syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
-    'Generated canonical request', {
-      id: "CANONICAL_REQUEST",
-      parameters: {
-        method,
-        path,
-        queryString: canonicalQueryString,
-        headers: canonicalHeaders,
-        signedHeaders,
-        canonicalRequest: canonicalRequest.replace(/\n/g, '\\n')
-      }
-    });
-
-  // Create string to sign
-  const scope = `${date}/${region}/${service}/aws4_request`;
-  const stringToSign = [
-    'AWS4-HMAC-SHA256',
-    timestamp,
-    scope,
-    crypto.createHash('sha256').update(canonicalRequest).digest('hex')
-  ].join('\n');
-
-  // Calculate signature
-  const kDate = crypto.createHmac('sha256', `AWS4${cleanApiKey}`).update(date).digest();
-  const kRegion = crypto.createHmac('sha256', kDate).update(region).digest();
-  const kService = crypto.createHmac('sha256', kRegion).update(service).digest();
-  const kSigning = crypto.createHmac('sha256', kService).update('aws4_request').digest();
-  const signature = crypto.createHmac('sha256', kSigning).update(stringToSign).digest('hex');
-
-  syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
-    'Generated AWS v4 signature', {
-      id: "AUTH_SIGNATURE",
-      parameters: {
-        timestamp,
-        scope,
-        signedHeaders,
-        signature
-      }
-    });
-
-  // Construct authorization header exactly according to AWS v4 spec
-  const authHeader = [
-    'AWS4-HMAC-SHA256',
-    `Credential=${cleanApiKey}/${scope}`,
-    `SignedHeaders=${signedHeaders}`,
-    `Signature=${signature}`
-  ].join(' ');
-
-  return {
-    headers: {
-      'Authorization': authHeader,
-      'Content-Type': 'application/json',
-      'Host': 'api.dol.gov',
-      'x-amz-date': timestamp,
-      'x-amz-security-token': cleanApiKey,
-      'Accept': 'application/json'
-    }
-  };
-}
 
 export async function fetchRegulationFromAPI(regulationId: string): Promise<any> {
   try {
@@ -130,68 +35,71 @@ export async function fetchRegulationFromAPI(regulationId: string): Promise<any>
       return null;
     }
 
-    const config = AGENCY_APIS[agency];
-
-    if (!process.env[`${agency}_API_KEY`]) {
-      syslog.log(LogFacility.LOCAL0, LogLevel.WARNING,
-        `Missing API key for ${agency}`);
-      return null;
+    if (!process.env.DOL_API_KEY) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
+        'DOL API key not found in environment variables');
+      throw new Error('DOL API key is required');
     }
 
-    const apiKey = process.env[`${agency}_API_KEY`];
-
-    // Extract regulation number from ID (e.g., "2024-001" from "DOL-2024-001")
-    const regulationNumber = regulationId.split('-').slice(1).join('-');
+    const config = AGENCY_APIS[agency];
 
     try {
-      const path = '/V1/regulations/search';
-      const queryParams = {
-        regulationNumber,
-        format: 'json'
-      };
-
-      const { headers: authHeaders } = signDOLRequest('GET', path, queryParams, apiKey);
-
+      // First fetch metadata to understand the structure
       syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
-        `Making DOL API request`, {
-          id: "API_REQUEST",
-          parameters: {
-            method: 'GET',
-            path,
-            queryParams,
-            headers: authHeaders
-          }
-        });
+        'Fetching regulation metadata');
 
-      // Make the API request
-      const regulationResponse = await axios.get(
-        `${config.baseUrl}${path}`,
+      const metadataResponse = await axios.get(
+        `${config.baseUrl}${config.endpoints.metadata}`,
         {
-          headers: authHeaders,
-          params: queryParams,
-          timeout: 10000,
-          validateStatus: null
+          params: {
+            'X-API-KEY': process.env.DOL_API_KEY
+          },
+          headers: {
+            ...config.headers,
+            'Accept': 'application/json'
+          },
+          timeout: 10000
         }
       );
 
       syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
-        `Received response from DOL API`, {
-          id: "API_RESPONSE",
+        'Received metadata response:', {
+          id: "METADATA_RESPONSE",
+          parameters: {
+            status: metadataResponse.status,
+            contentType: metadataResponse.headers['content-type'],
+            data: metadataResponse.data
+          }
+        });
+
+      // Extract regulation number from ID (e.g., "2024-001" from "DOL-2024-001")
+      const regulationNumber = regulationId.split('-').slice(1).join('-');
+
+      // Now fetch the actual regulation data
+      const regulationResponse = await axios.get(
+        `${config.baseUrl}${config.endpoints.data}`,
+        {
+          params: {
+            'X-API-KEY': process.env.DOL_API_KEY,
+            'regulation_number': regulationNumber
+          },
+          headers: config.headers,
+          timeout: 10000
+        }
+      );
+
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
+        'Received regulation data response:', {
+          id: "REGULATION_RESPONSE",
           parameters: {
             status: regulationResponse.status,
-            statusText: regulationResponse.statusText,
             contentType: regulationResponse.headers['content-type'],
-            dataSize: regulationResponse.data ? JSON.stringify(regulationResponse.data).length : 0,
-            headers: regulationResponse.headers,
             data: regulationResponse.data
           }
         });
 
-      if (regulationResponse.status !== 200) {
-        throw new Error(`API returned status ${regulationResponse.status}: ${regulationResponse.statusText}`);
-      }
-
       return regulationResponse.data;
+
     } catch (error) {
       const errorDetails = axios.isAxiosError(error) ? {
         status: error.response?.status,
@@ -206,7 +114,7 @@ export async function fetchRegulationFromAPI(regulationId: string): Promise<any>
       } : {};
 
       syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
-        `Failed to fetch regulation from DOL API`, {
+        'Failed to fetch regulation data:', {
           id: "API_ERROR",
           parameters: {
             regulationId,
@@ -218,8 +126,8 @@ export async function fetchRegulationFromAPI(regulationId: string): Promise<any>
     }
   } catch (error) {
     syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
-      `Failed to fetch regulation from API`, {
-        id: "API_ERROR",
+      'Failed to process regulation request:', {
+        id: "REQUEST_ERROR",
         parameters: {
           regulationId,
           error: error instanceof Error ? error.message : String(error)
