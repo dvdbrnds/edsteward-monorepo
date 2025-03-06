@@ -6,6 +6,7 @@ import { Server } from 'http';
 import { createServer } from 'http';
 import { log } from './vite';
 import { setupAuth } from './auth';
+import { syslog, LogLevel, LogFacility } from './services/syslog';
 
 export function registerRoutes(app: express.Application): Server {
   // Create HTTP server
@@ -19,29 +20,80 @@ export function registerRoutes(app: express.Application): Server {
     res.json({ status: "ok", message: "API is working" });
   });
 
-  // API routes
-  app.get("/api/regulations/ids", async (req, res) => {
+  // Add the missing /api/regulations route
+  app.get("/api/regulations", async (req, res) => {
     try {
       if (!req.user) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized access attempt to regulations");
         return res.status(401).json({ error: "Authentication required" });
       }
 
       try {
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Fetching regulations from storage");
         const regulations = await storage.getRegulations();
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Found ${regulations.length} regulations`);
+
+        return res.json(regulations);
+      } catch (dbError) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Database error fetching regulations", {
+          error: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+        return res.status(500).json({ 
+          error: "Database error fetching regulations",
+          details: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+      }
+    } catch (error) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to fetch regulations", {
+        error: error instanceof Error ? error.message : String(error)
+      });
+      return res.status(500).json({ 
+        error: "Failed to fetch regulations", 
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  // API routes
+  app.get("/api/regulations/ids", async (req, res) => {
+    try {
+      if (!req.user) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized access attempt to regulations");
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      try {
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Fetching regulations from storage");
+        const regulations = await storage.getRegulations();
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Found ${regulations.length} regulations`);
+
+        if (!regulations || regulations.length === 0) {
+          syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "No regulations found in database");
+          return res.json({ 
+            count: 0,
+            ids: [],
+            message: "No regulations found"
+          });
+        }
+
         const ids = regulations.map(reg => reg.itemId);
         return res.json({ 
           count: ids.length,
           ids
         });
       } catch (dbError) {
-        console.error("Database error fetching regulation IDs:", dbError);
+        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Database error fetching regulations", {
+          error: dbError instanceof Error ? dbError.message : String(dbError)
+        });
         return res.status(500).json({ 
           error: "Database error fetching regulation IDs",
           details: dbError instanceof Error ? dbError.message : String(dbError)
         });
       }
     } catch (error) {
-      console.error("Failed to fetch regulation IDs:", error);
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to fetch regulations", {
+        error: error instanceof Error ? error.message : String(error)
+      });
       return res.status(500).json({ 
         error: "Failed to fetch regulation IDs", 
         details: error instanceof Error ? error.message : String(error)
@@ -54,7 +106,7 @@ export function registerRoutes(app: express.Application): Server {
     try {
       const apiKey = process.env.OPENAI_API_KEY;
       if (!apiKey) {
-        console.log("OpenAI API key not configured");
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "OpenAI API key not configured");
         return res.status(500).json({
           status: "error",
           message: "OpenAI API key not configured",
@@ -70,7 +122,7 @@ export function registerRoutes(app: express.Application): Server {
       });
 
       if (response.ok) {
-        console.log("OpenAI API Status: ok");
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "OpenAI API connection successful");
         return res.status(200).json({
           status: "ok",
           message: "OpenAI API connection successful",
@@ -78,7 +130,9 @@ export function registerRoutes(app: express.Application): Server {
         });
       } else {
         const errorData = await response.json();
-        console.error("OpenAI API error:", errorData);
+        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "OpenAI API connection failed", {
+          error: errorData.error?.message
+        });
         return res.status(response.status).json({
           status: "error",
           message: "OpenAI API connection failed",
@@ -86,7 +140,9 @@ export function registerRoutes(app: express.Application): Server {
         });
       }
     } catch (error) {
-      console.error("OpenAI API check error:", error);
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "OpenAI API check error", {
+        error: error instanceof Error ? error.message : String(error)
+      });
       return res.status(500).json({
         status: "error",
         message: "Failed to check OpenAI API",
@@ -97,7 +153,10 @@ export function registerRoutes(app: express.Application): Server {
 
   // Global error handler for API routes
   app.use('/api', (err: Error, req: Request, res: Response, next: NextFunction) => {
-    console.error('API Error:', err);
+    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 'API Error', {
+      error: err.message,
+      stack: err.stack
+    });
     res.status(500).json({
       error: 'Internal Server Error',
       message: err.message || 'An unexpected error occurred'
