@@ -315,11 +315,17 @@ export function RegulationImportDebugger() {
             data.details ? `${timestamp} - Details: ${data.details}` : ''
           ].filter(Boolean));
         } else {
+          console.error('OpenAI API check error:', { 
+            status: response.status, 
+            statusText: response.statusText, 
+            data 
+          });
+          
           setOpenAiStatus('error');
           setLogs(prev => [
             ...prev, 
             `${timestamp} - OpenAI API Status: error`,
-            `${timestamp} - Message: ${data.message || 'Unknown error'}`,
+            `${timestamp} - Message: ${data.message || data.error || 'Unknown error'}`,
             data.details ? `${timestamp} - Details: ${data.details}` : '',
             `${timestamp} - HTTP Status: ${response.status} ${response.statusText}`
           ].filter(Boolean));

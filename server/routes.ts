@@ -307,7 +307,7 @@ export function registerRoutes(app: Express): Server {
 
         console.log("OpenAI API test call successful:", response.choices[0].message);
 
-        res.json({ 
+        return res.status(200).json({ 
           status: 'ok',
           message: 'OpenAI API connection successful',
           details: 'API key is valid and working properly'
