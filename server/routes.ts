@@ -102,6 +102,38 @@ export function registerRoutes(app: express.Application): Server {
   });
   
   // Add endpoint to fetch individual regulation by ID
+  app.get("/api/deadlines", async (req, res) => {
+    try {
+      if (!req.user) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized access attempt to deadlines");
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      try {
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Fetching deadlines from storage");
+        const deadlines = await storage.getDeadlines();
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Found ${deadlines.length} deadlines`);
+        return res.json(deadlines);
+      } catch (dbError) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Database error fetching deadlines", {
+          error: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+        return res.status(500).json({ 
+          error: "Database error fetching deadlines",
+          details: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+      }
+    } catch (error) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to fetch deadlines", {
+        error: error instanceof Error ? error.message : String(error)
+      });
+      return res.status(500).json({ 
+        error: "Failed to fetch deadlines", 
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
   app.get("/api/regulations/:regulationId", async (req, res) => {
     try {
       if (!req.user) {
