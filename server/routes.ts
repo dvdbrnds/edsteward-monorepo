@@ -100,6 +100,53 @@ export function registerRoutes(app: express.Application): Server {
       });
     }
   });
+  
+  // Add endpoint to fetch individual regulation by ID
+  app.get("/api/regulations/:regulationId", async (req, res) => {
+    try {
+      if (!req.user) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized access attempt to regulation details");
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const { regulationId } = req.params;
+      
+      if (!regulationId) {
+        return res.status(400).json({ error: "Regulation ID is required" });
+      }
+
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Fetching regulation with ID: ${regulationId}`);
+      
+      try {
+        const regulation = await storage.getRegulationById(regulationId);
+        
+        if (!regulation) {
+          syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, `Regulation not found with ID: ${regulationId}`);
+          return res.status(404).json({ error: "Regulation not found" });
+        }
+        
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Found regulation: ${regulation.name || regulation.topic}`);
+        return res.json(regulation);
+      } catch (dbError) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Database error fetching regulation", {
+          regulationId,
+          error: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+        return res.status(500).json({ 
+          error: "Database error fetching regulation",
+          details: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+      }
+    } catch (error) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to fetch regulation", {
+        error: error instanceof Error ? error.message : String(error)
+      });
+      return res.status(500).json({ 
+        error: "Failed to fetch regulation", 
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
 
   // System endpoint for OpenAI API check
   app.get("/api/system/check-openai", async (req, res) => {

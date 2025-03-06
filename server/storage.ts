@@ -38,7 +38,8 @@ export interface IStorage {
 
   // Regulation methods
   getRegulations(): Promise<Regulation[]>;
-  getRegulation(id: number): Promise<Regulation | undefined>;  
+  getRegulation(id: number): Promise<Regulation | undefined>;
+  getRegulationById(regulationId: string): Promise<Regulation | null>;
   createRegulation(regulation: InsertRegulation): Promise<Regulation>;
   updateRegulation(id: number, regulation: Partial<InsertRegulation>): Promise<Regulation>;
   setRegulationApplicability(id: number, isApplicable: boolean): Promise<Regulation>;
@@ -148,6 +149,30 @@ export class DatabaseStorage implements IStorage {
   async getRegulation(id: number): Promise<Regulation | undefined> {
     const [regulation] = await db.select().from(regulations).where(eq(regulations.id, id));
     return regulation;
+  }
+
+  async getRegulationById(regulationId: string): Promise<Regulation | null> {
+    try {
+      console.log(`Looking up regulation with ID: ${regulationId}`);
+      // First try to find by itemId (which is what the UI uses)
+      const results = await db.select()
+        .from(regulations)
+        .where(eq(regulations.itemId, regulationId));
+
+      if (results.length > 0) {
+        return results[0];
+      }
+
+      // Fallback to regular ID if itemId search fails
+      const fallbackResults = await db.select()
+        .from(regulations)
+        .where(eq(regulations.id, parseInt(regulationId, 10)));
+
+      return fallbackResults.length > 0 ? fallbackResults[0] : null;
+    } catch (error) {
+      console.error(`Error fetching regulation with ID ${regulationId}:`, error);
+      throw error;
+    }
   }
 
   async createRegulation(regulation: InsertRegulation): Promise<Regulation> {
