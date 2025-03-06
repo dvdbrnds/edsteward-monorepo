@@ -12,23 +12,35 @@ async function testOpenAIConnection() {
     return;
   }
   
+  console.log("OpenAI API key is set (value hidden)");
+  
   try {
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    const openai = new OpenAI({ 
+      apiKey: process.env.OPENAI_API_KEY,
+      dangerouslyAllowBrowser: false
+    });
     
-    console.log("Making test API call...");
+    console.log("OpenAI client initialized, making test API call...");
     const response = await openai.chat.completions.create({
       model: "gpt-4",
-      messages: [{ role: "user", content: "test" }],
-      max_tokens: 5
+      messages: [{ role: "user", content: "Hello, this is a test message." }],
+      max_tokens: 10
     });
     
     console.log("OpenAI API test successful!");
     console.log("Response:", response.choices[0].message);
+    return true;
   } catch (error) {
-    console.error("OpenAI API test failed:", error.message);
+    console.error("OpenAI API test failed:");
+    console.error("Error message:", error.message);
+    if (error.response) {
+      console.error("Status:", error.response.status);
+      console.error("Data:", error.response.data);
+    }
     if (error.message.includes("API key")) {
       console.log("The API key appears to be invalid or has insufficient permissions");
     }
+    return false;
   }
 }
 

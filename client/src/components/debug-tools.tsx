@@ -281,16 +281,31 @@ export function RegulationImportDebugger() {
 
   const checkOpenAiStatus = async () => {
     try {
+      setOpenAiStatus('checking');
+      setLogs(prev => [...prev, `${new Date().toISOString()} - Checking OpenAI API status...`]);
+      
       const response = await fetch('/api/regulations/check-openai');
       const data = await response.json();
+      
       console.log('OpenAI API check response:', data);
-      setOpenAiStatus(data.status === 'ok' ? 'ready' : 'error');
-      setLogs(prev => [
-        ...prev, 
-        `${new Date().toISOString()} - OpenAI API Status: ${data.status}`,
-        data.message ? `${new Date().toISOString()} - Message: ${data.message}` : '',
-        data.details ? `${new Date().toISOString()} - Details: ${data.details}` : ''
-      ].filter(Boolean));
+      
+      if (response.ok && data.status === 'ok') {
+        setOpenAiStatus('ready');
+        setLogs(prev => [
+          ...prev, 
+          `${new Date().toISOString()} - OpenAI API Status: ok`,
+          `${new Date().toISOString()} - Message: ${data.message || 'Connection successful'}`,
+          data.details ? `${new Date().toISOString()} - Details: ${data.details}` : ''
+        ].filter(Boolean));
+      } else {
+        setOpenAiStatus('error');
+        setLogs(prev => [
+          ...prev, 
+          `${new Date().toISOString()} - OpenAI API Status: error`,
+          `${new Date().toISOString()} - Message: ${data.message || 'Unknown error'}`,
+          data.details ? `${new Date().toISOString()} - Details: ${data.details}` : ''
+        ].filter(Boolean));
+      }
     } catch (error) {
       console.error('OpenAI API check error:', error);
       setOpenAiStatus('error');

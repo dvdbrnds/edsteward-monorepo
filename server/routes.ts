@@ -292,14 +292,21 @@ export function registerRoutes(app: Express): Server {
 
       res.json({ 
         status: 'ok',
-        message: 'OpenAI API connection successful'
+        message: 'OpenAI API connection successful',
+        details: 'API key is valid and working properly'
       });
     } catch (error) {
       console.error("OpenAI API check failed:", error);
-      res.json({ 
+      
+      // Enhanced error handling with more detailed information
+      const errorMessage = error instanceof Error ? error.message : 'Failed to connect to OpenAI API';
+      const errorDetails = error instanceof Error ? error.stack : undefined;
+      
+      // Return proper error status in the response
+      res.status(500).json({ 
         status: 'error', 
-        message: error instanceof Error ? error.message : 'Failed to connect to OpenAI API',
-        details: error instanceof Error ? error.stack : undefined
+        message: errorMessage,
+        details: errorDetails
       });
     }
   });
