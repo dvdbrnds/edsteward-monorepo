@@ -289,13 +289,13 @@ export function registerRoutes(app: Express): Server {
       try {
         console.log("Initializing OpenAI client...");
         const openai = new OpenAI({ 
-          apiKey: process.env.OPENAI_API_KEY,
+          apiKey: process.env.OPENAI_API_KEY
         });
 
         console.log("Making test API call...");
         // Simple test call to verify API access with a more specific prompt
         const response = await openai.chat.completions.create({
-          model: "gpt-4",
+          model: "gpt-3.5-turbo", // Fallback to a more widely available model
           messages: [{ role: "user", content: "Hello, this is a test message." }],
           max_tokens: 10
         });
@@ -317,8 +317,23 @@ export function registerRoutes(app: Express): Server {
         // Enhanced error handling with better error analysis
         let errorMessage = 'Failed to connect to OpenAI API';
         let errorDetails = '';
+        let statusCode = 500;
         
-        if (error instanceof Error) {
+        if (error.response) {
+          statusCode = error.response.status || 500;
+          console.error("OpenAI API error details:", {
+            status: error.response.status,
+            statusText: error.response.statusText,
+            data: error.response.data
+          });
+          
+          errorDetails = `Status: ${error.response.status} - ${error.response.statusText || ''}`;
+          
+          if (error.response.data && error.response.data.error) {
+            errorMessage = error.response.data.error.message || errorMessage;
+            errorDetails += `, Type: ${error.response.data.error.type || 'unknown'}`;
+          }
+        } else if (error instanceof Error) {
           errorMessage = error.message;
           errorDetails = error.stack || '';
           
@@ -341,7 +356,12 @@ export function registerRoutes(app: Express): Server {
           }
         }
         
-        throw new Error(`OpenAI API Error: ${errorMessage}`);
+        // Return error with the appropriate status code
+        return res.status(statusCode).json({ 
+          status: 'error', 
+          message: errorMessage,
+          details: errorDetails
+        });
       }
     } catch (error) {
       console.error("OpenAI API check failed:", error);
