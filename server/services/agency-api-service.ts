@@ -1,15 +1,15 @@
 import axios from 'axios';
 import { syslog, LogLevel, LogFacility } from './syslog';
+import * as crypto from 'crypto';
 
 interface AgencyAPIConfig {
   baseUrl: string;
-  apiKey?: string;
-  headers?: Record<string, string>;
   endpoints: {
     regulations: string;
     requirements?: string;
     guidance?: string;
   };
+  headers?: Record<string, string>;
 }
 
 // Map agency codes to their API configurations
@@ -17,7 +17,7 @@ const AGENCY_APIS = {
   'DOL': {
     baseUrl: 'https://api.dol.gov/V1',
     endpoints: {
-      regulations: '/regulations',
+      regulations: '/regulations/search',
       requirements: '/compliance/requirements',
       guidance: '/compliance/guidance'
     },
@@ -27,6 +27,39 @@ const AGENCY_APIS = {
     }
   }
 };
+
+function signDOLRequest(method: string, path: string, apiKey: string): string {
+  // DOL API uses AWS-style signing
+  const timestamp = new Date().toISOString();
+  const date = timestamp.split('T')[0].replace(/-/g, '');
+
+  // Create canonical request
+  const canonicalRequest = [
+    method,
+    path,
+    '', // Query string
+    `host:api.dol.gov\n`,
+    'host', // Signed headers
+    crypto.createHash('sha256').update('').digest('hex') // Empty body hash
+  ].join('\n');
+
+  // Create string to sign
+  const stringToSign = [
+    'AWS4-HMAC-SHA256',
+    timestamp,
+    `${date}/us-east-1/execute-api/aws4_request`,
+    crypto.createHash('sha256').update(canonicalRequest).digest('hex')
+  ].join('\n');
+
+  // Calculate signature
+  const kDate = crypto.createHmac('sha256', `AWS4${apiKey}`).update(date).digest();
+  const kRegion = crypto.createHmac('sha256', kDate).update('us-east-1').digest();
+  const kService = crypto.createHmac('sha256', kRegion).update('execute-api').digest();
+  const kSigning = crypto.createHmac('sha256', kService).update('aws4_request').digest();
+  const signature = crypto.createHmac('sha256', kSigning).update(stringToSign).digest('hex');
+
+  return `AWS4-HMAC-SHA256 Credential=${apiKey}/${date}/us-east-1/execute-api/aws4_request, SignedHeaders=host, Signature=${signature}`;
+}
 
 export async function fetchRegulationFromAPI(regulationId: string): Promise<any> {
   try {
@@ -48,10 +81,7 @@ export async function fetchRegulationFromAPI(regulationId: string): Promise<any>
       return null;
     }
 
-    const headers = {
-      ...config.headers,
-      'Authorization': `Bearer ${process.env[`${agency}_API_KEY`]}`
-    };
+    const apiKey = process.env[`${agency}_API_KEY`];
 
     // DOL-specific API endpoints
     if (agency === 'DOL') {
@@ -62,56 +92,74 @@ export async function fetchRegulationFromAPI(regulationId: string): Promise<any>
       const regulationNumber = regulationId.split('-').slice(1).join('-');
 
       try {
-        // First try to get the regulation details
-        const regulationResponse = await axios.get(`${config.baseUrl}${config.endpoints.regulations}`, {
-          headers,
-          params: {
-            regulationNumber,
-            format: 'json'
-          },
-          timeout: 10000
-        });
+        const path = `/V1/regulations/search?regulationNumber=${regulationNumber}&format=json`;
+        const authHeader = signDOLRequest('GET', path, apiKey);
 
         syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
-          `Successfully fetched regulation data from DOL API`, {
-            id: "API_SUCCESS",
+          `Making DOL API request`, {
+            id: "API_REQUEST",
             parameters: {
-              regulationId,
-              dataSize: JSON.stringify(regulationResponse.data).length,
-              endpoints: Object.keys(config.endpoints).join(', ')
+              method: 'GET',
+              path,
+              headers: ['Authorization', 'Accept', 'Content-Type'],
+              authPreview: authHeader.substring(0, 50) + '...'
             }
           });
 
-        // If available, also fetch compliance requirements
-        let requirementsData = null;
-        if (config.endpoints.requirements) {
-          try {
-            const requirementsResponse = await axios.get(
-              `${config.baseUrl}${config.endpoints.requirements}/${regulationNumber}`,
-              { headers, timeout: 10000 }
-            );
-            requirementsData = requirementsResponse.data;
-          } catch (reqError) {
-            syslog.log(LogFacility.LOCAL0, LogLevel.WARNING,
-              `Failed to fetch requirements data, continuing with regulation data only`, {
-                id: "REQUIREMENTS_ERROR",
-                parameters: {
-                  error: reqError instanceof Error ? reqError.message : String(reqError)
-                }
-              });
+        // Make the API request
+        const regulationResponse = await axios.get(
+          `${config.baseUrl}${config.endpoints.regulations}`,
+          {
+            headers: {
+              ...config.headers,
+              'Authorization': authHeader,
+              'Host': 'api.dol.gov'
+            },
+            params: {
+              regulationNumber,
+              format: 'json'
+            },
+            timeout: 10000,
+            validateStatus: null // Allow all status codes for error logging
           }
+        );
+
+        // Log full response details
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
+          `Received response from DOL API`, {
+            id: "API_RESPONSE",
+            parameters: {
+              status: regulationResponse.status,
+              statusText: regulationResponse.statusText,
+              contentType: regulationResponse.headers['content-type'],
+              dataSize: JSON.stringify(regulationResponse.data).length,
+              responsePreview: JSON.stringify(regulationResponse.data).substring(0, 200),
+              headers: regulationResponse.headers
+            }
+          });
+
+        if (regulationResponse.status !== 200) {
+          throw new Error(`API returned status ${regulationResponse.status}: ${regulationResponse.statusText}`);
         }
 
-        return {
-          ...regulationResponse.data,
-          requirements: requirementsData
-        };
+        if (!regulationResponse.data) {
+          throw new Error('Empty response from DOL API');
+        }
+
+        return regulationResponse.data;
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error);
         const errorDetails = axios.isAxiosError(error) ? {
           status: error.response?.status,
           statusText: error.response?.statusText,
-          data: error.response?.data
+          data: error.response?.data,
+          headers: error.response?.headers,
+          request: {
+            method: error.config?.method,
+            url: error.config?.url,
+            headers: error.config?.headers,
+            params: error.config?.params
+          }
         } : {};
 
         syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
