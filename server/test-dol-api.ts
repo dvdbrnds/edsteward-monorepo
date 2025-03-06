@@ -1,10 +1,10 @@
 import { fetchRegulationFromAPI } from './services/agency-api-service';
 import { syslog, LogLevel, LogFacility } from './syslog';
 import axios from 'axios';
+import { URL } from 'url';
 
 async function testDOLAPI() {
   try {
-    // Test with a regulation ID
     const testIds = ['DOL-2024-001'];
 
     console.log('\nStarting DOL API Integration Test...');
@@ -22,10 +22,10 @@ async function testDOLAPI() {
     console.log('Contains special characters:', /[^a-zA-Z0-9]/.test(apiKey));
 
     // First verify we can access the datasets endpoint
-    const baseUrl = 'https://apiprod.dol.gov/v4';
-    console.log('\nVerifying API access with datasets endpoint:', `${baseUrl}/datasets`);
+    const baseUrl = 'https://apiprod.dol.gov';
+    console.log('\nVerifying API access with datasets endpoint:', `${baseUrl}/v4/datasets`);
 
-    const datasetsResponse = await axios.get(`${baseUrl}/datasets`);
+    const datasetsResponse = await axios.get(`${baseUrl}/v4/datasets`);
     console.log('Successfully accessed datasets endpoint:', datasetsResponse.status);
     console.log('Number of datasets:', datasetsResponse.data?.datasets?.length || 0);
 
@@ -35,23 +35,10 @@ async function testDOLAPI() {
       try {
         console.log(`\nTesting regulation ID: ${regulationId}`);
 
-        // Get metadata with API key in both URL and header
-        const metadataUrl = `${baseUrl}/get/OASAM/regulatory/statutes/json/metadata?X-API-KEY=${apiKey}`;
-
-        console.log('\nFetching metadata from:', metadataUrl.replace(apiKey, '***'));
-        console.log('API Key will be sent in both URL and header');
-
-        const metadataResponse = await axios.get(metadataUrl, {
-          headers: {
-            'Accept': 'application/json',
-            'X-API-KEY': apiKey
-          }
-        });
-
-        console.log('\nMetadata Response:');
-        console.log('Status:', metadataResponse.status);
-        console.log('Headers:', JSON.stringify(metadataResponse.headers, null, 2));
-        console.log('Data:', JSON.stringify(metadataResponse.data, null, 2));
+        // Test metadata URL
+        const metadataUrl = new URL(`${baseUrl}/v4/get/OASAM/regulatory/statutes/json/metadata`);
+        metadataUrl.searchParams.append('X-API-KEY', apiKey);
+        console.log('\nMetadata URL (masked):', metadataUrl.toString().replace(apiKey, '***'));
 
         // Now attempt to fetch the regulation data
         console.log('\nFetching regulation data...');
@@ -77,16 +64,6 @@ async function testDOLAPI() {
           console.error('\nRequest Details:');
           console.error('URL:', error.config?.url?.replace(apiKey, '***'));
           console.error('Method:', error.config?.method);
-          if (error.config?.headers) {
-            const safeHeaders = { ...error.config.headers };
-            if (safeHeaders['X-API-KEY']) safeHeaders['X-API-KEY'] = '***';
-            console.error('Headers:', JSON.stringify(safeHeaders, null, 2));
-          }
-
-          console.error('\nDetailed Error Information:');
-          console.error('Name:', error.name);
-          console.error('Message:', error.message);
-          console.error('Code:', error.code);
         }
       }
     }
@@ -95,5 +72,4 @@ async function testDOLAPI() {
   }
 }
 
-// Run the test
 testDOLAPI().catch(console.error);
