@@ -5,31 +5,30 @@ import { z } from "zod";
 import { Server } from 'http';
 import { createServer } from 'http';
 import { log } from './vite';
+import { setupAuth } from './auth';
 
 export function registerRoutes(app: express.Application): Server {
   // Create HTTP server
   const httpServer = createServer(app);
 
+  // Setup auth routes first
+  setupAuth(app);
+
+  // Test route to verify API handling
+  app.get("/api/test", (req, res) => {
+    res.json({ status: "ok", message: "API is working" });
+  });
+
   // API routes
   app.get("/api/regulations/ids", async (req, res) => {
     try {
-      console.log(`Regulation IDs endpoint accessed - Auth check starting`);
-      
-      // Check if user exists
       if (!req.user) {
-        console.log(`Regulation IDs endpoint - Authentication required error`);
         return res.status(401).json({ error: "Authentication required" });
       }
-      
-      // Log the request for debugging
-      console.log(`Fetching regulation IDs for user: ${req.user.username}`);
-      
+
       try {
         const regulations = await storage.getRegulations();
         const ids = regulations.map(reg => reg.itemId);
-
-        console.log(`Found ${ids.length} regulation IDs`);
-        
         return res.json({ 
           count: ids.length,
           ids
@@ -94,6 +93,15 @@ export function registerRoutes(app: express.Application): Server {
         details: error instanceof Error ? error.message : String(error)
       });
     }
+  });
+
+  // Global error handler for API routes
+  app.use('/api', (err: Error, req: Request, res: Response, next: NextFunction) => {
+    console.error('API Error:', err);
+    res.status(500).json({
+      error: 'Internal Server Error',
+      message: err.message || 'An unexpected error occurred'
+    });
   });
 
   return httpServer;
