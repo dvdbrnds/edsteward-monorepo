@@ -1,4 +1,4 @@
-import { fetchRegulationFromAPI } from './services/agency-api-service';
+import { fetchRegulationFromAgency } from './services/agency-api-service';
 import { syslog, LogLevel, LogFacility } from './syslog';
 import axios from 'axios';
 import { URL } from 'url';
@@ -38,7 +38,7 @@ async function testDOLAPI() {
       });
 
       console.log('\nSearching for Labor/Regulation Related Datasets:');
-      const laborDatasets = datasetsResponse.data.datasets.filter(dataset => 
+      const laborDatasets = datasetsResponse.data.datasets.filter(dataset =>
         dataset.name.toLowerCase().includes('labor') ||
         dataset.name.toLowerCase().includes('regulation') ||
         dataset.description.toLowerCase().includes('labor standards') ||
@@ -78,7 +78,7 @@ async function testDOLAPI() {
       const regulationId = 'DOL-2024-001';
       console.log('Fetching regulation:', regulationId);
 
-      const result = await fetchRegulationFromAPI(regulationId);
+      const result = await fetchRegulationFromAgency(regulationId);
       if (result) {
         console.log('\nRegulation Data:');
         console.log(JSON.stringify(result, null, 2));
@@ -106,4 +106,32 @@ async function testDOLAPI() {
   }
 }
 
+async function testDOLRegulationScraping() {
+  try {
+    console.log('\nStarting DOL Web Scraping Test...');
+
+    // Test fetching a regulation
+    console.log('\nTesting regulation fetch:');
+    const regulationId = 'DOL-2024-001';
+    console.log('Fetching regulation:', regulationId);
+
+    const results = await fetchRegulationFromAgency(regulationId);
+    if (results && results.length > 0) {
+      console.log('\nRegulation Data:');
+      console.log(`Found ${results.length} regulations`);
+      results.forEach((result, index) => {
+        console.log(`\nRegulation ${index + 1}:`);
+        console.log(JSON.stringify(result, null, 2));
+      });
+    } else {
+      console.log('No regulation data found');
+    }
+
+  } catch (error) {
+    console.error('Test execution error:', error);
+    process.exit(1);
+  }
+}
+
 testDOLAPI().catch(console.error);
+testDOLRegulationScraping().catch(console.error);
