@@ -31,15 +31,15 @@ async function comparePasswords(supplied: string, stored: string) {
 
 export function setupAuth(app: Express) {
   const sessionSettings: session.SessionOptions = {
-    secret: process.env.REPL_ID!,
-    resave: true,
-    saveUninitialized: true,
-    cookie: {
-      secure: app.get("env") === "production",
-      maxAge: 24 * 60 * 60 * 1000, // 24 hours
-      sameSite: "lax"
-    },
     store: storage.sessionStore,
+    secret: process.env.SESSION_SECRET || 'your-secret-key',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
   };
 
   if (app.get("env") === "production") {
@@ -51,18 +51,20 @@ export function setupAuth(app: Express) {
   app.use(passport.session());
 
   passport.use(
-    new LocalStrategy(async (username, password, done) => {
+    new LocalStrategy(async (username: string, password: string, done) => {
       try {
         const user = await storage.getUserByUsername(username);
         if (!user || !(await comparePasswords(password, user.password))) {
+          await syslog.logAuthEvent(LogLevel.WARNING, "Failed login attempt", undefined, username);
           return done(null, false);
-        } else {
-          return done(null, user);
         }
+        await syslog.logAuthEvent(LogLevel.INFO, "Login successful", user.id, username);
+        return done(null, user);
       } catch (error) {
+        await syslog.logAuthEvent(LogLevel.ERROR, "Login error", undefined, username);
         return done(error);
       }
-    }),
+    })
   );
 
   passport.serializeUser((user, done) => {
@@ -71,31 +73,20 @@ export function setupAuth(app: Express) {
 
   passport.deserializeUser(async (id: number, done) => {
     try {
-      console.log(`Deserializing user with ID: ${id}`);
-      
-      // Check if ID is valid
       if (!id || isNaN(id)) {
         console.error(`Invalid user ID during deserialization: ${id}`);
         return done(null, false);
       }
-      
+
       const user = await storage.getUser(id);
       if (!user) {
         console.error(`User with ID ${id} not found during deserialization`);
         return done(null, false);
       }
-      
-      console.log(`User deserialized successfully: ${user.id}, ${user.username}, First: ${user.firstName || 'N/A'}, Last: ${user.lastName || 'N/A'}`);
-      
-      // Check if user has complete profile
-      if (!user.firstName || !user.lastName) {
-        console.warn(`User ${user.username} has incomplete profile (missing name information)`);
-      }
-      
+
       done(null, user);
     } catch (error) {
       console.error(`Error deserializing user ${id}:`, error);
-      // Instead of throwing an error that crashes the request, return false
       done(null, false);
     }
   });
@@ -104,12 +95,13 @@ export function setupAuth(app: Express) {
     try {
       const existingUser = await storage.getUserByUsername(req.body.username);
       if (existingUser) {
-        return res.status(400).send("Username already exists");
+        return res.status(400).json({ error: "Username already exists" });
       }
 
+      const hashedPassword = await hashPassword(req.body.password);
       const user = await storage.createUser({
         ...req.body,
-        password: await hashPassword(req.body.password),
+        password: hashedPassword,
       });
 
       req.login(user, (err) => {
@@ -122,59 +114,50 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/login", (req, res, next) => {
-    // Check for content type to ensure proper handling
     if (!req.is('application/json')) {
       return res.status(400).json({ error: "Content-Type must be application/json" });
     }
-    
-    // Wrap the passport authenticate in try/catch to handle any exceptions
-    try {
-      passport.authenticate("local", (err, user, info) => {
+
+    passport.authenticate("local", async (err: Error | null, user: SelectUser | false, info: any) => {
+      if (err) {
+        await syslog.logAuthEvent(LogLevel.ERROR, "Login error", undefined, req.body.username);
+        return res.status(500).json({ error: "Authentication error", details: err.message });
+      }
+
+      if (!user) {
+        await syslog.logAuthEvent(LogLevel.WARNING, "Failed login attempt", undefined, req.body.username);
+        return res.status(401).json({ error: "Invalid credentials" });
+      }
+
+      req.login(user, async (err) => {
         if (err) {
-          syslog.authEvent(LogLevel.ERROR, "Login error", undefined, req.body.username);
-          return res.status(500).json({ error: "Authentication error", details: err.message });
-        }
-        
-        if (!user) {
-          syslog.authEvent(LogLevel.WARNING, "Failed login attempt", undefined, req.body.username);
-          return res.status(401).json({ error: "Invalid credentials" });
+          await syslog.logAuthEvent(LogLevel.ERROR, "Session creation error", user.id, user.username);
+          return res.status(500).json({ error: "Session creation failed", details: err.message });
         }
 
-        req.login(user, (err) => {
-          if (err) {
-            syslog.authEvent(LogLevel.ERROR, "Session creation error", user.id, user.username);
-            return res.status(500).json({ error: "Session creation failed", details: err.message });
-          }
-          
-          // Update last login timestamp
-          storage.updateUser(user.id, { lastLogin: new Date() })
-            .then(() => {
-              syslog.authEvent(LogLevel.INFO, "User logged in successfully", user.id, user.username);
-              res.status(200).json(user);
-            })
-            .catch(error => {
-              syslog.error("Failed to update last login timestamp", { userId: user.id, error });
-              // Still return success to the user
-              res.status(200).json(user);
-            });
-        });
-      })(req, res, next);
-    } catch (error) {
-      console.error("Unexpected error in login route:", error);
-      return res.status(500).json({ error: "Internal server error during login" });
-    }
+        try {
+          await storage.updateUser(user.id, { lastLogin: new Date() });
+          await syslog.logAuthEvent(LogLevel.INFO, "User logged in successfully", user.id, user.username);
+          res.status(200).json(user);
+        } catch (error) {
+          await syslog.error("Failed to update last login timestamp", { userId: user.id, error });
+          // Still return success to the user
+          res.status(200).json(user);
+        }
+      });
+    })(req, res, next);
   });
 
-  app.post("/api/logout", (req, res, next) => {
+  app.post("/api/logout", async (req, res, next) => {
     const userId = req.user?.id;
     const username = req.user?.username;
-    
+
     req.logout((err) => {
       if (err) {
-        syslog.authEvent(LogLevel.ERROR, "Logout error", userId, username);
+        syslog.logAuthEvent(LogLevel.ERROR, "Logout error", userId, username);
         return next(err);
       }
-      syslog.authEvent(LogLevel.INFO, "User logged out", userId, username);
+      syslog.logAuthEvent(LogLevel.INFO, "User logged out", userId, username);
       res.sendStatus(200);
     });
   });
