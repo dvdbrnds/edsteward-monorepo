@@ -284,34 +284,64 @@ export function RegulationImportDebugger() {
       setOpenAiStatus('checking');
       setLogs(prev => [...prev, `${new Date().toISOString()} - Checking OpenAI API status...`]);
       
-      const response = await fetch('/api/regulations/check-openai');
-      const data = await response.json();
+      const timestamp = new Date().toISOString();
       
-      console.log('OpenAI API check response:', data);
+      // Add timeout to prevent hanging requests
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
       
-      if (response.ok && data.status === 'ok') {
-        setOpenAiStatus('ready');
-        setLogs(prev => [
-          ...prev, 
-          `${new Date().toISOString()} - OpenAI API Status: ok`,
-          `${new Date().toISOString()} - Message: ${data.message || 'Connection successful'}`,
-          data.details ? `${new Date().toISOString()} - Details: ${data.details}` : ''
-        ].filter(Boolean));
-      } else {
-        setOpenAiStatus('error');
-        setLogs(prev => [
-          ...prev, 
-          `${new Date().toISOString()} - OpenAI API Status: error`,
-          `${new Date().toISOString()} - Message: ${data.message || 'Unknown error'}`,
-          data.details ? `${new Date().toISOString()} - Details: ${data.details}` : ''
-        ].filter(Boolean));
+      try {
+        const response = await fetch('/api/regulations/check-openai', {
+          signal: controller.signal,
+          headers: {
+            'Cache-Control': 'no-cache', // Prevent caching
+            'Pragma': 'no-cache'
+          }
+        });
+        
+        clearTimeout(timeoutId);
+        
+        const data = await response.json();
+        console.log('OpenAI API check response:', data);
+        
+        if (response.ok && data.status === 'ok') {
+          setOpenAiStatus('ready');
+          setLogs(prev => [
+            ...prev, 
+            `${timestamp} - OpenAI API Status: ok`,
+            `${timestamp} - Message: ${data.message || 'Connection successful'}`,
+            data.details ? `${timestamp} - Details: ${data.details}` : ''
+          ].filter(Boolean));
+        } else {
+          // Detailed error logging
+          setOpenAiStatus('error');
+          setLogs(prev => [
+            ...prev, 
+            `${timestamp} - OpenAI API Status: error`,
+            `${timestamp} - Message: ${data.message || 'Unknown error'}`,
+            data.details ? `${timestamp} - Details: ${data.details}` : '',
+            `${timestamp} - HTTP Status: ${response.status} ${response.statusText}`
+          ].filter(Boolean));
+        }
+      } catch (fetchError) {
+        clearTimeout(timeoutId);
+        throw fetchError; // Rethrow to be caught by the outer try/catch
       }
     } catch (error) {
       console.error('OpenAI API check error:', error);
       setOpenAiStatus('error');
+      
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const timestamp = new Date().toISOString();
+      
+      // More detailed error logging
       setLogs(prev => [
         ...prev, 
-        `${new Date().toISOString()} - OpenAI API Error: ${error instanceof Error ? error.message : String(error)}`
+        `${timestamp} - OpenAI API Status: error`,
+        `${timestamp} - Error: ${errorMessage}`,
+        error instanceof Error && error.name === 'AbortError' 
+          ? `${timestamp} - Details: Request timed out after 10 seconds` 
+          : `${timestamp} - Details: Connection failed, please check your network and API configuration`
       ]);
     }
   };

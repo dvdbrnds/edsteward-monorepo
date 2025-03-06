@@ -270,23 +270,39 @@ export function registerRoutes(app: Express): Server {
 
       if (!process.env.OPENAI_API_KEY) {
         console.log("OpenAI API key is missing");
-        return res.json({ 
+        return res.status(400).json({ 
           status: 'error', 
           message: 'OpenAI API key not configured',
           details: 'Missing OPENAI_API_KEY environment variable'
         });
       }
 
+      if (process.env.OPENAI_API_KEY.startsWith('sk-') === false) {
+        console.log("OpenAI API key format is invalid");
+        return res.status(400).json({ 
+          status: 'error', 
+          message: 'OpenAI API key format is invalid',
+          details: 'API key should start with "sk-"'
+        });
+      }
+
       console.log("Initializing OpenAI client...");
-      const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+      const openai = new OpenAI({ 
+        apiKey: process.env.OPENAI_API_KEY,
+        dangerouslyAllowBrowser: false
+      });
 
       console.log("Making test API call...");
-      // Simple test call to verify API access
+      // Simple test call to verify API access with a more specific prompt
       const response = await openai.chat.completions.create({
         model: "gpt-4",
-        messages: [{ role: "user", content: "test" }],
-        max_tokens: 5
+        messages: [{ role: "user", content: "Hello, this is a test message." }],
+        max_tokens: 10
       });
+
+      if (!response || !response.choices || !response.choices[0].message) {
+        throw new Error("Invalid response structure from OpenAI API");
+      }
 
       console.log("OpenAI API test call successful:", response.choices[0].message);
 
@@ -298,11 +314,34 @@ export function registerRoutes(app: Express): Server {
     } catch (error) {
       console.error("OpenAI API check failed:", error);
       
-      // Enhanced error handling with more detailed information
-      const errorMessage = error instanceof Error ? error.message : 'Failed to connect to OpenAI API';
-      const errorDetails = error instanceof Error ? error.stack : undefined;
+      // Enhanced error handling with better error analysis
+      let errorMessage = 'Failed to connect to OpenAI API';
+      let errorDetails = '';
       
-      // Return proper error status in the response
+      if (error instanceof Error) {
+        errorMessage = error.message;
+        errorDetails = error.stack || '';
+        
+        // Check for common OpenAI API errors
+        if (error.message.includes('401')) {
+          errorMessage = 'OpenAI API key is invalid or unauthorized';
+          errorDetails = 'Please check your API key and ensure it has the proper permissions';
+        } else if (error.message.includes('429')) {
+          errorMessage = 'OpenAI API rate limit exceeded';
+          errorDetails = 'Your account has reached its API call limit or quota';
+        } else if (error.message.includes('500')) {
+          errorMessage = 'OpenAI API server error';
+          errorDetails = 'The OpenAI service is currently experiencing issues';
+        } else if (error.message.includes('timeout') || error.message.includes('ETIMEDOUT')) {
+          errorMessage = 'OpenAI API request timed out';
+          errorDetails = 'The connection to OpenAI API timed out, please try again later';
+        } else if (error.message.includes('network')) {
+          errorMessage = 'Network error when connecting to OpenAI API';
+          errorDetails = 'Please check your internet connection';
+        }
+      }
+      
+      // Return detailed error information
       res.status(500).json({ 
         status: 'error', 
         message: errorMessage,
