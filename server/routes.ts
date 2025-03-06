@@ -247,14 +247,21 @@ export function registerRoutes(app: Express): Server {
   app.get("/api/regulations/ids", async (req, res) => {
     try {
       console.log(`Regulation IDs endpoint accessed - Auth check starting`);
-      console.log(`User in request:`, req.user ? `ID: ${req.user.id}, Username: ${req.user.username}, Role: ${req.user.role}` : 'No user found');
-      console.log(`Session data:`, req.session);
       
       // Check if user exists and has admin role
       if (!req.user) {
         console.log(`Regulation IDs endpoint - Authentication required error`);
         return res.status(401).json({ error: "Authentication required" });
       }
+      
+      // Log more details about the authenticated user
+      console.log(`Authenticated user details:`, {
+        id: req.user.id,
+        username: req.user.username,
+        role: req.user.role,
+        firstName: req.user.firstName,
+        lastName: req.user.lastName
+      });
       
       if (req.user.role !== "admin") {
         console.log(`Regulation IDs endpoint - User ${req.user.username} is not admin (role: ${req.user.role})`);
@@ -264,18 +271,29 @@ export function registerRoutes(app: Express): Server {
       // Log the request for debugging
       console.log(`Fetching regulation IDs for admin user: ${req.user.username}`);
       
-      const regulations = await storage.getRegulations();
-      const ids = regulations.map(reg => reg.itemId);
+      try {
+        const regulations = await storage.getRegulations();
+        const ids = regulations.map(reg => reg.itemId);
 
-      console.log(`Found ${ids.length} regulation IDs`);
-      
-      res.json({ 
-        count: ids.length,
-        ids
-      });
+        console.log(`Found ${ids.length} regulation IDs`);
+        
+        return res.json({ 
+          count: ids.length,
+          ids
+        });
+      } catch (dbError) {
+        console.error("Database error fetching regulation IDs:", dbError);
+        return res.status(500).json({ 
+          error: "Database error fetching regulation IDs",
+          details: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+      }
     } catch (error) {
       console.error("Failed to fetch regulation IDs:", error);
-      res.status(500).json({ error: "Failed to fetch regulation IDs" });
+      return res.status(500).json({ 
+        error: "Failed to fetch regulation IDs", 
+        details: error instanceof Error ? error.message : String(error)
+      });
     }
   });
 
