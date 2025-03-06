@@ -91,8 +91,28 @@ app.use((req, res, next) => {
 app.use((err, req, res, next) => {
   if (err && err.message === 'Failed to deserialize user out of session') {
     console.log('Caught deserialization error, clearing session');
-    return req.session.destroy(() => {
-      return res.redirect('/');
+    // Check if the request expects JSON
+    if (req.xhr || req.path.startsWith('/api/')) {
+      return req.session.destroy(() => {
+        return res.status(401).json({ error: "Session expired, please log in again" });
+      });
+    } else {
+      return req.session.destroy(() => {
+        return res.redirect('/');
+      });
+    }
+  }
+  next(err);
+});
+
+// Final error handler to ensure API routes always return JSON
+app.use((err, req, res, next) => {
+  if (req.path.startsWith('/api/')) {
+    console.error('API error handler:', err);
+    return res.status(500).json({ 
+      error: "Server error", 
+      message: err.message || "Unknown error",
+      path: req.path
     });
   }
   next(err);

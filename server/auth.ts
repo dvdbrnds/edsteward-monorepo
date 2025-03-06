@@ -122,36 +122,47 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/login", (req, res, next) => {
-    passport.authenticate("local", (err, user, info) => {
-      if (err) {
-        syslog.authEvent(LogLevel.ERROR, "Login error", undefined, req.body.username);
-        return next(err);
-      }
-      
-      if (!user) {
-        syslog.authEvent(LogLevel.WARNING, "Failed login attempt", undefined, req.body.username);
-        return res.status(401).json({ error: "Invalid credentials" });
-      }
-
-      req.login(user, (err) => {
+    // Check for content type to ensure proper handling
+    if (!req.is('application/json')) {
+      return res.status(400).json({ error: "Content-Type must be application/json" });
+    }
+    
+    // Wrap the passport authenticate in try/catch to handle any exceptions
+    try {
+      passport.authenticate("local", (err, user, info) => {
         if (err) {
-          syslog.authEvent(LogLevel.ERROR, "Session creation error", user.id, user.username);
-          return next(err);
+          syslog.authEvent(LogLevel.ERROR, "Login error", undefined, req.body.username);
+          return res.status(500).json({ error: "Authentication error", details: err.message });
         }
         
-        // Update last login timestamp
-        storage.updateUser(user.id, { lastLogin: new Date() })
-          .then(() => {
-            syslog.authEvent(LogLevel.INFO, "User logged in successfully", user.id, user.username);
-            res.status(200).json(user);
-          })
-          .catch(error => {
-            syslog.error("Failed to update last login timestamp", { userId: user.id, error });
-            // Still return success to the user
-            res.status(200).json(user);
-          });
-      });
-    })(req, res, next);
+        if (!user) {
+          syslog.authEvent(LogLevel.WARNING, "Failed login attempt", undefined, req.body.username);
+          return res.status(401).json({ error: "Invalid credentials" });
+        }
+
+        req.login(user, (err) => {
+          if (err) {
+            syslog.authEvent(LogLevel.ERROR, "Session creation error", user.id, user.username);
+            return res.status(500).json({ error: "Session creation failed", details: err.message });
+          }
+          
+          // Update last login timestamp
+          storage.updateUser(user.id, { lastLogin: new Date() })
+            .then(() => {
+              syslog.authEvent(LogLevel.INFO, "User logged in successfully", user.id, user.username);
+              res.status(200).json(user);
+            })
+            .catch(error => {
+              syslog.error("Failed to update last login timestamp", { userId: user.id, error });
+              // Still return success to the user
+              res.status(200).json(user);
+            });
+        });
+      })(req, res, next);
+    } catch (error) {
+      console.error("Unexpected error in login route:", error);
+      return res.status(500).json({ error: "Internal server error during login" });
+    }
   });
 
   app.post("/api/logout", (req, res, next) => {
