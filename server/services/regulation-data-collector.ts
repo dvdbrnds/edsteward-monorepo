@@ -55,21 +55,28 @@ async function gatherRegulationData(regulationId: string): Promise<RegulationRes
     try {
       console.log(`Attempt ${attempts + 1}/${MAX_RETRIES} to gather data for regulation ${regulationId}`);
 
-      const systemPrompt = `You are a regulation data assistant. Analyze the regulation ID and provide information in JSON format.
-Your response must be a valid JSON object with these exact keys:
+      const systemPrompt = `You are an expert in higher education compliance regulations. Analyze the given regulation ID and provide detailed information focusing on its impact on educational institutions.
+
+Your response must be a complete and valid JSON object with these exact keys:
 {
-  "name": "Full regulation name",
-  "topic": "Subject matter",
-  "statute": "Legal reference",
-  "summary": "Detailed description",
-  "requirements": "Key compliance requirements",
-  "category": "One of: Human Resources, Academic Programs, Finance, Campus Safety, Research",
+  "name": "Official regulation title",
+  "topic": "Main subject area (e.g., Education Rights, Civil Rights, Campus Safety)",
+  "statute": "Legal citation (e.g., 20 U.S.C. § 1232g for FERPA)",
+  "summary": "Comprehensive description of regulation's purpose and scope",
+  "requirements": "Specific compliance requirements for educational institutions",
+  "category": "One of: Academic Programs, Campus Safety, Civil Rights, Student Services, Administrative",
   "jurisdiction": "Either 'federal' or 'state'",
-  "agency_url": "Primary agency website URL",
-  "agency_name": "Full agency name",
-  "agency_department": "Specific department name",
-  "submission_guidelines": "Guidelines for compliance submissions"
-}`;
+  "agency_url": "Official government agency website URL",
+  "agency_name": "Full name of governing agency",
+  "agency_department": "Specific department or office responsible",
+  "submission_guidelines": "Required reporting and compliance documentation procedures"
+}
+
+For education regulations:
+- Use Department of Education (www.ed.gov) as default agency when applicable
+- Include specific OCR guidance when relevant
+- Focus on higher education compliance requirements
+- Provide detailed submission guidelines for required reports`;
 
       const response = await openai.chat.completions.create({
         model: "gpt-4",
@@ -80,7 +87,7 @@ Your response must be a valid JSON object with these exact keys:
           },
           {
             role: "user",
-            content: `Analyze regulation ID ${regulationId} and provide all required information in the specified JSON format. If uncertain about specific agency details, use default values for the Department of Education.`
+            content: `Analyze regulation ID ${regulationId} and provide comprehensive information for higher education compliance. Include all required fields in the specified JSON format.`
           }
         ],
         temperature: 0.7,

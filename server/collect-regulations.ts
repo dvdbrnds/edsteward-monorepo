@@ -1,7 +1,7 @@
 import { populateRegulationData } from "./services/regulation-data-collector";
 import readline from 'readline';
 import { writeFileSync } from 'fs';
-import { db } from "./db";
+import { db, initializeLogging } from "./db";
 import { regulations } from "@shared/schema";
 import { syslog, LogLevel, LogFacility } from './services/syslog';
 
@@ -15,6 +15,9 @@ const standardRegulations = [
 
 async function main() {
   try {
+    // Initialize database logging
+    initializeLogging();
+
     syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Starting regulation data collection");
 
     console.log("Starting regulation data collection process...");
