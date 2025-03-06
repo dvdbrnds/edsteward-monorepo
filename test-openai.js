@@ -33,7 +33,7 @@ async function testOpenAIConnection() {
     
     // Make a simple test call
     const response = await openai.chat.completions.create({
-      model: "gpt-4", // Specify the model explicitly
+      model: "gpt-3.5-turbo", // Use more widely available model
       messages: [{ role: "user", content: "Hello, this is a test message." }],
       max_tokens: 20
     });
