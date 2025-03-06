@@ -72,11 +72,19 @@ export function setupAuth(app: Express) {
   passport.deserializeUser(async (id: number, done) => {
     try {
       console.log(`Deserializing user with ID: ${id}`);
+      
+      // Check if ID is valid
+      if (!id || isNaN(id)) {
+        console.error(`Invalid user ID during deserialization: ${id}`);
+        return done(null, false);
+      }
+      
       const user = await storage.getUser(id);
       if (!user) {
         console.error(`User with ID ${id} not found during deserialization`);
         return done(null, false);
       }
+      
       console.log(`User deserialized successfully: ${user.id}, ${user.username}, First: ${user.firstName || 'N/A'}, Last: ${user.lastName || 'N/A'}`);
       
       // Check if user has complete profile
@@ -87,7 +95,8 @@ export function setupAuth(app: Express) {
       done(null, user);
     } catch (error) {
       console.error(`Error deserializing user ${id}:`, error);
-      done(error);
+      // Instead of throwing an error that crashes the request, return false
+      done(null, false);
     }
   });
 
