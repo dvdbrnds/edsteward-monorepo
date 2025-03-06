@@ -82,7 +82,7 @@ app.use((req, res, next) => {
     }
   }
   next();
-});l;
+});
 let deadlineCheckInterval: NodeJS.Timeout | null = null;
 
 async function startServer(): Promise<Server> {
