@@ -37,7 +37,7 @@ const testLogin = async () => {
       },
       body: JSON.stringify(credentials),
       credentials: 'include',
-      redirect: 'manual',
+      redirect: 'follow', // Change to follow redirects automatically
     });
 
     log('Login response status: -', response.status);
