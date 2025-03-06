@@ -74,14 +74,28 @@ let server: Server | null = null;
 // Session cleanup middleware - clears invalid sessions
 app.use((req, res, next) => {
   if (req.session && req.session.passport && req.session.passport.user) {
+    // Check for invalid user ID (not a number or NaN)
     if (typeof req.session.passport.user !== 'number' || isNaN(req.session.passport.user)) {
       console.log(`Invalid user ID in session, destroying session`);
-      req.session.destroy(err => {
+      return req.session.destroy(err => {
         if (err) console.error('Session destruction error:', err);
+        // Redirect to home page or login after destroying session
+        return res.redirect('/');
       });
     }
   }
   next();
+});
+
+// Handle deserialization errors
+app.use((err, req, res, next) => {
+  if (err && err.message === 'Failed to deserialize user out of session') {
+    console.log('Caught deserialization error, clearing session');
+    return req.session.destroy(() => {
+      return res.redirect('/');
+    });
+  }
+  next(err);
 });
 let deadlineCheckInterval: NodeJS.Timeout | null = null;
 
