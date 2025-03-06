@@ -18,10 +18,12 @@ const exec = promisify(execCallback);
 
 // Initialize Express application with middleware
 const app = express();
+
+// Always parse JSON before any routes
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Session configuration
+// Setup authentication AFTER JSON parsing
 app.use(
   session({
     store: storage.sessionStore,
@@ -40,16 +42,24 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Error handler specifically for JSON parsing errors
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+  if (err instanceof SyntaxError && 'body' in err) {
+    return res.status(400).json({ error: 'Invalid JSON' });
+  }
+  next(err);
+});
+
 // Enhanced logging middleware for API requests
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
   const start = Date.now();
   const path = req.path;
   let capturedJsonResponse: Record<string, any> | undefined = undefined;
 
   const originalResJson = res.json;
-  res.json = function (bodyJson, ...args) {
+  res.json = function (bodyJson: any) {
     capturedJsonResponse = bodyJson;
-    return originalResJson.apply(res, [bodyJson, ...args]);
+    return originalResJson.call(res, bodyJson);
   };
 
   res.on("finish", () => {
@@ -105,10 +115,10 @@ app.use((err, req, res, next) => {
   next(err);
 });
 
-// Final error handler to ensure API routes always return JSON
-app.use((err, req, res, next) => {
+// API error handler - ensure JSON responses for API routes
+app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
   if (req.path.startsWith('/api/')) {
-    console.error('API error handler:', err);
+    console.error('API error:', err);
     return res.status(500).json({ 
       error: "Server error", 
       message: err.message || "Unknown error",
@@ -117,6 +127,7 @@ app.use((err, req, res, next) => {
   }
   next(err);
 });
+
 let deadlineCheckInterval: NodeJS.Timeout | null = null;
 
 async function startServer(): Promise<Server> {
@@ -124,13 +135,10 @@ async function startServer(): Promise<Server> {
     const PORT = 5000;
     log("Forcefully killing any process on port 5000...");
 
-    // Kill any existing process on port 5000
     try {
       await exec('fuser -k 5000/tcp');
-      // Wait for port to be freed
       await new Promise(resolve => setTimeout(resolve, 1000));
     } catch (error) {
-      // Ignore any errors from fuser command
       log("Note: fuser command error (this is usually fine)");
     }
 
@@ -175,20 +183,11 @@ async function startServer(): Promise<Server> {
     }
 
     return new Promise((resolve, reject) => {
-      // Set timeout for server startup
-      const timeoutId = setTimeout(() => {
-        log("Server startup timed out");
-        httpServer.close();
-        process.exit(1);
-      }, 10000);
-
-      // Start server with proper error handling
       httpServer
         .listen(PORT, "0.0.0.0")
         .once('listening', () => {
-          clearTimeout(timeoutId);
           log(`Server successfully started on port ${PORT}`);
-
+          
           // Start deadline notification check interval after a delay
           log("Starting server successfully, will initialize deadline checker in 30 seconds...");
           setTimeout(() => {
@@ -206,7 +205,6 @@ async function startServer(): Promise<Server> {
           resolve(httpServer);
         })
         .once('error', (err: NodeJS.ErrnoException) => {
-          clearTimeout(timeoutId);
           if (err.code === 'EADDRINUSE') {
             log(`Error: Port ${PORT} is already in use`);
             process.exit(1);
@@ -273,3 +271,5 @@ startServer()
     log("Unhandled error during server startup: " + (error instanceof Error ? error.message : String(error)));
     process.exit(1);
   });
+
+export default app;
