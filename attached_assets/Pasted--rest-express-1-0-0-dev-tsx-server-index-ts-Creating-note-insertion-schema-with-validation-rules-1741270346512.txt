@@ -1,0 +1,48 @@
+> rest-express@1.0.0 dev
+> tsx server/index.ts
+
+Creating note insertion schema with validation rules
+Note insertion schema created successfully
+Note schema fields: [
+  'id',        'regulationId',
+  'userId',    'title',
+  'content',   'category',
+  'status',    'isPrivate',
+  'createdAt', 'updatedAt',
+  'enableRLS'
+]
+Connecting to database in development mode
+2:12:07 PM [express] Forcefully killing any process on port 5000...
+2:12:09 PM [express] Starting server initialization...
+2:12:09 PM [express] Database connection successful
+2:12:09 PM [express] Registering routes...
+2:12:09 PM [express] Routes registered successfully
+2:12:09 PM [express] Setting up Vite development server...
+2:12:09 PM [express] Vite setup complete
+2:12:09 PM [express] Server successfully started on port 5000
+2:12:09 PM [express] Starting server successfully, will initialize deadline checker in 30 seconds...
+2:12:09 PM [express] Server startup complete
+Error: Failed to deserialize user out of session
+    at pass (/home/runner/workspace/node_modules/passport/lib/authenticator.js:359:19)
+    at Authenticator.deserializeUser (/home/runner/workspace/node_modules/passport/lib/authenticator.js:377:5)
+    at SessionStrategy.authenticate (/home/runner/workspace/node_modules/passport/lib/strategies/session.js:112:10)
+    at attempt (/home/runner/workspace/node_modules/passport/lib/middleware/authenticate.js:378:16)
+    at authenticate (/home/runner/workspace/node_modules/passport/lib/middleware/authenticate.js:379:7)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+Error: Failed to deserialize user out of session
+    at pass (/home/runner/workspace/node_modules/passport/lib/authenticator.js:359:19)
+    at Authenticator.deserializeUser (/home/runner/workspace/node_modules/passport/lib/authenticator.js:377:5)
+    at SessionStrategy.authenticate (/home/runner/workspace/node_modules/passport/lib/strategies/session.js:112:10)
+    at attempt (/home/runner/workspace/node_modules/passport/lib/middleware/authenticate.js:378:16)
+    at authenticate (/home/runner/workspace/node_modules/passport/lib/middleware/authenticate.js:379:7)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at trim_prefix (/home/runner/workspace/node_modules/express/lib/router/index.js:328:13)
+    at /home/runner/workspace/node_modules/express/lib/router/index.js:286:9
+    at Function.process_params (/home/runner/workspace/node_modules/express/lib/router/index.js:346:12)
+    at next (/home/runner/workspace/node_modules/express/lib/router/index.js:280:10)
+ Environment updated. Reloading shell...
+~/workspace$ 
