@@ -267,7 +267,11 @@ export function registerRoutes(app: Express): Server {
   app.get("/api/regulations/check-openai", async (req, res) => {
     try {
       if (!process.env.OPENAI_API_KEY) {
-        return res.json({ status: 'error', message: 'OpenAI API key not configured' });
+        return res.json({ 
+          status: 'error', 
+          message: 'OpenAI API key not configured',
+          details: 'Missing OPENAI_API_KEY environment variable'
+        });
       }
 
       const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -278,12 +282,16 @@ export function registerRoutes(app: Express): Server {
         max_tokens: 5
       });
 
-      res.json({ status: 'ok' });
+      res.json({ 
+        status: 'ok',
+        message: 'OpenAI API connection successful'
+      });
     } catch (error) {
       console.error("OpenAI API check failed:", error);
       res.json({ 
         status: 'error', 
-        message: error instanceof Error ? error.message : 'Failed to connect to OpenAI API'
+        message: error instanceof Error ? error.message : 'Failed to connect to OpenAI API',
+        details: error instanceof Error ? error.stack : undefined
       });
     }
   });
@@ -1321,6 +1329,7 @@ export function registerRoutes(app: Express): Server {
     }
   });
   
+
   // Add route to get URL analysis for a regulation
   app.get("/api/regulations/:id/similar-urls", async (req, res) => {
     try {
