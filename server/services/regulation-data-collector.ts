@@ -6,6 +6,7 @@ import OpenAI from "openai";
 import type { InsertRegulation } from "@shared/schema";
 import { storage } from "../storage";
 import { scrapeRegulationUrls } from './web-scraper';
+import { fetchRegulationFromAPI } from './agency-api-service';
 
 // Initialize OpenAI client
 if (!process.env.OPENAI_API_KEY) {
@@ -54,26 +55,31 @@ async function gatherRegulationData(regulationId: string): Promise<RegulationRes
       syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
         `Attempt ${attempts + 1}/${MAX_RETRIES} to gather data for regulation ${regulationId}`);
 
-      // Scrape all predefined URLs for this regulation
-      const scrapedResults = await scrapeRegulationUrls(regulationId);
+      // First try to get data from agency API
+      const apiData = await fetchRegulationFromAPI(regulationId);
 
-      // Process and organize the scraped content
       let primaryContent = '';
       let supplementaryContent = '';
       let downloadLinks = '';
 
-      for (const result of scrapedResults) {
-        if (result.content) {
-          // Primary content comes from HTML pages
-          if (!result.downloadUrls?.length) {
-            primaryContent += `\nContent from ${result.title || 'Main Page'}:\n${result.content}\n`;
-          } else {
-            // Supplementary content comes from PDFs and other documents
-            supplementaryContent += `\nSupplementary content from ${result.title || 'Document'}:\n${result.content}\n`;
+      if (apiData) {
+        // If we have API data, use it as primary content
+        primaryContent = `API Data for ${regulationId}:\n${JSON.stringify(apiData, null, 2)}\n`;
+      } else {
+        // Fall back to web scraping if API data isn't available
+        const scrapedResults = await scrapeRegulationUrls(regulationId);
+
+        for (const result of scrapedResults) {
+          if (result.content) {
+            if (!result.downloadUrls?.length) {
+              primaryContent += `\nContent from ${result.title || 'Main Page'}:\n${result.content}\n`;
+            } else {
+              supplementaryContent += `\nSupplementary content from ${result.title || 'Document'}:\n${result.content}\n`;
+            }
           }
-        }
-        if (result.downloadUrls?.length) {
-          downloadLinks += `\nRelated documents:\n${result.downloadUrls.join('\n')}\n`;
+          if (result.downloadUrls?.length) {
+            downloadLinks += `\nRelated documents:\n${result.downloadUrls.join('\n')}\n`;
+          }
         }
       }
 
@@ -97,7 +103,8 @@ ${downloadLinks}
             primaryContentLength: primaryContent.length,
             supplementaryContentLength: supplementaryContent.length,
             documentCount: downloadLinks.split('\n').length,
-            preview: combinedContent.substring(0, 200) + '...'
+            preview: combinedContent.substring(0, 200) + '...',
+            sourceType: apiData ? 'API' : 'Web Scraping'
           }
         });
 
