@@ -1,5 +1,6 @@
 import { syslog, LogLevel, LogFacility } from './services/syslog';
 import * as crypto from 'crypto';
+import { URL } from 'url';
 
 function generateTestSignature(method: string, path: string, apiKey: string): void {
   try {
@@ -12,14 +13,6 @@ function generateTestSignature(method: string, path: string, apiKey: string): vo
     const cleanApiKey = apiKey.trim();
 
     // Step 1: Create canonical request
-    const canonicalHeaders = [
-      'content-type:application/json',
-      'host:api.dol.gov',
-      `x-amz-date:${timestamp}`
-    ].join('\n') + '\n';
-
-    const signedHeaders = 'content-type;host;x-amz-date';
-
     // Split path and query string
     const [urlPath, queryString = ''] = path.split('?');
 
@@ -37,6 +30,14 @@ function generateTestSignature(method: string, path: string, apiKey: string): vo
       .sort((a, b) => a.key.localeCompare(b.key))
       .map(({ key, value }) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
       .join('&');
+
+    const canonicalHeaders = [
+      'content-type:application/json',
+      'host:api.dol.gov',
+      `x-amz-date:${timestamp}`
+    ].join('\n') + '\n';
+
+    const signedHeaders = 'content-type;host;x-amz-date';
 
     const canonicalRequest = [
       method,
@@ -73,12 +74,7 @@ function generateTestSignature(method: string, path: string, apiKey: string): vo
     console.log(signature);
 
     // Step 4: Create authorization header
-    const authHeader = [
-      'AWS4-HMAC-SHA256',
-      `Credential=${cleanApiKey}/${scope}`,
-      `SignedHeaders=${signedHeaders}`,
-      `Signature=${signature}`
-    ].join(', ');
+    const authHeader = `AWS4-HMAC-SHA256 Credential=${cleanApiKey}/${scope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
 
     console.log('\nStep 4: Authorization Header:');
     console.log(authHeader);
@@ -86,8 +82,10 @@ function generateTestSignature(method: string, path: string, apiKey: string): vo
     // Log for curl testing
     console.log('\nTest with curl:');
     console.log('curl -v \\');
-    console.log(`  -H "Authorization: ${authHeader}" \\`);
+    console.log(`  -H "Content-Type: application/json" \\`);
+    console.log(`  -H "Host: api.dol.gov" \\`);
     console.log(`  -H "x-amz-date: ${timestamp}" \\`);
+    console.log(`  -H "Authorization: ${authHeader}" \\`);
     console.log('  -H "Accept: application/json" \\');
     console.log(`  "https://api.dol.gov${path}"`);
 

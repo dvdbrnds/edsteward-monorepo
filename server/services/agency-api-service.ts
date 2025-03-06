@@ -12,7 +12,6 @@ interface AgencyAPIConfig {
   headers?: Record<string, string>;
 }
 
-// Map agency codes to their API configurations
 const AGENCY_APIS = {
   'DOL': {
     baseUrl: 'https://api.dol.gov/V1',
@@ -89,8 +88,7 @@ function signDOLRequest(method: string, path: string, queryParams: Record<string
   const signature = crypto.createHmac('sha256', kSigning).update(stringToSign).digest('hex');
 
   // Create authorization header according to AWS v4 spec
-  const credentialStr = `${cleanApiKey}/${scope}`;
-  const authHeader = `AWS4-HMAC-SHA256 Credential=${credentialStr}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
+  const authHeader = `AWS4-HMAC-SHA256 Credential=${cleanApiKey}/${scope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
 
   syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
     'Generated AWS v4 signature', {
@@ -99,7 +97,7 @@ function signDOLRequest(method: string, path: string, queryParams: Record<string
         timestamp,
         scope,
         signedHeaders,
-        authPreview: authHeader.substring(0, 50) + '...'
+        signature
       }
     });
 
@@ -127,7 +125,6 @@ export async function fetchRegulationFromAPI(regulationId: string): Promise<any>
 
     const config = AGENCY_APIS[agency];
 
-    // Check if we need an API key for this agency
     if (!process.env[`${agency}_API_KEY`]) {
       syslog.log(LogFacility.LOCAL0, LogLevel.WARNING,
         `Missing API key for ${agency}`);
@@ -140,7 +137,7 @@ export async function fetchRegulationFromAPI(regulationId: string): Promise<any>
     const regulationNumber = regulationId.split('-').slice(1).join('-');
 
     try {
-      const path = '/regulations/search';
+      const path = '/V1/regulations/search';
       const queryParams = {
         regulationNumber,
         format: 'json'
@@ -155,13 +152,13 @@ export async function fetchRegulationFromAPI(regulationId: string): Promise<any>
             method: 'GET',
             path,
             queryParams,
-            headers: Object.keys(authHeaders)
+            headers: authHeaders
           }
         });
 
       // Make the API request
       const regulationResponse = await axios.get(
-        `${config.baseUrl}${path}`,
+        `${config.baseUrl}/regulations/search`,
         {
           headers: authHeaders,
           params: queryParams,
@@ -170,7 +167,6 @@ export async function fetchRegulationFromAPI(regulationId: string): Promise<any>
         }
       );
 
-      // Log full response details
       syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
         `Received response from DOL API`, {
           id: "API_RESPONSE",
