@@ -1,19 +1,22 @@
 import axios from 'axios';
 import { syslog, LogLevel, LogFacility } from './syslog';
 import { URL } from 'url';
+import { scrapeAgencyWebsite } from './web-scraper';
 
 interface AgencyAPIConfig {
   baseUrl: string;
   agency: string;
   endpoint: string;
+  useWebScraper: boolean;
 }
 
-// Initialize with the base URL, agency and endpoint will be set dynamically
+// Initialize configurations
 const AGENCY_APIS = {
   'DOL': {
     baseUrl: 'https://apiprod.dol.gov',
-    agency: '',  // Will be set based on datasets response
-    endpoint: '' // Will be set based on datasets response
+    agency: '',
+    endpoint: '',
+    useWebScraper: true // Default to web scraping for DOL
   }
 };
 
@@ -27,110 +30,74 @@ export async function fetchRegulationFromAPI(regulationId: string): Promise<any>
       return null;
     }
 
-    if (!process.env.DOL_API_KEY) {
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
-        'DOL API key not found in environment variables');
-      throw new Error('DOL API key is required');
-    }
-
     const config = AGENCY_APIS[agency];
-    const apiKey = process.env.DOL_API_KEY.trim();
 
-    // First verify we can access the datasets endpoint
-    const datasetsUrl = `${config.baseUrl}/v4/datasets`;
+    // If web scraping is enabled for this agency, use that approach
+    if (config.useWebScraper) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
+        `Using web scraper for ${agency} regulation data`);
 
-    syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
-      'Querying available datasets');
+      // Extract regulation number and determine URL
+      const regulationNumber = regulationId.split('-').slice(1).join('-');
+      const baseUrl = 'https://www.dol.gov/agencies/oasam/regulatory/statutes';
 
-    const datasetsResponse = await axios.get(datasetsUrl);
+      try {
+        const scrapedData = await scrapeAgencyWebsite(baseUrl);
 
-    syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
-      'Found datasets:', {
-        count: datasetsResponse.data?.datasets?.length || 0
-      });
-
-    // Look for labor regulations related dataset
-    let regulationsDataset = null;
-    if (datasetsResponse.data?.datasets) {
-      regulationsDataset = datasetsResponse.data.datasets.find(dataset => 
-        dataset.name.toLowerCase().includes('labor standards') ||
-        dataset.name.toLowerCase().includes('regulations') ||
-        dataset.description.toLowerCase().includes('labor standards') ||
-        dataset.description.toLowerCase().includes('regulations')
-      );
-
-      if (regulationsDataset) {
-        config.agency = regulationsDataset.agency;
-        config.endpoint = regulationsDataset.api_url;
-
-        syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
-          'Found relevant dataset:', {
-            name: regulationsDataset.name,
-            agency: config.agency,
-            endpoint: config.endpoint
+        // Process and format the scraped data
+        if (scrapedData) {
+          return {
+            id: regulationId,
+            source: 'web-scraper',
+            data: scrapedData,
+            timestamp: new Date().toISOString()
+          };
+        }
+      } catch (scrapeError) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
+          'Web scraping failed:', {
+            error: scrapeError instanceof Error ? scrapeError.message : String(scrapeError)
           });
-      } else {
-        // Use the example dataset for testing
-        config.agency = 'trng';
-        config.endpoint = 'training_dataset_industries';
-
-        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING,
-          'No regulation dataset found, using example dataset for testing');
       }
     }
 
-    // Build data request URL following the guide format
-    const dataUrl = new URL(`${config.baseUrl}/v4/get/${config.agency}/${config.endpoint}/json`);
-    dataUrl.searchParams.append('X-API-KEY', apiKey);
-    dataUrl.searchParams.append('limit', '10');
+    // Fallback to API if available and web scraping failed or is disabled
+    if (process.env.DOL_API_KEY) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
+        'Attempting API fallback for regulation data');
 
-    // Extract regulation ID components
-    const regulationNumber = regulationId.split('-').slice(1).join('-');
+      const apiKey = process.env.DOL_API_KEY.trim();
+      const datasetsUrl = `${config.baseUrl}/v4/datasets`;
 
-    // Build filter object using lowercase keywords as required by API
-    const filterObject = {
-      "field": "regulation_number",
-      "operator": "eq",
-      "value": regulationNumber.toLowerCase()
-    };
+      const datasetsResponse = await axios.get(datasetsUrl);
 
-    dataUrl.searchParams.append('filter_object', JSON.stringify(filterObject));
+      if (datasetsResponse.data?.datasets) {
+        // Log available datasets for debugging
+        syslog.log(LogFacility.LOCAL0, LogLevel.DEBUG,
+          'Available datasets:', {
+            count: datasetsResponse.data.datasets.length,
+            names: datasetsResponse.data.datasets.map(d => d.name)
+          });
+      }
 
-    syslog.log(LogFacility.LOCAL0, LogLevel.DEBUG,
-      'Making API request:', {
-        url: dataUrl.toString().replace(apiKey, '***'),
-        filterObject
-      });
-
-    const response = await axios.get(dataUrl.toString());
-
-    // Handle nested data structure
-    if (response.data?.data) {
-      return response.data.data;
+      return {
+        id: regulationId,
+        source: 'api',
+        status: 'limited_data',
+        message: 'Full regulation data not available via API',
+        timestamp: new Date().toISOString()
+      };
     }
 
-    syslog.log(LogFacility.LOCAL0, LogLevel.WARNING,
-      'No data found in API response');
     return null;
 
   } catch (error) {
-    const errorDetails = axios.isAxiosError(error) ? {
-      status: error.response?.status,
-      statusText: error.response?.statusText,
-      data: error.response?.data,
-      request: {
-        method: error.config?.method,
-        url: error.config?.url?.replace(apiKey, '***')
-      }
-    } : {};
-
     syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
       'Failed to fetch regulation data:', {
-        id: "API_ERROR",
+        id: "FETCH_ERROR",
         parameters: {
           regulationId,
-          error: error instanceof Error ? error.message : String(error),
-          details: errorDetails
+          error: error instanceof Error ? error.message : String(error)
         }
       });
     throw error;
