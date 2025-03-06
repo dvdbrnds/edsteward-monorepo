@@ -35,7 +35,8 @@ async function testOpenAIConnection() {
     const response = await openai.chat.completions.create({
       model: "gpt-3.5-turbo", // Use more widely available model
       messages: [{ role: "user", content: "Hello, this is a test message." }],
-      max_tokens: 20
+      max_tokens: 20,
+      temperature: 0.5 // Add temperature for more stable responses
     });
     
     console.log("OpenAI API test successful!");

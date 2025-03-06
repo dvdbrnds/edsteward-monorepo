@@ -295,9 +295,10 @@ export function registerRoutes(app: Express): Server {
         console.log("Making test API call...");
         // Simple test call to verify API access with a more specific prompt
         const response = await openai.chat.completions.create({
-          model: "gpt-3.5-turbo", // Fallback to a more widely available model
+          model: "gpt-3.5-turbo", // Use more widely available model
           messages: [{ role: "user", content: "Hello, this is a test message." }],
-          max_tokens: 10
+          max_tokens: 10,
+          temperature: 0.5 // Add temperature parameter for more stable responses
         });
 
         if (!response || !response.choices || !response.choices[0].message) {
@@ -333,7 +334,13 @@ export function registerRoutes(app: Express): Server {
             errorMessage = error.response.data.error.message || errorMessage;
             errorDetails += `, Type: ${error.response.data.error.type || 'unknown'}`;
           }
-        } else if (error instanceof Error) {
+        } 
+        else if (error.status === 400) {
+          statusCode = 400;
+          errorMessage = 'Bad Request to OpenAI API';
+          errorDetails = error.message || 'The request to OpenAI API was malformed';
+        }
+        else if (error instanceof Error) {
           errorMessage = error.message;
           errorDetails = error.stack || '';
           
