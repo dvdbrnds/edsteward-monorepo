@@ -1,6 +1,6 @@
 
 // Simple script to test OpenAI API connection
-const { OpenAI } = require('openai');
+import { OpenAI } from 'openai';
 
 async function testOpenAIConnection() {
   console.log("Testing OpenAI API connection...");
