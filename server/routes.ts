@@ -268,9 +268,7 @@ export function registerRoutes(app: Express): Server {
     try {
       console.log("Checking OpenAI API configuration...");
 
-      // Remove any auth or regulation ID validation for this endpoint
-      // This endpoint should only check the OpenAI API status
-      
+
       if (!process.env.OPENAI_API_KEY) {
         console.log("OpenAI API key is missing");
         return res.status(400).json({ 
@@ -317,12 +315,12 @@ export function registerRoutes(app: Express): Server {
         });
       } catch (error) {
         console.error("OpenAI API call failed:", error);
-        
+
         // Enhanced error handling with better error analysis
         let errorMessage = 'Failed to connect to OpenAI API';
         let errorDetails = '';
         let statusCode = 500;
-        
+
         if (error.response) {
           statusCode = error.response.status || 500;
           console.error("OpenAI API error details:", {
@@ -330,9 +328,9 @@ export function registerRoutes(app: Express): Server {
             statusText: error.response.statusText,
             data: error.response.data
           });
-          
+
           errorDetails = `Status: ${error.response.status} - ${error.response.statusText || ''}`;
-          
+
           if (error.response.data && error.response.data.error) {
             errorMessage = error.response.data.error.message || errorMessage;
             errorDetails += `, Type: ${error.response.data.error.type || 'unknown'}`;
@@ -346,7 +344,7 @@ export function registerRoutes(app: Express): Server {
         else if (error instanceof Error) {
           errorMessage = error.message;
           errorDetails = error.stack || '';
-          
+
           // Check for common OpenAI API errors
           if (error.message.includes('401')) {
             errorMessage = 'OpenAI API key is invalid or unauthorized';
@@ -365,7 +363,7 @@ export function registerRoutes(app: Express): Server {
             errorDetails = 'Please check your internet connection';
           }
         }
-        
+
         // Return error with the appropriate status code
         return res.status(statusCode).json({ 
           status: 'error', 
@@ -375,7 +373,7 @@ export function registerRoutes(app: Express): Server {
       }
     } catch (error) {
       console.error("OpenAI API check failed:", error);
-      
+
       // Return detailed error information
       res.status(500).json({ 
         status: 'error', 
@@ -1316,7 +1314,7 @@ export function registerRoutes(app: Express): Server {
             '/api/admin/users': 'USER_MANAGEMENT',
             '/api/bug-report': 'BUG_REPORT'
           };
-          
+
           // Determine the context based on the path
           let context = 'USER_ACTIVITY';
           for (const key in contextMap) {
@@ -1325,7 +1323,7 @@ export function registerRoutes(app: Express): Server {
               break;
             }
           }
-          
+
           syslog.info(activity, {
             username: req.user.username,
             user: req.user.username,
@@ -1353,7 +1351,7 @@ export function registerRoutes(app: Express): Server {
   app.use('/api/admin/users*', logUserActivity('User management'));
   app.use('/api/auth/login', logUserActivity('Authentication'));
   app.use('/api/auth/logout', logUserActivity('Authentication'));
-  
+
 
   // Log all API requests for comprehensive activity tracking
   app.use('/api/*', async (req, res, next) => {
@@ -1363,7 +1361,7 @@ export function registerRoutes(app: Express): Server {
       const path = req.path;
       const method = req.method;
       const ip = req.ip || req.headers['x-forwarded-for'] || 'unknown';
-      
+
       try {
         await syslog.info(`API request: ${method} ${path}`, {
           username,
@@ -1381,7 +1379,7 @@ export function registerRoutes(app: Express): Server {
     }
     next();
   });
-  
+
 
   // Enhanced validation logging
   app.use('/api/regulations/validate', async (req, res, next) => {
@@ -1402,22 +1400,22 @@ export function registerRoutes(app: Express): Server {
       if (!req.user) {
         return res.status(401).json({ error: "Must be logged in to analyze URLs" });
       }
-      
+
       const { url } = req.body;
-      
+
       if (!url) {
         return res.status(400).json({ error: "URL is required" });
       }
-      
+
       const analysis = await UrlPatternAnalyzer.findSimilarRegulations(url);
       res.json(analysis);
-      
+
     } catch (error) {
       console.error("Failed to analyze URL:", error);
       res.status(500).json({ error: "Failed to analyze URL" });
     }
   });
-  
+
 
   // Add route to get URL analysis for a regulation
   app.get("/api/regulations/:id/similar-urls", async (req, res) => {
@@ -1425,24 +1423,24 @@ export function registerRoutes(app: Express): Server {
       if (!req.user) {
         return res.status(401).json({ error: "Must be logged in to find similar regulations" });
       }
-      
+
       const regulationId = parseInt(req.params.id);
       if (isNaN(regulationId)) {
         return res.status(400).json({ error: "Invalid regulation ID" });
       }
-      
+
       const regulation = await storage.getRegulation(regulationId);
       if (!regulation) {
         return res.status(404).json({ error: "Regulation not found" });
       }
-      
+
       if (!regulation.agency_url) {
         return res.status(404).json({ error: "Regulation does not have an agency URL" });
       }
-      
+
       const analysis = await UrlPatternAnalyzer.findSimilarRegulations(regulation.agency_url);
       res.json(analysis);
-      
+
     } catch (error) {
       console.error("Failed to find similar regulations:", error);
       res.status(500).json({ error: "Failed to find similar regulations" });
