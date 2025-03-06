@@ -1,5 +1,25 @@
 # Implementation Log
 
+## OpenAI API Check Endpoint Fix (March 6, 2025)
+
+### PREVIOUS STATE:
+- OpenAI API status check endpoint was failing with "Invalid regulation ID" error
+- The endpoint was incorrectly using regulation validation logic
+
+### INTENDED CHANGE:
+- Create a separate system endpoint for OpenAI API checks
+- Move API check endpoint from regulation routes to system routes
+
+### EXPECTED OUTCOME:
+- Successful OpenAI API status checks
+- Clean separation between regulation endpoints and system endpoints
+
+### Changes Applied:
+1. Created a new `/api/system/check-openai` endpoint in server/routes.ts
+2. Updated client to use the new endpoint in debug-tools.tsx
+3. Improved error handling and response formatting
+4. Separated system functionality from regulation endpoints
+
 ## Admin Settings UI Fix (March 7, 2025)
 
 ### PREVIOUS STATE:
