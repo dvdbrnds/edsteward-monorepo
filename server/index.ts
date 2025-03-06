@@ -70,6 +70,19 @@ app.use((req, res, next) => {
 
 // Declare server variable at module scope for proper cleanup
 let server: Server | null = null;
+
+// Session cleanup middleware - clears invalid sessions
+app.use((req, res, next) => {
+  if (req.session && req.session.passport && req.session.passport.user) {
+    if (typeof req.session.passport.user !== 'number' || isNaN(req.session.passport.user)) {
+      console.log(`Invalid user ID in session, destroying session`);
+      req.session.destroy(err => {
+        if (err) console.error('Session destruction error:', err);
+      });
+    }
+  }
+  next();
+});l;
 let deadlineCheckInterval: NodeJS.Timeout | null = null;
 
 async function startServer(): Promise<Server> {
