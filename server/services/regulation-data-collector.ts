@@ -4,7 +4,9 @@ import type { InsertRegulation } from "@shared/schema";
 import { db } from "../db";
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+const openai = new OpenAI({ 
+  apiKey: process.env.OPENAI_API_KEY 
+});
 
 interface RegulationResponse {
   name: string;
@@ -68,7 +70,7 @@ async function gatherRegulationData(regulationId: string): Promise<RegulationRes
       name, topic, statute, summary, requirements, category, jurisdiction, agency_url, agency_name, agency_department, submission_guidelines`;
 
       const response = await openai.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-4",
         messages: [{ role: "user", content: prompt }],
         response_format: { type: "json_object" }
       });

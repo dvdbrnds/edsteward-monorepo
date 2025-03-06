@@ -266,7 +266,10 @@ export function registerRoutes(app: Express): Server {
   // Add this endpoint after the existing regulations endpoints
   app.get("/api/regulations/check-openai", async (req, res) => {
     try {
+      console.log("Checking OpenAI API configuration...");
+
       if (!process.env.OPENAI_API_KEY) {
+        console.log("OpenAI API key is missing");
         return res.json({ 
           status: 'error', 
           message: 'OpenAI API key not configured',
@@ -274,13 +277,18 @@ export function registerRoutes(app: Express): Server {
         });
       }
 
+      console.log("Initializing OpenAI client...");
       const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+      console.log("Making test API call...");
       // Simple test call to verify API access
-      await openai.chat.completions.create({
-        model: "gpt-4o",
+      const response = await openai.chat.completions.create({
+        model: "gpt-4",
         messages: [{ role: "user", content: "test" }],
         max_tokens: 5
       });
+
+      console.log("OpenAI API test call successful:", response.choices[0].message);
 
       res.json({ 
         status: 'ok',
@@ -910,7 +918,7 @@ export function registerRoutes(app: Express): Server {
 
       // Only allow note owner or admin to delete
       if (note.userId !== req.user.id && req.user.role !== "admin") {
-        return res.status(403).json({ error: "Not authorized to delete this note" });
+        return res.status(403).json({ error: "Not authorizedto delete this note" });
       }
 
       await storage.deleteNote(noteId);
