@@ -246,12 +246,18 @@ export function registerRoutes(app: Express): Server {
   // Add this endpoint before the regulations collect endpoint
   app.get("/api/regulations/ids", async (req, res) => {
     try {
+      console.log(`Regulation IDs endpoint accessed - Auth check starting`);
+      console.log(`User in request:`, req.user ? `ID: ${req.user.id}, Username: ${req.user.username}, Role: ${req.user.role}` : 'No user found');
+      console.log(`Session data:`, req.session);
+      
       // Check if user exists and has admin role
       if (!req.user) {
+        console.log(`Regulation IDs endpoint - Authentication required error`);
         return res.status(401).json({ error: "Authentication required" });
       }
       
       if (req.user.role !== "admin") {
+        console.log(`Regulation IDs endpoint - User ${req.user.username} is not admin (role: ${req.user.role})`);
         return res.status(403).json({ error: "Only administrators can access regulation IDs" });
       }
 
