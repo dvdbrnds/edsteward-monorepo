@@ -7,9 +7,50 @@ import { regulations } from "@shared/schema";
 import { syslog, LogLevel, LogFacility } from '../services/syslog';
 
 // Initialize OpenAI client
+if (!process.env.OPENAI_API_KEY) {
+  throw new Error("OPENAI_API_KEY environment variable is required");
+}
+
 const openai = new OpenAI({ 
   apiKey: process.env.OPENAI_API_KEY 
 });
+
+// Verify OpenAI API connection on startup
+async function verifyOpenAIConnection() {
+  try {
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Checking OpenAI API status...");
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4",
+      messages: [{ role: "user", content: "test" }],
+      max_tokens: 5,
+      temperature: 0
+    });
+
+    if (!response.choices[0].message.content) {
+      throw new Error("Empty response from OpenAI");
+    }
+
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "OpenAI API connection successful", {
+      id: "OPENAI_STATUS",
+      parameters: {
+        status: "ok",
+        message: "API key is valid and working properly"
+      }
+    });
+    return true;
+  } catch (error) {
+    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "OpenAI API connection failed", {
+      id: "OPENAI_ERROR",
+      parameters: {
+        error: error instanceof OpenAI.APIError ? 
+          { status: error.status, code: error.code, type: error.type, message: error.message } :
+          { message: error instanceof Error ? error.message : String(error) }
+      }
+    });
+    return false;
+  }
+}
 
 interface RegulationResponse {
   name: string;
@@ -70,67 +111,109 @@ async function gatherRegulationData(regulationId: string): Promise<RegulationRes
       syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
         `Attempt ${attempts + 1}/${MAX_RETRIES} to gather data for regulation ${regulationId}`);
 
-      const systemPrompt = `You are an expert in higher education compliance regulations. Analyze the given regulation ID and provide detailed information focusing on its impact on educational institutions.
-
-Your response must be a complete and valid JSON object with these exact keys:
-{
-  "name": "Official regulation title",
-  "topic": "Main subject area (e.g., Education Rights, Civil Rights, Campus Safety)",
-  "statute": "Legal citation (e.g., 20 U.S.C. § 1232g for FERPA)",
-  "summary": "Comprehensive description of regulation's purpose and scope",
-  "requirements": "Specific compliance requirements for educational institutions",
-  "category": "One of: Academic Programs, Campus Safety, Civil Rights, Student Services, Administrative",
-  "jurisdiction": "Either 'federal' or 'state'",
-  "agency_url": "Official government agency website URL",
-  "agency_name": "Full name of governing agency",
-  "agency_department": "Specific department or office responsible",
-  "submission_guidelines": "Required reporting and compliance documentation procedures"
-}
-
-For education regulations:
-- Use Department of Education (www.ed.gov) as default agency when applicable
-- Include specific OCR guidance when relevant
-- Focus on higher education compliance requirements
-- Provide detailed submission guidelines for required reports`;
-
       const response = await openai.chat.completions.create({
         model: "gpt-4",
         messages: [
           {
             role: "system",
-            content: systemPrompt
+            content: "You are an expert in higher education compliance regulations. For each regulation ID provided, return a JSON object with regulation details. Only respond with the JSON object, no other text. The response must be valid JSON and include the following fields: name, topic, statute, summary, requirements, category (Academic Programs/Campus Safety/Civil Rights/Student Services/Administrative), jurisdiction (federal/state), agency_url, agency_name, agency_department, submission_guidelines."
           },
           {
             role: "user",
-            content: `Analyze regulation ID ${regulationId} and provide comprehensive information for higher education compliance. Include all required fields in the specified JSON format.`
+            content: `Return a JSON object with regulation details for ID: ${regulationId}`
           }
         ],
-        temperature: 0.7,
+        temperature: 0,
+        response_format: { type: "json_object" },
+        max_tokens: 1000
       });
 
       if (!response.choices[0].message.content) {
         throw new Error("Empty response from OpenAI");
       }
 
-      const regulationData = JSON.parse(response.choices[0].message.content);
-      const validatedData = await validateRegulationResponse(regulationData);
+      let regulationData: any;
+      try {
+        const content = response.choices[0].message.content.trim();
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
+          `Received OpenAI response for regulation ${regulationId}`, {
+            id: "OPENAI_RESPONSE",
+            parameters: {
+              content_preview: content.substring(0, 100) + "...",
+              total_length: content.length,
+              format: "json_object"
+            }
+          });
 
-      console.log(`Successfully validated data for regulation ${regulationId}`);
+        regulationData = JSON.parse(content);
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
+          `Successfully parsed JSON response for regulation ${regulationId}`);
+      } catch (parseError) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 
+          `Failed to parse JSON response for regulation ${regulationId}`, {
+            id: "JSON_PARSE_ERROR",
+            parameters: {
+              error: parseError instanceof Error ? parseError.message : String(parseError),
+              content: response.choices[0].message.content,
+              attempt: attempts + 1
+            }
+          });
+        throw new Error(`Invalid JSON response: ${parseError.message}`);
+      }
+
+      const validatedData = await validateRegulationResponse(regulationData);
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
+        `Successfully validated data for regulation ${regulationId}`);
+
       return validatedData;
 
     } catch (error) {
       attempts++;
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
-        `Error gathering data for regulation ${regulationId} (Attempt ${attempts}/${MAX_RETRIES}):`,
-        { error: error instanceof Error ? error.message : String(error) });
+
+      // Handle OpenAI API-specific errors
+      if (error instanceof OpenAI.APIError) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
+          `OpenAI API error for regulation ${regulationId}`, {
+            id: "OPENAI_API_ERROR",
+            parameters: {
+              status: error.status,
+              code: error.code,
+              type: error.type,
+              message: error.message,
+              attempt: attempts,
+              regulationId
+            }
+          });
+      } else {
+        // Log other errors
+        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
+          `Error gathering data for regulation ${regulationId} (Attempt ${attempts}/${MAX_RETRIES})`, {
+            id: "REGULATION_DATA_ERROR",
+            parameters: {
+              error: error instanceof Error ? error.message : String(error),
+              attempt: attempts,
+              maxRetries: MAX_RETRIES,
+              regulationId,
+              error_type: error instanceof Error ? error.constructor.name : typeof error
+            }
+          });
+      }
 
       if (attempts === MAX_RETRIES) {
         syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
-          `Failed to gather data for regulation ${regulationId} after ${MAX_RETRIES} attempts`);
+          `Failed to gather data for regulation ${regulationId} after ${MAX_RETRIES} attempts`, {
+            id: "MAX_RETRIES_EXCEEDED",
+            parameters: {
+              regulationId,
+              attempts,
+              maxRetries: MAX_RETRIES
+            }
+          });
         return null;
       }
 
-      await delay(RETRY_DELAY * attempts); // Exponential backoff
+      // Exponential backoff
+      await delay(RETRY_DELAY * Math.pow(2, attempts - 1));
     }
   }
 
@@ -138,7 +221,7 @@ For education regulations:
 }
 
 async function enrichRegulationData(regulation: RegulationResponse): Promise<InsertRegulation> {
-  console.log('Enriching regulation data with additional fields');
+  syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 'Enriching regulation data with additional fields');
 
   const enrichedData: InsertRegulation = {
     ...regulation,
@@ -165,11 +248,17 @@ async function enrichRegulationData(regulation: RegulationResponse): Promise<Ins
     statuteIds: ''
   };
 
-  console.log('Successfully enriched regulation data');
+  syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 'Successfully enriched regulation data');
   return enrichedData;
 }
 
 export async function populateRegulationData(regulationIds: string[]): Promise<any> {
+  // First verify OpenAI API connection
+  const apiStatus = await verifyOpenAIConnection();
+  if (!apiStatus) {
+    throw new Error("Cannot proceed with regulation data population due to OpenAI API issues");
+  }
+
   syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
     `Starting regulation data population for ${regulationIds.length} regulations`);
 
@@ -178,98 +267,52 @@ export async function populateRegulationData(regulationIds: string[]): Promise<a
   let skipCount = 0;
   let results = [];
 
-  for (const regulationId of regulationIds) {
-    try {
-      // Check if regulation already exists
-      const existing = await db.select()
-        .from(regulations)
-        .where(eq(regulations.itemId, regulationId));
+  // Start with just one regulation for testing
+  const testRegulationId = regulationIds[0];
+  try {
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
+      `Testing with a single regulation: ${testRegulationId}`);
 
-      if (existing.length > 0) {
-        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
-          `Regulation ${regulationId} already exists, skipping`);
-        skipCount++;
-        results.push({
-          regulationId,
-          status: 'skipped',
-          reason: 'Already exists'
-        });
-        continue;
+    const regulationData = await gatherRegulationData(testRegulationId);
+    if (!regulationData) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
+        `Failed to gather test data for regulation ${testRegulationId}`);
+      return {
+        status: 'failed',
+        error: 'Failed to gather test regulation data',
+        regulationId: testRegulationId
+      };
+    }
+
+    const enrichedData = await enrichRegulationData(regulationData);
+    const newRegulation = await storage.createRegulation(enrichedData);
+
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
+      `Successfully tested regulation data gathering with ${testRegulationId}`);
+
+    return {
+      status: 'success',
+      regulation: {
+        id: newRegulation.id,
+        name: newRegulation.name,
+        topic: newRegulation.topic,
+        category: newRegulation.category
       }
+    };
 
-      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
-        `Gathering data for regulation ${regulationId}`);
-      const regulationData = await gatherRegulationData(regulationId);
-
-      if (!regulationData) {
-        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
-          `Failed to gather data for regulation ${regulationId}`);
-        failureCount++;
-        results.push({
-          regulationId,
-          status: 'failed',
-          error: 'Failed to gather regulation data'
-        });
-        continue;
-      }
-
-      const enrichedData = await enrichRegulationData(regulationData);
-
-      // Double-check for race conditions before insert
-      const doubleCheck = await db.select()
-        .from(regulations)
-        .where(eq(regulations.itemId, regulationId));
-
-      if (doubleCheck.length > 0) {
-        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING,
-          `Race condition detected: Regulation ${regulationId} was created during processing`);
-        skipCount++;
-        results.push({
-          regulationId,
-          status: 'skipped',
-          reason: 'Race condition - created during processing'
-        });
-        continue;
-      }
-
-      const newRegulation = await storage.createRegulation(enrichedData);
-      syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
-        `Successfully created regulation ${regulationId}`);
-
-      results.push({
-        regulationId,
-        status: 'success',
-        data: {
-          name: newRegulation.name,
-          topic: newRegulation.topic,
-          category: newRegulation.category
+  } catch (error) {
+    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
+      `Error in test regulation data gathering`, {
+        id: "TEST_REGULATION_ERROR",
+        parameters: {
+          error: error instanceof Error ? error.message : String(error),
+          regulationId: testRegulationId
         }
       });
-
-      successCount++;
-
-    } catch (error) {
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
-        `Error processing regulation ${regulationId}:`,
-        { error: error instanceof Error ? error.message : String(error) });
-
-      failureCount++;
-      results.push({
-        regulationId,
-        status: 'error',
-        error: error instanceof Error ? error.message : String(error)
-      });
-    }
+    return {
+      status: 'error',
+      error: error instanceof Error ? error.message : String(error),
+      regulationId: testRegulationId
+    };
   }
-
-  const summary = {
-    totalProcessed: regulationIds.length,
-    successful: successCount,
-    failed: failureCount,
-    skipped: skipCount,
-    results
-  };
-
-  syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 'Regulation Population Summary:', summary);
-  return summary;
 }

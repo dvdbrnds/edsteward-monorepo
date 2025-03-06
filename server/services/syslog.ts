@@ -155,13 +155,17 @@ export class SysLogger {
     const pid = process.pid.toString();
 
     try {
-      // Prepare structured data for database
+      // Prepare structured data for database with safe defaults
       const dbStructuredData = structuredData ? {
-        ...structuredData.parameters,
+        ...(structuredData.parameters || {}),
         _timestamp: timestamp.toISOString(),
         _facility: LogFacilityNames[facility],
         _level: LogLevelNames[level]
-      } : null;
+      } : {
+        _timestamp: timestamp.toISOString(),
+        _facility: LogFacilityNames[facility],
+        _level: LogLevelNames[level]
+      };
 
       // Store in database according to RFC 5424
       await db.insert(systemLogs).values({
@@ -179,11 +183,16 @@ export class SysLogger {
 
       // Format syslog message according to RFC 5424
       const pri = facility * 8 + level;
-      const structuredDataStr = structuredData
-        ? `[${structuredData.id} ${Object.entries(structuredData.parameters)
-            .map(([key, value]) => `${key}="${value}"`)
-            .join(' ')}]`
-        : '-';
+      let structuredDataStr = '-';
+
+      if (structuredData?.parameters) {
+        const entries = Object.entries(structuredData.parameters || {});
+        if (entries.length > 0) {
+          structuredDataStr = `[${structuredData.id} ${entries
+            .map(([key, value]) => `${key}="${String(value)}"`)
+            .join(' ')}]`;
+        }
+      }
 
       const syslogMessage = `<${pri}>1 ${timestamp.toISOString()} ${hostname} ${
         this.config.applicationName
