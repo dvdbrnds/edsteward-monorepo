@@ -3,89 +3,43 @@ import readline from 'readline';
 import { writeFileSync } from 'fs';
 import { db } from "./db";
 import { regulations } from "@shared/schema";
+import { syslog, LogLevel, LogFacility } from './services/syslog';
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
-
-async function prompt(question: string): Promise<string> {
-  return new Promise((resolve) => {
-    rl.question(question, (answer) => {
-      resolve(answer);
-    });
-  });
-}
-
-async function getAllRegulationIds(): Promise<string[]> {
-  console.log("Fetching all regulation IDs from database...");
-  const allRegulations = await db.select({ itemId: regulations.itemId }).from(regulations);
-  return allRegulations.map(reg => reg.itemId);
-}
-
-async function processIndividualRegulations(): Promise<string[]> {
-  const regulationIds: string[] = [];
-
-  console.log("\nExample regulation IDs you can use:");
-  console.log("- TITLE-IX-2024 (Education regulation)");
-  console.log("- ADA-2024-001 (Accessibility regulation)");
-  console.log("- FERPA-2024-UPDATE (Privacy regulation update)");
-
-  while (true) {
-    const id = await prompt("\nEnter a regulation ID (or press enter to finish): ");
-    if (!id) break;
-    regulationIds.push(id);
-  }
-
-  return regulationIds;
-}
+const standardRegulations = [
+  'TITLE-IX-2024',
+  'ADA-2024-001',
+  'FERPA-2024-UPDATE',
+  'CLERY-ACT-2024',
+  'SAFETY-REG-2024'
+];
 
 async function main() {
   try {
-    console.log("Welcome to the Regulation Data Collector");
-    console.log("----------------------------------------");
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Starting regulation data collection");
 
-    const mode = await prompt("\nChoose operation mode:\n1. Process individual regulations\n2. Process all regulations\nEnter choice (1 or 2): ");
+    console.log("Starting regulation data collection process...");
+    console.log("Using standard regulation set for initial population");
 
-    let regulationIds: string[] = [];
+    await populateRegulationData(standardRegulations);
 
-    if (mode === "1") {
-      regulationIds = await processIndividualRegulations();
-    } else if (mode === "2") {
-      regulationIds = await getAllRegulationIds();
-      console.log(`Found ${regulationIds.length} regulations to process`);
-    } else {
-      console.log("Invalid choice. Exiting...");
-      process.exit(1);
-    }
-
-    if (regulationIds.length === 0) {
-      console.log("No regulation IDs to process. Exiting...");
-      process.exit(0);
-    }
-
-    console.log("\nCollecting data for the following regulations:");
-    regulationIds.forEach(id => console.log(`- ${id}`));
-
-    await populateRegulationData(regulationIds);
-
-    const saveToFile = await prompt("\nWould you like to save the results to a file? (y/n): ");
-    if (saveToFile.toLowerCase() === 'y') {
-      const filename = `regulation-data-${new Date().toISOString().split('T')[0]}.json`;
-      writeFileSync(filename, JSON.stringify(regulationIds, null, 2));
-      console.log(`Results saved to ${filename}`);
-    }
+    console.log("Initial regulation data collection completed");
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Initial regulation data collection completed");
 
   } catch (error) {
     console.error("Error:", error);
-  } finally {
-    rl.close();
+    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Error in regulation collection", {
+      error: error instanceof Error ? error.message : String(error)
+    });
+    process.exit(1);
   }
 }
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (error) => {
   console.error('Unhandled promise rejection:', error);
+  syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Unhandled promise rejection", {
+    error: error instanceof Error ? error.message : String(error)
+  });
   process.exit(1);
 });
 

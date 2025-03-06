@@ -5,18 +5,24 @@ import * as schema from "@shared/schema";
 
 neonConfig.webSocketConstructor = ws;
 
-// Get the appropriate DATABASE_URL based on environment
-const dbUrl = process.env.NODE_ENV === 'staging' 
-  ? process.env.STAGING_DATABASE_URL 
-  : process.env.DATABASE_URL;
-
-if (!dbUrl) {
+if (!process.env.DATABASE_URL) {
   throw new Error(
-    "Database URL must be set. Did you forget to provision a database?",
+    "DATABASE_URL must be set. Did you forget to provision a database?",
   );
 }
 
-console.log(`Connecting to database in ${process.env.NODE_ENV || 'development'} mode`);
+// Get the current environment
+const currentEnv = process.env.NODE_ENV || 'development';
 
-export const pool = new Pool({ connectionString: dbUrl });
+// Create pool and db instances
+export const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 export const db = drizzle({ client: pool, schema });
+
+// After db is initialized, we can safely log
+console.log(`Database connected in ${currentEnv} environment`);
+
+// Export environment info for other modules
+export const isDevelopment = currentEnv === 'development';
+export const isProduction = currentEnv === 'production';
+export const isStaging = currentEnv === 'staging';
+export const isTest = currentEnv === 'test';

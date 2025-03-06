@@ -3,7 +3,7 @@ import { storage } from "../storage";
 import type { InsertRegulation } from "@shared/schema";
 import { db } from "../db";
 
-// the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
+// Initialize OpenAI client
 const openai = new OpenAI({ 
   apiKey: process.env.OPENAI_API_KEY 
 });
@@ -41,7 +41,7 @@ async function validateRegulationResponse(data: any): Promise<RegulationResponse
     throw new Error(`Invalid regulation data. Missing fields: ${missingFields.join(', ')}`);
   }
 
-  if (!['federal', 'state'].includes(data.jurisdiction)) {
+  if (!['federal', 'state'].includes(data.jurisdiction.toLowerCase())) {
     throw new Error(`Invalid jurisdiction: ${data.jurisdiction}. Must be 'federal' or 'state'`);
   }
 
@@ -55,36 +55,45 @@ async function gatherRegulationData(regulationId: string): Promise<RegulationRes
     try {
       console.log(`Attempt ${attempts + 1}/${MAX_RETRIES} to gather data for regulation ${regulationId}`);
 
-      const prompt = `Please analyze and provide detailed information about regulation ID ${regulationId} in JSON format. Include the following:
-      - Full name of the regulation
-      - Topic/subject matter
-      - Statute reference
-      - Detailed summary
-      - Key requirements
-      - Category (e.g., 'Human Resources', 'Academic Programs', etc.)
-      - Jurisdiction ('federal' or 'state')
-      - Agency information (URL, name, department)
-      - Submission guidelines if applicable
-
-      Format the response as a JSON object with these exact keys:
-      name, topic, statute, summary, requirements, category, jurisdiction, agency_url, agency_name, agency_department, submission_guidelines`;
+      const systemPrompt = `You are a regulation data assistant. Analyze the regulation ID and provide information in JSON format.
+Your response must be a valid JSON object with these exact keys:
+{
+  "name": "Full regulation name",
+  "topic": "Subject matter",
+  "statute": "Legal reference",
+  "summary": "Detailed description",
+  "requirements": "Key compliance requirements",
+  "category": "One of: Human Resources, Academic Programs, Finance, Campus Safety, Research",
+  "jurisdiction": "Either 'federal' or 'state'",
+  "agency_url": "Primary agency website URL",
+  "agency_name": "Full agency name",
+  "agency_department": "Specific department name",
+  "submission_guidelines": "Guidelines for compliance submissions"
+}`;
 
       const response = await openai.chat.completions.create({
         model: "gpt-4",
-        messages: [{ role: "user", content: prompt }],
-        response_format: { type: "json_object" }
+        messages: [
+          {
+            role: "system",
+            content: systemPrompt
+          },
+          {
+            role: "user",
+            content: `Analyze regulation ID ${regulationId} and provide all required information in the specified JSON format. If uncertain about specific agency details, use default values for the Department of Education.`
+          }
+        ],
+        temperature: 0.7,
       });
 
       if (!response.choices[0].message.content) {
         throw new Error("Empty response from OpenAI");
       }
 
-      console.log(`Successfully received response for ${regulationId}`);
-
       const regulationData = JSON.parse(response.choices[0].message.content);
       const validatedData = await validateRegulationResponse(regulationData);
 
-      console.log(`Validation successful for regulation ${regulationId}`);
+      console.log(`Successfully validated data for regulation ${regulationId}`);
       return validatedData;
 
     } catch (error) {
