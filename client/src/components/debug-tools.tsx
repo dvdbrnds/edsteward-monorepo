@@ -282,28 +282,30 @@ export function RegulationImportDebugger() {
   const checkOpenAiStatus = async () => {
     try {
       setOpenAiStatus('checking');
-      setLogs(prev => [...prev, `${new Date().toISOString()} - Checking OpenAI API status...`]);
-      
       const timestamp = new Date().toISOString();
-      
-      // Add timeout to prevent hanging requests
+      setLogs(prev => [...prev, `${timestamp} - Checking OpenAI API status...`]);
+
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-      
+      const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+
       try {
         const response = await fetch('/api/regulations/check-openai', {
           signal: controller.signal,
           headers: {
-            'Cache-Control': 'no-cache', // Prevent caching
+            'Cache-Control': 'no-cache',
             'Pragma': 'no-cache'
           }
         });
-        
+
         clearTimeout(timeoutId);
-        
         const data = await response.json();
-        console.log('OpenAI API check response:', data);
-        
+
+        console.log('OpenAI API check response:', {
+          status: response.status,
+          statusText: response.statusText,
+          data
+        });
+
         if (response.ok && data.status === 'ok') {
           setOpenAiStatus('ready');
           setLogs(prev => [
@@ -313,7 +315,6 @@ export function RegulationImportDebugger() {
             data.details ? `${timestamp} - Details: ${data.details}` : ''
           ].filter(Boolean));
         } else {
-          // Detailed error logging
           setOpenAiStatus('error');
           setLogs(prev => [
             ...prev, 
@@ -325,22 +326,21 @@ export function RegulationImportDebugger() {
         }
       } catch (fetchError) {
         clearTimeout(timeoutId);
-        throw fetchError; // Rethrow to be caught by the outer try/catch
+        throw fetchError;
       }
     } catch (error) {
       console.error('OpenAI API check error:', error);
       setOpenAiStatus('error');
-      
+
       const errorMessage = error instanceof Error ? error.message : String(error);
       const timestamp = new Date().toISOString();
-      
-      // More detailed error logging
+
       setLogs(prev => [
         ...prev, 
         `${timestamp} - OpenAI API Status: error`,
         `${timestamp} - Error: ${errorMessage}`,
         error instanceof Error && error.name === 'AbortError' 
-          ? `${timestamp} - Details: Request timed out after 10 seconds` 
+          ? `${timestamp} - Details: Request timed out after 15 seconds` 
           : `${timestamp} - Details: Connection failed, please check your network and API configuration`
       ]);
     }
@@ -407,7 +407,6 @@ export function RegulationImportDebugger() {
       setRegulationIds(data.ids);
       setLogs(prev => [...prev, `${new Date().toISOString()} - Found ${data.count} regulations to analyze`]);
 
-      // Start analysis with all regulation IDs
       await startAnalysis();
     } catch (error) {
       console.error('Error analyzing all regulations:', error);
