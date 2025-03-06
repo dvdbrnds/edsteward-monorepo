@@ -21,26 +21,40 @@ async function testDOLAPI() {
     console.log('First few characters:', apiKey.substring(0, 4) + '...');
     console.log('Contains special characters:', /[^a-zA-Z0-9]/.test(apiKey));
 
+    // First verify we can access the datasets endpoint
+    const baseUrl = 'https://apiprod.dol.gov/v4';
+    console.log('\nVerifying API access with datasets endpoint:', `${baseUrl}/datasets`);
+
+    const datasetsResponse = await axios.get(`${baseUrl}/datasets`);
+    console.log('Successfully accessed datasets endpoint:', datasetsResponse.status);
+    console.log('Number of datasets:', datasetsResponse.data?.datasets?.length || 0);
+
     console.log('\nTesting regulation IDs:', testIds);
 
     for (const regulationId of testIds) {
       try {
         console.log(`\nTesting regulation ID: ${regulationId}`);
 
-        // Construct the request URL exactly as per DOL API guide
-        const baseUrl = 'https://apiprod.dol.gov/v4/get';
-        const regulationNumber = regulationId.split('-').slice(1).join('-');
-        const filterObject = {
-          field: "regulation_number",
-          operator: "eq",
-          value: regulationNumber
-        };
+        // Get metadata with API key in both URL and header
+        const metadataUrl = `${baseUrl}/get/OASAM/regulatory/statutes/json/metadata?X-API-KEY=${apiKey}`;
 
-        const url = `${baseUrl}/OASAM/regulatory/statutes/json`;
-        console.log('\nFetching regulation data from:', url);
-        console.log('Filter object:', JSON.stringify(filterObject, null, 2));
-        console.log('API Key will be sent in headers');
+        console.log('\nFetching metadata from:', metadataUrl.replace(apiKey, '***'));
+        console.log('API Key will be sent in both URL and header');
 
+        const metadataResponse = await axios.get(metadataUrl, {
+          headers: {
+            'Accept': 'application/json',
+            'X-API-KEY': apiKey
+          }
+        });
+
+        console.log('\nMetadata Response:');
+        console.log('Status:', metadataResponse.status);
+        console.log('Headers:', JSON.stringify(metadataResponse.headers, null, 2));
+        console.log('Data:', JSON.stringify(metadataResponse.data, null, 2));
+
+        // Now attempt to fetch the regulation data
+        console.log('\nFetching regulation data...');
         const result = await fetchRegulationFromAPI(regulationId);
 
         console.log('\nAPI Response Data:');
@@ -54,23 +68,19 @@ async function testDOLAPI() {
         console.error('\nError fetching regulation:', error.message);
 
         if (axios.isAxiosError(error)) {
-          if (error.response) {
-            console.error('\nResponse Error Details:');
-            console.error('Status:', error.response.status);
-            console.error('Status Text:', error.response.statusText);
-            console.error('Headers:', JSON.stringify(error.response.headers, null, 2));
-            console.error('Error Data:', JSON.stringify(error.response.data, null, 2));
-          }
+          console.error('\nResponse Error Details:');
+          console.error('Status:', error.response?.status);
+          console.error('Status Text:', error.response?.statusText);
+          console.error('Headers:', JSON.stringify(error.response?.headers, null, 2));
+          console.error('Error Data:', JSON.stringify(error.response?.data, null, 2));
 
-          if (error.config) {
-            console.error('\nRequest Details:');
-            console.error('URL:', error.config.url?.replace(apiKey, '***'));
-            console.error('Method:', error.config.method);
-            console.error('Headers:', JSON.stringify({
-              ...error.config.headers,
-              'X-API-KEY': '***'  // Mask the API key in logs
-            }, null, 2));
-            console.error('Parameters:', JSON.stringify(error.config.params, null, 2));
+          console.error('\nRequest Details:');
+          console.error('URL:', error.config?.url?.replace(apiKey, '***'));
+          console.error('Method:', error.config?.method);
+          if (error.config?.headers) {
+            const safeHeaders = { ...error.config.headers };
+            if (safeHeaders['X-API-KEY']) safeHeaders['X-API-KEY'] = '***';
+            console.error('Headers:', JSON.stringify(safeHeaders, null, 2));
           }
 
           console.error('\nDetailed Error Information:');
