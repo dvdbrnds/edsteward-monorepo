@@ -22,10 +22,11 @@ async function calculateSignature(method: string, path: string, queryParams: Rec
   const canonicalHeaders = [
     'content-type:application/json',
     'host:api.dol.gov',
-    `x-amz-date:${timestamp}`
+    `x-amz-date:${timestamp}`,
+    `x-amz-security-token:${cleanApiKey}`
   ].join('\n') + '\n';
 
-  const signedHeaders = 'content-type;host;x-amz-date';
+  const signedHeaders = 'content-type;host;x-amz-date;x-amz-security-token';
 
   const canonicalRequest = [
     method,
@@ -96,7 +97,7 @@ async function testWithCurl() {
     const region = 'us-east-1';
     const service = 'execute-api';
     const scope = `${date}/${region}/${service}/aws4_request`;
-    const signedHeaders = 'content-type;host;x-amz-date';
+    const signedHeaders = 'content-type;host;x-amz-date;x-amz-security-token';
 
     // Create authorization header according to AWS v4 spec
     const authHeader = `AWS4-HMAC-SHA256 Credential=${apiKey.trim()}/${scope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
@@ -110,6 +111,7 @@ async function testWithCurl() {
       -H "Host: api.dol.gov" \
       -H "Content-Type: application/json" \
       -H "x-amz-date: ${timestamp}" \
+      -H "x-amz-security-token: ${apiKey.trim()}" \
       -H 'Authorization: ${authHeader}' \
       -H "Accept: application/json"`;
 
