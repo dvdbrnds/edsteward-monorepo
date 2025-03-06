@@ -33,19 +33,28 @@ const testLogin = async () => {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Accept': 'application/json'
       },
       body: JSON.stringify(credentials),
       credentials: 'include',
+      redirect: 'manual',
     });
 
     log('Login response status: -', response.status);
 
-    // Try to parse the response as JSON
-    try {
-      const data = await response.json();
-      log('Login response data: -', data);
-    } catch (err) {
-      log('Failed to parse login response as JSON');
+    // Check content type before trying to parse as JSON
+    const contentType = response.headers.get('content-type');
+    if (contentType && contentType.includes('application/json')) {
+      try {
+        const data = await response.json();
+        log('Login response data: -', data);
+      } catch (err) {
+        log('Failed to parse login response as JSON');
+      }
+    } else {
+      // Log the text response for debugging
+      const textResponse = await response.text();
+      log('Non-JSON response received:', textResponse.substring(0, 100) + '...');
     }
 
     if (!response.ok) {
