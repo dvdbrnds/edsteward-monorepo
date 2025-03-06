@@ -1,11 +1,10 @@
 import { fetchRegulationFromAPI } from './services/agency-api-service';
 import { syslog, LogLevel, LogFacility } from './syslog';
 import axios from 'axios';
+import { URL } from 'url';
 
 async function testDOLAPI() {
   try {
-    const testIds = ['DOL-2024-001'];
-
     console.log('\nStarting DOL API Integration Test...');
 
     // Verify API key is available
@@ -28,55 +27,82 @@ async function testDOLAPI() {
     console.log('Successfully accessed datasets endpoint:', datasetsResponse.status);
     console.log('Number of datasets:', datasetsResponse.data?.datasets?.length || 0);
 
-    console.log('\nTesting regulation IDs:', testIds);
+    // Display available datasets with filtering for labor/regulation related ones
+    if (datasetsResponse.data?.datasets) {
+      console.log('\nAll Available Datasets:');
+      datasetsResponse.data.datasets.forEach((dataset, index) => {
+        console.log(`\n${index + 1}. ${dataset.name}`);
+        console.log(`   Agency: ${dataset.agency}`);
+        console.log(`   API URL: ${dataset.api_url}`);
+        console.log(`   Description: ${dataset.description}`);
+      });
 
-    for (const regulationId of testIds) {
-      try {
-        console.log(`\nTesting regulation ID: ${regulationId}`);
+      console.log('\nSearching for Labor/Regulation Related Datasets:');
+      const laborDatasets = datasetsResponse.data.datasets.filter(dataset => 
+        dataset.name.toLowerCase().includes('labor') ||
+        dataset.name.toLowerCase().includes('regulation') ||
+        dataset.description.toLowerCase().includes('labor standards') ||
+        dataset.description.toLowerCase().includes('regulations')
+      );
 
-        // Log metadata request details
-        const metadataUrl = `${baseUrl}/v4/get/OASAM/regulatory/statutes/json/metadata`;
-        console.log('\nMetadata Request:');
-        console.log('URL:', metadataUrl);
-        console.log('Headers:', {
-          'Accept': 'application/json',
-          'X-API-KEY': '***'
+      if (laborDatasets.length > 0) {
+        console.log('\nFound Labor/Regulation Related Datasets:');
+        laborDatasets.forEach(dataset => {
+          console.log('\nDataset:', dataset.name);
+          console.log('Details:', JSON.stringify(dataset, null, 2));
         });
+      }
+    }
 
-        // Now attempt to fetch the regulation data
-        console.log('\nFetching regulation data...');
-        const result = await fetchRegulationFromAPI(regulationId);
+    // Test with the example dataset from the guide first
+    console.log('\nTesting example dataset from guide:');
+    const exampleUrl = new URL(`${baseUrl}/v4/get/trng/training_dataset_industries/json`);
+    exampleUrl.searchParams.append('X-API-KEY', apiKey);
+    exampleUrl.searchParams.append('limit', '10');
 
-        console.log('\nAPI Response Data:');
-        if (result) {
-          console.log(JSON.stringify(result, null, 2));
-        } else {
-          console.log('No data returned from API');
-        }
+    console.log('URL (masked):', exampleUrl.toString().replace(apiKey, '***'));
 
-      } catch (error) {
-        console.error('\nError fetching regulation:', error.message);
+    try {
+      const exampleResponse = await axios.get(exampleUrl.toString());
+      console.log('\nExample Dataset Response Structure:');
+      console.log('Response keys:', Object.keys(exampleResponse.data));
 
-        if (axios.isAxiosError(error) && error.response) {
-          console.error('\nResponse Error Details:');
-          console.error('Status:', error.response.status);
-          console.error('Status Text:', error.response.statusText);
-          console.error('Error Data:', JSON.stringify(error.response.data, null, 2));
+      if (exampleResponse.data?.data && Array.isArray(exampleResponse.data.data)) {
+        console.log('\nExample Dataset (first 2 records):');
+        console.log(JSON.stringify(exampleResponse.data.data.slice(0, 2), null, 2));
+        console.log('\nTotal records:', exampleResponse.data.data.length);
+      }
 
-          console.error('\nRequest Details:');
-          console.error('URL:', error.config.url);
-          console.error('Method:', error.config.method);
+      // Now test fetching a regulation
+      console.log('\nTesting regulation fetch:');
+      const regulationId = 'DOL-2024-001';
+      console.log('Fetching regulation:', regulationId);
 
-          if (error.config.headers) {
-            const safeHeaders = { ...error.config.headers };
-            if (safeHeaders['X-API-KEY']) safeHeaders['X-API-KEY'] = '***';
-            console.error('Headers:', JSON.stringify(safeHeaders, null, 2));
-          }
-        }
+      const result = await fetchRegulationFromAPI(regulationId);
+      if (result) {
+        console.log('\nRegulation Data:');
+        console.log(JSON.stringify(result, null, 2));
+      } else {
+        console.log('No regulation data found');
+      }
+
+    } catch (error) {
+      console.error('\nError during test:', error.message);
+
+      if (axios.isAxiosError(error) && error.response) {
+        console.error('\nResponse Error Details:');
+        console.error('Status:', error.response.status);
+        console.error('Status Text:', error.response.statusText);
+        console.error('Error Data:', JSON.stringify(error.response.data, null, 2));
+
+        console.error('\nRequest Details:');
+        console.error('URL:', error.config?.url?.replace(apiKey, '***'));
+        console.error('Method:', error.config?.method);
       }
     }
   } catch (error) {
     console.error('Test execution error:', error);
+    process.exit(1);
   }
 }
 
