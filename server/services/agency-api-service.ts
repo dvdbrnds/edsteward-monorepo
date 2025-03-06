@@ -50,16 +50,20 @@ export async function fetchRegulationFromAPI(regulationId: string): Promise<any>
           dataCount: datasetsResponse.data?.datasets?.length || 0
         });
 
-      // Now get metadata using API key as query parameter
-      const metadataUrl = new URL(`${config.baseUrl}/v4/get/${config.agency}/${config.endpoint}/json/metadata`);
-      metadataUrl.searchParams.append('X-API-KEY', apiKey);
+      // Now get metadata following DOL API guide format
+      const metadataUrl = `${config.baseUrl}/v4/get/${config.agency}/${config.endpoint}/json/metadata`;
 
       syslog.log(LogFacility.LOCAL0, LogLevel.DEBUG,
         'Making metadata request:', {
-          url: metadataUrl.toString().replace(apiKey, '***')
+          url: metadataUrl
         });
 
-      const metadataResponse = await axios.get(metadataUrl.toString());
+      const metadataResponse = await axios.get(metadataUrl, {
+        headers: {
+          'Accept': 'application/json',
+          'X-API-KEY': apiKey
+        }
+      });
 
       // Extract regulation number from ID (e.g., "2024-001" from "DOL-2024-001")
       const regulationNumber = regulationId.split('-').slice(1).join('-');
@@ -72,17 +76,24 @@ export async function fetchRegulationFromAPI(regulationId: string): Promise<any>
       };
 
       // Now fetch the actual regulation data
-      const dataUrl = new URL(`${config.baseUrl}/v4/get/${config.agency}/${config.endpoint}/json`);
-      dataUrl.searchParams.append('X-API-KEY', apiKey);
-      dataUrl.searchParams.append('filter_object', JSON.stringify(filterObject));
+      const dataUrl = `${config.baseUrl}/v4/get/${config.agency}/${config.endpoint}/json`;
 
       syslog.log(LogFacility.LOCAL0, LogLevel.DEBUG,
         'Making regulation data request:', {
-          url: dataUrl.toString().replace(apiKey, '***'),
+          url: dataUrl,
           filterObject
         });
 
-      const regulationResponse = await axios.get(dataUrl.toString());
+      const regulationResponse = await axios.get(dataUrl, {
+        params: {
+          filter_object: JSON.stringify(filterObject)
+        },
+        headers: {
+          'Accept': 'application/json',
+          'X-API-KEY': apiKey
+        }
+      });
+
       return regulationResponse.data;
 
     } catch (error) {
@@ -92,7 +103,11 @@ export async function fetchRegulationFromAPI(regulationId: string): Promise<any>
         data: error.response?.data,
         request: {
           method: error.config?.method,
-          url: error.config?.url?.replace(apiKey, '***')
+          url: error.config?.url,
+          headers: {
+            ...error.config?.headers,
+            'X-API-KEY': '***'
+          }
         }
       } : {};
 
@@ -105,7 +120,6 @@ export async function fetchRegulationFromAPI(regulationId: string): Promise<any>
             details: errorDetails
           }
         });
-
       throw error;
     }
   } catch (error) {
