@@ -309,7 +309,10 @@ export function RegulationImportDebugger() {
         // More comprehensive error handling
         if (response.status !== 200) {
           console.error('OpenAI API check error details:', data);
+          // Reset status to show error state
           setOpenAiStatus('error');
+          // Clear previous logs related to this check
+          setLogs(prev => prev.filter(log => !log.includes('OpenAI API Status')));
           setLogs(prev => [
             ...prev, 
             `${timestamp} - OpenAI API Status: error`,

@@ -264,12 +264,13 @@ export function registerRoutes(app: Express): Server {
   });
 
   // Add this endpoint after the existing regulations endpoints
+  // Separate standalone endpoint for OpenAI API checks
   app.get("/api/regulations/check-openai", async (req, res) => {
     try {
       console.log("Checking OpenAI API configuration...");
       
-      // Skip any regulation validation for this endpoint
-      // This endpoint is only for checking OpenAI API status
+      // This is a standalone endpoint with no relation to regulations
+      // It only checks if the OpenAI API key is configured and working
       
       if (!process.env.OPENAI_API_KEY) {
         console.log("OpenAI API key is missing");
