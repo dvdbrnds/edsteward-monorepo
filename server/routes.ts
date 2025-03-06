@@ -268,6 +268,9 @@ export function registerRoutes(app: Express): Server {
     try {
       console.log("Checking OpenAI API configuration...");
 
+      // Remove any auth or regulation ID validation for this endpoint
+      // This endpoint should only check the OpenAI API status
+      
       if (!process.env.OPENAI_API_KEY) {
         console.log("OpenAI API key is missing");
         return res.status(400).json({ 

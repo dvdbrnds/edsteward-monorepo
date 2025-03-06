@@ -305,6 +305,19 @@ export function RegulationImportDebugger() {
           statusText: response.statusText,
           data
         });
+        
+        // More comprehensive error handling
+        if (response.status !== 200) {
+          setOpenAiStatus('error');
+          setLogs(prev => [
+            ...prev, 
+            `${timestamp} - OpenAI API Status: error`,
+            `${timestamp} - Message: ${data.message || data.error || 'Unknown error'}`,
+            data.details ? `${timestamp} - Details: ${data.details}` : '',
+            `${timestamp} - HTTP Status: ${response.status} ${response.statusText}`
+          ].filter(Boolean));
+          return;
+        }
 
         if (response.ok && data.status === 'ok') {
           setOpenAiStatus('ready');
