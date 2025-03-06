@@ -2,6 +2,9 @@ import OpenAI from "openai";
 import { storage } from "../storage";
 import type { InsertRegulation } from "@shared/schema";
 import { db } from "../db";
+import { eq } from "drizzle-orm";
+import { regulations } from "@shared/schema";
+import { syslog, LogLevel, LogFacility } from '../services/syslog';
 
 // Initialize OpenAI client
 const openai = new OpenAI({ 
@@ -49,11 +52,23 @@ async function validateRegulationResponse(data: any): Promise<RegulationResponse
 }
 
 async function gatherRegulationData(regulationId: string): Promise<RegulationResponse | null> {
+  // First check if regulation already exists
+  const existing = await db.select()
+    .from(regulations)
+    .where(eq(regulations.itemId, regulationId));
+
+  if (existing.length > 0) {
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
+      `Regulation ${regulationId} already exists, skipping data gathering`);
+    return null;
+  }
+
   let attempts = 0;
 
   while (attempts < MAX_RETRIES) {
     try {
-      console.log(`Attempt ${attempts + 1}/${MAX_RETRIES} to gather data for regulation ${regulationId}`);
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
+        `Attempt ${attempts + 1}/${MAX_RETRIES} to gather data for regulation ${regulationId}`);
 
       const systemPrompt = `You are an expert in higher education compliance regulations. Analyze the given regulation ID and provide detailed information focusing on its impact on educational institutions.
 
@@ -105,10 +120,13 @@ For education regulations:
 
     } catch (error) {
       attempts++;
-      console.error(`Error gathering data for regulation ${regulationId} (Attempt ${attempts}/${MAX_RETRIES}):`, error);
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
+        `Error gathering data for regulation ${regulationId} (Attempt ${attempts}/${MAX_RETRIES}):`,
+        { error: error instanceof Error ? error.message : String(error) });
 
       if (attempts === MAX_RETRIES) {
-        console.error(`Failed to gather data for regulation ${regulationId} after ${MAX_RETRIES} attempts`);
+        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
+          `Failed to gather data for regulation ${regulationId} after ${MAX_RETRIES} attempts`);
         return null;
       }
 
@@ -152,19 +170,40 @@ async function enrichRegulationData(regulation: RegulationResponse): Promise<Ins
 }
 
 export async function populateRegulationData(regulationIds: string[]): Promise<any> {
-  console.log(`Starting regulation data population for ${regulationIds.length} regulations`);
+  syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
+    `Starting regulation data population for ${regulationIds.length} regulations`);
 
   let successCount = 0;
   let failureCount = 0;
+  let skipCount = 0;
   let results = [];
 
   for (const regulationId of regulationIds) {
     try {
-      console.log(`Gathering data for regulation ${regulationId}`);
+      // Check if regulation already exists
+      const existing = await db.select()
+        .from(regulations)
+        .where(eq(regulations.itemId, regulationId));
+
+      if (existing.length > 0) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
+          `Regulation ${regulationId} already exists, skipping`);
+        skipCount++;
+        results.push({
+          regulationId,
+          status: 'skipped',
+          reason: 'Already exists'
+        });
+        continue;
+      }
+
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
+        `Gathering data for regulation ${regulationId}`);
       const regulationData = await gatherRegulationData(regulationId);
 
       if (!regulationData) {
-        console.error(`Failed to gather data for regulation ${regulationId}`);
+        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
+          `Failed to gather data for regulation ${regulationId}`);
         failureCount++;
         results.push({
           regulationId,
@@ -175,10 +214,27 @@ export async function populateRegulationData(regulationIds: string[]): Promise<a
       }
 
       const enrichedData = await enrichRegulationData(regulationData);
-      console.log('Creating new regulation:', enrichedData);
+
+      // Double-check for race conditions before insert
+      const doubleCheck = await db.select()
+        .from(regulations)
+        .where(eq(regulations.itemId, regulationId));
+
+      if (doubleCheck.length > 0) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING,
+          `Race condition detected: Regulation ${regulationId} was created during processing`);
+        skipCount++;
+        results.push({
+          regulationId,
+          status: 'skipped',
+          reason: 'Race condition - created during processing'
+        });
+        continue;
+      }
 
       const newRegulation = await storage.createRegulation(enrichedData);
-      console.log('Created regulation:', newRegulation);
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
+        `Successfully created regulation ${regulationId}`);
 
       results.push({
         regulationId,
@@ -190,11 +246,13 @@ export async function populateRegulationData(regulationIds: string[]): Promise<a
         }
       });
 
-      console.log(`Successfully populated data for regulation ${regulationId}`);
       successCount++;
 
     } catch (error) {
-      console.error(`Error processing regulation ${regulationId}:`, error);
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
+        `Error processing regulation ${regulationId}:`,
+        { error: error instanceof Error ? error.message : String(error) });
+
       failureCount++;
       results.push({
         regulationId,
@@ -208,9 +266,10 @@ export async function populateRegulationData(regulationIds: string[]): Promise<a
     totalProcessed: regulationIds.length,
     successful: successCount,
     failed: failureCount,
+    skipped: skipCount,
     results
   };
 
-  console.log('\nRegulation Population Summary:', summary);
+  syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 'Regulation Population Summary:', summary);
   return summary;
 }
