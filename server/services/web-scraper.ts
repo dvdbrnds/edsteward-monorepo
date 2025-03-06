@@ -9,12 +9,30 @@ interface ScrapedRegulationData {
   title?: string;
   lastUpdated?: string;
   downloadUrls?: string[];
+  source?: string;
 }
 
-const AGENCY_BASE_URLS = {
-  'ED': 'https://www2.ed.gov',
-  'DOL': 'https://www.dol.gov',
-  'OSHA': 'https://www.osha.gov',
+// Map regulation IDs to their authoritative source URLs
+const REGULATION_URLS = {
+  'TITLE-IX-2024': [
+    'https://www2.ed.gov/about/offices/list/ocr/docs/t9interp.html',
+    'https://www2.ed.gov/about/offices/list/ocr/titleix.html', // Main Title IX page
+    'https://www2.ed.gov/about/offices/list/ocr/docs/tix_dis.html' // Title IX guidance
+  ],
+  'CLERY-ACT-2024': [
+    'https://www2.ed.gov/admins/lead/safety/campus.html',
+    'https://www2.ed.gov/admins/lead/safety/clery.html'
+  ],
+  'FERPA-2024-UPDATE': [
+    'https://www2.ed.gov/policy/gen/guid/fpco/ferpa/index.html',
+    'https://www2.ed.gov/policy/gen/guid/fpco/ferpa/students.html',
+    'https://www2.ed.gov/policy/gen/reg/ferpa/index.html'
+  ],
+  'ADA-2024-001': [
+    'https://www.ada.gov/education/higher-ed-guidance/',
+    'https://www.ada.gov/education/higher-ed-requirements/',
+    'https://www.ada.gov/resources/higher-education-guidance/'
+  ]
 };
 
 const CONTENT_SELECTORS = [
@@ -26,7 +44,27 @@ const CONTENT_SELECTORS = [
   '.regulation-content',
   '.policy-content',
   '.compliance-content',
-  '[data-content-type="regulation"]'
+  '[data-content-type="regulation"]',
+  '.regulation-text',
+  '.requirement-details',
+  '.policy-requirements',
+  '[data-type="regulation"]',
+  '[data-content="policy"]',
+  '.law-content',
+  '.statute-text',
+  '#regulationText',
+  '.requirements-list',
+  // Additional selectors for regulation-specific content
+  '.compliance-requirements',
+  '.legal-requirements',
+  '.reporting-requirements',
+  '.deadlines',
+  '.submission-guidelines',
+  // Broader fallback selectors
+  '.container',
+  '#main-content',
+  '.page-content',
+  '.entry-content'
 ];
 
 async function scrapeWithPuppeteer(url: string): Promise<string> {
@@ -37,26 +75,110 @@ async function scrapeWithPuppeteer(url: string): Promise<string> {
 
   try {
     const page = await browser.newPage();
-    await page.goto(url, { waitUntil: 'networkidle0', timeout: 30000 });
+    await page.setViewport({ width: 1280, height: 800 });
+    await page.goto(url, { 
+      waitUntil: 'networkidle0', 
+      timeout: 45000 // Increased timeout for slower pages
+    });
 
     // Wait for content to load
     for (const selector of CONTENT_SELECTORS) {
       try {
-        await page.waitForSelector(selector, { timeout: 5000 });
+        await page.waitForSelector(selector, { timeout: 10000 });
         const content = await page.$eval(selector, el => el.textContent || '');
-        if (content.length > 100) { // Basic validation that we got meaningful content
+        if (content.length > 100) {
+          syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
+            `Found content using Puppeteer with selector: ${selector}`);
           return content;
         }
       } catch (e) {
-        continue; // Try next selector
+        continue;
       }
     }
 
-    // Fallback: get all text content if no selectors matched
-    return await page.$eval('body', el => el.textContent || '');
+    // Fallback: get all visible text content
+    return await page.evaluate(() => {
+      const walker = document.createTreeWalker(
+        document.body,
+        NodeFilter.SHOW_TEXT,
+        {
+          acceptNode: function(node) {
+            if (!node.parentElement) return NodeFilter.FILTER_REJECT;
+            const style = window.getComputedStyle(node.parentElement);
+            if (style.display === 'none' || style.visibility === 'hidden') {
+              return NodeFilter.FILTER_REJECT;
+            }
+            return NodeFilter.FILTER_ACCEPT;
+          }
+        }
+      );
+
+      let text = '';
+      let node;
+      while (node = walker.nextNode()) {
+        text += node.textContent + ' ';
+      }
+      return text.trim();
+    });
   } finally {
     await browser.close();
   }
+}
+
+export async function scrapeRegulationUrls(regulationId: string): Promise<ScrapedRegulationData[]> {
+  const urls = REGULATION_URLS[regulationId] || [];
+  if (!urls.length) {
+    syslog.log(LogFacility.LOCAL0, LogLevel.WARNING,
+      `No predefined URLs found for regulation ${regulationId}`);
+    return [];
+  }
+
+  const results: ScrapedRegulationData[] = [];
+  for (const url of urls) {
+    try {
+      const data = await scrapeAgencyWebsite(url);
+      if (data.content) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
+          `Successfully scraped content from ${url}`, {
+            id: "SCRAPE_SUCCESS",
+            parameters: {
+              url,
+              contentLength: data.content.length,
+              title: data.title || 'Untitled',
+              preview: data.content.substring(0, 100) + '...'
+            }
+          });
+        results.push({
+          ...data,
+          source: 'HTML'
+        });
+      }
+    } catch (error) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
+        `Failed to scrape URL ${url} for regulation ${regulationId}`, {
+          id: "SCRAPE_ERROR",
+          parameters: {
+            url,
+            regulationId,
+            error: error instanceof Error ? error.message : String(error)
+          }
+        });
+    }
+  }
+
+  // Log summary of scraped content
+  syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
+    `Scraped ${results.length} sources for regulation ${regulationId}`, {
+      id: "SCRAPE_SUMMARY",
+      parameters: {
+        regulationId,
+        totalSources: results.length,
+        htmlSources: results.filter(r => r.source === 'HTML').length,
+        totalContentLength: results.reduce((sum, r) => sum + r.content.length, 0)
+      }
+    });
+
+  return results;
 }
 
 export async function scrapeAgencyWebsite(url: string): Promise<ScrapedRegulationData> {
@@ -83,6 +205,8 @@ export async function scrapeAgencyWebsite(url: string): Promise<ScrapedRegulatio
         const selectedContent = $(selector).text().trim();
         if (selectedContent.length > 100) {
           content = selectedContent;
+          syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
+            `Found content using selector: ${selector}`);
           break;
         }
       }
@@ -121,9 +245,10 @@ export async function scrapeAgencyWebsite(url: string): Promise<ScrapedRegulatio
 
     // Find regulation-specific download links
     const downloadUrls = links.filter(href => 
-      href.toLowerCase().endsWith('.pdf') || 
-      href.toLowerCase().endsWith('.doc') || 
-      href.toLowerCase().endsWith('.docx')
+      href.toLowerCase().includes('/pdf/') ||
+      href.toLowerCase().includes('/docs/') ||
+      href.toLowerCase().includes('/regs/') ||
+      href.toLowerCase().includes('/guidance/')
     );
 
     // Try to find the page title
@@ -136,18 +261,6 @@ export async function scrapeAgencyWebsite(url: string): Promise<ScrapedRegulatio
       .text()
       .trim();
 
-    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
-      `Successfully scraped data from ${url}`, {
-        id: "SCRAPE_SUCCESS",
-        parameters: {
-          url,
-          contentLength: content.length,
-          linksCount: links.length,
-          hasTitle: !!title,
-          hasDownloads: downloadUrls.length
-        }
-      });
-
     return {
       content: content.replace(/\s+/g, ' ').trim(),
       links,
@@ -155,6 +268,7 @@ export async function scrapeAgencyWebsite(url: string): Promise<ScrapedRegulatio
       lastUpdated,
       downloadUrls
     };
+
   } catch (error) {
     syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 
       `Failed to scrape data from ${url}`, {
@@ -165,48 +279,5 @@ export async function scrapeAgencyWebsite(url: string): Promise<ScrapedRegulatio
         }
       });
     throw error;
-  }
-}
-
-export async function findRegulationPages(baseUrl: string, searchTerm: string): Promise<string[]> {
-  try {
-    const searchUrl = `${baseUrl}/search?q=${encodeURIComponent(searchTerm)}`;
-    const response = await axios.get(searchUrl);
-    const $ = cheerio.load(response.data);
-
-    // Extract search results that look like regulation pages
-    const regulationLinks = $('a')
-      .map((_, el) => $(el).attr('href'))
-      .get()
-      .filter(href => {
-        if (!href) return false;
-        const lower = href.toLowerCase();
-        return lower.includes('regulation') || 
-               lower.includes('compliance') || 
-               lower.includes('standard') ||
-               lower.includes('requirement') ||
-               lower.includes('policy') ||
-               lower.includes('guidance');
-      })
-      .map(href => {
-        try {
-          return new URL(href, baseUrl).toString();
-        } catch {
-          return href;
-        }
-      });
-
-    return [...new Set(regulationLinks)]; // Remove duplicates
-  } catch (error) {
-    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 
-      `Failed to search for regulation pages at ${baseUrl}`, {
-        id: "SEARCH_ERROR",
-        parameters: {
-          baseUrl,
-          searchTerm,
-          error: error instanceof Error ? error.message : String(error)
-        }
-      });
-    return [];
   }
 }

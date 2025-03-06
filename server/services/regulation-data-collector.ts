@@ -5,7 +5,7 @@ import { syslog, LogLevel, LogFacility } from './syslog';
 import OpenAI from "openai";
 import type { InsertRegulation } from "@shared/schema";
 import { storage } from "../storage";
-import { scrapeAgencyWebsite, findRegulationPages } from './web-scraper';
+import { scrapeRegulationUrls } from './web-scraper';
 
 // Initialize OpenAI client
 if (!process.env.OPENAI_API_KEY) {
@@ -15,34 +15,6 @@ if (!process.env.OPENAI_API_KEY) {
 const openai = new OpenAI({ 
   apiKey: process.env.OPENAI_API_KEY 
 });
-
-// Define agency-specific URLs and their regulation page patterns
-const AGENCY_BASE_URLS = {
-  'ED': {
-    baseUrl: 'https://www2.ed.gov',
-    regulationPaths: [
-      '/policy/gen/guid/fpco/ferpa',
-      '/about/offices/list/ocr',
-      '/policy/highered/reg',
-      '/about/offices/list/ope/policy'
-    ]
-  },
-  'DOL': {
-    baseUrl: 'https://www.dol.gov',
-    regulationPaths: [
-      '/agencies/oasam/regulatory/statutes',
-      '/general/topic/discrimination',
-      '/agencies/eta/policy'
-    ]
-  },
-  'OSHA': {
-    baseUrl: 'https://www.osha.gov',
-    regulationPaths: [
-      '/laws-regs',
-      '/regulations/standards'
-    ]
-  }
-};
 
 async function verifyOpenAIConnection() {
   try {
@@ -59,13 +31,7 @@ async function verifyOpenAIConnection() {
       throw new Error("Empty response from OpenAI");
     }
 
-    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "OpenAI API connection successful", {
-      id: "OPENAI_STATUS",
-      parameters: {
-        status: "ok",
-        message: "API key is valid and working properly"
-      }
-    });
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "OpenAI API connection successful");
     return true;
   } catch (error) {
     syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "OpenAI API connection failed", {
@@ -80,46 +46,6 @@ async function verifyOpenAIConnection() {
   }
 }
 
-interface RegulationResponse {
-  name: string;
-  topic: string;
-  statute: string;
-  summary: string;
-  requirements: string;
-  category: string;
-  jurisdiction: string;
-  agency_url: string;
-  agency_name: string;
-  agency_department: string;
-  submission_guidelines: string;
-}
-
-const MAX_RETRIES = 3;
-const RETRY_DELAY = 1000; // 1 second
-
-async function delay(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-async function validateRegulationResponse(data: any): Promise<RegulationResponse> {
-  const requiredFields = [
-    'name', 'topic', 'statute', 'summary', 'requirements',
-    'category', 'jurisdiction', 'agency_url', 'agency_name',
-    'agency_department', 'submission_guidelines'
-  ];
-
-  const missingFields = requiredFields.filter(field => !data[field]);
-  if (missingFields.length > 0) {
-    throw new Error(`Invalid regulation data. Missing fields: ${missingFields.join(', ')}`);
-  }
-
-  if (!['federal', 'state'].includes(data.jurisdiction.toLowerCase())) {
-    throw new Error(`Invalid jurisdiction: ${data.jurisdiction}. Must be 'federal' or 'state'`);
-  }
-
-  return data as RegulationResponse;
-}
-
 async function gatherRegulationData(regulationId: string): Promise<RegulationResponse | null> {
   let attempts = 0;
 
@@ -128,72 +54,56 @@ async function gatherRegulationData(regulationId: string): Promise<RegulationRes
       syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
         `Attempt ${attempts + 1}/${MAX_RETRIES} to gather data for regulation ${regulationId}`);
 
-      // Prepare search terms from regulation ID
-      const searchTerms = regulationId
-        .split('-')
-        .map(term => term.toLowerCase())
-        .filter(term => term !== 'act' && term !== 'law' && !term.match(/^\d+$/));
+      // Scrape all predefined URLs for this regulation
+      const scrapedResults = await scrapeRegulationUrls(regulationId);
 
-      let scrapedContent = '';
-      let relevantUrls = new Set<string>();
+      // Process and organize the scraped content
+      let primaryContent = '';
+      let supplementaryContent = '';
+      let downloadLinks = '';
 
-      // Search and scrape from each agency's relevant paths
-      for (const [agency, config] of Object.entries(AGENCY_BASE_URLS)) {
-        // First check specific regulation paths
-        for (const path of config.regulationPaths) {
-          const fullUrl = `${config.baseUrl}${path}`;
-          try {
-            const { content, links } = await scrapeAgencyWebsite(fullUrl);
-            if (content) {
-              scrapedContent += `\nContent from ${agency} (${fullUrl}):\n${content}\n`;
-              // Add relevant links to our set
-              links.forEach(link => {
-                if (searchTerms.some(term => link.toLowerCase().includes(term))) {
-                  relevantUrls.add(link);
-                }
-              });
-            }
-          } catch (error) {
-            syslog.log(LogFacility.LOCAL0, LogLevel.WARNING,
-              `Failed to scrape ${agency} path ${path}`, {
-                id: "SCRAPE_WARNING",
-                parameters: {
-                  agency,
-                  path,
-                  error: error instanceof Error ? error.message : String(error)
-                }
-              });
+      for (const result of scrapedResults) {
+        if (result.content) {
+          // Primary content comes from HTML pages
+          if (!result.downloadUrls?.length) {
+            primaryContent += `\nContent from ${result.title || 'Main Page'}:\n${result.content}\n`;
+          } else {
+            // Supplementary content comes from PDFs and other documents
+            supplementaryContent += `\nSupplementary content from ${result.title || 'Document'}:\n${result.content}\n`;
           }
         }
-
-        // Then search the site for our specific regulation
-        const searchResults = await findRegulationPages(config.baseUrl, searchTerms.join(' '));
-        for (const url of searchResults) {
-          if (!relevantUrls.has(url)) {
-            try {
-              const { content } = await scrapeAgencyWebsite(url);
-              if (content) {
-                scrapedContent += `\nSearch result from ${agency} (${url}):\n${content}\n`;
-              }
-            } catch (error) {
-              syslog.log(LogFacility.LOCAL0, LogLevel.WARNING,
-                `Failed to scrape search result from ${agency}`, {
-                  id: "SEARCH_SCRAPE_WARNING",
-                  parameters: {
-                    agency,
-                    url,
-                    error: error instanceof Error ? error.message : String(error)
-                  }
-                });
-            }
-          }
+        if (result.downloadUrls?.length) {
+          downloadLinks += `\nRelated documents:\n${result.downloadUrls.join('\n')}\n`;
         }
       }
 
-      // If we found no content, log warning and proceed with basic info
-      if (!scrapedContent.trim()) {
+      const combinedContent = `
+Primary Content:
+${primaryContent}
+
+Supplementary Content:
+${supplementaryContent}
+
+Available Documents:
+${downloadLinks}
+`.trim();
+
+      // Log content details before sending to OpenAI
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
+        `Preparing to send content to OpenAI for regulation ${regulationId}`, {
+          id: "CONTENT_SUMMARY",
+          parameters: {
+            contentLength: combinedContent.length,
+            primaryContentLength: primaryContent.length,
+            supplementaryContentLength: supplementaryContent.length,
+            documentCount: downloadLinks.split('\n').length,
+            preview: combinedContent.substring(0, 200) + '...'
+          }
+        });
+
+      if (!combinedContent) {
         syslog.log(LogFacility.LOCAL0, LogLevel.WARNING,
-          `No content found for regulation ${regulationId} from any agency`);
+          `No content found for regulation ${regulationId} from predefined URLs`);
       }
 
       const response = await openai.chat.completions.create({
@@ -201,11 +111,12 @@ async function gatherRegulationData(regulationId: string): Promise<RegulationRes
         messages: [
           {
             role: "system",
-            content: `You are an expert in higher education compliance regulations. Analyze the provided content from government agency websites to extract detailed regulation information. Focus on:
-- Official regulation names and citations
-- Specific requirements for educational institutions
-- Reporting and compliance guidelines
-- Agency contact information and submission procedures
+            content: `You are an expert in higher education compliance regulations. Analyze the provided content from official agency websites to extract detailed regulation information. Focus on:
+
+1. Official names and legal citations
+2. Core requirements for educational institutions
+3. Specific compliance guidelines and deadlines
+4. Agency contact points and submission procedures
 
 Return ONLY a JSON object with these exact fields:
 {
@@ -220,15 +131,17 @@ Return ONLY a JSON object with these exact fields:
   "agency_name": "Official agency name",
   "agency_department": "Specific department or office",
   "submission_guidelines": "Required documentation and reporting procedures"
-}`
+}
+
+Include ONLY factual information found in the provided content.`
           },
           {
             role: "user",
-            content: `Analyze this scraped content from agency websites for regulation ${regulationId}:
+            content: `Analyze this official content for regulation ${regulationId}:
 
-${scrapedContent}
+${combinedContent}
 
-Extract key regulation information and return it in the specified JSON format. Include only factual information found in the content.`
+Extract and structure the regulation information as a JSON object following the specified format. Include only verifiable information from the provided content.`
           }
         ],
         temperature: 0,
@@ -246,14 +159,13 @@ Extract key regulation information and return it in the specified JSON format. I
           `Received OpenAI response for regulation ${regulationId}`, {
             id: "OPENAI_RESPONSE",
             parameters: {
-              content_preview: content.substring(0, 100) + "...",
-              length: content.length
+              content_preview: content.substring(0, 200) + "...",
+              length: content.length,
+              structure: Object.keys(JSON.parse(content)).join(', ')
             }
           });
 
         regulationData = JSON.parse(content);
-        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
-          `Successfully parsed JSON response for regulation ${regulationId}`);
       } catch (parseError) {
         syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 
           `Failed to parse JSON response for regulation ${regulationId}`, {
@@ -310,6 +222,46 @@ Extract key regulation information and return it in the specified JSON format. I
   return null;
 }
 
+interface RegulationResponse {
+  name: string;
+  topic: string;
+  statute: string;
+  summary: string;
+  requirements: string;
+  category: string;
+  jurisdiction: string;
+  agency_url: string;
+  agency_name: string;
+  agency_department: string;
+  submission_guidelines: string;
+}
+
+const MAX_RETRIES = 3;
+const RETRY_DELAY = 1000; // 1 second
+
+async function delay(ms: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function validateRegulationResponse(data: any): Promise<RegulationResponse> {
+  const requiredFields = [
+    'name', 'topic', 'statute', 'summary', 'requirements',
+    'category', 'jurisdiction', 'agency_url', 'agency_name',
+    'agency_department', 'submission_guidelines'
+  ];
+
+  const missingFields = requiredFields.filter(field => !data[field]);
+  if (missingFields.length > 0) {
+    throw new Error(`Invalid regulation data. Missing fields: ${missingFields.join(', ')}`);
+  }
+
+  if (!['federal', 'state'].includes(data.jurisdiction.toLowerCase())) {
+    throw new Error(`Invalid jurisdiction: ${data.jurisdiction}. Must be 'federal' or 'state'`);
+  }
+
+  return data as RegulationResponse;
+}
+
 async function enrichRegulationData(regulation: RegulationResponse): Promise<InsertRegulation> {
   const enrichedData: InsertRegulation = {
     ...regulation,
@@ -340,7 +292,6 @@ async function enrichRegulationData(regulation: RegulationResponse): Promise<Ins
 }
 
 export async function populateRegulationData(regulationIds: string[]): Promise<any> {
-  // First verify OpenAI API connection
   const apiStatus = await verifyOpenAIConnection();
   if (!apiStatus) {
     throw new Error("Cannot proceed with regulation data population due to OpenAI API issues");
@@ -439,3 +390,30 @@ export async function populateRegulationData(regulationIds: string[]): Promise<a
   });
   return summary;
 }
+
+const AGENCY_BASE_URLS = {
+  'ED': {
+    baseUrl: 'https://www2.ed.gov',
+    regulationPaths: [
+      '/policy/gen/guid/fpco/ferpa',
+      '/about/offices/list/ocr',
+      '/policy/highered/reg',
+      '/about/offices/list/ope/policy'
+    ]
+  },
+  'DOL': {
+    baseUrl: 'https://www.dol.gov',
+    regulationPaths: [
+      '/agencies/oasam/regulatory/statutes',
+      '/general/topic/discrimination',
+      '/agencies/eta/policy'
+    ]
+  },
+  'OSHA': {
+    baseUrl: 'https://www.osha.gov',
+    regulationPaths: [
+      '/laws-regs',
+      '/regulations/standards'
+    ]
+  }
+};

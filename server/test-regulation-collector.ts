@@ -4,14 +4,11 @@ async function main() {
   // Test regulation IDs - these would typically come from your source of regulations
   const testRegulationIds = [
     // Valid regulation IDs
-    'OSHA-2024-001',  // Workplace safety regulation
-    'EDU-2024-001',   // Education regulation
-    'FERPA-2024',     // Privacy regulation
-
-    // Invalid/malformed IDs to test error handling
-    'INVALID-REG',    // Invalid format
-    '',               // Empty string
-    'TEST-123'        // Unknown format
+    'TITLE-IX-2024',    // Title IX updates for 2024
+    'CLERY-ACT-2024',   // Clery Act updates
+    'FERPA-2024-UPDATE', // FERPA updates
+    'ADA-2024-001',     // ADA compliance updates
+    'OSHA-2024-001',    // OSHA Safety regulations
   ];
 
   try {
