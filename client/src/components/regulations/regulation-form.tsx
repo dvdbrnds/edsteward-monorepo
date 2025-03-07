@@ -23,16 +23,33 @@ export default function RegulationForm({ onSuccess }: { onSuccess: () => void })
     resolver: zodResolver(insertRegulationSchema),
     defaultValues: {
       itemId: "",
+      name: "",
       topic: "",
       statute: "",
       statuteIds: "",
       requirements: "",
       requirementsUrl: "",
-      regulationUrl: "https://www.ecfr.gov/current/title-45/subtitle-B/chapter-VI/part-617",
+      regulationUrl: "",
       summary: "",
-      deadlines: "",
       category: "",
+      jurisdiction: "federal",
       agency_url: "",
+      agency_name: "",
+      agency_department: "",
+      submissionGuideUrl: "",
+      formsUrl: "",
+      submissionGuidelines: "",
+      isApplicable: true,
+      filingDeadlines: [],
+      reportingFrequency: "",
+      applicableforms: [],
+      relatedRegulations: [],
+      notificationSchedule: {
+        initialReminder: 90,
+        weeklyReminder: 30,
+        dailyReminder: 7,
+        finalDayReminders: true
+      }
     }
   });
 
@@ -70,6 +87,20 @@ export default function RegulationForm({ onSuccess }: { onSuccess: () => void })
           render={({ field }) => (
             <FormItem>
               <FormLabel>Item ID</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Name</FormLabel>
               <FormControl>
                 <Input {...field} />
               </FormControl>
@@ -137,7 +168,7 @@ export default function RegulationForm({ onSuccess }: { onSuccess: () => void })
             <FormItem>
               <FormLabel>Summary</FormLabel>
               <FormControl>
-                <Textarea {...field} />
+                <Textarea {...field} placeholder="Brief overview of the regulation" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -151,10 +182,107 @@ export default function RegulationForm({ onSuccess }: { onSuccess: () => void })
             <FormItem>
               <FormLabel>Requirements</FormLabel>
               <FormDescription>
-                Enter the regulation citation (e.g., 45 C.F.R. § 617)
+                Enter the detailed requirements for compliance
               </FormDescription>
               <FormControl>
-                <Textarea {...field} />
+                <Textarea {...field} placeholder="List specific requirements and obligations" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* New submission-specific fields */}
+        <div className="bg-gray-50 p-4 rounded-lg space-y-4">
+          <h3 className="text-lg font-semibold">Submission Requirements</h3>
+
+          <FormField
+            control={form.control}
+            name="submissionGuidelines"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Submission Guidelines</FormLabel>
+                <FormDescription>
+                  Detailed instructions for submitting compliance documentation
+                </FormDescription>
+                <FormControl>
+                  <Textarea {...field} placeholder="Step-by-step submission process and requirements" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="submissionGuideUrl"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Submission Guide URL</FormLabel>
+                <FormDescription>
+                  Link to official submission guidelines or documentation
+                </FormDescription>
+                <FormControl>
+                  <Input {...field} type="url" placeholder="https://example.com/submission-guide" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="formsUrl"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Required Forms URL</FormLabel>
+                <FormDescription>
+                  Link to required forms or templates
+                </FormDescription>
+                <FormControl>
+                  <Input {...field} type="url" placeholder="https://example.com/required-forms" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="reportingFrequency"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Reporting Frequency</FormLabel>
+                <FormDescription>
+                  How often submissions are required
+                </FormDescription>
+                <FormControl>
+                  <select
+                    {...field}
+                    className="w-full p-2 border rounded-md"
+                  >
+                    <option value="">Select frequency</option>
+                    <option value="annual">Annual</option>
+                    <option value="semi-annual">Semi-Annual</option>
+                    <option value="quarterly">Quarterly</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="as-needed">As Needed</option>
+                  </select>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+
+        <FormField
+          control={form.control}
+          name="agency_name"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Agency Name</FormLabel>
+              <FormControl>
+                <Input {...field} placeholder="Name of the regulatory agency" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -163,38 +291,18 @@ export default function RegulationForm({ onSuccess }: { onSuccess: () => void })
 
         <FormField
           control={form.control}
-          name="regulationUrl"
+          name="agency_department"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Regulation URL</FormLabel>
-              <FormDescription>
-                Enter the specific ECFR URL for this regulation
-              </FormDescription>
+              <FormLabel>Agency Department</FormLabel>
               <FormControl>
-                <Input
-                  {...field}
-                  type="url"
-                  placeholder="https://www.ecfr.gov/current/title-45/subtitle-B/chapter-VI/part-617"
-                />
+                <Input {...field} placeholder="Specific department or division" />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
 
-        <FormField
-          control={form.control}
-          name="deadlines"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Deadlines</FormLabel>
-              <FormControl>
-                <Input {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
 
         <Button
           type="submit"
