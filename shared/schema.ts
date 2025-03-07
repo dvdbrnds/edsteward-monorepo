@@ -2,6 +2,14 @@ import { pgTable, text, serial, integer, timestamp, boolean, date, jsonb } from 
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// Add source interface
+export interface RegulationSource {
+  url: string;
+  type: 'agency-api' | 'web-scrape' | 'document-link';
+  title?: string;
+  lastChecked?: Date;
+}
+
 // Users table
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -93,6 +101,7 @@ export const regulations = pgTable("regulations", {
     dailyReminder: number;
     finalDayReminders: boolean;
   }>(),
+  sources: jsonb("sources").$type<RegulationSource[]>(), // Add sources column
 });
 
 // Notifications table
@@ -166,6 +175,12 @@ export const insertRegulationSchema = createInsertSchema(regulations).extend({
     dailyReminder: z.number().min(1).max(30).default(7),
     finalDayReminders: z.boolean().default(true),
   }).optional().nullable(),
+  sources: z.array(z.object({
+    url: z.string(),
+    type: z.enum(['agency-api', 'web-scrape', 'document-link']),
+    title: z.string().optional(),
+    lastChecked: z.date().optional()
+  })).optional().nullable(),
 });
 
 // Schema for inserting notifications

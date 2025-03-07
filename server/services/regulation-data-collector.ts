@@ -6,7 +6,7 @@ import OpenAI from "openai";
 import type { InsertRegulation } from "@shared/schema";
 import { storage } from "../storage";
 import { scrapeRegulationUrls } from './web-scraper';
-import { fetchRegulationFromAPI } from './agency-api-service';
+import { fetchRegulationFromAgency } from './agency-api-service';
 
 // Initialize OpenAI client
 if (!process.env.OPENAI_API_KEY) {
@@ -16,6 +16,59 @@ if (!process.env.OPENAI_API_KEY) {
 const openai = new OpenAI({ 
   apiKey: process.env.OPENAI_API_KEY 
 });
+
+const AGENCY_BASE_URLS = {
+  'ED': {
+    baseUrl: 'https://www2.ed.gov',
+    regulationPaths: [
+      '/policy/gen/guid/fpco/ferpa',
+      '/about/offices/list/ocr',
+      '/policy/highered/reg',
+      '/about/offices/list/ope/policy',
+      '/about/offices/list/oese/legislation',
+      '/idea/regs',
+      '/policy/elsec/leg/esea02'
+    ]
+  },
+  'DOL': {
+    baseUrl: 'https://www.dol.gov',
+    regulationPaths: [
+      '/agencies/oasam/regulatory/statutes',
+      '/general/topic/discrimination',
+      '/agencies/eta/policy',
+      '/agencies/whd/laws-and-regulations',
+      '/agencies/ebsa/laws-and-regulations',
+      '/agencies/osha/laws-and-regulations'
+    ]
+  },
+  'EEOC': {
+    baseUrl: 'https://www.eeoc.gov',
+    regulationPaths: [
+      '/laws-regulations',
+      '/regulations',
+      '/guidance',
+      '/youth/laws'
+    ]
+  },
+  'ADA': {
+    baseUrl: 'https://www.ada.gov',
+    regulationPaths: [
+      '/education',
+      '/education/higher-ed-guidance',
+      '/education/higher-ed-requirements',
+      '/enforcement/settlement-agreements'
+    ]
+  },
+  'OCR': {
+    baseUrl: 'https://www2.ed.gov/about/offices/list/ocr',
+    regulationPaths: [
+      '/frontpage/pro-students/race-origin',
+      '/frontpage/pro-students/sex-discrimination',
+      '/frontpage/pro-students/disability',
+      '/frontpage/pro-students/language-minorities'
+    ]
+  }
+};
 
 async function verifyOpenAIConnection() {
   try {
@@ -56,30 +109,41 @@ async function gatherRegulationData(regulationId: string): Promise<RegulationRes
         `Attempt ${attempts + 1}/${MAX_RETRIES} to gather data for regulation ${regulationId}`);
 
       // First try to get data from agency API
-      const apiData = await fetchRegulationFromAPI(regulationId);
+      const apiData = await fetchRegulationFromAgency(regulationId);
 
+      // Initialize content containers
       let primaryContent = '';
       let supplementaryContent = '';
       let downloadLinks = '';
+      let sources: Array<{url: string; type: string}> = [];
 
-      if (apiData) {
-        // If we have API data, use it as primary content
-        primaryContent = `API Data for ${regulationId}:\n${JSON.stringify(apiData, null, 2)}\n`;
-      } else {
-        // Fall back to web scraping if API data isn't available
-        const scrapedResults = await scrapeRegulationUrls(regulationId);
+      // Process API data if available
+      if (apiData && apiData.length > 0) {
+        primaryContent = apiData.map(regulation => 
+          `API Data for ${regulation.id}:\n${JSON.stringify(regulation, null, 2)}`
+        ).join('\n\n');
+        sources.push({ url: apiData[0].url, type: 'agency-api' });
+      }
 
-        for (const result of scrapedResults) {
-          if (result.content) {
-            if (!result.downloadUrls?.length) {
-              primaryContent += `\nContent from ${result.title || 'Main Page'}:\n${result.content}\n`;
-            } else {
-              supplementaryContent += `\nSupplementary content from ${result.title || 'Document'}:\n${result.content}\n`;
-            }
+      // Always try web scraping to gather supplementary data
+      const scrapedResults = await scrapeRegulationUrls(regulationId);
+
+      for (const result of scrapedResults) {
+        if (result.content) {
+          sources.push({ url: result.title || result.url || 'Unknown', type: 'web-scrape' });
+
+          if (!result.downloadUrls?.length) {
+            primaryContent += `\nContent from ${result.title || 'Main Page'}:\n${result.content}\n`;
+          } else {
+            supplementaryContent += `\nSupplementary content from ${result.title || 'Document'}:\n${result.content}\n`;
           }
-          if (result.downloadUrls?.length) {
-            downloadLinks += `\nRelated documents:\n${result.downloadUrls.join('\n')}\n`;
-          }
+        }
+
+        if (result.downloadUrls?.length) {
+          downloadLinks += `\nRelated documents:\n${result.downloadUrls.join('\n')}\n`;
+          result.downloadUrls.forEach(url => {
+            sources.push({ url, type: 'document-link' });
+          });
         }
       }
 
@@ -92,6 +156,9 @@ ${supplementaryContent}
 
 Available Documents:
 ${downloadLinks}
+
+Data Sources:
+${sources.map(s => `- ${s.type}: ${s.url}`).join('\n')}
 `.trim();
 
       // Log content details before sending to OpenAI
@@ -103,14 +170,15 @@ ${downloadLinks}
             primaryContentLength: primaryContent.length,
             supplementaryContentLength: supplementaryContent.length,
             documentCount: downloadLinks.split('\n').length,
-            preview: combinedContent.substring(0, 200) + '...',
-            sourceType: apiData ? 'API' : 'Web Scraping'
+            sourceCount: sources.length,
+            preview: combinedContent.substring(0, 200) + '...'
           }
         });
 
       if (!combinedContent) {
         syslog.log(LogFacility.LOCAL0, LogLevel.WARNING,
-          `No content found for regulation ${regulationId} from predefined URLs`);
+          `No content found for regulation ${regulationId}`);
+        return null;
       }
 
       const response = await openai.chat.completions.create({
@@ -185,6 +253,9 @@ Extract and structure the regulation information as a JSON object following the 
         throw parseError;
       }
 
+      // Store source information with the regulation data
+      regulationData.sources = sources;
+
       const validatedData = await validateRegulationResponse(regulationData);
       return validatedData;
 
@@ -236,11 +307,12 @@ interface RegulationResponse {
   summary: string;
   requirements: string;
   category: string;
-  jurisdiction: string;
+  jurisdiction: "federal" | "state";
   agency_url: string;
   agency_name: string;
   agency_department: string;
   submission_guidelines: string;
+  sources?: Array<{url: string; type: string}>;
 }
 
 const MAX_RETRIES = 3;
@@ -266,33 +338,44 @@ async function validateRegulationResponse(data: any): Promise<RegulationResponse
     throw new Error(`Invalid jurisdiction: ${data.jurisdiction}. Must be 'federal' or 'state'`);
   }
 
+  // Ensure jurisdiction is correctly formatted
+  data.jurisdiction = data.jurisdiction.toLowerCase() as "federal" | "state";
+
   return data as RegulationResponse;
 }
 
 async function enrichRegulationData(regulation: RegulationResponse): Promise<InsertRegulation> {
+  // Create enriched data with all required fields
   const enrichedData: InsertRegulation = {
-    ...regulation,
     itemId: `REG-${Date.now()}`,
+    name: regulation.name,
+    topic: regulation.topic,
+    statute: regulation.statute,
+    category: regulation.category,
+    jurisdiction: regulation.jurisdiction,
     isApplicable: true,
-    lastUpdated: new Date(),
-    effectiveDate: null,
     originationDate: null,
+    effectiveDate: null,
+    lastUpdated: new Date(),
     lastVerified: new Date(),
     nextReviewDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
     filingDeadlines: null,
     reportingFrequency: '',
+    agency_url: regulation.agency_url,
+    agency_name: regulation.agency_name,
+    agency_contact: '',
+    agency_department: regulation.agency_department,
     regulationUrl: '',
     requirementsUrl: '',
     submissionGuideUrl: '',
     formsUrl: '',
-    regulationText: '',
+    submissionGuidelines: regulation.submission_guidelines,
+    regulationText: regulation.summary + '\n\n' + regulation.requirements,
     applicableforms: null,
     relatedRegulations: null,
     complianceNotes: '',
     verificationMethod: '',
-    notificationSchedule: null,
-    agency_contact: '',
-    statuteIds: ''
+    notificationSchedule: null
   };
 
   return enrichedData;
@@ -315,10 +398,7 @@ export async function populateRegulationData(regulationIds: string[]): Promise<a
   for (const regulationId of regulationIds) {
     try {
       // Check if regulation already exists
-      const existing = await db.select()
-        .from(regulations)
-        .where(eq(regulations.itemId, regulationId));
-
+      const existing = await storage.searchRegulations(regulationId);
       if (existing.length > 0) {
         syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
           `Regulation ${regulationId} already exists, skipping`);
@@ -360,7 +440,8 @@ export async function populateRegulationData(regulationIds: string[]): Promise<a
           id: newRegulation.id,
           name: newRegulation.name,
           topic: newRegulation.topic,
-          category: newRegulation.category
+          category: newRegulation.category,
+          sources: regulationData.sources
         }
       });
 
@@ -397,30 +478,3 @@ export async function populateRegulationData(regulationIds: string[]): Promise<a
   });
   return summary;
 }
-
-const AGENCY_BASE_URLS = {
-  'ED': {
-    baseUrl: 'https://www2.ed.gov',
-    regulationPaths: [
-      '/policy/gen/guid/fpco/ferpa',
-      '/about/offices/list/ocr',
-      '/policy/highered/reg',
-      '/about/offices/list/ope/policy'
-    ]
-  },
-  'DOL': {
-    baseUrl: 'https://www.dol.gov',
-    regulationPaths: [
-      '/agencies/oasam/regulatory/statutes',
-      '/general/topic/discrimination',
-      '/agencies/eta/policy'
-    ]
-  },
-  'OSHA': {
-    baseUrl: 'https://www.osha.gov',
-    regulationPaths: [
-      '/laws-regs',
-      '/regulations/standards'
-    ]
-  }
-};
