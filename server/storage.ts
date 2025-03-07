@@ -20,7 +20,7 @@ import type {
   InsertNote,
 } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, or, like } from "drizzle-orm";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
@@ -44,6 +44,7 @@ export interface IStorage {
   updateRegulation(id: number, regulation: Partial<InsertRegulation>): Promise<Regulation>;
   setRegulationApplicability(id: number, isApplicable: boolean): Promise<Regulation>;
   getRegulationsByJurisdiction(jurisdiction: string): Promise<Regulation[]>;
+  searchRegulations(searchTerm: string): Promise<Regulation[]>;
 
   // Notification methods
   getNotificationsByUser(userId: number): Promise<Notification[]>;
@@ -229,6 +230,26 @@ export class DatabaseStorage implements IStorage {
       .where(eq(regulations.jurisdiction, jurisdiction));
     console.log(`Found ${result.length} ${jurisdiction} regulations`);
     return result;
+  }
+
+  async searchRegulations(searchTerm: string): Promise<Regulation[]> {
+    try {
+      console.log(`Searching for regulations with term: ${searchTerm}`);
+      const results = await db.select()
+        .from(regulations)
+        .where(
+          or(
+            eq(regulations.itemId, searchTerm),
+            like(regulations.name, `%${searchTerm}%`),
+            like(regulations.topic, `%${searchTerm}%`)
+          )
+        );
+      console.log(`Found ${results.length} matching regulations`);
+      return results;
+    } catch (error) {
+      console.error("Error searching regulations:", error);
+      return [];
+    }
   }
 
   async getNotificationsByUser(userId: number): Promise<Notification[]> {
