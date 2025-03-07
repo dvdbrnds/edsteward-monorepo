@@ -15,6 +15,7 @@
  * ```
  */
 
+import { useState } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import type { Regulation, Deadline, Guide } from "@shared/schema";
@@ -71,9 +72,7 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { NoteSection } from "@/components/regulations/note-section";
-import { RegulationDiffViewer } from "@/components/regulations/regulation-diff-viewer";
-import { useState } from "react";
-
+import { RegulationChanges } from "@/components/regulations/regulation-changes";
 
 /**
  * @interface RegulationWithOverride
@@ -513,7 +512,7 @@ export default function RegulationDetailPage() {
                             </Button>
                             {showVersionHistory && regulation?.previousVersionId && (
                               <div className="mt-4">
-                                <RegulationDiffViewer currentRegulation={regulation} />
+                                <RegulationChanges currentRegulation={regulation} />
                               </div>
                             )}
                           </div>
