@@ -1,9 +1,9 @@
 import { FC, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Timeline, TrackList, Track, TimelineRow } from "@/components/ui/timeline";
+import { History, AlertCircle, CheckCircle, Clock } from "lucide-react";
 import { format } from "date-fns";
 import { type Regulation } from "@shared/schema";
-import { History, AlertCircle, CheckCircle } from "lucide-react";
+import { motion } from "framer-motion";
 
 interface RegulationTimelineProps {
   regulation: Regulation;
@@ -19,7 +19,8 @@ export const RegulationTimeline: FC<RegulationTimelineProps> = ({ regulation }) 
         date: new Date(regulation.originationDate),
         title: "Regulation Originated",
         description: "Initial publication of the regulation",
-        type: "origin"
+        type: "origin",
+        icon: <History className="h-5 w-5 text-blue-500" />
       });
     }
 
@@ -29,7 +30,8 @@ export const RegulationTimeline: FC<RegulationTimelineProps> = ({ regulation }) 
         date: new Date(regulation.effectiveDate),
         title: "Regulation Effective",
         description: "Regulation became effective",
-        type: "effective"
+        type: "effective",
+        icon: <CheckCircle className="h-5 w-5 text-green-500" />
       });
     }
 
@@ -39,7 +41,8 @@ export const RegulationTimeline: FC<RegulationTimelineProps> = ({ regulation }) 
         date: new Date(regulation.lastUpdated),
         title: "Last Updated",
         description: regulation.changeSummary || "Regulation was updated",
-        type: "update"
+        type: "update",
+        icon: <History className="h-5 w-5 text-purple-500" />
       });
     }
 
@@ -49,7 +52,8 @@ export const RegulationTimeline: FC<RegulationTimelineProps> = ({ regulation }) 
         date: new Date(regulation.nextReviewDate),
         title: "Next Review Due",
         description: "Scheduled review date",
-        type: "upcoming"
+        type: "upcoming",
+        icon: <Clock className="h-5 w-5 text-orange-500" />
       });
     }
 
@@ -70,27 +74,37 @@ export const RegulationTimeline: FC<RegulationTimelineProps> = ({ regulation }) 
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-8">
-          {timelineEvents.map((event, index) => (
-            <div key={index} className="flex items-start gap-4">
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-50">
-                {event.type === "upcoming" ? (
-                  <AlertCircle className="h-5 w-5 text-blue-500" />
-                ) : (
-                  <CheckCircle className="h-5 w-5 text-blue-500" />
-                )}
-              </div>
-              <div>
-                <div className="font-medium">{event.title}</div>
-                <div className="text-sm text-gray-500">
-                  {format(event.date, "PPP")}
+        <div className="relative pl-8">
+          {/* Vertical line */}
+          <div className="absolute left-4 top-0 bottom-0 w-px bg-border" />
+
+          {/* Timeline events */}
+          <div className="space-y-8">
+            {timelineEvents.map((event, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.2 }}
+                className="relative"
+              >
+                {/* Timeline dot */}
+                <div className="absolute -left-8 flex h-8 w-8 items-center justify-center rounded-full bg-background border-2">
+                  {event.icon}
                 </div>
-                <div className="mt-1 text-sm text-gray-600">
-                  {event.description}
+
+                <div className="rounded-lg border bg-card p-4">
+                  <div className="mb-2 font-medium">{event.title}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {format(event.date, "PPP")}
+                  </div>
+                  <div className="mt-2 text-sm">
+                    {event.description}
+                  </div>
                 </div>
-              </div>
-            </div>
-          ))}
+              </motion.div>
+            ))}
+          </div>
         </div>
       </CardContent>
     </Card>

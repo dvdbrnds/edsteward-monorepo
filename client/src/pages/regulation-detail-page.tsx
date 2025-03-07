@@ -73,8 +73,7 @@ import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { NoteSection } from "@/components/regulations/note-section";
 import { RegulationChanges } from "@/components/regulations/regulation-changes";
-import { RegulationTimeline } from "@/components/regulations/regulation-timeline"; // Added import
-
+import { RegulationTimeline } from "@/components/regulations/regulation-timeline";
 
 /**
  * @interface RegulationWithOverride
@@ -333,7 +332,6 @@ export default function RegulationDetailPage() {
                 <span className="px-2 py-1 bg-gray-100 rounded">
                   ID: {regulation?.itemId}
                 </span>
-                {/* In the category selector section */}
                 {user?.role === "admin" ? (
                   <Select
                     defaultValue={regulation?.category}
@@ -439,6 +437,7 @@ export default function RegulationDetailPage() {
               </Card>
             </div>
 
+            <RegulationTimeline regulation={regulation} />
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-6">
@@ -703,7 +702,6 @@ export default function RegulationDetailPage() {
                   </Card>
                 )}
 
-                {/* In the notification settings card section */}
                 {user?.role === "admin" && (
                   <Card className="border-2 border-[#5B2C8F] shadow-md bg-purple-50/30 relative hover:bg-purple-50/50 transition-colors">
                     <div className="absolute top-3 right-3 bg-[#5B2C8F] text-white text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
