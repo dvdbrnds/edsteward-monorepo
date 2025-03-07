@@ -3,7 +3,7 @@ import { regulations } from "@shared/schema";
 import { eq } from "drizzle-orm";
 import { syslog, LogLevel, LogFacility } from './syslog';
 import OpenAI from "openai";
-import type { InsertRegulation } from "@shared/schema";
+import type { InsertRegulation, Regulation } from "@shared/schema";
 import { storage } from "../storage";
 import { scrapeRegulationUrls } from './web-scraper';
 import { fetchRegulationFromAgency } from './agency-api-service';
@@ -102,6 +102,17 @@ async function verifyOpenAIConnection() {
 
 async function gatherRegulationData(regulationId: string): Promise<RegulationResponse | null> {
   let attempts = 0;
+
+  // First check if regulation exists
+  const existingRegulations = await storage.searchRegulations(regulationId);
+  let previousVersion: Regulation | null = null;
+
+  if (existingRegulations.length > 0) {
+    // Find the current version
+    previousVersion = existingRegulations.find(reg => reg.isCurrent) || existingRegulations[0];
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
+      `Found existing regulation ${regulationId}, current version: ${previousVersion.versionNumber}`);
+  }
 
   while (attempts < MAX_RETRIES) {
     try {
@@ -269,6 +280,40 @@ Extract and structure the regulation information as a JSON object following the 
         throw parseError;
       }
 
+      // Generate version metadata if updating existing regulation
+      if (previousVersion) {
+        const changes: Array<{field: string; oldValue: string; newValue: string; type: string}> = [];
+
+        // Compare fields and generate diff
+        const compareFields = ['name', 'topic', 'statute', 'summary', 'requirements', 'submissionGuidelines'];
+        for (const field of compareFields) {
+          const oldValue = String(previousVersion[field] || '');
+          const newValue = String(regulationData[field] || '');
+
+          if (oldValue !== newValue) {
+            changes.push({
+              field,
+              oldValue,
+              newValue,
+              type: !oldValue ? 'addition' : !newValue ? 'deletion' : 'modification'
+            });
+          }
+        }
+
+        // Add version metadata
+        regulationData.versionNumber = (previousVersion.versionNumber || 1) + 1;
+        regulationData.previousVersionId = previousVersion.id;
+        regulationData.versionMetadata = {
+          changes,
+          mergeMetadata: {
+            mergedFrom: [previousVersion.itemId]
+          }
+        };
+
+        // Mark previous version as not current
+        await storage.updateRegulation(previousVersion.id, { isCurrent: false });
+      }
+
       // Store source information with the regulation data
       regulationData.sources = sources;
 
@@ -339,6 +384,12 @@ interface RegulationResponse {
     special_requirements?: string;
   };
   sources?: Array<{url: string; type: string}>;
+  versionNumber?: number;
+  previousVersionId?: string;
+  versionMetadata?: {
+    changes: Array<{field: string; oldValue: string; newValue: string; type: string}>;
+    mergeMetadata: { mergedFrom: string[] };
+  };
 }
 
 const MAX_RETRIES = 3;
@@ -371,7 +422,6 @@ async function validateRegulationResponse(data: any): Promise<RegulationResponse
 }
 
 async function enrichRegulationData(regulation: RegulationResponse): Promise<InsertRegulation> {
-  // Create enriched data with all required fields
   const enrichedData: InsertRegulation = {
     itemId: `REG-${Date.now()}`,
     name: regulation.name,
@@ -412,7 +462,15 @@ async function enrichRegulationData(regulation: RegulationResponse): Promise<Ins
     complianceNotes: '',
     verificationMethod: '',
     notificationSchedule: null,
-    sources: regulation.sources
+    sources: regulation.sources,
+    versionNumber: regulation.versionNumber || 1,
+    previousVersionId: regulation.previousVersionId || null,
+    versionDate: new Date(),
+    changeSummary: regulation.versionMetadata?.changes
+      .map(c => `${c.type}: ${c.field}`)
+      .join('; ') || null,
+    isCurrent: true,
+    versionMetadata: regulation.versionMetadata || null,
   };
 
   return enrichedData;

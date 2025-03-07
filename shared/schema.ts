@@ -10,6 +10,20 @@ export interface RegulationSource {
   lastChecked?: Date;
 }
 
+// Add after the RegulationSource interface
+export interface RegulationVersion {
+  changes: {
+    field: string;
+    oldValue: string;
+    newValue: string;
+    type: 'addition' | 'deletion' | 'modification';
+  }[];
+  mergeMetadata?: {
+    mergedFrom: string[];
+    conflictResolutions?: Record<string, string>;
+  };
+}
+
 // Users table
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -56,7 +70,7 @@ export const notes = pgTable("notes", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-// Regulations table
+// Update the regulations table definition
 export const regulations = pgTable("regulations", {
   id: serial("id").primaryKey(),
   itemId: text("item_id").notNull(),
@@ -74,6 +88,14 @@ export const regulations = pgTable("regulations", {
   lastUpdated: timestamp("last_updated"),
   lastVerified: timestamp("last_verified"),
   nextReviewDate: timestamp("next_review_date"),
+  // Version control fields
+  versionNumber: integer("version_number").notNull().default(1),
+  previousVersionId: integer("previous_version_id").references(() => regulations.id),
+  versionDate: timestamp("version_date").notNull().defaultNow(),
+  changeSummary: text("change_summary"),
+  isCurrent: boolean("is_current").notNull().default(true),
+  versionMetadata: jsonb("version_metadata").$type<RegulationVersion>(),
+  // Existing fields continue...
   filingDeadlines: jsonb("filing_deadlines").$type<{
     type: string;
     date: string;
@@ -101,7 +123,7 @@ export const regulations = pgTable("regulations", {
     dailyReminder: number;
     finalDayReminders: boolean;
   }>(),
-  sources: jsonb("sources").$type<RegulationSource[]>(), // Add sources column
+  sources: jsonb("sources").$type<RegulationSource[]>(),
 });
 
 // Notifications table
@@ -148,13 +170,32 @@ console.log("Note insertion schema created successfully");
 // Log schema structure for debugging
 console.log("Note schema fields:", Object.keys(notes));
 
-// Schema for inserting regulations
+// Update the insert schema to include version control fields
 export const insertRegulationSchema = createInsertSchema(regulations).extend({
   name: z.string().min(1, "Regulation name is required"),
   jurisdiction: z.enum(["federal", "state"]),
   originationDate: z.date().optional().nullable(),
   effectiveDate: z.date().optional().nullable(),
   nextReviewDate: z.date().optional().nullable(),
+  // Version control validation
+  versionNumber: z.number().int().positive().default(1),
+  previousVersionId: z.number().int().positive().optional().nullable(),
+  versionDate: z.date().default(() => new Date()),
+  changeSummary: z.string().optional(),
+  isCurrent: z.boolean().default(true),
+  versionMetadata: z.object({
+    changes: z.array(z.object({
+      field: z.string(),
+      oldValue: z.string(),
+      newValue: z.string(),
+      type: z.enum(['addition', 'deletion', 'modification'])
+    })),
+    mergeMetadata: z.object({
+      mergedFrom: z.array(z.string()),
+      conflictResolutions: z.record(z.string()).optional()
+    }).optional()
+  }).optional().nullable(),
+  // Existing validations continue...
   filingDeadlines: z.array(z.object({
     type: z.string(),
     date: z.string(),
