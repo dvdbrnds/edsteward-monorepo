@@ -1,6 +1,22 @@
 import { storage } from "./storage";
 import { syslog, LogLevel, LogFacility } from './services/syslog';
 import type { Regulation } from "@shared/schema";
+import { db } from "./db";
+import { eq } from "drizzle-orm";
+import { regulations } from "@shared/schema";
+
+function isCleryActRegulation(regulation: Regulation): boolean {
+  const text = [
+    regulation.name,
+    regulation.topic,
+    regulation.summary
+  ].map(s => (s || '').toLowerCase()).join(' ');
+
+  return text.includes('clery') || 
+         text.includes('campus security') || 
+         text.includes('campus safety') ||
+         text.includes('crime statistics');
+}
 
 // Core Clery Act regulation information
 const baseCleryRegulation = {
@@ -21,23 +37,11 @@ const baseCleryRegulation = {
   forms_url: "https://surveys.ope.ed.gov/campussafety"
 };
 
-function isCleryActRegulation(regulation: Regulation): boolean {
-  const text = [
-    regulation.name,
-    regulation.topic,
-    regulation.summary
-  ].map(s => (s || '').toLowerCase()).join(' ');
-
-  return text.includes('clery') || 
-         text.includes('campus security') || 
-         text.includes('campus safety') ||
-         text.includes('crime statistics');
-}
-
 async function deduplicateRegulations() {
   try {
     syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Starting regulation deduplication process");
 
+    // Get all regulations
     const regulations = await storage.getRegulations();
     console.log(`Found ${regulations.length} total regulations`);
 
@@ -46,50 +50,34 @@ async function deduplicateRegulations() {
     console.log(`Found ${cleryRegulations.length} Clery Act regulations`);
 
     if (cleryRegulations.length > 1) {
-      // Sort by last_updated, oldest first
+      // Find the most recent regulation based on lastUpdated
       const sortedRegs = cleryRegulations.sort((a, b) => {
         const dateA = a.lastUpdated ? new Date(a.lastUpdated) : new Date(0);
         const dateB = b.lastUpdated ? new Date(b.lastUpdated) : new Date(0);
-        return dateA.getTime() - dateB.getTime();
+        return dateB.getTime() - dateA.getTime(); // Sort newest first
       });
 
-      console.log(`Processing ${sortedRegs.length} Clery Act regulations`);
+      const latestReg = sortedRegs[0];
+      console.log(`Using most recent regulation as base: ${latestReg.id} (${latestReg.itemId})`);
 
-      // First, mark all as non-current
-      for (const reg of sortedRegs) {
-        await storage.updateRegulation(reg.id, { 
-          is_current: false,
-          name: baseCleryRegulation.name // Ensure consistent naming
-        });
+      // Update the latest regulation with base content
+      await storage.updateRegulation(latestReg.id, {
+        ...baseCleryRegulation,
+        version_number: 1,
+        is_current: true,
+        previous_version_id: null,
+        last_updated: new Date(),
+        version_date: new Date(),
+        change_summary: "Consolidated Clery Act regulation"
+      });
+
+      // Delete all other Clery Act regulations
+      for (const reg of sortedRegs.slice(1)) {
+        await db.delete(regulations).where(eq(regulations.id, reg.id));
+        console.log(`Deleted regulation ${reg.id} (${reg.itemId})`);
       }
 
-      // Now update each regulation in order
-      for (let i = 0; i < sortedRegs.length; i++) {
-        const reg = sortedRegs[i];
-        const isLatest = i === sortedRegs.length - 1;
-
-        // For the last (newest) regulation, use all the base information
-        const updateData = {
-          ...(isLatest ? baseCleryRegulation : {}),
-          version_number: i + 1,
-          is_current: isLatest,
-          previous_version_id: i > 0 ? sortedRegs[i - 1].id : null,
-          version_date: reg.lastUpdated || new Date(),
-          change_summary: i === 0 
-            ? "Initial Clery Act regulation" 
-            : `Version ${i + 1} of Clery Act regulation`,
-          last_updated: new Date()
-        };
-
-        await storage.updateRegulation(reg.id, updateData);
-
-        syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
-          `Updated Clery Act regulation version ${i + 1}`, {
-            regulation_id: reg.id,
-            version_number: i + 1,
-            is_current: isLatest
-          });
-      }
+      console.log(`Successfully consolidated Clery Act regulations into single record: ${latestReg.id}`);
     }
 
     return {
@@ -102,9 +90,7 @@ async function deduplicateRegulations() {
   } catch (error) {
     syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
       "Error during regulation deduplication", {
-        parameters: {
-          message: error instanceof Error ? error.message : String(error)
-        }
+        error: error instanceof Error ? error.message : String(error)
       });
     throw error;
   }
