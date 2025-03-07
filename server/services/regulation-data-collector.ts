@@ -130,7 +130,7 @@ async function gatherRegulationData(regulationId: string): Promise<RegulationRes
 
       for (const result of scrapedResults) {
         if (result.content) {
-          sources.push({ url: result.title || result.url || 'Unknown', type: 'web-scrape' });
+          sources.push({ url: result.url || 'Unknown', type: 'web-scrape' });
 
           if (!result.downloadUrls?.length) {
             primaryContent += `\nContent from ${result.title || 'Main Page'}:\n${result.content}\n`;
@@ -186,12 +186,18 @@ ${sources.map(s => `- ${s.type}: ${s.url}`).join('\n')}
         messages: [
           {
             role: "system",
-            content: `You are an expert in higher education compliance regulations. Analyze the provided content from official agency websites to extract detailed regulation information. Focus on:
+            content: `You are an expert in higher education compliance regulations, specializing in submission requirements analysis. Analyze the provided content from official agency websites to extract detailed regulation information. Focus on:
 
-1. Official names and legal citations
-2. Core requirements for educational institutions
-3. Specific compliance guidelines and deadlines
-4. Agency contact points and submission procedures
+1. Official regulation identification and citations
+2. Core compliance requirements for educational institutions
+3. Detailed submission requirements:
+   - Required forms and documentation
+   - Submission deadlines and frequencies
+   - File format requirements
+   - Submission methods (electronic/paper)
+   - Required approvals or signatures
+   - Supporting documentation needs
+4. Agency contacts and submission procedures
 
 Return ONLY a JSON object with these exact fields:
 {
@@ -205,7 +211,17 @@ Return ONLY a JSON object with these exact fields:
   "agency_url": "Primary URL for regulation information",
   "agency_name": "Official agency name",
   "agency_department": "Specific department or office",
-  "submission_guidelines": "Required documentation and reporting procedures"
+  "submission_guidelines": "Detailed submission process, including file formats, methods, and requirements",
+  "submission_frequency": "How often submissions are required (e.g., annually, quarterly)",
+  "submission_deadlines": "Specific dates or timeframes for submissions",
+  "required_forms": ["List of required form names or IDs"],
+  "supporting_documents": ["List of required supporting documentation"],
+  "electronic_submission": {
+    "available": boolean,
+    "portal_url": "URL of submission portal if applicable",
+    "file_formats": ["Accepted file formats"],
+    "special_requirements": "Any special electronic submission requirements"
+  }
 }
 
 Include ONLY factual information found in the provided content.`
@@ -312,6 +328,16 @@ interface RegulationResponse {
   agency_name: string;
   agency_department: string;
   submission_guidelines: string;
+  submission_frequency?: string;
+  submission_deadlines?: string;
+  required_forms?: string[];
+  supporting_documents?: string[];
+  electronic_submission?: {
+    available: boolean;
+    portal_url?: string;
+    file_formats?: string[];
+    special_requirements?: string;
+  };
   sources?: Array<{url: string; type: string}>;
 }
 
@@ -359,23 +385,34 @@ async function enrichRegulationData(regulation: RegulationResponse): Promise<Ins
     lastUpdated: new Date(),
     lastVerified: new Date(),
     nextReviewDate: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000), // 1 year from now
-    filingDeadlines: null,
-    reportingFrequency: '',
+    filingDeadlines: regulation.submission_deadlines ? [{
+      type: 'submission',
+      date: regulation.submission_deadlines,
+      frequency: regulation.submission_frequency || 'as-needed',
+      description: 'Regulatory submission deadline'
+    }] : null,
+    reportingFrequency: regulation.submission_frequency || '',
     agency_url: regulation.agency_url,
     agency_name: regulation.agency_name,
     agency_contact: '',
     agency_department: regulation.agency_department,
     regulationUrl: '',
     requirementsUrl: '',
-    submissionGuideUrl: '',
+    submissionGuideUrl: regulation.electronic_submission?.portal_url || '',
     formsUrl: '',
-    submissionGuidelines: regulation.submission_guidelines,
+    submissionGuidelines: [
+      regulation.submission_guidelines || '',
+      regulation.required_forms?.length ? `Required forms: ${regulation.required_forms.join(', ')}` : '',
+      regulation.supporting_documents?.length ? `Required supporting documents: ${regulation.supporting_documents.join(', ')}` : '',
+      regulation.electronic_submission?.special_requirements || ''
+    ].filter(Boolean).join('\n\n'),
     regulationText: regulation.summary + '\n\n' + regulation.requirements,
-    applicableforms: null,
+    applicableforms: regulation.required_forms || null,
     relatedRegulations: null,
     complianceNotes: '',
     verificationMethod: '',
-    notificationSchedule: null
+    notificationSchedule: null,
+    sources: regulation.sources
   };
 
   return enrichedData;
