@@ -4,7 +4,6 @@ import Navigation from "@/components/layout/navigation";
 import ComplianceOverview from "@/components/dashboard/compliance-overview";
 import UpcomingDeadlines from "@/components/dashboard/upcoming-deadlines";
 import RegulationList from "@/components/regulations/regulation-list";
-import HealthScoreDashboard from "@/components/dashboard/health-score-dashboard";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Bell, CheckCircle, XCircle } from "lucide-react";
@@ -27,11 +26,6 @@ export default function HomePage() {
           <h1 className="text-3xl font-bold text-[#002147] mb-8">
             Welcome, {user?.username}
           </h1>
-
-          {/* Health Score Dashboard */}
-          <div className="mb-8">
-            <HealthScoreDashboard />
-          </div>
 
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 mb-8">
             <div className="lg:col-span-2">
