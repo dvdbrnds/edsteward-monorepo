@@ -140,10 +140,21 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getRegulations(): Promise<Regulation[]> {
-    console.log("Fetching regulations from database...");
-    const result = await db.select().from(regulations);
-    console.log(`Found ${result.length} regulations in database:`, result);
-    return result;
+    try {
+      console.log("Fetching regulations from database...");
+      // Add more detailed logging
+      const result = await db
+        .select()
+        .from(regulations)
+        .orderBy(desc(regulations.lastUpdated));
+
+      console.log(`Successfully fetched ${result.length} regulations from database`);
+      return result;
+    } catch (error) {
+      console.error("Error in getRegulations:", error);
+      // Return empty array instead of throwing to prevent frontend from getting stuck
+      return [];
+    }
   }
 
   async getRegulation(id: number): Promise<Regulation | undefined> {

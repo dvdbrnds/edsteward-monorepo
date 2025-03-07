@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/table";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/hooks/use-toast";
 
 interface RegulationListProps {
   categoryFilter: string | null;
@@ -107,15 +108,64 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
   const [search, setSearch] = useState("");
   const [sortConfig, setSortConfig] = useState<SortConfig>(null);
   const [_, navigate] = useLocation();
+  const { toast } = useToast();
 
-  const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
+  const { data: regulations, isLoading: regulationsLoading, error: regulationsError } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
+    retry: 2,
+    onError: (error) => {
+      console.error("Error fetching regulations:", error);
+      toast({
+        title: "Error Loading Regulations",
+        description: "Please try refreshing the page. If the problem persists, contact support.",
+        variant: "destructive",
+      });
+    }
   });
 
   const { data: deadlines, isLoading: deadlinesLoading } = useQuery<Deadline[]>({
     queryKey: ["/api/deadlines"],
     staleTime: 1000 * 60, // 1 minute
   });
+
+  if (regulationsLoading || deadlinesLoading) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <div className="flex items-center justify-center space-x-4">
+            <Loader2 className="h-6 w-6 animate-spin text-[#00267A]" />
+            <span>Loading regulations...</span>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (regulationsError) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <div className="text-center text-red-600">
+            <h3 className="text-lg font-semibold mb-2">Unable to Load Regulations</h3>
+            <p>There was an error loading the regulations list. Please try again later.</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!regulations || regulations.length === 0) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <div className="text-center text-gray-600">
+            <h3 className="text-lg font-semibold mb-2">No Regulations Found</h3>
+            <p>There are currently no regulations in the system.</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   const requestSort = (key: keyof Regulation) => {
     setSortConfig(current => {
@@ -145,18 +195,6 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
     });
   };
 
-  if (regulationsLoading || deadlinesLoading) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center justify-center space-x-4">
-            <Loader2 className="h-6 w-6 animate-spin text-[#00267A]" />
-            <span>Loading regulations...</span>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
 
   const handleRowClick = (regulation: Regulation) => {
     if (regulation && regulation.id) {
