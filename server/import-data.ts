@@ -9,6 +9,7 @@ import { eq } from "drizzle-orm";
 import { db } from "./db";
 import { addMonths, format, parse as dateParse } from "date-fns";
 import { RegulationValidator } from "./validation";
+import { deduplicateRegulations } from "./deduplicate-regulations";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -533,7 +534,19 @@ async function importRegulations(filePath?: string) {
     console.log(`Validation errors: ${validationErrors}`);
     console.log('Import completed');
 
-    return { newCount, updateCount, skipCount, validationErrors, mergeCount };
+    // Run deduplication after import
+    console.log('\nRunning deduplication process...');
+    const deduplicationSummary = await deduplicateRegulations();
+    console.log('Deduplication complete:', deduplicationSummary);
+
+    return { 
+      newCount, 
+      updateCount, 
+      skipCount, 
+      validationErrors, 
+      mergeCount,
+      deduplication: deduplicationSummary 
+    };
 
   } catch (error) {
     console.error('Failed to read or process file:', error);
