@@ -18,10 +18,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Download } from "lucide-react";
+import { Download, History } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { Redirect } from "wouter";
+import { RegulationDiffViewer } from "@/components/regulations/regulation-diff-viewer";
 
 interface RegulationData {
   id: number;
@@ -34,11 +35,22 @@ interface RegulationData {
   category: string;
   jurisdiction: string;
   lastUpdated: string;
+  versionNumber: number;
+  previousVersionId: number | null;
+  versionMetadata?: {
+    changes: Array<{
+      field: string;
+      oldValue: string;
+      newValue: string;
+      type: 'addition' | 'deletion' | 'modification';
+    }>;
+  };
 }
 
 export function RegulationViewer() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState<string>("");
+  const [showVersionHistory, setShowVersionHistory] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
 
@@ -127,11 +139,23 @@ export function RegulationViewer() {
             </SelectContent>
           </Select>
         </div>
-        <Button onClick={exportToCSV}>
-          <Download className="mr-2 h-4 w-4" />
-          Export to CSV
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={() => setShowVersionHistory(!showVersionHistory)}>
+            <History className="mr-2 h-4 w-4" />
+            {showVersionHistory ? 'Hide History' : 'Show History'}
+          </Button>
+          <Button onClick={exportToCSV}>
+            <Download className="mr-2 h-4 w-4" />
+            Export to CSV
+          </Button>
+        </div>
       </div>
+
+      {showVersionHistory && filteredRegulations?.length === 1 && (
+        <div className="mb-6">
+          <RegulationDiffViewer currentRegulation={filteredRegulations[0]} />
+        </div>
+      )}
 
       <div className="rounded-md border">
         <Table>
@@ -143,6 +167,7 @@ export function RegulationViewer() {
               <TableHead>Topic</TableHead>
               <TableHead>Category</TableHead>
               <TableHead>Jurisdiction</TableHead>
+              <TableHead>Version</TableHead>
               <TableHead>Last Updated</TableHead>
             </TableRow>
           </TableHeader>
@@ -157,6 +182,7 @@ export function RegulationViewer() {
                 <TableCell>{regulation.topic}</TableCell>
                 <TableCell>{regulation.category}</TableCell>
                 <TableCell>{regulation.jurisdiction}</TableCell>
+                <TableCell>{regulation.versionNumber}</TableCell>
                 <TableCell>{new Date(regulation.lastUpdated).toLocaleString()}</TableCell>
               </TableRow>
             ))}
