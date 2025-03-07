@@ -73,6 +73,8 @@ import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { NoteSection } from "@/components/regulations/note-section";
 import { RegulationChanges } from "@/components/regulations/regulation-changes";
+import { RegulationTimeline } from "@/components/regulations/regulation-timeline"; // Added import
+
 
 /**
  * @interface RegulationWithOverride
