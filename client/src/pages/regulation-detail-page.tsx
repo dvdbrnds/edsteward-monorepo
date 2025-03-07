@@ -392,51 +392,6 @@ export default function RegulationDetailPage() {
               </Button>
             </div>
 
-            <div className="mb-8">
-              <Card>
-                <CardContent className="pt-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-6">
-                      <div className="flex items-center justify-center w-24 h-24">
-                        <CircularProgress
-                          progress={complianceScore.score}
-                          size="lg"
-                          showPercentage={true}
-                        />
-                      </div>
-                      <div>
-                        <h3 className="text-lg font-semibold text-gray-900">
-                          Overall Compliance Score
-                        </h3>
-                        <div className="mt-2 grid grid-cols-3 gap-4 text-sm">
-                          <div>
-                            <p className="text-gray-500">Deadlines</p>
-                            <p className="font-medium">{complianceScore.breakdown.deadlines}%</p>
-                          </div>
-                          <div>
-                            <p className="text-gray-500">Documentation</p>
-                            <p className="font-medium">{complianceScore.breakdown.documentation}%</p>
-                          </div>
-                          <div>
-                            <p className="text-gray-500">Review Status</p>
-                            <p className="font-medium">{complianceScore.breakdown.review}%</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm text-gray-500">Last updated</p>
-                      <p className="text-sm font-medium">
-                        {regulation?.lastUpdated
-                          ? format(new Date(regulation.lastUpdated), "PP")
-                          : "Not reviewed"}
-                      </p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
             <RegulationTimeline regulation={regulation} />
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
