@@ -27,83 +27,6 @@ type SortConfig = {
   direction: 'asc' | 'desc';
 } | null;
 
-const getAgencyName = (url: string | null): string => {
-  if (!url) return "N/A";
-
-  const urlMap: Record<string, string> = {
-    "www.ed.gov": "Department of Education",
-    "www.eeoc.gov": "Equal Employment Opportunity Commission",
-    "www.justice.gov": "Department of Justice",
-    "www.osha.gov": "Occupational Safety and Health Administration",
-    "www.dhs.gov": "Department of Homeland Security"
-  };
-
-  try {
-    const hostname = new URL(url).hostname;
-    return urlMap[hostname] || hostname;
-  } catch {
-    return url;
-  }
-};
-
-const getCongressUrl = (statute: string): string | null => {
-  if (!statute) return null;
-
-  try {
-    console.log('Processing statute:', statute);
-
-    // Check for common acts first using the lookup table from congress-gov-links.md
-    const commonActs: Record<string, string> = {
-      'Higher Education Act': 'https://www.congress.gov/browse/uscode/20/section/1092',
-      'Higher Education Act: Textbook Information': 'https://www.congress.gov/browse/uscode/20/section/1015',
-      'Section 504 of The Rehabilitation Act': 'https://www.congress.gov/browse/uscode/29/section/794',
-      'Drug Free Schools and Communities Act': 'https://www.congress.gov/browse/uscode/20/section/1011i',
-      'Family Educational Rights and Privacy Act': 'https://www.congress.gov/browse/uscode/20/section/1232g',
-      'FERPA': 'https://www.congress.gov/browse/uscode/20/section/1232g',
-      'Americans with Disabilities Act': 'https://www.congress.gov/browse/uscode/42/section/12101',
-      'Title IX': 'https://www.congress.gov/browse/uscode/20/sections/1681-1688'
-    };
-
-    for (const [actName, url] of Object.entries(commonActs)) {
-      if (statute.toLowerCase().includes(actName.toLowerCase())) {
-        return url;
-      }
-    }
-
-    // Handle U.S. Code citations with section ranges
-    // Match patterns like: "42 U.S.C. §§ 12101-12213"
-    const rangeMatch = statute.match(/(\d+)\s*U\.?S\.?C\.?\s*§§\s*(\d+)-(\d+)/i);
-    if (rangeMatch) {
-      const [_, title, start] = rangeMatch;
-      return `https://www.congress.gov/browse/uscode/${title.trim()}/sections/${start.trim()}-${rangeMatch[3].trim()}`;
-    }
-
-    // Handle single U.S. Code citations
-    // Match patterns like: "20 U.S.C. § 1232g" or "29 USC 621"
-    const uscMatch = statute.match(/(\d+)\s*U\.?S\.?C\.?\s*(?:§+|\s+)?(\d+[a-z]?)(?:-\d+)?/i);
-    if (uscMatch) {
-      const [_, title, section] = uscMatch;
-      return `https://www.congress.gov/browse/uscode/${title.trim()}/section/${section.trim()}`;
-    }
-
-    // Handle Public Law citations
-    // Match patterns like: "Public Law 110-315" or "Pub. L. No. 110-315"
-    const publicLawMatch = statute.match(/(?:Public\s+Law|Pub\.\s*L\.)\s*(?:No\.)?\s*(\d+)-(\d+)/i);
-    if (publicLawMatch) {
-      const [_, congress, lawNumber] = publicLawMatch;
-      const cleanCongress = congress.trim();
-      const cleanLawNumber = lawNumber.trim().padStart(3, '0');
-      return `https://www.congress.gov/public-laws/${cleanCongress}th-congress/public-law/${cleanLawNumber}`;
-    }
-
-    console.log('No matching citation pattern found for statute:', statute);
-    return null;
-  } catch (error) {
-    console.error('Error processing statute citation:', error);
-    return null;
-  }
-};
-
 export default function RegulationList({ categoryFilter }: RegulationListProps) {
   const [search, setSearch] = useState("");
   const [sortConfig, setSortConfig] = useState<SortConfig>(null);
@@ -123,10 +46,16 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
     }
   });
 
-  const { data: deadlines, isLoading: deadlinesLoading } = useQuery<Deadline[]>({
+  const { data: deadlines = [], isLoading: deadlinesLoading } = useQuery<Deadline[]>({
     queryKey: ["/api/deadlines"],
     staleTime: 1000 * 60, // 1 minute
   });
+
+  const handleRowClick = (regulation: Regulation) => {
+    if (regulation && regulation.id) {
+      navigate(`/regulations/${regulation.id}`);
+    }
+  };
 
   if (regulationsLoading || deadlinesLoading) {
     return (
@@ -147,27 +76,44 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
         <CardContent className="p-6">
           <div className="text-center text-red-600">
             <h3 className="text-lg font-semibold mb-2">Unable to Load Regulations</h3>
-            <p>There was an error loading the regulations list. Please try again later.</p>
+            <p>Please try refreshing the page. If the problem persists, contact support.</p>
           </div>
         </CardContent>
       </Card>
     );
   }
 
-  if (!regulations || regulations.length === 0) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="text-center text-gray-600">
-            <h3 className="text-lg font-semibold mb-2">No Regulations Found</h3>
-            <p>There are currently no regulations in the system.</p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
+  const filteredRegulations = (regulations || []).filter(reg => {
+    if (categoryFilter && reg.category !== categoryFilter) {
+      return false;
+    }
+    if (search.trim()) {
+      const searchLower = search.toLowerCase();
+      return (
+        reg.name?.toLowerCase().includes(searchLower) ||
+        reg.topic?.toLowerCase().includes(searchLower) ||
+        reg.category?.toLowerCase().includes(searchLower) ||
+        reg.statute?.toLowerCase().includes(searchLower)
+      );
+    }
+    return true;
+  });
 
-  const requestSort = (key: keyof Regulation) => {
+  const sortedRegulations = filteredRegulations.sort((a, b) => {
+    if (!sortConfig) return 0;
+
+    const aValue = a[sortConfig.key];
+    const bValue = b[sortConfig.key];
+
+    if (!aValue && !bValue) return 0;
+    if (!aValue) return 1;
+    if (!bValue) return -1;
+
+    const comparison = String(aValue).localeCompare(String(bValue));
+    return sortConfig.direction === 'asc' ? comparison : -comparison;
+  });
+
+  const handleSort = (key: keyof Regulation) => {
     setSortConfig(current => {
       if (!current || current.key !== key) {
         return { key, direction: 'asc' };
@@ -179,63 +125,27 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
     });
   };
 
-  const sortData = (data: Regulation[]) => {
-    if (!sortConfig || !data) return data;
-
-    return [...data].sort((a, b) => {
-      const aValue = a[sortConfig.key];
-      const bValue = b[sortConfig.key];
-
-      if (!aValue && !bValue) return 0;
-      if (!aValue) return 1;
-      if (!bValue) return -1;
-
-      const comparison = String(aValue).localeCompare(String(bValue));
-      return sortConfig.direction === 'asc' ? comparison : -comparison;
-    });
-  };
-
-
-  const handleRowClick = (regulation: Regulation) => {
-    if (regulation && regulation.id) {
-      navigate(`/regulations/${regulation.id}`);
-    }
-  };
-
-  let filteredRegulations = regulations || [];
-
-  if (categoryFilter) {
-    filteredRegulations = filteredRegulations.filter(reg => reg.category === categoryFilter);
-  }
-
-  if (search.trim()) {
-    const searchLower = search.toLowerCase();
-    filteredRegulations = filteredRegulations.filter(reg =>
-      reg.topic?.toLowerCase().includes(searchLower) ||
-      reg.itemId?.toLowerCase().includes(searchLower) ||
-      reg.category?.toLowerCase().includes(searchLower) ||
-      reg.statute?.toLowerCase().includes(searchLower)
+  // Show empty state if no regulations exist or match filters
+  if (filteredRegulations.length === 0) {
+    return (
+      <Card>
+        <CardContent className="p-6">
+          <div className="text-center text-gray-600">
+            <h3 className="text-lg font-semibold mb-2">
+              {search.trim() || categoryFilter
+                ? "No matching regulations found"
+                : "No regulations available"}
+            </h3>
+            <p>
+              {search.trim() || categoryFilter
+                ? "Try adjusting your search criteria or filters"
+                : "There are currently no regulations in the system."}
+            </p>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
-
-  filteredRegulations = sortData(filteredRegulations);
-
-  const getColumnHeaderProps = (key: keyof Regulation) => ({
-    onClick: () => requestSort(key),
-    className: cn(
-      "cursor-pointer select-none",
-      sortConfig?.key === key && "font-bold"
-    ),
-  });
-
-  // Calculate completion percentage based on deadlines
-  const calculateCompletionPercentage = (regulation: Regulation) => {
-    const regulationDeadlines = deadlines?.filter(d => d.regulationId === regulation.id) || [];
-    if (regulationDeadlines.length === 0) return 0;
-
-    const completedDeadlines = regulationDeadlines.filter(d => d.status === "completed").length;
-    return Math.round((completedDeadlines / regulationDeadlines.length) * 100);
-  };
 
   return (
     <Card>
@@ -257,37 +167,19 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
             <TableHeader>
               <TableRow>
                 <TableHead>Status</TableHead>
-                <TableHead {...getColumnHeaderProps("itemId")}>
-                  <div className="flex items-center gap-2">
-                    ID
-                    <ArrowUpDown className="h-4 w-4" />
-                  </div>
-                </TableHead>
-                <TableHead {...getColumnHeaderProps("statute")}>
+                <TableHead className="cursor-pointer" onClick={() => handleSort('name')}>
                   <div className="flex items-center gap-2">
                     Name
                     <ArrowUpDown className="h-4 w-4" />
                   </div>
                 </TableHead>
-                <TableHead {...getColumnHeaderProps("jurisdiction")}>
-                  <div className="flex items-center gap-2">
-                    Jurisdiction
-                    <ArrowUpDown className="h-4 w-4" />
-                  </div>
-                </TableHead>
-                <TableHead {...getColumnHeaderProps("topic")}>
+                <TableHead className="cursor-pointer" onClick={() => handleSort('topic')}>
                   <div className="flex items-center gap-2">
                     Topic
                     <ArrowUpDown className="h-4 w-4" />
                   </div>
                 </TableHead>
-                <TableHead {...getColumnHeaderProps("agency_name")}>
-                  <div className="flex items-center gap-2">
-                    Agency Info
-                    <ArrowUpDown className="h-4 w-4" />
-                  </div>
-                </TableHead>
-                <TableHead {...getColumnHeaderProps("category")}>
+                <TableHead className="cursor-pointer" onClick={() => handleSort('category')}>
                   <div className="flex items-center gap-2">
                     Category
                     <ArrowUpDown className="h-4 w-4" />
@@ -297,15 +189,11 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredRegulations.map((regulation) => {
-                const regulationDeadlines = deadlines?.filter(d => d.regulationId === regulation.id) || [];
+              {sortedRegulations.map((regulation) => {
+                const regulationDeadlines = deadlines.filter(d => d.regulationId === regulation.id);
                 const nextDeadline = regulationDeadlines.length > 0
                   ? regulationDeadlines.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0]
                   : null;
-                const completionPercentage = calculateCompletionPercentage(regulation);
-
-                // Get Congress.gov URL for the regulation
-                const congressUrl = getCongressUrl(regulation.statute);
 
                 return (
                   <TableRow
@@ -316,58 +204,23 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                     <TableCell>
                       <div className="flex items-center justify-center">
                         <CircularProgress
-                          progress={completionPercentage}
+                          progress={nextDeadline?.status === 'completed' ? 100 : 0}
                           size="sm"
                           showPercentage={true}
                         />
                       </div>
                     </TableCell>
-                    <TableCell>{regulation.itemId}</TableCell>
                     <TableCell>
                       <div className="text-base font-medium text-gray-900">
-                        {regulation.name || regulation.statute}
+                        {regulation.name || regulation.statute || 'Untitled Regulation'}
                       </div>
-                    </TableCell>
-                    <TableCell>
-                      <span className="capitalize">{regulation.jurisdiction}</span>
                     </TableCell>
                     <TableCell>
                       <div className="text-sm text-gray-500">
-                        {regulation.topic}
+                        {regulation.topic || 'No topic specified'}
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <div className="flex flex-col gap-1">
-                        <div className="text-sm">
-                          {regulation.agency_name || getAgencyName(regulation.agency_url)}
-                        </div>
-                        {regulation.agency_url && (
-                          <a
-                            href={regulation.agency_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[#00267A] hover:text-[#003166] underline inline-flex items-center gap-1 text-sm group"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            View Agency Page
-                            <ExternalLink className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
-                          </a>
-                        )}
-                        {congressUrl && (
-                          <a
-                            href={congressUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[#00267A] hover:text-[#003166] underline inline-flex items-center gap-1 text-sm group"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            View on congress.gov
-                            <ExternalLink className="h-3 w-3 group-hover:translate-x-0.5 transition-transform" />
-                          </a>
-                        )}
-                      </div>
-                    </TableCell>
-                    <TableCell>{regulation.category || 'N/A'}</TableCell>
+                    <TableCell>{regulation.category || 'Uncategorized'}</TableCell>
                     <TableCell>
                       {nextDeadline ? (
                         <div className="flex items-center gap-2">
@@ -395,13 +248,6 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                   </TableRow>
                 );
               })}
-              {filteredRegulations.length === 0 && (
-                <TableRow>
-                  <TableCell colSpan={8} className="text-center py-4">
-                    No regulations found
-                  </TableCell>
-                </TableRow>
-              )}
             </TableBody>
           </Table>
         </div>
