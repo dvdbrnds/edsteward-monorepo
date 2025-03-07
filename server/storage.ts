@@ -45,6 +45,7 @@ export interface IStorage {
   setRegulationApplicability(id: number, isApplicable: boolean): Promise<Regulation>;
   getRegulationsByJurisdiction(jurisdiction: string): Promise<Regulation[]>;
   searchRegulations(searchTerm: string): Promise<Regulation[]>;
+  deleteRegulation(id: number): Promise<void>;
 
   // Notification methods
   getNotificationsByUser(userId: number): Promise<Notification[]>;
@@ -250,6 +251,10 @@ export class DatabaseStorage implements IStorage {
       console.error("Error searching regulations:", error);
       return [];
     }
+  }
+
+  async deleteRegulation(id: number): Promise<void> {
+    await db.delete(regulations).where(eq(regulations.id, id));
   }
 
   async getNotificationsByUser(userId: number): Promise<Notification[]> {
