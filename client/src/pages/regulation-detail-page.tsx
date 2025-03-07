@@ -35,6 +35,7 @@ import {
   Loader2,
   Bell,
   Shield,
+  History,
 } from "lucide-react";
 import CircularProgress from "@/components/common/circular-progress";
 import {
@@ -70,6 +71,9 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { NoteSection } from "@/components/regulations/note-section";
+import { RegulationDiffViewer } from "@/components/regulations/regulation-diff-viewer";
+import { useState } from "react";
+
 
 /**
  * @interface RegulationWithOverride
@@ -175,7 +179,9 @@ const CATEGORIES = [
 export default function RegulationDetailPage() {
   const [location, navigate] = useLocation();
   const { user } = useAuth();
+  const [showVersionHistory, setShowVersionHistory] = useState(false);
   const regulationId = location.split("/")[2];
+
 
   if (!user) {
     navigate("/auth");
@@ -493,6 +499,27 @@ export default function RegulationDetailPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
+                      {user?.role === "admin" && (
+                        <div>
+                          <h3 className="font-medium text-gray-900">Version History</h3>
+                          <div className="mt-2">
+                            <Button
+                              variant="outline"
+                              className="flex items-center gap-2"
+                              onClick={() => setShowVersionHistory(!showVersionHistory)}
+                            >
+                              <History className="h-4 w-4" />
+                              {showVersionHistory ? 'Hide Version History' : 'Show Version History'}
+                            </Button>
+                            {showVersionHistory && regulation?.previousVersionId && (
+                              <div className="mt-4">
+                                <RegulationDiffViewer currentRegulation={regulation} />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
                       <div>
                         <h3 className="font-medium text-gray-900">Statute</h3>
                         <p className="text-gray-700 mt-1">
