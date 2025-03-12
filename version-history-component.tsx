@@ -37,6 +37,16 @@ export const VersionHistory: FC<VersionHistoryProps> = ({ versions }) => {
 export const ExampleUsage = () => {
   const versionHistory = [
     {
+      version: 'v0.1.2 (Alpha)',
+      date: 'March 2025',
+      changes: [
+        'Enhanced PA regulation collector with improved error handling',
+        'Implemented skip mechanism for problematic regulations',
+        'Added detailed debug logging for database operations',
+        'Optimized database connection management'
+      ]
+    },
+    {
       version: 'v0.1.1 (Alpha)',
       date: 'February 2025',
       changes: [
