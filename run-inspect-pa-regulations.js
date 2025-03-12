@@ -1,6 +1,6 @@
 
-// Simple script to execute the TypeScript file using child_process
-const { execSync } = require('child_process');
+// Script to execute the TypeScript file using child_process
+import { execSync } from 'child_process';
 
 try {
   console.log('Running inspect-pa-regulations.ts...');
