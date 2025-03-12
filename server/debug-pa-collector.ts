@@ -1,127 +1,108 @@
-
-import { paRegulationCollector } from './services/pa-regulation-collector';
-import { syslog, LogLevel, LogFacility } from './services/syslog';
+import { storage } from './storage';
 import * as fs from 'fs';
 import * as path from 'path';
+import fetch from 'node-fetch';
 import * as cheerio from 'cheerio';
 
 /**
- * Debug script for PA regulation collector
- * This script will:
- * 1. Log all source URLs being scraped
- * 2. Save raw HTML for inspection
- * 3. Log detailed extraction steps
- * 4. Output detailed parsing information
+ * This script debugs the PA regulation collection process by:
+ * 1. Fetching HTML from source URLs
+ * 2. Storing raw HTML for inspection
+ * 3. Testing various selectors to find regulation content
+ * 4. Analyzing the structure of pages
  */
-async function debugPARegulationCollector() {
+async function debugPACollector() {
   try {
     console.log('==== PA Regulation Collector Debug ====');
-    console.log('Starting detailed debugging of PA regulation collection process...');
-    
-    // Create logs directory if it doesn't exist
-    const logsDir = path.join(process.cwd(), 'logs');
-    const htmlDir = path.join(logsDir, 'pa_html_samples');
-    
-    if (!fs.existsSync(logsDir)) {
-      fs.mkdirSync(logsDir);
-    }
-    
+
+    // Define PA education regulation sources
+    const sources = [
+      {
+        name: 'PA Dept of Education',
+        url: 'https://www.education.pa.gov/Pages/default.aspx',
+        description: 'Main PA education department page'
+      },
+      {
+        name: 'PA State Board of Education',
+        url: 'https://www.stateboard.education.pa.gov/Pages/default.aspx',
+        description: 'State board page'
+      },
+      {
+        name: 'PA Higher Education',
+        url: 'https://www.education.pa.gov/Postsecondary-Adult/Pages/default.aspx',
+        description: 'Higher education regulations'
+      },
+      {
+        name: 'PA Code Title 22',
+        url: 'http://www.pacodeandbulletin.gov/Display/pacode?titleNum=022',
+        description: 'PA Code for education'
+      }
+    ];
+
+    // Create directory for HTML dumps
+    const htmlDir = path.join(process.cwd(), 'logs', 'pa-html-dumps');
     if (!fs.existsSync(htmlDir)) {
-      fs.mkdirSync(htmlDir);
+      fs.mkdirSync(htmlDir, { recursive: true });
     }
-    
-    // Get all source URLs
-    const sources = paRegulationCollector.getSources ? 
-      paRegulationCollector.getSources() : 
-      []; // This assumes there's a getSources method, if not we'll need to modify the code
-    
-    console.log(`\nFound ${sources.length} source URLs to process:`);
-    sources.forEach((source, index) => {
-      console.log(`${index + 1}. ${source.url} (${source.agency})`);
-    });
-    
+
+    console.log(`\nFetching HTML from ${sources.length} sources...`);
+
     // Process each source
     for (const source of sources) {
-      console.log(`\n\n==== Processing Source: ${source.url} ====`);
-      console.log(`Agency: ${source.agency}`);
-      
+      console.log(`\nProcessing source: ${source.name}`);
+      console.log(`URL: ${source.url}`);
+
       try {
-        // Fetch the HTML content
-        console.log('Fetching HTML content...');
+        // Fetch the page HTML
         const response = await fetch(source.url, {
           headers: {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
           }
         });
-        
+
         if (!response.ok) {
-          console.error(`Failed to fetch source: ${response.status} ${response.statusText}`);
+          console.log(`Failed to fetch URL: ${response.status} ${response.statusText}`);
           continue;
         }
-        
+
         const html = await response.text();
-        console.log(`Received ${html.length} bytes of HTML`);
-        
-        // Save raw HTML for inspection
-        const safeFileName = source.url
-          .replace(/https?:\/\//, '')
-          .replace(/[^a-zA-Z0-9]/g, '_')
-          .substring(0, 50);
-        
-        const htmlFilePath = path.join(htmlDir, `${safeFileName}.html`);
-        fs.writeFileSync(htmlFilePath, html);
-        console.log(`Raw HTML saved to: ${htmlFilePath}`);
-        
-        // Parse with cheerio
+
+        // Save the HTML for analysis
+        const filename = source.name.toLowerCase().replace(/\s+/g, '-') + '.html';
+        const filepath = path.join(htmlDir, filename);
+        fs.writeFileSync(filepath, html);
+        console.log(`Saved HTML to ${filepath}`);
+
+        // Parse the HTML
         const $ = cheerio.load(html);
-        
-        // Debug page structure
-        console.log('\nPage Structure Analysis:');
-        console.log(`Title: ${$('title').text().trim()}`);
-        console.log(`Meta Description: ${$('meta[name="description"]').attr('content') || 'None'}`);
-        
-        // Detect SharePoint elements
-        const isSharePoint = $('[data-automation-id="CanvasSection"], .ms-SPCanvas, .ms-publiccanvas').length > 0;
-        console.log(`SharePoint Detected: ${isSharePoint ? 'Yes' : 'No'}`);
-        
-        // List main content containers
-        console.log('\nMain Content Containers:');
-        ['main', '#main-content', '#content', '.content', 'article', '.article'].forEach(selector => {
-          const elements = $(selector);
-          if (elements.length > 0) {
-            console.log(`${selector}: ${elements.length} elements found, text length: ${elements.text().trim().length}`);
-          }
+
+        // Output basic page info
+        console.log(`Page title: ${$('title').text().trim()}`);
+        console.log(`Body classes: ${$('body').attr('class')}`);
+
+        // Check for SharePoint elements
+        const isSharePoint = html.includes('SharePoint') || html.includes('_spPageContextInfo');
+        console.log(`Is SharePoint page: ${isSharePoint ? 'Yes' : 'No'}`);
+
+        // Check for main content containers
+        const containers = [
+          '#main-content', 
+          'main', 
+          '.main-content',
+          'article',
+          '.ms-rtestate-field',
+          '[data-automation-id="CanvasZone"]'
+        ];
+
+        console.log('\nContent Containers:');
+        containers.forEach(selector => {
+          const count = $(selector).length;
+          console.log(`- ${selector}: ${count} elements`);
         });
-        
-        // Look for regulation-related elements
-        console.log('\nRegulation-Related Elements:');
-        [
-          // Common regulation selectors
-          'h1:contains("Regulation")', 
-          'h2:contains("Regulation")',
-          'h3:contains("Regulation")',
-          'p:contains("Chapter")',
-          'p:contains("Title 22")',
-          'p:contains("Pennsylvania Code")',
-          'a[href*="pacode"]',
-          // SharePoint specific selectors
-          '.ms-rtestate-field:contains("Regulation")',
-          '[data-automation-id="textBox"]:contains("Regulation")'
-        ].forEach(selector => {
-          const elements = $(selector);
-          if (elements.length > 0) {
-            console.log(`${selector}: ${elements.length} elements found`);
-            elements.each((i, el) => {
-              if (i < 3) { // Limit to first 3 for brevity
-                console.log(`  Text sample: ${$(el).text().trim().substring(0, 100)}...`);
-              }
-            });
-          }
-        });
-        
-        // Analyze links
-        console.log('\nRegulation-Related Links:');
-        const links = $('a[href]').filter((i, el) => {
+
+        // Look for regulation-related links
+        console.log('\nRegulation-related links:');
+        const links = $('a').filter((_, el) => {
           const href = $(el).attr('href') || '';
           const text = $(el).text().trim().toLowerCase();
           return (
@@ -135,14 +116,14 @@ async function debugPARegulationCollector() {
             text.includes('chapter')
           );
         });
-        
+
         console.log(`Found ${links.length} regulation-related links`);
         links.each((i, el) => {
           if (i < 10) { // Limit to first 10 for brevity
             console.log(`  Link: ${$(el).attr('href')}, Text: ${$(el).text().trim().substring(0, 50)}`);
           }
         });
-        
+
         // Test content extraction with common selectors
         console.log('\nContent Extraction Test:');
         [
@@ -160,19 +141,19 @@ async function debugPARegulationCollector() {
             console.log(`${selector} content preview: ${text.substring(0, 150)}...`);
           }
         });
-        
+
       } catch (error) {
         console.error(`Error processing source ${source.url}:`, error);
       }
     }
-    
+
     console.log('\n\n==== Debug Script Complete ====');
     console.log(`Check the logs directory at ${htmlDir} for raw HTML files`);
-    
+
   } catch (error) {
     console.error('Debug script failed:', error);
   }
 }
 
 // Run the debug function
-debugPARegulationCollector().catch(console.error);
+debugPACollector().catch(console.error);

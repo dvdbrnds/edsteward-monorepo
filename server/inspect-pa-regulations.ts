@@ -1,3 +1,4 @@
+
 import { storage } from './storage';
 import { syslog, LogLevel, LogFacility } from './services/syslog';
 import * as fs from 'fs';
@@ -45,6 +46,17 @@ async function inspectPARegulations() {
       acc[pattern] = 0;
       return acc;
     }, {} as Record<string, number>);
+
+    // Group regulations by agency
+    const agencyGroups: Record<string, any[]> = {};
+    
+    paRegulations.forEach(reg => {
+      const agency = reg.stateAgency || 'Unknown';
+      if (!agencyGroups[agency]) {
+        agencyGroups[agency] = [];
+      }
+      agencyGroups[agency].push(reg);
+    });
 
     // Analyze each regulation
     for (const reg of paRegulations) {
@@ -119,7 +131,6 @@ async function inspectPARegulations() {
 
     console.log('\nInspection complete. Check the log file for detailed analysis.');
 
-
     // Export detailed report
     const reportPath = path.join(logsDir, 'pa_regulations_report.json');
 
@@ -130,7 +141,7 @@ async function inspectPARegulations() {
         byAgency: Object.fromEntries(
           Object.entries(agencyGroups).map(([agency, regs]) => [agency, regs.length])
         ),
-        contentStats: patternCounts // Use the new pattern counts
+        contentStats: patternCounts
       },
       regulationSamples: paRegulations.slice(0, 10).map(reg => ({
         name: reg.name,
