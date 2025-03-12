@@ -70,7 +70,7 @@ export const notes = pgTable("notes", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
-// Update the regulations table definition
+// Update the regulations table definition to include PA-specific fields
 export const regulations = pgTable("regulations", {
   id: serial("id").primaryKey(),
   itemId: text("item_id").notNull(),
@@ -82,13 +82,15 @@ export const regulations = pgTable("regulations", {
   requirements: text("requirements"),
   category: text("category").notNull(),
   jurisdiction: text("jurisdiction").notNull().default("federal"),
+  stateCode: text("state_code"), // Added for state regulations
+  stateAgency: text("state_agency"), // Added for state agency tracking
   isApplicable: boolean("is_applicable").notNull().default(true),
   originationDate: timestamp("origination_date"),
   effectiveDate: timestamp("effective_date"),
   lastUpdated: timestamp("last_updated"),
   lastVerified: timestamp("last_verified"),
   nextReviewDate: timestamp("next_review_date"),
-  // Version control fields
+  // Version control fields remain unchanged
   versionNumber: integer("version_number").notNull().default(1),
   previousVersionId: integer("previous_version_id").references(() => regulations.id),
   versionDate: timestamp("version_date").notNull().defaultNow(),
@@ -170,10 +172,12 @@ console.log("Note insertion schema created successfully");
 // Log schema structure for debugging
 console.log("Note schema fields:", Object.keys(notes));
 
-// Update the insert schema to include version control fields
+// Update the insert schema to include PA-specific validation
 export const insertRegulationSchema = createInsertSchema(regulations).extend({
   name: z.string().min(1, "Regulation name is required"),
   jurisdiction: z.enum(["federal", "state"]),
+  stateCode: z.string().optional(),
+  stateAgency: z.string().optional(),
   originationDate: z.date().optional().nullable(),
   effectiveDate: z.date().optional().nullable(),
   nextReviewDate: z.date().optional().nullable(),
@@ -195,7 +199,6 @@ export const insertRegulationSchema = createInsertSchema(regulations).extend({
       conflictResolutions: z.record(z.string()).optional()
     }).optional()
   }).optional().nullable(),
-  // Existing validations continue...
   filingDeadlines: z.array(z.object({
     type: z.string(),
     date: z.string(),
