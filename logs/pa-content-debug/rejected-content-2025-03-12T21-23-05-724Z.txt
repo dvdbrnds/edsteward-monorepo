@@ -1,0 +1,37 @@
+URL: https://www.education.pa.gov/agencies/education/resources/policies-acts-and-laws/basic-education-circulars-becs/pa-code/services-to-nonpublic-school-students.html
+Rejection Reason: Contains error indicators
+Content Length: 220693
+Timestamp: 2025-03-12T21:23:05.724Z
+Content Preview:
+
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Department of Education | Department of Education | Commonwealth of Pennsylvania </title>
+    <meta name="copapwp-page-title" content="Pennsylvania Department of Education (PDE)"/>
+    
+    
+    
+
+    <meta property="og:title" content="Department of Education"/>
+    <meta property="og:image" content="https://www.pa.gov/content/dam/copapwp-pagov/en/education/images/publishingimages/childreninschool.jpg"/>
+    <meta property="og:url" content="https://www.pa.gov/content/copapwp-pagov/en/agencies/education.html"/>
+    <meta property="og:type" content="website"/>
+
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Department of Education"/>
+    
+    
+        <meta property="og:description" content="The Department of Education oversees public schools in Pennsylvania and policies related to public, academic, and school libraries, and the State Library of Pennsylvania. "/>
+        <meta name="twitter:description" content="The Department of Education oversees public schools in Pennsylvania and policies related to public, academic, and school libraries, and the State Library of Pennsylvania. "/>
+    
+    
+    <meta name="twitter:image" content="https://www.pa.gov/content/dam/copapwp-pagov/en/education/images/publishingimages/childreninschool.jpg"/>
+    <meta name="twitter:url" content="https://www.pa.gov/content/copapwp-pagov/en/agencies/education.html"/>
+    <meta name="twitter:site" content="website"/>
+    
+    
+    
+        <meta name="description" content="The Department of Education oversees public schools in Pennsylvania and policies related to public, academic, and school libraries, and the State Library of Pennsylvania. "/>
+        <meta name="copapwp-description" content="The Department of Education oversees public schools in Pennsylvania and policies related to public, academic, and school libraries, and the State Library of Pennsylvania...

@@ -1,0 +1,50 @@
+URL: https://www.education.pa.gov/Policy-Funding/BECS/PACode/Pages/default.aspx
+Rejection Reason: Contains error indicators
+Content Length: 272699
+Timestamp: 2025-03-12T21:22:54.127Z
+Content Preview:
+
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Basic Education Circulars (BECs) | Department of Education | Commonwealth of Pennsylvania </title>
+    <meta name="copapwp-page-title" content="​​​Basic Education Circulars (BECs)"/>
+    
+    
+    
+
+    <meta property="og:title" content="Basic Education Circulars (BECs)"/>
+    <meta property="og:image" content="https://www.pa.gov/content/dam/copapwp-pagov/en/global/images/thumbnail.png"/>
+    <meta property="og:url" content="https://www.pa.gov/content/copapwp-pagov/en/agencies/education/resources/policies-acts-and-laws/basic-education-circulars-becs.html"/>
+    <meta property="og:type" content="website"/>
+
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="Basic Education Circulars (BECs)"/>
+    
+    
+    
+        <meta property="og:description" content="Basic Education Circulars (BECs)"/>
+        <meta name="twitter:description" content="Basic Education Circulars (BECs)"/>
+    
+    <meta name="twitter:image" content="https://www.pa.gov/content/dam/copapwp-pagov/en/global/images/thumbnail.png"/>
+    <meta name="twitter:url" content="https://www.pa.gov/content/copapwp-pagov/en/agencies/education/resources/policies-acts-and-laws/basic-education-circulars-becs.html"/>
+    <meta name="twitter:site" content="website"/>
+    
+    
+    
+        
+        <meta name="description" content="&lt;p>A Basic Education Circular (BEC) provides the Department of Education&#39;s guidance on the implementation of law, regulation and policy.&lt;/p>
+"/>
+        <meta name="copapwp-hero-description" content="&lt;p>A Basic Education Circular (BEC) provides the Department of Education&#39;s guidance on the implementation of law, regulation and policy.&lt;/p>
+"/>
+	
+
+    <meta name="template" content="agency-content-template"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    
+    
+        
+    
+    
+        <meta name="copapwp-badges...

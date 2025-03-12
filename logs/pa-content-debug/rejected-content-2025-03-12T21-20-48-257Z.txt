@@ -1,0 +1,47 @@
+URL: https://www.stateboard.education.pa.gov/agencies/stateboard/resources/regulations--policy/state-academic-standards.html
+Rejection Reason: Contains error indicators
+Content Length: 103631
+Timestamp: 2025-03-12T21:20:48.257Z
+Content Preview:
+
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>State Board of Education | State Board of Education | Commonwealth of Pennsylvania </title>
+    <meta name="copapwp-page-title" content="State Board of Education"/>
+    
+    
+    
+
+    <meta property="og:title" content="State Board of Education"/>
+    <meta property="og:image" content="https://www.pa.gov/content/dam/copapwp-pagov/en/stateboard/images/banner/sbe banner-agency.jpg"/>
+    <meta property="og:url" content="https://www.pa.gov/content/copapwp-pagov/en/agencies/stateboard.html"/>
+    <meta property="og:type" content="website"/>
+
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="State Board of Education"/>
+    
+    
+        <meta property="og:description" content="The State Board of Education reviews, develops, and adopts regulations that govern basic and higher education in the Commonwealth. "/>
+        <meta name="twitter:description" content="The State Board of Education reviews, develops, and adopts regulations that govern basic and higher education in the Commonwealth. "/>
+    
+    
+    <meta name="twitter:image" content="https://www.pa.gov/content/dam/copapwp-pagov/en/stateboard/images/banner/sbe banner-agency.jpg"/>
+    <meta name="twitter:url" content="https://www.pa.gov/content/copapwp-pagov/en/agencies/stateboard.html"/>
+    <meta name="twitter:site" content="website"/>
+    
+    
+    
+        <meta name="description" content="The State Board of Education reviews, develops, and adopts regulations that govern basic and higher education in the Commonwealth. "/>
+        <meta name="copapwp-description" content="The State Board of Education reviews, develops, and adopts regulations that govern basic and higher education in the Commonwealth. "/>
+        
+        
+
+    <meta name="template" content="agency-content-template"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    
+    
+        
+    
+   ...

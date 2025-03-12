@@ -1,0 +1,61 @@
+URL: https://www.education.pa.gov/Teachers%20-%20Administrators/School%20Services/Pages/default.aspx
+Rejection Reason: Contains error indicators
+Content Length: 220838
+Timestamp: 2025-03-12T21:16:50.286Z
+Content Preview:
+
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>School Guidance and Resources | Department of Education | Commonwealth of Pennsylvania </title>
+    <meta name="copapwp-page-title" content="School Guidance and Resources"/>
+    
+    
+    
+
+    <meta property="og:title" content="School Guidance and Resources"/>
+    <meta property="og:image" content="https://www.pa.gov/content/dam/copapwp-pagov/en/global/images/thumbnail.png"/>
+    <meta property="og:url" content="https://www.pa.gov/content/copapwp-pagov/en/agencies/education/programs-and-services/schools/school-services.html"/>
+    <meta property="og:type" content="website"/>
+
+    <meta name="twitter:card" content="summary_large_image"/>
+    <meta name="twitter:title" content="School Guidance and Resources"/>
+    
+    
+    
+        <meta property="og:description" content="School Guidance and Resources"/>
+        <meta name="twitter:description" content="School Guidance and Resources"/>
+    
+    <meta name="twitter:image" content="https://www.pa.gov/content/dam/copapwp-pagov/en/global/images/thumbnail.png"/>
+    <meta name="twitter:url" content="https://www.pa.gov/content/copapwp-pagov/en/agencies/education/programs-and-services/schools/school-services.html"/>
+    <meta name="twitter:site" content="website"/>
+    
+    
+    
+        
+
+    <meta name="template" content="agency-content-template"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    
+    
+        
+    
+    
+        <meta name="copapwp-badges" content="Department of Education"/>
+    
+    
+    <meta name="copapwp-agency" content="Department of Education"/>
+    
+    
+    
+
+    
+    
+        <script type="module">
+  window.RUM_BASE = window.origin;
+  import { sampleRUM } from '/.rum/@adobe/helix-rum-js@%5E2/src/index.js';
+  window.hlx = window.hlx || {};
+  window.hlx.sampleRUM = sampleRUM;
+  sampleRUM();
+</script><link rel="canonical" href="https://www.pa.gov/agencies/education/programs-and-services/scho...
