@@ -14,24 +14,6 @@ class PARegulationCollector {
     paCHE: 'https://www.education.pa.gov/Postsecondary-Adult/College%20and%20Career%20Education/Pages/default.aspx'
   };
 
-  private readonly TITLE_PATTERNS = {
-    core: [
-      /policy|regulation|requirement|standard|guideline|procedure/i,
-      /requirements?|standards?|guidelines?/i
-    ],
-    education: [
-      /academic|program|course|degree|student|faculty|education|certification/i,
-      /university|college|campus|enrollment|assessment/i
-    ],
-    document: [
-      /title:?\s*(.+)/i,
-      /policy:?\s*(.+)/i,
-      /regulation:?\s*(.+)/i,
-      /(\d+\s*PA\s*Code\s*.*)/i,
-      /(chapter\s+\d+[.:]\s*.*)/i
-    ]
-  };
-
   private readonly IGNORED_PATTERNS = [
     /^\s*$/,
     /^home$/i,
@@ -43,6 +25,46 @@ class PARegulationCollector {
     /^contact us$/i
   ];
 
+  private readonly BOILERPLATE_CONTENT = [
+    'The Pennsylvania Department of Education (PDE) oversees',
+    'PDE oversees public school districts',
+    'Contact Us',
+    'Follow Us',
+    'Accessibility',
+    'Copyright',
+    'All Rights Reserved',
+    'Privacy Policy',
+    'public school districts',
+    'Career and Technology Centers/Vocational Technical schools',
+    'public Intermediate Units',
+    'education of youth in State Juvenile Correctional Institutions'
+  ];
+
+  private readonly TITLE_PATTERNS = {
+    // Document titles
+    document: [
+      /(\d+\s*PA\s*Code\s*.*)/i,
+      /(Chapter\s+\d+[.:]\s*.*)/i,
+      /(Section\s+\d+[.:]\s*.*)/i,
+      /(Article\s+\d+[.:]\s*.*)/i
+    ],
+    // Policy/regulation patterns
+    policy: [
+      /Policy(?:\s+on|\s+for|\s+regarding)?\s+(.+)/i,
+      /Regulation(?:\s+on|\s+for|\s+regarding)?\s+(.+)/i,
+      /Requirement(?:s)?(?:\s+for|\s+on|\s+regarding)?\s+(.+)/i,
+      /Guideline(?:s)?(?:\s+for|\s+on|\s+regarding)?\s+(.+)/i,
+      /Standard(?:s)?(?:\s+for|\s+on|\s+regarding)?\s+(.+)/i
+    ],
+    // Education-specific patterns
+    education: [
+      /Academic\s+(?:Requirements?|Standards?|Policies?)\s+(?:for\s+)?(.+)/i,
+      /Program\s+(?:Requirements?|Standards?|Policies?)\s+(?:for\s+)?(.+)/i,
+      /Student\s+(?:Requirements?|Standards?|Policies?)\s+(?:for\s+)?(.+)/i,
+      /Faculty\s+(?:Requirements?|Standards?|Policies?)\s+(?:for\s+)?(.+)/i
+    ]
+  };
+
   private cleanText(text: string): string {
     return text
       .replace(/[\r\n]+/g, '\n')
@@ -52,219 +74,286 @@ class PARegulationCollector {
       .trim();
   }
 
+  private isBoilerplateContent(text: string): boolean {
+    return this.BOILERPLATE_CONTENT.some(phrase => 
+      text.toLowerCase().includes(phrase.toLowerCase())
+    );
+  }
+
   private findTitle($: cheerio.CheerioAPI, url: string): string {
-    // Try regulation-specific title elements first
+    let candidates: Array<{ text: string, source: string, score: number }> = [];
+
+    // Try specific title elements first
     const titleSelectors = [
-      '.regulation-title',
-      '.policy-title',
-      '.document-title',
+      'h1.regulation-title',
+      'h1.policy-title',
       'h1.page-title',
-      'h1.title',
       'h1:first-of-type',
-      '.page-header h1',
-      'h1'
+      'h1',
+      '.page-title',
+      '.document-title',
+      '[id*="title"]',
+      '[class*="title"]'
     ];
 
-    let bestTitle = '';
-    let bestScore = 0;
-
-    // Try specific title selectors
-    for (const selector of titleSelectors) {
-      const element = $(selector).first();
-      if (element.length) {
-        const text = this.cleanText(element.text());
+    // Check title elements
+    titleSelectors.forEach(selector => {
+      $(selector).each((_, el) => {
+        const text = this.cleanText($(el).text());
         if (text && text.length >= 5 && !this.IGNORED_PATTERNS.some(p => p.test(text))) {
           const score = this.scoreTitleCandidate(text);
-          if (score > bestScore) {
-            bestScore = score;
-            bestTitle = text;
-          }
-        }
-      }
-    }
-
-    // If no title found, try looking in first few paragraphs
-    if (!bestTitle) {
-      $('p').slice(0, 3).each((_, el) => {
-        const text = this.cleanText($(el).text());
-        const score = this.scoreTitleCandidate(text);
-        if (score > bestScore) {
-          bestScore = score;
-          bestTitle = text;
+          candidates.push({
+            text,
+            source: selector,
+            score: score + (selector.includes('regulation') || selector.includes('policy') ? 1 : 0)
+          });
         }
       });
-    }
+    });
 
-    if (bestTitle && bestScore >= 0.5) {
+    // Check text content for title patterns
+    $('p, div').slice(0, 5).each((_, el) => {
+      const text = this.cleanText($(el).text());
+      if (text) {
+        // Check against all title patterns
+        Object.entries(this.TITLE_PATTERNS).forEach(([type, patterns]) => {
+          patterns.forEach(pattern => {
+            const match = text.match(pattern);
+            if (match) {
+              const title = match[1] || match[0];
+              candidates.push({
+                text: this.cleanText(title),
+                source: `text-${type}`,
+                score: this.scoreTitleCandidate(title) + (type === 'document' ? 2 : 1)
+              });
+            }
+          });
+        });
+      }
+    });
+
+    // Log candidates for debugging
+    syslog.log(LogFacility.LOCAL0, LogLevel.DEBUG, "Title candidates", {
+      url,
+      candidates: candidates.map(c => ({
+        text: c.text,
+        source: c.source,
+        score: c.score,
+        length: c.text.length,
+        hasRegulationTerm: /regulation|policy|requirement|standard|guideline/i.test(c.text),
+        hasEducationTerm: /academic|program|course|degree|student|faculty/i.test(c.text)
+      }))
+    });
+
+    // Sort and select best candidate
+    candidates.sort((a, b) => b.score - a.score);
+    const bestCandidate = candidates[0];
+
+    // More permissive threshold (0.5 -> 0)
+    if (bestCandidate) {
       syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Selected title", {
         url,
-        title: bestTitle,
-        score: bestScore
+        title: bestCandidate.text,
+        score: bestCandidate.score,
+        source: bestCandidate.source
       });
-      return bestTitle;
+      return bestCandidate.text;
     }
 
     return '';
   }
 
   private scoreTitleCandidate(text: string): number {
-    const lowerText = text.toLowerCase();
     let score = 0;
+    const lowerText = text.toLowerCase();
 
-    // Check for regulation terms
-    this.TITLE_PATTERNS.core.forEach(pattern => {
-      if (pattern.test(lowerText)) score += 1.5;
-    });
+    // Check for policy/regulation patterns
+    const policyPatterns = [
+      /regulation/i,
+      /policy/i,
+      /requirement/i,
+      /standard/i,
+      /guideline/i
+    ];
 
-    // Check for education terms
-    this.TITLE_PATTERNS.education.forEach(pattern => {
+    policyPatterns.forEach(pattern => {
       if (pattern.test(lowerText)) score += 1;
     });
 
-    // Length-based adjustments
-    if (text.length < 10) score -= 1;
+    // Check for education-related terms
+    const educationPatterns = [
+      /academic/i,
+      /program/i,
+      /course/i,
+      /degree/i,
+      /student/i,
+      /faculty/i,
+      /university/i,
+      /college/i
+    ];
+
+    educationPatterns.forEach(pattern => {
+      if (pattern.test(lowerText)) score += 0.5;
+    });
+
+    // Check for formal title indicators
+    if (/chapter\s+\d+/i.test(lowerText)) score += 2;
+    if (/section\s+\d+/i.test(lowerText)) score += 2;
+    if (/article\s+\d+/i.test(lowerText)) score += 2;
+    if (/pa\s+code/i.test(lowerText)) score += 2;
+
+    // Format-based adjustments
+    if (/^[A-Z]/.test(text)) score += 0.25; // Starts with capital
+    if (text.length < 5) score -= 1;
     if (text.length > 200) score -= 1;
-    if (/^[A-Z]/.test(text)) score += 0.5;
 
     return score;
   }
 
   private extractContent($: cheerio.CheerioAPI, url: string): string {
-    // Remove irrelevant elements
-    $('script, style, nav, header:not(:has(h1)), footer, .navigation, .menu, .sidebar').remove();
+    // Remove navigation and irrelevant elements
+    $('nav, header:not(:has(h1)), footer, .navigation, .menu, .sidebar, .social-share, .comments').remove();
 
-    // Initialize content extraction
-    let content = '';
-    let contentSections: Array<{ text: string, source: string }> = [];
+    let bestContent = '';
+    let contentSections: Array<{ text: string, source: string, score: number }> = [];
 
-    // Function to extract and clean text from an element
-    const extractText = (el: cheerio.Element): string => {
+    const processElement = (el: cheerio.Element, selector: string) => {
       const $el = $(el);
-      let text = '';
+      let content = '';
 
-      // Handle different element types
-      if ($el.is('p, li, td')) {
-        text = this.cleanText($el.text());
-      } else if ($el.is('h2, h3, h4, h5, h6')) {
-        text = '\n' + this.cleanText($el.text()) + '\n';
-      }
-
-      return text;
-    };
-
-    // Try multiple content selectors in order of specificity
-    const contentSelectors = [
-      // Primary regulation content
-      '.regulation-content',
-      '.policy-content',
-      '.requirements-section',
-      '#regulation-content',
-      '#policy-content',
-      '[class*="regulation-text"]',
-      '[class*="policy-text"]',
-      // Fallback main content
-      '#main-content',
-      '.main-content',
-      'article',
-      '.article-content',
-      '.content'
-    ];
-
-    for (const selector of contentSelectors) {
-      $(selector).each((_, section) => {
-        let sectionText = '';
-
-        // Process all text elements within the section
-        $(section).find('p, li, td, h2, h3, h4, h5, h6').each((_, el) => {
-          const text = extractText(el);
-          if (text && text.length > 0) {
-            sectionText += text + '\n';
-          }
-        });
-
-        if (sectionText) {
-          contentSections.push({
-            text: sectionText,
-            source: selector
-          });
+      // Process text content
+      $el.find('p, li').each((_, element) => {
+        const text = this.cleanText($(element).text());
+        if (text && text.length > 20 && !this.isBoilerplateContent(text)) {
+          content += text + '\n\n';
         }
       });
 
-      // If we found substantial content, use it
-      if (contentSections.length > 0) {
-        break;
+      // Process headings to maintain structure
+      $el.find('h2, h3, h4').each((_, element) => {
+        const text = this.cleanText($(element).text());
+        if (text && !this.isBoilerplateContent(text)) {
+          content += '\n' + text + '\n\n';
+        }
+      });
+
+      if (content) {
+        contentSections.push({
+          text: content,
+          source: selector,
+          score: this.scoreContent(content)
+        });
+      }
+    };
+
+    // Try primary selectors first
+    for (const selector of this.CONTENT_SELECTORS.primary) {
+      $(selector).each((_, el) => processElement(el, selector));
+    }
+
+    // If no content found, try secondary selectors
+    if (contentSections.length === 0) {
+      for (const selector of this.CONTENT_SELECTORS.secondary) {
+        $(selector).each((_, el) => processElement(el, selector));
       }
     }
 
-    // Log all found content sections
+    // Sort by score and select best content
+    contentSections.sort((a, b) => b.score - a.score);
+
+    // Log content extraction results
     syslog.log(LogFacility.LOCAL0, LogLevel.DEBUG, "Content sections found", {
       url,
       sections: contentSections.map(s => ({
         source: s.source,
+        score: s.score,
         length: s.text.length,
         preview: s.text.substring(0, 100)
       }))
     });
 
-    // Select the longest content section that meets our criteria
-    let bestContent = '';
-    for (const section of contentSections) {
-      if (section.text.length > bestContent.length) {
-        // Validate content has meaningful regulation-related text
-        if (
-          this.TITLE_PATTERNS.core.some(p => p.test(section.text)) ||
-          this.TITLE_PATTERNS.education.some(p => p.test(section.text))
-        ) {
-          bestContent = section.text;
-        }
-      }
-    }
-
-    // If no specific content found, try extracting from body
-    if (!bestContent) {
-      syslog.log(LogFacility.LOCAL0, LogLevel.DEBUG, "No specific content found, trying body content");
-      let bodyContent = '';
-      $('body p, body li').each((_, el) => {
-        const text = extractText(el);
-        if (text && text.length > 0) {
-          bodyContent += text + '\n';
-        }
-      });
-
-      if (bodyContent.length > 100) {
-        bestContent = bodyContent;
-      }
+    if (contentSections.length > 0) {
+      bestContent = contentSections[0].text;
     }
 
     return bestContent;
+  }
+
+  private scoreContent(content: string): number {
+    let score = 0;
+    const lowerContent = content.toLowerCase();
+
+    // Check for regulation-related terms
+    const regulationTerms = [
+      'regulation',
+      'policy',
+      'requirement',
+      'standard',
+      'guideline',
+      'procedure',
+      'must',
+      'shall',
+      'comply',
+      'compliance'
+    ];
+
+    regulationTerms.forEach(term => {
+      const count = (lowerContent.match(new RegExp(term, 'g')) || []).length;
+      score += count * 0.5;
+    });
+
+    // Check for education-specific terms
+    const educationTerms = [
+      'academic',
+      'program',
+      'course',
+      'degree',
+      'student',
+      'faculty',
+      'university',
+      'college'
+    ];
+
+    educationTerms.forEach(term => {
+      const count = (lowerContent.match(new RegExp(term, 'g')) || []).length;
+      score += count * 0.3;
+    });
+
+    // Penalize boilerplate content
+    if (this.BOILERPLATE_CONTENT.some(phrase => 
+      lowerContent.includes(phrase.toLowerCase())
+    )) {
+      score -= 3;
+    }
+
+    // Length considerations
+    if (content.length < 50) score -= 1;
+    if (content.length > 10000) score -= 2;
+
+    return score;
   }
 
   private async parseRegulation(html: string, source: string, url: string): Promise<Partial<InsertRegulation> | null> {
     try {
       const $ = cheerio.load(html);
 
-      // Extract title first
       const title = this.findTitle($, url);
       if (!title) {
         syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "No valid title found", { url });
         return null;
       }
 
-      // Extract and validate content
       const content = this.extractContent($, url);
-
-      // More permissive content validation
-      if (!content || content.length < 100) {
+      if (!content || content.length < 50) {
         syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Insufficient content", {
           url,
-          contentLength: content?.length || 0,
-          preview: content?.substring(0, 100)
+          contentLength: content?.length || 0
         });
         return null;
       }
 
-      // Create regulation object
       const itemId = `PA-${source}-${Buffer.from(title).toString('base64').substring(0, 8)}`;
+
       const regulation: Partial<InsertRegulation> = {
         itemId,
         name: title,
@@ -291,8 +380,8 @@ class PARegulationCollector {
       };
 
       syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Successfully parsed regulation", {
-        url,
         title,
+        url,
         contentLength: content.length
       });
 
@@ -308,54 +397,32 @@ class PARegulationCollector {
 
   private detectCategory(content: string): string {
     const categories = {
-      'Academic Programs': {
-        terms: ['curriculum', 'program requirement', 'degree requirement', 'academic standard'],
-        weight: 2
-      },
-      'Financial Aid': {
-        terms: ['financial aid', 'scholarship', 'grant', 'loan', 'tuition'],
-        weight: 2
-      },
-      'Student Services': {
-        terms: ['student service', 'counseling', 'advising', 'support service'],
-        weight: 1.5
-      },
-      'Athletics': {
-        terms: ['athletic', 'sport', 'physical education', 'competition'],
-        weight: 1.5
-      },
-      'Campus Safety': {
-        terms: ['safety', 'security', 'emergency', 'crime', 'incident'],
-        weight: 1.5
-      },
-      'Research': {
-        terms: ['research', 'intellectual property', 'innovation'],
-        weight: 1
-      },
-      'Human Resources': {
-        terms: ['employment', 'faculty', 'staff', 'personnel', 'hiring'],
-        weight: 1
-      }
+      'Academic Programs': ['curriculum', 'program requirement', 'degree requirement', 'academic standard'],
+      'Financial Aid': ['financial aid', 'scholarship', 'grant', 'loan', 'tuition'],
+      'Student Services': ['student service', 'counseling', 'advising', 'support'],
+      'Athletics': ['athletic', 'sport', 'physical education', 'competition'],
+      'Campus Safety': ['safety', 'security', 'emergency', 'crime'],
+      'Research': ['research', 'intellectual property', 'innovation'],
+      'Human Resources': ['employment', 'faculty', 'staff', 'personnel']
     };
 
     const lowerContent = content.toLowerCase();
-    const scores: Record<string, number> = {};
+    let bestMatch = 'Other';
+    let maxMatches = 0;
 
-    for (const [category, config] of Object.entries(categories)) {
-      scores[category] = config.terms.reduce((score, term) => {
-        const matches = (lowerContent.match(new RegExp(term, 'g')) || []).length;
-        return score + matches * config.weight;
+    for (const [category, terms] of Object.entries(categories)) {
+      const matches = terms.reduce((count, term) => {
+        const regExp = new RegExp(term, 'g');
+        return count + (lowerContent.match(regExp) || []).length;
       }, 0);
+
+      if (matches > maxMatches) {
+        maxMatches = matches;
+        bestMatch = category;
+      }
     }
 
-    const entries = Object.entries(scores);
-    if (!entries.length) return 'Other';
-
-    const [bestCategory] = entries.reduce((best, current) =>
-      current[1] > best[1] ? current : best
-    );
-
-    return scores[bestCategory] > 0 ? bestCategory : 'Other';
+    return bestMatch;
   }
 
   private async fetchPageContent(url: string): Promise<string> {
@@ -377,6 +444,41 @@ class PARegulationCollector {
     }
   }
 
+  private readonly CONTENT_SELECTORS = {
+    primary: [
+      // Direct regulation content
+      '#regulation-text',
+      '#regulation-content',
+      '#policy-text',
+      '#policy-content',
+      '.regulation-text',
+      '.regulation-content',
+      '.policy-text',
+      '.policy-content',
+      // Regulation sections
+      '[id*="requirements"]',
+      '[id*="guidelines"]',
+      '[class*="requirements"]',
+      '[class*="guidelines"]',
+      // Content by type
+      '[data-content-type="regulation"]',
+      '[data-content-type="policy"]',
+      '[data-type="requirement"]'
+    ],
+    secondary: [
+      // Main content areas
+      '#main-content article',
+      '.main-content article',
+      'article.content',
+      '.article-content',
+      // Policy containers
+      '.policy-container',
+      '.requirement-container',
+      '.standard-container'
+    ]
+  };
+
+
   public async collectRegulations(): Promise<Partial<InsertRegulation>[]> {
     const regulations: Partial<InsertRegulation>[] = [];
 
@@ -390,15 +492,15 @@ class PARegulationCollector {
           const content = await this.fetchPageContent(baseUrl);
           const $ = cheerio.load(content);
 
-          // Find regulation-related links
           const links = $('a').toArray()
             .filter(element => {
               const href = $(element).attr('href');
               const text = $(element).text().toLowerCase();
               if (!href || href.startsWith('mailto:')) return false;
 
-              return this.TITLE_PATTERNS.core.some(p => p.test(text)) ||
-                     this.TITLE_PATTERNS.education.some(p => p.test(text));
+              return this.TITLE_PATTERNS.policy.some(p => p.test(text)) ||
+                     this.TITLE_PATTERNS.education.some(p => p.test(text)) ||
+                     this.TITLE_PATTERNS.document.some(p => p.test(text));
             });
 
           syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Found ${links.length} potential regulation links`, {
