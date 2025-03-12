@@ -1,18 +1,40 @@
 
-// Use dynamic import to handle both ESM and CommonJS
+// Unified CommonJS/ESM compatible imports
+import * as fs from 'fs';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
+
+// Get the storage instance in a way that works in both module systems
 const getStorage = async () => {
   try {
-    // Try ESM import first
+    // Try ESM import
     const module = await import('./storage.js');
     return module.storage;
   } catch (err) {
-    // Fall back to CommonJS-style require
-    return require('./storage.js').storage;
+    try {
+      // Fall back to CommonJS require
+      const storage = require('./storage.js').storage;
+      return storage;
+    } catch (requireErr) {
+      console.error('Failed to import storage module:', requireErr);
+      throw new Error('Could not load storage module using ESM or CommonJS');
+    }
   }
 };
 
-import * as fs from 'fs';
-import * as path from 'path';
+// Helper to get current directory name in ESM
+const getDirname = () => {
+  try {
+    // For ESM
+    const __filename = fileURLToPath(import.meta.url);
+    return path.dirname(__filename);
+  } catch (err) {
+    // For CommonJS
+    return __dirname;
+  }
+};
+
+const currentDir = getDirname();
 
 /**
  * This script inspects PA regulations to analyze content issues
@@ -33,8 +55,9 @@ async function inspectPARegulations() {
 
     console.log(`Found ${paRegulations.length} PA regulations to analyze`);
 
-    // Create logs directory
+    // Create logs directory with robust path handling
     const logsDir = path.join(process.cwd(), 'logs');
+    console.log(`Creating logs directory at: ${logsDir}`);
     if (!fs.existsSync(logsDir)) {
       fs.mkdirSync(logsDir, { recursive: true });
     }

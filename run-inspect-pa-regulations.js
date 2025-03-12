@@ -1,18 +1,26 @@
 
-// Script to execute the TypeScript inspection file using ts-node with proper flags
+// Direct JavaScript executor that works in both ESM and CommonJS environments
 import { execSync } from 'child_process';
+import fs from 'fs';
+import path from 'path';
 
 try {
-  console.log('Running inspect-pa-regulations.ts...');
+  console.log('Running PA regulations inspection...');
   
-  // Use ts-node-esm for properly handling ES modules
-  execSync('npx ts-node-esm --transpile-only server/inspect-pa-regulations.ts', { 
-    stdio: 'inherit',
-    env: { ...process.env, NODE_OPTIONS: '--experimental-specifier-resolution=node' }
+  // Compile TypeScript file first
+  execSync('npx tsc --esModuleInterop --target es2020 --module commonjs --outDir ./temp server/inspect-pa-regulations.ts', { 
+    stdio: 'inherit'
+  });
+  
+  console.log('Compiled successfully, now running inspection...');
+  
+  // Run the compiled JS file
+  execSync('node temp/server/inspect-pa-regulations.js', { 
+    stdio: 'inherit'
   });
   
   console.log('Successfully completed PA regulations inspection!');
 } catch (error) {
-  console.error('Failed to run inspect-pa-regulations.ts:', error.message);
+  console.error('Error:', error.message);
   process.exit(1);
 }
