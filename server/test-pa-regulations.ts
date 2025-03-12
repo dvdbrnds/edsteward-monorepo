@@ -27,9 +27,9 @@ async function testPARegulationCollection() {
       console.log(`${source}: ${count}`);
     });
 
-    // Print detailed info for first few regulations
-    console.log('\nSample Regulations:');
-    regulations.slice(0, 3).forEach((reg, index) => {
+    // Print detailed info for all regulations
+    console.log('\nDetailed Regulation Information:');
+    regulations.forEach((reg, index) => {
       console.log(`\nRegulation ${index + 1}:`);
       console.log(JSON.stringify({
         name: reg.name,
@@ -37,7 +37,8 @@ async function testPARegulationCollection() {
         stateCode: reg.stateCode,
         stateAgency: reg.stateAgency,
         topic: reg.topic,
-        category: reg.category
+        category: reg.category,
+        summary: reg.summary?.substring(0, 200) + '...'
       }, null, 2));
     });
 
