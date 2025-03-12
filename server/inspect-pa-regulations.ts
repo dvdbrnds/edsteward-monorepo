@@ -1,102 +1,128 @@
-
 import { storage } from './storage';
 import { syslog, LogLevel, LogFacility } from './services/syslog';
 import * as fs from 'fs';
 import * as path from 'path';
 
 /**
- * This script inspects the PA regulations in the database
- * to help diagnose collection issues
+ * This script inspects PA regulations to analyze content issues
+ * and logs detailed information to help debug the scraping process.
  */
 async function inspectPARegulations() {
   try {
-    console.log('==== PA Regulations Inspection ====');
-    
-    // Create logs directory if it doesn't exist
+    console.log('==== PA Regulations Inspector ====');
+
+    // Get all PA regulations
+    const allRegulations = await storage.getRegulations();
+    const paRegulations = allRegulations.filter(
+      reg => reg.stateCode === 'PA' && reg.jurisdiction === 'state'
+    );
+
+    console.log(`Found ${paRegulations.length} PA regulations to analyze`);
+
+    // Create logs directory
     const logsDir = path.join(process.cwd(), 'logs');
     if (!fs.existsSync(logsDir)) {
       fs.mkdirSync(logsDir);
     }
-    
-    // Get all regulations
-    const allRegulations = await storage.getRegulations();
-    
-    // Filter for PA regulations
-    const paRegulations = allRegulations.filter(
-      reg => reg.stateCode === 'PA' && reg.jurisdiction === 'state'
-    );
-    
-    console.log(`\nFound ${paRegulations.length} PA regulations out of ${allRegulations.length} total regulations`);
-    
-    // Group by agency
-    const agencyGroups = paRegulations.reduce((acc, reg) => {
-      const agency = reg.stateAgency || 'Unknown';
-      if (!acc[agency]) {
-        acc[agency] = [];
-      }
-      acc[agency].push(reg);
+
+    // Write log file with regulation content analysis
+    const logFilePath = path.join(logsDir, 'pa-regulations-analysis.log');
+    let logContent = `PA Regulations Analysis\n`;
+    logContent += `=====================\n`;
+    logContent += `Total PA Regulations: ${paRegulations.length}\n\n`;
+
+    // Common patterns in the scraped content
+    const contentPatterns = [
+      'Contact Us',
+      'The Pennsylvania Department of Education',
+      'PDE oversees',
+      'Clearances & Background Checks',
+      'State Board of Education',
+      'Professional Standards'
+    ];
+
+    const patternCounts = contentPatterns.reduce((acc, pattern) => {
+      acc[pattern] = 0;
       return acc;
-    }, {} as Record<string, typeof paRegulations>);
-    
-    console.log('\nPA Regulations by Agency:');
-    Object.entries(agencyGroups).forEach(([agency, regs]) => {
-      console.log(`${agency}: ${regs.length} regulations`);
-    });
-    
-    // Check content quality
-    console.log('\nContent Quality Analysis:');
-    
-    const contentStats = {
-      empty: 0,
-      veryShort: 0,
-      short: 0,
-      medium: 0,
-      long: 0,
-      veryLong: 0,
-      withUrls: 0,
-      withHtml: 0
-    };
-    
-    paRegulations.forEach(reg => {
-      const content = reg.requirements || '';
-      const length = content.length;
-      
-      if (length === 0) {
-        contentStats.empty++;
-      } else if (length < 100) {
-        contentStats.veryShort++;
-      } else if (length < 500) {
-        contentStats.short++;
-      } else if (length < 2000) {
-        contentStats.medium++;
-      } else if (length < 5000) {
-        contentStats.long++;
+    }, {} as Record<string, number>);
+
+    // Analyze each regulation
+    for (const reg of paRegulations) {
+      logContent += `\n-----------------------------------\n`;
+      logContent += `Regulation ID: ${reg.id}\n`;
+      logContent += `Name: ${reg.name}\n`;
+      logContent += `Agency: ${reg.stateAgency}\n`;
+      logContent += `URL: ${reg.regulationUrl}\n`;
+
+      // Content analysis
+      const contentLength = reg.requirements?.length || 0;
+      logContent += `Content Length: ${contentLength} characters\n`;
+
+      if (contentLength > 0) {
+        const preview = reg.requirements?.substring(0, 200).replace(/\n/g, ' ') + '...';
+        logContent += `Content Preview: ${preview}\n`;
+
+        // Check for common patterns
+        contentPatterns.forEach(pattern => {
+          if (reg.requirements?.includes(pattern)) {
+            patternCounts[pattern]++;
+            logContent += `Contains pattern: "${pattern}"\n`;
+          }
+        });
+
+        // Check for likely navigational content
+        const hasNavigationalContent = reg.requirements?.includes('Contact Us') || 
+                                       reg.requirements?.includes('About Us') ||
+                                       reg.requirements?.includes('Home') ||
+                                       reg.requirements?.includes('Search');
+
+        if (hasNavigationalContent) {
+          logContent += `WARNING: Likely contains navigational content\n`;
+        }
+
+        // Check for regulation-specific content
+        const hasRegulationContent = reg.requirements?.includes('shall') || 
+                                     reg.requirements?.includes('must') ||
+                                     reg.requirements?.includes('required') ||
+                                     reg.requirements?.includes('regulations') ||
+                                     reg.requirements?.includes('Chapter');
+
+        if (hasRegulationContent) {
+          logContent += `INFO: Contains regulation-specific language\n`;
+        } else {
+          logContent += `WARNING: Missing regulation-specific language\n`;
+        }
       } else {
-        contentStats.veryLong++;
+        logContent += `WARNING: Empty content\n`;
       }
-      
-      if (content.includes('http://') || content.includes('https://')) {
-        contentStats.withUrls++;
-      }
-      
-      if (content.includes('<') && content.includes('>')) {
-        contentStats.withHtml++;
-      }
+    }
+
+    // Add pattern statistics
+    logContent += `\n\nContent Pattern Analysis\n`;
+    logContent += `======================\n`;
+
+    Object.entries(patternCounts).forEach(([pattern, count]) => {
+      const percentage = (count / paRegulations.length) * 100;
+      logContent += `"${pattern}": Found in ${count} regulations (${percentage.toFixed(2)}%)\n`;
     });
-    
-    console.log('Content Length Distribution:');
-    console.log(`  Empty: ${contentStats.empty}`);
-    console.log(`  Very Short (<100 chars): ${contentStats.veryShort}`);
-    console.log(`  Short (100-500 chars): ${contentStats.short}`);
-    console.log(`  Medium (500-2000 chars): ${contentStats.medium}`);
-    console.log(`  Long (2000-5000 chars): ${contentStats.long}`);
-    console.log(`  Very Long (>5000 chars): ${contentStats.veryLong}`);
-    console.log(`  With URLs: ${contentStats.withUrls}`);
-    console.log(`  With HTML: ${contentStats.withHtml}`);
-    
+
+    // Write to log file
+    fs.writeFileSync(logFilePath, logContent);
+    console.log(`Analysis log written to: ${logFilePath}`);
+
+    // Provide summary to console
+    console.log('\nContent Pattern Summary:');
+    Object.entries(patternCounts).forEach(([pattern, count]) => {
+      const percentage = (count / paRegulations.length) * 100;
+      console.log(`- "${pattern}": ${count} regulations (${percentage.toFixed(2)}%)`);
+    });
+
+    console.log('\nInspection complete. Check the log file for detailed analysis.');
+
+
     // Export detailed report
     const reportPath = path.join(logsDir, 'pa_regulations_report.json');
-    
+
     // Create a report with anonymized regulation data
     const report = {
       summary: {
@@ -104,7 +130,7 @@ async function inspectPARegulations() {
         byAgency: Object.fromEntries(
           Object.entries(agencyGroups).map(([agency, regs]) => [agency, regs.length])
         ),
-        contentStats
+        contentStats: patternCounts // Use the new pattern counts
       },
       regulationSamples: paRegulations.slice(0, 10).map(reg => ({
         name: reg.name,
@@ -128,10 +154,10 @@ async function inspectPARegulations() {
           itemId: reg.itemId
         }))
     };
-    
+
     fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
     console.log(`\nDetailed report saved to: ${reportPath}`);
-    
+
     // Print a few examples of problematic regulations
     console.log('\nExamples of Empty/Poor Content Regulations:');
     paRegulations
@@ -144,9 +170,9 @@ async function inspectPARegulations() {
         console.log(`URL: ${reg.regulationUrl}`);
         console.log(`Content: ${reg.requirements || '[EMPTY]'}`);
       });
-    
+
     console.log('\n==== Inspection Complete ====');
-    
+
   } catch (error) {
     console.error('Inspection failed:', error);
   }

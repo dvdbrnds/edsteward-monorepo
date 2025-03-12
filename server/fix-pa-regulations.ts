@@ -3,7 +3,7 @@ import { storage } from './storage';
 import { db } from './db';
 import { syslog, LogLevel, LogFacility } from './services/syslog';
 import { regulations } from '@shared/schema';
-import { eq, and, isNull, lt } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import * as cheerio from 'cheerio';
 import fetch from 'node-fetch';
 
@@ -11,8 +11,8 @@ import fetch from 'node-fetch';
  * This script attempts to fix common issues with PA regulations:
  * 1. Empty content
  * 2. HTML tags in content
- * 3. Duplicate regulations
- * 4. Missing metadata
+ * 3. Navigation and boilerplate content
+ * 4. Missing or incorrect regulation content
  */
 async function fixPARegulations() {
   try {
@@ -26,18 +26,30 @@ async function fixPARegulations() {
     
     console.log(`Found ${paRegulations.length} PA regulations to analyze`);
     
-    // 1. Fix empty content
-    const emptyContentRegs = paRegulations.filter(
-      reg => !reg.requirements || reg.requirements.length < 100
-    );
+    // Fixing regulations with navigation/boilerplate content
+    console.log('\nFixing regulations with navigation/boilerplate content...');
     
-    console.log(`\n1. Found ${emptyContentRegs.length} regulations with empty or very short content`);
+    let boilerplateFixed = 0;
+    const boilerplatePatterns = [
+      'The Pennsylvania Department of Education (PDE) oversees',
+      'Contact Us Form',
+      'PDE Press Office',
+      'State Library of Pennsylvania',
+      'Professional Standards and Practices Commission'
+    ];
     
-    let emptyFixed = 0;
-    for (const reg of emptyContentRegs.slice(0, 10)) { // Limit to first 10 for testing
-      if (reg.regulationUrl) {
+    for (const reg of paRegulations) {
+      let hasBoilerplate = false;
+      for (const pattern of boilerplatePatterns) {
+        if (reg.requirements?.includes(pattern)) {
+          hasBoilerplate = true;
+          break;
+        }
+      }
+      
+      if (hasBoilerplate && reg.regulationUrl) {
         try {
-          console.log(`\nAttempting to fix content for: ${reg.name}`);
+          console.log(`\nFetching content for: ${reg.name}`);
           console.log(`URL: ${reg.regulationUrl}`);
           
           const response = await fetch(reg.regulationUrl, {
@@ -54,45 +66,107 @@ async function fixPARegulations() {
           const html = await response.text();
           const $ = cheerio.load(html);
           
-          // Try multiple content selectors
+          // Remove navigation, header, footer elements
+          $('nav, header, footer, .header, .footer, .navigation, .menu, .sidebar, .meta, script, style').remove();
+          
+          // Enhanced content selectors for PA education pages
           const contentSelectors = [
+            // Content-specific selectors
+            '.regulation-content', 
+            '.code-content',
+            '.chapter-content',
+            '.rules-content',
+            '.policy-content',
+            // PA SharePoint selectors
+            '[data-automation-id="CanvasZone"]',
+            '.ms-rtestate-field',
+            // Generic content selectors
+            'article',
+            '.main-content',
             '#main-content',
             'main',
-            'article',
-            '.ms-rtestate-field',
-            '[data-automation-id="CanvasZone"]',
             '.content',
-            '.main-content'
+            '#content'
           ];
           
-          let content = '';
-          for (const selector of contentSelectors) {
-            const element = $(selector).first();
-            if (element.length > 0) {
-              // Remove script and style tags
-              element.find('script, style').remove();
+          // Focus on elements likely to contain regulations
+          const regulationSelectors = [
+            'p:contains("Chapter")',
+            'p:contains("Section")',
+            'p:contains("§")',
+            'p:contains("shall")',
+            'p:contains("must")',
+            'div:contains("§")',
+            'div:contains("Chapter")'
+          ];
+          
+          // First try regulation-specific content
+          let extractedContent = '';
+          
+          // Look for regulation-specific elements
+          for (const selector of regulationSelectors) {
+            const elements = $(selector);
+            if (elements.length > 0) {
+              console.log(`Found ${elements.length} regulation elements with selector: ${selector}`);
               
-              // Get text and trim whitespace
-              const text = element.text().trim();
-              if (text.length > 100) {
-                content = text;
-                console.log(`Found content using selector: ${selector}`);
-                break;
+              elements.each((_, el) => {
+                // Get parent container for context
+                const parentContent = $(el).parent().text().trim();
+                if (parentContent.length > 100) {
+                  extractedContent += parentContent + '\n\n';
+                } else {
+                  extractedContent += $(el).text().trim() + '\n\n';
+                }
+              });
+            }
+          }
+          
+          // If no regulation-specific content found, try general content containers
+          if (extractedContent.length < 100) {
+            for (const selector of contentSelectors) {
+              const element = $(selector).first();
+              if (element.length > 0) {
+                // Remove navigation elements that might be inside content
+                element.find('nav, .navigation, .menu, script, style').remove();
+                
+                // Get text content
+                const text = element.text().trim();
+                if (text.length > 100) {
+                  console.log(`Found content using selector: ${selector}`);
+                  
+                  // Skip if content contains known boilerplate text
+                  const isBoilerplate = boilerplatePatterns.some(pattern => text.includes(pattern));
+                  if (!isBoilerplate) {
+                    extractedContent = text;
+                    break;
+                  } else {
+                    console.log(`Skipping boilerplate content from selector: ${selector}`);
+                  }
+                }
               }
             }
           }
           
-          if (content.length > 100) {
+          // Clean up the extracted content
+          extractedContent = extractedContent
+            .replace(/\s+/g, ' ')
+            .replace(/\n{3,}/g, '\n\n')
+            .trim();
+          
+          // Check if the content is substantially different and useful
+          if (extractedContent.length > 100 && 
+              !boilerplatePatterns.some(pattern => extractedContent.includes(pattern))) {
+            
             // Update the regulation
             await db.update(regulations)
               .set({
-                requirements: content,
+                requirements: extractedContent,
                 lastUpdated: new Date()
               })
               .where(eq(regulations.id, reg.id));
             
-            console.log(`Updated content for ${reg.name} (${content.length} characters)`);
-            emptyFixed++;
+            console.log(`Updated content for ${reg.name} (${extractedContent.length} characters)`);
+            boilerplateFixed++;
           } else {
             console.log(`Could not find suitable content for ${reg.name}`);
           }
@@ -102,96 +176,35 @@ async function fixPARegulations() {
       }
     }
     
-    console.log(`\nFixed ${emptyFixed} regulations with empty content`);
+    console.log(`\nFixed ${boilerplateFixed} regulations with boilerplate content`);
     
-    // 2. Fix HTML in content
-    const htmlContentRegs = paRegulations.filter(
-      reg => reg.requirements && 
-             reg.requirements.includes('<') && 
-             reg.requirements.includes('>')
-    );
+    // Add some fallback summary info if no content could be extracted
+    console.log('\nChecking for regulations that need a fallback summary...');
     
-    console.log(`\n2. Found ${htmlContentRegs.length} regulations with HTML in content`);
-    
-    let htmlFixed = 0;
-    for (const reg of htmlContentRegs.slice(0, 10)) { // Limit to first 10 for testing
-      try {
-        console.log(`\nCleaning HTML from: ${reg.name}`);
+    let fallbackAdded = 0;
+    for (const reg of paRegulations) {
+      if (!reg.requirements || reg.requirements.length < 100) {
+        const fallbackSummary = `This is a Pennsylvania state education regulation under the authority of ${reg.stateAgency}. ` +
+                               `For specific requirements and details, please refer to the official source at ${reg.regulationUrl}.`;
         
-        const $ = cheerio.load(`<div>${reg.requirements}</div>`);
-        // Remove all scripts and styles
-        $('script, style').remove();
-        
-        // Get text and trim whitespace
-        const cleanContent = $('div').text().trim();
-        
-        if (cleanContent.length > 100) {
-          // Update the regulation
+        try {
           await db.update(regulations)
             .set({
-              requirements: cleanContent,
+              requirements: fallbackSummary,
               lastUpdated: new Date()
             })
             .where(eq(regulations.id, reg.id));
           
-          console.log(`Cleaned HTML from ${reg.name} (${cleanContent.length} characters)`);
-          htmlFixed++;
+          console.log(`Added fallback summary for ${reg.name}`);
+          fallbackAdded++;
+        } catch (error) {
+          console.error(`Error adding fallback for ${reg.name}:`, error);
         }
-      } catch (error) {
-        console.error(`Error cleaning HTML from ${reg.name}:`, error);
       }
     }
     
-    console.log(`\nFixed ${htmlFixed} regulations with HTML in content`);
-    
-    // 3. Find and mark potential duplicates
-    console.log('\n3. Checking for duplicates...');
-    
-    const nameMap = new Map<string, number[]>();
-    
-    // Group by similar names
-    paRegulations.forEach(reg => {
-      // Normalize name by removing common words and punctuation
-      const normalizedName = reg.name
-        .toLowerCase()
-        .replace(/[^\w\s]/g, '')
-        .replace(/\s+/g, ' ')
-        .trim();
-      
-      if (!nameMap.has(normalizedName)) {
-        nameMap.set(normalizedName, []);
-      }
-      
-      nameMap.get(normalizedName)?.push(reg.id);
-    });
-    
-    // Find duplicate groups
-    const duplicateGroups = Array.from(nameMap.entries())
-      .filter(([_, ids]) => ids.length > 1)
-      .map(([name, ids]) => ({ name, ids }));
-    
-    console.log(`Found ${duplicateGroups.length} potential duplicate groups`);
-    
-    if (duplicateGroups.length > 0) {
-      console.log('Duplicate groups (first 5):');
-      duplicateGroups.slice(0, 5).forEach((group, i) => {
-        console.log(`Group ${i + 1}: ${group.name} (${group.ids.length} duplicates)`);
-        
-        // Find the regulations in this group
-        const groupRegs = paRegulations.filter(reg => group.ids.includes(reg.id));
-        
-        // Print details
-        groupRegs.forEach((reg, j) => {
-          console.log(`  ${j+1}. ID: ${reg.id}, Agency: ${reg.stateAgency}, Version: ${reg.versionNumber}`);
-        });
-      });
-    }
-    
+    console.log(`\nAdded fallback summaries for ${fallbackAdded} regulations`);
     console.log('\n==== Fix Script Complete ====');
-    console.log(`Summary of fixes:`);
-    console.log(`- Empty content fixed: ${emptyFixed}`);
-    console.log(`- HTML content fixed: ${htmlFixed}`);
-    console.log(`- Potential duplicate groups found: ${duplicateGroups.length}`);
     
   } catch (error) {
     console.error('Fix script failed:', error);
