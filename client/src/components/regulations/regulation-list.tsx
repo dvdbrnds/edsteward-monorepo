@@ -63,17 +63,21 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
     mutationFn: async (deadline: InsertDeadline) => {
       console.log('Creating deadline with data:', deadline);
       try {
+        const requestBody = {
+          regulationId: deadline.regulationId,
+          dueDate: deadline.dueDate,
+          status: deadline.status,
+          assignedTo: deadline.assignedTo || 1
+        };
+
+        console.log('Sending request with body:', JSON.stringify(requestBody));
+
         const response = await fetch('/api/deadlines', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            regulationId: deadline.regulationId,
-            dueDate: deadline.dueDate,
-            status: deadline.status,
-            assignedTo: deadline.assignedTo || 1
-          }),
+          body: JSON.stringify(requestBody),
         });
 
         if (!response.ok) {
@@ -82,7 +86,9 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
           throw new Error(errorData?.message || `Failed to create deadline: ${response.statusText}`);
         }
 
-        return await response.json();
+        const result = await response.json();
+        console.log('Server response:', result);
+        return result;
       } catch (error) {
         console.error('Error in createDeadlineMutation:', error);
         throw error;
