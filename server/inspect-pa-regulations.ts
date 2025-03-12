@@ -1,7 +1,18 @@
 
-import { storage } from './storage.js';
-import fs from 'fs';
-import path from 'path';
+// Use dynamic import to handle both ESM and CommonJS
+const getStorage = async () => {
+  try {
+    // Try ESM import first
+    const module = await import('./storage.js');
+    return module.storage;
+  } catch (err) {
+    // Fall back to CommonJS-style require
+    return require('./storage.js').storage;
+  }
+};
+
+import * as fs from 'fs';
+import * as path from 'path';
 
 /**
  * This script inspects PA regulations to analyze content issues
@@ -11,6 +22,9 @@ async function inspectPARegulations() {
   try {
     console.log('==== PA Regulations Inspector ====');
 
+    // Dynamically get storage module
+    const storage = await getStorage();
+    
     // Get all PA regulations
     const allRegulations = await storage.getRegulations();
     const paRegulations = allRegulations.filter(
