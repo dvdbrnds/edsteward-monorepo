@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import type { Regulation, Deadline } from "@shared/schema";
+import type { Regulation, Deadline, InsertDeadline } from "@shared/schema";
 import { useLocation } from "wouter";
 import { Search, ExternalLink, CheckCircle, AlertCircle, Clock, Loader2, ArrowUpDown } from "lucide-react";
 import { differenceInDays, format } from "date-fns";
@@ -17,6 +17,17 @@ import {
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import DeadlineForm from "./deadline-form";
+import { Button } from "@/components/ui/button";
+import { apiRequest, queryClient } from "@/lib/queryClient";
 
 interface RegulationListProps {
   categoryFilter: string | null;
@@ -33,22 +44,65 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
   const [_, navigate] = useLocation();
   const { toast } = useToast();
 
-  const { data: regulations, isLoading: regulationsLoading, error: regulationsError } = useQuery<Regulation[]>({
+  const { data: regulations = [], isLoading: regulationsLoading, error: regulationsError } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
-    retry: 2,
-    onError: (error) => {
-      console.error("Error fetching regulations:", error);
-      toast({
-        title: "Error Loading Regulations",
-        description: "Please try refreshing the page. If the problem persists, contact support.",
-        variant: "destructive",
-      });
-    }
   });
 
   const { data: deadlines = [], isLoading: deadlinesLoading } = useQuery<Deadline[]>({
     queryKey: ["/api/deadlines"],
     staleTime: 1000 * 60, // 1 minute
+  });
+
+  const { data: user = {} } = useQuery({
+    queryKey: ["/api/user"]
+  });
+
+  const isAdmin = user?.role === "admin";
+
+  const createDeadlineMutation = useMutation({
+    mutationFn: (deadline: InsertDeadline) => 
+      apiRequest("/api/deadlines", {
+        method: "POST",
+        body: JSON.stringify(deadline),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/deadlines"] });
+      toast({
+        title: "Success",
+        description: "Deadline added successfully",
+      });
+    },
+    onError: (error: Error) => {
+      console.error("Error creating deadline:", error);
+      toast({
+        title: "Error",
+        description: "Failed to add deadline. Please try again.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateDeadlineMutation = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: Partial<InsertDeadline> }) =>
+      apiRequest(`/api/deadlines/${id}`, {
+        method: "PATCH",
+        body: JSON.stringify(data),
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/deadlines"] });
+      toast({
+        title: "Success",
+        description: "Deadline updated successfully",
+      });
+    },
+    onError: (error: Error) => {
+      console.error("Error updating deadline:", error);
+      toast({
+        title: "Error",
+        description: "Failed to update deadline. Please try again.",
+        variant: "destructive",
+      });
+    },
   });
 
   const handleRowClick = (regulation: Regulation) => {
@@ -83,7 +137,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
     );
   }
 
-  const filteredRegulations = (regulations || []).filter(reg => {
+  const filteredRegulations = regulations.filter((reg: Regulation) => {
     if (categoryFilter && reg.category !== categoryFilter) {
       return false;
     }
@@ -99,7 +153,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
     return true;
   });
 
-  const sortedRegulations = filteredRegulations.sort((a, b) => {
+  const sortedRegulations = [...filteredRegulations].sort((a: Regulation, b: Regulation) => {
     if (!sortConfig) return 0;
 
     const aValue = a[sortConfig.key];
@@ -124,28 +178,6 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
       return null;
     });
   };
-
-  // Show empty state if no regulations exist or match filters
-  if (filteredRegulations.length === 0) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="text-center text-gray-600">
-            <h3 className="text-lg font-semibold mb-2">
-              {search.trim() || categoryFilter
-                ? "No matching regulations found"
-                : "No regulations available"}
-            </h3>
-            <p>
-              {search.trim() || categoryFilter
-                ? "Try adjusting your search criteria or filters"
-                : "There are currently no regulations in the system."}
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
 
   return (
     <Card>
@@ -186,10 +218,11 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                   </div>
                 </TableHead>
                 <TableHead>Next Deadline</TableHead>
+                {isAdmin && <TableHead>Actions</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
-              {sortedRegulations.map((regulation) => {
+              {sortedRegulations.map((regulation: Regulation) => {
                 const regulationDeadlines = deadlines.filter(d => d.regulationId === regulation.id);
                 const nextDeadline = regulationDeadlines.length > 0
                   ? regulationDeadlines.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0]
@@ -245,6 +278,31 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                         <span className="text-gray-500">No deadlines</span>
                       )}
                     </TableCell>
+                    {isAdmin && (
+                      <TableCell onClick={(e) => e.stopPropagation()}>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="outline" size="sm">
+                              Add Deadline
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Add Deadline</DialogTitle>
+                              <DialogDescription>
+                                Add a new deadline for {regulation.name || regulation.statute || 'this regulation'}
+                              </DialogDescription>
+                            </DialogHeader>
+                            <DeadlineForm
+                              regulationId={regulation.id}
+                              onSubmit={(data) => {
+                                createDeadlineMutation.mutate(data);
+                              }}
+                            />
+                          </DialogContent>
+                        </Dialog>
+                      </TableCell>
+                    )}
                   </TableRow>
                 );
               })}
