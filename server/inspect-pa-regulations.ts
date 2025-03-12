@@ -1,6 +1,5 @@
 
 import { storage } from './storage';
-import { syslog, LogLevel, LogFacility } from './services/syslog';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -23,7 +22,7 @@ async function inspectPARegulations() {
     // Create logs directory
     const logsDir = path.join(process.cwd(), 'logs');
     if (!fs.existsSync(logsDir)) {
-      fs.mkdirSync(logsDir);
+      fs.mkdirSync(logsDir, { recursive: true });
     }
 
     // Write log file with regulation content analysis
@@ -42,10 +41,10 @@ async function inspectPARegulations() {
       'Professional Standards'
     ];
 
-    const patternCounts = contentPatterns.reduce((acc, pattern) => {
-      acc[pattern] = 0;
-      return acc;
-    }, {} as Record<string, number>);
+    const patternCounts: Record<string, number> = {};
+    contentPatterns.forEach(pattern => {
+      patternCounts[pattern] = 0;
+    });
 
     // Group regulations by agency
     const agencyGroups: Record<string, any[]> = {};
@@ -185,9 +184,13 @@ async function inspectPARegulations() {
     console.log('\n==== Inspection Complete ====');
 
   } catch (error) {
-    console.error('Inspection failed:', error);
+    console.error('Inspection failed:', error instanceof Error ? error.message : String(error));
+    console.error('Stack trace:', error instanceof Error ? error.stack : 'No stack trace available');
   }
 }
 
 // Run the inspection function
-inspectPARegulations().catch(console.error);
+inspectPARegulations().catch(error => {
+  console.error('Top-level error:', error instanceof Error ? error.message : String(error));
+  process.exit(1);
+});
