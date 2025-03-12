@@ -3,56 +3,28 @@ import { db } from '../db';
 import { syslog, LogLevel, LogFacility } from './syslog';
 import { regulations } from '@shared/schema';
 import type { InsertRegulation } from '@shared/schema';
-import { eq, and } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import * as cheerio from 'cheerio';
 import fetch from 'node-fetch';
 import * as fs from 'fs';
 import * as path from 'path';
-
-interface ExtractedContent {
-  content: string;
-  source: string;
-  score: number;
-  matchedPatterns: string[];
-}
+import { drizzle } from 'drizzle-orm/neon-http';
+import { neon } from '@neondatabase/serverless';
 
 class PARegulationCollector {
   private readonly BASE_URLS = {
-    // Direct links to regulation content
     paEducation: 'https://www.education.pa.gov/Policy-Funding/BECS/PACode/Pages/default.aspx',
     paHigherEd: 'https://www.education.pa.gov/Policy-Funding/BECS/PACode/Pages/HigherEducation.aspx',
     paStateSystem: 'https://www.passhe.edu/inside/policies/Pages/Board-of-Governors-Policies.aspx',
-    // Add fallback URLs
     paDeptEd: 'https://www.education.pa.gov/Teachers%20-%20Administrators/School%20Services/Pages/default.aspx',
     paStateBoard: 'https://www.stateboard.education.pa.gov/Pages/RegulationsPolicy.aspx'
   };
 
-  private readonly SHAREPOINT_SELECTORS = {
-    mainContent: [
-      '#DeltaPlaceHolderMain',
-      '#contentBox',
-      '#s4-workspace',
-      '#s4-bodyContainer',
-      '.ms-webpart-zone',
-      '.ms-webpart-cell-horizontal',
-      '.ms-webpartzone-cell',
-      '[data-name="WebPartZone"]'
-    ],
-    richText: [
-      '.ms-rtestate-field',
-      '.ms-rtestate-read',
-      '#ctl00_PlaceHolderMain_ctl01__ControlWrapper_RichHtmlField'
-    ],
-    lists: [
-      '.ms-listviewtable',
-      '.ms-vh-div',
-      '.ms-vb2'
-    ]
-  };
-
   private readonly debugDir = path.join(process.cwd(), 'logs', 'pa-content-debug');
-  private pendingRegulations: Partial<InsertRegulation>[] = [];
+  private dbConnection: any = null;
   private isProcessing = false;
+  private lastConnectionTime = 0;
+  private readonly MIN_CONNECTION_DELAY = 30000; // 30 seconds
 
   constructor() {
     if (!fs.existsSync(this.debugDir)) {
@@ -60,199 +32,174 @@ class PARegulationCollector {
     }
   }
 
-  private async logDatabaseError(error: Error, operation: string, context: any = {}) {
-    const errorLog = {
-      timestamp: new Date().toISOString(),
-      operation,
-      error: {
-        name: error.name,
-        message: error.message,
-        stack: error.stack,
-        code: (error as any).code,
-        detail: (error as any).detail
-      },
-      context
-    };
-
-    const logPath = path.join(this.debugDir, 'database-errors.log');
-    await fs.promises.appendFile(
-      logPath,
-      JSON.stringify(errorLog, null, 2) + '\n\n',
-      'utf8'
-    );
-
-    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
-      `Database error in ${operation}`, errorLog);
-  }
-
-  private async retryDatabaseOperation<T>(
-    operation: () => Promise<T>,
-    operationName: string,
-    context: any = {},
-    maxRetries = 3,
-    initialDelay = 3000
-  ): Promise<T> {
-    let lastError: Error | null = null;
-    let delay = initialDelay;
-
-    for (let attempt = 1; attempt <= maxRetries; attempt++) {
-      try {
-        const startTime = Date.now();
-        const result = await operation();
-        const duration = Date.now() - startTime;
-
-        syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
-          `Database operation completed successfully`, {
-            operation: operationName,
-            attempt,
-            durationMs: duration,
-            context
-          });
-
-        return result;
-
-      } catch (error) {
-        lastError = error instanceof Error ? error : new Error(String(error));
-
-        const isConnectionError =
-          lastError.message.includes('terminating connection') ||
-          lastError.message.includes('Connection terminated');
-
-        await this.logDatabaseError(lastError, operationName, {
-          ...context,
-          attempt,
-          isConnectionError
-        });
-
-        if (attempt < maxRetries) {
-          const retryDelay = isConnectionError ? delay * 2 : delay;
-
+  private async initializeConnection(): Promise<void> {
+    try {
+      // Close existing connection if any
+      if (this.dbConnection) {
+        try {
+          await this.dbConnection.end();
+        } catch (error) {
           syslog.log(LogFacility.LOCAL0, LogLevel.WARNING,
-            `Retrying database operation after error`, {
-              operation: operationName,
-              attempt,
-              nextRetryDelayMs: retryDelay,
-              isConnectionError
+            "Error closing existing connection", {
+              error: error instanceof Error ? error.message : String(error)
             });
-
-          await new Promise(resolve => setTimeout(resolve, retryDelay));
-          delay *= 2; // Exponential backoff
         }
       }
-    }
 
-    throw lastError;
+      // Enforce minimum delay between connections
+      const now = Date.now();
+      const timeSinceLastConnection = now - this.lastConnectionTime;
+      if (timeSinceLastConnection < this.MIN_CONNECTION_DELAY) {
+        const waitTime = this.MIN_CONNECTION_DELAY - timeSinceLastConnection;
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
+          `Waiting ${waitTime}ms before creating new connection`);
+        await new Promise(resolve => setTimeout(resolve, waitTime));
+      }
+
+      // Initialize new connection
+      this.dbConnection = drizzle(neon(process.env.DATABASE_URL!));
+      this.lastConnectionTime = Date.now();
+
+      // Verify connection
+      await this.dbConnection.select().from(regulations).limit(1);
+
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Database connection initialized");
+    } catch (error) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
+        "Failed to initialize database connection", {
+          error: error instanceof Error ? error.message : String(error)
+        });
+      this.dbConnection = null;
+      throw error;
+    }
   }
 
-  private async processSingleRegulation(regulation: Partial<InsertRegulation>): Promise<void> {
-    try {
-      const operationContext = {
-        regulationId: regulation.itemId,
-        name: regulation.name
-      };
+  private async processRegulation(regulation: Partial<InsertRegulation>): Promise<void> {
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
+          `Processing regulation attempt ${attempt}: ${regulation.name}`);
 
-      await this.retryDatabaseOperation(
-        async () => {
-          const existing = await storage.getRegulationByItemId(regulation.itemId!);
+        await this.initializeConnection();
 
-          if (existing) {
-            await storage.updateRegulation(existing.id, {
+        // Query existing regulation
+        const existing = await this.dbConnection
+          .select()
+          .from(regulations)
+          .where(eq(regulations.itemId, regulation.itemId!))
+          .limit(1);
+
+        // Add significant delay before write operation
+        await new Promise(resolve => setTimeout(resolve, 15000));
+
+        if (existing.length > 0) {
+          await this.dbConnection
+            .update(regulations)
+            .set({
               ...regulation,
               lastUpdated: new Date(),
               lastVerified: new Date()
-            });
-          } else {
-            await storage.createRegulation(regulation);
-          }
-        },
-        'process_regulation',
-        operationContext
-      );
+            })
+            .where(eq(regulations.id, existing[0].id));
 
-      // Add significant delay between operations
-      await new Promise(resolve => setTimeout(resolve, 5000));
+          syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
+            `Updated regulation: ${regulation.name}`);
+        } else {
+          await this.dbConnection
+            .insert(regulations)
+            .values(regulation);
 
-    } catch (error) {
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
-        `Failed to process regulation after all retries`, {
-          name: regulation.name,
-          itemId: regulation.itemId,
-          error: error instanceof Error ? error.message : String(error)
-        });
+          syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
+            `Created regulation: ${regulation.name}`);
+        }
 
-      // Re-queue failed item for later retry
-      this.pendingRegulations.push(regulation);
+        // Add significant delay after write operation
+        await new Promise(resolve => setTimeout(resolve, 15000));
+        return;
+
+      } catch (error) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
+          `Error processing regulation (attempt ${attempt})`, {
+            name: regulation.name,
+            error: error instanceof Error ? error.message : String(error)
+          });
+
+        // Reset connection on error
+        this.dbConnection = null;
+
+        // Add exponential backoff delay
+        const delay = Math.pow(2, attempt) * 15000; // 15s, 30s, 60s
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
     }
+
+    throw new Error(`Failed to process regulation after 3 attempts: ${regulation.name}`);
   }
 
-  private async processQueue(): Promise<void> {
-    if (this.isProcessing) return;
+  public async collectRegulations(): Promise<void> {
+    if (this.isProcessing) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.WARNING,
+        "Collection already in progress");
+      return;
+    }
+
     this.isProcessing = true;
 
     try {
-      while (this.pendingRegulations.length > 0) {
-        const regulation = this.pendingRegulations.shift()!;
-        await this.processSingleRegulation(regulation);
-      }
-    } finally {
-      this.isProcessing = false;
-    }
-  }
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
+        "Starting PA regulations collection");
 
-  public async collectRegulations(): Promise<Partial<InsertRegulation>[]> {
-    const regulations: Partial<InsertRegulation>[] = [];
-
-    try {
-      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Starting PA regulations collection");
-
+      // Process one source at a time
       for (const [source, url] of Object.entries(this.BASE_URLS)) {
         try {
-          syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Processing source: ${source}`);
+          syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
+            `Processing source: ${source}`);
 
-          const baseContent = await this.fetchPageContent(url);
-          const baseRegulation = await this.parseRegulation(baseContent, source, url);
-          if (baseRegulation) {
-            regulations.push(baseRegulation);
-            this.pendingRegulations.push(baseRegulation);
-            await this.processQueue();
-          }
+          const content = await fetch(url).then(res => res.text());
+          const $ = cheerio.load(content);
 
-          const $ = cheerio.load(baseContent);
-          const links = $('a').filter((_, element) => {
-            const href = $(element).attr('href');
-            const text = $(element).text().toLowerCase();
+          // Extract regulation links
+          const links = $('a').filter((_, el) => {
+            const href = $(el).attr('href');
+            const text = $(el).text().toLowerCase();
             return href && !href.startsWith('mailto:') && (
-              /regulation|policy|requirement|chapter|standard/i.test(text) ||
-              /academic|program|course|degree|student|faculty/i.test(text)
+              /regulation|policy|requirement|standard/i.test(text) ||
+              /academic|program|course|degree/i.test(text)
             );
-          }).map((_, element) => {
-            const href = $(element).attr('href')!;
+          }).map((_, el) => {
+            const href = $(el).attr('href')!;
             return href.startsWith('http') ? href : new URL(href, url).toString();
           }).get();
 
           syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
             `Found ${links.length} potential regulation links`);
 
+          // Process each link sequentially
           for (const link of links) {
             try {
-              const regulation = await this.parseRegulation(
-                await this.fetchPageContent(link),
-                source,
-                link
-              );
+              const regulation: Partial<InsertRegulation> = {
+                itemId: `PA-${source}-${Date.now()}`,
+                name: $('h1').first().text().trim() || 'PA Regulation',
+                topic: 'Higher Education',
+                jurisdiction: 'state',
+                stateCode: 'PA',
+                stateAgency: source,
+                regulationUrl: link,
+                agency_url: url,
+                agency_name: source,
+                requirements: await fetch(link).then(res => res.text())
+              };
 
-              if (regulation) {
-                regulations.push(regulation);
-                this.pendingRegulations.push(regulation);
-                await this.processQueue();
-              }
+              await this.processRegulation(regulation);
+
+              // Add significant delay between regulations
+              await new Promise(resolve => setTimeout(resolve, 30000));
 
             } catch (error) {
               syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
                 `Error processing link: ${link}`, {
                   error: error instanceof Error ? error.message : String(error)
                 });
-              continue;
             }
           }
 
@@ -261,23 +208,31 @@ class PARegulationCollector {
             `Error processing source: ${source}`, {
               error: error instanceof Error ? error.message : String(error)
             });
-          continue;
         }
-      }
 
-      // Process any remaining items
-      await this.processQueue();
-      return regulations;
+        // Add delay between sources
+        await new Promise(resolve => setTimeout(resolve, 60000));
+      }
 
     } catch (error) {
       syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
-        `Error in regulation collection`, {
+        "Error in regulation collection", {
           error: error instanceof Error ? error.message : String(error)
         });
       throw error;
+    } finally {
+      this.isProcessing = false;
     }
   }
 
+  private cleanText(text: string): string {
+    return text
+      .replace(/[\r\n]+/g, '\n')
+      .replace(/\s*\n\s*/g, '\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .replace(/[^\S\n]+/g, ' ')
+      .trim();
+  }
   private async parseRegulation(
     html: string,
     source: string,
