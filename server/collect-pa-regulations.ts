@@ -2,6 +2,7 @@ import { paRegulationCollector } from './services/pa-regulation-collector';
 import { regulations } from '@shared/schema';
 import { db } from './db';
 import { eq, and } from 'drizzle-orm';
+import { syslog, LogLevel, LogFacility } from './services/syslog';
 
 async function collectPARegulations() {
   try {
@@ -9,12 +10,11 @@ async function collectPARegulations() {
 
     // Collect regulations from PA sources
     const newRegulations = await paRegulationCollector.collectRegulations();
+    console.log(`Found ${newRegulations.length} regulations to process`);
 
     let imported = 0;
     let updated = 0;
     let skipped = 0;
-
-    console.log(`Found ${newRegulations.length} regulations to process`);
 
     for (const regulation of newRegulations) {
       if (!regulation.name || !regulation.stateAgency) {
@@ -24,58 +24,76 @@ async function collectPARegulations() {
       }
 
       try {
-        // Check if regulation already exists by name AND state agency
-        const existing = await db.query.regulations.findFirst({
-          where: and(
-            eq(regulations.name, regulation.name),
-            eq(regulations.stateAgency, regulation.stateAgency)
-          )
-        });
-
-        // Prepare regulation data with required fields
-        const regulationData = {
-          ...regulation,
-          jurisdiction: 'state' as const,
-          stateCode: 'PA',
-          lastUpdated: new Date(),
-          isApplicable: true,
-          itemId: existing ? existing.itemId : `PA-${regulation.stateAgency}-${Date.now()}`,
-          topic: regulation.topic || 'General',
-          statute: regulation.statute || '',
-          category: regulation.category || 'Other'
-        };
-
-        if (existing) {
-          // Update existing regulation
-          console.log(`Updating existing regulation: ${regulation.name} (${regulation.stateAgency})`);
-          await db
-            .update(regulations)
-            .set({
-              ...regulationData,
-              versionNumber: existing.versionNumber + 1,
-              previousVersionId: existing.id
-            })
-            .where(
-              and(
-                eq(regulations.id, existing.id),
-                eq(regulations.stateAgency, regulation.stateAgency)
-              )
-            );
-          updated++;
-          console.log(`Successfully updated regulation: ${regulation.name}`);
-        } else {
-          // Insert new regulation
-          console.log(`Inserting new regulation: ${regulation.name} (${regulation.stateAgency})`);
-          await db.insert(regulations).values({
-            ...regulationData,
-            versionNumber: 1
+        // Use a transaction for each regulation
+        await db.transaction(async (tx) => {
+          // Check if regulation already exists by name AND state agency
+          const existing = await tx.query.regulations.findFirst({
+            where: and(
+              eq(regulations.name, regulation.name),
+              eq(regulations.stateAgency, regulation.stateAgency)
+            )
           });
-          imported++;
-          console.log(`Successfully imported new regulation: ${regulation.name}`);
-        }
+
+          // Prepare regulation data with required fields
+          const regulationData = {
+            ...regulation,
+            jurisdiction: 'state' as const,
+            stateCode: 'PA',
+            lastUpdated: new Date(),
+            isApplicable: true,
+            itemId: existing ? existing.itemId : `PA-${regulation.stateAgency}-${Date.now()}`,
+            topic: regulation.topic || 'General',
+            statute: regulation.statute || '',
+            category: regulation.category || 'Other'
+          };
+
+          if (existing) {
+            // Update existing regulation
+            console.log(`Updating existing regulation: ${regulation.name} (${regulation.stateAgency})`);
+            await tx
+              .update(regulations)
+              .set({
+                ...regulationData,
+                versionNumber: existing.versionNumber + 1,
+                previousVersionId: existing.id
+              })
+              .where(
+                and(
+                  eq(regulations.id, existing.id),
+                  eq(regulations.stateAgency, regulation.stateAgency)
+                )
+              );
+            updated++;
+            console.log(`Successfully updated regulation: ${regulation.name}`);
+          } else {
+            // Insert new regulation
+            console.log(`Inserting new regulation: ${regulation.name} (${regulation.stateAgency})`);
+            await tx.insert(regulations).values({
+              ...regulationData,
+              versionNumber: 1
+            });
+            imported++;
+            console.log(`Successfully imported new regulation: ${regulation.name}`);
+          }
+        });
       } catch (error) {
         console.error(`Error processing regulation ${regulation.name}:`, error);
         skipped++;
+
+        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Database operation failed", {
+          id: "DB_ERROR",
+          parameters: {
+            name: regulation.name,
+            error: error instanceof Error ? error.message : String(error),
+            stackTrace: error instanceof Error ? error.stack : undefined
+          }
+        });
+
+        // If we get a connection error, wait a bit before continuing
+        if (error instanceof Error && error.message.includes('terminating connection')) {
+          console.log('Database connection error, waiting before continuing...');
+          await new Promise(resolve => setTimeout(resolve, 5000));
+        }
       }
     }
 

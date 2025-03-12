@@ -15,86 +15,54 @@ class PARegulationCollector {
   };
 
   private readonly IGNORED_TITLE_PATTERNS = [
-    /the\.gov means/i,
-    /official website/i,
-    /home\s*page/i,
-    /welcome to/i,
-    /main\s*menu/i,
-    /navigation/i,
-    /skip to/i,
+    /^\s*$/,
     /^menu$/i,
     /^search$/i,
-    /^breadcrumb$/i
+    /^home$/i,
+    /^breadcrumb$/i,
+    /^skip to/i,
+    /^copyright/i,
+    /^site map$/i,
+    /^contact us$/i
   ];
 
   private readonly CONTENT_SECTION_SELECTORS = [
-    // Primary content selectors
-    '.regulation-content',
-    '.regulation-detail',
-    '#regulation-content',
-    '.policy-detail',
-    '#policy-content',
+    // Primary content areas
     '#main-content',
-    '#content-main',
     '.main-content',
-    // Secondary content selectors
+    '.content-main',
+    '#contentMain',
+    // Regulation-specific sections
+    '.regulation-content',
+    '.policy-content',
+    '[id*="policy"]',
+    '[id*="regulation"]',
+    // Generic content areas
     'article',
     '.post-content',
     '.entry-content',
-    // Generic content areas
-    '.content',
     '#content',
-    '.page-content',
-    // Fallback selectors
-    'main',
-    '.container'
+    '.content',
+    'main'
   ];
 
-  private readonly REGULATION_TITLE_SELECTORS = [
-    // Data attribute selectors
-    '[data-type="regulation"]',
-    '[data-type="policy"]',
-    '[data-content-type="regulation"]',
-    // Specific class selectors
-    '.regulation-title',
-    '.policy-title',
-    '.document-title',
-    // Content area headings
-    '#regulation-content h1',
-    '.regulation-content h1',
-    '.policy-content h1',
-    // Standard headings
-    'h1.title',
-    'h1.page-title',
-    // Fallback
-    'h1'
-  ];
-
-  private readonly REGULATION_RELATED_TERMS = [
-    // Core terms
-    'policy',
-    'regulation',
-    'requirement',
-    'standard',
-    'rule',
-    'guideline',
-    // Additional terms
-    'procedure',
-    'compliance',
-    'statute',
-    'code',
-    'law',
-    'mandate',
-    'provision',
-    'ordinance',
-    // Education-specific terms
-    'academic',
-    'certification',
-    'credential',
-    'degree',
-    'program',
-    'assessment',
-    'enrollment'
+  private readonly TITLE_INDICATORS = [
+    // Direct regulation/policy titles
+    'Requirements for',
+    'Policy on',
+    'Regulation for',
+    'Guidelines for',
+    'Standards for',
+    // Education-specific prefixes
+    'Academic Requirements',
+    'Program Requirements',
+    'Student Policy',
+    'Faculty Policy',
+    'Certification Requirements',
+    // Action verbs often used in titles
+    'Establishing',
+    'Implementing',
+    'Governing'
   ];
 
   private cleanText(text: string): string {
@@ -107,266 +75,196 @@ class PARegulationCollector {
       .trim();
   }
 
-  private isValidTitle(text: string, content: string): boolean {
-    if (!text || text.length < 5) {
-      syslog.log(LogFacility.LOCAL0, LogLevel.DEBUG, "Title validation failed: too short", {
-        text,
-        length: text?.length || 0
-      });
-      return false;
-    }
+  private findTitle($: cheerio.CheerioAPI): string {
+    let candidates: Array<{ text: string, source: string, score: number }> = [];
 
-    // Check against ignored patterns
-    if (this.IGNORED_TITLE_PATTERNS.some(pattern => pattern.test(text))) {
-      syslog.log(LogFacility.LOCAL0, LogLevel.DEBUG, "Title validation failed: matched ignored pattern", {
-        text,
-        pattern: this.IGNORED_TITLE_PATTERNS.find(p => p.test(text))?.toString()
-      });
-      return false;
-    }
-
-    const wordCount = text.split(/\s+/).length;
-    if (wordCount < 2 || wordCount > 50) {
-      syslog.log(LogFacility.LOCAL0, LogLevel.DEBUG, "Title validation failed: invalid word count", {
-        text,
-        wordCount
-      });
-      return false;
-    }
-
-    const lowerText = text.toLowerCase();
-    const lowerContent = content.toLowerCase();
-
-    // Look for regulation terms in title
-    const hasRegulationTerm = this.REGULATION_RELATED_TERMS.some(term => 
-      lowerText.includes(term)
-    );
-
-    // If title has regulation term, it's valid
-    if (hasRegulationTerm) {
-      syslog.log(LogFacility.LOCAL0, LogLevel.DEBUG, "Title validation passed: contains regulation term", {
-        text,
-        hasRegulationTerm: true
-      });
-      return true;
-    }
-
-    // If title appears in content near regulation terms, it's valid
-    for (const term of this.REGULATION_RELATED_TERMS) {
-      const contextPattern = new RegExp(`(${text}.*?${term}|${term}.*?${text})`, 'i');
-      if (contextPattern.test(content)) {
-        syslog.log(LogFacility.LOCAL0, LogLevel.DEBUG, "Title validation passed: regulation term in context", {
+    // Search for titles in headings
+    $('h1, h2, h3, [class*="title"], [id*="title"]').each((_, el) => {
+      const text = this.cleanText($(el).text());
+      if (text && text.length >= 5 && !this.IGNORED_TITLE_PATTERNS.some(p => p.test(text))) {
+        candidates.push({
           text,
-          term
+          source: el.tagName,
+          score: this.scoreTitleCandidate(text)
         });
-        return true;
       }
-    }
-
-    // Look for education-specific patterns
-    const educationPatterns = [
-      /(?:college|university|school|campus|student|faculty|education).*?(?:requirement|standard|policy)/i,
-      /(?:academic|program|course|degree).*?(?:requirement|standard|policy)/i,
-      /(?:certification|credential|assessment).*?(?:requirement|standard|policy)/i
-    ];
-
-    for (const pattern of educationPatterns) {
-      if (pattern.test(lowerContent)) {
-        syslog.log(LogFacility.LOCAL0, LogLevel.DEBUG, "Title validation passed: education context", {
-          text,
-          pattern: pattern.toString()
-        });
-        return true;
-      }
-    }
-
-    syslog.log(LogFacility.LOCAL0, LogLevel.DEBUG, "Title validation failed: no regulation context found", {
-      text
     });
-    return false;
+
+    // Look for key phrases in paragraphs
+    $('p').slice(0, 3).each((_, el) => {
+      const text = this.cleanText($(el).text());
+      for (const indicator of this.TITLE_INDICATORS) {
+        const pattern = new RegExp(`${indicator}\\s+([^.!?]+)[.!?]`, 'i');
+        const match = text.match(pattern);
+        if (match && match[1]) {
+          const title = this.cleanText(match[0]);
+          candidates.push({
+            text: title,
+            source: 'paragraph',
+            score: this.scoreTitleCandidate(title)
+          });
+        }
+      }
+    });
+
+    // Log all candidates for debugging
+    syslog.log(LogFacility.LOCAL0, LogLevel.DEBUG, "Title candidates found", {
+      candidates: candidates.map(c => ({
+        text: c.text,
+        source: c.source,
+        score: c.score
+      }))
+    });
+
+    // Sort by score and get best candidate
+    candidates.sort((a, b) => b.score - a.score);
+    const bestCandidate = candidates[0];
+
+    if (bestCandidate && bestCandidate.score >= 2) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Selected title", {
+        title: bestCandidate.text,
+        source: bestCandidate.source,
+        score: bestCandidate.score
+      });
+      return bestCandidate.text;
+    }
+
+    return '';
+  }
+
+  private scoreTitleCandidate(text: string): number {
+    const lowerText = text.toLowerCase();
+    let score = 0;
+
+    // Check for regulation-related terms
+    const regulationTerms = ['regulation', 'policy', 'requirement', 'standard', 'guideline'];
+    for (const term of regulationTerms) {
+      if (lowerText.includes(term)) score += 2;
+    }
+
+    // Check for education-related terms
+    const educationTerms = ['academic', 'student', 'faculty', 'program', 'degree', 'education'];
+    for (const term of educationTerms) {
+      if (lowerText.includes(term)) score += 1;
+    }
+
+    // Check for title indicators
+    for (const indicator of this.TITLE_INDICATORS) {
+      if (lowerText.includes(indicator.toLowerCase())) score += 2;
+    }
+
+    // Penalize very short or long titles
+    if (text.length < 10) score -= 1;
+    if (text.length > 150) score -= 2;
+
+    return score;
   }
 
   private extractContent($: cheerio.CheerioAPI): string {
     let bestContent = '';
 
-    // Remove common non-content elements
-    $('script, style, nav, header, footer, .navigation, .menu, .sidebar, .comments, .social-share').remove();
+    // Remove non-content elements
+    $('script, style, nav, header, footer, .navigation, .menu, .sidebar').remove();
 
     // Try each content selector
     for (const selector of this.CONTENT_SECTION_SELECTORS) {
-      const elements = $(selector);
-      elements.each((_, el) => {
-        const $el = $(el);
+      const section = $(selector);
+      if (section.length) {
         let content = '';
 
-        // Process child elements
-        $el.children().each((_, child) => {
-          const $child = $(child);
+        // Process each element while preserving structure
+        section.find('*').each((_, el) => {
+          const $el = $(el);
 
-          // Handle different element types
-          if ($child.is('p, div')) {
-            content += $child.text() + '\n\n';
-          } else if ($child.is('ul, ol')) {
-            $child.find('li').each((_, li) => {
+          if ($el.is('p')) {
+            content += $el.text() + '\n\n';
+          } else if ($el.is('h1, h2, h3, h4, h5, h6')) {
+            content += '\n' + $el.text() + '\n\n';
+          } else if ($el.is('ul, ol')) {
+            $el.find('li').each((_, li) => {
               content += '• ' + $(li).text() + '\n';
             });
             content += '\n';
-          } else if ($child.is('table')) {
-            $child.find('tr').each((_, row) => {
+          } else if ($el.is('table')) {
+            $el.find('tr').each((_, row) => {
               content += $(row).find('td, th').map((_, cell) => $(cell).text()).get().join(' | ') + '\n';
             });
             content += '\n';
-          } else if ($child.is('h1, h2, h3, h4, h5, h6')) {
-            content += '\n' + $child.text() + '\n\n';
           }
         });
 
-        // If this section has more content, use it
+        content = this.cleanText(content);
         if (content.length > bestContent.length) {
           bestContent = content;
         }
-      });
-    }
-
-    // If no content found in specific sections, try getting text from body
-    if (!bestContent) {
-      bestContent = $('body').text();
-    }
-
-    return this.cleanText(bestContent);
-  }
-
-  private findRegulationTitle($: cheerio.CheerioAPI, content: string): string {
-    let bestTitle = '';
-    let allTitles: string[] = [];
-
-    // First try specific regulation title selectors
-    for (const selector of this.REGULATION_TITLE_SELECTORS) {
-      const elements = $(selector);
-      elements.each((_, el) => {
-        const title = this.cleanText($(el).text());
-        if (title) {
-          allTitles.push(title);
-          if (this.isValidTitle(title, content)) {
-            bestTitle = title;
-            return false; // Break the loop
-          }
-        }
-      });
-      if (bestTitle) break;
-    }
-
-    // Log title candidates and selection result
-    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Title extraction candidates", {
-      id: "TITLE_EXTRACTION",
-      parameters: {
-        allTitles,
-        selectedTitle: bestTitle,
-        contentPreview: content.substring(0, 200)
       }
+    }
+
+    // Log content extraction result
+    syslog.log(LogFacility.LOCAL0, LogLevel.DEBUG, "Content extraction result", {
+      contentLength: bestContent.length,
+      preview: bestContent.substring(0, 200)
     });
 
-    // If no valid title found from selectors, try content extraction
-    if (!bestTitle) {
-      // Look for regulation names in the first few paragraphs
-      const paragraphs = content.split('\n\n').slice(0, 3);
-
-      // Common patterns that introduce regulation titles
-      const patterns = [
-        // Direct references
-        /(?:this|the)\s+(.*?(?:regulation|policy|requirement|standard|rule).*?)(?:\.|$)/i,
-        // Purpose statements
-        /(?:purpose|scope)\s+(?:of|for)\s+(.*?)(?:\.|$)/i,
-        // Requirements patterns
-        /(?:sets forth|establishes|implements)\s+(.*?)(?:\.|$)/i,
-        // Education-specific patterns
-        /(?:academic|program|certification)\s+(.*?)(?:\.|$)/i
-      ];
-
-      for (const para of paragraphs) {
-        for (const pattern of patterns) {
-          const match = para.match(pattern);
-          if (match && match[1]) {
-            const candidate = this.cleanText(match[1]);
-            if (this.isValidTitle(candidate, content)) {
-              bestTitle = candidate;
-              break;
-            }
-          }
-        }
-        if (bestTitle) break;
-      }
-
-      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Content-based title extraction result", {
-        id: "CONTENT_TITLE_EXTRACTION",
-        parameters: {
-          extractedTitle: bestTitle,
-          firstParagraph: paragraphs[0]
-        }
-      });
-    }
-
-    return bestTitle;
+    return bestContent;
   }
 
   private detectCategory(content: string): string {
-    const scores: Record<string, number> = {};
+    const categories = {
+      'Academic Programs': ['curriculum', 'program', 'degree', 'academic', 'course'],
+      'Financial Aid': ['financial aid', 'scholarship', 'grant', 'loan', 'tuition'],
+      'Student Services': ['student service', 'counseling', 'advising', 'support'],
+      'Athletics': ['athletic', 'sport', 'physical education', 'competition'],
+      'Campus Safety': ['safety', 'security', 'emergency', 'crime'],
+      'Research': ['research', 'intellectual property', 'innovation'],
+      'Human Resources': ['employment', 'faculty', 'staff', 'personnel']
+    };
 
-    // Calculate score for each category
-    for (const [category, patterns] of Object.entries(this.CATEGORY_PATTERNS)) {
-      scores[category] = patterns.reduce((score, pattern) => {
-        const matches = content.match(pattern);
-        return score + (matches ? matches.length : 0);
-      }, 0);
-    }
-
-    // Find category with highest score
-    let bestCategory = 'Other';
+    let bestMatch = 'Other';
     let highestScore = 0;
 
-    for (const [category, score] of Object.entries(scores)) {
+    const lowerContent = content.toLowerCase();
+    for (const [category, terms] of Object.entries(categories)) {
+      const score = terms.reduce((sum, term) => {
+        const matches = lowerContent.match(new RegExp(term, 'g'));
+        return sum + (matches ? matches.length : 0);
+      }, 0);
+
       if (score > highestScore) {
         highestScore = score;
-        bestCategory = category;
+        bestMatch = category;
       }
     }
 
-    syslog.log(LogFacility.LOCAL0, LogLevel.DEBUG, "Category detection result", {
-      bestCategory,
-      scores
-    });
-
-    return bestCategory;
+    return bestMatch;
   }
 
   private async parseRegulation(html: string, source: string, url: string): Promise<Partial<InsertRegulation> | null> {
     try {
       const $ = cheerio.load(html);
 
-      // Extract content first
-      const content = this.extractContent($);
-
-      // Skip if really insufficient content
-      if (!content || content.length < 30) {
-        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Skipping page - insufficient content", {
-          id: "SKIP_PAGE",
-          parameters: { url, contentLength: content.length }
-        });
-        return null;
-      }
-
-      // Find a valid title
-      const title = this.findRegulationTitle($, content);
+      // Find title first
+      const title = this.findTitle($);
       if (!title) {
-        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Skipping page - no valid title found", {
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "No valid title found", {
           id: "SKIP_PAGE",
           parameters: { url }
         });
         return null;
       }
 
+      // Extract content
+      const content = this.extractContent($);
+      if (!content || content.length < 100) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Insufficient content", {
+          id: "SKIP_PAGE",
+          parameters: { url, contentLength: content?.length || 0 }
+        });
+        return null;
+      }
+
       const category = this.detectCategory(content);
-      const itemId = `PA-${source.replace(/[^a-zA-Z0-9]/g, '')}-${Date.now()}`;
+      const itemId = `PA-${source}-${Buffer.from(title).toString('base64').substring(0, 8)}`;
 
       const regulation: Partial<InsertRegulation> = {
         itemId,
@@ -393,94 +291,28 @@ class PARegulationCollector {
         agency_department: source
       };
 
-      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Parsed regulation", {
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Successfully parsed regulation", {
         id: "PARSE_SUCCESS",
         parameters: {
-          source,
-          url,
           title,
           category,
-          contentLength: content.length
+          contentLength: content.length,
+          url
         }
       });
 
       return regulation;
-
     } catch (error) {
       syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Error parsing regulation", {
         id: "PARSE_ERROR",
         parameters: {
           url,
-          source,
-          errorMessage: error instanceof Error ? error.message : String(error)
+          error: error instanceof Error ? error.message : String(error)
         }
       });
       return null;
     }
   }
-
-  private readonly CATEGORY_PATTERNS = {
-    'Academic Programs': [
-      /academic.*program/i,
-      /curriculum/i,
-      /degree.*requirement/i,
-      /course.*requirement/i,
-      /academic.*standard/i,
-      /education.*requirement/i
-    ],
-    'Financial Aid': [
-      /financial.*aid/i,
-      /scholarship/i,
-      /grant.*program/i,
-      /student.*loan/i,
-      /tuition/i,
-      /financial.*assistance/i
-    ],
-    'Student Services': [
-      /student.*service/i,
-      /counseling/i,
-      /advising/i,
-      /student.*support/i,
-      /student.*resource/i
-    ],
-    'Athletics': [
-      /athletic/i,
-      /sport/i,
-      /NCAA/i,
-      /competition/i,
-      /physical.*education/i
-    ],
-    'Campus Safety': [
-      /safety/i,
-      /security/i,
-      /emergency/i,
-      /police/i,
-      /crime/i,
-      /incident/i
-    ],
-    'Research': [
-      /research/i,
-      /grant/i,
-      /intellectual.*property/i,
-      /innovation/i,
-      /laboratory/i
-    ],
-    'Human Resources': [
-      /employment/i,
-      /faculty/i,
-      /staff/i,
-      /personnel/i,
-      /hiring/i,
-      /recruitment/i
-    ],
-    'Accounting': [
-      /financial/i,
-      /accounting/i,
-      /budget/i,
-      /audit/i,
-      /fiscal/i
-    ]
-  };
 
   private async fetchPageContent(url: string): Promise<string> {
     try {
@@ -493,34 +325,14 @@ class PARegulationCollector {
       });
       return response.data;
     } catch (error) {
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Error fetching content", {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Error fetching page", {
         id: "FETCH_ERROR",
         parameters: {
           url,
-          errorMessage: error instanceof Error ? error.message : String(error)
+          error: error instanceof Error ? error.message : String(error)
         }
       });
       throw error;
-    }
-  }
-
-  public async validateRegulation(regulation: Partial<InsertRegulation>): Promise<boolean> {
-    try {
-      await insertRegulationSchema.parseAsync(regulation);
-      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Regulation validation successful", {
-        id: "VALIDATION_SUCCESS",
-        parameters: { name: regulation.name }
-      });
-      return true;
-    } catch (error) {
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Regulation validation failed", {
-        id: "VALIDATION_ERROR",
-        parameters: {
-          name: regulation.name,
-          errorMessage: error instanceof Error ? error.message : String(error)
-        }
-      });
-      return false;
     }
   }
 
@@ -532,40 +344,34 @@ class PARegulationCollector {
 
       for (const [source, baseUrl] of Object.entries(this.BASE_URLS)) {
         try {
-          syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Processing source", {
-            id: "SOURCE_START",
-            parameters: { source, baseUrl }
-          });
+          syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Processing source", { source });
 
           const content = await this.fetchPageContent(baseUrl);
           const $ = cheerio.load(content);
 
-          // Find regulation links
-          const links = $('a').toArray().filter(element => {
-            const href = $(element).attr('href');
-            const text = $(element).text().toLowerCase();
-            return href &&
-                   !href.startsWith('mailto:') &&
-                   (text.includes('regulation') ||
-                    text.includes('policy') ||
-                    text.includes('requirement') ||
-                    text.includes('standard'));
-          });
+          // Find potential regulation links
+          const links = $('a').toArray()
+            .filter(element => {
+              const href = $(element).attr('href');
+              const text = $(element).text().toLowerCase();
 
-          syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Found potential regulation links", {
-            id: "LINKS_FOUND",
-            parameters: {
-              source,
-              linkCount: links.length
-            }
-          });
+              if (!href || href.startsWith('mailto:')) return false;
 
-          // Process each link
+              return (
+                text.includes('regulation') ||
+                text.includes('policy') ||
+                text.includes('requirement') ||
+                text.includes('standard') ||
+                text.includes('education') ||
+                text.includes('academic')
+              );
+            });
+
           for (const link of links) {
-            const href = $(link).attr('href');
-            if (!href) continue;
-
             try {
+              const href = $(link).attr('href');
+              if (!href) continue;
+
               const fullUrl = href.startsWith('http') ? href : new URL(href, baseUrl).toString();
               const pageContent = await this.fetchPageContent(fullUrl);
               const regulation = await this.parseRegulation(pageContent, source, fullUrl);
@@ -573,12 +379,9 @@ class PARegulationCollector {
               if (regulation) {
                 regulations.push(regulation);
                 syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Added regulation", {
-                  id: "REGULATION_ADDED",
-                  parameters: {
-                    source,
-                    url: fullUrl,
-                    name: regulation.name
-                  }
+                  source,
+                  url: fullUrl,
+                  title: regulation.name
                 });
               }
             } catch (error) {
@@ -587,7 +390,7 @@ class PARegulationCollector {
                 parameters: {
                   url: href,
                   source,
-                  errorMessage: error instanceof Error ? error.message : String(error)
+                  error: error instanceof Error ? error.message : String(error)
                 }
               });
               continue;
@@ -598,29 +401,38 @@ class PARegulationCollector {
             id: "SOURCE_ERROR",
             parameters: {
               source,
-              errorMessage: error instanceof Error ? error.message : String(error)
+              error: error instanceof Error ? error.message : String(error)
             }
           });
           continue;
         }
       }
 
-      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "PA regulations collection completed", {
-        id: "COLLECTION_COMPLETE",
-        parameters: {
-          count: regulations.length
-        }
-      });
-
       return regulations;
     } catch (error) {
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Error in PA regulations collection", {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Error in regulation collection", {
         id: "COLLECTION_ERROR",
         parameters: {
-          errorMessage: error instanceof Error ? error.message : String(error)
+          error: error instanceof Error ? error.message : String(error)
         }
       });
       throw error;
+    }
+  }
+
+  public async validateRegulation(regulation: Partial<InsertRegulation>): Promise<boolean> {
+    try {
+      await insertRegulationSchema.parseAsync(regulation);
+      return true;
+    } catch (error) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Regulation validation failed", {
+        id: "VALIDATION_ERROR",
+        parameters: {
+          name: regulation.name,
+          error: error instanceof Error ? error.message : String(error)
+        }
+      });
+      return false;
     }
   }
 }
