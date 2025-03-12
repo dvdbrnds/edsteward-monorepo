@@ -24,6 +24,17 @@ export interface RegulationVersion {
   };
 }
 
+// Add after RegulationVersion interface
+export interface RegulationAction {
+  type: 'attestation' | 'website_publish' | 'community_communication' | 'agency_submission';
+  enabled: boolean;
+  required: boolean;
+  dueDate?: Date;
+  completedDate?: Date;
+  status: 'pending' | 'in_progress' | 'completed';
+  notes?: string;
+}
+
 // Users table
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -97,7 +108,6 @@ export const regulations = pgTable("regulations", {
   changeSummary: text("change_summary"),
   isCurrent: boolean("is_current").notNull().default(true),
   versionMetadata: jsonb("version_metadata").$type<RegulationVersion>(),
-  // Existing fields continue...
   filingDeadlines: jsonb("filing_deadlines").$type<{
     type: string;
     date: string;
@@ -126,6 +136,7 @@ export const regulations = pgTable("regulations", {
     finalDayReminders: boolean;
   }>(),
   sources: jsonb("sources").$type<RegulationSource[]>(),
+  actions: jsonb("actions").$type<RegulationAction[]>()
 });
 
 // Notifications table
@@ -225,6 +236,40 @@ export const insertRegulationSchema = createInsertSchema(regulations).extend({
     title: z.string().optional(),
     lastChecked: z.date().optional()
   })).optional().nullable(),
+  actions: z.array(z.object({
+    type: z.enum(['attestation', 'website_publish', 'community_communication', 'agency_submission']),
+    enabled: z.boolean().default(true),
+    required: z.boolean().default(false),
+    dueDate: z.date().optional(),
+    completedDate: z.date().optional(),
+    status: z.enum(['pending', 'in_progress', 'completed']).default('pending'),
+    notes: z.string().optional()
+  })).default([
+    {
+      type: 'attestation',
+      enabled: true,
+      required: false,
+      status: 'pending'
+    },
+    {
+      type: 'website_publish',
+      enabled: true,
+      required: false,
+      status: 'pending'
+    },
+    {
+      type: 'community_communication',
+      enabled: true,
+      required: false,
+      status: 'pending'
+    },
+    {
+      type: 'agency_submission',
+      enabled: true,
+      required: false,
+      status: 'pending'
+    }
+  ])
 });
 
 // Schema for inserting notifications

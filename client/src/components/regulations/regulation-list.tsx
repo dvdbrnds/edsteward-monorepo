@@ -1,7 +1,7 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
-import type { Regulation, Deadline, InsertDeadline } from "@shared/schema";
+import type { Regulation, Deadline, InsertDeadline, RegulationAction } from "@shared/schema";
 import { useLocation } from "wouter";
-import { Search, ExternalLink, CheckCircle, AlertCircle, Clock, Loader2, ArrowUpDown } from "lucide-react";
+import { Search, ExternalLink, CheckCircle, AlertCircle, Clock, Loader2, ArrowUpDown, Check, Globe, Mail, FileText, ToggleLeft, ToggleRight } from "lucide-react";
 import { differenceInDays, format } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -33,6 +33,7 @@ interface RegulationListProps {
   categoryFilter: string | null;
   jurisdictionFilter: 'federal' | 'state' | null;
   deadlines?: Deadline[];
+  onActionToggle?: (regulation: Regulation, actionType: string, enabled: boolean) => void;
 }
 
 type SortConfig = {
@@ -40,7 +41,7 @@ type SortConfig = {
   direction: 'asc' | 'desc';
 } | null;
 
-export default function RegulationList({ categoryFilter, jurisdictionFilter, deadlines = [] }: RegulationListProps) {
+export default function RegulationList({ categoryFilter, jurisdictionFilter, deadlines = [], onActionToggle }: RegulationListProps) {
   const [search, setSearch] = useState("");
   const [sortConfig, setSortConfig] = useState<SortConfig>(null);
   const [_, navigate] = useLocation();
@@ -182,7 +183,6 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
   }
 
   const filteredRegulations = regulations.filter((reg: Regulation) => {
-    // Add logging to debug jurisdiction values
     console.log('Regulation:', {
       id: reg.id,
       name: reg.name,
@@ -234,6 +234,33 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
     });
   };
 
+  const getActionIcon = (type: string) => {
+    switch (type) {
+      case 'attestation':
+        return <Check className="h-4 w-4" />;
+      case 'website_publish':
+        return <Globe className="h-4 w-4" />;
+      case 'community_communication':
+        return <Mail className="h-4 w-4" />;
+      case 'agency_submission':
+        return <FileText className="h-4 w-4" />;
+      default:
+        return null;
+    }
+  };
+
+  const getActionStatus = (action: RegulationAction) => {
+    if (!action.enabled) return 'disabled';
+    switch (action.status) {
+      case 'completed':
+        return 'text-green-500';
+      case 'in_progress':
+        return 'text-yellow-500';
+      default:
+        return 'text-gray-500';
+    }
+  };
+
   return (
     <Card>
       <CardContent className="p-6">
@@ -279,7 +306,8 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                   </div>
                 </TableHead>
                 <TableHead>Next Deadline</TableHead>
-                {isAdmin && <TableHead>Actions</TableHead>}
+                <TableHead>Actions</TableHead>
+                {isAdmin && <TableHead>Manage</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -344,29 +372,39 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                         <span className="text-gray-500">No deadlines</span>
                       )}
                     </TableCell>
+                    <TableCell>
+                      <div className="flex gap-2">
+                        {regulation.actions?.map(action => (
+                          <div
+                            key={action.type}
+                            className={`flex items-center gap-1 ${getActionStatus(action)}`}
+                            title={`${action.type.replace('_', ' ')} - ${action.status}`}
+                          >
+                            {getActionIcon(action.type)}
+                            {action.required && <span className="text-xs text-red-500">*</span>}
+                          </div>
+                        ))}
+                      </div>
+                    </TableCell>
                     {isAdmin && (
                       <TableCell onClick={(e) => e.stopPropagation()}>
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button variant="outline" size="sm">
-                              Add Deadline
+                        <div className="flex gap-2">
+                          {regulation.actions?.map(action => (
+                            <Button
+                              key={action.type}
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => onActionToggle?.(regulation, action.type, !action.enabled)}
+                              className="p-1"
+                            >
+                              {action.enabled ? (
+                                <ToggleRight className="h-4 w-4 text-green-500" />
+                              ) : (
+                                <ToggleLeft className="h-4 w-4 text-gray-400" />
+                              )}
                             </Button>
-                          </DialogTrigger>
-                          <DialogContent>
-                            <DialogHeader>
-                              <DialogTitle>Add Deadline</DialogTitle>
-                              <DialogDescription>
-                                Add a new deadline for {regulation.name || regulation.statute || 'this regulation'}
-                              </DialogDescription>
-                            </DialogHeader>
-                            <DeadlineForm
-                              regulationId={regulation.id}
-                              onSubmit={(data) => {
-                                createDeadlineMutation.mutate(data);
-                              }}
-                            />
-                          </DialogContent>
-                        </Dialog>
+                          ))}
+                        </div>
                       </TableCell>
                     )}
                   </TableRow>
