@@ -31,6 +31,8 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 
 interface RegulationListProps {
   categoryFilter: string | null;
+  jurisdictionFilter: 'federal' | 'state' | null;
+  deadlines?: Deadline[];
 }
 
 type SortConfig = {
@@ -38,7 +40,7 @@ type SortConfig = {
   direction: 'asc' | 'desc';
 } | null;
 
-export default function RegulationList({ categoryFilter }: RegulationListProps) {
+export default function RegulationList({ categoryFilter, jurisdictionFilter, deadlines = [] }: RegulationListProps) {
   const [search, setSearch] = useState("");
   const [sortConfig, setSortConfig] = useState<SortConfig>(null);
   const [_, navigate] = useLocation();
@@ -48,7 +50,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
     queryKey: ["/api/regulations"],
   });
 
-  const { data: deadlines = [], isLoading: deadlinesLoading } = useQuery<Deadline[]>({
+  const { data: deadlinesData = [], isLoading: deadlinesLoading } = useQuery<Deadline[]>({
     queryKey: ["/api/deadlines"],
     staleTime: 1000 * 60, // 1 minute
   });
@@ -183,6 +185,9 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
     if (categoryFilter && reg.category !== categoryFilter) {
       return false;
     }
+    if (jurisdictionFilter && reg.jurisdiction !== jurisdictionFilter) {
+      return false;
+    }
     if (search.trim()) {
       const searchLower = search.toLowerCase();
       return (
@@ -265,7 +270,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
             </TableHeader>
             <TableBody>
               {sortedRegulations.map((regulation: Regulation) => {
-                const regulationDeadlines = deadlines.filter(d => d.regulationId === regulation.id);
+                const regulationDeadlines = deadlinesData.filter(d => d.regulationId === regulation.id);
                 const nextDeadline = regulationDeadlines.length > 0
                   ? regulationDeadlines.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0]
                   : null;

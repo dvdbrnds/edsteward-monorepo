@@ -16,6 +16,7 @@ import { useLocation } from "wouter";
 import RegulationList from "@/components/regulations/regulation-list";
 import CustomPieChart from "@/components/common/custom-pie-chart";
 import RegulationWizard from "@/components/regulations/regulation-wizard";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 // Nine distinct colors from different parts of the color wheel
 const CATEGORY_COLORS = {
@@ -30,9 +31,15 @@ const CATEGORY_COLORS = {
   "Human Resources": "#FF6600",      // Orange
 } as const;
 
+const JURISDICTION_COLORS = {
+  "federal": "#4169E1", // Royal Blue
+  "state": "#228B22",   // Forest Green
+} as const;
+
 export default function RegulationsPage() {
   const [open, setOpen] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
+  const [jurisdictionFilter, setJurisdictionFilter] = useState<'federal' | 'state' | null>(null);
   const [_, navigate] = useLocation();
 
   const { data: regulations } = useQuery<Regulation[]>({
@@ -48,7 +55,17 @@ export default function RegulationsPage() {
     return acc;
   }, {} as Record<string, number>) || {};
 
+  const jurisdictionSummary = regulations?.reduce((acc, reg) => {
+    acc[reg.jurisdiction] = (acc[reg.jurisdiction] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>) || {};
+
   const categoryChartData = Object.entries(categorySummary).map(([name, value]) => ({
+    name,
+    value,
+  }));
+
+  const jurisdictionChartData = Object.entries(jurisdictionSummary).map(([name, value]) => ({
     name,
     value,
   }));
@@ -90,17 +107,43 @@ export default function RegulationsPage() {
             </div>
           </div>
 
-          <CustomPieChart
-            data={categoryChartData}
-            title="Regulations by Category"
-            onSegmentClick={setCategoryFilter}
-            activeFilter={categoryFilter}
-          />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <Card>
+              <CardHeader>
+                <CardTitle>Filter by Category</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CustomPieChart
+                  data={categoryChartData}
+                  colors={CATEGORY_COLORS}
+                  title="Regulations by Category"
+                  onSegmentClick={setCategoryFilter}
+                  activeFilter={categoryFilter}
+                />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Filter by Jurisdiction</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CustomPieChart
+                  data={jurisdictionChartData}
+                  colors={JURISDICTION_COLORS}
+                  title="Regulations by Jurisdiction"
+                  onSegmentClick={setJurisdictionFilter as (value: string | null) => void}
+                  activeFilter={jurisdictionFilter}
+                />
+              </CardContent>
+            </Card>
+          </div>
 
           <RegulationList 
             regulations={regulations || []} 
             deadlines={deadlines} 
-            categoryFilter={categoryFilter} 
+            categoryFilter={categoryFilter}
+            jurisdictionFilter={jurisdictionFilter}
           />
         </div>
       </main>
