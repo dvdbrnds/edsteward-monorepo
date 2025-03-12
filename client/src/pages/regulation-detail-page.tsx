@@ -792,7 +792,45 @@ export default function RegulationDetailPage() {
                     </div>
                   </CardContent>
                 </Card>
-
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Actions</CardTitle>
+                    <CardDescription>Required actions and their current status</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {regulation?.actions?.map((action) => (
+                        <ActionButton
+                          key={action.type}
+                          action={action}
+                          regulationId={regulation.id}
+                          isAdmin={user?.role === "admin"}
+                          onToggle={(enabled) => {
+                            updateActionMutation.mutate({
+                              regulationId: regulation.id,
+                              action: { ...action, enabled }
+                            });
+                          }}
+                          onStatusChange={(status) => {
+                            updateActionMutation.mutate({
+                              regulationId: regulation.id,
+                              action: { ...action, status }
+                            });
+                          }}
+                          onRequiredChange={(required) => {
+                            updateActionMutation.mutate({
+                              regulationId: regulation.id,
+                              action: { ...action, required }
+                            });
+                          }}
+                        />
+                      ))}
+                      {(!regulation?.actions || regulation.actions.length === 0) && (
+                        <p className="text-gray-500 italic">No actions configured</p>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
                 {nextDeadline && nextDeadline.status !== "completed" && (
                   <Card className="border-[#00267A]">
                     <CardHeader>
@@ -899,7 +937,7 @@ export default function RegulationDetailPage() {
                                       step={1}
                                       value={[field.value || 7]}
                                       onValueChange={([value]) => field.onChange(value)}
-                                      className="w-full"
+                                                                     className="w-full"
                                     />
                                   </FormControl>
                                   <FormDescription>
