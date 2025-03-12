@@ -294,5 +294,54 @@ export function registerRoutes(app: express.Application): Server {
     });
   });
 
+  // Add endpoint to update regulation category
+  app.patch("/api/regulations/:regulationId/category", async (req, res) => {
+    try {
+      if (!req.user) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized regulation update attempt");
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const { regulationId } = req.params;
+      const { category } = req.body;
+
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Updating category for regulation ${regulationId}`, {
+        newCategory: category
+      });
+
+      if (!category) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Invalid category update data received", { body: req.body });
+        return res.status(400).json({ error: "Category is required" });
+      }
+
+      try {
+        const regulation = await storage.updateRegulation(parseInt(regulationId), { category });
+
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Successfully updated regulation category", { 
+          regulationId,
+          newCategory: category 
+        });
+
+        return res.json(regulation);
+      } catch (dbError) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Database error updating regulation category", {
+          error: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+        return res.status(500).json({ 
+          error: "Database error updating regulation category",
+          details: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+      }
+    } catch (error) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to update regulation category", {
+        error: error instanceof Error ? error.message : String(error)
+      });
+      return res.status(500).json({ 
+        error: "Failed to update regulation category", 
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
   return httpServer;
 }

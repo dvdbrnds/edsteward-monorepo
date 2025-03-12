@@ -256,8 +256,14 @@ export default function RegulationDetailPage() {
 
   const categoryMutation = useMutation({
     mutationFn: async (category: string) => {
+      console.log('Updating category for regulation:', regulation?.id, 'to:', category);
+
+      if (!regulation?.id) {
+        throw new Error('No regulation ID available');
+      }
+
       const response = await fetch(
-        `/api/regulations/${regulation?.id}/category`,
+        `/api/regulations/${regulation.id}/category`,
         {
           method: "PATCH",
           headers: {
@@ -266,9 +272,18 @@ export default function RegulationDetailPage() {
           body: JSON.stringify({ category }),
         }
       );
+
       if (!response.ok) {
-        throw new Error("Failed to update category");
+        const errorText = await response.text();
+        console.error('Server error response:', errorText);
+        try {
+          const errorJson = JSON.parse(errorText);
+          throw new Error(errorJson.message || errorJson.error || 'Failed to update category');
+        } catch (e) {
+          throw new Error(`Failed to update category: ${errorText}`);
+        }
       }
+
       return response.json();
     },
     onSuccess: () => {
@@ -278,7 +293,8 @@ export default function RegulationDetailPage() {
       });
       queryClient.invalidateQueries({ queryKey: ["/api/regulations", regulation?.id] });
     },
-    onError: (error) => {
+    onError: (error: Error) => {
+      console.error("Error updating category:", error);
       toast({
         title: "Update Failed",
         description: error.message,
