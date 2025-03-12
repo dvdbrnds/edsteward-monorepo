@@ -23,20 +23,42 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// Use dynamic import to handle both ESM and CommonJS
+// Unified CommonJS/ESM compatible imports
+const fs = __importStar(require("fs"));
+const path = __importStar(require("path"));
+const url_1 = require("url");
+// Get the storage instance in a way that works in both module systems
 const getStorage = async () => {
     try {
-        // Try ESM import first
+        // Try ESM import
         const module = await Promise.resolve().then(() => __importStar(require('./storage.js')));
         return module.storage;
     }
     catch (err) {
-        // Fall back to CommonJS-style require
-        return require('./storage.js').storage;
+        try {
+            // Fall back to CommonJS require
+            const storage = require('./storage.js').storage;
+            return storage;
+        }
+        catch (requireErr) {
+            console.error('Failed to import storage module:', requireErr);
+            throw new Error('Could not load storage module using ESM or CommonJS');
+        }
     }
 };
-const fs = __importStar(require("fs"));
-const path = __importStar(require("path"));
+// Helper to get current directory name in ESM
+const getDirname = () => {
+    try {
+        // For ESM
+        const __filename = (0, url_1.fileURLToPath)(import.meta.url);
+        return path.dirname(__filename);
+    }
+    catch (err) {
+        // For CommonJS
+        return __dirname;
+    }
+};
+const currentDir = getDirname();
 /**
  * This script inspects PA regulations to analyze content issues
  * and logs detailed information to help debug the scraping process.
@@ -50,8 +72,9 @@ async function inspectPARegulations() {
         const allRegulations = await storage.getRegulations();
         const paRegulations = allRegulations.filter(reg => reg.stateCode === 'PA' && reg.jurisdiction === 'state');
         console.log(`Found ${paRegulations.length} PA regulations to analyze`);
-        // Create logs directory
+        // Create logs directory with robust path handling
         const logsDir = path.join(process.cwd(), 'logs');
+        console.log(`Creating logs directory at: ${logsDir}`);
         if (!fs.existsSync(logsDir)) {
             fs.mkdirSync(logsDir, { recursive: true });
         }
