@@ -182,6 +182,14 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
   }
 
   const filteredRegulations = regulations.filter((reg: Regulation) => {
+    // Add logging to debug jurisdiction values
+    console.log('Regulation:', {
+      id: reg.id,
+      name: reg.name,
+      jurisdiction: reg.jurisdiction,
+      stateCode: reg.stateCode
+    });
+
     if (categoryFilter && reg.category !== categoryFilter) {
       return false;
     }
