@@ -60,11 +60,24 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
   const isAdmin = user?.role === "admin";
 
   const createDeadlineMutation = useMutation({
-    mutationFn: (deadline: InsertDeadline) => 
-      apiRequest("/api/deadlines", {
-        method: "POST",
-        body: JSON.stringify(deadline),
-      }),
+    mutationFn: async (deadline: InsertDeadline) => {
+      try {
+        const response = await apiRequest("/api/deadlines", {
+          method: "POST",
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(deadline)
+        });
+        if (!response.ok) {
+          throw new Error(`Failed to create deadline: ${response.statusText}`);
+        }
+        return response.json();
+      } catch (error) {
+        console.error('Error in createDeadlineMutation:', error);
+        throw error;
+      }
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/deadlines"] });
       toast({
@@ -76,18 +89,31 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
       console.error("Error creating deadline:", error);
       toast({
         title: "Error",
-        description: "Failed to add deadline. Please try again.",
+        description: `Failed to add deadline: ${error.message}`,
         variant: "destructive",
       });
     },
   });
 
   const updateDeadlineMutation = useMutation({
-    mutationFn: ({ id, data }: { id: number; data: Partial<InsertDeadline> }) =>
-      apiRequest(`/api/deadlines/${id}`, {
-        method: "PATCH",
-        body: JSON.stringify(data),
-      }),
+    mutationFn: async ({ id, data }: { id: number; data: Partial<InsertDeadline> }) => {
+      try {
+        const response = await apiRequest(`/api/deadlines/${id}`, {
+          method: "PATCH",
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+        if (!response.ok) {
+          throw new Error(`Failed to update deadline: ${response.statusText}`);
+        }
+        return response.json();
+      } catch (error) {
+        console.error('Error in updateDeadlineMutation:', error);
+        throw error;
+      }
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/deadlines"] });
       toast({
@@ -99,7 +125,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
       console.error("Error updating deadline:", error);
       toast({
         title: "Error",
-        description: "Failed to update deadline. Please try again.",
+        description: `Failed to update deadline: ${error.message}`,
         variant: "destructive",
       });
     },

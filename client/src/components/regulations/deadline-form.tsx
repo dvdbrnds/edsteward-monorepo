@@ -12,7 +12,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -53,9 +52,17 @@ export default function DeadlineForm({ regulationId, onSubmit, initialData, onCa
   });
 
   const handleSubmit = (data: InsertDeadline) => {
+    if (!date) {
+      form.setError("dueDate", {
+        type: "manual",
+        message: "Please select a due date",
+      });
+      return;
+    }
+
     onSubmit({
       ...data,
-      dueDate: date?.toISOString() || new Date().toISOString(),
+      dueDate: date.toISOString(),
     });
   };
 
