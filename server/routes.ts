@@ -134,6 +134,58 @@ export function registerRoutes(app: express.Application): Server {
     }
   });
 
+  // Add endpoint to create a new deadline
+  app.post("/api/deadlines", async (req, res) => {
+    try {
+      if (!req.user) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized deadline creation attempt");
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const { regulationId, dueDate, status, assignedTo } = req.body;
+
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Creating new deadline", {
+        regulationId,
+        dueDate,
+        status,
+        assignedTo: assignedTo || 1
+      });
+
+      if (!regulationId || !dueDate || !status) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Invalid deadline data received", { body: req.body });
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      try {
+        const deadline = await storage.createDeadline({
+          regulationId,
+          dueDate,
+          status,
+          assignedTo: assignedTo || 1
+        });
+
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Successfully created deadline", { deadlineId: deadline.id });
+        return res.json(deadline);
+      } catch (dbError) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Database error creating deadline", {
+          error: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+        return res.status(500).json({ 
+          error: "Database error creating deadline",
+          details: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+      }
+    } catch (error) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to create deadline", {
+        error: error instanceof Error ? error.message : String(error)
+      });
+      return res.status(500).json({ 
+        error: "Failed to create deadline", 
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
   app.get("/api/regulations/:regulationId", async (req, res) => {
     try {
       if (!req.user) {
