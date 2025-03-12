@@ -18,7 +18,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import type { Regulation, Deadline, Guide } from "@shared/schema";
+import type { Regulation, Deadline, Guide, RegulationAction } from "@shared/schema";
 import Navigation from "@/components/layout/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -37,6 +37,12 @@ import {
   Bell,
   Shield,
   History,
+  Check,
+  ToggleLeft,
+  ToggleRight,
+  CheckCircle2,
+  Clock4,
+  Ban
 } from "lucide-react";
 import CircularProgress from "@/components/common/circular-progress";
 import {
@@ -91,6 +97,7 @@ interface RegulationWithOverride extends Regulation {
     dailyReminder: number;
     finalDayReminders: boolean;
   }
+  actions?: RegulationAction[];
 }
 
 /**
@@ -175,6 +182,109 @@ const CATEGORIES = [
   "Athletics",
   "Financial Aid",
 ];
+
+interface ActionButtonProps {
+  action: RegulationAction;
+  regulationId: number;
+  isAdmin: boolean;
+  onToggle?: (enabled: boolean) => void;
+  onStatusChange?: (status: RegulationAction['status']) => void;
+  onRequiredChange?: (required: boolean) => void;
+}
+
+function ActionButton({ action, regulationId, isAdmin, onToggle, onStatusChange, onRequiredChange }: ActionButtonProps) {
+  const getIcon = () => {
+    switch (action.type) {
+      case 'attestation':
+        return <Check className="h-5 w-5" />;
+      case 'website_publish':
+        return <Globe className="h-5 w-5" />;
+      case 'community_communication':
+        return <Mail className="h-5 w-5" />;
+      case 'agency_submission':
+        return <FileText className="h-5 w-5" />;
+    }
+  };
+
+  const getStatusIcon = () => {
+    switch (action.status) {
+      case 'completed':
+        return <CheckCircle2 className="h-4 w-4 text-green-500" />;
+      case 'in_progress':
+        return <Clock4 className="h-4 w-4 text-yellow-500" />;
+      case 'pending':
+        return <Clock4 className="h-4 w-4 text-gray-400" />;
+    }
+  };
+
+  const getActionLabel = () => {
+    return action.type
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
+  return (
+    <div className={`flex items-center justify-between p-3 border rounded-lg ${!action.enabled ? 'bg-gray-50' : ''}`}>
+      <div className="flex items-center gap-3">
+        <div className={`p-2 rounded-full ${action.enabled ? 'bg-blue-50' : 'bg-gray-100'}`}>
+          {getIcon()}
+        </div>
+        <div>
+          <p className="font-medium flex items-center gap-2">
+            {getActionLabel()}
+            {action.required && <span className="text-xs text-red-500">*Required</span>}
+          </p>
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            {getStatusIcon()}
+            <span>{action.status.charAt(0).toUpperCase() + action.status.slice(1)}</span>
+          </div>
+        </div>
+      </div>
+      {isAdmin && (
+        <div className="flex items-center gap-2">
+          <Select
+            value={action.status}
+            onValueChange={(value) => onStatusChange?.(value as RegulationAction['status'])}
+          >
+            <SelectTrigger className="w-[130px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="pending">Pending</SelectItem>
+              <SelectItem value="in_progress">In Progress</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onToggle?.(!action.enabled)}
+            title={action.enabled ? 'Disable action' : 'Enable action'}
+          >
+            {action.enabled ? (
+              <ToggleRight className="h-5 w-5 text-green-500" />
+            ) : (
+              <ToggleLeft className="h-5 w-5 text-gray-400" />
+            )}
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onRequiredChange?.(!action.required)}
+            title={action.required ? 'Make optional' : 'Make required'}
+          >
+            {action.required ? (
+              <Check className="h-5 w-5 text-red-500" />
+            ) : (
+              <Ban className="h-5 w-5 text-gray-400" />
+            )}
+          </Button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function RegulationDetailPage() {
   const [location, navigate] = useLocation();
@@ -295,6 +405,39 @@ export default function RegulationDetailPage() {
     },
     onError: (error: Error) => {
       console.error("Error updating category:", error);
+      toast({
+        title: "Update Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateActionMutation = useMutation({
+    mutationFn: async ({ regulationId, action }: { regulationId: number, action: RegulationAction }) => {
+      const response = await fetch(
+        `/api/regulations/${regulationId}/actions/${action.type}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(action),
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to update action");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Action Updated",
+        description: "The action has been updated successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/regulations", regulation?.id] });
+    },
+    onError: (error) => {
       toast({
         title: "Update Failed",
         description: error.message,
@@ -789,8 +932,7 @@ export default function RegulationDetailPage() {
 
                             <Button
                               type="submit"
-                              className="w-full"
-                              disabled={overrideMutation.isPending}
+                              className="w-full"                              disabled={overrideMutation.isPending}
                             >
                               {overrideMutation.isPending ? (
                                 <>

@@ -101,6 +101,7 @@ export function registerRoutes(app: express.Application): Server {
     }
   });
   
+
   // Add endpoint to fetch individual regulation by ID
   app.get("/api/deadlines", async (req, res) => {
     try {
@@ -338,6 +339,79 @@ export function registerRoutes(app: express.Application): Server {
       });
       return res.status(500).json({ 
         error: "Failed to update regulation category", 
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  // Add this endpoint after the category update endpoint
+  app.patch("/api/regulations/:regulationId/actions/:actionType", async (req, res) => {
+    try {
+      if (!req.user) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized action update attempt");
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      if (req.user.role !== 'admin') {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Non-admin user attempted to update action");
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const { regulationId, actionType } = req.params;
+      const actionUpdate = req.body;
+
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Updating action for regulation ${regulationId}`, {
+        actionType,
+        update: actionUpdate
+      });
+
+      try {
+        const regulation = await storage.getRegulationById(parseInt(regulationId));
+
+        if (!regulation) {
+          syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, `Regulation not found with ID: ${regulationId}`);
+          return res.status(404).json({ error: "Regulation not found" });
+        }
+
+        if (!regulation.actions) {
+          regulation.actions = [];
+        }
+
+        const actionIndex = regulation.actions.findIndex(a => a.type === actionType);
+        if (actionIndex === -1) {
+          regulation.actions.push(actionUpdate);
+        } else {
+          regulation.actions[actionIndex] = {
+            ...regulation.actions[actionIndex],
+            ...actionUpdate
+          };
+        }
+
+        const updatedRegulation = await storage.updateRegulation(parseInt(regulationId), {
+          actions: regulation.actions
+        });
+
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Successfully updated regulation action", {
+          regulationId,
+          actionType
+        });
+
+        return res.json(updatedRegulation);
+      } catch (dbError) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Database error updating regulation action", {
+          error: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+        return res.status(500).json({
+          error: "Database error updating regulation action",
+          details: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+      }
+    } catch (error) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to update regulation action", {
+        error: error instanceof Error ? error.message : String(error)
+      });
+      return res.status(500).json({
+        error: "Failed to update regulation action",
         details: error instanceof Error ? error.message : String(error)
       });
     }
