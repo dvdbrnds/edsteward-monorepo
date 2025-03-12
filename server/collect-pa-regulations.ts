@@ -26,6 +26,13 @@ async function collectPARegulations() {
       try {
         // Use a transaction for each regulation
         await db.transaction(async (tx) => {
+          // Print regulation details for debugging
+          console.log('\nRegulation details:');
+          console.log('Title:', regulation.name);
+          console.log('State Agency:', regulation.stateAgency);
+          console.log('Content Preview:', regulation.requirements?.substring(0, 200));
+          console.log('URL:', regulation.regulationUrl);
+
           // Check if regulation already exists by name AND state agency
           const existing = await tx.query.regulations.findFirst({
             where: and(
@@ -48,23 +55,28 @@ async function collectPARegulations() {
           };
 
           if (existing) {
-            // Update existing regulation
-            console.log(`Updating existing regulation: ${regulation.name} (${regulation.stateAgency})`);
-            await tx
-              .update(regulations)
-              .set({
-                ...regulationData,
-                versionNumber: existing.versionNumber + 1,
-                previousVersionId: existing.id
-              })
-              .where(
-                and(
-                  eq(regulations.id, existing.id),
-                  eq(regulations.stateAgency, regulation.stateAgency)
-                )
-              );
-            updated++;
-            console.log(`Successfully updated regulation: ${regulation.name}`);
+            // Only update if content has changed
+            if (existing.requirements !== regulationData.requirements) {
+              console.log(`Updating existing regulation: ${regulation.name} (${regulation.stateAgency})`);
+              await tx
+                .update(regulations)
+                .set({
+                  ...regulationData,
+                  versionNumber: existing.versionNumber + 1,
+                  previousVersionId: existing.id
+                })
+                .where(
+                  and(
+                    eq(regulations.id, existing.id),
+                    eq(regulations.stateAgency, regulation.stateAgency)
+                  )
+                );
+              updated++;
+              console.log(`Successfully updated regulation: ${regulation.name}`);
+            } else {
+              console.log(`Skipping update - no content changes: ${regulation.name}`);
+              skipped++;
+            }
           } else {
             // Insert new regulation
             console.log(`Inserting new regulation: ${regulation.name} (${regulation.stateAgency})`);
@@ -97,7 +109,7 @@ async function collectPARegulations() {
       }
     }
 
-    console.log(`PA Regulation collection complete.`);
+    console.log(`\nPA Regulation collection complete.`);
     console.log(`Imported: ${imported}, Updated: ${updated}, Skipped: ${skipped}`);
 
   } catch (error) {
