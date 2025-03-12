@@ -61,18 +61,23 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
 
   const createDeadlineMutation = useMutation({
     mutationFn: async (deadline: InsertDeadline) => {
+      console.log('Creating deadline with data:', deadline);
       try {
-        const response = await apiRequest("/api/deadlines", {
-          method: "POST",
+        const response = await fetch('/api/deadlines', {
+          method: 'POST',
           headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
           },
-          body: JSON.stringify(deadline)
+          body: JSON.stringify(deadline),
         });
+
         if (!response.ok) {
-          throw new Error(`Failed to create deadline: ${response.statusText}`);
+          const errorData = await response.json().catch(() => null);
+          console.error('Server error response:', errorData);
+          throw new Error(errorData?.message || `Failed to create deadline: ${response.statusText}`);
         }
-        return response.json();
+
+        return await response.json();
       } catch (error) {
         console.error('Error in createDeadlineMutation:', error);
         throw error;
@@ -322,6 +327,7 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
                             <DeadlineForm
                               regulationId={regulation.id}
                               onSubmit={(data) => {
+                                console.log('Submitting deadline data:', data);
                                 createDeadlineMutation.mutate(data);
                               }}
                             />
