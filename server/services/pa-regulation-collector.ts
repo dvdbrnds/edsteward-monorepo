@@ -7,9 +7,12 @@ import { syslog, LogLevel, LogFacility } from './syslog';
 class PARegulationCollector {
   private readonly BASE_URLS = {
     // Direct links to regulation content
-    paEducation: 'https://www.education.pa.gov/Postsecondary-Adult/College%20and%20Career%20Education/Pages/Chapter-31-General-Provisions.aspx',
+    paEducation: 'https://www.education.pa.gov/Policy-Funding/BECS/PACode/Pages/default.aspx',
     paHigherEd: 'https://www.education.pa.gov/Policy-Funding/BECS/PACode/Pages/HigherEducation.aspx',
-    paStateSystem: 'https://www.passhe.edu/inside/policies/Pages/Board-of-Governors-Policies.aspx'
+    paStateSystem: 'https://www.passhe.edu/inside/policies/Pages/Board-of-Governors-Policies.aspx',
+    // Add fallback URLs
+    paDeptEd: 'https://www.education.pa.gov/Teachers%20-%20Administrators/School%20Services/Pages/default.aspx',
+    paStateBoard: 'https://www.stateboard.education.pa.gov/Pages/RegulationsPolicy.aspx'
   };
 
   private readonly SHAREPOINT_SELECTORS = {
@@ -82,39 +85,88 @@ class PARegulationCollector {
     return (hasRegulationTerm || hasEducationTerm) && hasLegalTerm;
   }
 
-  private async retryContentLoad(url: string, maxRetries = 3, delay = 2000): Promise<string> {
+  private async retryContentLoad(url: string, maxRetries = 5, initialDelay = 2000): Promise<string> {
     let lastError: Error | null = null;
+    let delay = initialDelay;
 
     for (let attempt = 1; attempt <= maxRetries; attempt++) {
       try {
+        // Add special handling for PA Code website
+        if (url.includes('pacodeandbulletin.gov')) {
+          // Log the attempt for PA Code site
+          syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
+            `Attempting to fetch PA Code content (attempt ${attempt})`, {
+              url,
+              attempt,
+              delay
+            });
+
+          // Use more conservative timeout for PA Code site
+          delay = attempt * 10000; // Longer delays for problematic site
+        }
+
         const response = await axios.get(url, {
           headers: {
             'User-Agent': 'Mozilla/5.0 (compatible; MoravianComplianceBot/1.0)',
             'Accept': 'text/html,application/xhtml+xml',
-            'Accept-Language': 'en-US,en;q=0.5'
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache'
           },
-          timeout: attempt * 5000 // Increase timeout with each retry
+          timeout: attempt * 5000, // Increase timeout with each retry
+          validateStatus: function (status) {
+            // Consider only 5xx errors for retry
+            return status < 500;
+          }
         });
 
-        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Successfully fetched content on attempt ${attempt}`, {
-          url,
-          contentLength: response.data.length,
-          attempt
-        });
+        // Check for error pages or invalid responses
+        if (response.data.includes('Server Error in') ||
+          response.data.includes('Runtime Error') ||
+          response.data.includes('404 Not Found')) {
+          throw new Error(`Server returned error page: ${url}`);
+        }
+
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
+          `Successfully fetched content on attempt ${attempt}`, {
+            url,
+            contentLength: response.data.length,
+            attempt
+          });
 
         return response.data;
+
       } catch (error) {
         lastError = error instanceof Error ? error : new Error(String(error));
 
-        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING,
-          `Attempt ${attempt} failed to fetch content`, {
-            url,
-            error: lastError.message,
-            nextRetryIn: delay
-          });
+        // Special handling for PA Code site errors
+        if (url.includes('pacodeandbulletin.gov')) {
+          syslog.log(LogFacility.LOCAL0, LogLevel.WARNING,
+            `PA Code site fetch failed on attempt ${attempt}`, {
+              url,
+              error: lastError.message,
+              nextRetryIn: delay,
+              willRetry: attempt < maxRetries
+            });
+
+          if (attempt === maxRetries) {
+            // Log that we're falling back to alternative sources
+            syslog.log(LogFacility.LOCAL0, LogLevel.WARNING,
+              `PA Code site unavailable after ${maxRetries} attempts, using fallback sources`);
+            throw new Error('PA Code site unavailable');
+          }
+        } else {
+          syslog.log(LogFacility.LOCAL0, LogLevel.WARNING,
+            `Attempt ${attempt} failed to fetch content`, {
+              url,
+              error: lastError.message,
+              nextRetryIn: delay
+            });
+        }
 
         if (attempt < maxRetries) {
           await new Promise(resolve => setTimeout(resolve, delay));
+          delay *= 2; // Exponential backoff
         }
       }
     }
@@ -123,131 +175,240 @@ class PARegulationCollector {
   }
 
   private validateContent(content: string): boolean {
-    // More lenient content validation
-    const contentQualityIndicators = {
-      minLength: 50, // Reduced from 100
-      hasRegulationTerms: /regulation|policy|requirement|standard|guideline|code|statute/i.test(content),
-      hasEducationTerms: /academic|program|course|degree|student|faculty|school|education|college|university/i.test(content),
-      hasLegalTerms: /shall|must|required|compliance|pursuant|chapter|section|article/i.test(content),
-      hasStructure: /<h[1-6]|<p|<div|<table|<ul|<ol/i.test(content),
-      hasSuspiciousContent: /403 Forbidden|404 Not Found|Error|Access Denied|Under Maintenance/i.test(content)
-    };
+    // Basic validation
+    if (!content || content.length < 50) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.DEBUG, "Content too short", {
+        contentLength: content?.length || 0
+      });
+      return false;
+    }
 
-    // Log content snippets for debugging
-    syslog.log(LogFacility.LOCAL0, LogLevel.DEBUG, "Content validation details", {
-      indicators: contentQualityIndicators,
-      contentPreview: content.substring(0, 200),
-      contentLength: content.length,
-      hasHtmlTags: /<[^>]+>/i.test(content),
-      firstParagraph: content.match(/<p[^>]*>([^<]+)<\/p>/i)?.[1]?.trim() || ''
+    // Log the actual content being validated
+    syslog.log(LogFacility.LOCAL0, LogLevel.DEBUG, "Content being validated", {
+      contentPreview: content.substring(0, 1000),
+      totalLength: content.length,
+      hasHtmlTags: /<[^>]+>/i.test(content)
     });
 
-    // More flexible validation logic
-    const hasQualityContent = 
-      contentQualityIndicators.minLength &&
-      (contentQualityIndicators.hasRegulationTerms || contentQualityIndicators.hasEducationTerms) &&
-      (contentQualityIndicators.hasLegalTerms || contentQualityIndicators.hasStructure) &&
-      !contentQualityIndicators.hasSuspiciousContent;
+    // Check for suspicious content first
+    const hasSuspiciousContent = /403 Forbidden|404 Not Found|Error|Access Denied|Under Maintenance|Server Error/i.test(content);
+    if (hasSuspiciousContent) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.DEBUG, "Content contains error indicators", {
+        contentPreview: content.substring(0, 200)
+      });
+      return false;
+    }
 
-    if (!hasQualityContent) {
+    // Split content into sections for better analysis
+    const sections = content.split(/\n\s*\n/);
+    let relevantSections = 0;
+
+    // Analyze each section
+    sections.forEach((section, index) => {
+      if (section.length > 20) { // Only analyze substantial sections
+        const patterns = {
+          education: /education|academic|school|college|university|student|faculty|degree|program|course/i,
+          regulation: /regulation|policy|requirement|guideline|standard|rule|procedure/i,
+          legal: /shall|must|required|compliance|pursuant|accordance|provision/i,
+          reference: /chapter|section|article|paragraph|part|pursuant|according/i
+        };
+
+        const matches = Object.entries(patterns)
+          .filter(([_, pattern]) => pattern.test(section))
+          .map(([key]) => key);
+
+        if (matches.length > 0) {
+          relevantSections++;
+          syslog.log(LogFacility.LOCAL0, LogLevel.DEBUG, `Found relevant content in section ${index}`, {
+            patterns: matches,
+            sectionPreview: section.substring(0, 100)
+          });
+        }
+      }
+    });
+
+    // More detailed logging of validation results
+    const validationDetails = {
+      totalSections: sections.length,
+      relevantSections,
+      contentLength: content.length,
+      hasEducationTerms: /education|academic|school|college|university/i.test(content),
+      hasRegulationTerms: /regulation|policy|requirement|guideline/i.test(content),
+      hasLegalTerms: /shall|must|required|compliance/i.test(content)
+    };
+
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Content validation details", validationDetails);
+
+    // Accept content if:
+    // 1. Has at least one relevant section
+    // 2. Contains either education or regulation terms
+    // 3. No suspicious content
+    const isValid =
+      relevantSections > 0 &&
+      (validationDetails.hasEducationTerms || validationDetails.hasRegulationTerms) &&
+      !hasSuspiciousContent;
+
+    if (!isValid) {
       syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Content validation failed", {
-        reason: Object.entries(contentQualityIndicators)
-          .filter(([_, value]) => !value)
-          .map(([key]) => key)
-          .join(', ')
+        reason: !relevantSections ? "No relevant sections found" :
+          !validationDetails.hasEducationTerms && !validationDetails.hasRegulationTerms ? "Missing education/regulation terms" :
+            hasSuspiciousContent ? "Contains error indicators" : "Unknown reason",
+        details: validationDetails
       });
     }
 
-    return hasQualityContent;
+    return isValid;
   }
 
   private extractContent($: cheerio.CheerioAPI, url: string): string {
-    // Remove navigation elements
-    $('nav, footer, .navigation, .menu, .sidebar, script, style').remove();
+    // Remove navigation and irrelevant elements
+    $('nav, header, footer, .navigation, .menu, .sidebar, script, style').remove();
 
     let content = '';
     const processedTexts = new Set<string>();
 
-    // Helper function to process section content with improved context retention
-    const processSection = (section: cheerio.Cheerio<cheerio.Element>) => {
-      let sectionContent = '';
-      let currentContext = '';
+    // Extract content from PA education department specific elements
+    const paEducationSelectors = [
+      // SharePoint specific content containers
+      '#DeltaPlaceHolderMain',
+      '#contentBox',
+      '#s4-workspace',
+      '#s4-bodyContainer',
+      '.ms-webpart-zone',
+      '.ms-webpart-cell-horizontal',
+      // Rich text content areas
+      '.ms-rtestate-field',
+      '.ms-rtestate-read',
+      '#ctl00_PlaceHolderMain_ctl01__ControlWrapper_RichHtmlField',
+      // Regulation specific content
+      '[id*="regulation"]',
+      '[id*="policy"]',
+      '[class*="regulation"]',
+      '[class*="policy"]',
+      // Standard content areas
+      'main',
+      'article',
+      '.content',
+      '#content',
+      // List views
+      '.ms-listviewtable',
+      '.ms-vh-div'
+    ];
 
-      // Process headings first to establish context
-      section.find('h1, h2, h3, h4').each((_, el) => {
-        const text = this.cleanText($(el).text());
-        if (text && !processedTexts.has(text)) {
-          currentContext = text;
-          sectionContent += '\n' + text + '\n\n';
-          processedTexts.add(text);
-        }
-      });
+    // First try to extract content from the most specific selectors
+    for (const selector of paEducationSelectors) {
+      const elements = $(selector);
+      if (elements.length > 0) {
+        elements.each((_, element) => {
+          const $element = $(element);
 
-      // Process main content with context
-      section.find('p, li, td').each((_, el) => {
-        const $el = $(el);
-        const text = this.cleanText($el.text());
+          // Extract headings with hierarchy
+          ['h1', 'h2', 'h3', 'h4', 'h5', 'h6'].forEach(heading => {
+            $element.find(heading).each((_, h) => {
+              const text = this.cleanText($(h).text());
+              if (text && !processedTexts.has(text)) {
+                content += `\n${text}\n\n`;
+                processedTexts.add(text);
+              }
+            });
+          });
 
-        if (text && !processedTexts.has(text)) {
-          // Check if this content is related to current context
-          if (currentContext && !sectionContent.includes(text)) {
-            sectionContent += text + '\n\n';
-            processedTexts.add(text);
-          }
-        }
-      });
-
-      // Process tables specifically
-      section.find('table').each((_, table) => {
-        const $rows = $(table).find('tr');
-        if ($rows.length > 0) {
-          sectionContent += '\nTable Content:\n';
-          $rows.each((_, row) => {
-            const rowContent = $(row).find('th, td')
-              .map((_, cell) => $(cell).text().trim())
-              .get()
-              .join(' | ');
-            if (rowContent && !processedTexts.has(rowContent)) {
-              sectionContent += rowContent + '\n';
-              processedTexts.add(rowContent);
+          // Extract paragraphs and list items
+          $element.find('p, li').each((_, el) => {
+            const text = this.cleanText($(el).text());
+            if (text && !processedTexts.has(text) && text.length > 20) {
+              content += `${text}\n\n`;
+              processedTexts.add(text);
             }
           });
-          sectionContent += '\n';
+
+          // Handle tables
+          $element.find('table').each((_, table) => {
+            const $rows = $(table).find('tr');
+            if ($rows.length > 0) {
+              let hasHeader = false;
+              $rows.each((rowIndex, row) => {
+                const cells = $(row).find('th, td')
+                  .map((_, cell) => $(cell).text().trim())
+                  .get()
+                  .filter(text => text.length > 0);
+
+                if (cells.length > 0) {
+                  const rowText = cells.join(' | ');
+                  if (!processedTexts.has(rowText)) {
+                    if (rowIndex === 0 || $(row).find('th').length > 0) {
+                      hasHeader = true;
+                      content += `\nTable: ${rowText}\n`;
+                    } else {
+                      content += `${rowText}\n`;
+                    }
+                    processedTexts.add(rowText);
+                  }
+                }
+              });
+              if (hasHeader) content += '\n';
+            }
+          });
+
+          // Extract any remaining text nodes that might contain important content
+          $element.contents().each((_, node) => {
+            if (node.type === 'text') {
+              const text = this.cleanText($(node).text());
+              if (text && !processedTexts.has(text) && text.length > 20) {
+                content += `${text}\n\n`;
+                processedTexts.add(text);
+              }
+            }
+          });
+        });
+
+        // Log successful content extraction
+        if (content.length > 100) {
+          syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Content extracted from selector", {
+            selector,
+            contentLength: content.length,
+            preview: content.substring(0, 200)
+          });
+        }
+      }
+    }
+
+    // If no content was found with specific selectors, try a more generic approach
+    if (!content || content.length < 100) {
+      // Try to find any div that might contain regulation text
+      $('div').each((_, div) => {
+        const $div = $(div);
+        const text = this.cleanText($div.text());
+
+        // Check if this div contains regulation-related content
+        if (text && text.length > 100 &&
+          !processedTexts.has(text) &&
+          /regulation|policy|requirement|education/i.test(text)) {
+          content += `${text}\n\n`;
+          processedTexts.add(text);
+
+          syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Found regulation content in generic div", {
+            contentLength: text.length,
+            preview: text.substring(0, 200)
+          });
         }
       });
+    }
 
-      return sectionContent;
-    };
-
-    // Process SharePoint specific zones first
-    this.SHAREPOINT_SELECTORS.mainContent.forEach(selector => {
-      $(selector).each((_, el) => {
-        const sectionContent = processSection($(el));
-        if (sectionContent) {
-          content += sectionContent;
-        }
+    // Log extraction results
+    if (!content) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "No content found with any selector", {
+        url,
+        selectors: paEducationSelectors
       });
-    });
-
-    // Process rich text content
-    this.SHAREPOINT_SELECTORS.richText.forEach(selector => {
-      $(selector).each((_, el) => {
-        const sectionContent = processSection($(el));
-        if (sectionContent) {
-          content += sectionContent;
-        }
+    } else {
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Content extraction complete", {
+        url,
+        contentLength: content.length,
+        sections: content.split('\n\n').length,
+        preview: content.substring(0, 200)
       });
-    });
-
-    // Log extraction summary
-    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Content extraction details", {
-      url,
-      totalLength: content.length,
-      sections: content.split('\n\n').length,
-      hasRegulationTerms: /regulation|policy|requirement/i.test(content),
-      hasLegalTerms: /shall|must|required|compliance/i.test(content),
-      preview: content.substring(0, 200)
-    });
+    }
 
     return content;
   }
