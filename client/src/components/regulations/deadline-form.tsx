@@ -60,9 +60,12 @@ export default function DeadlineForm({ regulationId, onSubmit, initialData, onCa
       return;
     }
 
+    // Ensure we're sending a properly formatted deadline object
     onSubmit({
-      ...data,
+      regulationId: data.regulationId,
+      status: data.status,
       dueDate: date.toISOString(),
+      assignedTo: data.assignedTo || 1
     });
   };
 

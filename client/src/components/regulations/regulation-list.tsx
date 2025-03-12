@@ -68,7 +68,12 @@ export default function RegulationList({ categoryFilter }: RegulationListProps) 
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(deadline),
+          body: JSON.stringify({
+            regulationId: deadline.regulationId,
+            dueDate: deadline.dueDate,
+            status: deadline.status,
+            assignedTo: deadline.assignedTo || 1
+          }),
         });
 
         if (!response.ok) {
