@@ -48,6 +48,18 @@ import moravianLogo from "@/assets/Screenshot_2025-02-12_at_9.15.57_AM-removebg-
  */
 const CHANGELOG = [
   {
+    version: "0.2.6",
+    date: "March 12, 2025",
+    changes: [
+      "Fixed deadline creation functionality with improved validation",
+      "Added dedicated endpoint for updating regulation categories",
+      "Enhanced error handling and logging throughout the application",
+      "Improved JSON parsing and error reporting in API responses",
+      "Added comprehensive system logging for better debugging",
+      "Fixed form validation in deadline creation workflow"
+    ],
+  },
+  {
     version: "0.2.5",
     date: "March 4, 2025",
     changes: [
@@ -264,7 +276,7 @@ export default function Navigation() {
                 </Link>
                 <Dialog open={changelogOpen} onOpenChange={setChangelogOpen}>
                   <DialogTrigger asChild>
-                    <button 
+                    <button
                       className="text-xs text-gray-300 ml-2 hover:text-white transition-colors"
                       onClick={(e) => {
                         e.preventDefault();
@@ -272,7 +284,7 @@ export default function Navigation() {
                         setChangelogOpen(true);
                       }}
                     >
-                      Alpha v0.2.5
+                      Alpha v0.2.6
                     </button>
                   </DialogTrigger>
                   <DialogContent className="max-h-[80vh] overflow-y-auto">
