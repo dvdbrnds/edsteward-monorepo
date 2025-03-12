@@ -264,6 +264,12 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                     <ArrowUpDown className="h-4 w-4" />
                   </div>
                 </TableHead>
+                <TableHead className="cursor-pointer" onClick={() => handleSort('jurisdiction')}>
+                  <div className="flex items-center gap-2">
+                    Jurisdiction
+                    <ArrowUpDown className="h-4 w-4" />
+                  </div>
+                </TableHead>
                 <TableHead>Next Deadline</TableHead>
                 {isAdmin && <TableHead>Actions</TableHead>}
               </TableRow>
@@ -301,6 +307,11 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                       </div>
                     </TableCell>
                     <TableCell>{regulation.category || 'Uncategorized'}</TableCell>
+                    <TableCell>
+                      <div className={`text-sm ${regulation.jurisdiction === 'federal' ? 'text-blue-600' : 'text-green-600'}`}>
+                        {regulation.jurisdiction === 'federal' ? 'Federal' : 'State'}
+                      </div>
+                    </TableCell>
                     <TableCell>
                       {nextDeadline ? (
                         <div className="flex items-center gap-2">
@@ -343,7 +354,6 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                             <DeadlineForm
                               regulationId={regulation.id}
                               onSubmit={(data) => {
-                                console.log('Submitting deadline data:', data);
                                 createDeadlineMutation.mutate(data);
                               }}
                             />
