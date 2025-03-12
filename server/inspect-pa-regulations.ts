@@ -1,7 +1,7 @@
 
-import { storage } from './storage';
-import * as fs from 'fs';
-import * as path from 'path';
+import { storage } from './storage.js';
+import fs from 'fs';
+import path from 'path';
 
 /**
  * This script inspects PA regulations to analyze content issues
