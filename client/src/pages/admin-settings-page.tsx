@@ -312,7 +312,7 @@ export default function SystemSettingsPage() {
     document.body.removeChild(link);
   };
 
-  const { mutate: updateUserMutation, isLoading: updateUserLoading } = useMutation({
+  const { mutate: updateUser, isPending: isUpdatingUser } = useMutation({
     mutationFn: async (data: {id: number; role: string; department: string}) => {
       const response = await fetch('/api/admin/update-user', {
         method: 'POST',
@@ -342,7 +342,7 @@ export default function SystemSettingsPage() {
     }
   });
 
-  const { mutate: resetPasswordMutation, isLoading: resetPasswordLoading } = useMutation({
+  const { mutate: resetPassword, isPending: isResettingPassword } = useMutation({
     mutationFn: async (id: number) => {
       const response = await fetch('/api/admin/reset-password', {
         method: 'POST',
@@ -354,14 +354,15 @@ export default function SystemSettingsPage() {
       if (!response.ok) {
         throw new Error('Failed to reset password');
       }
-      return response.json();
+      const data = await response.json();
+      return data;
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
+    onSuccess: (data) => {
       toast({
-        title: 'Success',
-        description: 'Password has been reset'
+        title: 'Password Reset Successful',
+        description: `Temporary password: ${data.temporaryPassword}`
       });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
     },
     onError: (error: Error) => {
       toast({
@@ -371,7 +372,6 @@ export default function SystemSettingsPage() {
       });
     }
   });
-  
 
   const { data: users = [], isLoading: usersLoading } = useQuery({
     queryKey: ['/api/admin/users'],
@@ -632,10 +632,10 @@ export default function SystemSettingsPage() {
                                   <Select
                                     defaultValue={user.role}
                                     onValueChange={(role) =>
-                                      updateUserMutation.mutate({ 
-                                        id: user.id, 
-                                        role, 
-                                        department: user.department 
+                                      updateUser({
+                                        id: user.id,
+                                        role,
+                                        department: user.department
                                       })
                                     }
                                   >
@@ -655,7 +655,7 @@ export default function SystemSettingsPage() {
                                   <Input
                                     defaultValue={user.department}
                                     onBlur={(e) =>
-                                      updateUserMutation.mutate({
+                                      updateUser({
                                         id: user.id,
                                         department: e.target.value,
                                         role: user.role
@@ -667,10 +667,10 @@ export default function SystemSettingsPage() {
                                   <Button
                                     variant="outline"
                                     size="sm"
-                                    onClick={() => resetPasswordMutation.mutate(user.id)}
-                                    disabled={resetPasswordMutation.isPending}
+                                    onClick={() => resetPassword(user.id)}
+                                    disabled={isResettingPassword}
                                   >
-                                    {resetPasswordMutation.isPending ? (
+                                    {isResettingPassword ? (
                                       <Loader2 className="h-4 w-4 animate-spin mr-2" />
                                     ) : null}
                                     Reset Password

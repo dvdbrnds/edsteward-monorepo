@@ -7,6 +7,8 @@ import { createServer } from 'http';
 import { log } from './vite';
 import { setupAuth } from './auth';
 import { syslog, LogLevel, LogFacility } from './services/syslog';
+import { hashPassword } from './auth'; //Import hashPassword function
+
 
 export function registerRoutes(app: express.Application): Server {
   // Create HTTP server
@@ -493,6 +495,58 @@ export function registerRoutes(app: express.Application): Server {
       });
       return res.status(500).json({ 
         error: "Failed to update user", 
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  // Add the reset password endpoint
+  app.post("/api/admin/reset-password", async (req, res) => {
+    try {
+      if (!req.user) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized access attempt to password reset");
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      if (req.user.role !== 'admin') {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Non-admin user attempted to reset password");
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const { id } = req.body;
+
+      if (!id) {
+        return res.status(400).json({ error: "User ID is required" });
+      }
+
+      try {
+        // Generate a temporary password
+        const tempPassword = Math.random().toString(36).slice(-8);
+        const hashedPassword = await hashPassword(tempPassword);
+
+        const updatedUser = await storage.updateUser(id, { password: hashedPassword });
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Successfully reset password for user ${id}`);
+
+        return res.json({ 
+          success: true, 
+          temporaryPassword: tempPassword,
+          message: "Password has been reset" 
+        });
+      } catch (dbError) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Database error resetting password", {
+          error: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+        return res.status(500).json({ 
+          error: "Database error resetting password",
+          details: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+      }
+    } catch (error) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to reset password", {
+        error: error instanceof Error ? error.message : String(error)
+      });
+      return res.status(500).json({ 
+        error: "Failed to reset password", 
         details: error instanceof Error ? error.message : String(error)
       });
     }
