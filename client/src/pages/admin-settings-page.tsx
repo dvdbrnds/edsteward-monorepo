@@ -15,7 +15,7 @@ import { AlertCircle, Download, Loader2, RefreshCw } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import Navigation from "@/components/layout/navigation";
 import { apiRequest } from "@/lib/api";
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation } from '@tanstack/react-query';
 import { format } from "date-fns";
 import {
   Table,
@@ -101,6 +101,7 @@ export default function SystemSettingsPage() {
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [logs, setLogs] = useState<any[]>([]);
   const refreshInterval = 10000; // 10 seconds
+  const [users, setUsers] = useState<any[]>([]);
 
   const form = useForm<FormValues>({
     resolver: zodResolver(insertEmailConfigSchema),
@@ -252,7 +253,7 @@ export default function SystemSettingsPage() {
     }
   };
 
-  const { data, isLoading, error, refetch } = useQuery({
+  const { data: logData, isLoading: logIsLoading, error: logError, refetch: refetchLogs } = useQuery({
     queryKey: ["/api/admin/logs", { search, level, facility, startDate, endDate, page }],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -275,19 +276,19 @@ export default function SystemSettingsPage() {
   useEffect(() => {
     if (autoRefresh) {
       const intervalId = setInterval(() => {
-        refetch();
+        refetchLogs();
       }, refreshInterval);
       return () => clearInterval(intervalId);
     }
-  }, [autoRefresh, refetch]);
+  }, [autoRefresh, refetchLogs]);
 
   const downloadCSV = () => {
-    if (!data?.logs) return;
+    if (!logData?.logs) return;
 
     const headers = ["Timestamp", "Username", "Level", "Facility", "Message", "IP Address", "User Agent"];
     const csvContent = [
       headers.join(","),
-      ...data.logs.map((log: any) => {
+      ...logData.logs.map((log: any) => {
         return [
           format(new Date(log.timestamp), "MMM d, yyyy HH:mm:ss"),
           log.username || 'system',
@@ -311,6 +312,42 @@ export default function SystemSettingsPage() {
     document.body.removeChild(link);
   };
 
+  const { mutate: updateUserMutation, isLoading: updateUserLoading } = useMutation({
+    mutationFn: async (data: {id: number; role: string; department: string}) => {
+      await apiRequest('/api/admin/update-user', {method: 'POST', body: JSON.stringify(data)})
+      return data
+    },
+    onSuccess: () => {
+      fetchUsers()
+    }
+  })
+
+  const { mutate: resetPasswordMutation, isLoading: resetPasswordLoading } = useMutation({
+    mutationFn: async (id: number) => {
+      await apiRequest('/api/admin/reset-password', {method: 'POST', body: JSON.stringify({id})})
+    },
+    onSuccess: () => {
+      fetchUsers()
+    }
+  })
+  
+  const fetchUsers = async () => {
+    try {
+      const response = await fetch('/api/admin/users')
+      if (response.ok) {
+        const data = await response.json()
+        setUsers(data)
+      }
+    } catch (error) {
+      console.error("Failed to fetch users:", error)
+    }
+  }
+
+  useEffect(() => {
+    fetchUsers()
+  }, [])
+
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
@@ -320,10 +357,11 @@ export default function SystemSettingsPage() {
           <h1 className="text-3xl font-bold text-gray-900 mb-8">System Settings</h1>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-5 mb-4">
+            <TabsList className="grid grid-cols-6 mb-4">
               <TabsTrigger value="email">Email</TabsTrigger>
               <TabsTrigger value="sms">SMS</TabsTrigger>
               <TabsTrigger value="notifications">Notifications</TabsTrigger>
+              <TabsTrigger value="users">Users</TabsTrigger>
               <TabsTrigger value="logs">System Logs</TabsTrigger>
               <TabsTrigger value="debug">Debug Tools</TabsTrigger>
             </TabsList>
@@ -518,6 +556,87 @@ export default function SystemSettingsPage() {
               </Card>
             </TabsContent>
 
+            <TabsContent value="users">
+              <Card>
+                <CardHeader>
+                  <CardTitle>User Management</CardTitle>
+                  <CardDescription>
+                    Manage user accounts, roles, and departments.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    {/* User Table */}
+                    <div className="rounded-md border">
+                      <Table>
+                        <TableHeader>
+                          <TableRow>
+                            <TableHead>Name</TableHead>
+                            <TableHead>Username</TableHead>
+                            <TableHead>Email</TableHead>
+                            <TableHead>Role</TableHead>
+                            <TableHead>Department</TableHead>
+                            <TableHead>Actions</TableHead>
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          {users?.map((user) => (
+                            <TableRow key={user.id}>
+                              <TableCell>{user.firstName} {user.lastName}</TableCell>
+                              <TableCell>{user.username}</TableCell>
+                              <TableCell>{user.email}</TableCell>
+                              <TableCell>
+                                <Select
+                                  defaultValue={user.role}
+                                  onValueChange={(role) =>
+                                    updateUserMutation.mutate({ id: user.id, role, department: user.department })
+                                  }
+                                >
+                                  <SelectTrigger className="w-[140px]">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="user">User</SelectItem>
+                                    <SelectItem value="compliance_officer">
+                                      Compliance Officer
+                                    </SelectItem>
+                                    <SelectItem value="admin">Admin</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                              </TableCell>
+                              <TableCell>
+                                <Input
+                                  defaultValue={user.department}
+                                  onBlur={(e) =>
+                                    updateUserMutation.mutate({
+                                      id: user.id,
+                                      department: e.target.value,
+                                      role: user.role
+                                    })
+                                  }
+                                />
+                              </TableCell>
+                              <TableCell>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() =>
+                                    resetPasswordMutation.mutate(user.id)
+                                  }
+                                >
+                                  Reset Password
+                                </Button>
+                              </TableCell>
+                            </TableRow>
+                          ))}
+                        </TableBody>
+                      </Table>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
             <TabsContent value="logs">
               <Card>
                 <CardHeader className="pb-2">
@@ -623,9 +742,9 @@ export default function SystemSettingsPage() {
                       </div>
                     </div>
 
-                    {isLoading ? (
+                    {logIsLoading ? (
                       <div className="text-center py-8">Loading logs...</div>
-                    ) : error ? (
+                    ) : logError ? (
                       <Alert variant="destructive">
                         <AlertCircle className="h-4 w-4" />
                         <AlertTitle>Error</AlertTitle>
@@ -649,7 +768,7 @@ export default function SystemSettingsPage() {
                               </TableRow>
                             </TableHeader>
                             <TableBody>
-                              {data?.logs.map((log: any, index: number) => (
+                              {logData?.logs.map((log: any, index: number) => (
                                 <TableRow key={index}>
                                   <TableCell>
                                     {format(new Date(log.timestamp), "MMM d, yyyy HH:mm:ss")}
@@ -678,7 +797,7 @@ export default function SystemSettingsPage() {
 
                         <div className="mt-4 flex justify-between items-center">
                           <div className="text-sm text-muted-foreground">
-                            Showing {data?.logs.length} of {data?.total} logs
+                            Showing {logData?.logs.length} of {logData?.total} logs
                           </div>
                           <div className="flex gap-2">
                             <Button
@@ -686,14 +805,14 @@ export default function SystemSettingsPage() {
                               onClick={downloadCSV}
                               size="sm"
                               title="Export logs as CSV"
-                              disabled={!data?.logs?.length}
+                              disabled={!logData?.logs?.length}
                             >
                               <Download className="h-4 w-4 mr-2" />
                               Export CSV
                             </Button>
                             <Button
                               variant="outline"
-                              onClick={() => refetch()}
+                              onClick={() => refetchLogs()}
                               size="sm"
                               title="Refresh logs"
                             >
@@ -709,7 +828,7 @@ export default function SystemSettingsPage() {
                             </Button>
                             <Button
                               variant="outline"
-                              disabled={page === data?.totalPages}
+                              disabled={page === logData?.totalPages}
                               onClick={() => setPage(p => p + 1)}
                             >
                               Next
