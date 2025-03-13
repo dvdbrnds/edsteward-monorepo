@@ -1,7 +1,7 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import type { Regulation, Deadline, InsertDeadline, RegulationAction } from "@shared/schema";
 import { useLocation } from "wouter";
-import { Search, ExternalLink, CheckCircle, AlertCircle, Clock, Loader2, ArrowUpDown, Check, Globe, Mail, FileText, ToggleLeft, ToggleRight } from "lucide-react";
+import { Search, ExternalLink, CheckCircle, AlertCircle, Clock, Loader2, ArrowUpDown, Check, Globe, Mail, FileText } from "lucide-react";
 import { differenceInDays, format } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -33,7 +33,6 @@ interface RegulationListProps {
   categoryFilter: string | null;
   jurisdictionFilter: 'federal' | 'state' | null;
   deadlines?: Deadline[];
-  onActionToggle?: (regulation: Regulation, actionType: string, enabled: boolean) => void;
 }
 
 type SortConfig = {
@@ -41,7 +40,7 @@ type SortConfig = {
   direction: 'asc' | 'desc';
 } | null;
 
-export default function RegulationList({ categoryFilter, jurisdictionFilter, deadlines = [], onActionToggle }: RegulationListProps) {
+export default function RegulationList({ categoryFilter, jurisdictionFilter, deadlines = [] }: RegulationListProps) {
   const [search, setSearch] = useState("");
   const [sortConfig, setSortConfig] = useState<SortConfig>(null);
   const [_, navigate] = useLocation();
@@ -61,94 +60,6 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
   });
 
   const isAdmin = user?.role === "admin";
-
-  const createDeadlineMutation = useMutation({
-    mutationFn: async (deadline: InsertDeadline) => {
-      console.log('Creating deadline with data:', deadline);
-      try {
-        const requestBody = {
-          regulationId: deadline.regulationId,
-          dueDate: deadline.dueDate,
-          status: deadline.status,
-          assignedTo: deadline.assignedTo || 1
-        };
-
-        console.log('Sending request with body:', JSON.stringify(requestBody));
-
-        const response = await fetch('/api/deadlines', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(requestBody),
-        });
-
-        if (!response.ok) {
-          const errorData = await response.json().catch(() => null);
-          console.error('Server error response:', errorData);
-          throw new Error(errorData?.message || `Failed to create deadline: ${response.statusText}`);
-        }
-
-        const result = await response.json();
-        console.log('Server response:', result);
-        return result;
-      } catch (error) {
-        console.error('Error in createDeadlineMutation:', error);
-        throw error;
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/deadlines"] });
-      toast({
-        title: "Success",
-        description: "Deadline added successfully",
-      });
-    },
-    onError: (error: Error) => {
-      console.error("Error creating deadline:", error);
-      toast({
-        title: "Error",
-        description: `Failed to add deadline: ${error.message}`,
-        variant: "destructive",
-      });
-    },
-  });
-
-  const updateDeadlineMutation = useMutation({
-    mutationFn: async ({ id, data }: { id: number; data: Partial<InsertDeadline> }) => {
-      try {
-        const response = await apiRequest(`/api/deadlines/${id}`, {
-          method: "PATCH",
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data)
-        });
-        if (!response.ok) {
-          throw new Error(`Failed to update deadline: ${response.statusText}`);
-        }
-        return response.json();
-      } catch (error) {
-        console.error('Error in updateDeadlineMutation:', error);
-        throw error;
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/deadlines"] });
-      toast({
-        title: "Success",
-        description: "Deadline updated successfully",
-      });
-    },
-    onError: (error: Error) => {
-      console.error("Error updating deadline:", error);
-      toast({
-        title: "Error",
-        description: `Failed to update deadline: ${error.message}`,
-        variant: "destructive",
-      });
-    },
-  });
 
   const handleRowClick = (regulation: Regulation) => {
     if (regulation && regulation.id) {
@@ -183,13 +94,6 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
   }
 
   const filteredRegulations = regulations.filter((reg: Regulation) => {
-    console.log('Regulation:', {
-      id: reg.id,
-      name: reg.name,
-      jurisdiction: reg.jurisdiction,
-      stateCode: reg.stateCode
-    });
-
     if (categoryFilter && reg.category !== categoryFilter) {
       return false;
     }
@@ -250,7 +154,6 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
   };
 
   const getActionStatus = (action: RegulationAction) => {
-    if (!action.enabled) return 'disabled';
     switch (action.status) {
       case 'completed':
         return 'text-green-500';
@@ -307,7 +210,6 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                 </TableHead>
                 <TableHead>Next Deadline</TableHead>
                 <TableHead>Actions</TableHead>
-                {isAdmin && <TableHead>Manage</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -386,27 +288,6 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                         ))}
                       </div>
                     </TableCell>
-                    {isAdmin && (
-                      <TableCell onClick={(e) => e.stopPropagation()}>
-                        <div className="flex gap-2">
-                          {regulation.actions?.map(action => (
-                            <Button
-                              key={action.type}
-                              variant="ghost"
-                              size="sm"
-                              onClick={() => onActionToggle?.(regulation, action.type, !action.enabled)}
-                              className="p-1"
-                            >
-                              {action.enabled ? (
-                                <ToggleRight className="h-4 w-4 text-green-500" />
-                              ) : (
-                                <ToggleLeft className="h-4 w-4 text-gray-400" />
-                              )}
-                            </Button>
-                          ))}
-                        </div>
-                      </TableCell>
-                    )}
                   </TableRow>
                 );
               })}
