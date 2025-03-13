@@ -1,21 +1,4 @@
-/**
- * @module RegulationDetailPage
- * @description Displays detailed information about a specific regulation and provides administrative controls
- * @compliance ISO/IEC/IEEE 26514 4.3.2 - User Interface Documentation
- * 
- * @securityControl Access Control
- * - Implements role-based access control for admin features
- * - Restricts notification settings to admin users
- * - Validates user authentication status
- * 
- * @component
- * @example
- * ```tsx
- * <RegulationDetailPage />
- * ```
- */
-
-import { useState } from "react";
+import React, { useState } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import type { Regulation, Deadline, Guide, RegulationAction } from "@shared/schema";
