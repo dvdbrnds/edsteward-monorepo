@@ -77,12 +77,13 @@ function AttestationAction({ action, regulationId, onStatusChange }: Attestation
 interface ActionButtonProps {
   action: RegulationAction;
   regulationId: number;
+  regulation: Regulation;
   isAdmin: boolean;
   onRequiredChange?: (required: boolean) => void;
   onStatusChange?: (status: RegulationAction['status']) => void;
 }
 
-function ActionButton({ action, regulationId, isAdmin, onRequiredChange, onStatusChange }: ActionButtonProps) {
+function ActionButton({ action, regulationId, regulation, isAdmin, onRequiredChange, onStatusChange }: ActionButtonProps) {
   const [showWebPublishDialog, setShowWebPublishDialog] = useState(false);
 
   const getIcon = () => {
@@ -178,7 +179,7 @@ function ActionButton({ action, regulationId, isAdmin, onRequiredChange, onStatu
         )}
       </div>
 
-      {action.type === 'website_publish' && regulation && (
+      {action.type === 'website_publish' && (
         <WebPublishDialog
           regulation={regulation}
           open={showWebPublishDialog}
@@ -368,6 +369,7 @@ export default function RegulationDetailPage() {
                           key={action.type}
                           action={action}
                           regulationId={Number(regulationId)}
+                          regulation={regulation}
                           isAdmin={user?.role === "admin"}
                           onRequiredChange={(required) => {
                             updateActionMutation.mutate({
