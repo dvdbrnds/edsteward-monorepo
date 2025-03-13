@@ -32,6 +32,7 @@ import { NoteSection } from "@/components/regulations/note-section";
 import { RegulationChanges } from "@/components/regulations/regulation-changes";
 import { RegulationTimeline } from "@/components/regulations/regulation-timeline";
 import { WebPublishDialog } from "@/components/regulations/web-publish-dialog";
+import { CommunicationDialog } from "@/components/regulations/communication-dialog";
 
 interface AttestationActionProps {
   action: RegulationAction;
@@ -85,6 +86,7 @@ interface ActionButtonProps {
 
 function ActionButton({ action, regulationId, regulation, isAdmin, onRequiredChange, onStatusChange }: ActionButtonProps) {
   const [showWebPublishDialog, setShowWebPublishDialog] = useState(false);
+  const [showCommunicationDialog, setShowCommunicationDialog] = useState(false);
 
   const getIcon = () => {
     switch (action.type) {
@@ -109,6 +111,8 @@ function ActionButton({ action, regulationId, regulation, isAdmin, onRequiredCha
   const handleActionClick = () => {
     if (action.type === 'website_publish') {
       setShowWebPublishDialog(true);
+    } else if (action.type === 'community_communication') {
+      setShowCommunicationDialog(true);
     }
   };
 
@@ -156,6 +160,19 @@ function ActionButton({ action, regulationId, regulation, isAdmin, onRequiredCha
             <Globe className="h-4 w-4 mr-2" />
             Publish to Website
           </Button>
+        ) : action.type === 'community_communication' ? (
+          <Button
+            variant="default"
+            size="sm"
+            className="w-full"
+            onClick={() => {
+              handleActionClick();
+              onStatusChange?.('in_progress');
+            }}
+          >
+            <Mail className="h-4 w-4 mr-2" />
+            Generate Statement
+          </Button>
         ) : (
           <div className="flex gap-2">
             <Button
@@ -194,6 +211,14 @@ function ActionButton({ action, regulationId, regulation, isAdmin, onRequiredCha
           regulation={regulation}
           open={showWebPublishDialog}
           onOpenChange={setShowWebPublishDialog}
+        />
+      )}
+
+      {action.type === 'community_communication' && (
+        <CommunicationDialog
+          regulation={regulation}
+          open={showCommunicationDialog}
+          onOpenChange={setShowCommunicationDialog}
         />
       )}
     </>
