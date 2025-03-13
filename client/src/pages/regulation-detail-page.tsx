@@ -23,8 +23,30 @@ import Navigation from "@/components/layout/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Check, Globe, Mail, FileText, CheckCircle2, Clock4 } from "lucide-react";
+import {
+  ExternalLink,
+  FileText,
+  Mail,
+  Printer,
+  Globe,
+  Clock,
+  CheckCircle,
+  AlertCircle,
+  ArrowLeft,
+  Loader2,
+  Bell,
+  Shield,
+  History,
+  Check,
+  CheckCircle2,
+  Clock4
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import CircularProgress from "@/components/common/circular-progress";
+import { format, differenceInDays } from "date-fns";
+import { NoteSection } from "@/components/regulations/note-section";
+import { RegulationChanges } from "@/components/regulations/regulation-changes";
+import { RegulationTimeline } from "@/components/regulations/regulation-timeline";
 
 interface ActionButtonProps {
   action: RegulationAction;
@@ -109,89 +131,246 @@ function ActionButton({ action, regulationId, isAdmin, onRequiredChange, onStatu
   );
 }
 
+export default function RegulationDetailPage() {
+  const [location] = useLocation();
+  const regulationId = location.split("/")[2];
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+  const [showVersionHistory, setShowVersionHistory] = useState(false);
 
-// ... other imports and code ...
-
-const RegulationDetailPage = () => {
-  const [regulationId, setRegulationId] = useState<number | null>(null);
-  const [user, setUser] = useState<{ role: string } | null>(null); // Assuming user data is available
-
-  const { data: regulation, isLoading } = useQuery({
-    queryKey: ['regulation', regulationId],
-    queryFn: () => getRegulation(regulationId!), // Assuming getRegulation is defined elsewhere
-    enabled: !!regulationId,
+  const { data: user } = useQuery({
+    queryKey: ["/api/user"]
   });
 
-  const queryClient = useQueryClient();
-  const toast = useToast();
+  const { data: regulation, isLoading: regulationLoading } = useQuery<Regulation>({
+    queryKey: ["/api/regulations", regulationId],
+    queryFn: async () => {
+      const response = await fetch(`/api/regulations/${regulationId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch regulation');
+      }
+      return response.json();
+    },
+    enabled: !!regulationId
+  });
+
+  const { data: deadlines = [], isLoading: deadlinesLoading } = useQuery<Deadline[]>({
+    queryKey: ["/api/deadlines"]
+  });
 
   const updateActionMutation = useMutation({
-    mutationFn: (data: { regulationId: number; action: RegulationAction }) =>
-      updateRegulationAction(data.regulationId, data.action), // Assuming updateRegulationAction is defined elsewhere
-    onSuccess: () => {
-      queryClient.invalidateQueries(['regulation', regulationId]);
-      toast({
-        title: 'Action updated',
-        description: 'The regulation action has been successfully updated.',
-      });
+    mutationFn: async ({ regulationId, action }: { regulationId: number; action: RegulationAction }) => {
+      const response = await fetch(
+        `/api/regulations/${regulationId}/actions/${action.type}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(action),
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to update action");
+      }
+      return response.json();
     },
-    onError: (error) => {
+    onSuccess: () => {
       toast({
-        title: 'Error updating action',
+        title: "Action Updated",
+        description: "The action has been updated successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/regulations", regulationId] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Update Failed",
         description: error.message,
-        variant: 'destructive',
+        variant: "destructive",
       });
     },
   });
 
-  // ... other code ...
+  if (regulationLoading || deadlinesLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        <main className="py-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-center space-x-4">
+              <Loader2 className="h-6 w-6 animate-spin text-[#00267A]" />
+              <span>Loading...</span>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
+  const regulationDeadlines = deadlines.filter(d => d.regulationId === Number(regulationId)) || [];
+  const nextDeadline = regulationDeadlines.length > 0
+    ? regulationDeadlines.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0]
+    : null;
+
+  if (!regulation) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        <main className="py-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <h2 className="text-2xl font-semibold text-gray-900">Regulation Not Found</h2>
+              <p className="mt-2 text-gray-600">The regulation you're looking for doesn't exist or you don't have permission to view it.</p>
+              <Button
+                variant="outline"
+                onClick={() => window.history.back()}
+                className="mt-4"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Go Back
+              </Button>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50">
       <Navigation />
-      <div className="container mx-auto p-4">
-        {/* ... other content ... */}
+      <main className="py-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="space-y-8">
+            <div>
+              <Button
+                variant="ghost"
+                onClick={() => window.history.back()}
+                className="mb-4"
+              >
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Regulations
+              </Button>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                {regulation.name || regulation.topic}
+              </h1>
+              <div className="flex items-center space-x-2 text-sm text-gray-500">
+                <span className="px-2 py-1 bg-gray-100 rounded">
+                  ID: {regulation.itemId}
+                </span>
+                <span className="px-2 py-1 bg-gray-100 rounded">
+                  {regulation.category || 'Uncategorized'}
+                </span>
+              </div>
+            </div>
 
-        {regulation && (
-          <Card>
-            <CardHeader>
-              <CardTitle>Actions</CardTitle>
-              <CardDescription>Required actions and their current status</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {regulation?.actions?.map((action) => (
-                  <ActionButton
-                    key={action.type}
-                    action={action}
-                    regulationId={regulation.id}
-                    isAdmin={user?.role === "admin"}
-                    onRequiredChange={(required) => {
-                      updateActionMutation.mutate({
-                        regulationId: regulation.id,
-                        action: { ...action, required }
-                      });
-                    }}
-                    onStatusChange={(status) => {
-                      updateActionMutation.mutate({
-                        regulationId: regulation.id,
-                        action: { ...action, status }
-                      });
-                    }}
-                  />
-                ))}
-                {(!regulation?.actions || regulation.actions.length === 0) && (
-                  <p className="text-gray-500 italic">No actions configured</p>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              <div className="lg:col-span-2 space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Summary</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="prose prose-sm max-w-none text-gray-700">
+                      {regulation.summary || "No summary available."}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Requirements</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="prose max-w-none">
+                      <div className="space-y-4">
+                        {regulation.requirements ? (
+                          <p className="text-gray-700">{regulation.requirements}</p>
+                        ) : (
+                          <p className="text-gray-500 italic">
+                            No specific requirements listed.
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              <div className="space-y-6">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Actions</CardTitle>
+                    <CardDescription>Required actions and their current status</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {regulation?.actions?.map((action) => (
+                        <ActionButton
+                          key={action.type}
+                          action={action}
+                          regulationId={Number(regulationId)}
+                          isAdmin={user?.role === "admin"}
+                          onRequiredChange={(required) => {
+                            updateActionMutation.mutate({
+                              regulationId: Number(regulationId),
+                              action: { ...action, required }
+                            });
+                          }}
+                          onStatusChange={(status) => {
+                            updateActionMutation.mutate({
+                              regulationId: Number(regulationId),
+                              action: { ...action, status }
+                            });
+                          }}
+                        />
+                      ))}
+                      {(!regulation?.actions || regulation.actions.length === 0) && (
+                        <p className="text-gray-500 italic">No actions configured</p>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {nextDeadline && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Next Deadline</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center gap-3">
+                        <div className={`p-2 rounded-full ${
+                          nextDeadline.status === 'completed' ? 'bg-green-50' :
+                          nextDeadline.status === 'overdue' ? 'bg-red-50' : 'bg-yellow-50'
+                        }`}>
+                          {nextDeadline.status === 'completed' ? (
+                            <CheckCircle className="h-5 w-5 text-green-500" />
+                          ) : nextDeadline.status === 'overdue' ? (
+                            <AlertCircle className="h-5 w-5 text-red-500" />
+                          ) : (
+                            <Clock className="h-5 w-5 text-yellow-500" />
+                          )}
+                        </div>
+                        <div>
+                          <p className="font-medium">
+                            Due: {format(new Date(nextDeadline.dueDate), "PP")}
+                          </p>
+                          <span className={`text-sm ${
+                            nextDeadline.status === 'completed' ? 'text-green-600' :
+                            nextDeadline.status === 'overdue' ? 'text-red-600' : 'text-yellow-600'
+                          }`}>
+                            {nextDeadline.status.charAt(0).toUpperCase() + nextDeadline.status.slice(1)}
+                          </span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
                 )}
               </div>
-            </CardContent>
-          </Card>
-        )}
-        {/* ... other content ... */}
-      </div>
+            </div>
+          </div>
+        </div>
+      </main>
     </div>
   );
-};
-
-export default RegulationDetailPage;
+}
