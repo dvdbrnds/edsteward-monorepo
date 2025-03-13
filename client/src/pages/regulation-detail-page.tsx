@@ -31,6 +31,7 @@ import { format, differenceInDays } from "date-fns";
 import { NoteSection } from "@/components/regulations/note-section";
 import { RegulationChanges } from "@/components/regulations/regulation-changes";
 import { RegulationTimeline } from "@/components/regulations/regulation-timeline";
+import { WebPublishDialog } from "@/components/regulations/web-publish-dialog";
 
 interface AttestationActionProps {
   action: RegulationAction;
@@ -82,6 +83,8 @@ interface ActionButtonProps {
 }
 
 function ActionButton({ action, regulationId, isAdmin, onRequiredChange, onStatusChange }: ActionButtonProps) {
+  const [showWebPublishDialog, setShowWebPublishDialog] = useState(false);
+
   const getIcon = () => {
     switch (action.type) {
       case 'attestation':
@@ -102,68 +105,87 @@ function ActionButton({ action, regulationId, isAdmin, onRequiredChange, onStatu
       .join(' ');
   };
 
+  const handleActionClick = () => {
+    if (action.type === 'website_publish') {
+      setShowWebPublishDialog(true);
+    }
+  };
+
   return (
-    <div className={`flex flex-col space-y-4 p-4 border rounded-lg ${action.required ? 'border-red-200' : ''}`}>
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className={`p-2 rounded-full ${action.status === 'completed' ? 'bg-green-50' : 'bg-blue-50'}`}>
-            {getIcon()}
+    <>
+      <div className={`flex flex-col space-y-4 p-4 border rounded-lg ${action.required ? 'border-red-200' : ''}`}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className={`p-2 rounded-full ${action.status === 'completed' ? 'bg-green-50' : 'bg-blue-50'}`}>
+              {getIcon()}
+            </div>
+            <div>
+              <span className="font-medium">{getActionLabel()}</span>
+              {action.required && <span className="ml-2 text-xs text-red-500">*Required</span>}
+            </div>
           </div>
-          <div>
-            <span className="font-medium">{getActionLabel()}</span>
-            {action.required && <span className="ml-2 text-xs text-red-500">*Required</span>}
-          </div>
+          {isAdmin && (
+            <div className="flex items-center gap-2">
+              <Switch
+                checked={action.required}
+                onCheckedChange={onRequiredChange}
+                aria-label="Toggle required"
+              />
+              <span className="text-sm text-gray-500">Required</span>
+            </div>
+          )}
         </div>
-        {isAdmin && (
-          <div className="flex items-center gap-2">
-            <Switch
-              checked={action.required}
-              onCheckedChange={onRequiredChange}
-              aria-label="Toggle required"
-            />
-            <span className="text-sm text-gray-500">Required</span>
+
+        {action.type === 'attestation' ? (
+          <AttestationAction
+            action={action}
+            regulationId={regulationId}
+            onStatusChange={onStatusChange!}
+          />
+        ) : (
+          <div className="flex gap-2">
+            <Button
+              variant={action.status === 'pending' ? 'default' : 'outline'}
+              size="sm"
+              className="flex-1"
+              onClick={() => onStatusChange?.('pending')}
+            >
+              <Clock4 className="h-4 w-4 mr-2" />
+              Pending
+            </Button>
+            <Button
+              variant={action.status === 'in_progress' ? 'default' : 'outline'}
+              size="sm"
+              className="flex-1"
+              onClick={() => {
+                onStatusChange?.('in_progress');
+                handleActionClick();
+              }}
+            >
+              <Clock4 className="h-4 w-4 mr-2" />
+              In Progress
+            </Button>
+            <Button
+              variant={action.status === 'completed' ? 'default' : 'outline'}
+              size="sm"
+              className="flex-1"
+              onClick={() => onStatusChange?.('completed')}
+            >
+              <CheckCircle2 className="h-4 w-4 mr-2" />
+              Complete
+            </Button>
           </div>
         )}
       </div>
 
-      {action.type === 'attestation' ? (
-        <AttestationAction
-          action={action}
-          regulationId={regulationId}
-          onStatusChange={onStatusChange!}
+      {action.type === 'website_publish' && regulation && (
+        <WebPublishDialog
+          regulation={regulation}
+          open={showWebPublishDialog}
+          onOpenChange={setShowWebPublishDialog}
         />
-      ) : (
-        <div className="flex gap-2">
-          <Button
-            variant={action.status === 'pending' ? 'default' : 'outline'}
-            size="sm"
-            className="flex-1"
-            onClick={() => onStatusChange?.('pending')}
-          >
-            <Clock4 className="h-4 w-4 mr-2" />
-            Pending
-          </Button>
-          <Button
-            variant={action.status === 'in_progress' ? 'default' : 'outline'}
-            size="sm"
-            className="flex-1"
-            onClick={() => onStatusChange?.('in_progress')}
-          >
-            <Clock4 className="h-4 w-4 mr-2" />
-            In Progress
-          </Button>
-          <Button
-            variant={action.status === 'completed' ? 'default' : 'outline'}
-            size="sm"
-            className="flex-1"
-            onClick={() => onStatusChange?.('completed')}
-          >
-            <CheckCircle2 className="h-4 w-4 mr-2" />
-            Complete
-          </Button>
-        </div>
       )}
-    </div>
+    </>
   );
 }
 
