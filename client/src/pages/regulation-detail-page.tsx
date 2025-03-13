@@ -23,6 +23,7 @@ import Navigation from "@/components/layout/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   ExternalLink,
   FileText,
@@ -47,6 +48,47 @@ import { format, differenceInDays } from "date-fns";
 import { NoteSection } from "@/components/regulations/note-section";
 import { RegulationChanges } from "@/components/regulations/regulation-changes";
 import { RegulationTimeline } from "@/components/regulations/regulation-timeline";
+
+interface AttestationActionProps {
+  action: RegulationAction;
+  regulationId: number;
+  onStatusChange: (status: RegulationAction['status']) => void;
+}
+
+function AttestationAction({ action, regulationId, onStatusChange }: AttestationActionProps) {
+  const handleAttestation = (checked: boolean) => {
+    onStatusChange(checked ? 'completed' : 'pending');
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="text-sm text-gray-600 space-y-2">
+        <p>
+          By checking this box, you attest that your institution is in compliance with all
+          requirements specified in this regulation. This attestation will be recorded and
+          timestamped.
+        </p>
+        <p>
+          Please ensure you have reviewed all requirements and have sufficient documentation
+          to support this attestation.
+        </p>
+      </div>
+      <div className="flex items-center space-x-2">
+        <Checkbox
+          id="attestation"
+          checked={action.status === 'completed'}
+          onCheckedChange={handleAttestation}
+        />
+        <label
+          htmlFor="attestation"
+          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+        >
+          Yes, I attest that we are in compliance with this regulation
+        </label>
+      </div>
+    </div>
+  );
+}
 
 interface ActionButtonProps {
   action: RegulationAction;
@@ -77,6 +119,51 @@ function ActionButton({ action, regulationId, isAdmin, onRequiredChange, onStatu
       .join(' ');
   };
 
+  const renderActionContent = () => {
+    switch (action.type) {
+      case 'attestation':
+        return (
+          <AttestationAction
+            action={action}
+            regulationId={regulationId}
+            onStatusChange={onStatusChange!}
+          />
+        );
+      default:
+        return (
+          <div className="flex gap-2">
+            <Button
+              variant={action.status === 'pending' ? 'default' : 'outline'}
+              size="sm"
+              className="flex-1"
+              onClick={() => onStatusChange?.('pending')}
+            >
+              <Clock4 className="h-4 w-4 mr-2" />
+              Pending
+            </Button>
+            <Button
+              variant={action.status === 'in_progress' ? 'default' : 'outline'}
+              size="sm"
+              className="flex-1"
+              onClick={() => onStatusChange?.('in_progress')}
+            >
+              <Clock4 className="h-4 w-4 mr-2" />
+              In Progress
+            </Button>
+            <Button
+              variant={action.status === 'completed' ? 'default' : 'outline'}
+              size="sm"
+              className="flex-1"
+              onClick={() => onStatusChange?.('completed')}
+            >
+              <CheckCircle2 className="h-4 w-4 mr-2" />
+              Complete
+            </Button>
+          </div>
+        );
+    }
+  };
+
   return (
     <div className={`flex flex-col space-y-4 p-4 border rounded-lg ${isAdmin ? 'border-[#5B2C8F] relative' : ''}`}>
       {isAdmin && (
@@ -95,35 +182,8 @@ function ActionButton({ action, regulationId, isAdmin, onRequiredChange, onStatu
       </div>
 
       <div className="flex flex-col gap-4">
-        <div className="flex gap-2">
-          <Button
-            variant={action.status === 'pending' ? 'default' : 'outline'}
-            size="sm"
-            className="flex-1"
-            onClick={() => onStatusChange?.('pending')}
-          >
-            <Clock4 className="h-4 w-4 mr-2" />
-            Pending
-          </Button>
-          <Button
-            variant={action.status === 'in_progress' ? 'default' : 'outline'}
-            size="sm"
-            className="flex-1"
-            onClick={() => onStatusChange?.('in_progress')}
-          >
-            <Clock4 className="h-4 w-4 mr-2" />
-            In Progress
-          </Button>
-          <Button
-            variant={action.status === 'completed' ? 'default' : 'outline'}
-            size="sm"
-            className="flex-1"
-            onClick={() => onStatusChange?.('completed')}
-          >
-            <CheckCircle2 className="h-4 w-4 mr-2" />
-            Complete
-          </Button>
-        </div>
+        {renderActionContent()}
+
         {isAdmin && (
           <div className="flex items-center justify-end gap-2 pt-2 border-t">
             <Switch
