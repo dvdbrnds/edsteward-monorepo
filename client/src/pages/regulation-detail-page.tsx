@@ -143,6 +143,19 @@ function ActionButton({ action, regulationId, regulation, isAdmin, onRequiredCha
             regulationId={regulationId}
             onStatusChange={onStatusChange!}
           />
+        ) : action.type === 'website_publish' ? (
+          <Button
+            variant="default"
+            size="sm"
+            className="w-full"
+            onClick={() => {
+              handleActionClick();
+              onStatusChange?.('in_progress');
+            }}
+          >
+            <Globe className="h-4 w-4 mr-2" />
+            Publish to Website
+          </Button>
         ) : (
           <div className="flex gap-2">
             <Button
@@ -158,10 +171,7 @@ function ActionButton({ action, regulationId, regulation, isAdmin, onRequiredCha
               variant={action.status === 'in_progress' ? 'default' : 'outline'}
               size="sm"
               className="flex-1"
-              onClick={() => {
-                onStatusChange?.('in_progress');
-                handleActionClick();
-              }}
+              onClick={() => onStatusChange?.('in_progress')}
             >
               <Clock4 className="h-4 w-4 mr-2" />
               In Progress
