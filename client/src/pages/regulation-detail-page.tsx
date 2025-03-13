@@ -78,7 +78,13 @@ function ActionButton({ action, regulationId, isAdmin, onRequiredChange, onStatu
   };
 
   return (
-    <div className="flex flex-col space-y-4 p-4 border rounded-lg">
+    <div className={`flex flex-col space-y-4 p-4 border rounded-lg ${isAdmin ? 'border-[#5B2C8F] relative' : ''}`}>
+      {isAdmin && (
+        <div className="absolute -top-2 -right-2 bg-[#5B2C8F] text-white text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
+          <Shield className="h-3 w-3" />
+          Admin
+        </div>
+      )}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className={`p-2 rounded-full ${action.status === 'completed' ? 'bg-green-50' : 'bg-blue-50'}`}>
@@ -86,8 +92,40 @@ function ActionButton({ action, regulationId, isAdmin, onRequiredChange, onStatu
           </div>
           <span className="font-medium">{getActionLabel()}</span>
         </div>
+      </div>
+
+      <div className="flex flex-col gap-4">
+        <div className="flex gap-2">
+          <Button
+            variant={action.status === 'pending' ? 'default' : 'outline'}
+            size="sm"
+            className="flex-1"
+            onClick={() => onStatusChange?.('pending')}
+          >
+            <Clock4 className="h-4 w-4 mr-2" />
+            Pending
+          </Button>
+          <Button
+            variant={action.status === 'in_progress' ? 'default' : 'outline'}
+            size="sm"
+            className="flex-1"
+            onClick={() => onStatusChange?.('in_progress')}
+          >
+            <Clock4 className="h-4 w-4 mr-2" />
+            In Progress
+          </Button>
+          <Button
+            variant={action.status === 'completed' ? 'default' : 'outline'}
+            size="sm"
+            className="flex-1"
+            onClick={() => onStatusChange?.('completed')}
+          >
+            <CheckCircle2 className="h-4 w-4 mr-2" />
+            Complete
+          </Button>
+        </div>
         {isAdmin && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-end gap-2 pt-2 border-t">
             <Switch
               checked={action.required}
               onCheckedChange={onRequiredChange}
@@ -96,36 +134,6 @@ function ActionButton({ action, regulationId, isAdmin, onRequiredChange, onStatu
             <span className="text-sm text-gray-500">Required</span>
           </div>
         )}
-      </div>
-
-      <div className="flex gap-2">
-        <Button
-          variant={action.status === 'pending' ? 'default' : 'outline'}
-          size="sm"
-          className="flex-1"
-          onClick={() => onStatusChange?.('pending')}
-        >
-          <Clock4 className="h-4 w-4 mr-2" />
-          Pending
-        </Button>
-        <Button
-          variant={action.status === 'in_progress' ? 'default' : 'outline'}
-          size="sm"
-          className="flex-1"
-          onClick={() => onStatusChange?.('in_progress')}
-        >
-          <Clock4 className="h-4 w-4 mr-2" />
-          In Progress
-        </Button>
-        <Button
-          variant={action.status === 'completed' ? 'default' : 'outline'}
-          size="sm"
-          className="flex-1"
-          onClick={() => onStatusChange?.('completed')}
-        >
-          <CheckCircle2 className="h-4 w-4 mr-2" />
-          Complete
-        </Button>
       </div>
     </div>
   );
