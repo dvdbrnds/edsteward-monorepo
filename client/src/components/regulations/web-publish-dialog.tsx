@@ -135,7 +135,7 @@ export function WebPublishDialog({ regulation, open, onOpenChange }: WebPublishD
 
         <Tabs value={activeTab} onValueChange={setActiveTab}>
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="drupal">Drupal (Moravian)</TabsTrigger>
+            <TabsTrigger value="drupal">Drupal</TabsTrigger>
             <TabsTrigger value="universal">Universal HTML</TabsTrigger>
           </TabsList>
 
