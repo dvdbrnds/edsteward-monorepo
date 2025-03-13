@@ -417,5 +417,86 @@ export function registerRoutes(app: express.Application): Server {
     }
   });
 
+  // Add the admin users endpoint
+  app.get("/api/admin/users", async (req, res) => {
+    try {
+      if (!req.user) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized access attempt to user management");
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      if (req.user.role !== 'admin') {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Non-admin user attempted to access user management");
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      try {
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Fetching all users");
+        const users = await storage.getAllUsers();
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Found ${users.length} users`);
+        return res.json(users);
+      } catch (dbError) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Database error fetching users", {
+          error: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+        return res.status(500).json({ 
+          error: "Database error fetching users",
+          details: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+      }
+    } catch (error) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to fetch users", {
+        error: error instanceof Error ? error.message : String(error)
+      });
+      return res.status(500).json({ 
+        error: "Failed to fetch users", 
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  // Add endpoint to update user
+  app.post("/api/admin/update-user", async (req, res) => {
+    try {
+      if (!req.user) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized access attempt to user update");
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      if (req.user.role !== 'admin') {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Non-admin user attempted to update user");
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const { id, role, department } = req.body;
+
+      if (!id || !role) {
+        return res.status(400).json({ error: "Missing required fields" });
+      }
+
+      try {
+        const updatedUser = await storage.updateUser(id, { role, department });
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Successfully updated user ${id}`);
+        return res.json(updatedUser);
+      } catch (dbError) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Database error updating user", {
+          error: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+        return res.status(500).json({ 
+          error: "Database error updating user",
+          details: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+      }
+    } catch (error) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to update user", {
+        error: error instanceof Error ? error.message : String(error)
+      });
+      return res.status(500).json({ 
+        error: "Failed to update user", 
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
   return httpServer;
 }
