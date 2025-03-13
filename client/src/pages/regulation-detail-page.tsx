@@ -187,12 +187,10 @@ interface ActionButtonProps {
   action: RegulationAction;
   regulationId: number;
   isAdmin: boolean;
-  onToggle?: (enabled: boolean) => void;
-  onStatusChange?: (status: RegulationAction['status']) => void;
   onRequiredChange?: (required: boolean) => void;
 }
 
-function ActionButton({ action, regulationId, isAdmin, onToggle, onStatusChange, onRequiredChange }: ActionButtonProps) {
+function ActionButton({ action, regulationId, isAdmin, onRequiredChange }: ActionButtonProps) {
   const getIcon = () => {
     switch (action.type) {
       case 'attestation':
@@ -225,13 +223,13 @@ function ActionButton({ action, regulationId, isAdmin, onToggle, onStatusChange,
   };
 
   return (
-    <div className={`flex items-center justify-between p-3 border rounded-lg ${!action.enabled ? 'bg-gray-50' : ''}`}>
+    <div className="flex items-center justify-between p-3 border rounded-lg">
       <div className="flex items-center gap-3">
-        <div className={`p-2 rounded-full ${action.enabled ? 'bg-blue-50' : 'bg-gray-100'}`}>
+        <div className="p-2 rounded-full bg-blue-50">
           {getIcon()}
         </div>
         <div>
-          <p className="font-medium flex items-center gap-2">
+          <p className="font-medium">
             {getActionLabel()}
             {action.required && <span className="text-xs text-red-500">*Required</span>}
           </p>
@@ -243,43 +241,14 @@ function ActionButton({ action, regulationId, isAdmin, onToggle, onStatusChange,
       </div>
       {isAdmin && (
         <div className="flex items-center gap-2">
-          <Select
-            value={action.status}
-            onValueChange={(value) => onStatusChange?.(value as RegulationAction['status'])}
-          >
-            <SelectTrigger className="w-[130px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="in_progress">In Progress</SelectItem>
-              <SelectItem value="completed">Completed</SelectItem>
-            </SelectContent>
-          </Select>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onToggle?.(!action.enabled)}
-            title={action.enabled ? 'Disable action' : 'Enable action'}
-          >
-            {action.enabled ? (
-              <ToggleRight className="h-5 w-5 text-green-500" />
-            ) : (
-              <ToggleLeft className="h-5 w-5 text-gray-400" />
-            )}
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => onRequiredChange?.(!action.required)}
-            title={action.required ? 'Make optional' : 'Make required'}
-          >
-            {action.required ? (
-              <Check className="h-5 w-5 text-red-500" />
-            ) : (
-              <Ban className="h-5 w-5 text-gray-400" />
-            )}
-          </Button>
+          <div className="flex items-center space-x-2">
+            <Switch
+              checked={action.required}
+              onCheckedChange={onRequiredChange}
+              aria-label="Toggle required"
+            />
+            <span className="text-sm text-gray-500">Required</span>
+          </div>
         </div>
       )}
     </div>
@@ -805,18 +774,6 @@ export default function RegulationDetailPage() {
                           action={action}
                           regulationId={regulation.id}
                           isAdmin={user?.role === "admin"}
-                          onToggle={(enabled) => {
-                            updateActionMutation.mutate({
-                              regulationId: regulation.id,
-                              action: { ...action, enabled }
-                            });
-                          }}
-                          onStatusChange={(status) => {
-                            updateActionMutation.mutate({
-                              regulationId: regulation.id,
-                              action: { ...action, status }
-                            });
-                          }}
                           onRequiredChange={(required) => {
                             updateActionMutation.mutate({
                               regulationId: regulation.id,
@@ -831,6 +788,7 @@ export default function RegulationDetailPage() {
                     </div>
                   </CardContent>
                 </Card>
+
                 {nextDeadline && nextDeadline.status !== "completed" && (
                   <Card className="border-[#00267A]">
                     <CardHeader>
@@ -937,7 +895,7 @@ export default function RegulationDetailPage() {
                                       step={1}
                                       value={[field.value || 7]}
                                       onValueChange={([value]) => field.onChange(value)}
-                                                                     className="w-full"
+                                      className="w-full"
                                     />
                                   </FormControl>
                                   <FormDescription>
@@ -970,7 +928,8 @@ export default function RegulationDetailPage() {
 
                             <Button
                               type="submit"
-                              className="w-full"                              disabled={overrideMutation.isPending}
+                              className="w-full"
+                              disabled={overrideMutation.isPending}
                             >
                               {overrideMutation.isPending ? (
                                 <>
@@ -997,8 +956,8 @@ export default function RegulationDetailPage() {
 }
 
 function GuideContent() {
-  const { data: guides, isLoading } = useQuery<Guide[]>({
-    queryKey: ["/api/guides", { category: "submission" }],
+  const{ data: guides, isLoading } = useQuery<Guide[]>({
+    queryKey: ["/api/guides", {category: "submission" }],
   });
 
   if (isLoading) {
