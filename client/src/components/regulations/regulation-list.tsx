@@ -17,15 +17,6 @@ import {
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import DeadlineForm from "./deadline-form";
 import { Button } from "@/components/ui/button";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 
@@ -155,6 +146,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
 
   const getActionStatus = (action: RegulationAction) => {
     if (!action.enabled) return 'text-gray-300';
+    if (action.type === 'attestation' && action.status === 'completed') return 'text-green-500';
     if (action.required) return 'text-red-500';
 
     switch (action.status) {
