@@ -19,11 +19,10 @@ interface WebPublishDialogProps {
 }
 
 const generateDrupalCode = (regulation: Regulation): string => {
-  return `
-<!-- Moravian University Compliance Information -->
+  return `<!-- Moravian University Compliance Information -->
 <div class="compliance-regulation">
   <h2>${regulation.name}</h2>
-  
+
   <div class="regulation-metadata">
     <p class="regulation-id">Regulation ID: ${regulation.itemId}</p>
     <p class="regulation-category">${regulation.category}</p>
@@ -79,16 +78,14 @@ const generateDrupalCode = (regulation: Regulation): string => {
   padding-top: 1em;
   border-top: 1px solid #eee;
 }
-</style>
-`;
+</style>`.trim();
 };
 
 const generateUniversalCode = (regulation: Regulation): string => {
-  return `
-<!-- Universal Compliance Information -->
+  return `<!-- Universal Compliance Information -->
 <div class="compliance-regulation">
   <h2>${regulation.name}</h2>
-  
+
   <div class="regulation-metadata">
     <p><strong>Regulation ID:</strong> ${regulation.itemId}</p>
     <p><strong>Category:</strong> ${regulation.category}</p>
@@ -113,13 +110,12 @@ const generateUniversalCode = (regulation: Regulation): string => {
     <p>${regulation.agency_name}<br>
     ${regulation.agency_department}</p>
   </div>
-</div>
-`;
+</div>`.trim();
 };
 
 export function WebPublishDialog({ regulation, open, onOpenChange }: WebPublishDialogProps) {
   const [activeTab, setActiveTab] = useState("drupal");
-  
+
   const handleCopy = async (code: string) => {
     await navigator.clipboard.writeText(code);
   };
@@ -150,7 +146,7 @@ export function WebPublishDialog({ regulation, open, onOpenChange }: WebPublishD
               </p>
               <div className="relative">
                 <ScrollArea className="h-[400px] w-full rounded-md border bg-muted p-4">
-                  <pre className="text-sm">{drupalCode}</pre>
+                  <pre className="text-sm whitespace-pre-wrap break-words">{drupalCode}</pre>
                 </ScrollArea>
                 <Button
                   variant="outline"
@@ -171,7 +167,7 @@ export function WebPublishDialog({ regulation, open, onOpenChange }: WebPublishD
               </p>
               <div className="relative">
                 <ScrollArea className="h-[400px] w-full rounded-md border bg-muted p-4">
-                  <pre className="text-sm">{universalCode}</pre>
+                  <pre className="text-sm whitespace-pre-wrap break-words">{universalCode}</pre>
                 </ScrollArea>
                 <Button
                   variant="outline"
