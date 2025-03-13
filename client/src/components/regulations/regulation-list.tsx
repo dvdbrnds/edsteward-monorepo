@@ -154,13 +154,16 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
   };
 
   const getActionStatus = (action: RegulationAction) => {
+    if (!action.enabled) return 'text-gray-300';
+    if (action.required) return 'text-red-500';
+
     switch (action.status) {
       case 'completed':
         return 'text-green-500';
       case 'in_progress':
         return 'text-yellow-500';
       default:
-        return 'text-gray-500';
+        return 'text-gray-400';
     }
   };
 
@@ -283,7 +286,6 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                             title={`${action.type.replace('_', ' ')} - ${action.status}`}
                           >
                             {getActionIcon(action.type)}
-                            {action.required && <span className="text-xs text-red-500">*</span>}
                           </div>
                         ))}
                       </div>
