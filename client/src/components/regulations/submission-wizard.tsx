@@ -28,20 +28,7 @@ import type { Regulation } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 
-interface SubmissionWizardProps {
-  regulation: Regulation;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
-
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-const ACCEPTED_FILE_TYPES = [
-  'application/pdf',
-  'application/msword',
-  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-  'image/jpeg',
-  'image/png'
-];
+// ... keep existing interfaces and constants ...
 
 const evidenceFormSchema = z.object({
   documentTitle: z.string().min(1, "Document title is required"),
@@ -54,20 +41,6 @@ const evidenceFormSchema = z.object({
   }),
   notes: z.string().optional(),
 });
-
-type EvidenceFormValues = z.infer<typeof evidenceFormSchema>;
-
-const steps = [
-  { id: 'info', title: 'Basic Information' },
-  { id: 'requirements', title: 'Requirements Review' },
-  { id: 'evidence', title: 'Evidence Upload' },
-  { id: 'review', title: 'Final Review' }
-];
-
-interface UploadedFile {
-  file: File;
-  description: string;
-}
 
 export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionWizardProps) {
   const [currentStep, setCurrentStep] = useState<string>('info');
@@ -188,36 +161,28 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
   };
 
   const handleSubmit = async (values: EvidenceFormValues) => {
-    console.log('Submit handler called with values:', values);
-    console.log('Current uploaded files:', uploadedFiles);
-
     try {
       setIsSubmitting(true);
-      console.log('Starting submission process...');
+      console.log('Starting submission with values:', values);
+      console.log('Files to upload:', uploadedFiles);
 
       if (uploadedFiles.length === 0) {
-        console.log('No files uploaded, showing error');
         toast({
           title: "No Files",
           description: "Please upload at least one evidence file.",
           variant: "destructive",
         });
-        setIsSubmitting(false);
         return;
       }
 
       const formData = new FormData();
-      console.log('Creating FormData...');
-
       formData.append('data', JSON.stringify(values));
 
       uploadedFiles.forEach((uploadedFile, index) => {
-        console.log(`Adding file ${index + 1}:`, uploadedFile.file.name);
         formData.append('files', uploadedFile.file);
         formData.append(`description${index}`, uploadedFile.description);
       });
 
-      console.log('Sending request to server...');
       const response = await fetch(`/api/regulations/${regulation.id}/evidence`, {
         method: 'POST',
         body: formData,
@@ -228,17 +193,16 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
       }
 
       const result = await response.json();
-      console.log('Server response:', result);
+      console.log('Submission successful:', result);
 
       toast({
         title: "Evidence Submitted Successfully",
         description: `${uploadedFiles.length} files uploaded successfully.`,
       });
 
-      console.log('Clearing form and closing dialog...');
+      queryClient.invalidateQueries(['/api/regulations', regulation.id, 'evidence']);
       setUploadedFiles([]);
       form.reset();
-      queryClient.invalidateQueries(['/api/regulations', regulation.id, 'evidence']);
       onOpenChange(false);
     } catch (error) {
       console.error('Submission error:', error);
@@ -344,6 +308,7 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
                 )}
               />
 
+              {/* File upload section */}
               <div className="space-y-4">
                 <Label>Evidence Files</Label>
                 <input
@@ -352,6 +317,7 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
                   className="hidden"
                   onChange={handleFileUpload}
                   accept={ACCEPTED_FILE_TYPES.join(',')}
+                  multiple
                 />
 
                 <div
@@ -420,7 +386,6 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
         );
 
       case 'review':
-        console.log('Rendering review step');
         return (
           <Form {...form}>
             <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
