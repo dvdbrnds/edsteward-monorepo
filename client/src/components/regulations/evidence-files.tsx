@@ -64,7 +64,7 @@ export function EvidenceFiles({ regulationId }: EvidenceFilesProps) {
       return (
         <div className="relative w-full h-32 bg-muted rounded-md overflow-hidden">
           <img 
-            src={`/uploads/${file.storagePath.split('/').pop()}`}
+            src={`/api/uploads/${file.storagePath.split('/').pop()}`}
             alt={file.fileName}
             className="object-cover w-full h-full"
           />

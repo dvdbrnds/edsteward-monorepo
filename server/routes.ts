@@ -63,6 +63,9 @@ export function registerRoutes(app: express.Application): Server {
   // Create HTTP server
   const httpServer = createServer(app);
 
+  // Serve static files from the uploads directory
+  app.use('/api/uploads', express.static(uploadDir));
+
   // Setup auth routes first
   setupAuth(app);
 
@@ -722,7 +725,6 @@ export function registerRoutes(app: express.Application): Server {
     }
   });
 
-  // Add the new evidence upload route (This is a duplicate route.  Removing the second one)
 
   return httpServer;
 }
