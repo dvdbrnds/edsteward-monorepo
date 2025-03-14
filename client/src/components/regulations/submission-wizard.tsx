@@ -1,14 +1,22 @@
-
 import React, { useState } from 'react';
 import { Button } from '../ui/button';
+import { Input } from '@/components/ui/input';
+import { Form } from '@/components/ui/form';
+import { useToast } from '@/hooks/use-toast';
+import { Check, FileText, Upload, X, Loader2 } from 'lucide-react';
+import { z } from 'zod';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 interface SubmissionWizardProps {
   regulation: any;
   onActionUpdate: (type: string) => void;
+  onOpenChange: (open: boolean) => void;
 }
 
-export const SubmissionWizard: React.FC<SubmissionWizardProps> = ({ regulation, onActionUpdate }) => {
+export const SubmissionWizard: React.FC<SubmissionWizardProps> = ({ regulation, onActionUpdate, onOpenChange }) => {
   const [step, setStep] = useState(0);
+  const { toast } = useToast();
 
   const steps = [
     { id: 'info', title: 'Basic Information' },
@@ -25,7 +33,7 @@ export const SubmissionWizard: React.FC<SubmissionWizardProps> = ({ regulation, 
           <div className="flex items-start gap-3 p-4 border rounded-lg">
             <input 
               type="checkbox" 
-              checked={regulation.actions?.find(a => a.type === 'attestation')?.status === 'completed'}
+              checked={regulation.actions?.find((a: any) => a.type === 'attestation')?.status === 'completed'}
               onChange={() => onActionUpdate('attestation')}
               className="mt-1" 
             />
@@ -38,7 +46,7 @@ export const SubmissionWizard: React.FC<SubmissionWizardProps> = ({ regulation, 
           <div className="flex items-start gap-3 p-4 border rounded-lg">
             <input 
               type="checkbox"
-              checked={regulation.actions?.find(a => a.type === 'website_publish')?.status === 'completed'}
+              checked={regulation.actions?.find((a: any) => a.type === 'website_publish')?.status === 'completed'}
               onChange={() => onActionUpdate('website_publish')}
               className="mt-1"
             />
@@ -51,7 +59,7 @@ export const SubmissionWizard: React.FC<SubmissionWizardProps> = ({ regulation, 
           <div className="flex items-start gap-3 p-4 border rounded-lg">
             <input 
               type="checkbox"
-              checked={regulation.actions?.find(a => a.type === 'community_communication')?.status === 'completed'}
+              checked={regulation.actions?.find((a: any) => a.type === 'community_communication')?.status === 'completed'}
               onChange={() => onActionUpdate('community_communication')}
               className="mt-1"
             />
@@ -64,7 +72,7 @@ export const SubmissionWizard: React.FC<SubmissionWizardProps> = ({ regulation, 
           <div className="flex items-start gap-3 p-4 border rounded-lg">
             <input 
               type="checkbox"
-              checked={regulation.actions?.find(a => a.type === 'agency_submission')?.status === 'completed'}
+              checked={regulation.actions?.find((a: any) => a.type === 'agency_submission')?.status === 'completed'}
               onChange={() => onActionUpdate('agency_submission')}
               className="mt-1"
             />
@@ -73,30 +81,17 @@ export const SubmissionWizard: React.FC<SubmissionWizardProps> = ({ regulation, 
               <p className="text-sm text-gray-600">Submit required documentation</p>
             </div>
           </div>
-
-          <Button 
-            onClick={handleSubmitEvidence}
-            className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white"
-          >
-            Submit Evidence
-          </Button>
         </div>
       </div>
     );
-  };
-
-  const handleSubmitEvidence = () => {
-    // Handle evidence submission
-    console.log('Submitting evidence...');
   };
 
   const renderContent = () => {
     switch (steps[step].id) {
       case 'actions':
         return renderActionStep();
-      // Add other step renders as needed
       default:
-        return <div>Content for {steps[step].id}</div>;
+        return null;
     }
   };
 
@@ -117,7 +112,7 @@ export const SubmissionWizard: React.FC<SubmissionWizardProps> = ({ regulation, 
           </div>
         ))}
       </div>
-      
+
       <div className="p-4 border rounded-lg">
         {renderContent()}
       </div>
