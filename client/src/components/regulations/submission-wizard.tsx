@@ -100,7 +100,7 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
       if (!isValid || uploadedFiles.length === 0) {
         toast({
           title: "Required Fields",
-          description: uploadedFiles.length === 0 
+          description: uploadedFiles.length === 0
             ? "Please upload at least one file before proceeding."
             : "Please fill in the document title and description.",
           variant: "destructive",
