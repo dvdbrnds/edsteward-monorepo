@@ -93,14 +93,13 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
     },
   });
 
-  const handleStepChange = (stepId: string) => {
+  const handleStepChange = async (stepId: string) => {
     if (currentStep === 'evidence' && stepId === 'review') {
-      // Validate form before allowing to proceed to review
-      form.trigger(['documentTitle', 'description', 'contact.name', 'contact.email']);
-      if (!form.formState.isValid) {
+      const isValid = await form.trigger(['documentTitle', 'description']);
+      if (!isValid) {
         toast({
           title: "Form Validation",
-          description: "Please fill in all required fields before proceeding.",
+          description: "Please fill in all required fields for this step before proceeding.",
           variant: "destructive",
         });
         return;
@@ -256,7 +255,7 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
               <h3>Submit Evidence for {regulation.name}</h3>
               <p>
                 This wizard will guide you through the process of submitting evidence
-                for compliance with {regulation.agency_name}'s requirements.
+                for compliance with regulation requirements.
               </p>
               <div className="bg-muted p-4 rounded-md">
                 <h4 className="text-sm font-medium">Submission Requirements</h4>
