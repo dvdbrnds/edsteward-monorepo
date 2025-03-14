@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -23,14 +23,24 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Check, ChevronRight, FileText, Upload } from "lucide-react";
+import { Check, ChevronRight, FileText, Upload, X } from "lucide-react";
 import type { Regulation } from "@shared/schema";
+import { useToast } from "@/hooks/use-toast";
 
 interface SubmissionWizardProps {
   regulation: Regulation;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const ACCEPTED_FILE_TYPES = [
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'image/jpeg',
+  'image/png'
+];
 
 const evidenceFormSchema = z.object({
   documentTitle: z.string().min(1, "Document title is required"),
@@ -53,9 +63,17 @@ const steps = [
   { id: 'review', title: 'Final Review' }
 ];
 
+interface UploadedFile {
+  file: File;
+  description: string;
+}
+
 export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionWizardProps) {
   const [currentStep, setCurrentStep] = useState<string>('info');
-  
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+
   const form = useForm<EvidenceFormValues>({
     resolver: zodResolver(evidenceFormSchema),
     defaultValues: {
@@ -75,9 +93,92 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
     setCurrentStep(stepId);
   };
 
-  const handleSubmit = (values: EvidenceFormValues) => {
-    console.log('Form submitted:', values);
-    // TODO: Implement actual submission logic
+  const handleFileSelect = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files?.length) return;
+
+    const file = files[0];
+
+    // Validate file type and size
+    if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
+      toast({
+        title: "Invalid file type",
+        description: "Please upload a PDF, Word document, or image file.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (file.size > MAX_FILE_SIZE) {
+      toast({
+        title: "File too large",
+        description: "Files must be smaller than 10MB.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Add file to uploaded files list
+    setUploadedFiles(prev => [...prev, { file, description: '' }]);
+
+    // Reset input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleFileDescriptionChange = (index: number, description: string) => {
+    setUploadedFiles(prev => 
+      prev.map((file, i) => 
+        i === index ? { ...file, description } : file
+      )
+    );
+  };
+
+  const handleFileRemove = (index: number) => {
+    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleSubmit = async (values: EvidenceFormValues) => {
+    // Create FormData for file upload
+    const formData = new FormData();
+
+    // Add form values
+    formData.append('data', JSON.stringify(values));
+
+    // Add files
+    uploadedFiles.forEach((uploadedFile, index) => {
+      formData.append(`file${index}`, uploadedFile.file);
+      formData.append(`description${index}`, uploadedFile.description);
+    });
+
+    try {
+      const response = await fetch(`/api/regulations/${regulation.id}/evidence`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit evidence');
+      }
+
+      toast({
+        title: "Evidence Submitted",
+        description: "Your evidence has been successfully submitted.",
+      });
+
+      onOpenChange(false);
+    } catch (error) {
+      toast({
+        title: "Submission Failed",
+        description: "There was an error submitting your evidence. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const renderStepContent = () => {
@@ -172,15 +273,63 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
                 )}
               />
 
-              <div className="border-2 border-dashed rounded-md p-6 text-center">
-                <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
-                <p className="text-sm text-muted-foreground">
-                  Drag and drop files here, or click to select files
-                </p>
-                <Button variant="outline" size="sm" className="mt-2">
-                  <FileText className="h-4 w-4 mr-2" />
-                  Select Files
-                </Button>
+              {/* File Upload Section */}
+              <div className="space-y-4">
+                <Label>Evidence Files</Label>
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  className="hidden"
+                  onChange={handleFileUpload}
+                  accept={ACCEPTED_FILE_TYPES.join(',')}
+                />
+
+                <div className="border-2 border-dashed rounded-md p-6 text-center">
+                  <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">
+                    Drag and drop files here, or click to select files
+                  </p>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="mt-2"
+                    onClick={handleFileSelect}
+                  >
+                    <FileText className="h-4 w-4 mr-2" />
+                    Select Files
+                  </Button>
+                </div>
+
+                {/* Uploaded Files List */}
+                {uploadedFiles.length > 0 && (
+                  <div className="space-y-2">
+                    {uploadedFiles.map((uploadedFile, index) => (
+                      <div key={index} className="flex items-start gap-2 bg-muted p-2 rounded-md">
+                        <FileText className="h-5 w-5 mt-1 shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium truncate">
+                            {uploadedFile.file.name}
+                          </p>
+                          <input
+                            type="text"
+                            placeholder="Add a description for this file..."
+                            className="mt-1 w-full text-sm bg-transparent border-0 border-b border-input focus:ring-0"
+                            value={uploadedFile.description}
+                            onChange={(e) => handleFileDescriptionChange(index, e.target.value)}
+                          />
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleFileRemove(index)}
+                          className="shrink-0"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <Button
@@ -207,9 +356,21 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
                   <p className="text-sm">{form.getValues('description')}</p>
                 </div>
                 <div>
+                  <h4 className="text-sm font-medium">Evidence Files</h4>
+                  {uploadedFiles.map((file, index) => (
+                    <div key={index} className="text-sm">
+                      <p className="font-medium">{file.file.name}</p>
+                      <p className="text-muted-foreground">{file.description}</p>
+                    </div>
+                  ))}
+                </div>
+                <div>
                   <h4 className="text-sm font-medium">Contact Information</h4>
                   <p className="text-sm">{form.getValues('contact.name')}</p>
                   <p className="text-sm">{form.getValues('contact.email')}</p>
+                  {form.getValues('contact.phone') && (
+                    <p className="text-sm">{form.getValues('contact.phone')}</p>
+                  )}
                 </div>
               </div>
             </div>
