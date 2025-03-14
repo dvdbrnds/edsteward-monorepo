@@ -132,8 +132,8 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
   };
 
   const handleFileDescriptionChange = (index: number, description: string) => {
-    setUploadedFiles(prev => 
-      prev.map((file, i) => 
+    setUploadedFiles(prev =>
+      prev.map((file, i) =>
         i === index ? { ...file, description } : file
       )
     );
@@ -152,7 +152,7 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
 
     // Add files
     uploadedFiles.forEach((uploadedFile, index) => {
-      formData.append(`file${index}`, uploadedFile.file);
+      formData.append(`files`, uploadedFile.file);
       formData.append(`description${index}`, uploadedFile.description);
     });
 
@@ -166,11 +166,16 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
         throw new Error('Failed to submit evidence');
       }
 
+      const result = await response.json();
+
       toast({
-        title: "Evidence Submitted",
-        description: "Your evidence has been successfully submitted.",
+        title: "Evidence Submitted Successfully",
+        description: `${uploadedFiles.length} files uploaded successfully.`,
       });
 
+      // Clear form and close dialog
+      setUploadedFiles([]);
+      form.reset();
       onOpenChange(false);
     } catch (error) {
       toast({
@@ -289,9 +294,9 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
                   <p className="text-sm text-muted-foreground">
                     Drag and drop files here, or click to select files
                   </p>
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
+                  <Button
+                    variant="outline"
+                    size="sm"
                     className="mt-2"
                     onClick={handleFileSelect}
                   >

@@ -34,6 +34,7 @@ import { RegulationTimeline } from "@/components/regulations/regulation-timeline
 import { WebPublishDialog } from "@/components/regulations/web-publish-dialog";
 import { CommunicationDialog } from "@/components/regulations/communication-dialog";
 import { SubmissionWizard } from "@/components/regulations/submission-wizard";
+import { EvidenceFiles } from "@/components/regulations/evidence-files";
 
 interface AttestationActionProps {
   action: RegulationAction;
@@ -419,7 +420,7 @@ export default function RegulationDetailPage() {
                     </div>
                   </CardContent>
                 </Card>
-
+                <EvidenceFiles regulationId={Number(regulationId)} />
                 {nextDeadline && (
                   <Card>
                     <CardHeader>

@@ -230,6 +230,56 @@ export function registerRoutes(app: express.Application): Server {
     }
   });
 
+  // Add endpoint to update regulation category
+  app.patch("/api/regulations/:regulationId/category", async (req, res) => {
+    try {
+      if (!req.user) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized regulation update attempt");
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const { regulationId } = req.params;
+      const { category } = req.body;
+
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Updating category for regulation ${regulationId}`, {
+        newCategory: category
+      });
+
+      if (!category) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Invalid category update data received", { body: req.body });
+        return res.status(400).json({ error: "Category is required" });
+      }
+
+      try {
+        const regulation = await storage.updateRegulation(parseInt(regulationId), { category });
+
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Successfully updated regulation category", { 
+          regulationId,
+          newCategory: category 
+        });
+
+        return res.json(regulation);
+      } catch (dbError) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Database error updating regulation category", {
+          error: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+        return res.status(500).json({ 
+          error: "Database error updating regulation category",
+          details: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+      }
+    } catch (error) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to update regulation category", {
+        error: error instanceof Error ? error.message : String(error)
+      });
+      return res.status(500).json({ 
+        error: "Failed to update regulation category", 
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  // Add endpoint to fetch individual regulation by ID
   app.get("/api/regulations/:regulationId", async (req, res) => {
     try {
       if (!req.user) {
@@ -271,6 +321,31 @@ export function registerRoutes(app: express.Application): Server {
       });
       return res.status(500).json({ 
         error: "Failed to fetch regulation", 
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+  
+  // Add new route to get evidence files
+  app.get("/api/regulations/:regulationId/evidence", async (req, res) => {
+    try {
+      if (!req.user) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized evidence files access attempt");
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const { regulationId } = req.params;
+
+      const files = await storage.getEvidenceFilesByRegulation(parseInt(regulationId));
+
+      return res.json(files);
+    } catch (error) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Error fetching evidence files", {
+        error: error instanceof Error ? error.message : String(error)
+      });
+
+      return res.status(500).json({
+        error: "Failed to fetch evidence files",
         details: error instanceof Error ? error.message : String(error)
       });
     }
@@ -336,55 +411,6 @@ export function registerRoutes(app: express.Application): Server {
       error: 'Internal Server Error',
       message: err.message || 'An unexpected error occurred'
     });
-  });
-
-  // Add endpoint to update regulation category
-  app.patch("/api/regulations/:regulationId/category", async (req, res) => {
-    try {
-      if (!req.user) {
-        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized regulation update attempt");
-        return res.status(401).json({ error: "Authentication required" });
-      }
-
-      const { regulationId } = req.params;
-      const { category } = req.body;
-
-      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Updating category for regulation ${regulationId}`, {
-        newCategory: category
-      });
-
-      if (!category) {
-        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Invalid category update data received", { body: req.body });
-        return res.status(400).json({ error: "Category is required" });
-      }
-
-      try {
-        const regulation = await storage.updateRegulation(parseInt(regulationId), { category });
-
-        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Successfully updated regulation category", { 
-          regulationId,
-          newCategory: category 
-        });
-
-        return res.json(regulation);
-      } catch (dbError) {
-        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Database error updating regulation category", {
-          error: dbError instanceof Error ? dbError.message : String(dbError)
-        });
-        return res.status(500).json({ 
-          error: "Database error updating regulation category",
-          details: dbError instanceof Error ? dbError.message : String(dbError)
-        });
-      }
-    } catch (error) {
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to update regulation category", {
-        error: error instanceof Error ? error.message : String(error)
-      });
-      return res.status(500).json({ 
-        error: "Failed to update regulation category", 
-        details: error instanceof Error ? error.message : String(error)
-      });
-    }
   });
 
   // Add this endpoint after the category update endpoint
