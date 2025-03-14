@@ -33,6 +33,7 @@ import { RegulationChanges } from "@/components/regulations/regulation-changes";
 import { RegulationTimeline } from "@/components/regulations/regulation-timeline";
 import { WebPublishDialog } from "@/components/regulations/web-publish-dialog";
 import { CommunicationDialog } from "@/components/regulations/communication-dialog";
+import { SubmissionWizard } from "@/components/regulations/submission-wizard";
 
 interface AttestationActionProps {
   action: RegulationAction;
@@ -87,6 +88,7 @@ interface ActionButtonProps {
 function ActionButton({ action, regulationId, regulation, isAdmin, onRequiredChange, onStatusChange }: ActionButtonProps) {
   const [showWebPublishDialog, setShowWebPublishDialog] = useState(false);
   const [showCommunicationDialog, setShowCommunicationDialog] = useState(false);
+  const [showSubmissionWizard, setShowSubmissionWizard] = useState(false);
 
   const getIcon = () => {
     switch (action.type) {
@@ -114,7 +116,7 @@ function ActionButton({ action, regulationId, regulation, isAdmin, onRequiredCha
     } else if (action.type === 'community_communication') {
       setShowCommunicationDialog(true);
     } else if (action.type === 'agency_submission') {
-      // Will be connected to submission wizard in future
+      setShowSubmissionWizard(true);
       onStatusChange?.('in_progress');
     }
   };
@@ -202,6 +204,14 @@ function ActionButton({ action, regulationId, regulation, isAdmin, onRequiredCha
           regulation={regulation}
           open={showCommunicationDialog}
           onOpenChange={setShowCommunicationDialog}
+        />
+      )}
+
+      {action.type === 'agency_submission' && (
+        <SubmissionWizard
+          regulation={regulation}
+          open={showSubmissionWizard}
+          onOpenChange={setShowSubmissionWizard}
         />
       )}
     </>
