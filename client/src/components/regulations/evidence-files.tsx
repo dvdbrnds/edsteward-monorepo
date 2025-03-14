@@ -9,23 +9,62 @@ import {
 } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { FileText, Download } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 interface EvidenceFilesProps {
   regulationId: number;
 }
 
 export function EvidenceFiles({ regulationId }: EvidenceFilesProps) {
-  const { data: evidenceFiles } = useQuery({
+  const { toast } = useToast();
+  const { data: evidenceFiles, error, isLoading } = useQuery({
     queryKey: ['/api/regulations', regulationId, 'evidence'],
     queryFn: async () => {
-      const response = await fetch(`/api/regulations/${regulationId}/evidence`);
-      if (!response.ok) throw new Error('Failed to fetch evidence files');
-      return response.json();
+      try {
+        console.log('Fetching evidence files for regulation:', regulationId);
+        const response = await fetch(`/api/regulations/${regulationId}/evidence`);
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Failed to fetch evidence files');
+        }
+        const data = await response.json();
+        console.log('Evidence files data:', data);
+        return data;
+      } catch (err) {
+        console.error('Error fetching evidence files:', err);
+        toast({
+          title: "Error",
+          description: err instanceof Error ? err.message : "Failed to fetch evidence files",
+          variant: "destructive"
+        });
+        throw err;
+      }
     }
   });
 
+  if (isLoading) {
+    return <div>Loading evidence files...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="text-red-500">
+        Error loading evidence files: {error instanceof Error ? error.message : 'Unknown error'}
+      </div>
+    );
+  }
+
   if (!evidenceFiles?.length) {
-    return null;
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Evidence Files</CardTitle>
+          <CardDescription>
+            No evidence files uploaded yet
+          </CardDescription>
+        </CardHeader>
+      </Card>
+    );
   }
 
   return (
