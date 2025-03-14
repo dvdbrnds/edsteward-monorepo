@@ -94,12 +94,15 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
   });
 
   const handleStepChange = async (stepId: string) => {
+    // Only validate evidence form fields when moving to review
     if (currentStep === 'evidence' && stepId === 'review') {
       const isValid = await form.trigger(['documentTitle', 'description']);
-      if (!isValid) {
+      if (!isValid || uploadedFiles.length === 0) {
         toast({
-          title: "Form Validation",
-          description: "Please fill in all required fields for this step before proceeding.",
+          title: "Required Fields",
+          description: uploadedFiles.length === 0 
+            ? "Please upload at least one file before proceeding."
+            : "Please fill in the document title and description.",
           variant: "destructive",
         });
         return;
