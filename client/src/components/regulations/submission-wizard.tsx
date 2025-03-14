@@ -192,10 +192,15 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
   };
 
   const handleSubmit = async (values: EvidenceFormValues) => {
+    console.log('Submit handler called with values:', values);
+    console.log('Current uploaded files:', uploadedFiles);
+
     try {
       setIsSubmitting(true);
+      console.log('Starting submission process...');
 
       if (uploadedFiles.length === 0) {
+        console.log('No files uploaded, showing error');
         toast({
           title: "No Files",
           description: "Please upload at least one evidence file.",
@@ -207,16 +212,19 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
 
       // Create FormData for file upload
       const formData = new FormData();
+      console.log('Creating FormData...');
 
       // Add form values
       formData.append('data', JSON.stringify(values));
 
       // Add files
       uploadedFiles.forEach((uploadedFile, index) => {
+        console.log(`Adding file ${index + 1}:`, uploadedFile.file.name);
         formData.append('files', uploadedFile.file);
         formData.append(`description${index}`, uploadedFile.description);
       });
 
+      console.log('Sending request to server...');
       const response = await fetch(`/api/regulations/${regulation.id}/evidence`, {
         method: 'POST',
         body: formData,
@@ -227,6 +235,7 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
       }
 
       const result = await response.json();
+      console.log('Server response:', result);
 
       toast({
         title: "Evidence Submitted Successfully",
@@ -234,11 +243,13 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
       });
 
       // Clear form and close dialog
+      console.log('Clearing form and closing dialog...');
       setUploadedFiles([]);
       form.reset();
       queryClient.invalidateQueries(['/api/regulations', regulation.id, 'evidence']);
       onOpenChange(false);
     } catch (error) {
+      console.error('Submission error:', error);
       toast({
         title: "Submission Failed",
         description: "There was an error submitting your evidence. Please try again.",
@@ -419,6 +430,7 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
         );
 
       case 'review':
+        console.log('Rendering review step');
         return (
           <div className="space-y-4">
             <div className="prose max-w-none">
@@ -449,7 +461,10 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
               </div>
             </div>
             <Button
-              onClick={form.handleSubmit(handleSubmit)}
+              onClick={() => {
+                console.log('Submit button clicked');
+                form.handleSubmit(handleSubmit)();
+              }}
               className="w-full"
               disabled={isSubmitting}
             >
