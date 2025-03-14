@@ -466,8 +466,12 @@ export class DatabaseStorage implements IStorage {
     try {
       console.log(`Fetching evidence files for regulation ${regulationId}`);
       const files = await db
-        .select()
+        .select({
+          ...evidenceFiles,
+          uploaderName: users.username
+        })
         .from(evidenceFiles)
+        .leftJoin(users, eq(evidenceFiles.uploadedBy, users.id))
         .where(eq(evidenceFiles.regulationId, regulationId))
         .orderBy(desc(evidenceFiles.uploadedAt));
 
@@ -475,7 +479,7 @@ export class DatabaseStorage implements IStorage {
       return files;
     } catch (error) {
       console.error("Error fetching evidence files:", error);
-      throw error; // Let the route handler deal with the error
+      throw error;
     }
   }
 
