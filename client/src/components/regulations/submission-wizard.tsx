@@ -94,7 +94,6 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
   });
 
   const handleStepChange = async (stepId: string) => {
-    // Only validate evidence form fields when moving to review
     if (currentStep === 'evidence' && stepId === 'review') {
       const isValid = await form.trigger(['documentTitle', 'description']);
       if (!isValid || uploadedFiles.length === 0) {
@@ -147,7 +146,6 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
     handleFiles(files);
-    // Reset input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -155,7 +153,6 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
 
   const handleFiles = (files: File[]) => {
     for (const file of files) {
-      // Validate file type and size
       if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
         toast({
           title: "Invalid file type",
@@ -174,7 +171,6 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
         continue;
       }
 
-      // Add file to uploaded files list
       setUploadedFiles(prev => [...prev, { file, description: '' }]);
     }
   };
@@ -210,14 +206,11 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
         return;
       }
 
-      // Create FormData for file upload
       const formData = new FormData();
       console.log('Creating FormData...');
 
-      // Add form values
       formData.append('data', JSON.stringify(values));
 
-      // Add files
       uploadedFiles.forEach((uploadedFile, index) => {
         console.log(`Adding file ${index + 1}:`, uploadedFile.file.name);
         formData.append('files', uploadedFile.file);
@@ -242,7 +235,6 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
         description: `${uploadedFiles.length} files uploaded successfully.`,
       });
 
-      // Clear form and close dialog
       console.log('Clearing form and closing dialog...');
       setUploadedFiles([]);
       form.reset();
@@ -352,7 +344,6 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
                 )}
               />
 
-              {/* File Upload Section */}
               <div className="space-y-4">
                 <Label>Evidence Files</Label>
                 <input
@@ -385,7 +376,6 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
                   </Button>
                 </div>
 
-                {/* Uploaded Files List */}
                 {uploadedFiles.length > 0 && (
                   <div className="space-y-2">
                     {uploadedFiles.map((uploadedFile, index) => (
@@ -432,55 +422,54 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
       case 'review':
         console.log('Rendering review step');
         return (
-          <div className="space-y-4">
-            <div className="prose max-w-none">
-              <h3>Review Submission</h3>
-              <div className="bg-muted p-4 rounded-md space-y-4">
-                <div>
-                  <h4 className="text-sm font-medium">Document Information</h4>
-                  <p className="text-sm">{form.getValues('documentTitle')}</p>
-                  <p className="text-sm">{form.getValues('description')}</p>
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium">Evidence Files</h4>
-                  {uploadedFiles.map((file, index) => (
-                    <div key={index} className="text-sm">
-                      <p className="font-medium">{file.file.name}</p>
-                      <p className="text-muted-foreground">{file.description}</p>
-                    </div>
-                  ))}
-                </div>
-                <div>
-                  <h4 className="text-sm font-medium">Contact Information</h4>
-                  <p className="text-sm">{form.getValues('contact.name')}</p>
-                  <p className="text-sm">{form.getValues('contact.email')}</p>
-                  {form.getValues('contact.phone') && (
-                    <p className="text-sm">{form.getValues('contact.phone')}</p>
-                  )}
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+              <div className="prose max-w-none">
+                <h3>Review Submission</h3>
+                <div className="bg-muted p-4 rounded-md space-y-4">
+                  <div>
+                    <h4 className="text-sm font-medium">Document Information</h4>
+                    <p className="text-sm">{form.getValues('documentTitle')}</p>
+                    <p className="text-sm">{form.getValues('description')}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium">Evidence Files</h4>
+                    {uploadedFiles.map((file, index) => (
+                      <div key={index} className="text-sm">
+                        <p className="font-medium">{file.file.name}</p>
+                        <p className="text-muted-foreground">{file.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium">Contact Information</h4>
+                    <p className="text-sm">{form.getValues('contact.name')}</p>
+                    <p className="text-sm">{form.getValues('contact.email')}</p>
+                    {form.getValues('contact.phone') && (
+                      <p className="text-sm">{form.getValues('contact.phone')}</p>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-            <Button
-              onClick={() => {
-                console.log('Submit button clicked');
-                form.handleSubmit(handleSubmit)();
-              }}
-              className="w-full"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Submitting...
-                </>
-              ) : (
-                <>
-                  Submit Evidence
-                  <Check className="h-4 w-4 ml-2" />
-                </>
-              )}
-            </Button>
-          </div>
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    Submit Evidence
+                    <Check className="h-4 w-4 ml-2" />
+                  </>
+                )}
+              </Button>
+            </form>
+          </Form>
         );
     }
   };
@@ -496,7 +485,6 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
         </DialogHeader>
 
         <div className="flex gap-8">
-          {/* Steps sidebar */}
           <div className="w-48 shrink-0">
             <div className="space-y-1">
               {steps.map((step) => (
@@ -515,7 +503,6 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
             </div>
           </div>
 
-          {/* Main content area */}
           <div className="flex-1">
             <ScrollArea className="h-[500px]">
               {renderStepContent()}

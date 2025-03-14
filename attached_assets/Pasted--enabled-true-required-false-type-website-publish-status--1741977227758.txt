@@ -1,0 +1,150 @@
+      enabled: true,
+      required: false
+    },
+    {
+      type: 'website_publish',
+      status: 'in_progress',
+      enabled: true,
+      required: false
+    },
+    {
+      type: 'community_communication',
+      status: 'in_progress',
+      enabled: true,
+      required: false
+    },
+    {
+      type: 'agency_submission',
+      status: 'in_progress',
+      enabled: true,
+      required: false
+    }
+  ]
+}
+Updated regulation: {
+  id: 4850,
+  itemId: 'PA-paDeptEd-1741813075521',
+  name: 'default',
+  topic: 'Higher Education',
+  statute: '',
+  statuteIds: null,
+  summary: 'School Guidance and Resources\n' +
+    'Office of Elementary and Secondary Education (OESE) Annual Calendar\n' +
+    'Office of Elementary and Secondary Education (OESE) Contacts\n' +
+    'School Services Office\n' +
+    'The School Services Office serves as a central point of inquiry for advice and assistance to school administrators regarding school law, regulations, and related programs, services, and policies. The office also responds to parent inquiries and handles student enrollment complaints.\n' +
+    'Topics we frequently address in ad',
+  requirements: 'School Guidance and Resources\n' +
+    'Office of Elementary and Secondary Education (OESE) Annual Calendar\n' +
+    'Office of Elementary and Secondary Education (OESE) Contacts\n' +
+    'School Services Office\n' +
+    'The School Services Office serves as a central point of inquiry for advice and assistance to school administrators regarding school law, regulations, and related programs, services, and policies. The office also responds to parent inquiries and handles student enrollment complaints.\n' +
+    'Topics we frequently address in addition to those that appear below include: non-weather related emergency school closings, grievance procedures, teacher work stoppages, ward of state determination, Commissions (for superintendents, assistants, and IU executive directors), compulsory attendance, and truancy elimination.\n' +
+    'Allegations of Curriculum Deficiencies\n' +
+    'Clearances/Background Checks\n' +
+    'Child Labor Law\n' +
+    'Flexible Instructional Days (FID)\n' +
+    'Home Education and Private Tutoring\n' +
+    'Homebound Instruction\n' +
+    'Interscholastic Athletic Opportunity Disclosure\n' +
+    'Opportunity Scholarship Tax Credit Program (OSTCP)\n' +
+    'School Reconfigurations\n' +
+    'Basic Education Circulars (BECs)\n' +
+    'Enrollment of Students\n' +
+    'Instructional Time\n' +
+    'Military Access to Secondary Students\n' +
+    'All BECs Listing\n' +
+    'Contact Us\n' +
+    'Background Checks: 717-783-3750 or ra-PDE-SchoolService@pa.gov\n' +
+    'All other questions: 717-787-4860\n' +
+    'COVID-19 Resources for School Communities\n' +
+    'Coronavirus (COVID-19) mitigation ​efforts have required school communities to work within changing, complex circumstances and unprecedented situations. The Pennsylvania Department of Education is committed to offering guidance and resources to support and help protect school communities during this pandemic.\n' +
+    'COVID-19 Inquiry Contact\n' +
+    'Resources for Pre-K to 12 Schools\n' +
+    'Roadmap for Education Leaders\n' +
+    'Accelerated Learning\n' +
+    'School Age Child Care Programs\n' +
+    'Health and Safety Plans\n' +
+    'State Mandated Training Timeline\n' +
+    'Resources for Postsecondary and Adult Education\n' +
+    "Access a list of county an​d municipal health department websites in Pennsylvania, compiled and housed on the Pennsylvania Department of Health's website.\n" +
+    'COVID-19 Vaccine Challenge\n' +
+    "Governor's Emergency Education Relief Funds (GEER)\n" +
+    "Information on the distribution of Governor's Emergency Education Relief (GEER) Funds to schools in Pennsylvania during COVID-19.\n" +
+    'Learn more about GEER Funds\n' +
+    'Elementary and Secondary School Emergency Relief (ESSER) Funds\n' +
+    'Information on the distribution of Elementary and Secondary School Emergency Relief (ESSER) Funds to schools in Pennsylvania during COVID-19.\n' +
+    'More information about ESSER Funding',
+  category: 'Academic Programs',
+  jurisdiction: 'state',
+  stateCode: 'PA',
+  stateAgency: 'paDeptEd',
+  isApplicable: true,
+  originationDate: null,
+  effectiveDate: null,
+  lastUpdated: 2025-03-14T18:33:10.508Z,
+  lastVerified: 2025-03-12T21:16:50.304Z,
+  nextReviewDate: null,
+  versionNumber: 3,
+  previousVersionId: 4850,
+  versionDate: 2025-03-12T20:57:55.409Z,
+  changeSummary: null,
+  isCurrent: true,
+  versionMetadata: null,
+  filingDeadlines: null,
+  reportingFrequency: null,
+  agency_url: 'https://www.education.pa.gov/Teachers%20-%20Administrators/School%20Services/Pages/default.aspx',
+  agency_name: 'paDeptEd',
+  agency_contact: null,
+  agency_department: 'paDeptEd',
+  regulationUrl: 'https://www.education.pa.gov/Teachers%20-%20Administrators/School%20Services/Pages/default.aspx',
+  requirementsUrl: null,
+  submissionGuideUrl: null,
+  formsUrl: null,
+  submissionGuidelines: null,
+  regulationText: null,
+  applicableforms: null,
+  relatedRegulations: null,
+  complianceNotes: null,
+  verificationMethod: null,
+  notificationSchedule: null,
+  sources: [
+    {
+      url: 'https://www.education.pa.gov/Teachers%20-%20Administrators/School%20Services/Pages/default.aspx',
+      type: 'web-scrape',
+      lastChecked: '2025-03-12T21:16:50.304Z'
+    }
+  ],
+  actions: [
+    {
+      type: 'attestation',
+      status: 'completed',
+      enabled: true,
+      required: false
+    },
+    {
+      type: 'website_publish',
+      status: 'in_progress',
+      enabled: true,
+      required: false
+    },
+    {
+      type: 'community_communication',
+      status: 'in_progress',
+      enabled: true,
+      required: false
+    },
+    {
+      type: 'agency_submission',
+      status: 'in_progress',
+      enabled: true,
+      required: false
+    }
+  ]
+}
+2025-03-14T18:33:10.590Z [INFO] Successfully updated regulation action
+6:33:10 PM [express] PATCH /api/regulations/4850/actions/agency_submission 200 in 386ms :: {"id":485…
+Looking up regulation with ID: 4850
+2025-03-14T18:33:10.918Z [INFO] Fetching regulation with ID: 4850
+2025-03-14T18:33:11.064Z [INFO] Found regulation: default
+6:33:11 PM [express] GET /api/regulations/4850 200 in 295ms :: {"id":4850,"itemId":"PA-paDeptEd-1741…
