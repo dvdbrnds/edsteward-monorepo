@@ -26,6 +26,7 @@ import * as z from "zod";
 import { Check, ChevronRight, FileText, Upload, X, Loader2 } from "lucide-react";
 import type { Regulation } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface SubmissionWizardProps {
   regulation: Regulation;
@@ -74,6 +75,7 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const form = useForm<EvidenceFormValues>({
     resolver: zodResolver(evidenceFormSchema),
@@ -91,6 +93,18 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
   });
 
   const handleStepChange = (stepId: string) => {
+    if (currentStep === 'evidence' && stepId === 'review') {
+      // Validate form before allowing to proceed to review
+      form.trigger(['documentTitle', 'description', 'contact.name', 'contact.email']);
+      if (!form.formState.isValid) {
+        toast({
+          title: "Form Validation",
+          description: "Please fill in all required fields before proceeding.",
+          variant: "destructive",
+        });
+        return;
+      }
+    }
     setCurrentStep(stepId);
   };
 
@@ -148,6 +162,16 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
     try {
       setIsSubmitting(true);
 
+      if (uploadedFiles.length === 0) {
+        toast({
+          title: "No Files",
+          description: "Please upload at least one evidence file.",
+          variant: "destructive",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
       // Create FormData for file upload
       const formData = new FormData();
 
@@ -179,6 +203,7 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
       // Clear form and close dialog
       setUploadedFiles([]);
       form.reset();
+      queryClient.invalidateQueries(['/api/regulations', regulation.id, 'evidence']);
       onOpenChange(false);
     } catch (error) {
       toast({
