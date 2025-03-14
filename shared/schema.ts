@@ -24,6 +24,17 @@ export interface RegulationVersion {
   };
 }
 
+// Add after RegulationVersion interface
+export interface RegulationAction {
+  type: 'attestation' | 'website_publish' | 'community_communication' | 'agency_submission';
+  enabled: boolean;
+  required: boolean;
+  dueDate?: Date;
+  completedDate?: Date;
+  status: 'pending' | 'in_progress' | 'completed';
+  notes?: string;
+}
+
 // Users table
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -70,6 +81,20 @@ export const notes = pgTable("notes", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// Add after the notes table definition
+export const evidenceFiles = pgTable("evidence_files", {
+  id: serial("id").primaryKey(),
+  regulationId: integer("regulation_id").notNull(),
+  fileName: text("file_name").notNull(),
+  fileSize: integer("file_size").notNull(),
+  fileType: text("file_type").notNull(),
+  description: text("description"),
+  uploadedBy: integer("uploaded_by").notNull(),
+  uploadedAt: timestamp("uploaded_at").notNull().defaultNow(),
+  status: text("status").notNull().default("pending"),
+  storagePath: text("storage_path").notNull(),
+});
+
 // Update the regulations table definition to include PA-specific fields
 export const regulations = pgTable("regulations", {
   id: serial("id").primaryKey(),
@@ -97,7 +122,6 @@ export const regulations = pgTable("regulations", {
   changeSummary: text("change_summary"),
   isCurrent: boolean("is_current").notNull().default(true),
   versionMetadata: jsonb("version_metadata").$type<RegulationVersion>(),
-  // Existing fields continue...
   filingDeadlines: jsonb("filing_deadlines").$type<{
     type: string;
     date: string;
@@ -126,6 +150,7 @@ export const regulations = pgTable("regulations", {
     finalDayReminders: boolean;
   }>(),
   sources: jsonb("sources").$type<RegulationSource[]>(),
+  actions: jsonb("actions").$type<RegulationAction>()
 });
 
 // Notifications table
@@ -225,6 +250,40 @@ export const insertRegulationSchema = createInsertSchema(regulations).extend({
     title: z.string().optional(),
     lastChecked: z.date().optional()
   })).optional().nullable(),
+  actions: z.array(z.object({
+    type: z.enum(['attestation', 'website_publish', 'community_communication', 'agency_submission']),
+    enabled: z.boolean().default(true),
+    required: z.boolean().default(false),
+    dueDate: z.date().optional(),
+    completedDate: z.date().optional(),
+    status: z.enum(['pending', 'in_progress', 'completed']).default('pending'),
+    notes: z.string().optional()
+  })).default([
+    {
+      type: 'attestation',
+      enabled: true,
+      required: false,
+      status: 'pending'
+    },
+    {
+      type: 'website_publish',
+      enabled: true,
+      required: false,
+      status: 'pending'
+    },
+    {
+      type: 'community_communication',
+      enabled: true,
+      required: false,
+      status: 'pending'
+    },
+    {
+      type: 'agency_submission',
+      enabled: true,
+      required: false,
+      status: 'pending'
+    }
+  ])
 });
 
 // Schema for inserting notifications
@@ -243,6 +302,9 @@ export const insertGuideSchema = createInsertSchema(guides).extend({
   content: z.string().min(1, "Guide content cannot be empty"),
   category: z.enum(["submission", "compliance", "general"]),
 });
+
+// Add after other insert schemas
+export const insertEvidenceFileSchema = createInsertSchema(evidenceFiles);
 
 // Email Configuration table
 export const emailConfigs = pgTable("email_configs", {
@@ -413,6 +475,8 @@ export type TwilioConfig = typeof twilioConfigs.$inferSelect;
 export type InsertTwilioConfig = z.infer<typeof insertTwilioConfigSchema>;
 export type Note = typeof notes.$inferSelect;
 export type InsertNote = z.infer<typeof insertNoteSchema>;
+export type EvidenceFile = typeof evidenceFiles.$inferSelect;
+export type InsertEvidenceFile = z.infer<typeof insertEvidenceFileSchema>;
 
 // Add after the existing tables
 // System Logs table according to RFC 5424 syslog standard

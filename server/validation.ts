@@ -30,6 +30,7 @@
  * 3. Reference Integrity
  *    - Missing statute IDs
  *    - Incomplete agency information
+ * 
  */
 
 import { z } from "zod";
@@ -301,6 +302,75 @@ export class RegulationValidator {
     return errors;
   }
 
+  private determineRequiredActions(regulation: Regulation): ValidationError[] {
+    const errors: ValidationError[] = [];
+    const requiresAttestation = regulation.requirements?.toLowerCase().includes('attestation') ||
+                              regulation.requirements?.toLowerCase().includes('certify') ||
+                              regulation.requirements?.toLowerCase().includes('verify');
+
+    const requiresWebPublish = regulation.requirements?.toLowerCase().includes('publish') ||
+                             regulation.requirements?.toLowerCase().includes('public notice') ||
+                             regulation.requirements?.toLowerCase().includes('make available');
+
+    const requiresCommunication = regulation.requirements?.toLowerCase().includes('notify') ||
+                                regulation.requirements?.toLowerCase().includes('inform') ||
+                                regulation.requirements?.toLowerCase().includes('communicate');
+
+    const requiresSubmission = regulation.requirements?.toLowerCase().includes('submit') ||
+                             regulation.requirements?.toLowerCase().includes('file') ||
+                             regulation.requirements?.toLowerCase().includes('report');
+
+    // Initialize actions array if it doesn't exist
+    if (!regulation.actions) {
+      errors.push({
+        regulationId: regulation.itemId,
+        field: 'actions',
+        error: 'Actions configuration is missing',
+        value: null,
+        severity: 'warning',
+        category: 'content',
+        priority: 2
+      });
+      return errors;
+    }
+
+    // Validate each action type
+    const actionTypes = ['attestation', 'website_publish', 'community_communication', 'agency_submission'] as const;
+    const requirements = {
+      attestation: requiresAttestation,
+      website_publish: requiresWebPublish,
+      community_communication: requiresCommunication,
+      agency_submission: requiresSubmission
+    };
+
+    actionTypes.forEach(type => {
+      const action = regulation.actions?.find(a => a.type === type);
+      if (!action) {
+        errors.push({
+          regulationId: regulation.itemId,
+          field: 'actions',
+          error: `Missing ${type} action configuration`,
+          value: null,
+          severity: 'warning',
+          category: 'content',
+          priority: 2
+        });
+      } else if (requirements[type] && !action.required) {
+        errors.push({
+          regulationId: regulation.itemId,
+          field: `actions.${type}`,
+          error: `${type} appears to be required based on regulation text`,
+          value: action,
+          severity: 'warning',
+          category: 'content',
+          priority: 3
+        });
+      }
+    });
+
+    return errors;
+  }
+
   public validateRegulation(regulation: Regulation): ValidationError[] {
     console.log(`Starting validation for regulation ${regulation.itemId}`);
     const errors = [
@@ -309,7 +379,8 @@ export class RegulationValidator {
       ...this.validateRequiredFields(regulation),
       ...this.validateSourceVerification(regulation),
       ...this.validateRequiredContent(regulation),
-      ...this.validateContent(regulation)
+      ...this.validateContent(regulation),
+      ...this.determineRequiredActions(regulation)
     ];
 
     // Sort errors by priority
