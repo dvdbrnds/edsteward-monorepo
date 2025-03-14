@@ -247,33 +247,124 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
     switch (currentStep) {
       case 'info':
         return (
-          <div className="space-y-4">
-            <div className="prose max-w-none">
-              <h3>Submit Evidence for {regulation.name}</h3>
-              <p>
-                This wizard will guide you through the process of submitting evidence
-                for compliance with regulation requirements.
-              </p>
-              <div className="bg-muted p-4 rounded-md">
-                <h4 className="text-sm font-medium">Submission Requirements</h4>
-                <ul className="mt-2 text-sm">
-                  <li>All required documents must be in PDF format</li>
-                  <li>Maximum file size: 10MB per document</li>
-                  <li>Evidence must be dated within the current reporting period</li>
-                  <li>Contact information must be current and verified</li>
-                </ul>
-              </div>
-            </div>
-            <Button
-              onClick={() => handleStepChange('requirements')}
-              className="w-full mt-4"
-            >
-              Begin Submission Process
-              <ChevronRight className="h-4 w-4 ml-2" />
-            </Button>
-          </div>
-        );
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+              <div className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="documentTitle"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Document Title</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Enter document title" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Describe the contents and relevance of this document"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {/* File upload section */}
+                <div className="space-y-4">
+                  <Label>Evidence Files</Label>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    className="hidden"
+                    onChange={handleFileUpload}
+                    accept={ACCEPTED_FILE_TYPES.join(',')}
+                    multiple
+                  />
+
+                  <div
+                    ref={dropZoneRef}
+                    className="border-2 border-dashed rounded-md p-6 text-center transition-colors"
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                  >
+                    <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                    <p className="text-sm text-muted-foreground">
+                      Drag and drop files here, or click to select files
+                    </p>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="mt-2"
+                      onClick={handleFileSelect}
+                    >
+                      <FileText className="h-4 w-4 mr-2" />
+                      Select Files
+                    </Button>
+                  </div>
+
+                  {uploadedFiles.length > 0 && (
+                    <div className="space-y-2">
+                      {uploadedFiles.map((uploadedFile, index) => (
+                        <div key={index} className="flex items-start gap-2 bg-muted p-2 rounded-md">
+                          <FileText className="h-5 w-5 mt-1 shrink-0" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm font-medium truncate">
+                              {uploadedFile.file.name}
+                            </p>
+                            <input
+                              type="text"
+                              placeholder="Add a description for this file..."
+                              className="mt-1 w-full text-sm bg-transparent border-0 border-b border-input focus:ring-0"
+                              value={uploadedFile.description}
+                              onChange={(e) => handleFileDescriptionChange(index, e.target.value)}
+                            />
+                          </div>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleFileRemove(index)}
+                            className="shrink-0"
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Submitting...
+                  </>
+                ) : (
+                  <>
+                    Submit Evidence
+                    <Check className="h-4 w-4 ml-2" />
+                  </>
+                )}
+              </Button>
+            </form>
+          </Form>
+        );
       case 'requirements':
         return (
           <div className="space-y-4">
@@ -299,7 +390,6 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
             </Button>
           </div>
         );
-
       case 'evidence':
         return (
           <Form {...form}>
@@ -411,7 +501,6 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
             </form>
           </Form>
         );
-
       case 'review':
         return (
           <Form {...form}>
@@ -463,6 +552,8 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
             </form>
           </Form>
         );
+      default:
+        return <div>Step content for {currentStep}</div>;
     }
   };
 
