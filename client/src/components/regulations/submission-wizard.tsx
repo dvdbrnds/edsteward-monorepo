@@ -74,6 +74,7 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const dropZoneRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -108,41 +109,71 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
     setCurrentStep(stepId);
   };
 
-  const handleFileSelect = () => {
+  const handleFileSelect = (event: React.MouseEvent) => {
+    event.preventDefault();
     fileInputRef.current?.click();
   };
 
+  const handleDragOver = (event: React.DragEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (dropZoneRef.current) {
+      dropZoneRef.current.classList.add('border-primary');
+    }
+  };
+
+  const handleDragLeave = (event: React.DragEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+    if (dropZoneRef.current) {
+      dropZoneRef.current.classList.remove('border-primary');
+    }
+  };
+
+  const handleDrop = (event: React.DragEvent) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    if (dropZoneRef.current) {
+      dropZoneRef.current.classList.remove('border-primary');
+    }
+
+    const files = Array.from(event.dataTransfer.files);
+    handleFiles(files);
+  };
+
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (!files?.length) return;
-
-    const file = files[0];
-
-    // Validate file type and size
-    if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
-      toast({
-        title: "Invalid file type",
-        description: "Please upload a PDF, Word document, or image file.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    if (file.size > MAX_FILE_SIZE) {
-      toast({
-        title: "File too large",
-        description: "Files must be smaller than 10MB.",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    // Add file to uploaded files list
-    setUploadedFiles(prev => [...prev, { file, description: '' }]);
-
+    const files = Array.from(event.target.files || []);
+    handleFiles(files);
     // Reset input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
+    }
+  };
+
+  const handleFiles = (files: File[]) => {
+    for (const file of files) {
+      // Validate file type and size
+      if (!ACCEPTED_FILE_TYPES.includes(file.type)) {
+        toast({
+          title: "Invalid file type",
+          description: "Please upload a PDF, Word document, or image file.",
+          variant: "destructive",
+        });
+        continue;
+      }
+
+      if (file.size > MAX_FILE_SIZE) {
+        toast({
+          title: "File too large",
+          description: "Files must be smaller than 10MB.",
+          variant: "destructive",
+        });
+        continue;
+      }
+
+      // Add file to uploaded files list
+      setUploadedFiles(prev => [...prev, { file, description: '' }]);
     }
   };
 
@@ -319,7 +350,13 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
                   accept={ACCEPTED_FILE_TYPES.join(',')}
                 />
 
-                <div className="border-2 border-dashed rounded-md p-6 text-center">
+                <div
+                  ref={dropZoneRef}
+                  className="border-2 border-dashed rounded-md p-6 text-center transition-colors"
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                >
                   <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
                   <p className="text-sm text-muted-foreground">
                     Drag and drop files here, or click to select files
