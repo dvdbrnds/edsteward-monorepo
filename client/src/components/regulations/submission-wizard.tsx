@@ -382,6 +382,7 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
             <Button
               onClick={form.handleSubmit(handleSubmit)}
               className="w-full"
+              type="submit"
             >
               Submit Evidence
               <Check className="h-4 w-4 ml-2" />
