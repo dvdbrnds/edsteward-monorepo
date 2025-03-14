@@ -1,7 +1,7 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
-import type { Regulation, Deadline, InsertDeadline, RegulationAction } from "@shared/schema";
+import type { Regulation, Deadline, InsertDeadline } from "@shared/schema";
 import { useLocation } from "wouter";
-import { Search, ExternalLink, CheckCircle, AlertCircle, Clock, Loader2, ArrowUpDown, Check, Globe, Mail, FileText } from "lucide-react";
+import { Search, ExternalLink, CheckCircle, AlertCircle, Clock, Loader2, ArrowUpDown } from "lucide-react";
 import { differenceInDays, format } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,15 @@ import {
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import DeadlineForm from "./deadline-form";
 import { Button } from "@/components/ui/button";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 
@@ -52,6 +61,94 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
 
   const isAdmin = user?.role === "admin";
 
+  const createDeadlineMutation = useMutation({
+    mutationFn: async (deadline: InsertDeadline) => {
+      console.log('Creating deadline with data:', deadline);
+      try {
+        const requestBody = {
+          regulationId: deadline.regulationId,
+          dueDate: deadline.dueDate,
+          status: deadline.status,
+          assignedTo: deadline.assignedTo || 1
+        };
+
+        console.log('Sending request with body:', JSON.stringify(requestBody));
+
+        const response = await fetch('/api/deadlines', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestBody),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => null);
+          console.error('Server error response:', errorData);
+          throw new Error(errorData?.message || `Failed to create deadline: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        console.log('Server response:', result);
+        return result;
+      } catch (error) {
+        console.error('Error in createDeadlineMutation:', error);
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/deadlines"] });
+      toast({
+        title: "Success",
+        description: "Deadline added successfully",
+      });
+    },
+    onError: (error: Error) => {
+      console.error("Error creating deadline:", error);
+      toast({
+        title: "Error",
+        description: `Failed to add deadline: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateDeadlineMutation = useMutation({
+    mutationFn: async ({ id, data }: { id: number; data: Partial<InsertDeadline> }) => {
+      try {
+        const response = await apiRequest(`/api/deadlines/${id}`, {
+          method: "PATCH",
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        });
+        if (!response.ok) {
+          throw new Error(`Failed to update deadline: ${response.statusText}`);
+        }
+        return response.json();
+      } catch (error) {
+        console.error('Error in updateDeadlineMutation:', error);
+        throw error;
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/deadlines"] });
+      toast({
+        title: "Success",
+        description: "Deadline updated successfully",
+      });
+    },
+    onError: (error: Error) => {
+      console.error("Error updating deadline:", error);
+      toast({
+        title: "Error",
+        description: `Failed to update deadline: ${error.message}`,
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleRowClick = (regulation: Regulation) => {
     if (regulation && regulation.id) {
       navigate(`/regulations/${regulation.id}`);
@@ -85,6 +182,14 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
   }
 
   const filteredRegulations = regulations.filter((reg: Regulation) => {
+    // Add logging to debug jurisdiction values
+    console.log('Regulation:', {
+      id: reg.id,
+      name: reg.name,
+      jurisdiction: reg.jurisdiction,
+      stateCode: reg.stateCode
+    });
+
     if (categoryFilter && reg.category !== categoryFilter) {
       return false;
     }
@@ -127,36 +232,6 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
       }
       return null;
     });
-  };
-
-  const getActionIcon = (type: string) => {
-    switch (type) {
-      case 'attestation':
-        return <Check className="h-4 w-4" />;
-      case 'website_publish':
-        return <Globe className="h-4 w-4" />;
-      case 'community_communication':
-        return <Mail className="h-4 w-4" />;
-      case 'agency_submission':
-        return <FileText className="h-4 w-4" />;
-      default:
-        return null;
-    }
-  };
-
-  const getActionStatus = (action: RegulationAction) => {
-    if (!action.enabled) return 'text-gray-300';
-    if (action.type === 'attestation' && action.status === 'completed') return 'text-green-500';
-    if (action.required) return 'text-red-500';
-
-    switch (action.status) {
-      case 'completed':
-        return 'text-green-500';
-      case 'in_progress':
-        return 'text-yellow-500';
-      default:
-        return 'text-gray-400';
-    }
   };
 
   return (
@@ -204,7 +279,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                   </div>
                 </TableHead>
                 <TableHead>Next Deadline</TableHead>
-                <TableHead>Actions</TableHead>
+                {isAdmin && <TableHead>Actions</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -269,19 +344,31 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                         <span className="text-gray-500">No deadlines</span>
                       )}
                     </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        {regulation.actions?.map(action => (
-                          <div
-                            key={action.type}
-                            className={`flex items-center gap-1 ${getActionStatus(action)}`}
-                            title={`${action.type.replace('_', ' ')} - ${action.status}`}
-                          >
-                            {getActionIcon(action.type)}
-                          </div>
-                        ))}
-                      </div>
-                    </TableCell>
+                    {isAdmin && (
+                      <TableCell onClick={(e) => e.stopPropagation()}>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="outline" size="sm">
+                              Add Deadline
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Add Deadline</DialogTitle>
+                              <DialogDescription>
+                                Add a new deadline for {regulation.name || regulation.statute || 'this regulation'}
+                              </DialogDescription>
+                            </DialogHeader>
+                            <DeadlineForm
+                              regulationId={regulation.id}
+                              onSubmit={(data) => {
+                                createDeadlineMutation.mutate(data);
+                              }}
+                            />
+                          </DialogContent>
+                        </Dialog>
+                      </TableCell>
+                    )}
                   </TableRow>
                 );
               })}

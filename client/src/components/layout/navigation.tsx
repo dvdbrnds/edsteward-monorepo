@@ -48,17 +48,6 @@ import moravianLogo from "@/assets/Screenshot_2025-02-12_at_9.15.57_AM-removebg-
  */
 const CHANGELOG = [
   {
-    version: "0.2.7",
-    date: "March 12, 2025",
-    changes: [
-      "Enhanced PA regulation collector with improved error handling",
-      "Implemented skip mechanism for problematic regulations",
-      "Added detailed debug logging for database operations",
-      "Optimized database connection management with automatic recovery",
-      "Improved regulation content validation and extraction"
-    ],
-  },
-  {
     version: "0.2.6",
     date: "March 12, 2025",
     changes: [
@@ -295,7 +284,7 @@ export default function Navigation() {
                         setChangelogOpen(true);
                       }}
                     >
-                      Alpha v0.2.7
+                      Alpha v0.2.6
                     </button>
                   </DialogTrigger>
                   <DialogContent className="max-h-[80vh] overflow-y-auto">

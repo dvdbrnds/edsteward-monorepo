@@ -15,7 +15,7 @@ import { AlertCircle, Download, Loader2, RefreshCw } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import Navigation from "@/components/layout/navigation";
 import { apiRequest } from "@/lib/api";
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { format } from "date-fns";
 import {
   Table,
@@ -89,7 +89,7 @@ type TwilioFormValues = z.infer<typeof insertTwilioConfigSchema>;
 export default function SystemSettingsPage() {
   const { user } = useAuth();
   const { toast } = useToast();
-  const queryClient = useQueryClient();
+  const [notifications, setNotifications] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState("email");
   const [notificationEnabled, setNotificationEnabled] = useState(false);
   const [search, setSearch] = useState("");
@@ -101,7 +101,6 @@ export default function SystemSettingsPage() {
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [logs, setLogs] = useState<any[]>([]);
   const refreshInterval = 10000; // 10 seconds
-
 
   const form = useForm<FormValues>({
     resolver: zodResolver(insertEmailConfigSchema),
@@ -253,7 +252,7 @@ export default function SystemSettingsPage() {
     }
   };
 
-  const { data: logData, isLoading: logIsLoading, error: logError, refetch: refetchLogs } = useQuery({
+  const { data, isLoading, error, refetch } = useQuery({
     queryKey: ["/api/admin/logs", { search, level, facility, startDate, endDate, page }],
     queryFn: async () => {
       const params = new URLSearchParams();
@@ -276,19 +275,19 @@ export default function SystemSettingsPage() {
   useEffect(() => {
     if (autoRefresh) {
       const intervalId = setInterval(() => {
-        refetchLogs();
+        refetch();
       }, refreshInterval);
       return () => clearInterval(intervalId);
     }
-  }, [autoRefresh, refetchLogs]);
+  }, [autoRefresh, refetch]);
 
   const downloadCSV = () => {
-    if (!logData?.logs) return;
+    if (!data?.logs) return;
 
     const headers = ["Timestamp", "Username", "Level", "Facility", "Message", "IP Address", "User Agent"];
     const csvContent = [
       headers.join(","),
-      ...logData.logs.map((log: any) => {
+      ...data.logs.map((log: any) => {
         return [
           format(new Date(log.timestamp), "MMM d, yyyy HH:mm:ss"),
           log.username || 'system',
@@ -312,80 +311,6 @@ export default function SystemSettingsPage() {
     document.body.removeChild(link);
   };
 
-  const { mutate: updateUser, isPending: isUpdatingUser } = useMutation({
-    mutationFn: async (data: {id: number; role: string; department: string}) => {
-      const response = await fetch('/api/admin/update-user', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      });
-      if (!response.ok) {
-        throw new Error('Failed to update user');
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
-      toast({
-        title: 'Success',
-        description: 'User updated successfully'
-      });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive'
-      });
-    }
-  });
-
-  const { mutate: resetPassword, isPending: isResettingPassword } = useMutation({
-    mutationFn: async (id: number) => {
-      const response = await fetch('/api/admin/reset-password', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ id })
-      });
-      if (!response.ok) {
-        throw new Error('Failed to reset password');
-      }
-      const data = await response.json();
-      return data;
-    },
-    onSuccess: (data) => {
-      toast({
-        title: 'Password Reset Successful',
-        description: `Temporary password: ${data.temporaryPassword}`
-      });
-      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: 'Error',
-        description: error.message,
-        variant: 'destructive'
-      });
-    }
-  });
-
-  const { data: users = [], isLoading: usersLoading } = useQuery({
-    queryKey: ['/api/admin/users'],
-    queryFn: async () => {
-      const response = await fetch('/api/admin/users');
-      if (!response.ok) {
-        throw new Error('Failed to fetch users');
-      }
-      return response.json();
-    },
-    enabled: user?.role === 'admin' && activeTab === 'users'
-  });
-
-
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
@@ -395,11 +320,10 @@ export default function SystemSettingsPage() {
           <h1 className="text-3xl font-bold text-gray-900 mb-8">System Settings</h1>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-6 mb-4">
+            <TabsList className="grid grid-cols-5 mb-4">
               <TabsTrigger value="email">Email</TabsTrigger>
               <TabsTrigger value="sms">SMS</TabsTrigger>
               <TabsTrigger value="notifications">Notifications</TabsTrigger>
-              <TabsTrigger value="users">Users</TabsTrigger>
               <TabsTrigger value="logs">System Logs</TabsTrigger>
               <TabsTrigger value="debug">Debug Tools</TabsTrigger>
             </TabsList>
@@ -594,99 +518,6 @@ export default function SystemSettingsPage() {
               </Card>
             </TabsContent>
 
-            <TabsContent value="users">
-              <Card>
-                <CardHeader>
-                  <CardTitle>User Management</CardTitle>
-                  <CardDescription>
-                    Manage user accounts, roles, and departments.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {/* User Table */}
-                    {usersLoading ? (
-                      <div className="flex items-center justify-center py-8">
-                        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-                      </div>
-                    ) : (
-                      <div className="rounded-md border">
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead>Name</TableHead>
-                              <TableHead>Username</TableHead>
-                              <TableHead>Email</TableHead>
-                              <TableHead>Role</TableHead>
-                              <TableHead>Department</TableHead>
-                              <TableHead>Actions</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {users?.map((user: any) => (
-                              <TableRow key={user.id}>
-                                <TableCell>{user.firstName} {user.lastName}</TableCell>
-                                <TableCell>{user.username}</TableCell>
-                                <TableCell>{user.email}</TableCell>
-                                <TableCell>
-                                  <Select
-                                    defaultValue={user.role}
-                                    onValueChange={(role) =>
-                                      updateUser({
-                                        id: user.id,
-                                        role,
-                                        department: user.department
-                                      })
-                                    }
-                                  >
-                                    <SelectTrigger className="w-[140px]">
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="user">User</SelectItem>
-                                      <SelectItem value="compliance_officer">
-                                        Compliance Officer
-                                      </SelectItem>
-                                      <SelectItem value="admin">Admin</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </TableCell>
-                                <TableCell>
-                                  <Input
-                                    defaultValue={user.department}
-                                    onBlur={(e) =>
-                                      updateUser({
-                                        id: user.id,
-                                        department: e.target.value,
-                                        role: user.role
-                                      })
-                                    }
-                                  />
-                                </TableCell>
-                                <TableCell>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => resetPassword(user.id)}
-                                    disabled={isResettingPassword}
-                                  >
-                                    {isResettingPassword ? (
-                                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                                    ) : null}
-                                    Reset Password
-                                  </Button>
-                                </TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
             <TabsContent value="logs">
               <Card>
                 <CardHeader className="pb-2">
@@ -792,9 +623,9 @@ export default function SystemSettingsPage() {
                       </div>
                     </div>
 
-                    {logIsLoading ? (
+                    {isLoading ? (
                       <div className="text-center py-8">Loading logs...</div>
-                    ) : logError ? (
+                    ) : error ? (
                       <Alert variant="destructive">
                         <AlertCircle className="h-4 w-4" />
                         <AlertTitle>Error</AlertTitle>
@@ -818,7 +649,7 @@ export default function SystemSettingsPage() {
                               </TableRow>
                             </TableHeader>
                             <TableBody>
-                              {logData?.logs.map((log: any, index: number) => (
+                              {data?.logs.map((log: any, index: number) => (
                                 <TableRow key={index}>
                                   <TableCell>
                                     {format(new Date(log.timestamp), "MMM d, yyyy HH:mm:ss")}
@@ -847,7 +678,7 @@ export default function SystemSettingsPage() {
 
                         <div className="mt-4 flex justify-between items-center">
                           <div className="text-sm text-muted-foreground">
-                            Showing {logData?.logs.length} of {logData?.total} logs
+                            Showing {data?.logs.length} of {data?.total} logs
                           </div>
                           <div className="flex gap-2">
                             <Button
@@ -855,14 +686,14 @@ export default function SystemSettingsPage() {
                               onClick={downloadCSV}
                               size="sm"
                               title="Export logs as CSV"
-                              disabled={!logData?.logs?.length}
+                              disabled={!data?.logs?.length}
                             >
                               <Download className="h-4 w-4 mr-2" />
                               Export CSV
                             </Button>
                             <Button
                               variant="outline"
-                              onClick={() => refetchLogs()}
+                              onClick={() => refetch()}
                               size="sm"
                               title="Refresh logs"
                             >
@@ -878,7 +709,7 @@ export default function SystemSettingsPage() {
                             </Button>
                             <Button
                               variant="outline"
-                              disabled={page === logData?.totalPages}
+                              disabled={page === data?.totalPages}
                               onClick={() => setPage(p => p + 1)}
                             >
                               Next

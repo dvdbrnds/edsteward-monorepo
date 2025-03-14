@@ -7,49 +7,6 @@ import { createServer } from 'http';
 import { log } from './vite';
 import { setupAuth } from './auth';
 import { syslog, LogLevel, LogFacility } from './services/syslog';
-import { hashPassword } from './auth'; //Import hashPassword function
-import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
-
-// Configure multer storage
-const multerStorage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const uploadDir = path.join(__dirname, '../uploads');
-    // Ensure upload directory exists
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
-    cb(null, `${file.fieldname}-${uniqueSuffix}${path.extname(file.originalname)}`);
-  }
-});
-
-const upload = multer({
-  storage: multerStorage,
-  limits: {
-    fileSize: 10 * 1024 * 1024, // 10MB limit
-  },
-  fileFilter: (req, file, cb) => {
-    const allowedTypes = [
-      'application/pdf',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'image/jpeg',
-      'image/png'
-    ];
-
-    if (allowedTypes.includes(file.mimetype)) {
-      cb(null, true);
-    } else {
-      cb(new Error('Invalid file type'));
-    }
-  }
-});
-
 
 export function registerRoutes(app: express.Application): Server {
   // Create HTTP server
@@ -144,7 +101,6 @@ export function registerRoutes(app: express.Application): Server {
     }
   });
   
-
   // Add endpoint to fetch individual regulation by ID
   app.get("/api/deadlines", async (req, res) => {
     try {
@@ -230,56 +186,6 @@ export function registerRoutes(app: express.Application): Server {
     }
   });
 
-  // Add endpoint to update regulation category
-  app.patch("/api/regulations/:regulationId/category", async (req, res) => {
-    try {
-      if (!req.user) {
-        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized regulation update attempt");
-        return res.status(401).json({ error: "Authentication required" });
-      }
-
-      const { regulationId } = req.params;
-      const { category } = req.body;
-
-      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Updating category for regulation ${regulationId}`, {
-        newCategory: category
-      });
-
-      if (!category) {
-        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Invalid category update data received", { body: req.body });
-        return res.status(400).json({ error: "Category is required" });
-      }
-
-      try {
-        const regulation = await storage.updateRegulation(parseInt(regulationId), { category });
-
-        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Successfully updated regulation category", { 
-          regulationId,
-          newCategory: category 
-        });
-
-        return res.json(regulation);
-      } catch (dbError) {
-        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Database error updating regulation category", {
-          error: dbError instanceof Error ? dbError.message : String(dbError)
-        });
-        return res.status(500).json({ 
-          error: "Database error updating regulation category",
-          details: dbError instanceof Error ? dbError.message : String(dbError)
-        });
-      }
-    } catch (error) {
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to update regulation category", {
-        error: error instanceof Error ? error.message : String(error)
-      });
-      return res.status(500).json({ 
-        error: "Failed to update regulation category", 
-        details: error instanceof Error ? error.message : String(error)
-      });
-    }
-  });
-
-  // Add endpoint to fetch individual regulation by ID
   app.get("/api/regulations/:regulationId", async (req, res) => {
     try {
       if (!req.user) {
@@ -321,31 +227,6 @@ export function registerRoutes(app: express.Application): Server {
       });
       return res.status(500).json({ 
         error: "Failed to fetch regulation", 
-        details: error instanceof Error ? error.message : String(error)
-      });
-    }
-  });
-  
-  // Add new route to get evidence files
-  app.get("/api/regulations/:regulationId/evidence", async (req, res) => {
-    try {
-      if (!req.user) {
-        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized evidence files access attempt");
-        return res.status(401).json({ error: "Authentication required" });
-      }
-
-      const { regulationId } = req.params;
-
-      const files = await storage.getEvidenceFilesByRegulation(parseInt(regulationId));
-
-      return res.json(files);
-    } catch (error) {
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Error fetching evidence files", {
-        error: error instanceof Error ? error.message : String(error)
-      });
-
-      return res.status(500).json({
-        error: "Failed to fetch evidence files",
         details: error instanceof Error ? error.message : String(error)
       });
     }
@@ -413,263 +294,50 @@ export function registerRoutes(app: express.Application): Server {
     });
   });
 
-  // Add this endpoint after the category update endpoint
-  app.patch("/api/regulations/:regulationId/actions/:actionType", async (req, res) => {
+  // Add endpoint to update regulation category
+  app.patch("/api/regulations/:regulationId/category", async (req, res) => {
     try {
       if (!req.user) {
-        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized action update attempt");
-        return res.status(401).json({ error: "Authentication required" });
-      }
-
-      if (req.user.role !== 'admin') {
-        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Non-admin user attempted to update action");
-        return res.status(403).json({ error: "Admin access required" });
-      }
-
-      const { regulationId, actionType } = req.params;
-      const actionUpdate = req.body;
-
-      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Updating action for regulation ${regulationId}`, {
-        actionType,
-        update: actionUpdate
-      });
-
-      try {
-        const regulation = await storage.getRegulationById(parseInt(regulationId));
-
-        if (!regulation) {
-          syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, `Regulation not found with ID: ${regulationId}`);
-          return res.status(404).json({ error: "Regulation not found" });
-        }
-
-        if (!regulation.actions) {
-          regulation.actions = [];
-        }
-
-        const actionIndex = regulation.actions.findIndex(a => a.type === actionType);
-        if (actionIndex === -1) {
-          regulation.actions.push(actionUpdate);
-        } else {
-          regulation.actions[actionIndex] = {
-            ...regulation.actions[actionIndex],
-            ...actionUpdate
-          };
-        }
-
-        const updatedRegulation = await storage.updateRegulation(parseInt(regulationId), {
-          actions: regulation.actions
-        });
-
-        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Successfully updated regulation action", {
-          regulationId,
-          actionType
-        });
-
-        return res.json(updatedRegulation);
-      } catch (dbError) {
-        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Database error updating regulation action", {
-          error: dbError instanceof Error ? dbError.message : String(dbError)
-        });
-        return res.status(500).json({
-          error: "Database error updating regulation action",
-          details: dbError instanceof Error ? dbError.message : String(dbError)
-        });
-      }
-    } catch (error) {
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to update regulation action", {
-        error: error instanceof Error ? error.message : String(error)
-      });
-      return res.status(500).json({
-        error: "Failed to update regulation action",
-        details: error instanceof Error ? error.message : String(error)
-      });
-    }
-  });
-
-  // Add the admin users endpoint
-  app.get("/api/admin/users", async (req, res) => {
-    try {
-      if (!req.user) {
-        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized access attempt to user management");
-        return res.status(401).json({ error: "Authentication required" });
-      }
-
-      if (req.user.role !== 'admin') {
-        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Non-admin user attempted to access user management");
-        return res.status(403).json({ error: "Admin access required" });
-      }
-
-      try {
-        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Fetching all users");
-        const users = await storage.getAllUsers();
-        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Found ${users.length} users`);
-        return res.json(users);
-      } catch (dbError) {
-        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Database error fetching users", {
-          error: dbError instanceof Error ? dbError.message : String(dbError)
-        });
-        return res.status(500).json({ 
-          error: "Database error fetching users",
-          details: dbError instanceof Error ? dbError.message : String(dbError)
-        });
-      }
-    } catch (error) {
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to fetch users", {
-        error: error instanceof Error ? error.message : String(error)
-      });
-      return res.status(500).json({ 
-        error: "Failed to fetch users", 
-        details: error instanceof Error ? error.message : String(error)
-      });
-    }
-  });
-
-  // Add endpoint to update user
-  app.post("/api/admin/update-user", async (req, res) => {
-    try {
-      if (!req.user) {
-        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized access attempt to user update");
-        return res.status(401).json({ error: "Authentication required" });
-      }
-
-      if (req.user.role !== 'admin') {
-        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Non-admin user attempted to update user");
-        return res.status(403).json({ error: "Admin access required" });
-      }
-
-      const { id, role, department } = req.body;
-
-      if (!id || !role) {
-        return res.status(400).json({ error: "Missing required fields" });
-      }
-
-      try {
-        const updatedUser = await storage.updateUser(id, { role, department });
-        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Successfully updated user ${id}`);
-        return res.json(updatedUser);
-      } catch (dbError) {
-        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Database error updating user", {
-          error: dbError instanceof Error ? dbError.message : String(dbError)
-        });
-        return res.status(500).json({ 
-          error: "Database error updating user",
-          details: dbError instanceof Error ? dbError.message : String(dbError)
-        });
-      }
-    } catch (error) {
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to update user", {
-        error: error instanceof Error ? error.message : String(error)
-      });
-      return res.status(500).json({ 
-        error: "Failed to update user", 
-        details: error instanceof Error ? error.message : String(error)
-      });
-    }
-  });
-
-  // Add the reset password endpoint
-  app.post("/api/admin/reset-password", async (req, res) => {
-    try {
-      if (!req.user) {
-        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized access attempt to password reset");
-        return res.status(401).json({ error: "Authentication required" });
-      }
-
-      if (req.user.role !== 'admin') {
-        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Non-admin user attempted to reset password");
-        return res.status(403).json({ error: "Admin access required" });
-      }
-
-      const { id } = req.body;
-
-      if (!id) {
-        return res.status(400).json({ error: "User ID is required" });
-      }
-
-      try {
-        // Generate a temporary password
-        const tempPassword = Math.random().toString(36).slice(-8);
-        const hashedPassword = await hashPassword(tempPassword);
-
-        const updatedUser = await storage.updateUser(id, { password: hashedPassword });
-        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Successfully reset password for user ${id}`);
-
-        return res.json({ 
-          success: true, 
-          temporaryPassword: tempPassword,
-          message: "Password has been reset" 
-        });
-      } catch (dbError) {
-        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Database error resetting password", {
-          error: dbError instanceof Error ? dbError.message : String(dbError)
-        });
-        return res.status(500).json({ 
-          error: "Database error resetting password",
-          details: dbError instanceof Error ? dbError.message : String(dbError)
-        });
-      }
-    } catch (error) {
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to reset password", {
-        error: error instanceof Error ? error.message : String(error)
-      });
-      return res.status(500).json({ 
-        error: "Failed to reset password", 
-        details: error instanceof Error ? error.message : String(error)
-      });
-    }
-  });
-
-  // Add the new evidence upload route
-  app.post("/api/regulations/:regulationId/evidence", upload.array('files', 5), async (req, res) => {
-    try {
-      if (!req.user) {
-        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized evidence upload attempt");
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized regulation update attempt");
         return res.status(401).json({ error: "Authentication required" });
       }
 
       const { regulationId } = req.params;
-      const files = req.files as Express.Multer.File[];
-      const formData = req.body.data ? JSON.parse(req.body.data) : {}; //handle case where data is missing
+      const { category } = req.body;
 
-      if (!files || files.length === 0) {
-        return res.status(400).json({ error: "No files uploaded" });
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Updating category for regulation ${regulationId}`, {
+        newCategory: category
+      });
+
+      if (!category) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Invalid category update data received", { body: req.body });
+        return res.status(400).json({ error: "Category is required" });
       }
 
-      const savedFiles = [];
+      try {
+        const regulation = await storage.updateRegulation(parseInt(regulationId), { category });
 
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const description = req.body[`description${i}`] || '';
-
-        const evidenceFile = await storage.createEvidenceFile({
-          regulationId: parseInt(regulationId),
-          fileName: file.originalname,
-          fileSize: file.size,
-          fileType: file.mimetype,
-          description,
-          uploadedBy: req.user.id,
-          status: "pending",
-          storagePath: file.path
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Successfully updated regulation category", { 
+          regulationId,
+          newCategory: category 
         });
 
-        savedFiles.push(evidenceFile);
+        return res.json(regulation);
+      } catch (dbError) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Database error updating regulation category", {
+          error: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+        return res.status(500).json({ 
+          error: "Database error updating regulation category",
+          details: dbError instanceof Error ? dbError.message : String(dbError)
+        });
       }
-
-      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
-        `Successfully uploaded ${savedFiles.length} evidence files for regulation ${regulationId}`);
-
-      return res.json({
-        message: "Files uploaded successfully",
-        files: savedFiles
-      });
-
     } catch (error) {
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Error uploading evidence files", {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to update regulation category", {
         error: error instanceof Error ? error.message : String(error)
       });
-
-      return res.status(500).json({
-        error: "Failed to upload evidence files",
+      return res.status(500).json({ 
+        error: "Failed to update regulation category", 
         details: error instanceof Error ? error.message : String(error)
       });
     }
