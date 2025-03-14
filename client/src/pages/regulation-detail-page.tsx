@@ -524,6 +524,14 @@ export default function RegulationDetailPage() {
                       )}
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {regulation?.section && (
+                          <div>
+                            <h3 className="font-medium text-gray-900">Section</h3>
+                            <p className="text-gray-700 mt-1">
+                              {regulation.section}
+                            </p>
+                          </div>
+                        )}
                         {regulation?.originationDate && (
                           <div>
                             <h3 className="font-medium text-gray-900">Origination Date</h3>
