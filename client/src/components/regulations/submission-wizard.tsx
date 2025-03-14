@@ -63,9 +63,9 @@ interface UploadedFile {
 }
 
 const steps = [
+  { id: 'evidence', title: 'Evidence Upload' },
   { id: 'info', title: 'Basic Information' },
   { id: 'requirements', title: 'Requirements Review' },
-  { id: 'evidence', title: 'Evidence Upload' },
   { id: 'review', title: 'Final Review' }
 ];
 
