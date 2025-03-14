@@ -48,6 +48,17 @@ import moravianLogo from "@/assets/Screenshot_2025-02-12_at_9.15.57_AM-removebg-
  */
 const CHANGELOG = [
   {
+    version: "0.2.8",
+    date: "March 14, 2025",
+    changes: [
+      "Added hover preview functionality for evidence files",
+      "Enhanced evidence files display with uploader information",
+      "Fixed file upload destination configuration",
+      "Improved static file serving for uploaded evidence files",
+      "Added image and PDF preview support in evidence file viewer"
+    ],
+  },
+  {
     version: "0.2.7",
     date: "March 12, 2025",
     changes: [
@@ -295,7 +306,7 @@ export default function Navigation() {
                         setChangelogOpen(true);
                       }}
                     >
-                      Alpha v0.2.7
+                      Alpha v0.2.8
                     </button>
                   </DialogTrigger>
                   <DialogContent className="max-h-[80vh] overflow-y-auto">

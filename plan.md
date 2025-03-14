@@ -9,6 +9,8 @@
    - [x] Basic deployment setup
    - [x] User management with password reset
    - [x] Commenting system implementation
+   - [x] Evidence files management with preview functionality
+   - [x] File upload and storage system
 
 ## Current Focus: Testing & Documentation Enhancement
 
@@ -130,7 +132,6 @@
    - [ ] Add department statistics
 
 5. Testing Coverage (Now incorporated into the Current Focus section above)
-
 
 ## Current Focus (Updated)
 Implementing robust commenting system with proper documentation and tracking while following the new structured approach:
