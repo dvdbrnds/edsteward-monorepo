@@ -1,7 +1,10 @@
+
+import React from 'react';
+
 const steps = [
-  { id: 'actions', title: 'Actions & Review' },
-  { id: 'evidence', title: 'Evidence Upload' },
   { id: 'info', title: 'Basic Information' },
+  { id: 'evidence', title: 'Evidence Upload' },
+  { id: 'actions', title: 'Actions & Review' },
   { id: 'requirements', title: 'Requirements Review' },
   { id: 'review', title: 'Final Review' }
 ];
@@ -61,6 +64,13 @@ const renderActionStep = () => {
             <p className="text-sm text-gray-600">Submit required documentation</p>
           </div>
         </div>
+
+        <Button 
+          onClick={handleSubmitEvidence}
+          className="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white"
+        >
+          Submit Evidence
+        </Button>
       </div>
     </div>
   );
