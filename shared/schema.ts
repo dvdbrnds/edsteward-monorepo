@@ -81,6 +81,20 @@ export const notes = pgTable("notes", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// Add after the notes table definition
+export const evidenceFiles = pgTable("evidence_files", {
+  id: serial("id").primaryKey(),
+  regulationId: integer("regulation_id").notNull(),
+  fileName: text("file_name").notNull(),
+  fileSize: integer("file_size").notNull(),
+  fileType: text("file_type").notNull(),
+  description: text("description"),
+  uploadedBy: integer("uploaded_by").notNull(),
+  uploadedAt: timestamp("uploaded_at").notNull().defaultNow(),
+  status: text("status").notNull().default("pending"),
+  storagePath: text("storage_path").notNull(),
+});
+
 // Update the regulations table definition to include PA-specific fields
 export const regulations = pgTable("regulations", {
   id: serial("id").primaryKey(),
@@ -136,7 +150,7 @@ export const regulations = pgTable("regulations", {
     finalDayReminders: boolean;
   }>(),
   sources: jsonb("sources").$type<RegulationSource[]>(),
-  actions: jsonb("actions").$type<RegulationAction[]>()
+  actions: jsonb("actions").$type<RegulationAction>()
 });
 
 // Notifications table
@@ -288,6 +302,9 @@ export const insertGuideSchema = createInsertSchema(guides).extend({
   content: z.string().min(1, "Guide content cannot be empty"),
   category: z.enum(["submission", "compliance", "general"]),
 });
+
+// Add after other insert schemas
+export const insertEvidenceFileSchema = createInsertSchema(evidenceFiles);
 
 // Email Configuration table
 export const emailConfigs = pgTable("email_configs", {
@@ -458,6 +475,8 @@ export type TwilioConfig = typeof twilioConfigs.$inferSelect;
 export type InsertTwilioConfig = z.infer<typeof insertTwilioConfigSchema>;
 export type Note = typeof notes.$inferSelect;
 export type InsertNote = z.infer<typeof insertNoteSchema>;
+export type EvidenceFile = typeof evidenceFiles.$inferSelect;
+export type InsertEvidenceFile = z.infer<typeof insertEvidenceFileSchema>;
 
 // Add after the existing tables
 // System Logs table according to RFC 5424 syslog standard

@@ -1,4 +1,4 @@
-import { users, regulations, notifications, deadlines, guides, csvSchemas, validationRules, fieldMappings, notes } from "@shared/schema";
+import { users, regulations, notifications, deadlines, guides, csvSchemas, validationRules, fieldMappings, notes, evidenceFiles, type EvidenceFile, type InsertEvidenceFile } from "@shared/schema";
 import type {
   User,
   InsertUser,
@@ -83,6 +83,12 @@ export interface IStorage {
   createNote(note: InsertNote): Promise<Note>;
   updateNote(id: number, note: Partial<InsertNote>): Promise<Note>;
   deleteNote(id: number): Promise<void>;
+
+  // Evidence file methods
+  createEvidenceFile(file: InsertEvidenceFile): Promise<EvidenceFile>;
+  getEvidenceFilesByRegulation(regulationId: number): Promise<EvidenceFile[]>;
+  getEvidenceFile(id: number): Promise<EvidenceFile | undefined>;
+  updateEvidenceFileStatus(id: number, status: string): Promise<EvidenceFile>;
 }
 
 import { emailService } from './services/email';
@@ -438,6 +444,39 @@ export class DatabaseStorage implements IStorage {
       .where(eq(regulations.jurisdiction, jurisdiction));
     console.log(`Found ${result.length} ${jurisdiction} regulations`);
     return result;
+  }
+
+    async createEvidenceFile(file: InsertEvidenceFile): Promise<EvidenceFile> {
+    const [evidenceFile] = await db
+      .insert(evidenceFiles)
+      .values(file)
+      .returning();
+    return evidenceFile;
+  }
+
+  async getEvidenceFilesByRegulation(regulationId: number): Promise<EvidenceFile[]> {
+    return await db
+      .select()
+      .from(evidenceFiles)
+      .where(eq(evidenceFiles.regulationId, regulationId))
+      .orderBy(desc(evidenceFiles.uploadedAt));
+  }
+
+  async getEvidenceFile(id: number): Promise<EvidenceFile | undefined> {
+    const [file] = await db
+      .select()
+      .from(evidenceFiles)
+      .where(eq(evidenceFiles.id, id));
+    return file;
+  }
+
+  async updateEvidenceFileStatus(id: number, status: string): Promise<EvidenceFile> {
+    const [file] = await db
+      .update(evidenceFiles)
+      .set({ status })
+      .where(eq(evidenceFiles.id, id))
+      .returning();
+    return file;
   }
 }
 

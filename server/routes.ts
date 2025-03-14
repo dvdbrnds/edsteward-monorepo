@@ -8,6 +8,47 @@ import { log } from './vite';
 import { setupAuth } from './auth';
 import { syslog, LogLevel, LogFacility } from './services/syslog';
 import { hashPassword } from './auth'; //Import hashPassword function
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+
+// Configure multer storage
+const multerStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadDir = path.join(__dirname, '../uploads');
+    // Ensure upload directory exists
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req, file, cb) => {
+    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
+    cb(null, `${file.fieldname}-${uniqueSuffix}${path.extname(file.originalname)}`);
+  }
+});
+
+const upload = multer({
+  storage: multerStorage,
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB limit
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'image/jpeg',
+      'image/png'
+    ];
+
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type'));
+    }
+  }
+});
 
 
 export function registerRoutes(app: express.Application): Server {
@@ -547,6 +588,62 @@ export function registerRoutes(app: express.Application): Server {
       });
       return res.status(500).json({ 
         error: "Failed to reset password", 
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  // Add the new evidence upload route
+  app.post("/api/regulations/:regulationId/evidence", upload.array('files', 5), async (req, res) => {
+    try {
+      if (!req.user) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized evidence upload attempt");
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const { regulationId } = req.params;
+      const files = req.files as Express.Multer.File[];
+      const formData = req.body.data ? JSON.parse(req.body.data) : {}; //handle case where data is missing
+
+      if (!files || files.length === 0) {
+        return res.status(400).json({ error: "No files uploaded" });
+      }
+
+      const savedFiles = [];
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const description = req.body[`description${i}`] || '';
+
+        const evidenceFile = await storage.createEvidenceFile({
+          regulationId: parseInt(regulationId),
+          fileName: file.originalname,
+          fileSize: file.size,
+          fileType: file.mimetype,
+          description,
+          uploadedBy: req.user.id,
+          status: "pending",
+          storagePath: file.path
+        });
+
+        savedFiles.push(evidenceFile);
+      }
+
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
+        `Successfully uploaded ${savedFiles.length} evidence files for regulation ${regulationId}`);
+
+      return res.json({
+        message: "Files uploaded successfully",
+        files: savedFiles
+      });
+
+    } catch (error) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Error uploading evidence files", {
+        error: error instanceof Error ? error.message : String(error)
+      });
+
+      return res.status(500).json({
+        error: "Failed to upload evidence files",
         details: error instanceof Error ? error.message : String(error)
       });
     }
