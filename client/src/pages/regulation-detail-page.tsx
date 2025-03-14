@@ -113,6 +113,9 @@ function ActionButton({ action, regulationId, regulation, isAdmin, onRequiredCha
       setShowWebPublishDialog(true);
     } else if (action.type === 'community_communication') {
       setShowCommunicationDialog(true);
+    } else if (action.type === 'agency_submission') {
+      // Will be connected to submission wizard in future
+      onStatusChange?.('in_progress');
     }
   };
 
@@ -173,37 +176,17 @@ function ActionButton({ action, regulationId, regulation, isAdmin, onRequiredCha
             <Mail className="h-4 w-4 mr-2" />
             Generate Statement
           </Button>
-        ) : (
-          <div className="flex gap-2">
-            <Button
-              variant={action.status === 'pending' ? 'default' : 'outline'}
-              size="sm"
-              className="flex-1"
-              onClick={() => onStatusChange?.('pending')}
-            >
-              <Clock4 className="h-4 w-4 mr-2" />
-              Pending
-            </Button>
-            <Button
-              variant={action.status === 'in_progress' ? 'default' : 'outline'}
-              size="sm"
-              className="flex-1"
-              onClick={() => onStatusChange?.('in_progress')}
-            >
-              <Clock4 className="h-4 w-4 mr-2" />
-              In Progress
-            </Button>
-            <Button
-              variant={action.status === 'completed' ? 'default' : 'outline'}
-              size="sm"
-              className="flex-1"
-              onClick={() => onStatusChange?.('completed')}
-            >
-              <CheckCircle2 className="h-4 w-4 mr-2" />
-              Complete
-            </Button>
-          </div>
-        )}
+        ) : action.type === 'agency_submission' ? (
+          <Button
+            variant="default"
+            size="sm"
+            className="w-full"
+            onClick={handleActionClick}
+          >
+            <FileText className="h-4 w-4 mr-2" />
+            Begin Submission
+          </Button>
+        ) : null}
       </div>
 
       {action.type === 'website_publish' && (
