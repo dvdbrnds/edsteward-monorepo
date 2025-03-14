@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Copy, Eye } from "lucide-react";
+import { Copy } from "lucide-react";
 import type { Regulation } from "@shared/schema";
 
 interface WebPublishDialogProps {
@@ -115,7 +115,6 @@ const generateUniversalCode = (regulation: Regulation): string => {
 
 export function WebPublishDialog({ regulation, open, onOpenChange }: WebPublishDialogProps) {
   const [activeTab, setActiveTab] = useState("drupal");
-  const [viewMode, setViewMode] = useState<"code" | "preview">("preview");
 
   const handleCopy = async (code: string) => {
     await navigator.clipboard.writeText(code);
@@ -130,7 +129,7 @@ export function WebPublishDialog({ regulation, open, onOpenChange }: WebPublishD
         <DialogHeader>
           <DialogTitle>Website Publication Code</DialogTitle>
           <DialogDescription>
-            Preview how your compliance information will look, then copy the generated code for your CMS.
+            Preview the generated content and copy the code for your CMS.
           </DialogDescription>
         </DialogHeader>
 
@@ -140,55 +139,35 @@ export function WebPublishDialog({ regulation, open, onOpenChange }: WebPublishD
             <TabsTrigger value="universal">Universal HTML</TabsTrigger>
           </TabsList>
 
-          <div className="flex justify-end mt-2 mb-4">
-            <div className="inline-flex rounded-md shadow-sm">
-              <Button
-                variant={viewMode === "preview" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setViewMode("preview")}
-                className="rounded-l-md rounded-r-none"
-              >
-                <Eye className="h-4 w-4 mr-2" />
-                Preview
-              </Button>
-              <Button
-                variant={viewMode === "code" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setViewMode("code")}
-                className="rounded-l-none rounded-r-md"
-              >
-                <Copy className="h-4 w-4 mr-2" />
-                Code
-              </Button>
-            </div>
-          </div>
-
           <TabsContent value="drupal">
             <div className="space-y-4">
               <p className="text-sm text-muted-foreground">
                 This code is optimized for Drupal CMS. It includes styled components and responsive design.
               </p>
+
+              {/* Preview Section */}
+              <div className="rounded-md border bg-white p-4 mb-4">
+                <h3 className="text-sm font-medium mb-2">Preview</h3>
+                <div 
+                  className="prose max-w-none"
+                  dangerouslySetInnerHTML={{ __html: drupalCode }}
+                />
+              </div>
+
+              {/* Code Section */}
               <div className="relative">
-                <ScrollArea className="h-[400px] w-full rounded-md border bg-muted p-4">
-                  {viewMode === "preview" ? (
-                    <div 
-                      className="prose max-w-none"
-                      dangerouslySetInnerHTML={{ __html: drupalCode }}
-                    />
-                  ) : (
-                    <pre className="text-sm whitespace-pre-wrap break-words">{drupalCode}</pre>
-                  )}
+                <h3 className="text-sm font-medium mb-2">Code</h3>
+                <ScrollArea className="h-[200px] w-full rounded-md border bg-muted p-4">
+                  <pre className="text-sm whitespace-pre-wrap break-words">{drupalCode}</pre>
                 </ScrollArea>
-                {viewMode === "code" && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="absolute top-2 right-2"
-                    onClick={() => handleCopy(drupalCode)}
-                  >
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="absolute top-2 right-2"
+                  onClick={() => handleCopy(drupalCode)}
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
               </div>
             </div>
           </TabsContent>
@@ -198,27 +177,30 @@ export function WebPublishDialog({ regulation, open, onOpenChange }: WebPublishD
               <p className="text-sm text-muted-foreground">
                 This is a universal HTML version that works with any CMS or website platform.
               </p>
+
+              {/* Preview Section */}
+              <div className="rounded-md border bg-white p-4 mb-4">
+                <h3 className="text-sm font-medium mb-2">Preview</h3>
+                <div 
+                  className="prose max-w-none"
+                  dangerouslySetInnerHTML={{ __html: universalCode }}
+                />
+              </div>
+
+              {/* Code Section */}
               <div className="relative">
-                <ScrollArea className="h-[400px] w-full rounded-md border bg-muted p-4">
-                  {viewMode === "preview" ? (
-                    <div 
-                      className="prose max-w-none"
-                      dangerouslySetInnerHTML={{ __html: universalCode }}
-                    />
-                  ) : (
-                    <pre className="text-sm whitespace-pre-wrap break-words">{universalCode}</pre>
-                  )}
+                <h3 className="text-sm font-medium mb-2">Code</h3>
+                <ScrollArea className="h-[200px] w-full rounded-md border bg-muted p-4">
+                  <pre className="text-sm whitespace-pre-wrap break-words">{universalCode}</pre>
                 </ScrollArea>
-                {viewMode === "code" && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="absolute top-2 right-2"
-                    onClick={() => handleCopy(universalCode)}
-                  >
-                    <Copy className="h-4 w-4" />
-                  </Button>
-                )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="absolute top-2 right-2"
+                  onClick={() => handleCopy(universalCode)}
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
               </div>
             </div>
           </TabsContent>

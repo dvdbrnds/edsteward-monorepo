@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   Dialog,
   DialogContent,
@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Copy, Eye } from "lucide-react";
+import { Copy } from "lucide-react";
 import type { Regulation } from "@shared/schema";
 
 interface CommunicationDialogProps {
@@ -43,7 +43,6 @@ This notice is published as part of our commitment to transparency and regulator
 };
 
 export function CommunicationDialog({ regulation, open, onOpenChange }: CommunicationDialogProps) {
-  const [viewMode, setViewMode] = useState<"preview" | "text">("preview");
   const statement = generateCommunicationStatement(regulation);
 
   const handleCopy = async () => {
@@ -56,62 +55,42 @@ export function CommunicationDialog({ regulation, open, onOpenChange }: Communic
         <DialogHeader>
           <DialogTitle>Community Communication Statement</DialogTitle>
           <DialogDescription>
-            Preview and generate a statement to communicate our compliance status to the community.
+            Preview the statement and copy the text for your communications.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="flex justify-end">
-            <div className="inline-flex rounded-md shadow-sm">
-              <Button
-                variant={viewMode === "preview" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setViewMode("preview")}
-                className="rounded-l-md rounded-r-none"
-              >
-                <Eye className="h-4 w-4 mr-2" />
-                Preview
-              </Button>
-              <Button
-                variant={viewMode === "text" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setViewMode("text")}
-                className="rounded-l-none rounded-r-md"
-              >
-                <Copy className="h-4 w-4 mr-2" />
-                Text
-              </Button>
+          {/* Preview Section */}
+          <div className="rounded-md border bg-white p-4">
+            <h3 className="text-sm font-medium mb-2">Preview</h3>
+            <div className="prose max-w-none space-y-4">
+              {statement.split('\n\n').map((paragraph, index) => (
+                <p key={index} className="text-sm">
+                  {paragraph.split('\n').map((line, lineIndex) => (
+                    <React.Fragment key={lineIndex}>
+                      {line}
+                      {lineIndex < paragraph.split('\n').length - 1 && <br />}
+                    </React.Fragment>
+                  ))}
+                </p>
+              ))}
             </div>
           </div>
+
+          {/* Plain Text Section */}
           <div className="relative">
-            <ScrollArea className="h-[400px] w-full rounded-md border bg-muted p-4">
-              {viewMode === "preview" ? (
-                <div className="prose max-w-none space-y-4">
-                  {statement.split('\n\n').map((paragraph, index) => (
-                    <p key={index} className="text-sm">
-                      {paragraph.split('\n').map((line, lineIndex) => (
-                        <React.Fragment key={lineIndex}>
-                          {line}
-                          {lineIndex < paragraph.split('\n').length - 1 && <br />}
-                        </React.Fragment>
-                      ))}
-                    </p>
-                  ))}
-                </div>
-              ) : (
-                <pre className="text-sm whitespace-pre-wrap break-words font-sans">{statement}</pre>
-              )}
+            <h3 className="text-sm font-medium mb-2">Plain Text</h3>
+            <ScrollArea className="h-[200px] w-full rounded-md border bg-muted p-4">
+              <pre className="text-sm whitespace-pre-wrap break-words font-sans">{statement}</pre>
             </ScrollArea>
-            {viewMode === "text" && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="absolute top-2 right-2"
-                onClick={handleCopy}
-              >
-                <Copy className="h-4 w-4" />
-              </Button>
-            )}
+            <Button
+              variant="outline"
+              size="sm"
+              className="absolute top-2 right-2"
+              onClick={handleCopy}
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
           </div>
         </div>
       </DialogContent>
