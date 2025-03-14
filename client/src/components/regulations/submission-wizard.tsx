@@ -28,7 +28,20 @@ import type { Regulation } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 
-// ... keep existing interfaces and constants ...
+interface SubmissionWizardProps {
+  regulation: Regulation;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const ACCEPTED_FILE_TYPES = [
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'image/jpeg',
+  'image/png'
+];
 
 const evidenceFormSchema = z.object({
   documentTitle: z.string().min(1, "Document title is required"),
@@ -41,6 +54,20 @@ const evidenceFormSchema = z.object({
   }),
   notes: z.string().optional(),
 });
+
+type EvidenceFormValues = z.infer<typeof evidenceFormSchema>;
+
+interface UploadedFile {
+  file: File;
+  description: string;
+}
+
+const steps = [
+  { id: 'info', title: 'Basic Information' },
+  { id: 'requirements', title: 'Requirements Review' },
+  { id: 'evidence', title: 'Evidence Upload' },
+  { id: 'review', title: 'Final Review' }
+];
 
 export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionWizardProps) {
   const [currentStep, setCurrentStep] = useState<string>('info');
