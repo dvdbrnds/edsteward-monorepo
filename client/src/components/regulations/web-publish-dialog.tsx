@@ -115,6 +115,7 @@ const generateUniversalCode = (regulation: Regulation): string => {
 
 export function WebPublishDialog({ regulation, open, onOpenChange }: WebPublishDialogProps) {
   const [activeTab, setActiveTab] = useState("drupal");
+  const [expandedSection, setExpandedSection] = useState<"preview" | "code" | null>(null);
 
   const handleCopy = async (code: string) => {
     await navigator.clipboard.writeText(code);
@@ -146,28 +147,57 @@ export function WebPublishDialog({ regulation, open, onOpenChange }: WebPublishD
               </p>
 
               {/* Preview Section */}
-              <div className="rounded-md border bg-white p-4 mb-4">
-                <h3 className="text-sm font-medium mb-2">Preview</h3>
-                <div 
-                  className="prose max-w-none"
-                  dangerouslySetInnerHTML={{ __html: drupalCode }}
-                />
-              </div>
-
-              {/* Code Section */}
-              <div className="relative">
-                <h3 className="text-sm font-medium mb-2">Code</h3>
-                <ScrollArea className="h-[200px] w-full rounded-md border bg-muted p-4">
-                  <pre className="text-sm whitespace-pre-wrap break-words">{drupalCode}</pre>
+              <div className="relative rounded-md border bg-white p-4">
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="text-sm font-medium">Preview</h3>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setExpandedSection(expandedSection === "preview" ? null : "preview")}
+                  >
+                    {expandedSection === "preview" ? "Show Less" : "Show More"}
+                  </Button>
+                </div>
+                <ScrollArea className={`w-full transition-all ${expandedSection === "preview" ? "h-[400px]" : "h-[150px]"}`}>
+                  <div 
+                    className="prose max-w-none"
+                    dangerouslySetInnerHTML={{ __html: drupalCode }}
+                  />
                 </ScrollArea>
                 <Button
                   variant="outline"
                   size="sm"
-                  className="absolute top-2 right-2"
+                  className="absolute bottom-2 right-2"
                   onClick={() => handleCopy(drupalCode)}
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
+              </div>
+
+              {/* Code Section */}
+              <div className="relative rounded-md border bg-muted p-4">
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="text-sm font-medium">Code</h3>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setExpandedSection(expandedSection === "code" ? null : "code")}
+                    >
+                      {expandedSection === "code" ? "Show Less" : "Show More"}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleCopy(drupalCode)}
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+                <ScrollArea className={`w-full transition-all ${expandedSection === "code" ? "h-[400px]" : "h-[150px]"}`}>
+                  <pre className="text-sm whitespace-pre-wrap break-words">{drupalCode}</pre>
+                </ScrollArea>
               </div>
             </div>
           </TabsContent>
@@ -179,28 +209,57 @@ export function WebPublishDialog({ regulation, open, onOpenChange }: WebPublishD
               </p>
 
               {/* Preview Section */}
-              <div className="rounded-md border bg-white p-4 mb-4">
-                <h3 className="text-sm font-medium mb-2">Preview</h3>
-                <div 
-                  className="prose max-w-none"
-                  dangerouslySetInnerHTML={{ __html: universalCode }}
-                />
-              </div>
-
-              {/* Code Section */}
-              <div className="relative">
-                <h3 className="text-sm font-medium mb-2">Code</h3>
-                <ScrollArea className="h-[200px] w-full rounded-md border bg-muted p-4">
-                  <pre className="text-sm whitespace-pre-wrap break-words">{universalCode}</pre>
+              <div className="relative rounded-md border bg-white p-4">
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="text-sm font-medium">Preview</h3>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setExpandedSection(expandedSection === "preview" ? null : "preview")}
+                  >
+                    {expandedSection === "preview" ? "Show Less" : "Show More"}
+                  </Button>
+                </div>
+                <ScrollArea className={`w-full transition-all ${expandedSection === "preview" ? "h-[400px]" : "h-[150px]"}`}>
+                  <div 
+                    className="prose max-w-none"
+                    dangerouslySetInnerHTML={{ __html: universalCode }}
+                  />
                 </ScrollArea>
                 <Button
                   variant="outline"
                   size="sm"
-                  className="absolute top-2 right-2"
+                  className="absolute bottom-2 right-2"
                   onClick={() => handleCopy(universalCode)}
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
+              </div>
+
+              {/* Code Section */}
+              <div className="relative rounded-md border bg-muted p-4">
+                <div className="flex justify-between items-center mb-2">
+                  <h3 className="text-sm font-medium">Code</h3>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setExpandedSection(expandedSection === "code" ? null : "code")}
+                    >
+                      {expandedSection === "code" ? "Show Less" : "Show More"}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handleCopy(universalCode)}
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+                <ScrollArea className={`w-full transition-all ${expandedSection === "code" ? "h-[400px]" : "h-[150px]"}`}>
+                  <pre className="text-sm whitespace-pre-wrap break-words">{universalCode}</pre>
+                </ScrollArea>
               </div>
             </div>
           </TabsContent>

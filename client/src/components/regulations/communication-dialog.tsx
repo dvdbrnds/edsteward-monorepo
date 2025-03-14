@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -44,6 +44,7 @@ This notice is published as part of our commitment to transparency and regulator
 
 export function CommunicationDialog({ regulation, open, onOpenChange }: CommunicationDialogProps) {
   const statement = generateCommunicationStatement(regulation);
+  const [expandedSection, setExpandedSection] = useState<"preview" | "text" | null>(null);
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(statement);
@@ -61,36 +62,57 @@ export function CommunicationDialog({ regulation, open, onOpenChange }: Communic
 
         <div className="space-y-4">
           {/* Preview Section */}
-          <div className="rounded-md border bg-white p-4">
-            <h3 className="text-sm font-medium mb-2">Preview</h3>
-            <div className="prose max-w-none space-y-4">
-              {statement.split('\n\n').map((paragraph, index) => (
-                <p key={index} className="text-sm">
-                  {paragraph.split('\n').map((line, lineIndex) => (
-                    <React.Fragment key={lineIndex}>
-                      {line}
-                      {lineIndex < paragraph.split('\n').length - 1 && <br />}
-                    </React.Fragment>
-                  ))}
-                </p>
-              ))}
+          <div className="relative rounded-md border bg-white p-4">
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="text-sm font-medium">Preview</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setExpandedSection(expandedSection === "preview" ? null : "preview")}
+              >
+                {expandedSection === "preview" ? "Show Less" : "Show More"}
+              </Button>
             </div>
+            <ScrollArea className={`w-full transition-all ${expandedSection === "preview" ? "h-[400px]" : "h-[150px]"}`}>
+              <div className="prose max-w-none space-y-4">
+                {statement.split('\n\n').map((paragraph, index) => (
+                  <p key={index} className="text-sm">
+                    {paragraph.split('\n').map((line, lineIndex) => (
+                      <React.Fragment key={lineIndex}>
+                        {line}
+                        {lineIndex < paragraph.split('\n').length - 1 && <br />}
+                      </React.Fragment>
+                    ))}
+                  </p>
+                ))}
+              </div>
+            </ScrollArea>
           </div>
 
           {/* Plain Text Section */}
-          <div className="relative">
-            <h3 className="text-sm font-medium mb-2">Plain Text</h3>
-            <ScrollArea className="h-[200px] w-full rounded-md border bg-muted p-4">
+          <div className="relative rounded-md border bg-muted p-4">
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="text-sm font-medium">Plain Text</h3>
+              <div className="flex gap-2">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setExpandedSection(expandedSection === "text" ? null : "text")}
+                >
+                  {expandedSection === "text" ? "Show Less" : "Show More"}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleCopy}
+                >
+                  <Copy className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+            <ScrollArea className={`w-full transition-all ${expandedSection === "text" ? "h-[400px]" : "h-[150px]"}`}>
               <pre className="text-sm whitespace-pre-wrap break-words font-sans">{statement}</pre>
             </ScrollArea>
-            <Button
-              variant="outline"
-              size="sm"
-              className="absolute top-2 right-2"
-              onClick={handleCopy}
-            >
-              <Copy className="h-4 w-4" />
-            </Button>
           </div>
         </div>
       </DialogContent>
