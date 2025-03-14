@@ -548,6 +548,14 @@ export default function RegulationDetailPage() {
                             </p>
                           </div>
                         )}
+                        {regulation?.section && (
+                          <div>
+                            <h3 className="font-medium text-gray-900">Section</h3>
+                            <p className="text-gray-700 mt-1">
+                              {regulation.section}
+                            </p>
+                          </div>
+                        )}
                         {regulation?.nextReviewDate && (
                           <div>
                             <h3 className="font-medium text-gray-900">Next Review Date</h3>
