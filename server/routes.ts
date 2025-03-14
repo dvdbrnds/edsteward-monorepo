@@ -7,19 +7,27 @@ import { createServer } from 'http';
 import { log } from './vite';
 import { setupAuth } from './auth';
 import { syslog, LogLevel, LogFacility } from './services/syslog';
-import { hashPassword } from './auth'; //Import hashPassword function
+import { hashPassword } from './auth';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
+
+// ES Module compatibility: Get current file path
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Configure multer storage
+const uploadDir = path.join(process.cwd(), 'uploads');
+
+// Ensure upload directory exists
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
 const multerStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadDir = path.join(__dirname, '../uploads');
-    // Ensure upload directory exists
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
     cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
@@ -714,81 +722,7 @@ export function registerRoutes(app: express.Application): Server {
     }
   });
 
-  // Add the new evidence upload route
-  app.post("/api/regulations/:regulationId/evidence", upload.array('files', 5), async (req, res) => {
-    try {
-      if (!req.user) {
-        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized evidence upload attempt");
-        return res.status(401).json({ error: "Authentication required" });
-      }
-
-      const { regulationId } = req.params;
-
-      if (!regulationId || isNaN(parseInt(regulationId))) {
-        return res.status(400).json({ error: "Invalid regulation ID" });
-      }
-
-      const files = req.files as Express.Multer.File[];
-      const formData = req.body.data ? JSON.parse(req.body.data) : {}; //handle case where data is missing
-
-      if (!files || files.length === 0) {
-        return res.status(400).json({ error: "No files uploaded" });
-      }
-
-      const savedFiles = [];
-
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const description = req.body[`description${i}`] || '';
-
-        try {
-          const evidenceFile = await storage.createEvidenceFile({
-            regulationId: parseInt(regulationId),
-            fileName: file.originalname,
-            fileSize: file.size,
-            fileType: file.mimetype,
-            description,
-            uploadedBy: req.user.id,
-            status: "pending",
-            storagePath: file.path
-          });
-
-          savedFiles.push(evidenceFile);
-        } catch (fileError) {
-          syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Error saving evidence file", {
-            error: fileError instanceof Error ? fileError.message : String(fileError),
-            fileName: file.originalname
-          });
-          // Continue with other files even if one fails
-        }
-      }
-
-      if (savedFiles.length === 0) {
-        return res.status(500).json({
-          error: "Failed to save any evidence files",
-          message: "None of the uploaded files could be saved"
-        });
-      }
-
-      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
-        `Successfully uploaded ${savedFiles.length} evidence files for regulation ${regulationId}`);
-
-      return res.json({
-        message: `Successfully uploaded ${savedFiles.length} of ${files.length} files`,
-        files: savedFiles
-      });
-
-    } catch (error) {
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Error uploading evidence files", {
-        error: error instanceof Error ? error.message : String(error)
-      });
-
-      return res.status(500).json({
-        error: "Failed to upload evidence files",
-        details: error instanceof Error ? error.message : String(error)
-      });
-    }
-  });
+  // Add the new evidence upload route (This is a duplicate route.  Removing the second one)
 
   return httpServer;
 }
