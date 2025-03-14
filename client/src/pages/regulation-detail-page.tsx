@@ -1,18 +1,6 @@
 /**
  * @module RegulationDetailPage
  * @description Displays detailed information about a specific regulation and provides administrative controls
- * @compliance ISO/IEC/IEEE 26514 4.3.2 - User Interface Documentation
- * 
- * @securityControl Access Control
- * - Implements role-based access control for admin features
- * - Restricts notification settings to admin users
- * - Validates user authentication status
- * 
- * @component
- * @example
- * ```tsx
- * <RegulationDetailPage />
- * ```
  */
 
 import { useState } from "react";
@@ -39,11 +27,20 @@ import {
   Shield,
   History,
 } from "lucide-react";
-import { format, differenceInDays } from "date-fns";
+import { format } from "date-fns";
 import { NoteSection } from "@/components/regulations/note-section";
 import { RegulationTimeline } from "@/components/regulations/regulation-timeline";
 import { RegulationChanges } from "@/components/regulations/regulation-changes";
 import Navigation from "@/components/layout/navigation";
+
+interface Action {
+  type: string;
+  status: string;
+}
+
+interface RegulationType extends Regulation {
+  actions?: Action[];
+}
 
 export default function RegulationDetailPage() {
   const [location, navigate] = useLocation();
@@ -53,7 +50,7 @@ export default function RegulationDetailPage() {
   const queryClient = useQueryClient();
   const regulationId = location.split("/")[2];
 
-  const { data: regulation, isLoading } = useQuery<Regulation>({
+  const { data: regulation, isLoading } = useQuery<RegulationType>({
     queryKey: ["/api/regulations", regulationId],
   });
 
@@ -68,7 +65,7 @@ export default function RegulationDetailPage() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries(["/api/regulations", regulationId]);
+      queryClient.invalidateQueries({ queryKey: ["/api/regulations", regulationId] });
       toast({
         title: "Action Updated",
         description: "The regulation action has been updated successfully.",
@@ -84,7 +81,7 @@ export default function RegulationDetailPage() {
   });
 
   const handleActionUpdate = (type: string) => {
-    const currentAction = regulation?.actions?.find((a: any) => a.type === type);
+    const currentAction = regulation?.actions?.find(a => a.type === type);
     const newStatus = currentAction?.status === "completed" ? "pending" : "completed";
     actionMutation.mutate({ type, status: newStatus });
   };
@@ -98,6 +95,21 @@ export default function RegulationDetailPage() {
             <div className="flex items-center justify-center space-x-4">
               <Loader2 className="h-6 w-6 animate-spin text-[#00267A]" />
               <span>Loading...</span>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
+
+  if (!regulation) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        <main className="py-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <p>Regulation not found.</p>
             </div>
           </div>
         </main>
@@ -122,25 +134,25 @@ export default function RegulationDetailPage() {
                 Back to Regulations
               </Button>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                {regulation?.name || regulation?.topic}
+                {regulation.name || regulation.topic}
               </h1>
               <div className="flex items-center space-x-2 text-sm text-gray-500">
                 <span className="px-2 py-1 bg-gray-100 rounded">
-                  ID: {regulation?.itemId}
+                  ID: {regulation.itemId}
                 </span>
                 <span className="px-2 py-1 bg-gray-100 rounded">
-                  {regulation?.category}
+                  {regulation.category}
                 </span>
               </div>
             </div>
 
             {/* Action Buttons */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {regulation?.regulationUrl && (
+              {regulation.regulationUrl && (
                 <Button
                   variant="outline"
                   className="flex items-center justify-center gap-2"
-                  onClick={() => window.open(regulation.regulationUrl, '_blank')}
+                  onClick={() => window.open(regulation.regulationUrl || '', '_blank')}
                 >
                   <Globe className="h-4 w-4" />
                   View Regulation Website
@@ -158,7 +170,7 @@ export default function RegulationDetailPage() {
                 variant="outline"
                 className="flex items-center justify-center gap-2"
                 onClick={() => {
-                  const subject = encodeURIComponent(`Regulation ${regulation?.itemId} - ${regulation?.topic}`);
+                  const subject = encodeURIComponent(`Regulation ${regulation.itemId} - ${regulation.topic}`);
                   window.location.href = `mailto:compliance@moravian.edu?subject=${subject}`;
                 }}
               >
@@ -171,9 +183,64 @@ export default function RegulationDetailPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Required Actions</CardTitle>
+                <CardDescription>Track and manage compliance requirements</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
+                  <div className="grid gap-4">
+                    <div className="flex items-start gap-3 p-4 border rounded-lg">
+                      <input 
+                        type="checkbox" 
+                        checked={regulation.actions?.find(a => a.type === 'attestation')?.status === 'completed'}
+                        onChange={() => handleActionUpdate('attestation')}
+                        className="mt-1" 
+                      />
+                      <div>
+                        <p className="font-medium">Attestation</p>
+                        <p className="text-sm text-gray-600">Confirm review of requirements</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3 p-4 border rounded-lg">
+                      <input 
+                        type="checkbox"
+                        checked={regulation.actions?.find(a => a.type === 'website_publish')?.status === 'completed'}
+                        onChange={() => handleActionUpdate('website_publish')}
+                        className="mt-1"
+                      />
+                      <div>
+                        <p className="font-medium">Website Publication</p>
+                        <p className="text-sm text-gray-600">Public disclosure requirements</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3 p-4 border rounded-lg">
+                      <input 
+                        type="checkbox"
+                        checked={regulation.actions?.find(a => a.type === 'community_communication')?.status === 'completed'}
+                        onChange={() => handleActionUpdate('community_communication')}
+                        className="mt-1"
+                      />
+                      <div>
+                        <p className="font-medium">Community Communication</p>
+                        <p className="text-sm text-gray-600">Required notifications</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-start gap-3 p-4 border rounded-lg">
+                      <input 
+                        type="checkbox"
+                        checked={regulation.actions?.find(a => a.type === 'agency_submission')?.status === 'completed'}
+                        onChange={() => handleActionUpdate('agency_submission')}
+                        className="mt-1"
+                      />
+                      <div>
+                        <p className="font-medium">Agency Submission</p>
+                        <p className="text-sm text-gray-600">Submit required documentation</p>
+                      </div>
+                    </div>
+                  </div>
+
                   <Button 
                     onClick={() => setShowSubmissionWizard(true)}
                     className="w-full"
@@ -206,7 +273,7 @@ export default function RegulationDetailPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="prose prose-sm max-w-none text-gray-700">
-                      {regulation?.summary
+                      {regulation.summary
                         ?.replace(/<[^>]*>/g, '')
                         ?.split(/\n+/)
                         .map((paragraph, index) => (
@@ -227,7 +294,7 @@ export default function RegulationDetailPage() {
                   <CardContent>
                     <div className="prose max-w-none">
                       <div className="space-y-4">
-                        {regulation?.requirements ? (
+                        {regulation.requirements ? (
                           <>
                             <p className="text-gray-700">{regulation.requirements}</p>
                             {regulation.requirementsUrl && (
@@ -269,8 +336,8 @@ export default function RegulationDetailPage() {
 
               {/* Sidebar */}
               <div className="space-y-6">
-                {/* Version History (Admin Only) */}
-                {regulation?.previousVersionId && (
+                {/* Version History */}
+                {regulation.previousVersionId && (
                   <Card>
                     <CardHeader>
                       <CardTitle>Version History</CardTitle>
