@@ -446,37 +446,64 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
 
-    async createEvidenceFile(file: InsertEvidenceFile): Promise<EvidenceFile> {
-    const [evidenceFile] = await db
-      .insert(evidenceFiles)
-      .values(file)
-      .returning();
-    return evidenceFile;
+  async createEvidenceFile(file: InsertEvidenceFile): Promise<EvidenceFile> {
+    try {
+      console.log("Creating new evidence file:", file);
+      const [evidenceFile] = await db
+        .insert(evidenceFiles)
+        .values(file)
+        .returning();
+
+      console.log("Created evidence file:", evidenceFile);
+      return evidenceFile;
+    } catch (error) {
+      console.error("Error creating evidence file:", error);
+      throw error;
+    }
   }
 
   async getEvidenceFilesByRegulation(regulationId: number): Promise<EvidenceFile[]> {
-    return await db
-      .select()
-      .from(evidenceFiles)
-      .where(eq(evidenceFiles.regulationId, regulationId))
-      .orderBy(desc(evidenceFiles.uploadedAt));
+    try {
+      console.log(`Fetching evidence files for regulation ${regulationId}`);
+      const files = await db
+        .select()
+        .from(evidenceFiles)
+        .where(eq(evidenceFiles.regulationId, regulationId))
+        .orderBy(desc(evidenceFiles.uploadedAt));
+
+      console.log(`Found ${files.length} evidence files`);
+      return files;
+    } catch (error) {
+      console.error("Error fetching evidence files:", error);
+      throw error; // Let the route handler deal with the error
+    }
   }
 
   async getEvidenceFile(id: number): Promise<EvidenceFile | undefined> {
-    const [file] = await db
-      .select()
-      .from(evidenceFiles)
-      .where(eq(evidenceFiles.id, id));
-    return file;
+    try {
+      const [file] = await db
+        .select()
+        .from(evidenceFiles)
+        .where(eq(evidenceFiles.id, id));
+      return file;
+    } catch (error) {
+      console.error("Error fetching evidence file:", error);
+      throw error;
+    }
   }
 
   async updateEvidenceFileStatus(id: number, status: string): Promise<EvidenceFile> {
-    const [file] = await db
-      .update(evidenceFiles)
-      .set({ status })
-      .where(eq(evidenceFiles.id, id))
-      .returning();
-    return file;
+    try {
+      const [file] = await db
+        .update(evidenceFiles)
+        .set({ status })
+        .where(eq(evidenceFiles.id, id))
+        .returning();
+      return file;
+    } catch (error) {
+      console.error("Error updating evidence file status:", error);
+      throw error;
+    }
   }
 }
 

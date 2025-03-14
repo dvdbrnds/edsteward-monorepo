@@ -326,7 +326,8 @@ export function registerRoutes(app: express.Application): Server {
     }
   });
   
-  // Add new route to get evidence files
+
+  // Update the evidence files endpoints with better error handling
   app.get("/api/regulations/:regulationId/evidence", async (req, res) => {
     try {
       if (!req.user) {
@@ -336,9 +337,27 @@ export function registerRoutes(app: express.Application): Server {
 
       const { regulationId } = req.params;
 
-      const files = await storage.getEvidenceFilesByRegulation(parseInt(regulationId));
+      if (!regulationId || isNaN(parseInt(regulationId))) {
+        return res.status(400).json({ error: "Invalid regulation ID" });
+      }
 
-      return res.json(files);
+      try {
+        const files = await storage.getEvidenceFilesByRegulation(parseInt(regulationId));
+
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
+          `Successfully fetched ${files.length} evidence files for regulation ${regulationId}`);
+
+        return res.json(files);
+      } catch (dbError) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Database error fetching evidence files", {
+          error: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+
+        return res.status(500).json({
+          error: "Database error fetching evidence files",
+          details: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+      }
     } catch (error) {
       syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Error fetching evidence files", {
         error: error instanceof Error ? error.message : String(error)
@@ -346,6 +365,82 @@ export function registerRoutes(app: express.Application): Server {
 
       return res.status(500).json({
         error: "Failed to fetch evidence files",
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  // Update the evidence upload endpoint with better error handling
+  app.post("/api/regulations/:regulationId/evidence", upload.array('files', 5), async (req, res) => {
+    try {
+      if (!req.user) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized evidence upload attempt");
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const { regulationId } = req.params;
+
+      if (!regulationId || isNaN(parseInt(regulationId))) {
+        return res.status(400).json({ error: "Invalid regulation ID" });
+      }
+
+      const files = req.files as Express.Multer.File[];
+      const formData = req.body.data ? JSON.parse(req.body.data) : {};
+
+      if (!files || files.length === 0) {
+        return res.status(400).json({ error: "No files uploaded" });
+      }
+
+      const savedFiles = [];
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const description = req.body[`description${i}`] || '';
+
+        try {
+          const evidenceFile = await storage.createEvidenceFile({
+            regulationId: parseInt(regulationId),
+            fileName: file.originalname,
+            fileSize: file.size,
+            fileType: file.mimetype,
+            description,
+            uploadedBy: req.user.id,
+            status: "pending",
+            storagePath: file.path
+          });
+
+          savedFiles.push(evidenceFile);
+        } catch (fileError) {
+          syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Error saving evidence file", {
+            error: fileError instanceof Error ? fileError.message : String(fileError),
+            fileName: file.originalname
+          });
+          // Continue with other files even if one fails
+        }
+      }
+
+      if (savedFiles.length === 0) {
+        return res.status(500).json({
+          error: "Failed to save any evidence files",
+          message: "None of the uploaded files could be saved"
+        });
+      }
+
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
+        `Successfully uploaded ${savedFiles.length} evidence files for regulation ${regulationId}`);
+
+      return res.json({
+        message: `Successfully uploaded ${savedFiles.length} of ${files.length} files`,
+        files: savedFiles
+      });
+
+    } catch (error) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Error uploading evidence files", {
+        error: error instanceof Error ? error.message : String(error)
+      });
+
+      return res.status(500).json({
+        error: "Failed to upload evidence files",
         details: error instanceof Error ? error.message : String(error)
       });
     }
@@ -628,6 +723,11 @@ export function registerRoutes(app: express.Application): Server {
       }
 
       const { regulationId } = req.params;
+
+      if (!regulationId || isNaN(parseInt(regulationId))) {
+        return res.status(400).json({ error: "Invalid regulation ID" });
+      }
+
       const files = req.files as Express.Multer.File[];
       const formData = req.body.data ? JSON.parse(req.body.data) : {}; //handle case where data is missing
 
@@ -641,25 +741,40 @@ export function registerRoutes(app: express.Application): Server {
         const file = files[i];
         const description = req.body[`description${i}`] || '';
 
-        const evidenceFile = await storage.createEvidenceFile({
-          regulationId: parseInt(regulationId),
-          fileName: file.originalname,
-          fileSize: file.size,
-          fileType: file.mimetype,
-          description,
-          uploadedBy: req.user.id,
-          status: "pending",
-          storagePath: file.path
-        });
+        try {
+          const evidenceFile = await storage.createEvidenceFile({
+            regulationId: parseInt(regulationId),
+            fileName: file.originalname,
+            fileSize: file.size,
+            fileType: file.mimetype,
+            description,
+            uploadedBy: req.user.id,
+            status: "pending",
+            storagePath: file.path
+          });
 
-        savedFiles.push(evidenceFile);
+          savedFiles.push(evidenceFile);
+        } catch (fileError) {
+          syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Error saving evidence file", {
+            error: fileError instanceof Error ? fileError.message : String(fileError),
+            fileName: file.originalname
+          });
+          // Continue with other files even if one fails
+        }
+      }
+
+      if (savedFiles.length === 0) {
+        return res.status(500).json({
+          error: "Failed to save any evidence files",
+          message: "None of the uploaded files could be saved"
+        });
       }
 
       syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
         `Successfully uploaded ${savedFiles.length} evidence files for regulation ${regulationId}`);
 
       return res.json({
-        message: "Files uploaded successfully",
+        message: `Successfully uploaded ${savedFiles.length} of ${files.length} files`,
         files: savedFiles
       });
 
