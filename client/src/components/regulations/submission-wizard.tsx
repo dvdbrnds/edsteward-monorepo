@@ -23,7 +23,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { Check, ChevronRight, FileText, Upload, X } from "lucide-react";
+import { Check, ChevronRight, FileText, Upload, X, Loader2 } from "lucide-react";
 import type { Regulation } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
 
@@ -71,6 +71,7 @@ interface UploadedFile {
 export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionWizardProps) {
   const [currentStep, setCurrentStep] = useState<string>('info');
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
 
@@ -144,19 +145,21 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
   };
 
   const handleSubmit = async (values: EvidenceFormValues) => {
-    // Create FormData for file upload
-    const formData = new FormData();
-
-    // Add form values
-    formData.append('data', JSON.stringify(values));
-
-    // Add files
-    uploadedFiles.forEach((uploadedFile, index) => {
-      formData.append(`files`, uploadedFile.file);
-      formData.append(`description${index}`, uploadedFile.description);
-    });
-
     try {
+      setIsSubmitting(true);
+
+      // Create FormData for file upload
+      const formData = new FormData();
+
+      // Add form values
+      formData.append('data', JSON.stringify(values));
+
+      // Add files
+      uploadedFiles.forEach((uploadedFile, index) => {
+        formData.append('files', uploadedFile.file);
+        formData.append(`description${index}`, uploadedFile.description);
+      });
+
       const response = await fetch(`/api/regulations/${regulation.id}/evidence`, {
         method: 'POST',
         body: formData,
@@ -183,6 +186,8 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
         description: "There was an error submitting your evidence. Please try again.",
         variant: "destructive",
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -246,7 +251,7 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
       case 'evidence':
         return (
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
+            <form className="space-y-4">
               <FormField
                 control={form.control}
                 name="documentTitle"
@@ -382,10 +387,19 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
             <Button
               onClick={form.handleSubmit(handleSubmit)}
               className="w-full"
-              type="submit"
+              disabled={isSubmitting}
             >
-              Submit Evidence
-              <Check className="h-4 w-4 ml-2" />
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Submitting...
+                </>
+              ) : (
+                <>
+                  Submit Evidence
+                  <Check className="h-4 w-4 ml-2" />
+                </>
+              )}
             </Button>
           </div>
         );
