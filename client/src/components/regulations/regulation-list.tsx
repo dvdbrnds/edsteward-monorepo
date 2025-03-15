@@ -206,7 +206,8 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                     <ArrowUpDown className="h-4 w-4" />
                   </div>
                 </TableHead>
-                <TableHead>Status & Actions</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Next Deadline</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -239,57 +240,57 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="space-y-2">
-                        {nextDeadline ? (
-                          <div className="flex items-center gap-2">
-                            {nextDeadline.status === "completed" ? (
-                              <CheckCircle className="h-4 w-4 text-green-500" />
-                            ) : nextDeadline.status === "overdue" ? (
-                              <AlertCircle className="h-4 w-4 text-red-500" />
-                            ) : (
-                              <Clock className="h-4 w-4 text-yellow-500" />
+                      <div className="flex gap-3">
+                        {regulation.actions?.map(action => (
+                          <div
+                            key={action.type}
+                            className={cn(
+                              "relative flex items-center gap-1 transition-all duration-200",
+                              getActionStatus(action),
+                              action.required ? "scale-110" : "scale-90"
                             )}
-                            <span className={
-                              nextDeadline.status === "completed"
-                                ? "text-green-600"
-                                : nextDeadline.status === "overdue"
-                                ? "text-red-600"
-                                : "text-yellow-600"
-                            }>
-                              {format(new Date(nextDeadline.dueDate), "PP")}
-                            </span>
+                            title={`${action.type.replace('_', ' ')} ${action.required ? '(Required)' : '(Optional)'} - ${action.status}`}
+                          >
+                            {getActionIcon(action.type)}
+                            {action.required && (
+                              <div className="absolute -top-1 -right-1 flex items-center justify-center">
+                                <div
+                                  className={cn(
+                                    "h-2 w-2 rounded-full",
+                                    action.status === 'completed'
+                                      ? "bg-emerald-600"
+                                      : "bg-rose-500 animate-pulse"
+                                  )}
+                                />
+                              </div>
+                            )}
                           </div>
-                        ) : (
-                          <span className="text-gray-500">No deadlines</span>
-                        )}
-                        <div className="flex gap-3">
-                          {regulation.actions?.map(action => (
-                            <div
-                              key={action.type}
-                              className={cn(
-                                "relative flex items-center gap-1 transition-all duration-200",
-                                getActionStatus(action),
-                                action.required ? "scale-110" : "scale-90"
-                              )}
-                              title={`${action.type.replace('_', ' ')} ${action.required ? '(Required)' : '(Optional)'} - ${action.status}`}
-                            >
-                              {getActionIcon(action.type)}
-                              {action.required && (
-                                <div className="absolute -top-1 -right-1 flex items-center justify-center">
-                                  <div
-                                    className={cn(
-                                      "h-2 w-2 rounded-full",
-                                      action.status === 'completed'
-                                        ? "bg-emerald-600"
-                                        : "bg-rose-500 animate-pulse"
-                                    )}
-                                  />
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                        </div>
+                        ))}
                       </div>
+                    </TableCell>
+                    <TableCell>
+                      {nextDeadline ? (
+                        <div className="flex items-center gap-2">
+                          {nextDeadline.status === "completed" ? (
+                            <CheckCircle className="h-4 w-4 text-green-500" />
+                          ) : nextDeadline.status === "overdue" ? (
+                            <AlertCircle className="h-4 w-4 text-red-500" />
+                          ) : (
+                            <Clock className="h-4 w-4 text-yellow-500" />
+                          )}
+                          <span className={
+                            nextDeadline.status === "completed"
+                              ? "text-green-600"
+                              : nextDeadline.status === "overdue"
+                              ? "text-red-600"
+                              : "text-yellow-600"
+                          }>
+                            {format(new Date(nextDeadline.dueDate), "PP")}
+                          </span>
+                        </div>
+                      ) : (
+                        <span className="text-gray-500">No deadlines</span>
+                      )}
                     </TableCell>
                   </TableRow>
                 );
