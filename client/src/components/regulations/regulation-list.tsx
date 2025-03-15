@@ -160,10 +160,8 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
       return 'text-gray-400 opacity-40';
     }
 
-    // Required incomplete actions use warm colors
-    return action.status === 'in_progress'
-      ? 'text-amber-500' // Warm color for in-progress
-      : 'text-rose-500'; // Warm color for attention needed
+    // Required incomplete actions use red
+    return 'text-rose-500'; // Warm color for attention needed
   };
 
   return (
