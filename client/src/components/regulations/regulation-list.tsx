@@ -289,9 +289,16 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                             title={`${action.type.replace('_', ' ')} ${action.required ? '(Required)' : '(Optional)'} - ${action.status}`}
                           >
                             {getActionIcon(action.type)}
-                            {action.required && action.status !== 'completed' && (
+                            {action.required && (
                               <div className="absolute -top-1 -right-1 flex items-center justify-center">
-                                <div className="h-2 w-2 rounded-full bg-current animate-pulse" />
+                                <div 
+                                  className={cn(
+                                    "h-2 w-2 rounded-full bg-current",
+                                    action.status === 'completed'
+                                      ? "" 
+                                      : "animate-pulse" 
+                                  )}
+                                />
                               </div>
                             )}
                           </div>
