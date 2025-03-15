@@ -35,6 +35,8 @@ import { WebPublishDialog } from "@/components/regulations/web-publish-dialog";
 import { CommunicationDialog } from "@/components/regulations/communication-dialog";
 import { SubmissionWizard } from "@/components/regulations/submission-wizard";
 import { EvidenceFiles } from "@/components/regulations/evidence-files";
+import marked from 'marked'; // Import marked library for markdown parsing
+
 
 interface AttestationActionProps {
   action: RegulationAction;
@@ -224,9 +226,40 @@ function ActionButton({ action, regulationId, regulation, isAdmin, onRequiredCha
   );
 }
 
+function GuideContent() {
+  const { data: guides, isLoading } = useQuery({
+    queryKey: ["/api/guides", { category: "submission" }],
+  });
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-4">
+        <Loader2 className="h-6 w-6 animate-spin text-[#00267A]" />
+      </div>
+    );
+  }
+
+  const submissionGuide = guides?.find(guide => guide.category === "submission");
+
+  if (!submissionGuide) {
+    return (
+      <div className="p-4 text-gray-600">
+        <p>No submission guidelines available for this regulation.</p>
+        <p className="mt-2">Please contact the compliance office for assistance with your submission.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="prose prose-sm max-w-none"
+      dangerouslySetInnerHTML={{ __html: marked.parse(submissionGuide.content) }}
+    />
+  );
+}
+
 function RegulationDetailPage() {
   const [location] = useLocation();
-  const regulationId = Number(location.split("/")[2]);
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [showVersionHistory, setShowVersionHistory] = useState(false);
@@ -268,7 +301,7 @@ function RegulationDetailPage() {
 
   const handleActionStatusChange = (action: RegulationAction, newStatus: RegulationAction['status']) => {
     updateActionMutation.mutate({
-      regulationId,
+      regulationId: action.regulationId, // Corrected to use action.regulationId
       action: { ...action, status: newStatus }
     });
   };
@@ -277,20 +310,27 @@ function RegulationDetailPage() {
     queryKey: ["/api/user"]
   });
 
-  const { data: regulation, isLoading: regulationLoading } = useQuery<Regulation>({
-    queryKey: ["/api/regulations", regulationId],
+  const { data: regulation, isLoading: regulationLoading } = useQuery({
+    queryKey: ["/api/regulations", location.split("/")[2]], // Use location.split for dynamic id
     queryFn: async () => {
-      const response = await fetch(`/api/regulations/${regulationId}`);
+      const response = await fetch(`/api/regulations/${location.split("/")[2]}`); // Use location.split for dynamic id
       if (!response.ok) {
         throw new Error('Failed to fetch regulation');
       }
       return response.json();
     },
-    enabled: !!regulationId
+    enabled: !!location.split("/")[2] // Check if regulationId exists
   });
 
   const { data: deadlines = [], isLoading: deadlinesLoading } = useQuery<Deadline[]>({
-    queryKey: ["/api/deadlines"]
+    queryKey: ["/api/deadlines", location.split("/")[2]], // Use location.split for dynamic id
+    queryFn: async () => {
+        const response = await fetch(`/api/deadlines?regulationId=${location.split("/")[2]}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch deadlines');
+        }
+        return response.json();
+      }
   });
 
 
@@ -310,7 +350,7 @@ function RegulationDetailPage() {
     );
   }
 
-  const regulationDeadlines = deadlines.filter(d => d.regulationId === regulationId) || [];
+  const regulationDeadlines = deadlines.filter(d => d.regulationId === Number(location.split("/")[2])) || [];
   const nextDeadline = regulationDeadlines.length > 0
     ? regulationDeadlines.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0]
     : null;
@@ -415,6 +455,14 @@ function RegulationDetailPage() {
                     </div>
                   </CardContent>
                 </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Submission Guidelines</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <GuideContent />
+                  </CardContent>
+                </Card>
               </div>
 
               <div className="space-y-6">
@@ -429,12 +477,12 @@ function RegulationDetailPage() {
                         <ActionButton
                           key={action.type}
                           action={action}
-                          regulationId={regulationId}
+                          regulationId={Number(location.split("/")[2])} // Corrected to use Number(location.split("/")[2])
                           regulation={regulation}
                           isAdmin={user?.role === "admin"}
                           onRequiredChange={(required) => {
                             updateActionMutation.mutate({
-                              regulationId,
+                              regulationId: Number(location.split("/")[2]), // Corrected to use Number(location.split("/")[2])
                               action: { ...action, required }
                             });
                           }}
@@ -447,7 +495,7 @@ function RegulationDetailPage() {
                     </div>
                   </CardContent>
                 </Card>
-                <EvidenceFiles regulationId={regulationId} />
+                <EvidenceFiles regulationId={Number(location.split("/")[2])} /> {/* Corrected to use Number(location.split("/")[2]) */}
                 {nextDeadline && (
                   <Card>
                     <CardHeader>
