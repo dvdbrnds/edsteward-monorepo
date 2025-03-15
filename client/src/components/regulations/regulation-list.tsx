@@ -93,6 +93,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
     if (search.trim()) {
       const searchLower = search.toLowerCase();
       return (
+        reg.itemId?.toLowerCase().includes(searchLower) ||
         reg.name?.toLowerCase().includes(searchLower) ||
         reg.topic?.toLowerCase().includes(searchLower) ||
         reg.category?.toLowerCase().includes(searchLower) ||
