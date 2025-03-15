@@ -48,6 +48,17 @@ import moravianLogo from "@/assets/Screenshot_2025-02-12_at_9.15.57_AM-removebg-
  */
 const CHANGELOG = [
   {
+    version: "0.3.0",
+    date: "March 15, 2025",
+    changes: [
+      "Redesigned regulations list for improved readability",
+      "Added Directly Responsible Office (DRO) column",
+      "Optimized column ordering for better user experience",
+      "Enhanced ID number search functionality",
+      "Improved status visualization with streamlined layout"
+    ],
+  },
+  {
     version: "0.2.9",
     date: "March 15, 2025",
     changes: [
