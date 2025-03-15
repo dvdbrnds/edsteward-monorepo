@@ -1,7 +1,7 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import type { Regulation, Deadline, InsertDeadline, RegulationAction } from "@shared/schema";
 import { useLocation } from "wouter";
-import { Search, ExternalLink, CheckCircle, AlertCircle, Clock, Loader2, ArrowUpDown, Check, Globe, Mail, FileText, Ban } from "lucide-react";
+import { Search, ExternalLink, CheckCircle, AlertCircle, Clock, Loader2, ArrowUpDown, Check, Globe, Mail, FileText } from "lucide-react";
 import { differenceInDays, format } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -145,16 +145,24 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
   };
 
   const getActionStatus = (action: RegulationAction) => {
-    if (!action.enabled) return 'text-gray-300';
-    if (!action.required) return 'text-gray-400/50'; // Dim non-required actions more
+    if (!action.enabled) return 'opacity-30';
 
+    // Non-required actions use neutral colors with reduced saturation
+    if (!action.required) {
+      return cn(
+        'opacity-40 grayscale',
+        action.status === 'completed' ? 'text-gray-600' : 'text-gray-400'
+      );
+    }
+
+    // Required actions use warm/cool colors based on status
     switch (action.status) {
       case 'completed':
-        return 'text-green-600';
+        return 'text-emerald-600'; // Cool color for completion
       case 'in_progress':
-        return 'text-yellow-500';
+        return 'text-amber-500'; // Warm color for in-progress
       default:
-        return 'text-blue-500'; // Make pending required actions more noticeable
+        return 'text-rose-500'; // Warm color for attention
     }
   };
 
@@ -269,24 +277,22 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                       )}
                     </TableCell>
                     <TableCell>
-                      <div className="flex gap-2">
+                      <div className="flex gap-3">
                         {regulation.actions?.map(action => (
                           <div
                             key={action.type}
-                            className={`relative flex items-center gap-1 ${getActionStatus(action)}`}
-                            title={`${action.type.replace('_', ' ')} - ${action.status}${action.required ? ' (Required)' : ' (Optional)'}`}
+                            className={cn(
+                              "relative flex items-center gap-1 transition-all duration-200",
+                              getActionStatus(action),
+                              action.required ? "scale-110" : "scale-90" // Required actions are slightly larger
+                            )}
+                            title={`${action.type.replace('_', ' ')} ${action.required ? '(Required)' : '(Optional)'} - ${action.status}`}
                           >
                             {getActionIcon(action.type)}
-                            {!action.required && (
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <Ban
-                                  className="h-5 w-5 text-gray-400 opacity-90"
-                                  strokeWidth={1.5}
-                                />
-                              </div>
-                            )}
                             {action.required && (
-                              <div className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full" />
+                              <div className="absolute -top-1 -right-1 flex items-center justify-center">
+                                <div className="h-2 w-2 rounded-full bg-current animate-pulse" />
+                              </div>
                             )}
                           </div>
                         ))}
