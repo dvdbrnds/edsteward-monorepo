@@ -36,6 +36,58 @@ import { CommunicationDialog } from "@/components/regulations/communication-dial
 import { SubmissionWizard } from "@/components/regulations/submission-wizard";
 import { EvidenceFiles } from "@/components/regulations/evidence-files";
 
+function calculateComplianceScore(regulation: Regulation | undefined, deadlines: Deadline[] = []): {
+  score: number;
+  breakdown: {
+    deadlines: number;
+    documentation: number;
+    review: number;
+  };
+} {
+  if (!regulation) {
+    return {
+      score: 0,
+      breakdown: {
+        deadlines: 0,
+        documentation: 0,
+        review: 0
+      }
+    };
+  }
+
+  // Calculate deadline completion rate (40% of total score)
+  const completedDeadlines = deadlines.filter(d => d.status === "completed").length;
+  const deadlineScore = deadlines.length > 0
+    ? (completedDeadlines / deadlines.length) * 40
+    : 0;
+
+  // Calculate documentation score (30% of total score)
+  const documentationFields = [
+    regulation.requirements,
+    regulation.regulationUrl,
+    regulation.requirementsUrl,
+    regulation.submissionGuidelines
+  ];
+  const filledFields = documentationFields.filter(field => field && field.length > 0).length;
+  const documentationScore = (filledFields / documentationFields.length) * 30;
+
+  // Calculate review status score (30% of total score)
+  const reviewScore = regulation.lastUpdated
+    ? Math.max(0, 30 - Math.floor(differenceInDays(new Date(), new Date(regulation.lastUpdated)) / 30))
+    : 0;
+
+  const totalScore = Math.round(deadlineScore + documentationScore + reviewScore);
+
+  return {
+    score: totalScore,
+    breakdown: {
+      deadlines: Math.round(deadlineScore),
+      documentation: Math.round(documentationScore),
+      review: Math.round(reviewScore)
+    }
+  };
+}
+
 function RegulationDetailPage() {
   const [location] = useLocation();
   const regulationId = Number(location.split("/")[2]);
@@ -149,6 +201,8 @@ function RegulationDetailPage() {
     );
   }
 
+  const complianceScore = calculateComplianceScore(regulation, regulationDeadlines);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
@@ -176,6 +230,42 @@ function RegulationDetailPage() {
                 </span>
               </div>
             </div>
+
+            {/* Add action buttons */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {regulation?.regulationUrl && (
+                <Button
+                  variant="outline"
+                  className="flex items-center justify-center gap-2"
+                  onClick={() => window.open(regulation.regulationUrl, '_blank')}
+                >
+                  <Globe className="h-4 w-4" />
+                  View Regulation Website
+                </Button>
+              )}
+              <Button
+                variant="outline"
+                className="flex items-center justify-center gap-2"
+                onClick={() => window.print()}
+              >
+                <Printer className="h-4 w-4" />
+                Print Report
+              </Button>
+              <Button
+                variant="outline"
+                className="flex items-center justify-center gap-2"
+                onClick={() => {
+                  const subject = encodeURIComponent(`Regulation ${regulation?.itemId} - ${regulation?.topic}`);
+                  window.location.href = `mailto:compliance@moravian.edu?subject=${subject}`;
+                }}
+              >
+                <Mail className="h-4 w-4" />
+                Contact Compliance Office
+              </Button>
+            </div>
+
+            {/* Add Timeline */}
+            <RegulationTimeline regulation={regulation} />
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-6">
@@ -252,9 +342,131 @@ function RegulationDetailPage() {
                     <NoteSection regulationId={regulationId} />
                   </CardContent>
                 </Card>
+
+                {/* Add Additional Details card */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Additional Details</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {user?.role === "admin" && (
+                        <div>
+                          <h3 className="font-medium text-gray-900">Version History</h3>
+                          <div className="mt-2">
+                            <Button
+                              variant="outline"
+                              className="flex items-center gap-2"
+                              onClick={() => setShowVersionHistory(!showVersionHistory)}
+                            >
+                              <History className="h-4 w-4" />
+                              {showVersionHistory ? 'Hide Version History' : 'Show Version History'}
+                            </Button>
+                            {showVersionHistory && regulation?.previousVersionId && (
+                              <div className="mt-4">
+                                <RegulationChanges currentRegulation={regulation} />
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      <div>
+                        <h3 className="font-medium text-gray-900">Statute</h3>
+                        <p className="text-gray-700 mt-1">
+                          {regulation?.statute}
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {regulation?.originationDate && (
+                          <div>
+                            <h3 className="font-medium text-gray-900">Origination Date</h3>
+                            <p className="text-gray-700 mt-1">
+                              {format(new Date(regulation.originationDate), "PP")}
+                            </p>
+                          </div>
+                        )}
+                        {regulation?.effectiveDate && (
+                          <div>
+                            <h3 className="font-medium text-gray-900">Effective Date</h3>
+                            <p className="text-gray-700 mt-1">
+                              {format(new Date(regulation.effectiveDate), "PP")}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Add Agency Information card */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Agency Information</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-2">
+                      {regulation?.agency_name && (
+                        <p className="text-gray-700">
+                          <span className="font-medium">Agency:</span> {regulation.agency_name}
+                        </p>
+                      )}
+                      {regulation?.agency_url && (
+                        <a
+                          href={regulation.agency_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#00267A] hover:text-[#003166] underline inline-flex items-center gap-2"
+                        >
+                          Visit Agency Website
+                          <ExternalLink className="h-3 w-3" />
+                        </a>
+                      )}
+                      {regulation?.agency_contact && (
+                        <p className="text-gray-700">
+                          <span className="font-medium">Contact:</span> {regulation.agency_contact}
+                        </p>
+                      )}
+                      {regulation?.agency_department && (
+                        <p className="text-gray-700">
+                          <span className="font-medium">Department:</span> {regulation.agency_department}
+                        </p>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
               </div>
 
               <div className="space-y-6">
+                {/* Add Compliance Score card */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Compliance Score</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-center">
+                      <div className="text-4xl font-bold text-[#00267A]">
+                        {complianceScore.score}%
+                      </div>
+                      <div className="mt-4 space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>Deadlines</span>
+                          <span>{complianceScore.breakdown.deadlines}%</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>Documentation</span>
+                          <span>{complianceScore.breakdown.documentation}%</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span>Review Status</span>
+                          <span>{complianceScore.breakdown.review}%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
                 <Card>
                   <CardHeader>
                     <CardTitle>Actions Required</CardTitle>
