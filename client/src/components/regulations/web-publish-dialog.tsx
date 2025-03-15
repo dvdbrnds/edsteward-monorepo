@@ -9,13 +9,15 @@ import {
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Copy } from "lucide-react";
+import { Copy, Check } from "lucide-react";
 import type { Regulation } from "@shared/schema";
+import { useToast } from "@/hooks/use-toast";
 
 interface WebPublishDialogProps {
   regulation: Regulation;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onComplete?: () => void;
 }
 
 const generateDrupalCode = (regulation: Regulation): string => {
@@ -113,19 +115,35 @@ const generateUniversalCode = (regulation: Regulation): string => {
 </div>`.trim();
 };
 
-export function WebPublishDialog({ regulation, open, onOpenChange }: WebPublishDialogProps) {
+export function WebPublishDialog({ regulation, open, onOpenChange, onComplete }: WebPublishDialogProps) {
   const [activeTab, setActiveTab] = useState("drupal");
   const [expandedSection, setExpandedSection] = useState<"preview" | "code" | null>(null);
+  const [hasCopied, setHasCopied] = useState(false);
+  const { toast } = useToast();
 
   const handleCopy = async (code: string) => {
     await navigator.clipboard.writeText(code);
+    setHasCopied(true);
+    toast({
+      title: "Code Copied",
+      description: "The website code has been copied to your clipboard.",
+    });
+    onComplete?.(); // Trigger completion callback when code is copied
   };
 
   const drupalCode = generateDrupalCode(regulation);
   const universalCode = generateUniversalCode(regulation);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog 
+      open={open} 
+      onOpenChange={(newOpen) => {
+        if (!newOpen && hasCopied) {
+          onComplete?.(); // Also trigger completion when dialog is closed after copying
+        }
+        onOpenChange(newOpen);
+      }}
+    >
       <DialogContent className="sm:max-w-[800px]">
         <DialogHeader>
           <DialogTitle>Website Publication Code</DialogTitle>
