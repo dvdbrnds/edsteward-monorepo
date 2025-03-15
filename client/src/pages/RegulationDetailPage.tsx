@@ -345,54 +345,89 @@ export function RegulationDetailPage() {
                       <div>
                         <h3 className="font-medium text-gray-900">Statute</h3>
                         <p className="text-gray-700 mt-1">
-                          {regulation?.statute}
+                          {regulation?.statute || (
+                            <span className="text-gray-500 italic">No statute information available</span>
+                          )}
+                        </p>
+                      </div>
+
+                      <div>
+                        <h3 className="font-medium text-gray-900">Filing Deadlines</h3>
+                        {regulation?.filingDeadlines && regulation.filingDeadlines.length > 0 ? (
+                          <ul className="list-disc pl-5 mt-1 space-y-1">
+                            {regulation.filingDeadlines.map((deadline, index) => (
+                              <li key={index} className="text-gray-700">
+                                {deadline.date}: {deadline.description}
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p className="text-gray-500 italic mt-1">No filing deadlines specified</p>
+                        )}
+                      </div>
+
+                      <div>
+                        <h3 className="font-medium text-gray-900">Reporting Frequency</h3>
+                        <p className="text-gray-700 mt-1">
+                          {regulation?.reportingFrequency || (
+                            <span className="text-gray-500 italic">No reporting frequency specified</span>
+                          )}
                         </p>
                       </div>
 
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {regulation?.originationDate && (
-                          <div>
-                            <h3 className="font-medium text-gray-900">Origination Date</h3>
-                            <p className="text-gray-700 mt-1">
-                              {format(new Date(regulation.originationDate), "PP")}
-                            </p>
-                          </div>
-                        )}
-                        {regulation?.effectiveDate && (
-                          <div>
-                            <h3 className="font-medium text-gray-900">Effective Date</h3>
-                            <p className="text-gray-700 mt-1">
-                              {format(new Date(regulation.effectiveDate), "PP")}
-                            </p>
-                          </div>
-                        )}
-                        {regulation?.lastUpdated && (
-                          <div>
-                            <h3 className="font-medium text-gray-900">Last Updated</h3>
-                            <p className="text-gray-700 mt-1">
-                              {format(new Date(regulation.lastUpdated), "PP")}
-                            </p>
-                          </div>
-                        )}
-                        {regulation?.nextReviewDate && (
-                          <div>
-                            <h3 className="font-medium text-gray-900">Next Review Date</h3>
-                            <p className="text-gray-700 mt-1">
-                              {format(new Date(regulation.nextReviewDate), "PP")}
-                            </p>
-                          </div>
-                        )}
+                        <div>
+                          <h3 className="font-medium text-gray-900">Origination Date</h3>
+                          <p className="text-gray-700 mt-1">
+                            {regulation?.originationDate ? (
+                              format(new Date(regulation.originationDate), "PP")
+                            ) : (
+                              <span className="text-gray-500 italic">No origination date specified</span>
+                            )}
+                          </p>
+                        </div>
+                        <div>
+                          <h3 className="font-medium text-gray-900">Effective Date</h3>
+                          <p className="text-gray-700 mt-1">
+                            {regulation?.effectiveDate ? (
+                              format(new Date(regulation.effectiveDate), "PP")
+                            ) : (
+                              <span className="text-gray-500 italic">No effective date specified</span>
+                            )}
+                          </p>
+                        </div>
+                        <div>
+                          <h3 className="font-medium text-gray-900">Last Updated</h3>
+                          <p className="text-gray-700 mt-1">
+                            {regulation?.lastUpdated ? (
+                              format(new Date(regulation.lastUpdated), "PP")
+                            ) : (
+                              <span className="text-gray-500 italic">No last update date available</span>
+                            )}
+                          </p>
+                        </div>
+                        <div>
+                          <h3 className="font-medium text-gray-900">Next Review Date</h3>
+                          <p className="text-gray-700 mt-1">
+                            {regulation?.nextReviewDate ? (
+                              format(new Date(regulation.nextReviewDate), "PP")
+                            ) : (
+                              <span className="text-gray-500 italic">No review date scheduled</span>
+                            )}
+                          </p>
+                        </div>
                       </div>
 
                       <div>
                         <h3 className="font-medium text-gray-900">Agency Information</h3>
                         <div className="mt-2 space-y-2">
-                          {regulation?.agency_name && (
-                            <p className="text-gray-700">
-                              <span className="font-medium">Agency:</span> {regulation.agency_name}
-                            </p>
-                          )}
-                          {regulation?.agency_url && (
+                          <p className="text-gray-700">
+                            <span className="font-medium">Agency:</span>{' '}
+                            {regulation?.agency_name || (
+                              <span className="text-gray-500 italic">No agency name provided</span>
+                            )}
+                          </p>
+                          {regulation?.agency_url ? (
                             <a
                               href={regulation.agency_url}
                               target="_blank"
@@ -402,17 +437,21 @@ export function RegulationDetailPage() {
                               Visit Agency Website
                               <ExternalLink className="h-3 w-3" />
                             </a>
+                          ) : (
+                            <p className="text-gray-500 italic">No agency website available</p>
                           )}
-                          {regulation?.agency_contact && (
-                            <p className="text-gray-700">
-                              <span className="font-medium">Contact:</span> {regulation.agency_contact}
-                            </p>
-                          )}
-                          {regulation?.agency_department && (
-                            <p className="text-gray-700">
-                              <span className="font-medium">Department:</span> {regulation.agency_department}
-                            </p>
-                          )}
+                          <p className="text-gray-700">
+                            <span className="font-medium">Contact:</span>{' '}
+                            {regulation?.agency_contact || (
+                              <span className="text-gray-500 italic">No contact information provided</span>
+                            )}
+                          </p>
+                          <p className="text-gray-700">
+                            <span className="font-medium">Department:</span>{' '}
+                            {regulation?.agency_department || (
+                              <span className="text-gray-500 italic">No department specified</span>
+                            )}
+                          </p>
                         </div>
                       </div>
                     </div>
@@ -426,8 +465,8 @@ export function RegulationDetailPage() {
                   <CardContent>
                     <div className="prose max-w-none">
                       {regulation?.submissionGuidelines ? (
-                        <div dangerouslySetInnerHTML={{ 
-                          __html: regulation.submissionGuidelines 
+                        <div dangerouslySetInnerHTML={{
+                          __html: regulation.submissionGuidelines
                         }} />
                       ) : (
                         <p className="text-gray-500 italic">
