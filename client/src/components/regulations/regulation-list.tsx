@@ -146,16 +146,15 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
 
   const getActionStatus = (action: RegulationAction) => {
     if (!action.enabled) return 'text-gray-300';
-    if (action.type === 'attestation' && action.status === 'completed') return 'text-green-500';
-    if (action.required) return 'text-red-500';
+    if (!action.required) return 'text-gray-400/50'; // Dim non-required actions more
 
     switch (action.status) {
       case 'completed':
-        return 'text-green-500';
+        return 'text-green-600';
       case 'in_progress':
         return 'text-yellow-500';
       default:
-        return 'text-gray-400';
+        return 'text-blue-500'; // Make pending required actions more noticeable
     }
   };
 
@@ -280,8 +279,14 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                             {getActionIcon(action.type)}
                             {!action.required && (
                               <div className="absolute inset-0 flex items-center justify-center">
-                                <Ban className="h-4 w-4 text-gray-400/50" />
+                                <Ban
+                                  className="h-5 w-5 text-gray-400 opacity-90"
+                                  strokeWidth={1.5}
+                                />
                               </div>
+                            )}
+                            {action.required && (
+                              <div className="absolute -top-1 -right-1 h-2 w-2 bg-red-500 rounded-full" />
                             )}
                           </div>
                         ))}
