@@ -369,12 +369,12 @@ function RegulationDetailPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-6">
-                {regulation.sections && regulation.sections.length > 0 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Regulation Sections</CardTitle>
-                    </CardHeader>
-                    <CardContent>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Regulation Sections</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    {regulation.sections && regulation.sections.length > 0 ? (
                       <div className="space-y-4">
                         {regulation.sections.map((section, index) => (
                           <div key={index} className="border-b pb-4 last:border-b-0">
@@ -383,9 +383,11 @@ function RegulationDetailPage() {
                           </div>
                         ))}
                       </div>
-                    </CardContent>
-                  </Card>
-                )}
+                    ) : (
+                      <p className="text-gray-500 italic">No sections available for this regulation.</p>
+                    )}
+                  </CardContent>
+                </Card>
                 <Card>
                   <CardHeader>
                     <CardTitle>Summary</CardTitle>
