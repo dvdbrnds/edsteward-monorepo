@@ -171,6 +171,21 @@ function ActionButton({ action, regulationId, regulation, isAdmin, onRequiredCha
       .join(' ');
   };
 
+  const handleActionClick = () => {
+    switch (action.type) {
+      case 'website_publish':
+        setShowWebPublishDialog(true);
+        break;
+      case 'community_communication':
+        setShowCommunicationDialog(true);
+        break;
+      case 'agency_submission':
+        setShowSubmissionWizard(true);
+        break;
+    }
+    onStatusChange?.('in_progress');
+  };
+
   return (
     <>
       <div className={`flex flex-col space-y-4 p-4 border rounded-lg ${action.required ? 'border-red-200' : ''}`}>
@@ -202,37 +217,21 @@ function ActionButton({ action, regulationId, regulation, isAdmin, onRequiredCha
             regulationId={regulationId}
             onStatusChange={onStatusChange!}
           />
-        ) : action.type === 'website_publish' ? (
+        ) : (
           <Button
             variant="default"
             size="sm"
             className="w-full"
-            onClick={() => setShowWebPublishDialog(true)}
+            onClick={handleActionClick}
           >
-            <Globe className="h-4 w-4 mr-2" />
-            Publish to Website
+            {getIcon()}
+            <span className="ml-2">
+              {action.type === 'website_publish' && 'Publish to Website'}
+              {action.type === 'community_communication' && 'Generate Statement'}
+              {action.type === 'agency_submission' && 'Begin Submission'}
+            </span>
           </Button>
-        ) : action.type === 'community_communication' ? (
-          <Button
-            variant="default"
-            size="sm"
-            className="w-full"
-            onClick={() => setShowCommunicationDialog(true)}
-          >
-            <Mail className="h-4 w-4 mr-2" />
-            Generate Statement
-          </Button>
-        ) : action.type === 'agency_submission' ? (
-          <Button
-            variant="default"
-            size="sm"
-            className="w-full"
-            onClick={() => setShowSubmissionWizard(true)}
-          >
-            <FileText className="h-4 w-4 mr-2" />
-            Begin Submission
-          </Button>
-        ) : null}
+        )}
       </div>
 
       <WebPublishDialog
@@ -430,7 +429,11 @@ export function RegulationDetailPage() {
                     defaultValue={regulation.category}
                     onValueChange={(value) => categoryMutation.mutate(value)}
                   >
-                    <SelectTrigger className="w-[180px] bg-gray-100">
+                    <SelectTrigger className="w-[180px] bg-gray-100 border-2 border-[#5B2C8F] rounded-md relative group hover:bg-purple-50/50 transition-colors">
+                      <div className="absolute -top-2 -right-2 bg-[#5B2C8F] text-white text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
+                        <Shield className="h-3 w-3" />
+                        Admin
+                      </div>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
