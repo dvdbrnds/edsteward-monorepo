@@ -5,7 +5,6 @@ import { Search, ExternalLink, CheckCircle, AlertCircle, Clock, Loader2, ArrowUp
 import { differenceInDays, format } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import CircularProgress from "@/components/common/circular-progress";
 import {
   Table,
   TableBody,
@@ -183,7 +182,6 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Status</TableHead>
                 <TableHead className="cursor-pointer" onClick={() => handleSort('name')}>
                   <div className="flex items-center gap-2">
                     Name
@@ -208,8 +206,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                     <ArrowUpDown className="h-4 w-4" />
                   </div>
                 </TableHead>
-                <TableHead>Next Deadline</TableHead>
-                <TableHead>Actions</TableHead>
+                <TableHead>Status & Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -225,15 +222,6 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                     className="cursor-pointer hover:bg-gray-50"
                     onClick={() => handleRowClick(regulation)}
                   >
-                    <TableCell>
-                      <div className="flex items-center justify-center">
-                        <CircularProgress
-                          progress={nextDeadline?.status === 'completed' ? 100 : 0}
-                          size="sm"
-                          showPercentage={true}
-                        />
-                      </div>
-                    </TableCell>
                     <TableCell>
                       <div className="text-base font-medium text-gray-900">
                         {regulation.name || regulation.statute || 'Untitled Regulation'}
@@ -251,56 +239,56 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                       </div>
                     </TableCell>
                     <TableCell>
-                      {nextDeadline ? (
-                        <div className="flex items-center gap-2">
-                          {nextDeadline.status === "completed" ? (
-                            <CheckCircle className="h-4 w-4 text-green-500" />
-                          ) : nextDeadline.status === "overdue" ? (
-                            <AlertCircle className="h-4 w-4 text-red-500" />
-                          ) : (
-                            <Clock className="h-4 w-4 text-yellow-500" />
-                          )}
-                          <span className={
-                            nextDeadline.status === "completed"
-                              ? "text-green-600"
-                              : nextDeadline.status === "overdue"
-                              ? "text-red-600"
-                              : "text-yellow-600"
-                          }>
-                            {format(new Date(nextDeadline.dueDate), "PP")}
-                          </span>
-                        </div>
-                      ) : (
-                        <span className="text-gray-500">No deadlines</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-3">
-                        {regulation.actions?.map(action => (
-                          <div
-                            key={action.type}
-                            className={cn(
-                              "relative flex items-center gap-1 transition-all duration-200",
-                              getActionStatus(action),
-                              action.required ? "scale-110" : "scale-90" // Required actions are slightly larger
+                      <div className="space-y-2">
+                        {nextDeadline ? (
+                          <div className="flex items-center gap-2">
+                            {nextDeadline.status === "completed" ? (
+                              <CheckCircle className="h-4 w-4 text-green-500" />
+                            ) : nextDeadline.status === "overdue" ? (
+                              <AlertCircle className="h-4 w-4 text-red-500" />
+                            ) : (
+                              <Clock className="h-4 w-4 text-yellow-500" />
                             )}
-                            title={`${action.type.replace('_', ' ')} ${action.required ? '(Required)' : '(Optional)'} - ${action.status}`}
-                          >
-                            {getActionIcon(action.type)}
-                            {action.required && (
-                              <div className="absolute -top-1 -right-1 flex items-center justify-center">
-                                <div
-                                  className={cn(
-                                    "h-2 w-2 rounded-full",
-                                    action.status === 'completed'
-                                      ? "bg-emerald-600" // Static green circle for completed
-                                      : "bg-rose-500 animate-pulse" // Animated red circle for pending required
-                                  )}
-                                />
-                              </div>
-                            )}
+                            <span className={
+                              nextDeadline.status === "completed"
+                                ? "text-green-600"
+                                : nextDeadline.status === "overdue"
+                                ? "text-red-600"
+                                : "text-yellow-600"
+                            }>
+                              {format(new Date(nextDeadline.dueDate), "PP")}
+                            </span>
                           </div>
-                        ))}
+                        ) : (
+                          <span className="text-gray-500">No deadlines</span>
+                        )}
+                        <div className="flex gap-3">
+                          {regulation.actions?.map(action => (
+                            <div
+                              key={action.type}
+                              className={cn(
+                                "relative flex items-center gap-1 transition-all duration-200",
+                                getActionStatus(action),
+                                action.required ? "scale-110" : "scale-90"
+                              )}
+                              title={`${action.type.replace('_', ' ')} ${action.required ? '(Required)' : '(Optional)'} - ${action.status}`}
+                            >
+                              {getActionIcon(action.type)}
+                              {action.required && (
+                                <div className="absolute -top-1 -right-1 flex items-center justify-center">
+                                  <div
+                                    className={cn(
+                                      "h-2 w-2 rounded-full",
+                                      action.status === 'completed'
+                                        ? "bg-emerald-600"
+                                        : "bg-rose-500 animate-pulse"
+                                    )}
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </TableCell>
                   </TableRow>
