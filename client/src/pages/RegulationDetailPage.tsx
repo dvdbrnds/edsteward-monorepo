@@ -5,7 +5,6 @@ import type { Regulation, Deadline, RegulationAction } from "@shared/schema";
 import { Navigation } from "@/components/layout/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import {
@@ -19,7 +18,6 @@ import {
   AlertCircle,
   ArrowLeft,
   Loader2,
-  Bell,
   Shield,
   History,
   Check,
@@ -34,7 +32,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { RegulationDiffViewer } from "@/components/regulations/regulation-diff-viewer";
 import { NoteSection } from "@/components/regulations/note-section";
 import { RegulationChanges } from "@/components/regulations/regulation-changes";
 import { RegulationTimeline } from "@/components/regulations/regulation-timeline";
@@ -43,31 +40,11 @@ import { CommunicationDialog } from "@/components/regulations/communication-dial
 import { SubmissionWizard } from "@/components/regulations/submission-wizard";
 import { EvidenceFiles } from "@/components/regulations/evidence-files";
 
-const CATEGORIES = [
-  "Academic Programs",
-  "Campus Safety",
-  "Civil Rights",
-  "Student Services",
-  "Administrative",
-  "Other"
-];
-
-function calculateComplianceScore(regulation: Regulation | undefined, deadlines: Deadline[] = []): {
-  score: number;
-  breakdown: {
-    deadlines: number;
-    documentation: number;
-    review: number;
-  };
-} {
+function calculateComplianceScore(regulation: Regulation | undefined, deadlines: Deadline[] = []) {
   if (!regulation) {
     return {
       score: 0,
-      breakdown: {
-        deadlines: 0,
-        documentation: 0,
-        review: 0
-      }
+      breakdown: { deadlines: 0, documentation: 0, review: 0 }
     };
   }
 
@@ -92,10 +69,8 @@ function calculateComplianceScore(regulation: Regulation | undefined, deadlines:
     ? Math.max(0, 30 - Math.floor(differenceInDays(new Date(), new Date(regulation.lastUpdated)) / 30))
     : 0;
 
-  const totalScore = Math.round(deadlineScore + documentationScore + reviewScore);
-
   return {
-    score: totalScore,
+    score: Math.round(deadlineScore + documentationScore + reviewScore),
     breakdown: {
       deadlines: Math.round(deadlineScore),
       documentation: Math.round(documentationScore),
@@ -266,6 +241,7 @@ export function RegulationDetailPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Update action mutation
   const updateActionMutation = useMutation({
     mutationFn: async ({ regulationId, action }: { regulationId: number; action: RegulationAction }) => {
       const response = await fetch(
@@ -300,6 +276,7 @@ export function RegulationDetailPage() {
     },
   });
 
+  // Category mutation
   const categoryMutation = useMutation({
     mutationFn: async (category: string) => {
       const response = await fetch(
@@ -370,13 +347,6 @@ export function RegulationDetailPage() {
     );
   }
 
-  const regulationDeadlines = deadlines?.filter(d => d.regulationId === regulationId) || [];
-  const nextDeadline = regulationDeadlines.length > 0
-    ? regulationDeadlines.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0]
-    : null;
-
-  const complianceScore = calculateComplianceScore(regulation, regulationDeadlines);
-
   if (!regulation) {
     return (
       <div className="min-h-screen bg-gray-50">
@@ -400,6 +370,13 @@ export function RegulationDetailPage() {
       </div>
     );
   }
+
+  const regulationDeadlines = deadlines?.filter(d => d.regulationId === regulationId) || [];
+  const nextDeadline = regulationDeadlines.length > 0
+    ? regulationDeadlines.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0]
+    : null;
+
+  const complianceScore = calculateComplianceScore(regulation, regulationDeadlines);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -437,7 +414,14 @@ export function RegulationDetailPage() {
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {CATEGORIES.map((category) => (
+                      {[
+                        "Academic Programs",
+                        "Campus Safety",
+                        "Civil Rights",
+                        "Student Services",
+                        "Administrative",
+                        "Other"
+                      ].map((category) => (
                         <SelectItem key={category} value={category}>
                           {category}
                         </SelectItem>
@@ -496,15 +480,7 @@ export function RegulationDetailPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="prose prose-sm max-w-none text-gray-700">
-                      {regulation.summary
-                        ? regulation.summary
-                            .split(/\n+/)
-                            .map((paragraph, index) => (
-                              <p key={index} className="mb-4 leading-relaxed">
-                                {paragraph.trim()}
-                              </p>
-                            ))
-                        : "No summary available."}
+                      {regulation.summary || "No summary available."}
                     </div>
                   </CardContent>
                 </Card>
@@ -560,7 +536,6 @@ export function RegulationDetailPage() {
                       {showVersionHistory && (
                         <div className="mt-4">
                           <RegulationChanges currentRegulation={regulation} />
-                          <RegulationDiffViewer currentRegulation={regulation} />
                         </div>
                       )}
                     </CardContent>
@@ -612,9 +587,10 @@ export function RegulationDetailPage() {
                   <CardContent>
                     <div className="prose max-w-none">
                       {regulation.submissionGuidelines ? (
-                        <div dangerouslySetInnerHTML={{
-                          __html: regulation.submissionGuidelines
-                        }} />
+                        <div 
+                          className="text-gray-700"
+                          dangerouslySetInnerHTML={{ __html: regulation.submissionGuidelines }} 
+                        />
                       ) : (
                         <p className="text-gray-500 italic">
                           No submission guidelines available.
