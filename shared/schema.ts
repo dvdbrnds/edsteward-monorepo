@@ -107,8 +107,8 @@ export const regulations = pgTable("regulations", {
   requirements: text("requirements"),
   category: text("category").notNull(),
   jurisdiction: text("jurisdiction").notNull().default("federal"),
-  stateCode: text("state_code"), // Added for state regulations
-  stateAgency: text("state_agency"), // Added for state agency tracking
+  // Add DRO field
+  dro: text("dro").notNull().default(""),
   isApplicable: boolean("is_applicable").notNull().default(true),
   originationDate: timestamp("origination_date"),
   effectiveDate: timestamp("effective_date"),
@@ -200,6 +200,7 @@ console.log("Note schema fields:", Object.keys(notes));
 // Update the insert schema to include PA-specific validation
 export const insertRegulationSchema = createInsertSchema(regulations).extend({
   name: z.string().min(1, "Regulation name is required"),
+  dro: z.string().email("DRO must be a valid email address").optional(),
   jurisdiction: z.enum(["federal", "state"]),
   stateCode: z.string().optional(),
   stateAgency: z.string().optional(),

@@ -97,7 +97,8 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
         reg.name?.toLowerCase().includes(searchLower) ||
         reg.topic?.toLowerCase().includes(searchLower) ||
         reg.category?.toLowerCase().includes(searchLower) ||
-        reg.statute?.toLowerCase().includes(searchLower)
+        reg.statute?.toLowerCase().includes(searchLower) ||
+        reg.dro?.toLowerCase().includes(searchLower)
       );
     }
     return true;
@@ -164,6 +165,25 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
     return 'text-rose-500'; // Warm color for attention needed
   };
 
+  const getDroEmailByCategory = (category: string) => {
+    switch(category) {
+      case 'Campus Safety':
+        return 'campus.safety@university.edu';
+      case 'Academic Programs':
+        return 'academic.affairs@university.edu';
+      case 'Finance':
+        return 'finance@university.edu';
+      case 'Human Resources':
+        return 'hr@university.edu';
+      case 'Information Technology':
+        return 'it.security@university.edu';
+      case 'Research':
+        return 'research.compliance@university.edu';
+      default:
+        return 'compliance@university.edu';
+    }
+  };
+
   return (
     <Card>
       <CardContent className="p-6">
@@ -207,6 +227,12 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                     <ArrowUpDown className="h-4 w-4" />
                   </div>
                 </TableHead>
+                <TableHead className="cursor-pointer" onClick={() => handleSort('dro')}>
+                  <div className="flex items-center gap-2">
+                    DRO
+                    <ArrowUpDown className="h-4 w-4" />
+                  </div>
+                </TableHead>
                 <TableHead className="cursor-pointer" onClick={() => handleSort('jurisdiction')}>
                   <div className="flex items-center gap-2">
                     Jurisdiction
@@ -246,6 +272,11 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                       </div>
                     </TableCell>
                     <TableCell>{regulation.category || 'Uncategorized'}</TableCell>
+                    <TableCell>
+                      <div className="text-sm text-blue-600">
+                        {regulation.dro || getDroEmailByCategory(regulation.category)}
+                      </div>
+                    </TableCell>
                     <TableCell>
                       <div className={`text-sm ${regulation.jurisdiction === 'federal' ? 'text-blue-600' : 'text-green-600'}`}>
                         {regulation.jurisdiction === 'federal' ? 'Federal' : 'State'}
