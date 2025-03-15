@@ -63,7 +63,7 @@ const CHANGELOG = [
     date: "March 15, 2025",
     changes: [
       "Enhanced action icons with improved color psychology",
-      "Bug Fixes: Fixed website publish completion, improved visual distinction for actions, standardized status colors"
+      "Bug Fixes"
     ],
   },
   {
@@ -72,7 +72,7 @@ const CHANGELOG = [
     changes: [
       "Added hover preview functionality for evidence files",
       "Enhanced evidence files display with uploader information",
-      "Bug Fixes: Improved file upload configuration and static file serving"
+      "Bug Fixes"
     ],
   },
   {
@@ -80,7 +80,7 @@ const CHANGELOG = [
     date: "March 12, 2025",
     changes: [
       "Enhanced PA regulation collector with improved error handling",
-      "Bug Fixes: Implemented skip mechanism for problematic regulations, optimized database operations"
+      "Bug Fixes"
     ],
   },
   {
@@ -88,7 +88,7 @@ const CHANGELOG = [
     date: "March 12, 2025",
     changes: [
       "Added dedicated endpoint for updating regulation categories",
-      "Bug Fixes: Fixed deadline creation, enhanced error handling, improved form validation"
+      "Bug Fixes"
     ],
   },
   {
@@ -98,7 +98,7 @@ const CHANGELOG = [
       "Added CSV export functionality to system logs",
       "Enhanced system logs display with improved formatting",
       "Replaced comments with comprehensive diary functionality",
-      "Bug Fixes: Improved log entry readability and tracking"
+      "Bug Fixes"
     ],
   },
   {
@@ -106,7 +106,7 @@ const CHANGELOG = [
     date: "February 27, 2025",
     changes: [
       "Added comprehensive JSDoc documentation",
-      "Bug Fixes: Enhanced code maintainability and documentation format"
+      "Bug Fixes"
     ],
   },
   {
@@ -115,7 +115,7 @@ const CHANGELOG = [
     changes: [
       "Enhanced user management in admin settings",
       "Added password reset functionality",
-      "Bug Fixes: Improved version dialog, enhanced admin section visibility"
+      "Bug Fixes"
     ],
   },
   {
@@ -133,7 +133,7 @@ const CHANGELOG = [
     changes: [
       "Added jurisdiction filtering for regulations",
       "Implemented sortable columns in regulations table",
-      "Bug Fixes: Fixed user registration workflow and table UI"
+      "Bug Fixes"
     ],
   },
   {
@@ -151,7 +151,7 @@ const CHANGELOG = [
     date: "February 21, 2025",
     changes: [
       "Updated pie chart colors with distinct color scheme",
-      "Bug Fixes: Unified category colors and improved consistency"
+      "Bug Fixes"
     ],
   },
   {
@@ -160,7 +160,7 @@ const CHANGELOG = [
     changes: [
       "Updated setup wizard to focus on compliance offices",
       "Added support for department distribution lists",
-      "Bug Fixes: Improved setup wizard UX and admin detection"
+      "Bug Fixes"
     ],
   },
   {
@@ -184,7 +184,7 @@ const CHANGELOG = [
     version: "0.1.5",
     date: "February 18, 2025",
     changes: [
-      "Bug Fixes: Fixed agency name display and improved URL mapping"
+      "Bug Fixes"
     ],
   },
   {
@@ -193,21 +193,21 @@ const CHANGELOG = [
     changes: [
       "Added in-platform submission guide feature",
       "Integrated guide system with markdown support",
-      "Bug Fixes: Fixed external URL dependencies"
+      "Bug Fixes"
     ],
   },
   {
     version: "0.1.3",
     date: "February 18, 2025",
     changes: [
-      "Bug Fixes: Fixed HTML formatting and improved regulation readability"
+      "Bug Fixes"
     ],
   },
   {
     version: "0.1.2",
     date: "February 18, 2025",
     changes: [
-      "Bug Fixes: Fixed regulation detail navigation and improved route handling"
+      "Bug Fixes"
     ],
   },
   {
@@ -215,7 +215,7 @@ const CHANGELOG = [
     date: "February 18, 2025",
     changes: [
       "Added changelog tracking system",
-      "Bug Fixes: Fixed legend formatting in reports"
+      "Bug Fixes"
     ],
   },
   {
