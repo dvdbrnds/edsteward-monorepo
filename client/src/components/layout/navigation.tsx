@@ -48,6 +48,16 @@ import moravianLogo from "@/assets/Screenshot_2025-02-12_at_9.15.57_AM-removebg-
  */
 const CHANGELOG = [
   {
+    version: "0.3.1",
+    date: "March 15, 2025",
+    changes: [
+      "Fixed regulation detail page cards missing due to component version mismatch",
+      "Consolidated regulation detail components into single source",
+      "Restored complete set of information cards including Agency Information and Timeline",
+      "Enhanced card layout and organization for better readability"
+    ],
+  },
+  {
     version: "0.3.0",
     date: "March 15, 2025",
     changes: [
