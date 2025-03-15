@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import type { Regulation, Deadline, Guide, RegulationAction } from "@shared/schema";
+import type { Regulation, Deadline, RegulationAction } from "@shared/schema";
 import Navigation from "@/components/layout/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -149,8 +149,10 @@ function ActionButton({ action, regulationId, regulation, isAdmin, onRequiredCha
   const handleActionClick = () => {
     if (action.type === 'website_publish') {
       setShowWebPublishDialog(true);
+      onStatusChange?.('in_progress');
     } else if (action.type === 'community_communication') {
       setShowCommunicationDialog(true);
+      onStatusChange?.('in_progress');
     } else if (action.type === 'agency_submission') {
       setShowSubmissionWizard(true);
       onStatusChange?.('in_progress');
@@ -234,7 +236,7 @@ function ActionButton({ action, regulationId, regulation, isAdmin, onRequiredCha
           onOpenChange={setShowWebPublishDialog}
           onComplete={() => {
             updateActionMutation.mutate({
-              regulationId: Number(regulationId),
+              regulationId,
               action: { ...action, status: 'completed' }
             });
           }}
