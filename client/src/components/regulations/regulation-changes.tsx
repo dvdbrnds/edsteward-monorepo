@@ -29,6 +29,7 @@ function HighlightDifferences({ oldText = '', newText = '' }: { oldText?: string
 
   while (i < words1.length || j < words2.length) {
     if (i >= words1.length) {
+      // Rest of words2 are additions
       changes.push(
         <span key={`add-${j}`} className="bg-green-100">
           {words2.slice(j).join(' ')} 
@@ -37,6 +38,7 @@ function HighlightDifferences({ oldText = '', newText = '' }: { oldText?: string
       break;
     }
     if (j >= words2.length) {
+      // Rest of words1 are deletions
       changes.push(
         <span key={`del-${i}`} className="bg-red-100">
           {words1.slice(i).join(' ')} 
@@ -50,8 +52,10 @@ function HighlightDifferences({ oldText = '', newText = '' }: { oldText?: string
       i++;
       j++;
     } else {
+      // Look ahead for matches
       const nextMatch = words2.slice(j).findIndex(w => w === words1[i]);
       if (nextMatch === -1) {
+        // Word was deleted
         changes.push(
           <span key={`del-${i}`} className="bg-red-100">
             {words1[i]}{' '}
@@ -59,6 +63,7 @@ function HighlightDifferences({ oldText = '', newText = '' }: { oldText?: string
         );
         i++;
       } else {
+        // Words were added
         changes.push(
           <span key={`add-${j}`} className="bg-green-100">
             {words2.slice(j, j + nextMatch).join(' ')}{' '}
@@ -123,21 +128,19 @@ export function RegulationChanges({ currentRegulation }: RegulationChangesProps)
             const oldValue = previousVersion[key as keyof Regulation] as string;
             const newValue = currentRegulation[key as keyof Regulation] as string;
 
+            if (oldValue === newValue) return null;
+
             return (
               <div key={key} className="space-y-2">
                 <h3 className="font-medium text-gray-900">{label}</h3>
                 <div className="rounded-lg border p-4 bg-gray-50">
-                  {oldValue === newValue ? (
-                    <p className="text-gray-500 italic">No changes in this section</p>
-                  ) : (
-                    <HighlightDifferences oldText={oldValue} newText={newValue} />
-                  )}
+                  <HighlightDifferences oldText={oldValue} newText={newValue} />
                 </div>
               </div>
             );
           })}
 
-          {(!currentRegulation.versionMetadata?.changes || currentRegulation.versionMetadata?.changes.length === 0) && (
+          {currentRegulation.versionMetadata?.changes.length === 0 && (
             <p className="text-gray-500 italic">No significant changes detected between versions.</p>
           )}
         </div>
