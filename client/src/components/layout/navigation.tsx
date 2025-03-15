@@ -48,6 +48,17 @@ import moravianLogo from "@/assets/Screenshot_2025-02-12_at_9.15.57_AM-removebg-
  */
 const CHANGELOG = [
   {
+    version: "0.2.9",
+    date: "March 15, 2025",
+    changes: [
+      "Enhanced action icons with improved color psychology for better status visibility",
+      "Fixed website publish action completion functionality",
+      "Improved visual distinction between required and optional actions",
+      "Added animated indicators for pending required actions",
+      "Standardized completion status colors across all action types"
+    ],
+  },
+  {
     version: "0.2.8",
     date: "March 14, 2025",
     changes: [
@@ -306,7 +317,7 @@ export default function Navigation() {
                         setChangelogOpen(true);
                       }}
                     >
-                      Alpha v0.2.8
+                      Alpha v0.2.9
                     </button>
                   </DialogTrigger>
                   <DialogContent className="max-h-[80vh] overflow-y-auto">
