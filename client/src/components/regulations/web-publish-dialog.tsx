@@ -122,13 +122,21 @@ export function WebPublishDialog({ regulation, open, onOpenChange, onComplete }:
   const { toast } = useToast();
 
   const handleCopy = async (code: string) => {
-    await navigator.clipboard.writeText(code);
-    setHasCopied(true);
-    toast({
-      title: "Code Copied",
-      description: "The website code has been copied to your clipboard.",
-    });
-    onComplete?.(); // Trigger completion callback when code is copied
+    try {
+      await navigator.clipboard.writeText(code);
+      setHasCopied(true);
+      toast({
+        title: "Code Copied",
+        description: "The website code has been copied to your clipboard.",
+      });
+      onComplete?.();
+    } catch (error) {
+      toast({
+        title: "Copy Failed",
+        description: "Failed to copy code to clipboard.",
+        variant: "destructive",
+      });
+    }
   };
 
   const drupalCode = generateDrupalCode(regulation);
@@ -139,7 +147,7 @@ export function WebPublishDialog({ regulation, open, onOpenChange, onComplete }:
       open={open} 
       onOpenChange={(newOpen) => {
         if (!newOpen && hasCopied) {
-          onComplete?.(); // Also trigger completion when dialog is closed after copying
+          onComplete?.(); 
         }
         onOpenChange(newOpen);
       }}

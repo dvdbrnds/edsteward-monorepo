@@ -90,41 +90,6 @@ function ActionButton({ action, regulationId, regulation, isAdmin, onRequiredCha
   const [showWebPublishDialog, setShowWebPublishDialog] = useState(false);
   const [showCommunicationDialog, setShowCommunicationDialog] = useState(false);
   const [showSubmissionWizard, setShowSubmissionWizard] = useState(false);
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
-
-  const updateActionMutation = useMutation({
-    mutationFn: async ({ regulationId, action }: { regulationId: number; action: RegulationAction }) => {
-      const response = await fetch(
-        `/api/regulations/${regulationId}/actions/${action.type}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(action),
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to update action");
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      toast({
-        title: "Action Updated",
-        description: "The action has been updated successfully.",
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/regulations", regulationId] });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Update Failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
 
   const getIcon = () => {
     switch (action.type) {
@@ -235,10 +200,7 @@ function ActionButton({ action, regulationId, regulation, isAdmin, onRequiredCha
           open={showWebPublishDialog}
           onOpenChange={setShowWebPublishDialog}
           onComplete={() => {
-            updateActionMutation.mutate({
-              regulationId,
-              action: { ...action, status: 'completed' }
-            });
+            onStatusChange?.('completed');
           }}
         />
       )}
@@ -262,12 +224,52 @@ function ActionButton({ action, regulationId, regulation, isAdmin, onRequiredCha
   );
 }
 
-export default function RegulationDetailPage() {
+function RegulationDetailPage() {
   const [location] = useLocation();
-  const regulationId = location.split("/")[2];
+  const regulationId = Number(location.split("/")[2]);
   const queryClient = useQueryClient();
   const { toast } = useToast();
   const [showVersionHistory, setShowVersionHistory] = useState(false);
+
+  const updateActionMutation = useMutation({
+    mutationFn: async ({ regulationId, action }: { regulationId: number; action: RegulationAction }) => {
+      const response = await fetch(
+        `/api/regulations/${regulationId}/actions/${action.type}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(action),
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to update action");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Action Updated",
+        description: "The action has been updated successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/regulations", regulationId] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Update Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleActionStatusChange = (action: RegulationAction, newStatus: RegulationAction['status']) => {
+    updateActionMutation.mutate({
+      regulationId,
+      action: { ...action, status: newStatus }
+    });
+  };
 
   const { data: user } = useQuery({
     queryKey: ["/api/user"]
@@ -306,7 +308,7 @@ export default function RegulationDetailPage() {
     );
   }
 
-  const regulationDeadlines = deadlines.filter(d => d.regulationId === Number(regulationId)) || [];
+  const regulationDeadlines = deadlines.filter(d => d.regulationId === regulationId) || [];
   const nextDeadline = regulationDeadlines.length > 0
     ? regulationDeadlines.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0]
     : null;
@@ -408,21 +410,16 @@ export default function RegulationDetailPage() {
                         <ActionButton
                           key={action.type}
                           action={action}
-                          regulationId={Number(regulationId)}
+                          regulationId={regulationId}
                           regulation={regulation}
                           isAdmin={user?.role === "admin"}
                           onRequiredChange={(required) => {
                             updateActionMutation.mutate({
-                              regulationId: Number(regulationId),
+                              regulationId,
                               action: { ...action, required }
                             });
                           }}
-                          onStatusChange={(status) => {
-                            updateActionMutation.mutate({
-                              regulationId: Number(regulationId),
-                              action: { ...action, status }
-                            });
-                          }}
+                          onStatusChange={(status) => handleActionStatusChange(action, status)}
                         />
                       ))}
                       {(!regulation?.actions || regulation.actions.length === 0) && (
@@ -431,7 +428,7 @@ export default function RegulationDetailPage() {
                     </div>
                   </CardContent>
                 </Card>
-                <EvidenceFiles regulationId={Number(regulationId)} />
+                <EvidenceFiles regulationId={regulationId} />
                 {nextDeadline && (
                   <Card>
                     <CardHeader>
@@ -474,3 +471,5 @@ export default function RegulationDetailPage() {
     </div>
   );
 }
+
+export default RegulationDetailPage;
