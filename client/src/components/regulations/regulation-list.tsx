@@ -291,12 +291,12 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                             {getActionIcon(action.type)}
                             {action.required && (
                               <div className="absolute -top-1 -right-1 flex items-center justify-center">
-                                <div 
+                                <div
                                   className={cn(
-                                    "h-2 w-2 rounded-full bg-current",
+                                    "h-2 w-2 rounded-full",
                                     action.status === 'completed'
-                                      ? "" 
-                                      : "animate-pulse" 
+                                      ? "bg-emerald-600" // Static green circle for completed
+                                      : "bg-rose-500 animate-pulse" // Animated red circle for pending required
                                   )}
                                 />
                               </div>
