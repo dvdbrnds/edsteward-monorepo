@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
+import { useLocation } from "wouter";
 import {
   Table,
   TableBody,
@@ -17,33 +18,40 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
-import { Download, History } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Download,
+  History,
+  ExternalLink,
+  FileText,
+  Mail,
+  Printer,
+  Globe,
+  Clock,
+  CheckCircle,
+  AlertCircle,
+  ArrowLeft,
+  Loader2,
+  Bell,
+  Shield,
+} from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/use-auth";
 import { Redirect } from "wouter";
 import { RegulationDiffViewer } from "@/components/regulations/regulation-diff-viewer";
+import type { Regulation } from "@shared/schema";
+import { format } from "date-fns";
 
-interface RegulationData {
-  id: number;
-  itemId: string;
-  name: string;
-  topic: string;
-  statute: string;
-  summary: string;
-  requirements: string;
-  category: string;
-  jurisdiction: string;
-  lastUpdated: string;
-  versionNumber: number;
-  previousVersionId: number | null;
-  versionMetadata?: {
-    changes: Array<{
-      field: string;
-      oldValue: string;
-      newValue: string;
-      type: 'addition' | 'deletion' | 'modification';
-    }>;
+interface RegulationData extends Regulation {
+  notificationOverride?: {
+    email: string | null;
+    phone: string | null;
+  };
+  notificationSchedule?: {
+    initialReminder: number;
+    weeklyReminder: number;
+    dailyReminder: number;
+    finalDayReminders: boolean;
   };
 }
 
@@ -53,6 +61,7 @@ export function RegulationViewer() {
   const [showVersionHistory, setShowVersionHistory] = useState(false);
   const { toast } = useToast();
   const { user } = useAuth();
+  const [location, navigate] = useLocation();
 
   // Check for admin access
   if (!user || user.role !== "admin") {
@@ -109,6 +118,10 @@ export function RegulationViewer() {
     if (hoursSinceUpdate < 1) return "bg-green-100"; // Updated within last hour
     if (hoursSinceUpdate < 24) return "bg-yellow-50"; // Updated within last day
     return ""; // No special highlighting
+  };
+
+  const handleRegulationClick = (regulation: RegulationData) => {
+    navigate(`/regulations/${regulation.id}`);
   };
 
   if (isLoading) {
@@ -173,7 +186,11 @@ export function RegulationViewer() {
           </TableHeader>
           <TableBody>
             {filteredRegulations?.map((regulation) => (
-              <TableRow key={regulation.id}>
+              <TableRow 
+                key={regulation.id}
+                className="cursor-pointer hover:bg-gray-50"
+                onClick={() => handleRegulationClick(regulation)}
+              >
                 <TableCell>{regulation.id}</TableCell>
                 <TableCell>{regulation.itemId}</TableCell>
                 <TableCell className={getCellColor(regulation.lastUpdated)}>
