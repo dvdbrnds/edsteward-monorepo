@@ -1,6 +1,8 @@
 # Project Plan: Moravian University Compliance Platform
 
-## Completed Features ✓
+## Core Documentation & Technical Reference
+
+### Completed Features ✓
 1. Core Infrastructure
    - [x] TypeScript and React frontend setup
    - [x] Authentication system with role-based access
@@ -11,6 +13,49 @@
    - [x] Commenting system implementation
    - [x] Evidence files management with preview functionality
    - [x] File upload and storage system
+   - [x] Image and PDF preview support
+   - [x] Uploader information tracking
+
+### Technical Implementation Details
+
+#### Authentication System
+- Role-based access control (RBAC)
+- Session management using express-session
+- Password hashing with bcrypt
+- JWT token management for API access
+
+#### Database Schema
+1. Users Table
+   - Role-based permissions
+   - Department associations
+   - Password reset functionality
+
+2. Regulations Table
+   - Multi-jurisdiction support
+   - Category-based organization
+   - Deadline tracking integration
+
+3. Evidence Files Table
+   - File metadata storage
+   - User attribution
+   - Preview support for images and PDFs
+   - File type validation
+
+#### API Endpoints
+1. Authentication Routes
+   - /api/auth/login
+   - /api/auth/logout
+   - /api/auth/reset-password
+
+2. Regulation Management
+   - /api/regulations
+   - /api/regulations/:id
+   - /api/regulations/:id/evidence
+
+3. Evidence Files
+   - /api/regulations/:regulationId/evidence
+   - /api/uploads/* (Static file serving)
+
 
 ## Current Focus: Testing & Documentation Enhancement
 
@@ -69,17 +114,6 @@
    - [ ] Code style guide
    - [ ] Testing guide
 
-## Next Steps
-1. Begin with Unit Testing setup
-   - Install testing dependencies
-   - Create initial test structure
-   - Implement first batch of API tests
-
-2. Parallel Documentation Work
-   - Set up documentation tools
-   - Begin API documentation
-   - Start component documentation
-
 ## Timeline
 - Phase 1 (Unit Testing): 2 weeks
 - Phase 2 (Integration Testing): 2 weeks
@@ -91,51 +125,26 @@
 - Zero undocumented endpoints
 - All major user flows covered by E2E tests
 
-## Phase 2: Commenting System Implementation
-1. Database Schema Updates
-   - [ ] Create comments table
-   - [ ] Define relationships with regulations
-   - [ ] Set up user associations
+## Current Implementation Progress
+Latest Feature (v0.2.8):
+- Added hover preview for evidence files
+- Enhanced evidence display with uploader information
+- Fixed file upload configuration
+- Improved static file serving
+- Added image/PDF preview support
 
-2. Backend Implementation
-   - [ ] Create comment routes
-   - [ ] Implement CRUD operations
-   - [ ] Add permission controls
+Next Steps:
+1. Complete evidence file preview system
+2. Enhance file type validation
+3. Add bulk upload capabilities
+4. Implement file version tracking
 
-3. Frontend Implementation
-   - [ ] Design comment components
-   - [ ] Integrate with regulation detail page
-   - [ ] Add real-time updates
-
-4. Testing & Documentation (Now incorporated into the Current Focus section above)
-
-
-## Phase 3: Core Feature Enhancement
-1. Data Visualization
-   - [ ] Design dashboard layouts
-   - [ ] Implement compliance metrics charts
-   - [ ] Create department-specific visualizations
-
-2. Notification System
-   - [ ] Set up automated deadline tracking
-   - [ ] Implement email notifications
-   - [ ] Create notification preferences
-
-3. Reporting Tools
-   - [ ] Design report templates
-   - [ ] Implement report generation
-   - [ ] Add export functionality
-
-4. Department Views
-   - [ ] Create department-specific dashboards
-   - [ ] Implement role-based content filtering
-   - [ ] Add department statistics
-
-5. Testing Coverage (Now incorporated into the Current Focus section above)
-
-## Current Focus (Updated)
-Implementing robust commenting system with proper documentation and tracking while following the new structured approach:
-1. Document all changes in reference.md
-2. Use structured code comments
-3. Follow step-by-step implementation verification
-4. Maintain clear progress tracking
+## Tech Stack Reference
+- Frontend: React + TypeScript
+- Backend: Express + Node.js
+- Database: PostgreSQL
+- File Storage: Local filesystem
+- Authentication: Session-based
+- UI Components: shadcn/ui
+- State Management: TanStack Query
+- Form Handling: react-hook-form + zod

@@ -1,7 +1,7 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import type { Regulation, Deadline, InsertDeadline, RegulationAction } from "@shared/schema";
 import { useLocation } from "wouter";
-import { Search, ExternalLink, CheckCircle, AlertCircle, Clock, Loader2, ArrowUpDown, Check, Globe, Mail, FileText } from "lucide-react";
+import { Search, ExternalLink, CheckCircle, AlertCircle, Clock, Loader2, ArrowUpDown, Check, Globe, Mail, FileText, Ban } from "lucide-react";
 import { differenceInDays, format } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -274,10 +274,15 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                         {regulation.actions?.map(action => (
                           <div
                             key={action.type}
-                            className={`flex items-center gap-1 ${getActionStatus(action)}`}
-                            title={`${action.type.replace('_', ' ')} - ${action.status}`}
+                            className={`relative flex items-center gap-1 ${getActionStatus(action)}`}
+                            title={`${action.type.replace('_', ' ')} - ${action.status}${action.required ? ' (Required)' : ' (Optional)'}`}
                           >
                             {getActionIcon(action.type)}
+                            {!action.required && (
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <Ban className="h-4 w-4 text-gray-400/50" />
+                              </div>
+                            )}
                           </div>
                         ))}
                       </div>
