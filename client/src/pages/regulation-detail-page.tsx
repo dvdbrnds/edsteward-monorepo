@@ -253,6 +253,8 @@ function RegulationDetailPage() {
         title: "Action Updated",
         description: "The action has been updated successfully.",
       });
+      // Invalidate both the specific regulation and the full list
+      queryClient.invalidateQueries({ queryKey: ["/api/regulations"] });
       queryClient.invalidateQueries({ queryKey: ["/api/regulations", regulationId] });
     },
     onError: (error: Error) => {
