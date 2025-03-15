@@ -62,11 +62,8 @@ const CHANGELOG = [
     version: "0.2.9",
     date: "March 15, 2025",
     changes: [
-      "Enhanced action icons with improved color psychology for better status visibility",
-      "Fixed website publish action completion functionality",
-      "Improved visual distinction between required and optional actions",
-      "Added animated indicators for pending required actions",
-      "Standardized completion status colors across all action types"
+      "Enhanced action icons with improved color psychology",
+      "Bug Fixes: Fixed website publish completion, improved visual distinction for actions, standardized status colors"
     ],
   },
   {
@@ -75,9 +72,7 @@ const CHANGELOG = [
     changes: [
       "Added hover preview functionality for evidence files",
       "Enhanced evidence files display with uploader information",
-      "Fixed file upload destination configuration",
-      "Improved static file serving for uploaded evidence files",
-      "Added image and PDF preview support in evidence file viewer"
+      "Bug Fixes: Improved file upload configuration and static file serving"
     ],
   },
   {
@@ -85,46 +80,33 @@ const CHANGELOG = [
     date: "March 12, 2025",
     changes: [
       "Enhanced PA regulation collector with improved error handling",
-      "Implemented skip mechanism for problematic regulations",
-      "Added detailed debug logging for database operations",
-      "Optimized database connection management with automatic recovery",
-      "Improved regulation content validation and extraction"
+      "Bug Fixes: Implemented skip mechanism for problematic regulations, optimized database operations"
     ],
   },
   {
     version: "0.2.6",
     date: "March 12, 2025",
     changes: [
-      "Fixed deadline creation functionality with improved validation",
       "Added dedicated endpoint for updating regulation categories",
-      "Enhanced error handling and logging throughout the application",
-      "Improved JSON parsing and error reporting in API responses",
-      "Added comprehensive system logging for better debugging",
-      "Fixed form validation in deadline creation workflow"
+      "Bug Fixes: Fixed deadline creation, enhanced error handling, improved form validation"
     ],
   },
   {
     version: "0.2.5",
     date: "March 4, 2025",
     changes: [
-      "Added CSV export functionality to system logs for administrators",
-      "Enhanced system logs display with improved column formatting",
-      "Added IP address and user agent tracking to log entries",
-      "Improved log entry readability with color-coded severity levels",
-      "Replaced deprecated comments section with comprehensive diary functionality",
-      "Added structured diary entries for better compliance tracking",
-      "Implemented automated diary entry timestamps and user attribution"
+      "Added CSV export functionality to system logs",
+      "Enhanced system logs display with improved formatting",
+      "Replaced comments with comprehensive diary functionality",
+      "Bug Fixes: Improved log entry readability and tracking"
     ],
   },
   {
     version: "0.2.4",
     date: "February 27, 2025",
     changes: [
-      "Added comprehensive JSDoc documentation to core UI components",
-      "Enhanced developer experience with detailed component documentation",
-      "Improved code maintainability with standardized documentation format",
-      "Added accessibility and compliance documentation to UI components",
-      "Included usage examples in component documentation"
+      "Added comprehensive JSDoc documentation",
+      "Bug Fixes: Enhanced code maintainability and documentation format"
     ],
   },
   {
@@ -132,70 +114,62 @@ const CHANGELOG = [
     date: "February 27, 2025",
     changes: [
       "Enhanced user management in admin settings",
-      "Added password reset functionality for existing users",
-      "Improved user editing interface with better validation",
-      "Added secure password management for admin users",
-      "Fixed version number dialog to work correctly from all pages",
-      "Enhanced admin section visibility with purple highlighting",
+      "Added password reset functionality",
+      "Bug Fixes: Improved version dialog, enhanced admin section visibility"
     ],
   },
   {
     version: "0.2.2",
     date: "February 24, 2025",
     changes: [
-      "Added interactive health score dashboard with collapsible category details",
-      "Implemented dynamic circular progress indicators for compliance scores",
-      "Enhanced category breakdown visualization with expandable insights",
-      "Improved overall compliance health score calculation"
+      "Added interactive health score dashboard",
+      "Implemented dynamic circular progress indicators",
+      "Enhanced category breakdown visualization"
     ],
   },
   {
     version: "0.2.1",
     date: "February 24, 2025",
     changes: [
-      "Added jurisdiction filtering for federal and state regulations",
+      "Added jurisdiction filtering for regulations",
       "Implemented sortable columns in regulations table",
-      "Fixed user registration workflow with proper email field validation",
-      "Enhanced table UI with sort indicators and improved column headers"
+      "Bug Fixes: Fixed user registration workflow and table UI"
     ],
   },
   {
     version: "0.2.0",
     date: "February 21, 2025",
     changes: [
-      "Added comprehensive submission guidelines system with markdown support",
-      "Enhanced compliance wizard with category-specific requirements",
-      "Added regulation-specific notification override for admins",
-      "Improved deadline tracking and status visualization",
-      "Enhanced regulation detail page with better document organization",
+      "Added comprehensive submission guidelines system",
+      "Enhanced compliance wizard with category requirements",
+      "Added regulation-specific notification override",
+      "Improved deadline tracking visualization"
     ],
   },
   {
     version: "0.1.9",
     date: "February 21, 2025",
     changes: [
-      "Updated pie chart colors to use 9 distinct colors from different parts of the color wheel",
-      "Unified Student Services category colors",
-      "Improved color consistency across compliance overview and regulations page",
+      "Updated pie chart colors with distinct color scheme",
+      "Bug Fixes: Unified category colors and improved consistency"
     ],
   },
   {
     version: "0.1.8",
     date: "February 20, 2025",
     changes: [
-      "Updated setup wizard to focus on compliance offices instead of individual officers",
-      "Added support for department distribution lists in compliance assignments",
-      "Improved setup wizard UX with suggested email distribution lists",
-      "Enhanced setup flow with better admin existence detection",
+      "Updated setup wizard to focus on compliance offices",
+      "Added support for department distribution lists",
+      "Bug Fixes: Improved setup wizard UX and admin detection"
     ],
   },
   {
     version: "0.1.7",
     date: "February 20, 2025",
     changes: [
-      "Moved notification controls to Admin Settings for centralized management",
+      "Moved notification controls to Admin Settings",
       "Added Recent Notifications card to dashboard",
-      "Improved notification management workflow for compliance officers",
+      "Enhanced notification management workflow"
     ],
   },
   {
@@ -203,15 +177,14 @@ const CHANGELOG = [
     date: "February 18, 2025",
     changes: [
       "Improved regulation title display in Upcoming Deadlines",
-      "Added combined view of regulation IDs and topics for better clarity",
+      "Added combined view of regulation IDs and topics"
     ],
   },
   {
     version: "0.1.5",
     date: "February 18, 2025",
     changes: [
-      "Fixed agency name display in upcoming deadlines dropdown",
-      "Improved agency URL mapping and display consistency",
+      "Bug Fixes: Fixed agency name display and improved URL mapping"
     ],
   },
   {
@@ -220,32 +193,29 @@ const CHANGELOG = [
     changes: [
       "Added in-platform submission guide feature",
       "Integrated guide system with markdown support",
-      "Fixed external URL dependencies",
+      "Bug Fixes: Fixed external URL dependencies"
     ],
   },
   {
     version: "0.1.3",
     date: "February 18, 2025",
     changes: [
-      "Fixed HTML formatting in regulation summaries",
-      "Improved readability of regulation details",
+      "Bug Fixes: Fixed HTML formatting and improved regulation readability"
     ],
   },
   {
     version: "0.1.2",
     date: "February 18, 2025",
     changes: [
-      "Fixed regulation detail page navigation",
-      "Improved route parameter handling",
-      "Added comprehensive logging for debugging",
+      "Bug Fixes: Fixed regulation detail navigation and improved route handling"
     ],
   },
   {
     version: "0.1.1",
     date: "February 18, 2025",
     changes: [
-      "Fixed legend formatting in reports page pie charts",
       "Added changelog tracking system",
+      "Bug Fixes: Fixed legend formatting in reports"
     ],
   },
   {
@@ -256,7 +226,7 @@ const CHANGELOG = [
       "Core authentication system",
       "Basic compliance tracking",
       "Department-specific views",
-      "Responsive design implementation",
+      "Responsive design implementation"
     ],
   },
 ] as const;
