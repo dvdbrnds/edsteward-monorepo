@@ -182,6 +182,12 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
           <Table>
             <TableHeader>
               <TableRow>
+                <TableHead className="cursor-pointer" onClick={() => handleSort('itemId')}>
+                  <div className="flex items-center gap-2">
+                    ID
+                    <ArrowUpDown className="h-4 w-4" />
+                  </div>
+                </TableHead>
                 <TableHead className="cursor-pointer" onClick={() => handleSort('name')}>
                   <div className="flex items-center gap-2">
                     Name
@@ -223,6 +229,11 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                     className="cursor-pointer hover:bg-gray-50"
                     onClick={() => handleRowClick(regulation)}
                   >
+                    <TableCell>
+                      <div className="text-sm font-medium">
+                        {regulation.itemId}
+                      </div>
+                    </TableCell>
                     <TableCell>
                       <div className="text-base font-medium text-gray-900">
                         {regulation.name || regulation.statute || 'Untitled Regulation'}
