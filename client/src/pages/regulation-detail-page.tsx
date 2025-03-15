@@ -197,6 +197,12 @@ function ActionButton({ action, regulationId, regulation, isAdmin, onRequiredCha
           regulation={regulation}
           open={showWebPublishDialog}
           onOpenChange={setShowWebPublishDialog}
+          onComplete={() => {
+            updateActionMutation.mutate({
+              regulationId: Number(regulationId),
+              action: { ...action, status: 'completed' }
+            });
+          }}
         />
       )}
 
