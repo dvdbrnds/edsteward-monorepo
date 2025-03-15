@@ -426,8 +426,8 @@ export function RegulationDetailPage() {
                   <CardContent>
                     <div className="prose max-w-none">
                       {regulation?.submissionGuidelines ? (
-                        <div dangerouslySetInnerHTML={{ 
-                          __html: regulation.submissionGuidelines 
+                        <div dangerouslySetInnerHTML={{
+                          __html: regulation.submissionGuidelines
                         }} />
                       ) : (
                         <p className="text-gray-500 italic">
@@ -515,6 +515,23 @@ export function RegulationDetailPage() {
                     </div>
                   </CardContent>
                 </Card>
+
+                {regulation?.filingDeadlines && regulation.filingDeadlines.length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Filing Deadlines</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="list-disc pl-5 mt-1 space-y-1">
+                        {regulation.filingDeadlines.map((deadline, index) => (
+                          <li key={index} className="text-gray-700">
+                            {deadline.date}: {deadline.description}
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                )}
 
                 {nextDeadline && nextDeadline.status !== "completed" && (
                   <Card className="border-[#00267A]">
