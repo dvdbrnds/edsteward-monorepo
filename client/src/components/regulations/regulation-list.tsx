@@ -147,23 +147,23 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
   const getActionStatus = (action: RegulationAction) => {
     if (!action.enabled) return 'opacity-30';
 
-    // Non-required actions use neutral colors with reduced saturation
-    if (!action.required) {
+    // All completed actions use cool green color
+    if (action.status === 'completed') {
       return cn(
-        'opacity-40 grayscale',
-        action.status === 'completed' ? 'text-gray-600' : 'text-gray-400'
+        'text-emerald-600',
+        !action.required && 'opacity-75' // Slightly dim non-required completed actions
       );
     }
 
-    // Required actions use warm/cool colors based on status
-    switch (action.status) {
-      case 'completed':
-        return 'text-emerald-600'; // Cool color for completion
-      case 'in_progress':
-        return 'text-amber-500'; // Warm color for in-progress
-      default:
-        return 'text-rose-500'; // Warm color for attention
+    // Non-required incomplete actions use neutral colors
+    if (!action.required) {
+      return 'text-gray-400 opacity-40';
     }
+
+    // Required incomplete actions use warm colors
+    return action.status === 'in_progress'
+      ? 'text-amber-500' // Warm color for in-progress
+      : 'text-rose-500'; // Warm color for attention needed
   };
 
   return (
@@ -289,7 +289,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                             title={`${action.type.replace('_', ' ')} ${action.required ? '(Required)' : '(Optional)'} - ${action.status}`}
                           >
                             {getActionIcon(action.type)}
-                            {action.required && (
+                            {action.required && action.status !== 'completed' && (
                               <div className="absolute -top-1 -right-1 flex items-center justify-center">
                                 <div className="h-2 w-2 rounded-full bg-current animate-pulse" />
                               </div>
