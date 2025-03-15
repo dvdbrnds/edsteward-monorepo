@@ -257,7 +257,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                     onClick={() => handleRowClick(regulation)}
                   >
                     <TableCell>
-                      <div className="text-sm">
+                      <div className="text-sm text-gray-500">
                         {regulation.itemId}
                       </div>
                     </TableCell>
