@@ -35,6 +35,19 @@ import { WebPublishDialog } from "@/components/regulations/web-publish-dialog";
 import { CommunicationDialog } from "@/components/regulations/communication-dialog";
 import { SubmissionWizard } from "@/components/regulations/submission-wizard";
 import { EvidenceFiles } from "@/components/regulations/evidence-files";
+import { useAuth } from "@/hooks/use-auth";
+
+const CATEGORIES = [
+  "Other",
+  "Campus Safety",
+  "Accounting",
+  "Human Resources",
+  "Student Life",
+  "Academic Programs",
+  "Admissions",
+  "Athletics",
+  "Financial Aid",
+];
 
 function calculateComplianceScore(regulation: Regulation | undefined, deadlines: Deadline[] = []): {
   score: number;
@@ -89,11 +102,12 @@ function calculateComplianceScore(regulation: Regulation | undefined, deadlines:
 }
 
 function RegulationDetailPage() {
-  const [location] = useLocation();
-  const regulationId = Number(location.split("/")[2]);
-  const queryClient = useQueryClient();
-  const { toast } = useToast();
+  const [location, navigate] = useLocation();
+  const { user } = useAuth();
   const [showVersionHistory, setShowVersionHistory] = useState(false);
+  const regulationId = Number(location.split("/")[2]);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
   const updateActionMutation = useMutation({
     mutationFn: async ({ regulationId, action }: { regulationId: number; action: RegulationAction }) => {
@@ -135,10 +149,6 @@ function RegulationDetailPage() {
       action: { ...action, status: newStatus }
     });
   };
-
-  const { data: user } = useQuery({
-    queryKey: ["/api/user"]
-  });
 
   const { data: regulation, isLoading: regulationLoading } = useQuery<Regulation>({
     queryKey: ["/api/regulations", regulationId],
@@ -231,7 +241,7 @@ function RegulationDetailPage() {
               </div>
             </div>
 
-            {/* Add action buttons */}
+            {/* Action buttons */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {regulation?.regulationUrl && (
                 <Button
@@ -264,11 +274,12 @@ function RegulationDetailPage() {
               </Button>
             </div>
 
-            {/* Add Timeline */}
+            {/* Timeline */}
             <RegulationTimeline regulation={regulation} />
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-6">
+                {/* Regulation Sections Card */}
                 {regulation.sections && regulation.sections.length > 0 && (
                   <Card>
                     <CardHeader>
@@ -287,6 +298,7 @@ function RegulationDetailPage() {
                   </Card>
                 )}
 
+                {/* Summary Card */}
                 <Card>
                   <CardHeader>
                     <CardTitle>Summary</CardTitle>
@@ -298,6 +310,7 @@ function RegulationDetailPage() {
                   </CardContent>
                 </Card>
 
+                {/* Requirements Card */}
                 <Card>
                   <CardHeader>
                     <CardTitle>Requirements</CardTitle>
@@ -306,7 +319,21 @@ function RegulationDetailPage() {
                     <div className="prose max-w-none">
                       <div className="space-y-4">
                         {regulation.requirements ? (
-                          <p className="text-gray-700">{regulation.requirements}</p>
+                          <>
+                            <p className="text-gray-700">{regulation.requirements}</p>
+                            {regulation.requirementsUrl && (
+                              <a
+                                href={regulation.requirementsUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-[#00267A] hover:text-[#003166] underline inline-flex items-center gap-2"
+                              >
+                                <FileText className="h-4 w-4" />
+                                View Detailed Requirements
+                                <ExternalLink className="h-3 w-3" />
+                              </a>
+                            )}
+                          </>
                         ) : (
                           <p className="text-gray-500 italic">
                             No specific requirements listed.
@@ -317,6 +344,7 @@ function RegulationDetailPage() {
                   </CardContent>
                 </Card>
 
+                {/* Submission Guidelines Card */}
                 <Card>
                   <CardHeader>
                     <CardTitle>Submission Guidelines</CardTitle>
@@ -324,7 +352,9 @@ function RegulationDetailPage() {
                   <CardContent>
                     <div className="prose max-w-none">
                       {regulation.submissionGuidelines ? (
-                        <p className="text-gray-700">{regulation.submissionGuidelines}</p>
+                        <div dangerouslySetInnerHTML={{ 
+                          __html: regulation.submissionGuidelines 
+                        }} />
                       ) : (
                         <p className="text-gray-500 italic">
                           No submission guidelines available.
@@ -334,6 +364,7 @@ function RegulationDetailPage() {
                   </CardContent>
                 </Card>
 
+                {/* Notes & Comments Card */}
                 <Card>
                   <CardHeader>
                     <CardTitle>Notes & Comments</CardTitle>
@@ -343,7 +374,7 @@ function RegulationDetailPage() {
                   </CardContent>
                 </Card>
 
-                {/* Add Additional Details card */}
+                {/* Additional Details Card */}
                 <Card>
                   <CardHeader>
                     <CardTitle>Additional Details</CardTitle>
@@ -400,7 +431,7 @@ function RegulationDetailPage() {
                   </CardContent>
                 </Card>
 
-                {/* Add Agency Information card */}
+                {/* Agency Information Card */}
                 <Card>
                   <CardHeader>
                     <CardTitle>Agency Information</CardTitle>
@@ -439,7 +470,7 @@ function RegulationDetailPage() {
               </div>
 
               <div className="space-y-6">
-                {/* Add Compliance Score card */}
+                {/* Compliance Score Card */}
                 <Card>
                   <CardHeader>
                     <CardTitle>Compliance Score</CardTitle>
@@ -467,6 +498,7 @@ function RegulationDetailPage() {
                   </CardContent>
                 </Card>
 
+                {/* Actions Required Card */}
                 <Card>
                   <CardHeader>
                     <CardTitle>Actions Required</CardTitle>
@@ -585,6 +617,7 @@ function RegulationDetailPage() {
                   </CardContent>
                 </Card>
 
+                {/* Evidence Files Card */}
                 <Card>
                   <CardHeader>
                     <CardTitle>Evidence Files</CardTitle>
@@ -594,6 +627,7 @@ function RegulationDetailPage() {
                   </CardContent>
                 </Card>
 
+                {/* Deadlines Card */}
                 <Card>
                   <CardHeader>
                     <CardTitle>Deadlines</CardTitle>
@@ -648,6 +682,7 @@ function RegulationDetailPage() {
                   </CardContent>
                 </Card>
 
+                {/* Action Required Card */}
                 {nextDeadline && nextDeadline.status !== "completed" && (
                   <Card className="border-[#00267A]">
                     <CardHeader>

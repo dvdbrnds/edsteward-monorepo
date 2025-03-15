@@ -8,7 +8,7 @@ import HomePage from "@/pages/home-page";
 import NotFound from "@/pages/not-found";
 import AuthPage from "@/pages/auth-page";
 import RegulationsPage from "@/pages/regulations-page";
-import RegulationDetailPage from "@/pages/regulation-detail-page";
+import RegulationDetailPage from "@/pages/RegulationDetailPage";
 import ComplianceWizardPage from "@/pages/compliance-wizard-page";
 import ReportsPage from "@/pages/reports-page";
 import ValidationPage from "@/pages/validation-page";
