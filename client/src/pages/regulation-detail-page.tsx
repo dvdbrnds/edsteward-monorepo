@@ -90,6 +90,41 @@ function ActionButton({ action, regulationId, regulation, isAdmin, onRequiredCha
   const [showWebPublishDialog, setShowWebPublishDialog] = useState(false);
   const [showCommunicationDialog, setShowCommunicationDialog] = useState(false);
   const [showSubmissionWizard, setShowSubmissionWizard] = useState(false);
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  const updateActionMutation = useMutation({
+    mutationFn: async ({ regulationId, action }: { regulationId: number; action: RegulationAction }) => {
+      const response = await fetch(
+        `/api/regulations/${regulationId}/actions/${action.type}`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(action),
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to update action");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Action Updated",
+        description: "The action has been updated successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/regulations", regulationId] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Update Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
 
   const getIcon = () => {
     switch (action.type) {
@@ -252,38 +287,6 @@ export default function RegulationDetailPage() {
     queryKey: ["/api/deadlines"]
   });
 
-  const updateActionMutation = useMutation({
-    mutationFn: async ({ regulationId, action }: { regulationId: number; action: RegulationAction }) => {
-      const response = await fetch(
-        `/api/regulations/${regulationId}/actions/${action.type}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(action),
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to update action");
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      toast({
-        title: "Action Updated",
-        description: "The action has been updated successfully.",
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/regulations", regulationId] });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Update Failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
 
   if (regulationLoading || deadlinesLoading) {
     return (
