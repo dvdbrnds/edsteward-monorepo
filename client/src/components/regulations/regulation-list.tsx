@@ -215,12 +215,6 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                     <ArrowUpDown className="h-4 w-4" />
                   </div>
                 </TableHead>
-                <TableHead className="cursor-pointer" onClick={() => handleSort('topic')}>
-                  <div className="flex items-center gap-2">
-                    Topic
-                    <ArrowUpDown className="h-4 w-4" />
-                  </div>
-                </TableHead>
                 <TableHead className="cursor-pointer" onClick={() => handleSort('category')}>
                   <div className="flex items-center gap-2">
                     Category
@@ -233,14 +227,14 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                     <ArrowUpDown className="h-4 w-4" />
                   </div>
                 </TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Next Deadline</TableHead>
                 <TableHead className="cursor-pointer" onClick={() => handleSort('jurisdiction')}>
                   <div className="flex items-center gap-2">
                     Jurisdiction
                     <ArrowUpDown className="h-4 w-4" />
                   </div>
                 </TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Next Deadline</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -266,20 +260,10 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                         {regulation.name || regulation.statute || 'Untitled Regulation'}
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <div className="text-sm text-gray-500">
-                        {regulation.topic || 'No topic specified'}
-                      </div>
-                    </TableCell>
                     <TableCell>{regulation.category || 'Uncategorized'}</TableCell>
                     <TableCell>
                       <div className="text-sm text-blue-600">
                         {regulation.dro || getDroEmailByCategory(regulation.category)}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className={`text-sm ${regulation.jurisdiction === 'federal' ? 'text-blue-600' : 'text-green-600'}`}>
-                        {regulation.jurisdiction === 'federal' ? 'Federal' : 'State'}
                       </div>
                     </TableCell>
                     <TableCell>
@@ -334,6 +318,11 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                       ) : (
                         <span className="text-gray-500">No deadlines</span>
                       )}
+                    </TableCell>
+                    <TableCell>
+                      <div className={`text-sm ${regulation.jurisdiction === 'federal' ? 'text-blue-600' : 'text-green-600'}`}>
+                        {regulation.jurisdiction === 'federal' ? 'Federal' : 'State'}
+                      </div>
                     </TableCell>
                   </TableRow>
                 );
