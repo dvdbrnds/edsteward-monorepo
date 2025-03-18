@@ -13,6 +13,7 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { notes, insertNoteSchema } from "@shared/schema";
 
 // ES Module compatibility: Get current file path
 const __filename = fileURLToPath(import.meta.url);
@@ -507,6 +508,150 @@ export function registerRoutes(app: express.Application): Server {
     }
   });
 
+  // Add notes endpoints
+  app.post("/api/notes", async (req, res) => {
+    try {
+      if (!req.user) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized note creation attempt");
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Creating new note", { body: req.body });
+
+      // Validate request body
+      const validatedData = insertNoteSchema.parse({
+        ...req.body,
+        userId: req.user.id
+      });
+
+      const note = await storage.createNote(validatedData);
+
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Note created successfully", { noteId: note.id });
+      return res.json(note);
+    } catch (error) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to create note", {
+        error: error instanceof Error ? error.message : String(error)
+      });
+
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          error: "Invalid note data",
+          details: error.errors
+        });
+      }
+
+      return res.status(500).json({
+        error: "Failed to create note",
+        message: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  app.get("/api/notes/regulation/:regulationId", async (req, res) => {
+    try {
+      if (!req.user) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized note access attempt");
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const { regulationId } = req.params;
+
+      if (!regulationId || isNaN(parseInt(regulationId))) {
+        return res.status(400).json({ error: "Invalid regulation ID" });
+      }
+
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Fetching notes for regulation ${regulationId}`);
+
+      const notes = await storage.getNotesByRegulation(parseInt(regulationId));
+
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Found ${notes.length} notes for regulation ${regulationId}`);
+      return res.json(notes);
+    } catch (error) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to fetch notes", {
+        error: error instanceof Error ? error.message : String(error)
+      });
+      return res.status(500).json({
+        error: "Failed to fetch notes",
+        message: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  app.patch("/api/notes/:noteId", async (req, res) => {
+    try {
+      if (!req.user) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized note update attempt");
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const { noteId } = req.params;
+
+      if (!noteId || isNaN(parseInt(noteId))) {
+        return res.status(400).json({ error: "Invalid note ID" });
+      }
+
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Updating note ${noteId}`, { body: req.body });
+
+      // Validate the update data
+      const validatedData = insertNoteSchema.partial().parse(req.body);
+
+      const note = await storage.updateNote(parseInt(noteId), validatedData);
+
+      if (!note) {
+        return res.status(404).json({ error: "Note not found" });
+      }
+
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Successfully updated note ${noteId}`);
+      return res.json(note);
+    } catch (error) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to update note", {
+        error: error instanceof Error ? error.message : String(error)
+      });
+
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({
+          error: "Invalid note data",
+          details: error.errors
+        });
+      }
+
+      return res.status(500).json({
+        error: "Failed to update note",
+        message: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  app.delete("/api/notes/:noteId", async (req, res) => {
+    try {
+      if (!req.user) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized note deletion attempt");
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      const { noteId } = req.params;
+
+      if (!noteId || isNaN(parseInt(noteId))) {
+        return res.status(400).json({ error: "Invalid note ID" });
+      }
+
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Deleting note ${noteId}`);
+
+      await storage.deleteNote(parseInt(noteId));
+
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Successfully deleted note ${noteId}`);
+      return res.json({ success: true, message: "Note deleted successfully" });
+    } catch (error) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to delete note", {
+        error: error instanceof Error ? error.message : String(error)
+      });
+      return res.status(500).json({
+        error: "Failed to delete note",
+        message: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
   // Global error handler for API routes
   app.use('/api', (err: Error, req: Request, res: Response, next: NextFunction) => {
     syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 'API Error', {
@@ -677,7 +822,7 @@ export function registerRoutes(app: express.Application): Server {
   app.post("/api/admin/reset-password", async (req, res) => {
     try {
       if (!req.user) {
-        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized access attempt to password reset");
+        syslog.log(LogFacility.LOCAL0,LogLevel.WARNING, "Unauthorized access attempt to password reset");
         return res.status(401).json({ error: "Authentication required" });
       }
 
