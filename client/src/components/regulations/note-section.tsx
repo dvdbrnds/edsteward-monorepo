@@ -58,7 +58,6 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
     }
   };
 
-
   const onSubmit = async (data: FormValues) => {
     try {
       setIsSubmitting(true);
@@ -71,7 +70,7 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
 
       const payload = {
         ...data,
-        regulationId: parseInt(regulationId), //Attempt to parse regulationId.  Error handling would be needed in production.
+        regulationId: parseInt(regulationId),
       };
 
       const response = await fetch(endpoint, {
@@ -82,14 +81,24 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
         body: JSON.stringify(payload),
       });
 
+      // Log raw response for debugging
+      const responseText = await response.text();
+      console.log('Raw server response:', responseText);
+
+      let responseData;
+      try {
+        responseData = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('JSON parse error:', parseError);
+        throw new Error(`Failed to parse server response: ${responseText.substring(0, 100)}...`);
+      }
+
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || "Failed to save note");
+        throw new Error(responseData.error || "Failed to save note");
       }
 
       // Refresh notes after successful submission
       await fetchNotes();
-
 
       // Reset form if creating a new note
       if (!initialData?.id) {
@@ -112,7 +121,7 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
         description: error instanceof Error ? error.message : "Failed to save note",
         variant: "destructive",
       });
-      console.error(error);
+      console.error('Note submission error:', error);
     } finally {
       setIsSubmitting(false);
     }
@@ -227,8 +236,8 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
                     {note.isPrivate && <span className="ml-2">(Private)</span>}
                   </div>
                 </div>
-                <div 
-                  className="mt-2 text-sm" 
+                <div
+                  className="mt-2 text-sm"
                   dangerouslySetInnerHTML={{ __html: note.content }}
                 />
                 {/* Removed status display */}
