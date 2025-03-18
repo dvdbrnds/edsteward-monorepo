@@ -383,7 +383,7 @@ export function registerRoutes(app: express.Application): Server {
   });
 
   // Update the evidence upload endpoint with better error handling
-  app.post("/api/regulations/:regulationId/evidence", upload.array('files', 5), async (req, res) => {
+  app.post("/api/regulations/:regulationId/evidence", upload.single('file'), async (req, res) => {
     try {
       if (!req.user) {
         syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized evidence upload attempt");
@@ -396,63 +396,51 @@ export function registerRoutes(app: express.Application): Server {
         return res.status(400).json({ error: "Invalid regulation ID" });
       }
 
-      const files = req.files as Express.Multer.File[];
-      const formData = req.body.data ? JSON.parse(req.body.data) : {};
-
-      if (!files || files.length === 0) {
-        return res.status(400).json({ error: "No files uploaded" });
+      if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
       }
 
-      const savedFiles = [];
+      const file = req.file;
+      const description = req.body.description || '';
 
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const description = req.body[`description${i}`] || '';
+      try {
+        const evidenceFile = await storage.createEvidenceFile({
+          regulationId: parseInt(regulationId),
+          fileName: file.originalname,
+          fileSize: file.size,
+          fileType: file.mimetype,
+          description,
+          uploadedBy: req.user.id,
+          status: "pending",
+          storagePath: file.path
+        });
 
-        try {
-          const evidenceFile = await storage.createEvidenceFile({
-            regulationId: parseInt(regulationId),
-            fileName: file.originalname,
-            fileSize: file.size,
-            fileType: file.mimetype,
-            description,
-            uploadedBy: req.user.id,
-            status: "pending",
-            storagePath: file.path
-          });
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
+          `Successfully uploaded evidence file for regulation ${regulationId}`);
 
-          savedFiles.push(evidenceFile);
-        } catch (fileError) {
-          syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Error saving evidence file", {
-            error: fileError instanceof Error ? fileError.message : String(fileError),
-            fileName: file.originalname
-          });
-          // Continue with other files even if one fails
-        }
-      }
+        return res.json({
+          message: "File uploaded successfully",
+          file: evidenceFile
+        });
 
-      if (savedFiles.length === 0) {
+      } catch (dbError) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Database error saving evidence file", {
+          error: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+
         return res.status(500).json({
-          error: "Failed to save any evidence files",
-          message: "None of the uploaded files could be saved"
+          error: "Database error saving evidence file",
+          details: dbError instanceof Error ? dbError.message : String(dbError)
         });
       }
 
-      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
-        `Successfully uploaded ${savedFiles.length} evidence files for regulation ${regulationId}`);
-
-      return res.json({
-        message: `Successfully uploaded ${savedFiles.length} of ${files.length} files`,
-        files: savedFiles
-      });
-
     } catch (error) {
-      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Error uploading evidence files", {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Error uploading evidence file", {
         error: error instanceof Error ? error.message : String(error)
       });
 
       return res.status(500).json({
-        error: "Failed to upload evidence files",
+        error: "Failed to upload evidence file",
         details: error instanceof Error ? error.message : String(error)
       });
     }
@@ -834,7 +822,7 @@ export function registerRoutes(app: express.Application): Server {
       const { id } = req.body;
 
       if (!id) {
-        return res.status(400).json({ error: "User ID is required" });
+        return res.status(400).json({ error: "User ID is required"});
       }
 
       try {
