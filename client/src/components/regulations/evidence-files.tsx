@@ -1,5 +1,5 @@
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Card,
   CardContent,
@@ -13,8 +13,20 @@ import {
   HoverCardTrigger,
 } from "@/components/ui/hover-card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { FileText, Image as ImageIcon, FileText as PdfIcon, User } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { FileText, Image as ImageIcon, FileText as PdfIcon, User, Upload } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 interface EvidenceFilesProps {
   regulationId: number;
@@ -34,6 +46,12 @@ interface EvidenceFile {
 
 export function EvidenceFiles({ regulationId }: EvidenceFilesProps) {
   const { toast } = useToast();
+  const queryClient = useQueryClient();
+  const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [description, setDescription] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+
   const { data: evidenceFiles, error, isLoading } = useQuery({
     queryKey: ['/api/regulations', regulationId, 'evidence'],
     queryFn: async () => {
@@ -58,6 +76,60 @@ export function EvidenceFiles({ regulationId }: EvidenceFilesProps) {
       }
     }
   });
+
+  const uploadMutation = useMutation({
+    mutationFn: async (formData: FormData) => {
+      const response = await fetch(`/api/regulations/${regulationId}/evidence`, {
+        method: 'POST',
+        body: formData,
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Failed to upload file');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/regulations', regulationId, 'evidence'] });
+      toast({
+        title: "Success",
+        description: "Evidence file uploaded successfully",
+      });
+      setIsUploadDialogOpen(false);
+      setSelectedFile(null);
+      setDescription("");
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const handleFileUpload = async () => {
+    if (!selectedFile) {
+      toast({
+        title: "Error",
+        description: "Please select a file to upload",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', selectedFile);
+    formData.append('description', description);
+    formData.append('regulationId', regulationId.toString());
+
+    setIsUploading(true);
+    try {
+      await uploadMutation.mutateAsync(formData);
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   const renderFilePreview = (file: EvidenceFile) => {
     if (file.fileType.startsWith('image/')) {
@@ -93,66 +165,101 @@ export function EvidenceFiles({ regulationId }: EvidenceFilesProps) {
     );
   }
 
-  if (!evidenceFiles?.length) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Evidence Files</CardTitle>
-          <CardDescription>
-            No evidence files uploaded yet
-          </CardDescription>
-        </CardHeader>
-      </Card>
-    );
-  }
-
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>Evidence Files</CardTitle>
-        <CardDescription>
-          Uploaded documentation and evidence files
-        </CardDescription>
+      <CardHeader className="flex flex-row items-center justify-between">
+        <div>
+          <CardTitle>Evidence Files</CardTitle>
+          <CardDescription>
+            Uploaded documentation and evidence files
+          </CardDescription>
+        </div>
+        <Dialog open={isUploadDialogOpen} onOpenChange={setIsUploadDialogOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline" className="flex items-center gap-2">
+              <Upload className="h-4 w-4" />
+              Upload Evidence
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Upload Evidence File</DialogTitle>
+              <DialogDescription>
+                Upload documentation or evidence files for this regulation.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="file">File</Label>
+                <Input
+                  id="file"
+                  type="file"
+                  onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="description">Description</Label>
+                <Textarea
+                  id="description"
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Enter a description for this file..."
+                />
+              </div>
+              <Button
+                onClick={handleFileUpload}
+                disabled={isUploading || !selectedFile}
+                className="w-full"
+              >
+                {isUploading ? "Uploading..." : "Upload File"}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </CardHeader>
       <CardContent>
         <ScrollArea className="h-[200px]">
           <div className="space-y-2">
-            {evidenceFiles.map((file) => (
-              <HoverCard key={file.id}>
-                <HoverCardTrigger asChild>
-                  <div className="flex items-center gap-2 p-2 rounded-md border cursor-pointer hover:bg-muted/50">
-                    <FileText className="h-4 w-4 shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{file.fileName}</p>
-                      <p className="text-xs text-muted-foreground">{file.description}</p>
-                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                        <User className="h-3 w-3" />
-                        <span>{file.uploaderName}</span>
-                        <span>•</span>
-                        <span>{new Date(file.uploadedAt).toLocaleDateString()}</span>
+            {evidenceFiles?.length ? (
+              evidenceFiles.map((file) => (
+                <HoverCard key={file.id}>
+                  <HoverCardTrigger asChild>
+                    <div className="flex items-center gap-2 p-2 rounded-md border cursor-pointer hover:bg-muted/50">
+                      <FileText className="h-4 w-4 shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{file.fileName}</p>
+                        <p className="text-xs text-muted-foreground">{file.description}</p>
+                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                          <User className="h-3 w-3" />
+                          <span>{file.uploaderName}</span>
+                          <span>•</span>
+                          <span>{new Date(file.uploadedAt).toLocaleDateString()}</span>
+                        </div>
+                      </div>
+                      <div className="text-xs text-right">
+                        <p>{(file.fileSize / 1024 / 1024).toFixed(2)} MB</p>
+                        <p className="capitalize">{file.status}</p>
                       </div>
                     </div>
-                    <div className="text-xs text-right">
-                      <p>{(file.fileSize / 1024 / 1024).toFixed(2)} MB</p>
-                      <p className="capitalize">{file.status}</p>
+                  </HoverCardTrigger>
+                  <HoverCardContent align="start" className="w-80">
+                    <div className="space-y-2">
+                      <h4 className="text-sm font-semibold">{file.fileName}</h4>
+                      {renderFilePreview(file)}
+                      <p className="text-xs text-muted-foreground">{file.description}</p>
+                      <div className="text-xs">
+                        <p>Uploaded by: {file.uploaderName}</p>
+                        <p>Date: {new Date(file.uploadedAt).toLocaleString()}</p>
+                        <p>Size: {(file.fileSize / 1024 / 1024).toFixed(2)} MB</p>
+                        <p>Type: {file.fileType}</p>
+                      </div>
                     </div>
-                  </div>
-                </HoverCardTrigger>
-                <HoverCardContent align="start" className="w-80">
-                  <div className="space-y-2">
-                    <h4 className="text-sm font-semibold">{file.fileName}</h4>
-                    {renderFilePreview(file)}
-                    <p className="text-xs text-muted-foreground">{file.description}</p>
-                    <div className="text-xs">
-                      <p>Uploaded by: {file.uploaderName}</p>
-                      <p>Date: {new Date(file.uploadedAt).toLocaleString()}</p>
-                      <p>Size: {(file.fileSize / 1024 / 1024).toFixed(2)} MB</p>
-                      <p>Type: {file.fileType}</p>
-                    </div>
-                  </div>
-                </HoverCardContent>
-              </HoverCard>
-            ))}
+                  </HoverCardContent>
+                </HoverCard>
+              ))
+            ) : (
+              <p className="text-gray-500 italic text-center">No evidence files uploaded yet</p>
+            )}
           </div>
         </ScrollArea>
       </CardContent>
