@@ -1,8 +1,8 @@
 # Beta Release Roadmap
 
-## Current Version: Alpha v0.2.9
+## Current Version: Alpha v0.3.0
 Status: In Development
-Target Beta Release: March 2025
+Target Beta Release: April 2025
 
 ## Core Features Status
 
@@ -15,6 +15,10 @@ Target Beta Release: March 2025
 - Recent notifications dashboard integration
 - Enhanced user feedback with color psychology
 - Action status visualization improvements
+- Notes management system
+- Evidence file upload and preview system
+- Enhanced regulation information display
+- Multi-jurisdiction regulation tracking
 
 ### In Progress 🚧
 
@@ -26,8 +30,8 @@ Target Beta Release: March 2025
 - [ ] Compliance officer assignment interface
 
 #### 2. Data Management
-- [ ] Bulk regulation import/export
-- [ ] Enhanced data validation
+- [x] Notes and evidence file system
+- [x] Enhanced validation system
 - [ ] Audit logging system
 - [ ] Data backup and restore functionality
 
@@ -35,6 +39,7 @@ Target Beta Release: March 2025
 - [x] Enhanced error handling and user feedback
 - [x] Improved loading states
 - [x] Action status visual indicators
+- [x] Evidence file preview functionality
 - [ ] Mobile responsiveness optimization
 - [ ] Accessibility improvements (WCAG compliance)
 
@@ -56,30 +61,31 @@ Target Beta Release: March 2025
 ### User Experience Requirements
 - [x] Intuitive status indicators
 - [x] Clear error messages
+- [x] File upload and preview system
 - [ ] Comprehensive help documentation
 - [ ] Responsive design on all devices
 
 ### Administrative Requirements
 - [ ] Complete audit logging
 - [ ] Backup and restore functionality
-- [ ] User management tools
+- [x] Enhanced user management tools
 - [ ] System health monitoring
 
 ## Timeline
 
-### Phase 1: Setup Wizard (2 weeks)
+### Phase 1: Core Features (Completed)
+- ✓ Notes management system
+- ✓ Evidence file uploads
+- ✓ Preview functionality
+- ✓ Enhanced error handling
+
+### Phase 2: Setup Wizard (2 weeks)
 - Week 1: Core wizard framework and admin setup
 - Week 2: Configuration steps and testing
 
-### Phase 2: Data Management (2 weeks)
-- Week 1: Import/Export functionality
-- Week 2: Validation and audit logging
-
-### Phase 3: UX Improvements (1 week)
-- ✓ Enhanced error handling
-- ✓ Loading states
-- ✓ Status indicators
-- Mobile optimization
+### Phase 3: Data Management (2 weeks)
+- Week 1: Audit logging implementation
+- Week 2: Backup and restore functionality
 
 ### Phase 4: Documentation (1 week)
 - User documentation
@@ -99,3 +105,14 @@ Target Beta Release: March 2025
 - Custom reporting
 - Integration capabilities
 - Advanced workflow automation
+- AI-powered compliance analysis
+- Real-time regulation updates
+
+## Success Metrics
+- System Uptime: 99.9%
+- Page Load Time: < 2s
+- API Response Time: < 500ms
+- Error Rate: < 0.1%
+- User Satisfaction: > 90%
+
+This roadmap is continuously updated as development progresses.
