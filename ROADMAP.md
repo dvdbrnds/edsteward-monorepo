@@ -108,11 +108,24 @@ An advanced AI-powered regulatory compliance platform that transforms complex mu
     - [ ] AACSB (Business Schools)
     - [ ] ABET (Engineering Programs)
     - [ ] CCNE (Nursing Education)
+    - [ ] CAEP (Education Programs)
+    - [ ] ABA (Law Schools)
+    - [ ] ACEN (Nursing Programs)
+  - [ ] Federal Education Regulations
+    - [ ] IDEA (Individuals with Disabilities Education Act)
+    - [ ] Section 504 Compliance
+    - [ ] Title IX Requirements
+  - [ ] Research Compliance
+    - [ ] IRB (Institutional Review Board)
+    - [ ] OHRP (Office for Human Research Protections)
+    - [ ] Research Integrity Standards
 - [ ] Healthcare Compliance
   - [ ] HIPAA (Health Insurance Portability and Accountability Act)
   - [ ] HITECH (Health Information Technology for Economic and Clinical Health Act)
   - [ ] Clinical Data Standards
   - [ ] Research Data Protection Standards
+  - [ ] NIH Data Management and Sharing Policy
+  - [ ] CDC Research Requirements
 - [ ] Financial Compliance
   - [ ] GLBA (Gramm-Leach-Bliley Act)
   - [ ] PCI DSS (Payment Card Industry Data Security Standard)
@@ -120,12 +133,24 @@ An advanced AI-powered regulatory compliance platform that transforms complex mu
   - [ ] Student Financial Aid Requirements
   - [ ] Federal Grant Compliance
   - [ ] Financial Reporting Standards
+  - [ ] Single Audit Act Requirements
+  - [ ] OMB Uniform Guidance
+  - [ ] Federal Student Aid Blue Book Compliance
 - [ ] Data Privacy Standards
   - [ ] GDPR Compliance for International Programs
   - [ ] CCPA (California Consumer Privacy Act)
   - [ ] State-specific Privacy Laws
   - [ ] International Data Transfer Requirements
   - [ ] Data Retention and Disposal Standards
+  - [ ] COPPA (Children's Online Privacy Protection Act)
+  - [ ] PPRA (Protection of Pupil Rights Amendment)
+- [ ] Security & Risk Management
+  - [ ] NIST Cybersecurity Framework Implementation
+  - [ ] SOC 2 Type II Compliance
+  - [ ] ISO/IEC 27001 Certification Requirements
+  - [ ] FISMA (Federal Information Security Management Act)
+  - [ ] NIST SP 800-171 (CUI Protection)
+  - [ ] NIST SP 800-53 (Security Controls)
 - [ ] Industry-Specific Features
   - [ ] Customizable Compliance Templates
   - [ ] Cross-Reference Between Standards
@@ -137,6 +162,9 @@ An advanced AI-powered regulatory compliance platform that transforms complex mu
   - [ ] Compliance Reporting and Analytics
   - [ ] Stakeholder Communication Tools
   - [ ] Evidence Collection Workflows
+  - [ ] Regulatory Change Management
+  - [ ] Incident Response Tracking
+  - [ ] Policy Management System
 
 
 ## Timeline
