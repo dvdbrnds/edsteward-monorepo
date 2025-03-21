@@ -187,7 +187,7 @@ async function startServer(): Promise<Server> {
         .listen(PORT, "0.0.0.0")
         .once('listening', () => {
           log(`Server successfully started on port ${PORT}`);
-          
+
           // Start deadline notification check interval after a delay
           log("Starting server successfully, will initialize deadline checker in 30 seconds...");
           setTimeout(() => {
