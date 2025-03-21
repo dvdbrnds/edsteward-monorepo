@@ -147,9 +147,27 @@ function RegulationDetailPage() {
   });
 
   const handleActionStatusChange = (action: RegulationAction, newStatus: RegulationAction['status']) => {
+    const updatedAction = { ...action, status: newStatus };
+    
+    // For attestation actions that are being completed, add user information
+    if (action.type === 'attestation' && newStatus === 'completed' && user) {
+      const now = new Date();
+      const fullName = user.firstName && user.lastName 
+        ? `${user.firstName} ${user.lastName}` 
+        : undefined;
+      
+      updatedAction.completedBy = {
+        userId: user.id,
+        username: user.username,
+        fullName
+      };
+      updatedAction.completedAt = now;
+      updatedAction.completedDate = now;
+    }
+    
     updateActionMutation.mutate({
       regulationId,
-      action: { ...action, status: newStatus }
+      action: updatedAction
     });
   };
 
@@ -602,6 +620,34 @@ function RegulationDetailPage() {
                                     I attest that we are in compliance
                                   </label>
                                 </div>
+                                
+                                {/* Digital signature information */}
+                                {action.status === "completed" && action.completedBy && (
+                                  <div className="mt-2 p-3 bg-gray-50 border border-gray-200 rounded-md">
+                                    <div className="text-xs text-gray-500">
+                                      <div className="flex items-center gap-1">
+                                        <CheckCircle2 className="h-3 w-3 text-green-600" />
+                                        <span className="text-green-600 font-medium">Digitally signed</span>
+                                      </div>
+                                      <div className="mt-1">
+                                        <p>
+                                          <span className="font-medium">Signed by:</span>{" "}
+                                          {action.completedBy.fullName || action.completedBy.username}
+                                        </p>
+                                        <p>
+                                          <span className="font-medium">Username:</span>{" "}
+                                          {action.completedBy.username}
+                                        </p>
+                                        <p>
+                                          <span className="font-medium">Date:</span>{" "}
+                                          {action.completedAt 
+                                            ? format(new Date(action.completedAt), "PPpp") 
+                                            : "Unknown"}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
                               </div>
                             ) : (
                               <Button

@@ -33,6 +33,12 @@ export interface RegulationAction {
   completedDate?: Date;
   status: 'pending' | 'in_progress' | 'completed';
   notes?: string;
+  completedBy?: {
+    userId: number;
+    username: string;
+    fullName?: string;
+  };
+  completedAt?: Date;
 }
 
 // Users table
@@ -258,7 +264,13 @@ export const insertRegulationSchema = createInsertSchema(regulations).extend({
     dueDate: z.date().optional(),
     completedDate: z.date().optional(),
     status: z.enum(['pending', 'in_progress', 'completed']).default('pending'),
-    notes: z.string().optional()
+    notes: z.string().optional(),
+    completedBy: z.object({
+      userId: z.number(),
+      username: z.string(),
+      fullName: z.string().optional()
+    }).optional(),
+    completedAt: z.date().optional()
   })).default([
     {
       type: 'attestation',
