@@ -763,6 +763,45 @@ export function registerRoutes(app: express.Application): Server {
     }
   });
 
+  // Add the roadmap endpoint after the admin users endpoint
+  app.get("/api/roadmap", async (req, res) => {
+    try {
+      if (!req.user) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized access attempt to roadmap");
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      if (req.user.role !== 'admin') {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Non-admin user attempted to access roadmap");
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const roadmapPath = path.resolve(__dirname, '..', 'ROADMAP.md');
+
+      try {
+        const content = await fs.promises.readFile(roadmapPath, 'utf-8');
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Successfully served roadmap content");
+        return res.send(content);
+      } catch (fsError) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Error reading roadmap file", {
+          error: fsError instanceof Error ? fsError.message : String(fsError)
+        });
+        return res.status(500).json({ 
+          error: "Error reading roadmap content",
+          details: fsError instanceof Error ? fsError.message : String(fsError)
+        });
+      }
+    } catch (error) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to serve roadmap", {
+        error: error instanceof Error ? error.message : String(error)
+      });
+      return res.status(500).json({ 
+        error: "Failed to serve roadmap", 
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
   // Add endpoint to update user
   app.post("/api/admin/update-user", async (req, res) => {
     try {
