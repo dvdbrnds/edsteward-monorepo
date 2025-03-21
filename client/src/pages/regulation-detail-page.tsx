@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import type { Regulation, Deadline, RegulationAction } from "@shared/schema";
+import type { Regulation, RegulationAction } from "@shared/schema";
 import Navigation from "@/components/layout/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -79,129 +79,101 @@ function AttestationAction({ action, regulationId, onStatusChange }: Attestation
 
 interface ActionButtonProps {
   action: RegulationAction;
-  regulationId: number;
   regulation: Regulation;
-  isAdmin: boolean;
-  onRequiredChange?: (required: boolean) => void;
-  onStatusChange?: (status: RegulationAction['status']) => void;
+  onStatusChange: (status: RegulationAction['status']) => void;
 }
 
-function ActionButton({ action, regulationId, regulation, isAdmin, onRequiredChange, onStatusChange }: ActionButtonProps) {
+function ActionButton({ action, regulation, onStatusChange }: ActionButtonProps) {
   const [showWebPublishDialog, setShowWebPublishDialog] = useState(false);
   const [showCommunicationDialog, setShowCommunicationDialog] = useState(false);
   const [showSubmissionWizard, setShowSubmissionWizard] = useState(false);
+  const { toast } = useToast();
 
-  const getIcon = () => {
+  const handleActionClick = () => {
+    console.log(`Handling action click for type: ${action.type}`);
+
     switch (action.type) {
-      case 'attestation':
-        return <Check className="h-5 w-5" />;
       case 'website_publish':
-        return <Globe className="h-5 w-5" />;
+        console.log('Opening web publish dialog');
+        setShowWebPublishDialog(true);
+        onStatusChange('in_progress');
+        break;
       case 'community_communication':
-        return <Mail className="h-5 w-5" />;
+        console.log('Opening communication dialog');
+        setShowCommunicationDialog(true);
+        onStatusChange('in_progress');
+        break;
       case 'agency_submission':
-        return <FileText className="h-5 w-5" />;
+        console.log('Opening submission wizard');
+        setShowSubmissionWizard(true);
+        onStatusChange('in_progress');
+        break;
     }
   };
 
-  const getActionLabel = () => {
-    return action.type
-      .split('_')
-      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-      .join(' ');
-  };
+  const handleActionComplete = () => {
+    console.log(`Action completed: ${action.type}`);
+    onStatusChange('completed');
 
-  const handleActionClick = () => {
-    if (action.type === 'website_publish') {
-      setShowWebPublishDialog(true);
-      onStatusChange?.('in_progress');
-    } else if (action.type === 'community_communication') {
-      setShowCommunicationDialog(true);
-      onStatusChange?.('in_progress');
-    } else if (action.type === 'agency_submission') {
-      setShowSubmissionWizard(true);
-      onStatusChange?.('in_progress');
+    switch (action.type) {
+      case 'website_publish':
+        setShowWebPublishDialog(false);
+        toast({
+          title: "Website Publication Complete",
+          description: "The content has been prepared for website publishing.",
+        });
+        break;
+      case 'community_communication':
+        setShowCommunicationDialog(false);
+        toast({
+          title: "Communication Generated",
+          description: "The communication statement has been generated.",
+        });
+        break;
+      case 'agency_submission':
+        setShowSubmissionWizard(false);
+        toast({
+          title: "Submission Process Complete",
+          description: "The agency submission process has been completed.",
+        });
+        break;
     }
   };
 
   return (
     <>
-      <div className={`flex flex-col space-y-4 p-4 border rounded-lg ${action.required ? 'border-red-200' : ''}`}>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-full ${action.status === 'completed' ? 'bg-green-50' : 'bg-blue-50'}`}>
-              {getIcon()}
-            </div>
-            <div>
-              <span className="font-medium">{getActionLabel()}</span>
-              {action.required && <span className="ml-2 text-xs text-red-500">*Required</span>}
-            </div>
-          </div>
-          {isAdmin && (
-            <div className="flex items-center gap-2">
-              <Switch
-                checked={action.required}
-                onCheckedChange={onRequiredChange}
-                aria-label="Toggle required"
-              />
-              <span className="text-sm text-gray-500">Required</span>
-            </div>
-          )}
-        </div>
-
-        {action.type === 'attestation' ? (
-          <AttestationAction
-            action={action}
-            regulationId={regulationId}
-            onStatusChange={onStatusChange!}
-          />
-        ) : action.type === 'website_publish' ? (
-          <Button
-            variant="default"
-            size="sm"
-            className="w-full"
-            onClick={() => {
-              handleActionClick();
-              onStatusChange?.('in_progress');
-            }}
-          >
-            <Globe className="h-4 w-4 mr-2" />
-            Publish to Website
-          </Button>
-        ) : action.type === 'community_communication' ? (
-          <Button
-            variant="default"
-            size="sm"
-            className="w-full"
-            onClick={() => {
-              handleActionClick();
-              onStatusChange?.('in_progress');
-            }}
-          >
-            <Mail className="h-4 w-4 mr-2" />
-            Generate Statement
-          </Button>
-        ) : action.type === 'agency_submission' ? (
-          <Button
-            variant="default"
-            size="sm"
-            className="w-full"
-            onClick={handleActionClick}
-          >
-            <FileText className="h-4 w-4 mr-2" />
-            Begin Submission
-          </Button>
-        ) : null}
-      </div>
+      <Button
+        variant="outline"
+        size="sm"
+        className="w-full gap-2"
+        onClick={handleActionClick}
+      >
+        {action.type === 'website_publish' && (
+          <>
+            <Globe className="h-4 w-4" />
+            <span>Publish to Website</span>
+          </>
+        )}
+        {action.type === 'community_communication' && (
+          <>
+            <Mail className="h-4 w-4" />
+            <span>Generate Communication</span>
+          </>
+        )}
+        {action.type === 'agency_submission' && (
+          <>
+            <FileText className="h-4 w-4" />
+            <span>Submit to Agency</span>
+          </>
+        )}
+      </Button>
 
       {action.type === 'website_publish' && (
         <WebPublishDialog
           regulation={regulation}
           open={showWebPublishDialog}
           onOpenChange={setShowWebPublishDialog}
-          onComplete={() => {
-            onStatusChange?.('completed');
-          }}
+          onComplete={handleActionComplete}
         />
       )}
 
@@ -210,6 +182,7 @@ function ActionButton({ action, regulationId, regulation, isAdmin, onRequiredCha
           regulation={regulation}
           open={showCommunicationDialog}
           onOpenChange={setShowCommunicationDialog}
+          onComplete={handleActionComplete}
         />
       )}
 
@@ -218,6 +191,7 @@ function ActionButton({ action, regulationId, regulation, isAdmin, onRequiredCha
           regulation={regulation}
           open={showSubmissionWizard}
           onOpenChange={setShowSubmissionWizard}
+          onComplete={handleActionComplete}
         />
       )}
     </>
@@ -429,15 +403,7 @@ function RegulationDetailPage() {
                         <ActionButton
                           key={action.type}
                           action={action}
-                          regulationId={regulationId}
                           regulation={regulation}
-                          isAdmin={user?.role === "admin"}
-                          onRequiredChange={(required) => {
-                            updateActionMutation.mutate({
-                              regulationId,
-                              action: { ...action, required }
-                            });
-                          }}
                           onStatusChange={(status) => handleActionStatusChange(action, status)}
                         />
                       ))}
@@ -457,7 +423,7 @@ function RegulationDetailPage() {
                       <div className="flex items-center gap-3">
                         <div className={`p-2 rounded-full ${
                           nextDeadline.status === 'completed' ? 'bg-green-50' :
-                          nextDeadline.status === 'overdue' ? 'bg-red-50' : 'bg-yellow-50'
+                            nextDeadline.status === 'overdue' ? 'bg-red-50' : 'bg-yellow-50'
                         }`}>
                           {nextDeadline.status === 'completed' ? (
                             <CheckCircle className="h-5 w-5 text-green-500" />
@@ -473,7 +439,7 @@ function RegulationDetailPage() {
                           </p>
                           <span className={`text-sm ${
                             nextDeadline.status === 'completed' ? 'text-green-600' :
-                            nextDeadline.status === 'overdue' ? 'text-red-600' : 'text-yellow-600'
+                              nextDeadline.status === 'overdue' ? 'text-red-600' : 'text-yellow-600'
                           }`}>
                             {nextDeadline.status.charAt(0).toUpperCase() + nextDeadline.status.slice(1)}
                           </span>

@@ -15,6 +15,7 @@ interface CommunicationDialogProps {
   regulation: Regulation;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onComplete?: () => void;
 }
 
 const generateCommunicationStatement = (regulation: Regulation): string => {
@@ -42,12 +43,17 @@ For inquiries regarding our compliance status or for more detailed information, 
 This notice is published as part of our commitment to transparency and regulatory compliance.`.trim();
 };
 
-export function CommunicationDialog({ regulation, open, onOpenChange }: CommunicationDialogProps) {
+export function CommunicationDialog({ regulation, open, onOpenChange, onComplete }: CommunicationDialogProps) {
   const statement = generateCommunicationStatement(regulation);
   const [expandedSection, setExpandedSection] = useState<"preview" | "text" | null>(null);
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(statement);
+    try {
+      await navigator.clipboard.writeText(statement);
+      onComplete?.();
+    } catch (error) {
+      console.error('Failed to copy statement:', error);
+    }
   };
 
   return (

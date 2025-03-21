@@ -105,6 +105,9 @@ function RegulationDetailPage() {
   const [location, navigate] = useLocation();
   const { user } = useAuth();
   const [showVersionHistory, setShowVersionHistory] = useState(false);
+  const [showWebPublishDialog, setShowWebPublishDialog] = useState(false);
+  const [showCommunicationDialog, setShowCommunicationDialog] = useState(false);
+  const [showSubmissionWizard, setShowSubmissionWizard] = useState(false);
   const regulationId = Number(location.split("/")[2]);
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -212,6 +215,20 @@ function RegulationDetailPage() {
   }
 
   const complianceScore = calculateComplianceScore(regulation, regulationDeadlines);
+
+  const handleActionClick = (actionType: string) => {
+    switch (actionType) {
+      case "website_publish":
+        setShowWebPublishDialog(true);
+        break;
+      case "community_communication":
+        setShowCommunicationDialog(true);
+        break;
+      case "agency_submission":
+        setShowSubmissionWizard(true);
+        break;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -352,8 +369,8 @@ function RegulationDetailPage() {
                   <CardContent>
                     <div className="prose max-w-none">
                       {regulation.submissionGuidelines ? (
-                        <div dangerouslySetInnerHTML={{ 
-                          __html: regulation.submissionGuidelines 
+                        <div dangerouslySetInnerHTML={{
+                          __html: regulation.submissionGuidelines
                         }} />
                       ) : (
                         <p className="text-gray-500 italic">
@@ -591,17 +608,7 @@ function RegulationDetailPage() {
                                 variant="outline"
                                 size="sm"
                                 className="w-full"
-                                onClick={() => {
-                                  if (action.type === "website_publish") {
-                                    // Handle website publish
-                                  } else if (
-                                    action.type === "community_communication"
-                                  ) {
-                                    // Handle community communication
-                                  } else if (action.type === "agency_submission") {
-                                    // Handle agency submission
-                                  }
-                                }}
+                                onClick={() => handleActionClick(action.type)}
                               >
                                 {action.type === "website_publish"
                                   ? "Publish to Website"
@@ -708,6 +715,25 @@ function RegulationDetailPage() {
           </div>
         </div>
       </main>
+      {regulation && (
+        <>
+          <WebPublishDialog
+            regulation={regulation}
+            open={showWebPublishDialog}
+            onOpenChange={setShowWebPublishDialog}
+          />
+          <CommunicationDialog
+            regulation={regulation}
+            open={showCommunicationDialog}
+            onOpenChange={setShowCommunicationDialog}
+          />
+          <SubmissionWizard
+            regulation={regulation}
+            open={showSubmissionWizard}
+            onOpenChange={setShowSubmissionWizard}
+          />
+        </>
+      )}
     </div>
   );
 }
