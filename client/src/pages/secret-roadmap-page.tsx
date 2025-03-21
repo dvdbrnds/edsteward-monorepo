@@ -11,113 +11,73 @@ interface RoadmapItem {
 }
 
 export default function SecretRoadmapPage() {
-  const [roadmapData, setRoadmapData] = useState<RoadmapItem[]>([]);
+  const [roadmapData, setRoadmapData] = useState<RoadmapItem[]>([
+    {
+      title: "Phase 1: Core Infrastructure",
+      isCompleted: true,
+      children: [
+        { title: "TypeScript and React frontend with Vite", isCompleted: true },
+        { title: "PostgreSQL database with ETL capabilities", isCompleted: true },
+        { title: "Authentication system with role-based access", isCompleted: true },
+        { title: "Compliance tracking interface", isCompleted: true },
+        { title: "Responsive design with Moravian branding", isCompleted: true },
+        { title: "Basic deployment setup", isCompleted: true }
+      ]
+    },
+    {
+      title: "Phase 2: User Management & Content",
+      isCompleted: true,
+      children: [
+        { title: "User management with password reset", isCompleted: true },
+        { title: "Commenting system implementation", isCompleted: true },
+        { title: "Evidence files management system", isCompleted: true },
+        { title: "File upload and storage system", isCompleted: true },
+        { title: "Image and PDF preview support", isCompleted: true },
+        { title: "Enhanced error handling and feedback", isCompleted: true }
+      ]
+    },
+    {
+      title: "Phase 3: Regulation Management",
+      isCompleted: true,
+      children: [
+        { title: "Enhanced regulation list interface", isCompleted: true },
+        { title: "Optimized column layout", isCompleted: true },
+        { title: "ID number search functionality", isCompleted: true },
+        { title: "Multi-jurisdiction regulation support", isCompleted: true },
+        { title: "Automated regulation data collection", isCompleted: true }
+      ]
+    },
+    {
+      title: "Phase 4: Notes & Evidence System",
+      isCompleted: true,
+      children: [
+        { title: "Comprehensive notes management", isCompleted: true },
+        { title: "Evidence file upload with preview", isCompleted: true },
+        { title: "Private/public note visibility", isCompleted: true },
+        { title: "Notes linking to regulations", isCompleted: true }
+      ]
+    },
+    {
+      title: "Phase 5: Testing & Documentation",
+      isCompleted: false,
+      children: [
+        { title: "Backend Unit Tests", isCompleted: false },
+        { title: "Frontend Unit Tests", isCompleted: false },
+        { title: "API Integration Tests", isCompleted: false },
+        { title: "Documentation Enhancement", isCompleted: false }
+      ]
+    }
+  ]);
   const [progress, setProgress] = useState(0);
 
-  // Mark items that are completed (those with ✓ in the ROADMAP.md)
-  const parseRoadmapData = () => {
-    const completedPhases = [
-      "Core Infrastructure",
-      "User Management & Content",
-      "Regulation Management",
-      "Notes & Evidence System"
-    ];
-
-    const inProgressPhases = [
-      "Testing & Documentation"
-    ];
-
-    const phases = [
-      {
-        title: "Phase 1: Core Infrastructure",
-        isCompleted: true,
-        children: [
-          { title: "TypeScript and React frontend with Vite", isCompleted: true },
-          { title: "PostgreSQL database with ETL capabilities", isCompleted: true },
-          { title: "Authentication system with role-based access", isCompleted: true },
-          { title: "Compliance tracking interface", isCompleted: true },
-          { title: "Responsive design with Moravian branding", isCompleted: true },
-          { title: "Basic deployment setup", isCompleted: true }
-        ]
-      },
-      {
-        title: "Phase 2: User Management & Content",
-        isCompleted: true,
-        children: [
-          { title: "User management with password reset", isCompleted: true },
-          { title: "Commenting system implementation", isCompleted: true },
-          { title: "Evidence files management system", isCompleted: true },
-          { title: "File upload and storage system", isCompleted: true },
-          { title: "Image and PDF preview support", isCompleted: true },
-          { title: "Enhanced error handling and feedback", isCompleted: true }
-        ]
-      },
-      {
-        title: "Phase 3: Regulation Management",
-        isCompleted: true,
-        children: [
-          { title: "Enhanced regulation list interface", isCompleted: true },
-          { title: "Optimized column layout", isCompleted: true },
-          { title: "ID number search functionality", isCompleted: true },
-          { title: "Multi-jurisdiction regulation support", isCompleted: true },
-          { title: "Automated regulation data collection", isCompleted: true }
-        ]
-      },
-      {
-        title: "Phase 4: Notes & Evidence System",
-        isCompleted: true,
-        children: [
-          { title: "Comprehensive notes management", isCompleted: true },
-          { title: "Evidence file upload with preview", isCompleted: true },
-          { title: "Private/public note visibility", isCompleted: true },
-          { title: "Notes linking to regulations", isCompleted: true }
-        ]
-      },
-      {
-        title: "Phase 5: Testing & Documentation",
-        isCompleted: false,
-        children: [
-          { title: "Backend Unit Tests", isCompleted: false },
-          { title: "Frontend Unit Tests", isCompleted: false },
-          { title: "API Integration Tests", isCompleted: false },
-          { title: "Documentation Enhancement", isCompleted: false }
-        ]
-      },
-      {
-        title: "Phase 6: AI Integration",
-        isCompleted: false,
-        children: [
-          { title: "AI-driven regulation data collection", isCompleted: false },
-          { title: "Automated compliance analysis", isCompleted: false },
-          { title: "Smart document comparison", isCompleted: false },
-          { title: "Regulatory change detection", isCompleted: false }
-        ]
-      },
-      {
-        title: "Phase 7: Enhanced Monitoring",
-        isCompleted: false,
-        children: [
-          { title: "Performance monitoring dashboard", isCompleted: false },
-          { title: "Error reporting system", isCompleted: false },
-          { title: "Automated health checks", isCompleted: false },
-          { title: "Load testing infrastructure", isCompleted: false }
-        ]
-      }
-    ];
-
-    setRoadmapData(phases);
-    
+  useEffect(() => {
     // Calculate overall progress
-    const totalItems = phases.reduce((acc, phase) => acc + (phase.children?.length || 0), 0);
-    const completedItems = phases.reduce((acc, phase) => 
+    const totalItems = roadmapData.reduce((acc, phase) => acc + (phase.children?.length || 0), 0);
+    const completedItems = roadmapData.reduce((acc, phase) => 
       acc + (phase.children?.filter(item => item.isCompleted)?.length || 0), 0
     );
     setProgress((completedItems / totalItems) * 100);
-  };
-
-  useEffect(() => {
-    parseRoadmapData();
-  }, []);
+  }, [roadmapData]);
 
   const RoadmapItem = ({ item }: { item: RoadmapItem }) => (
     <div className="space-y-2">
