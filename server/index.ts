@@ -172,9 +172,16 @@ async function startServer(): Promise<Server> {
 
     // Setup Vite or static serving based on environment
     if (process.env.NODE_ENV !== "production") {
-      log("Setting up Vite development server...");
-      await setupVite(app, httpServer);
-      log("Vite setup complete");
+      try {
+        log("Setting up Vite development server...");
+        await setupVite(app, httpServer);
+        log("Vite setup complete");
+      } catch (error) {
+        log("Error setting up Vite: " + (error instanceof Error ? error.message : String(error)));
+        // Continue without Vite in case of error
+        log("Falling back to static serving...");
+        serveStatic(app);
+      }
     } else {
       log("Setting up static file serving...");
       serveStatic(app);
