@@ -17,7 +17,6 @@ import LogsPage from "@/pages/admin/logs-page";
 import DebugToolsPage from "@/pages/admin/debug-tools-page";
 import { RegulationViewer } from "@/pages/RegulationViewer";
 import SetupWizardPage from "@/pages/setup-wizard-page";
-import SecretRoadmapPage from "@/pages/secret-roadmap-page";
 import { ProtectedRoute } from "./lib/protected-route";
 import { ProtectedRegulationRoute } from "./lib/protected-regulation-route";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
@@ -47,7 +46,6 @@ function Router() {
           <ProtectedRoute path="/admin/logs" component={LogsPage} />
           <ProtectedRoute path="/admin/debug" component={DebugToolsPage} />
           <ProtectedRoute path="/admin/regulations" component={RegulationViewer} />
-          <ProtectedRoute path="/secretroadmap.html" component={SecretRoadmapPage} />
           <Route component={NotFound} />
         </Switch>
       </PageLayout>
