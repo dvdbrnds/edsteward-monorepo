@@ -133,21 +133,15 @@ let deadlineCheckInterval: NodeJS.Timeout | null = null;
 async function startServer(): Promise<Server> {
   try {
     const PORT = 5000;
-    log("Forcefully killing any process on port 5000...");
-
-    // Check if port is in use before killing
-    try {
-      const { stdout } = await exec('lsof -i :5000 -t');
-      if (stdout) {
-        log("Port 5000 is in use, cleaning up...");
-        await exec('fuser -k 5000/tcp');
-        await new Promise(resolve => setTimeout(resolve, 2000));
-      }
-    } catch (error) {
-      // Ignore error - port is likely not in use
-    }
-
     log("Starting server initialization...");
+    
+    // Kill any existing processes more reliably
+    try {
+      await exec('pkill -f "node.*5000"');
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    } catch (error) {
+      // Ignore errors from pkill
+    }
 
     // Test database connection with retries
     let dbConnected = false;
@@ -188,11 +182,9 @@ async function startServer(): Promise<Server> {
     }
 
     return new Promise((resolve, reject) => {
-      httpServer
-        .listen(PORT, "0.0.0.0")
-        .once('listening', () => {
+      const server = httpServer.listen(PORT, "0.0.0.0", () => {
           log(`Server successfully started on port ${PORT}`);
-
+          
           // Start deadline notification check interval after a delay
           log("Starting server successfully, will initialize deadline checker in 30 seconds...");
           setTimeout(() => {
