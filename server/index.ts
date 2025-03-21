@@ -182,7 +182,18 @@ async function startServer(): Promise<Server> {
     }
 
     return new Promise((resolve, reject) => {
-      const server = httpServer.listen(PORT, "0.0.0.0", () => {
+      // Clean any existing connections
+      const cleanup = async () => {
+        try {
+          await exec('fuser -k 5000/tcp');
+          await new Promise(resolve => setTimeout(resolve, 2000));
+        } catch (error) {
+          // Ignore cleanup errors
+        }
+      };
+
+      cleanup().then(() => {
+        const server = httpServer.listen(PORT, "0.0.0.0", () => {
           log(`Server successfully started on port ${PORT}`);
           
           // Start deadline notification check interval after a delay
@@ -200,14 +211,15 @@ async function startServer(): Promise<Server> {
           }, 30000); // Wait 30 seconds before starting the checker
 
           resolve(httpServer);
-        })
-        .once('error', (err: NodeJS.ErrnoException) => {
-          if (err.code === 'EADDRINUSE') {
-            log(`Error: Port ${PORT} is already in use`);
-            process.exit(1);
-          }
-          reject(err);
-        });
+          })
+          .once('error', (err: NodeJS.ErrnoException) => {
+            if (err.code === 'EADDRINUSE') {
+              log(`Error: Port ${PORT} is already in use`);
+              process.exit(1);
+            }
+            reject(err);
+          });
+      });
     });
   } catch (error) {
     log("Fatal error during server startup: " + (error instanceof Error ? error.message : String(error)));
