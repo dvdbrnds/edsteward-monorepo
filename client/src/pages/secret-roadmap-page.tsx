@@ -11,18 +11,11 @@ interface RoadmapItem {
 }
 
 export default function SecretRoadmapPage() {
-  console.log('[SecretRoadmapPage] Component mounting');
   const [roadmapData, setRoadmapData] = useState<RoadmapItem[]>([]);
   const [progress, setProgress] = useState(0);
 
-  useEffect(() => {
-    console.log('[SecretRoadmapPage] Running useEffect for data initialization');
-    parseRoadmapData();
-  }, []);
-
-  // Mark items that are completed 
+  // Mark items that are completed (those with ✓ in the ROADMAP.md)
   const parseRoadmapData = () => {
-    console.log('[SecretRoadmapPage] Parsing roadmap data');
     const completedPhases = [
       "Core Infrastructure",
       "User Management & Content",
@@ -97,8 +90,7 @@ export default function SecretRoadmapPage() {
           { title: "AI-driven regulation data collection", isCompleted: false },
           { title: "Automated compliance analysis", isCompleted: false },
           { title: "Smart document comparison", isCompleted: false },
-          { title: "Regulatory change detection", isCompleted: false },
-          { title: "Model Context Protocol (MCP)", isCompleted: false }
+          { title: "Regulatory change detection", isCompleted: false }
         ]
       },
       {
@@ -114,7 +106,7 @@ export default function SecretRoadmapPage() {
     ];
 
     setRoadmapData(phases);
-
+    
     // Calculate overall progress
     const totalItems = phases.reduce((acc, phase) => acc + (phase.children?.length || 0), 0);
     const completedItems = phases.reduce((acc, phase) => 
@@ -122,6 +114,10 @@ export default function SecretRoadmapPage() {
     );
     setProgress((completedItems / totalItems) * 100);
   };
+
+  useEffect(() => {
+    parseRoadmapData();
+  }, []);
 
   const RoadmapItem = ({ item }: { item: RoadmapItem }) => (
     <div className="space-y-2">
