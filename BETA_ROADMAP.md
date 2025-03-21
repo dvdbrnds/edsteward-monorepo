@@ -4,7 +4,7 @@
 Status: In Development
 Target Beta Release: April 2025
 
-## Core Features Status
+## Core Features Status:
 
 ### Completed ✓
 - Core compliance tracking system
@@ -71,35 +71,6 @@ Target Beta Release: April 2025
 - [x] Enhanced user management tools
 - [ ] System health monitoring
 
-## Timeline
-
-### Phase 1: Core Features (Completed)
-- ✓ Notes management system
-- ✓ Evidence file uploads
-- ✓ Preview functionality
-- ✓ Enhanced error handling
-
-### Phase 2: Setup Wizard (2 weeks)
-- Week 1: Core wizard framework and admin setup
-- Week 2: Configuration steps and testing
-
-### Phase 3: Data Management (2 weeks)
-- Week 1: Audit logging implementation
-- Week 2: Backup and restore functionality
-
-### Phase 4: Documentation (1 week)
-- User documentation
-- Admin guides
-- API documentation
-
-## Beta Launch Criteria
-1. All core features implemented and tested
-2. Setup wizard fully functional
-3. Documentation complete
-4. No critical bugs
-5. Performance metrics met
-6. Security audit passed
-
 ## Post-Beta Roadmap
 - Advanced analytics
 - Custom reporting
@@ -117,7 +88,7 @@ Target Beta Release: April 2025
         - Seminary Program (ATS): Commission Standards, Educational Standards, Assessment, Faculty Requirements
     - Federal Regulations: Title IV, IDEA, Section 504, Title IX, CRDC, CUPA-HR, DFSCA, Clery Act
     - International: Bologna Process, UNESCO Standards, IACBE, DEAC, CHEA
-    - Research: IRB, OHRP, Research Integrity, NIH Data Management, NSF Requirements (including Broader Impacts), Export Control, International Collaboration, Social Science Standards
+    - Research: IRB, OHRP, Research Integrity, NIH Data Management, NSF Requirements, Export Control, International Collaboration, Social Science Standards
     - Healthcare: HIPAA, HITECH, Clinical Data Standards, Research Protection
     - Financial: GLBA, PCI DSS, FERPA, Financial Aid Requirements, Federal Grants, Single Audit Act, OMB Uniform Guidance, Federal Student Aid Blue Book Compliance, NACUBO Standards
     - Privacy: GDPR, CCPA, State Laws, International Data Transfer, Data Retention, COPPA, PPRA
