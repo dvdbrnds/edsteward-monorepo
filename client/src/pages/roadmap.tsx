@@ -1,19 +1,47 @@
 import { useEffect, useState } from 'react';
 import { marked } from 'marked';
+import { Loader2 } from 'lucide-react';
 
 export default function RoadmapPage() {
   const [roadmapContent, setRoadmapContent] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetch('/ROADMAP.md')
-      .then(response => response.text())
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to load roadmap');
+        }
+        return response.text();
+      })
       .then(text => {
-        setRoadmapContent(marked.parse(text));
+        const parsed = marked.parse(text);
+        setRoadmapContent(parsed);
+        setIsLoading(false);
       })
       .catch(error => {
         console.error('Error loading roadmap:', error);
+        setError('Failed to load the roadmap content. Please try again later.');
+        setIsLoading(false);
       });
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin text-border" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <div className="text-red-500">{error}</div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
