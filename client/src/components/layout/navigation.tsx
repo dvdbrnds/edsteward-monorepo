@@ -48,6 +48,17 @@ import moravianLogo from "@/assets/Screenshot_2025-02-12_at_9.15.57_AM-removebg-
  */
 const CHANGELOG = [
   {
+    version: "0.3.2",
+    date: "March 21, 2025",
+    changes: [
+      "Added regulation timeline visualization for tracking regulation history",
+      "Implemented evidence file preview functionality",
+      "Enhanced regulation detail page with historical version tracking",
+      "Improved user interface for compliance status indicators",
+      "Fixed various display issues in timeline components"
+    ],
+  },
+  {
     version: "0.3.1",
     date: "March 15, 2025",
     changes: [
@@ -309,7 +320,7 @@ export default function Navigation() {
                         setChangelogOpen(true);
                       }}
                     >
-                      Alpha v0.2.9
+                      Alpha v0.3.2
                     </button>
                   </DialogTrigger>
                   <DialogContent className="max-h-[80vh] overflow-y-auto">

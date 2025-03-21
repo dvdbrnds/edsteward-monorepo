@@ -37,32 +37,34 @@ export const VersionHistory: FC<VersionHistoryProps> = ({ versions }) => {
 export const ExampleUsage = () => {
   const versionHistory = [
     {
-      version: 'v0.1.2 (Alpha)',
-      date: 'March 2025',
+      version: 'v0.3.2 (Alpha)',
+      date: 'March 21, 2025',
       changes: [
-        'Enhanced PA regulation collector with improved error handling',
-        'Implemented skip mechanism for problematic regulations',
-        'Added detailed debug logging for database operations',
-        'Optimized database connection management'
+        'Added regulation timeline visualization for tracking regulation history',
+        'Implemented evidence file preview functionality',
+        'Enhanced regulation detail page with historical version tracking',
+        'Improved user interface for compliance status indicators',
+        'Fixed various display issues in timeline components'
       ]
     },
     {
-      version: 'v0.1.1 (Alpha)',
-      date: 'February 2025',
+      version: 'v0.3.1 (Alpha)',
+      date: 'March 15, 2025',
       changes: [
-        'Fixed OAuth2 configuration for Google Sheets integration',
-        'Improved setup wizard with optional OAuth2 configuration',
-        'Enhanced error handling for authentication flows'
+        'Fixed regulation detail page cards missing due to component version mismatch',
+        'Consolidated regulation detail components into single source',
+        'Restored complete set of information cards including Agency Information',
+        'Enhanced card layout and organization for better readability'
       ]
     },
     {
-      version: 'v0.1.0 (Alpha)',
-      date: 'February 2025',
+      version: 'v0.3.0 (Alpha)',
+      date: 'March 15, 2025',
       changes: [
-        'Initial alpha release',
-        'Core functionality implementation',
-        'Basic user interface and navigation',
-        'Fundamental compliance tracking features'
+        'Redesigned regulations list for improved readability',
+        'Added Directly Responsible Office (DRO) column',
+        'Enhanced ID number search functionality',
+        'Improved status visualization with streamlined layout'
       ]
     }
   ];
