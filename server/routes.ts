@@ -823,7 +823,10 @@ export function registerRoutes(app: express.Application): Server {
       }
 
       try {
-        const updatedUser = await storage.updateUser(id, { role, department });
+        const updatedUser = await storage.updateUser(id, { 
+          role: role.toLowerCase(), 
+          department 
+        });
         syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Successfully updated user ${id}`);
         return res.json(updatedUser);
       } catch (dbError) {
