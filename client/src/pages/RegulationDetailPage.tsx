@@ -98,57 +98,7 @@ const CATEGORIES = [
   "Financial Aid",
 ];
 
-function calculateComplianceScore(regulation: Regulation | undefined, deadlines: Deadline[] = []): {
-  score: number;
-  breakdown: {
-    deadlines: number;
-    documentation: number;
-    review: number;
-  };
-} {
-  if (!regulation) {
-    return {
-      score: 0,
-      breakdown: {
-        deadlines: 0,
-        documentation: 0,
-        review: 0
-      }
-    };
-  }
 
-  // Calculate deadline completion rate (40% of total score)
-  const completedDeadlines = deadlines.filter(d => d.status === "completed").length;
-  const deadlineScore = deadlines.length > 0
-    ? (completedDeadlines / deadlines.length) * 40
-    : 0;
-
-  // Calculate documentation score (30% of total score)
-  const documentationFields = [
-    regulation.requirements,
-    regulation.regulationUrl,
-    regulation.requirementsUrl,
-    regulation.submissionGuidelines
-  ];
-  const filledFields = documentationFields.filter(field => field && field.length > 0).length;
-  const documentationScore = (filledFields / documentationFields.length) * 30;
-
-  // Calculate review status score (30% of total score)
-  const reviewScore = regulation.lastUpdated
-    ? Math.max(0, 30 - Math.floor(differenceInDays(new Date(), new Date(regulation.lastUpdated)) / 30))
-    : 0;
-
-  const totalScore = Math.round(deadlineScore + documentationScore + reviewScore);
-
-  return {
-    score: totalScore,
-    breakdown: {
-      deadlines: Math.round(deadlineScore),
-      documentation: Math.round(documentationScore),
-      review: Math.round(reviewScore)
-    }
-  };
-}
 
 function RegulationDetailPage() {
   const [location, navigate] = useLocation();
@@ -398,7 +348,7 @@ function RegulationDetailPage() {
     );
   }
 
-  const complianceScore = calculateComplianceScore(regulation, regulationDeadlines);
+
 
   const handleActionClick = (actionType: string) => {
     switch (actionType) {
@@ -859,33 +809,6 @@ function RegulationDetailPage() {
               </div>
 
               <div className="space-y-6">
-                {/* Compliance Score Card */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Compliance Score</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="text-center">
-                      <div className="text-4xl font-bold text-[#00267A]">
-                        {complianceScore.score}%
-                      </div>
-                      <div className="mt-4 space-y-2">
-                        <div className="flex justify-between text-sm">
-                          <span>Deadlines</span>
-                          <span>{complianceScore.breakdown.deadlines}%</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span>Documentation</span>
-                          <span>{complianceScore.breakdown.documentation}%</span>
-                        </div>
-                        <div className="flex justify-between text-sm">
-                          <span>Review Status</span>
-                          <span>{complianceScore.breakdown.review}%</span>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
 
                 {/* Actions Required Card */}
                 <Card>
