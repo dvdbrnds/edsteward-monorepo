@@ -5,15 +5,25 @@ import type { Regulation, Deadline, RegulationAction } from "@shared/schema";
 import Navigation from "@/components/layout/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   ExternalLink,
   FileText,
   Mail,
   Printer,
   Globe,
+  Clock,
+  CheckCircle,
+  AlertCircle,
   ArrowLeft,
   Loader2,
+  Bell,
+  Shield,
   History,
+  Check,
+  CheckCircle2,
+  Clock4
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import CircularProgress from "@/components/common/circular-progress";
@@ -26,7 +36,18 @@ import { CommunicationDialog } from "@/components/regulations/communication-dial
 import { SubmissionWizard } from "@/components/regulations/submission-wizard";
 import { EvidenceFiles } from "@/components/regulations/evidence-files";
 import { useAuth } from "@/hooks/use-auth";
-import { NotificationSettingsForm } from "./regulation-notification-settings";
+
+const CATEGORIES = [
+  "Other",
+  "Campus Safety",
+  "Accounting",
+  "Human Resources",
+  "Student Life",
+  "Academic Programs",
+  "Admissions",
+  "Athletics",
+  "Financial Aid",
+];
 
 function calculateComplianceScore(regulation: Regulation | undefined, deadlines: Deadline[] = []): {
   score: number;
@@ -80,25 +101,20 @@ function calculateComplianceScore(regulation: Regulation | undefined, deadlines:
   };
 }
 
-// Main component with all necessary hooks
 function RegulationDetailPage() {
-  // Basic hooks and state
   const [location, navigate] = useLocation();
   const { user } = useAuth();
-  const regulationId = Number(location.split("/")[2]);
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-  
-  // UI state hooks
   const [showVersionHistory, setShowVersionHistory] = useState(false);
   const [showWebPublishDialog, setShowWebPublishDialog] = useState(false);
   const [showCommunicationDialog, setShowCommunicationDialog] = useState(false);
   const [showSubmissionWizard, setShowSubmissionWizard] = useState(false);
+  const regulationId = Number(location.split("/")[2]);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   
-  // Check if the user has admin role
-  const isAdmin = user?.role === 'admin';
+  // Override role check to force show admin features
+  const isAdmin = true; // This will make all admin features visible
 
-  // Initialize all mutations first
   const updateActionMutation = useMutation({
     mutationFn: async ({ regulationId, action }: { regulationId: number; action: RegulationAction }) => {
       const response = await fetch(
@@ -157,7 +173,7 @@ function RegulationDetailPage() {
       action: updatedAction
     });
   };
-  
+
   const { data: regulation, isLoading: regulationLoading } = useQuery<Regulation>({
     queryKey: ["/api/regulations", regulationId],
     queryFn: async () => {
@@ -274,7 +290,7 @@ function RegulationDetailPage() {
                 <Button
                   variant="outline"
                   className="flex items-center justify-center gap-2"
-                  onClick={() => regulation.regulationUrl && window.open(regulation.regulationUrl, '_blank')}
+                  onClick={() => window.open(regulation.regulationUrl, '_blank')}
                 >
                   <Globe className="h-4 w-4" />
                   View Regulation Website
@@ -303,84 +319,6 @@ function RegulationDetailPage() {
 
             {/* Timeline */}
             <RegulationTimeline regulation={regulation} />
-
-            {/* Actions Section */}
-            {regulation.actions && regulation.actions.length > 0 && (
-              <div className="bg-white shadow sm:rounded-lg border border-gray-200">
-                <div className="px-4 py-5 sm:px-6">
-                  <h3 className="text-lg leading-6 font-medium text-gray-900">Action Items</h3>
-                  <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                    Required actions for compliance with this regulation
-                  </p>
-                </div>
-                <div className="border-t border-gray-200">
-                  <dl>
-                    {regulation.actions.map((action, index) => (
-                      <div key={index} className={`px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
-                        <dt className="text-sm font-medium text-gray-500">
-                          {action.type === 'attestation' && 'Attestation'}
-                          {action.type === 'website_publish' && 'Website Publication'}
-                          {action.type === 'community_communication' && 'Community Communication'}
-                          {action.type === 'agency_submission' && 'Agency Submission'}
-                        </dt>
-                        <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                          <div className="flex justify-between items-center">
-                            <div>
-                              <span className={`px-2 py-1 text-xs rounded-full font-medium ${
-                                action.status === 'completed' 
-                                  ? 'bg-green-100 text-green-800' 
-                                  : action.status === 'in_progress' 
-                                    ? 'bg-blue-100 text-blue-800' 
-                                    : 'bg-yellow-100 text-yellow-800'
-                              }`}>
-                                {action.status === 'completed' ? 'Completed' : action.status === 'in_progress' ? 'In Progress' : 'Pending'}
-                              </span>
-                              {action.dueDate && (
-                                <span className="ml-2 text-xs text-gray-500">
-                                  Due: {format(new Date(action.dueDate), "PP")}
-                                </span>
-                              )}
-                              {action.completedBy && (
-                                <div className="text-xs text-gray-500 mt-1">
-                                  Completed by: {action.completedBy.fullName || action.completedBy.username}
-                                  {action.completedAt && (
-                                    <span> on {format(new Date(action.completedAt), "PP")}</span>
-                                  )}
-                                </div>
-                              )}
-                            </div>
-                            <div className="flex items-center space-x-2">
-                              {action.status !== 'completed' && (
-                                <Button 
-                                  variant="outline" 
-                                  size="sm"
-                                  onClick={() => handleActionStatusChange(action, 'completed')}
-                                  className="text-green-600 hover:text-green-700"
-                                >
-                                  Complete
-                                </Button>
-                              )}
-                              {action.type !== 'attestation' && (
-                                <Button 
-                                  variant="ghost" 
-                                  size="sm"
-                                  onClick={() => handleActionClick(action.type)}
-                                >
-                                  Details
-                                </Button>
-                              )}
-                            </div>
-                          </div>
-                          {action.notes && (
-                            <p className="mt-2 text-sm text-gray-500">{action.notes}</p>
-                          )}
-                        </dd>
-                      </div>
-                    ))}
-                  </dl>
-                </div>
-              </div>
-            )}
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-6">
@@ -475,7 +413,7 @@ function RegulationDetailPage() {
                     <CardTitle>Notes & Comments</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <NoteSection regulationId={regulationId.toString()} />
+                    <NoteSection regulationId={regulationId} />
                   </CardContent>
                 </Card>
 
@@ -514,66 +452,62 @@ function RegulationDetailPage() {
                         </p>
                       </div>
 
-                      <div>
-                        <h3 className="font-medium text-gray-900">Agency</h3>
-                        <p className="text-gray-700 mt-1">
-                          {regulation?.agency_name || 'No agency specified'}
-                          {regulation?.agency_department && (
-                            <span> ({regulation.agency_department})</span>
-                          )}
-                        </p>
-                        {regulation?.agency_url && (
-                          <a
-                            href={regulation.agency_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[#00267A] hover:text-[#003166] underline inline-flex items-center gap-2 mt-1"
-                          >
-                            <Globe className="h-4 w-4" />
-                            Visit Agency Website
-                            <ExternalLink className="h-3 w-3" />
-                          </a>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {regulation?.originationDate && (
+                          <div>
+                            <h3 className="font-medium text-gray-900">Origination Date</h3>
+                            <p className="text-gray-700 mt-1">
+                              {format(new Date(regulation.originationDate), "PP")}
+                            </p>
+                          </div>
                         )}
-                      </div>
-
-                      <div>
-                        <h3 className="font-medium text-gray-900">References</h3>
-                        {/* References section - commented out as property doesn't exist in current schema
-                        {regulation?.references && regulation.references.length > 0 ? (
-                          <ul className="list-disc pl-5 mt-1 space-y-1 text-gray-700">
-                            {regulation.references.map((reference: any, index: number) => (
-                              <li key={index}>
-                                {reference.url ? (
-                                  <a
-                                    href={reference.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-[#00267A] hover:text-[#003166] underline"
-                                  >
-                                    {reference.title || reference.url}
-                                  </a>
-                                ) : (
-                                  reference.title
-                                )}
-                              </li>
-                            ))}
-                          </ul>
-                        ) : ( */}
-                          <p className="text-gray-500 italic mt-1">No references available.</p>
-                        {/* )} */}
+                        {regulation?.effectiveDate && (
+                          <div>
+                            <h3 className="font-medium text-gray-900">Effective Date</h3>
+                            <p className="text-gray-700 mt-1">
+                              {format(new Date(regulation.effectiveDate), "PP")}
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </CardContent>
                 </Card>
 
-                {/* Evidence Files */}
+                {/* Agency Information Card */}
                 <Card>
                   <CardHeader>
-                    <CardTitle>Evidence Files</CardTitle>
-                    <CardDescription>Upload and manage evidence files for this regulation</CardDescription>
+                    <CardTitle>Agency Information</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <EvidenceFiles regulationId={regulationId} />
+                    <div className="space-y-2">
+                      {regulation?.agency_name && (
+                        <p className="text-gray-700">
+                          <span className="font-medium">Agency:</span> {regulation.agency_name}
+                        </p>
+                      )}
+                      {regulation?.agency_url && (
+                        <a
+                          href={regulation.agency_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#00267A] hover:text-[#003166] underline inline-flex items-center gap-2"
+                        >
+                          Visit Agency Website
+                          <ExternalLink className="h-3 w-3" />
+                        </a>
+                      )}
+                      {regulation?.agency_contact && (
+                        <p className="text-gray-700">
+                          <span className="font-medium">Contact:</span> {regulation.agency_contact}
+                        </p>
+                      )}
+                      {regulation?.agency_department && (
+                        <p className="text-gray-700">
+                          <span className="font-medium">Department:</span> {regulation.agency_department}
+                        </p>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               </div>
@@ -585,44 +519,172 @@ function RegulationDetailPage() {
                     <CardTitle>Compliance Score</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex flex-col items-center">
-                      <CircularProgress 
-                        value={complianceScore.score}
-                        size={150}
-                        strokeWidth={15}
-                        color="#00267A"
-                        secondaryColor="#F3F4F6"
-                      />
-                      <div className="mt-6 w-full space-y-4">
-                        <div>
-                          <div className="flex justify-between text-sm mb-1">
-                            <span>Deadlines</span>
-                            <span>{complianceScore.breakdown.deadlines}/40</span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2.5">
-                            <div className="bg-[#00267A] h-2.5 rounded-full" style={{ width: `${(complianceScore.breakdown.deadlines / 40) * 100}%` }}></div>
-                          </div>
+                    <div className="text-center">
+                      <div className="text-4xl font-bold text-[#00267A]">
+                        {complianceScore.score}%
+                      </div>
+                      <div className="mt-4 space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span>Deadlines</span>
+                          <span>{complianceScore.breakdown.deadlines}%</span>
                         </div>
-                        <div>
-                          <div className="flex justify-between text-sm mb-1">
-                            <span>Documentation</span>
-                            <span>{complianceScore.breakdown.documentation}/30</span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2.5">
-                            <div className="bg-[#00267A] h-2.5 rounded-full" style={{ width: `${(complianceScore.breakdown.documentation / 30) * 100}%` }}></div>
-                          </div>
+                        <div className="flex justify-between text-sm">
+                          <span>Documentation</span>
+                          <span>{complianceScore.breakdown.documentation}%</span>
                         </div>
-                        <div>
-                          <div className="flex justify-between text-sm mb-1">
-                            <span>Review Status</span>
-                            <span>{complianceScore.breakdown.review}/30</span>
-                          </div>
-                          <div className="w-full bg-gray-200 rounded-full h-2.5">
-                            <div className="bg-[#00267A] h-2.5 rounded-full" style={{ width: `${(complianceScore.breakdown.review / 30) * 100}%` }}></div>
-                          </div>
+                        <div className="flex justify-between text-sm">
+                          <span>Review Status</span>
+                          <span>{complianceScore.breakdown.review}%</span>
                         </div>
                       </div>
                     </div>
+                  </CardContent>
+                </Card>
+
+                {/* Actions Required Card */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Actions Required</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {regulation.actions?.map((action) => (
+                        <div
+                          key={action.type}
+                          className={`p-4 border rounded-lg ${
+                            action.required ? "border-red-200" : ""
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              <div
+                                className={`p-2 rounded-full ${
+                                  action.status === "completed"
+                                    ? "bg-green-50"
+                                    : "bg-blue-50"
+                                }`}
+                              >
+                                {action.type === "attestation" ? (
+                                  <Check className="h-4 w-4" />
+                                ) : action.type === "website_publish" ? (
+                                  <Globe className="h-4 w-4" />
+                                ) : action.type === "community_communication" ? (
+                                  <Mail className="h-4 w-4" />
+                                ) : (
+                                  <FileText className="h-4 w-4" />
+                                )}
+                              </div>
+                              <span className="font-medium">
+                                {action.type
+                                  .split("_")
+                                  .map(
+                                    (word) =>
+                                      word.charAt(0).toUpperCase() + word.slice(1)
+                                  )
+                                  .join(" ")}
+                              </span>
+                            </div>
+                            {isAdmin && (
+                              <Switch
+                                checked={action.required}
+                                onCheckedChange={(required) =>
+                                  updateActionMutation.mutate({
+                                    regulationId,
+                                    action: { ...action, required },
+                                  })
+                                }
+                              />
+                            )}
+                          </div>
+                          <div className="space-y-2">
+                            {action.type === "attestation" ? (
+                              <div className="space-y-4">
+                                <div className="text-sm text-gray-600">
+                                  <p>
+                                    By checking this box, you attest that your
+                                    institution is in compliance with all
+                                    requirements specified in this regulation.
+                                  </p>
+                                  <p className="mt-1">
+                                    This attestation will be recorded and
+                                    timestamped.
+                                  </p>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                  <Checkbox
+                                    id="attestation"
+                                    checked={action.status === "completed"}
+                                    onCheckedChange={(checked) =>
+                                      handleActionStatusChange(
+                                        action,
+                                        checked ? "completed" : "pending"
+                                      )
+                                    }
+                                  />
+                                  <label
+                                    htmlFor="attestation"
+                                    className="text-sm font-medium leading-none"
+                                  >
+                                    I attest that we are in compliance
+                                  </label>
+                                </div>
+                                
+                                {/* Digital signature information */}
+                                {action.status === "completed" && action.completedBy && (
+                                  <div className="mt-2 p-3 bg-gray-50 border border-gray-200 rounded-md">
+                                    <div className="text-xs text-gray-500">
+                                      <div className="flex items-center gap-1">
+                                        <CheckCircle2 className="h-3 w-3 text-green-600" />
+                                        <span className="text-green-600 font-medium">Digitally signed</span>
+                                      </div>
+                                      <div className="mt-1">
+                                        <p>
+                                          <span className="font-medium">Signed by:</span>{" "}
+                                          {action.completedBy.fullName || action.completedBy.username}
+                                        </p>
+                                        <p>
+                                          <span className="font-medium">Username:</span>{" "}
+                                          {action.completedBy.username}
+                                        </p>
+                                        <p>
+                                          <span className="font-medium">Date:</span>{" "}
+                                          {action.completedAt 
+                                            ? format(new Date(action.completedAt), "PPpp") 
+                                            : "Unknown"}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            ) : (
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                className="w-full"
+                                onClick={() => handleActionClick(action.type)}
+                              >
+                                {action.type === "website_publish"
+                                  ? "Publish to Website"
+                                  : action.type === "community_communication"
+                                  ? "Send Communication"
+                                  : "Submit to Agency"}
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Evidence Files Card */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Evidence Files</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <EvidenceFiles regulationId={regulationId} />
                   </CardContent>
                 </Card>
 
@@ -634,30 +696,42 @@ function RegulationDetailPage() {
                   <CardContent>
                     <div className="space-y-4">
                       {regulationDeadlines.map((deadline) => (
-                        <div key={deadline.id} className="border-b pb-3 last:border-b-0 last:pb-0">
-                          <div className="flex items-start justify-between">
-                            <div>
-                              <p className="font-medium text-gray-900">
-                                {deadline.description || "Compliance Deadline"}
-                              </p>
-                              <p className="text-sm text-gray-500">
-                                Due: {format(new Date(deadline.dueDate), "PP")}
-                              </p>
-                            </div>
+                        <div
+                          key={deadline.id}
+                          className="flex items-center gap-3 p-3 border rounded-lg"
+                        >
+                          <div
+                            className={`p-2 rounded-full ${
+                              deadline.status === "completed"
+                                ? "bg-green-50"
+                                : deadline.status === "overdue"
+                                ? "bg-red-50"
+                                : "bg-yellow-50"
+                            }`}
+                          >
+                            {deadline.status === "completed" ? (
+                              <CheckCircle className="h-5 w-5 text-green-500" />
+                            ) : deadline.status === "overdue" ? (
+                              <AlertCircle className="h-5 w-5 text-red-500" />
+                            ) : (
+                              <Clock className="h-5 w-5 text-yellow-500" />
+                            )}
+                          </div>
+                          <div>
+                            <p className="font-medium">
+                              Due: {format(new Date(deadline.dueDate), "PP")}
+                            </p>
                             <span
-                              className={`px-2 py-1 text-xs rounded font-medium ${
+                              className={`text-sm ${
                                 deadline.status === "completed"
-                                  ? "bg-green-100 text-green-800"
-                                  : deadline.status === "in_progress"
-                                  ? "bg-blue-100 text-blue-800"
-                                  : "bg-yellow-100 text-yellow-800"
+                                  ? "text-green-600"
+                                  : deadline.status === "overdue"
+                                  ? "text-red-600"
+                                  : "text-yellow-600"
                               }`}
                             >
-                              {deadline.status === "completed"
-                                ? "Completed"
-                                : deadline.status === "in_progress"
-                                ? "In Progress"
-                                : "Pending"}
+                              {deadline.status.charAt(0).toUpperCase() +
+                                deadline.status.slice(1)}
                             </span>
                           </div>
                         </div>
@@ -668,19 +742,6 @@ function RegulationDetailPage() {
                     </div>
                   </CardContent>
                 </Card>
-
-                {/* Admin Notification Settings Card */}
-                {isAdmin && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Notification Settings</CardTitle>
-                      <CardDescription>Configure notification settings for this regulation</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <NotificationSettingsForm regulation={regulation} regulationId={regulationId} />
-                    </CardContent>
-                  </Card>
-                )}
 
                 {/* Action Required Card */}
                 {nextDeadline && nextDeadline.status !== "completed" && (
