@@ -304,6 +304,84 @@ function RegulationDetailPage() {
             {/* Timeline */}
             <RegulationTimeline regulation={regulation} />
 
+            {/* Actions Section */}
+            {regulation.actions && regulation.actions.length > 0 && (
+              <div className="bg-white shadow sm:rounded-lg border border-gray-200">
+                <div className="px-4 py-5 sm:px-6">
+                  <h3 className="text-lg leading-6 font-medium text-gray-900">Action Items</h3>
+                  <p className="mt-1 max-w-2xl text-sm text-gray-500">
+                    Required actions for compliance with this regulation
+                  </p>
+                </div>
+                <div className="border-t border-gray-200">
+                  <dl>
+                    {regulation.actions.map((action, index) => (
+                      <div key={index} className={`px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6 ${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}`}>
+                        <dt className="text-sm font-medium text-gray-500">
+                          {action.type === 'attestation' && 'Attestation'}
+                          {action.type === 'website_publish' && 'Website Publication'}
+                          {action.type === 'community_communication' && 'Community Communication'}
+                          {action.type === 'agency_submission' && 'Agency Submission'}
+                        </dt>
+                        <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <span className={`px-2 py-1 text-xs rounded-full font-medium ${
+                                action.status === 'completed' 
+                                  ? 'bg-green-100 text-green-800' 
+                                  : action.status === 'in_progress' 
+                                    ? 'bg-blue-100 text-blue-800' 
+                                    : 'bg-yellow-100 text-yellow-800'
+                              }`}>
+                                {action.status === 'completed' ? 'Completed' : action.status === 'in_progress' ? 'In Progress' : 'Pending'}
+                              </span>
+                              {action.dueDate && (
+                                <span className="ml-2 text-xs text-gray-500">
+                                  Due: {format(new Date(action.dueDate), "PP")}
+                                </span>
+                              )}
+                              {action.completedBy && (
+                                <div className="text-xs text-gray-500 mt-1">
+                                  Completed by: {action.completedBy.fullName || action.completedBy.username}
+                                  {action.completedAt && (
+                                    <span> on {format(new Date(action.completedAt), "PP")}</span>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              {action.status !== 'completed' && (
+                                <Button 
+                                  variant="outline" 
+                                  size="sm"
+                                  onClick={() => handleActionStatusChange(action, 'completed')}
+                                  className="text-green-600 hover:text-green-700"
+                                >
+                                  Complete
+                                </Button>
+                              )}
+                              {action.type !== 'attestation' && (
+                                <Button 
+                                  variant="ghost" 
+                                  size="sm"
+                                  onClick={() => handleActionClick(action.type)}
+                                >
+                                  Details
+                                </Button>
+                              )}
+                            </div>
+                          </div>
+                          {action.notes && (
+                            <p className="mt-2 text-sm text-gray-500">{action.notes}</p>
+                          )}
+                        </dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              </div>
+            )}
+
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-6">
                 {/* Regulation Sections Card */}
@@ -439,14 +517,14 @@ function RegulationDetailPage() {
                       <div>
                         <h3 className="font-medium text-gray-900">Agency</h3>
                         <p className="text-gray-700 mt-1">
-                          {regulation?.agencyName || 'No agency specified'}
-                          {regulation?.agencyDepartment && (
-                            <span> ({regulation.agencyDepartment})</span>
+                          {regulation?.agency_name || 'No agency specified'}
+                          {regulation?.agency_department && (
+                            <span> ({regulation.agency_department})</span>
                           )}
                         </p>
-                        {regulation?.agencyUrl && (
+                        {regulation?.agency_url && (
                           <a
-                            href={regulation.agencyUrl}
+                            href={regulation.agency_url}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="text-[#00267A] hover:text-[#003166] underline inline-flex items-center gap-2 mt-1"
@@ -460,9 +538,10 @@ function RegulationDetailPage() {
 
                       <div>
                         <h3 className="font-medium text-gray-900">References</h3>
+                        {/* References section - commented out as property doesn't exist in current schema
                         {regulation?.references && regulation.references.length > 0 ? (
                           <ul className="list-disc pl-5 mt-1 space-y-1 text-gray-700">
-                            {regulation.references.map((reference, index) => (
+                            {regulation.references.map((reference: any, index: number) => (
                               <li key={index}>
                                 {reference.url ? (
                                   <a
@@ -479,9 +558,9 @@ function RegulationDetailPage() {
                               </li>
                             ))}
                           </ul>
-                        ) : (
+                        ) : ( */}
                           <p className="text-gray-500 italic mt-1">No references available.</p>
-                        )}
+                        {/* )} */}
                       </div>
                     </div>
                   </CardContent>
