@@ -2,6 +2,12 @@ import React, { useState } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import type { Regulation, Deadline, RegulationAction } from "@shared/schema";
+
+// Extended type that includes actions and other UI-specific properties
+type RegulationWithOverride = Regulation & {
+  actions: RegulationAction[];
+  sections?: { title: string; content: string }[];
+};
 import Navigation from "@/components/layout/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,6 +32,7 @@ import {
   Clock4
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { toast } from "@/hooks/use-toast";
 import CircularProgress from "@/components/common/circular-progress";
 import { format, differenceInDays } from "date-fns";
 import { NoteSection } from "@/components/regulations/note-section";
@@ -104,12 +111,13 @@ function calculateComplianceScore(regulation: Regulation | undefined, deadlines:
 function RegulationDetailPage() {
   const [location, navigate] = useLocation();
   const { user } = useAuth();
+  const queryClient = useQueryClient();
   const [showVersionHistory, setShowVersionHistory] = useState(false);
   const [showWebPublishDialog, setShowWebPublishDialog] = useState(false);
   const [showCommunicationDialog, setShowCommunicationDialog] = useState(false);
   const [showSubmissionWizard, setShowSubmissionWizard] = useState(false);
   const regulationId = location.split("/")[2];
-  const isAdmin = user?.role === "admin";
+  const isAdmin = user?.role?.toLowerCase() === "admin";
 
   const { data: regulation, isLoading } = useQuery<RegulationWithOverride>({
     queryKey: ["/api/regulations", regulationId],
@@ -123,7 +131,6 @@ function RegulationDetailPage() {
     enabled: !!user && !!regulationId,
   });
 
-  const isAdmin = user?.role?.toLowerCase() === "admin";
   const hasRegulation = regulation != null && 'actions' in regulation;
   const actions = hasRegulation ? regulation.actions : [];
   const categoryVisible = isAdmin && hasRegulation;
