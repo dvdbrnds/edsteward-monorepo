@@ -113,7 +113,7 @@ function RegulationDetailPage() {
   const queryClient = useQueryClient();
 
   // Check if the user has admin role
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = user?.role?.toLowerCase() === "admin";
 
   const updateActionMutation = useMutation({
     mutationFn: async ({ regulationId, action }: { regulationId: number; action: RegulationAction }) => {
