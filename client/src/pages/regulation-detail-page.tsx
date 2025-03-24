@@ -7,6 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Slider } from "@/components/ui/slider";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   ExternalLink,
   FileText,
@@ -35,6 +40,20 @@ import { WebPublishDialog } from "@/components/regulations/web-publish-dialog";
 import { CommunicationDialog } from "@/components/regulations/communication-dialog";
 import { SubmissionWizard } from "@/components/regulations/submission-wizard";
 import { EvidenceFiles } from "@/components/regulations/evidence-files";
+
+// Notification override schema for admin settings
+const notificationOverrideSchema = z.object({
+  email: z.string().email("Invalid email").optional().nullable(),
+  phone: z.string().regex(/^\+?[\d\s-()]+$/, "Invalid phone number").optional().nullable(),
+  notificationSchedule: z.object({
+    initialReminder: z.number().min(1).max(365).optional(),
+    weeklyReminder: z.number().min(1).max(90).optional(),
+    dailyReminder: z.number().min(1).max(30).optional(),
+    finalDayReminders: z.boolean().optional()
+  }).optional().nullable()
+});
+
+type NotificationOverride = z.infer<typeof notificationOverrideSchema>;
 
 interface AttestationActionProps {
   action: RegulationAction;
@@ -246,6 +265,40 @@ function RegulationDetailPage() {
       action: { ...action, status: newStatus }
     });
   };
+  
+  // Notification override mutation
+  const overrideMutation = useMutation({
+    mutationFn: async (data: NotificationOverride) => {
+      const response = await fetch(
+        `/api/regulations/${regulationId}/notification-override`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to update notification override");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Notification Settings Updated",
+        description: "The notification settings have been updated successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/regulations", regulationId] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Update Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
 
   const { data: user } = useQuery({
     queryKey: ["/api/user"]
