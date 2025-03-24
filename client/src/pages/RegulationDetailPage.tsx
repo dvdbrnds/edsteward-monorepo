@@ -133,8 +133,8 @@ function RegulationDetailPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   
-  // Override role check to force show admin features
-  const isAdmin = true; // This will make all admin features visible
+  // Check if the user has admin role
+  const isAdmin = user?.role === 'admin';
 
   const updateActionMutation = useMutation({
     mutationFn: async ({ regulationId, action }: { regulationId: number; action: RegulationAction }) => {
