@@ -105,6 +105,9 @@ function RegulationDetailPage() {
   const [location, navigate] = useLocation();
   const { user } = useAuth();
   const [showVersionHistory, setShowVersionHistory] = useState(false);
+  const [showWebPublishDialog, setShowWebPublishDialog] = useState(false);
+  const [showCommunicationDialog, setShowCommunicationDialog] = useState(false);
+  const [showSubmissionWizard, setShowSubmissionWizard] = useState(false);
   const regulationId = location.split("/")[2];
 
   const { data: regulation, isLoading } = useQuery<RegulationWithOverride>({
