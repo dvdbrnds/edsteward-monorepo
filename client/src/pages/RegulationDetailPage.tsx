@@ -108,13 +108,31 @@ function RegulationDetailPage() {
   const [showWebPublishDialog, setShowWebPublishDialog] = useState(false);
   const [showCommunicationDialog, setShowCommunicationDialog] = useState(false);
   const [showSubmissionWizard, setShowSubmissionWizard] = useState(false);
-  const regulationId = Number(location.split("/")[2]);
+  const regulationId = location.split("/")[2];
+
+  if (!user) {
+    navigate("/auth");
+    return null;
+  }
+
+  const { data: regulation, isLoading } = useQuery<Regulation>({
+    queryKey: ["/api/regulations", regulationId],
+    queryFn: async () => {
+      const response = await fetch(`/api/regulations/${regulationId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch regulation');
+      }
+      return response.json();
+    },
+    enabled: !!user && !!regulationId,
+  });
+
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   // Check if the user has admin role and ensure the regulation exists
   const isAdmin = user?.role?.toLowerCase() === "admin";
-  const hasRegulation = regulation && regulation.actions;
+  const hasRegulation = regulation != null && 'actions' in regulation;
   const actions = hasRegulation ? regulation.actions : [];
   const categoryVisible = isAdmin && hasRegulation;
   const notificationOverrideVisible = isAdmin && hasRegulation;
@@ -178,23 +196,12 @@ function RegulationDetailPage() {
     });
   };
 
-  const { data: regulation, isLoading: regulationLoading } = useQuery<Regulation>({
-    queryKey: ["/api/regulations", regulationId],
-    queryFn: async () => {
-      const response = await fetch(`/api/regulations/${regulationId}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch regulation');
-      }
-      return response.json();
-    },
-    enabled: !!regulationId
-  });
 
   const { data: deadlines = [], isLoading: deadlinesLoading } = useQuery<Deadline[]>({
     queryKey: ["/api/deadlines"]
   });
 
-  if (regulationLoading || deadlinesLoading) {
+  if (isLoading || deadlinesLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Navigation />
