@@ -13,7 +13,7 @@ import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
-import { notes, insertNoteSchema } from "@shared/schema";
+import { notes, insertNoteSchema, type InsertRegulation } from "@shared/schema";
 
 // ES Module compatibility: Get current file path
 const __filename = fileURLToPath(import.meta.url);
@@ -286,6 +286,64 @@ export function registerRoutes(app: express.Application): Server {
       });
       return res.status(500).json({ 
         error: "Failed to update regulation category", 
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  // Add endpoint to update notification override settings
+  app.patch("/api/regulations/:regulationId/notification-override", async (req, res) => {
+    try {
+      if (!req.user) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized notification override update attempt");
+        return res.status(401).json({ error: "Authentication required" });
+      }
+      
+      // Check for admin role
+      if (req.user.role.toLowerCase() !== "admin") {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Non-admin attempted to update notification overrides", {
+          userId: req.user.id,
+          username: req.user.username
+        });
+        return res.status(403).json({ error: "Admin permission required" });
+      }
+
+      const { regulationId } = req.params;
+      const { email, phone, notificationSchedule } = req.body;
+
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Updating notification override for regulation ${regulationId}`);
+
+      try {
+        // Create update object with notification override settings
+        const updateData: Partial<InsertRegulation> = {
+          notificationOverride: { email, phone },
+          notificationSchedule
+        };
+
+        const regulation = await storage.updateRegulation(parseInt(regulationId), updateData);
+
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Successfully updated notification override settings", { 
+          regulationId,
+          email: email || "(not set)",
+          hasSchedule: !!notificationSchedule
+        });
+
+        return res.json(regulation);
+      } catch (dbError) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Database error updating notification override", {
+          error: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+        return res.status(500).json({ 
+          error: "Database error updating notification override",
+          details: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+      }
+    } catch (error) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Error updating notification override", {
+        error: error instanceof Error ? error.message : String(error)
+      });
+      return res.status(500).json({ 
+        error: "Error updating notification override",
         details: error instanceof Error ? error.message : String(error)
       });
     }
