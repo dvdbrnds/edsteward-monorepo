@@ -111,6 +111,9 @@ function RegulationDetailPage() {
   const regulationId = Number(location.split("/")[2]);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  // Override role check to force show admin features
+  const isAdmin = true; // This will make all admin features visible
 
   const updateActionMutation = useMutation({
     mutationFn: async ({ regulationId, action }: { regulationId: number; action: RegulationAction }) => {
@@ -273,6 +276,11 @@ function RegulationDetailPage() {
                 <span className="px-2 py-1 bg-gray-100 rounded">
                   {regulation.category || 'Uncategorized'}
                 </span>
+                {isAdmin && (
+                  <span className="px-2 py-1 bg-green-100 text-green-800 rounded font-bold">
+                    Admin Mode Active
+                  </span>
+                )}
               </div>
             </div>
 
@@ -416,7 +424,7 @@ function RegulationDetailPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {user?.role === "admin" && (
+                      {isAdmin && (
                         <div>
                           <h3 className="font-medium text-gray-900">Version History</h3>
                           <div className="mt-2">
@@ -576,7 +584,7 @@ function RegulationDetailPage() {
                                   .join(" ")}
                               </span>
                             </div>
-                            {user?.role === "admin" && (
+                            {isAdmin && (
                               <Switch
                                 checked={action.required}
                                 onCheckedChange={(required) =>
