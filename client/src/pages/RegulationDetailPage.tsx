@@ -8,7 +8,9 @@ import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Separator } from "@/components/ui/separator";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -231,9 +233,9 @@ function RegulationDetailPage() {
   const overrideForm = useForm<NotificationOverride>({
     resolver: zodResolver(notificationOverrideSchema),
     defaultValues: {
-      email: regulation?.notificationOverride?.email || "",
-      phone: regulation?.notificationOverride?.phone || "",
-      notificationSchedule: regulation?.notificationSchedule || {
+      email: "",
+      phone: "",
+      notificationSchedule: {
         initialReminder: 90,
         weeklyReminder: 30,
         dailyReminder: 7,
@@ -321,6 +323,11 @@ function RegulationDetailPage() {
     }
   }, [regulation, overrideForm]);
 
+  // Handle notification override form submission
+  const onOverrideSubmit = (data: NotificationOverride) => {
+    overrideMutation.mutate(data);
+  };
+
   const handleActionClick = (actionType: string) => {
     switch (actionType) {
       case "website_publish":
@@ -374,7 +381,7 @@ function RegulationDetailPage() {
                 <Button
                   variant="outline"
                   className="flex items-center justify-center gap-2"
-                  onClick={() => window.open(regulation.regulationUrl, '_blank')}
+                  onClick={() => regulation.regulationUrl && window.open(regulation.regulationUrl, '_blank')}
                 >
                   <Globe className="h-4 w-4" />
                   View Regulation Website
@@ -497,7 +504,7 @@ function RegulationDetailPage() {
                     <CardTitle>Notes & Comments</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <NoteSection regulationId={regulationId} />
+                    <NoteSection regulationId={regulationId.toString()} />
                   </CardContent>
                 </Card>
 
@@ -826,6 +833,172 @@ function RegulationDetailPage() {
                     </div>
                   </CardContent>
                 </Card>
+
+                {/* Admin Notification Settings Card */}
+                {isAdmin && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Notification Settings</CardTitle>
+                      <CardDescription>Configure notification settings for this regulation</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <Form {...overrideForm}>
+                        <form onSubmit={overrideForm.handleSubmit(onOverrideSubmit)} className="space-y-4">
+                          <FormField
+                            control={overrideForm.control}
+                            name="email"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Override Email</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="email@example.com" value={field.value || ""} onChange={field.onChange} onBlur={field.onBlur} ref={field.ref} />
+                                </FormControl>
+                                <FormDescription>
+                                  Specific email to receive notifications for this regulation
+                                </FormDescription>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <FormField
+                            control={overrideForm.control}
+                            name="phone"
+                            render={({ field }) => (
+                              <FormItem>
+                                <FormLabel>Override Phone</FormLabel>
+                                <FormControl>
+                                  <Input placeholder="+1 (555) 555-5555" value={field.value || ""} onChange={field.onChange} onBlur={field.onBlur} ref={field.ref} />
+                                </FormControl>
+                                <FormDescription>
+                                  Specific phone to receive SMS notifications (if enabled)
+                                </FormDescription>
+                                <FormMessage />
+                              </FormItem>
+                            )}
+                          />
+                          
+                          <Separator className="my-4" />
+                          
+                          <div>
+                            <h3 className="text-sm font-medium mb-2">Notification Schedule</h3>
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                              <FormField
+                                control={overrideForm.control}
+                                name="notificationSchedule.initialReminder"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Initial Reminder</FormLabel>
+                                    <FormControl>
+                                      <Input 
+                                        type="number" 
+                                        min="1" 
+                                        max="365" 
+                                        value={field.value?.toString() || "90"}
+                                        onChange={(e) => field.onChange(Number(e.target.value))}
+                                        onBlur={field.onBlur}
+                                        ref={field.ref}
+                                      />
+                                    </FormControl>
+                                    <FormDescription>
+                                      Days before deadline
+                                    </FormDescription>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              
+                              <FormField
+                                control={overrideForm.control}
+                                name="notificationSchedule.weeklyReminder"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Weekly Reminders</FormLabel>
+                                    <FormControl>
+                                      <Input 
+                                        type="number" 
+                                        min="1" 
+                                        max="90" 
+                                        value={field.value?.toString() || "30"}
+                                        onChange={(e) => field.onChange(Number(e.target.value))}
+                                        onBlur={field.onBlur}
+                                        ref={field.ref}
+                                      />
+                                    </FormControl>
+                                    <FormDescription>
+                                      Days before deadline
+                                    </FormDescription>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                              
+                              <FormField
+                                control={overrideForm.control}
+                                name="notificationSchedule.dailyReminder"
+                                render={({ field }) => (
+                                  <FormItem>
+                                    <FormLabel>Daily Reminders</FormLabel>
+                                    <FormControl>
+                                      <Input 
+                                        type="number" 
+                                        min="1" 
+                                        max="30" 
+                                        value={field.value?.toString() || "7"}
+                                        onChange={(e) => field.onChange(Number(e.target.value))}
+                                        onBlur={field.onBlur}
+                                        ref={field.ref}
+                                      />
+                                    </FormControl>
+                                    <FormDescription>
+                                      Days before deadline
+                                    </FormDescription>
+                                    <FormMessage />
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                            
+                            <div className="mt-4">
+                              <FormField
+                                control={overrideForm.control}
+                                name="notificationSchedule.finalDayReminders"
+                                render={({ field }) => (
+                                  <FormItem className="flex flex-row items-center space-x-3 space-y-0">
+                                    <FormControl>
+                                      <Checkbox 
+                                        checked={field.value} 
+                                        onCheckedChange={field.onChange}
+                                      />
+                                    </FormControl>
+                                    <div className="space-y-1 leading-none">
+                                      <FormLabel>Send final day reminders</FormLabel>
+                                      <FormDescription>
+                                        Send multiple reminders on the due date
+                                      </FormDescription>
+                                    </div>
+                                  </FormItem>
+                                )}
+                              />
+                            </div>
+                          </div>
+                          
+                          <div className="flex justify-end">
+                            <Button 
+                              type="submit" 
+                              disabled={overrideMutation.isPending}
+                            >
+                              {overrideMutation.isPending && (
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                              )}
+                              Save Settings
+                            </Button>
+                          </div>
+                        </form>
+                      </Form>
+                    </CardContent>
+                  </Card>
+                )}
 
                 {/* Action Required Card */}
                 {nextDeadline && nextDeadline.status !== "completed" && (
