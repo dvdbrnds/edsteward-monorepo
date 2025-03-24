@@ -319,8 +319,10 @@ function RegulationDetailPage() {
     queryKey: ["/api/user"]
   });
   
-  // Debug user information
+  // Debug user information with detailed role information
   console.log("Current user data:", user);
+  console.log("User role:", user?.role);
+  console.log("Is admin check:", user && user.role === "admin");
 
   const { data: regulation, isLoading: regulationLoading } = useQuery<Regulation>({
     queryKey: ["/api/regulations", regulationId],
