@@ -113,14 +113,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
   });
 
-  // Force admin role for testing purposes
-  const adminUser = user ? { ...user, role: "admin" } : null;
-  console.log("Auth provider returning user with forced admin role:", adminUser);
-  
+  // Use the actual user data from the API
   return (
     <AuthContext.Provider
       value={{
-        user: adminUser,
+        user: user || null,
         isLoading,
         error,
         loginMutation,
