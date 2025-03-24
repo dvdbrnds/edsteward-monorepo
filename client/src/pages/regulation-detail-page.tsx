@@ -315,14 +315,25 @@ function RegulationDetailPage() {
     },
   });
 
-  const { data: user } = useQuery({
+  // Define a User type interface based on what's returned from the /api/user endpoint
+  interface User {
+    id: number;
+    username: string;
+    role: string;
+    email: string;
+    firstName?: string;
+    lastName?: string;
+    department?: string;
+  }
+
+  const { data: user } = useQuery<User>({
     queryKey: ["/api/user"]
   });
   
   // Debug user information with detailed role information
   console.log("Current user data:", user);
   console.log("User role:", user?.role);
-  console.log("Is admin check:", user && user.role === "admin");
+  console.log("Is admin check:", user?.role === "admin");
 
   const { data: regulation, isLoading: regulationLoading } = useQuery<Regulation>({
     queryKey: ["/api/regulations", regulationId],
@@ -538,9 +549,8 @@ function RegulationDetailPage() {
                   </Card>
                 )}
                 
-                {/* Admin Notification Settings - temporarily visible to all (should be admin-only) */}
-                {/* For debugging: forcing visibility since we know you're admin from server logs */}
-                {(
+                {/* Admin Notification Settings - only visible to admin users */}
+                {user?.role === "admin" && (
                   <Card>
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
