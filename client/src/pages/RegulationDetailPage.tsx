@@ -106,6 +106,19 @@ function RegulationDetailPage() {
   const { user } = useAuth();
   const [showVersionHistory, setShowVersionHistory] = useState(false);
   const regulationId = location.split("/")[2];
+
+  const { data: regulation, isLoading } = useQuery<RegulationWithOverride>({
+    queryKey: ["/api/regulations", regulationId],
+    queryFn: async () => {
+      const response = await fetch(`/api/regulations/${regulationId}`);
+      if (!response.ok) {
+        throw new Error('Failed to fetch regulation');
+      }
+      return response.json();
+    },
+    enabled: !!user && !!regulationId,
+  });
+
   const isAdmin = user?.role?.toLowerCase() === "admin";
   const hasRegulation = regulation != null && 'actions' in regulation;
   const actions = hasRegulation ? regulation.actions : [];
