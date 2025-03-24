@@ -8,7 +8,7 @@ export default function DebugToolsPage() {
   const { user } = useAuth();
 
   // Only allow admin access
-  if (!user || user.role !== "admin") {
+  if (!user || user.role?.toLowerCase() !== "admin") {
     return <Redirect to="/" />;
   }
 

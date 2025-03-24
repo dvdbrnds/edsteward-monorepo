@@ -103,7 +103,7 @@ export default function SystemSettingsPage() {
   const refreshInterval = 10000; // 10 seconds
   
   // Redirect if user is not an admin
-  if (!user || user.role !== "admin") {
+  if (!user || user.role?.toLowerCase() !== "admin") {
     return (
       <div className="min-h-screen bg-gray-50">
         <Navigation />
@@ -295,7 +295,7 @@ export default function SystemSettingsPage() {
       }
       return response.json();
     },
-    enabled: user?.role === "admin"
+    enabled: user?.role?.toLowerCase() === "admin"
   });
 
   useEffect(() => {
@@ -407,7 +407,7 @@ export default function SystemSettingsPage() {
       }
       return response.json();
     },
-    enabled: user?.role === 'admin' && activeTab === 'users'
+    enabled: user?.role?.toLowerCase() === 'admin' && activeTab === 'users'
   });
 
 
