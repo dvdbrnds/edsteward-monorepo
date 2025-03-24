@@ -533,8 +533,8 @@ function RegulationDetailPage() {
                   </Card>
                 )}
                 
-                {/* Admin Notification Settings */}
-                {user?.role === "admin" && (
+                {/* Admin Notification Settings - temporarily visible for all users */}
+                {true && (
                   <Card>
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
