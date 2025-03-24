@@ -771,10 +771,7 @@ export function registerRoutes(app: express.Application): Server {
         return res.status(401).json({ error: "Authentication required" });
       }
 
-      if (req.user.role !== 'admin') {
-        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Non-admin user attempted to access roadmap");
-        return res.status(403).json({ error: "Admin access required" });
-      }
+      // Allow any authenticated user
 
       const roadmapPath = path.resolve(__dirname, '..', 'ROADMAP.md');
 
