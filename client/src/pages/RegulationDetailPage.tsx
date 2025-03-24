@@ -277,6 +277,35 @@ function RegulationDetailPage() {
   }
 
   const regulationDeadlines = deadlines.filter(d => d.regulationId === regulationId) || [];
+  // Initialize form with data after regulation is loaded
+  React.useEffect(() => {
+    // Always call reset even if regulation is undefined to ensure hooks are consistent
+    if (regulation) {
+      overrideForm.reset({
+        email: regulation.notificationOverride?.email || "",
+        phone: regulation.notificationOverride?.phone || "",
+        notificationSchedule: regulation.notificationSchedule || {
+          initialReminder: 90,
+          weeklyReminder: 30,
+          dailyReminder: 7,
+          finalDayReminders: true
+        }
+      });
+    } else {
+      // Default values when no regulation is loaded
+      overrideForm.reset({
+        email: "",
+        phone: "",
+        notificationSchedule: {
+          initialReminder: 90,
+          weeklyReminder: 30,
+          dailyReminder: 7,
+          finalDayReminders: true
+        }
+      });
+    }
+  }, [regulation, overrideForm]);
+
   const nextDeadline = regulationDeadlines.length > 0
     ? regulationDeadlines.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0]
     : null;
@@ -306,21 +335,6 @@ function RegulationDetailPage() {
   }
 
   const complianceScore = calculateComplianceScore(regulation, regulationDeadlines);
-
-  // Initialize form with data after regulation is loaded
-  React.useEffect(() => {
-    // Always call reset even if regulation is undefined to ensure hooks are consistent
-    overrideForm.reset({
-      email: regulation?.notificationOverride?.email || "",
-      phone: regulation?.notificationOverride?.phone || "",
-      notificationSchedule: regulation?.notificationSchedule || {
-        initialReminder: 90,
-        weeklyReminder: 30,
-        dailyReminder: 7,
-        finalDayReminders: true
-      }
-    });
-  }, [regulation, overrideForm]);
 
   // Handle notification override form submission
   const onOverrideSubmit = (data: NotificationOverride) => {
