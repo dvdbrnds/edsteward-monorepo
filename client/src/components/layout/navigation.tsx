@@ -278,7 +278,7 @@ export default function Navigation() {
   const links = [
     { href: "/", label: "Dashboard", icon: LayoutDashboard },
     { href: "/regulations", label: "Regulations", icon: Book },
-    ...(user?.role === "admin"
+    ...(user?.role?.toLowerCase() === "admin"
       ? [
           { href: "/admin/settings", label: "System Settings", icon: Settings },
           { href: "/roadmap", label: "Development Roadmap", icon: FileText },

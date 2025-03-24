@@ -106,7 +106,7 @@ export default function LogsPage() {
       }
       return response.json();
     },
-    enabled: user?.role === "admin"
+    enabled: user?.role?.toLowerCase() === "admin"
   });
 
   useEffect(() => {
@@ -118,7 +118,7 @@ export default function LogsPage() {
     }
   }, [autoRefresh, refetch]);
 
-  if (user?.role !== "admin") {
+  if (user?.role?.toLowerCase() !== "admin") {
     return (
       <PageLayout>
         <Navigation />

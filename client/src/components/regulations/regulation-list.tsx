@@ -49,7 +49,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
     queryKey: ["/api/user"]
   });
 
-  const isAdmin = user?.role === "admin";
+  const isAdmin = user?.role?.toLowerCase() === "admin";
 
   const handleRowClick = (regulation: Regulation) => {
     if (regulation && regulation.id) {

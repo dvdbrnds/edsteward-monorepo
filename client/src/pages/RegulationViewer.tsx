@@ -64,7 +64,7 @@ export function RegulationViewer() {
   const [location, navigate] = useLocation();
 
   // Check for admin access
-  if (!user || user.role !== "admin") {
+  if (!user || user.role?.toLowerCase() !== "admin") {
     return <Redirect to="/" />;
   }
 
