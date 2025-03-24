@@ -131,7 +131,12 @@ function RegulationDetailPage() {
     enabled: !!user && !!regulationId,
   });
 
+  console.log("Regulation data:", regulation);
+  console.log("User role:", user?.role, "isAdmin:", isAdmin);
+  
   const hasRegulation = regulation != null && 'actions' in regulation;
+  console.log("hasRegulation check:", hasRegulation, "actions in regulation:", regulation ? 'actions' in regulation : false);
+  
   const actions = hasRegulation ? regulation.actions : [];
   const categoryVisible = isAdmin && hasRegulation;
   const notificationOverrideVisible = isAdmin && hasRegulation;
