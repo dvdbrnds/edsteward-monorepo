@@ -112,8 +112,12 @@ function RegulationDetailPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Check if the user has admin role (case insensitive)
+  // Check if the user has admin role and ensure the regulation exists
   const isAdmin = user?.role?.toLowerCase() === "admin";
+  const hasRegulation = regulation && regulation.actions;
+  const actions = hasRegulation ? regulation.actions : [];
+  const categoryVisible = isAdmin && hasRegulation;
+  const notificationOverrideVisible = isAdmin && hasRegulation;
 
   const updateActionMutation = useMutation({
     mutationFn: async ({ regulationId, action }: { regulationId: number; action: RegulationAction }) => {
@@ -276,7 +280,7 @@ function RegulationDetailPage() {
                 <span className="px-2 py-1 bg-gray-100 rounded">
                   {regulation.category || 'Uncategorized'}
                 </span>
-                {isAdmin && (
+                {categoryVisible && (
                   <span className="px-2 py-1 bg-green-100 text-green-800 rounded font-bold">
                     Admin Mode Active
                   </span>
@@ -424,7 +428,7 @@ function RegulationDetailPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {isAdmin && (
+                      {categoryVisible && (
                         <div>
                           <h3 className="font-medium text-gray-900">Version History</h3>
                           <div className="mt-2">
@@ -584,7 +588,7 @@ function RegulationDetailPage() {
                                   .join(" ")}
                               </span>
                             </div>
-                            {isAdmin && (
+                            {categoryVisible && (
                               <Switch
                                 checked={action.required}
                                 onCheckedChange={(required) =>
