@@ -855,7 +855,7 @@ const isAdmin = user?.role === "admin";
                   </Card>
                 )}
 
-                {isAdmin && (
+                {user?.role === "admin" && (
                   <Card className="border-2 border-[#5B2C8F] shadow-md bg-purple-50/30 relative hover:bg-purple-50/50 transition-colors">
                     <div className="absolute top-3 right-3 bg-[#5B2C8F] text-white text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
                       <Shield className="h-3 w-3" />
