@@ -333,18 +333,19 @@ function RegulationDetailPage() {
   // Extended debug information
   console.log("Current user data:", JSON.stringify(user));
   console.log("User role:", user?.role);
-  console.log("Is admin check:", user?.role === "admin");
   
-  // Let's examine the structure of the user object
+  // Debugging the user object structure
   if (user) {
     console.log("User keys:", Object.keys(user));
-    console.log("User prototype:", Object.getPrototypeOf(user));
-    console.log("Role value:", user.role); 
-    console.log("Role type:", typeof user.role);
   }
   
-  // TEMPORARY: Make the notification settings component always visible
-  const isAdmin = true; // Override for testing
+  // Force override for testing - using string comparison with both string literals
+  // This should handle any issues with non-strict equality
+  const isAdmin = !!user && String(user.role) === String("admin");
+  
+  // Add additional console logs for debugging
+  console.log("Admin role value check:", String(user?.role) === String("admin"));
+  console.log("Is admin final value:", isAdmin);
 
   const { data: regulation, isLoading: regulationLoading } = useQuery<Regulation>({
     queryKey: ["/api/regulations", regulationId],
