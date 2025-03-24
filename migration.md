@@ -39,6 +39,7 @@ Based on the code reviewed, the application is designed to handle:
 - A database of regulations with associated metadata
 - Document storage for compliance evidence files
 - Notification systems for deadlines and compliance events
+- Admin-specific notification settings per regulation
 
 The scale appears to be suitable for a single institution with multiple departments, rather than a multi-tenant system serving many different institutions.
 
