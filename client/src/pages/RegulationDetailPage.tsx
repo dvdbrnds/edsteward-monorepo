@@ -114,7 +114,6 @@ function RegulationDetailPage() {
 
   // Check if the user has admin role
   const isAdmin = user?.role === "Admin";
-  console.log("Current user role:", user?.role, "isAdmin:", isAdmin);
 
   const updateActionMutation = useMutation({
     mutationFn: async ({ regulationId, action }: { regulationId: number; action: RegulationAction }) => {
@@ -324,26 +323,7 @@ function RegulationDetailPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-6">
                 {/* Regulation Sections Card */}
-                {(regulation.sections || isAdmin) && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Regulation Sections</CardTitle>
-                      {isAdmin && <CardDescription>Admin view enabled</CardDescription>}
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        {regulation.sections.map((section, index) => (
-                          <div key={index} className="border-b pb-4 last:border-b-0">
-                            <h3 className="font-semibold text-gray-900">{section.title}</h3>
-                            <p className="mt-2 text-gray-700 whitespace-pre-wrap">{section.content}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {regulation?.sections && regulation.sections.length > 0 && (
+                {regulation.sections && regulation.sections.length > 0 && (
                   <Card>
                     <CardHeader>
                       <CardTitle>Regulation Sections</CardTitle>
