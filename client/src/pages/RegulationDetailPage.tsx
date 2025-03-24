@@ -111,9 +111,9 @@ function RegulationDetailPage() {
   const regulationId = Number(location.split("/")[2]);
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  
+
   // Check if the user has admin role
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = user?.role === "Admin";
 
   const updateActionMutation = useMutation({
     mutationFn: async ({ regulationId, action }: { regulationId: number; action: RegulationAction }) => {
@@ -151,14 +151,14 @@ function RegulationDetailPage() {
 
   const handleActionStatusChange = (action: RegulationAction, newStatus: RegulationAction['status']) => {
     const updatedAction = { ...action, status: newStatus };
-    
+
     // For attestation actions that are being completed, add user information
     if (action.type === 'attestation' && newStatus === 'completed' && user) {
       const now = new Date();
       const fullName = user.firstName && user.lastName 
         ? `${user.firstName} ${user.lastName}` 
         : undefined;
-      
+
       updatedAction.completedBy = {
         userId: user.id,
         username: user.username,
@@ -167,7 +167,7 @@ function RegulationDetailPage() {
       updatedAction.completedAt = now;
       updatedAction.completedDate = now;
     }
-    
+
     updateActionMutation.mutate({
       regulationId,
       action: updatedAction
@@ -628,7 +628,7 @@ function RegulationDetailPage() {
                                     I attest that we are in compliance
                                   </label>
                                 </div>
-                                
+
                                 {/* Digital signature information */}
                                 {action.status === "completed" && action.completedBy && (
                                   <div className="mt-2 p-3 bg-gray-50 border border-gray-200 rounded-md">
