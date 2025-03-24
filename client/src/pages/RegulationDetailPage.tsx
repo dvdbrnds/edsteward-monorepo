@@ -341,6 +341,24 @@ function RegulationDetailPage() {
                   </Card>
                 )}
 
+                {regulation?.sections && regulation.sections.length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Regulation Sections</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-4">
+                        {regulation.sections.map((section, index) => (
+                          <div key={index} className="border-b pb-4 last:border-b-0">
+                            <h3 className="font-semibold text-gray-900">{section.title}</h3>
+                            <p className="mt-2 text-gray-700 whitespace-pre-wrap">{section.content}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
                 {/* Summary Card */}
                 <Card>
                   <CardHeader>
