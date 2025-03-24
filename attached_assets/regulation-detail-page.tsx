@@ -289,6 +289,7 @@ function ActionButton({ action, regulationId, isAdmin, onToggle, onStatusChange,
 export default function RegulationDetailPage() {
   const [location, navigate] = useLocation();
   const { user } = useAuth();
+const isAdmin = user?.role === "admin";
   const [showVersionHistory, setShowVersionHistory] = useState(false);
   const regulationId = location.split("/")[2];
 
