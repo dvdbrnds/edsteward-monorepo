@@ -109,6 +109,7 @@ function RegulationDetailPage() {
   const [showCommunicationDialog, setShowCommunicationDialog] = useState(false);
   const [showSubmissionWizard, setShowSubmissionWizard] = useState(false);
   const regulationId = location.split("/")[2];
+  const isAdmin = user?.role === "admin";
 
   const { data: regulation, isLoading } = useQuery<RegulationWithOverride>({
     queryKey: ["/api/regulations", regulationId],
