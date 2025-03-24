@@ -101,6 +101,31 @@ export default function SystemSettingsPage() {
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [logs, setLogs] = useState<any[]>([]);
   const refreshInterval = 10000; // 10 seconds
+  
+  // Redirect if user is not an admin
+  if (!user || user.role !== "admin") {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        <main className="py-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <h2 className="text-2xl font-semibold text-gray-900">Access Denied</h2>
+              <p className="mt-2 text-gray-600">You do not have permission to access admin settings.</p>
+              <Button
+                variant="outline"
+                onClick={() => window.history.back()}
+                className="mt-4"
+              >
+                <AlertCircle className="h-4 w-4 mr-2" />
+                Go Back
+              </Button>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
 
   const form = useForm<FormValues>({
