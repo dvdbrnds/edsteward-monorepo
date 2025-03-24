@@ -11,7 +11,7 @@ export default function RoadmapPage() {
   const [error, setError] = useState<string | null>(null);
 
   // Redirect non-admin users
-  if (!user?.role === 'admin') {
+  if (!user || user.role?.toLowerCase() !== 'admin') {
     return <Redirect to="/" />;
   }
 
