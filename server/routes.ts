@@ -660,11 +660,6 @@ export function registerRoutes(app: express.Application): Server {
         return res.status(401).json({ error: "Authentication required" });
       }
 
-      if (req.user.role !== 'admin') {
-        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Non-admin user attempted to update action");
-        return res.status(403).json({ error: "Admin access required" });
-      }
-
       const { regulationId, actionType } = req.params;
       const actionUpdate = req.body;
 
