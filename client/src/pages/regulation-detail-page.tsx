@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import type { Regulation, RegulationAction } from "@shared/schema";
+import type { Regulation, RegulationAction, Deadline } from "@shared/schema";
 import Navigation from "@/components/layout/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -299,6 +299,21 @@ function RegulationDetailPage() {
       });
     },
   });
+  
+  // Form for notification override settings
+  const overrideForm = useForm<NotificationOverride>({
+    resolver: zodResolver(notificationOverrideSchema),
+    defaultValues: {
+      email: regulation?.notificationOverride?.email || "",
+      phone: regulation?.notificationOverride?.phone || "",
+      notificationSchedule: regulation?.notificationSchedule || {
+        initialReminder: 90,
+        weeklyReminder: 30,
+        dailyReminder: 7,
+        finalDayReminders: true
+      }
+    },
+  });
 
   const { data: user } = useQuery({
     queryKey: ["/api/user"]
@@ -315,6 +330,22 @@ function RegulationDetailPage() {
     },
     enabled: !!regulationId
   });
+
+  // Initialize form with data after regulation is loaded
+  React.useEffect(() => {
+    if (regulation) {
+      overrideForm.reset({
+        email: regulation.notificationOverride?.email || "",
+        phone: regulation.notificationOverride?.phone || "",
+        notificationSchedule: regulation.notificationSchedule || {
+          initialReminder: 90,
+          weeklyReminder: 30,
+          dailyReminder: 7,
+          finalDayReminders: true
+        }
+      });
+    }
+  }, [regulation, overrideForm]);
 
   const { data: deadlines = [], isLoading: deadlinesLoading } = useQuery<Deadline[]>({
     queryKey: ["/api/deadlines"]
@@ -497,6 +528,140 @@ function RegulationDetailPage() {
                             {nextDeadline.status.charAt(0).toUpperCase() + nextDeadline.status.slice(1)}
                           </span>
                         </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+                
+                {/* Admin Notification Settings */}
+                {user?.role === "admin" && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Bell className="h-5 w-5" />
+                        Notification Settings
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-6">
+                        <div className="mb-6 space-y-2">
+                          <h3 className="font-medium">Reminder Schedule</h3>
+                          <p className="text-sm text-gray-600">
+                            Configure when reminder notifications are sent for this regulation.
+                            Leave empty to use system defaults.
+                          </p>
+                        </div>
+
+                        <Form {...overrideForm}>
+                          <form onSubmit={overrideForm.handleSubmit((data) => overrideMutation.mutate(data))} className="space-y-6">
+                            <FormField
+                              control={overrideForm.control}
+                              name="notificationSchedule.initialReminder"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Initial Reminder (days before)</FormLabel>
+                                  <FormControl>
+                                    <Slider
+                                      min={1}
+                                      max={365}
+                                      step={1}
+                                      value={[field.value || 90]}
+                                      onValueChange={([value]) => field.onChange(value)}
+                                      className="w-full"
+                                    />
+                                  </FormControl>
+                                  <FormDescription>
+                                    Send first reminder {field.value || 90} days before deadline
+                                  </FormDescription>
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={overrideForm.control}
+                              name="notificationSchedule.weeklyReminder"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Weekly Reminders Start (days before)</FormLabel>
+                                  <FormControl>
+                                    <Slider
+                                      min={1}
+                                      max={90}
+                                      step={1}
+                                      value={[field.value || 30]}
+                                      onValueChange={([value]) => field.onChange(value)}
+                                      className="w-full"
+                                    />
+                                  </FormControl>
+                                  <FormDescription>
+                                    Start weekly reminders {field.value || 30} days before deadline
+                                  </FormDescription>
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={overrideForm.control}
+                              name="notificationSchedule.dailyReminder"
+                              render={({ field }) => (
+                                <FormItem>
+                                  <FormLabel>Daily Reminders Start (days before)</FormLabel>
+                                  <FormControl>
+                                    <Slider
+                                      min={1}
+                                      max={30}
+                                      step={1}
+                                      value={[field.value || 7]}
+                                      onValueChange={([value]) => field.onChange(value)}
+                                      className="w-full"
+                                    />
+                                  </FormControl>
+                                  <FormDescription>
+                                    Start daily reminders {field.value || 7} days before deadline
+                                  </FormDescription>
+                                </FormItem>
+                              )}
+                            />
+
+                            <FormField
+                              control={overrideForm.control}
+                              name="notificationSchedule.finalDayReminders"
+                              render={({ field }) => (
+                                <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                                  <FormControl>
+                                    <Checkbox
+                                      checked={field.value}
+                                      onCheckedChange={field.onChange}
+                                    />
+                                  </FormControl>
+                                  <div className="space-y-1 leading-none">
+                                    <FormLabel>
+                                      Enable final day reminders
+                                    </FormLabel>
+                                    <FormDescription>
+                                      Send urgent reminders on the final day before deadline
+                                    </FormDescription>
+                                  </div>
+                                </FormItem>
+                              )}
+                            />
+
+                            <Button
+                              type="submit"
+                              className="w-full"
+                              disabled={overrideMutation.isPending}
+                            >
+                              {overrideMutation.isPending ? (
+                                <>
+                                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                  Saving...
+                                </>
+                              ) : (
+                                "Save Notification Settings"
+                              )}
+                            </Button>
+                          </form>
+                        </Form>
                       </div>
                     </CardContent>
                   </Card>
