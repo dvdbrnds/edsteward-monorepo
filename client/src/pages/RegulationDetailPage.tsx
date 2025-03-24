@@ -105,32 +105,7 @@ function RegulationDetailPage() {
   const [location, navigate] = useLocation();
   const { user } = useAuth();
   const [showVersionHistory, setShowVersionHistory] = useState(false);
-  const [showWebPublishDialog, setShowWebPublishDialog] = useState(false);
-  const [showCommunicationDialog, setShowCommunicationDialog] = useState(false);
-  const [showSubmissionWizard, setShowSubmissionWizard] = useState(false);
   const regulationId = location.split("/")[2];
-
-  if (!user) {
-    navigate("/auth");
-    return null;
-  }
-
-  const { data: regulation, isLoading } = useQuery<Regulation>({
-    queryKey: ["/api/regulations", regulationId],
-    queryFn: async () => {
-      const response = await fetch(`/api/regulations/${regulationId}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch regulation');
-      }
-      return response.json();
-    },
-    enabled: !!user && !!regulationId,
-  });
-
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-
-  // Check if the user has admin role and ensure the regulation exists
   const isAdmin = user?.role?.toLowerCase() === "admin";
   const hasRegulation = regulation != null && 'actions' in regulation;
   const actions = hasRegulation ? regulation.actions : [];

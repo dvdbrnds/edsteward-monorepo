@@ -155,7 +155,7 @@ export function registerRoutes(app: express.Application): Server {
       });
     }
   });
-  
+
 
   // Add endpoint to fetch individual regulation by ID
   app.get("/api/deadlines", async (req, res) => {
@@ -300,21 +300,21 @@ export function registerRoutes(app: express.Application): Server {
       }
 
       const { regulationId } = req.params;
-      
+
       if (!regulationId) {
         return res.status(400).json({ error: "Regulation ID is required" });
       }
 
       syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Fetching regulation with ID: ${regulationId}`);
-      
+
       try {
         const regulation = await storage.getRegulationById(regulationId);
-        
+
         if (!regulation) {
           syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, `Regulation not found with ID: ${regulationId}`);
           return res.status(404).json({ error: "Regulation not found" });
         }
-        
+
         syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Found regulation: ${regulation.name || regulation.topic}`);
         return res.json(regulation);
       } catch (dbError) {
@@ -337,7 +337,7 @@ export function registerRoutes(app: express.Application): Server {
       });
     }
   });
-  
+
 
   // Update the evidence files endpoints with better error handling
   app.get("/api/regulations/:regulationId/evidence", async (req, res) => {
@@ -664,7 +664,7 @@ export function registerRoutes(app: express.Application): Server {
       const actionUpdate = req.body;
 
       // Only admins can change 'required' status
-      if ('required' in actionUpdate && req.user.role !== 'admin') {
+      if ('required' in actionUpdate && req.user.role.toLowerCase() !== 'admin') {
         syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Non-admin attempted to update required status");
         return res.status(403).json({ error: "Admin access required to change required status" });
       }
@@ -734,7 +734,7 @@ export function registerRoutes(app: express.Application): Server {
         return res.status(401).json({ error: "Authentication required" });
       }
 
-      if (req.user.role !== 'admin') {
+      if (req.user.role.toLowerCase() !== 'admin') {
         syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Non-admin user attempted to access user management");
         return res.status(403).json({ error: "Admin access required" });
       }
@@ -772,7 +772,7 @@ export function registerRoutes(app: express.Application): Server {
         return res.status(401).json({ error: "Authentication required" });
       }
 
-      if (req.user.role !== 'admin') {
+      if (req.user.role.toLowerCase() !== 'admin') {
         syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Non-admin user attempted to access roadmap");
         return res.status(403).json({ error: "Admin access required" });
       }
@@ -811,7 +811,7 @@ export function registerRoutes(app: express.Application): Server {
         return res.status(401).json({ error: "Authentication required" });
       }
 
-      if (req.user.role !== 'admin') {
+      if (req.user.role.toLowerCase() !== 'admin') {
         syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Non-admin user attempted to update user");
         return res.status(403).json({ error: "Admin access required" });
       }
@@ -854,7 +854,7 @@ export function registerRoutes(app: express.Application): Server {
         return res.status(401).json({ error: "Authentication required" });
       }
 
-      if (req.user.role !== 'admin') {
+      if (req.user.role.toLowerCase() !== 'admin') {
         syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Non-admin user attempted to reset password");
         return res.status(403).json({ error: "Admin access required" });
       }
