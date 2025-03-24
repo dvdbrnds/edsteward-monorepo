@@ -112,7 +112,7 @@ function RegulationDetailPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Check if the user has admin role
+  // Check if the user has admin role (case insensitive)
   const isAdmin = user?.role?.toLowerCase() === "admin";
 
   const updateActionMutation = useMutation({
