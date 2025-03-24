@@ -13,6 +13,13 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   ExternalLink,
   FileText,
@@ -151,6 +158,47 @@ function RegulationDetailPage() {
     actionsLength: actions.length
   });
 
+  const categoryMutation = useMutation({
+    mutationFn: async (category: string) => {
+      console.log('Updating category for regulation:', regulation?.id, 'to:', category);
+      
+      if (!regulation?.id) {
+        throw new Error('No regulation ID available');
+      }
+      
+      const response = await fetch(
+        `/api/regulations/${regulation.id}/category`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ category }),
+        }
+      );
+      
+      if (!response.ok) {
+        throw new Error("Failed to update category");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Category Updated",
+        description: "The category has been updated successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/regulations"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/regulations", regulationId] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Update Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+  
   const updateActionMutation = useMutation({
     mutationFn: async ({ regulationId, action }: { regulationId: number; action: RegulationAction }) => {
       const response = await fetch(
@@ -298,9 +346,31 @@ function RegulationDetailPage() {
                 <span className="px-2 py-1 bg-gray-100 rounded">
                   ID: {regulation.itemId}
                 </span>
-                <span className="px-2 py-1 bg-gray-100 rounded">
-                  {regulation.category || 'Uncategorized'}
-                </span>
+                {categoryVisible ? (
+                  <Select
+                    defaultValue={regulation.category || "Other"}
+                    onValueChange={(value) => categoryMutation.mutate(value)}
+                  >
+                    <SelectTrigger className="w-[180px] bg-gray-100 border-2 border-[#5B2C8F] rounded-md relative group hover:bg-purple-50/50 transition-colors">
+                      <div className="absolute -top-2 -right-2 bg-[#5B2C8F] text-white text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
+                        <Shield className="h-3 w-3" />
+                        Admin
+                      </div>
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {CATEGORIES.map((category) => (
+                        <SelectItem key={category} value={category}>
+                          {category}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <span className="px-2 py-1 bg-gray-100 rounded">
+                    {regulation.category || 'Uncategorized'}
+                  </span>
+                )}
                 {categoryVisible && (
                   <span className="px-2 py-1 bg-green-100 text-green-800 rounded font-bold">
                     Admin Mode Active
