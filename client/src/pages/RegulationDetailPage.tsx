@@ -7,6 +7,11 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Slider } from "@/components/ui/slider";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
 import {
   ExternalLink,
   FileText,
@@ -48,6 +53,20 @@ const CATEGORIES = [
   "Athletics",
   "Financial Aid",
 ];
+
+// Notification override schema for admin settings
+const notificationOverrideSchema = z.object({
+  email: z.string().email("Invalid email").optional().nullable(),
+  phone: z.string().regex(/^\+?[\d\s-()]+$/, "Invalid phone number").optional().nullable(),
+  notificationSchedule: z.object({
+    initialReminder: z.number().min(1).max(365).optional(),
+    weeklyReminder: z.number().min(1).max(90).optional(),
+    dailyReminder: z.number().min(1).max(30).optional(),
+    finalDayReminders: z.boolean().optional()
+  }).optional().nullable()
+});
+
+type NotificationOverride = z.infer<typeof notificationOverrideSchema>;
 
 function calculateComplianceScore(regulation: Regulation | undefined, deadlines: Deadline[] = []): {
   score: number;
@@ -173,6 +192,55 @@ function RegulationDetailPage() {
       action: updatedAction
     });
   };
+  
+  // Notification override mutation for admin settings
+  const overrideMutation = useMutation({
+    mutationFn: async (data: NotificationOverride) => {
+      const response = await fetch(
+        `/api/regulations/${regulationId}/notification-override`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to update notification override");
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Notification Settings Updated",
+        description: "The notification settings have been updated successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/regulations", regulationId] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Update Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+  
+  // Form for notification override settings
+  const overrideForm = useForm<NotificationOverride>({
+    resolver: zodResolver(notificationOverrideSchema),
+    defaultValues: {
+      email: regulation?.notificationOverride?.email || "",
+      phone: regulation?.notificationOverride?.phone || "",
+      notificationSchedule: regulation?.notificationSchedule || {
+        initialReminder: 90,
+        weeklyReminder: 30,
+        dailyReminder: 7,
+        finalDayReminders: true
+      }
+    },
+  });
 
   const { data: regulation, isLoading: regulationLoading } = useQuery<Regulation>({
     queryKey: ["/api/regulations", regulationId],
@@ -236,6 +304,22 @@ function RegulationDetailPage() {
   }
 
   const complianceScore = calculateComplianceScore(regulation, regulationDeadlines);
+
+  // Initialize form with data after regulation is loaded
+  React.useEffect(() => {
+    if (regulation) {
+      overrideForm.reset({
+        email: regulation.notificationOverride?.email || "",
+        phone: regulation.notificationOverride?.phone || "",
+        notificationSchedule: regulation.notificationSchedule || {
+          initialReminder: 90,
+          weeklyReminder: 30,
+          dailyReminder: 7,
+          finalDayReminders: true
+        }
+      });
+    }
+  }, [regulation, overrideForm]);
 
   const handleActionClick = (actionType: string) => {
     switch (actionType) {
