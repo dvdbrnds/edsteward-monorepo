@@ -29,7 +29,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
 interface EvidenceFilesProps {
-  regulationId: number;
+  regulationId: number | string;
 }
 
 interface EvidenceFile {

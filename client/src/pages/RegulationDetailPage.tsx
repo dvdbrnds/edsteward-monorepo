@@ -309,18 +309,17 @@ function RegulationDetailPage() {
 
   // Initialize form with data after regulation is loaded
   React.useEffect(() => {
-    if (regulation) {
-      overrideForm.reset({
-        email: regulation.notificationOverride?.email || "",
-        phone: regulation.notificationOverride?.phone || "",
-        notificationSchedule: regulation.notificationSchedule || {
-          initialReminder: 90,
-          weeklyReminder: 30,
-          dailyReminder: 7,
-          finalDayReminders: true
-        }
-      });
-    }
+    // Always call reset even if regulation is undefined to ensure hooks are consistent
+    overrideForm.reset({
+      email: regulation?.notificationOverride?.email || "",
+      phone: regulation?.notificationOverride?.phone || "",
+      notificationSchedule: regulation?.notificationSchedule || {
+        initialReminder: 90,
+        weeklyReminder: 30,
+        dailyReminder: 7,
+        finalDayReminders: true
+      }
+    });
   }, [regulation, overrideForm]);
 
   // Handle notification override form submission
@@ -775,7 +774,7 @@ function RegulationDetailPage() {
                     <CardTitle>Evidence Files</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <EvidenceFiles regulationId={regulationId.toString()} />
+                    <EvidenceFiles regulationId={regulationId} />
                   </CardContent>
                 </Card>
 
