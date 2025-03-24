@@ -155,8 +155,17 @@ export const regulations = pgTable("regulations", {
     dailyReminder: number;
     finalDayReminders: boolean;
   }>(),
+  notificationOverride: jsonb("notification_override").$type<{
+    email: string | null;
+    phone: string | null;
+  }>(),
+  sections: jsonb("sections").$type<{
+    title: string;
+    content: string;
+    identifiers?: string[];
+  }[]>(),
   sources: jsonb("sources").$type<RegulationSource[]>(),
-  actions: jsonb("actions").$type<RegulationAction>()
+  actions: jsonb("actions").$type<RegulationAction[]>()
 });
 
 // Notifications table
@@ -251,6 +260,15 @@ export const insertRegulationSchema = createInsertSchema(regulations).extend({
     dailyReminder: z.number().min(1).max(30).default(7),
     finalDayReminders: z.boolean().default(true),
   }).optional().nullable(),
+  notificationOverride: z.object({
+    email: z.string().email("Invalid email").optional().nullable(),
+    phone: z.string().regex(/^\+?[\d\s-()]+$/, "Invalid phone number").optional().nullable(),
+  }).optional().nullable(),
+  sections: z.array(z.object({
+    title: z.string(),
+    content: z.string(),
+    identifiers: z.array(z.string()).optional(),
+  })).optional().nullable(),
   sources: z.array(z.object({
     url: z.string(),
     type: z.enum(['agency-api', 'web-scrape', 'document-link']),
