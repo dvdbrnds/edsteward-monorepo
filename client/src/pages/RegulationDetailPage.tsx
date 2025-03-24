@@ -134,12 +134,22 @@ function RegulationDetailPage() {
   console.log("Regulation data:", regulation);
   console.log("User role:", user?.role, "isAdmin:", isAdmin);
   
-  const hasRegulation = regulation != null && 'actions' in regulation;
-  console.log("hasRegulation check:", hasRegulation, "actions in regulation:", regulation ? 'actions' in regulation : false);
+  // Check if regulation exists 
+  const hasRegulation = regulation != null;
   
-  const actions = hasRegulation ? regulation.actions : [];
+  // Ensure actions is always available (initialize if missing)
+  const actions = regulation?.actions || [];
+  
+  // Make admin tools visible if the user is an admin and regulation exists
   const categoryVisible = isAdmin && hasRegulation;
   const notificationOverrideVisible = isAdmin && hasRegulation;
+  
+  console.log("Admin tools visibility check:", { 
+    hasRegulation, 
+    isAdmin, 
+    categoryVisible,
+    actionsLength: actions.length
+  });
 
   const updateActionMutation = useMutation({
     mutationFn: async ({ regulationId, action }: { regulationId: number; action: RegulationAction }) => {
