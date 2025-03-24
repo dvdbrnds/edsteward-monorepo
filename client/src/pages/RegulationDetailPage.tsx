@@ -775,7 +775,7 @@ function RegulationDetailPage() {
                     <CardTitle>Evidence Files</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <EvidenceFiles regulationId={regulationId} />
+                    <EvidenceFiles regulationId={regulationId.toString()} />
                   </CardContent>
                 </Card>
 

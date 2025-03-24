@@ -290,6 +290,61 @@ export function registerRoutes(app: express.Application): Server {
       });
     }
   });
+  
+  // Add endpoint to update notification settings for a regulation
+  app.patch("/api/regulations/:regulationId/notification-override", async (req, res) => {
+    try {
+      if (!req.user) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized notification settings update attempt");
+        return res.status(401).json({ error: "Authentication required" });
+      }
+
+      // Check if user is admin
+      if (req.user.role !== "admin") {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Non-admin user tried to update notification settings");
+        return res.status(403).json({ error: "Admin access required" });
+      }
+
+      const { regulationId } = req.params;
+      const { email, phone, notificationSchedule } = req.body;
+
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Updating notification settings for regulation ${regulationId}`, {
+        email: email || null,
+        phone: phone || null,
+        scheduleUpdated: !!notificationSchedule
+      });
+
+      try {
+        // Update the regulation with notification override settings
+        const regulation = await storage.updateRegulation(parseInt(regulationId), { 
+          notificationOverride: { email, phone },
+          notificationSchedule
+        });
+
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Successfully updated notification settings", { 
+          regulationId
+        });
+
+        return res.json(regulation);
+      } catch (dbError) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Database error updating notification settings", {
+          error: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+        return res.status(500).json({ 
+          error: "Database error updating notification settings",
+          details: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+      }
+    } catch (error) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to update notification settings", {
+        error: error instanceof Error ? error.message : String(error)
+      });
+      return res.status(500).json({ 
+        error: "Failed to update notification settings", 
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
 
   // Add endpoint to fetch individual regulation by ID
   app.get("/api/regulations/:regulationId", async (req, res) => {
