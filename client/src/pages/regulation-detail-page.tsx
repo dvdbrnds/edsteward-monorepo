@@ -318,6 +318,9 @@ function RegulationDetailPage() {
   const { data: user } = useQuery({
     queryKey: ["/api/user"]
   });
+  
+  // Debug user information
+  console.log("Current user data:", user);
 
   const { data: regulation, isLoading: regulationLoading } = useQuery<Regulation>({
     queryKey: ["/api/regulations", regulationId],
