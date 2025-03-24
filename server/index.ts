@@ -133,16 +133,15 @@ let deadlineCheckInterval: NodeJS.Timeout | null = null;
 async function startServer(): Promise<Server> {
   try {
     const PORT = 5000;
-    log("Forcefully killing any process on port 5000...");
-
+    log("Starting server initialization...");
+    
+    // Kill any existing processes more reliably
     try {
-      await exec('fuser -k 5000/tcp');
+      await exec('pkill -f "node.*5000"');
       await new Promise(resolve => setTimeout(resolve, 1000));
     } catch (error) {
-      log("Note: fuser command error (this is usually fine)");
+      // Ignore errors from pkill
     }
-
-    log("Starting server initialization...");
 
     // Test database connection with retries
     let dbConnected = false;
@@ -173,9 +172,16 @@ async function startServer(): Promise<Server> {
 
     // Setup Vite or static serving based on environment
     if (process.env.NODE_ENV !== "production") {
-      log("Setting up Vite development server...");
-      await setupVite(app, httpServer);
-      log("Vite setup complete");
+      try {
+        log("Setting up Vite development server...");
+        await setupVite(app, httpServer);
+        log("Vite setup complete");
+      } catch (error) {
+        log("Error setting up Vite: " + (error instanceof Error ? error.message : String(error)));
+        // Continue without Vite in case of error
+        log("Falling back to static serving...");
+        serveStatic(app);
+      }
     } else {
       log("Setting up static file serving...");
       serveStatic(app);
@@ -183,9 +189,18 @@ async function startServer(): Promise<Server> {
     }
 
     return new Promise((resolve, reject) => {
-      httpServer
-        .listen(PORT, "0.0.0.0")
-        .once('listening', () => {
+      // Clean any existing connections
+      const cleanup = async () => {
+        try {
+          await exec('fuser -k 5000/tcp');
+          await new Promise(resolve => setTimeout(resolve, 2000));
+        } catch (error) {
+          // Ignore cleanup errors
+        }
+      };
+
+      cleanup().then(() => {
+        const server = httpServer.listen(PORT, "0.0.0.0", () => {
           log(`Server successfully started on port ${PORT}`);
           
           // Start deadline notification check interval after a delay
@@ -203,14 +218,15 @@ async function startServer(): Promise<Server> {
           }, 30000); // Wait 30 seconds before starting the checker
 
           resolve(httpServer);
-        })
-        .once('error', (err: NodeJS.ErrnoException) => {
-          if (err.code === 'EADDRINUSE') {
-            log(`Error: Port ${PORT} is already in use`);
-            process.exit(1);
-          }
-          reject(err);
-        });
+          })
+          .once('error', (err: NodeJS.ErrnoException) => {
+            if (err.code === 'EADDRINUSE') {
+              log(`Error: Port ${PORT} is already in use`);
+              process.exit(1);
+            }
+            reject(err);
+          });
+      });
     });
   } catch (error) {
     log("Fatal error during server startup: " + (error instanceof Error ? error.message : String(error)));
