@@ -663,6 +663,12 @@ export function registerRoutes(app: express.Application): Server {
       const { regulationId, actionType } = req.params;
       const actionUpdate = req.body;
 
+      // Only admins can change 'required' status
+      if ('required' in actionUpdate && req.user.role !== 'admin') {
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Non-admin attempted to update required status");
+        return res.status(403).json({ error: "Admin access required to change required status" });
+      }
+
       syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Updating action for regulation ${regulationId}`, {
         actionType,
         update: actionUpdate
