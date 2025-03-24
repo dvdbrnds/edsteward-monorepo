@@ -339,12 +339,18 @@ function RegulationDetailPage() {
     console.log("User keys:", Object.keys(user));
   }
   
-  // Force admin mode for everyone temporarily for debugging
+  // Add a debug message directly to the UI
   const isAdmin = true; // Override all role checks to show admin components for testing
+  const userRoleText = user ? `Your role: ${user.role}` : "Not logged in";
+  const debugInfo = {
+    isForceAdmin: true,
+    userInfo: user ? JSON.stringify(user) : "No user data",
+    timestampCheck: new Date().toISOString()
+  };
   
   // Add additional console logs for debugging
-  console.log("FORCED ADMIN MODE ENABLED - all users will see admin components");
-  console.log("User details:", user);
+  console.log("Debug info:", debugInfo);
+  console.log("User data structure:", user);
 
   const { data: regulation, isLoading: regulationLoading } = useQuery<Regulation>({
     queryKey: ["/api/regulations", regulationId],
@@ -427,6 +433,17 @@ function RegulationDetailPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navigation />
+      
+      {/* Debug Panel - Will show for everyone */}
+      <div className="bg-blue-100 p-4 m-4 rounded-lg border-2 border-blue-500">
+        <h2 className="text-lg font-bold mb-2">Debug Information</h2>
+        <p><strong>Role:</strong> {userRoleText}</p>
+        <p><strong>Admin Check:</strong> {isAdmin ? 'YES (Forced to true)' : 'NO'}</p>
+        <p><strong>Timestamp:</strong> {debugInfo.timestampCheck}</p>
+        <p><strong>Admin Components Should Be Visible</strong></p>
+        <pre className="bg-gray-100 p-2 mt-2 text-xs overflow-auto max-h-20">{debugInfo.userInfo}</pre>
+      </div>
+      
       <main className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="space-y-8">
