@@ -1,6 +1,6 @@
 
-const fs = require('fs');
-const { pool } = require('./server/db');
+import fs from 'fs';
+import { pool } from './server/db.js';
 
 async function exportRegulations() {
   try {
