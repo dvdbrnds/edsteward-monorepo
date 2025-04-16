@@ -64,8 +64,39 @@ export function registerRoutes(app: express.Application): Server {
   // Create HTTP server
   const httpServer = createServer(app);
 
-  // Serve static files from the uploads directory
-  app.use('/api/uploads', express.static(uploadDir));
+  // Custom file download route with proper content-type handling
+  app.get('/api/uploads/:filename', (req, res) => {
+    const filename = req.params.filename;
+    const filePath = path.join(uploadDir, filename);
+    
+    // Check if file exists
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({ error: 'File not found' });
+    }
+    
+    // Get file extension to determine content-type
+    const ext = path.extname(filename).toLowerCase();
+    
+    // Set appropriate content-type based on file extension
+    if (ext === '.pdf') {
+      res.setHeader('Content-Type', 'application/pdf');
+    } else if (ext === '.doc') {
+      res.setHeader('Content-Type', 'application/msword');
+    } else if (ext === '.docx') {
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+    } else if (ext === '.jpg' || ext === '.jpeg') {
+      res.setHeader('Content-Type', 'image/jpeg');
+    } else if (ext === '.png') {
+      res.setHeader('Content-Type', 'image/png');
+    }
+    
+    // Set content disposition header for download
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    
+    // Stream file to response
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
+  });
 
   // Setup auth routes first
   setupAuth(app);
