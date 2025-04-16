@@ -98,7 +98,10 @@ export function registerRoutes(app: express.Application): Server {
     fileStream.pipe(res);
   });
 
-  // Setup auth routes first
+  // Serve static files from public directory for downloads
+  app.use('/downloads', express.static(path.join(process.cwd(), 'public/downloads')));
+
+  // Setup auth routes first 
   setupAuth(app);
 
   // Test route to verify API handling

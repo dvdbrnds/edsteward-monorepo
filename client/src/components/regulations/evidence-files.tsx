@@ -249,7 +249,7 @@ export function EvidenceFiles({ regulationId }: EvidenceFilesProps) {
                           title="Download file"
                         >
                           <a 
-                            href={`/api/uploads/${file.storagePath.split('/').pop()}`}
+                            href={`/downloads/regulations/${file.storagePath.split('/').pop()}`}
                             download={file.fileName}
                             onClick={(e) => e.stopPropagation()}
                           >
@@ -277,7 +277,7 @@ export function EvidenceFiles({ regulationId }: EvidenceFilesProps) {
                         asChild
                       >
                         <a 
-                          href={`/api/uploads/${file.storagePath.split('/').pop()}`}
+                          href={`/downloads/regulations/${file.storagePath.split('/').pop()}`}
                           download={file.fileName}
                           target="_blank"
                           rel="noopener noreferrer"
