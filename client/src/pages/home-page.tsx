@@ -88,6 +88,34 @@ export default function HomePage() {
             </Card>
           </div>
 
+          {/* Board of Trustees Dashboard Card */}
+          <Card className="mt-8 mb-6 bg-gradient-to-r from-slate-50 to-blue-50 border-blue-100">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Users className="h-5 w-5 text-blue-600" />
+                Board of Trustees Dashboard
+              </CardTitle>
+              <CardDescription>
+                A public dashboard with compliance insights for trustees
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-slate-600 max-w-xl">
+                  Access the view-only dashboard providing an overview of our regulatory compliance status. 
+                  This dashboard is designed specifically for the board of trustees to monitor compliance metrics 
+                  and receive status updates.
+                </p>
+                <Button asChild className="gap-2">
+                  <Link href="/public-dashboard">
+                    <span>Open Trustees Dashboard</span>
+                    <ExternalLink className="h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Regulations List Section */}
           <div className="mt-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
