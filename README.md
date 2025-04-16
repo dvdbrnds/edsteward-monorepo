@@ -93,6 +93,14 @@ Please report any issues or provide feedback by:
 
 ## Version History
 
+- v0.1.2 (Alpha) - April 2025
+  - Added isOfficial flag for evidence files to identify government source documents
+  - Enhanced file upload form with official document marking capability
+  - Improved file download functionality with proper content types
+  - Added display of uploader's full name in evidence files
+  - Implemented specialized endpoint for regulation file downloads
+  - Enhanced file path resolution for different storage locations
+
 - v0.1.1 (Alpha) - February 2025
   - Fixed OAuth2 configuration for Google Sheets integration
   - Improved setup wizard with optional OAuth2 configuration
