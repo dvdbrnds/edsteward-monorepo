@@ -99,6 +99,7 @@ export const evidenceFiles = pgTable("evidence_files", {
   uploadedAt: timestamp("uploaded_at").notNull().defaultNow(),
   status: text("status").notNull().default("pending"),
   storagePath: text("storage_path").notNull(),
+  isOfficial: boolean("is_official").notNull().default(false),
 });
 
 // Update the regulations table definition to include PA-specific fields
@@ -335,7 +336,9 @@ export const insertGuideSchema = createInsertSchema(guides).extend({
 });
 
 // Add after other insert schemas
-export const insertEvidenceFileSchema = createInsertSchema(evidenceFiles);
+export const insertEvidenceFileSchema = createInsertSchema(evidenceFiles).extend({
+  isOfficial: z.boolean().default(false),
+});
 
 // Email Configuration table
 export const emailConfigs = pgTable("email_configs", {
