@@ -166,20 +166,21 @@ export default function PublicDashboardPage() {
         }
 
         // Apply category filter
-        if (categoryFilter && regulation.category !== categoryFilter) {
+        if (categoryFilter && categoryFilter !== "all" && regulation.category !== categoryFilter) {
           return false;
         }
 
         // Apply jurisdiction filter
         if (
-          jurisdictionFilter &&
+          jurisdictionFilter && 
+          jurisdictionFilter !== "all" && 
           regulation.jurisdiction !== jurisdictionFilter
         ) {
           return false;
         }
 
         // Apply compliance status filter
-        if (complianceFilter) {
+        if (complianceFilter && complianceFilter !== "all") {
           const status = calculateComplianceStatus(regulation).status;
           if (
             (complianceFilter === "compliant" && status !== "compliant") ||
@@ -379,7 +380,7 @@ export default function PublicDashboardPage() {
                     <SelectValue placeholder="Category" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Categories</SelectItem>
+                    <SelectItem value="all">All Categories</SelectItem>
                     {categories.map((category) => (
                       <SelectItem key={category} value={category}>
                         {category}
@@ -395,7 +396,7 @@ export default function PublicDashboardPage() {
                     <SelectValue placeholder="Jurisdiction" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Jurisdictions</SelectItem>
+                    <SelectItem value="all">All Jurisdictions</SelectItem>
                     <SelectItem value="federal">Federal</SelectItem>
                     <SelectItem value="state">State</SelectItem>
                   </SelectContent>
@@ -408,7 +409,7 @@ export default function PublicDashboardPage() {
                     <SelectValue placeholder="Compliance Status" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Statuses</SelectItem>
+                    <SelectItem value="all">All Statuses</SelectItem>
                     <SelectItem value="compliant">Compliant</SelectItem>
                     <SelectItem value="needs-attention">Needs Attention</SelectItem>
                     <SelectItem value="at-risk">At Risk</SelectItem>
@@ -418,9 +419,9 @@ export default function PublicDashboardPage() {
                   variant="outline"
                   onClick={() => {
                     setSearchQuery("");
-                    setCategoryFilter("");
-                    setJurisdictionFilter("");
-                    setComplianceFilter("");
+                    setCategoryFilter("all");
+                    setJurisdictionFilter("all");
+                    setComplianceFilter("all");
                   }}
                 >
                   Clear Filters
@@ -546,9 +547,9 @@ export default function PublicDashboardPage() {
                             className="mt-2"
                             onClick={() => {
                               setSearchQuery("");
-                              setCategoryFilter("");
-                              setJurisdictionFilter("");
-                              setComplianceFilter("");
+                              setCategoryFilter("all");
+                              setJurisdictionFilter("all");
+                              setComplianceFilter("all");
                             }}
                           >
                             Clear all filters
