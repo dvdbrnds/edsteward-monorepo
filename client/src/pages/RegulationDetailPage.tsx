@@ -117,6 +117,7 @@ function RegulationDetailPage() {
   const [showWebPublishDialog, setShowWebPublishDialog] = useState(false);
   const [showCommunicationDialog, setShowCommunicationDialog] = useState(false);
   const [showSubmissionWizard, setShowSubmissionWizard] = useState(false);
+  const [showFullTextDialog, setShowFullTextDialog] = useState(false);
   const regulationId = location.split("/")[2];
   const isAdmin = user?.role?.toLowerCase() === "admin";
 
@@ -488,7 +489,18 @@ function RegulationDetailPage() {
                 {/* Summary Card */}
                 <Card>
                   <CardHeader>
-                    <CardTitle>Summary</CardTitle>
+                    <CardTitle className="flex justify-between items-center">
+                      <span>Summary</span>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        className="flex items-center gap-1"
+                        onClick={() => setShowFullTextDialog(true)}
+                      >
+                        <FileText className="h-4 w-4" />
+                        View Full Text
+                      </Button>
+                    </CardTitle>
                   </CardHeader>
                   <CardContent>
                     <div className="prose prose-sm max-w-none text-gray-700">
@@ -1064,6 +1076,32 @@ function RegulationDetailPage() {
             open={showSubmissionWizard}
             onOpenChange={setShowSubmissionWizard}
           />
+          
+          {/* Full Regulation Text Dialog */}
+          <Dialog open={showFullTextDialog} onOpenChange={setShowFullTextDialog}>
+            <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Full Regulation Text</DialogTitle>
+                <DialogDescription>
+                  Complete text of {regulation.name || regulation.topic}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="prose prose-sm max-w-none mt-4 text-gray-800 whitespace-pre-wrap">
+                {regulation.regulationText ? (
+                  <div className="space-y-4">
+                    {regulation.regulationText}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 italic">
+                    Full regulation text is not available.
+                  </p>
+                )}
+              </div>
+              <DialogFooter className="mt-6">
+                <Button onClick={() => setShowFullTextDialog(false)}>Close</Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
         </>
       )}
     </div>
