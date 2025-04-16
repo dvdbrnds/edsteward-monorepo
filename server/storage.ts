@@ -239,6 +239,7 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
 
+
   async searchRegulations(searchTerm: string): Promise<Regulation[]> {
     try {
       console.log(`Searching for regulations with term: ${searchTerm}`);
@@ -436,15 +437,6 @@ export class DatabaseStorage implements IStorage {
   async deleteNote(id: number): Promise<void> {
     await db.delete(notes).where(eq(notes.id, id));
   }
-  async getRegulationsByJurisdiction(jurisdiction: string): Promise<Regulation[]> {
-    console.log(`Fetching regulations with jurisdiction: ${jurisdiction}`);
-    const result = await db
-      .select()
-      .from(regulations)
-      .where(eq(regulations.jurisdiction, jurisdiction));
-    console.log(`Found ${result.length} ${jurisdiction} regulations`);
-    return result;
-  }
 
   async createEvidenceFile(file: InsertEvidenceFile): Promise<EvidenceFile> {
     try {
@@ -465,18 +457,35 @@ export class DatabaseStorage implements IStorage {
   async getEvidenceFilesByRegulation(regulationId: number): Promise<EvidenceFile[]> {
     try {
       console.log(`Fetching evidence files for regulation ${regulationId}`);
+      // First, get the evidence files
       const files = await db
-        .select({
-          ...evidenceFiles,
-          uploaderName: db.sql`concat(${users.firstName}, ' ', ${users.lastName})`
-        })
+        .select()
         .from(evidenceFiles)
-        .leftJoin(users, eq(evidenceFiles.uploadedBy, users.id))
         .where(eq(evidenceFiles.regulationId, regulationId))
         .orderBy(desc(evidenceFiles.uploadedAt));
 
-      console.log(`Found ${files.length} evidence files`);
-      return files;
+      // Then, for each file, look up the user's details separately
+      const result = await Promise.all(
+        files.map(async (file) => {
+          if (file.uploadedBy) {
+            const user = await this.getUser(file.uploadedBy);
+            return {
+              ...file,
+              // Use the user's first and last name if available, or username as fallback
+              uploaderName: (user?.firstName && user?.lastName) 
+                ? `${user.firstName} ${user.lastName}`
+                : user?.username || 'Unknown'
+            };
+          }
+          return {
+            ...file,
+            uploaderName: 'Unknown'
+          };
+        })
+      );
+
+      console.log(`Found ${result.length} evidence files`);
+      return result;
     } catch (error) {
       console.error("Error fetching evidence files:", error);
       throw error;
