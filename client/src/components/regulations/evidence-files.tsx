@@ -236,9 +236,26 @@ export function EvidenceFiles({ regulationId }: EvidenceFilesProps) {
                           <span>{new Date(file.uploadedAt).toLocaleDateString()}</span>
                         </div>
                       </div>
-                      <div className="text-xs text-right flex flex-col items-end">
-                        <p>{(file.fileSize / 1024 / 1024).toFixed(2)} MB</p>
-                        <p className="capitalize">{file.status}</p>
+                      <div className="flex flex-col items-end gap-1">
+                        <div className="text-xs text-right">
+                          <p>{(file.fileSize / 1024 / 1024).toFixed(2)} MB</p>
+                          <p className="capitalize">{file.status}</p>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="p-1 h-auto"
+                          asChild
+                          title="Download file"
+                        >
+                          <a 
+                            href={`/api/uploads/${file.storagePath.split('/').pop()}`}
+                            download={file.fileName}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <Download className="h-4 w-4" />
+                          </a>
+                        </Button>
                       </div>
                     </div>
                   </HoverCardTrigger>
