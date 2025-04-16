@@ -1,4 +1,4 @@
-# Moravian University Compliance Portal (Alpha v0.1.1)
+# Moravian University Compliance Portal (Alpha v0.1.2)
 
 A comprehensive compliance management platform designed for Moravian University to streamline regulation tracking and management across institutional departments.
 
@@ -14,6 +14,9 @@ This is an alpha release of the Compliance Portal. While the core functionality 
 - 📈 Advanced reporting capabilities
 - 🎯 Multi-category support (Academic, Accounting, Athletics, Admissions, Campus Safety)
 - 🔐 Role-based access control
+- 📄 Evidence file management with official document marking
+- 📋 Notes system for tracking compliance activities
+- 🏛️ Official government regulation source identification
 
 ## Getting Started
 
@@ -71,6 +74,9 @@ This alpha release includes:
 - ✅ Compliance status tracking
 - ✅ Basic reporting
 - ✅ Deadline management
+- ✅ Evidence file management
+- ✅ Official document identification
+- ✅ Enhanced download capabilities
 
 Upcoming features:
 - 🚧 Advanced notification system

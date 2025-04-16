@@ -44,6 +44,16 @@ An advanced AI-powered regulatory compliance platform that transforms complex mu
 - ✓ Private/public note visibility controls
 - ✓ Notes linking to regulations
 
+### Phase 4.5: Evidence Files Enhancement (Completed April 2025)
+- ✓ "isOfficial" flag for identifying government source documents
+- ✓ Enhanced file upload form with official document checkbox
+- ✓ Official badge display in list and detail views
+- ✓ Improved file download functionality with proper content types
+- ✓ Uploader's full name display in evidence files
+- ✓ Specialized endpoint for regulation file downloads
+- ✓ Proper handling of various document formats
+- ✓ Improved file path resolution for different storage locations
+
 ## Current Development Focus
 
 ### Phase 5: Testing & Documentation (In Progress)

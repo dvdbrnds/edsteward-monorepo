@@ -1,5 +1,25 @@
 # Changelog
 
+## [1.2.0] - 2025-04-16
+
+### Added
+- "isOfficial" flag for evidence files to identify official government source documents
+- Official badges for government regulation files in both list and detail views
+- Enhanced file upload form with checkbox for marking official government documents
+- Dedicated endpoint for regulation file downloads with proper content-type handling
+- Improved file server for both user-uploaded and system regulation files
+
+### Fixed
+- File download content-type handling for various document formats
+- File path resolution for documents from different storage locations
+- Evidence file metadata display and attribution
+
+### Improved
+- Evidence files now display uploader's full name instead of username
+- Enhanced user interface for file identification and downloading
+- Better handling of file downloads with correct headers and disposition
+- Official government documents are now clearly distinguished in the interface
+
 ## [1.1.0] - 2025-03-13
 
 ### Added

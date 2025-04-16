@@ -42,6 +42,10 @@ This document outlines the documentation standards for the Moravian University C
 - Include references to relevant regulations
 - Document audit trail for changes
 - Maintain compliance verification checklist
+- Clearly identify official government source documents
+- Ensure proper attribution for all regulatory documents
+- Maintain accurate metadata for evidence files
+- Follow government citation standards when referencing official documents
 
 ## File Structure
 ```
