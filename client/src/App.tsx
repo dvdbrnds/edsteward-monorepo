@@ -18,6 +18,8 @@ import DebugToolsPage from "@/pages/admin/debug-tools-page";
 import { RegulationViewer } from "@/pages/RegulationViewer";
 import SetupWizardPage from "@/pages/setup-wizard-page";
 import RoadmapPage from "@/pages/roadmap";
+import PublicDashboardPage from "@/pages/public-dashboard-page";
+import PublicRegulationDetailPage from "@/pages/public-regulation-detail-page";
 import { ProtectedRoute } from "./lib/protected-route";
 import { ProtectedRegulationRoute } from "./lib/protected-regulation-route";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
@@ -29,8 +31,15 @@ function Router() {
     <ErrorBoundary>
       <PageLayout>
         <Switch>
+          {/* Public Routes - No Authentication Required */}
+          <Route path="/public-dashboard" component={PublicDashboardPage} />
+          <Route path="/public-dashboard/regulation/:id" component={PublicRegulationDetailPage} />
+          
+          {/* Authentication Route */}
           <Route path="/auth" component={AuthPage} />
           <Route path="/setup" component={SetupWizardPage} />
+          
+          {/* Protected Routes - Authentication Required */}
           <ProtectedRoute path="/" component={HomePage} />
           <ProtectedRoute path="/regulations" component={RegulationsPage} />
           <ProtectedRoute path="/regulations/validate" component={ValidationPage} />

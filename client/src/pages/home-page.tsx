@@ -1,12 +1,14 @@
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
+import { Link } from "wouter";
 import Navigation from "@/components/layout/navigation";
 import ComplianceOverview from "@/components/dashboard/compliance-overview";
 import UpcomingDeadlines from "@/components/dashboard/upcoming-deadlines";
 import RegulationList from "@/components/regulations/regulation-list";
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Bell, CheckCircle, XCircle } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Bell, CheckCircle, XCircle, Users, ExternalLink } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import type { Notification } from "@shared/schema";
 
 export default function HomePage() {

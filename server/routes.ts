@@ -145,6 +145,160 @@ export function registerRoutes(app: express.Application): Server {
   app.get("/api/test", (req, res) => {
     res.json({ status: "ok", message: "API is working" });
   });
+  
+  // Public routes for Board of Trustees view-only dashboard
+  app.get("/api/public/regulations", async (req, res) => {
+    try {
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Public access: Fetching regulations from storage");
+      const regulations = await storage.getRegulations();
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Public access: Found ${regulations.length} regulations`);
+
+      // Only return necessary fields for public view
+      const publicRegulations = regulations.map(reg => ({
+        id: reg.id,
+        itemId: reg.itemId,
+        name: reg.name,
+        topic: reg.topic,
+        statute: reg.statute,
+        statuteIds: reg.statuteIds,
+        summary: reg.summary,
+        category: reg.category,
+        jurisdiction: reg.jurisdiction,
+        isApplicable: reg.isApplicable,
+        effectiveDate: reg.effectiveDate,
+        lastUpdated: reg.lastUpdated,
+        lastVerified: reg.lastVerified,
+        nextReviewDate: reg.nextReviewDate,
+        agency_name: reg.agency_name,
+        agency_department: reg.agency_department
+      }));
+
+      return res.json(publicRegulations);
+    } catch (error) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Public access: Failed to fetch regulations", {
+        error: error instanceof Error ? error.message : String(error)
+      });
+      return res.status(500).json({ 
+        error: "Failed to fetch regulations", 
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+  
+  // Public endpoint to fetch individual regulation by ID
+  app.get("/api/public/regulations/:regulationId", async (req, res) => {
+    try {
+      const { regulationId } = req.params;
+
+      if (!regulationId) {
+        return res.status(400).json({ error: "Regulation ID is required" });
+      }
+
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Public access: Fetching regulation with ID: ${regulationId}`);
+
+      try {
+        const regulation = await storage.getRegulationById(regulationId);
+
+        if (!regulation) {
+          syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, `Public access: Regulation not found with ID: ${regulationId}`);
+          return res.status(404).json({ error: "Regulation not found" });
+        }
+
+        // Only return necessary fields for public view
+        const publicRegulation = {
+          id: regulation.id,
+          itemId: regulation.itemId,
+          name: regulation.name,
+          topic: regulation.topic,
+          statute: regulation.statute,
+          statuteIds: regulation.statuteIds,
+          summary: regulation.summary,
+          requirements: regulation.requirements,
+          category: regulation.category,
+          jurisdiction: regulation.jurisdiction,
+          isApplicable: regulation.isApplicable,
+          effectiveDate: regulation.effectiveDate,
+          lastUpdated: regulation.lastUpdated,
+          lastVerified: regulation.lastVerified,
+          nextReviewDate: regulation.nextReviewDate,
+          agency_name: regulation.agency_name,
+          agency_department: regulation.agency_department,
+          agency_url: regulation.agency_url,
+          regulationUrl: regulation.regulationUrl,
+          requirementsUrl: regulation.requirementsUrl,
+          submissionGuidelines: regulation.submissionGuidelines
+        };
+
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Public access: Found regulation: ${regulation.name || regulation.topic}`);
+        return res.json(publicRegulation);
+      } catch (dbError) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Public access: Database error fetching regulation", {
+          regulationId,
+          error: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+        return res.status(500).json({ 
+          error: "Database error fetching regulation",
+          details: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+      }
+    } catch (error) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Public access: Failed to fetch regulation", {
+        error: error instanceof Error ? error.message : String(error)
+      });
+      return res.status(500).json({ 
+        error: "Failed to fetch regulation", 
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+  
+  // Public endpoint to fetch deadlines for a specific regulation
+  app.get("/api/public/regulations/:regulationId/deadlines", async (req, res) => {
+    try {
+      const { regulationId } = req.params;
+
+      if (!regulationId || isNaN(parseInt(regulationId))) {
+        return res.status(400).json({ error: "Invalid regulation ID" });
+      }
+
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Public access: Fetching deadlines for regulation: ${regulationId}`);
+
+      try {
+        const allDeadlines = await storage.getDeadlines();
+        const regulationDeadlines = allDeadlines.filter(d => d.regulationId === parseInt(regulationId));
+
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
+          `Public access: Found ${regulationDeadlines.length} deadlines for regulation ${regulationId}`);
+
+        // Only return necessary fields for public view
+        const publicDeadlines = regulationDeadlines.map(deadline => ({
+          id: deadline.id,
+          regulationId: deadline.regulationId,
+          dueDate: deadline.dueDate,
+          status: deadline.status,
+          description: deadline.description
+        }));
+
+        return res.json(publicDeadlines);
+      } catch (dbError) {
+        syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Public access: Database error fetching deadlines", {
+          error: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+        return res.status(500).json({ 
+          error: "Database error fetching deadlines",
+          details: dbError instanceof Error ? dbError.message : String(dbError)
+        });
+      }
+    } catch (error) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Public access: Failed to fetch deadlines", {
+        error: error instanceof Error ? error.message : String(error)
+      });
+      return res.status(500).json({ 
+        error: "Failed to fetch deadlines", 
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
 
   // Add the missing /api/regulations route
   app.get("/api/regulations", async (req, res) => {
