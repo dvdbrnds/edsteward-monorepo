@@ -51,6 +51,7 @@ export function EvidenceFiles({ regulationId }: EvidenceFilesProps) {
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [description, setDescription] = useState("");
+  const [isOfficial, setIsOfficial] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
   const { data: evidenceFiles, error, isLoading } = useQuery({
@@ -99,6 +100,7 @@ export function EvidenceFiles({ regulationId }: EvidenceFilesProps) {
       setIsUploadDialogOpen(false);
       setSelectedFile(null);
       setDescription("");
+      setIsOfficial(false);
     },
     onError: (error: Error) => {
       toast({
@@ -123,6 +125,7 @@ export function EvidenceFiles({ regulationId }: EvidenceFilesProps) {
     formData.append('file', selectedFile);
     formData.append('description', description);
     formData.append('regulationId', regulationId.toString());
+    formData.append('isOfficial', isOfficial.toString());
 
     setIsUploading(true);
     try {
@@ -207,6 +210,18 @@ export function EvidenceFiles({ regulationId }: EvidenceFilesProps) {
                   placeholder="Enter a description for this file..."
                 />
               </div>
+              <div className="flex items-center space-x-2">
+                <input
+                  type="checkbox"
+                  id="isOfficial"
+                  checked={isOfficial}
+                  onChange={(e) => setIsOfficial(e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                />
+                <Label htmlFor="isOfficial" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Mark as official government source document
+                </Label>
+              </div>
               <Button
                 onClick={handleFileUpload}
                 disabled={isUploading || !selectedFile}
@@ -228,7 +243,14 @@ export function EvidenceFiles({ regulationId }: EvidenceFilesProps) {
                     <div className="flex items-center gap-2 p-2 rounded-md border cursor-pointer hover:bg-muted/50">
                       <FileText className="h-4 w-4 shrink-0" />
                       <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{file.fileName}</p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-medium truncate">{file.fileName}</p>
+                          {file.isOfficial && (
+                            <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
+                              Official
+                            </span>
+                          )}
+                        </div>
                         <p className="text-xs text-muted-foreground">{file.description}</p>
                         <div className="flex items-center gap-2 text-xs text-muted-foreground">
                           <User className="h-3 w-3" />
@@ -262,7 +284,14 @@ export function EvidenceFiles({ regulationId }: EvidenceFilesProps) {
                   </HoverCardTrigger>
                   <HoverCardContent align="start" className="w-80">
                     <div className="space-y-2">
-                      <h4 className="text-sm font-semibold">{file.fileName}</h4>
+                      <div className="flex items-center justify-between">
+                        <h4 className="text-sm font-semibold">{file.fileName}</h4>
+                        {file.isOfficial && (
+                          <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-800">
+                            Official
+                          </span>
+                        )}
+                      </div>
                       {renderFilePreview(file)}
                       <p className="text-xs text-muted-foreground">{file.description}</p>
                       <div className="text-xs">
@@ -270,6 +299,7 @@ export function EvidenceFiles({ regulationId }: EvidenceFilesProps) {
                         <p>Date: {new Date(file.uploadedAt).toLocaleString()}</p>
                         <p>Size: {(file.fileSize / 1024 / 1024).toFixed(2)} MB</p>
                         <p>Type: {file.fileType}</p>
+                        {file.isOfficial && <p className="font-medium text-blue-700">Government Source Document</p>}
                       </div>
                       <Button
                         size="sm"
