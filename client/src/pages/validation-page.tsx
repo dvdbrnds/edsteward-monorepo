@@ -19,7 +19,6 @@ import autoTable from 'jspdf-autotable';
 import { format } from "date-fns";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
-import { BugReportButton } from "@/components/common/bug-report-button";
 
 interface ValidationError {
   regulationId: string;
@@ -323,7 +322,6 @@ export default function ValidationPage() {
               </p>
             </div>
             <div className="flex items-center space-x-4">
-              <BugReportButton />
               {report && report.totalRegulations > 0 && (
                 <>
                   <Button variant="outline" onClick={downloadCSV}>
