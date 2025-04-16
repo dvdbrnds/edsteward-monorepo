@@ -100,9 +100,9 @@ function calculateComplianceStatus(regulation: any): {
 export default function PublicDashboardPage() {
   const [location, navigate] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
-  const [categoryFilter, setCategoryFilter] = useState<string>("");
-  const [jurisdictionFilter, setJurisdictionFilter] = useState<string>("");
-  const [complianceFilter, setComplianceFilter] = useState<string>("");
+  const [categoryFilter, setCategoryFilter] = useState<string>("all");
+  const [jurisdictionFilter, setJurisdictionFilter] = useState<string>("all");
+  const [complianceFilter, setComplianceFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
 
