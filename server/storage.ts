@@ -468,7 +468,7 @@ export class DatabaseStorage implements IStorage {
       const files = await db
         .select({
           ...evidenceFiles,
-          uploaderName: users.username
+          uploaderName: db.sql`concat(${users.firstName}, ' ', ${users.lastName})`
         })
         .from(evidenceFiles)
         .leftJoin(users, eq(evidenceFiles.uploadedBy, users.id))
