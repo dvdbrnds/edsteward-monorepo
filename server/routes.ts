@@ -101,6 +101,43 @@ export function registerRoutes(app: express.Application): Server {
   // Serve static files from public directory for downloads
   app.use('/downloads', express.static(path.join(process.cwd(), 'public/downloads')));
 
+  // Add specialized endpoint for regulation file downloads with proper content type handling
+  app.get('/downloads/regulations/:filename', (req, res) => {
+    const filename = req.params.filename;
+    const filePath = path.join(process.cwd(), 'public/downloads/regulations', filename);
+    
+    // Check if file exists
+    if (!fs.existsSync(filePath)) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, `Regulation file not found: ${filename}`);
+      return res.status(404).json({ error: 'Regulation file not found' });
+    }
+    
+    // Get file extension to determine content-type
+    const ext = path.extname(filename).toLowerCase();
+    
+    // Set appropriate content-type based on file extension
+    if (ext === '.pdf') {
+      res.setHeader('Content-Type', 'application/pdf');
+    } else if (ext === '.doc') {
+      res.setHeader('Content-Type', 'application/msword');
+    } else if (ext === '.docx') {
+      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+    } else if (ext === '.jpg' || ext === '.jpeg') {
+      res.setHeader('Content-Type', 'image/jpeg');
+    } else if (ext === '.png') {
+      res.setHeader('Content-Type', 'image/png');
+    } else if (ext === '.txt') {
+      res.setHeader('Content-Type', 'text/plain');
+    }
+    
+    // Set content disposition header for download
+    res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+    
+    // Stream file to response
+    const fileStream = fs.createReadStream(filePath);
+    fileStream.pipe(res);
+  });
+
   // Setup auth routes first 
   setupAuth(app);
 
