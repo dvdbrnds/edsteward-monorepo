@@ -42,6 +42,7 @@ interface EvidenceFile {
   status: string;
   storagePath: string;
   uploaderName: string;
+  isOfficial?: boolean;
 }
 
 export function EvidenceFiles({ regulationId }: EvidenceFilesProps) {

@@ -494,6 +494,7 @@ export function registerRoutes(app: express.Application): Server {
 
       const file = req.file;
       const description = req.body.description || '';
+      const isOfficial = req.body.isOfficial === 'true';
 
       try {
         const evidenceFile = await storage.createEvidenceFile({
@@ -504,7 +505,8 @@ export function registerRoutes(app: express.Application): Server {
           description,
           uploadedBy: req.user.id,
           status: "pending",
-          storagePath: file.path
+          storagePath: file.path,
+          isOfficial
         });
 
         syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
