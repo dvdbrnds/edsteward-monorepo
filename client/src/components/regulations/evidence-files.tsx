@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/hover-card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { FileText, Image as ImageIcon, FileText as PdfIcon, User, Upload } from "lucide-react";
+import { FileText, Image as ImageIcon, FileText as PdfIcon, User, Upload, Download } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -236,7 +236,7 @@ export function EvidenceFiles({ regulationId }: EvidenceFilesProps) {
                           <span>{new Date(file.uploadedAt).toLocaleDateString()}</span>
                         </div>
                       </div>
-                      <div className="text-xs text-right">
+                      <div className="text-xs text-right flex flex-col items-end">
                         <p>{(file.fileSize / 1024 / 1024).toFixed(2)} MB</p>
                         <p className="capitalize">{file.status}</p>
                       </div>
@@ -253,6 +253,22 @@ export function EvidenceFiles({ regulationId }: EvidenceFilesProps) {
                         <p>Size: {(file.fileSize / 1024 / 1024).toFixed(2)} MB</p>
                         <p>Type: {file.fileType}</p>
                       </div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="w-full mt-2 gap-2"
+                        asChild
+                      >
+                        <a 
+                          href={`/api/uploads/${file.storagePath.split('/').pop()}`}
+                          download={file.fileName}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <Download className="h-4 w-4" />
+                          Download
+                        </a>
+                      </Button>
                     </div>
                   </HoverCardContent>
                 </HoverCard>
