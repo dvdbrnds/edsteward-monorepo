@@ -104,7 +104,7 @@ export default function CustomPieChart({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px] w-full">
+        <div className="h-[350px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -142,7 +142,7 @@ export default function CustomPieChart({
               />
               <Legend
                 verticalAlign="bottom"
-                height={80}
+                height={100}
                 iconType="circle"
                 payload={legendData.map((entry, index) => ({
                   value: entry.name,
@@ -170,13 +170,13 @@ export default function CustomPieChart({
                 )}
                 wrapperStyle={{
                   paddingTop: '20px',
-                  paddingBottom: '10px',
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
-                  gap: '6px',
+                  paddingBottom: '20px',
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  justifyContent: 'space-around',
+                  gap: '10px',
                   width: '100%',
-                  maxWidth: '100%',
-                  overflow: 'hidden'
+                  maxWidth: '100%'
                 }}
               />
             </PieChart>
