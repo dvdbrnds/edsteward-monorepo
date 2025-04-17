@@ -23,6 +23,12 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
+// Add X-Robots-Tag header to prevent search engine indexing
+app.use((req, res, next) => {
+  res.setHeader('X-Robots-Tag', 'noindex, nofollow');
+  next();
+});
+
 // Setup authentication AFTER JSON parsing
 app.use(
   session({
