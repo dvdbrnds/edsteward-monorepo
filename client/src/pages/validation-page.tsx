@@ -311,14 +311,27 @@ export default function ValidationPage() {
     <div className="min-h-screen bg-gray-50">
       <main className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Deprecation Banner */}
+          <div className="bg-amber-50 border-l-4 border-amber-400 p-4 mb-8 rounded-md shadow-sm">
+            <div className="flex items-center">
+              <AlertTriangle className="h-6 w-6 text-amber-500 mr-3" />
+              <div>
+                <h3 className="text-amber-800 font-medium">Deprecation Notice</h3>
+                <p className="text-amber-700 text-sm mt-1">
+                  This validation feature is deprecated and will be removed in a future update.
+                  Please use the built-in compliance tracking features instead.
+                </p>
+              </div>
+            </div>
+          </div>
           {/* Header */}
           <div className="flex justify-between items-center mb-8">
             <div>
               <h1 className="text-3xl font-bold text-gray-900">
-                Regulation Validation
+                Regulation Validation <span className="text-sm font-normal text-red-600 ml-2 px-2 py-1 bg-red-50 rounded-full border border-red-200">Deprecated</span>
               </h1>
               <p className="mt-1 text-sm text-gray-500">
-                Validate regulations against compliance rules and standards
+                This feature has been deprecated and is scheduled for removal.
               </p>
             </div>
             <div className="flex items-center space-x-4">
@@ -336,16 +349,11 @@ export default function ValidationPage() {
               )}
               <Button
                 onClick={() => validateMutation.mutate()}
-                disabled={validateMutation.isPending}
+                disabled={true}
+                className="opacity-50 cursor-not-allowed"
               >
-                {validateMutation.isPending ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Validating...
-                  </>
-                ) : (
-                  "Run Validation"
-                )}
+                <AlertTriangle className="h-4 w-4 mr-2 text-amber-500" />
+                Validation Disabled
               </Button>
             </div>
           </div>

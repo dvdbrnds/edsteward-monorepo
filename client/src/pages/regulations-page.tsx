@@ -82,14 +82,6 @@ export default function RegulationsPage() {
             </h1>
 
             <div className="space-x-4">
-              <Button
-                variant="outline"
-                onClick={() => navigate("/regulations/validate")}
-              >
-                <FileCheck className="h-4 w-4 mr-2" />
-                Validate Data
-              </Button>
-
               <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
                   <Button>
