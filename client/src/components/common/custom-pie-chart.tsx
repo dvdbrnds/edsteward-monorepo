@@ -91,8 +91,8 @@ export default function CustomPieChart({
               size="sm"
               onClick={() => downloadCSV(
                 data.map(({ name, value }) => ({
-                  [title.toLowerCase().replace(/ /g, '_')]: name,
-                  count: value,
+                  name,
+                  value
                 })),
                 `${title.toLowerCase().replace(/ /g, '-')}.csv`
               )}
@@ -104,8 +104,8 @@ export default function CustomPieChart({
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="h-[300px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
+        <div className="h-auto min-h-[340px] w-full">
+          <ResponsiveContainer width="100%" height="100%" minHeight={340}>
             <PieChart>
               <Pie
                 data={sortedData}
@@ -142,8 +142,9 @@ export default function CustomPieChart({
               />
               <Legend
                 verticalAlign="bottom"
-                height={80}
+                height={100}
                 iconType="circle"
+                layout="horizontal"
                 payload={legendData.map((entry, index) => ({
                   value: entry.name,
                   type: 'circle',
@@ -158,12 +159,11 @@ export default function CustomPieChart({
                       cursor-pointer
                       inline-flex
                       items-center
-                      ${value.length > 15 ? 'text-xs' : 'text-xs'}
+                      text-xs
                       ${activeFilter === value ? 'font-bold' : ''}
-                      truncate
+                      break-words
                     `}
                     onClick={() => onSegmentClick(value as string)}
-                    title={value as string} // Show full text on hover
                   >
                     {value}
                   </span>
@@ -172,11 +172,10 @@ export default function CustomPieChart({
                   paddingTop: '20px',
                   paddingBottom: '10px',
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
-                  gap: '6px',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(110px, auto))',
+                  gap: '8px',
                   width: '100%',
-                  maxWidth: '100%',
-                  overflow: 'hidden'
+                  height: 'auto'
                 }}
               />
             </PieChart>
