@@ -158,10 +158,12 @@ export default function CustomPieChart({
                       cursor-pointer
                       inline-flex
                       items-center
-                      ${value.length > 15 ? 'text-xs' : 'text-sm'}
+                      ${value.length > 15 ? 'text-xs' : 'text-xs'}
                       ${activeFilter === value ? 'font-bold' : ''}
+                      truncate
                     `}
                     onClick={() => onSegmentClick(value as string)}
+                    title={value as string} // Show full text on hover
                   >
                     {value}
                   </span>
@@ -170,9 +172,11 @@ export default function CustomPieChart({
                   paddingTop: '20px',
                   paddingBottom: '10px',
                   display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-                  gap: '8px',
-                  width: '100%'
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))',
+                  gap: '6px',
+                  width: '100%',
+                  maxWidth: '100%',
+                  overflow: 'hidden'
                 }}
               />
             </PieChart>
