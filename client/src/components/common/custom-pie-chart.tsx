@@ -103,8 +103,9 @@ export default function CustomPieChart({
           )}
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="h-[350px] w-full">
+      <CardContent className="pb-8">
+        {/* Chart container */}
+        <div className="h-[250px] w-full mb-4">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -140,47 +141,32 @@ export default function CustomPieChart({
                 }}
                 itemStyle={{ color: COLORS[0] }}
               />
-              <Legend
-                verticalAlign="bottom"
-                height={100}
-                iconType="circle"
-                payload={legendData.map((entry, index) => ({
-                  value: entry.name,
-                  type: 'circle',
-                  color: COLORS[sortedData.findIndex(d => d.name === entry.name) % COLORS.length],
-                  id: entry.name
-                }))}
-                formatter={(value) => (
-                  <span
-                    className={`
-                      text-[#666666]
-                      ml-2
-                      cursor-pointer
-                      inline-flex
-                      items-center
-                      ${value.length > 15 ? 'text-xs' : 'text-xs'}
-                      ${activeFilter === value ? 'font-bold' : ''}
-                      truncate
-                    `}
-                    onClick={() => onSegmentClick(value as string)}
-                    title={value as string} // Show full text on hover
-                  >
-                    {value}
-                  </span>
-                )}
-                wrapperStyle={{
-                  paddingTop: '20px',
-                  paddingBottom: '20px',
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  justifyContent: 'space-around',
-                  gap: '10px',
-                  width: '100%',
-                  maxWidth: '100%'
-                }}
-              />
             </PieChart>
           </ResponsiveContainer>
+        </div>
+        
+        {/* Custom legend outside of ResponsiveContainer */}
+        <div className="mt-2 px-2">
+          <div className="flex flex-wrap justify-center gap-2">
+            {legendData.map((entry, index) => (
+              <div 
+                key={`legend-${index}`} 
+                className={`
+                  flex items-center rounded px-2 py-1 transition-colors
+                  ${activeFilter === entry.name ? 'bg-gray-100 font-medium' : 'hover:bg-gray-50'}
+                  cursor-pointer
+                `}
+                onClick={() => onSegmentClick(entry.name)}
+                title={entry.name}
+              >
+                <div 
+                  className="w-3 h-3 rounded-full mr-2" 
+                  style={{ backgroundColor: COLORS[sortedData.findIndex(d => d.name === entry.name) % COLORS.length] }}
+                ></div>
+                <span className="text-xs truncate max-w-[120px]">{entry.name}</span>
+              </div>
+            ))}
+          </div>
         </div>
       </CardContent>
     </Card>
