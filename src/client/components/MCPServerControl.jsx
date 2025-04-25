@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import axios from 'axios';
 import { toast } from 'react-toastify';
+import MCPApiClient from '../api/MCPApiClient';
+
+// Create an instance of the API client
+const apiClient = new MCPApiClient();
 
 // Styled components
 const Container = styled.div`
@@ -184,6 +187,17 @@ const ServerType = styled.div`
         return '#4b5563';
     }
   }};
+`;
+
+// Add a tag for regulation-specific servers
+const RegulationTag = styled.div`
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+  border-radius: 4px;
+  margin-left: 0.5rem;
+  background-color: #fff1f2;
+  color: #e11d48;
 `;
 
 const ServerStatus = styled.div`
@@ -388,95 +402,6 @@ const ConfigValue = styled.div`
   white-space: nowrap;
 `;
 
-// Mock function to fetch servers
-const fetchServers = () => {
-  // This would be an API call in a real app
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve([
-        {
-          id: 1,
-          name: 'MCP LLM Gateway',
-          type: 'LLM Gateway',
-          status: 'Running',
-          uptime: '2h 34m',
-          category: 'Gateway',
-          address: 'http://localhost:3001',
-          startTime: '2023-07-15T08:45:00',
-          pid: 12345,
-          memory: '128MB',
-          cpu: '2.3%',
-          requests: 347,
-          config: {
-            port: 3001,
-            maxConcurrentRequests: 10,
-            timeout: 30000,
-            providers: ['OpenAI', 'Anthropic'],
-          }
-        },
-        {
-          id: 2,
-          name: 'Regulation Registry',
-          type: 'Regulation Server',
-          status: 'Running',
-          uptime: '2h 34m',
-          category: 'Registry',
-          address: 'http://localhost:3002',
-          startTime: '2023-07-15T08:45:15',
-          pid: 12346,
-          memory: '86MB',
-          cpu: '1.2%',
-          requests: 125,
-          config: {
-            port: 3002,
-            storagePath: './regulations',
-            cacheSize: '100MB',
-          }
-        },
-        {
-          id: 3,
-          name: 'Batch Processing Server',
-          type: 'Batch Server',
-          status: 'Running',
-          uptime: '2h 33m',
-          category: 'Processor',
-          address: 'http://localhost:3003',
-          startTime: '2023-07-15T08:46:00',
-          pid: 12347,
-          memory: '156MB',
-          cpu: '3.5%',
-          requests: 28,
-          config: {
-            port: 3003,
-            maxBatchSize: 100,
-            workerCount: 4,
-            outputDir: './batch-results',
-          }
-        },
-        {
-          id: 4,
-          name: 'Test Compliance Server',
-          type: 'Regulation Server',
-          status: 'Stopped',
-          uptime: '0m',
-          category: 'Testing',
-          address: 'http://localhost:3004',
-          startTime: null,
-          pid: null,
-          memory: '0MB',
-          cpu: '0%',
-          requests: 0,
-          config: {
-            port: 3004,
-            testMode: true,
-            mockResponses: true,
-          }
-        },
-      ]);
-    }, 1000);
-  });
-};
-
 const MCPServerControl = () => {
   const [isOpen, setIsOpen] = useState(true);
   const [servers, setServers] = useState([]);
@@ -498,12 +423,12 @@ const MCPServerControl = () => {
   const loadServers = async () => {
     setIsLoading(true);
     try {
-      const data = await fetchServers();
-      setServers(data);
+      const serverList = await apiClient.getServerStatus();
+      setServers(serverList);
       
       // Ensure selection is still valid
       if (selectedServer) {
-        const updatedServer = data.find(s => s.id === selectedServer.id);
+        const updatedServer = serverList.find(s => s.id === selectedServer.id);
         setSelectedServer(updatedServer || null);
       }
       
@@ -516,135 +441,39 @@ const MCPServerControl = () => {
   };
   
   const handleStartServer = async (serverId) => {
-    // This would be an API call in a real app
-    toast.info(`Starting server ${serverId}...`);
-    
-    // Mock server start
-    setServers(prev => 
-      prev.map(server => 
-        server.id === serverId 
-          ? { ...server, status: 'Starting' } 
-          : server
-      )
-    );
-    
-    // Simulate start completion after 2 seconds
-    setTimeout(() => {
-      setServers(prev => 
-        prev.map(server => 
-          server.id === serverId 
-            ? { 
-                ...server, 
-                status: 'Running',
-                uptime: '0m',
-                startTime: new Date().toISOString(),
-                pid: Math.floor(Math.random() * 10000) + 10000,
-                memory: '64MB',
-                cpu: '1.0%',
-              } 
-            : server
-        )
-      );
-      
-      // Update selected server if it's the one we just started
-      if (selectedServer && selectedServer.id === serverId) {
-        const updatedServer = servers.find(s => s.id === serverId);
-        setSelectedServer(updatedServer);
-      }
-      
+    try {
+      toast.info(`Starting server ${serverId}...`);
+      await apiClient.startServer(serverId);
+      await loadServers(); // Refresh the server list
       toast.success(`Server ${serverId} started successfully`);
-    }, 2000);
+    } catch (error) {
+      console.error(`Error starting server ${serverId}:`, error);
+      toast.error(`Failed to start server: ${error.message}`);
+    }
   };
   
   const handleStopServer = async (serverId) => {
-    // This would be an API call in a real app
-    toast.info(`Stopping server ${serverId}...`);
-    
-    // Mock server stop
-    setServers(prev => 
-      prev.map(server => 
-        server.id === serverId 
-          ? { ...server, status: 'Stopping' } 
-          : server
-      )
-    );
-    
-    // Simulate stop completion after 1.5 seconds
-    setTimeout(() => {
-      setServers(prev => 
-        prev.map(server => 
-          server.id === serverId 
-            ? { 
-                ...server, 
-                status: 'Stopped',
-                uptime: '0m',
-                startTime: null,
-                pid: null,
-                memory: '0MB',
-                cpu: '0%',
-              } 
-            : server
-        )
-      );
-      
-      // Update selected server if it's the one we just stopped
-      if (selectedServer && selectedServer.id === serverId) {
-        const updatedServer = servers.find(s => s.id === serverId);
-        setSelectedServer(updatedServer);
-      }
-      
+    try {
+      toast.info(`Stopping server ${serverId}...`);
+      await apiClient.stopServer(serverId);
+      await loadServers(); // Refresh the server list
       toast.success(`Server ${serverId} stopped successfully`);
-    }, 1500);
+    } catch (error) {
+      console.error(`Error stopping server ${serverId}:`, error);
+      toast.error(`Failed to stop server: ${error.message}`);
+    }
   };
   
   const handleRestartServer = async (serverId) => {
-    // This would be an API call in a real app
-    toast.info(`Restarting server ${serverId}...`);
-    
-    // First stop the server
-    setServers(prev => 
-      prev.map(server => 
-        server.id === serverId 
-          ? { ...server, status: 'Stopping' } 
-          : server
-      )
-    );
-    
-    // Then start it again
-    setTimeout(() => {
-      setServers(prev => 
-        prev.map(server => 
-          server.id === serverId 
-            ? { ...server, status: 'Starting' } 
-            : server
-        )
-      );
-      
-      // Finally set it to running
-      setTimeout(() => {
-        setServers(prev => 
-          prev.map(server => 
-            server.id === serverId 
-              ? { 
-                  ...server, 
-                  status: 'Running',
-                  uptime: '0m',
-                  startTime: new Date().toISOString(),
-                  pid: Math.floor(Math.random() * 10000) + 10000,
-                } 
-              : server
-          )
-        );
-        
-        // Update selected server if it's the one we just restarted
-        if (selectedServer && selectedServer.id === serverId) {
-          const updatedServer = servers.find(s => s.id === serverId);
-          setSelectedServer(updatedServer);
-        }
-        
-        toast.success(`Server ${serverId} restarted successfully`);
-      }, 1500);
-    }, 1500);
+    try {
+      toast.info(`Restarting server ${serverId}...`);
+      await apiClient.restartServer(serverId);
+      await loadServers(); // Refresh the server list
+      toast.success(`Server ${serverId} restarted successfully`);
+    } catch (error) {
+      console.error(`Error restarting server ${serverId}:`, error);
+      toast.error(`Failed to restart server: ${error.message}`);
+    }
   };
   
   const handleStartAll = async () => {
@@ -652,15 +481,21 @@ const MCPServerControl = () => {
     
     // Get IDs of stopped servers
     const stoppedServerIds = servers
-      .filter(server => server.status === 'Stopped')
+      .filter(server => server.status === 'Stopped' || server.status === 'stopped')
       .map(server => server.id);
     
-    // Start each stopped server with a slight delay between starts
-    stoppedServerIds.forEach((id, index) => {
-      setTimeout(() => {
-        handleStartServer(id);
-      }, index * 500);
-    });
+    // Start each stopped server
+    for (const id of stoppedServerIds) {
+      try {
+        await apiClient.startServer(id);
+      } catch (error) {
+        console.error(`Failed to start server ${id}:`, error);
+      }
+    }
+    
+    // Refresh server list
+    await loadServers();
+    toast.success('Started all servers');
   };
   
   const handleStopAll = async () => {
@@ -668,15 +503,21 @@ const MCPServerControl = () => {
     
     // Get IDs of running servers
     const runningServerIds = servers
-      .filter(server => server.status === 'Running')
+      .filter(server => server.status === 'Running' || server.status === 'running')
       .map(server => server.id);
     
-    // Stop each running server with a slight delay between stops
-    runningServerIds.forEach((id, index) => {
-      setTimeout(() => {
-        handleStopServer(id);
-      }, index * 500);
-    });
+    // Stop each running server
+    for (const id of runningServerIds) {
+      try {
+        await apiClient.stopServer(id);
+      } catch (error) {
+        console.error(`Failed to stop server ${id}:`, error);
+      }
+    }
+    
+    // Refresh server list
+    await loadServers();
+    toast.success('Stopped all servers');
   };
   
   const handleSelectServer = (server) => {
@@ -691,7 +532,9 @@ const MCPServerControl = () => {
   const filteredServers = servers.filter(server => {
     const matchesFilter = server.name.toLowerCase().includes(filter.toLowerCase()) ||
                          server.type.toLowerCase().includes(filter.toLowerCase()) ||
-                         server.address.toLowerCase().includes(filter.toLowerCase());
+                         (server.address && server.address.toLowerCase().includes(filter.toLowerCase())) ||
+                         (server.url && server.url.toLowerCase().includes(filter.toLowerCase())) ||
+                         (server.regulationId && server.regulationId.toLowerCase().includes(filter.toLowerCase()));
     
     const matchesCategory = categoryFilter === 'all' || 
                            server.category.toLowerCase() === categoryFilter.toLowerCase();
@@ -699,7 +542,12 @@ const MCPServerControl = () => {
     return matchesFilter && matchesCategory;
   });
   
-  const categories = [...new Set(servers.map(server => server.category))];
+  const categories = [...new Set(servers.map(server => server.category || 'Unknown'))];
+  
+  // Ensure the Regulation category is included even if no regulation servers are loaded yet
+  if (!categories.includes('Regulation')) {
+    categories.push('Regulation');
+  }
   
   return (
     <Container>
@@ -770,13 +618,16 @@ const MCPServerControl = () => {
                 onClick={() => handleSelectServer(server)}
               >
                 <ServerName>{server.name}</ServerName>
-                <ServerType type={server.type}>{server.type}</ServerType>
+                <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <ServerType type={server.type}>{server.type}</ServerType>
+                  {server.regulationId && <RegulationTag>Regulation</RegulationTag>}
+                </div>
                 <ServerStatus>
                   <StatusIndicator status={server.status} />
                   <StatusText status={server.status}>{server.status}</StatusText>
                 </ServerStatus>
                 <ServerUptime>Uptime: {server.uptime}</ServerUptime>
-                <ServerAddress>Address: {server.address}</ServerAddress>
+                <ServerAddress>Address: {server.address || server.url}</ServerAddress>
                 
                 <ServerCardActions>
                   {server.status === 'Stopped' ? (
@@ -789,7 +640,7 @@ const MCPServerControl = () => {
                     >
                       Start
                     </CardButton>
-                  ) : server.status === 'Running' ? (
+                  ) : server.status === 'Running' || server.status === 'running' ? (
                     <>
                       <CardButton 
                         variant="stop" 
@@ -856,6 +707,13 @@ const MCPServerControl = () => {
                   <InfoLabel>Category</InfoLabel>
                   <InfoValue>{selectedServer.category}</InfoValue>
                   
+                  {selectedServer.regulationId && (
+                    <>
+                      <InfoLabel>Regulation ID</InfoLabel>
+                      <InfoValue>{selectedServer.regulationId}</InfoValue>
+                    </>
+                  )}
+                  
                   <InfoLabel>Status</InfoLabel>
                   <InfoValue>
                     <ServerStatus>
@@ -867,7 +725,7 @@ const MCPServerControl = () => {
                   </InfoValue>
                   
                   <InfoLabel>Address</InfoLabel>
-                  <InfoValue>{selectedServer.address}</InfoValue>
+                  <InfoValue>{selectedServer.address || selectedServer.url}</InfoValue>
                   
                   <InfoLabel>Uptime</InfoLabel>
                   <InfoValue>{selectedServer.uptime}</InfoValue>

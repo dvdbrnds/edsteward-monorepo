@@ -95,6 +95,33 @@ class MCPApiClient {
         }
       });
       
+      // Fetch regulation MCP servers from the registry API
+      try {
+        const regulationServersResponse = await this.regulationRegistry.get('/api/mcp/servers');
+        if (regulationServersResponse.data && Array.isArray(regulationServersResponse.data)) {
+          // Map regulation servers to match the server object format
+          const regulationServers = regulationServersResponse.data.map(server => ({
+            id: `regulation-${server.regulationId}`,
+            name: server.name,
+            type: 'Regulation Server',
+            category: 'Regulation',
+            description: `MCP server for ${server.name} regulation`,
+            status: server.status || 'unknown',
+            startTime: server.startTime,
+            pid: server.pid,
+            uptime: server.uptime || '0m',
+            url: server.url || 'N/A',
+            regulationId: server.regulationId
+          }));
+          
+          // Add regulation servers to the servers array
+          servers.push(...regulationServers);
+        }
+      } catch (error) {
+        console.error('Error fetching regulation MCP servers:', error);
+        // Continue with the core servers even if regulation servers couldn't be fetched
+      }
+      
       return servers;
     } catch (error) {
       console.error('Error fetching server status:', error);
