@@ -18,7 +18,12 @@ const app = express();
 const PORT = process.env.PORT || 3010;
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
+  credentials: false
+}));
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -59,6 +64,15 @@ const writeRegulations = (regulations) => {
 };
 
 // API Routes
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'ok',
+    time: new Date().toISOString(),
+    regulations: readRegulations().length
+  });
+});
 
 // Get all regulations
 app.get('/api/regulations', (req, res) => {

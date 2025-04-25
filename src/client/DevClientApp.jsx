@@ -1,3 +1,5 @@
+'use client';
+
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
@@ -11,25 +13,53 @@ import ValidationResults from './components/ValidationResults';
 import MCPServerControl from './components/MCPServerControl';
 import BatchTestingPanel from './components/BatchTestingPanel';
 import RequestInspector from './components/RequestInspector';
+import ColorGuide from './components/ColorGuide';
 import GlobalStyle from './GlobalStyle';
+import MCPServerDetail from './pages/MCPServerDetail';
 
-// Theme configuration
+// Theme configuration with Material Design color palette
 const theme = {
   colors: {
-    primary: '#2196F3',
-    primaryDark: '#1976D2',
-    secondary: '#FF4081',
-    success: '#4CAF50',
-    error: '#F44336',
-    warning: '#FF9800',
-    info: '#2196F3',
-    neutral: '#9E9E9E',
-    text: '#333333',
-    textSecondary: '#757575',
-    border: '#E0E0E0',
-    cardBackground: '#FFFFFF',
-    background: '#F5F5F5',
-    hover: 'rgba(0, 0, 0, 0.05)',
+    // Primary: Deep Blue
+    primary: '#1976D2',           // Blue 700 (darker for better contrast)
+    primaryLight: '#42A5F5',      // Blue 400
+    primaryDark: '#0D47A1',       // Blue 900
+    
+    // Secondary: Pink
+    secondary: '#C2185B',         // Pink 700 (darker for better contrast)
+    secondaryLight: '#F06292',    // Pink 300
+    secondaryDark: '#880E4F',     // Pink 900
+    
+    // Feedback colors
+    success: '#2E7D32',           // Green 800 (better contrast)
+    error: '#D32F2F',             // Red 700 (better contrast)
+    warning: '#F57C00',           // Orange 700 (better contrast)
+    info: '#0277BD',              // Light Blue 800
+    
+    // Neutrals
+    neutral: '#757575',           // Grey 600
+    neutralLight: '#BDBDBD',      // Grey 400
+    neutralDark: '#424242',       // Grey 800
+    
+    // Text
+    text: '#212121',              // Grey 900 for primary text
+    textSecondary: '#616161',     // Grey 700 for secondary text
+    textDisabled: '#9E9E9E',      // Grey 500 for disabled text
+    textOnPrimary: '#FFFFFF',     // White text on primary bg
+    textOnSecondary: '#FFFFFF',   // White text on secondary bg
+    
+    // Backgrounds
+    background: '#F5F5F5',        // Grey 100 for main background
+    paper: '#FFFFFF',             // White for cards and elevated surfaces
+    cardBackground: '#FFFFFF',    // White for cards
+    divider: '#E0E0E0',           // Grey 300 for dividers
+    border: '#E0E0E0',            // Grey 300 for borders
+    
+    // Interactive states
+    hover: 'rgba(0, 0, 0, 0.04)',
+    selected: 'rgba(25, 118, 210, 0.08)', // Primary color with opacity
+    focus: 'rgba(25, 118, 210, 0.12)',    // Primary color with opacity
+    disabled: 'rgba(0, 0, 0, 0.12)'
   },
   space: [0, 4, 8, 16, 24, 32, 48, 64, 96],
   sizes: {
@@ -73,7 +103,7 @@ const Header = styled.header`
   height: 64px;
   padding: 0 24px;
   background-color: ${props => props.theme.colors.primary};
-  color: white;
+  color: ${props => props.theme.colors.textOnPrimary};
   box-shadow: ${props => props.theme.shadows.medium};
 `;
 
@@ -89,7 +119,7 @@ const Nav = styled.nav`
 `;
 
 const NavLink = styled.a`
-  color: white;
+  color: ${props => props.theme.colors.textOnPrimary};
   text-decoration: none;
   margin-left: 24px;
   opacity: 0.9;
@@ -111,7 +141,7 @@ const Footer = styled.footer`
   text-align: center;
   padding: 16px;
   background-color: ${props => props.theme.colors.primaryDark};
-  color: white;
+  color: ${props => props.theme.colors.textOnPrimary};
   font-size: 14px;
 `;
 
@@ -129,6 +159,7 @@ const DevClientApp = () => {
               <NavLink href="/servers">Servers</NavLink>
               <NavLink href="/batch">Batch Testing</NavLink>
               <NavLink href="/debug">Debug</NavLink>
+              <NavLink href="/colors">Colors</NavLink>
             </Nav>
           </Header>
           
@@ -136,8 +167,10 @@ const DevClientApp = () => {
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/servers" element={<MCPServerControl />} />
+              <Route path="/servers/:serverId" element={<MCPServerDetail />} />
               <Route path="/batch" element={<BatchTestingPanel />} />
               <Route path="/debug" element={<RequestInspector />} />
+              <Route path="/colors" element={<ColorGuide />} />
               <Route path="/validate" element={<ValidationForm />} />
               <Route path="/results/:id" element={<ValidationResults />} />
               <Route path="*" element={<Dashboard />} />

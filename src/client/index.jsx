@@ -1,4 +1,6 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import { ValidationProvider } from './context/ValidationContext';
 import DevClientApp from './DevClientApp';
@@ -9,19 +11,26 @@ import 'react-toastify/dist/ReactToastify.css';
 console.log('JavaScript loaded and running');
 document.title = 'MCP Client - Debug Mode';
 
-// Add visual confirmation that JS is running
-const debugElement = document.createElement('div');
-debugElement.style.position = 'fixed';
-debugElement.style.bottom = '10px';
-debugElement.style.right = '10px';
-debugElement.style.backgroundColor = 'green';
-debugElement.style.color = 'white';
-debugElement.style.padding = '5px 10px';
-debugElement.style.borderRadius = '4px';
-debugElement.style.fontSize = '12px';
-debugElement.style.zIndex = '9999';
-debugElement.textContent = 'JS Running';
-document.body.appendChild(debugElement);
+// ClientOnly wrapper component to prevent hydration mismatch
+const ClientOnly = ({ children }) => {
+  const [isClient, setIsClient] = useState(false);
+  
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+  
+  return isClient ? children : null;
+};
+
+// Styled Components registry support
+let StyledComponentsRegistry;
+try {
+  // Try to import our registry if we're in a Next.js environment
+  StyledComponentsRegistry = require('./lib/registry').default;
+} catch (error) {
+  // If we're not in a Next.js environment, use a simple pass-through component
+  StyledComponentsRegistry = ({ children }) => children;
+}
 
 // Get the root element
 const container = document.getElementById('root');
@@ -40,9 +49,13 @@ const root = ReactDOM.createRoot(container || document.getElementById('root'));
 try {
   root.render(
     <React.StrictMode>
-      <ValidationProvider>
-        <DevClientApp />
-      </ValidationProvider>
+      <ClientOnly>
+        <StyledComponentsRegistry>
+          <ValidationProvider>
+            <DevClientApp />
+          </ValidationProvider>
+        </StyledComponentsRegistry>
+      </ClientOnly>
     </React.StrictMode>
   );
   console.log('React rendering completed');

@@ -1,5 +1,8 @@
+'use client';
+
 import React, { useState } from 'react';
-import '../styles/ValidationComponents.css';
+import StatusIndicator from './StatusIndicator';
+import './ValidationResults.css';
 
 const ValidationResults = ({ results }) => {
   const [activeTab, setActiveTab] = useState('summary');
@@ -18,19 +21,6 @@ const ValidationResults = ({ results }) => {
     }));
   };
 
-  const getStatusClass = (status) => {
-    switch (status.toLowerCase()) {
-      case 'pass':
-        return 'status-pass';
-      case 'fail':
-        return 'status-fail';
-      case 'warning':
-        return 'status-warning';
-      default:
-        return '';
-    }
-  };
-
   const renderSummary = () => {
     const totalFindings = findings ? findings.length : 0;
     const criticalFindings = findings ? findings.filter(f => f.severity === 'critical').length : 0;
@@ -40,8 +30,13 @@ const ValidationResults = ({ results }) => {
 
     return (
       <div className="results-summary">
-        <div className={`result-status ${getStatusClass(status)}`}>
-          <span className="status-label">Status:</span> {status}
+        <div className="result-status">
+          <span className="status-label">Status:</span>{' '}
+          <StatusIndicator 
+            status={status} 
+            bold={true}
+            uppercase={true}
+          />
         </div>
         
         <div className="result-confidence">
@@ -111,14 +106,14 @@ const ValidationResults = ({ results }) => {
         {findings.map((finding, index) => (
           <div 
             key={index} 
-            className={`finding-item severity-${finding.severity}`}
+            className={`finding-item`}
           >
             <div 
               className="finding-header"
               onClick={() => toggleFinding(index)}
             >
               <div className="finding-title">
-                <span className={`severity-indicator ${finding.severity}`}></span>
+                <StatusIndicator status={finding.severity || 'info'} />
                 {finding.message}
               </div>
               <div className="finding-meta">

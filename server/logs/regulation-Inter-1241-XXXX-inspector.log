@@ -1,0 +1,12 @@
+[2025-04-25T18:14:46.658Z] Port 6277 is available
+[2025-04-25T18:14:46.659Z] Starting MCP Inspector for Regulation Server (ID: regulation-Inter-1241-XXXX) at http://localhost:3285
+[2025-04-25T18:14:46.661Z] Inspector process started with PID: 62959
+[2025-04-25T18:14:47.695Z] STDERR: npm error code E404
+npm error 404 Not Found - GET https://registry.npmjs.org/@mcp%2finspector - Not found
+[2025-04-25T18:14:47.696Z] STDERR: npm error 404
+npm error 404  '@mcp/inspector@*' is not in this registry.
+npm error 404
+npm error 404 Note that you can also install from a
+npm error 404 tarball, folder, http url, or git url.
+[2025-04-25T18:14:47.696Z] STDERR: npm error A complete log of this run can be found in: /Users/dvdbrnds/.npm/_logs/2025-04-25T18_14_46_721Z-debug-0.log
+[2025-04-25T18:14:47.703Z] Inspector process exited with code 1

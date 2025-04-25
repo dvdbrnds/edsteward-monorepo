@@ -49,15 +49,60 @@ function executeCommand(command) {
 }
 
 /**
+ * Kill any process running on the specified port
+ */
+async function killProcessOnPort(port) {
+  console.log(`Checking for processes on port ${port}...`);
+  
+  try {
+    // Find process ID using the port
+    const command = process.platform === 'win32'
+      ? `netstat -ano | findstr :${port}`
+      : `lsof -i :${port} | grep LISTEN`;
+    
+    const output = await executeCommand(command);
+    
+    // Extract PID from command output
+    let pid;
+    if (process.platform === 'win32') {
+      // Windows: Extract PID from last column of netstat output
+      const matches = output.match(/(\d+)$/m);
+      pid = matches ? matches[1] : null;
+    } else {
+      // macOS/Linux: Extract PID from second column of lsof output
+      const matches = output.match(/\S+\s+(\d+)/);
+      pid = matches ? matches[1] : null;
+    }
+    
+    if (pid) {
+      console.log(`Found process ${pid} using port ${port}. Killing process...`);
+      await executeCommand(process.platform === 'win32' ? `taskkill /PID ${pid} /F` : `kill -9 ${pid}`);
+      console.log(`Process ${pid} killed successfully`);
+      return true;
+    } else {
+      console.log(`No process found using port ${port}`);
+      return false;
+    }
+  } catch (error) {
+    // If there's an error, it likely means no process is using the port
+    console.log(`No process found using port ${port}`);
+    return false;
+  }
+}
+
+/**
  * Start the registry API server
  */
-function startRegistryServer() {
+async function startRegistryServer() {
   console.log('Starting Registry API Server...');
   
   if (runningProcesses.registry) {
     console.log('Registry server is already running.');
     return;
   }
+  
+  // Kill any process using the registry port
+  await killProcessOnPort(REGISTRY_PORT);
   
   const registry = spawn('node', ['src/server/registry-api/registry-server.js'], {
     stdio: 'inherit'
@@ -76,12 +121,19 @@ function startRegistryServer() {
 /**
  * Start the client application
  */
-function startClientApp() {
+async function startClientApp() {
   console.log('Starting Client Application...');
   
   if (runningProcesses.client) {
     console.log('Client application is already running.');
     return;
+  }
+  
+  // Kill any process using client ports
+  // Vite will try ports in sequence if they're occupied
+  const clientPorts = [CLIENT_PORT, 3050, 3051, 3052, 3053];
+  for (const port of clientPorts) {
+    await killProcessOnPort(port);
   }
   
   const client = spawn('npm', ['run', 'dev:client'], {
@@ -96,6 +148,7 @@ function startClientApp() {
   });
   
   console.log(`Client application should be running at http://localhost:${CLIENT_PORT}`);
+  console.log('Note: The actual port may be different if 3000 is already in use.');
 }
 
 /**
@@ -187,16 +240,32 @@ async function checkStatus() {
     console.log('❌ CSRA Management API: Not running');
   }
   
-  // Check client application (this is approximate since the client doesn't have a specific API)
-  try {
-    await axios.get(`http://localhost:${CLIENT_PORT}`);
-    console.log('✅ Client Application: Likely running');
-  } catch (error) {
-    if (error.code === 'ECONNREFUSED') {
-      console.log('❌ Client Application: Not running');
-    } else {
-      console.log('❓ Client Application: Status unknown');
+  // Check client application on multiple possible ports
+  const clientPorts = [CLIENT_PORT, 3050, 3051, 3052, 3053];
+  let clientRunning = false;
+  let clientPort = null;
+  
+  for (const port of clientPorts) {
+    try {
+      await axios.get(`http://localhost:${port}`);
+      clientRunning = true;
+      clientPort = port;
+      break;
+    } catch (error) {
+      // Only consider connection refused as a definitive sign it's not running
+      if (error.code !== 'ECONNREFUSED') {
+        // If we get any response at all, consider it might be running
+        clientRunning = true;
+        clientPort = port;
+        break;
+      }
     }
+  }
+  
+  if (clientRunning) {
+    console.log(`✅ Client Application: Running on port ${clientPort}`);
+  } else {
+    console.log('❌ Client Application: Not running');
   }
   
   console.log('=========================\n');
@@ -221,7 +290,7 @@ async function uploadTestRegulations() {
  * Start all components
  */
 async function startAll() {
-  startRegistryServer();
+  await startRegistryServer();
   
   // Wait for registry to start
   await new Promise(resolve => setTimeout(resolve, 3000));
@@ -230,7 +299,7 @@ async function startAll() {
   await uploadTestRegulations();
   
   // Start client
-  startClientApp();
+  await startClientApp();
   
   console.log('\n🚀 All components started!');
   console.log('- Registry API: http://localhost:3010');
@@ -271,10 +340,10 @@ function showMenu() {
   rl.question('Enter your choice: ', async (choice) => {
     switch (choice) {
       case '1':
-        startRegistryServer();
+        await startRegistryServer();
         break;
       case '2':
-        startClientApp();
+        await startClientApp();
         break;
       case '3':
         await startCsraServer();
@@ -327,10 +396,10 @@ async function main() {
     case 'start':
       switch (target) {
         case 'registry':
-          startRegistryServer();
+          await startRegistryServer();
           break;
         case 'client':
-          startClientApp();
+          await startClientApp();
           break;
         case 'csra':
           await startCsraServer();

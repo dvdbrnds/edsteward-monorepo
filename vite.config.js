@@ -11,25 +11,42 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src/client')
-    }
+      '@': resolve(__dirname, './src/client'),
+      '@api': resolve(__dirname, './src/client/api')
+    },
+    extensions: ['.js', '.jsx', '.ts', '.tsx', '.json']
   },
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:3000',
+        target: 'http://localhost:3010',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, '')
+        secure: false
       },
       '/health': {
-        target: 'http://localhost:3000',
-        changeOrigin: true
+        target: 'http://localhost:3010',
+        changeOrigin: true,
+        secure: false
+      },
+      '^/api/.*\\.js$': {
+        target: 'http://localhost:3010',
+        changeOrigin: true,
+        secure: false,
+        rewrite: (path) => path.replace(/^\/api/, '')
       }
     }
   },
   esbuild: {
-    loader: {
-      '.js': 'jsx'
-    }
+    jsxFactory: 'React.createElement',
+    jsxFragment: 'React.Fragment'
+  },
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      'styled-components',
+      'react-toastify'
+    ]
   }
 }); 

@@ -1,10 +1,10 @@
+'use client';
+
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { toast } from 'react-toastify';
-import MCPApiClient from '../api/MCPApiClient';
-
-// Create an instance of the API client
-const apiClient = new MCPApiClient();
+import mcpApiClient from '../api/MCPApiClient';
+import StatusIndicator from './StatusIndicator';
 
 // Styled components
 const Container = styled.div`
@@ -207,42 +207,6 @@ const ServerStatus = styled.div`
   margin-bottom: 0.5rem;
 `;
 
-const StatusIndicator = styled.div`
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background-color: ${props => {
-    switch (props.status) {
-      case 'Running':
-        return props.theme.colors.success;
-      case 'Stopped':
-        return props.theme.colors.error;
-      case 'Starting':
-      case 'Stopping':
-        return props.theme.colors.warning;
-      default:
-        return props.theme.colors.secondary;
-    }
-  }};
-`;
-
-const StatusText = styled.span`
-  color: ${props => {
-    switch (props.status) {
-      case 'Running':
-        return props.theme.colors.success;
-      case 'Stopped':
-        return props.theme.colors.error;
-      case 'Starting':
-      case 'Stopping':
-        return props.theme.colors.warning;
-      default:
-        return props.theme.colors.secondary;
-    }
-  }};
-  font-size: 0.9rem;
-`;
-
 const ServerUptime = styled.div`
   font-size: 0.85rem;
   color: ${props => props.theme.colors.textSecondary};
@@ -423,7 +387,7 @@ const MCPServerControl = () => {
   const loadServers = async () => {
     setIsLoading(true);
     try {
-      const serverList = await apiClient.getServerStatus();
+      const serverList = await mcpApiClient.getServerStatus();
       setServers(serverList);
       
       // Ensure selection is still valid
@@ -443,7 +407,7 @@ const MCPServerControl = () => {
   const handleStartServer = async (serverId) => {
     try {
       toast.info(`Starting server ${serverId}...`);
-      await apiClient.startServer(serverId);
+      await mcpApiClient.startServer(serverId);
       await loadServers(); // Refresh the server list
       toast.success(`Server ${serverId} started successfully`);
     } catch (error) {
@@ -455,7 +419,7 @@ const MCPServerControl = () => {
   const handleStopServer = async (serverId) => {
     try {
       toast.info(`Stopping server ${serverId}...`);
-      await apiClient.stopServer(serverId);
+      await mcpApiClient.stopServer(serverId);
       await loadServers(); // Refresh the server list
       toast.success(`Server ${serverId} stopped successfully`);
     } catch (error) {
@@ -467,7 +431,7 @@ const MCPServerControl = () => {
   const handleRestartServer = async (serverId) => {
     try {
       toast.info(`Restarting server ${serverId}...`);
-      await apiClient.restartServer(serverId);
+      await mcpApiClient.restartServer(serverId);
       await loadServers(); // Refresh the server list
       toast.success(`Server ${serverId} restarted successfully`);
     } catch (error) {
@@ -487,7 +451,7 @@ const MCPServerControl = () => {
     // Start each stopped server
     for (const id of stoppedServerIds) {
       try {
-        await apiClient.startServer(id);
+        await mcpApiClient.startServer(id);
       } catch (error) {
         console.error(`Failed to start server ${id}:`, error);
       }
@@ -509,7 +473,7 @@ const MCPServerControl = () => {
     // Stop each running server
     for (const id of runningServerIds) {
       try {
-        await apiClient.stopServer(id);
+        await mcpApiClient.stopServer(id);
       } catch (error) {
         console.error(`Failed to stop server ${id}:`, error);
       }
@@ -624,7 +588,6 @@ const MCPServerControl = () => {
                 </div>
                 <ServerStatus>
                   <StatusIndicator status={server.status} />
-                  <StatusText status={server.status}>{server.status}</StatusText>
                 </ServerStatus>
                 <ServerUptime>Uptime: {server.uptime}</ServerUptime>
                 <ServerAddress>Address: {server.address || server.url}</ServerAddress>
@@ -717,10 +680,7 @@ const MCPServerControl = () => {
                   <InfoLabel>Status</InfoLabel>
                   <InfoValue>
                     <ServerStatus>
-                      <StatusIndicator status={selectedServer.status} />
-                      <StatusText status={selectedServer.status}>
-                        {selectedServer.status}
-                      </StatusText>
+                      <StatusIndicator status={selectedServer.status} bold={true} />
                     </ServerStatus>
                   </InfoValue>
                   

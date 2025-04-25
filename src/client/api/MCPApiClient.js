@@ -40,6 +40,105 @@ class MCPApiClient {
   // Server Management API
   
   /**
+   * Get all MCP servers including regulation servers from the registry
+   * @returns {Promise<Object>} Response with server data
+   */
+  async getServers() {
+    try {
+      // Get core servers
+      const coreServers = await this.getServerStatus();
+      
+      // Get regulation servers from registry file
+      let regulationServers = [];
+      try {
+        // Try to fetch the regulation servers directly from the registry file
+        // Using window.location.origin to ensure we access from the correct domain
+        const origin = window.location.origin || '';
+        const response = await axios.get(`${origin}/regulation-servers-registry.json`);
+        
+        if (response.data && typeof response.data === 'object') {
+          // Convert object of servers to array
+          regulationServers = Object.entries(response.data).map(([id, regulation]) => {
+            // Extract server info
+            return {
+              id: `regulation-${id}`,
+              name: regulation.name || `Regulation ${id}`,
+              type: 'Regulation Server',
+              category: 'Regulation',
+              description: regulation.description || `MCP server for regulation`,
+              status: regulation.server?.running ? 'running' : 'stopped',
+              port: regulation.server?.port || null,
+              uptime: regulation.server?.lastStarted ? 
+                this.formatUptime(new Date(regulation.server.lastStarted)) : '—',
+              url: regulation.server?.url || null,
+              regulationId: id
+            };
+          });
+          
+          console.log('Found regulation servers from registry file:', regulationServers);
+        }
+      } catch (error) {
+        console.error('Error fetching regulation servers from registry file:', error);
+        // Try API fallback
+        try {
+          const regulationServersResponse = await this.regulationRegistry.get('/api/mcp/servers');
+          if (regulationServersResponse.data && Array.isArray(regulationServersResponse.data)) {
+            // Map regulation servers to match the server object format
+            regulationServers = regulationServersResponse.data.map(server => ({
+              id: `regulation-${server.regulationId}`,
+              name: server.name || `Regulation ${server.regulationId}`,
+              type: 'Regulation Server',
+              category: 'Regulation',
+              description: `MCP server for ${server.name || 'regulation'}`,
+              status: server.status || 'unknown',
+              startTime: server.startTime,
+              port: server.port || null,
+              uptime: server.uptime || '0m',
+              url: server.url || 'N/A',
+              regulationId: server.regulationId
+            }));
+          }
+        } catch (apiError) {
+          console.error('Error fetching regulation servers from API:', apiError);
+        }
+      }
+      
+      // Combine core servers with regulation servers
+      const allServers = [...coreServers, ...regulationServers];
+      
+      return {
+        success: true,
+        data: allServers
+      };
+    } catch (error) {
+      console.error('Error fetching servers:', error);
+      throw error;
+    }
+  }
+  
+  /**
+   * Format uptime from a timestamp
+   * @param {Date} startDate - The start date
+   * @returns {string} Formatted uptime
+   */
+  formatUptime(startDate) {
+    if (!startDate) return '—';
+    
+    const now = new Date();
+    const diff = now - startDate;
+    
+    // Convert to hours and minutes
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    
+    if (hours > 0) {
+      return `${hours}h ${minutes}m`;
+    } else {
+      return `${minutes}m`;
+    }
+  }
+  
+  /**
    * Get status of all MCP servers
    * @returns {Promise<Array>} Array of server status objects
    */
@@ -323,6 +422,144 @@ class MCPApiClient {
       }));
     } catch (error) {
       console.error(`Error getting batch job results for ${jobId}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Launch the MCP Inspector for a specific server
+   * @param {Object} params - Parameters for launching the inspector
+   * @param {string} params.serverId - ID of the server to inspect
+   * @param {number} params.port - Port of the server
+   * @param {string} params.serverType - Type of the server
+   * @param {string} params.command - Command to execute
+   * @returns {Promise<Object>} Response from the server
+   */
+  async launchInspector(params) {
+    try {
+      console.log('Launching MCP Inspector for server:', params);
+      
+      // Use the Inspector API server endpoint
+      const inspectorApiUrl = 'http://localhost:9000/api/inspector';
+      
+      // Make the actual API call to launch the inspector
+      try {
+        const response = await axios.post(`${inspectorApiUrl}/launch`, params, {
+          // Add these options to help with CORS and debugging
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          timeout: 10000, // 10 second timeout
+          withCredentials: false // No need for credentials
+        });
+        
+        console.log('Inspector launch response:', response.data);
+        
+        // Return the response data
+        return response.data;
+      } catch (apiError) {
+        console.error('API error when launching inspector:', apiError);
+        console.error('Error details:', apiError.message);
+        
+        // More detailed error logging
+        if (apiError.response) {
+          // The request was made and the server responded with a status code
+          // that falls out of the range of 2xx
+          console.error('Response data:', apiError.response.data);
+          console.error('Response status:', apiError.response.status);
+          console.error('Response headers:', apiError.response.headers);
+        } else if (apiError.request) {
+          // The request was made but no response was received
+          console.error('No response received. Request details:', apiError.request);
+        }
+        
+        // If the API server is not running, fall back to the simulated response
+        if (apiError.code === 'ECONNREFUSED' || apiError.code === 'ENOTFOUND' || 
+            apiError.message.includes('Network Error')) {
+          console.warn('Inspector API server not running or network error, using simulated response');
+          
+          // Simulate a delay
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          
+          // Return a simulated response
+          return {
+            success: true,
+            message: 'MCP Inspector launch process initiated (simulated)',
+            serverId: params.serverId,
+            processId: Math.floor(Math.random() * 10000), // Simulated process ID
+            commandExecuted: params.command,
+            isSimulated: true
+          };
+        }
+        
+        // Otherwise, re-throw the error
+        throw apiError;
+      }
+    } catch (error) {
+      console.error(`Error launching MCP Inspector for server ${params.serverId}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get the console output from an MCP Inspector process
+   * @param {string} serverId - ID of the server being inspected
+   * @returns {Promise<Object>} Console output from the inspector process
+   */
+  async getInspectorOutput(serverId) {
+    try {
+      console.log('Getting MCP Inspector output for server:', serverId);
+      
+      // Use the Inspector API server endpoint
+      const inspectorApiUrl = 'http://localhost:9000/api/inspector';
+      
+      // Make the API call to get the output
+      try {
+        const response = await axios.get(`${inspectorApiUrl}/output/${serverId}`, {
+          // Add these options to help with CORS and debugging
+          headers: {
+            'Accept': 'application/json'
+          },
+          timeout: 5000, // 5 second timeout
+          withCredentials: false // No need for credentials
+        });
+        
+        console.log('Inspector output response:', response.data);
+        
+        // Return the response data
+        return response.data;
+      } catch (apiError) {
+        console.error('API error when getting inspector output:', apiError);
+        
+        // More detailed error logging
+        if (apiError.response) {
+          console.error('Response data:', apiError.response.data);
+          console.error('Response status:', apiError.response.status);
+        } else if (apiError.request) {
+          console.error('No response received. Request details:', apiError.request);
+        }
+        
+        // If the API server is not running or network error, return empty output
+        if (apiError.code === 'ECONNREFUSED' || apiError.code === 'ENOTFOUND' || 
+            apiError.message.includes('Network Error')) {
+          console.warn('Inspector API server not running or network error, using empty output');
+          
+          // Return empty output
+          return {
+            success: false,
+            message: 'Inspector API server not running or network error',
+            serverId,
+            output: 'No output available - Server connection issue. Check if the server is running.',
+            lastUpdated: Date.now()
+          };
+        }
+        
+        // Otherwise, re-throw the error
+        throw apiError;
+      }
+    } catch (error) {
+      console.error(`Error getting MCP Inspector output for server ${serverId}:`, error);
       throw error;
     }
   }

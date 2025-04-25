@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { toast } from 'react-toastify';
-import mcpApiClient from '../api/MCPApiClient';
+import mcpApiClient from '../api';
 
 const Container = styled.div`
   border: 1px solid #ddd;
