@@ -1,0 +1,88 @@
+graph TD
+    %% Frontend Components
+    subgraph "Replit Frontend"
+        FE[React Frontend]
+        LocalDB[Local Regulation Repository]
+        ChangeMgmt[Change Management UI]
+    end
+
+    %% API Layer
+    subgraph "API Layer"
+        APIGW[API Gateway]
+        Cognito[Cognito Authentication]
+        CognitoAuth[Cognito Authorizer]
+    end
+
+    %% MCP Core Components
+    subgraph "MCP Core Services"
+        Orchestrator[Primary MCP Orchestrator]
+        Level1[Level 1 Validator]
+        Level2[Level 2 Validator]
+        Level3[Level 3 Validator]
+        VersionCtrl[Version Control Service]
+        Audit[Audit Logging Service]
+    end
+
+    %% Data Services
+    subgraph "Data Services"
+        AuroraDB[Aurora PostgreSQL]
+        S3[S3 Document Store]
+        QLDB[QLDB Audit Trail]
+        Secrets[Secrets Manager]
+    end
+
+    %% External Services
+    subgraph "External Services"
+        SNS[SNS Notifications]
+        CW[CloudWatch Monitoring]
+        CWLogs[CloudWatch Logs]
+    end
+
+    %% Connections
+    FE -- "API Requests" --> APIGW
+    LocalDB -- "Syncs with" --> ChangeMgmt
+    ChangeMgmt -- "Accepts/Rejects Updates" --> APIGW
+
+    APIGW -- "Authenticates" --> Cognito
+    APIGW -- "Authorizes" --> CognitoAuth
+    APIGW -- "Routes Requests" --> Orchestrator
+
+    Orchestrator -- "Routes to" --> Level1
+    Orchestrator -- "Routes to" --> Level2
+    Orchestrator -- "Routes to" --> Level3
+    Orchestrator -- "Tracks Versions" --> VersionCtrl
+    Orchestrator -- "Logs Events" --> Audit
+
+    Level1 -- "Queries" --> AuroraDB
+    Level2 -- "Queries" --> AuroraDB
+    Level3 -- "Queries" --> AuroraDB
+    VersionCtrl -- "Stores Versions" --> AuroraDB
+    Audit -- "Stores Immutable Events" --> QLDB
+
+    Level1 -- "Retrieves Documents" --> S3
+    Level2 -- "Retrieves Documents" --> S3
+    Level3 -- "Retrieves Documents" --> S3
+    VersionCtrl -- "Stores Version Artifacts" --> S3
+
+    AuroraDB -- "Credentials" --> Secrets
+
+    VersionCtrl -- "Sends Notifications" --> SNS
+    SNS -- "Notifies" --> FE
+
+    Orchestrator -- "Logs" --> CWLogs
+    Level1 -- "Logs" --> CWLogs
+    Level2 -- "Logs" --> CWLogs
+    Level3 -- "Logs" --> CWLogs
+    VersionCtrl -- "Logs" --> CWLogs
+    Audit -- "Logs" --> CWLogs
+
+    CWLogs -- "Metrics" --> CW
+
+    %% Styling
+    classDef aws fill:#FF9900,stroke:#232F3E,color:#232F3E
+    classDef frontend fill:#1D76DB,stroke:#0A4F8F,color:white
+    classDef database fill:#3B48CC,stroke:#232F3E,color:white
+    
+    class APIGW,Cognito,CognitoAuth,Orchestrator,Level1,Level2,Level3,VersionCtrl,Audit,AuroraDB,S3,QLDB,Secrets,SNS,CW,CWLogs aws
+    class FE,LocalDB,ChangeMgmt frontend
+    class AuroraDB,QLDB database

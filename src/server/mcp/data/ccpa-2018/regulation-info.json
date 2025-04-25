@@ -1,0 +1,21 @@
+{
+  "regulationId": "ccpa-2018",
+  "name": "California Consumer Privacy Act",
+  "description": "California law focused on consumer privacy rights",
+  "version": "1.0",
+  "enactedDate": "2018-06-28",
+  "publicLaw": "AB-375",
+  "keyProvisions": [
+    {
+      "title": "Right to Know",
+      "description": "Consumers have the right to know what personal information businesses collect"
+    },
+    {
+      "title": "Right to Delete",
+      "description": "Consumers have the right to request deletion of personal information"
+    }
+  ],
+  "createdAt": "2025-04-17T02:19:49.038Z",
+  "updatedAt": "2025-04-17T02:19:49.038Z",
+  "status": "Pending"
+}

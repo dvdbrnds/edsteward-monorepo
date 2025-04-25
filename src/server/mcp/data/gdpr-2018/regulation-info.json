@@ -1,0 +1,21 @@
+{
+  "regulationId": "gdpr-2018",
+  "name": "General Data Protection Regulation",
+  "description": "EU data protection and privacy regulation",
+  "version": "1.0",
+  "enactedDate": "2018-05-25",
+  "publicLaw": "EU 2016/679",
+  "keyProvisions": [
+    {
+      "title": "Right to Access",
+      "description": "Individuals have the right to access their personal data"
+    },
+    {
+      "title": "Right to be Forgotten",
+      "description": "Individuals have the right to have their personal data erased"
+    }
+  ],
+  "createdAt": "2025-04-17T02:19:49.037Z",
+  "updatedAt": "2025-04-17T02:45:09.300Z",
+  "status": "Active"
+}

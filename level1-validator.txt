@@ -1,0 +1,349 @@
+// src/lambda/level1-validator/index.js
+/**
+ * Level 1 Validator Lambda
+ * 
+ * This Lambda handles validation of static text-based regulations.
+ * It focuses on simple validation types like pattern matching, existence checks, 
+ * and direct comparisons.
+ */
+
+const { SeverityLevel, ValidationStatus } = require('../../common/mcp/protocol');
+const textCompare = require('./textCompare');
+const patternMatch = require('./patternMatch');
+const cache = require('./cache');
+const dbOps = require('../../common/db/operations');
+
+/**
+ * Main Lambda handler function
+ */
+exports.handler = async (event) => {
+  console.log('Received Level 1 validation request:', JSON.stringify(event, null, 2));
+  
+  try {
+    const { regulation, data, validationContext } = event;
+    
+    // Check for required fields
+    if (!regulation || !data || !validationContext) {
+      throw new Error('Missing required fields in validation request');
+    }
+    
+    // Try to get cached result if available
+    const cacheKey = generateCacheKey(regulation.id, regulation.version, data);
+    const cachedResult = await cache.getResult(cacheKey);
+    
+    if (cachedResult) {
+      console.log('Returning cached validation result');
+      return cachedResult;
+    }
+    
+    // Get validation rules for regulation
+    const validationRules = await getValidationRules(
+      regulation.id, 
+      regulation.version,
+      validationContext.versionId
+    );
+    
+    console.log(`Retrieved ${validationRules.length} validation rules`);
+    
+    // Perform validation
+    const findings = [];
+    let hasErrors = false;
+    
+    for (const rule of validationRules) {
+      // Skip rules that require higher validation levels
+      if (rule.validation_level > 1) {
+        continue;
+      }
+      
+      // Get the data value at the specified path
+      const dataValue = getValueAtPath(data, rule.data_path);
+      
+      let isValid = true;
+      let message = null;
+      
+      // Perform appropriate validation based on rule type
+      switch (rule.validation_type) {
+        case 'PATTERN':
+          const patternResult = patternMatch.validate(dataValue, rule.validation_params);
+          isValid = patternResult.isValid;
+          message = patternResult.message;
+          break;
+          
+        case 'EXISTS':
+          isValid = dataValue !== undefined && dataValue !== null;
+          message = isValid ? null : `Required field is missing`;
+          break;
+          
+        case 'EQUALS':
+          isValid = dataValue === rule.validation_params.value;
+          message = isValid ? null : `Value does not match expected value`;
+          break;
+          
+        case 'RANGE':
+          if (typeof dataValue === 'number') {
+            const min = rule.validation_params.min;
+            const max = rule.validation_params.max;
+            isValid = (min === undefined || dataValue >= min) && 
+                      (max === undefined || dataValue <= max);
+            message = isValid ? null : `Value is outside the allowed range`;
+          } else {
+            isValid = false;
+            message = 'Value must be a number for range validation';
+          }
+          break;
+          
+        default:
+          // Default text comparison
+          const compareResult = textCompare.validate(dataValue, rule.validation_params);
+          isValid = compareResult.isValid;
+          message = compareResult.message;
+      }
+      
+      // Add finding if validation failed
+      if (!isValid) {
+        const finding = {
+          id: rule.rule_code || `find-${findings.length + 1}`,
+          path: rule.data_path,
+          severity: rule.severity,
+          message: message || rule.message_template.replace('{value}', String(dataValue || '')),
+          reference: rule.reference_section
+        };
+        
+        findings.push(finding);
+        
+        if (rule.severity === SeverityLevel.ERROR) {
+          hasErrors = true;
+        }
+      }
+    }
+    
+    // Determine overall status
+    let status = ValidationStatus.PASS;
+    if (hasErrors) {
+      status = ValidationStatus.FAIL;
+    } else if (findings.length > 0) {
+      status = ValidationStatus.PARTIAL;
+    }
+    
+    const result = {
+      status,
+      confidence: calculateConfidence(findings, validationRules.length),
+      findings
+    };
+    
+    // Cache result for future use
+    await cache.storeResult(cacheKey, result);
+    
+    return result;
+  } catch (error) {
+    console.error('Error in Level 1 validation:', error);
+    throw error;
+  }
+};
+
+/**
+ * Generate cache key for validation result
+ * 
+ * @param {string} regulationId - Regulation identifier
+ * @param {string} version - Regulation version
+ * @param {Object} data - Data being validated
+ * @returns {string} Cache key
+ */
+function generateCacheKey(regulationId, version, data) {
+  const crypto = require('crypto');
+  const dataHash = crypto
+    .createHash('sha256')
+    .update(JSON.stringify(data))
+    .digest('hex');
+  
+  return `${regulationId}:${version}:${dataHash}`;
+}
+
+/**
+ * Calculate confidence score based on findings
+ * 
+ * @param {Array} findings - Array of validation findings
+ * @param {number} totalRules - Total number of validation rules applied
+ * @returns {number} Confidence score between 0 and 1
+ */
+function calculateConfidence(findings, totalRules) {
+  if (!findings || findings.length === 0) return 1.0;
+  if (!totalRules || totalRules <= 0) return 0.0;
+  
+  // Weight factors for different severity levels
+  const errorWeight = 0.6;
+  const warningWeight = 0.3;
+  const infoWeight = 0.1;
+  
+  // Count findings by severity
+  let errorCount = 0;
+  let warningCount = 0;
+  let infoCount = 0;
+  
+  findings.forEach(finding => {
+    if (finding.severity === SeverityLevel.ERROR) errorCount++;
+    else if (finding.severity === SeverityLevel.WARNING) warningCount++;
+    else if (finding.severity === SeverityLevel.INFO) infoCount++;
+  });
+  
+  // Calculate weighted sum of issues
+  const weightedIssues = (errorCount * errorWeight) + 
+                         (warningCount * warningWeight) + 
+                         (infoCount * infoWeight);
+  
+  // Calculate confidence score (higher is better)
+  return Math.max(0, Math.min(1, 1 - (weightedIssues / totalRules)));
+}
+
+/**
+ * Extract value at specified JSON path
+ * 
+ * @param {Object} obj - Object to extract value from
+ * @param {string} path - JSON path to the value
+ * @returns {any} Extracted value or undefined if not found
+ */
+function getValueAtPath(obj, path) {
+  if (!path) return obj;
+  
+  const parts = path.split('.');
+  let current = obj;
+  
+  for (const part of parts) {
+    if (current === null || current === undefined) return undefined;
+    
+    // Handle array notation (e.g., items[0])
+    if (part.includes('[') && part.includes(']')) {
+      const arrayPart = part.substring(0, part.indexOf('['));
+      const indexPart = part.substring(part.indexOf('[') + 1, part.indexOf(']'));
+      const index = parseInt(indexPart, 10);
+      
+      current = current[arrayPart];
+      if (Array.isArray(current) && !isNaN(index)) {
+        current = current[index];
+      } else {
+        return undefined;
+      }
+    } else {
+      current = current[part];
+    }
+  }
+  
+  return current;
+}
+
+/**
+ * Get validation rules for regulation from database
+ * 
+ * @param {string} regulationId - Regulation identifier
+ * @param {string} version - Regulation version
+ * @param {string} versionId - Version UUID from database
+ * @returns {Array} Array of validation rules
+ */
+async function getValidationRules(regulationId, version, versionId) {
+  try {
+    return await dbOps.getValidationRules(regulationId, versionId);
+  } catch (error) {
+    console.error('Error fetching validation rules:', error);
+    
+    // Fallback to sample rules for development/testing
+    console.log('Using fallback sample rules');
+    return getSampleRules(regulationId);
+  }
+}
+
+/**
+ * Get sample validation rules for testing
+ * 
+ * @param {string} regulationId - Regulation identifier
+ * @returns {Array} Sample validation rules
+ */
+function getSampleRules(regulationId) {
+  // Sample rules for common regulation types
+  if (regulationId.includes('FERPA')) {
+    return [
+      {
+        rule_code: 'FERPA-SR-CONSENT-01',
+        data_path: 'studentRecords[0].recipients[0].consentDocumentation.type',
+        validation_type: 'PATTERN',
+        validation_params: {
+          pattern: '^(written|electronic),
+          flags: 'i'
+        },
+        severity: SeverityLevel.ERROR,
+        message_template: 'Consent documentation type "{value}" must be either written or electronic',
+        reference_section: 'FERPA §99.30',
+        validation_level: 1
+      },
+      {
+        rule_code: 'FERPA-SR-CONSENT-02',
+        data_path: 'studentRecords[0].recipients[0].consentDocumentation.date',
+        validation_type: 'EXISTS',
+        validation_params: {},
+        severity: SeverityLevel.ERROR,
+        message_template: 'Consent documentation date is required',
+        reference_section: 'FERPA §99.30',
+        validation_level: 1
+      },
+      {
+        rule_code: 'FERPA-SR-TRAINING-01',
+        data_path: 'institutionalControls.trainingProgram.completionRate',
+        validation_type: 'RANGE',
+        validation_params: {
+          min: 0.9,
+          max: 1.0
+        },
+        severity: SeverityLevel.WARNING,
+        message_template: 'Training completion rate {value} is below the recommended 90%',
+        reference_section: 'FERPA §99.16(b)(2)',
+        validation_level: 1
+      }
+    ];
+  }
+  
+  if (regulationId.includes('HIPAA')) {
+    return [
+      {
+        rule_code: 'HIPAA-PHI-ENC-01',
+        data_path: 'phi[0].storage.encryption',
+        validation_type: 'PATTERN',
+        validation_params: {
+          pattern: '^(AES-256|RSA-2048)',
+          flags: 'i'
+        },
+        severity: SeverityLevel.ERROR,
+        message_template: 'PHI storage encryption "{value}" must use approved algorithms',
+        reference_section: 'HIPAA §164.312(a)(2)(iv)',
+        validation_level: 1
+      },
+      {
+        rule_code: 'HIPAA-PHI-AUTH-01',
+        data_path: 'phi[0].purposes[0].authorization.type',
+        validation_type: 'PATTERN',
+        validation_params: {
+          pattern: '^(signed|electronic),
+          flags: 'i'
+        },
+        severity: SeverityLevel.ERROR,
+        message_template: 'Authorization type "{value}" must be signed or electronic',
+        reference_section: 'HIPAA §164.508',
+        validation_level: 1
+      }
+    ];
+  }
+  
+  // Default rules
+  return [
+    {
+      rule_code: 'DEFAULT-DOC-01',
+      data_path: 'documentation.exists',
+      validation_type: 'EQUALS',
+      validation_params: {
+        value: true
+      },
+      severity: SeverityLevel.ERROR,
+      message_template: 'Required documentation does not exist',
+      reference_section: 'GENERAL',
+      validation_level: 1
+    }
+  ];
+}

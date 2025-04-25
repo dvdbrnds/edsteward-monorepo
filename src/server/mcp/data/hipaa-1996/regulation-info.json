@@ -1,0 +1,21 @@
+{
+  "regulationId": "hipaa-1996",
+  "name": "Health Insurance Portability and Accountability Act",
+  "description": "US healthcare privacy regulation",
+  "version": "2.1",
+  "enactedDate": "1996-08-21",
+  "publicLaw": "104-191",
+  "keyProvisions": [
+    {
+      "title": "Privacy Rule",
+      "description": "Establishes national standards for the protection of health information"
+    },
+    {
+      "title": "Security Rule",
+      "description": "Sets standards for securing patient data"
+    }
+  ],
+  "createdAt": "2025-04-17T02:19:49.038Z",
+  "updatedAt": "2025-04-17T02:19:49.038Z",
+  "status": "Pending"
+}
