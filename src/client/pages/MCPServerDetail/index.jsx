@@ -304,92 +304,740 @@ const MCPServerDetail = () => {
         
         // Generate mock content
         const getMockContent = (serverId) => {
-          if (serverId.includes('gateway')) {
-            return JSON.stringify({
-              name: "LLM Gateway",
-              version: "1.0.0",
-              status: "running",
-              connectedLLMs: ["gpt-4", "claude-3", "llama-3"],
-              endpoints: [
-                { path: "/gateway/status", method: "GET", description: "Get gateway status" },
-                { path: "/gateway/validate", method: "POST", description: "Submit text for validation" }
-              ],
-              stats: {
-                requests: 1245,
-                averageResponseTime: "230ms",
-                lastRestart: "2023-08-15T09:12:34Z"
-              }
-            }, null, 2);
+          if (serverId.includes('llm-gateway')) {
+            return `import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+
+// Create LLM Gateway server
+const server = new Server({
+  name: "llm-gateway",
+  version: "1.0.0"
+}, {
+  capabilities: {
+    prompts: {
+      modelSelection: {
+        description: "Select an LLM model for completion",
+        template: "Please use the {{model}} model for the following task: {{task}}",
+        parameters: {
+          model: { type: "string", enum: ["gpt-4", "claude-2", "llama-2"] },
+          task: { type: "string" }
+        }
+      },
+      completionFormat: {
+        description: "Format for completion requests",
+        template: "Generate a {{format}} response for: {{input}}",
+        parameters: {
+          format: { type: "string", enum: ["json", "text", "markdown"] },
+          input: { type: "string" }
+        }
+      }
+    },
+    resources: {
+      modelCapabilities: {
+        description: "Get capabilities of available models",
+        type: "object"
+      },
+      usageMetrics: {
+        description: "Get usage metrics for models",
+        type: "object"
+      }
+    },
+    tools: {
+      completions: {
+        description: "Generate text completions",
+        parameters: {
+          prompt: { type: "string" },
+          model: { type: "string", enum: ["gpt-4", "claude-2", "llama-2"] },
+          temperature: { type: "number", minimum: 0, maximum: 1 }
+        }
+      },
+      embeddings: {
+        description: "Generate text embeddings",
+        parameters: {
+          text: { type: "string" },
+          model: { type: "string", enum: ["gpt-4", "claude-2", "llama-2"] }
+        }
+      }
+    }
+  }
+});
+
+// Handle prompt requests
+server.setPromptHandler("modelSelection", async (params) => {
+  const { model, task } = params;
+  return {
+    prompt: \`Using \${model} model for task: \${task}\`,
+    model: model
+  };
+});
+
+server.setPromptHandler("completionFormat", async (params) => {
+  const { format, input } = params;
+  return {
+    prompt: \`Generate \${format} format: \${input}\`,
+    format: format
+  };
+});
+
+// Handle resource requests
+server.setResourceHandler("modelCapabilities", async () => {
+  return {
+    models: {
+      "gpt-4": { maxTokens: 8192, features: ["completion", "embedding"] },
+      "claude-2": { maxTokens: 100000, features: ["completion", "embedding", "analysis"] },
+      "llama-2": { maxTokens: 4096, features: ["completion"] }
+    }
+  };
+});
+
+server.setResourceHandler("usageMetrics", async () => {
+  return {
+    totalRequests: 1250,
+    requestsByModel: {
+      "gpt-4": 500,
+      "claude-2": 600,
+      "llama-2": 150
+    },
+    averageLatency: "120ms"
+  };
+});
+
+// Handle tool requests
+server.setRequestHandler("completions", async (params) => {
+  const { prompt, model, temperature } = params;
+  // Implementation would call actual LLM API
+  return {
+    completion: "Sample completion for: " + prompt,
+    model: model,
+    temperature: temperature
+  };
+});
+
+server.setRequestHandler("embeddings", async (params) => {
+  const { text, model } = params;
+  // Implementation would call actual embedding API
+  return {
+    embedding: [0.1, 0.2, 0.3], // Sample embedding vector
+    model: model,
+    dimensions: 3
+  };
+});
+
+// Connect transport
+const transport = new StdioServerTransport();
+await server.connect(transport);`;
           } else if (serverId.includes('batch')) {
-            return JSON.stringify({
-              name: "Batch Processing Server",
-              version: "1.0.0",
-              status: "running",
-              jobQueue: {
-                pending: 3,
-                processing: 1,
-                completed: 89,
-                failed: 2
-              },
-              workerCount: 4,
-              endpoints: [
-                { path: "/batch/submit", method: "POST", description: "Submit a batch job" },
-                { path: "/batch/status/:id", method: "GET", description: "Get job status" },
-                { path: "/batch/results/:id", method: "GET", description: "Get job results" }
-              ]
-            }, null, 2);
+            return `import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+
+// Create Batch Processing server
+const server = new Server({
+  name: "batch-processing",
+  version: "1.0.0"
+}, {
+  capabilities: {
+    prompts: {
+      jobTemplate: {
+        description: "Template for creating batch jobs",
+        template: "Create a {{jobType}} job to process {{dataType}} data with priority {{priority}}",
+        parameters: {
+          jobType: { type: "string", enum: ["analysis", "transformation", "validation"] },
+          dataType: { type: "string" },
+          priority: { type: "string", enum: ["low", "medium", "high"] }
+        }
+      },
+      batchSize: {
+        description: "Configure batch size for processing",
+        template: "Process data in batches of {{size}} items with {{parallel}} parallel workers",
+        parameters: {
+          size: { type: "number", minimum: 1 },
+          parallel: { type: "number", minimum: 1, maximum: 10 }
+        }
+      }
+    },
+    resources: {
+      queueStatus: {
+        description: "Get current status of job queues",
+        type: "object"
+      },
+      jobHistory: {
+        description: "Get history of completed jobs",
+        type: "object"
+      },
+      workerStatus: {
+        description: "Get status of worker processes",
+        type: "object"
+      }
+    },
+    tools: {
+      submitJob: {
+        description: "Submit a batch processing job",
+        parameters: {
+          type: { type: "string", enum: ["analysis", "transformation", "validation"] },
+          data: { type: "object" },
+          priority: { type: "string", enum: ["low", "medium", "high"] },
+          options: { type: "object" }
+        }
+      },
+      getJobStatus: {
+        description: "Get status of a job",
+        parameters: {
+          jobId: { type: "string" }
+        }
+      },
+      cancelJob: {
+        description: "Cancel a running or queued job",
+        parameters: {
+          jobId: { type: "string" }
+        }
+      }
+    }
+  }
+});
+
+// Handle prompt requests
+server.setPromptHandler("jobTemplate", async (params) => {
+  const { jobType, dataType, priority } = params;
+  return {
+    prompt: \`Creating \${priority} priority \${jobType} job for \${dataType} data\`,
+    defaults: {
+      type: jobType,
+      priority: priority
+    }
+  };
+});
+
+server.setPromptHandler("batchSize", async (params) => {
+  const { size, parallel } = params;
+  return {
+    prompt: \`Processing in batches of \${size} with \${parallel} workers\`,
+    config: { batchSize: size, parallelWorkers: parallel }
+  };
+});
+
+// Handle resource requests
+server.setResourceHandler("queueStatus", async () => {
+  return {
+    queues: {
+      high: { waiting: 2, processing: 1 },
+      medium: { waiting: 5, processing: 2 },
+      low: { waiting: 10, processing: 1 }
+    },
+    totalJobs: 21,
+    averageWaitTime: "45s"
+  };
+});
+
+server.setResourceHandler("jobHistory", async () => {
+  return {
+    completedJobs: 156,
+    failedJobs: 3,
+    averageProcessingTime: "2m 30s",
+    recentJobs: [
+      { id: "job-123", type: "analysis", status: "completed", duration: "1m 20s" }
+    ]
+  };
+});
+
+server.setResourceHandler("workerStatus", async () => {
+  return {
+    activeWorkers: 4,
+    maxWorkers: 10,
+    workerLoad: [
+      { id: "worker-1", jobs: 2, cpu: "45%", memory: "128MB" }
+    ]
+  };
+});
+
+// Handle tool requests
+server.setRequestHandler("submitJob", async (params) => {
+  const { type, data, priority, options } = params;
+  const jobId = Date.now().toString();
+  // Implementation would queue job for processing
+  return {
+    jobId: jobId,
+    status: "queued",
+    priority: priority,
+    estimatedTime: "30s",
+    queuePosition: 2
+  };
+});
+
+server.setRequestHandler("getJobStatus", async (params) => {
+  const { jobId } = params;
+  // Implementation would check actual job status
+  return {
+    jobId: jobId,
+    status: "processing",
+    progress: "50%",
+    startTime: new Date().toISOString(),
+    estimatedCompletion: "1m"
+  };
+});
+
+server.setRequestHandler("cancelJob", async (params) => {
+  const { jobId } = params;
+  // Implementation would cancel the job
+  return {
+    jobId: jobId,
+    status: "cancelled",
+    reason: "User requested cancellation"
+  };
+});
+
+// Connect transport
+const transport = new StdioServerTransport();
+await server.connect(transport);`;
           } else if (serverId.includes('registry')) {
-            return JSON.stringify({
-              name: "Regulation Registry",
-              version: "1.0.0",
-              status: "running",
-              regulationCount: 237,
-              categories: ["Academic", "Finance", "HR", "Privacy", "Safety", "Research"],
-              latestUpdate: "2023-08-20T15:43:12Z",
-              endpoints: [
-                { path: "/registry/list", method: "GET", description: "List all regulations" },
-                { path: "/registry/regulation/:id", method: "GET", description: "Get regulation details" }
-              ]
-            }, null, 2);
+            return `import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+
+// Create Regulation Registry server
+const server = new Server({
+  name: "regulation-registry",
+  version: "1.0.0"
+}, {
+  capabilities: {
+    prompts: {
+      regulationSearch: {
+        description: "Search for regulations by criteria",
+        template: "Find regulations in {{category}} category that are {{status}} and related to {{keyword}}",
+        parameters: {
+          category: { type: "string", enum: ["Academic", "Finance", "HR", "Privacy", "Safety", "Research"] },
+          status: { type: "string", enum: ["active", "draft", "archived"] },
+          keyword: { type: "string" }
+        }
+      },
+      complianceCheck: {
+        description: "Check compliance requirements",
+        template: "Check {{organization}} compliance with {{regulationId}} focusing on {{aspect}}",
+        parameters: {
+          organization: { type: "string" },
+          regulationId: { type: "string" },
+          aspect: { type: "string", enum: ["documentation", "processes", "training", "reporting"] }
+        }
+      }
+    },
+    resources: {
+      listRegulations: {
+        description: "List all available regulations",
+        type: "array"
+      },
+      getRegulation: {
+        description: "Get details of a specific regulation",
+        type: "object",
+        parameters: {
+          id: { type: "string" }
+        }
+      },
+      categories: {
+        description: "Get available regulation categories",
+        type: "array"
+      },
+      statistics: {
+        description: "Get registry statistics",
+        type: "object"
+      }
+    },
+    tools: {
+      updateRegulation: {
+        description: "Update regulation content or metadata",
+        parameters: {
+          id: { type: "string" },
+          content: { type: "object" },
+          metadata: { type: "object" }
+        }
+      },
+      validateRegulation: {
+        description: "Validate regulation format and references",
+        parameters: {
+          id: { type: "string" }
+        }
+      },
+      exportRegulation: {
+        description: "Export regulation in specified format",
+        parameters: {
+          id: { type: "string" },
+          format: { type: "string", enum: ["pdf", "html", "json"] }
+        }
+      }
+    }
+  }
+});
+
+// Handle prompt requests
+server.setPromptHandler("regulationSearch", async (params) => {
+  const { category, status, keyword } = params;
+  return {
+    prompt: \`Searching for \${status} regulations in \${category} category containing "\${keyword}"\`,
+    searchParams: { category, status, keyword }
+  };
+});
+
+server.setPromptHandler("complianceCheck", async (params) => {
+  const { organization, regulationId, aspect } = params;
+  return {
+    prompt: \`Checking \${organization}'s compliance with \${regulationId} focusing on \${aspect}\`,
+    checkParams: { organization, regulationId, aspect }
+  };
+});
+
+// Handle resource requests
+server.setResourceHandler("listRegulations", async () => {
+  return {
+    regulations: [
+      { id: "FERPA", name: "Family Educational Rights and Privacy Act", category: "Privacy" },
+      { id: "HIPAA", name: "Health Insurance Portability and Accountability Act", category: "Privacy" }
+    ],
+    total: 237,
+    page: 1,
+    pageSize: 50
+  };
+});
+
+server.setResourceHandler("getRegulation", async (params) => {
+  const { id } = params;
+  return {
+    id: id,
+    name: "Sample Regulation",
+    version: "2024.1",
+    status: "active",
+    lastUpdated: new Date().toISOString(),
+    content: "Regulation content...",
+    metadata: {
+      category: "Privacy",
+      jurisdiction: "Federal",
+      effectiveDate: "2024-01-01"
+    }
+  };
+});
+
+server.setResourceHandler("categories", async () => {
+  return {
+    categories: ["Academic", "Finance", "HR", "Privacy", "Safety", "Research"],
+    metadata: {
+      totalRegulations: 237,
+      lastUpdated: new Date().toISOString()
+    }
+  };
+});
+
+server.setResourceHandler("statistics", async () => {
+  return {
+    totalRegulations: 237,
+    byCategory: {
+      Academic: 45,
+      Finance: 52,
+      HR: 38,
+      Privacy: 41,
+      Safety: 35,
+      Research: 26
+    },
+    byStatus: {
+      active: 200,
+      draft: 25,
+      archived: 12
+    },
+    lastUpdate: new Date().toISOString()
+  };
+});
+
+// Handle tool requests
+server.setRequestHandler("updateRegulation", async (params) => {
+  const { id, content, metadata } = params;
+  // Implementation would update regulation in database
+  return {
+    id: id,
+    status: "updated",
+    timestamp: new Date().toISOString(),
+    version: "2024.2"
+  };
+});
+
+server.setRequestHandler("validateRegulation", async (params) => {
+  const { id } = params;
+  // Implementation would validate regulation format
+  return {
+    id: id,
+    isValid: true,
+    checks: [
+      { type: "format", status: "passed" },
+      { type: "references", status: "passed" }
+    ]
+  };
+});
+
+server.setRequestHandler("exportRegulation", async (params) => {
+  const { id, format } = params;
+  // Implementation would generate export
+  return {
+    id: id,
+    format: format,
+    url: \`/exports/\${id}.\${format}\`,
+    expiresIn: "1h"
+  };
+});
+
+// Connect transport
+const transport = new StdioServerTransport();
+await server.connect(transport);`;
           } else {
-            // Regulation server mock content
-            return JSON.stringify({
-              regulation: {
-                id: serverId,
-                name: `Regulation Server: ${serverId.split('-').slice(1).join('-')}`,
-                source: "Federal Register",
-                publicationDate: "2020-05-15",
-                effectiveDate: "2020-06-01",
-                category: serverId.includes('Acade') ? "Academic" :
-                         serverId.includes('Finan') ? "Financial" :
-                         serverId.includes('HR') ? "Human Resources" :
-                         serverId.includes('Priva') ? "Privacy" :
-                         "General",
-                summary: "This regulation governs the standards and procedures for compliance with federal guidelines.",
-                sections: [
-                  { id: "section-1", title: "Purpose and Scope", content: "..." },
-                  { id: "section-2", title: "Definitions", content: "..." },
-                  { id: "section-3", title: "Requirements", content: "..." },
-                  { id: "section-4", title: "Implementation", content: "..." },
-                  { id: "section-5", title: "Enforcement", content: "..." }
-                ],
-                relatedRegulations: [
-                  "regulation-" + Math.random().toString(36).substring(7),
-                  "regulation-" + Math.random().toString(36).substring(7)
-                ]
-              },
-              validator: {
-                status: "ready",
-                validationMethods: ["content", "context", "contradiction", "completeness"],
-                supportedFormats: ["json", "text", "pdf", "docx"],
-                apiVersion: "1.2.0"
-              },
-              endpoints: [
-                { path: "/status", method: "GET", description: "Get server status" },
-                { path: "/validate", method: "POST", description: "Validate against this regulation" },
-                { path: "/regulation", method: "GET", description: "Get regulation details" }
-              ]
-            }, null, 2);
+            // For regulation servers, show the MCP server implementation
+            const regulationId = serverId.split('-')[1]; // Extract regulation ID from server ID
+            return `import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+
+// Create Regulation-specific MCP server
+const server = new Server({
+  name: "${regulationId}-regulation-server",
+  version: "1.0.0"
+}, {
+  capabilities: {
+    prompts: {
+      validationScope: {
+        description: "Define validation scope for regulation check",
+        template: "Validate {{contentType}} against {{section}} requirements with {{level}} strictness",
+        parameters: {
+          contentType: { type: "string", enum: ["document", "process", "system", "training"] },
+          section: { type: "string" },
+          level: { type: "string", enum: ["strict", "normal", "lenient"] }
+        }
+      },
+      complianceReport: {
+        description: "Generate compliance report template",
+        template: "Create {{reportType}} report for {{period}} with focus on {{aspects}}",
+        parameters: {
+          reportType: { type: "string", enum: ["full", "summary", "violations", "progress"] },
+          period: { type: "string" },
+          aspects: { type: "array", items: { type: "string" } }
+        }
+      }
+    },
+    resources: {
+      regulationContent: {
+        description: "Get full regulation content and metadata",
+        type: "object"
+      },
+      requirements: {
+        description: "Get detailed requirements breakdown",
+        type: "object"
+      },
+      validationRules: {
+        description: "Get validation rules and criteria",
+        type: "object"
+      },
+      complianceMetrics: {
+        description: "Get compliance tracking metrics",
+        type: "object"
+      }
+    },
+    tools: {
+      validate: {
+        description: "Validate content against regulation rules",
+        parameters: {
+          content: { type: "string" },
+          context: { type: "object" },
+          options: {
+            type: "object",
+            properties: {
+              strictness: { type: "string", enum: ["strict", "normal", "lenient"] },
+              sections: { type: "array", items: { type: "string" } }
+            }
+          }
+        }
+      },
+      generateReport: {
+        description: "Generate compliance report",
+        parameters: {
+          timeframe: { type: "string" },
+          format: { type: "string", enum: ["pdf", "html", "json"] },
+          type: { type: "string", enum: ["full", "summary", "violations", "progress"] }
+        }
+      },
+      assessRisk: {
+        description: "Assess compliance risk level",
+        parameters: {
+          context: { type: "object" },
+          scenario: { type: "string" }
+        }
+      }
+    }
+  }
+});
+
+// Handle prompt requests
+server.setPromptHandler("validationScope", async (params) => {
+  const { contentType, section, level } = params;
+  return {
+    prompt: \`Validating \${contentType} against \${section} with \${level} strictness\`,
+    validationParams: {
+      type: contentType,
+      section: section,
+      strictness: level
+    }
+  };
+});
+
+server.setPromptHandler("complianceReport", async (params) => {
+  const { reportType, period, aspects } = params;
+  return {
+    prompt: \`Generating \${reportType} report for \${period}\`,
+    reportParams: {
+      type: reportType,
+      period: period,
+      aspects: aspects
+    }
+  };
+});
+
+// Handle resource requests
+server.setResourceHandler("regulationContent", async () => {
+  return {
+    id: "${regulationId}",
+    type: "Federal Regulation",
+    status: "Active",
+    metadata: {
+      title: "${regulationId} Compliance Requirements",
+      effectiveDate: "2024-01-01",
+      lastAmended: "2024-03-15",
+      enforcementAgency: "Department of Education"
+    },
+    content: {
+      purpose: "This regulation establishes standards for ensuring compliance...",
+      scope: "Applies to all educational institutions...",
+      definitions: {
+        key_terms: [
+          { term: "Educational Institution", definition: "Any organization providing educational services" }
+        ]
+      }
+    }
+  };
+});
+
+server.setResourceHandler("requirements", async () => {
+  return {
+    sections: [
+      {
+        id: "data-protection",
+        title: "Data Protection Requirements",
+        requirements: [
+          { id: "dp-1", text: "Implement secure data storage systems" },
+          { id: "dp-2", text: "Establish data access controls" }
+        ]
+      },
+      {
+        id: "compliance-monitoring",
+        title: "Compliance Monitoring",
+        requirements: [
+          { id: "cm-1", text: "Conduct monthly compliance reviews" },
+          { id: "cm-2", text: "Maintain audit trails" }
+        ]
+      }
+    ]
+  };
+});
+
+server.setResourceHandler("validationRules", async () => {
+  return {
+    rules: [
+      {
+        section: "data-protection",
+        criteria: [
+          { id: "dp-1-1", check: "encryption", level: "required" },
+          { id: "dp-1-2", check: "access-control", level: "required" }
+        ]
+      },
+      {
+        section: "compliance-monitoring",
+        criteria: [
+          { id: "cm-1-1", check: "review-frequency", level: "recommended" },
+          { id: "cm-1-2", check: "documentation", level: "required" }
+        ]
+      }
+    ]
+  };
+});
+
+server.setResourceHandler("complianceMetrics", async () => {
+  return {
+    overall: {
+      score: 85,
+      trend: "+5%",
+      lastAssessment: new Date().toISOString()
+    },
+    bySection: {
+      "data-protection": { score: 90, findings: 2 },
+      "compliance-monitoring": { score: 80, findings: 3 }
+    },
+    recentFindings: [
+      {
+        id: "finding-1",
+        rule: "dp-1-1",
+        severity: "medium",
+        description: "Encryption standard needs upgrade"
+      }
+    ]
+  };
+});
+
+// Handle tool requests
+server.setRequestHandler("validate", async (params) => {
+  const { content, context, options } = params;
+  // Implementation would perform actual validation
+  return {
+    valid: true,
+    strictness: options.strictness,
+    findings: [],
+    recommendations: [
+      {
+        section: "data-protection",
+        suggestion: "Consider upgrading encryption standard",
+        priority: "medium"
+      }
+    ],
+    metadata: {
+      timestamp: new Date().toISOString(),
+      validatedSections: options.sections
+    }
+  };
+});
+
+server.setRequestHandler("generateReport", async (params) => {
+  const { timeframe, format, type } = params;
+  // Implementation would generate actual report
+  return {
+    report: {
+      type: type,
+      format: format,
+      timeframe: timeframe,
+      content: "Report content would go here...",
+      sections: ["summary", "findings", "recommendations"]
+    },
+    metadata: {
+      generated: new Date().toISOString(),
+      expires: new Date(Date.now() + 86400000).toISOString()
+    }
+  };
+});
+
+server.setRequestHandler("assessRisk", async (params) => {
+  const { context, scenario } = params;
+  // Implementation would perform risk assessment
+  return {
+    riskLevel: "medium",
+    factors: [
+      { category: "data-protection", level: "low", reason: "Strong encryption in place" },
+      { category: "compliance-monitoring", level: "medium", reason: "Review frequency below target" }
+    ],
+    recommendations: [
+      { priority: "high", action: "Increase compliance review frequency" }
+    ]
+  };
+});
+
+// Connect transport
+const transport = new StdioServerTransport();
+await server.connect(transport);`;
           }
         };
         
