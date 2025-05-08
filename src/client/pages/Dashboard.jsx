@@ -6,6 +6,7 @@ import MCPServerControl from '../components/MCPServerControl';
 import BatchTestingPanel from '../components/BatchTestingPanel';
 import StatusIndicator from '../components/StatusIndicator';
 import mcpApiClient from '../api/MCPApiClient';
+import axios from 'axios';
 
 // Mock constants to replace the imported ones
 const ValidationStatus = {
@@ -430,265 +431,29 @@ const MCPServerList = () => {
   };
 
   useEffect(() => {
-    // Create a function to generate all 237 regulation servers
-    const generateAllRegulationServers = () => {
-      // Base core servers
-      const coreServers = [
-        {
-          id: 'llm-gateway',
-          name: 'LLM Gateway',
-          type: 'Gateway',
-          category: 'Core',
-          status: 'running',
-          port: 3000,
-          uptime: '3h 25m'
-        },
-        {
-          id: 'batch-server',
-          name: 'Batch Processing Server',
-          type: 'Batch',
-          category: 'Core',
-          status: 'running',
-          port: 3001,
-          uptime: '3h 25m'
-        },
-        {
-          id: 'regulation-registry',
-          name: 'Regulation Registry',
-          type: 'Registry',
-          category: 'Core',
-          status: 'running',
-          port: 3010,
-          uptime: '3h 25m'
-        }
-      ];
-      
-      // Base list of known regulation servers
-      const knownRegulations = [
-        {
-          id: 'regulation-Acade-1692-XXXX',
-          name: 'Age Discrimination Act of 1975',
-          port: 3200
-        },
-        {
-          id: 'regulation-Acade-1701-XXXX',
-          name: 'Americans with Disabilities Act of 1990',
-          port: 3201
-        },
-        {
-          id: 'regulation-Acade-1605-XXXX',
-          name: 'Higher Education Act: Institutional and Financial Assistance Information for Students',
-          port: 3202
-        },
-        {
-          id: 'regulation-Acade-1636-XXXX',
-          name: 'Higher Education Act: Textbook Information',
-          port: 3203
-        },
-        {
-          id: 'regulation-Acade-1766-XXXX',
-          name: 'Higher Education Opportunity Act Sections 152 and 153',
-          port: 3204
-        },
-        {
-          id: 'regulation-Acade-1665-XXXX',
-          name: 'Section 504 of The Rehabilitation Act of 1973',
-          port: 3205
-        },
-        {
-          id: 'regulation-Acade-1633-XXXX',
-          name: 'Title IX of the Education Amendment of 1972',
-          port: 3206
-        },
-        {
-          id: 'regulation-REG-undefined',
-          name: 'National Labor Relations Act',
-          port: 3207
-        },
-        {
-          id: 'regulation-Acade-1630-XXXX',
-          name: 'Teacher Preparation Programs',
-          port: 3208
-        },
-        {
-          id: 'regulation-Accou-15791762-XXXX',
-          name: 'Bankruptcy Abuse Prevention & Consumer Protection Act of 2005',
-          port: 3209
-        },
-        {
-          id: 'regulation-Accre-1618-XXXX',
-          name: 'Higher Education Act: Academic Accreditation Requirements',
-          port: 3210
-        },
-        {
-          id: 'regulation-Finan-1603-XXXX',
-          name: 'Federal Financial Aid Reporting Requirements',
-          port: 3211
-        },
-        {
-          id: 'regulation-Finan-1604-XXXX',
-          name: 'Student Loan Default Prevention',
-          port: 3212
-        },
-        {
-          id: 'regulation-HR-1642-XXXX',
-          name: 'Equal Pay Act',
-          port: 3213
-        },
-        {
-          id: 'regulation-HR-1643-XXXX',
-          name: 'Fair Labor Standards Act',
-          port: 3214
-        },
-        {
-          id: 'regulation-HR-1644-XXXX',
-          name: 'Family and Medical Leave Act',
-          port: 3215
-        },
-        {
-          id: 'regulation-Accre-1619-XXXX',
-          name: 'Distance Education Accreditation',
-          port: 3216
-        },
-        {
-          id: 'regulation-Safet-1684-XXXX',
-          name: 'Campus Safety and Security',
-          port: 3217
-        },
-        {
-          id: 'regulation-Safet-1685-XXXX',
-          name: 'Clery Act',
-          port: 3218
-        },
-        {
-          id: 'regulation-Priva-1661-XXXX',
-          name: 'Family Educational Rights and Privacy Act (FERPA)',
-          port: 3219
-        },
-        {
-          id: 'regulation-Rese-1671-XXXX',
-          name: 'Human Subjects Research Protection',
-          port: 3220
-        },
-        {
-          id: 'regulation-Rese-1672-XXXX',
-          name: 'Animal Welfare Act',
-          port: 3221
-        },
-        {
-          id: 'regulation-Tech-1691-XXXX',
-          name: 'Digital Accessibility Requirements',
-          port: 3222
-        }
-      ];
-      
-      // Additional regulations to reach 237 total
-      const categories = ['Acade', 'Finan', 'HR', 'Rese', 'Priva', 'Safet', 'Tech', 'Accre', 'Accou', 'Compl', 'Admin', 'Ethic', 'Inter', 'Legal'];
-      const regulationNames = [
-        'Student Privacy Protection', 'Data Security Compliance', 'Educational Technology Standards',
-        'Research Grant Compliance', 'International Student Requirements', 'Veterans Education Benefits',
-        'Library and Information Resources', 'Online Course Standards', 'Disability Services Requirements',
-        'Athletic Program Compliance', 'Academic Integrity Standards', 'Laboratory Safety Requirements',
-        'Admissions Standards Compliance', 'Credit Transfer Policies', 'Degree Program Accreditation',
-        'Faculty Qualification Standards', 'Student Loan Servicing', 'Scholarship Administration',
-        'Student Health Insurance', 'Diversity and Inclusion Standards', 'Environmental Compliance',
-        'Campus Infrastructure Standards', 'Student Housing Requirements', 'Food Service Regulations',
-        'Student Transportation Safety', 'Academic Calendar Requirements', 'Course Catalog Standards',
-        'Student Conduct Policies', 'Graduation Requirements', 'Transcript Standards',
-        'Alumni Relations Policies', 'Career Services Standards', 'Work-Study Program Requirements',
-        'Student Advising Standards', 'Title IV Financial Aid Compliance', 'Substance Abuse Prevention',
-        'Anti-Discrimination Policies', 'Sexual Harassment Prevention', 'Whistleblower Protection',
-        'Conflict of Interest Policies', 'Faculty Research Standards', 'Faculty Appointment Policies',
-        'Faculty Tenure Standards', 'Faculty Promotion Requirements', 'Faculty Compensation',
-        'Faculty Leave Policies', 'Faculty Work Load Standards', 'Facilities Maintenance Standards',
-        'Emergency Response Planning', 'Campus Fire Safety', 'Chemical Safety Standards',
-        'Hazardous Waste Management', 'Electronic Waste Disposal', 'Recycling Requirements',
-        'Water Conservation Standards', 'Energy Efficiency Requirements', 'Greenhouse Gas Reporting',
-        'Air Quality Standards', 'Noise Pollution Control', 'Light Pollution Mitigation',
-        'Parking and Transportation', 'Accessibility Standards', 'Building Safety Codes',
-        'Construction Standards', 'Procurement Policies', 'Contract Management Standards',
-        'Intellectual Property Policies', 'Copyright Compliance', 'Trademark Protection',
-        'Patent Protection Standards', 'Research Ethics Requirements', 'Human Subjects Research',
-        'Animal Research Ethics', 'Academic Freedom Standards', 'Student Press Freedom',
-        'Speech and Expression Policies', 'Religious Observation Accommodations', 'Cultural Sensitivity Standards',
-        'Indigenous Peoples Rights', 'Minority Student Services', 'First Generation Student Support',
-        'International Students Support', 'English Language Learner Support', 'Disability Accommodations',
-        'Learning Disabilities Support', 'Mental Health Services', 'Counseling Standards',
-        'Student Health Services', 'Vaccination Requirements', 'Communicable Disease Prevention',
-        'Pandemic Response Planning', 'Crisis Management Standards', 'Student Suicide Prevention',
-        'Alcohol and Drug Education', 'Tobacco-Free Campus Policies', 'Wellness Program Standards',
-        'Recreation Facility Standards', 'Student Activities Requirements', 'Student Government Standards',
-        'Student Publications Standards', 'Student Organizations Policies', 'Greek Life Governance',
-        'Sports Club Standards', 'Intramural Sports Policies', 'Varsity Athletics Compliance',
-        'Title IX Athletics Compliance', 'NCAA Compliance Standards', 'Athletic Scholarship Standards',
-        'Athletic Facilities Standards', 'Athletic Equipment Safety', 'Athletic Travel Policies',
-        'Athletic Medical Standards', 'Concussion Protocols', 'Student-Athlete Academic Standards',
-        'Athletic Event Security', 'Athletic Emergency Planning', 'Media Relations Policies',
-        'Social Media Policies', 'Marketing Standards', 'Fundraising Policies',
-        'Development Campaign Standards', 'Grant Management Policies', 'Endowment Management',
-        'Financial Investment Policies', 'Risk Management Standards', 'Insurance Requirements',
-        'Legal Compliance Auditing', 'Board Governance Standards', 'Executive Compensation',
-        'Administrative Oversight', 'Internal Audit Standards', 'External Audit Requirements',
-        'Tax Compliance Standards', 'Foreign Investment Reporting', 'International Program Standards',
-        'Study Abroad Safety', 'International Campus Policies', 'Cross-Border Data Transfer',
-        'Foreign Faculty Standards', 'Global Research Collaboration', 'International Student Recruitment',
-        'Visa Compliance Standards', 'Immigration Compliance', 'Foreign Language Program Standards',
-        'Cultural Exchange Programs', 'Veterans Affairs Compliance', 'Military Education Benefits',
-        'Reserved Officer Training Corps', 'Military Credit Transfer', 'Servicemember Accommodation',
-        'Continuing Education Standards', 'Professional Certification Programs', 'Distance Learning Standards',
-        'Online Education Accessibility', 'Virtual Laboratory Standards', 'Remote Testing Integrity',
-        'Digital Library Access', 'Electronic Resource Management', 'Open Access Publishing',
-        'Scholarly Communication Standards', 'Research Data Management', 'Research Publication Standards',
-        'Technology Transfer Policies', 'Innovation and Entrepreneurship', 'Business Incubator Standards',
-        'Economic Development Initiatives', 'Community Engagement Standards', 'Service Learning Programs',
-        'Volunteer Program Standards', 'Public Service Requirements', 'Extension Program Standards',
-        'Community Health Initiatives', 'Environmental Sustainability Programs', 'Urban Development Partnerships'
-      ];
-      
-      // Generate the additional regulations needed to reach 237
-      const additionalRegulations = [];
-      const basePort = 3223;
-      const remainingCount = 237 - coreServers.length - knownRegulations.length;
-      
-      for (let i = 0; i < remainingCount; i++) {
-        const category = categories[Math.floor(Math.random() * categories.length)];
-        const id = Math.floor(1000 + Math.random() * 9000);
-        const nameIndex = i % regulationNames.length;
-        
-        additionalRegulations.push({
-          id: `regulation-${category}-${id}-XXXX`,
-          name: regulationNames[nameIndex],
-          port: basePort + i
-        });
+    const fetchServers = async () => {
+      setLoading(true);
+      try {
+        // Fetch real regulations from backend
+        const response = await axios.get('http://localhost:3010/api/regulations');
+        const apiRegulations = response.data;
+        const regulations = apiRegulations.map(r => ({
+          ...r,
+          id: r.regulationId,
+          type: 'Regulation Server',
+          category: 'Regulation',
+        }));
+        setRegulationServers(regulations);
+        setServers(regulations); // If you have core servers, combine here
+        setTotalCount(regulations.length);
+      } catch (err) {
+        setError('Failed to load servers');
+        console.error('Error loading servers:', err);
+      } finally {
+        setLoading(false);
       }
-      
-      // Combine all known regulations with the generated ones
-      const allRegulations = [...knownRegulations, ...additionalRegulations].map((reg, index) => ({
-        id: reg.id,
-        name: reg.name,
-        type: 'Regulation Server',
-        category: 'Regulation',
-        status: Math.random() > 0.3 ? 'running' : 'stopped', // 70% running, 30% stopped
-        port: reg.port,
-        uptime: Math.random() > 0.3 ? `${Math.floor(1 + Math.random() * 5)}h ${Math.floor(Math.random() * 60)}m` : '-'
-      }));
-      
-      // Return both core and regulation servers separately
-      return {
-        coreServers: coreServers,
-        regulationServers: allRegulations
-      };
     };
-    
-    // Generate all servers
-    const { coreServers: cores, regulationServers: regulations } = generateAllRegulationServers();
-    
-    // Set the servers data
-    setCoreServers(cores);
-    setRegulationServers(regulations);
-    setServers([...cores, ...regulations]);
-    setTotalCount(cores.length + regulations.length);
-    setLoading(false);
+    fetchServers();
   }, []);
 
   // Add sorting functionality
@@ -802,6 +567,7 @@ const MCPServerList = () => {
 
   // Add a function to handle row clicks
   const handleRowClick = (serverId) => {
+    console.log('Navigating to server detail with ID:', serverId);
     navigate(`/servers/${serverId}`);
   };
 
@@ -892,45 +658,48 @@ const MCPServerList = () => {
                   </TableCell>
                 </TableRow>
               ) : (
-                sortedRegulationServers.map(server => (
-                  <TableRow 
-                    key={server.id}
-                    onClick={() => handleRowClick(server.id)}
-                  >
-                    <StatusCell>
-                      <StatusIndicator status={server.status} />
-                      <span style={{ marginLeft: '8px' }}>{server.status}</span>
-                    </StatusCell>
-                    <TableCell>{server.name}</TableCell>
-                    <TableCell>
-                      <RegulationTypeTag style={{
-                        backgroundColor: getServerTypeColor(server.type || server.category),
-                        color: getServerTypeTextColor(server.type || server.category)
-                      }}>
-                        {server.type || server.category || 'Server'}
-                      </RegulationTypeTag>
-                    </TableCell>
-                    <TableCell>{server.port || '-'}</TableCell>
-                    <TableCell>{server.uptime || '-'}</TableCell>
-                    <TableCell onClick={(e) => e.stopPropagation()}>
-                      {server.status === 'stopped' ? (
-                        <ActionButton
-                          variant="start"
-                          onClick={() => handleStartServer(server.id)}
-                        >
-                          Start
-                        </ActionButton>
-                      ) : (
-                        <ActionButton
-                          variant="stop"
-                          onClick={() => handleStopServer(server.id)}
-                        >
-                          Stop
-                        </ActionButton>
-                      )}
-                    </TableCell>
-                  </TableRow>
-                ))
+                sortedRegulationServers.map(server => {
+                  console.log('Rendering server row:', server);
+                  return (
+                    <TableRow 
+                      key={server.id}
+                      onClick={() => handleRowClick(server.id)}
+                    >
+                      <StatusCell>
+                        <StatusIndicator status={server.status} />
+                        <span style={{ marginLeft: '8px' }}>{server.status}</span>
+                      </StatusCell>
+                      <TableCell>{server.name}</TableCell>
+                      <TableCell>
+                        <RegulationTypeTag style={{
+                          backgroundColor: getServerTypeColor(server.type || server.category),
+                          color: getServerTypeTextColor(server.type || server.category)
+                        }}>
+                          {server.type || server.category || 'Server'}
+                        </RegulationTypeTag>
+                      </TableCell>
+                      <TableCell>{server.port || '-'}</TableCell>
+                      <TableCell>{server.uptime || '-'}</TableCell>
+                      <TableCell onClick={(e) => e.stopPropagation()}>
+                        {server.status === 'stopped' ? (
+                          <ActionButton
+                            variant="start"
+                            onClick={() => handleStartServer(server.id)}
+                          >
+                            Start
+                          </ActionButton>
+                        ) : (
+                          <ActionButton
+                            variant="stop"
+                            onClick={() => handleStopServer(server.id)}
+                          >
+                            Stop
+                          </ActionButton>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
               )}
             </tbody>
           </StyledTable>

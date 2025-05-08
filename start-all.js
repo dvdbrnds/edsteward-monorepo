@@ -9,6 +9,8 @@ import axios from 'axios';
 import { exec } from 'child_process';
 import path from 'path';
 import fs from 'fs';
+import { existsSync } from 'fs';
+import { execSync } from 'child_process';
 
 // Configuration
 const REGISTRY_PORT = 3010;
@@ -62,6 +64,7 @@ function startRegistryServer() {
   });
   
   runningProcesses.registry = registry;
+  console.log(`Registry API Server PID: ${registry.pid}`);
   
   registry.stdout.on('data', (data) => {
     console.log(`[Registry API] ${data.toString().trim()}`);
@@ -81,46 +84,6 @@ function startRegistryServer() {
 }
 
 /**
- * Start the client application
- */
-function startClientApp() {
-  console.log('Starting Client Application...');
-  
-  // Navigate to client directory
-  const clientDir = path.join(process.cwd(), 'src/client');
-  
-  const client = spawn('npm', ['run', 'start'], {
-    stdio: ['ignore', 'pipe', 'pipe'],
-    cwd: clientDir
-  });
-  
-  runningProcesses.client = client;
-  
-  client.stdout.on('data', (data) => {
-    const output = data.toString().trim();
-    console.log(`[Client] ${output}`);
-    
-    // If client is ready, extract the URL
-    if (output.includes('Server running at http://')) {
-      const match = output.match(/Server running at (http:\/\/[^\s]+)/);
-      if (match && match[1]) {
-        console.log(`\n🔗 Client is accessible at: ${match[1]}\n`);
-      }
-    }
-  });
-  
-  client.stderr.on('data', (data) => {
-    console.error(`[Client Error] ${data.toString().trim()}`);
-  });
-  
-  client.on('close', (code) => {
-    console.log(`Client application exited with code ${code}`);
-    delete runningProcesses.client;
-    process.exit(1);
-  });
-}
-
-/**
  * Upload test regulations
  */
 async function uploadTestRegulations() {
@@ -135,31 +98,187 @@ async function uploadTestRegulations() {
   }
 }
 
+// Utility to kill any process using a given port
+async function killProcessOnPort(port) {
+  try {
+    const { execSync } = await import('child_process');
+    // Find the PID(s) using the port - use a more aggressive approach for port 3000
+    const command = port === 3000 ? `lsof -ti :${port}` : `lsof -ti tcp:${port}`;
+    console.log(`Finding processes on port ${port} using: ${command}`);
+    
+    const stdout = execSync(command).toString();
+    const pids = stdout.split('\n').filter(Boolean);
+    if (pids.length > 0) {
+      console.log(`Killing process(es) on port ${port}: ${pids.join(', ')}`);
+      for (const pid of pids) {
+        try {
+          // Force kill (-9) to ensure the process is terminated
+          execSync(`kill -9 ${pid}`);
+          console.log(`Successfully killed PID ${pid} on port ${port}`);
+        } catch (e) {
+          console.warn(`Failed to kill PID ${pid}:`, e.message);
+        }
+      }
+      
+      // Add extra delay for port 3000 to ensure it's fully released
+      if (port === 3000) {
+        console.log(`Adding extra delay for port ${port} release...`);
+        await sleep(3000); // 3 second delay specifically for port 3000
+      }
+    } else {
+      console.log(`No processes found using port ${port}`);
+    }
+  } catch (e) {
+    console.log(`No process found using port ${port} or lsof not available`);
+  }
+}
+
+// Ensure dependencies are installed in a directory
+function ensureDependencies(dir) {
+  if (!existsSync(path.join(dir, 'node_modules'))) {
+    console.log(`Installing dependencies in ${dir}...`);
+    execSync('npm install', { cwd: dir, stdio: 'inherit' });
+  }
+}
+
+/**
+ * Start the Vite dev server
+ */
+function startViteDevServer() {
+  console.log('Starting Vite Dev Server on port', CLIENT_PORT);
+  // Explicitly pass the port and strictPort flags
+  const vite = spawn('npx', ['vite', 'src/client', '--port', CLIENT_PORT.toString(), '--strictPort'], {
+    stdio: ['ignore', 'pipe', 'pipe'],
+    cwd: process.cwd(),
+    shell: true,
+  });
+
+  runningProcesses.vite = vite;
+  console.log(`Vite Dev Server PID: ${vite.pid}`);
+
+  vite.stdout.on('data', (data) => {
+    const output = data.toString().trim();
+    console.log(`[Vite] ${output}`);
+    if (output.includes('Local:')) {
+      const match = output.match(/Local:\s*(http:\/\/[^\s]+)/);
+      if (match && match[1]) {
+        console.log(`\n🔗 Vite Dev Server is accessible at: ${match[1]}\n`);
+      }
+    }
+  });
+
+  vite.stderr.on('data', (data) => {
+    console.error(`[Vite Error] ${data.toString().trim()}`);
+  });
+
+  vite.on('close', (code) => {
+    console.log(`Vite dev server exited with code ${code}`);
+    delete runningProcesses.vite;
+    process.exit(1);
+  });
+}
+
+/**
+ * Start the LLM Gateway
+ */
+function startLLMGateway() {
+  console.log('Starting LLM Gateway...');
+
+  const llmGateway = spawn('node', ['src/llm-gateway/start-llm-gateway.js'], {
+    stdio: ['ignore', 'pipe', 'pipe'],
+    cwd: process.cwd(),
+    shell: true,
+  });
+
+  runningProcesses.llmGateway = llmGateway;
+  console.log(`LLM Gateway PID: ${llmGateway.pid}`);
+
+  llmGateway.stdout.on('data', (data) => {
+    const output = data.toString().trim();
+    console.log(`[LLM Gateway] ${output}`);
+    if (output.includes('Health check endpoint:')) {
+      const match = output.match(/Health check endpoint: (http:\/\/[^\s]+)/);
+      if (match && match[1]) {
+        console.log(`\n🔗 LLM Gateway Health: ${match[1]}\n`);
+      }
+    }
+  });
+
+  llmGateway.stderr.on('data', (data) => {
+    console.error(`[LLM Gateway Error] ${data.toString().trim()}`);
+  });
+
+  llmGateway.on('close', (code) => {
+    console.log(`LLM Gateway exited with code ${code}`);
+    delete runningProcesses.llmGateway;
+    process.exit(1);
+  });
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 /**
  * Start all components
  */
 async function startAll() {
-  // Start registry server
-  startRegistryServer();
-  
-  // Wait for registry to be ready
-  const registryReady = await waitForServer(`http://localhost:${REGISTRY_PORT}/health`, 15, 1000);
-  if (!registryReady) {
-    console.error('Registry server failed to start. Exiting...');
+  try {
+    // Force kill any running node processes that might be using our ports
+    try {
+      const { execSync } = await import('child_process');
+      console.log('Forcefully terminating potential conflicting processes...');
+      execSync('pkill -f "node.*start-all.js" || true');
+      execSync('pkill -f "vite" || true');
+      execSync('pkill -f "registry-server.js" || true');
+      execSync('pkill -f "start-llm-gateway.js" || true');
+      console.log('Process cleanup complete');
+    } catch (e) {
+      console.log('Process cleanup warning:', e.message);
+    }
+
+    // Ensure dependencies in all relevant directories
+    ensureDependencies(process.cwd()); // root
+    ensureDependencies(path.join(process.cwd(), 'src/client'));
+    ensureDependencies(path.join(process.cwd(), 'server'));
+
+    // Kill any process using the required ports
+    await killProcessOnPort(3000);
+    await killProcessOnPort(3001);
+    await killProcessOnPort(3010);
+    await killProcessOnPort(REGISTRY_PORT);
+    await killProcessOnPort(CLIENT_PORT);
+
+    // Wait a bit to ensure ports are released
+    await sleep(2000);
+
+    // Start registry server
+    startRegistryServer();
+    
+    // Wait for registry to be ready
+    const registryReady = await waitForServer(`http://localhost:${REGISTRY_PORT}/health`, 15, 1000);
+    if (!registryReady) {
+      console.error('Registry server failed to start. Exiting...');
+      process.exit(1);
+    }
+    
+    // Upload test regulations
+    await uploadTestRegulations();
+    
+    // Start LLM Gateway
+    startLLMGateway();
+
+    // Start Vite dev server
+    startViteDevServer();
+    
+    console.log('\n🚀 All components started!');
+    console.log(`- Registry API: http://localhost:${REGISTRY_PORT}`);
+    console.log(`- Client application (Vite): http://localhost:${CLIENT_PORT}`);
+    console.log('Press Ctrl+C to stop all servers');
+  } catch (error) {
+    console.error('Failed to start components:', error);
     process.exit(1);
   }
-  
-  // Upload test regulations
-  await uploadTestRegulations();
-  
-  // Start client application
-  startClientApp();
-  
-  console.log('\n🚀 All components started!');
-  console.log(`- Registry API: http://localhost:${REGISTRY_PORT}`);
-  console.log('- Client application should be available at the URL above\n');
-  
-  console.log('Press Ctrl+C to stop all servers');
 }
 
 // Handle process termination

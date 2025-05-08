@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 import styled from 'styled-components';
 import { ToastContainer } from 'react-toastify';
@@ -118,7 +118,7 @@ const Nav = styled.nav`
   align-items: center;
 `;
 
-const NavLink = styled.a`
+const NavLink = styled(Link)`
   color: ${props => props.theme.colors.textOnPrimary};
   text-decoration: none;
   margin-left: 24px;
@@ -155,11 +155,11 @@ const DevClientApp = () => {
           <Header>
             <AppTitle>MCP Engine DevClient</AppTitle>
             <Nav>
-              <NavLink href="/">Dashboard</NavLink>
-              <NavLink href="/servers">Servers</NavLink>
-              <NavLink href="/batch">Batch Testing</NavLink>
-              <NavLink href="/debug">Debug</NavLink>
-              <NavLink href="/colors">Colors</NavLink>
+              <NavLink to="/">Dashboard</NavLink>
+              <NavLink to="/servers">Servers</NavLink>
+              <NavLink to="/batch">Batch Testing</NavLink>
+              <NavLink to="/debug">Debug</NavLink>
+              <NavLink to="/colors">Colors</NavLink>
             </Nav>
           </Header>
           

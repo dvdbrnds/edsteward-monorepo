@@ -67,7 +67,11 @@ const InspectorOutput = styled.pre`
 `;
 
 const MCPServerDetail = () => {
-  const { id } = useParams();
+  const { serverId } = useParams();
+  console.log('MCPServerDetail loaded with serverId:', serverId);
+  if (!serverId) {
+    return <div style={{ padding: '20px', color: 'red' }}>Error: No server ID in URL</div>;
+  }
   const navigate = useNavigate();
   const [server, setServer] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -84,18 +88,19 @@ const MCPServerDetail = () => {
   const loadServerDetails = async () => {
     setLoading(true);
     setError(null);
-
+    console.log('Calling getServerById with id:', serverId);
     try {
-      const response = await MCPApiClient.getServerById(id);
-      
+      const response = await MCPApiClient.getServerById(serverId);
+      console.log('getServerById response:', response);
       if (response.success) {
         setServer(response.server);
       } else {
+        console.error('Server detail fetch failed:', response.error);
         setError(response.error || 'Failed to load server details');
       }
     } catch (err) {
-      setError('An unexpected error occurred while loading server details');
       console.error('Error loading server details:', err);
+      setError('An unexpected error occurred while loading server details');
     } finally {
       setLoading(false);
     }
@@ -110,12 +115,12 @@ const MCPServerDetail = () => {
         clearInterval(outputPollingRef.current);
       }
     };
-  }, [id]);
+  }, [serverId]);
 
   const handleStartServer = async () => {
     try {
       message.loading({ content: 'Starting server...', key: 'serverAction' });
-      const response = await MCPApiClient.startServer(id);
+      const response = await MCPApiClient.startServer(serverId);
       
       if (response.success) {
         message.success({ content: 'Server started successfully', key: 'serverAction' });
@@ -132,7 +137,7 @@ const MCPServerDetail = () => {
   const handleStopServer = async () => {
     try {
       message.loading({ content: 'Stopping server...', key: 'serverAction' });
-      const response = await MCPApiClient.stopServer(id);
+      const response = await MCPApiClient.stopServer(serverId);
       
       if (response.success) {
         message.success({ content: 'Server stopped successfully', key: 'serverAction' });
@@ -326,7 +331,7 @@ const MCPServerDetail = () => {
       <div style={{ padding: '20px' }}>
         <Alert
           message="Server Not Found"
-          description={`No server found with ID: ${id}`}
+          description={`No server found with ID: ${serverId}`}
           type="warning"
           showIcon
           action={

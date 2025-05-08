@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:9000/api';
+const API_BASE_URL = 'http://localhost:3010/api';
 const MOCK_MODE = false; // Set to false to use real API calls
 
 class MCPApiClient {
@@ -42,15 +42,70 @@ class MCPApiClient {
         throw new Error('Server ID is required');
       }
 
-      // Find the server in our mock data
-      const allServers = this._getMockServers();
-      const server = allServers.find(s => s.id === id);
-
-      if (!server) {
-        throw new Error(`Server with ID ${id} not found`);
+      console.log(`getServerById called with ID: ${id}`);
+      
+      if (this.mockMode) {
+        // Find the server in our mock data
+        const allServers = this._getMockServers();
+        const server = allServers.find(s => s.id === id || s.regulationId === id);
+        if (!server) {
+          throw new Error(`Server with ID ${id} not found`);
+        }
+        return { success: true, server };
       }
 
-      return { success: true, server };
+      // Use live backend data - try with both /api/regulations/:id format and without
+      console.log(`Fetching regulation with ID: ${id}`);
+      try {
+        // First attempt - directly with ID 
+        const response = await axios.get(`${this.baseUrl}/regulations/${id}`);
+        const regulation = response.data;
+        
+        // Map regulation data to server format
+        const server = { 
+          ...regulation, 
+          id: regulation.regulationId || id,
+          regulationId: regulation.regulationId || id,
+          type: 'Regulation Server',
+          category: 'Regulation',
+          status: regulation.server?.running ? 'running' : 'stopped',
+          port: regulation.server?.port || (3010 + Math.floor(Math.random() * 100)), // Use real port if available
+          uptime: regulation.server?.uptime || '1h 30m'
+        };
+        
+        console.log('Successfully mapped server:', server);
+        return { success: true, server };
+      } catch (directError) {
+        console.warn(`Direct fetch failed for ID ${id}, trying to list all regulations`);
+        
+        // Second attempt - get all regulations and find the matching one
+        const allResponse = await axios.get(`${this.baseUrl}/regulations`);
+        const allRegulations = allResponse.data;
+        
+        // Find the regulation matching either id or regulationId
+        const matchingRegulation = allRegulations.find(
+          r => r.regulationId === id || r.id === id
+        );
+        
+        if (!matchingRegulation) {
+          throw new Error(`Server with ID ${id} not found in regulations list`);
+        }
+        
+        // Map the matching regulation to server format
+        const server = { 
+          ...matchingRegulation, 
+          id: matchingRegulation.regulationId || id,
+          regulationId: matchingRegulation.regulationId || id,
+          type: 'Regulation Server',
+          category: 'Regulation',
+          status: matchingRegulation.server?.running ? 'running' : 'stopped',
+          port: matchingRegulation.server?.port || (3010 + Math.floor(Math.random() * 100)),
+          uptime: matchingRegulation.server?.uptime || '1h 30m'
+        };
+        
+        console.log('Found server by matching in all regulations:', server);
+        return { success: true, server };
+      }
     } catch (error) {
       console.error(`Error fetching server ${id}:`, error);
       return { success: false, error: error.message };

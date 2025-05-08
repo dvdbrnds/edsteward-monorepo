@@ -86,3 +86,5 @@ Response:
 This server is designed to work with the MCP Engine client-side application. The client will make API calls to this server to launch MCP Inspector instances for different MCP servers.
 
 The server needs to be running for the "Launch MCP Inspector" feature to work in the client application. 
+
+node start-all.js 

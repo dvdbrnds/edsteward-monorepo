@@ -9,12 +9,12 @@
     "test": "jest"
   },
   "dependencies": {
+    "@uiw/react-json-view": "^2.0.0-alpha.30",
     "axios": "^0.27.2",
     "chart.js": "^3.9.1",
-    "react": "^18.2.0",
+    "react": "^18.3.1",
     "react-chartjs-2": "^4.3.1",
-    "react-dom": "^18.2.0",
-    "react-json-view": "^1.21.3",
+    "react-dom": "^18.3.1",
     "react-router-dom": "^6.4.1",
     "react-syntax-highlighter": "^15.5.0",
     "react-toastify": "^9.0.8",
@@ -28,7 +28,7 @@
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "jest": "^29.0.3",
-    "parcel-bundler": "^1.12.5"
+    "vite": "^6.3.3"
   },
   "browserslist": [
     ">0.2%",

@@ -11,6 +11,9 @@ import 'react-toastify/dist/ReactToastify.css';
 console.log('JavaScript loaded and running');
 document.title = 'MCP Client - Debug Mode';
 
+// Add debugging to the React entry point
+console.log('React client initializing...');
+
 // ClientOnly wrapper component to prevent hydration mismatch
 const ClientOnly = ({ children }) => {
   const [isClient, setIsClient] = useState(false);
@@ -26,7 +29,7 @@ const ClientOnly = ({ children }) => {
 let StyledComponentsRegistry;
 try {
   // Try to import our registry if we're in a Next.js environment
-  StyledComponentsRegistry = require('./lib/registry').default;
+  StyledComponentsRegistry = require('./lib/registry.jsx').default;
 } catch (error) {
   // If we're not in a Next.js environment, use a simple pass-through component
   StyledComponentsRegistry = ({ children }) => children;
@@ -35,15 +38,20 @@ try {
 // Get the root element
 const container = document.getElementById('root');
 
-if (!container) {
-  // Create a fallback element if root is not found
-  const fallbackElement = document.createElement('div');
-  fallbackElement.id = 'root';
-  document.body.appendChild(fallbackElement);
-  console.error('Root element not found, created fallback');
-}
-
 const root = ReactDOM.createRoot(container || document.getElementById('root'));
+
+// Don't set innerHTML on the root element - this will cause problems with ReactDOM
+// Instead, use a fallback div if there's an issue
+const fallbackElement = document.createElement('div');
+fallbackElement.innerHTML = '<div style="padding: 20px; font-family: sans-serif;">' +
+  '<h2>Loading MCP Engine DevClient...</h2>' +
+  '<p>If the application does not load within a few seconds, please check the browser console for errors.</p>' +
+  '</div>';
+
+// Only show fallback if needed
+if (!container) {
+  document.body.appendChild(fallbackElement);
+}
 
 // Render the application
 try {

@@ -264,6 +264,7 @@ app.post('/api/regulations/:id/query', async (req, res) => {
     // Use the MCP server to query the regulation
     try {
       const response = await queryRegulation(regulation.regulationId, query);
+      console.log('First 5 servers:', (response.servers || response.data).slice(0, 5));
       res.json(response);
     } catch (error) {
       console.error(`Error querying regulation ${regulation.regulationId}:`, error);
