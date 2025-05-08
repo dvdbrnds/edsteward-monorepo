@@ -1,0 +1,97 @@
+service: mcp-gdpr-validator
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs16.x
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-1'}
+  environment:
+    REGULATIONS_TABLE: ${self:service}-${self:provider.stage}-regulations
+    VALIDATIONS_TABLE: ${self:service}-${self:provider.stage}-validations
+    BASELINES_BUCKET: ${self:service}-${self:provider.stage}-baselines
+  
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: 
+        - !GetAtt RegulationsTable.Arn
+        - !GetAtt ValidationsTable.Arn
+    - Effect: Allow
+      Action:
+        - s3:GetObject
+        - s3:PutObject
+        - s3:ListBucket
+      Resource:
+        - !GetAtt BaselinesBucket.Arn
+        - Fn::Join:
+          - ''
+          - - !GetAtt BaselinesBucket.Arn
+            - '/*'
+
+functions:
+  gdprValidator:
+    handler: index.handler
+    description: GDPR-specific MCP validator server
+    memorySize: 1024
+    timeout: 30
+    events:
+      - http:
+          path: /gdpr/validate
+          method: post
+          cors: true
+      - http:
+          path: /gdpr/mcp
+          method: post
+          cors: true
+    environment:
+      REGULATION_TYPE: GDPR
+      LOG_LEVEL: INFO
+
+resources:
+  Resources:
+    RegulationsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.REGULATIONS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: regulationId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: regulationId
+            KeyType: HASH
+    
+    ValidationsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.VALIDATIONS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+    
+    BaselinesBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.BASELINES_BUCKET}
+        AccessControl: Private
+        CorsConfiguration:
+          CorsRules:
+            - AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - GET
+              AllowedOrigins:
+                - '*'
+              MaxAge: 3000

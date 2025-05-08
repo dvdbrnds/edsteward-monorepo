@@ -1,0 +1,24 @@
+{
+  "gdpr-test": {
+    "name": "GDPR Regulation Validator",
+    "description": "Validates compliance with GDPR regulations",
+    "version": "1.0.0-test",
+    "server": {
+      "running": true,
+      "port": 3055,
+      "lastStarted": "2023-06-28T14:00:00.000Z",
+      "url": "http://localhost:3055"
+    }
+  },
+  "hipaa": {
+    "name": "HIPAA Compliance Validator",
+    "description": "Validates compliance with HIPAA regulations",
+    "version": "1.0.0",
+    "server": {
+      "running": true,
+      "port": 3056,
+      "lastStarted": "2023-06-28T14:00:00.000Z",
+      "url": "http://localhost:3056"
+    }
+  }
+}

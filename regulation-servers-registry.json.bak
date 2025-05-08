@@ -1,24 +1,4 @@
 {
-  "TEST-GDPR-DEMO": {
-    "id": "TEST-GDPR-DEMO",
-    "name": "Test GDPR Compliance Demo",
-    "category": "Test Servers",
-    "description": "Test data server for GDPR compliance demonstration purposes only.",
-    "version": "test-1.0.0",
-    "statute": "GDPR",
-    "statuteReference": "EU General Data Protection Regulation",
-    "regulation": "TEST-GDPR",
-    "regulationReference": "Test GDPR Reference",
-    "deadline": "N/A",
-    "deadlineType": "N/A",
-    "validationFrequency": "daily",
-    "server": {
-      "port": 3299,
-      "running": true,
-      "lastStarted": "2025-04-24T22:00:45.319Z",
-      "url": "http://localhost:3299/mcp"
-    }
-  },
   "Acade-1692-XXXX": {
     "id": "Acade-1692-XXXX",
     "name": "Age Discrimination Act of 1975",

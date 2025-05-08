@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import { Card, Tag, Empty, Spin, Button, Tooltip, Pagination } from 'antd';
 import { PlayCircleOutlined, PauseCircleOutlined, ReloadOutlined, SettingOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import ServerListFilter from './ServerListFilter';
+import mcpApiClient from '../api/MCPApiClient.jsx';
+import TestDataOverlay from './TestDataOverlay';
 
 // Styled components
 const ListContainer = styled.div`
@@ -19,6 +21,8 @@ const ServerGrid = styled.div`
 const ServerCard = styled(Card)`
   transition: all 0.3s;
   border: 1px solid ${props => props.theme.colors.border};
+  position: relative;
+  overflow: hidden;
   
   &:hover {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -31,6 +35,11 @@ const ServerCard = styled(Card)`
   
   ${props => props.selected && `
     border: 2px solid ${props.theme.colors.primary};
+  `}
+  
+  ${props => props.isTestData && `
+    border: 1px dashed #0284c7;
+    background-color: #f8fafc;
   `}
 `;
 
@@ -93,6 +102,12 @@ const PaginationContainer = styled.div`
   margin-top: 1.5rem;
 `;
 
+const TestDataTag = styled(Tag)`
+  background-color: #f0f9ff !important;
+  color: #0284c7 !important;
+  border: 1px dashed #0284c7 !important;
+`;
+
 /**
  * Enhanced Server List Component
  * Displays MCP servers with filtering capabilities
@@ -106,7 +121,7 @@ const EnhancedServerList = ({ onServerSelect }) => {
   
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const [pageSize, setPageSize] = useState(8);
+  const [pageSize, setPageSize] = useState(9999); // Set to very large number to show all
   
   // Filter state
   const [filters, setFilters] = useState({
@@ -118,182 +133,206 @@ const EnhancedServerList = ({ onServerSelect }) => {
     sortDirection: 'asc'
   });
   
-  // Mock data for demonstration
+  // Load servers from MCPApiClient
   useEffect(() => {
-    // This would be replaced with an actual API call
-    setTimeout(() => {
-      const mockServers = [
-        {
-          id: 'gdpr-server-1',
-          name: 'GDPR Validation Server',
-          description: 'Validates content against GDPR (General Data Protection Regulation) requirements.',
-          type: 'gdpr',
-          validationLevel: 2,
-          status: 'running',
-          port: 3000,
-          uptime: '3d 5h 12m',
-          lastUpdated: '2023-11-15T12:30:45Z'
-        },
-        {
-          id: 'hipaa-server-1',
-          name: 'HIPAA Compliance Server',
-          description: 'Validates healthcare-related content against HIPAA requirements.',
-          type: 'hipaa',
-          validationLevel: 3,
-          status: 'running',
-          port: 3001,
-          uptime: '1d 2h 45m',
-          lastUpdated: '2023-11-16T09:15:22Z'
-        },
-        {
-          id: 'ccpa-server-1',
-          name: 'CCPA Validation Service',
-          description: 'California Consumer Privacy Act compliance validation.',
-          type: 'ccpa',
-          validationLevel: 2,
-          status: 'stopped',
-          port: 3002,
-          uptime: '0',
-          lastUpdated: '2023-11-10T14:50:30Z'
-        },
-        {
-          id: 'pci-dss-server-1',
-          name: 'PCI DSS Validator',
-          description: 'Payment Card Industry Data Security Standard validation server.',
-          type: 'pci-dss',
-          validationLevel: 4,
-          status: 'error',
-          port: 3003,
-          uptime: '0',
-          lastUpdated: '2023-11-14T11:22:18Z'
-        },
-        {
-          id: 'sox-server-1',
-          name: 'SOX Compliance Server',
-          description: 'Sarbanes-Oxley Act compliance validation for financial reporting.',
-          type: 'sox',
-          validationLevel: 1,
-          status: 'running',
-          port: 3004,
-          uptime: '5d 12h 33m',
-          lastUpdated: '2023-11-12T08:40:55Z'
-        },
-        {
-          id: 'gdpr-server-2',
-          name: 'GDPR Advanced Validator',
-          description: 'Advanced GDPR validation with AI-assisted analysis.',
-          type: 'gdpr',
-          validationLevel: 3,
-          status: 'running',
-          port: 3005,
-          uptime: '2d 9h 15m',
-          lastUpdated: '2023-11-15T16:20:10Z'
-        },
-        {
-          id: 'custom-server-1',
-          name: 'Internal Policy Validator',
-          description: 'Custom validation for internal company policies and procedures.',
-          type: 'custom',
-          validationLevel: 2,
-          status: 'stopped',
-          port: 3006,
-          uptime: '0',
-          lastUpdated: '2023-11-13T13:45:28Z'
-        },
-        {
-          id: 'hipaa-server-2',
-          name: 'HIPAA Human-in-Loop',
-          description: 'HIPAA validation with human review for critical validations.',
-          type: 'hipaa',
-          validationLevel: 4,
-          status: 'running',
-          port: 3007,
-          uptime: '1d 3h 22m',
-          lastUpdated: '2023-11-16T10:30:15Z'
-        },
-        {
-          id: 'ccpa-server-2',
-          name: 'CCPA Basic Validator',
-          description: 'Basic text validation for CCPA compliance.',
-          type: 'ccpa',
-          validationLevel: 1,
-          status: 'running',
-          port: 3008,
-          uptime: '6d 7h 14m',
-          lastUpdated: '2023-11-11T09:10:45Z'
-        },
-        {
-          id: 'pci-dss-server-2',
-          name: 'PCI DSS Pattern Matcher',
-          description: 'PCI DSS validation with advanced pattern matching.',
-          type: 'pci-dss',
-          validationLevel: 2,
-          status: 'running',
-          port: 3009,
-          uptime: '4d 1h 5m',
-          lastUpdated: '2023-11-13T11:25:33Z'
+    const loadServers = async () => {
+      setLoading(true);
+      try {
+        const response = await mcpApiClient.getServers();
+        if (response && response.data) {
+          console.log("Loaded servers from API:", response.data);
+          // Log test servers for debugging
+          const testServers = response.data.filter(s => s.isTestData);
+          console.log("Test data servers:", testServers);
+          
+          setServers(response.data);
+          // Initial filtering
+          applyFilters(response.data);
+        } else {
+          console.error("No server data returned");
         }
-      ];
-      
-      setServers(mockServers);
-      setFilteredServers(mockServers);
-      setLoading(false);
-    }, 1000);
+      } catch (error) {
+        console.error('Error loading servers:', error);
+        // Fallback to mock data if API fails
+        const mockData = getMockServers();
+        console.log("Using mock data:", mockData);
+        setServers(mockData);
+        applyFilters(mockData);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadServers();
   }, []);
   
+  // Mock data function as fallback
+  const getMockServers = () => {
+    return [
+      {
+        id: 'gdpr-server-1',
+        name: 'GDPR Validation Server',
+        description: 'Validates content against GDPR (General Data Protection Regulation) requirements.',
+        type: 'gdpr',
+        validationLevel: 2,
+        status: 'running',
+        port: 3000,
+        uptime: '3d 5h 12m',
+        lastUpdated: '2023-11-15T12:30:45Z'
+      },
+      {
+        id: 'hipaa-server-1',
+        name: 'HIPAA Compliance Server',
+        description: 'Validates healthcare-related content against HIPAA requirements.',
+        type: 'hipaa',
+        validationLevel: 3,
+        status: 'running',
+        port: 3001,
+        uptime: '1d 2h 45m',
+        lastUpdated: '2023-11-16T09:15:22Z'
+      },
+      {
+        id: 'ccpa-server-1',
+        name: 'CCPA Validation Service',
+        description: 'California Consumer Privacy Act compliance validation.',
+        type: 'ccpa',
+        validationLevel: 2,
+        status: 'stopped',
+        port: 3002,
+        uptime: '0',
+        lastUpdated: '2023-11-10T14:50:30Z'
+      },
+      {
+        id: 'pci-dss-server-1',
+        name: 'PCI DSS Validator',
+        description: 'Payment Card Industry Data Security Standard validation server.',
+        type: 'pci-dss',
+        validationLevel: 4,
+        status: 'error',
+        port: 3003,
+        uptime: '0',
+        lastUpdated: '2023-11-14T11:22:18Z'
+      },
+      {
+        id: 'sox-server-1',
+        name: 'SOX Compliance Server',
+        description: 'Sarbanes-Oxley Act compliance validation for financial reporting.',
+        type: 'sox',
+        validationLevel: 1,
+        status: 'running',
+        port: 3004,
+        uptime: '5d 12h 33m',
+        lastUpdated: '2023-11-12T08:40:55Z'
+      },
+      {
+        id: 'gdpr-server-2',
+        name: 'GDPR Advanced Validator',
+        description: 'Advanced GDPR validation with AI-assisted analysis.',
+        type: 'gdpr',
+        validationLevel: 3,
+        status: 'running',
+        port: 3005,
+        uptime: '2d 9h 15m',
+        lastUpdated: '2023-11-15T16:20:10Z'
+      },
+      {
+        id: 'custom-server-1',
+        name: 'Internal Policy Validator',
+        description: 'Custom validation for internal company policies and procedures.',
+        type: 'custom',
+        validationLevel: 2,
+        status: 'stopped',
+        port: 3006,
+        uptime: '0',
+        lastUpdated: '2023-11-13T13:45:28Z'
+      },
+      {
+        id: 'hipaa-server-2',
+        name: 'HIPAA Human-in-Loop',
+        description: 'HIPAA validation with human review for critical validations.',
+        type: 'hipaa',
+        validationLevel: 4,
+        status: 'running',
+        port: 3007,
+        uptime: '1d 3h 22m',
+        lastUpdated: '2023-11-16T10:30:15Z'
+      },
+      {
+        id: 'ccpa-server-2',
+        name: 'CCPA Basic Validator',
+        description: 'Basic text validation for CCPA compliance.',
+        type: 'ccpa',
+        validationLevel: 1,
+        status: 'running',
+        port: 3008,
+        uptime: '6d 7h 14m',
+        lastUpdated: '2023-11-11T09:10:45Z'
+      },
+      {
+        id: 'pci-dss-server-2',
+        name: 'PCI DSS Pattern Matcher',
+        description: 'PCI DSS validation with advanced pattern matching.',
+        type: 'pci-dss',
+        validationLevel: 2,
+        status: 'running',
+        port: 3009,
+        uptime: '4d 1h 5m',
+        lastUpdated: '2023-11-13T11:25:33Z'
+      }
+    ];
+  };
+  
   // Apply filters to server list
-  const applyFilters = () => {
-    let result = [...servers];
+  const applyFilters = (serverList = null) => {
+    let result = [...(serverList || servers)];
     
     // Apply search filter
     if (filters.search) {
-      const searchLower = filters.search.toLowerCase();
+      const search = filters.search.toLowerCase();
       result = result.filter(server => 
-        server.name.toLowerCase().includes(searchLower) || 
-        server.description.toLowerCase().includes(searchLower)
+        server.name.toLowerCase().includes(search) ||
+        server.description?.toLowerCase().includes(search) ||
+        server.type?.toLowerCase().includes(search)
       );
     }
     
     // Apply regulation type filter
     if (filters.regulationType) {
-      result = result.filter(server => server.type === filters.regulationType);
+      result = result.filter(server => 
+        server.type?.toLowerCase() === filters.regulationType.toLowerCase()
+      );
     }
     
     // Apply validation level filter
     if (filters.validationLevel) {
-      result = result.filter(server => server.validationLevel === filters.validationLevel);
+      result = result.filter(server => 
+        server.validationLevel === parseInt(filters.validationLevel)
+      );
     }
     
     // Apply status filter
     if (filters.status) {
-      result = result.filter(server => server.status === filters.status);
+      result = result.filter(server => 
+        server.status?.toLowerCase() === filters.status.toLowerCase()
+      );
     }
     
     // Apply sorting
     if (filters.sortBy) {
       result.sort((a, b) => {
-        let comparison = 0;
+        let valueA = a[filters.sortBy];
+        let valueB = b[filters.sortBy];
         
-        switch (filters.sortBy) {
-          case 'name':
-            comparison = a.name.localeCompare(b.name);
-            break;
-          case 'validationLevel':
-            comparison = a.validationLevel - b.validationLevel;
-            break;
-          case 'lastUpdated':
-            comparison = new Date(a.lastUpdated) - new Date(b.lastUpdated);
-            break;
-          default:
-            comparison = 0;
-        }
+        if (typeof valueA === 'string') valueA = valueA.toLowerCase();
+        if (typeof valueB === 'string') valueB = valueB.toLowerCase();
         
-        return filters.sortDirection === 'desc' ? -comparison : comparison;
+        if (valueA < valueB) return filters.sortDirection === 'asc' ? -1 : 1;
+        if (valueA > valueB) return filters.sortDirection === 'asc' ? 1 : -1;
+        return 0;
       });
     }
     
     setFilteredServers(result);
-    setCurrentPage(1); // Reset to first page when filters change
   };
   
   // Clear all filters
@@ -356,12 +395,6 @@ const EnhancedServerList = ({ onServerSelect }) => {
     }
   };
   
-  // Get current page data
-  const paginatedServers = filteredServers.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
-  );
-  
   // Server status badge colors
   const getStatusColor = (status) => {
     switch (status) {
@@ -390,157 +423,119 @@ const EnhancedServerList = ({ onServerSelect }) => {
   const renderServers = () => {
     if (loading) {
       return (
-        <EmptyStateContainer>
+        <div style={{ padding: '2rem', textAlign: 'center' }}>
           <Spin size="large" />
-          <p style={{ marginTop: '1rem' }}>Loading servers...</p>
-        </EmptyStateContainer>
+          <div style={{ marginTop: '1rem' }}>Loading servers...</div>
+        </div>
       );
     }
     
     if (filteredServers.length === 0) {
       return (
         <EmptyStateContainer>
-          <Empty description="No servers found" />
-          <Button type="primary" style={{ marginTop: '1rem' }}>
-            Create New Server
+          <Empty 
+            description="No servers match your filter criteria" 
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+          />
+          <Button 
+            type="primary" 
+            onClick={clearFilters}
+            style={{ marginTop: '1rem' }}
+          >
+            Clear Filters
           </Button>
         </EmptyStateContainer>
       );
     }
     
-    // Get current page data
-    const firstIndex = (currentPage - 1) * pageSize;
-    const lastIndex = firstIndex + pageSize;
-    const currentServers = filteredServers.slice(firstIndex, lastIndex);
-    
     return (
       <ServerGrid>
-        {currentServers.map(server => (
-          <ServerCard 
-            key={server.id} 
-            hoverable
-            selected={selectedServer === server.id}
-            onClick={() => handleServerSelect(server)}
-          >
-            <ServerName>{server.name}</ServerName>
-            <ServerDescription>{server.description}</ServerDescription>
-            
-            <TagsContainer>
-              <StatusTag color={getStatusColor(server.status)}>
-                {server.status.toUpperCase()}
-              </StatusTag>
-              {getValidationLevelTag(server.validationLevel)}
-              <Tag color="orange">{server.type.toUpperCase()}</Tag>
-            </TagsContainer>
-            
-            <ServerInfo>
-              <strong>Port:</strong> {server.port}
-            </ServerInfo>
-            
-            <ServerInfo>
-              <strong>Uptime:</strong> {server.uptime}
-            </ServerInfo>
-            
-            <ServerActions>
-              {server.status === 'running' ? (
-                <Tooltip title="Stop Server">
+        {filteredServers.map(server => {
+          // Debug test data status
+          console.log(`Server ${server.id} isTestData:`, !!server.isTestData);
+          return (
+            <ServerCard 
+              key={server.id}
+              selected={selectedServer?.id === server.id}
+              isTestData={!!server.isTestData}
+              onClick={() => handleServerSelect(server)}
+              hoverable
+            >
+              {server.isTestData && <TestDataOverlay />}
+              <ServerName>{server.name}</ServerName>
+              <ServerDescription>{server.description}</ServerDescription>
+              
+              <TagsContainer>
+                <StatusTag color={getStatusColor(server.status)}>
+                  {server.status?.toUpperCase()}
+                </StatusTag>
+                {getValidationLevelTag(server.validationLevel)}
+                <Tag color="blue">{server.type?.toUpperCase()}</Tag>
+                {!!server.isTestData && (
+                  <TestDataTag>Test Data</TestDataTag>
+                )}
+              </TagsContainer>
+              
+              <ServerInfo>Port: {server.port}</ServerInfo>
+              <ServerInfo>Uptime: {server.uptime}</ServerInfo>
+              
+              <ServerActions>
+                {server.status === 'running' ? (
+                  <Tooltip title="Stop Server">
+                    <Button 
+                      icon={<PauseCircleOutlined />} 
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleServerAction('stop', server.id);
+                      }}
+                    />
+                  </Tooltip>
+                ) : (
+                  <Tooltip title="Start Server">
+                    <Button 
+                      icon={<PlayCircleOutlined />} 
+                      size="small"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleServerAction('start', server.id);
+                      }}
+                    />
+                  </Tooltip>
+                )}
+                
+                <Tooltip title="Restart Server">
                   <Button 
-                    icon={<PauseCircleOutlined />} 
+                    icon={<ReloadOutlined />} 
                     size="small"
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleServerAction('stop', server.id);
+                      handleServerAction('restart', server.id);
                     }}
-                    danger
                   />
                 </Tooltip>
-              ) : (
-                <Tooltip title="Start Server">
+                
+                <Tooltip title="Server Details">
                   <Button 
-                    type="primary" 
-                    icon={<PlayCircleOutlined />} 
+                    icon={<EyeOutlined />} 
                     size="small"
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleServerAction('start', server.id);
+                      handleServerSelect(server);
                     }}
                   />
                 </Tooltip>
-              )}
-              
-              <Tooltip title="Restart Server">
-                <Button 
-                  icon={<ReloadOutlined />} 
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleServerAction('restart', server.id);
-                  }}
-                />
-              </Tooltip>
-              
-              <Tooltip title="Configure">
-                <Button 
-                  icon={<SettingOutlined />} 
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleServerAction('settings', server.id);
-                  }}
-                />
-              </Tooltip>
-              
-              <Tooltip title="View Details">
-                <Button 
-                  icon={<EyeOutlined />} 
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleServerAction('view', server.id);
-                  }}
-                />
-              </Tooltip>
-              
-              <Tooltip title="Delete Server">
-                <Button 
-                  icon={<DeleteOutlined />} 
-                  size="small"
-                  danger
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleServerAction('delete', server.id);
-                  }}
-                />
-              </Tooltip>
-            </ServerActions>
-          </ServerCard>
-        ))}
+              </ServerActions>
+            </ServerCard>
+          );
+        })}
       </ServerGrid>
     );
   };
   
   // Render pagination
   const renderPagination = () => {
-    if (filteredServers.length <= pageSize) {
-      return null;
-    }
-    
-    return (
-      <PaginationContainer>
-        <Pagination
-          current={currentPage}
-          pageSize={pageSize}
-          total={filteredServers.length}
-          onChange={setCurrentPage}
-          showSizeChanger
-          onShowSizeChange={(current, size) => {
-            setPageSize(size);
-            setCurrentPage(1);
-          }}
-          pageSizeOptions={['4', '8', '12', '16']}
-        />
-      </PaginationContainer>
-    );
+    return null; // Never show pagination
   };
   
   return (

@@ -3,8 +3,9 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { toast } from 'react-toastify';
-import mcpApiClient from '../api/MCPApiClient';
+import mcpApiClient from '../api/MCPApiClient.jsx';
 import StatusIndicator from './StatusIndicator';
+import TestDataOverlay from './TestDataOverlay';
 
 // Styled components
 const Container = styled.div`
@@ -139,6 +140,8 @@ const ServerCard = styled.div`
   transition: all 0.2s;
   border: 1px solid ${props => props.theme.colors.border};
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
   
   &:hover {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -148,6 +151,11 @@ const ServerCard = styled.div`
   ${props => props.isSelected && `
     border: 2px solid ${props.theme.colors.primary};
     box-shadow: 0 0 0 1px ${props.theme.colors.primary};
+  `}
+  
+  ${props => props.isTestData && `
+    border: 1px dashed #0284c7;
+    background-color: #f8fafc;
   `}
 `;
 
@@ -198,6 +206,18 @@ const RegulationTag = styled.div`
   margin-left: 0.5rem;
   background-color: #fff1f2;
   color: #e11d48;
+`;
+
+// Add a tag for test data servers
+const TestDataTag = styled.div`
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.8rem;
+  border-radius: 4px;
+  margin-left: 0.5rem;
+  background-color: #f0f9ff;
+  color: #0284c7;
+  border: 1px dashed #0284c7;
 `;
 
 const ServerStatus = styled.div`
@@ -387,13 +407,22 @@ const MCPServerControl = () => {
   const loadServers = async () => {
     setIsLoading(true);
     try {
-      const serverList = await mcpApiClient.getServerStatus();
-      setServers(serverList);
-      
-      // Ensure selection is still valid
-      if (selectedServer) {
-        const updatedServer = serverList.find(s => s.id === selectedServer.id);
-        setSelectedServer(updatedServer || null);
+      const response = await mcpApiClient.getServers();
+      if (response && response.data) {
+        console.log("Loaded servers:", response.data);
+        // Log test servers for debugging
+        const testServers = response.data.filter(s => s.isTestData);
+        console.log("Test data servers:", testServers);
+        
+        setServers(response.data);
+        
+        // Ensure selection is still valid
+        if (selectedServer) {
+          const updatedServer = response.data.find(s => s.id === selectedServer.id);
+          setSelectedServer(updatedServer || null);
+        }
+      } else {
+        console.error("No server data returned");
       }
       
       setIsLoading(false);
@@ -575,16 +604,22 @@ const MCPServerControl = () => {
           </div>
         ) : (
           <ServerGrid>
-            {filteredServers.map(server => (
+            {filteredServers.map(server => {
+              console.log("Server data:", server.id, "isTestData:", server.isTestData);
+              return (
               <ServerCard 
                 key={server.id} 
                 isSelected={selectedServer?.id === server.id}
+                isTestData={server.isTestData}
                 onClick={() => handleSelectServer(server)}
               >
+                {server.isTestData && <TestDataOverlay />}
                 <ServerName>{server.name}</ServerName>
-                <div style={{ display: 'flex', alignItems: 'center' }}>
+                <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
                   <ServerType type={server.type}>{server.type}</ServerType>
                   {server.regulationId && <RegulationTag>Regulation</RegulationTag>}
+                  {console.log("Rendering test tag?", server.id, !!server.isTestData)}
+                  {!!server.isTestData && <TestDataTag>Test Data</TestDataTag>}
                 </div>
                 <ServerStatus>
                   <StatusIndicator status={server.status} />
@@ -631,7 +666,8 @@ const MCPServerControl = () => {
                   )}
                 </ServerCardActions>
               </ServerCard>
-            ))}
+              );
+            })}
           </ServerGrid>
         )}
         

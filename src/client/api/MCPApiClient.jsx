@@ -59,6 +59,16 @@ class MCPApiClient {
         if (response.data && typeof response.data === 'object') {
           // Convert object of servers to array
           regulationServers = Object.entries(response.data).map(([id, regulation]) => {
+            // Check if this is a test data server
+            const isTestData = !!(
+              regulation.name?.toLowerCase().includes('gdpr') || 
+              id.toLowerCase().includes('gdpr') || 
+              id.toLowerCase().includes('test') || 
+              regulation.name?.toLowerCase().includes('test') || 
+              regulation.description?.toLowerCase().includes('test data') || 
+              regulation.version?.includes('test')
+            );
+              
             // Extract server info
             return {
               id: `regulation-${id}`,
@@ -71,7 +81,8 @@ class MCPApiClient {
               uptime: regulation.server?.lastStarted ? 
                 this.formatUptime(new Date(regulation.server.lastStarted)) : '—',
               url: regulation.server?.url || null,
-              regulationId: id
+              regulationId: id,
+              isTestData: isTestData
             };
           });
           
@@ -84,19 +95,32 @@ class MCPApiClient {
           const regulationServersResponse = await this.regulationRegistry.get('/api/mcp/servers');
           if (regulationServersResponse.data && Array.isArray(regulationServersResponse.data)) {
             // Map regulation servers to match the server object format
-            regulationServers = regulationServersResponse.data.map(server => ({
-              id: `regulation-${server.regulationId}`,
-              name: server.name || `Regulation ${server.regulationId}`,
-              type: 'Regulation Server',
-              category: 'Regulation',
-              description: `MCP server for ${server.name || 'regulation'}`,
-              status: server.status || 'unknown',
-              startTime: server.startTime,
-              port: server.port || null,
-              uptime: server.uptime || '0m',
-              url: server.url || 'N/A',
-              regulationId: server.regulationId
-            }));
+            regulationServers = regulationServersResponse.data.map(server => {
+              // Check if this is a test data server
+              const isTestData = !!(
+                server.name?.toLowerCase().includes('gdpr') || 
+                server.regulationId?.toLowerCase().includes('gdpr') || 
+                server.regulationId?.toLowerCase().includes('test') || 
+                server.name?.toLowerCase().includes('test') || 
+                server.description?.toLowerCase().includes('test data') || 
+                server.version?.includes('test')
+              );
+              
+              return {
+                id: `regulation-${server.regulationId}`,
+                name: server.name || `Regulation ${server.regulationId}`,
+                type: 'Regulation Server',
+                category: 'Regulation',
+                description: `MCP server for ${server.name || 'regulation'}`,
+                status: server.status || 'unknown',
+                startTime: server.startTime,
+                port: server.port || null,
+                uptime: server.uptime || '0m',
+                url: server.url || 'N/A',
+                regulationId: server.regulationId,
+                isTestData: isTestData
+              };
+            });
           }
         } catch (apiError) {
           console.error('Error fetching regulation servers from API:', apiError);
@@ -199,19 +223,32 @@ class MCPApiClient {
         const regulationServersResponse = await this.regulationRegistry.get('/api/mcp/servers');
         if (regulationServersResponse.data && Array.isArray(regulationServersResponse.data)) {
           // Map regulation servers to match the server object format
-          const regulationServers = regulationServersResponse.data.map(server => ({
-            id: `regulation-${server.regulationId}`,
-            name: server.name,
-            type: 'Regulation Server',
-            category: 'Regulation',
-            description: `MCP server for ${server.name} regulation`,
-            status: server.status || 'unknown',
-            startTime: server.startTime,
-            pid: server.pid,
-            uptime: server.uptime || '0m',
-            url: server.url || 'N/A',
-            regulationId: server.regulationId
-          }));
+          const regulationServers = regulationServersResponse.data.map(server => {
+            // Check if this is a test data server
+            const isTestData = !!(
+              server.name?.toLowerCase().includes('gdpr') || 
+              server.regulationId?.toLowerCase().includes('gdpr') || 
+              server.regulationId?.toLowerCase().includes('test') || 
+              server.name?.toLowerCase().includes('test') || 
+              server.description?.toLowerCase().includes('test data') || 
+              server.version?.includes('test')
+            );
+            
+            return {
+              id: `regulation-${server.regulationId}`,
+              name: server.name,
+              type: 'Regulation Server',
+              category: 'Regulation',
+              description: `MCP server for ${server.name} regulation`,
+              status: server.status || 'unknown',
+              startTime: server.startTime,
+              pid: server.pid,
+              uptime: server.uptime || '0m',
+              url: server.url || 'N/A',
+              regulationId: server.regulationId,
+              isTestData: isTestData
+            };
+          });
           
           // Add regulation servers to the servers array
           servers.push(...regulationServers);
