@@ -1,7 +1,12 @@
 'use client';
 
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { 
+  Routes, 
+  Route, 
+  Link,
+  BrowserRouter
+} from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
 import styled from 'styled-components';
 import { ToastContainer } from 'react-toastify';
@@ -16,6 +21,7 @@ import RequestInspector from './components/RequestInspector';
 import ColorGuide from './components/ColorGuide';
 import GlobalStyle from './GlobalStyle';
 import MCPServerDetail from './pages/MCPServerDetail';
+import MCPEditorTool from './pages/MCPEditorTool';
 
 // Theme configuration with Material Design color palette
 const theme = {
@@ -150,13 +156,17 @@ const DevClientApp = () => {
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyle />
-      <Router>
+      <BrowserRouter future={{ 
+        v7_startTransition: true,
+        v7_relativeSplatPath: true 
+      }}>
         <AppContainer>
           <Header>
             <AppTitle>MCP Engine DevClient</AppTitle>
             <Nav>
               <NavLink to="/">Dashboard</NavLink>
               <NavLink to="/servers">Servers</NavLink>
+              <NavLink to="/editor">Editor Tool</NavLink>
               <NavLink to="/batch">Batch Testing</NavLink>
               <NavLink to="/debug">Debug</NavLink>
               <NavLink to="/colors">Colors</NavLink>
@@ -168,6 +178,7 @@ const DevClientApp = () => {
               <Route path="/" element={<Dashboard />} />
               <Route path="/servers" element={<MCPServerControl />} />
               <Route path="/servers/:serverId" element={<MCPServerDetail />} />
+              <Route path="/editor" element={<MCPEditorTool />} />
               <Route path="/batch" element={<BatchTestingPanel />} />
               <Route path="/debug" element={<RequestInspector />} />
               <Route path="/colors" element={<ColorGuide />} />
@@ -181,7 +192,7 @@ const DevClientApp = () => {
             MCP Engine DevClient v1.0.0 — Developer Internal Use Only
           </Footer>
         </AppContainer>
-      </Router>
+      </BrowserRouter>
       <ToastContainer position="top-right" autoClose={3000} />
     </ThemeProvider>
   );
