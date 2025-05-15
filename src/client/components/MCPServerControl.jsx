@@ -2,7 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { toast } from 'react-toastify';
+import { toast } from 'react-hot-toast';
+import { FaSyncAlt, FaPlay, FaStop } from 'react-icons/fa';
 import mcpApiClient from '../api/MCPApiClient.jsx';
 import StatusIndicator from './StatusIndicator';
 import TestDataOverlay from './TestDataOverlay';
@@ -394,22 +395,43 @@ const MCPServerControl = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [processingServers, setProcessingServers] = useState(new Set());
+  const [isProcessingAll, setIsProcessingAll] = useState(false);
 
   useEffect(() => {
     loadServers();
     
-    // Poll for updates every 30 seconds
-    const intervalId = setInterval(loadServers, 30000);
+    // Poll for updates every 60 seconds (increased from 30)
+    const intervalId = setInterval(loadServers, 60000);
+    console.log("MCPServerControl: Set up polling with interval ID:", intervalId);
     
-    return () => clearInterval(intervalId);
+    return () => {
+      console.log("MCPServerControl: Clearing polling interval:", intervalId);
+      clearInterval(intervalId);
+    };
   }, []);
   
   const loadServers = async () => {
+    console.log("MCPServerControl: Loading servers...");
     setIsLoading(true);
     try {
       const response = await mcpApiClient.getServers();
       if (response && response.data) {
-        console.log("Loaded servers:", response.data);
+        console.log("MCPServerControl: Loaded servers:", response.data);
+        
+        // Log server status changes to debug UI updates
+        if (servers.length > 0) {
+          const statusChanges = response.data.filter(newServer => {
+            const oldServer = servers.find(s => s.id === newServer.id);
+            return oldServer && oldServer.status !== newServer.status;
+          });
+          
+          if (statusChanges.length > 0) {
+            console.log("MCPServerControl: Server status changes detected:", 
+              statusChanges.map(s => `${s.id}: ${servers.find(old => old.id === s.id)?.status} -> ${s.status}`));
+          }
+        }
+        
         // Log test servers for debugging
         const testServers = response.data.filter(s => s.isTestData);
         console.log("Test data servers:", testServers);
@@ -436,46 +458,184 @@ const MCPServerControl = () => {
   const handleStartServer = async (serverId) => {
     try {
       toast.info(`Starting server ${serverId}...`);
+      
+      // Add this server to processing state
+      setProcessingServers(prev => new Set(prev).add(serverId));
+      
+      // Update UI immediately
+      setServers(currentServers => 
+        currentServers.map(server => 
+          server.id === serverId 
+            ? { ...server, status: 'running', uptime: '0m' }
+            : server
+        )
+      );
+      
       await mcpApiClient.startServer(serverId);
       await loadServers(); // Refresh the server list
       toast.success(`Server ${serverId} started successfully`);
+      
+      // Remove from processing state
+      setProcessingServers(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(serverId);
+        return newSet;
+      });
     } catch (error) {
       console.error(`Error starting server ${serverId}:`, error);
       toast.error(`Failed to start server: ${error.message}`);
+      
+      // Remove from processing state on error too
+      setProcessingServers(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(serverId);
+        return newSet;
+      });
     }
   };
   
   const handleStopServer = async (serverId) => {
     try {
       toast.info(`Stopping server ${serverId}...`);
-      await mcpApiClient.stopServer(serverId);
-      await loadServers(); // Refresh the server list
+      
+      // Add this server to processing state
+      setProcessingServers(prev => new Set(prev).add(serverId));
+      
+      // Find the server in the current state and log its status
+      const serverBefore = servers.find(s => s.id === serverId);
+      console.log(`Before stopping: Server ${serverId} status = ${serverBefore?.status}`);
+      
+      // Update UI immediately
+      setServers(currentServers => 
+        currentServers.map(server => 
+          server.id === serverId 
+            ? { ...server, status: 'stopped', uptime: '0m' }
+            : server
+        )
+      );
+      
+      // Call the API to stop the server
+      console.log(`MCPServerControl: Calling stopServer API for ${serverId}...`);
+      const result = await mcpApiClient.stopServer(serverId);
+      console.log(`MCPServerControl: stopServer API result:`, result);
+      
+      // Wait a moment to ensure state propagates
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      // Force an immediate refresh to update UI
+      console.log(`MCPServerControl: Refreshing server list after stopping ${serverId}...`);
+      await loadServers(); 
+      
+      // Log the updated status
+      const updatedServers = await mcpApiClient.getServers();
+      const serverAfter = updatedServers.data.find(s => s.id === serverId);
+      console.log(`After stopping: Server ${serverId} status = ${serverAfter?.status}`);
+      
+      // Verify the server is actually stopped
+      if (serverAfter && serverAfter.status !== 'stopped') {
+        console.warn(`Server ${serverId} is still not showing as stopped after stopServer call. Forcing status update...`);
+        
+        // Force another direct update - this would normally be a separate API call
+        await mcpApiClient.stopServer(serverId);
+        
+        // Refresh one more time
+        await loadServers();
+      }
+      
       toast.success(`Server ${serverId} stopped successfully`);
+      
+      // Remove from processing state
+      setProcessingServers(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(serverId);
+        return newSet;
+      });
     } catch (error) {
       console.error(`Error stopping server ${serverId}:`, error);
       toast.error(`Failed to stop server: ${error.message}`);
+      
+      // Remove from processing state on error too
+      setProcessingServers(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(serverId);
+        return newSet;
+      });
     }
   };
   
   const handleRestartServer = async (serverId) => {
     try {
       toast.info(`Restarting server ${serverId}...`);
+      
+      // Add this server to processing state
+      setProcessingServers(prev => new Set(prev).add(serverId));
+      
+      // Update UI immediately - first to restarting status
+      setServers(currentServers => 
+        currentServers.map(server => 
+          server.id === serverId 
+            ? { ...server, status: 'restarting' }
+            : server
+        )
+      );
+      
       await mcpApiClient.restartServer(serverId);
+      
+      // Then set to running
+      setServers(currentServers => 
+        currentServers.map(server => 
+          server.id === serverId 
+            ? { ...server, status: 'running', uptime: '0m' }
+            : server
+        )
+      );
+      
       await loadServers(); // Refresh the server list
       toast.success(`Server ${serverId} restarted successfully`);
+      
+      // Remove from processing state
+      setProcessingServers(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(serverId);
+        return newSet;
+      });
     } catch (error) {
       console.error(`Error restarting server ${serverId}:`, error);
       toast.error(`Failed to restart server: ${error.message}`);
+      
+      // Remove from processing state on error too
+      setProcessingServers(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(serverId);
+        return newSet;
+      });
     }
   };
   
   const handleStartAll = async () => {
     toast.info('Starting all servers...');
-    
+    setIsProcessingAll(true);
+
     // Get IDs of stopped servers
     const stoppedServerIds = servers
-      .filter(server => server.status === 'Stopped' || server.status === 'stopped')
+      .filter(server => server.status?.toLowerCase() === 'stopped')
       .map(server => server.id);
+    
+    // Mark all these servers as processing
+    setProcessingServers(prev => {
+      const newSet = new Set(prev);
+      stoppedServerIds.forEach(id => newSet.add(id));
+      return newSet;
+    });
+    
+    // Update UI immediately
+    setServers(currentServers => 
+      currentServers.map(server => 
+        stoppedServerIds.includes(server.id)
+          ? { ...server, status: 'running', uptime: '0m' }
+          : server
+      )
+    );
     
     // Start each stopped server
     for (const id of stoppedServerIds) {
@@ -489,15 +649,41 @@ const MCPServerControl = () => {
     // Refresh server list
     await loadServers();
     toast.success('Started all servers');
+    
+    // Clear processing state
+    setProcessingServers(prev => {
+      const newSet = new Set(prev);
+      stoppedServerIds.forEach(id => newSet.delete(id));
+      return newSet;
+    });
+    
+    setIsProcessingAll(false);
   };
   
   const handleStopAll = async () => {
     toast.info('Stopping all servers...');
-    
+    setIsProcessingAll(true);
+
     // Get IDs of running servers
     const runningServerIds = servers
-      .filter(server => server.status === 'Running' || server.status === 'running')
+      .filter(server => server.status?.toLowerCase() === 'running')
       .map(server => server.id);
+    
+    // Mark all these servers as processing
+    setProcessingServers(prev => {
+      const newSet = new Set(prev);
+      runningServerIds.forEach(id => newSet.add(id));
+      return newSet;
+    });
+    
+    // Update UI immediately
+    setServers(currentServers => 
+      currentServers.map(server => 
+        runningServerIds.includes(server.id)
+          ? { ...server, status: 'stopped', uptime: '0m' }
+          : server
+      )
+    );
     
     // Stop each running server
     for (const id of runningServerIds) {
@@ -511,6 +697,15 @@ const MCPServerControl = () => {
     // Refresh server list
     await loadServers();
     toast.success('Stopped all servers');
+    
+    // Clear processing state
+    setProcessingServers(prev => {
+      const newSet = new Set(prev);
+      runningServerIds.forEach(id => newSet.delete(id));
+      return newSet;
+    });
+    
+    setIsProcessingAll(false);
   };
   
   const handleSelectServer = (server) => {
@@ -557,16 +752,16 @@ const MCPServerControl = () => {
             <Button 
               variant="start" 
               onClick={handleStartAll} 
-              disabled={servers.every(s => s.status !== 'Stopped')}
+              disabled={servers.every(s => s.status?.toLowerCase() !== 'stopped') || isProcessingAll}
             >
-              Start All
+              {isProcessingAll ? 'Starting...' : 'Start All'}
             </Button>
             <Button 
               variant="stop" 
               onClick={handleStopAll}
-              disabled={servers.every(s => s.status !== 'Running')}
+              disabled={servers.every(s => s.status?.toLowerCase() !== 'running') || isProcessingAll}
             >
-              Stop All
+              {isProcessingAll ? 'Stopping...' : 'Stop All'}
             </Button>
             <Button onClick={loadServers} disabled={isLoading}>
               Refresh
@@ -623,31 +818,35 @@ const MCPServerControl = () => {
                 </div>
                 <ServerStatus>
                   <StatusIndicator status={server.status} />
+                  <span>{server.status?.toUpperCase()}</span>
                 </ServerStatus>
                 <ServerUptime>Uptime: {server.uptime}</ServerUptime>
                 <ServerAddress>Address: {server.address || server.url}</ServerAddress>
                 
                 <ServerCardActions>
-                  {server.status === 'Stopped' ? (
+                  {(server.status === 'Stopped' || server.status === 'stopped') ? (
                     <CardButton 
                       variant="start" 
                       onClick={(e) => {
                         e.stopPropagation();
                         handleStartServer(server.id);
                       }}
+                      disabled={processingServers.has(server.id)}
                     >
-                      Start
+                      {processingServers.has(server.id) ? 'Starting...' : 'Start'}
                     </CardButton>
-                  ) : server.status === 'Running' || server.status === 'running' ? (
+                  ) : (server.status === 'Running' || server.status === 'running') ? (
                     <>
                       <CardButton 
                         variant="stop" 
                         onClick={(e) => {
                           e.stopPropagation();
+                          console.log(`Stopping server ${server.id} with current status: ${server.status}`);
                           handleStopServer(server.id);
                         }}
+                        disabled={processingServers.has(server.id)}
                       >
-                        Stop
+                        {processingServers.has(server.id) ? 'Stopping...' : 'Stop'}
                       </CardButton>
                       <CardButton 
                         variant="restart" 
@@ -655,6 +854,7 @@ const MCPServerControl = () => {
                           e.stopPropagation();
                           handleRestartServer(server.id);
                         }}
+                        disabled={processingServers.has(server.id)}
                       >
                         Restart
                       </CardButton>

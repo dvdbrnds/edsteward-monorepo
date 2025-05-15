@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import styled from 'styled-components';
 
 const OverlayContainer = styled.div`
@@ -12,7 +12,7 @@ const OverlayContainer = styled.div`
   justify-content: center;
   pointer-events: none;
   z-index: 10;
-  opacity: 0.7;
+  opacity: 0.8;
 `;
 
 const TestText = styled.div`
@@ -28,6 +28,10 @@ const TestText = styled.div`
 `;
 
 const TestDataOverlay = () => {
+  useEffect(() => {
+    console.log('TestDataOverlay rendered');
+  }, []);
+
   return (
     <OverlayContainer>
       <TestText>TEST</TestText>

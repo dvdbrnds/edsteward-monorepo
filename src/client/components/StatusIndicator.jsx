@@ -13,6 +13,9 @@ const StatusIndicatorDiv = styled.div`
       case 'stopped':
       case 'Stopped':
         return props.theme.colors.error;
+      case 'restarting':
+      case 'Restarting':
+        return props.theme.colors.warning;
       case 'error':
         return props.theme.colors.error;
       case 'warning':
@@ -27,6 +30,16 @@ const StatusIndicatorDiv = styled.div`
   }};
   margin-right: 8px;
   ${props => props.bold ? 'width: 16px; height: 16px;' : ''}
+  
+  ${props => props.status === 'restarting' && `
+    animation: pulse 1.5s infinite;
+    
+    @keyframes pulse {
+      0% { opacity: 0.5; }
+      50% { opacity: 1; }
+      100% { opacity: 0.5; }
+    }
+  `}
 `;
 
 const StatusIndicator = ({ status, bold }) => {

@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Card, Tag, Empty, Spin, Button, Tooltip, Pagination } from 'antd';
 import { PlayCircleOutlined, PauseCircleOutlined, ReloadOutlined, SettingOutlined, DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-hot-toast';
 import ServerListFilter from './ServerListFilter';
 import mcpApiClient from '../api/MCPApiClient.jsx';
 import TestDataOverlay from './TestDataOverlay';
@@ -137,14 +138,31 @@ const EnhancedServerList = ({ onServerSelect }) => {
     sortDirection: 'asc'
   });
   
+  const [processingServers, setProcessingServers] = useState(new Set());
+  
   // Load servers from MCPApiClient
   useEffect(() => {
     const loadServers = async () => {
+      console.log("EnhancedServerList: Loading servers...");
       setLoading(true);
       try {
         const response = await mcpApiClient.getServers();
         if (response && response.data) {
-          console.log("Loaded servers from API:", response.data);
+          console.log("EnhancedServerList: Loaded servers from API:", response.data);
+          
+          // Check and log any status changes for debugging
+          if (servers.length > 0) {
+            const statusChanges = response.data.filter(newServer => {
+              const oldServer = servers.find(s => s.id === newServer.id);
+              return oldServer && oldServer.status !== newServer.status;
+            });
+            
+            if (statusChanges.length > 0) {
+              console.log("EnhancedServerList: Server status changes detected:", 
+                statusChanges.map(s => `${s.id}: ${servers.find(old => old.id === s.id)?.status} -> ${s.status}`));
+            }
+          }
+          
           // Log test servers for debugging
           const testServers = response.data.filter(s => s.isTestData);
           console.log("Test data servers:", testServers);
@@ -168,6 +186,15 @@ const EnhancedServerList = ({ onServerSelect }) => {
     };
     
     loadServers();
+    
+    // Poll for updates every 60 seconds (increased from 30)
+    const intervalId = setInterval(loadServers, 60000);
+    console.log("EnhancedServerList: Set up polling with interval ID:", intervalId);
+    
+    return () => {
+      console.log("EnhancedServerList: Clearing polling interval:", intervalId);
+      clearInterval(intervalId);
+    };
   }, []);
   
   // Mock data function as fallback
@@ -401,45 +428,133 @@ const EnhancedServerList = ({ onServerSelect }) => {
     navigate(`/servers/${navigationId}`);
   };
   
-  const handleServerAction = (action, serverId) => {
+  const handleServerAction = async (action, serverId) => {
     const server = servers.find(s => s.id === serverId);
     if (!server) return;
     
-    switch (action) {
-      case 'start':
-        console.log(`Starting server: ${serverId}`);
-        break;
-      case 'stop':
-        console.log(`Stopping server: ${serverId}`);
-        break;
-      case 'restart':
-        console.log(`Restarting server: ${serverId}`);
-        break;
-      case 'settings':
-        console.log(`Settings for server: ${serverId}`);
-        // Select this server when settings is clicked
-        handleServerSelect(server);
-        break;
-      case 'view':
-        console.log(`View details for server: ${serverId}`);
-        // Select this server when view is clicked
-        handleServerSelect(server);
-        break;
-      case 'delete':
-        console.log(`Delete server: ${serverId}`);
-        break;
-      default:
-        break;
+    // Add to processing servers
+    setProcessingServers(prev => new Set(prev).add(serverId));
+    
+    try {
+      switch (action) {
+        case 'start':
+          console.log(`Starting server: ${serverId}`);
+          // Update UI immediately to improve responsiveness
+          setServers(currentServers => 
+            currentServers.map(s => 
+              s.id === serverId ? { ...s, status: 'running', uptime: '0m' } : s
+            )
+          );
+          // Also update filtered servers
+          setFilteredServers(current => 
+            current.map(s => 
+              s.id === serverId ? { ...s, status: 'running', uptime: '0m' } : s
+            )
+          );
+          
+          await mcpApiClient.startServer(serverId);
+          break;
+          
+        case 'stop':
+          console.log(`Stopping server: ${serverId}`);
+          // Update UI immediately to improve responsiveness
+          setServers(currentServers => 
+            currentServers.map(s => 
+              s.id === serverId ? { ...s, status: 'stopped', uptime: '0m' } : s
+            )
+          );
+          // Also update filtered servers
+          setFilteredServers(current => 
+            current.map(s => 
+              s.id === serverId ? { ...s, status: 'stopped', uptime: '0m' } : s
+            )
+          );
+          
+          await mcpApiClient.stopServer(serverId);
+          break;
+          
+        case 'restart':
+          console.log(`Restarting server: ${serverId}`);
+          // Update UI immediately to show restarting status
+          setServers(currentServers => 
+            currentServers.map(s => 
+              s.id === serverId ? { ...s, status: 'restarting' } : s
+            )
+          );
+          // Also update filtered servers
+          setFilteredServers(current => 
+            current.map(s => 
+              s.id === serverId ? { ...s, status: 'restarting' } : s
+            )
+          );
+          
+          await mcpApiClient.restartServer(serverId);
+          
+          // Update to running after restart completes
+          setServers(currentServers => 
+            currentServers.map(s => 
+              s.id === serverId ? { ...s, status: 'running', uptime: '0m' } : s
+            )
+          );
+          // Also update filtered servers
+          setFilteredServers(current => 
+            current.map(s => 
+              s.id === serverId ? { ...s, status: 'running', uptime: '0m' } : s
+            )
+          );
+          break;
+          
+        case 'settings':
+          console.log(`Settings for server: ${serverId}`);
+          // Select this server when settings is clicked
+          handleServerSelect(server);
+          break;
+          
+        case 'view':
+          console.log(`View details for server: ${serverId}`);
+          // Select this server when view is clicked
+          handleServerSelect(server);
+          break;
+          
+        case 'delete':
+          console.log(`Delete server: ${serverId}`);
+          break;
+          
+        default:
+          break;
+      }
+      
+      // Refresh server list after action completes
+      const response = await mcpApiClient.getServers();
+      if (response && response.data) {
+        setServers(response.data);
+        applyFilters(response.data);
+      }
+      
+    } catch (error) {
+      console.error(`Error performing action ${action} on server ${serverId}:`, error);
+    } finally {
+      // Remove from processing servers
+      setProcessingServers(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(serverId);
+        return newSet;
+      });
     }
   };
   
   // Server status badge colors
   const getStatusColor = (status) => {
-    switch (status) {
+    if (!status) return 'default';
+    
+    const lowerStatus = status.toLowerCase();
+    switch (lowerStatus) {
       case 'running':
         return 'success';
       case 'stopped':
         return 'default';
+      case 'restarting':
+        return 'warning';
       case 'error':
         return 'error';
       default:
@@ -518,7 +633,7 @@ const EnhancedServerList = ({ onServerSelect }) => {
               <ServerInfo>Uptime: {server.uptime}</ServerInfo>
               
               <ServerActions>
-                {server.status === 'running' ? (
+                {(server.status || '').toLowerCase() === 'running' ? (
                   <Tooltip title="Stop Server">
                     <Button 
                       icon={<PauseCircleOutlined />} 
@@ -527,9 +642,11 @@ const EnhancedServerList = ({ onServerSelect }) => {
                         e.stopPropagation();
                         handleServerAction('stop', server.id);
                       }}
+                      loading={processingServers.has(server.id)}
+                      disabled={processingServers.has(server.id)}
                     />
                   </Tooltip>
-                ) : (
+                ) : (server.status || '').toLowerCase() === 'stopped' ? (
                   <Tooltip title="Start Server">
                     <Button 
                       icon={<PlayCircleOutlined />} 
@@ -538,6 +655,16 @@ const EnhancedServerList = ({ onServerSelect }) => {
                         e.stopPropagation();
                         handleServerAction('start', server.id);
                       }}
+                      loading={processingServers.has(server.id)}
+                      disabled={processingServers.has(server.id)}
+                    />
+                  </Tooltip>
+                ) : (
+                  <Tooltip title={`Server ${server.status}`}>
+                    <Button 
+                      icon={<ReloadOutlined spin />} 
+                      size="small"
+                      disabled={true}
                     />
                   </Tooltip>
                 )}
@@ -550,6 +677,8 @@ const EnhancedServerList = ({ onServerSelect }) => {
                       e.stopPropagation();
                       handleServerAction('restart', server.id);
                     }}
+                    loading={processingServers.has(server.id)}
+                    disabled={processingServers.has(server.id) || server.status === 'stopped'}
                   />
                 </Tooltip>
                 

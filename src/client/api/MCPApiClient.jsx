@@ -35,6 +35,9 @@ class MCPApiClient {
         'Content-Type': 'application/json',
       },
     });
+    
+    // In-memory state to track server statuses for demonstration
+    this.serverStates = new Map();
   }
   
   // Server Management API
@@ -51,12 +54,14 @@ class MCPApiClient {
       // Get regulation servers from registry file
       let regulationServers = [];
       try {
+        console.log('Trying to fetch regulation servers from registry file...');
         // Try to fetch the regulation servers directly from the registry file
         // Using window.location.origin to ensure we access from the correct domain
         const origin = window.location.origin || '';
         const response = await axios.get(`${origin}/regulation-servers-registry.json`);
         
         if (response.data && typeof response.data === 'object') {
+          console.log('Found regulation data in registry file:', response.data);
           // Convert object of servers to array
           regulationServers = Object.entries(response.data).map(([id, regulation]) => {
             // Check if this is a test data server
@@ -93,7 +98,7 @@ class MCPApiClient {
               type: 'Regulation Server',
               category: 'Regulation',
               description: regulation.description || `MCP server for regulation`,
-              status: regulation.server?.running ? 'running' : 'stopped',
+              status: (regulation.server?.running ? 'running' : 'stopped').toLowerCase(),
               port: regulation.server?.port || null,
               uptime: regulation.server?.lastStarted ? 
                 this.formatUptime(new Date(regulation.server.lastStarted)) : '—',
@@ -147,7 +152,7 @@ class MCPApiClient {
                 type: 'Regulation Server',
                 category: 'Regulation',
                 description: `MCP server for ${server.name || 'regulation'}`,
-                status: server.status || 'unknown',
+                status: (server.status || 'unknown').toLowerCase(),
                 startTime: server.startTime,
                 port: server.port || null,
                 uptime: server.uptime || '0m',
@@ -163,8 +168,11 @@ class MCPApiClient {
         }
       }
       
-      // Combine core servers with regulation servers
-      const allServers = [...coreServers, ...regulationServers];
+      // Combine core servers with regulation servers and normalize status values
+      const allServers = [...coreServers, ...regulationServers].map(server => ({
+        ...server,
+        status: (server.status || 'unknown').toLowerCase()
+      }));
       
       return {
         success: true,
@@ -204,33 +212,34 @@ class MCPApiClient {
    */
   async getServerStatus() {
     try {
+      console.log('========== getServerStatus called ==========');
+      console.log('Current server states:', Object.fromEntries(this.serverStates));
+      
+      // Initialize core servers
       const servers = [
         {
           id: 'llm-gateway',
           name: 'LLM Gateway',
-          type: 'gateway',
-          category: 'core',
-          description: 'Handles LLM queries and compliance processing',
+          type: 'API Server',
           status: 'unknown',
-          url: this.config.llmGatewayUrl
+          category: 'Core',
+          address: 'http://localhost:3100'
         },
         {
           id: 'batch-server',
           name: 'Batch Processing Server',
-          type: 'batch',
-          category: 'core',
-          description: 'Processes batches of documents for compliance',
+          type: 'Processing Server',
           status: 'unknown',
-          url: this.config.batchServerUrl
+          category: 'Core',
+          address: 'http://localhost:3110'
         },
         {
-          id: 'regulation-registry',
-          name: 'Regulation Registry',
-          type: 'registry',
-          category: 'core',
-          description: 'Manages regulation definitions and metadata',
+          id: 'registry-api',
+          name: 'Registry API',
+          type: 'Registry Server',
           status: 'unknown',
-          url: this.config.regulationRegistryUrl
+          category: 'Core',
+          address: 'http://localhost:3010'
         }
       ];
       
@@ -243,12 +252,37 @@ class MCPApiClient {
       
       // Update status based on responses
       results.forEach((result, index) => {
+        const serverId = servers[index].id;
+        
+        // First check if we have a manually set state for this server
+        if (this.serverStates.has(serverId)) {
+          const serverState = this.serverStates.get(serverId);
+          console.log(`Server ${serverId} has a stored state:`, serverState);
+          
+          // Check for persistent state flag and prioritize it
+          if (serverState.persistentState) {
+            console.log(`Server ${serverId} using persistent state: ${serverState.persistentState}`);
+            servers[index].status = serverState.persistentState;
+          } else {
+            servers[index].status = serverState.status;
+          }
+          
+          servers[index].startTime = serverState.startTime || new Date().toISOString();
+          servers[index].uptime = serverState.uptime || this.formatUptime(new Date(serverState.startTime));
+          return;
+        } else {
+          console.log(`Server ${serverId} has no stored state`);
+        }
+        
+        // Otherwise use the health check result
         if (result.status === 'fulfilled' && result.value.status === 200) {
+          console.log(`Server ${serverId} health check passed, setting status to running`);
           servers[index].status = 'running';
           servers[index].startTime = new Date().toISOString(); // Mock start time
           servers[index].uptime = '1h 30m'; // Mock uptime
           servers[index].version = result.value.data.version || '1.0.0';
         } else {
+          console.log(`Server ${serverId} health check failed, setting status to stopped`);
           servers[index].status = 'stopped';
           servers[index].error = result.reason?.message || 'Server not responding';
         }
@@ -287,8 +321,11 @@ class MCPApiClient {
               server.version?.includes('test')
             );
             
-            return {
-              id: `regulation-${standardId}`,
+            const serverId = `regulation-${standardId}`;
+            
+            // Create the server object
+            const serverObj = {
+              id: serverId,
               name: server.name,
               type: 'Regulation Server',
               category: 'Regulation',
@@ -303,6 +340,26 @@ class MCPApiClient {
               originalId: server.regulationId,
               isTestData: isTestData
             };
+            
+            // Check if we have a manually set state for this server
+            if (this.serverStates.has(serverId)) {
+              const serverState = this.serverStates.get(serverId);
+              console.log(`Regulation server ${serverId} has a stored state:`, serverState);
+              
+              // Check for persistent state flag and prioritize it
+              if (serverState.persistentState) {
+                console.log(`Regulation server ${serverId} using persistent state: ${serverState.persistentState}`);
+                serverObj.status = serverState.persistentState;
+              } else {
+                serverObj.status = serverState.status;
+              }
+              if (serverState.startTime) serverObj.startTime = serverState.startTime;
+              if (serverState.uptime) serverObj.uptime = serverState.uptime;
+            } else {
+              console.log(`Regulation server ${serverId} has no stored state, using default status: ${serverObj.status}`);
+            }
+            
+            return serverObj;
           });
           
           // Add to servers list
@@ -326,9 +383,22 @@ class MCPApiClient {
    */
   async startServer(serverId) {
     try {
+      console.log(`Starting server ${serverId}...`);
+      
+      // Update our in-memory state to track this server as running
+      // and clear any persistent status flag
+      this.serverStates.set(serverId, {
+        status: 'running',
+        startTime: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        persistentState: null // Clear any persistent state
+      });
+      
       // In a production environment, this would call a server management endpoint
-      // For now, we'll just return a mock success response
+      // For now, we'll just simulate a delay
       await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      console.log(`Server ${serverId} started successfully`);
       return {
         success: true,
         message: `Server ${serverId} started successfully`,
@@ -347,9 +417,41 @@ class MCPApiClient {
    */
   async stopServer(serverId) {
     try {
+      console.log(`Stopping server ${serverId}...`);
+      
+      // Ensure the server is marked as permanently stopped by setting multiple flags
+      const stoppedState = {
+        status: 'stopped',
+        persistentState: 'stopped',
+        isPermanentlyStopped: true,  // Additional flag to be absolutely sure
+        stopTime: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        uptime: '0m'
+      };
+      
+      // Update our in-memory state to track this server as stopped
+      this.serverStates.set(serverId, stoppedState);
+      
+      // Log the updated state for debugging
+      console.log(`Updated server state for ${serverId}:`, this.serverStates.get(serverId));
+      
+      // Force an immediate save of this state
+      this._saveServerStates();
+      
       // In a production environment, this would call a server management endpoint
-      // For now, we'll just return a mock success response
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // For now, we'll just simulate a delay
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // Double-check the state is still as expected after the delay
+      if (this.serverStates.has(serverId)) {
+        if (this.serverStates.get(serverId).status !== 'stopped') {
+          console.warn(`Server state for ${serverId} changed unexpectedly during stop operation`);
+          // Force it back to stopped
+          this.serverStates.set(serverId, stoppedState);
+        }
+      }
+      
+      console.log(`Server ${serverId} stopped successfully`);
       return {
         success: true,
         message: `Server ${serverId} stopped successfully`,
@@ -362,15 +464,45 @@ class MCPApiClient {
   }
   
   /**
+   * Internal method to save server states
+   * @private
+   */
+  _saveServerStates() {
+    console.log('Saving server states:', Object.fromEntries(this.serverStates));
+    // In a real app, this might persist to localStorage
+    // For now it just ensures we have the in-memory copy
+  }
+  
+  /**
    * Restart a specific MCP server
    * @param {string} serverId - ID of the server to restart
    * @returns {Promise<Object>} Status response
    */
   async restartServer(serverId) {
     try {
+      console.log(`Restarting server ${serverId}...`);
+      
+      // First update state to restarting
+      this.serverStates.set(serverId, {
+        status: 'restarting',
+        updatedAt: new Date().toISOString(),
+        persistentState: null // Clear any persistent state
+      });
+      
       // In a production environment, this would call a server management endpoint
-      // For now, we'll just return a mock success response
+      // For now, we'll just simulate a delay
       await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // After "restart" is complete, set to running
+      this.serverStates.set(serverId, {
+        status: 'running',
+        startTime: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        uptime: '0m',
+        persistentState: null // Ensure persistent state is cleared
+      });
+      
+      console.log(`Server ${serverId} restarted successfully`);
       return {
         success: true,
         message: `Server ${serverId} restarted successfully`,
@@ -666,4 +798,4 @@ class MCPApiClient {
 
 // Export a singleton instance
 const mcpApiClient = new MCPApiClient();
-export default mcpApiClient; 
+export default mcpApiClient;
