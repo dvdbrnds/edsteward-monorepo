@@ -14,6 +14,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { notes, insertNoteSchema, type InsertRegulation } from "@shared/schema";
+import regulationUpdatesApi from './regulation-updates-api';
 
 // ES Module compatibility: Get current file path
 const __filename = fileURLToPath(import.meta.url);
@@ -63,6 +64,9 @@ const upload = multer({
 export function registerRoutes(app: express.Application): Server {
   // Create HTTP server
   const httpServer = createServer(app);
+
+  // Register regulation updates API
+  app.use(regulationUpdatesApi);
 
   // Custom file download route with proper content-type handling
   app.get('/api/uploads/:filename', (req, res) => {

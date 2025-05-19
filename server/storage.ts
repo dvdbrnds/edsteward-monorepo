@@ -104,6 +104,88 @@ export interface IStorage {
 import { emailService } from './services/email';
 
 export class DatabaseStorage implements IStorage {
+  // Regulation Update methods
+  async getPendingRegulationUpdates(): Promise<RegulationUpdate[]> {
+    try {
+      return await db.select().from(regulationUpdates).where(eq(regulationUpdates.status, "pending"));
+    } catch (error) {
+      console.error("Error fetching pending regulation updates:", error);
+      return [];
+    }
+  }
+
+  async getRegulationUpdateById(id: number): Promise<RegulationUpdate | null> {
+    try {
+      const results = await db.select().from(regulationUpdates).where(eq(regulationUpdates.id, id));
+      return results.length > 0 ? results[0] : null;
+    } catch (error) {
+      console.error(`Error fetching regulation update with ID ${id}:`, error);
+      return null;
+    }
+  }
+
+  async acceptRegulationUpdate(id: number, userId: number, signature: string): Promise<void> {
+    try {
+      // 1. Get the update details
+      const update = await this.getRegulationUpdateById(id);
+      if (!update) {
+        throw new Error(`Regulation update with ID ${id} not found`);
+      }
+
+      // 2. Update the regulation with the new content
+      await this.updateRegulation(update.regulationId, {
+        requirements: update.updatedContent,
+        lastUpdated: new Date(),
+      });
+
+      // 3. Mark the update as accepted
+      await db.update(regulationUpdates)
+        .set({
+          status: "accepted",
+          signature,
+          userId,
+          processedAt: new Date(),
+        })
+        .where(eq(regulationUpdates.id, id));
+
+    } catch (error) {
+      console.error(`Error accepting regulation update with ID ${id}:`, error);
+      throw error;
+    }
+  }
+
+  async rejectRegulationUpdate(id: number, userId: number, signature: string, reason: string): Promise<void> {
+    try {
+      await db.update(regulationUpdates)
+        .set({
+          status: "rejected",
+          signature,
+          userId,
+          rejectionReason: reason,
+          processedAt: new Date(),
+        })
+        .where(eq(regulationUpdates.id, id));
+    } catch (error) {
+      console.error(`Error rejecting regulation update with ID ${id}:`, error);
+      throw error;
+    }
+  }
+
+  async deferRegulationUpdate(id: number, userId: number, signature: string): Promise<void> {
+    try {
+      await db.update(regulationUpdates)
+        .set({
+          status: "deferred",
+          signature,
+          userId,
+          processedAt: new Date(),
+        })
+        .where(eq(regulationUpdates.id, id));
+    } catch (error) {
+      console.error(`Error deferring regulation update with ID ${id}:`, error);
+      throw error;
+    }
+  }
   sessionStore: session.Store;
 
   constructor() {
