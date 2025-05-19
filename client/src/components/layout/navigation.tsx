@@ -278,6 +278,11 @@ export default function Navigation() {
   const links = [
     { href: "/", label: "Dashboard", icon: LayoutDashboard },
     { href: "/regulations", label: "Regulations", icon: Book },
+    ...(user?.role?.toLowerCase() === "admin" || user?.role?.toLowerCase() === "compliance_officer"
+      ? [
+          { href: "/regulations/updates", label: "Regulation Updates", icon: FileText },
+        ]
+      : []),
     ...(user?.role?.toLowerCase() === "admin"
       ? [
           { href: "/admin/settings", label: "System Settings", icon: Settings },
