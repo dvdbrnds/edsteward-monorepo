@@ -69,26 +69,31 @@ const UpdatesListPage: React.FC = () => {
   
   if (isLoading) {
     return (
-      <div className="container mx-auto py-6">
-        <h1 className="text-2xl font-bold mb-6">Pending Regulation Updates</h1>
-        {[1, 2, 3].map((i) => (
-          <Card key={i} className="mb-4">
-            <CardHeader>
-              <Skeleton className="h-6 w-3/4" />
-              <Skeleton className="h-4 w-1/2 mt-2" />
-            </CardHeader>
-            <CardContent>
-              <div className="flex justify-between">
-                <Skeleton className="h-4 w-1/4" />
-                <Skeleton className="h-4 w-1/4" />
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Skeleton className="h-10 w-24 mr-2" />
-              <Skeleton className="h-10 w-24" />
-            </CardFooter>
-          </Card>
-        ))}
+      <div className="min-h-screen bg-gray-50">
+        <Navigation />
+        <main className="py-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h1 className="text-2xl font-bold mb-6">Pending Regulation Updates</h1>
+            {[1, 2, 3].map((i) => (
+              <Card key={i} className="mb-4">
+                <CardHeader>
+                  <Skeleton className="h-6 w-3/4" />
+                  <Skeleton className="h-4 w-1/2 mt-2" />
+                </CardHeader>
+                <CardContent>
+                  <div className="flex justify-between">
+                    <Skeleton className="h-4 w-1/4" />
+                    <Skeleton className="h-4 w-1/4" />
+                  </div>
+                </CardContent>
+                <CardFooter>
+                  <Skeleton className="h-10 w-24 mr-2" />
+                  <Skeleton className="h-10 w-24" />
+                </CardFooter>
+              </Card>
+            ))}
+          </div>
+        </main>
       </div>
     );
   }
