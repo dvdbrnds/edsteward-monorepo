@@ -1,10 +1,12 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { diffWords } from 'diff';
 import { Separator } from '@/components/ui/separator';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { AlertCircle, Download } from 'lucide-react';
 
 const DiffTestPage = () => {
   const [originalText, setOriginalText] = useState<string>('');
@@ -76,6 +78,22 @@ const DiffTestPage = () => {
     if (updatedFileRef.current) updatedFileRef.current.value = '';
   };
   
+  const fetchExampleFiles = async () => {
+    try {
+      // Fetch the original Title IX text
+      const originalResponse = await fetch('/downloads/title-ix-original.txt');
+      const originalContent = await originalResponse.text();
+      setOriginalText(originalContent);
+      
+      // Fetch the updated Title IX text
+      const updatedResponse = await fetch('/downloads/title-ix-updated.txt');
+      const updatedContent = await updatedResponse.text();
+      setUpdatedText(updatedContent);
+    } catch (error) {
+      console.error('Error fetching example files:', error);
+    }
+  };
+
   return (
     <div className="container mx-auto py-8">
       <Card className="mb-8">
@@ -86,6 +104,30 @@ const DiffTestPage = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <Alert className="mb-6">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Example Files Available</AlertTitle>
+            <AlertDescription>
+              You can use our example Title IX regulation files to test the differential view feature.
+              <div className="mt-4 flex gap-4">
+                <Button variant="outline" size="sm" onClick={fetchExampleFiles}>
+                  <Download className="mr-2 h-4 w-4" />
+                  Load Example Files
+                </Button>
+                <Button variant="outline" size="sm" asChild>
+                  <a href="/downloads/title-ix-original.txt" target="_blank" download>
+                    Download Original
+                  </a>
+                </Button>
+                <Button variant="outline" size="sm" asChild>
+                  <a href="/downloads/title-ix-updated.txt" target="_blank" download>
+                    Download Updated
+                  </a>
+                </Button>
+              </div>
+            </AlertDescription>
+          </Alert>
+          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <Label htmlFor="original-file">Original Regulation Text</Label>
