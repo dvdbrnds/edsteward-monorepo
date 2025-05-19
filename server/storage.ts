@@ -19,6 +19,9 @@ import type {
   Note,
   InsertNote,
 } from "@shared/schema";
+
+// Import RegulationUpdate type from schema
+import { regulationUpdates, type RegulationUpdate, type InsertRegulationUpdate } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or, like } from "drizzle-orm";
 import session from "express-session";
@@ -46,6 +49,13 @@ export interface IStorage {
   getRegulationsByJurisdiction(jurisdiction: string): Promise<Regulation[]>;
   searchRegulations(searchTerm: string): Promise<Regulation[]>;
   deleteRegulation(id: number): Promise<void>;
+  
+  // Regulation Update methods
+  getPendingRegulationUpdates(): Promise<RegulationUpdate[]>;
+  getRegulationUpdateById(id: number): Promise<RegulationUpdate | null>;
+  acceptRegulationUpdate(id: number, userId: number, signature: string): Promise<void>;
+  rejectRegulationUpdate(id: number, userId: number, signature: string, reason: string): Promise<void>;
+  deferRegulationUpdate(id: number, userId: number, signature: string): Promise<void>;
 
   // Notification methods
   getNotificationsByUser(userId: number): Promise<Notification[]>;

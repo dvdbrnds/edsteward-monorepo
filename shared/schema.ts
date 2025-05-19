@@ -432,6 +432,32 @@ export const validationRules = pgTable("validation_rules", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// Table for regulation updates
+export const regulationUpdates = pgTable("regulation_updates", {
+  id: serial("id").primaryKey(),
+  regulationId: integer("regulation_id").notNull().references(() => regulations.id),
+  name: text("name").notNull(),
+  originalContent: text("original_content").notNull(),
+  updatedContent: text("updated_content").notNull(),
+  status: text("status").notNull().default("pending"),
+  updateDate: timestamp("update_date").notNull().defaultNow(),
+  signature: text("signature"),
+  userId: integer("user_id").references(() => users.id),
+  rejectionReason: text("rejection_reason"),
+  processedAt: timestamp("processed_at"),
+});
+
+// Schema for inserting regulation updates
+export const insertRegulationUpdateSchema = createInsertSchema(regulationUpdates).extend({
+  status: z.enum(["pending", "accepted", "rejected", "deferred"]).default("pending"),
+  signature: z.string().optional(),
+  rejectionReason: z.string().optional(),
+});
+
+// Types for regulation updates
+export type RegulationUpdate = typeof regulationUpdates.$inferSelect;
+export type InsertRegulationUpdate = z.infer<typeof insertRegulationUpdateSchema>;
+
 // Transformation Logs table
 export const transformationLogs = pgTable("transformation_logs", {
   id: serial("id").primaryKey(),
