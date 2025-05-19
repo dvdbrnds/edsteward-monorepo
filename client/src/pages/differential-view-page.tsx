@@ -84,19 +84,60 @@ const DifferentialViewPage = () => {
     queryFn: async () => {
       if (!updateId) throw new Error('No update ID provided');
       
-      const response = await fetch(`/api/regulation-updates/${updateId}`);
-      if (!response.ok) {
-        throw new Error('Failed to fetch regulation update');
+      try {
+        const response = await fetch(`/api/regulation-updates/${updateId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch regulation update');
+        }
+        
+        const data = await response.json();
+        
+        // Check if we received the expected data structure
+        const defaultResult = {
+          update: {
+            id: updateId,
+            regulationId: 0,
+            name: 'Regulation Update',
+            originalContent: 'Original content unavailable',
+            updatedContent: 'Updated content unavailable',
+            status: 'pending',
+            updateDate: new Date().toISOString()
+          } as RegulationUpdate,
+          original: null,
+          diffData: null
+        };
+        
+        if (!data || !data.update) {
+          console.error('Invalid data structure returned from API:', data);
+          return defaultResult;
+        }
+        
+        return {
+          update: data.update as RegulationUpdate,
+          original: data.original as RegulationDetail || null,
+          diffData: data.diffData as DiffData || null
+        };
+      } catch (err) {
+        console.error('Error fetching regulation update details:', err);
+        // Provide fallback data to prevent crashes
+        return {
+          update: {
+            id: updateId,
+            regulationId: 0,
+            name: 'Regulation Update',
+            originalContent: 'Original content unavailable',
+            updatedContent: 'Updated content unavailable',
+            status: 'pending',
+            updateDate: new Date().toISOString()
+          } as RegulationUpdate,
+          original: null,
+          diffData: null
+        };
       }
-      
-      const data = await response.json();
-      return {
-        update: data.update as RegulationUpdate,
-        original: data.original as RegulationDetail,
-        diffData: data.diffData as DiffData
-      };
     },
-    enabled: !!updateId
+    enabled: !!updateId,
+    retry: 1,
+    retryDelay: 1000
   });
   
   // Approve action

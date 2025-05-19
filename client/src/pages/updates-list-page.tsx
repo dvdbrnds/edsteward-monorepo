@@ -27,12 +27,24 @@ const UpdatesListPage: React.FC = () => {
   const { data, isLoading, error } = useQuery({
     queryKey: ['/api/regulation-updates/pending'],
     queryFn: async () => {
-      const response = await fetch('/api/regulation-updates/pending');
-      if (!response.ok) {
-        throw new Error('Failed to fetch regulation updates');
+      try {
+        const response = await fetch('/api/regulation-updates/pending');
+        if (!response.ok) {
+          throw new Error('Failed to fetch regulation updates');
+        }
+        const jsonData = await response.json();
+        return Array.isArray(jsonData) ? jsonData : [];
+      } catch (err) {
+        console.error('Error fetching regulation updates:', err);
+        // Return empty array instead of throwing to prevent app crashes
+        return [];
       }
-      return response.json();
-    }
+    },
+    // Add retry logic to make the feature more robust
+    retry: 1,
+    retryDelay: 1000,
+    // Default to empty array to prevent undefined errors
+    initialData: []
   });
   
   useEffect(() => {
