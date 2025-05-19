@@ -22,6 +22,7 @@ import PublicDashboardPage from "@/pages/public-dashboard-page";
 import PublicRegulationDetailPage from "@/pages/public-regulation-detail-page";
 import UpdatesListPage from "@/pages/updates-list-page";
 import DifferentialViewPage from "@/pages/differential-view-page";
+import DiffTestPage from "@/pages/diff-test-page";
 import { ProtectedRoute } from "./lib/protected-route";
 import { ProtectedRegulationRoute } from "./lib/protected-regulation-route";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
@@ -47,6 +48,7 @@ function Router() {
           <ProtectedRoute path="/regulations/validate" component={ValidationPage} />
           <ProtectedRoute path="/regulations/updates" component={UpdatesListPage} />
           <ProtectedRoute path="/regulations/updates/:id" component={DifferentialViewPage} />
+          <ProtectedRoute path="/regulations/diff-test" component={DiffTestPage} />
           <ProtectedRegulationRoute 
             path="/regulations/:id" 
             component={RegulationDetailPage} 
