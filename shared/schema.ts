@@ -41,6 +41,50 @@ export interface RegulationAction {
   completedAt?: Date;
 }
 
+// MCP Validation Levels
+export enum ValidationLevel {
+  A = "A", // Basic structural validation
+  B = "B", // Content-level validation
+  C = "C", // Business rules validation
+  D = "D"  // Contextual/cross-reference validation
+}
+
+// MCP Integration Types
+export interface MCPSyncStatus {
+  lastSyncAttempt: Date;
+  lastSuccessfulSync: Date | null;
+  syncErrors: Array<{
+    timestamp: Date;
+    message: string;
+    code: string;
+  }>;
+  nextScheduledSync: Date | null;
+  syncState: 'idle' | 'in_progress' | 'failed' | 'completed';
+}
+
+export interface MCPVersionConflict {
+  field: string;
+  localValue: string;
+  remoteValue: string;
+  resolutionStrategy: 'local' | 'remote' | 'merge' | 'manual';
+  resolvedValue?: string;
+  resolvedBy?: number; // User ID
+  resolvedAt?: Date;
+}
+
+export interface MCPValidationResult {
+  level: ValidationLevel;
+  passed: boolean;
+  errors: Array<{
+    field: string;
+    message: string;
+    code: string;
+    severity: 'warning' | 'error' | 'critical';
+  }>;
+  validatedAt: Date;
+  validatedBy?: number; // User ID
+}
+
 // Users table
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
@@ -457,6 +501,168 @@ export const insertRegulationUpdateSchema = createInsertSchema(regulationUpdates
 // Types for regulation updates
 export type RegulationUpdate = typeof regulationUpdates.$inferSelect;
 export type InsertRegulationUpdate = z.infer<typeof insertRegulationUpdateSchema>;
+
+// MCP Integration Tables
+export const regulationVersions = pgTable("regulation_versions", {
+  id: serial("id").primaryKey(),
+  regulationId: integer("regulation_id").notNull().references(() => regulations.id),
+  versionNumber: integer("version_number").notNull(),
+  content: text("content").notNull(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  createdBy: integer("created_by").references(() => users.id),
+  source: text("source").notNull().default("local"), // 'local', 'mcp', 'import'
+  sourceId: text("source_id"), // ID from external system if applicable
+  validationStatus: jsonb("validation_status").$type<MCPValidationResult[]>(),
+});
+
+export const validationStatus = pgTable("validation_status", {
+  id: serial("id").primaryKey(),
+  regulationId: integer("regulation_id").notNull().references(() => regulations.id),
+  versionId: integer("version_id").references(() => regulationVersions.id),
+  level: text("level").notNull(), // ValidationLevel enum value
+  status: text("status").notNull(), // 'passed', 'failed', 'pending', 'in_progress'
+  details: jsonb("details").$type<{
+    errors: Array<{
+      field: string;
+      message: string;
+      code: string;
+      severity: 'warning' | 'error' | 'critical';
+    }>;
+  }>(),
+  validatedAt: timestamp("validated_at").notNull().defaultNow(),
+  validatedBy: integer("validated_by").references(() => users.id),
+});
+
+export const syncControl = pgTable("sync_control", {
+  id: serial("id").primaryKey(),
+  regulationId: integer("regulation_id").notNull().references(() => regulations.id),
+  lastSyncAttempt: timestamp("last_sync_attempt"),
+  lastSuccessfulSync: timestamp("last_successful_sync"),
+  syncErrors: jsonb("sync_errors").$type<Array<{
+    timestamp: Date;
+    message: string;
+    code: string;
+  }>>(),
+  nextScheduledSync: timestamp("next_scheduled_sync"),
+  syncState: text("sync_state").notNull().default("idle"), // 'idle', 'in_progress', 'failed', 'completed'
+  syncSettings: jsonb("sync_settings").$type<{
+    frequency: 'hourly' | 'daily' | 'weekly' | 'manual';
+    priority: 'high' | 'normal' | 'low';
+    includeContent: boolean;
+    validateOnSync: boolean;
+  }>(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export const notificationQueue = pgTable("notification_queue", {
+  id: serial("id").primaryKey(),
+  regulationId: integer("regulation_id").notNull().references(() => regulations.id),
+  userId: integer("user_id").references(() => users.id),
+  type: text("type").notNull(), // 'sync_complete', 'validation_failed', 'version_conflict', etc.
+  content: jsonb("content").notNull(),
+  status: text("status").notNull().default("pending"), // 'pending', 'sent', 'failed'
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  sentAt: timestamp("sent_at"),
+  priority: text("priority").notNull().default("normal"), // 'high', 'normal', 'low'
+  retryCount: integer("retry_count").notNull().default(0),
+  nextRetryAt: timestamp("next_retry_at"),
+});
+
+export const versionConflicts = pgTable("version_conflicts", {
+  id: serial("id").primaryKey(),
+  regulationId: integer("regulation_id").notNull().references(() => regulations.id),
+  localVersionId: integer("local_version_id").references(() => regulationVersions.id),
+  remoteVersionId: text("remote_version_id").notNull(), // ID from MCP system
+  conflicts: jsonb("conflicts").$type<MCPVersionConflict[]>(),
+  status: text("status").notNull().default("pending"), // 'pending', 'resolved', 'rejected'
+  resolutionMethod: text("resolution_method"), // 'auto', 'manual'
+  resolvedAt: timestamp("resolved_at"),
+  resolvedBy: integer("resolved_by").references(() => users.id),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
+// Create insert schemas for MCP integration tables
+export const insertRegulationVersionSchema = createInsertSchema(regulationVersions).extend({
+  validationStatus: z.array(z.object({
+    level: z.nativeEnum(ValidationLevel),
+    passed: z.boolean(),
+    errors: z.array(z.object({
+      field: z.string(),
+      message: z.string(),
+      code: z.string(),
+      severity: z.enum(['warning', 'error', 'critical'])
+    })),
+    validatedAt: z.date(),
+    validatedBy: z.number().optional()
+  })).optional().nullable()
+});
+
+export const insertValidationStatusSchema = createInsertSchema(validationStatus).extend({
+  level: z.nativeEnum(ValidationLevel),
+  status: z.enum(['passed', 'failed', 'pending', 'in_progress']),
+  details: z.object({
+    errors: z.array(z.object({
+      field: z.string(),
+      message: z.string(),
+      code: z.string(),
+      severity: z.enum(['warning', 'error', 'critical'])
+    }))
+  }).optional().nullable()
+});
+
+export const insertSyncControlSchema = createInsertSchema(syncControl).extend({
+  syncState: z.enum(['idle', 'in_progress', 'failed', 'completed']).default('idle'),
+  syncSettings: z.object({
+    frequency: z.enum(['hourly', 'daily', 'weekly', 'manual']).default('daily'),
+    priority: z.enum(['high', 'normal', 'low']).default('normal'),
+    includeContent: z.boolean().default(true),
+    validateOnSync: z.boolean().default(true)
+  }).optional().nullable()
+});
+
+export const insertNotificationQueueSchema = createInsertSchema(notificationQueue).extend({
+  type: z.enum([
+    'sync_complete', 
+    'validation_failed', 
+    'version_conflict', 
+    'approval_needed',
+    'sync_error',
+    'change_detected'
+  ]),
+  status: z.enum(['pending', 'sent', 'failed']).default('pending'),
+  priority: z.enum(['high', 'normal', 'low']).default('normal')
+});
+
+export const insertVersionConflictSchema = createInsertSchema(versionConflicts).extend({
+  status: z.enum(['pending', 'resolved', 'rejected']).default('pending'),
+  resolutionMethod: z.enum(['auto', 'manual']).optional(),
+  conflicts: z.array(z.object({
+    field: z.string(),
+    localValue: z.string(),
+    remoteValue: z.string(),
+    resolutionStrategy: z.enum(['local', 'remote', 'merge', 'manual']),
+    resolvedValue: z.string().optional(),
+    resolvedBy: z.number().optional(),
+    resolvedAt: z.date().optional()
+  })).optional().nullable()
+});
+
+// Export types for MCP integration
+export type RegulationVersion = typeof regulationVersions.$inferSelect;
+export type InsertRegulationVersion = z.infer<typeof insertRegulationVersionSchema>;
+
+export type ValidationStatus = typeof validationStatus.$inferSelect;
+export type InsertValidationStatus = z.infer<typeof insertValidationStatusSchema>;
+
+export type SyncControl = typeof syncControl.$inferSelect;
+export type InsertSyncControl = z.infer<typeof insertSyncControlSchema>;
+
+export type NotificationQueue = typeof notificationQueue.$inferSelect;
+export type InsertNotificationQueue = z.infer<typeof insertNotificationQueueSchema>;
+
+export type VersionConflict = typeof versionConflicts.$inferSelect;
+export type InsertVersionConflict = z.infer<typeof insertVersionConflictSchema>;
 
 // Transformation Logs table
 export const transformationLogs = pgTable("transformation_logs", {

@@ -1,4 +1,23 @@
-import { users, regulations, notifications, deadlines, guides, csvSchemas, validationRules, fieldMappings, notes, evidenceFiles, type EvidenceFile, type InsertEvidenceFile } from "@shared/schema";
+import { 
+  users, 
+  regulations, 
+  notifications, 
+  deadlines, 
+  guides, 
+  csvSchemas, 
+  validationRules, 
+  fieldMappings, 
+  notes, 
+  evidenceFiles, 
+  regulationVersions,
+  validationStatus,
+  syncControl,
+  notificationQueue,
+  versionConflicts,
+  type EvidenceFile, 
+  type InsertEvidenceFile 
+} from "@shared/schema";
+
 import type {
   User,
   InsertUser,
@@ -18,6 +37,19 @@ import type {
   InsertFieldMapping,
   Note,
   InsertNote,
+  // MCP Integration types
+  RegulationVersion,
+  InsertRegulationVersion,
+  ValidationStatus,
+  InsertValidationStatus,
+  SyncControl,
+  InsertSyncControl,
+  NotificationQueue,
+  InsertNotificationQueue,
+  VersionConflict,
+  InsertVersionConflict,
+  MCPValidationResult,
+  MCPVersionConflict
 } from "@shared/schema";
 
 // Import RegulationUpdate type from schema
