@@ -1,0 +1,79 @@
+-- SQL script to create 10 Davegulations for testing MCP integration
+
+-- Create 10 test Davegulations
+INSERT INTO regulations (
+  item_id, name, topic, statute, summary, requirements, category, 
+  jurisdiction, dro, is_applicable, origination_date, effective_date, 
+  last_updated, next_review_date, version_number, version_date, is_current,
+  agency_name, agency_contact
+)
+VALUES 
+('DAVE-1-001', 'Davegulation 1: Campus Safety Standards', 'Campus Safety', 'Davegulation Act 2025-1', 
+ 'This regulation establishes standards for campus safety and security protocols across educational institutions.', 
+ '## Requirements\n\n- Implement emergency notification systems\n- Conduct safety drills quarterly\n- Appoint safety coordinators for each building\n\n## Compliance Deadlines\n\nInitial documentation: 6/1/2025\nFull implementation: 12/1/2025',
+ 'Safety', 'federal', 'dave@example.com', true, 
+ '2025-01-15', '2025-07-01', CURRENT_DATE, '2026-07-01', 1, CURRENT_DATE, true,
+ 'Dave Regulatory Authority', 'safety@daveregulations.example.com'),
+
+('DAVE-2-002', 'Davegulation 2: Data Privacy Protocol', 'Data Privacy', 'Davegulation Act 2025-2', 
+ 'This regulation establishes requirements for handling student and faculty personal data according to privacy standards.', 
+ '## Requirements\n\n- Implement data encryption for all PII\n- Obtain explicit consent for data collection\n- Establish data retention policies\n\n## Compliance Deadlines\n\nInitial assessment: 5/15/2025\nFull compliance: 11/30/2025',
+ 'Technology', 'state', 'dave@example.com', true, 
+ '2025-02-10', '2025-08-01', CURRENT_DATE, '2026-08-01', 1, CURRENT_DATE, true,
+ 'Dave Regulatory Authority', 'privacy@daveregulations.example.com'),
+
+('DAVE-3-003', 'Davegulation 3: Financial Aid Transparency', 'Financial Aid', 'Davegulation Act 2025-3', 
+ 'This regulation mandates transparency in financial aid processes and reporting for all higher education institutions.', 
+ '## Requirements\n\n- Provide clear cost breakdowns\n- Publish financial aid statistics annually\n- Implement financial literacy programs\n\n## Compliance Deadlines\n\nInitial reporting: 7/1/2025\nFull implementation: 1/15/2026',
+ 'Financial', 'federal', 'dave@example.com', true, 
+ '2025-03-15', '2025-09-01', CURRENT_DATE, '2026-09-01', 1, CURRENT_DATE, true,
+ 'Dave Regulatory Authority', 'finance@daveregulations.example.com'),
+
+('DAVE-4-004', 'Davegulation 4: Accessibility Standards', 'Accessibility', 'Davegulation Act 2025-4', 
+ 'This regulation defines standards for physical and digital accessibility across educational institutions.', 
+ '## Requirements\n\n- Ensure ADA compliance for all facilities\n- Implement digital accessibility standards\n- Provide accommodation services\n\n## Compliance Deadlines\n\nInitial assessment: 8/1/2025\nFull implementation: 2/28/2026',
+ 'Administrative', 'state', 'dave@example.com', true, 
+ '2025-04-20', '2025-10-01', CURRENT_DATE, '2026-10-01', 1, CURRENT_DATE, true,
+ 'Dave Regulatory Authority', 'accessibility@daveregulations.example.com'),
+
+('DAVE-5-005', 'Davegulation 5: Faculty Certification Requirements', 'Faculty Affairs', 'Davegulation Act 2025-5', 
+ 'This regulation establishes certification and professional development requirements for faculty members.', 
+ '## Requirements\n\n- Annual professional development hours\n- Subject matter expertise verification\n- Teaching methodology certification\n\n## Compliance Deadlines\n\nInitial certification: 9/1/2025\nFull faculty compliance: 3/15/2026',
+ 'Academic', 'federal', 'dave@example.com', true, 
+ '2025-05-01', '2025-11-01', CURRENT_DATE, '2026-11-01', 1, CURRENT_DATE, true,
+ 'Dave Regulatory Authority', 'faculty@daveregulations.example.com'),
+
+('DAVE-6-006', 'Davegulation 6: Environmental Sustainability Standards', 'Environmental Compliance', 'Davegulation Act 2025-6', 
+ 'This regulation outlines sustainability requirements for campus operations and facilities management.', 
+ '## Requirements\n\n- Reduce carbon emissions by 30%\n- Implement recycling programs\n- Conduct environmental impact studies\n\n## Compliance Deadlines\n\nInitial assessment: 10/1/2025\nPhased implementation: 4/30/2026',
+ 'Facilities', 'state', 'dave@example.com', true, 
+ '2025-06-15', '2025-12-01', CURRENT_DATE, '2026-12-01', 1, CURRENT_DATE, true,
+ 'Dave Regulatory Authority', 'environment@daveregulations.example.com'),
+
+('DAVE-7-007', 'Davegulation 7: Student Mental Health Services', 'Student Wellness', 'Davegulation Act 2025-7', 
+ 'This regulation mandates mental health service provisions and standards for educational institutions.', 
+ '## Requirements\n\n- Provide counseling services\n- Implement crisis intervention protocols\n- Staff training for mental health awareness\n\n## Compliance Deadlines\n\nInitial services: 11/15/2025\nFull implementation: 5/31/2026',
+ 'Student Affairs', 'federal', 'dave@example.com', true, 
+ '2025-07-01', '2026-01-01', CURRENT_DATE, '2027-01-01', 1, CURRENT_DATE, true,
+ 'Dave Regulatory Authority', 'wellness@daveregulations.example.com'),
+
+('DAVE-8-008', 'Davegulation 8: Research Ethics and Integrity', 'Research Ethics', 'Davegulation Act 2025-8', 
+ 'This regulation establishes standards for research ethics, integrity, and oversight in academic institutions.', 
+ '## Requirements\n\n- Establish ethics review boards\n- Implement conflict of interest policies\n- Research misconduct investigation procedures\n\n## Compliance Deadlines\n\nPolicy development: 12/1/2025\nFull implementation: 6/30/2026',
+ 'Research', 'state', 'dave@example.com', true, 
+ '2025-08-01', '2026-02-01', CURRENT_DATE, '2027-02-01', 1, CURRENT_DATE, true,
+ 'Dave Regulatory Authority', 'research@daveregulations.example.com'),
+
+('DAVE-9-009', 'Davegulation 9: Cybersecurity Standards', 'Cybersecurity', 'Davegulation Act 2025-9', 
+ 'This regulation defines cybersecurity standards and data protection requirements for educational institutions.', 
+ '## Requirements\n\n- Implement multi-factor authentication\n- Regular security audits\n- Incident response planning\n\n## Compliance Deadlines\n\nSecurity assessment: 1/15/2026\nFull implementation: 7/31/2026',
+ 'Technology', 'federal', 'dave@example.com', true, 
+ '2025-09-01', '2026-03-01', CURRENT_DATE, '2027-03-01', 1, CURRENT_DATE, true,
+ 'Dave Regulatory Authority', 'security@daveregulations.example.com'),
+
+('DAVE-10-010', 'Davegulation 10: Distance Learning Standards', 'Online Education', 'Davegulation Act 2025-10', 
+ 'This regulation establishes quality and accessibility standards for distance and online education programs.', 
+ '## Requirements\n\n- Ensure content accessibility\n- Implement identity verification\n- Provide equivalent student services\n\n## Compliance Deadlines\n\nInitial assessment: 2/28/2026\nFull implementation: 8/31/2026',
+ 'Academic', 'state', 'dave@example.com', true, 
+ '2025-10-01', '2026-04-01', CURRENT_DATE, '2027-04-01', 1, CURRENT_DATE, true,
+ 'Dave Regulatory Authority', 'online@daveregulations.example.com');

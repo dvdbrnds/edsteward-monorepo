@@ -8,6 +8,7 @@
 import { db } from './db';
 import { regulations, type InsertRegulation } from '@shared/schema';
 import { syslog, LogLevel, LogFacility } from './services/syslog';
+import { like } from 'drizzle-orm';
 
 // Sample data for generating random regulations
 const titles = [
@@ -224,7 +225,7 @@ async function createDavegulations(count: number = 10) {
   try {
     // Check if Davegulations already exist
     const existingRegs = await db.select().from(regulations)
-      .where(({ name }) => db.like(name, 'Davegulation %'));
+      .where(like(regulations.name, 'Davegulation %'));
     
     const existingCount = existingRegs.length;
     
