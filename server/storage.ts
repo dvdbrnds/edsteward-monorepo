@@ -116,8 +116,29 @@ export class DatabaseStorage implements IStorage {
 
   async getRegulationUpdateById(id: number): Promise<RegulationUpdate | null> {
     try {
-      const results = await db.select().from(regulationUpdates).where(eq(regulationUpdates.id, id));
-      return results.length > 0 ? results[0] : null;
+      // Use raw SQL to avoid column mapping issues
+      const query = `
+        SELECT * FROM regulation_updates WHERE id = $1
+      `;
+      const result = await db.execute(query, [id]);
+      
+      if (result.rows.length > 0) {
+        const update = result.rows[0];
+        return {
+          id: update.id,
+          regulationId: update.regulation_id,
+          originalContent: update.original_content,
+          updatedContent: update.updated_content,
+          status: update.status,
+          updateDate: update.created_at ? new Date(update.created_at) : new Date(),
+          signature: update.signature_data,
+          userId: update.reviewer_id,
+          rejectionReason: update.rejection_reason,
+          processedAt: update.reviewed_at ? new Date(update.reviewed_at) : null,
+          name: update.summary || `Update #${update.id}`
+        } as RegulationUpdate;
+      }
+      return null;
     } catch (error) {
       console.error(`Error fetching regulation update with ID ${id}:`, error);
       return null;
