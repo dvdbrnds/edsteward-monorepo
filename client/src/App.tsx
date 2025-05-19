@@ -20,6 +20,8 @@ import SetupWizardPage from "@/pages/setup-wizard-page";
 import RoadmapPage from "@/pages/roadmap";
 import PublicDashboardPage from "@/pages/public-dashboard-page";
 import PublicRegulationDetailPage from "@/pages/public-regulation-detail-page";
+import UpdatesListPage from "@/pages/updates-list-page";
+import DifferentialViewPage from "@/pages/differential-view-page";
 import { ProtectedRoute } from "./lib/protected-route";
 import { ProtectedRegulationRoute } from "./lib/protected-regulation-route";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
@@ -43,6 +45,8 @@ function Router() {
           <ProtectedRoute path="/" component={HomePage} />
           <ProtectedRoute path="/regulations" component={RegulationsPage} />
           <ProtectedRoute path="/regulations/validate" component={ValidationPage} />
+          <ProtectedRoute path="/regulations/updates" component={UpdatesListPage} />
+          <ProtectedRoute path="/regulations/updates/:id" component={DifferentialViewPage} />
           <ProtectedRegulationRoute 
             path="/regulations/:id" 
             component={RegulationDetailPage} 

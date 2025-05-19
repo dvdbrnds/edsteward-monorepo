@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useNavigate, useParams } from "wouter";
+import { useLocation, useParams } from "wouter";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -13,7 +13,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ChangeStatistics } from "@/components/ChangeStatistics";
+import { ChangeStatistics } from "./ChangeStatistics";
 
 // Diff library
 import { diffWords } from 'diff';
@@ -33,7 +33,7 @@ interface RegulationUpdate {
 
 export default function DifferentialView() {
   const { id } = useParams();
-  const navigate = useNavigate();
+  const [, navigate] = useLocation();
   const [confirmAction, setConfirmAction] = useState<'accept' | 'reject' | 'defer' | null>(null);
   const [rejectionReason, setRejectionReason] = useState('');
   const [signature, setSignature] = useState('');
