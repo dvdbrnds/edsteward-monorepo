@@ -1,32 +1,41 @@
 # Title IX Compliance Requirements
 
-## Overview
+## Purpose
+This document outlines the requirements for compliance with Title IX of the Education Amendments of 1972, which prohibits discrimination on the basis of sex in education programs and activities that receive federal financial assistance.
 
-Title IX of the Education Amendments of 1972 prohibits discrimination on the basis of sex in education programs and activities that receive federal financial assistance. All higher education institutions that receive federal funding must comply with Title IX regulations.
+## Scope
+These requirements apply to all educational institutions receiving federal funding, including colleges, universities, and K-12 schools.
 
-## Key Requirements
+## General Requirements
 
-1. **Non-Discrimination Policy**: Institutions must implement a written policy stating that they do not discriminate on the basis of sex in their educational programs and activities.
+1. Each institution must designate at least one employee as the Title IX Coordinator to oversee compliance efforts and investigate any complaints of sex discrimination.
 
-2. **Title IX Coordinator**: Institutions must designate at least one employee to coordinate Title IX compliance efforts, including investigating complaints.
+2. Institutions must adopt and publish grievance procedures that provide for the prompt and equitable resolution of student and employee complaints alleging sex discrimination.
 
-3. **Grievance Procedures**: Institutions must adopt and publish grievance procedures providing for the prompt and equitable resolution of student and employee sex discrimination complaints.
+3. Institutions must notify all students, employees, applicants for admission and employment, and unions or professional organizations holding collective bargaining agreements with the institution that:
+   a. The institution does not discriminate on the basis of sex in its education programs and activities
+   b. Questions regarding Title IX may be referred to the institution's Title IX Coordinator or to the Office for Civil Rights
 
-4. **Notification Requirements**: Institutions must notify all students, employees, applicants, and parents that they do not discriminate on the basis of sex.
+4. Educational materials and curriculum content must not discriminate on the basis of sex.
 
-5. **Training**: Institutions must ensure that Title IX coordinators, investigators, decision-makers, and any person who facilitates an informal resolution process receive training on Title IX regulations.
+5. Institutions must provide equitable athletic opportunities for members of both sexes.
 
 ## Reporting Requirements
 
-Institutions must maintain records of all Title IX complaints, investigations, and resolutions for a period of seven years. Annual reports must be submitted to the Department of Education summarizing Title IX activities.
+1. Annual submission of the Civil Rights Data Collection (CRDC) survey to the Department of Education.
+
+2. Maintenance of records documenting Title IX compliance for a minimum of three years.
+
+3. Documentation of all Title IX complaints, investigations, and resolutions.
 
 ## Enforcement
 
-The Office for Civil Rights (OCR) within the Department of Education is responsible for enforcing Title IX. Institutions found in violation may lose federal funding.
+1. The Office for Civil Rights (OCR) at the U.S. Department of Education is responsible for enforcing Title IX.
 
-## Compliance Timeline
+2. Institutions found to be in violation of Title IX may face:
+   a. Loss of federal funding
+   b. Debarment from federal programs
+   c. Referral to the Department of Justice for further action
 
-- Initial Policy Implementation: Within 60 days of the effective date
-- Coordinator Designation: Within 30 days of the effective date
-- Training Completion: Within 90 days of the effective date
-- Full Documentation System: Within 120 days of the effective date
+## Effective Date
+This regulation is effective as of July 1, 2020.
