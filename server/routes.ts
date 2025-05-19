@@ -15,6 +15,7 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { notes, insertNoteSchema, type InsertRegulation } from "@shared/schema";
 import { setupRegulationUpdatesApi } from './regulation-updates-api';
+import { setupDebugRegulationUpdatesApi } from './debug-regulation-updates';
 
 // ES Module compatibility: Get current file path
 const __filename = fileURLToPath(import.meta.url);
