@@ -40,12 +40,21 @@ export function setupDebugRegulationUpdatesApi(app: Express) {
       
       const regulation = regResult.rows.length > 0 ? regResult.rows[0] : null;
       
-      // Calculate the diff
-      const diffData = calculateTextChangeDiff(
-        regulation?.requirements || '',
-        update.updated_content
-      );
+      // Calculate the diff - only if we have a regulation
+      let diffData = null;
+      if (regulation) {
+        // Use requirements or original content, whichever is appropriate
+        const originalContent = regulation.requirements || update.original_content || '';
+        diffData = calculateTextChangeDiff(
+          originalContent,
+          update.updated_content || ''
+        );
+      }
       
+      // Set response header to application/json
+      res.setHeader('Content-Type', 'application/json');
+      
+      // Send JSON response
       res.json({
         update,
         regulation,

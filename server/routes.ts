@@ -147,6 +147,9 @@ export function registerRoutes(app: express.Application): Server {
   
   // Setup regulation updates API routes
   setupRegulationUpdatesApi(app);
+  
+  // Setup debug endpoints for regulation updates
+  setupDebugRegulationUpdatesApi(app);
 
   // Test route to verify API handling
   app.get("/api/test", (req, res) => {
