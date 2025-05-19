@@ -1,163 +1,167 @@
-import { useState } from "react";
-import { useLocation } from "wouter";
-import { useQuery } from "@tanstack/react-query";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ChevronRight } from "lucide-react";
-import { Spinner } from "@/components/ui/spinner";
+import { FC } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { apiRequest } from '@/lib/queryClient';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
+import { AlertCircle, FileText, PenTool, Sparkles } from 'lucide-react';
+import { Link } from 'wouter';
+import { formatDistanceToNow } from 'date-fns';
 
-type RegulationUpdate = {
+interface RegulationUpdate {
   id: number;
-  name: string;
-  changes: {
-    added: number;
-    removed: number;
-    changed: number;
+  regulationId: number;
+  updatedContent: string;
+  submittedAt: string;
+  submittedBy: number;
+  status: 'pending' | 'accepted' | 'rejected' | 'deferred';
+  changeStats: {
+    addedPercentage: number;
+    removedPercentage: number;
+    changedPercentage: number;
   };
-  priority: "HIGH" | "MEDIUM" | "LOW";
-  date: string;
-};
+}
 
-export default function UpdatesList() {
-  const [, navigate] = useLocation();
-  const [sortField, setSortField] = useState<"name" | "priority" | "date">("date");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
-
+export const UpdatesList: FC = () => {
   // Fetch pending regulation updates
-  const { data: updates, isLoading, error } = useQuery<RegulationUpdate[]>({
-    queryKey: ["/api/regulations/updates"],
-    refetchOnWindowFocus: false,
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['/api/regulation-updates/pending'],
+    queryFn: () => apiRequest('/api/regulation-updates/pending'),
   });
-
-  const handleSort = (field: "name" | "priority" | "date") => {
-    if (sortField === field) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortField(field);
-      setSortDirection("asc");
-    }
-  };
-
-  const sortedUpdates = updates
-    ? [...updates].sort((a, b) => {
-        if (sortField === "name") {
-          return sortDirection === "asc"
-            ? a.name.localeCompare(b.name)
-            : b.name.localeCompare(a.name);
-        } else if (sortField === "priority") {
-          const priorityValue = { HIGH: 3, MEDIUM: 2, LOW: 1 };
-          return sortDirection === "asc"
-            ? priorityValue[a.priority] - priorityValue[b.priority]
-            : priorityValue[b.priority] - priorityValue[a.priority];
-        } else {
-          // date
-          return sortDirection === "asc"
-            ? new Date(a.date).getTime() - new Date(b.date).getTime()
-            : new Date(b.date).getTime() - new Date(a.date).getTime();
-        }
-      })
-    : [];
-
-  const getPriorityBadgeClass = (priority: string) => {
-    if (priority === "HIGH") return "bg-red-100 text-red-800";
-    if (priority === "MEDIUM") return "bg-yellow-100 text-yellow-800";
-    return "bg-blue-100 text-blue-800";
-  };
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <Spinner className="w-10 h-10" />
+      <div className="flex items-center justify-center h-64">
+        <div className="loading loading-spinner loading-lg"></div>
       </div>
     );
   }
 
-  if (error) {
+  if (error || !data) {
     return (
-      <Card>
-        <CardContent className="pt-6">
-          <div className="text-center text-red-500">
-            <p>Error loading updates. Please try again later.</p>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="text-center p-6 border rounded-lg bg-red-50 text-red-700">
+        <AlertCircle className="w-8 h-8 mx-auto mb-2" />
+        <h3 className="text-lg font-medium">Error loading updates</h3>
+        <p>{error?.message || 'Failed to load regulation updates'}</p>
+      </div>
+    );
+  }
+
+  if (data.length === 0) {
+    return (
+      <div className="text-center p-12 border rounded-lg bg-gray-50">
+        <FileText className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+        <h3 className="text-xl font-medium">No pending updates</h3>
+        <p className="text-gray-500 mt-2">There are currently no regulation updates awaiting review.</p>
+      </div>
     );
   }
 
   return (
-    <Card className="w-full">
-      <CardHeader>
-        <CardTitle>Pending Regulation Updates</CardTitle>
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold tracking-tight">Pending Regulation Updates</h2>
+      <p className="text-muted-foreground">
+        Review, accept or reject changes to regulations. Click on an update to view detailed changes.
+      </p>
+      
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        {data.map((update: RegulationUpdate) => (
+          <UpdateCard key={update.id} update={update} />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+interface UpdateCardProps {
+  update: RegulationUpdate;
+}
+
+const UpdateCard: FC<UpdateCardProps> = ({ update }) => {
+  // Get change severity level based on percentage of changes
+  const getChangeSeverity = (percentage: number) => {
+    if (percentage < 10) return 'low';
+    if (percentage < 30) return 'medium';
+    return 'high';
+  };
+
+  const severity = getChangeSeverity(update.changeStats.changedPercentage);
+  
+  // Set colors based on severity
+  const severityColors = {
+    low: {
+      badge: 'bg-blue-100 text-blue-800 hover:bg-blue-200',
+      border: 'border-blue-200',
+    },
+    medium: {
+      badge: 'bg-amber-100 text-amber-800 hover:bg-amber-200',
+      border: 'border-amber-200',
+    },
+    high: {
+      badge: 'bg-red-100 text-red-800 hover:bg-red-200',
+      border: 'border-red-200',
+    },
+  };
+
+  return (
+    <Card className={`overflow-hidden ${severityColors[severity].border}`}>
+      <CardHeader className="pb-2">
+        <div className="flex justify-between items-start">
+          <CardTitle className="text-lg">Update #{update.id}</CardTitle>
+          <Badge variant="outline" className={severityColors[severity].badge}>
+            {update.changeStats.changedPercentage}% Changed
+          </Badge>
+        </div>
         <CardDescription>
-          Review and process updates to regulatory documents
+          Submitted {formatDistanceToNow(new Date(update.submittedAt), { addSuffix: true })}
         </CardDescription>
       </CardHeader>
+      
       <CardContent>
-        <div className="border rounded-md">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead
-                  className="cursor-pointer"
-                  onClick={() => handleSort("name")}
-                >
-                  Title {sortField === "name" && (sortDirection === "asc" ? "↑" : "↓")}
-                </TableHead>
-                <TableHead>Changes</TableHead>
-                <TableHead
-                  className="cursor-pointer"
-                  onClick={() => handleSort("priority")}
-                >
-                  Priority {sortField === "priority" && (sortDirection === "asc" ? "↑" : "↓")}
-                </TableHead>
-                <TableHead
-                  className="cursor-pointer"
-                  onClick={() => handleSort("date")}
-                >
-                  Date {sortField === "date" && (sortDirection === "asc" ? "↑" : "↓")}
-                </TableHead>
-                <TableHead className="text-right">Action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {sortedUpdates.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center h-32 text-muted-foreground">
-                    No pending updates at this time
-                  </TableCell>
-                </TableRow>
-              ) : (
-                sortedUpdates.map((update) => (
-                  <TableRow key={update.id} className="hover:bg-muted/50">
-                    <TableCell>{update.name}</TableCell>
-                    <TableCell>
-                      <span className="text-green-600">+{update.changes.added}%</span>{" "}
-                      <span className="text-red-600">-{update.changes.removed}%</span>
-                    </TableCell>
-                    <TableCell>
-                      <Badge className={getPriorityBadgeClass(update.priority)}>
-                        {update.priority}
-                      </Badge>
-                    </TableCell>
-                    <TableCell>{new Date(update.date).toLocaleDateString()}</TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => navigate(`/regulations/updates/${update.id}`)}
-                      >
-                        <ChevronRight className="h-4 w-4" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <div className="text-sm font-medium">Change Statistics</div>
+            <div className="grid grid-cols-3 gap-1 text-center text-sm">
+              <div>
+                <div className="font-medium text-green-600">{update.changeStats.addedPercentage}%</div>
+                <div className="text-xs text-muted-foreground">Added</div>
+              </div>
+              <div>
+                <div className="font-medium text-red-600">{update.changeStats.removedPercentage}%</div>
+                <div className="text-xs text-muted-foreground">Removed</div>
+              </div>
+              <div>
+                <div className="font-medium text-blue-600">{update.changeStats.changedPercentage}%</div>
+                <div className="text-xs text-muted-foreground">Total</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-blue-500"
+              style={{ width: `${update.changeStats.changedPercentage}%` }}
+            ></div>
+          </div>
         </div>
       </CardContent>
+      
+      <Separator />
+      
+      <CardFooter className="pt-4 pb-4 flex justify-between">
+        <div className="text-sm text-muted-foreground">
+          <span className="font-medium">Regulation ID:</span> {update.regulationId}
+        </div>
+        <Button size="sm" asChild>
+          <Link to={`/regulation-updates/${update.id}`}>
+            <Sparkles className="mr-2 h-4 w-4" />
+            View Changes
+          </Link>
+        </Button>
+      </CardFooter>
     </Card>
   );
-}
+};
+
+export default UpdatesList;

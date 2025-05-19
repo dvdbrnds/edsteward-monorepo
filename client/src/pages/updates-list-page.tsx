@@ -1,14 +1,17 @@
-import { PageHeader } from "@/components/ui/page-header";
-import UpdatesList from "@/components/UpdatesList";
+import { PageHeader } from '../components/ui/page-header';
+import { UpdatesList } from '../components/UpdatesList';
+import { Shell } from '../components/ui/shell';
 
-export default function UpdatesListPage() {
+export default function RegulationUpdatesListPage() {
   return (
-    <div className="container py-6 space-y-6">
+    <Shell>
       <PageHeader
         heading="Regulation Updates"
-        description="Review and process pending regulation updates"
+        subheading="Review and manage pending updates to regulations"
       />
-      <UpdatesList />
-    </div>
+      <div className="container py-4">
+        <UpdatesList />
+      </div>
+    </Shell>
   );
 }

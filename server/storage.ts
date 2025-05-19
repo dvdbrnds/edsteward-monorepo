@@ -133,10 +133,13 @@ export class DatabaseStorage implements IStorage {
       }
 
       // 2. Update the regulation with the new content
-      await this.updateRegulation(update.regulationId, {
-        requirements: update.updatedContent,
-        lastUpdated: new Date(),
-      });
+      // Use raw SQL to ensure large text fields are properly handled
+      await db.execute(
+        `UPDATE regulations 
+         SET requirements = $1, last_updated = $2 
+         WHERE id = $3`,
+        [update.updatedContent, new Date(), update.regulationId]
+      );
 
       // 3. Mark the update as accepted
       await db.update(regulationUpdates)

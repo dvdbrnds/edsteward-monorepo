@@ -1,22 +1,15 @@
-import { cn } from "@/lib/utils";
+import { FC } from 'react';
 
 interface PageHeaderProps {
   heading: string;
-  description?: string;
-  className?: string;
+  subheading?: string;
 }
 
-export function PageHeader({
-  heading,
-  description,
-  className,
-}: PageHeaderProps) {
+export const PageHeader: FC<PageHeaderProps> = ({ heading, subheading }) => {
   return (
-    <div className={cn("space-y-2", className)}>
+    <div className="flex flex-col gap-2 mb-6 px-4 lg:px-8">
       <h1 className="text-3xl font-bold tracking-tight">{heading}</h1>
-      {description && (
-        <p className="text-muted-foreground text-lg">{description}</p>
-      )}
+      {subheading && <p className="text-muted-foreground">{subheading}</p>}
     </div>
   );
-}
+};
