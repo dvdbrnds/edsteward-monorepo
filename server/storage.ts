@@ -295,16 +295,54 @@ export class DatabaseStorage implements IStorage {
 
   async updateRegulation(id: number, regulation: Partial<InsertRegulation>): Promise<Regulation> {
     console.log(`Updating regulation ${id} with:`, regulation);
-    const [updatedRegulation] = await db
-      .update(regulations)
-      .set({
-        ...regulation,
-        lastUpdated: new Date()
-      })
-      .where(eq(regulations.id, id))
-      .returning();
-    console.log("Updated regulation:", updatedRegulation);
-    return updatedRegulation;
+    
+    try {
+      // If we're updating content/requirements, handle it differently due to potential size
+      if (regulation.requirements) {
+        // First, update the text field directly using SQL
+        await db.execute(
+          `UPDATE regulations SET requirements = $1, last_updated = $2 WHERE id = $3`,
+          [regulation.requirements, new Date(), id]
+        );
+        
+        // Remove the requirements field from the update object
+        const { requirements, ...otherFields } = regulation;
+        
+        // If there are other fields to update, do that separately
+        if (Object.keys(otherFields).length > 0) {
+          await db.update(regulations)
+            .set({
+              ...otherFields,
+              lastUpdated: new Date()
+            })
+            .where(eq(regulations.id, id));
+        }
+        
+        // Fetch and return the updated regulation
+        const results = await db.select().from(regulations).where(eq(regulations.id, id));
+        if (results.length > 0) {
+          return results[0];
+        } else {
+          throw new Error(`Regulation with ID ${id} not found after update`);
+        }
+      } else {
+        // No requirements field, regular update
+        const [updatedRegulation] = await db
+          .update(regulations)
+          .set({
+            ...regulation,
+            lastUpdated: new Date()
+          })
+          .where(eq(regulations.id, id))
+          .returning();
+          
+        console.log("Updated regulation:", updatedRegulation);
+        return updatedRegulation;
+      }
+    } catch (error) {
+      console.error(`Error updating regulation ${id}:`, error);
+      throw error;
+    }
   }
 
   async setRegulationApplicability(id: number, isApplicable: boolean): Promise<Regulation> {
