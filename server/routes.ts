@@ -16,6 +16,7 @@ import { dirname } from 'path';
 import { notes, insertNoteSchema, type InsertRegulation } from "@shared/schema";
 import { setupRegulationUpdatesApi } from './regulation-updates-api';
 import { setupDebugRegulationUpdatesApi } from './debug-regulation-updates';
+import { setupMCPIntegrationApi } from './mcp-integration-api';
 
 // ES Module compatibility: Get current file path
 const __filename = fileURLToPath(import.meta.url);
@@ -147,6 +148,9 @@ export function registerRoutes(app: express.Application): Server {
   
   // Setup regulation updates API routes
   setupRegulationUpdatesApi(app);
+  
+  // Setup MCP integration API routes
+  setupMCPIntegrationApi(app);
   
   // Setup debug endpoints for regulation updates
   setupDebugRegulationUpdatesApi(app);
