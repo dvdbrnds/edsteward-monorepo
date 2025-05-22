@@ -1,54 +1,41 @@
-import { QueryClient } from "@tanstack/react-query";
-import { apiClient, isApiError, isRateLimited, isUnauthorized } from "@/api";
+import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
-// Create a custom query function that uses our API client
-const defaultQueryFn = async ({ queryKey }: { queryKey: any[] }) => {
-  const [url, ...params] = queryKey;
-  
-  // Handle parameterized queries
-  let finalUrl = url;
-  if (params.length > 0) {
-    const searchParams = new URLSearchParams();
-    params.forEach((param, index) => {
-      if (param !== undefined && param !== null) {
-        searchParams.append(`param${index}`, param.toString());
-      }
-    });
-    if (searchParams.toString()) {
-      finalUrl += `?${searchParams.toString()}`;
-    }
+async function throwIfResNotOk(res: Response) {
+  if (!res.ok) {
+    const text = (await res.text()) || res.statusText;
+    throw new Error(`${res.status}: ${text}`);
   }
-  
-  return await apiClient.get(finalUrl);
-};
+}
+
+type UnauthorizedBehavior = "returnNull" | "throw";
+export const getQueryFn: <T>(options: {
+  on401: UnauthorizedBehavior;
+}) => QueryFunction<T> =
+  ({ on401: unauthorizedBehavior }) =>
+  async ({ queryKey }) => {
+    const res = await fetch(queryKey[0] as string, {
+      credentials: "include",
+    });
+
+    if (unauthorizedBehavior === "returnNull" && res.status === 401) {
+      return null;
+    }
+
+    await throwIfResNotOk(res);
+    return await res.json();
+  };
 
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      queryFn: defaultQueryFn,
-      staleTime: 5 * 60 * 1000, // 5 minutes
-      gcTime: 10 * 60 * 1000, // 10 minutes (formerly cacheTime)
+      queryFn: getQueryFn({ on401: "throw" }),
+      refetchInterval: false,
       refetchOnWindowFocus: false,
-      retry: (failureCount, error) => {
-        // Don't retry on auth errors or rate limits
-        if (isUnauthorized(error) || isRateLimited(error)) {
-          return false;
-        }
-        // Retry up to 3 times for other errors
-        return failureCount < 3;
-      },
-      retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+      staleTime: Infinity,
+      retry: false,
     },
     mutations: {
-      retry: (failureCount, error) => {
-        // Don't retry mutations on auth errors or rate limits
-        if (isUnauthorized(error) || isRateLimited(error)) {
-          return false;
-        }
-        // Retry once for network errors
-        return failureCount < 1;
-      },
-      retryDelay: 1000,
+      retry: false,
     },
   },
 });
