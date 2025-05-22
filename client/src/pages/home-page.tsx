@@ -31,7 +31,7 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 mb-8">
             <div className="lg:col-span-2">
-              <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:items-start">
+              <div className="grid grid-cols-1 gap-8 md:grid-cols-2 md:items-stretch">
                 <ComplianceOverview 
                   onCategorySelect={setSelectedCategory}
                   selectedCategory={selectedCategory}
