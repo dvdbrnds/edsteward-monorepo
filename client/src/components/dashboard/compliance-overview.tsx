@@ -18,10 +18,10 @@ export default function ComplianceOverview({ onCategorySelect, selectedCategory 
     return <div>Loading...</div>;
   }
 
-  const categories = regulations.reduce((acc, reg) => {
+  const categories = Array.isArray(regulations) ? regulations.reduce((acc, reg) => {
     acc[reg.category] = (acc[reg.category] || 0) + 1;
     return acc;
-  }, {} as Record<string, number>);
+  }, {} as Record<string, number>) : {};
 
   const data = Object.entries(categories).map(([name, value]) => ({
     name,
