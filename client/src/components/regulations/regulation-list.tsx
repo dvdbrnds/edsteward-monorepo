@@ -83,7 +83,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
     );
   }
 
-  const filteredRegulations = regulations.filter((reg: Regulation) => {
+  const filteredRegulations = (regulations || []).filter((reg: Regulation) => {
     if (categoryFilter && reg.category !== categoryFilter) {
       return false;
     }
