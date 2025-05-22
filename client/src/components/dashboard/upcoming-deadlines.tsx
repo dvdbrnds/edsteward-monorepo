@@ -63,7 +63,7 @@ export default function UpcomingDeadlines({ categoryFilter, limit }: UpcomingDea
         </CardTitle>
       </CardHeader>
       <CardContent className="p-6">
-        <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+        <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
           {sortedDeadlines.map((deadline) => {
             const regulation = Array.isArray(regulations) ? regulations.find(r => r.id === deadline.regulationId) : null;
             const daysUntilDue = differenceInDays(new Date(deadline.dueDate), new Date());
@@ -76,14 +76,14 @@ export default function UpcomingDeadlines({ categoryFilter, limit }: UpcomingDea
               : `Regulation #${deadline.regulationId}`;
 
             return (
-              <div key={deadline.id} className="space-y-2">
+              <div key={deadline.id}>
                 <div
                   onClick={() => {
                     if (regulation) {
                       setLocation(`/regulations/${regulation.id}`);
                     }
                   }}
-                  className="flex items-center justify-between p-4 bg-white border rounded-lg hover:border-[#00267A] hover:shadow-sm transition-all cursor-pointer"
+                  className="flex items-center justify-between p-3 bg-white border rounded-lg hover:border-[#00267A] hover:shadow-sm transition-all cursor-pointer"
                 >
                   <div className="flex items-center space-x-4">
                     {deadline.status === "completed" ? (
