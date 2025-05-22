@@ -99,7 +99,7 @@ export default function UpcomingDeadlines({ categoryFilter, limit }: UpcomingDea
                         {regulationTitle}
                       </p>
                       <p className="text-sm text-gray-500">
-                        Due: {format(new Date(deadline.dueDate), "PP")}
+                        Due: {deadline.dueDate ? format(new Date(deadline.dueDate), "PP") : "Date not set"}
                         {daysUntilDue > 0 && deadline.status !== "completed" && (
                           <span className="ml-2">
                             ({daysUntilDue} {daysUntilDue === 1 ? 'day' : 'days'} remaining)
