@@ -61,8 +61,8 @@ export default function UpcomingDeadlines({ categoryFilter, limit }: UpcomingDea
           )}
         </CardTitle>
       </CardHeader>
-      <CardContent>
-        <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+      <CardContent className="h-[400px] flex flex-col">
+        <div className="flex-1 space-y-3 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
           {sortedDeadlines.map((deadline) => {
             const regulation = Array.isArray(regulations) ? regulations.find(r => r.id === deadline.regulationId) : null;
             const daysUntilDue = differenceInDays(new Date(deadline.dueDate), new Date());
