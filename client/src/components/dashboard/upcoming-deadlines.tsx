@@ -48,12 +48,7 @@ export default function UpcomingDeadlines({ categoryFilter, limit }: UpcomingDea
 
   const sortedDeadlines = filteredDeadlines
     .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
-    .slice(0, limit || 20); // Show up to 20 deadlines to fill the card
-  
-  console.log('DEBUG: Total deadlines:', deadlines?.length);
-  console.log('DEBUG: Filtered deadlines:', filteredDeadlines.length);
-  console.log('DEBUG: Sorted deadlines to show:', sortedDeadlines.length);
-  console.log('DEBUG: Limit:', limit);
+    .slice(0, limit || 20);
 
   return (
     <Card>
@@ -67,8 +62,8 @@ export default function UpcomingDeadlines({ categoryFilter, limit }: UpcomingDea
           )}
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-0">
-        <div className="p-6 space-y-3 h-[400px] overflow-y-scroll pr-2 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+      <CardContent className="p-6">
+        <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
           {sortedDeadlines.map((deadline) => {
             const regulation = Array.isArray(regulations) ? regulations.find(r => r.id === deadline.regulationId) : null;
             const daysUntilDue = differenceInDays(new Date(deadline.dueDate), new Date());
