@@ -31,6 +31,62 @@ type SortConfig = {
   direction: 'asc' | 'desc';
 } | null;
 
+// Calculate compliance status with beautiful icons
+function calculateComplianceStatus(regulation: Regulation): {
+  status: "compliant" | "needs-attention" | "at-risk" | "unknown";
+  icon: JSX.Element;
+  label: string;
+  className: string;
+} {
+  // If no last update or verification, it's unknown
+  if (!regulation.lastUpdated && !regulation.lastVerified) {
+    return {
+      status: "unknown",
+      icon: <Info className="h-4 w-4 text-gray-500" />,
+      label: "Unknown",
+      className: "text-gray-500 bg-gray-100",
+    };
+  }
+
+  // Calculate days since last update
+  const daysSinceUpdate = regulation.lastUpdated
+    ? differenceInDays(new Date(), new Date(regulation.lastUpdated))
+    : 999;
+
+  // Check if next review date is past due
+  const isReviewOverdue = regulation.nextReviewDate
+    ? differenceInDays(new Date(), new Date(regulation.nextReviewDate)) > 0
+    : false;
+
+  // At risk if overdue by more than 90 days or review date is past due
+  if (daysSinceUpdate > 90 || isReviewOverdue) {
+    return {
+      status: "at-risk",
+      icon: <AlertCircle className="h-4 w-4 text-red-500" />,
+      label: "At Risk",
+      className: "text-red-600 bg-red-50",
+    };
+  }
+
+  // Needs attention if overdue by more than 30 days
+  if (daysSinceUpdate > 30) {
+    return {
+      status: "needs-attention",
+      icon: <AlertTriangle className="h-4 w-4 text-yellow-500" />,
+      label: "Needs Attention",
+      className: "text-yellow-600 bg-yellow-50",
+    };
+  }
+
+  // Compliant - recently updated
+  return {
+    status: "compliant",
+    icon: <CheckCircle className="h-4 w-4 text-green-500" />,
+    label: "Compliant",
+    className: "text-green-600 bg-green-50",
+  };
+}
+
 export default function RegulationList({ categoryFilter, jurisdictionFilter, deadlines = [] }: RegulationListProps) {
   const [search, setSearch] = useState("");
   const [sortConfig, setSortConfig] = useState<SortConfig>(null);
@@ -268,33 +324,15 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="flex gap-3">
-                        {regulation.actions?.map(action => (
-                          <div
-                            key={action.type}
-                            className={cn(
-                              "relative flex items-center gap-1 transition-all duration-200",
-                              getActionStatus(action),
-                              action.required ? "scale-110" : "scale-90"
-                            )}
-                            title={`${action.type.replace('_', ' ')} ${action.required ? '(Required)' : '(Optional)'} - ${action.status}`}
-                          >
-                            {getActionIcon(action.type)}
-                            {action.required && (
-                              <div className="absolute -top-1 -right-1 flex items-center justify-center">
-                                <div
-                                  className={cn(
-                                    "h-2 w-2 rounded-full",
-                                    action.status === 'completed'
-                                      ? "bg-emerald-600"
-                                      : "bg-rose-500 animate-pulse"
-                                  )}
-                                />
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
+                      {(() => {
+                        const complianceStatus = calculateComplianceStatus(regulation);
+                        return (
+                          <Badge variant="outline" className={`${complianceStatus.className} flex items-center gap-1 w-fit`}>
+                            {complianceStatus.icon}
+                            <span>{complianceStatus.label}</span>
+                          </Badge>
+                        );
+                      })()}
                     </TableCell>
                     <TableCell>
                       {nextDeadline ? (
