@@ -1,7 +1,7 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import type { Regulation, Deadline, InsertDeadline, RegulationAction } from "@shared/schema";
 import { useLocation } from "wouter";
-import { Search, ExternalLink, CheckCircle, AlertCircle, Clock, Loader2, ArrowUpDown, Check, Globe, Mail, FileText } from "lucide-react";
+import { Search, ExternalLink, CheckCircle, AlertCircle, Clock, Loader2, ArrowUpDown, Check, Globe, Mail, FileText, AlertTriangle, Info } from "lucide-react";
 import { differenceInDays, format } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -17,6 +17,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 
 interface RegulationListProps {
