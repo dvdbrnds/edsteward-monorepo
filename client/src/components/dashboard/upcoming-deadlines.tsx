@@ -49,6 +49,11 @@ export default function UpcomingDeadlines({ categoryFilter, limit }: UpcomingDea
   const sortedDeadlines = filteredDeadlines
     .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
     .slice(0, limit || 20); // Show up to 20 deadlines to fill the card
+  
+  console.log('DEBUG: Total deadlines:', deadlines?.length);
+  console.log('DEBUG: Filtered deadlines:', filteredDeadlines.length);
+  console.log('DEBUG: Sorted deadlines to show:', sortedDeadlines.length);
+  console.log('DEBUG: Limit:', limit);
 
   return (
     <Card>
