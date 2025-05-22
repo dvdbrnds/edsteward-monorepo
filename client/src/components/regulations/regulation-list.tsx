@@ -324,15 +324,33 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                       </div>
                     </TableCell>
                     <TableCell>
-                      {(() => {
-                        const complianceStatus = calculateComplianceStatus(regulation);
-                        return (
-                          <Badge variant="outline" className={`${complianceStatus.className} flex items-center gap-1 w-fit`}>
-                            {complianceStatus.icon}
-                            <span>{complianceStatus.label}</span>
-                          </Badge>
-                        );
-                      })()}
+                      <div className="flex gap-3">
+                        {regulation.actions?.map(action => (
+                          <div
+                            key={action.type}
+                            className={cn(
+                              "relative flex items-center gap-1 transition-all duration-200",
+                              getActionStatus(action),
+                              action.required ? "scale-110" : "scale-90"
+                            )}
+                            title={`${action.type.replace('_', ' ')} ${action.required ? '(Required)' : '(Optional)'} - ${action.status}`}
+                          >
+                            {getActionIcon(action.type)}
+                            {action.required && (
+                              <div className="absolute -top-1 -right-1 flex items-center justify-center">
+                                <div
+                                  className={cn(
+                                    "h-2 w-2 rounded-full",
+                                    action.status === 'completed'
+                                      ? "bg-emerald-600"
+                                      : "bg-rose-500 animate-pulse"
+                                  )}
+                                />
+                              </div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
                     </TableCell>
                     <TableCell>
                       {nextDeadline ? (
