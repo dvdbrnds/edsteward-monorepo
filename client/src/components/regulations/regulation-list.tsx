@@ -83,7 +83,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
     );
   }
 
-  const filteredRegulations = (regulations || []).filter((reg: Regulation) => {
+  const filteredRegulations = Array.isArray(regulations) ? regulations.filter((reg: Regulation) => {
     if (categoryFilter && reg.category !== categoryFilter) {
       return false;
     }
@@ -102,7 +102,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
       );
     }
     return true;
-  });
+  }) : [];
 
   const sortedRegulations = [...filteredRegulations].sort((a: Regulation, b: Regulation) => {
     if (!sortConfig) return 0;
