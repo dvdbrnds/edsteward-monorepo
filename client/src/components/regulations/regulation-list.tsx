@@ -325,7 +325,12 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                     </TableCell>
                     <TableCell>
                       <div className="flex gap-3">
-                        {regulation.actions?.map(action => (
+                        {(regulation.actions || [
+                          { type: 'attestation', enabled: true, required: true, status: 'pending' },
+                          { type: 'website_publish', enabled: true, required: false, status: 'pending' },
+                          { type: 'community_communication', enabled: true, required: false, status: 'pending' },
+                          { type: 'agency_submission', enabled: true, required: true, status: 'pending' }
+                        ]).map(action => (
                           <div
                             key={action.type}
                             className={cn(
