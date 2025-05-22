@@ -38,7 +38,7 @@ export default function HomePage() {
                 />
                 <UpcomingDeadlines 
                   categoryFilter={selectedCategory}
-                  limit={12}
+                  limit={6}
                 />
               </div>
             </div>
