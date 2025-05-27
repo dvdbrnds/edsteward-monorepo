@@ -393,38 +393,10 @@ const EnhancedServerList = ({ onServerSelect }) => {
       });
     }
     
-    // FORCE map to specific regulation IDs that we know exist
+    // Use the server's original ID for navigation
     let navigationId = server.id;
     
-    // If this is a regulation server, always route to one of the three known regulation servers
-    if (server.id.startsWith('regulation-')) {
-      const lowerName = (server.name || '').toLowerCase();
-      const lowerId = server.id.toLowerCase();
-      
-      // Choose which regulation to map to based on simple rules
-      if (lowerId.includes('ethic') || lowerId.includes('intel') || lowerName.includes('ethics') || 
-          lowerName.includes('data') || lowerName.includes('protection') || lowerName.includes('gdpr') ||
-          lowerId.includes('gdpr')) {
-        navigationId = 'gdpr-2018';  // GDPR - removed "regulation-" prefix
-      } 
-      else if (lowerId.includes('hipaa') || lowerId.includes('resea') || lowerName.includes('health') || 
-              lowerName.includes('insurance') || lowerName.includes('hipaa') ||
-              lowerId.includes('health')) {
-        navigationId = 'hipaa-1996';  // HIPAA - removed "regulation-" prefix
-      }
-      else if (lowerId.includes('priv') || lowerId.includes('ccpa') || lowerName.includes('california') || 
-              lowerName.includes('privacy') || lowerName.includes('consumer') || lowerId.includes('consumer')) {
-        navigationId = 'ccpa-2018';  // CCPA - removed "regulation-" prefix
-      }
-      else {
-        // Default fallback - map to GDPR as a fallback
-        navigationId = 'gdpr-2018';  // removed "regulation-" prefix
-      }
-      
-      console.log(`Remapping regulation ID ${server.id} to ${navigationId}`);
-    }
-    
-    // Navigate to server details page using the remapped ID
+    // Navigate to server details page using the original ID
     navigate(`/servers/${navigationId}`);
   };
   
@@ -689,37 +661,10 @@ const EnhancedServerList = ({ onServerSelect }) => {
                     onClick={(e) => {
                       e.stopPropagation();
                       
-                      // FORCE map to specific regulation IDs that we know exist
+                      // Use the server's original ID for navigation
                       let navigationId = server.id;
                       
-                      // If this is a regulation server, always route to one of the three known regulation servers
-                      if (server.id.startsWith('regulation-')) {
-                        const lowerName = (server.name || '').toLowerCase();
-                        const lowerId = server.id.toLowerCase();
-                        
-                        // Choose which regulation to map to based on simple rules
-                        if (lowerId.includes('ethic') || lowerId.includes('intel') || lowerName.includes('ethics') || 
-                            lowerName.includes('data') || lowerName.includes('protection') || lowerName.includes('gdpr') ||
-                            lowerId.includes('gdpr')) {
-                          navigationId = 'gdpr-2018';  // GDPR - removed "regulation-" prefix
-                        } 
-                        else if (lowerId.includes('hipaa') || lowerId.includes('resea') || lowerName.includes('health') || 
-                                lowerName.includes('insurance') || lowerName.includes('hipaa') ||
-                                lowerId.includes('health')) {
-                          navigationId = 'hipaa-1996';  // HIPAA - removed "regulation-" prefix
-                        }
-                        else if (lowerId.includes('priv') || lowerId.includes('ccpa') || lowerName.includes('california') || 
-                                lowerName.includes('privacy') || lowerName.includes('consumer') || lowerId.includes('consumer')) {
-                          navigationId = 'ccpa-2018';  // CCPA - removed "regulation-" prefix
-                        }
-                        else {
-                          // Default fallback - map to GDPR as a fallback
-                          navigationId = 'gdpr-2018';  // removed "regulation-" prefix
-                        }
-                        
-                        console.log(`Remapping regulation ID ${server.id} to ${navigationId}`);
-                      }
-                      
+                      // Navigate to server details page using the original ID
                       navigate(`/servers/${navigationId}`);
                     }}
                   />

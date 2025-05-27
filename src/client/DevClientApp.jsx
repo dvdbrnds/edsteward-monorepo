@@ -12,16 +12,15 @@ import styled from 'styled-components';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-import Dashboard from './pages/Dashboard';
 import ValidationForm from './components/ValidationForm';
 import ValidationResults from './components/ValidationResults';
-import MCPServerControl from './components/MCPServerControl';
 import BatchTestingPanel from './components/BatchTestingPanel';
 import RequestInspector from './components/RequestInspector';
 import ColorGuide from './components/ColorGuide';
+import AdminDebugPanel from './components/AdminDebugPanel';
 import GlobalStyle from './GlobalStyle';
-import MCPServerDetail from './pages/MCPServerDetail';
 import MCPEditorTool from './pages/MCPEditorTool';
+import MCPServerDetail from './pages/MCPServerDetail';
 
 // Theme configuration with Material Design color palette
 const theme = {
@@ -162,34 +161,32 @@ const DevClientApp = () => {
       }}>
         <AppContainer>
           <Header>
-            <AppTitle>MCP Engine DevClient</AppTitle>
+            <AppTitle>MCP Editor Tool</AppTitle>
             <Nav>
-              <NavLink to="/">Dashboard</NavLink>
-              <NavLink to="/servers">Servers</NavLink>
-              <NavLink to="/editor">Editor Tool</NavLink>
+              <NavLink to="/">MCP Editor</NavLink>
               <NavLink to="/batch">Batch Testing</NavLink>
               <NavLink to="/debug">Debug</NavLink>
+              <NavLink to="/admin">Admin</NavLink>
               <NavLink to="/colors">Colors</NavLink>
             </Nav>
           </Header>
           
           <Main>
             <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/servers" element={<MCPServerControl />} />
+              <Route path="/" element={<MCPEditorTool />} />
               <Route path="/servers/:serverId" element={<MCPServerDetail />} />
-              <Route path="/editor" element={<MCPEditorTool />} />
               <Route path="/batch" element={<BatchTestingPanel />} />
               <Route path="/debug" element={<RequestInspector />} />
+              <Route path="/admin" element={<AdminDebugPanel />} />
               <Route path="/colors" element={<ColorGuide />} />
               <Route path="/validate" element={<ValidationForm />} />
               <Route path="/results/:id" element={<ValidationResults />} />
-              <Route path="*" element={<Dashboard />} />
+              <Route path="*" element={<MCPEditorTool />} />
             </Routes>
           </Main>
           
           <Footer>
-            MCP Engine DevClient v1.0.0 — Developer Internal Use Only
+            MCP Editor Tool v1.0.0 — Advanced Regulation Server Management
           </Footer>
         </AppContainer>
       </BrowserRouter>

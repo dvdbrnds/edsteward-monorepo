@@ -15,123 +15,81 @@ if (!fs.existsSync(logsDir)) {
  * Supports different log levels and structured logging.
  */
 
-// Log levels in order of verbosity
-const LOG_LEVELS = {
-  ERROR: 0,
-  WARN: 1,
-  INFO: 2,
-  DEBUG: 3,
-  TRACE: 4
-};
-
-// Default log level (can be overridden by environment variable)
-const DEFAULT_LOG_LEVEL = 'INFO';
+/**
+ * Logger utility for consistent logging across the application
+ */
 
 /**
- * Create a logger instance for a specific component
- * @param {string} component - Component name for the logger
- * @param {Object} options - Logger options
- * @returns {Object} Logger object with log methods
+ * Create a logger instance for a specific module
+ * @param {string} module The module name for the logger
+ * @returns {Object} Logger instance
  */
-export function setupLogger(component, options = {}) {
-  const logLevel = determineLogLevel(options.level);
+export function setupLogger(module) {
+  const logLevel = process.env.LOG_LEVEL || 'info';
   
-  // Create and return the logger object
+  // Log levels mapping
+  const logLevels = {
+    error: 0,
+    warn: 1,
+    info: 2,
+    debug: 3
+  };
+  
+  // Only log if the level is less than or equal to the configured level
+  const shouldLog = (level) => logLevels[level] <= logLevels[logLevel];
+  
+  // Format log messages
+  const formatLog = (level, message, data) => {
+    const timestamp = new Date().toISOString();
+    const logData = data ? ` ${JSON.stringify(data)}` : '';
+    return `[${timestamp}] ${level.toUpperCase()} [${module}] ${message}${logData}`;
+  };
+  
   return {
-    error: createLogMethod('ERROR', component, logLevel),
-    warn: createLogMethod('WARN', component, logLevel),
-    info: createLogMethod('INFO', component, logLevel),
-    debug: createLogMethod('DEBUG', component, logLevel),
-    trace: createLogMethod('TRACE', component, logLevel),
-    
-    // Allow dynamically changing the log level
-    setLevel: (newLevel) => {
-      const parsedLevel = determineLogLevel(newLevel);
-      
-      // Update all log methods
-      Object.keys(LOG_LEVELS).forEach((level) => {
-        const methodName = level.toLowerCase();
-        logger[methodName] = createLogMethod(level, component, parsedLevel);
-      });
+    /**
+     * Log an error message
+     * @param {string} message The log message
+     * @param {Object} data Optional data to include in the log
+     */
+    error: (message, data) => {
+      if (shouldLog('error')) {
+        console.error(formatLog('error', message, data));
+      }
     },
     
-    // Get current log level
-    getLevel: () => {
-      return Object.keys(LOG_LEVELS).find(
-        key => LOG_LEVELS[key] === logLevel
-      );
+    /**
+     * Log a warning message
+     * @param {string} message The log message
+     * @param {Object} data Optional data to include in the log
+     */
+    warn: (message, data) => {
+      if (shouldLog('warn')) {
+        console.warn(formatLog('warn', message, data));
+      }
+    },
+    
+    /**
+     * Log an info message
+     * @param {string} message The log message
+     * @param {Object} data Optional data to include in the log
+     */
+    info: (message, data) => {
+      if (shouldLog('info')) {
+        console.info(formatLog('info', message, data));
+      }
+    },
+    
+    /**
+     * Log a debug message
+     * @param {string} message The log message
+     * @param {Object} data Optional data to include in the log
+     */
+    debug: (message, data) => {
+      if (shouldLog('debug')) {
+        console.debug(formatLog('debug', message, data));
+      }
     }
   };
-}
-
-/**
- * Create a log method for a specific level
- * @param {string} level - Log level (ERROR, WARN, etc.)
- * @param {string} component - Component name
- * @param {number} configuredLevel - Configured log level threshold
- * @returns {Function} Log method
- */
-function createLogMethod(level, component, configuredLevel) {
-  const levelValue = LOG_LEVELS[level];
-  
-  // If the log level is above the configured threshold, return a no-op function
-  if (levelValue > configuredLevel) {
-    return () => {}; // No-op
-  }
-  
-  // Return a function that formats and outputs the log
-  return (message, data = {}) => {
-    const timestamp = new Date().toISOString();
-    
-    // Prepare log entry
-    const logEntry = {
-      timestamp,
-      level,
-      component,
-      message,
-      ...data
-    };
-    
-    // Convert the entry to JSON
-    const logString = JSON.stringify(logEntry);
-    
-    // Output to the appropriate console method
-    switch (level) {
-      case 'ERROR':
-        console.error(logString);
-        break;
-      case 'WARN':
-        console.warn(logString);
-        break;
-      case 'DEBUG':
-      case 'TRACE':
-        console.debug(logString);
-        break;
-      default:
-        console.log(logString);
-    }
-  };
-}
-
-/**
- * Determine the log level based on input
- * @param {string|undefined} level - Log level string or undefined
- * @returns {number} Log level value
- */
-function determineLogLevel(level) {
-  // First check the parameter
-  if (level && LOG_LEVELS[level.toUpperCase()] !== undefined) {
-    return LOG_LEVELS[level.toUpperCase()];
-  }
-  
-  // Then check environment variable
-  const envLevel = process.env.LOG_LEVEL;
-  if (envLevel && LOG_LEVELS[envLevel.toUpperCase()] !== undefined) {
-    return LOG_LEVELS[envLevel.toUpperCase()];
-  }
-  
-  // Fall back to default
-  return LOG_LEVELS[DEFAULT_LOG_LEVEL];
 }
 
 /**

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Tabs, Button, Collapse, Divider, Select } from 'antd';
+import { Tabs, Button, Collapse, Divider, Select, ConfigProvider } from 'antd';
 import ServerCreationForm from '../components/ServerCreationForm';
 import EnhancedServerList from '../components/EnhancedServerList';
 import ConfigurationEditor from '../components/ConfigurationEditor';
@@ -106,15 +106,17 @@ const ConfigEditor = ({ selectedServer }) => {
       
       <Divider />
       
-      <Tabs defaultActiveKey="basic">
-        <Tabs.TabPane tab="Basic Configuration" key="basic">
-          <ConfigurationEditor serverId={selectedServer.id} />
-        </Tabs.TabPane>
-        
-        <Tabs.TabPane tab="Validation Tools" key="tools">
-          <ValidationToolEditor serverId={selectedServer.id} />
-        </Tabs.TabPane>
-      </Tabs>
+      <ConfigProvider>
+        <Tabs defaultActiveKey="basic">
+          <Tabs.TabPane tab="Basic Configuration" key="basic">
+            <ConfigurationEditor serverId={selectedServer.id} />
+          </Tabs.TabPane>
+          
+          <Tabs.TabPane tab="Validation Tools" key="tools">
+            <ValidationToolEditor serverId={selectedServer.id} />
+          </Tabs.TabPane>
+        </Tabs>
+      </ConfigProvider>
     </TabContentContainer>
   );
 };
@@ -146,14 +148,16 @@ const VersionControlTab = ({ selectedServer }) => {
       
       <Divider />
       
-      <Tabs defaultActiveKey="versions">
-        <Tabs.TabPane tab="Version Management" key="versions">
-          <VersionControl serverId={selectedServer.id} />
-        </Tabs.TabPane>
-        <Tabs.TabPane tab="Server Utilities" key="utilities">
-          <ServerUtilities serverId={selectedServer.id} />
-        </Tabs.TabPane>
-      </Tabs>
+      <ConfigProvider>
+        <Tabs defaultActiveKey="versions">
+          <Tabs.TabPane tab="Version Management" key="versions">
+            <VersionControl serverId={selectedServer.id} />
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="Server Utilities" key="utilities">
+            <ServerUtilities serverId={selectedServer.id} />
+          </Tabs.TabPane>
+        </Tabs>
+      </ConfigProvider>
     </TabContentContainer>
   );
 };
@@ -169,14 +173,16 @@ const PerformanceMonitorTab = ({ selectedServer }) => {
       
       <Divider />
       
-      <Tabs defaultActiveKey="performance">
-        <Tabs.TabPane tab="Performance Metrics" key="performance">
-          <PerformanceMonitor serverId={selectedServer.id} />
-        </Tabs.TabPane>
-        <Tabs.TabPane tab="Server Logs" key="logs">
-          <ServerLogsViewer serverId={selectedServer.id} />
-        </Tabs.TabPane>
-      </Tabs>
+      <ConfigProvider>
+        <Tabs defaultActiveKey="performance">
+          <Tabs.TabPane tab="Performance Metrics" key="performance">
+            <PerformanceMonitor serverId={selectedServer.id} />
+          </Tabs.TabPane>
+          <Tabs.TabPane tab="Server Logs" key="logs">
+            <ServerLogsViewer serverId={selectedServer.id} />
+          </Tabs.TabPane>
+        </Tabs>
+      </ConfigProvider>
     </TabContentContainer>
   );
 };
@@ -269,23 +275,25 @@ const MCPEditorTool = () => {
   const [activeTab, setActiveTab] = useState('management');
 
   return (
-    <EditorContainer>
-      <Header>
-        <Title>MCP Editor Tool</Title>
-        <Subtitle>
-          Create, configure, and manage Model Context Protocol validation servers
-        </Subtitle>
-      </Header>
-      
-      <Tabs
-        activeKey={activeTab}
-        onChange={setActiveTab}
-        items={tabItems}
-        type="card"
-        size="large"
-        style={{ marginTop: '1rem' }}
-      />
-    </EditorContainer>
+    <ConfigProvider>
+      <EditorContainer>
+        <Header>
+          <Title>MCP Editor Tool</Title>
+          <Subtitle>
+            Create, configure, and manage Model Context Protocol validation servers
+          </Subtitle>
+        </Header>
+        
+        <Tabs
+          activeKey={activeTab}
+          onChange={setActiveTab}
+          items={tabItems}
+          type="card"
+          size="large"
+          style={{ marginTop: '1rem' }}
+        />
+      </EditorContainer>
+    </ConfigProvider>
   );
 };
 
