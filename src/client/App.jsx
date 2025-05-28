@@ -5,6 +5,8 @@ import { Outlet } from 'react-router-dom';
 import styled from 'styled-components';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
+import ErrorBoundary from './components/ErrorBoundary.jsx';
+import { ComplianceProvider } from './context/ComplianceContext.jsx';
 
 const AppContainer = styled.div`
   display: flex;
@@ -31,17 +33,23 @@ const App = () => {
   };
 
   return (
-    <AppContainer>
-      <Sidebar isOpen={sidebarOpen} />
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <Header toggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
-        <MainContent>
-          <ContentWrapper>
-            <Outlet />
-          </ContentWrapper>
-        </MainContent>
-      </div>
-    </AppContainer>
+    <ComplianceProvider>
+      <ErrorBoundary>
+        <AppContainer>
+          <Sidebar isOpen={sidebarOpen} />
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            <Header toggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />
+            <MainContent>
+              <ContentWrapper>
+                <ErrorBoundary>
+                  <Outlet />
+                </ErrorBoundary>
+              </ContentWrapper>
+            </MainContent>
+          </div>
+        </AppContainer>
+      </ErrorBoundary>
+    </ComplianceProvider>
   );
 };
 

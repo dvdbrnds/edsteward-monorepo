@@ -83,6 +83,22 @@ export class LLMService extends LLMServiceInterface {
     }
   }
 
+  /**
+   * Get service health status
+   */
+  async getHealth() {
+    const isAvailable = await this.isAvailable();
+    return {
+      status: isAvailable ? 'healthy' : 'unhealthy',
+      details: {
+        mockMode: this.mockMode,
+        model: this.model,
+        hasApiKey: !!this.openaiApiKey,
+        available: isAvailable
+      }
+    };
+  }
+
   // Private methods
 
   async _callOpenAI(prompt, options = {}) {

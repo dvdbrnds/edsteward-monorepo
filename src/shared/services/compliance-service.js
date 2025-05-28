@@ -197,6 +197,39 @@ export class ComplianceService extends ComplianceServiceInterface {
     }
   }
 
+  /**
+   * Get service health status
+   */
+  async getHealth() {
+    try {
+      const regulationCount = await this.regulationRepository.count();
+      const llmHealth = await this.llmService.getHealth();
+      
+      return {
+        status: llmHealth.status === 'healthy' ? 'healthy' : 'unhealthy',
+        details: {
+          regulationRepository: !!this.regulationRepository,
+          llmService: !!this.llmService,
+          validationService: !!this.validationService,
+          cacheRepository: !!this.cacheRepository,
+          regulationCount,
+          llmServiceStatus: llmHealth.status
+        }
+      };
+    } catch (error) {
+      return {
+        status: 'unhealthy',
+        error: error.message,
+        details: {
+          regulationRepository: !!this.regulationRepository,
+          llmService: !!this.llmService,
+          validationService: !!this.validationService,
+          cacheRepository: !!this.cacheRepository
+        }
+      };
+    }
+  }
+
   // Private helper methods
 
   async _findRelevantRegulations(query, options) {

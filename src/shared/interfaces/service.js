@@ -18,6 +18,15 @@ export class BaseService {
   }
 
   /**
+   * Initialize the service
+   * @returns {Promise<void>}
+   */
+  async initialize() {
+    // Base implementation - can be overridden by subclasses
+    return Promise.resolve();
+  }
+
+  /**
    * Validate input data
    * @param {any} data - Data to validate
    * @param {Object} rules - Validation rules

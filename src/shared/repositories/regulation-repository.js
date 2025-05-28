@@ -240,17 +240,113 @@ export class RegulationRepository extends BaseRepository {
     return !!regulation;
   }
 
-  // These methods would be implemented for database-backed storage
+  // These methods support in-memory operations for advanced features
   async create(data) {
-    throw new Error('Create operation not supported for CSV-based regulations');
+    await this._ensureLoaded();
+    
+    // Generate new ID
+    const maxId = this.regulations.length > 0 
+      ? Math.max(...this.regulations.map(r => r.id)) 
+      : 0;
+    
+    const regulation = {
+      id: maxId + 1,
+      category: data.category || 'Uncategorized',
+      name: data.title || data.name || 'Unnamed',
+      description: data.description || '',
+      statute: data.statute || '',
+      regulation: data.regulation || data.content || '',
+      deadline: data.deadline || '',
+      reportingRequirements: data.reportingRequirements || '',
+      keywords: this._extractKeywordsFromData(data),
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      metadata: data.metadata || {},
+      type: data.type || 'regulation',
+      status: data.status || 'active',
+      version: 1,
+      ...data
+    };
+    
+    this.regulations.push(regulation);
+    
+    // Clear cache if enabled
+    if (this.cacheEnabled) {
+      await this.cacheRepository.delete('regulations:all');
+    }
+    
+    return regulation;
   }
 
   async update(id, data) {
-    throw new Error('Update operation not supported for CSV-based regulations');
+    await this._ensureLoaded();
+    
+    const index = this.regulations.findIndex(reg => reg.id === parseInt(id));
+    if (index === -1) {
+      throw new Error(`Regulation with ID ${id} not found`);
+    }
+    
+    const existing = this.regulations[index];
+    const updated = {
+      ...existing,
+      ...data,
+      id: existing.id, // Preserve ID
+      updatedAt: new Date().toISOString(),
+      version: (existing.version || 1) + 1
+    };
+    
+    // Update keywords if content changed
+    if (data.title || data.name || data.content || data.description) {
+      updated.keywords = this._extractKeywordsFromData(updated);
+    }
+    
+    this.regulations[index] = updated;
+    
+    // Clear cache if enabled
+    if (this.cacheEnabled) {
+      await this.cacheRepository.delete('regulations:all');
+    }
+    
+    return updated;
   }
 
   async delete(id) {
-    throw new Error('Delete operation not supported for CSV-based regulations');
+    await this._ensureLoaded();
+    
+    const index = this.regulations.findIndex(reg => reg.id === parseInt(id));
+    if (index === -1) {
+      throw new Error(`Regulation with ID ${id} not found`);
+    }
+    
+    const deleted = this.regulations.splice(index, 1)[0];
+    
+    // Clear cache if enabled
+    if (this.cacheEnabled) {
+      await this.cacheRepository.delete('regulations:all');
+    }
+    
+    return deleted;
+  }
+
+  /**
+   * Extract keywords from regulation data
+   * @private
+   */
+  _extractKeywordsFromData(data) {
+    const fields = [
+      data.title || data.name,
+      data.category,
+      data.statute,
+      data.description,
+      data.content
+    ];
+    
+    return fields
+      .filter(Boolean)
+      .join(' ')
+      .toLowerCase()
+      .split(/\s+/)
+      .filter(word => word.length > 2);
   }
 
   /**
