@@ -1,0 +1,58 @@
+apiVersion: v2
+name: mcp-engine
+description: A Helm chart for MCP Engine Phase 5 - Enterprise Kubernetes & Advanced Operations
+type: application
+version: 5.0.0
+appVersion: "5.0.0"
+
+keywords:
+  - mcp
+  - compliance
+  - llm
+  - regulation
+  - kubernetes
+  - enterprise
+
+home: https://mcp-engine.com
+sources:
+  - https://github.com/mcp-engine/mcp-engine
+
+maintainers:
+  - name: MCP Engine Team
+    email: devops@mcp-engine.com
+    url: https://mcp-engine.com
+
+annotations:
+  category: Application
+  licenses: MIT
+  images: |
+    - name: llm-gateway
+      image: mcp-engine/llm-gateway:phase4-latest
+    - name: frontend
+      image: mcp-engine/frontend:phase4-latest
+    - name: redis
+      image: redis:7-alpine
+    - name: prometheus
+      image: prom/prometheus:latest
+    - name: grafana
+      image: grafana/grafana:latest
+    - name: jaeger
+      image: jaegertracing/all-in-one:latest
+
+dependencies:
+  - name: redis
+    version: "17.x.x"
+    repository: "https://charts.bitnami.com/bitnami"
+    condition: redis.enabled
+  - name: prometheus
+    version: "15.x.x"
+    repository: "https://prometheus-community.github.io/helm-charts"
+    condition: monitoring.prometheus.enabled
+  - name: grafana
+    version: "6.x.x"
+    repository: "https://grafana.github.io/helm-charts"
+    condition: monitoring.grafana.enabled
+  - name: jaeger
+    version: "0.x.x"
+    repository: "https://jaegertracing.github.io/helm-charts"
+    condition: monitoring.jaeger.enabled 
