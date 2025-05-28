@@ -26,14 +26,7 @@ const ClientOnly = ({ children }) => {
 };
 
 // Styled Components registry support
-let StyledComponentsRegistry;
-try {
-  // Try to import our registry if we're in a Next.js environment
-  StyledComponentsRegistry = require('./lib/registry.jsx').default;
-} catch (error) {
-  // If we're not in a Next.js environment, use a simple pass-through component
-  StyledComponentsRegistry = ({ children }) => children;
-}
+import StyledComponentsRegistry from './lib/registry.jsx';
 
 // Get the root element
 const container = document.getElementById('root');

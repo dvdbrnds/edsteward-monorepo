@@ -2,36 +2,14 @@
  * Simple admin server for testing the CDC pipeline
  * This is a lightweight version of the main application with admin routes only
  */
+import { createExpressApp, startServer } from './core/server-factory.js';
 import express from 'express';
-import cors from 'cors';
-import { setupLogger } from './utils/logger.js';
 
-// Initialize logger
-const logger = setupLogger('simple-admin');
-
-// Create Express app
-const app = express();
-
-// CORS middleware
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
-// Parse JSON body
-app.use(express.json());
-
-// Health check endpoint
-app.get('/health', (req, res) => {
-  res.json({
-    status: 'ok',
-    timestamp: new Date().toISOString()
-  });
-});
+// Create router for admin routes
+const adminRouter = express.Router();
 
 // Admin inject test regulation endpoint
-app.post('/v1/admin/inject-test-reg', (req, res) => {
+adminRouter.post('/inject-test-reg', (req, res) => {
   try {
     const { tenant_id, reg_id, title, revision, payload = {} } = req.body;
     
@@ -67,8 +45,8 @@ app.post('/v1/admin/inject-test-reg', (req, res) => {
   }
 });
 
-// Log request details
-app.use((req, res, next) => {
+// Log request details middleware
+const requestLogger = (req, res, next) => {
   console.log(`${req.method} ${req.path}`);
   
   if (req.method === 'POST' || req.method === 'PUT') {
@@ -77,12 +55,35 @@ app.use((req, res, next) => {
   }
   
   next();
-});
+};
 
-// Start server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Simple admin server started on port ${PORT}`);
-  console.log(`Health check: http://localhost:${PORT}/health`);
-  console.log(`Test endpoint: http://localhost:${PORT}/v1/admin/inject-test-reg`);
-}); 
+// Start the application
+async function startAdminServer() {
+  const { app } = await createExpressApp({
+    name: 'simple-admin',
+    routes: [
+      { path: '/v1/admin', router: adminRouter }
+    ],
+    cors: {
+      origin: '*',
+      methods: ['GET', 'POST', 'PUT', 'DELETE'],
+      allowedHeaders: ['Content-Type', 'Authorization']
+    },
+    middleware: [requestLogger]
+  });
+
+  const PORT = process.env.PORT || 3000;
+  startServer(app, {
+    port: PORT,
+    name: 'simple-admin',
+    onReady: () => {
+      console.log(`Health check: http://localhost:${PORT}/health`);
+      console.log(`Test endpoint: http://localhost:${PORT}/v1/admin/inject-test-reg`);
+    }
+  });
+}
+
+// Start if run directly
+if (import.meta.url === `file://${process.argv[1]}`) {
+  startAdminServer();
+} 

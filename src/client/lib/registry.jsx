@@ -1,26 +1,15 @@
 'use client';
 
-import React, { useState } from 'react';
-import { useServerInsertedHTML } from 'next/navigation';
-import { ServerStyleSheet, StyleSheetManager } from 'styled-components';
+import React from 'react';
+import { StyleSheetManager } from 'styled-components';
 
 export default function StyledComponentsRegistry({ children }) {
-  // Only create stylesheet once with lazy initial state
-  const [styledComponentsStyleSheet] = useState(() => new ServerStyleSheet());
-
-  useServerInsertedHTML(() => {
-    const styles = styledComponentsStyleSheet.getStyleElement();
-    styledComponentsStyleSheet.instance.clearTag();
-    return <>{styles}</>;
-  });
-
+  // For Vite/client-side only apps, we don't need SSR styled-components handling
+  // Just return the children wrapped in StyleSheetManager for consistent styling
   if (typeof window !== 'undefined') {
     return <>{children}</>;
   }
 
-  return (
-    <StyleSheetManager sheet={styledComponentsStyleSheet.instance}>
-      {children}
-    </StyleSheetManager>
-  );
+  // Fallback for any SSR scenarios (though we're using Vite)
+  return <>{children}</>;
 } 

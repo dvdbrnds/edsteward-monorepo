@@ -1,43 +1,22 @@
+/**
+ * Batch Processing Server
+ * Server for handling batch processing of compliance queries
+ */
 import express from 'express';
-import cors from 'cors';
+import { createExpressApp, startServer } from '../core/server-factory.js';
 import { setupLogger } from '../utils/logger.js';
 
 // Initialize logger
-const logger = setupLogger('BatchServer');
+const logger = setupLogger('batch-server');
 
 /**
- * Start the Batch Processing server
- * @param {Object} options Configuration options
- * @returns {Object} The server instance
+ * Create batch routes
  */
-export default async function startBatchServer(options = {}) {
-  // Default options
-  const {
-    port = 3001,
-    batchDir,
-    outputDir,
-    registry,
-    processQuery
-  } = options;
-  
-  // Create Express app
-  const app = express();
-  
-  // Add middleware
-  app.use(cors());
-  app.use(express.json());
-  
-  // Health check endpoint
-  app.get('/health', (req, res) => {
-    res.json({
-      status: 'ok',
-      service: 'batch-server',
-      timestamp: new Date().toISOString()
-    });
-  });
+function createBatchRoutes(options = {}) {
+  const router = express.Router();
   
   // Get batch status endpoint
-  app.get('/batch/status', (req, res) => {
+  router.get('/status', (req, res) => {
     res.json({
       status: 'available',
       activeJobs: 0,
@@ -49,7 +28,7 @@ export default async function startBatchServer(options = {}) {
   });
   
   // Submit batch job endpoint
-  app.post('/batch/submit', (req, res) => {
+  router.post('/submit', (req, res) => {
     // This is a stub that would normally process the batch job
     logger.info('Batch job submission received', { body: req.body });
     
@@ -61,12 +40,48 @@ export default async function startBatchServer(options = {}) {
     });
   });
   
-  // Start the server
-  const server = app.listen(port, () => {
-    logger.info(`Batch server started on port ${port}`);
-    logger.info(`Health check endpoint: http://localhost:${port}/health`);
-    logger.info(`Batch status endpoint: http://localhost:${port}/batch/status`);
-  });
+  return router;
+}
+
+/**
+ * Start the Batch Processing server
+ * @param {Object} options Configuration options
+ * @returns {Object} The server instance
+ */
+export default async function startBatchServer(options = {}) {
+  const {
+    port = 3001,
+    batchDir,
+    outputDir,
+    registry,
+    processQuery
+  } = options;
   
-  return { server, app };
+  try {
+    // Create batch routes
+    const batchRoutes = createBatchRoutes({ batchDir, outputDir, registry, processQuery });
+    
+    // Create Express app using factory
+    const { app } = await createExpressApp({
+      name: 'batch-server',
+      routes: [
+        { path: '/batch', router: batchRoutes }
+      ]
+    });
+    
+    // Start server
+    const server = startServer(app, {
+      port,
+      name: 'batch-server',
+      onReady: () => {
+        logger.info(`Health check endpoint: http://localhost:${port}/health`);
+        logger.info(`Batch status endpoint: http://localhost:${port}/batch/status`);
+      }
+    });
+    
+    return { server, app };
+  } catch (error) {
+    logger.error(`Failed to start batch server: ${error.message}`);
+    throw error;
+  }
 } 
