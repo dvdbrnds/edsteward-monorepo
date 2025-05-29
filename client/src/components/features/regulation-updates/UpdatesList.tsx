@@ -164,4 +164,4 @@ const UpdateCard: FC<UpdateCardProps> = ({ update }) => {
   );
 };
 
-export default UpdatesList;
+export default UpdatesList; 

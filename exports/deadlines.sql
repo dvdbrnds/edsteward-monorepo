@@ -1,0 +1,60 @@
+-- Export for table: deadlines
+-- Exported on: 2025-05-29T18:37:01.873Z
+
+-- Data for deadlines
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (791, 4461, '2025-10-01T04:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (792, 4462, '2025-10-01T04:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (793, 4463, '2025-09-01T04:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (794, 4467, '2025-04-30T04:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (795, 4482, '2025-12-31T05:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (796, 4491, '2025-12-31T05:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (797, 4496, '2025-12-31T05:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (798, 4498, '2025-12-31T05:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (799, 4501, '2025-10-01T04:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (800, 4503, '2025-10-01T04:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (801, 4513, '2026-01-31T05:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (802, 4520, '2025-09-01T04:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (803, 4523, '2025-12-31T05:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (804, 4559, '2025-12-31T05:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (805, 4560, '2025-10-01T04:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (806, 4569, '2025-12-31T05:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (807, 4570, '2025-09-01T04:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (808, 4574, '2025-06-30T04:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (809, 4577, '2025-12-31T05:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (810, 4591, '2025-12-31T05:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (811, 4593, '2025-09-01T04:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (812, 4595, '2025-12-31T05:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (813, 4596, '2025-12-31T05:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (814, 4613, '2026-01-31T05:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (815, 4619, '2025-09-01T04:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (816, 4620, '2025-09-30T04:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (817, 4621, '2025-09-30T04:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (818, 4623, '2025-09-01T04:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (819, 4625, '2025-09-01T04:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (820, 4626, '2025-09-01T04:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (821, 4627, '2025-09-30T04:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (822, 4629, '2025-12-31T05:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (823, 4634, '2025-12-31T05:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (824, 4635, '2025-04-30T04:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (825, 4639, '2026-01-31T05:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (826, 4652, '2026-01-15T05:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (827, 4660, '2025-12-31T05:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (828, 4683, '2025-07-30T04:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (829, 4685, '2025-04-20T04:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (830, 4698, '2025-07-01T04:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (831, 4711, '2025-12-01T05:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (832, 4721, '2025-12-31T05:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (833, 4724, '2025-12-31T05:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (834, 4725, '2025-12-31T05:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (835, 4726, '2025-12-31T05:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (836, 4727, '2025-10-01T04:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (837, 4733, '2025-12-31T05:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (838, 4734, '2025-12-31T05:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (839, 4739, '2026-01-31T05:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (840, 4740, '2025-12-31T05:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (841, 4742, '2025-12-31T05:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (842, 4744, '2025-12-31T05:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (843, 4753, '2025-12-31T05:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (844, 4754, '2025-03-26T04:00:00.000Z', 'pending', 1);
+INSERT INTO deadlines (id, regulation_id, due_date, status, assigned_to) VALUES (845, 4754, '2025-03-30T04:00:00.000Z', 'pending', 1);
+

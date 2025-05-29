@@ -1,0 +1,41 @@
+<132>1 2025-05-29T18:44:10.914Z Mac.moravian.edu compliance-app 94290 - - Unauthorized access attempt to regulations
+<86>1 2025-05-29T18:45:51.677Z Mac.moravian.edu compliance-app 94290 AUTH [AUTH userId="6" username="dvdbrnds" timestamp="2025-05-29T18:45:51.677Z" event="login" ip="N/A" userAgent="N/A" context="AUTH" type="auth_event"] Login successful
+<86>1 2025-05-29T18:45:52.215Z Mac.moravian.edu compliance-app 94290 AUTH [AUTH userId="6" username="dvdbrnds" timestamp="2025-05-29T18:45:52.215Z" event="auth" ip="N/A" userAgent="N/A" context="AUTH" type="auth_event"] User logged in successfully
+<134>1 2025-05-29T18:45:52.720Z Mac.moravian.edu compliance-app 94290 - - Fetching regulations from storage
+<134>1 2025-05-29T18:45:53.030Z Mac.moravian.edu compliance-app 94290 - - Fetching deadlines from storage
+<134>1 2025-05-29T18:45:53.134Z Mac.moravian.edu compliance-app 94290 - - Found 55 deadlines
+<134>1 2025-05-29T18:45:53.755Z Mac.moravian.edu compliance-app 94290 - - Found 368 regulations
+<134>1 2025-05-29T18:46:00.666Z Mac.moravian.edu compliance-app 94290 - - Fetching regulation with ID: 4747
+<134>1 2025-05-29T18:46:00.871Z Mac.moravian.edu compliance-app 94290 - - Found regulation: Civil Service Reform Act of 1978
+<134>1 2025-05-29T18:46:01.294Z Mac.moravian.edu compliance-app 94290 - - Fetching notes for regulation 4747
+<134>1 2025-05-29T18:46:01.393Z Mac.moravian.edu compliance-app 94290 - - Successfully fetched 0 evidence files for regulation 4747
+<134>1 2025-05-29T18:46:01.397Z Mac.moravian.edu compliance-app 94290 - - Found 0 notes for regulation 4747
+<134>1 2025-05-29T18:46:10.618Z Mac.moravian.edu compliance-app 94290 - - Updating action for regulation 4747
+<134>1 2025-05-29T18:46:10.940Z Mac.moravian.edu compliance-app 94290 - - Successfully updated regulation action
+<134>1 2025-05-29T18:46:11.330Z Mac.moravian.edu compliance-app 94290 - - Fetching regulations from storage
+<134>1 2025-05-29T18:46:11.352Z Mac.moravian.edu compliance-app 94290 - - Fetching regulation with ID: 4747
+<134>1 2025-05-29T18:46:11.449Z Mac.moravian.edu compliance-app 94290 - - Successfully fetched 0 evidence files for regulation 4747
+<134>1 2025-05-29T18:46:11.883Z Mac.moravian.edu compliance-app 94290 - - Found regulation: Civil Service Reform Act of 1978
+<134>1 2025-05-29T18:46:11.927Z Mac.moravian.edu compliance-app 94290 - - Found 368 regulations
+<134>1 2025-05-29T18:46:11.973Z Mac.moravian.edu compliance-app 94290 - - Successfully fetched 0 evidence files for regulation 4747
+<134>1 2025-05-29T18:46:12.187Z Mac.moravian.edu compliance-app 94290 - - Fetching regulation with ID: 4747
+<134>1 2025-05-29T18:46:12.393Z Mac.moravian.edu compliance-app 94290 - - Found regulation: Civil Service Reform Act of 1978
+<134>1 2025-05-29T18:46:25.516Z Mac.moravian.edu compliance-app 94290 - - Fetching notes for regulation 4747
+<134>1 2025-05-29T18:46:25.908Z Mac.moravian.edu compliance-app 94290 - - Found 0 notes for regulation 4747
+<134>1 2025-05-29T18:46:28.316Z Mac.moravian.edu compliance-app 94290 - - Updating action for regulation 4747
+<134>1 2025-05-29T18:46:28.612Z Mac.moravian.edu compliance-app 94290 - - Successfully updated regulation action
+<134>1 2025-05-29T18:46:29.005Z Mac.moravian.edu compliance-app 94290 - - Fetching regulations from storage
+<134>1 2025-05-29T18:46:29.010Z Mac.moravian.edu compliance-app 94290 - - Fetching regulation with ID: 4747
+<134>1 2025-05-29T18:46:29.093Z Mac.moravian.edu compliance-app 94290 - - Successfully fetched 0 evidence files for regulation 4747
+<134>1 2025-05-29T18:46:29.507Z Mac.moravian.edu compliance-app 94290 - - Found regulation: Civil Service Reform Act of 1978
+<134>1 2025-05-29T18:46:29.787Z Mac.moravian.edu compliance-app 94290 - - Fetching regulation with ID: 4747
+<134>1 2025-05-29T18:46:29.848Z Mac.moravian.edu compliance-app 94290 - - Found 368 regulations
+<134>1 2025-05-29T18:46:29.892Z Mac.moravian.edu compliance-app 94290 - - Successfully fetched 0 evidence files for regulation 4747
+<134>1 2025-05-29T18:46:29.992Z Mac.moravian.edu compliance-app 94290 - - Found regulation: Civil Service Reform Act of 1978
+<134>1 2025-05-29T18:46:47.658Z Mac.moravian.edu compliance-app 94290 - - Successfully served roadmap content
+<134>1 2025-05-29T18:46:58.884Z Mac.moravian.edu compliance-app 94290 - - Fetching all users
+<134>1 2025-05-29T18:46:58.976Z Mac.moravian.edu compliance-app 94290 - - Found 14 users
+<134>1 2025-05-29T19:01:52.434Z Mac.moravian.edu compliance-app 97189 - - Public access: Fetching regulations from storage
+<134>1 2025-05-29T19:01:53.498Z Mac.moravian.edu compliance-app 97189 - - Public access: Found 368 regulations
+<134>1 2025-05-29T20:03:25.417Z Mac.moravian.edu compliance-app 99406 - - Public access: Fetching regulations from storage
+<134>1 2025-05-29T20:03:26.401Z Mac.moravian.edu compliance-app 99406 - - Public access: Found 368 regulations

@@ -36,4 +36,4 @@ export function ChangeStatistics({ statistics }: ChangeStatisticsProps) {
       </CardContent>
     </Card>
   );
-}
+} 
