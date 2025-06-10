@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: ../..
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      # Database Configuration
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+      
+      # Multi-tenant Configuration
+      - BASE_DOMAIN=${BASE_DOMAIN:-edsteward.ai}
+      - ENABLE_MULTI_TENANCY=true
+      - TENANT_CACHE_TTL=300000
+      
+      # SAML Configuration
+      - SAML_SP_ENTITY_ID_PREFIX=urn:regulatorytrackr:sp
+      - SAML_SP_PRIVATE_KEY=${SAML_SP_PRIVATE_KEY}
+      - SAML_SP_CERT=${SAML_SP_CERT}
+      
+      # AWS Configuration
+      - AWS_REGION=${AWS_REGION}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      
+      # Parameter Store for tenant configs
+      - AWS_PARAMETER_STORE_PREFIX=/regulatorytrackr/tenants
+      
+      # Session Configuration
+      - SESSION_SECRET=${SESSION_SECRET}
+      - REDIS_URL=${REDIS_URL}
+      
+      # Email Configuration
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USER=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      
+      # Application Configuration
+      - NODE_ENV=production
+      - LOG_LEVEL=info
+      - PORT=3000
+      
+    depends_on:
+      - redis
+    volumes:
+      - /app/uploads:/app/uploads
+    networks:
+      - app-network
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: /aws/ecs/regulatorytrackr
+        awslogs-region: ${AWS_REGION}
+        awslogs-stream-prefix: app
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - app-network
+    logging:
+      driver: awslogs
+      options:
+        awslogs-group: /aws/ecs/regulatorytrackr
+        awslogs-region: ${AWS_REGION}
+        awslogs-stream-prefix: redis
+
+volumes:
+  redis-data:
+
+networks:
+  app-network:
+    driver: bridge 
