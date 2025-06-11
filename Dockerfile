@@ -8,10 +8,9 @@ WORKDIR /app
 
 # Copy package files
 COPY package.json package-lock.json ./
-COPY shared/package.json ./shared/
 
 # Install dependencies
-RUN npm ci --only=production && npm cache clean --force
+RUN npm ci --only=production --legacy-peer-deps && npm cache clean --force
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -19,10 +18,9 @@ WORKDIR /app
 
 # Copy dependency files
 COPY package.json package-lock.json ./
-COPY shared/package.json ./shared/
 
 # Install all dependencies (including dev dependencies)
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 # Copy source code
 COPY . .
@@ -30,8 +28,8 @@ COPY . .
 # Generate Prisma client (if needed)
 # RUN npx prisma generate
 
-# Build the application
-RUN npm run build
+# Build the frontend only
+RUN npx vite build
 
 # Production image, copy all the files and run the app
 FROM base AS runner
@@ -43,12 +41,15 @@ RUN adduser --system --uid 1001 nodejs
 
 # Copy built application
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/server ./server
 COPY --from=builder /app/package.json ./package.json
-COPY --from=deps /app/node_modules ./node_modules
+COPY --from=builder /app/tsconfig.json ./tsconfig.json
+COPY --from=builder /app/vite.config.ts ./vite.config.ts
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/shared ./shared
 
-# Create uploads directory (fallback for local development)
-RUN mkdir -p /app/uploads && chown nodejs:nodejs /app/uploads
+# Create uploads and logs directories (fallback for local development)
+RUN mkdir -p /app/uploads /app/logs && chown nodejs:nodejs /app/uploads /app/logs
 
 # Set permissions
 USER nodejs
@@ -65,4 +66,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
 
 # Start the application
-CMD ["node", "dist/server/index.js"] 
+CMD ["./node_modules/.bin/tsx", "server/index.ts"] 

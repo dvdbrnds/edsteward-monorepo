@@ -1,0 +1,84 @@
+{
+  "containerDefinitions": [
+    {
+      "name": "edsteward",
+      "image": "259661441422.dkr.ecr.us-east-1.amazonaws.com/edsteward:latest",
+      "cpu": 0,
+      "portMappings": [
+        {
+          "containerPort": 3000,
+          "hostPort": 3000,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "environment": [
+        {
+          "name": "BASE_DOMAIN",
+          "value": "edsteward.ai"
+        },
+        {
+          "name": "REDIS_HOST",
+          "value": "edsteward-redis.jdwzzj.0001.use1.cache.amazonaws.com"
+        },
+        {
+          "name": "AWS_REGION",
+          "value": "us-east-1"
+        },
+        {
+          "name": "DATABASE_URL",
+          "value": "postgresql://postgres:FZ2Pk9ij4ow2yStKrJiZD7vfUW9emT+PtVrM2VV536s=@edsteward-db.cwv4g6g0yzmg.us-east-1.rds.amazonaws.com:5432/edsteward"
+        },
+        {
+          "name": "PORT",
+          "value": "3000"
+        },
+        {
+          "name": "SESSION_SECRET",
+          "value": "FZ2Pk9ij4ow2yStKrJiZD7vfUW9emT+PtVrM2VV536s="
+        },
+        {
+          "name": "ENABLE_MULTI_TENANCY",
+          "value": "true"
+        },
+        {
+          "name": "NODE_ENV",
+          "value": "production"
+        },
+        {
+          "name": "S3_BUCKET_NAME",
+          "value": "edsteward-uploads-20b7ea47"
+        },
+        {
+          "name": "SES_FROM_EMAIL",
+          "value": "noreply@edsteward.ai"
+        },
+        {
+          "name": "REDIS_URL",
+          "value": "redis://edsteward-redis.jdwzzj.0001.use1.cache.amazonaws.com:6379"
+        }
+      ],
+      "mountPoints": [],
+      "volumesFrom": [],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/aws/ecs/edsteward",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "systemControls": []
+    }
+  ],
+  "family": "edsteward-task",
+  "taskRoleArn": "arn:aws:iam::259661441422:role/edsteward-ecs-task-role",
+  "executionRoleArn": "arn:aws:iam::259661441422:role/edsteward-ecs-execution-role",
+  "networkMode": "awsvpc",
+  "volumes": [],
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "512",
+  "memory": "1024"
+}

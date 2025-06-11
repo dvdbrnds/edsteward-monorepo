@@ -155,6 +155,16 @@ export function registerRoutes(app: express.Application): Server {
   // Setup debug endpoints for regulation updates
   setupDebugRegulationUpdatesApi(app);
 
+  // Health check endpoint for ALB - completely independent of database
+  app.get("/health", (req, res) => {
+    res.status(200).json({ 
+      status: "ok", 
+      message: "Service is healthy", 
+      timestamp: new Date().toISOString(),
+      version: "v1.19-database-independent"
+    });
+  });
+
   // Test route to verify API handling
   app.get("/api/test", (req, res) => {
     res.json({ status: "ok", message: "API is working" });

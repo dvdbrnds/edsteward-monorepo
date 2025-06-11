@@ -1,0 +1,5 @@
+aws_region    = "us-east-1"
+environment   = "production"
+app_name      = "edsteward"
+base_domain   = "edsteward.ai"
+db_password   = "FZ2Pk9ij4ow2yStKrJiZD7vfUW9emT+PtVrM2VV536s=" 

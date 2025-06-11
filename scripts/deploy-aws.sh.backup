@@ -74,8 +74,8 @@ get_aws_info() {
 build_image() {
     log "Building Docker image..."
     
-    # Build the image with correct platform for ECS (linux/amd64) and load to local daemon
-    docker buildx build --platform linux/amd64 --load -t ${APP_NAME}:${IMAGE_TAG} .
+    # Build the image
+    docker build -t ${APP_NAME}:${IMAGE_TAG} .
     
     # Tag for ECR
     docker tag ${APP_NAME}:${IMAGE_TAG} ${ECR_REPOSITORY}:${IMAGE_TAG}
@@ -120,33 +120,7 @@ update_ecs_service() {
         error "ECS service '$SERVICE_NAME' not found. Please deploy infrastructure first."
     fi
     
-    # Get current task definition
-    CURRENT_TASK_DEF=$(aws ecs describe-task-definition \
-        --task-definition $TASK_DEFINITION \
-        --region $AWS_REGION \
-        --query 'taskDefinition' 2>/dev/null)
-    
-    if [ $? -eq 0 ]; then
-        # Update the image in the task definition while preserving all environment variables
-        NEW_TASK_DEF=$(echo $CURRENT_TASK_DEF | jq --arg image "${ECR_REPOSITORY}:${IMAGE_TAG}" '
-            .containerDefinitions[0].image = $image |
-            del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .placementConstraints, .compatibilities, .registeredAt, .registeredBy)
-        ')
-        
-        # Show current DATABASE_URL for debugging
-        echo "Current environment variables preserved:"
-        echo $CURRENT_TASK_DEF | jq -r '.containerDefinitions[0].environment[] | select(.name == "DATABASE_URL") | "  DATABASE_URL: " + .value[:50] + "..."'
-        echo $CURRENT_TASK_DEF | jq -r '.containerDefinitions[0].environment[] | select(.name == "SESSION_SECRET") | "  SESSION_SECRET: " + .value[:20] + "..."'
-        
-        # Register new task definition
-        aws ecs register-task-definition \
-            --region $AWS_REGION \
-            --cli-input-json "$NEW_TASK_DEF" > /dev/null
-        
-        log "Updated task definition with new image: ${ECR_REPOSITORY}:${IMAGE_TAG}"
-    fi
-    
-    # Force new deployment with updated task definition
+    # Force new deployment
     aws ecs update-service \
         --cluster $CLUSTER_NAME \
         --service $SERVICE_NAME \
@@ -200,6 +174,7 @@ wait_for_deployment() {
                     --output text 2>/dev/null || echo "0")
                 
                 if [ "$recent_failures" -gt 0 ] && [ "$running_count" -eq 0 ] && [ "$pending_count" -eq 0 ]; then
+                    warning "Deployment appears to be failing (tasks not starting). Check logs for details."
                     return 1
                 fi
             fi

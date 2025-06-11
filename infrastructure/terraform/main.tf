@@ -119,6 +119,52 @@ resource "aws_route_table_association" "public" {
   route_table_id = aws_route_table.public.id
 }
 
+# NAT Gateway
+resource "aws_eip" "nat" {
+  count  = length(aws_subnet.public)
+  domain = "vpc"
+
+  tags = {
+    Name        = "${var.app_name}-nat-eip-${count.index + 1}"
+    Environment = var.environment
+  }
+}
+
+resource "aws_nat_gateway" "main" {
+  count         = length(aws_subnet.public)
+  allocation_id = aws_eip.nat[count.index].id
+  subnet_id     = aws_subnet.public[count.index].id
+
+  tags = {
+    Name        = "${var.app_name}-nat-gateway-${count.index + 1}"
+    Environment = var.environment
+  }
+
+  depends_on = [aws_internet_gateway.main]
+}
+
+# Private Route Tables
+resource "aws_route_table" "private" {
+  count  = length(aws_subnet.private)
+  vpc_id = aws_vpc.main.id
+
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.main[count.index].id
+  }
+
+  tags = {
+    Name        = "${var.app_name}-private-rt-${count.index + 1}"
+    Environment = var.environment
+  }
+}
+
+resource "aws_route_table_association" "private" {
+  count          = length(aws_subnet.private)
+  subnet_id      = aws_subnet.private[count.index].id
+  route_table_id = aws_route_table.private[count.index].id
+}
+
 # Security Groups
 resource "aws_security_group" "alb" {
   name_prefix = "${var.app_name}-alb-"
@@ -210,13 +256,13 @@ resource "aws_db_subnet_group" "main" {
 resource "aws_db_instance" "main" {
   identifier             = "${var.app_name}-db"
   engine                 = "postgres"
-  engine_version         = "15.4"
+  engine_version         = "15.7"
   instance_class         = "db.t3.micro"
   allocated_storage      = 20
   max_allocated_storage  = 100
   storage_encrypted      = true
 
-  db_name  = "regulatorytrackr"
+  db_name  = "edsteward"
   username = "postgres"
   password = var.db_password
 
@@ -390,11 +436,19 @@ resource "aws_ecs_task_definition" "app" {
         },
         {
           name  = "DATABASE_URL"
-          value = "postgresql://postgres:${var.db_password}@${aws_db_instance.main.endpoint}:5432/regulatorytrackr"
+          value = "postgresql://postgres:${var.db_password}@${aws_db_instance.main.endpoint}/edsteward"
+        },
+        {
+          name  = "SESSION_SECRET"
+          value = var.db_password
         },
         {
           name  = "REDIS_URL"
           value = "redis://${aws_elasticache_cluster.main.cache_nodes[0].address}:6379"
+        },
+        {
+          name  = "REDIS_HOST"
+          value = aws_elasticache_cluster.main.cache_nodes[0].address
         },
         {
           name  = "S3_BUCKET_NAME"
@@ -549,6 +603,19 @@ resource "aws_route53_zone" "main" {
   tags = {
     Name        = "${var.app_name}-zone"
     Environment = var.environment
+  }
+}
+
+# Route53 A record pointing to ALB
+resource "aws_route53_record" "main" {
+  zone_id = aws_route53_zone.main.zone_id
+  name    = var.base_domain
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.main.dns_name
+    zone_id                = aws_lb.main.zone_id
+    evaluate_target_health = true
   }
 }
 
