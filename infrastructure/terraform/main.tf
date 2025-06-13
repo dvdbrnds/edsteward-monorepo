@@ -376,6 +376,20 @@ resource "aws_lb_listener" "app" {
   }
 }
 
+# HTTPS ALB Listener
+resource "aws_lb_listener" "app_https" {
+  load_balancer_arn = aws_lb.main.arn
+  port              = "443"
+  protocol          = "HTTPS"
+  ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
+  certificate_arn   = aws_acm_certificate.main.arn
+
+  default_action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.app.arn
+  }
+}
+
 # ECS Cluster
 resource "aws_ecs_cluster" "main" {
   name = "${var.app_name}-cluster"

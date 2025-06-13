@@ -4,7 +4,7 @@ import { promisify } from 'util';
 import { testDatabaseConnection, ensureDatabaseSchema } from './config/database';
 import { config, isDevelopment } from './config/environment';
 import { createApp } from './app';
-import { registerRoutes } from './routes';
+import { registerRoutes } from './routes/index';
 import { setupVite, serveStatic, log } from './vite';
 import { checkAndSendDeadlineNotifications } from './services/deadline-notifications';
 
@@ -48,6 +48,17 @@ export async function startServer(): Promise<Server> {
       console.log("Database connections will be tested on first request");
       console.log("⚠️  Also skipping database schema check in production");
       console.log("Application will start without database dependency");
+      
+      // Auto-initialize database schema in production
+      console.log("🔧 Auto-initializing database schema in production...");
+      try {
+        const { initializeDatabase } = await import('./db-init');
+        const result = await initializeDatabase();
+        console.log("✅ Database auto-initialization successful:", result);
+      } catch (error) {
+        console.error("❌ Database auto-initialization failed:", error);
+        console.log("🔄 Application will continue to start - database can be initialized later via /api/init-db");
+      }
     }
 
     console.log("Creating Express app...");
@@ -55,14 +66,14 @@ export async function startServer(): Promise<Server> {
     const app = createApp();
     console.log("Express app created successfully!");
 
-    // Register routes
+    // Register routes FIRST, before static serving
     console.log("Registering routes...");
     log("Registering routes...");
     const httpServer = registerRoutes(app);
     console.log("Routes registered successfully!");
     log("Routes registered successfully");
 
-    // Setup Vite or static serving based on environment
+    // Setup Vite or static serving based on environment AFTER routes
     if (!isDevelopment) {
       console.log("Setting up static file serving (production mode)...");
       log("Setting up static file serving...");

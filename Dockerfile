@@ -47,9 +47,14 @@ COPY --from=builder /app/tsconfig.json ./tsconfig.json
 COPY --from=builder /app/vite.config.ts ./vite.config.ts
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/shared ./shared
+COPY --from=builder /app/sql_dump ./sql_dump
+COPY --from=builder /app/exports ./exports
 
-# Create uploads and logs directories (fallback for local development)
-RUN mkdir -p /app/uploads /app/logs && chown nodejs:nodejs /app/uploads /app/logs
+# Copy AWS RDS SSL certificate
+COPY --from=builder /app/ssl/rds-ca-2019-root.pem /app/ssl/rds-ca-2019-root.pem
+
+# Create uploads, logs, and ssl directories (fallback for local development)
+RUN mkdir -p /app/uploads /app/logs /app/ssl && chown nodejs:nodejs /app/uploads /app/logs
 
 # Set permissions
 USER nodejs
@@ -65,5 +70,5 @@ ENV PORT=3000
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
 
-# Start the frontend-only application (bypassing database)
-CMD ["node", "dist/index-frontend-only.js"] 
+# Start the application
+CMD ["node", "dist/index.js"] 

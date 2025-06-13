@@ -29,8 +29,19 @@ if (!dbUrl) {
   );
 }
 
-// Create pool and db instances
-export const pool = new Pool({ connectionString: dbUrl });
+// Create pool and db instances with SSL configuration
+const connectionString = dbUrl;
+
+export const pool = new Pool({ 
+  connectionString: connectionString,
+  ssl: process.env.NODE_ENV === 'production' ? {
+    rejectUnauthorized: false,
+    checkServerIdentity: () => undefined,
+    secureProtocol: 'TLSv1_2_method'
+  } : false,
+  connectionTimeoutMillis: 30000,
+  idleTimeoutMillis: 30000
+});
 export const db = drizzle(pool, { schema });
 
 // Export environment info for other modules

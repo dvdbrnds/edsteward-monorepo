@@ -47,6 +47,11 @@ export async function setupVite(app: Express, server: Server) {
   app.use("*", async (req, res, next) => {
     const url = req.originalUrl;
 
+    // Don't serve index.html for API routes - let them pass through to route handlers
+    if (url.startsWith('/api/')) {
+      return next();
+    }
+
     try {
       const clientTemplate = path.resolve(
         __dirname,
@@ -81,8 +86,14 @@ export function serveStatic(app: Express) {
 
   app.use(express.static(distPath));
 
-  // fall through to index.html if the file doesn't exist
-  app.use("*", (_req, res) => {
+  // fall through to index.html if the file doesn't exist, but EXCLUDE API routes
+  app.get("*", (req, res, next) => {
+    // Don't serve index.html for API routes - let them pass through to route handlers
+    if (req.originalUrl.startsWith('/api/')) {
+      return next();
+    }
+    
+    // Serve index.html for all non-API routes (SPA routing)
     res.sendFile(path.resolve(distPath, "index.html"));
   });
 }
