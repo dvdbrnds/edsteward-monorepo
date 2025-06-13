@@ -1,8 +1,15 @@
 {
+  "family": "edsteward-task",
+  "taskRoleArn": "arn:aws:iam::259661441422:role/edsteward-ecs-task-role",
+  "executionRoleArn": "arn:aws:iam::259661441422:role/edsteward-ecs-execution-role",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
   "containerDefinitions": [
     {
       "name": "edsteward",
-      "image": "259661441422.dkr.ecr.us-east-1.amazonaws.com/edsteward:latest",
+      "image": "259661441422.dkr.ecr.us-east-1.amazonaws.com/edsteward:v11.0-ssl-certificate",
       "cpu": 0,
       "portMappings": [
         {
@@ -27,7 +34,7 @@
         },
         {
           "name": "DATABASE_URL",
-          "value": "postgresql://postgres:FZ2Pk9ij4ow2yStKrJiZD7vfUW9emT+PtVrM2VV536s=@edsteward-db.cwv4g6g0yzmg.us-east-1.rds.amazonaws.com:5432/edsteward"
+          "value": "postgresql://postgres:FZ2Pk9ij4ow2yStKrJiZD7vfUW9emT+PtVrM2VV536s=@edsteward-db.cwv4g6g0yzmg.us-east-1.rds.amazonaws.com:5432/edsteward?sslmode=require&sslcert=/app/ssl/rds-ca-2019-root.pem"
         },
         {
           "name": "PORT",
@@ -70,15 +77,5 @@
       },
       "systemControls": []
     }
-  ],
-  "family": "edsteward-task",
-  "taskRoleArn": "arn:aws:iam::259661441422:role/edsteward-ecs-task-role",
-  "executionRoleArn": "arn:aws:iam::259661441422:role/edsteward-ecs-execution-role",
-  "networkMode": "awsvpc",
-  "volumes": [],
-  "requiresCompatibilities": [
-    "FARGATE"
-  ],
-  "cpu": "512",
-  "memory": "1024"
-}
+  ]
+} 
