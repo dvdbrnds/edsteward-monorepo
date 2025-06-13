@@ -11,7 +11,9 @@
     "db:push": "drizzle-kit push",
     "db:setup": "tsx server/create-notes-table.ts",
     "db:export": "node scripts/export-database.mjs",
-    "db:setup-local": "chmod +x scripts/setup-local-db.sh && ./scripts/setup-local-db.sh"
+    "db:setup-local": "chmod +x scripts/setup-local-db.sh && ./scripts/setup-local-db.sh",
+    "db:test": "node test-rds-connection.js",
+    "db:test-connection": "node test-rds-connection.js"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.37.0",

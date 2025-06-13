@@ -1,0 +1,673 @@
+{
+    "service": {
+        "serviceArn": "arn:aws:ecs:us-east-1:259661441422:service/edsteward-cluster/edsteward-service",
+        "serviceName": "edsteward-service",
+        "clusterArn": "arn:aws:ecs:us-east-1:259661441422:cluster/edsteward-cluster",
+        "loadBalancers": [
+            {
+                "targetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:259661441422:targetgroup/edsteward-tg/eef6c92f1f7c5e69",
+                "containerName": "edsteward",
+                "containerPort": 3000
+            }
+        ],
+        "serviceRegistries": [],
+        "status": "ACTIVE",
+        "desiredCount": 1,
+        "runningCount": 1,
+        "pendingCount": 0,
+        "launchType": "FARGATE",
+        "platformVersion": "LATEST",
+        "platformFamily": "Linux",
+        "taskDefinition": "arn:aws:ecs:us-east-1:259661441422:task-definition/edsteward:4",
+        "deploymentConfiguration": {
+            "deploymentCircuitBreaker": {
+                "enable": false,
+                "rollback": false
+            },
+            "maximumPercent": 200,
+            "minimumHealthyPercent": 100
+        },
+        "deployments": [
+            {
+                "id": "ecs-svc/2880961867233605260",
+                "status": "PRIMARY",
+                "taskDefinition": "arn:aws:ecs:us-east-1:259661441422:task-definition/edsteward:4",
+                "desiredCount": 0,
+                "pendingCount": 0,
+                "runningCount": 0,
+                "failedTasks": 0,
+                "createdAt": "2025-06-13T10:03:16.963000-04:00",
+                "updatedAt": "2025-06-13T10:03:16.963000-04:00",
+                "launchType": "FARGATE",
+                "platformVersion": "1.4.0",
+                "platformFamily": "Linux",
+                "networkConfiguration": {
+                    "awsvpcConfiguration": {
+                        "subnets": [
+                            "subnet-0105fe0ce653c3028",
+                            "subnet-0bc514aab497f4027"
+                        ],
+                        "securityGroups": [
+                            "sg-05d224df33d970f0c"
+                        ],
+                        "assignPublicIp": "DISABLED"
+                    }
+                },
+                "rolloutState": "IN_PROGRESS",
+                "rolloutStateReason": "ECS deployment ecs-svc/2880961867233605260 in progress."
+            },
+            {
+                "id": "ecs-svc/4782866779119359501",
+                "status": "ACTIVE",
+                "taskDefinition": "arn:aws:ecs:us-east-1:259661441422:task-definition/edsteward:3",
+                "desiredCount": 1,
+                "pendingCount": 0,
+                "runningCount": 0,
+                "failedTasks": 0,
+                "createdAt": "2025-06-13T09:58:10.848000-04:00",
+                "updatedAt": "2025-06-13T09:58:22.960000-04:00",
+                "launchType": "FARGATE",
+                "platformVersion": "1.4.0",
+                "platformFamily": "Linux",
+                "networkConfiguration": {
+                    "awsvpcConfiguration": {
+                        "subnets": [
+                            "subnet-0105fe0ce653c3028",
+                            "subnet-0bc514aab497f4027"
+                        ],
+                        "securityGroups": [
+                            "sg-05d224df33d970f0c"
+                        ],
+                        "assignPublicIp": "DISABLED"
+                    }
+                },
+                "rolloutState": "IN_PROGRESS",
+                "rolloutStateReason": "ECS deployment ecs-svc/4782866779119359501 in progress."
+            },
+            {
+                "id": "ecs-svc/7716252115440556310",
+                "status": "ACTIVE",
+                "taskDefinition": "arn:aws:ecs:us-east-1:259661441422:task-definition/edsteward:2",
+                "desiredCount": 0,
+                "pendingCount": 0,
+                "runningCount": 0,
+                "failedTasks": 0,
+                "createdAt": "2025-06-13T09:16:24.060000-04:00",
+                "updatedAt": "2025-06-13T09:58:22.970000-04:00",
+                "launchType": "FARGATE",
+                "platformVersion": "1.4.0",
+                "platformFamily": "Linux",
+                "networkConfiguration": {
+                    "awsvpcConfiguration": {
+                        "subnets": [
+                            "subnet-0105fe0ce653c3028",
+                            "subnet-0bc514aab497f4027"
+                        ],
+                        "securityGroups": [
+                            "sg-05d224df33d970f0c"
+                        ],
+                        "assignPublicIp": "DISABLED"
+                    }
+                },
+                "rolloutState": "IN_PROGRESS",
+                "rolloutStateReason": "ECS deployment ecs-svc/7716252115440556310 in progress."
+            },
+            {
+                "id": "ecs-svc/8031490123214156211",
+                "status": "ACTIVE",
+                "taskDefinition": "arn:aws:ecs:us-east-1:259661441422:task-definition/edsteward-task:62",
+                "desiredCount": 1,
+                "pendingCount": 0,
+                "runningCount": 1,
+                "failedTasks": 0,
+                "createdAt": "2025-06-12T22:23:05.408000-04:00",
+                "updatedAt": "2025-06-13T09:58:22.978000-04:00",
+                "launchType": "FARGATE",
+                "platformVersion": "1.4.0",
+                "platformFamily": "Linux",
+                "networkConfiguration": {
+                    "awsvpcConfiguration": {
+                        "subnets": [
+                            "subnet-0105fe0ce653c3028",
+                            "subnet-0bc514aab497f4027"
+                        ],
+                        "securityGroups": [
+                            "sg-05d224df33d970f0c"
+                        ],
+                        "assignPublicIp": "DISABLED"
+                    }
+                },
+                "rolloutState": "COMPLETED",
+                "rolloutStateReason": "ECS deployment ecs-svc/8031490123214156211 completed."
+            }
+        ],
+        "roleArn": "arn:aws:iam::259661441422:role/aws-service-role/ecs.amazonaws.com/AWSServiceRoleForECS",
+        "events": [
+            {
+                "id": "d0a9c6db-781b-4b5c-8af8-2ef200ce563f",
+                "createdAt": "2025-06-13T09:58:23.529000-04:00",
+                "message": "(service edsteward-service) failed to launch a task with (error ECS was unable to assume the role 'arn:aws:iam::259661441422:role/ecsTaskExecutionRole' that was provided for this task. Please verify that the role being passed has the proper trust relationship and permissions and that your IAM user has permissions to pass this role.)."
+            },
+            {
+                "id": "9e0571e4-a134-4be6-ba7c-04520ce1ddc5",
+                "createdAt": "2025-06-13T09:16:43.649000-04:00",
+                "message": "(service edsteward-service) failed to launch a task with (error ECS was unable to assume the role 'arn:aws:iam::259661441422:role/ecsTaskRole' that was provided for this task. Please verify that the role being passed has the proper trust relationship and permissions and that your IAM user has permissions to pass this role.)."
+            },
+            {
+                "id": "ee2a7e6f-c42e-4aad-a5d3-73adfae2f01a",
+                "createdAt": "2025-06-13T04:39:42.134000-04:00",
+                "message": "(service edsteward-service) failed to launch a task with (error ECS was unable to assume the role 'arn:aws:iam::259661441422:role/edsteward-task-role' that was provided for this task. Please verify that the role being passed has the proper trust relationship and permissions and that your IAM user has permissions to pass this role.)."
+            },
+            {
+                "id": "db4e058b-b921-454c-9818-9ea9909e8e06",
+                "createdAt": "2025-06-12T22:28:25.815000-04:00",
+                "message": "(service edsteward-service) failed to launch a task with (error ECS was unable to assume the role 'arn:aws:iam::259661441422:role/edsteward-task-role' that was provided for this task. Please verify that the role being passed has the proper trust relationship and permissions and that your IAM user has permissions to pass this role.)."
+            },
+            {
+                "id": "48d3608c-eb93-4dbc-9e7f-9e6983d7bbe3",
+                "createdAt": "2025-06-12T22:26:02.213000-04:00",
+                "message": "(service edsteward-service) has reached a steady state."
+            },
+            {
+                "id": "364c8751-1944-425b-b8b2-a006853c43ba",
+                "createdAt": "2025-06-12T22:26:02.212000-04:00",
+                "message": "(service edsteward-service) (deployment ecs-svc/8031490123214156211) deployment completed."
+            },
+            {
+                "id": "faa35195-e9b7-4eaa-915e-25bff75e4d6b",
+                "createdAt": "2025-06-12T22:25:00.333000-04:00",
+                "message": "(service edsteward-service, taskSet ecs-svc/8572617518375127080) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "91470cd9-b7ec-4ce1-afc2-58f4a64e78dd",
+                "createdAt": "2025-06-12T22:25:00.328000-04:00",
+                "message": "(service edsteward-service) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-east-1:259661441422:targetgroup/edsteward-tg/eef6c92f1f7c5e69)"
+            },
+            {
+                "id": "9dc5edd4-7523-4358-a42d-c68c93565103",
+                "createdAt": "2025-06-12T22:24:50.894000-04:00",
+                "message": "(service edsteward-service) has stopped 1 running tasks: (task e65828d53bb04c249b9d4654ae826b18)."
+            },
+            {
+                "id": "64090601-90a0-4182-ba59-6e56d4dd4bd3",
+                "createdAt": "2025-06-12T22:24:00.161000-04:00",
+                "message": "(service edsteward-service) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-east-1:259661441422:targetgroup/edsteward-tg/eef6c92f1f7c5e69)"
+            },
+            {
+                "id": "02b956e9-1e44-463a-b518-752b79cf95b8",
+                "createdAt": "2025-06-12T22:23:18.585000-04:00",
+                "message": "(service edsteward-service) has started 1 tasks: (task 9f6801497f144700bb4532957ba18c27)."
+            },
+            {
+                "id": "aeb42b4e-373b-43a6-badc-690a2bf08f9f",
+                "createdAt": "2025-06-12T22:20:45.867000-04:00",
+                "message": "(service edsteward-service) failed to launch a task with (error ECS was unable to assume the role 'arn:aws:iam::259661441422:role/edsteward-task-role' that was provided for this task. Please verify that the role being passed has the proper trust relationship and permissions and that your IAM user has permissions to pass this role.)."
+            },
+            {
+                "id": "426c6cc7-143a-40af-a41c-a0c38d7f2456",
+                "createdAt": "2025-06-12T22:09:22.110000-04:00",
+                "message": "(service edsteward-service) has reached a steady state."
+            },
+            {
+                "id": "d99d00da-d21c-4a64-81c3-80cacc391b60",
+                "createdAt": "2025-06-12T22:09:22.109000-04:00",
+                "message": "(service edsteward-service) (deployment ecs-svc/8572617518375127080) deployment completed."
+            },
+            {
+                "id": "2e8d2a69-3e71-48ed-a342-4a28cf49696d",
+                "createdAt": "2025-06-12T22:08:51.920000-04:00",
+                "message": "(service edsteward-service) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-east-1:259661441422:targetgroup/edsteward-tg/eef6c92f1f7c5e69)"
+            },
+            {
+                "id": "359311f7-7c0e-41df-bf79-25cc49a56013",
+                "createdAt": "2025-06-12T22:07:59.937000-04:00",
+                "message": "(service edsteward-service) has started 1 tasks: (task e65828d53bb04c249b9d4654ae826b18)."
+            },
+            {
+                "id": "b7122489-63cf-4bef-b63a-f587441279c8",
+                "createdAt": "2025-06-12T22:05:47.321000-04:00",
+                "message": "(service edsteward-service) failed to launch a task with (error ECS was unable to assume the role 'arn:aws:iam::259661441422:role/edsteward-task-role' that was provided for this task. Please verify that the role being passed has the proper trust relationship and permissions and that your IAM user has permissions to pass this role.)."
+            },
+            {
+                "id": "83177147-e995-45fc-b0d5-7e6991c27c3a",
+                "createdAt": "2025-06-12T22:04:58.666000-04:00",
+                "message": "(service edsteward-service) has started 1 tasks: (task f65e5533ecdb4b33ab5197e6c7fc1bcf)."
+            },
+            {
+                "id": "c2236c44-4788-4021-9fc2-e8316fe1c190",
+                "createdAt": "2025-06-12T22:02:53.837000-04:00",
+                "message": "(service edsteward-service) has started 1 tasks: (task 523ce42200e247c0863aada0d5cf6beb)."
+            },
+            {
+                "id": "6feccd6e-797a-42b5-a890-23d6b7241940",
+                "createdAt": "2025-06-12T21:57:07.960000-04:00",
+                "message": "(service edsteward-service, taskSet ecs-svc/8641918315845811342) has begun draining connections on 2 tasks."
+            },
+            {
+                "id": "81debdac-762e-4bfa-a8be-61d70a41b86c",
+                "createdAt": "2025-06-12T21:57:07.955000-04:00",
+                "message": "(service edsteward-service) deregistered 2 targets in (target-group arn:aws:elasticloadbalancing:us-east-1:259661441422:targetgroup/edsteward-tg/eef6c92f1f7c5e69)"
+            },
+            {
+                "id": "0b23e9a3-0837-4159-8003-febd50017f44",
+                "createdAt": "2025-06-12T21:56:57.551000-04:00",
+                "message": "(service edsteward-service) has stopped 2 running tasks: (task a26e79756f6241819e52cfd6ada6d83c) (task d7d87766f49c4d10a5064ac3e54bb23d)."
+            },
+            {
+                "id": "2d945c9e-f2ed-47f7-bf03-3aab9926c36c",
+                "createdAt": "2025-06-12T21:50:57.911000-04:00",
+                "message": "(service edsteward-service) has started 1 tasks: (task 523b14a9de88420bae57042e8eab6467)."
+            },
+            {
+                "id": "dba4bc90-f949-4690-b55b-07ed94cf8d28",
+                "createdAt": "2025-06-12T21:48:58.371000-04:00",
+                "message": "(service edsteward-service) has started 1 tasks: (task 83f99d7580704ab3ad7b46617dedea0e)."
+            },
+            {
+                "id": "2584a944-6eb7-435a-9922-3605ecab8262",
+                "createdAt": "2025-06-12T21:47:05.517000-04:00",
+                "message": "(service edsteward-service) has started 1 tasks: (task c30b8b84c0064b4982bf9d10d61e1a49)."
+            },
+            {
+                "id": "75254983-f5af-4b71-8509-a362d6092a0c",
+                "createdAt": "2025-06-12T21:43:58.403000-04:00",
+                "message": "(service edsteward-service) has started 1 tasks: (task b0a553fcb6604c6eac34f62fa14a94bd)."
+            },
+            {
+                "id": "5eacd549-e850-4023-baa6-f8a093bf2817",
+                "createdAt": "2025-06-12T21:42:00.970000-04:00",
+                "message": "(service edsteward-service) has started 1 tasks: (task 58a143098e2b4d54bb393129feca77dd)."
+            },
+            {
+                "id": "68402fee-c0ce-42f1-bc95-a7e2cbf2b5ee",
+                "createdAt": "2025-06-12T21:39:56.667000-04:00",
+                "message": "(service edsteward-service) has started 1 tasks: (task 95810b26b27f4feab9a4e4178bd7d62a)."
+            },
+            {
+                "id": "bdc76a31-d0cc-4acb-ae46-f87896e5de45",
+                "createdAt": "2025-06-12T21:39:56.052000-04:00",
+                "message": "(service edsteward-service) stopped 1 pending tasks."
+            },
+            {
+                "id": "cb629860-4a58-465b-a357-cd84c5267c04",
+                "createdAt": "2025-06-12T21:39:16.838000-04:00",
+                "message": "(service edsteward-service) has started 1 tasks: (task 3b93a382ad5c4ba68db4cd72ebe22b2a)."
+            },
+            {
+                "id": "0fccdcf4-c0ab-404c-a86b-928c6b46b3da",
+                "createdAt": "2025-06-12T21:35:57.626000-04:00",
+                "message": "(service edsteward-service) has started 2 tasks: (task 0dd7621a10f9472c9aa2b37e3b7637f0) (task 31babaa1a4bd48fa84445ef6471759d8)."
+            },
+            {
+                "id": "de748e31-cb05-47b2-8025-7a9dce8a261f",
+                "createdAt": "2025-06-12T21:29:34.009000-04:00",
+                "message": "(service edsteward-service) has started 2 tasks: (task 5989dbdb33ff429886ebf594c1c18deb) (task 66e6ea390f0440d1a3fd574774a29e05)."
+            },
+            {
+                "id": "8c4ef906-1369-44f9-8779-66a850c206d8",
+                "createdAt": "2025-06-12T21:27:32.739000-04:00",
+                "message": "(service edsteward-service) has started 2 tasks: (task 12fde8adcd844e34b691dfd5082d0595) (task 3670c5159326499bbc55546f4c95af3d)."
+            },
+            {
+                "id": "02afb1a1-6140-4af3-a9f5-5758440a9bba",
+                "createdAt": "2025-06-12T21:21:05.476000-04:00",
+                "message": "(service edsteward-service) has started 1 tasks: (task 9d2ec45d120349b4a0ec8a7fb051d9d6)."
+            },
+            {
+                "id": "9b0a1084-7956-4861-8a6d-475f69c3b6a8",
+                "createdAt": "2025-06-12T21:14:23.068000-04:00",
+                "message": "(service edsteward-service) has started 1 tasks: (task 5f321ed0ac614da993d7a2b52dc1538b)."
+            },
+            {
+                "id": "678200ef-f1e2-44a9-8c3c-747980a9225f",
+                "createdAt": "2025-06-12T21:12:24.384000-04:00",
+                "message": "(service edsteward-service) has started 1 tasks: (task e2b64062ecf249b5a232efa882b99b7c)."
+            },
+            {
+                "id": "6bc79691-2302-4430-ad30-76d9c327ee99",
+                "createdAt": "2025-06-12T21:10:31.184000-04:00",
+                "message": "(service edsteward-service) has started 1 tasks: (task 03df4598885840c2ba525533fc4d9e22)."
+            },
+            {
+                "id": "91e8fe4e-0dde-436c-8591-d470d4f65ea9",
+                "createdAt": "2025-06-12T20:57:45.426000-04:00",
+                "message": "(service edsteward-service) has reached a steady state."
+            },
+            {
+                "id": "482a5469-1086-495f-8429-2b04a9c358e6",
+                "createdAt": "2025-06-12T20:57:45.425000-04:00",
+                "message": "(service edsteward-service) (deployment ecs-svc/8641918315845811342) deployment completed."
+            },
+            {
+                "id": "b18de731-067a-4406-a4ff-52badcb6ad98",
+                "createdAt": "2025-06-12T20:56:44.877000-04:00",
+                "message": "(service edsteward-service, taskSet ecs-svc/8290051301608833676) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "fcf3e9c4-eddf-4d66-8fed-81703d6e77cf",
+                "createdAt": "2025-06-12T20:56:44.872000-04:00",
+                "message": "(service edsteward-service) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-east-1:259661441422:targetgroup/edsteward-tg/eef6c92f1f7c5e69)"
+            },
+            {
+                "id": "d6f53f4b-e5b0-42de-a36d-1c694779c299",
+                "createdAt": "2025-06-12T20:56:34.738000-04:00",
+                "message": "(service edsteward-service) has stopped 1 running tasks: (task 0e843e3c9aa84fe7b14da65cba23340b)."
+            },
+            {
+                "id": "d1f2cfd2-4290-419a-ab0a-bad735a55c11",
+                "createdAt": "2025-06-12T20:55:43.916000-04:00",
+                "message": "(service edsteward-service) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-east-1:259661441422:targetgroup/edsteward-tg/eef6c92f1f7c5e69)"
+            },
+            {
+                "id": "44d211e0-8137-45eb-b9e8-d8b91a7af7be",
+                "createdAt": "2025-06-12T20:55:12.889000-04:00",
+                "message": "(service edsteward-service, taskSet ecs-svc/8290051301608833676) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "2f2711d8-d823-486d-bca5-56227e1bb504",
+                "createdAt": "2025-06-12T20:55:12.883000-04:00",
+                "message": "(service edsteward-service) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-east-1:259661441422:targetgroup/edsteward-tg/eef6c92f1f7c5e69)"
+            },
+            {
+                "id": "c2e6e591-76f8-4618-b526-0bcdf48561db",
+                "createdAt": "2025-06-12T20:55:03.526000-04:00",
+                "message": "(service edsteward-service) has started 1 tasks: (task d7d87766f49c4d10a5064ac3e54bb23d)."
+            },
+            {
+                "id": "833f5ef6-2188-4709-af48-7df6065dda7a",
+                "createdAt": "2025-06-12T20:55:02.901000-04:00",
+                "message": "(service edsteward-service) has stopped 1 running tasks: (task 9507a362b0a64f029e242ca2713b9471)."
+            },
+            {
+                "id": "b3d412ce-67db-432c-b0fd-52256f411f3c",
+                "createdAt": "2025-06-12T20:53:10.940000-04:00",
+                "message": "(service edsteward-service) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-east-1:259661441422:targetgroup/edsteward-tg/eef6c92f1f7c5e69)"
+            },
+            {
+                "id": "2edcdbd2-6feb-4af9-b707-c4e6fc4a3e12",
+                "createdAt": "2025-06-12T20:52:30.552000-04:00",
+                "message": "(service edsteward-service) has started 1 tasks: (task a26e79756f6241819e52cfd6ada6d83c)."
+            },
+            {
+                "id": "9262fb15-e78f-4f5e-b2ab-ee5ae9396afc",
+                "createdAt": "2025-06-12T20:47:03.254000-04:00",
+                "message": "(service edsteward-service, taskSet ecs-svc/5846764205811548820) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "7b512966-d153-4637-a98a-557ce9492f10",
+                "createdAt": "2025-06-12T20:47:03.250000-04:00",
+                "message": "(service edsteward-service) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-east-1:259661441422:targetgroup/edsteward-tg/eef6c92f1f7c5e69)"
+            },
+            {
+                "id": "23fe7ce9-2a23-427b-a580-f922e0fc09a2",
+                "createdAt": "2025-06-12T20:46:52.945000-04:00",
+                "message": "(service edsteward-service) has stopped 1 running tasks: (task 5550f7cadd524536b6c1cb092cede923)."
+            },
+            {
+                "id": "7510f14f-85ca-4b84-9496-0ae6fd30aba4",
+                "createdAt": "2025-06-12T20:46:32.560000-04:00",
+                "message": "(service edsteward-service, taskSet ecs-svc/5846764205811548820) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "7da69629-9e28-45e8-bff0-e979d77e2ab4",
+                "createdAt": "2025-06-12T20:46:32.556000-04:00",
+                "message": "(service edsteward-service) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-east-1:259661441422:targetgroup/edsteward-tg/eef6c92f1f7c5e69)"
+            },
+            {
+                "id": "51dfb2f6-573b-4d69-9e82-d2cebacfee67",
+                "createdAt": "2025-06-12T20:46:21.510000-04:00",
+                "message": "(service edsteward-service) has stopped 1 running tasks: (task ee56798ab1844430875c350046826a77)."
+            },
+            {
+                "id": "ae374df6-0cc5-48cc-8fb4-ca409b7752f7",
+                "createdAt": "2025-06-12T20:45:31.668000-04:00",
+                "message": "(service edsteward-service) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-east-1:259661441422:targetgroup/edsteward-tg/eef6c92f1f7c5e69)"
+            },
+            {
+                "id": "b3f04337-b5ee-419d-bd65-cd57b1ae55fa",
+                "createdAt": "2025-06-12T20:45:11.543000-04:00",
+                "message": "(service edsteward-service) has started 1 tasks: (task 0e843e3c9aa84fe7b14da65cba23340b)."
+            },
+            {
+                "id": "c5db55cc-2a10-46dd-b454-a641237c789e",
+                "createdAt": "2025-06-12T20:44:51.221000-04:00",
+                "message": "(service edsteward-service) has started 1 tasks: (task 9507a362b0a64f029e242ca2713b9471)."
+            },
+            {
+                "id": "bcdd32d1-ef14-4c8e-9728-12d164e1d02a",
+                "createdAt": "2025-06-12T20:19:49.738000-04:00",
+                "message": "(service edsteward-service) has reached a steady state."
+            },
+            {
+                "id": "d1c20750-e62e-4b0d-b27f-9ffdc4ba00f0",
+                "createdAt": "2025-06-12T20:19:49.737000-04:00",
+                "message": "(service edsteward-service) (deployment ecs-svc/5846764205811548820) deployment completed."
+            },
+            {
+                "id": "dda20054-0f0b-437a-a925-92d65ddb3c82",
+                "createdAt": "2025-06-12T20:18:38.824000-04:00",
+                "message": "(service edsteward-service, taskSet ecs-svc/2333736027849464428) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "4deb6d3a-ec8a-4181-889c-43c15478d6ed",
+                "createdAt": "2025-06-12T20:18:38.819000-04:00",
+                "message": "(service edsteward-service) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-east-1:259661441422:targetgroup/edsteward-tg/eef6c92f1f7c5e69)"
+            },
+            {
+                "id": "837dc860-eb86-4025-b562-56c4c5bda46d",
+                "createdAt": "2025-06-12T20:18:28.706000-04:00",
+                "message": "(service edsteward-service) has stopped 1 running tasks: (task 07d700abe266493188fca70d0a7905e4)."
+            },
+            {
+                "id": "193109c9-7a84-4dee-a8c5-a88ad4a1c1b1",
+                "createdAt": "2025-06-12T20:17:58.063000-04:00",
+                "message": "(service edsteward-service, taskSet ecs-svc/1735642697856164646) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "d21692b3-9cce-4e6c-81ee-a514bea8506f",
+                "createdAt": "2025-06-12T20:17:58.059000-04:00",
+                "message": "(service edsteward-service) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-east-1:259661441422:targetgroup/edsteward-tg/eef6c92f1f7c5e69)"
+            },
+            {
+                "id": "3d9d25de-3cb9-41d8-bfae-becc85183565",
+                "createdAt": "2025-06-12T20:17:47.925000-04:00",
+                "message": "(service edsteward-service) has stopped 1 running tasks: (task 9420c7c72f1c402aba6b240f52e1b61d)."
+            },
+            {
+                "id": "366161f6-620c-4c25-b03f-e0054644c560",
+                "createdAt": "2025-06-12T20:17:06.193000-04:00",
+                "message": "(service edsteward-service) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-east-1:259661441422:targetgroup/edsteward-tg/eef6c92f1f7c5e69)"
+            },
+            {
+                "id": "05ee9299-cac0-4dfa-8731-d9121c657878",
+                "createdAt": "2025-06-12T20:16:55.891000-04:00",
+                "message": "(service edsteward-service) has started 1 tasks: (task 5550f7cadd524536b6c1cb092cede923)."
+            },
+            {
+                "id": "30b7d04c-57fc-444a-a45e-732b960aaf6a",
+                "createdAt": "2025-06-12T20:16:25.662000-04:00",
+                "message": "(service edsteward-service) has started 1 tasks: (task ee56798ab1844430875c350046826a77)."
+            },
+            {
+                "id": "dd735f8b-021f-4c30-abb5-9e56eb5b7eff",
+                "createdAt": "2025-06-12T20:15:25.068000-04:00",
+                "message": "(service edsteward-service, taskSet ecs-svc/7342516622289100831) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "50c72772-1bc6-4749-a6d8-7ce4521a1700",
+                "createdAt": "2025-06-12T20:15:25.062000-04:00",
+                "message": "(service edsteward-service) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-east-1:259661441422:targetgroup/edsteward-tg/eef6c92f1f7c5e69)"
+            },
+            {
+                "id": "8867bd1e-a854-474a-bbb2-4a6d32f4f981",
+                "createdAt": "2025-06-12T20:15:14.888000-04:00",
+                "message": "(service edsteward-service) has stopped 1 running tasks: (task 468fe77634054ac788711450c96f2c5f)."
+            },
+            {
+                "id": "de1a9d5e-63bd-430f-8bca-88c9612bea70",
+                "createdAt": "2025-06-12T20:14:23.703000-04:00",
+                "message": "(service edsteward-service) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-east-1:259661441422:targetgroup/edsteward-tg/eef6c92f1f7c5e69)"
+            },
+            {
+                "id": "e7785ee4-c483-43cd-8aeb-c74776060ed1",
+                "createdAt": "2025-06-12T20:14:13.116000-04:00",
+                "message": "(service edsteward-service, taskSet ecs-svc/7342516622289100831) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "e5e2fdb2-bf3f-4b76-859a-18c999670472",
+                "createdAt": "2025-06-12T20:14:13.110000-04:00",
+                "message": "(service edsteward-service) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-east-1:259661441422:targetgroup/edsteward-tg/eef6c92f1f7c5e69)"
+            },
+            {
+                "id": "d2189b3a-92ed-4b61-8513-ddaccc6db472",
+                "createdAt": "2025-06-12T20:14:03.433000-04:00",
+                "message": "(service edsteward-service) has stopped 1 running tasks: (task 727735a51bf04ede8dbe6832d25f657c)."
+            },
+            {
+                "id": "d0db0fda-de6b-4020-9507-115a9f0ec90c",
+                "createdAt": "2025-06-12T20:13:43.669000-04:00",
+                "message": "(service edsteward-service) has started 1 tasks: (task 9420c7c72f1c402aba6b240f52e1b61d)."
+            },
+            {
+                "id": "2d192d65-e7b4-4618-9a3b-516a97758aff",
+                "createdAt": "2025-06-12T20:13:11.289000-04:00",
+                "message": "(service edsteward-service) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-east-1:259661441422:targetgroup/edsteward-tg/eef6c92f1f7c5e69)"
+            },
+            {
+                "id": "d79fb0f1-8755-438b-87a1-657a22a934a5",
+                "createdAt": "2025-06-12T20:12:41.853000-04:00",
+                "message": "(service edsteward-service, taskSet ecs-svc/8579571056540055871) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "715a459d-17ec-4bb7-b75d-2a38052e0ce9",
+                "createdAt": "2025-06-12T20:12:41.849000-04:00",
+                "message": "(service edsteward-service) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-east-1:259661441422:targetgroup/edsteward-tg/eef6c92f1f7c5e69)"
+            },
+            {
+                "id": "42ce003d-796e-4798-ab21-7ea99aa06021",
+                "createdAt": "2025-06-12T20:12:32.212000-04:00",
+                "message": "(service edsteward-service) has started 1 tasks: (task 727735a51bf04ede8dbe6832d25f657c)."
+            },
+            {
+                "id": "0e3d17a8-6dad-4a05-a5ac-706cac6300f3",
+                "createdAt": "2025-06-12T20:12:31.645000-04:00",
+                "message": "(service edsteward-service) has stopped 1 running tasks: (task d94c28b2e47f4b59a7ff40f1257c9070)."
+            },
+            {
+                "id": "a5251689-b95a-4079-9038-f1a655c21b28",
+                "createdAt": "2025-06-12T20:11:10.074000-04:00",
+                "message": "(service edsteward-service) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-east-1:259661441422:targetgroup/edsteward-tg/eef6c92f1f7c5e69)"
+            },
+            {
+                "id": "83f8733f-df96-48c8-b8c3-4a35eaca2d6b",
+                "createdAt": "2025-06-12T20:10:29.919000-04:00",
+                "message": "(service edsteward-service) has started 1 tasks: (task 468fe77634054ac788711450c96f2c5f)."
+            },
+            {
+                "id": "7d04d892-e6e9-4914-babf-1b5367d83553",
+                "createdAt": "2025-06-12T20:05:12.221000-04:00",
+                "message": "(service edsteward-service, taskSet ecs-svc/8579571056540055871) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "6fb781a2-4827-43d1-84f1-67a1388513a6",
+                "createdAt": "2025-06-12T20:05:12.215000-04:00",
+                "message": "(service edsteward-service) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-east-1:259661441422:targetgroup/edsteward-tg/eef6c92f1f7c5e69)"
+            },
+            {
+                "id": "6821e645-ced3-4435-b0ea-bc39c89b10f4",
+                "createdAt": "2025-06-12T20:05:01.764000-04:00",
+                "message": "(service edsteward-service) has stopped 1 running tasks: (task 9a1853c16705452383eff8d381d2098d)."
+            },
+            {
+                "id": "7ffe110f-02e0-48c2-82d6-ea9af0a00a27",
+                "createdAt": "2025-06-12T20:04:31.938000-04:00",
+                "message": "(service edsteward-service, taskSet ecs-svc/2333736027849464428) has begun draining connections on 1 tasks."
+            },
+            {
+                "id": "ee195c4b-d855-4836-8da9-de937bd858a3",
+                "createdAt": "2025-06-12T20:04:31.933000-04:00",
+                "message": "(service edsteward-service) deregistered 1 targets in (target-group arn:aws:elasticloadbalancing:us-east-1:259661441422:targetgroup/edsteward-tg/eef6c92f1f7c5e69)"
+            },
+            {
+                "id": "d2a34b7b-42e1-40ad-afae-4c4a80e58e98",
+                "createdAt": "2025-06-12T20:04:21.299000-04:00",
+                "message": "(service edsteward-service) has stopped 1 running tasks: (task bad0fa97fa2947e19833ff42137bf9b0)."
+            },
+            {
+                "id": "5673cd11-c1d4-435c-8350-147268251377",
+                "createdAt": "2025-06-12T20:03:31.025000-04:00",
+                "message": "(service edsteward-service) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-east-1:259661441422:targetgroup/edsteward-tg/eef6c92f1f7c5e69)"
+            },
+            {
+                "id": "a952e4fa-8ca3-4b70-9ee0-33ee0884f961",
+                "createdAt": "2025-06-12T20:03:10.143000-04:00",
+                "message": "(service edsteward-service) has started 1 tasks: (task d94c28b2e47f4b59a7ff40f1257c9070)."
+            },
+            {
+                "id": "895d3241-df33-42ef-aa5a-344f8b48b23d",
+                "createdAt": "2025-06-12T20:02:50.282000-04:00",
+                "message": "(service edsteward-service) has started 1 tasks: (task 9a1853c16705452383eff8d381d2098d)."
+            },
+            {
+                "id": "f510f41c-93f1-4867-9c4b-881cf842cb69",
+                "createdAt": "2025-06-12T19:49:44.101000-04:00",
+                "message": "(service edsteward-service) has reached a steady state."
+            },
+            {
+                "id": "47e245a6-7c9a-4b19-a69a-53915771b563",
+                "createdAt": "2025-06-12T19:49:44.100000-04:00",
+                "message": "(service edsteward-service) (deployment ecs-svc/2333736027849464428) deployment completed."
+            },
+            {
+                "id": "377ee272-cc81-45c2-bf73-7270eecb0bc6",
+                "createdAt": "2025-06-12T19:48:32.850000-04:00",
+                "message": "(service edsteward-service) registered 1 targets in (target-group arn:aws:elasticloadbalancing:us-east-1:259661441422:targetgroup/edsteward-tg/eef6c92f1f7c5e69)"
+            },
+            {
+                "id": "c5814c22-bd04-4bb7-916c-1570b86e23be",
+                "createdAt": "2025-06-12T19:48:11.863000-04:00",
+                "message": "(service edsteward-service) has started 1 tasks: (task bad0fa97fa2947e19833ff42137bf9b0)."
+            },
+            {
+                "id": "d72ffa7b-41e9-44ff-97d2-0452ce212ba8",
+                "createdAt": "2025-06-12T19:47:52.500000-04:00",
+                "message": "(service edsteward-service) has started 1 tasks: (task 07d700abe266493188fca70d0a7905e4)."
+            },
+            {
+                "id": "98269d75-e41a-46a1-8f62-3df53e88b925",
+                "createdAt": "2025-06-12T19:45:47.066000-04:00",
+                "message": "(service edsteward-service) has started 2 tasks: (task 38fbbb7c6eec4c3398fc2254cb392ac0) (task ff1923d9309d4f4bb23ea4f7dc6cd72f)."
+            },
+            {
+                "id": "5eba6d87-f89e-44e7-ab6c-787d251d8d27",
+                "createdAt": "2025-06-12T19:40:31.305000-04:00",
+                "message": "(service edsteward-service) has started 2 tasks: (task bae59e8651b840cf8cb5ec6c97fd8411) (task d97952d215fb496c87971bea0cd3802a)."
+            }
+        ],
+        "createdAt": "2025-06-11T10:35:26.636000-04:00",
+        "placementConstraints": [],
+        "placementStrategy": [],
+        "networkConfiguration": {
+            "awsvpcConfiguration": {
+                "subnets": [
+                    "subnet-0105fe0ce653c3028",
+                    "subnet-0bc514aab497f4027"
+                ],
+                "securityGroups": [
+                    "sg-05d224df33d970f0c"
+                ],
+                "assignPublicIp": "DISABLED"
+            }
+        },
+        "healthCheckGracePeriodSeconds": 0,
+        "schedulingStrategy": "REPLICA",
+        "deploymentController": {
+            "type": "ECS"
+        },
+        "createdBy": "arn:aws:iam::259661441422:root",
+        "enableECSManagedTags": false,
+        "propagateTags": "NONE",
+        "enableExecuteCommand": false,
+        "availabilityZoneRebalancing": "DISABLED"
+    }
+}

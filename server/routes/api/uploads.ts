@@ -12,8 +12,8 @@ const __dirname = dirname(__filename);
 
 const router = express.Router();
 
-// Configure multer storage
-const uploadDir = path.join(process.cwd(), 'uploads');
+// Configure multer storage - use /app/uploads in container
+const uploadDir = path.join('/app', 'uploads');
 
 // Ensure upload directory exists
 if (!fs.existsSync(uploadDir)) {
@@ -89,7 +89,7 @@ router.get('/:filename', (req, res) => {
 // Regulation file downloads with proper content type handling
 router.get('/regulations/:filename', (req, res) => {
   const filename = req.params.filename;
-  const filePath = path.join(process.cwd(), 'public/downloads/regulations', filename);
+  const filePath = path.join('/app', 'public/downloads/regulations', filename);
   
   // Check if file exists
   if (!fs.existsSync(filePath)) {

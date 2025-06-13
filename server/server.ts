@@ -7,6 +7,7 @@ import { createApp } from './app';
 import { registerRoutes } from './routes/index';
 import { setupVite, serveStatic, log } from './vite';
 import { checkAndSendDeadlineNotifications } from './services/deadline-notifications';
+import { databaseHealthMonitor } from './services/database-health';
 
 const exec = promisify(execCallback);
 
@@ -141,6 +142,17 @@ export async function startServer(): Promise<Server> {
           console.log("Deadline notification service started!");
         }
         
+        // Start database health monitoring
+        try {
+          databaseHealthMonitor.startMonitoring().then(() => {
+            console.log("Database health monitoring started!");
+          }).catch((error) => {
+            console.error('Error starting database health monitoring:', error);
+          });
+        } catch (error) {
+          console.error('Error starting database health monitoring:', error);
+        }
+        
         resolve(httpServer);
       });
 
@@ -161,6 +173,8 @@ function cleanup() {
     clearInterval(deadlineCheckInterval);
     deadlineCheckInterval = null;
   }
+  // Stop database health monitoring
+  databaseHealthMonitor.stopMonitoring().catch(console.error);
   if (server) {
     server.close();
     server = null;
