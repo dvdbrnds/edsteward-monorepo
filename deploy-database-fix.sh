@@ -12,7 +12,8 @@ echo "Building new Docker image with database fix..."
 BUILD_TIME=$(date +%Y%m%d-%H%M%S)
 IMAGE_TAG="v12.1-db-fix-$BUILD_TIME"
 
-docker build -t edsteward:$IMAGE_TAG .
+# CRITICAL: Always build for linux/amd64 platform to prevent deployment issues
+docker buildx build --platform linux/amd64 --load -t edsteward:$IMAGE_TAG .
 
 echo "Tagging for ECR..."
 docker tag edsteward:$IMAGE_TAG 259661441422.dkr.ecr.us-east-1.amazonaws.com/edsteward:$IMAGE_TAG

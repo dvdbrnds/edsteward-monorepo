@@ -108,6 +108,11 @@ export function registerRoutes(app: express.Application): Server {
     res.json({ status: "ok", message: "API is working" });
   });
 
+  // Simple health check for ALB (no database dependency)
+  app.get("/health", (req, res) => {
+    res.status(200).send("OK");
+  });
+
   // Comprehensive health check with database status
   app.get("/api/health", async (req, res) => {
     try {

@@ -1,8 +1,8 @@
 # Multi-stage build for production deployment
-FROM node:18-alpine AS base
+FROM --platform=linux/amd64 node:18-alpine AS base
 
 # Install dependencies only when needed
-FROM base AS deps
+FROM --platform=linux/amd64 base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
@@ -13,7 +13,7 @@ COPY package.json package-lock.json ./
 RUN npm ci --only=production --legacy-peer-deps && npm cache clean --force
 
 # Rebuild the source code only when needed
-FROM base AS builder
+FROM --platform=linux/amd64 base AS builder
 WORKDIR /app
 
 # Copy dependency files
@@ -32,7 +32,7 @@ COPY . .
 RUN npx vite build
 
 # Production image, copy all the files and run the app
-FROM base AS runner
+FROM --platform=linux/amd64 base AS runner
 WORKDIR /app
 
 # Create app user for security

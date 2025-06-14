@@ -1,0 +1,28 @@
+FROM --platform=linux/amd64 node:18-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package.json package-lock.json ./
+
+# Install ALL dependencies (including dev dependencies that the build needs)
+RUN npm ci --legacy-peer-deps
+
+# Copy built application files
+COPY dist ./dist
+COPY server ./server
+COPY shared ./shared
+COPY ssl ./ssl
+
+# Create necessary directories
+RUN mkdir -p /app/uploads /app/logs
+
+# Expose port
+EXPOSE 3000
+
+# Environment
+ENV NODE_ENV=production
+ENV PORT=3000
+
+# Start the application
+CMD ["node", "dist/index.js"] 

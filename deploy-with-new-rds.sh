@@ -10,7 +10,8 @@ echo ""
 NEW_DATABASE_URL="postgresql://edsteward_admin:iRCCeTqRikGOeNldbWcGov75q@edsteward-postgres.cwv4g6g0yzmg.us-east-1.rds.amazonaws.com:5432/edsteward?sslmode=require"
 
 echo "📦 Building Docker image with RDS database..."
-docker build -t edsteward:v13.0-rds-$(date +%Y%m%d-%H%M%S) .
+# CRITICAL: Always build for linux/amd64 platform to prevent deployment issues
+docker buildx build --platform linux/amd64 --load -t edsteward:v13.0-rds-$(date +%Y%m%d-%H%M%S) .
 
 # Get the image tag
 IMAGE_TAG=$(docker images edsteward --format "table {{.Tag}}" | grep rds | head -1)

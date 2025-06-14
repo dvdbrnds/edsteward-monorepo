@@ -30,7 +30,8 @@ TIMESTAMP=$(date +%Y%m%d-%H%M%S)
 IMAGE_TAG="v12.0-ssl-db-fix-${TIMESTAMP}"
 FULL_IMAGE_URI="${ECR_REPO}:${IMAGE_TAG}"
 
-docker build -t edsteward:latest .
+# CRITICAL: Always build for linux/amd64 platform to prevent deployment issues
+docker buildx build --platform linux/amd64 --load -t edsteward:latest .
 docker tag edsteward:latest $FULL_IMAGE_URI
 
 # Login to ECR

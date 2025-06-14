@@ -8,7 +8,8 @@ echo ""
 
 # Build new image with SSL fix
 echo "🏗️ Building Docker image with SSL fix..."
-docker build -t edsteward:v12.3-ssl-fix-$(date +%Y%m%d-%H%M%S) .
+# CRITICAL: Always build for linux/amd64 platform to prevent deployment issues
+docker buildx build --platform linux/amd64 --load -t edsteward:v12.3-ssl-fix-$(date +%Y%m%d-%H%M%S) .
 
 # Get the image tag
 IMAGE_TAG=$(docker images edsteward --format "table {{.Tag}}" | grep ssl-fix | head -1)
