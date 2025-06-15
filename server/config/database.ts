@@ -62,10 +62,13 @@ try {
   };
   
   // Handle SSL configuration properly
+  // Check if this is an RDS connection (AWS managed PostgreSQL)
+  const isRDS = url.hostname.includes('.rds.amazonaws.com') || url.hostname.includes('.rds.');
+  
   if (sslMode === 'disable') {
     poolConfig.ssl = false;
     console.log('✅ SSL disabled');
-  } else if (sslMode === 'require' || sslMode === 'prefer') {
+  } else if (sslMode === 'require' || sslMode === 'prefer' || isRDS) {
     // For RDS or managed PostgreSQL services, we typically need SSL
     // but we don't need to specify certificate files
     poolConfig.ssl = {
@@ -80,6 +83,10 @@ try {
     } else {
       console.log('✅ Using SSL without certificate file (managed service)');
     }
+    
+    if (isRDS) {
+      console.log('🔒 RDS detected - forcing SSL connection');
+    }
   }
   
   console.log('✅ Database configuration created successfully');
@@ -91,10 +98,13 @@ try {
 } catch (error) {
   console.error('❌ Failed to parse DATABASE_URL:', error);
   
-  // Fallback: create a safe configuration that avoids SSL certificate file issues
+  // Check if this is an RDS connection even in fallback
+  const isRDSFallback = dbUrl.includes('.rds.amazonaws.com') || dbUrl.includes('.rds.');
+  
+  // Fallback: create a safe configuration
   poolConfig = {
     connectionString: dbUrl.split('?')[0], // Remove all query parameters
-    ssl: false, // Disable SSL to avoid certificate issues
+    ssl: isRDSFallback ? { rejectUnauthorized: false } : false, // Enable SSL for RDS
     max: 20,
     min: 2,
     connectionTimeoutMillis: 10000,
@@ -103,7 +113,11 @@ try {
     keepAliveInitialDelayMillis: 10000,
   };
   
-  console.log('⚠️ Using fallback configuration with SSL disabled');
+  if (isRDSFallback) {
+    console.log('⚠️ Using fallback configuration with SSL enabled for RDS');
+  } else {
+    console.log('⚠️ Using fallback configuration with SSL disabled');
+  }
 }
 
 // Create the connection pool

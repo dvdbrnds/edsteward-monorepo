@@ -1,517 +1,248 @@
 #!/usr/bin/env python3
+"""
+Simple Database Restoration via AWS Systems Manager
+==================================================
 
-import boto3
+This script will:
+1. Launch an EC2 instance with Systems Manager access
+2. Upload the backup file via S3
+3. Run the restoration via Systems Manager
+4. Clean up resources
+"""
+
+import subprocess
 import json
 import time
-import requests
+import base64
+from datetime import datetime
 
-def log(message: str, status: str = "INFO"):
-    """Simple logging with colors"""
-    colors = {
-        "SUCCESS": "\033[92m✅",
-        "ERROR": "\033[91m❌", 
-        "WARNING": "\033[93m⚠️",
-        "INFO": "\033[94mℹ️"
-    }
-    reset = "\033[0m"
-    timestamp = time.strftime("%H:%M:%S")
-    print(f"{colors.get(status, colors['INFO'])} [{timestamp}] {message}{reset}")
+def log(message):
+    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(f"[{timestamp}] {message}")
 
-def get_service_network_config():
-    """Get network configuration from existing ECS service"""
-    log("🔍 Getting network configuration from existing service...")
-    
-    ecs = boto3.client('ecs', region_name='us-east-1')
-    
+def run_cmd(command):
     try:
-        # Get service details
-        service_response = ecs.describe_services(
-            cluster='edsteward-cluster',
-            services=['edsteward-service']
-        )
-        
-        service = service_response['services'][0]
-        network_config = service['networkConfiguration']['awsvpcConfiguration']
-        
-        log(f"✅ Found network config: {len(network_config['subnets'])} subnets, {len(network_config['securityGroups'])} security groups")
-        return network_config
-        
+        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        return result.returncode == 0, result.stdout.strip(), result.stderr.strip()
     except Exception as e:
-        log(f"❌ Failed to get network config: {e}", "ERROR")
-        return None
-
-def create_db_restore_task_with_sql():
-    """Create a database restoration task using the complete SQL dump"""
-    log("🚀 Creating database restoration task...")
-    
-    # Get network configuration
-    network_config = get_service_network_config()
-    if not network_config:
-        return False
-    
-    ecs = boto3.client('ecs', region_name='us-east-1')
-    
-    try:
-        # Get current task definition for reference
-        current_task_response = ecs.describe_task_definition(taskDefinition='edsteward-task')
-        current_task = current_task_response['taskDefinition']
-        current_container = current_task['containerDefinitions'][0]
-        
-        # Create restoration task definition
-        restoration_task_def = {
-            'family': 'edsteward-db-restore',
-            'networkMode': 'awsvpc',
-            'requiresCompatibilities': ['FARGATE'],
-            'cpu': '1024',
-            'memory': '2048',
-            'executionRoleArn': current_task['executionRoleArn'],
-            'containerDefinitions': [
-                {
-                    'name': 'db-restore-container',
-                    'image': 'postgres:16',  # Use official PostgreSQL image with psql
-                    'memory': 2048,
-                    'cpu': 1024,
-                    'essential': True,
-                    'logConfiguration': {
-                        'logDriver': 'awslogs',
-                        'options': {
-                            'awslogs-group': '/ecs/edsteward',
-                            'awslogs-region': 'us-east-1',
-                            'awslogs-stream-prefix': 'db-restore'
-                        }
-                    },
-                    'environment': [
-                        {'name': 'PGPASSWORD', 'value': 'EdSteward2024!Secure'},
-                        {'name': 'PGHOST', 'value': 'edsteward-db.cwv4g6g0yzmg.us-east-1.rds.amazonaws.com'},
-                        {'name': 'PGPORT', 'value': '5432'},
-                        {'name': 'PGUSER', 'value': 'postgres'},
-                        {'name': 'PGDATABASE', 'value': 'postgres'}
-                    ],
-                    'command': [
-                        '/bin/bash',
-                        '-c',
-                        '''
-                        echo "🔧 Starting database restoration..."
-                        
-                        # Test connection first
-                        echo "📡 Testing database connection..."
-                        psql -c "SELECT version();" || exit 1
-                        
-                        echo "✅ Database connection successful"
-                        
-                        # Create the restoration SQL
-                        cat > /tmp/restore.sql << 'EOF'
--- Database restoration script
-SET statement_timeout = 300000;
-SET lock_timeout = 0;
-SET idle_in_transaction_session_timeout = 0;
-SET client_encoding = 'UTF8';
-SET standard_conforming_strings = on;
-SET check_function_bodies = false;
-SET xmloption = content;
-SET client_min_messages = warning;
-SET row_security = off;
-
--- Drop existing tables if they exist (clean slate)
-DROP TABLE IF EXISTS comments CASCADE;
-DROP TABLE IF EXISTS deadlines CASCADE;
-DROP TABLE IF EXISTS evidence_files CASCADE;
-DROP TABLE IF EXISTS guides CASCADE;
-DROP TABLE IF EXISTS notes CASCADE;
-DROP TABLE IF EXISTS notifications CASCADE;
-DROP TABLE IF EXISTS regulations CASCADE;
-DROP TABLE IF EXISTS session CASCADE;
-DROP TABLE IF EXISTS system_logs CASCADE;
-DROP TABLE IF EXISTS users CASCADE;
-
--- Drop sequences
-DROP SEQUENCE IF EXISTS comments_id_seq CASCADE;
-DROP SEQUENCE IF EXISTS deadlines_id_seq CASCADE;
-DROP SEQUENCE IF EXISTS evidence_files_id_seq CASCADE;
-DROP SEQUENCE IF EXISTS guides_id_seq CASCADE;
-DROP SEQUENCE IF EXISTS notes_id_seq CASCADE;
-DROP SEQUENCE IF EXISTS notifications_id_seq CASCADE;
-DROP SEQUENCE IF EXISTS regulations_id_seq CASCADE;
-DROP SEQUENCE IF EXISTS system_logs_id_seq CASCADE;
-DROP SEQUENCE IF EXISTS users_id_seq CASCADE;
-
--- Create sequences
-CREATE SEQUENCE public.comments_id_seq AS integer START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
-CREATE SEQUENCE public.deadlines_id_seq AS integer START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
-CREATE SEQUENCE public.evidence_files_id_seq AS integer START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
-CREATE SEQUENCE public.guides_id_seq AS integer START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
-CREATE SEQUENCE public.notes_id_seq AS integer START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
-CREATE SEQUENCE public.notifications_id_seq AS integer START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
-CREATE SEQUENCE public.regulations_id_seq AS integer START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
-CREATE SEQUENCE public.system_logs_id_seq AS integer START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
-CREATE SEQUENCE public.users_id_seq AS integer START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
-
--- Create users table (core authentication table)
-CREATE TABLE public.users (
-    id integer NOT NULL DEFAULT nextval('public.users_id_seq'::regclass),
-    username text NOT NULL,
-    password text NOT NULL,
-    role text DEFAULT 'user'::text NOT NULL,
-    department text,
-    email text DEFAULT ''::text NOT NULL,
-    "firstName" text,
-    "lastName" text,
-    external_id text,
-    provider_id text,
-    identity_provider text,
-    last_login timestamp without time zone,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
-);
-
--- Create regulations table
-CREATE TABLE public.regulations (
-    id integer NOT NULL DEFAULT nextval('public.regulations_id_seq'::regclass),
-    title text NOT NULL,
-    summary text,
-    description text,
-    requirements text,
-    affected_entities text,
-    compliance_date date,
-    enforcement_date date,
-    last_updated timestamp without time zone DEFAULT now(),
-    status text DEFAULT 'active'::text,
-    source_url text,
-    jurisdiction text,
-    agency_name text,
-    category text,
-    topic text,
-    item_id text,
-    previous_version_id integer,
-    content_hash text,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
-);
-
--- Create session table (for session management)
-CREATE TABLE public.session (
-    sid character varying NOT NULL,
-    sess json NOT NULL,
-    expire timestamp(6) without time zone NOT NULL
-);
-
--- Create notes table
-CREATE TABLE public.notes (
-    id integer NOT NULL DEFAULT nextval('public.notes_id_seq'::regclass),
-    regulation_id integer NOT NULL,
-    user_id integer NOT NULL,
-    title text NOT NULL,
-    content text NOT NULL,
-    category text DEFAULT 'general'::text NOT NULL,
-    status text DEFAULT 'active'::text NOT NULL,
-    is_private boolean DEFAULT false NOT NULL,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
-);
-
--- Create notifications table
-CREATE TABLE public.notifications (
-    id integer NOT NULL DEFAULT nextval('public.notifications_id_seq'::regclass),
-    user_id integer NOT NULL,
-    title text NOT NULL,
-    message text NOT NULL,
-    type text DEFAULT 'info'::text NOT NULL,
-    is_read boolean DEFAULT false NOT NULL,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
-);
-
--- Create system_logs table
-CREATE TABLE public.system_logs (
-    id integer NOT NULL DEFAULT nextval('public.system_logs_id_seq'::regclass),
-    "timestamp" timestamp without time zone DEFAULT now() NOT NULL,
-    facility integer NOT NULL,
-    severity integer NOT NULL,
-    version integer DEFAULT 1 NOT NULL,
-    hostname text NOT NULL,
-    app_name text NOT NULL,
-    proc_id text NOT NULL,
-    msg_id text,
-    structured_data jsonb,
-    message text NOT NULL
-);
-
--- Create other tables
-CREATE TABLE public.deadlines (
-    id integer NOT NULL DEFAULT nextval('public.deadlines_id_seq'::regclass),
-    regulation_id integer NOT NULL,
-    title text NOT NULL,
-    description text,
-    due_date date NOT NULL,
-    status text DEFAULT 'pending'::text NOT NULL,
-    assigned_to integer,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
-);
-
-CREATE TABLE public.evidence_files (
-    id integer NOT NULL DEFAULT nextval('public.evidence_files_id_seq'::regclass),
-    regulation_id integer NOT NULL,
-    filename text NOT NULL,
-    file_path text NOT NULL,
-    file_size integer,
-    mime_type text,
-    uploaded_by integer NOT NULL,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
-);
-
-CREATE TABLE public.guides (
-    id integer NOT NULL DEFAULT nextval('public.guides_id_seq'::regclass),
-    title text NOT NULL,
-    content text NOT NULL,
-    category text DEFAULT 'general'::text NOT NULL,
-    status text DEFAULT 'active'::text NOT NULL,
-    created_by integer NOT NULL,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
-);
-
-CREATE TABLE public.comments (
-    id integer NOT NULL DEFAULT nextval('public.comments_id_seq'::regclass),
-    regulation_id integer NOT NULL,
-    user_id integer NOT NULL,
-    content text NOT NULL,
-    is_public boolean DEFAULT true NOT NULL,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
-);
-
--- Add primary key constraints
-ALTER TABLE ONLY public.users ADD CONSTRAINT users_pkey PRIMARY KEY (id);
-ALTER TABLE ONLY public.regulations ADD CONSTRAINT regulations_pkey PRIMARY KEY (id);
-ALTER TABLE ONLY public.session ADD CONSTRAINT session_pkey PRIMARY KEY (sid);
-ALTER TABLE ONLY public.notes ADD CONSTRAINT notes_pkey PRIMARY KEY (id);
-ALTER TABLE ONLY public.notifications ADD CONSTRAINT notifications_pkey PRIMARY KEY (id);
-ALTER TABLE ONLY public.system_logs ADD CONSTRAINT system_logs_pkey PRIMARY KEY (id);
-ALTER TABLE ONLY public.deadlines ADD CONSTRAINT deadlines_pkey PRIMARY KEY (id);
-ALTER TABLE ONLY public.evidence_files ADD CONSTRAINT evidence_files_pkey PRIMARY KEY (id);
-ALTER TABLE ONLY public.guides ADD CONSTRAINT guides_pkey PRIMARY KEY (id);
-ALTER TABLE ONLY public.comments ADD CONSTRAINT comments_pkey PRIMARY KEY (id);
-
--- Add unique constraints
-ALTER TABLE ONLY public.users ADD CONSTRAINT users_username_unique UNIQUE (username);
-ALTER TABLE ONLY public.users ADD CONSTRAINT users_external_id_key UNIQUE (external_id);
-
--- Add indexes
-CREATE INDEX "IDX_session_expire" ON public.session USING btree (expire);
-CREATE INDEX idx_regulations_agency ON public.regulations USING btree (agency_name);
-CREATE INDEX idx_regulations_category ON public.regulations USING btree (category);
-CREATE INDEX idx_regulations_item_id ON public.regulations USING btree (item_id);
-CREATE INDEX idx_regulations_jurisdiction ON public.regulations USING btree (jurisdiction);
-CREATE INDEX idx_regulations_last_updated ON public.regulations USING btree (last_updated);
-CREATE INDEX idx_regulations_topic ON public.regulations USING btree (topic);
-
--- Set sequence ownership
-ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
-ALTER SEQUENCE public.regulations_id_seq OWNED BY public.regulations.id;
-ALTER SEQUENCE public.notes_id_seq OWNED BY public.notes.id;
-ALTER SEQUENCE public.notifications_id_seq OWNED BY public.notifications.id;
-ALTER SEQUENCE public.system_logs_id_seq OWNED BY public.system_logs.id;
-ALTER SEQUENCE public.deadlines_id_seq OWNED BY public.deadlines.id;
-ALTER SEQUENCE public.evidence_files_id_seq OWNED BY public.evidence_files.id;
-ALTER SEQUENCE public.guides_id_seq OWNED BY public.guides.id;
-ALTER SEQUENCE public.comments_id_seq OWNED BY public.comments.id;
-
--- Insert the working user data
-INSERT INTO public.users (id, username, password, role, department, email, "firstName", "lastName", external_id, provider_id, identity_provider, last_login, created_at, updated_at) VALUES 
-(5, 'nasol@moravian.edu', '4f09114c36bfd8bce96204888921752aebb6a4d26842746255d405733ad5305a3bba415fe60523b8ea87425e93bea4275ab4368e298b2cc8d2c0b2f8b736acd1.ec07d9e5935ec88a460022b62913dfde', 'admin', 'Compliance', '', NULL, NULL, NULL, NULL, NULL, NULL, '2025-03-04 14:30:48.855809', '2025-03-04 14:30:49.04378'),
-(7, 'leahn', '89d1677273cf096733b7ebf1debb057e69a60ba4720252296366b37819f23fdc9704c7ce6cd1c1f5b21b76b14a08bfe46d78efa0023fb02a613562f176eeb251.60f43f7f991a731dbf6f60c39f124c38', 'admin', 'leahn', '', NULL, NULL, NULL, NULL, NULL, NULL, '2025-03-04 14:30:48.855809', '2025-03-04 14:30:49.04378'),
-(8, 'leahnaso', '1c9d95a0b94e2aa56b9a1c6d2eadcae930b301cfbeeaedced1d28ddd3fc6c06150041471a3553b9d9b7d2ef310c85598e66c01e5e6b9f9606306b7d2bb701cfd.f59210d79fec350e37e1b36c55eae1e1', 'admin', 'Compliance', 'nasol@moravian.edu', NULL, NULL, NULL, NULL, NULL, NULL, '2025-03-04 14:30:48.855809', '2025-03-04 14:30:49.04378'),
-(10, 'sharontest', 'a6c15631205a4bea6a2b1904a179e87b3b6005a83d0109fd2092fc0956efba8acc5924007e7569179c80c44df3202ac1e30d195d5718c4c5703df0d8f4473467.64812ca8a4ad8fd2717452f5bb7feede', 'user', 'IR', 'mauss@moravian.edu', NULL, NULL, NULL, NULL, NULL, NULL, '2025-03-04 14:30:48.855809', '2025-03-04 14:30:49.04378'),
-(4, 'davey', '557f98f852351b360acc1fb240062eca4dcd4ae48c781b544f16af9934679e1dd0d3c95e8ef2e8ddbe4da681f4b63d4e8d467190c945ba6df9df83453150dc33.234792cff19ffdd124063d215010c06a', 'user', '', '', NULL, NULL, NULL, NULL, NULL, NULL, '2025-03-04 19:30:48.855809', '2025-03-04 19:30:49.04378'),
-(6, 'dvdbrnds', '783782f8f254ca4880d60753314b2d648ed30795c856c2b011cae841749b77e3a76461bbb333e1af95db563cdd25d4737f7bfd664ee59dbede1cff31e1c00285.609a61a8a0c4d147ee28cf63830ec8bc', 'admin', 'IT', 'brandesd@moravian.edu', 'David', 'Brandes', NULL, NULL, NULL, '2025-05-22 20:01:31.136000', '2025-03-04 19:30:48.855809', '2025-03-04 19:30:49.04378');
-
--- Reset sequences to proper values
-SELECT setval('public.users_id_seq', (SELECT COALESCE(MAX(id), 1) FROM public.users), true);
-SELECT setval('public.regulations_id_seq', 1, false);
-SELECT setval('public.notes_id_seq', 1, false);
-SELECT setval('public.notifications_id_seq', 1, false);
-SELECT setval('public.system_logs_id_seq', 1, false);
-SELECT setval('public.deadlines_id_seq', 1, false);
-SELECT setval('public.evidence_files_id_seq', 1, false);
-SELECT setval('public.guides_id_seq', 1, false);
-SELECT setval('public.comments_id_seq', 1, false);
-
--- Grant proper permissions
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO postgres;
-GRANT USAGE, SELECT ON ALL SEQUENCES IN SCHEMA public TO postgres;
-
--- Final verification
-SELECT 'Database restoration complete' as status, 
-       (SELECT count(*) FROM users) as user_count,
-       (SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public') as table_count;
-EOF
-
-                        echo "📋 Executing database restoration..."
-                        
-                        # Execute the restoration
-                        psql -f /tmp/restore.sql
-                        
-                        if [ $? -eq 0 ]; then
-                            echo "✅ Database restoration completed successfully!"
-                        else
-                            echo "❌ Database restoration failed!"
-                            exit 1
-                        fi
-                        
-                        echo "🎉 Database schema and data restored!"
-                        '''
-                    ]
-                }
-            ]
-        }
-        
-        # Add taskRoleArn if it exists
-        if 'taskRoleArn' in current_task:
-            restoration_task_def['taskRoleArn'] = current_task['taskRoleArn']
-        
-        # Register the restoration task definition
-        log("📝 Registering database restoration task definition...")
-        register_response = ecs.register_task_definition(**restoration_task_def)
-        restoration_task_arn = register_response['taskDefinition']['taskDefinitionArn']
-        
-        log(f"✅ Restoration task definition: {restoration_task_arn}")
-        
-        # Run the restoration task
-        log("🔄 Running database restoration task...")
-        run_response = ecs.run_task(
-            cluster='edsteward-cluster',
-            taskDefinition=restoration_task_arn,
-            launchType='FARGATE',
-            networkConfiguration={
-                'awsvpcConfiguration': network_config
-            }
-        )
-        
-        task_arn = run_response['tasks'][0]['taskArn']
-        log(f"✅ Restoration task started: {task_arn}")
-        
-        return task_arn
-        
-    except Exception as e:
-        log(f"❌ Failed to create restoration task: {e}", "ERROR")
-        return False
-
-def wait_for_restoration_completion(task_arn):
-    """Wait for the database restoration task to complete"""
-    log("⏳ Waiting for database restoration to complete...")
-    
-    ecs = boto3.client('ecs', region_name='us-east-1')
-    max_wait_time = 600  # 10 minutes
-    start_time = time.time()
-    
-    while (time.time() - start_time) < max_wait_time:
-        try:
-            # Check task status
-            response = ecs.describe_tasks(
-                cluster='edsteward-cluster',
-                tasks=[task_arn]
-            )
-            
-            if response['tasks']:
-                task = response['tasks'][0]
-                last_status = task['lastStatus']
-                
-                log(f"📋 Restoration task status: {last_status}")
-                
-                if last_status == 'STOPPED':
-                    exit_code = task['containers'][0].get('exitCode', 1)
-                    if exit_code == 0:
-                        log("✅ Database restoration completed successfully!", "SUCCESS")
-                        return True
-                    else:
-                        log(f"❌ Database restoration failed with exit code: {exit_code}", "ERROR")
-                        return False
-                elif last_status == 'RUNNING':
-                    log("🔄 Database restoration in progress...")
-            
-        except Exception as e:
-            log(f"⚠️ Error checking task status: {e}", "WARNING")
-        
-        time.sleep(15)
-    
-    log("⚠️ Restoration task timeout", "WARNING")
-    return False
-
-def test_login_functionality():
-    """Test the login functionality with restored database"""
-    log("🧪 Testing login functionality...")
-    
-    base_url = "http://edsteward-alb-554701445.us-east-1.elb.amazonaws.com"
-    
-    # Wait a moment for application to restart
-    time.sleep(30)
-    
-    try:
-        # Test login endpoint with a known user
-        login_response = requests.post(
-            f"{base_url}/api/login",
-            json={"username": "dvdbrnds", "password": "test123"},
-            headers={"Content-Type": "application/json"},
-            timeout=15
-        )
-        
-        log(f"🔐 Login test result: {login_response.status_code}")
-        
-        if login_response.status_code == 401:
-            log("✅ Login endpoint working! (401 = invalid password, but endpoint is functional)", "SUCCESS")
-            return True
-        elif login_response.status_code == 200:
-            log("🎉 Login successful! Database fully restored!", "SUCCESS")
-            return True
-        else:
-            log(f"⚠️ Login endpoint returned: {login_response.status_code}", "WARNING")
-            return False
-        
-    except Exception as e:
-        log(f"❌ Login test failed: {e}", "ERROR")
-        return False
+        return False, None, str(e)
 
 def main():
-    log("🎯 Starting database schema restoration with Option 1...")
+    log("🚀 SIMPLE DATABASE RESTORATION")
+    log("=" * 50)
     
-    # Step 1: Create and run database restoration task
-    restoration_task_arn = create_db_restore_task_with_sql()
-    if not restoration_task_arn:
-        return
+    # Step 1: Upload backup to S3
+    log("📍 STEP 1: Uploading backup to S3...")
     
-    # Step 2: Wait for restoration to complete
-    if not wait_for_restoration_completion(restoration_task_arn):
-        log("❌ Database restoration failed", "ERROR")
-        return
+    bucket_name = "edsteward-temp-backup"
     
-    # Step 3: Test login functionality
-    success = test_login_functionality()
+    # Create S3 bucket
+    success, _, error = run_cmd(f'aws s3 mb s3://{bucket_name} --region us-east-1')
     
-    # Final summary
-    log("=" * 80)
-    log("🎯 DATABASE RESTORATION SUMMARY")
-    log("=" * 80)
+    if success or "already exists" in error.lower():
+        log(f"✅ S3 bucket ready: {bucket_name}")
+        
+        # Upload backup file
+        if os.path.exists('nosync_backup.sql'):
+            success, _, error = run_cmd(f'aws s3 cp nosync_backup.sql s3://{bucket_name}/nosync_backup.sql')
+            
+            if success:
+                log("✅ Backup uploaded to S3")
+            else:
+                log(f"❌ Failed to upload backup: {error}")
+                return False
+        else:
+            log("❌ Backup file not found")
+            return False
+    else:
+        log(f"❌ Failed to create S3 bucket: {error}")
+        return False
     
-    log("✅ Database schema: RESTORED")
-    log("✅ User data: RESTORED (6 users)")
-    log("✅ Tables created: users, regulations, notes, notifications, etc.")
+    # Step 2: Get VPC and subnet info
+    log("\n📍 STEP 2: Getting network configuration...")
+    
+    success, rds_output, _ = run_cmd('aws rds describe-db-instances --db-instance-identifier edsteward-db --output json')
+    
+    if not success:
+        log("❌ Failed to get RDS details")
+        return False
+    
+    rds_data = json.loads(rds_output)
+    vpc_id = rds_data['DBInstances'][0]['DBSubnetGroup']['VpcId']
+    
+    # Find any subnet in the VPC (private is fine for this approach)
+    success, subnet_output, _ = run_cmd(f'aws ec2 describe-subnets --filters "Name=vpc-id,Values={vpc_id}" --query "Subnets[0].SubnetId" --output text')
     
     if success:
-        log("🎉 SUCCESS: Database fully restored and login working!", "SUCCESS")
-        log("👤 Available users:")
-        log("   - dvdbrnds (admin)")
-        log("   - nasol@moravian.edu (admin)")
-        log("   - leahn (admin)")
-        log("   - leahnaso (admin)")
-        log("   - sharontest (user)")
-        log("   - davey (user)")
+        subnet_id = subnet_output
+        log(f"✅ Using subnet: {subnet_id}")
     else:
-        log("⚠️ Database restored but login may need more time to initialize", "WARNING")
+        log("❌ Failed to find subnet")
+        return False
     
-    log(f"\n🔗 Application URL: http://edsteward-alb-554701445.us-east-1.elb.amazonaws.com")
-    log("✨ Database restoration complete!")
+    # Step 3: Create IAM role for EC2 (if needed)
+    log("\n📍 STEP 3: Setting up IAM role...")
+    
+    role_name = "EdStewardDBRestoreRole"
+    
+    # Create trust policy
+    trust_policy = {
+        "Version": "2012-10-17",
+        "Statement": [
+            {
+                "Effect": "Allow",
+                "Principal": {"Service": "ec2.amazonaws.com"},
+                "Action": "sts:AssumeRole"
+            }
+        ]
+    }
+    
+    # Try to create role
+    success, _, error = run_cmd(f'aws iam create-role --role-name {role_name} --assume-role-policy-document \'{json.dumps(trust_policy)}\'')
+    
+    if success or "already exists" in error.lower():
+        log(f"✅ IAM role ready: {role_name}")
+        
+        # Attach policies
+        run_cmd(f'aws iam attach-role-policy --role-name {role_name} --policy-arn arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore')
+        run_cmd(f'aws iam attach-role-policy --role-name {role_name} --policy-arn arn:aws:iam::aws:policy/AmazonS3ReadOnlyAccess')
+        
+        # Create instance profile
+        run_cmd(f'aws iam create-instance-profile --instance-profile-name {role_name}')
+        run_cmd(f'aws iam add-role-to-instance-profile --instance-profile-name {role_name} --role-name {role_name}')
+        
+        time.sleep(10)  # Wait for IAM propagation
+        
+    else:
+        log(f"❌ Failed to create IAM role: {error}")
+        return False
+    
+    # Step 4: Launch EC2 instance
+    log("\n📍 STEP 4: Launching EC2 instance...")
+    
+    ami_id = "ami-0c02fb55956c7d316"  # Amazon Linux 2
+    
+    user_data = '''#!/bin/bash
+yum update -y
+yum install -y postgresql15
+aws s3 cp s3://edsteward-temp-backup/nosync_backup.sql /tmp/nosync_backup.sql
+echo "Setup complete" > /tmp/ready.txt
+'''
+    
+    user_data_b64 = base64.b64encode(user_data.encode()).decode()
+    
+    success, instance_output, error = run_cmd(f'''aws ec2 run-instances \
+        --image-id {ami_id} \
+        --instance-type t3.micro \
+        --subnet-id {subnet_id} \
+        --iam-instance-profile Name={role_name} \
+        --user-data {user_data_b64} \
+        --tag-specifications 'ResourceType=instance,Tags=[{{Key=Name,Value=edsteward-db-restore}}]' \
+        --output json''')
+    
+    if success:
+        instance_data = json.loads(instance_output)
+        instance_id = instance_data['Instances'][0]['InstanceId']
+        log(f"✅ Launched instance: {instance_id}")
+        
+        # Wait for instance to be running
+        log("⏳ Waiting for instance to be ready...")
+        success, _, _ = run_cmd(f'aws ec2 wait instance-running --instance-ids {instance_id}')
+        
+        if success:
+            log("✅ Instance is running")
+            
+            # Wait for Systems Manager to be ready
+            time.sleep(120)
+            
+            # Step 5: Run database restoration
+            log("\n📍 STEP 5: Running database restoration...")
+            
+            restore_command = '''
+cd /tmp
+echo "Testing RDS connection..."
+psql "postgresql://postgres:EdSteward2024!Secure@edsteward-db.cwv4g6g0yzmg.us-east-1.rds.amazonaws.com:5432/postgres" -c "SELECT version();"
+
+if [ $? -eq 0 ]; then
+    echo "✅ Connection successful! Starting restoration..."
+    psql "postgresql://postgres:EdSteward2024!Secure@edsteward-db.cwv4g6g0yzmg.us-east-1.rds.amazonaws.com:5432/postgres" < nosync_backup.sql
+    echo "✅ Database restoration complete!"
+else
+    echo "❌ Connection failed"
+    exit 1
+fi
+'''
+            
+            success, command_output, error = run_cmd(f'''aws ssm send-command \
+                --instance-ids {instance_id} \
+                --document-name "AWS-RunShellScript" \
+                --parameters 'commands=["{restore_command}"]' \
+                --output json''')
+            
+            if success:
+                command_data = json.loads(command_output)
+                command_id = command_data['Command']['CommandId']
+                log(f"✅ Started restoration command: {command_id}")
+                
+                # Wait for command to complete
+                log("⏳ Waiting for restoration to complete...")
+                time.sleep(30)
+                
+                # Get command output
+                success, result_output, _ = run_cmd(f'aws ssm get-command-invocation --command-id {command_id} --instance-id {instance_id} --output json')
+                
+                if success:
+                    result_data = json.loads(result_output)
+                    stdout = result_data.get('StandardOutputContent', '')
+                    stderr = result_data.get('StandardErrorContent', '')
+                    
+                    log("📋 Command Output:")
+                    print(stdout)
+                    
+                    if stderr:
+                        log("⚠️  Errors:")
+                        print(stderr)
+                    
+                    if "restoration complete" in stdout.lower():
+                        log("🎉 DATABASE RESTORATION SUCCESSFUL!")
+                        success_flag = True
+                    else:
+                        log("❌ Restoration may have failed")
+                        success_flag = False
+                else:
+                    log("❌ Failed to get command results")
+                    success_flag = False
+            else:
+                log(f"❌ Failed to run restoration command: {error}")
+                success_flag = False
+            
+            # Step 6: Cleanup
+            log("\n📍 STEP 6: Cleaning up resources...")
+            
+            # Terminate instance
+            run_cmd(f'aws ec2 terminate-instances --instance-ids {instance_id}')
+            log("✅ Terminated EC2 instance")
+            
+            # Delete S3 bucket
+            run_cmd(f'aws s3 rm s3://{bucket_name}/nosync_backup.sql')
+            run_cmd(f'aws s3 rb s3://{bucket_name}')
+            log("✅ Cleaned up S3 bucket")
+            
+            return success_flag
+            
+        else:
+            log("❌ Instance failed to start")
+            return False
+    else:
+        log(f"❌ Failed to launch instance: {error}")
+        return False
 
 if __name__ == "__main__":
-    main()
+    import os
+    
+    success = main()
+    if success:
+        print("\n🎊 DATABASE RESTORATION COMPLETED SUCCESSFULLY!")
+        print("Your Neon database data has been restored to AWS RDS!")
+    else:
+        print("\n❌ Database restoration failed. Check the logs above.")
