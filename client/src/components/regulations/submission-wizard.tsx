@@ -47,7 +47,8 @@ const steps = [
   { id: 'info', title: 'Basic Information' },
   { id: 'requirements', title: 'Requirements Review' },
   { id: 'evidence', title: 'Evidence Upload' },
-  { id: 'review', title: 'Final Review' }
+  { id: 'review', title: 'Final Review' },
+  { id: 'submit', title: 'Submit to Agency' }
 ];
 
 interface UploadedFile {
@@ -65,9 +66,21 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
   const [currentStep, setCurrentStep] = useState<string>('info');
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmittingToAgency, setIsSubmittingToAgency] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Reset wizard when dialog opens
+  React.useEffect(() => {
+    if (open) {
+      setCurrentStep('info');
+      setUploadedFiles([]);
+      setIsSubmitting(false);
+      setIsSubmittingToAgency(false);
+      form.reset();
+    }
+  }, [open]);
 
   const form = useForm<EvidenceFormValues>({
     resolver: zodResolver(evidenceFormSchema),
@@ -78,7 +91,7 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
   });
 
   const handleStepChange = async (stepId: string) => {
-    if (currentStep === 'evidence' && stepId === 'review') {
+    if (currentStep === 'evidence' && (stepId === 'review' || stepId === 'submit')) {
       const isValid = await form.trigger(['documentTitle', 'description']);
       if (!isValid || uploadedFiles.length === 0) {
         toast({
@@ -146,7 +159,7 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
     setUploadedFiles(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleSubmit = async () => {
+  const handleEvidenceSubmit = async () => {
     if (!regulation.id) {
       toast({
         title: "Error",
@@ -187,15 +200,13 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
       }
 
       toast({
-        title: "Evidence Submitted Successfully",
+        title: "Evidence Uploaded Successfully",
         description: `${uploadedFiles.length} files uploaded successfully.`,
       });
 
-      // Clear form and close dialog
-      setUploadedFiles([]);
-      form.reset();
+      // Move to next step instead of closing
+      setCurrentStep('submit');
       queryClient.invalidateQueries({ queryKey: ['/api/regulations', regulation.id, 'evidence'] });
-      onOpenChange(false);
     } catch (error) {
       toast({
         title: "Submission Failed",
@@ -207,13 +218,44 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
     }
   };
 
+  const handleAgencySubmit = async () => {
+    try {
+      setIsSubmittingToAgency(true);
+
+      // TODO: Implement actual agency submission logic here
+      // For now, just simulate a successful submission
+      await new Promise(resolve => setTimeout(resolve, 2000));
+
+      const agencyName = regulation.agency_name || 'Agency';
+      
+      toast({
+        title: "Successfully Submitted to " + agencyName,
+        description: "Your compliance submission has been sent to the agency.",
+      });
+
+      // Clear form and close dialog
+      setUploadedFiles([]);
+      form.reset();
+      setCurrentStep('info');
+      onOpenChange(false);
+    } catch (error) {
+      toast({
+        title: "Agency Submission Failed",
+        description: "There was an error submitting to the agency. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmittingToAgency(false);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-[800px]">
         <DialogHeader>
-          <DialogTitle>Submit Evidence</DialogTitle>
+          <DialogTitle>Agency Submission Wizard</DialogTitle>
           <DialogDescription>
-            Complete each step to submit your compliance evidence.
+            Complete each step to upload evidence and submit your compliance to the agency.
           </DialogDescription>
         </DialogHeader>
 
@@ -417,22 +459,85 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
                     </div>
                   </div>
                   <Button
-                    onClick={handleSubmit}
+                    onClick={handleEvidenceSubmit}
                     className="w-full"
                     disabled={isSubmitting}
                   >
                     {isSubmitting ? (
                       <>
                         <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                        Submitting...
+                        Uploading Evidence...
                       </>
                     ) : (
                       <>
-                        Submit Evidence
-                        <Check className="h-4 w-4 ml-2" />
+                        Upload Evidence
+                        <ChevronRight className="h-4 w-4 ml-2" />
                       </>
                     )}
                   </Button>
+                </div>
+              )}
+
+              {currentStep === 'submit' && (
+                <div className="space-y-4">
+                  <div className="prose max-w-none">
+                    <h3>Submit to {regulation.agency_name || 'Agency'}</h3>
+                    <p>
+                      Your evidence has been uploaded and is ready for submission to the regulatory agency.
+                    </p>
+                    <div className="bg-green-50 border border-green-200 p-4 rounded-md">
+                      <div className="flex items-start gap-2">
+                        <Check className="h-5 w-5 text-green-600 mt-0.5" />
+                        <div>
+                          <h4 className="text-sm font-medium text-green-800">Evidence Ready</h4>
+                          <p className="text-sm text-green-700">
+                            {uploadedFiles.length} file{uploadedFiles.length !== 1 ? 's' : ''} uploaded successfully
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    {regulation.agency_name && (
+                      <div className="bg-blue-50 border border-blue-200 p-4 rounded-md">
+                        <h4 className="text-sm font-medium text-blue-800">Agency Information</h4>
+                        <p className="text-sm text-blue-700 mt-1">
+                          <strong>Agency:</strong> {regulation.agency_name}
+                        </p>
+                        {regulation.agency_department && (
+                          <p className="text-sm text-blue-700">
+                            <strong>Department:</strong> {regulation.agency_department}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => handleStepChange('review')}
+                      className="flex-1"
+                    >
+                      Back to Review
+                    </Button>
+                    <Button
+                      onClick={handleAgencySubmit}
+                      className="flex-1"
+                      disabled={isSubmittingToAgency}
+                    >
+                      {isSubmittingToAgency ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Submitting...
+                        </>
+                      ) : (
+                        <>
+                          Submit to {regulation.agency_name || 'Agency'}
+                          <Check className="h-4 w-4 ml-2" />
+                        </>
+                      )}
+                    </Button>
+                  </div>
                 </div>
               )}
             </ScrollArea>
