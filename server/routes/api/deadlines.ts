@@ -4,7 +4,7 @@ import type { InsertDeadline } from "@shared/schema";
 
 const router = express.Router();
 
-// GET /api/deadlines - Get all deadlines (requires authentication)
+// GET /api/deadlines - Get all deadlines with regulation names (requires authentication)
 router.get("/", async (req, res) => {
   try {
     if (!req.user) {
@@ -12,7 +12,20 @@ router.get("/", async (req, res) => {
     }
 
     const deadlines = await storage.getDeadlines();
-    return res.json(deadlines);
+    const regulations = await storage.getRegulations();
+    
+    // Create a map for quick regulation lookup
+    const regulationMap = new Map(regulations.map(reg => [reg.id, reg]));
+    
+    // Enhance deadlines with regulation names
+    const enhancedDeadlines = deadlines.map(deadline => ({
+      ...deadline,
+      regulationName: regulationMap.get(deadline.regulationId)?.name || `Regulation #${deadline.regulationId}`,
+      regulationTopic: regulationMap.get(deadline.regulationId)?.topic,
+      regulationStatuteIds: regulationMap.get(deadline.regulationId)?.statuteIds
+    }));
+
+    return res.json(enhancedDeadlines);
   } catch (error) {
     console.error("Error fetching deadlines:", error);
     return res.status(500).json({ 

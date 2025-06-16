@@ -69,11 +69,12 @@ export default function UpcomingDeadlines({ categoryFilter, limit }: UpcomingDea
             const daysUntilDue = differenceInDays(new Date(deadline.dueDate), new Date());
             const isExpanded = expandedDeadlineId === deadline.id;
 
-            const regulationTitle = regulation 
-              ? regulation.statuteIds 
-                ? `${regulation.statuteIds}${regulation.topic ? ` - ${regulation.topic}` : ''}`
-                : regulation.topic || `Regulation #${deadline.regulationId}`
-              : `Regulation #${deadline.regulationId}`;
+            // Use regulation name from deadline (if enhanced endpoint) or from regulation lookup
+            const regulationTitle = (deadline as any).regulationName 
+              ? (deadline as any).regulationName
+              : regulation 
+                ? regulation.name || regulation.topic || `Regulation #${deadline.regulationId}`
+                : `Regulation #${deadline.regulationId}`;
 
             return (
               <div key={deadline.id}>
