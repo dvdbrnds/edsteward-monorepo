@@ -43,12 +43,12 @@ class RegulationsApi {
   // Get all regulations with filtering
   async getRegulations(filters?: RegulationFilters): Promise<Regulation[]> {
     const params = filters ? this.buildFilterParams(filters) : undefined;
-    return apiClient.get<Regulation[]>('/regulations', { params });
+    return apiClient.get<Regulation[]>('/public/regulations', { params });
   }
 
   // Get regulation by ID
   async getRegulation(id: string): Promise<Regulation> {
-    return apiClient.get<Regulation>(`/regulations/${id}`);
+    return apiClient.get<Regulation>(`/public/regulations/${id}`);
   }
 
   // Create new regulation

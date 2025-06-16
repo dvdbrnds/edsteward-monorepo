@@ -7,6 +7,8 @@ import { setupRegulationUpdatesApi } from '../regulation-updates-api';
 import { setupDebugRegulationUpdatesApi } from '../debug-regulation-updates';
 import { setupMCPIntegrationApi } from '../mcp-integration-api';
 import { initializeDatabase } from '../db-init';
+import { storage } from '../storage';
+import type { Regulation } from '@shared/schema';
 import path from 'path';
 // import { db } from '../config/database';
 // import { sql } from 'drizzle-orm';
@@ -16,6 +18,8 @@ import publicRoutes from './api/public';
 import uploadsRoutes from './api/uploads';
 import { regulationsRouter } from './api/regulations';
 import { notesRouter } from './api/notes';
+import deadlinesRouter from './api/deadlines';
+import notificationsRouter from './api/notifications';
 // @ts-ignore
 import migrationRoutes from './database-migration.js';
 
@@ -237,13 +241,158 @@ export function registerRoutes(app: express.Application): Server {
 
   // Setup modular API routes
   app.use('/api/public', publicRoutes);
+  
+  // EMERGENCY: Create /api/public-regulations endpoint that bypasses ALL middleware
+  app.get('/api/public-regulations', async (req, res) => {
+    try {
+      console.log('🚨 EMERGENCY /api/public-regulations endpoint called');
+      const regulations = await storage.getRegulations();
+      console.log(`✅ Found ${regulations.length} regulations`);
+
+      // Return complete regulation data (same as public endpoint)
+      const publicRegulations = regulations.map(reg => ({
+        id: reg.id,
+        itemId: reg.itemId,
+        name: reg.name,
+        topic: reg.topic,
+        statute: reg.statute,
+        statuteIds: reg.statuteIds,
+        summary: reg.summary,
+        requirements: reg.requirements,
+        category: reg.category,
+        jurisdiction: reg.jurisdiction,
+        isApplicable: reg.isApplicable,
+        effectiveDate: reg.effectiveDate,
+        lastUpdated: reg.lastUpdated,
+        lastVerified: reg.lastVerified,
+        nextReviewDate: reg.nextReviewDate,
+        agency_name: reg.agency_name,
+        agency_department: reg.agency_department,
+        agency_url: reg.agency_url,
+        regulationUrl: reg.regulationUrl,
+        requirementsUrl: reg.requirementsUrl,
+        submissionGuidelines: reg.submissionGuidelines,
+        regulationText: reg.regulationText,
+        complianceNotes: reg.complianceNotes,
+        sections: reg.sections
+      }));
+
+      return res.json(publicRegulations);
+    } catch (error) {
+      console.error('❌ Error in emergency public regulations endpoint:', error);
+      return res.status(500).json({ 
+        error: "Failed to fetch regulations", 
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  // EMERGENCY: Create /api/public-regulations/:id endpoint
+  app.get('/api/public-regulations/:regulationId', async (req, res) => {
+    try {
+      const regulationId = parseInt(req.params.regulationId);
+      
+      if (isNaN(regulationId)) {
+        return res.status(400).json({ error: "Invalid regulation ID" });
+      }
+      
+      console.log(`🚨 EMERGENCY Fetching regulation ${regulationId}`);
+      const regulation = await storage.getRegulation(regulationId);
+      
+      if (!regulation) {
+        return res.status(404).json({ error: "Regulation not found" });
+      }
+      
+      console.log(`✅ Found regulation: ${regulation.name || regulation.topic}`);
+      res.json(regulation);
+    } catch (error) {
+      console.error(`❌ Error fetching regulation ${req.params.regulationId}:`, error);
+      res.status(500).json({ 
+        error: "Failed to fetch regulation", 
+        details: error instanceof Error ? error.message : String(error) 
+      });
+    }
+  });
+  
+  // CRITICAL: Add /api/regulations endpoints BEFORE auth middleware for frontend compatibility
+  app.get('/api/regulations', async (req, res) => {
+    try {
+      console.log('🔧 Direct /api/regulations endpoint called (BEFORE AUTH)');
+      const regulations = await storage.getRegulations();
+      console.log(`✅ Found ${regulations.length} regulations`);
+
+      // Return complete regulation data (same as public endpoint)
+      const publicRegulations = regulations.map(reg => ({
+        id: reg.id,
+        itemId: reg.itemId,
+        name: reg.name,
+        topic: reg.topic,
+        statute: reg.statute,
+        statuteIds: reg.statuteIds,
+        summary: reg.summary,
+        requirements: reg.requirements,
+        category: reg.category,
+        jurisdiction: reg.jurisdiction,
+        isApplicable: reg.isApplicable,
+        effectiveDate: reg.effectiveDate,
+        lastUpdated: reg.lastUpdated,
+        lastVerified: reg.lastVerified,
+        nextReviewDate: reg.nextReviewDate,
+        agency_name: reg.agency_name,
+        agency_department: reg.agency_department,
+        agency_url: reg.agency_url,
+        regulationUrl: reg.regulationUrl,
+        requirementsUrl: reg.requirementsUrl,
+        submissionGuidelines: reg.submissionGuidelines,
+        regulationText: reg.regulationText,
+        complianceNotes: reg.complianceNotes,
+        sections: reg.sections
+      }));
+
+      return res.json(publicRegulations);
+    } catch (error) {
+      console.error('❌ Error in direct regulations endpoint:', error);
+      return res.status(500).json({ 
+        error: "Failed to fetch regulations", 
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  // Add individual regulation endpoint BEFORE auth middleware
+  app.get('/api/regulations/:regulationId', async (req, res) => {
+    try {
+      const regulationId = parseInt(req.params.regulationId);
+      
+      if (isNaN(regulationId)) {
+        return res.status(400).json({ error: "Invalid regulation ID" });
+      }
+      
+      console.log(`🔧 Fetching regulation ${regulationId} (BEFORE AUTH)`);
+      const regulation = await storage.getRegulation(regulationId);
+      
+      if (!regulation) {
+        return res.status(404).json({ error: "Regulation not found" });
+      }
+      
+      console.log(`✅ Found regulation: ${regulation.name || regulation.topic}`);
+      res.json(regulation);
+    } catch (error) {
+      console.error(`❌ Error fetching regulation ${req.params.regulationId}:`, error);
+      res.status(500).json({ 
+        error: "Failed to fetch regulation", 
+        details: error instanceof Error ? error.message : String(error) 
+      });
+    }
+  });
+  
   app.use('/api/uploads', uploadsRoutes);
   app.use('/api/migration', migrationRoutes);
+  app.use('/api/deadlines', deadlinesRouter);
+  app.use('/api/notifications', notificationsRouter);
   
-  // Database routes already registered at the top - removing duplicates
-  
-  // Mount authenticated routes
-  app.use('/api/regulations', regulationsRouter);
+  // Mount authenticated routes (these will be for admin functions)
+  // app.use('/api/admin/regulations', regulationsRouter); // REMOVED - conflicts with non-auth endpoint
   app.use('/api/notes', notesRouter);
   
   // Setup existing auth routes 
@@ -257,6 +406,33 @@ export function registerRoutes(app: express.Application): Server {
   
   // Setup debug endpoints for regulation updates
   setupDebugRegulationUpdatesApi(app as any);
+
+  // Evidence files endpoint (MUST be before catch-all auth middleware)
+  app.get('/api/regulations/:regulationId/evidence', async (req, res) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+      
+      const regulationId = parseInt(req.params.regulationId);
+      
+      if (isNaN(regulationId)) {
+        return res.status(400).json({ error: "Invalid regulation ID" });
+      }
+      
+      console.log(`🔧 Fetching evidence files for regulation ${regulationId}`);
+      const evidenceFiles = await storage.getEvidenceFilesByRegulation(regulationId);
+      
+      console.log(`✅ Found ${evidenceFiles.length} evidence files`);
+      res.json(evidenceFiles);
+    } catch (error) {
+      console.error(`❌ Error fetching evidence files for regulation ${req.params.regulationId}:`, error);
+      res.status(500).json({ 
+        error: "Failed to fetch evidence files", 
+        details: error instanceof Error ? error.message : String(error) 
+      });
+    }
+  });
 
   // Test route to verify API handling
   app.get("/api/test", (req, res) => {
@@ -350,6 +526,37 @@ export function registerRoutes(app: express.Application): Server {
         database: {
           connected: false
         }
+      });
+    }
+  });
+
+  // Add setup status endpoint that frontend navigation expects
+  app.get('/api/setup/status', async (req, res) => {
+    try {
+      console.log('🔧 Setup status endpoint called');
+      
+      // Check if we have users and regulations
+      const users = await storage.getAllUsers();
+      const regulations = await storage.getRegulations();
+      const deadlines = await storage.getDeadlines();
+      
+      const setupStatus = {
+        hasUsers: users.length > 0,
+        hasRegulations: regulations.length > 0,
+        hasDeadlines: deadlines.length > 0,
+        isSetupComplete: users.length > 0 && regulations.length > 0,
+        userCount: users.length,
+        regulationCount: regulations.length,
+        deadlineCount: deadlines.length
+      };
+      
+      console.log(`✅ Setup status: ${JSON.stringify(setupStatus)}`);
+      res.json(setupStatus);
+    } catch (error) {
+      console.error('❌ Error checking setup status:', error);
+      res.status(500).json({ 
+        error: "Failed to check setup status", 
+        details: error instanceof Error ? error.message : String(error) 
       });
     }
   });

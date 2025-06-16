@@ -11,7 +11,7 @@ router.get('/regulations', async (req, res) => {
     const regulations = await storage.getRegulations();
     syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Public access: Found ${regulations.length} regulations`);
 
-    // Only return necessary fields for public view
+    // Return complete regulation data for public view
     const publicRegulations = regulations.map(reg => ({
       id: reg.id,
       itemId: reg.itemId,
@@ -20,6 +20,7 @@ router.get('/regulations', async (req, res) => {
       statute: reg.statute,
       statuteIds: reg.statuteIds,
       summary: reg.summary,
+      requirements: reg.requirements,
       category: reg.category,
       jurisdiction: reg.jurisdiction,
       isApplicable: reg.isApplicable,
@@ -28,7 +29,14 @@ router.get('/regulations', async (req, res) => {
       lastVerified: reg.lastVerified,
       nextReviewDate: reg.nextReviewDate,
       agency_name: reg.agency_name,
-      agency_department: reg.agency_department
+      agency_department: reg.agency_department,
+      agency_url: reg.agency_url,
+      regulationUrl: reg.regulationUrl,
+      requirementsUrl: reg.requirementsUrl,
+      submissionGuidelines: reg.submissionGuidelines,
+      regulationText: reg.regulationText,
+      complianceNotes: reg.complianceNotes,
+      sections: reg.sections
     }));
 
     return res.json(publicRegulations);

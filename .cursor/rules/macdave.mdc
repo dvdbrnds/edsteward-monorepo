@@ -1,0 +1,15 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+CRITICAL: The local development environment uses zsh shell on macOS with Homebrew. Always:
+
+Write scripts with #!/bin/zsh shebang (NOT bash)
+Use zsh-compatible syntax and features
+Use Homebrew (brew) as the package manager for installing dependencies
+Test commands locally before assuming they work
+When scripts fail, ALWAYS read and analyze the actual error output
+Don't assume scripts work without verification - check the exit codes and output
+Use macOS-compatible commands (e.g., brew install instead of apt-get, greadlink instead of readlink)
+Be aware of macOS-specific paths and behaviors (e.g., Homebrew installs to /opt/homebrew on Apple Silicon)
