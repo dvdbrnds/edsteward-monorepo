@@ -1,0 +1,9 @@
+FROM 259661441422.dkr.ecr.us-east-1.amazonaws.com/edsteward:platform-fix-1749916525
+
+# Copy patch script
+COPY patch.sh /patch.sh
+RUN chmod +x /patch.sh
+
+# Use patch script as entrypoint
+ENTRYPOINT ["/patch.sh"]
+CMD ["node", "dist/index.js"]

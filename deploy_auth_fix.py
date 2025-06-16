@@ -1,134 +1,159 @@
 #!/usr/bin/env python3
+"""
+Deploy Authentication Fix to AWS
+================================
+
+This script deploys the fixed authentication configuration to AWS ECS.
+"""
+
+import subprocess
 import boto3
 import time
+import sys
 
-def deploy_auth_fix():
-    """Deploy the auth fix"""
+# Configuration
+ECR_REPO = "588670245982.dkr.ecr.us-east-1.amazonaws.com/edsteward"
+LOCAL_TAG = "edsteward:fix-auth"
+REMOTE_TAG = f"{ECR_REPO}:auth-fix-{int(time.time())}"
+CLUSTER_NAME = "edsteward-cluster"
+SERVICE_NAME = "edsteward-service"
+
+def run_command(cmd, description):
+    """Run a command and return success status"""
+    print(f"🔄 {description}...")
+    try:
+        result = subprocess.run(cmd, shell=True, capture_output=True, text=True, check=True)
+        print(f"✅ {description} completed")
+        if result.stdout.strip():
+            print(f"   Output: {result.stdout.strip()}")
+        return True
+    except subprocess.CalledProcessError as e:
+        print(f"❌ {description} failed:")
+        print(f"   Error: {e.stderr}")
+        return False
+
+def main():
+    print("🚀 Starting deployment of authentication fix...")
+    
+    # Step 1: Login to ECR
+    print("\n📦 Logging into ECR...")
+    if not run_command(
+        "aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 588670245982.dkr.ecr.us-east-1.amazonaws.com",
+        "ECR login"
+    ):
+        print("❌ ECR login failed. Trying alternative approach...")
+        return False
+    
+    # Step 2: Tag the image
+    print(f"\n🏷️  Tagging image...")
+    if not run_command(
+        f"docker tag {LOCAL_TAG} {REMOTE_TAG}",
+        f"Tag image as {REMOTE_TAG}"
+    ):
+        return False
+    
+    # Step 3: Push to ECR
+    print(f"\n📤 Pushing to ECR...")
+    if not run_command(
+        f"docker push {REMOTE_TAG}",
+        f"Push {REMOTE_TAG} to ECR"
+    ):
+        return False
+    
+    # Step 4: Update ECS service
+    print(f"\n🔄 Updating ECS service...")
     try:
         ecs = boto3.client('ecs', region_name='us-east-1')
         
-        # Use the auth fix image
-        auth_fix_image = '259661441422.dkr.ecr.us-east-1.amazonaws.com/edsteward-repo:auth-fix-1750035418'
-        
-        print(f"🚀 Deploying AUTH FIX: {auth_fix_image}")
-        
         # Get current task definition
-        response = ecs.describe_services(
-            cluster='edsteward-cluster',
-            services=['edsteward-service']
+        service_response = ecs.describe_services(
+            cluster=CLUSTER_NAME,
+            services=[SERVICE_NAME]
         )
         
-        current_task_def = response['services'][0]['taskDefinition']
+        if not service_response['services']:
+            print(f"❌ Service {SERVICE_NAME} not found")
+            return False
+            
+        current_task_def = service_response['services'][0]['taskDefinition']
+        print(f"   Current task definition: {current_task_def}")
         
         # Get task definition details
-        task_def_response = ecs.describe_task_definition(taskDefinition=current_task_def)
+        task_def_response = ecs.describe_task_definition(
+            taskDefinition=current_task_def
+        )
+        
         task_def = task_def_response['taskDefinition']
-        
-        # Create new task definition
-        new_task_def = {
-            'family': task_def['family'],
-            'networkMode': task_def['networkMode'],
-            'requiresCompatibilities': task_def['requiresCompatibilities'],
-            'cpu': task_def['cpu'],
-            'memory': task_def['memory'],
-            'executionRoleArn': task_def['executionRoleArn'],
-            'containerDefinitions': []
-        }
-        
-        if task_def.get('taskRoleArn'):
-            new_task_def['taskRoleArn'] = task_def['taskRoleArn']
         
         # Update container image
         for container in task_def['containerDefinitions']:
-            new_container = container.copy()
-            if container['name'] == 'edsteward-app':
-                new_container['image'] = auth_fix_image
-            new_task_def['containerDefinitions'].append(new_container)
+            if container['name'] == 'edsteward':
+                old_image = container['image']
+                container['image'] = REMOTE_TAG
+                print(f"   Updated image: {old_image} -> {REMOTE_TAG}")
+                break
         
-        # Register and deploy
-        new_task_response = ecs.register_task_definition(**new_task_def)
-        new_task_arn = new_task_response['taskDefinition']['taskDefinitionArn']
+        # Remove fields that can't be included in registration
+        for field in ['taskDefinitionArn', 'revision', 'status', 'requiresAttributes', 
+                     'placementConstraints', 'compatibilities', 'registeredAt', 'registeredBy']:
+            if field in task_def:
+                del task_def[field]
         
+        # Register new task definition
+        print("   Registering new task definition...")
+        new_task_def = ecs.register_task_definition(**task_def)
+        new_task_arn = new_task_def['taskDefinition']['taskDefinitionArn']
+        print(f"   New task definition: {new_task_arn}")
+        
+        # Update service
+        print("   Updating service...")
         ecs.update_service(
-            cluster='edsteward-cluster',
-            service='edsteward-service',
-            taskDefinition=new_task_arn,
-            forceNewDeployment=True
+            cluster=CLUSTER_NAME,
+            service=SERVICE_NAME,
+            taskDefinition=new_task_arn
         )
         
-        print("⏳ Waiting for auth fix deployment...")
-        
-        # Wait for deployment
-        for i in range(15):
-            time.sleep(30)
-            
-            response = ecs.describe_services(
-                cluster='edsteward-cluster',
-                services=['edsteward-service']
-            )
-            
-            service = response['services'][0]
-            running_count = service['runningCount']
-            desired_count = service['desiredCount']
-            
-            deployments = service['deployments']
-            primary_deployment = next((d for d in deployments if d['status'] == 'PRIMARY'), None)
-            
-            if primary_deployment:
-                current_task_def = primary_deployment['taskDefinition']
-                print(f"   Attempt {i+1}: {running_count}/{desired_count} tasks, using {current_task_def}")
-                
-                if running_count == desired_count and new_task_arn in current_task_def:
-                    print("✅ AUTH FIX DEPLOYMENT COMPLETED!")
-                    
-                    # Test the fix
-                    print("🧪 Testing the auth fix...")
-                    time.sleep(15)
-                    
-                    import requests
-                    try:
-                        # Test the frontend endpoint that was failing
-                        response = requests.get('http://edsteward-alb-554701445.us-east-1.elb.amazonaws.com/api/regulations', timeout=15)
-                        if response.status_code == 200:
-                            data = response.json()
-                            if isinstance(data, list) and len(data) > 0:
-                                first_reg = data[0]
-                                field_count = len(first_reg.keys())
-                                has_requirements = 'requirements' in first_reg
-                                has_regulation_url = 'regulationUrl' in first_reg
-                                has_submission_guidelines = 'submissionGuidelines' in first_reg
-                                
-                                print(f"📊 Regulation has {field_count} fields")
-                                print(f"✅ Has requirements field: {has_requirements}")
-                                print(f"✅ Has regulationUrl field: {has_regulation_url}")
-                                print(f"✅ Has submissionGuidelines field: {has_submission_guidelines}")
-                                
-                                if has_requirements and has_regulation_url and field_count > 20:
-                                    print("🎉 SUCCESS! The frontend should now work!")
-                                    print("🎯 All critical fields are now present in /api/regulations")
-                                    print("🚀 EdSteward is now fully operational!")
-                                    print("🔓 Authentication bypass successful!")
-                                    return True
-                                else:
-                                    print("⚠️ Still missing some critical fields")
-                                    return False
-                            else:
-                                print("⚠️ No regulations returned or wrong format")
-                                return False
-                        else:
-                            print(f"⚠️ API returned status {response.status_code}")
-                            if response.status_code == 401:
-                                print("🔒 Still getting authentication error - auth bypass failed")
-                            return False
-                    except Exception as e:
-                        print(f"⚠️ Couldn't test API: {e}")
-                        return True
-        
-        return False
+        print("✅ ECS service update initiated")
         
     except Exception as e:
-        print(f"❌ Error: {e}")
+        print(f"❌ ECS update failed: {e}")
         return False
+    
+    # Step 5: Wait for deployment
+    print(f"\n⏳ Waiting for deployment to complete...")
+    try:
+        waiter = ecs.get_waiter('services_stable')
+        waiter.wait(
+            cluster=CLUSTER_NAME,
+            services=[SERVICE_NAME],
+            WaiterConfig={'maxAttempts': 30, 'delay': 30}
+        )
+        print("✅ Deployment completed successfully!")
+        
+    except Exception as e:
+        print(f"⚠️  Deployment may still be in progress: {e}")
+        print("   Check AWS console for status")
+    
+    # Step 6: Test the deployment
+    print(f"\n🧪 Testing deployment...")
+    time.sleep(10)  # Give it a moment to start
+    
+    if run_command(
+        "python3 diagnose-auth-issue.py",
+        "Testing regulations endpoint"
+    ):
+        print("\n🎉 DEPLOYMENT SUCCESSFUL!")
+        print("   The authentication fix has been deployed and is working!")
+    else:
+        print("\n⚠️  Deployment completed but endpoint test failed")
+        print("   Please check the service logs")
+    
+    return True
 
 if __name__ == "__main__":
-    deploy_auth_fix() 
+    if main():
+        print("\n✅ Authentication fix deployment completed!")
+        sys.exit(0)
+    else:
+        print("\n❌ Deployment failed!")
+        sys.exit(1) 

@@ -9,12 +9,9 @@ export const regulationKeys = {
   list: (filters?: RegulationFilters) => [...regulationKeys.lists(), { filters }] as const,
   details: () => [...regulationKeys.all, 'detail'] as const,
   detail: (id: string) => [...regulationKeys.details(), id] as const,
-  public: () => [...regulationKeys.all, 'public'] as const,
-  publicList: () => [...regulationKeys.public(), 'list'] as const,
-  publicDetail: (id: string) => [...regulationKeys.public(), 'detail', id] as const,
 };
 
-// Hook for fetching regulations list
+// Hook for fetching regulations list (authenticated)
 export function useRegulations(filters?: RegulationFilters) {
   return useQuery({
     queryKey: regulationKeys.list(filters),
@@ -23,32 +20,13 @@ export function useRegulations(filters?: RegulationFilters) {
   });
 }
 
-// Hook for fetching a single regulation
+// Hook for fetching a single regulation (authenticated)
 export function useRegulation(id: string, enabled = true) {
   return useQuery({
     queryKey: regulationKeys.detail(id),
     queryFn: () => regulationsApi.getRegulation(id),
     enabled: enabled && !!id,
     staleTime: 5 * 60 * 1000, // 5 minutes
-  });
-}
-
-// Hook for fetching public regulations (no auth required)
-export function usePublicRegulations() {
-  return useQuery({
-    queryKey: regulationKeys.publicList(),
-    queryFn: () => regulationsApi.getPublicRegulations(),
-    staleTime: 10 * 60 * 1000, // 10 minutes
-  });
-}
-
-// Hook for fetching a single public regulation
-export function usePublicRegulation(id: string, enabled = true) {
-  return useQuery({
-    queryKey: regulationKeys.publicDetail(id),
-    queryFn: () => regulationsApi.getPublicRegulation(id),
-    enabled: enabled && !!id,
-    staleTime: 10 * 60 * 1000, // 10 minutes
   });
 }
 

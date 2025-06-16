@@ -1,99 +1,22 @@
-version: '3.8'
-
 services:
-  app-dev:
+  app:
     build:
       context: .
       dockerfile: Dockerfile.dev
       target: development
     ports:
-      - "3000:3000"
-      - "5173:5173"  # Vite dev server
+      - "3000:3001"
     environment:
-      # Development Configuration
       - NODE_ENV=development
-      - PORT=3000
-      - VITE_PORT=5173
-      
-      # Database Configuration (local dev DB)
-      - DATABASE_URL=postgresql://devuser:devpass@postgres-dev:5432/devdb?sslmode=disable
-      - DB_HOST=postgres-dev
+      - DATABASE_URL=postgresql://neondb_owner:npg_foSr6ixkzw7W@ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require
+      - DB_HOST=ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech
       - DB_PORT=5432
-      - DB_NAME=devdb
-      - DB_USER=devuser
-      - DB_PASSWORD=devpass
-      
-      # Development Settings
-      - BASE_DOMAIN=localhost
-      - ENABLE_MULTI_TENANCY=false
-      - SESSION_SECRET=dev-secret-key-12345
-      - REDIS_URL=redis://redis-dev:6379
-      
-      # Development Features
-      - HOT_RELOAD=true
-      - DISABLE_EXTERNAL_APIS=true
-      - SKIP_SSL_VERIFY=true
-      - LOG_LEVEL=debug
-      - WATCH_MODE=true
-      
-    depends_on:
-      - redis-dev
-      - postgres-dev
+      - DB_NAME=neondb
+      - DB_USER=neondb_owner
+      - DB_PASSWORD=npg_foSr6ixkzw7W
+      - DB_SSL=true
+      - SESSION_SECRET=dev-secret-key-for-local-development-only
     volumes:
-      # Mount source code for hot reloading
-      - ./server:/app/server
-      - ./client:/app/client
-      - ./shared:/app/shared
-      - ./package.json:/app/package.json
-      - ./tsconfig.json:/app/tsconfig.json
-      - ./vite.config.ts:/app/vite.config.ts
-      - ./uploads:/app/uploads
-      - ./logs:/app/logs
-      # Node modules cache (don't override)
+      - .:/app
       - /app/node_modules
-    networks:
-      - dev-network
     command: npm run dev
-    stdin_open: true
-    tty: true
-
-  redis-dev:
-    image: redis:7-alpine
-    ports:
-      - "6380:6379"  # Different port for dev
-    networks:
-      - dev-network
-    command: redis-server --appendonly yes
-    volumes:
-      - redis-dev-data:/data
-
-  postgres-dev:
-    image: postgres:15-alpine
-    ports:
-      - "5433:5432"  # Different port for dev
-    environment:
-      - POSTGRES_DB=devdb
-      - POSTGRES_USER=devuser
-      - POSTGRES_PASSWORD=devpass
-      - POSTGRES_HOST_AUTH_METHOD=trust
-    networks:
-      - dev-network
-    volumes:
-      - postgres-dev-data:/var/lib/postgresql/data
-      - ./sql_dump/database_export_clean.sql:/docker-entrypoint-initdb.d/01-database_export_clean.sql
-      - ./sql_dump/regulations_data.sql:/docker-entrypoint-initdb.d/02-regulations_data.sql
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U devuser -d devdb"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-
-volumes:
-  redis-dev-data:
-    driver: local
-  postgres-dev-data:
-    driver: local
-
-networks:
-  dev-network:
-    driver: bridge 

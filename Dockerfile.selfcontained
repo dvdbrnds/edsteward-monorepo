@@ -1,0 +1,69 @@
+# Multi-stage build for self-contained production deployment
+FROM --platform=linux/amd64 node:18-alpine AS base
+
+# Install dependencies only when needed
+FROM --platform=linux/amd64 base AS deps
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+
+# Copy package files
+COPY package.json package-lock.json ./
+
+# Install dependencies
+RUN npm ci --only=production --legacy-peer-deps && npm cache clean --force
+
+# Rebuild the source code only when needed
+FROM --platform=linux/amd64 base AS builder
+WORKDIR /app
+
+# Copy dependency files
+COPY package.json package-lock.json ./
+
+# Install all dependencies (including dev dependencies)
+RUN npm ci --legacy-peer-deps
+
+# Copy source code
+COPY . .
+
+# Build the frontend
+RUN npx vite build
+
+# Production image, copy all the files and run the app
+FROM --platform=linux/amd64 base AS runner
+WORKDIR /app
+
+# Install PostgreSQL client for health checks and utilities
+RUN apk add --no-cache postgresql-client
+
+# Create app user for security
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nodejs
+
+# Copy built application
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/server ./server
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/tsconfig.json ./tsconfig.json
+COPY --from=builder /app/vite.config.ts ./vite.config.ts
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/shared ./shared
+
+# Create directories and set permissions
+RUN mkdir -p /app/uploads /app/logs && chown -R nodejs:nodejs /app/uploads /app/logs
+
+# Set permissions
+USER nodejs
+
+# Expose port
+EXPOSE 3000
+
+# Environment variables
+ENV NODE_ENV=production
+ENV PORT=3000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
+
+# Start the application
+CMD ["node", "dist/index.js"] 

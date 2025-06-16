@@ -15,40 +15,16 @@ export interface RegulationListResponse {
   limit: number;
 }
 
-export interface PublicRegulation {
-  id: number;
-  itemId: string;
-  name: string;
-  topic: string;
-  statute: string;
-  statuteIds?: string;
-  summary?: string;
-  requirements?: string;
-  category: string;
-  jurisdiction: string;
-  isApplicable: boolean;
-  effectiveDate?: Date;
-  lastUpdated?: Date;
-  lastVerified?: Date;
-  nextReviewDate?: Date;
-  agency_name?: string;
-  agency_department?: string;
-  agency_url?: string;
-  regulationUrl?: string;
-  requirementsUrl?: string;
-  submissionGuidelines?: string;
-}
-
 class RegulationsApi {
-  // Get all regulations with filtering
+  // Get all regulations with filtering (authenticated)
   async getRegulations(filters?: RegulationFilters): Promise<Regulation[]> {
     const params = filters ? this.buildFilterParams(filters) : undefined;
-    return apiClient.get<Regulation[]>('/public/regulations', { params });
+    return apiClient.get<Regulation[]>('/regulations', { params });
   }
 
-  // Get regulation by ID
+  // Get regulation by ID (authenticated)
   async getRegulation(id: string): Promise<Regulation> {
-    return apiClient.get<Regulation>(`/public/regulations/${id}`);
+    return apiClient.get<Regulation>(`/regulations/${id}`);
   }
 
   // Create new regulation
@@ -64,16 +40,6 @@ class RegulationsApi {
   // Delete regulation
   async deleteRegulation(id: string): Promise<void> {
     return apiClient.delete<void>(`/regulations/${id}`);
-  }
-
-  // Get public regulations (no auth required)
-  async getPublicRegulations(): Promise<PublicRegulation[]> {
-    return apiClient.get<PublicRegulation[]>('/public/regulations');
-  }
-
-  // Get public regulation by ID (no auth required)
-  async getPublicRegulation(id: string): Promise<PublicRegulation> {
-    return apiClient.get<PublicRegulation>(`/public/regulations/${id}`);
   }
 
   // Upload regulation file

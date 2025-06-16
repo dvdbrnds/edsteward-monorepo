@@ -1,0 +1,6 @@
+FROM 259661441422.dkr.ecr.us-east-1.amazonaws.com/edsteward:platform-fix-1749916525
+
+# Just copy our fixed routes file
+COPY server/routes/index.ts /app/server/routes/index.ts
+
+# That's it - use the existing image with our fix
