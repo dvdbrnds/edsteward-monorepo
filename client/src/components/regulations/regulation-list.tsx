@@ -102,7 +102,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
     staleTime: 1000 * 60, // 1 minute
   });
 
-  const { data: user = {} } = useQuery({
+  const { data: user } = useQuery<{ role?: string }>({
     queryKey: ["/api/user"]
   });
 

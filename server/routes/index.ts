@@ -346,7 +346,13 @@ export function registerRoutes(app: express.Application): Server {
         submissionGuidelines: reg.submissionGuidelines,
         regulationText: reg.regulationText,
         complianceNotes: reg.complianceNotes,
-        sections: reg.sections
+        sections: reg.sections,
+        actions: reg.actions || [
+          { type: 'attestation', enabled: true, required: true, status: 'pending' },
+          { type: 'website_publish', enabled: true, required: false, status: 'pending' },
+          { type: 'community_communication', enabled: true, required: false, status: 'pending' },
+          { type: 'agency_submission', enabled: true, required: true, status: 'pending' }
+        ]
       }));
 
       return res.json(publicRegulations);
@@ -430,6 +436,71 @@ export function registerRoutes(app: express.Application): Server {
       res.status(500).json({ 
         error: "Failed to fetch evidence files", 
         details: error instanceof Error ? error.message : String(error) 
+      });
+    }
+  });
+
+  // Actions endpoint for updating regulation actions
+  app.patch('/api/regulations/:regulationId/actions/:actionType', async (req, res) => {
+    try {
+      if (!req.user) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+
+      const { regulationId, actionType } = req.params;
+      const actionUpdate = req.body;
+
+      // Only admins can change 'required' status
+      if ('required' in actionUpdate && req.user.role.toLowerCase() !== 'admin') {
+        return res.status(403).json({ error: "Admin access required to change required status" });
+      }
+
+      console.log(`🔧 Updating action for regulation ${regulationId}`, { actionType, update: actionUpdate });
+
+      const regulation = await storage.getRegulation(parseInt(regulationId));
+
+      if (!regulation) {
+        return res.status(404).json({ error: "Regulation not found" });
+      }
+
+      // Initialize default actions if they don't exist
+      if (!regulation.actions) {
+        regulation.actions = [
+          { type: 'attestation', enabled: true, required: true, status: 'pending' },
+          { type: 'website_publish', enabled: true, required: false, status: 'pending' },
+          { type: 'community_communication', enabled: true, required: false, status: 'pending' },
+          { type: 'agency_submission', enabled: true, required: true, status: 'pending' }
+        ];
+      }
+
+      const actionIndex = regulation.actions.findIndex(a => a.type === actionType);
+      if (actionIndex === -1) {
+        // If action type doesn't exist, add it with the update
+        regulation.actions.push({
+          type: actionType,
+          enabled: true,
+          required: false,
+          status: 'pending',
+          ...actionUpdate
+        });
+      } else {
+        regulation.actions[actionIndex] = {
+          ...regulation.actions[actionIndex],
+          ...actionUpdate
+        };
+      }
+
+      const updatedRegulation = await storage.updateRegulation(parseInt(regulationId), {
+        actions: regulation.actions
+      });
+
+      console.log(`✅ Successfully updated regulation action`, { regulationId, actionType });
+      res.json(updatedRegulation);
+    } catch (error) {
+      console.error(`❌ Error updating regulation action:`, error);
+      res.status(500).json({
+        error: "Failed to update regulation action",
+        details: error instanceof Error ? error.message : String(error)
       });
     }
   });
