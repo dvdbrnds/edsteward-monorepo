@@ -17,7 +17,6 @@ import LogsPage from "@/pages/admin/logs-page";
 import DebugToolsPage from "@/pages/admin/debug-tools-page";
 import { RegulationViewer } from "@/pages/RegulationViewer";
 import SetupWizardPage from "@/pages/setup-wizard-page";
-import RoadmapPage from "@/pages/roadmap";
 import PublicDashboardPage from "@/pages/public-dashboard-page";
 import PublicRegulationDetailPage from "@/pages/public-regulation-detail-page";
 import UpdatesListPage from "@/pages/updates-list-page";
@@ -62,7 +61,6 @@ function Router() {
           <ProtectedRoute path="/admin/logs" component={LogsPage} />
           <ProtectedRoute path="/admin/debug" component={DebugToolsPage} />
           <ProtectedRoute path="/admin/regulations" component={RegulationViewer} />
-          <ProtectedRoute path="/roadmap" component={RoadmapPage} />
           <Route component={NotFound} />
         </Switch>
       </PageLayout>

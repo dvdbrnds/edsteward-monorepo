@@ -286,7 +286,6 @@ export default function Navigation() {
     ...(user?.role?.toLowerCase() === "admin"
       ? [
           { href: "/admin/settings", label: "System Settings", icon: Settings },
-          { href: "/roadmap", label: "Development Roadmap", icon: FileText },
           // System Logs route is available at /admin/logs but hidden from navigation
           // Uncomment the following line to show it in the navigation:
           // { href: "/admin/logs", label: "System Logs", icon: FileText }

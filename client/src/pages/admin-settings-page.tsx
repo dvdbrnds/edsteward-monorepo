@@ -1,5 +1,3 @@
-import DebugTools from "@/components/debug-tools";
-import DatabaseManagement from "@/components/admin/database-management";
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -92,7 +90,6 @@ export default function SystemSettingsPage() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState("email");
-  const [notificationEnabled, setNotificationEnabled] = useState(false);
   const [search, setSearch] = useState("");
   const [level, setLevel] = useState<string>();
   const [facility, setFacility] = useState<string>();
@@ -421,14 +418,11 @@ export default function SystemSettingsPage() {
           <h1 className="text-3xl font-bold text-gray-900 mb-8">System Settings</h1>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-7 mb-4">
+            <TabsList className="grid grid-cols-4 mb-4">
               <TabsTrigger value="email">Email</TabsTrigger>
               <TabsTrigger value="sms">SMS</TabsTrigger>
-              <TabsTrigger value="notifications">Notifications</TabsTrigger>
               <TabsTrigger value="users">Users</TabsTrigger>
-              <TabsTrigger value="database">Database</TabsTrigger>
               <TabsTrigger value="logs">System Logs</TabsTrigger>
-              <TabsTrigger value="debug">Debug Tools</TabsTrigger>
             </TabsList>
 
             <TabsContent value="email">
@@ -583,40 +577,6 @@ export default function SystemSettingsPage() {
                       </Button>
                     </form>
                   </Form>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="notifications">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Notification Settings</CardTitle>
-                  <CardDescription>
-                    Configure system-wide notification settings.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        id="notification-enabled"
-                        checked={notificationEnabled}
-                        onCheckedChange={setNotificationEnabled}
-                      />
-                      <label
-                        htmlFor="notification-enabled"
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        Enable System Notifications
-                      </label>
-                    </div>
-
-                    {/* Additional notification settings would go here */}
-
-                    <Button>
-                      Save Notification Settings
-                    </Button>
-                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -915,34 +875,6 @@ export default function SystemSettingsPage() {
                       </>
                     )}
                   </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="database">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Database Management</CardTitle>
-                  <CardDescription>
-                    Import, export, and manage your database
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <DatabaseManagement />
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="debug">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Debug Tools</CardTitle>
-                  <CardDescription>
-                    Access system debugging and maintenance tools
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <DebugTools />
                 </CardContent>
               </Card>
             </TabsContent>

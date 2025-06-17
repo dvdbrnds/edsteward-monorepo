@@ -16,6 +16,7 @@ import { regulationsRouter } from './api/regulations';
 import { notesRouter } from './api/notes';
 import deadlinesRouter from './api/deadlines';
 import notificationsRouter from './api/notifications';
+import adminRouter from './api/admin';
 // @ts-ignore
 import migrationRoutes from './database-migration.js';
 
@@ -91,6 +92,7 @@ export function registerRoutes(app: express.Application): Server {
   app.use('/api/notes', notesRouter);
   app.use('/api/deadlines', deadlinesRouter);
   app.use('/api/notifications', notificationsRouter);
+  app.use('/api/admin', adminRouter);
   app.use('/api/database-migration', migrationRoutes);
 
   // Setup additional APIs
