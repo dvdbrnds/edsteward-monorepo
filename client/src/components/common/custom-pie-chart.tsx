@@ -68,7 +68,7 @@ export default function CustomPieChart({
   const legendData = [...data].sort((a, b) => a.name.localeCompare(b.name));
 
   return (
-    <Card>
+    <Card className="h-[600px]">
       <CardHeader>
         <CardTitle className="flex justify-between items-center">
           <div className="flex items-center gap-2">
@@ -91,8 +91,8 @@ export default function CustomPieChart({
               size="sm"
               onClick={() => downloadCSV(
                 data.map(({ name, value }) => ({
-                  [title.toLowerCase().replace(/ /g, '_')]: name,
-                  count: value,
+                  name: name,
+                  value: value,
                 })),
                 `${title.toLowerCase().replace(/ /g, '-')}.csv`
               )}
@@ -103,9 +103,9 @@ export default function CustomPieChart({
           )}
         </CardTitle>
       </CardHeader>
-      <CardContent className="pb-8">
+      <CardContent className="p-0">
         {/* Chart container */}
-        <div className="h-[250px] w-full mb-4">
+        <div className="h-[250px] w-full mb-4 px-6">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -146,7 +146,7 @@ export default function CustomPieChart({
         </div>
         
         {/* Custom legend outside of ResponsiveContainer */}
-        <div className="mt-2 px-2">
+        <div className="mt-2 px-8 pb-4">
           <div className="flex flex-wrap justify-center gap-2">
             {legendData.map((entry, index) => (
               <div 

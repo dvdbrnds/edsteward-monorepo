@@ -25,7 +25,7 @@ export default function UpcomingDeadlines({ categoryFilter, limit }: UpcomingDea
 
   if (deadlinesLoading || regulationsLoading || !deadlines || !regulations) {
     return (
-      <Card>
+      <Card className="h-[600px]">
         <CardHeader>
           <CardTitle>Upcoming Deadlines</CardTitle>
         </CardHeader>
@@ -52,7 +52,7 @@ export default function UpcomingDeadlines({ categoryFilter, limit }: UpcomingDea
     .slice(0, limit || filteredDeadlines.length);
 
   return (
-    <Card>
+    <Card className="h-[600px]">
       <CardHeader>
         <CardTitle>
           Upcoming Deadlines
@@ -66,8 +66,8 @@ export default function UpcomingDeadlines({ categoryFilter, limit }: UpcomingDea
           </span>
         </CardTitle>
       </CardHeader>
-      <CardContent className="pb-4">
-        <div className="space-y-2 max-h-[450px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400 pr-3">
+      <CardContent className="p-0">
+        <div className="space-y-2 max-h-[515px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400 pr-3 px-6 pb-4">
             {sortedDeadlines.map((deadline) => {
               const regulation = Array.isArray(regulations) ? regulations.find(r => r.id === deadline.regulationId) : null;
               const daysUntilDue = differenceInDays(new Date(deadline.dueDate), new Date());

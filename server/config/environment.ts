@@ -12,7 +12,7 @@ for (const envVar of requiredEnvVars) {
 export const config = {
   // Server configuration
   NODE_ENV: process.env.NODE_ENV || 'development',
-  PORT: parseInt(process.env.PORT || '3001', 10),
+  PORT: parseInt(process.env.PORT || '3000', 10),
   
   // Database
   DATABASE_URL: process.env.DATABASE_URL!,
@@ -39,8 +39,8 @@ export const config = {
   REDIS_PORT: parseInt(process.env.REDIS_PORT || '6379', 10),
   
   // Frontend URLs
-  REACT_APP_API_URL: process.env.REACT_APP_API_URL || 'http://localhost:3001',
-  REACT_APP_WS_URL: process.env.REACT_APP_WS_URL || 'ws://localhost:3001',
+  REACT_APP_API_URL: process.env.REACT_APP_API_URL || 'http://localhost:3000',
+  REACT_APP_WS_URL: process.env.REACT_APP_WS_URL || 'ws://localhost:3000',
 } as const;
 
 // Environment helpers

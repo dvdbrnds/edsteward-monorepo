@@ -363,12 +363,7 @@ export const insertRegulationSchema = createInsertSchema(regulations).extend({
 });
 
 // Schema for inserting notifications
-export const insertNotificationSchema = createInsertSchema(notifications).extend({
-  phoneNumber: z
-    .string()
-    .regex(/^\+\d{1,15}$/, "Must be a valid phone number in E.164 format")
-    .optional(),
-});
+export const insertNotificationSchema = createInsertSchema(notifications);
 
 // Schema for inserting deadlines
 export const insertDeadlineSchema = createInsertSchema(deadlines);

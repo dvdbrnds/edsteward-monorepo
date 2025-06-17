@@ -75,6 +75,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     onSuccess: (user: SelectUser) => {
       queryClient.setQueryData(["/api/user"], user);
+      // Invalidate all queries to refresh data after login
+      queryClient.invalidateQueries({ queryKey: ["/api/notifications"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/notifications", "v2"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/deadlines"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/regulations"] });
     },
     onError: (error: Error) => {
       toast({

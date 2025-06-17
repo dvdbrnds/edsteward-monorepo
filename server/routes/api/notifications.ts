@@ -4,14 +4,42 @@ import type { InsertNotification } from "@shared/schema";
 
 const router = express.Router();
 
-// GET /api/notifications - Get notifications for the current user
+// GET /api/notifications - Get notifications for the current user (or all for admins)
 router.get("/", async (req, res) => {
   try {
     if (!req.user) {
       return res.status(401).json({ error: "Authentication required" });
     }
 
-    const notifications = await storage.getNotificationsByUser(req.user.id);
+    // Debug logging
+    console.log("🔍 Notifications API Debug:", {
+      userId: req.user.id,
+      username: req.user.username,
+      role: req.user.role,
+      isAdmin: req.user.role === 'admin'
+    });
+
+    let notifications;
+    
+    // If user is admin, get all notifications; otherwise get user's notifications
+    if (req.user.role === 'admin') {
+      console.log("🔍 Admin user - fetching ALL notifications");
+      notifications = await storage.getAllNotifications();
+    } else {
+      console.log("🔍 Regular user - fetching user-specific notifications");
+      notifications = await storage.getNotificationsByUser(req.user.id);
+    }
+    
+    console.log("🔍 Notifications result:", {
+      isAdmin: req.user.role === 'admin',
+      totalReturned: notifications.length,
+      sampleUserIds: notifications.slice(0, 5).map(n => n.userId),
+      userIdDistribution: notifications.reduce((acc, n) => {
+        acc[n.userId] = (acc[n.userId] || 0) + 1;
+        return acc;
+      }, {} as Record<number, number>)
+    });
+    
     return res.json(notifications);
   } catch (error) {
     console.error("Error fetching notifications:", error);

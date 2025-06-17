@@ -15,9 +15,11 @@ export default function HomePage() {
   const { user } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  const { data: notifications, isLoading: notificationsLoading } = useQuery<Notification[]>({
-    queryKey: ["/api/notifications"],
+  const { data: notifications, isLoading: notificationsLoading, error } = useQuery<Notification[]>({
+    queryKey: ["/api/notifications", "v2"],
   });
+
+
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -29,9 +31,9 @@ export default function HomePage() {
             Welcome, {user?.username}
           </h1>
 
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 mb-8">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 mb-8 items-stretch">
             <div className="lg:col-span-2">
-              <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
+              <div className="grid grid-cols-1 gap-8 md:grid-cols-2 items-stretch h-full">
                 <ComplianceOverview 
                   onCategorySelect={setSelectedCategory}
                   selectedCategory={selectedCategory}
@@ -43,15 +45,15 @@ export default function HomePage() {
             </div>
 
             {/* Recent Notifications Card */}
-            <Card>
+            <Card className="h-[600px]">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Bell className="h-5 w-5 text-blue-500" />
                   Recent Notifications
                 </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-4 max-h-[400px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200 scrollbar-track-transparent">
+              <CardContent className="p-0">
+                <div className="space-y-2 max-h-[515px] overflow-y-auto pr-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400 px-6 pb-4">
                   {notificationsLoading ? (
                     <p className="text-gray-500 text-center py-4">Loading notifications...</p>
                   ) : Array.isArray(notifications) && notifications.length > 0 ? (
@@ -120,7 +122,7 @@ export default function HomePage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
               {selectedCategory ? `${selectedCategory} Regulations` : 'All Regulations'}
             </h2>
-            <RegulationList categoryFilter={selectedCategory} />
+            <RegulationList categoryFilter={selectedCategory} jurisdictionFilter={null} />
           </div>
         </div>
       </main>

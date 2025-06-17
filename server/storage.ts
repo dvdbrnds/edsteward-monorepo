@@ -133,6 +133,7 @@ export interface IStorage {
 
   // Notification methods
   getNotificationsByUser(userId: number): Promise<Notification[]>;
+  getAllNotifications(): Promise<Notification[]>;
   createNotification(notification: InsertNotification): Promise<Notification>;
   sendEmailNotification(userId: number, subject: string, message: string): Promise<boolean>;
 
@@ -526,6 +527,13 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(notifications)
       .where(eq(notifications.userId, userId));
+  }
+
+  async getAllNotifications(): Promise<Notification[]> {
+    return await db
+      .select()
+      .from(notifications)
+      .orderBy(notifications.id);
   }
 
   async createNotification(notification: InsertNotification): Promise<Notification> {
