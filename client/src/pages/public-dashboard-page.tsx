@@ -96,7 +96,8 @@ export default function DashboardPage() {
   const [location, navigate] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
-  const [jurisdictionFilter, setJurisdictionFilter] = useState<string>("all");
+  const [jurisdictionSourceFilter, setJurisdictionSourceFilter] = useState<string>("all");
+  const [institutionTypeFilter, setInstitutionTypeFilter] = useState<string>("all");
   const [complianceFilter, setComplianceFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
@@ -167,7 +168,9 @@ export default function DashboardPage() {
         reg.agency_name?.toLowerCase().includes(searchQuery.toLowerCase());
       
       const matchesCategory = categoryFilter === "all" || reg.category === categoryFilter;
-      const matchesJurisdiction = jurisdictionFilter === "all" || reg.jurisdiction === jurisdictionFilter;
+      const matchesJurisdictionSource = jurisdictionSourceFilter === "all" || reg.jurisdictionSource === jurisdictionSourceFilter;
+      const matchesInstitutionType = institutionTypeFilter === "all" || 
+        (reg.applicableInstitutions && reg.applicableInstitutions.includes(institutionTypeFilter));
       
       let matchesCompliance = true;
       if (complianceFilter !== "all") {
@@ -175,7 +178,7 @@ export default function DashboardPage() {
         matchesCompliance = status === complianceFilter;
       }
       
-      return matchesSearch && matchesCategory && matchesJurisdiction && matchesCompliance;
+      return matchesSearch && matchesCategory && matchesJurisdictionSource && matchesInstitutionType && matchesCompliance;
     });
 
     // Sort regulations

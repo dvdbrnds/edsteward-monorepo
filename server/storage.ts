@@ -80,7 +80,9 @@ export interface IStorage {
   createRegulation(regulation: InsertRegulation): Promise<Regulation>;
   updateRegulation(id: number, regulation: Partial<InsertRegulation>): Promise<Regulation>;
   setRegulationApplicability(id: number, isApplicable: boolean): Promise<Regulation>;
-  getRegulationsByJurisdiction(jurisdiction: string): Promise<Regulation[]>;
+  getRegulationsByJurisdiction(jurisdiction: string): Promise<Regulation[]>; // Legacy method
+  getRegulationsByJurisdictionSource(jurisdictionSource: string): Promise<Regulation[]>;
+  getRegulationsByInstitutionType(institutionType: string): Promise<Regulation[]>;
   searchRegulations(searchTerm: string): Promise<Regulation[]>;
   deleteRegulation(id: number): Promise<void>;
   
@@ -493,9 +495,39 @@ export class DatabaseStorage implements IStorage {
     const result = await db
       .select()
       .from(regulations)
-      .where(eq(regulations.jurisdiction, jurisdiction));
+      .where(eq(regulations.jurisdictionSource, jurisdiction));
     console.log(`Found ${result.length} ${jurisdiction} regulations`);
     return result as Regulation[];
+  }
+
+  async getRegulationsByJurisdictionSource(jurisdictionSource: string): Promise<Regulation[]> {
+    console.log(`Fetching regulations with jurisdiction source: ${jurisdictionSource}`);
+    const result = await db
+      .select()
+      .from(regulations)
+      .where(eq(regulations.jurisdictionSource, jurisdictionSource));
+    console.log(`Found ${result.length} ${jurisdictionSource} regulations`);
+    return result as Regulation[];
+  }
+
+  async getRegulationsByInstitutionType(institutionType: string): Promise<Regulation[]> {
+    console.log(`Fetching regulations applicable to institution type: ${institutionType}`);
+    
+    // Use raw SQL to query JSONB field
+    const query = `
+      SELECT * FROM regulations 
+      WHERE applicable_institutions @> $1 
+      OR applicable_institutions @> $2
+      ORDER BY last_updated DESC
+    `;
+    
+    const result = await pool.query(query, [
+      JSON.stringify([institutionType]),
+      JSON.stringify(['all-institutions'])
+    ]);
+    
+    console.log(`Found ${result.rows.length} regulations for ${institutionType}`);
+    return result.rows as Regulation[];
   }
 
   async searchRegulations(searchTerm: string): Promise<Regulation[]> {

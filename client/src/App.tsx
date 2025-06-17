@@ -22,6 +22,7 @@ import PublicRegulationDetailPage from "@/pages/public-regulation-detail-page";
 import UpdatesListPage from "@/pages/updates-list-page";
 import DifferentialViewPage from "@/pages/differential-view-page";
 import DiffTestPage from "@/pages/diff-test-page";
+import EnhancedJurisdictionDemo from "@/pages/enhanced-jurisdiction-demo";
 import { ProtectedRoute } from "./lib/protected-route";
 import { ProtectedRegulationRoute } from "./lib/protected-regulation-route";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
@@ -36,6 +37,7 @@ function Router() {
           {/* Public Routes - No Authentication Required */}
           <Route path="/public-dashboard" component={PublicDashboardPage} />
           <Route path="/public-dashboard/regulation/:id" component={PublicRegulationDetailPage} />
+          <Route path="/enhanced-jurisdiction-demo" component={EnhancedJurisdictionDemo} />
           
           {/* Authentication Route */}
           <Route path="/auth" component={AuthPage} />

@@ -70,7 +70,9 @@ router.get("/", async (req, res) => {
     
     // Parse query parameters
     const {
-      jurisdiction,
+      jurisdiction, // Legacy support
+      jurisdictionSource,
+      institutionType,
       category,
       search,
       applicable,
@@ -83,8 +85,25 @@ router.get("/", async (req, res) => {
     let regulations = await storage.getRegulations();
     
     // Apply filters
+    // Legacy jurisdiction filter support
     if (jurisdiction && typeof jurisdiction === 'string') {
-      regulations = regulations.filter(reg => reg.jurisdiction === jurisdiction);
+      regulations = regulations.filter(reg => reg.jurisdictionSource === jurisdiction);
+    }
+    
+    // New jurisdiction source filter
+    if (jurisdictionSource && typeof jurisdictionSource === 'string') {
+      regulations = regulations.filter(reg => reg.jurisdictionSource === jurisdictionSource);
+    }
+    
+    // New institution type filter
+    if (institutionType && typeof institutionType === 'string') {
+      regulations = regulations.filter(reg => {
+        if (!reg.applicableInstitutions) return false;
+        const institutions = Array.isArray(reg.applicableInstitutions) 
+          ? reg.applicableInstitutions 
+          : [];
+        return institutions.includes(institutionType) || institutions.includes('all-institutions');
+      });
     }
     
     if (category && typeof category === 'string') {

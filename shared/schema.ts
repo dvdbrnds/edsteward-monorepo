@@ -2,6 +2,32 @@ import { pgTable, text, serial, integer, timestamp, boolean, date, jsonb } from 
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// Jurisdiction and Institution Type Constants
+export const JURISDICTION_SOURCES = [
+  "federal",
+  "state", 
+  "international",
+  "private-organization",
+  "accreditor",
+  "industry-association"
+] as const;
+
+export const INSTITUTION_TYPES = [
+  "public-universities",
+  "private-universities", 
+  "community-colleges",
+  "conservatories",
+  "technical-institutes",
+  "religious-institutions",
+  "for-profit-institutions",
+  "research-institutes",
+  "professional-schools",
+  "all-institutions"
+] as const;
+
+export type JurisdictionSource = typeof JURISDICTION_SOURCES[number];
+export type InstitutionType = typeof INSTITUTION_TYPES[number];
+
 // Add source interface
 export interface RegulationSource {
   url: string;
@@ -157,8 +183,8 @@ export const regulations = pgTable("regulations", {
   summary: text("summary"),
   requirements: text("requirements"),
   category: text("category").notNull(),
-  jurisdiction: text("jurisdiction").notNull().default("federal"),
-  // Add DRO field
+  jurisdictionSource: text("jurisdiction_source").notNull().default("federal"), // federal | state | international | private-organization | accreditor | etc.
+  applicableInstitutions: jsonb("applicable_institutions").$type<string[]>(), // ["public-universities", "private-universities", "community-colleges", "conservatories", etc.]
   dro: text("dro").notNull().default(""),
   isApplicable: boolean("is_applicable").notNull().default(true),
   originationDate: timestamp("origination_date"),
@@ -166,7 +192,6 @@ export const regulations = pgTable("regulations", {
   lastUpdated: timestamp("last_updated"),
   lastVerified: timestamp("last_verified"),
   nextReviewDate: timestamp("next_review_date"),
-  // Version control fields remain unchanged
   versionNumber: integer("version_number").notNull().default(1),
   previousVersionId: integer("previous_version_id").references(() => regulations.id),
   versionDate: timestamp("version_date").notNull().defaultNow(),
@@ -257,17 +282,17 @@ console.log("Note insertion schema created successfully");
 // Log schema structure for debugging
 console.log("Note schema fields:", Object.keys(notes));
 
-// Update the insert schema to include PA-specific validation
+// Update the insert schema to include new jurisdiction validation
 export const insertRegulationSchema = createInsertSchema(regulations).extend({
   name: z.string().min(1, "Regulation name is required"),
   dro: z.string().email("DRO must be a valid email address").optional(),
-  jurisdiction: z.enum(["federal", "state"]),
+  jurisdictionSource: z.enum(JURISDICTION_SOURCES),
+  applicableInstitutions: z.array(z.enum(INSTITUTION_TYPES)).optional().nullable(),
   stateCode: z.string().optional(),
   stateAgency: z.string().optional(),
   originationDate: z.date().optional().nullable(),
   effectiveDate: z.date().optional().nullable(),
   nextReviewDate: z.date().optional().nullable(),
-  // Version control validation
   versionNumber: z.number().int().positive().default(1),
   previousVersionId: z.number().int().positive().optional().nullable(),
   versionDate: z.date().default(() => new Date()),
