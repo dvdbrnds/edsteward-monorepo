@@ -12,6 +12,57 @@ const requireAuth = (req: express.Request, res: express.Response, next: express.
   next();
 };
 
+// Helper function to log regulation changes with user details
+const logRegulationChange = (
+  action: string,
+  regulationId: number,
+  userId: number,
+  username: string,
+  changes?: Record<string, { from: any; to: any }>,
+  metadata?: any
+) => {
+  const changeDetails = changes 
+    ? Object.entries(changes)
+        .map(([field, { from, to }]) => `${field}: "${from}" → "${to}"`)
+        .join(', ')
+    : '';
+  
+  const message = `${action} regulation ${regulationId} by user ${username} (${userId})${changeDetails ? `: ${changeDetails}` : ''}`;
+  
+  syslog.log(LogFacility.LOCAL0, LogLevel.INFO, message, {
+    id: 'regulation-change',
+    parameters: {
+      userId,
+      username,
+      regulationId,
+      action,
+      changes,
+      ...metadata
+    }
+  });
+};
+
+// Helper function to compare regulation objects and detect changes
+const detectChanges = (original: any, updated: any): Record<string, { from: any; to: any }> => {
+  const changes: Record<string, { from: any; to: any }> = {};
+  const fieldsToTrack = [
+    'name', 'description', 'requirements', 'category', 'jurisdiction', 
+    'isApplicable', 'effectiveDate', 'nextReviewDate', 'agency_name',
+    'agency_contact', 'regulationUrl', 'complianceNotes'
+  ];
+  
+  for (const field of fieldsToTrack) {
+    if (original[field] !== updated[field]) {
+      changes[field] = {
+        from: original[field],
+        to: updated[field]
+      };
+    }
+  }
+  
+  return changes;
+};
+
 // Get all regulations (temporarily without auth for testing)
 router.get("/", async (req, res) => {
   try {
@@ -206,6 +257,9 @@ router.patch("/:regulationId/actions/:actionType", requireAuth, async (req, res)
     const actions = regulation.actions || [];
     const actionIndex = actions.findIndex(action => action.type === actionType);
     
+    // Store the previous status for logging
+    const previousStatus = actionIndex !== -1 ? actions[actionIndex].status : 'not_exists';
+    
     if (actionIndex === -1) {
       // Action doesn't exist, create it
       actions.push({
@@ -232,16 +286,227 @@ router.patch("/:regulationId/actions/:actionType", requireAuth, async (req, res)
     await storage.updateRegulation(regulationId, { actions });
     
     const totalTime = Date.now() - startTime;
-    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Updated action ${actionType} for regulation ${regulationId} in ${totalTime}ms`);
+    
+    // Enhanced logging with user details and action specifics
+    logRegulationChange(
+      `Updated action ${actionType}`,
+      regulationId,
+      req.user!.id,
+      req.user!.username,
+      {
+        [`action_${actionType}_status`]: {
+          from: previousStatus,
+          to: actionUpdate.status || 'pending'
+        }
+      },
+      {
+        actionType,
+        actionEnabled: actionUpdate.enabled,
+        actionRequired: actionUpdate.required,
+        updateTime: totalTime,
+        completedBy: actionUpdate.completedBy,
+        completedAt: actionUpdate.completedAt
+      }
+    );
 
     res.json({ 
       success: true, 
       action: actions[actionIndex !== -1 ? actionIndex : actions.length - 1] 
     });
   } catch (error) {
-    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Failed to update action for regulation ${req.params.regulationId}: ${error instanceof Error ? error.message : String(error)}`);
+    const user = req.user!;
+    syslog.log(
+      LogFacility.LOCAL0, 
+      LogLevel.ERROR, 
+      `Failed to update action for regulation ${req.params.regulationId} by user ${user.username} (${user.id}): ${error instanceof Error ? error.message : String(error)}`,
+      {
+        id: 'regulation-action-error',
+        parameters: {
+          userId: user.id,
+          username: user.username,
+          regulationId: req.params.regulationId,
+          actionType: req.params.actionType,
+          error: error instanceof Error ? error.message : String(error)
+        }
+      }
+    );
     res.status(500).json({ 
       error: "Failed to update action", 
+      details: error instanceof Error ? error.message : String(error) 
+    });
+  }
+});
+
+// Update entire regulation (PUT endpoint)
+router.put("/:regulationId", requireAuth, async (req, res) => {
+  try {
+    const startTime = Date.now();
+    const regulationId = parseInt(req.params.regulationId);
+    const user = req.user!;
+    
+    if (isNaN(regulationId)) {
+      return res.status(400).json({ error: "Invalid regulation ID" });
+    }
+    
+    // Get current regulation for change tracking
+    const currentRegulation = await storage.getRegulation(regulationId);
+    if (!currentRegulation) {
+      return res.status(404).json({ error: "Regulation not found" });
+    }
+    
+    const updateData = req.body;
+    
+    // Validate required fields
+    if (updateData.name && typeof updateData.name !== 'string') {
+      return res.status(400).json({ error: "Name must be a string" });
+    }
+    
+    // Detect changes for audit trail
+    const changes = detectChanges(currentRegulation, updateData);
+    
+    // Update the regulation
+    const updatedRegulation = await storage.updateRegulation(regulationId, updateData);
+    
+    const totalTime = Date.now() - startTime;
+    
+    // Log the regulation update with detailed change tracking
+    logRegulationChange(
+      'Updated',
+      regulationId,
+      user.id,
+      user.username,
+      changes,
+      {
+        fieldsChanged: Object.keys(changes).length,
+        updateTime: totalTime,
+        requestSize: JSON.stringify(updateData).length
+      }
+    );
+
+    res.json(updatedRegulation);
+  } catch (error) {
+    const user = req.user!;
+    syslog.log(
+      LogFacility.LOCAL0, 
+      LogLevel.ERROR, 
+      `Failed to update regulation ${req.params.regulationId} by user ${user.username} (${user.id}): ${error instanceof Error ? error.message : String(error)}`
+    );
+    res.status(500).json({ 
+      error: "Failed to update regulation", 
+      details: error instanceof Error ? error.message : String(error) 
+    });
+  }
+});
+
+// Create new regulation (POST endpoint)
+router.post("/", requireAuth, async (req, res) => {
+  try {
+    const startTime = Date.now();
+    const user = req.user!;
+    const regulationData = req.body;
+    
+    // Validate required fields
+    if (!regulationData.name || typeof regulationData.name !== 'string') {
+      return res.status(400).json({ error: "Name is required and must be a string" });
+    }
+    
+    if (!regulationData.itemId || typeof regulationData.itemId !== 'string') {
+      return res.status(400).json({ error: "Item ID is required and must be a string" });
+    }
+    
+    // Create the regulation
+    const newRegulation = await storage.createRegulation(regulationData);
+    
+    const totalTime = Date.now() - startTime;
+    
+    // Log the regulation creation
+    logRegulationChange(
+      'Created',
+      newRegulation.id,
+      user.id,
+      user.username,
+      undefined,
+      {
+        itemId: newRegulation.itemId,
+        name: newRegulation.name,
+        category: newRegulation.category,
+        jurisdiction: newRegulation.jurisdiction,
+        createTime: totalTime
+      }
+    );
+
+    res.status(201).json(newRegulation);
+  } catch (error) {
+    const user = req.user!;
+    syslog.log(
+      LogFacility.LOCAL0, 
+      LogLevel.ERROR, 
+      `Failed to create regulation by user ${user.username} (${user.id}): ${error instanceof Error ? error.message : String(error)}`
+    );
+    res.status(500).json({ 
+      error: "Failed to create regulation", 
+      details: error instanceof Error ? error.message : String(error) 
+    });
+  }
+});
+
+// Delete regulation (DELETE endpoint)
+router.delete("/:regulationId", requireAuth, async (req, res) => {
+  try {
+    const startTime = Date.now();
+    const regulationId = parseInt(req.params.regulationId);
+    const user = req.user!;
+    
+    if (isNaN(regulationId)) {
+      return res.status(400).json({ error: "Invalid regulation ID" });
+    }
+    
+    // Get regulation details before deletion for logging
+    const regulation = await storage.getRegulation(regulationId);
+    if (!regulation) {
+      return res.status(404).json({ error: "Regulation not found" });
+    }
+    
+    // Delete the regulation
+    await storage.deleteRegulation(regulationId);
+    
+    const totalTime = Date.now() - startTime;
+    
+    // Log the regulation deletion
+    logRegulationChange(
+      'Deleted',
+      regulationId,
+      user.id,
+      user.username,
+      undefined,
+      {
+        deletedName: regulation.name,
+        deletedItemId: regulation.itemId,
+        deletedCategory: regulation.category,
+        deletedJurisdiction: regulation.jurisdiction,
+        deleteTime: totalTime
+      }
+    );
+
+    res.json({ success: true, message: "Regulation deleted successfully" });
+  } catch (error) {
+    const user = req.user!;
+    syslog.log(
+      LogFacility.LOCAL0, 
+      LogLevel.ERROR, 
+      `Failed to delete regulation ${req.params.regulationId} by user ${user.username} (${user.id}): ${error instanceof Error ? error.message : String(error)}`,
+      {
+        id: 'regulation-delete-error',
+        parameters: {
+          userId: user.id,
+          username: user.username,
+          regulationId: req.params.regulationId,
+          error: error instanceof Error ? error.message : String(error)
+        }
+      }
+    );
+    res.status(500).json({ 
+      error: "Failed to delete regulation", 
       details: error instanceof Error ? error.message : String(error) 
     });
   }
