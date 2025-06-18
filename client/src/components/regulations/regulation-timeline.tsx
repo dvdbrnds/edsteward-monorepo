@@ -1,6 +1,6 @@
 import { FC, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { History, AlertCircle, CheckCircle, Clock } from "lucide-react";
+import { History, CheckCircle, Clock } from "lucide-react";
 import { format } from "date-fns";
 import { type Regulation } from "@shared/schema";
 import { motion } from "framer-motion";

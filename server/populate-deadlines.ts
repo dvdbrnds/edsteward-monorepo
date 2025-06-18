@@ -34,7 +34,7 @@ async function populateDeadlines() {
               if (isoMatch) {
                 try {
                   dueDate = parse(isoMatch[0], 'yyyy-MM-dd', new Date());
-                } catch (e) {
+                } catch (_e) {
                   console.log(`Failed to parse ISO date ${isoMatch[0]}`);
                 }
               }
@@ -49,7 +49,7 @@ async function populateDeadlines() {
                       if (dueDate && !isNaN(dueDate.getTime())) {
                         break;
                       }
-                    } catch (e) {
+                    } catch (_e) {
                       continue;
                     }
                   }

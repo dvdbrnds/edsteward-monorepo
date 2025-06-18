@@ -1,8 +1,8 @@
 import { populateRegulationData } from "./services/regulation-data-collector";
-import readline from 'readline';
-import { writeFileSync } from 'fs';
-import { db, initializeLogging } from "./db";
-import { regulations } from "@shared/schema";
+import _readline from 'readline';
+import { writeFileSync as _writeFileSync } from 'fs';
+import { db as _db, initializeLogging } from "./db";
+import { regulations as _regulations } from "@shared/schema";
 import { syslog, LogLevel, LogFacility } from './services/syslog';
 
 const standardRegulations = [

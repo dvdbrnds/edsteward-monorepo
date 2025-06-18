@@ -1,6 +1,7 @@
+import React from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { Loader2 } from "lucide-react";
-import { Redirect, Route, useParams } from "wouter";
+import { Redirect, Route } from "wouter";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 import { useQuery } from "@tanstack/react-query";
 import type { Regulation } from "@shared/schema";

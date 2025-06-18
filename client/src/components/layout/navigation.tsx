@@ -19,7 +19,6 @@ import {
   Loader2,
   User,
   Settings,
-  Cog,
 } from "lucide-react";
 import {
   Dialog,
@@ -267,7 +266,7 @@ export default function Navigation() {
   const [location] = useLocation();
   const [changelogOpen, setChangelogOpen] = useState(false);
 
-  const { data: setupComplete } = useQuery({
+  const { data: _setupComplete } = useQuery({
     queryKey: ["/api/setup/status"],
     queryFn: async () => {
       const response = await apiRequest("GET", "/api/setup/status");

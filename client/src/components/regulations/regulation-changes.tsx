@@ -1,3 +1,4 @@
+import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { Regulation } from "@shared/schema";
 import { useQuery } from "@tanstack/react-query";
@@ -22,7 +23,7 @@ function HighlightDifferences({ oldText = '', newText = '' }: { oldText?: string
 
   const words1 = oldText.split(' ');
   const words2 = newText.split(' ');
-  const changes: JSX.Element[] = [];
+  const changes: React.ReactElement[] = [];
 
   let i = 0;
   let j = 0;

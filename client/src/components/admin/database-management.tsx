@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,7 +10,7 @@ import {
   Database, 
   FileText, 
   AlertCircle, 
-  CheckCircle, 
+   
   Loader2,
   RefreshCw 
 } from "lucide-react";
@@ -39,7 +39,7 @@ export default function DatabaseManagement() {
   const [isLoadingStats, setIsLoadingStats] = useState(false);
 
   // Fetch database statistics
-  const fetchDatabaseStats = async () => {
+  const fetchDatabaseStats = useCallback(async () => {
     setIsLoadingStats(true);
     try {
       const response = await fetch('/api/db-stats', {
@@ -51,7 +51,7 @@ export default function DatabaseManagement() {
       } else {
         throw new Error(data.error || 'Failed to fetch stats');
       }
-    } catch (error) {
+    } catch {
       toast({
         title: "Error",
         description: "Failed to fetch database statistics",
@@ -60,7 +60,7 @@ export default function DatabaseManagement() {
     } finally {
       setIsLoadingStats(false);
     }
-  };
+  }, [toast]);
 
   // Export database
   const handleExport = async () => {
@@ -89,7 +89,7 @@ export default function DatabaseManagement() {
         title: "Export Successful",
         description: "Database exported successfully",
       });
-    } catch (error) {
+    } catch {
       toast({
         title: "Export Failed",
         description: "Failed to export database",
@@ -146,7 +146,7 @@ export default function DatabaseManagement() {
                 if (data.error) {
                   throw new Error(data.error);
                 }
-              } catch (e) {
+              } catch {
                 // Ignore JSON parse errors for non-JSON lines
               }
             }
@@ -195,7 +195,7 @@ export default function DatabaseManagement() {
   // Load stats on component mount
   React.useEffect(() => {
     fetchDatabaseStats();
-  }, []);
+  }, [fetchDatabaseStats]);
 
   return (
     <div className="space-y-6">

@@ -1,11 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import type { Regulation } from "@shared/schema";
 import CustomPieChart from "@/components/common/custom-pie-chart";
-import { Button } from "@/components/ui/button";
-import { X } from "lucide-react";
 
 interface ComplianceOverviewProps {
-  onCategorySelect: (category: string | null) => void;
+  onCategorySelect: (_category: string | null) => void;
   selectedCategory: string | null;
 }
 

@@ -1,4 +1,4 @@
-import { pool, checkConnectionHealth, closeDatabaseConnection } from '../config/database';
+import { pool as _pool, checkConnectionHealth, closeDatabaseConnection as _closeDatabaseConnection } from '../config/database';
 import { syslog, LogFacility, LogLevel } from './syslog';
 
 export class DatabaseHealthMonitor {

@@ -29,7 +29,7 @@ const INSTITUTION_TYPES = [
 ];
 
 interface EnhancedJurisdictionFiltersProps {
-  onFiltersChange: (filters: {
+  onFiltersChange: (_filters: {
     jurisdictionSource: string;
     institutionType: string;
   }) => void;
@@ -161,13 +161,10 @@ export default function EnhancedJurisdictionFilters({ onFiltersChange }: Enhance
 
 // Example usage in a parent component:
 export function DemoUsage() {
-  const [filters, setFilters] = useState({
-    jurisdictionSource: "all",
-    institutionType: "all"
-  });
-
-  const handleFiltersChange = (newFilters: typeof filters) => {
-    setFilters(newFilters);
+  const handleFiltersChange = (newFilters: {
+    jurisdictionSource: string;
+    institutionType: string;
+  }) => {
     console.log("Filters changed:", newFilters);
     // This would trigger a re-fetch of regulations with the new filters
   };

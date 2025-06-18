@@ -2,7 +2,6 @@ import nodemailer from 'nodemailer';
 import { log } from '../vite';
 import { db } from '../db';
 import { emailConfigs } from '@shared/schema';
-import { eq } from 'drizzle-orm';
 
 export class EmailService {
   private transporter: nodemailer.Transporter | null = null;

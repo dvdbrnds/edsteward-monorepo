@@ -2,9 +2,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
 import type { Deadline, Regulation } from "@shared/schema";
 import { format, differenceInDays } from "date-fns";
-import { AlertCircle, CheckCircle, Clock, ChevronDown, ChevronUp, ExternalLink } from "lucide-react";
-import { Link, useLocation } from "wouter";
-import { useState } from "react";
+import { AlertCircle, CheckCircle, Clock } from "lucide-react";
+import { useLocation } from "wouter";
+
 
 interface UpcomingDeadlinesProps {
   categoryFilter: string | null;
@@ -12,7 +12,6 @@ interface UpcomingDeadlinesProps {
 }
 
 export default function UpcomingDeadlines({ categoryFilter, limit }: UpcomingDeadlinesProps) {
-  const [expandedDeadlineId, setExpandedDeadlineId] = useState<number | null>(null);
   const [, setLocation] = useLocation();
 
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
@@ -71,7 +70,7 @@ export default function UpcomingDeadlines({ categoryFilter, limit }: UpcomingDea
             {sortedDeadlines.map((deadline) => {
               const regulation = Array.isArray(regulations) ? regulations.find(r => r.id === deadline.regulationId) : null;
               const daysUntilDue = differenceInDays(new Date(deadline.dueDate), new Date());
-              const isExpanded = expandedDeadlineId === deadline.id;
+
 
               // Use regulation name from deadline (if enhanced endpoint) or from regulation lookup
               const regulationTitle = (deadline as any).regulationName 

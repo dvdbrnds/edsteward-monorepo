@@ -2,7 +2,6 @@
 // that uses the existing storage.ts and gradually migrates functionality
 
 import { UserRepository } from './user.repository';
-import type { IStorage } from '../storage';
 
 // For now, let's create instances but continue using storage.ts for complex operations
 export const userRepository = new UserRepository();

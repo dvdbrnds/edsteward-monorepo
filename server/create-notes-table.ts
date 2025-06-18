@@ -1,6 +1,5 @@
 
 import { db } from "./db";
-import { notes } from "@shared/schema";
 
 async function createNotesTable() {
   try {

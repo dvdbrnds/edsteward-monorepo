@@ -36,8 +36,8 @@ export function useWebSocket(options: WebSocketHookOptions = {}) {
   const { toast } = useToast();
 
   const wsRef = useRef<WebSocket | null>(null);
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const heartbeatTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const reconnectTimeoutRef = useRef<number | null>(null);
+  const heartbeatTimeoutRef = useRef<number | null>(null);
   const [connectionState, setConnectionState] = useState<'disconnected' | 'connecting' | 'connected' | 'error'>('disconnected');
   const [reconnectCount, setReconnectCount] = useState(0);
 
@@ -64,7 +64,7 @@ export function useWebSocket(options: WebSocketHookOptions = {}) {
         wsRef.current.send(JSON.stringify({ type: 'ping' }));
         startHeartbeat(); // Schedule next heartbeat
       }
-    }, heartbeatInterval);
+    }, heartbeatInterval) as unknown as number;
   }, [heartbeatInterval]);
 
   const handleMessage = useCallback((event: MessageEvent) => {
@@ -144,7 +144,7 @@ export function useWebSocket(options: WebSocketHookOptions = {}) {
           reconnectTimeoutRef.current = setTimeout(() => {
             setReconnectCount(prev => prev + 1);
             connect();
-          }, reconnectDelay);
+          }, reconnectDelay) as unknown as number;
         } else if (reconnectCount >= reconnectAttempts) {
           setConnectionState('error');
           toast({

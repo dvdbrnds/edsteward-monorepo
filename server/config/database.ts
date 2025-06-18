@@ -4,7 +4,6 @@ import { drizzle } from 'drizzle-orm/node-postgres';
 import { sql } from 'drizzle-orm';
 import * as schema from "@shared/schema";
 import fs from 'fs';
-import path from 'path';
 
 const { Pool } = pg;
 

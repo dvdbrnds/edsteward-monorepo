@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from "recharts";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { Download, X } from "lucide-react";
 
 // Extended color palette with Moravian brand colors and complementary shades
@@ -35,7 +35,7 @@ interface ChartData {
 interface CustomPieChartProps {
   data: ChartData[];
   title: string;
-  onSegmentClick: (name: string) => void;
+  onSegmentClick: (_name: string) => void;
   activeFilter: string | null;
   allowExport?: boolean;
 }
@@ -91,8 +91,8 @@ export default function CustomPieChart({
               size="sm"
               onClick={() => downloadCSV(
                 data.map(({ name, value }) => ({
-                  name: name,
-                  value: value,
+                  name,
+                  value,
                 })),
                 `${title.toLowerCase().replace(/ /g, '-')}.csv`
               )}

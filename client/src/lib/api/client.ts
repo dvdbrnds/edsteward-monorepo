@@ -2,15 +2,18 @@ class ApiError extends Error {
   constructor(
     message: string,
     public status: number,
-    public data?: any
+    public data?: unknown
   ) {
     super(message);
     this.name = 'ApiError';
   }
 }
 
-interface ApiOptions extends RequestInit {
+interface ApiOptions {
   params?: Record<string, string>;
+  method?: string;
+  headers?: Record<string, string>;
+  body?: BodyInit | null;
 }
 
 class ApiClient {
@@ -44,7 +47,7 @@ class ApiClient {
       'Content-Type': 'application/json',
     };
 
-    const config: RequestInit = {
+    const config = {
       ...fetchOptions,
       headers: {
         ...defaultHeaders,
@@ -96,7 +99,7 @@ class ApiClient {
 
   async post<T>(
     endpoint: string,
-    data?: any,
+    data?: unknown,
     options?: ApiOptions
   ): Promise<T> {
     return this.request<T>(endpoint, {
@@ -108,7 +111,7 @@ class ApiClient {
 
   async put<T>(
     endpoint: string,
-    data?: any,
+    data?: unknown,
     options?: ApiOptions
   ): Promise<T> {
     return this.request<T>(endpoint, {
@@ -120,7 +123,7 @@ class ApiClient {
 
   async patch<T>(
     endpoint: string,
-    data?: any,
+    data?: unknown,
     options?: ApiOptions
   ): Promise<T> {
     return this.request<T>(endpoint, {

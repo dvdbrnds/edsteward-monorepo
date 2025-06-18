@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { Pool } from 'pg';
 import multer from 'multer';
 import fs from 'fs/promises';
-import path from 'path';
+import _path from 'path';
 
 const router = Router();
 

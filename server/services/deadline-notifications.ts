@@ -1,6 +1,6 @@
 import { storage } from '../storage';
 import { emailService } from '../services/email';
-import { differenceInDays, differenceInHours, format } from 'date-fns';
+import { differenceInDays, differenceInHours as _differenceInHours, format } from 'date-fns';
 import type { Deadline, Regulation, User } from '@shared/schema';
 
 // Default notification schedules if not specified in regulation
