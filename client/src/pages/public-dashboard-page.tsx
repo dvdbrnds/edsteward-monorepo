@@ -34,6 +34,7 @@ import { format, differenceInDays, parseISO } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
+import { EnhancedJurisdictionFilter } from "@/components/filters/enhanced-jurisdiction-filter";
 
 // Calculate compliance status based on regulation data
 function calculateComplianceStatus(regulation: any) {
@@ -123,13 +124,13 @@ export default function DashboardPage() {
 
   // Get unique categories for filtering
   const categories = useMemo(() => {
-    if (!regulations) return [];
+    if (!regulations || !Array.isArray(regulations)) return [];
     return Array.from(new Set(regulations.map((reg: any) => reg.category))).sort();
   }, [regulations]);
 
   // Calculate statistics
   const stats = useMemo(() => {
-    if (!regulations) {
+    if (!regulations || !Array.isArray(regulations)) {
       return {
         total: 0,
         compliant: 0,
@@ -159,7 +160,7 @@ export default function DashboardPage() {
 
   // Filter and sort regulations
   const filteredRegulations = useMemo(() => {
-    if (!regulations) return [];
+    if (!regulations || !Array.isArray(regulations)) return [];
 
     let filtered = regulations.filter((reg: any) => {
       const matchesSearch = !searchQuery || 
@@ -195,7 +196,7 @@ export default function DashboardPage() {
     });
 
     return filtered;
-  }, [regulations, searchQuery, categoryFilter, jurisdictionFilter, complianceFilter, sortBy, sortDirection]);
+  }, [regulations, searchQuery, categoryFilter, jurisdictionSourceFilter, institutionTypeFilter, complianceFilter, sortBy, sortDirection]);
 
   if (isLoading) {
     return (
@@ -307,7 +308,7 @@ export default function DashboardPage() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">All Categories</SelectItem>
-                  {categories.map((category) => (
+                  {categories.map((category: string) => (
                     <SelectItem key={category} value={category}>
                       {category}
                     </SelectItem>
@@ -315,16 +316,17 @@ export default function DashboardPage() {
                 </SelectContent>
               </Select>
 
-              <Select value={jurisdictionFilter} onValueChange={setJurisdictionFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Jurisdiction" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Jurisdictions</SelectItem>
-                  <SelectItem value="federal">Federal</SelectItem>
-                  <SelectItem value="state">State</SelectItem>
-                </SelectContent>
-              </Select>
+              <EnhancedJurisdictionFilter
+                jurisdictionSourceFilter={jurisdictionSourceFilter}
+                setJurisdictionSourceFilter={setJurisdictionSourceFilter}
+                institutionTypeFilter={institutionTypeFilter}
+                setInstitutionTypeFilter={setInstitutionTypeFilter}
+                onClearFilters={() => {
+                  setJurisdictionSourceFilter("all");
+                  setInstitutionTypeFilter("all");
+                }}
+                showTitle={false}
+              />
 
               <Select value={complianceFilter} onValueChange={setComplianceFilter}>
                 <SelectTrigger>
@@ -343,7 +345,8 @@ export default function DashboardPage() {
                 onClick={() => {
                   setSearchQuery("");
                   setCategoryFilter("all");
-                  setJurisdictionFilter("all");
+                  setJurisdictionSourceFilter("all");
+                  setInstitutionTypeFilter("all");
                   setComplianceFilter("all");
                 }}
               >
@@ -392,6 +395,7 @@ export default function DashboardPage() {
                         <ArrowUpDown className="h-4 w-4" />
                       </div>
                     </TableHead>
+                    <TableHead>Applies To</TableHead>
                     <TableHead>Agency</TableHead>
                     <TableHead>Compliance Status</TableHead>
                     <TableHead 
@@ -449,6 +453,26 @@ export default function DashboardPage() {
                           >
                             {regulation.jurisdiction}
                           </Badge>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-wrap gap-1">
+                            {regulation.applicableInstitutions && Array.isArray(regulation.applicableInstitutions) ? (
+                              regulation.applicableInstitutions.slice(0, 3).map((type: string) => (
+                                <Badge key={type} variant="outline" className="text-xs">
+                                  {type.replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                                </Badge>
+                              ))
+                            ) : (
+                              <Badge variant="outline" className="text-xs">
+                                All Institutions
+                              </Badge>
+                            )}
+                            {regulation.applicableInstitutions && regulation.applicableInstitutions.length > 3 && (
+                              <Badge variant="outline" className="text-xs">
+                                +{regulation.applicableInstitutions.length - 3} more
+                              </Badge>
+                            )}
+                          </div>
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
