@@ -33,13 +33,39 @@ export function registerRoutes(app: express.Application): Server {
     res.status(200).send("OK");
   });
 
-  // API health check
-  app.get('/api/health', (req, res) => {
-    res.json({
-      status: "healthy",
-      timestamp: new Date().toISOString(),
-      server: "running"
-    });
+  // API health check with database status
+  app.get('/api/health', async (req, res) => {
+    try {
+      const { checkConnectionHealth } = await import('../config/database');
+      const { databaseHealthMonitor } = await import('../services/database-health');
+      
+      const dbHealthy = await checkConnectionHealth();
+      const healthStatus = databaseHealthMonitor.getHealthStatus();
+      
+      const response = {
+        status: dbHealthy ? "healthy" : "degraded",
+        timestamp: new Date().toISOString(),
+        server: "running",
+        database: {
+          connected: dbHealthy,
+          monitoring: healthStatus.isMonitoring,
+          consecutiveFailures: healthStatus.consecutiveFailures,
+          maxFailures: healthStatus.maxFailures
+        }
+      };
+      
+      res.status(dbHealthy ? 200 : 503).json(response);
+    } catch (error) {
+      res.status(503).json({
+        status: "unhealthy",
+        timestamp: new Date().toISOString(),
+        server: "running",
+        database: {
+          connected: false,
+          error: error instanceof Error ? error.message : String(error)
+        }
+      });
+    }
   });
 
   // =============================================================================
