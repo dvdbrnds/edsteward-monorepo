@@ -1,8 +1,6 @@
 import { FC, useState } from 'react';
-import { DiffType } from 'diff';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { AlertCircle, Check, XCircle, Clock } from 'lucide-react';
@@ -20,9 +18,9 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
-import { useRouter } from 'wouter';
+import { useLocation } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/queryClient';
+import { apiRequest, apiQuery } from '@/lib/queryClient';
 
 interface DifferentialViewProps {
   updateId: number;
@@ -71,23 +69,20 @@ export const DifferentialView: FC<DifferentialViewProps> = ({ updateId }) => {
   const [selectedTab, setSelectedTab] = useState<'before' | 'after' | 'diff'>('diff');
   const [signature, setSignature] = useState('');
   const [rejectionReason, setRejectionReason] = useState('');
-  const router = useRouter();
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   // Fetch regulation update data
   const { data, isLoading, error } = useQuery({
     queryKey: ['/api/regulation-updates', updateId],
-    queryFn: () => apiRequest(`/api/regulation-updates/${updateId}`),
+    queryFn: () => apiQuery(`/api/regulation-updates/${updateId}`),
   });
 
   // Accept update mutation
   const acceptMutation = useMutation({
     mutationFn: () => 
-      apiRequest(`/api/regulation-updates/${updateId}/accept`, {
-        method: 'POST',
-        body: JSON.stringify({ signature }),
-      }),
+      apiRequest('POST', `/api/regulation-updates/${updateId}/accept`, { signature }),
     onSuccess: () => {
       toast({
         title: 'Update accepted',
@@ -95,7 +90,7 @@ export const DifferentialView: FC<DifferentialViewProps> = ({ updateId }) => {
         variant: 'default',
       });
       queryClient.invalidateQueries({ queryKey: ['/api/regulation-updates'] });
-      router[0]('/regulation-updates');
+      setLocation('/regulation-updates');
     },
     onError: (error: Error) => {
       toast({
@@ -109,9 +104,9 @@ export const DifferentialView: FC<DifferentialViewProps> = ({ updateId }) => {
   // Reject update mutation
   const rejectMutation = useMutation({
     mutationFn: () => 
-      apiRequest(`/api/regulation-updates/${updateId}/reject`, {
-        method: 'POST',
-        body: JSON.stringify({ signature, reason: rejectionReason }),
+      apiRequest('POST', `/api/regulation-updates/${updateId}/reject`, { 
+        signature, 
+        reason: rejectionReason 
       }),
     onSuccess: () => {
       toast({
@@ -120,7 +115,7 @@ export const DifferentialView: FC<DifferentialViewProps> = ({ updateId }) => {
         variant: 'default',
       });
       queryClient.invalidateQueries({ queryKey: ['/api/regulation-updates'] });
-      router[0]('/regulation-updates');
+      setLocation('/regulation-updates');
     },
     onError: (error: Error) => {
       toast({
@@ -134,10 +129,7 @@ export const DifferentialView: FC<DifferentialViewProps> = ({ updateId }) => {
   // Defer update mutation
   const deferMutation = useMutation({
     mutationFn: () => 
-      apiRequest(`/api/regulation-updates/${updateId}/defer`, {
-        method: 'POST',
-        body: JSON.stringify({ signature }),
-      }),
+      apiRequest('POST', `/api/regulation-updates/${updateId}/defer`, { signature }),
     onSuccess: () => {
       toast({
         title: 'Update deferred',
@@ -145,7 +137,7 @@ export const DifferentialView: FC<DifferentialViewProps> = ({ updateId }) => {
         variant: 'default',
       });
       queryClient.invalidateQueries({ queryKey: ['/api/regulation-updates'] });
-      router[0]('/regulation-updates');
+      setLocation('/regulation-updates');
     },
     onError: (error: Error) => {
       toast({

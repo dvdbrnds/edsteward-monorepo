@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import * as z from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -35,11 +35,6 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [notes, setNotes] = useState<any[]>([]);
 
-  // Fetch notes when component loads
-  useEffect(() => {
-    fetchNotes();
-  }, [regulationId]);
-
   // Use form hook
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -50,13 +45,18 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
     },
   });
 
-  const fetchNotes = async () => {
+  const fetchNotes = useCallback(async () => {
     const updatedResponse = await fetch(`/api/notes/regulation/${regulationId}`);
     if (updatedResponse.ok) {
       const updatedData = await updatedResponse.json();
       setNotes(updatedData);
     }
-  };
+  }, [regulationId]);
+
+  // Fetch notes when component loads
+  useEffect(() => {
+    fetchNotes();
+  }, [fetchNotes]);
 
   const onSubmit = async (data: FormValues) => {
     try {

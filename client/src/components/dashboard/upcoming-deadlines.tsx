@@ -73,8 +73,9 @@ export default function UpcomingDeadlines({ categoryFilter, limit }: UpcomingDea
 
 
               // Use regulation name from deadline (if enhanced endpoint) or from regulation lookup
-              const regulationTitle = (deadline as any).regulationName 
-                ? (deadline as any).regulationName
+              const deadlineWithName = deadline as Deadline & { regulationName?: string };
+              const regulationTitle = deadlineWithName.regulationName 
+                ? deadlineWithName.regulationName
                 : regulation 
                   ? regulation.name || regulation.topic || `Regulation #${deadline.regulationId}`
                   : `Regulation #${deadline.regulationId}`;

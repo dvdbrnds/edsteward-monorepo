@@ -71,6 +71,14 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  const form = useForm<EvidenceFormValues>({
+    resolver: zodResolver(evidenceFormSchema),
+    defaultValues: {
+      documentTitle: '',
+      description: '',
+    },
+  });
+
   // Reset wizard when dialog opens
   React.useEffect(() => {
     if (open) {
@@ -80,15 +88,7 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
       setIsSubmittingToAgency(false);
       form.reset();
     }
-  }, [open]);
-
-  const form = useForm<EvidenceFormValues>({
-    resolver: zodResolver(evidenceFormSchema),
-    defaultValues: {
-      documentTitle: '',
-      description: '',
-    },
-  });
+  }, [open, form]);
 
   const handleStepChange = async (stepId: string) => {
     if (currentStep === 'evidence' && (stepId === 'review' || stepId === 'submit')) {

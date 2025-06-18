@@ -1,11 +1,11 @@
 import { FC } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { apiRequest } from '@/lib/queryClient';
+import { apiQuery } from '@/lib/queryClient';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { AlertCircle, FileText, PenTool, Sparkles } from 'lucide-react';
+import { AlertCircle, FileText, Sparkles } from 'lucide-react';
 import { Link } from 'wouter';
 import { formatDistanceToNow } from 'date-fns';
 
@@ -27,7 +27,7 @@ export const UpdatesList: FC = () => {
   // Fetch pending regulation updates
   const { data, isLoading, error } = useQuery({
     queryKey: ['/api/regulation-updates/pending'],
-    queryFn: () => apiRequest('/api/regulation-updates/pending'),
+    queryFn: () => apiQuery('/api/regulation-updates/pending'),
   });
 
   if (isLoading) {

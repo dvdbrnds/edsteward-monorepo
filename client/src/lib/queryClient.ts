@@ -8,7 +8,7 @@ async function throwIfResNotOk(res: Response) {
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";
-export const getQueryFn: <T>(options: {
+export const getQueryFn: <T>(_options: {
   on401: UnauthorizedBehavior;
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
@@ -45,11 +45,12 @@ export async function apiRequest(
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
   url: string,
   data?: unknown
-): Promise<Response> {
+): Promise<any> {
   const response = await fetch(url, {
     method,
     headers: await getRequestHeaders(),
     body: data ? JSON.stringify(data) : undefined,
+    credentials: "include",
   });
 
   if (!response.ok) {
@@ -66,16 +67,30 @@ export async function apiRequest(
     throw error;
   }
 
-  return response;
+  // Handle no content responses
+  if (response.status === 204) {
+    return null;
+  }
+
+  return response.json();
+}
+
+// Simple API function for queries (GET requests)
+export async function apiQuery(url: string): Promise<any> {
+  return apiRequest('GET', url);
 }
 
 // Helper to get request headers with auth and tenant
 async function getRequestHeaders(): Promise<Record<string, string>> {
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    'X-Tenant': import.meta.env.VITE_TENANT_ID,
   };
 
-  // Note: Auth headers will be handled by the API client
+  // Add tenant header if available
+  const tenantId = import.meta.env.VITE_TENANT_ID;
+  if (tenantId) {
+    headers['X-Tenant'] = tenantId;
+  }
+
   return headers;
 }

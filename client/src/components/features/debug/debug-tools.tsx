@@ -13,11 +13,11 @@ export function NoteDebugger() {
   const [regulationId, setRegulationId] = useState('3869');
   const [title, setTitle] = useState('Debug Test Note');
   const [content, setContent] = useState('This is a test note created through the debug tool');
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<unknown>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [schemaInfo, setSchemaInfo] = useState<any>(null); 
-  const [reqResponse, setReqResponse] = useState<any>(null); 
+  const [schemaInfo, setSchemaInfo] = useState<unknown>(null); 
+  const [reqResponse, setReqResponse] = useState<unknown>(null); 
 
   const createNote = async () => {
     setLoading(true);
@@ -170,7 +170,7 @@ export function NoteDebugger() {
           <div className="p-3 bg-gray-50 border border-gray-200 rounded-md">
             <h4 className="font-medium text-sm mb-1">Result:</h4>
             <pre className="text-xs overflow-auto max-h-40">
-              {JSON.stringify(result, null, 2)}
+              {typeof result === 'string' ? result : JSON.stringify(result, null, 2)}
             </pre>
           </div>
         )}
@@ -178,7 +178,7 @@ export function NoteDebugger() {
           <div className="p-3 bg-gray-50 border border-gray-200 rounded-md">
             <h4 className="font-medium text-sm mb-1">Schema Info:</h4>
             <pre className="text-xs overflow-auto max-h-40">
-              {JSON.stringify(schemaInfo, null, 2)}
+              {typeof schemaInfo === 'string' ? schemaInfo : JSON.stringify(schemaInfo, null, 2)}
             </pre>
           </div>
         )}
@@ -186,7 +186,7 @@ export function NoteDebugger() {
           <div className="p-3 bg-gray-50 border border-gray-200 rounded-md">
             <h4 className="font-medium text-sm mb-1">Request Response:</h4>
             <pre className="text-xs overflow-auto max-h-40">
-              {JSON.stringify(reqResponse, null, 2)}
+              {typeof reqResponse === 'string' ? reqResponse : JSON.stringify(reqResponse, null, 2)}
             </pre>
           </div>
         )}

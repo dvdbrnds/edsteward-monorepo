@@ -112,9 +112,9 @@ export function BugReportButton() {
       });
       setIsOpen(false);
       form.reset();
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Bug report submission error:", error);
-      const errorMessage = error.message && typeof error.message === 'string'
+      const errorMessage = error instanceof Error && typeof error.message === 'string'
         ? error.message
         : "Failed to submit bug report. Please try again.";
 
