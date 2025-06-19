@@ -65,7 +65,11 @@ export default function CustomPieChart({
 }: CustomPieChartProps) {
   // Sort data by value for the pie chart while keeping a separate sorted copy for the legend
   const sortedData = [...data].sort((a, b) => b.value - a.value);
-  const legendData = [...data].sort((a, b) => a.name.localeCompare(b.name));
+  const legendData = [...data].sort((a, b) => {
+    const aName = a.name || '';
+    const bName = b.name || '';
+    return aName.localeCompare(bName);
+  });
 
   return (
     <Card className="h-[600px]">
