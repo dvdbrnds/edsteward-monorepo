@@ -269,8 +269,7 @@ export default function Navigation() {
   const { data: _setupComplete } = useQuery({
     queryKey: ["/api/setup/status"],
     queryFn: async () => {
-      const response = await apiRequest("GET", "/api/setup/status");
-      return response.json();
+      return await apiRequest("GET", "/api/setup/status");
     },
   });
 

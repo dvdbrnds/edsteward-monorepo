@@ -1,0 +1,74 @@
+{
+  "family": "edsteward-multi-tenant",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048",
+  "executionRoleArn": "arn:aws:iam::259661441422:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::259661441422:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "edsteward-multi-tenant",
+      "image": "259661441422.dkr.ecr.us-east-1.amazonaws.com/edsteward:multi-tenant-latest",
+      "portMappings": [
+        {
+          "containerPort": 3000,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {
+          "name": "NODE_ENV",
+          "value": "production"
+        },
+        {
+          "name": "PORT",
+          "value": "3000"
+        },
+        {
+          "name": "MULTI_TENANT",
+          "value": "true"
+        },
+        {
+          "name": "DATABASE_URL",
+          "value": "postgresql://neondb_owner:npg_ZhQkQoD3Oo2I@ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require"
+        },
+        {
+          "name": "SESSION_SECRET",
+          "value": "9qbArxksSA8llE2Gpkt1Hs2jvFBPFE9G9ZENI/xVh6qj2Z4wD/jPN1mjcNh/WL/pPvoSbiPpzisIz88Ky6lPdQ=="
+        },
+        {
+          "name": "TENANT_ADMIN_DATABASE",
+          "value": "edsteward_admin"
+        },
+        {
+          "name": "TENANT_MORAVIAN_DATABASE", 
+          "value": "edsteward_moravian"
+        },
+        {
+          "name": "DEFAULT_TENANT",
+          "value": "admin"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/edsteward-multi-tenant",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs",
+          "awslogs-create-group": "true"
+        }
+      },
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "curl -f http://localhost:3000/health || exit 1"
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      }
+    }
+  ]
+} 

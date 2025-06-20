@@ -1,0 +1,29 @@
+{
+  "family": "edsteward-simple",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "arn:aws:iam::259661441422:role/ecsTaskExecutionRole",
+  "containerDefinitions": [
+    {
+      "name": "edsteward",
+      "image": "259661441422.dkr.ecr.us-east-1.amazonaws.com/edsteward:multi-tenant-latest",
+      "portMappings": [{"containerPort": 3000}],
+      "environment": [
+        {"name": "NODE_ENV", "value": "production"},
+        {"name": "PORT", "value": "3000"},
+        {"name": "DATABASE_URL", "value": "postgresql://neondb_owner:npg_ZhQkQoD3Oo2I@ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require"},
+        {"name": "SESSION_SECRET", "value": "9qbArxksSA8llE2Gpkt1Hs2jvFBPFE9G9ZENI/xVh6qj2Z4wD/jPN1mjcNh/WL/pPvoSbiPpzisIz88Ky6lPdQ=="}
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/aws/ecs/edsteward",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      }
+    }
+  ]
+}

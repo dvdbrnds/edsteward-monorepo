@@ -17,6 +17,8 @@ import LogsPage from "@/pages/admin/logs-page";
 import DebugToolsPage from "@/pages/admin/debug-tools-page";
 import { RegulationViewer } from "@/pages/RegulationViewer";
 import SetupWizardPage from "@/pages/setup-wizard-page";
+import VendorAdminPage from "@/pages/vendor-admin-page";
+import TenantSelectionPage from "@/pages/tenant-selection-page";
 import PublicDashboardPage from "@/pages/public-dashboard-page";
 import PublicRegulationDetailPage from "@/pages/public-regulation-detail-page";
 import UpdatesListPage from "@/pages/updates-list-page";
@@ -42,6 +44,10 @@ function Router() {
           {/* Authentication Route */}
           <Route path="/auth" component={AuthPage} />
           <Route path="/setup" component={SetupWizardPage} />
+          
+          {/* Tenant Management Routes */}
+          <Route path="/tenant-select" component={TenantSelectionPage} />
+          <ProtectedRoute path="/vendor-admin" component={VendorAdminPage} />
           
           {/* Protected Routes - Authentication Required */}
           <ProtectedRoute path="/" component={HomePage} />

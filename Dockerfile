@@ -48,7 +48,8 @@ COPY --from=builder /app/vite.config.ts ./vite.config.ts
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/shared ./shared
 COPY --from=builder /app/sql_dump ./sql_dump
-COPY --from=builder /app/exports ./exports
+# Copy exports directory if it exists (optional)
+RUN mkdir -p ./exports
 
 # Copy AWS RDS SSL certificate
 COPY --from=builder /app/ssl/rds-ca-2019-root.pem /app/ssl/rds-ca-2019-root.pem

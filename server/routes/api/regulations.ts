@@ -1,11 +1,16 @@
 import express from 'express';
 import { storage } from '../../storage';
 import { syslog, LogLevel, LogFacility } from '../../services/syslog';
+import { tenantDetection, EdStewardTenantRequest } from '../../middleware/tenantDetection';
+import { getTenantStorage } from '../../services/tenantStorage';
 
 const router = express.Router();
 
+// Apply tenant detection to all routes
+router.use(tenantDetection);
+
 // Simple auth middleware (we'll improve this later)
-const requireAuth = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+const requireAuth = (req: EdStewardTenantRequest, res: express.Response, next: express.NextFunction) => {
   if (!req.user) {
     return res.status(401).json({ error: 'Authentication required' });
   }
@@ -68,6 +73,12 @@ router.get("/", async (req, res) => {
   try {
     const startTime = Date.now();
     
+    // Get tenant-aware storage
+    const tenantReq = req as any;
+    const tenantStorage = tenantReq.tenant ? getTenantStorage(tenantReq.tenant) : storage;
+    
+    console.log(`[REGULATIONS] Using tenant: ${tenantReq.tenantId || 'default'}`);
+    
     // Parse query parameters
     const {
       jurisdiction, // Legacy support
@@ -82,7 +93,7 @@ router.get("/", async (req, res) => {
       limit = '1000'
     } = req.query;
 
-    let regulations = await storage.getRegulations();
+    let regulations = await tenantStorage.getRegulations();
     
     // Apply filters
     // Legacy jurisdiction filter support
