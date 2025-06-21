@@ -4,11 +4,15 @@ import passport from 'passport';
 import { sessionConfig } from './config/session';
 import { jsonErrorHandler, apiErrorHandler, deserializationErrorHandler } from './middleware/error';
 import { loggingMiddleware } from './middleware/logging';
-import { sessionCleanupMiddleware } from './middleware/session';
+import { sessionCleanupMiddleware, sessionDebugMiddleware } from './middleware/session';
 import { securityHeadersMiddleware } from './middleware/security';
 
 export function createApp(): express.Application {
   const app = express();
+
+  // CRITICAL AWS ALB FIX: Trust first proxy (ALB) for X-Forwarded-* headers
+  // This enables secure cookies by reading X-Forwarded-Proto header
+  app.set('trust proxy', 1);
 
   // Security headers
   app.use(securityHeadersMiddleware);
@@ -20,15 +24,16 @@ export function createApp(): express.Application {
   // Error handler specifically for JSON parsing errors
   app.use(jsonErrorHandler);
 
-  // Session management
+  // Session management with AWS ALB trust proxy configuration
   app.use(session(sessionConfig));
 
   // Initialize passport after session
   app.use(passport.initialize());
   app.use(passport.session());
 
-  // Session cleanup
+  // Session cleanup and debugging
   app.use(sessionCleanupMiddleware);
+  app.use(sessionDebugMiddleware);
 
   // Enhanced logging middleware for API requests
   app.use(loggingMiddleware);

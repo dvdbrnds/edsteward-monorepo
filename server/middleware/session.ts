@@ -10,17 +10,63 @@ declare module 'express-session' {
 }
 
 // Session cleanup middleware - clears invalid sessions
-export function sessionCleanupMiddleware(req: Request, res: Response, next: NextFunction) {
-  if (req.session && req.session.passport && req.session.passport.user) {
-    // Check for invalid user ID (not a number or NaN)
-    if (typeof req.session.passport.user !== 'number' || isNaN(req.session.passport.user)) {
-      console.log(`Invalid user ID in session, destroying session`);
-      return req.session.destroy(err => {
-        if (err) console.error('Session destruction error:', err);
-        // Redirect to home page or login after destroying session
-        return res.redirect('/');
-      });
-    }
+export const sessionCleanupMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  // Clean up any empty or invalid session data
+  if (req.session && Object.keys(req.session).length === 1 && req.session.cookie) {
+    // Session only has cookie, consider it empty
+    req.session.regenerate((err) => {
+      if (err) {
+        console.error('Failed to regenerate empty session:', err);
+      }
+      next();
+    });
+  } else {
+    next();
   }
+};
+
+// Add comprehensive session debugging middleware
+export const sessionDebugMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  const originalSend = res.send;
+  const originalJson = res.json;
+  
+  // Log session state before request
+  console.log(`🔍 [${req.method} ${req.path}] Session Debug:`, {
+    sessionId: req.sessionID,
+    hasSession: !!req.session,
+    sessionKeys: req.session ? Object.keys(req.session) : [],
+    userId: (req.session as any)?.userId,
+    passport: req.session?.passport,
+    cookieHeader: req.headers.cookie,
+    userAgent: req.headers['user-agent']?.substring(0, 50)
+  });
+
+  // Intercept response to log Set-Cookie headers
+  res.send = function(body) {
+    console.log(`📤 [${req.method} ${req.path}] Response:`, {
+      statusCode: res.statusCode,
+      setCookieHeaders: res.getHeaders()['set-cookie'],
+      sessionAfterResponse: req.session ? {
+        id: req.sessionID,
+        userId: (req.session as any).userId,
+        keys: Object.keys(req.session)
+      } : null
+    });
+    return originalSend.call(this, body);
+  };
+
+  res.json = function(body) {
+    console.log(`📤 [${req.method} ${req.path}] JSON Response:`, {
+      statusCode: res.statusCode,
+      setCookieHeaders: res.getHeaders()['set-cookie'],
+      sessionAfterResponse: req.session ? {
+        id: req.sessionID,
+        userId: (req.session as any).userId,
+        keys: Object.keys(req.session)
+      } : null
+    });
+    return originalJson.call(this, body);
+  };
+
   next();
-} 
+}; 

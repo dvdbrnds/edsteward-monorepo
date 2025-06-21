@@ -31,25 +31,15 @@ async function comparePasswords(supplied: string, stored: string) {
 }
 
 export function setupAuth(app: Express) {
-  const sessionSettings: session.SessionOptions = {
-    store: storage.sessionStore,
-    secret: process.env.SESSION_SECRET || 'your-secret-key',
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: process.env.NODE_ENV === 'production',
-      httpOnly: true,
-      maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    }
-  };
-
+  // Note: Session middleware is already configured in app.ts
+  // We only need to set up passport here
+  
   if (app.get("env") === "production") {
     app.set("trust proxy", 1);
   }
 
-  app.use(session(sessionSettings));
-  app.use(passport.initialize());
-  app.use(passport.session());
+  // Passport middleware is already configured in app.ts
+  // We only need to configure the strategies here
 
   passport.use(
     new LocalStrategy(async (username: string, password: string, done) => {
@@ -137,10 +127,29 @@ export function setupAuth(app: Express) {
           return res.status(500).json({ error: "Session creation failed", details: err.message });
         }
 
+        // Debug session state after login
+        console.log('🔍 Session Debug After Login:', {
+          sessionId: req.sessionID,
+          hasSession: !!req.session,
+          sessionKeys: req.session ? Object.keys(req.session) : [],
+          passportUser: req.session?.passport?.user,
+          isAuthenticated: req.isAuthenticated(),
+          setCookieHeader: res.getHeaders()['set-cookie']
+        });
+
         try {
           await storage.updateUser(user.id, { lastLogin: new Date() });
           await syslog.logAuthEvent(LogLevel.INFO, "User logged in successfully", user.id, user.username);
-          res.status(200).json(user);
+          
+          // Force session save before responding
+          req.session.save((saveErr) => {
+            if (saveErr) {
+              console.error('❌ Session save error:', saveErr);
+            } else {
+              console.log('✅ Session saved successfully');
+            }
+            res.status(200).json(user);
+          });
         } catch (error) {
           await syslog.error("Failed to update last login timestamp", { userId: user.id, error });
           // Still return success to the user

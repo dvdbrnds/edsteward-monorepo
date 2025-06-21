@@ -59,8 +59,21 @@ import { eq, desc, or, like } from "drizzle-orm";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
+import { Pool } from "pg";
+import { config } from "./config/environment";
 
 const PostgresSessionStore = connectPg(session);
+
+// Create a separate pool for session store to avoid conflicts
+const sessionPool = new Pool({
+  connectionString: config.DATABASE_URL,
+  ssl: config.DATABASE_URL.includes('neondb') ? { rejectUnauthorized: false } : false,
+  max: 5, // Smaller pool for sessions
+  idleTimeoutMillis: 0, // Never timeout idle connections
+  connectionTimeoutMillis: 10000,
+  // Prevent the pool from being closed accidentally
+  allowExitOnIdle: false,
+});
 
 export interface IStorage {
   // User methods
@@ -291,7 +304,7 @@ export class DatabaseStorage implements IStorage {
 
   constructor() {
     this.sessionStore = new PostgresSessionStore({
-      pool,
+      pool: sessionPool,
       createTableIfMissing: true,
     });
   }
