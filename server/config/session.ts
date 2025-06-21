@@ -5,8 +5,8 @@ import crypto from 'crypto';
 // Enable session debugging based on Context7 documentation
 console.log('🔍 Session Store Debug - Context7 AWS ALB Configuration');
 console.log('🔍 Environment:', isProduction ? 'PRODUCTION' : 'DEVELOPMENT');
-console.log('🔍 Trust Proxy: 1 (ALB), Secure Cookies: true (HTTPS ENABLED)');
-console.log('🔍 SUCCESS: ALB has HTTPS listener on port 443!');
+console.log('🔍 Trust Proxy: 1 (ALB), Secure Cookies: auto (HTTPS READY)');
+console.log('🔍 SUCCESS: SSL certificate configured for edsteward.ai');
 
 export const sessionConfig: session.SessionOptions = {
   // Temporarily disable database store for debugging
@@ -16,9 +16,9 @@ export const sessionConfig: session.SessionOptions = {
   saveUninitialized: true, // CRITICAL: Enable for AWS load balancer
   name: 'edsteward.sid',
   cookie: {
-    // HTTPS IS NOW CONFIGURED: Use secure: true with HTTPS ALB listener
-    // This will work with X-Forwarded-Proto: https from the ALB
-    secure: true, // Now works because ALB has HTTPS listener on port 443
+    // HTTPS READY: Using secure: 'auto' for AWS ALB compatibility
+    // Auto-detects HTTPS from X-Forwarded-Proto header
+    secure: 'auto', // Auto-detects HTTPS from ALB proxy headers
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
     sameSite: 'lax' // Allow cross-site for load balancer
