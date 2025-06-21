@@ -4,9 +4,11 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/hooks/use-auth";
 import { PageLayout } from "@/components/layout/page-layout";
+import { useTenantTitle } from "@/hooks/use-tenant-title";
+import { TenantTitleUpdater } from "@/components/tenant-title-updater";
 import HomePage from "@/pages/home-page";
 import NotFound from "@/pages/not-found";
-import AuthPage from "@/pages/auth-page";
+import TenantAwareAuth from "@/components/tenant-aware-auth";
 import RegulationsPage from "@/pages/regulations-page";
 import RegulationDetailPage from "@/pages/RegulationDetailPage";
 import ComplianceWizardPage from "@/pages/compliance-wizard-page";
@@ -15,6 +17,7 @@ import ValidationPage from "@/pages/validation-page";
 import AdminSettingsPage from "@/pages/admin-settings-page";
 import LogsPage from "@/pages/admin/logs-page";
 import DebugToolsPage from "@/pages/admin/debug-tools-page";
+import UtilitiesIndexPage from "@/pages/utilities/index";
 import { RegulationViewer } from "@/pages/RegulationViewer";
 import SetupWizardPage from "@/pages/setup-wizard-page";
 import VendorAdminPage from "@/pages/vendor-admin-page";
@@ -31,6 +34,9 @@ import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 function Router() {
   console.log('[Router] Initializing router');
+  
+  // Set tenant-aware title
+  useTenantTitle();
 
   return (
     <ErrorBoundary>
@@ -41,8 +47,8 @@ function Router() {
           <Route path="/public-dashboard/regulation/:id" component={PublicRegulationDetailPage} />
           <Route path="/enhanced-jurisdiction-demo" component={EnhancedJurisdictionDemo} />
           
-          {/* Authentication Route */}
-          <Route path="/auth" component={AuthPage} />
+          {/* Authentication Route - Now tenant-aware */}
+          <Route path="/auth" component={TenantAwareAuth} />
           <Route path="/setup" component={SetupWizardPage} />
           
           {/* Tenant Management Routes */}
@@ -69,6 +75,7 @@ function Router() {
           <ProtectedRoute path="/admin/logs" component={LogsPage} />
           <ProtectedRoute path="/admin/debug" component={DebugToolsPage} />
           <ProtectedRoute path="/admin/regulations" component={RegulationViewer} />
+          <Route path="/utilities" component={UtilitiesIndexPage} />
           <Route component={NotFound} />
         </Switch>
       </PageLayout>
@@ -83,6 +90,7 @@ export default function App() {
     <ErrorBoundary>
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
+          <TenantTitleUpdater />
           <Router />
           <Toaster />
         </AuthProvider>

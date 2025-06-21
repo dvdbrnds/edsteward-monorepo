@@ -84,7 +84,20 @@ export function serveStatic(app: Express) {
     );
   }
 
-  app.use(express.static(distPath));
+  // Serve static files with cache-busting headers
+  app.use(express.static(distPath, {
+    setHeaders: (res, path) => {
+      // Disable caching for HTML files to ensure tenant detection works
+      if (path.endsWith('.html')) {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+      } else {
+        // Allow short caching for assets but with revalidation
+        res.setHeader('Cache-Control', 'public, max-age=300, must-revalidate');
+      }
+    }
+  }));
 
   // fall through to index.html if the file doesn't exist, but EXCLUDE API routes
   app.get("*", (req, res, next) => {
@@ -93,7 +106,33 @@ export function serveStatic(app: Express) {
       return next();
     }
     
-    // Serve index.html for all non-API routes (SPA routing)
-    res.sendFile(path.resolve(distPath, "index.html"));
+    // Server-side tenant detection for title injection
+    // Use neutral default and let client-side handle detection
+    // This avoids issues with ALB hostname detection
+    let pageTitle = 'Loading...';
+    
+    console.log(`[TITLE] Using neutral default, client-side will handle subdomain detection`);
+    
+    // Read the HTML file and inject tenant-specific title
+    const htmlPath = path.resolve(distPath, "index.html");
+    fs.readFile(htmlPath, 'utf8', (err, html) => {
+      if (err) {
+        return res.status(500).send('Error loading page');
+      }
+      
+      // Replace the title with tenant-specific title
+      const modifiedHtml = html.replace(
+        /<title[^>]*>.*?<\/title>/i,
+        `<title>${pageTitle}</title>`
+      );
+      
+      // Set no-cache headers
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+      res.setHeader('Content-Type', 'text/html');
+      
+      res.send(modifiedHtml);
+    });
   });
 }

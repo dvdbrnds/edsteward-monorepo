@@ -9,7 +9,7 @@
   "containerDefinitions": [
     {
       "name": "edsteward-multi-tenant",
-      "image": "259661441422.dkr.ecr.us-east-1.amazonaws.com/edsteward:multi-tenant-latest",
+      "image": "259661441422.dkr.ecr.us-east-1.amazonaws.com/edsteward:aws-session-fix-1750513905",
       "portMappings": [
         {
           "containerPort": 3000,

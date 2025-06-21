@@ -2,15 +2,38 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Moravian University Compliance Portal</title>
+    <title>Loading...</title>
+    
+    <!-- IMMEDIATE TITLE FIX - Runs before anything else -->
+    <script>
+      (function() {
+        const hostname = window.location.hostname;
+        console.log('🏷️ Hostname detected:', hostname);
+        
+        if (hostname.startsWith('admin.')) {
+          document.title = 'EdSteward Admin Console';
+          console.log('✅ Title updated to: EdSteward Admin Console');
+        } else if (hostname.startsWith('moravian.')) {
+          document.title = 'Moravian University Compliance Portal';
+          console.log('✅ Title updated to: Moravian University Compliance Portal');
+        } else if (hostname === 'localhost' || hostname.startsWith('127.0.0.1')) {
+          document.title = 'EdSteward Development';
+          console.log('✅ Title updated to: EdSteward Development');
+        } else {
+          document.title = 'EdSteward Compliance Portal';
+          console.log('✅ Title updated to: EdSteward Compliance Portal (default)');
+        }
+      })();
+    </script>
+    
     <meta name="description" content="Compliance management platform for Moravian University" />
     <meta name="robots" content="noindex, nofollow" />
     <meta name="googlebot" content="noindex, nofollow" />
     <meta name="bingbot" content="noindex, nofollow" />
     <meta name="slurp" content="noindex, nofollow" />
     <meta name="duckduckbot" content="noindex, nofollow" />
-    <link rel="icon" type="image/png" href="/src/assets/Moravian-Monogram-MoravianBlue.png" />
   </head>
   <body>
     <div id="root"></div>

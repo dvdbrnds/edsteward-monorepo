@@ -1,17 +1,17 @@
 import express from 'express';
 import { storage } from '../../storage';
 import { syslog, LogLevel, LogFacility } from '../../services/syslog';
-import { tenantDetection, EdStewardTenantRequest } from '../../middleware/tenantDetection';
+import { tenantMiddleware } from '../../middleware/tenant';
 import { getTenantStorage } from '../../services/tenantStorage';
 
 const router = express.Router();
 
-// Apply tenant detection to all routes
-router.use(tenantDetection);
+// Apply new tenant middleware to all routes
+router.use(tenantMiddleware);
 
 // Simple auth middleware (we'll improve this later)
-const requireAuth = (req: EdStewardTenantRequest, res: express.Response, next: express.NextFunction) => {
-  if (!req.user) {
+const requireAuth = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+  if (!(req as any).user) {
     return res.status(401).json({ error: 'Authentication required' });
   }
   next();

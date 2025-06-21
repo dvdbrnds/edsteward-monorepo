@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { tenantDetection, TenantRequest, TenantManager, TenantConfig } from '../../middleware/tenantDetection.js';
+import { tenantMiddleware, requireTenant, TenantService } from '../../middleware/tenant';
 import { createTenantDatabase, runTenantMigrations } from '../../services/tenantDatabase.js';
 
 const router = Router();
 
-// Apply tenant detection to all routes
-router.use(tenantDetection);
+// Apply new tenant middleware to all routes
+router.use(tenantMiddleware);
 
 /**
  * Check if user is admin
