@@ -13,7 +13,7 @@ interface TenantDatabaseConfig {
   };
 }
 
-// Tenant database configurations
+// Tenant database configurations - each tenant gets its own database
 const TENANT_DATABASE_CONFIGS: Record<string, TenantDatabaseConfig> = {
   'admin': {
     tenantId: 'admin',
@@ -50,6 +50,8 @@ export class MultiTenantDatabaseService {
       throw new Error(`No database configuration found for tenant: ${tenantId}`);
     }
 
+    console.log(`[MULTI-TENANT-DB] Creating pool for tenant ${tenantId} with database: ${config.databaseUrl.split('/').pop()?.split('?')[0]}`);
+
     const pool = new Pool({
       connectionString: config.databaseUrl,
       ssl: config.databaseUrl.includes('neondb') ? { rejectUnauthorized: false } : false,
@@ -58,11 +60,11 @@ export class MultiTenantDatabaseService {
 
     // Handle pool errors
     pool.on('error', (err) => {
-      console.error(`Database pool error for tenant ${tenantId}:`, err);
+      console.error(`[MULTI-TENANT-DB] Database pool error for tenant ${tenantId}:`, err);
     });
 
     tenantPools.set(tenantId, pool);
-    console.log(`[MULTI-TENANT-DB] Created database pool for tenant: ${tenantId}`);
+    console.log(`[MULTI-TENANT-DB] ✓ Created database pool for tenant: ${tenantId}`);
     
     return pool;
   }
@@ -85,7 +87,7 @@ export class MultiTenantDatabaseService {
     (storage as any).pool = pool;
 
     tenantStorages.set(tenantId, storage);
-    console.log(`[MULTI-TENANT-DB] Created storage instance for tenant: ${tenantId}`);
+    console.log(`[MULTI-TENANT-DB] ✓ Created storage instance for tenant: ${tenantId}`);
     
     return storage;
   }
@@ -138,10 +140,10 @@ export class MultiTenantDatabaseService {
       const client = await pool.connect();
       await client.query('SELECT 1');
       client.release();
-      console.log(`[MULTI-TENANT-DB] Connection test successful for tenant: ${tenantId}`);
+      console.log(`[MULTI-TENANT-DB] ✓ Connection test successful for tenant: ${tenantId}`);
       return true;
     } catch (error) {
-      console.error(`[MULTI-TENANT-DB] Connection test failed for tenant ${tenantId}:`, error);
+      console.error(`[MULTI-TENANT-DB] ✗ Connection test failed for tenant ${tenantId}:`, error);
       return false;
     }
   }
@@ -155,8 +157,12 @@ export class MultiTenantDatabaseService {
 
     for (const tenantId of tenantIds) {
       try {
-        await this.testTenantConnection(tenantId);
-        console.log(`[MULTI-TENANT-DB] ✓ Tenant ${tenantId} initialized successfully`);
+        const isHealthy = await this.testTenantConnection(tenantId);
+        if (isHealthy) {
+          console.log(`[MULTI-TENANT-DB] ✓ Tenant ${tenantId} initialized successfully`);
+        } else {
+          console.log(`[MULTI-TENANT-DB] ✗ Tenant ${tenantId} connection failed`);
+        }
       } catch (error) {
         console.error(`[MULTI-TENANT-DB] ✗ Failed to initialize tenant ${tenantId}:`, error);
       }
@@ -192,25 +198,24 @@ export class MultiTenantDatabaseService {
     for (const tenantId of this.getConfiguredTenants()) {
       try {
         const pool = this.getTenantPool(tenantId);
+        const config = TENANT_DATABASE_CONFIGS[tenantId];
         stats[tenantId] = {
+          database: config.databaseUrl.split('/').pop()?.split('?')[0],
           totalConnections: pool.totalCount,
           idleConnections: pool.idleCount,
           waitingClients: pool.waitingCount,
           isHealthy: await this.testTenantConnection(tenantId)
         };
       } catch (error) {
-        stats[tenantId] = {
-          error: error instanceof Error ? error.message : 'Unknown error',
-          isHealthy: false
-        };
+        stats[tenantId] = { error: error instanceof Error ? error.message : String(error) };
       }
     }
-
+    
     return stats;
   }
 }
 
-// Export convenience function
+// Export the function for getting tenant storage
 export function getTenantStorage(tenantId: string): DatabaseStorage {
   return MultiTenantDatabaseService.getTenantStorage(tenantId);
 }

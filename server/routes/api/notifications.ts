@@ -4,6 +4,12 @@ import type { InsertNotification } from "@shared/schema";
 
 const router = express.Router();
 
+// Helper function to get tenant-aware storage
+function getTenantStorage(tenantId: string) {
+  const { TenantStorage } = require('../../services/tenantStorage');
+  return new TenantStorage(tenantId, storage);
+}
+
 // GET /api/notifications - Get notifications for the current user (or all for admins)
 router.get("/", async (req, res) => {
   try {
@@ -11,12 +17,19 @@ router.get("/", async (req, res) => {
       return res.status(401).json({ error: "Authentication required" });
     }
 
+    // Get tenant-aware storage for data isolation
+    const tenantReq = req as any;
+    const tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
+    
+    console.log(`[NOTIFICATIONS] Using tenant: ${tenantReq.tenantId || 'default'} with isolation: ${!!tenantReq.tenantId}`);
+
     // Debug logging
     console.log("🔍 Notifications API Debug:", {
       userId: req.user.id,
       username: req.user.username,
       role: req.user.role,
-      isAdmin: req.user.role === 'admin'
+      isAdmin: req.user.role === 'admin',
+      tenantId: tenantReq.tenantId
     });
 
     let notifications;
@@ -24,20 +37,21 @@ router.get("/", async (req, res) => {
     // If user is admin, get all notifications; otherwise get user's notifications
     if (req.user.role === 'admin') {
       console.log("🔍 Admin user - fetching ALL notifications");
-      notifications = await storage.getAllNotifications();
+      notifications = await tenantStorage.getAllNotifications();
     } else {
       console.log("🔍 Regular user - fetching user-specific notifications");
-      notifications = await storage.getNotificationsByUser(req.user.id);
+      notifications = await tenantStorage.getNotificationsByUser(req.user.id);
     }
     
     console.log("🔍 Notifications result:", {
       isAdmin: req.user.role === 'admin',
       totalReturned: notifications.length,
-      sampleUserIds: notifications.slice(0, 5).map(n => n.userId),
-      userIdDistribution: notifications.reduce((acc, n) => {
+      sampleUserIds: notifications.slice(0, 5).map((n: any) => n.userId),
+      userIdDistribution: notifications.reduce((acc: Record<number, number>, n: any) => {
         acc[n.userId] = (acc[n.userId] || 0) + 1;
         return acc;
-      }, {} as Record<number, number>)
+      }, {} as Record<number, number>),
+      tenantId: tenantReq.tenantId
     });
     
     return res.json(notifications);
@@ -57,6 +71,10 @@ router.post("/", async (req, res) => {
       return res.status(401).json({ error: "Authentication required" });
     }
 
+    // Get tenant-aware storage for data isolation
+    const tenantReq = req as any;
+    const tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
+
     const { regulationId, type, frequency, enabled, phoneNumber } = req.body;
 
     if (!regulationId || !type || !frequency) {
@@ -72,7 +90,8 @@ router.post("/", async (req, res) => {
       phoneNumber,
     };
 
-    const createdNotification = await storage.createNotification(notification);
+    const createdNotification = await tenantStorage.createNotification(notification);
+    console.log(`[NOTIFICATIONS] Created notification for tenant ${tenantReq.tenantId || 'default'}: ${createdNotification.id}`);
     return res.json(createdNotification);
   } catch (error) {
     console.error("Error creating notification:", error);

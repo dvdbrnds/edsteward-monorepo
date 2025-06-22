@@ -8,8 +8,10 @@ export function useTenantTitle() {
       document.title = 'EdSteward Admin Console';
     } else if (hostname.startsWith('moravian.')) {
       document.title = 'Moravian University Compliance Portal';
+    } else if (hostname.startsWith('test.')) {
+      document.title = 'Generic Compliance Portal';
     } else {
-      document.title = 'EdSteward Admin Console';
+      document.title = 'EdSteward Compliance Portal';
     }
   }, []);
 } 

@@ -21,9 +21,12 @@ export function TenantTitleUpdater() {
         } else if (tenantId === 'moravian') {
           document.title = 'Moravian University Compliance Portal';
           console.log('✅ Title updated to: Moravian University Compliance Portal');
+        } else if (tenantId === 'test') {
+          document.title = 'Generic Compliance Portal';
+          console.log('✅ Title updated to: Generic Compliance Portal');
         } else {
-          document.title = 'EdSteward Admin Console'; // Default
-          console.log('✅ Title updated to default: EdSteward Admin Console');
+          document.title = 'EdSteward Compliance Portal'; // Default
+          console.log('✅ Title updated to default: EdSteward Compliance Portal');
         }
       } catch (error) {
         console.error('❌ Failed to update title from API:', error);
@@ -33,6 +36,10 @@ export function TenantTitleUpdater() {
           document.title = 'EdSteward Admin Console';
         } else if (hostname.startsWith('moravian.')) {
           document.title = 'Moravian University Compliance Portal';
+        } else if (hostname.startsWith('test.')) {
+          document.title = 'Generic Compliance Portal';
+        } else {
+          document.title = 'EdSteward Compliance Portal';
         }
       }
     };

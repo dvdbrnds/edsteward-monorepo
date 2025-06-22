@@ -15,6 +15,7 @@ import ComplianceWizardPage from "@/pages/compliance-wizard-page";
 import ReportsPage from "@/pages/reports-page";
 import ValidationPage from "@/pages/validation-page";
 import AdminSettingsPage from "@/pages/admin-settings-page";
+import AdminConsolePage from "@/pages/admin-console-page";
 import LogsPage from "@/pages/admin/logs-page";
 import DebugToolsPage from "@/pages/admin/debug-tools-page";
 import UtilitiesIndexPage from "@/pages/utilities/index";
@@ -35,40 +36,54 @@ import { ErrorBoundary } from "@/components/ui/error-boundary";
 // Function to detect if we're on admin subdomain
 function isAdminSubdomain(): boolean {
   const hostname = window.location.hostname;
-  return hostname.startsWith('admin.') || hostname === 'admin.edsteward.local' || hostname === 'admin.edsteward.ai';
+  const isAdmin = hostname.startsWith('admin.') || 
+                  hostname === 'admin.edsteward.local' || 
+                  hostname === 'admin.edsteward.ai' ||
+                  hostname.includes('admin.edsteward');
+  
+  console.log('[isAdminSubdomain] Hostname:', hostname, 'Is Admin:', isAdmin);
+  return isAdmin;
 }
 
 function Router() {
-  console.log('[Router] Initializing router');
+  const hostname = window.location.hostname;
+  const pathname = window.location.pathname;
+  console.log('[Router] Initializing router - Hostname:', hostname, 'Path:', pathname);
   
   // Set tenant-aware title
   useTenantTitle();
 
-  // If we're on admin subdomain, show vendor admin interface
-  if (isAdminSubdomain()) {
-    console.log('[Router] Admin subdomain detected - routing to vendor admin');
+  // If we're on admin subdomain, show admin console interface
+  const isAdmin = isAdminSubdomain();
+  console.log('[Router] Is admin subdomain?', isAdmin);
+  
+  if (isAdmin) {
+    console.log('[Router] ✅ Admin subdomain detected - routing to admin console');
     return (
       <ErrorBoundary>
-        <PageLayout>
-          <Switch>
-            {/* Admin authentication */}
-            <Route path="/auth" component={TenantAwareAuth} />
-            
-            {/* Admin routes */}
-            <ProtectedRoute path="/" component={() => <VendorAdminPage />} />
-            <ProtectedRoute path="/tenants" component={() => <VendorAdminPage />} />
-            <ProtectedRoute path="/system" component={AdminSettingsPage} />
-            <ProtectedRoute path="/logs" component={LogsPage} />
-            <ProtectedRoute path="/debug" component={DebugToolsPage} />
-            
-            {/* Fallback */}
-            <Route component={NotFound} />
-          </Switch>
-        </PageLayout>
+        <Switch>
+          {/* Admin authentication */}
+          <Route path="/auth" component={TenantAwareAuth} />
+          
+          {/* Admin console routes */}
+          <ProtectedRoute path="/" component={AdminConsolePage} />
+          <ProtectedRoute path="/console" component={AdminConsolePage} />
+          <ProtectedRoute path="/tenants" component={AdminConsolePage} />
+          <ProtectedRoute path="/system" component={AdminSettingsPage} />
+          <ProtectedRoute path="/admin/settings" component={AdminSettingsPage} />
+          <ProtectedRoute path="/admin/logs" component={LogsPage} />
+          <ProtectedRoute path="/admin/debug" component={DebugToolsPage} />
+          <ProtectedRoute path="/logs" component={LogsPage} />
+          <ProtectedRoute path="/debug" component={DebugToolsPage} />
+          
+          {/* Fallback */}
+          <Route component={NotFound} />
+        </Switch>
       </ErrorBoundary>
     );
   }
 
+  console.log('[Router] ❌ Regular tenant routing - not admin subdomain');
   // Regular tenant routing
   return (
     <ErrorBoundary>

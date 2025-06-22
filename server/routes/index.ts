@@ -81,6 +81,12 @@ export function registerRoutes(app: express.Application): Server {
   // AUTHENTICATED ENDPOINTS ONLY
   // =============================================================================
 
+  // Helper function to get tenant-aware storage
+  function getTenantStorage(tenantId: string) {
+    const { TenantStorage } = require('../services/tenantStorage');
+    return new TenantStorage(tenantId, storage);
+  }
+
   // Setup status for frontend navigation (requires auth)
   app.get('/api/setup/status', async (req, res) => {
     try {
@@ -88,10 +94,14 @@ export function registerRoutes(app: express.Application): Server {
         return res.status(401).json({ error: "Authentication required" });
       }
 
-      log('📋 Checking setup status');
+      // Get tenant-aware storage for data isolation
+      const tenantReq = req as any;
+      const tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
+
+      log(`📋 Checking setup status for tenant: ${tenantReq.tenantId || 'default'}`);
       
-      const users = await storage.getAllUsers();
-      const regulations = await storage.getRegulations();
+      const users = await tenantStorage.getAllUsers();
+      const regulations = await tenantStorage.getRegulations();
       
       const setupStatus = {
         hasUsers: users.length > 0,
@@ -100,10 +110,11 @@ export function registerRoutes(app: express.Application): Server {
         isSetupComplete: users.length > 0 && regulations.length > 0,
         userCount: users.length,
         regulationCount: regulations.length,
-        deadlineCount: 0
+        deadlineCount: 0,
+        tenantId: tenantReq.tenantId || 'default'
       };
       
-      log(`✅ Setup status: ${JSON.stringify(setupStatus)}`);
+      log(`✅ Setup status for tenant ${tenantReq.tenantId || 'default'}: ${JSON.stringify(setupStatus)}`);
       res.json(setupStatus);
     } catch (error) {
       log(`❌ Error checking setup status: ${error}`);

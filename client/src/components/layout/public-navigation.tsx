@@ -6,12 +6,15 @@
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { FileText } from "lucide-react";
+import { useTenantBranding } from "@/hooks/use-tenant-branding";
 
-// Import the logo using relative path from client's perspective
+// Import logos
 import moravianLogo from "@/assets/Screenshot_2025-02-12_at_9.15.57_AM-removebg-preview.png";
+import genericLogo from "@/assets/generic-logo.svg";
 
 export default function PublicNavigation() {
   const [location] = useLocation();
+  const branding = useTenantBranding();
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200">
@@ -21,15 +24,15 @@ export default function PublicNavigation() {
             <div className="flex-shrink-0 flex items-center">
               <img
                 className="block h-10 w-auto"
-                src={moravianLogo}
-                alt="Moravian University"
+                src={branding.id === 'moravian' ? moravianLogo : branding.id === 'test' ? genericLogo : moravianLogo}
+                alt={branding.name}
               />
               <div className="ml-4 flex flex-col">
                 <h1 className="text-lg font-semibold text-gray-900">
-                  Moravian University
+                  {branding.name}
                 </h1>
                 <h2 className="text-sm text-gray-600">
-                  Board of Trustees Dashboard
+                  {branding.id === 'test' ? 'Public Dashboard' : 'Board of Trustees Dashboard'}
                 </h2>
               </div>
             </div>

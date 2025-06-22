@@ -1,8 +1,14 @@
 import express from "express";
 import { storage } from "../../storage";
-import type { InsertDeadline } from "@shared/schema";
+import type { InsertDeadline, Regulation } from "@shared/schema";
 
 const router = express.Router();
+
+// Helper function to get tenant-aware storage
+function getTenantStorage(tenantId: string) {
+  const { TenantStorage } = require('../../services/tenantStorage');
+  return new TenantStorage(tenantId, storage);
+}
 
 // GET /api/deadlines - Get all deadlines with regulation names (requires authentication)
 router.get("/", async (req, res) => {
@@ -11,20 +17,30 @@ router.get("/", async (req, res) => {
       return res.status(401).json({ error: "Authentication required" });
     }
 
-    const deadlines = await storage.getDeadlines();
-    const regulations = await storage.getRegulations();
+    // Get tenant-aware storage for data isolation
+    const tenantReq = req as any;
+    const tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
+    
+    console.log(`[DEADLINES] Using tenant: ${tenantReq.tenantId || 'default'} with isolation: ${!!tenantReq.tenantId}`);
+
+    const deadlines = await tenantStorage.getDeadlines();
+    const regulations = await tenantStorage.getRegulations();
     
     // Create a map for quick regulation lookup
-    const regulationMap = new Map(regulations.map(reg => [reg.id, reg]));
+    const regulationMap = new Map(regulations.map((reg: Regulation) => [reg.id, reg]));
     
     // Enhance deadlines with regulation names
-    const enhancedDeadlines = deadlines.map(deadline => ({
-      ...deadline,
-      regulationName: regulationMap.get(deadline.regulationId)?.name || `Regulation #${deadline.regulationId}`,
-      regulationTopic: regulationMap.get(deadline.regulationId)?.topic,
-      regulationStatuteIds: regulationMap.get(deadline.regulationId)?.statuteIds
-    }));
+    const enhancedDeadlines = deadlines.map((deadline: any) => {
+      const regulation = regulationMap.get(deadline.regulationId);
+      return {
+        ...deadline,
+        regulationName: regulation?.name || `Regulation #${deadline.regulationId}`,
+        regulationTopic: regulation?.topic,
+        regulationStatuteIds: regulation?.statuteIds
+      };
+    });
 
+    console.log(`[DEADLINES] Found ${enhancedDeadlines.length} deadlines for tenant ${tenantReq.tenantId || 'default'}`);
     return res.json(enhancedDeadlines);
   } catch (error) {
     console.error("Error fetching deadlines:", error);
@@ -42,6 +58,10 @@ router.post("/", async (req, res) => {
       return res.status(401).json({ error: "Authentication required" });
     }
 
+    // Get tenant-aware storage for data isolation
+    const tenantReq = req as any;
+    const tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
+
     const { regulationId, dueDate, status, assignedTo } = req.body;
 
     if (!regulationId || !dueDate || !status) {
@@ -55,7 +75,8 @@ router.post("/", async (req, res) => {
       assignedTo: assignedTo || req.user.id,
     };
 
-    const createdDeadline = await storage.createDeadline(deadline);
+    const createdDeadline = await tenantStorage.createDeadline(deadline);
+    console.log(`[DEADLINES] Created deadline for tenant ${tenantReq.tenantId || 'default'}: ${createdDeadline.id}`);
     return res.json(createdDeadline);
   } catch (error) {
     console.error("Error creating deadline:", error);

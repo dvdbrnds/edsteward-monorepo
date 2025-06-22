@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   # Main application
   app:
@@ -9,7 +7,12 @@ services:
       target: development
     environment:
       - NODE_ENV=development
+      # Main database (used as fallback and for moravian tenant)
       - DATABASE_URL=postgresql://neondb_owner:npg_foSr6ixkzw7W@ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require
+      # Tenant-specific databases for complete data isolation
+      - ADMIN_DATABASE_URL=postgresql://neondb_owner:npg_foSr6ixkzw7W@ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech/neondb_admin?sslmode=require
+      - MORAVIAN_DATABASE_URL=postgresql://neondb_owner:npg_foSr6ixkzw7W@ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require
+      - TEST_DATABASE_URL=postgresql://neondb_owner:npg_foSr6ixkzw7W@ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech/neondb_test?sslmode=require
       - DB_HOST=ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech
       - DB_PORT=5432
       - DB_NAME=neondb
