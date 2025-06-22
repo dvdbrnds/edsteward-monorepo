@@ -32,12 +32,44 @@ import { ProtectedRoute } from "./lib/protected-route";
 import { ProtectedRegulationRoute } from "./lib/protected-regulation-route";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 
+// Function to detect if we're on admin subdomain
+function isAdminSubdomain(): boolean {
+  const hostname = window.location.hostname;
+  return hostname.startsWith('admin.') || hostname === 'admin.edsteward.local' || hostname === 'admin.edsteward.ai';
+}
+
 function Router() {
   console.log('[Router] Initializing router');
   
   // Set tenant-aware title
   useTenantTitle();
 
+  // If we're on admin subdomain, show vendor admin interface
+  if (isAdminSubdomain()) {
+    console.log('[Router] Admin subdomain detected - routing to vendor admin');
+    return (
+      <ErrorBoundary>
+        <PageLayout>
+          <Switch>
+            {/* Admin authentication */}
+            <Route path="/auth" component={TenantAwareAuth} />
+            
+            {/* Admin routes */}
+            <ProtectedRoute path="/" component={() => <VendorAdminPage />} />
+            <ProtectedRoute path="/tenants" component={() => <VendorAdminPage />} />
+            <ProtectedRoute path="/system" component={AdminSettingsPage} />
+            <ProtectedRoute path="/logs" component={LogsPage} />
+            <ProtectedRoute path="/debug" component={DebugToolsPage} />
+            
+            {/* Fallback */}
+            <Route component={NotFound} />
+          </Switch>
+        </PageLayout>
+      </ErrorBoundary>
+    );
+  }
+
+  // Regular tenant routing
   return (
     <ErrorBoundary>
       <PageLayout>

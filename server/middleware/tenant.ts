@@ -96,6 +96,28 @@ const FALLBACK_TENANTS: Record<string, Tenant> = {
     },
     createdAt: new Date(),
     updatedAt: new Date()
+  },
+  'test': {
+    id: 'test',
+    name: 'EdSteward Test Environment',
+    domain: 'test.edsteward.local',
+    subdomain: 'test',
+    databaseName: 'edsteward_test',
+    status: 'active',
+    settings: {
+      allowedDomains: ['edsteward.ai', 'test.edsteward.local'],
+      defaultRole: 'admin',
+      enableAutoProvisioning: true,
+      features: {
+        apiAccess: true,
+        customDomain: false,
+        ssoEnabled: false,
+        maxUsers: 100,
+        maxRegulations: 1000
+      }
+    },
+    createdAt: new Date(),
+    updatedAt: new Date()
   }
 };
 

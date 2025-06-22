@@ -56,6 +56,7 @@ import type {
 import { regulationUpdates, type RegulationUpdate, type InsertRegulationUpdate } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or, like } from "drizzle-orm";
+import { getTenantStorage } from "./services/multi-tenant-database";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
@@ -76,15 +77,15 @@ const sessionPool = new Pool({
 });
 
 export interface IStorage {
-  // User methods
-  getUser(id: number): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  getUserByEmail(email: string): Promise<User | undefined>;
-  getUserByExternalId(externalId: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
-  getAllUsers(): Promise<User[]>;
-  updateUser(id: number, user: Partial<InsertUser>): Promise<User>;
-  deleteUser(id: number): Promise<void>;
+  // User methods - now tenant-aware
+  getUser(id: number, tenantId?: string): Promise<User | undefined>;
+  getUserByUsername(username: string, tenantId?: string): Promise<User | undefined>;
+  getUserByEmail(email: string, tenantId?: string): Promise<User | undefined>;
+  getUserByExternalId(externalId: string, tenantId?: string): Promise<User | undefined>;
+  createUser(user: InsertUser, tenantId?: string): Promise<User>;
+  getAllUsers(tenantId?: string): Promise<User[]>;
+  updateUser(id: number, user: Partial<InsertUser>, tenantId?: string): Promise<User>;
+  deleteUser(id: number, tenantId?: string): Promise<void>;
 
   // Regulation methods
   getRegulations(): Promise<Regulation[]>;
@@ -309,7 +310,7 @@ export class DatabaseStorage implements IStorage {
     });
   }
 
-  async getUser(id: number): Promise<User | undefined> {
+  async getUser(id: number, tenantId?: string): Promise<User | undefined> {
     try {
       const [user] = await db.select().from(users).where(eq(users.id, id));
       return user;
@@ -319,7 +320,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
+  async getUserByUsername(username: string, tenantId?: string): Promise<User | undefined> {
     try {
       console.log(`Looking up user with username: ${username}`);
       const [user] = await db.select().from(users).where(eq(users.username, username));
@@ -331,7 +332,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async getUserByEmail(email: string): Promise<User | undefined> {
+  async getUserByEmail(email: string, tenantId?: string): Promise<User | undefined> {
     try {
       console.log(`Looking up user with email: ${email}`);
       const [user] = await db.select().from(users).where(eq(users.email, email));
@@ -343,7 +344,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async getUserByExternalId(externalId: string): Promise<User | undefined> {
+  async getUserByExternalId(externalId: string, tenantId?: string): Promise<User | undefined> {
     try {
       console.log(`Looking up user with external ID: ${externalId}`);
       const [user] = await db.select().from(users).where(eq(users.externalId, externalId));
@@ -355,22 +356,28 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
-    // Handle optional password for SAML users
+  async createUser(insertUser: InsertUser, tenantId?: string): Promise<User> {
+    // Use tenant-specific storage if tenantId provided
+    if (tenantId) {
+      const tenantStorage = getTenantStorage(tenantId);
+      return await tenantStorage.createUser(insertUser);
+    }
+    
+    // Handle optional password for SAML users - ensure we have a valid password or null
     const userToCreate = {
       ...insertUser,
-      password: insertUser.password || null // Allow null password for SAML users
+      password: insertUser.password || '' // Use empty string instead of null for database compatibility
     };
     
     const [user] = await db.insert(users).values(userToCreate).returning();
     return user;
   }
 
-  async getAllUsers(): Promise<User[]> {
+  async getAllUsers(tenantId?: string): Promise<User[]> {
     return await db.select().from(users);
   }
 
-  async updateUser(id: number, userData: Partial<InsertUser>): Promise<User> {
+  async updateUser(id: number, userData: Partial<InsertUser>, tenantId?: string): Promise<User> {
     const [user] = await db
       .update(users)
       .set(userData)
@@ -379,7 +386,7 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async deleteUser(id: number): Promise<void> {
+  async deleteUser(id: number, tenantId?: string): Promise<void> {
     await db.delete(users).where(eq(users.id, id));
   }
 

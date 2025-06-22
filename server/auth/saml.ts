@@ -2,6 +2,7 @@ import passport from 'passport';
 import { Strategy as SamlStrategy, MultiSamlStrategy } from '@node-saml/passport-saml';
 import { Express, Request, Response, NextFunction } from 'express';
 import { storage } from '../storage';
+import { getTenantStorage } from '../services/multi-tenant-database';
 import { attributeMappings } from '../config/saml';
 import { syslog, LogLevel } from '../services/syslog';
 
@@ -154,25 +155,32 @@ export function setupSamlAuth(app: Express) {
         
         const userData = extractUserAttributes(profile, idpType);
         
-        // Check if user exists by external ID or email
-        let user = await storage.getUserByExternalId(userData.externalId);
+        // Get tenant-aware storage - try to determine tenant from request or use default
+        const tenantId = req.tenantId || req.tenant?.id;
+        const userStorage = tenantId ? getTenantStorage(tenantId) : storage;
+        
+        // Check if user exists by external ID or email in this tenant
+        let user = await userStorage.getUserByExternalId(userData.externalId);
         if (!user && userData.email) {
-          user = await storage.getUserByEmail(userData.email);
+          user = await userStorage.getUserByEmail(userData.email);
         }
 
         if (user) {
           // Update existing user's login timestamp and SAML data
-          await storage.updateUser(user.id, {
+          await userStorage.updateUser(user.id, {
             lastLogin: new Date(),
             identityProvider: userData.identityProvider,
             providerId: userData.providerId
           });
           
-          await syslog.logAuthEvent(LogLevel.INFO, `SAML login successful via ${idpType}`, user.id, user.username);
+          await syslog.logAuthEvent(LogLevel.INFO, `SAML login successful via ${idpType}`, user.id, user.username, {
+            tenantId,
+            provider: idpType
+          });
           return done(null, user);
         } else {
           // Create new user from SAML profile - password is optional for SAML users
-          const newUser = await storage.createUser({
+          const newUser = await userStorage.createUser({
             username: userData.username,
             email: userData.email,
             firstName: userData.firstName,
@@ -183,10 +191,13 @@ export function setupSamlAuth(app: Express) {
             identityProvider: userData.identityProvider,
             providerId: userData.providerId,
             lastLogin: new Date()
-            // Note: no password for SAML users
+            // Note: no password for SAML users, tenantId handled by storage layer
           });
           
-          await syslog.logAuthEvent(LogLevel.INFO, `New SAML user created via ${idpType}`, newUser.id, newUser.username);
+          await syslog.logAuthEvent(LogLevel.INFO, `New SAML user created via ${idpType}`, newUser.id, newUser.username, {
+            tenantId,
+            provider: idpType
+          });
           return done(null, newUser);
         }
       } catch (error) {

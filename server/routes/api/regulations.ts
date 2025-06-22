@@ -1,8 +1,9 @@
 import express from 'express';
 import { storage } from '../../storage';
+import { getTenantStorage } from '../../services/multi-tenant-database';
 import { syslog, LogLevel, LogFacility } from '../../services/syslog';
 import { tenantMiddleware } from '../../middleware/tenant';
-import { getTenantStorage } from '../../services/tenantStorage';
+import type { Regulation } from '@shared/schema';
 
 const router = express.Router();
 
@@ -68,16 +69,16 @@ const detectChanges = (original: any, updated: any): Record<string, { from: any;
   return changes;
 };
 
-// Get all regulations (temporarily without auth for testing)
+// Get all regulations (with tenant isolation)
 router.get("/", async (req, res) => {
   try {
     const startTime = Date.now();
     
-    // Get tenant-aware storage
+    // Get tenant-aware storage for data isolation
     const tenantReq = req as any;
-    const tenantStorage = tenantReq.tenant ? getTenantStorage(tenantReq.tenant) : storage;
+    const tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
     
-    console.log(`[REGULATIONS] Using tenant: ${tenantReq.tenantId || 'default'}`);
+    console.log(`[REGULATIONS] Using tenant: ${tenantReq.tenantId || 'default'} with isolation: ${!!tenantReq.tenantId}`);
     
     // Parse query parameters
     const {
@@ -98,17 +99,17 @@ router.get("/", async (req, res) => {
     // Apply filters
     // Legacy jurisdiction filter support
     if (jurisdiction && typeof jurisdiction === 'string') {
-      regulations = regulations.filter(reg => reg.jurisdictionSource === jurisdiction);
+      regulations = regulations.filter((reg: Regulation) => reg.jurisdictionSource === jurisdiction);
     }
     
     // New jurisdiction source filter
     if (jurisdictionSource && typeof jurisdictionSource === 'string') {
-      regulations = regulations.filter(reg => reg.jurisdictionSource === jurisdictionSource);
+      regulations = regulations.filter((reg: Regulation) => reg.jurisdictionSource === jurisdictionSource);
     }
     
     // New institution type filter
     if (institutionType && typeof institutionType === 'string') {
-      regulations = regulations.filter(reg => {
+      regulations = regulations.filter((reg: Regulation) => {
         if (!reg.applicableInstitutions) return false;
         const institutions = Array.isArray(reg.applicableInstitutions) 
           ? reg.applicableInstitutions 
@@ -118,27 +119,27 @@ router.get("/", async (req, res) => {
     }
     
     if (category && typeof category === 'string') {
-      regulations = regulations.filter(reg => reg.category === category);
+      regulations = regulations.filter((reg: Regulation) => reg.category === category);
     }
     
     if (applicable && typeof applicable === 'string') {
       const isApplicable = applicable === 'true';
-      regulations = regulations.filter(reg => reg.isApplicable === isApplicable);
+      regulations = regulations.filter((reg: Regulation) => reg.isApplicable === isApplicable);
     }
     
     if (search && typeof search === 'string') {
-      const searchResults = await storage.searchRegulations(search);
-      const searchIds = new Set(searchResults.map(r => r.id));
-      regulations = regulations.filter(reg => searchIds.has(reg.id));
+      const searchResults = await tenantStorage.searchRegulations(search);
+      const searchIds = new Set(searchResults.map((r: Regulation) => r.id));
+      regulations = regulations.filter((reg: Regulation) => searchIds.has(reg.id));
     }
 
     // Apply sorting
     const validSortFields = ['lastUpdated', 'name', 'effectiveDate', 'category', 'jurisdiction'];
     const sortField = validSortFields.includes(sortBy as string) ? sortBy as string : 'lastUpdated';
     
-    regulations.sort((a, b) => {
-      const aVal = a[sortField as keyof typeof a];
-      const bVal = b[sortField as keyof typeof b];
+    regulations.sort((a: Regulation, b: Regulation) => {
+      const aVal = a[sortField as keyof Regulation];
+      const bVal = b[sortField as keyof Regulation];
       
       if (aVal == null && bVal == null) return 0;
       if (aVal == null) return 1;
@@ -159,7 +160,7 @@ router.get("/", async (req, res) => {
     const paginatedRegulations = regulations.slice(offset, offset + limitNum);
     
     const totalTime = Date.now() - startTime;
-    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Fetched ${paginatedRegulations.length} regulations in ${totalTime}ms`);
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Fetched ${paginatedRegulations.length} regulations for tenant ${tenantReq.tenantId || 'default'} in ${totalTime}ms`);
 
     // For compatibility with frontend expecting array directly
     res.json(paginatedRegulations);
@@ -176,13 +177,18 @@ router.get("/", async (req, res) => {
 router.get("/ids", requireAuth, async (req, res) => {
   try {
     const startTime = Date.now();
-    const regulations = await storage.getRegulations();
+    
+    // Use tenant-specific storage for data isolation
+    const tenantReq = req as any;
+    const tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
+    
+    const regulations = await tenantStorage.getRegulations();
     
     const regulationIds = regulations.map(reg => ({
       id: reg.id,
       itemId: reg.itemId,
       name: reg.name,
-      jurisdiction: reg.jurisdiction,
+      jurisdiction: reg.jurisdictionSource,
       category: reg.category,
       isApplicable: reg.isApplicable
     }));
@@ -210,7 +216,11 @@ router.get("/:regulationId", async (req, res) => {
       return res.status(400).json({ error: "Invalid regulation ID" });
     }
     
-    const regulation = await storage.getRegulation(regulationId);
+    // Use tenant-specific storage for data isolation
+    const tenantReq = req as any;
+    const tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
+    
+    const regulation = await tenantStorage.getRegulation(regulationId);
     
     if (!regulation) {
       return res.status(404).json({ error: "Regulation not found" });
@@ -239,7 +249,11 @@ router.get("/:regulationId/evidence", requireAuth, async (req, res) => {
       return res.status(400).json({ error: "Invalid regulation ID" });
     }
     
-    const evidenceFiles = await storage.getEvidenceFilesByRegulation(regulationId);
+    // Use tenant-specific storage for data isolation
+    const tenantReq = req as any;
+    const tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
+    
+    const evidenceFiles = await tenantStorage.getEvidenceFilesByRegulation(regulationId);
     
     const totalTime = Date.now() - startTime;
     syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Fetched ${evidenceFiles.length} evidence files for regulation ${regulationId} in ${totalTime}ms`);
@@ -460,7 +474,7 @@ router.post("/", requireAuth, async (req, res) => {
         itemId: newRegulation.itemId,
         name: newRegulation.name,
         category: newRegulation.category,
-        jurisdiction: newRegulation.jurisdiction,
+        jurisdiction: newRegulation.jurisdictionSource,
         createTime: totalTime
       }
     );
@@ -513,7 +527,7 @@ router.delete("/:regulationId", requireAuth, async (req, res) => {
         deletedName: regulation.name,
         deletedItemId: regulation.itemId,
         deletedCategory: regulation.category,
-        deletedJurisdiction: regulation.jurisdiction,
+        deletedJurisdiction: regulation.jurisdictionSource,
         deleteTime: totalTime
       }
     );

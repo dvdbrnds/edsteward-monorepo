@@ -1,11 +1,18 @@
 import express from "express";
 import { storage } from "../../storage";
+import { getTenantStorage } from "../../services/multi-tenant-database";
 import { hashPassword } from "../../auth";
 import { db } from "../../db";
 import { systemLogs } from "@shared/schema";
 import { desc, and, gte, lte, ilike, eq, count } from "drizzle-orm";
 
 const router = express.Router();
+
+// Get tenant-aware storage for user operations
+function getTenantAwareStorage(req: any) {
+  const tenantId = req.tenantId || req.tenant?.id;
+  return tenantId ? getTenantStorage(tenantId) : storage;
+}
 
 // Middleware to check admin access
 const requireAdmin = (req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -20,11 +27,24 @@ const requireAdmin = (req: express.Request, res: express.Response, next: express
   next();
 };
 
-// User management endpoints
+// User management endpoints - now tenant-aware
 router.get('/users', requireAdmin, async (req, res) => {
   try {
-    const users = await storage.getAllUsers();
-    return res.json(users);
+    // Use tenant-aware storage to get users for this tenant only
+    const tenantStorage = getTenantAwareStorage(req);
+    const users = await tenantStorage.getAllUsers();
+    
+    // Filter out password field for security
+    const safeUsers = users.map(user => {
+      const { password, ...safeUser } = user;
+      return {
+        ...safeUser,
+        tenantId: req.tenantId,
+        subdomain: req.tenant?.subdomain
+      };
+    });
+    
+    return res.json(safeUsers);
   } catch (error) {
     console.error("Error fetching users:", error);
     return res.status(500).json({ 
@@ -42,8 +62,25 @@ router.post('/update-user', requireAdmin, async (req, res) => {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
-    const updatedUser = await storage.updateUser(id, { username, role });
-    return res.json(updatedUser);
+    // Use tenant-aware storage to update user in this tenant only
+    const tenantStorage = getTenantAwareStorage(req);
+    
+    // Verify user exists in this tenant
+    const existingUser = await tenantStorage.getUser(id);
+    if (!existingUser) {
+      return res.status(404).json({ error: "User not found in this tenant" });
+    }
+
+    const updatedUser = await tenantStorage.updateUser(id, { username, role });
+    
+    // Remove password field for security
+    const { password, ...safeUser } = updatedUser;
+    
+    return res.json({
+      ...safeUser,
+      tenantId: req.tenantId,
+      subdomain: req.tenant?.subdomain
+    });
   } catch (error) {
     console.error("Error updating user:", error);
     return res.status(500).json({ 
@@ -61,14 +98,26 @@ router.post('/reset-password', requireAdmin, async (req, res) => {
       return res.status(400).json({ error: "User ID is required" });
     }
 
+    // Use tenant-aware storage to reset password for user in this tenant only
+    const tenantStorage = getTenantAwareStorage(req);
+    
+    // Verify user exists in this tenant
+    const existingUser = await tenantStorage.getUser(id);
+    if (!existingUser) {
+      return res.status(404).json({ error: "User not found in this tenant" });
+    }
+
     // Generate a temporary password
     const temporaryPassword = Math.random().toString(36).slice(-8);
     const hashedPassword = await hashPassword(temporaryPassword);
     
-    const updatedUser = await storage.updateUser(id, { password: hashedPassword });
+    const updatedUser = await tenantStorage.updateUser(id, { password: hashedPassword });
+    
     return res.json({ 
       message: "Password reset successfully",
-      temporaryPassword: temporaryPassword
+      temporaryPassword: temporaryPassword,
+      tenantId: req.tenantId,
+      userId: updatedUser.id
     });
   } catch (error) {
     console.error("Error resetting password:", error);
@@ -79,11 +128,115 @@ router.post('/reset-password', requireAdmin, async (req, res) => {
   }
 });
 
+// Create new user endpoint - tenant-aware
+router.post('/create-user', requireAdmin, async (req, res) => {
+  try {
+    const { username, email, role, firstName, lastName, department } = req.body;
+
+    if (!username || !email || !role) {
+      return res.status(400).json({ error: "Username, email, and role are required" });
+    }
+
+    // Use tenant-aware storage
+    const tenantStorage = getTenantAwareStorage(req);
+    
+    // Check if user already exists in this tenant
+    const existingUser = await tenantStorage.getUserByUsername(username);
+    if (existingUser) {
+      return res.status(400).json({ error: "Username already exists in this tenant" });
+    }
+
+    const existingEmailUser = await tenantStorage.getUserByEmail(email);
+    if (existingEmailUser) {
+      return res.status(400).json({ error: "Email already exists in this tenant" });
+    }
+
+    // Generate a temporary password
+    const temporaryPassword = Math.random().toString(36).slice(-8);
+    const hashedPassword = await hashPassword(temporaryPassword);
+
+    const newUser = await tenantStorage.createUser({
+      username,
+      email,
+      password: hashedPassword,
+      role: role.toLowerCase(),
+      firstName: firstName || '',
+      lastName: lastName || '',
+      department: department || ''
+    });
+
+    // Remove password field for security
+    const { password, ...safeUser } = newUser;
+
+    return res.status(201).json({
+      ...safeUser,
+      temporaryPassword,
+      tenantId: req.tenantId,
+      subdomain: req.tenant?.subdomain,
+      message: "User created successfully"
+    });
+  } catch (error) {
+    console.error("Error creating user:", error);
+    return res.status(500).json({ 
+      error: "Failed to create user",
+      details: error instanceof Error ? error.message : String(error)
+    });
+  }
+});
+
+// Delete user endpoint - tenant-aware
+router.delete('/users/:id', requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const userId = parseInt(id);
+
+    if (isNaN(userId)) {
+      return res.status(400).json({ error: "Invalid user ID" });
+    }
+
+    // Use tenant-aware storage
+    const tenantStorage = getTenantAwareStorage(req);
+    
+    // Verify user exists in this tenant
+    const existingUser = await tenantStorage.getUser(userId);
+    if (!existingUser) {
+      return res.status(404).json({ error: "User not found in this tenant" });
+    }
+
+    // Prevent deleting the last admin user
+    if (existingUser.role === 'admin') {
+      const allUsers = await tenantStorage.getAllUsers();
+      const adminUsers = allUsers.filter(u => u.role === 'admin');
+      if (adminUsers.length <= 1) {
+        return res.status(400).json({ error: "Cannot delete the last admin user" });
+      }
+    }
+
+    await tenantStorage.deleteUser(userId);
+
+    return res.json({ 
+      message: "User deleted successfully",
+      tenantId: req.tenantId,
+      deletedUserId: userId
+    });
+  } catch (error) {
+    console.error("Error deleting user:", error);
+    return res.status(500).json({ 
+      error: "Failed to delete user",
+      details: error instanceof Error ? error.message : String(error)
+    });
+  }
+});
+
 // Configuration endpoints (placeholder - would need actual implementation)
 router.get('/email-config', requireAdmin, async (req, res) => {
   try {
-    // Return empty config for now
-    return res.json({});
+    // Return empty config for now - would be tenant-specific in the future
+    return res.json({
+      tenantId: req.tenantId,
+      subdomain: req.tenant?.subdomain,
+      emailConfig: {}
+    });
   } catch (error) {
     console.error("Error fetching email config:", error);
     return res.status(500).json({ 
@@ -95,8 +248,12 @@ router.get('/email-config', requireAdmin, async (req, res) => {
 
 router.post('/email-config', requireAdmin, async (req, res) => {
   try {
-    // Placeholder - would need actual email config storage
-    return res.json({ message: "Email configuration updated" });
+    // Placeholder - would need actual email config storage per tenant
+    return res.json({ 
+      message: "Email configuration updated",
+      tenantId: req.tenantId,
+      subdomain: req.tenant?.subdomain
+    });
   } catch (error) {
     console.error("Error updating email config:", error);
     return res.status(500).json({ 
