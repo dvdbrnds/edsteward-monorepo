@@ -16,9 +16,9 @@ export const sessionConfig: session.SessionOptions = {
   saveUninitialized: true, // CRITICAL: Enable for AWS load balancer
   name: 'edsteward.sid',
   cookie: {
-    // HTTPS IS NOW CONFIGURED: Use secure: true with HTTPS ALB listener
-    // This will work with X-Forwarded-Proto: https from the ALB
-    secure: true, // Now works because ALB has HTTPS listener on port 443
+    // Use secure cookies only in production (HTTPS)
+    // In development, use HTTP cookies for local testing
+    secure: isProduction, // Only secure in production with HTTPS
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
     sameSite: 'lax' // Allow cross-site for load balancer

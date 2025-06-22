@@ -207,13 +207,13 @@ export class TenantService {
     
     console.log(`[TENANT] Extracting tenant from host: ${host} (protocol: ${protocol})`);
     
-    // Method 1: Subdomain detection (tenant.edsteward.ai) - PRIMARY METHOD
-    const subdomainMatch = host.match(/^([^.]+)\.edsteward\.ai(?::\d+)?$/);
+    // Method 1: Subdomain detection (tenant.edsteward.ai or tenant.edsteward.local) - PRIMARY METHOD
+    const subdomainMatch = host.match(/^([^.]+)\.edsteward\.(ai|local)(?::\d+)?$/);
     if (subdomainMatch && subdomainMatch[1] !== 'www' && subdomainMatch[1] !== 'api') {
-      console.log(`[TENANT] ✓ Detected subdomain: ${subdomainMatch[1]}`);
+      console.log(`[TENANT] ✓ Detected subdomain: ${subdomainMatch[1]} (domain: ${subdomainMatch[2]})`);
       return {
         subdomain: subdomainMatch[1],
-        domain: 'edsteward.ai',
+        domain: subdomainMatch[2] === 'local' ? 'edsteward.local' : 'edsteward.ai',
         method: 'subdomain'
       };
     }

@@ -201,7 +201,7 @@ router.get("/ids", requireAuth, async (req, res) => {
 });
 
 // Get single regulation by ID
-router.get("/:regulationId", requireAuth, async (req, res) => {
+router.get("/:regulationId", async (req, res) => {
   try {
     const startTime = Date.now();
     const regulationId = parseInt(req.params.regulationId);

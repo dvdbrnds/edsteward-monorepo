@@ -28,8 +28,8 @@ COPY . .
 # Generate Prisma client (if needed)
 # RUN npx prisma generate
 
-# Build the frontend only
-RUN npx vite build
+# Build both frontend and backend
+RUN npm run build
 
 # Production image, copy all the files and run the app
 FROM --platform=linux/amd64 base AS runner
