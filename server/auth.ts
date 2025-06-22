@@ -169,7 +169,7 @@ export function setupAuth(app: Express) {
         return next(err);
       }
       syslog.logAuthEvent(LogLevel.INFO, "User logged out", userId, username);
-      res.sendStatus(200);
+      res.status(200).json({ success: true, message: "Logged out successfully" });
     });
   });
 
