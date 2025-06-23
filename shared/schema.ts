@@ -36,19 +36,7 @@ export interface RegulationSource {
   lastChecked?: Date;
 }
 
-// Add after the RegulationSource interface
-export interface RegulationVersion {
-  changes: {
-    field: string;
-    oldValue: string;
-    newValue: string;
-    type: 'addition' | 'deletion' | 'modification';
-  }[];
-  mergeMetadata?: {
-    mergedFrom: string[];
-    conflictResolutions?: Record<string, string>;
-  };
-}
+// RegulationVersion interface moved to database schema section
 
 // Add after RegulationVersion interface
 export interface RegulationAction {
@@ -832,6 +820,11 @@ export const tenants = pgTable("tenants", {
       customDomain?: boolean;
       ssoEnabled?: boolean;
     };
+    institutionConfig?: {
+      primaryTypes: InstitutionType[];
+      hideNonApplicable: boolean;
+      allowUsersToToggle: boolean;
+    };
   }>().default({
     allowedDomains: [],
     defaultRole: 'user',
@@ -866,6 +859,11 @@ export const insertTenantSchema = createInsertSchema(tenants).extend({
       apiAccess: z.boolean().default(true),
       customDomain: z.boolean().default(false),
       ssoEnabled: z.boolean().default(false),
+    }).optional(),
+    institutionConfig: z.object({
+      primaryTypes: z.array(z.enum(INSTITUTION_TYPES)),
+      hideNonApplicable: z.boolean(),
+      allowUsersToToggle: z.boolean(),
     }).optional(),
   }).optional(),
 });

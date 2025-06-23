@@ -2,7 +2,7 @@ import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import { Express } from "express";
 import session from "express-session";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import { storage } from "./storage";
 import { getTenantStorage } from "./services/multi-tenant-database";
 import { User as SelectUser } from "@shared/schema";

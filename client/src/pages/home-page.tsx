@@ -5,6 +5,7 @@ import Navigation from "@/components/layout/navigation";
 import ComplianceOverview from "@/components/dashboard/compliance-overview";
 import UpcomingDeadlines from "@/components/dashboard/upcoming-deadlines";
 import RegulationList from "@/components/regulations/regulation-list";
+import { AppliesToFilter } from "@/components/filters/applies-to-filter";
 import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Bell, CheckCircle, XCircle, Users, ExternalLink } from "lucide-react";
@@ -14,6 +15,7 @@ import type { Notification } from "@shared/schema";
 export default function HomePage() {
   const { user } = useAuth();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedInstitutionTypes, setSelectedInstitutionTypes] = useState<string[]>([]);
 
   const { data: notifications, isLoading: notificationsLoading, error } = useQuery<Notification[]>({
     queryKey: ["/api/notifications", "v2"],
@@ -122,7 +124,21 @@ export default function HomePage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
               {selectedCategory ? `${selectedCategory} Regulations` : 'All Regulations'}
             </h2>
-            <RegulationList categoryFilter={selectedCategory} jurisdictionFilter={null} />
+            
+            {/* Filters Section */}
+            <div className="mb-6">
+              <AppliesToFilter
+                selectedInstitutionTypes={selectedInstitutionTypes}
+                onInstitutionTypesChange={setSelectedInstitutionTypes}
+                compact={true}
+              />
+            </div>
+            
+            <RegulationList 
+              categoryFilter={selectedCategory} 
+              jurisdictionFilter={null}
+              appliesToFilter={selectedInstitutionTypes}
+            />
           </div>
         </div>
       </main>

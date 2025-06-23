@@ -1,6 +1,10 @@
 import { Router } from 'express';
 import { tenantMiddleware, requireTenant, TenantService } from '../../middleware/tenant';
 import { createTenantDatabase, runTenantMigrations } from '../../services/tenantDatabase.js';
+import { EdStewardTenantRequest as TenantRequest, TenantConfig, TenantManager } from '../../middleware/tenantDetection';
+import { eq } from 'drizzle-orm';
+import { db } from '../../db';
+import { tenants } from '@shared/schema';
 
 const router = Router();
 
@@ -272,6 +276,129 @@ router.post('/select', (req: TenantRequest, res) => {
   } catch (error) {
     res.status(500).json({
       error: 'Failed to select tenant',
+      message: error instanceof Error ? error.message : String(error)
+    });
+  }
+});
+
+/**
+ * PUT /api/tenants/:tenantId/institution-config - Update institution configuration
+ */
+router.put('/:tenantId/institution-config', async (req: TenantRequest, res) => {
+  try {
+    const { tenantId } = req.params;
+    const { primaryTypes, hideNonApplicable, allowUsersToToggle } = req.body;
+    
+    // Check if user can access this tenant
+    if (!isAdmin(req.user) && req.tenantId !== tenantId) {
+      return res.status(403).json({
+        error: 'Forbidden',
+        message: 'Cannot update other tenant configuration'
+      });
+    }
+
+    // Validate institution types
+    if (!Array.isArray(primaryTypes)) {
+      return res.status(400).json({
+        error: 'Invalid data',
+        message: 'primaryTypes must be an array'
+      });
+    }
+
+    // Get current tenant from database
+    const currentTenant = await db.select().from(tenants).where(eq(tenants.id, tenantId)).limit(1);
+    
+    if (currentTenant.length === 0) {
+      return res.status(404).json({
+        error: 'Tenant not found',
+        message: `Tenant ${tenantId} does not exist`
+      });
+    }
+
+    const tenant = currentTenant[0];
+    const currentSettings = tenant.settings || {};
+    
+    // Update institution configuration
+    const updatedSettings = {
+      ...currentSettings,
+      institutionConfig: {
+        primaryTypes,
+        hideNonApplicable: hideNonApplicable ?? true,
+        allowUsersToToggle: allowUsersToToggle ?? true
+      }
+    };
+
+    // Update tenant in database
+    await db.update(tenants)
+      .set({
+        settings: updatedSettings,
+        updatedAt: new Date()
+      })
+      .where(eq(tenants.id, tenantId));
+
+    // Update in-memory tenant cache if using TenantManager
+    const tenantConfig = TenantManager.getTenant(tenantId);
+    if (tenantConfig) {
+      TenantManager.updateTenant(tenantId, {
+        settings: updatedSettings
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Institution configuration updated successfully',
+      institutionConfig: {
+        primaryTypes,
+        hideNonApplicable,
+        allowUsersToToggle
+      }
+    });
+
+  } catch (error) {
+    console.error('Error updating institution configuration:', error);
+    res.status(500).json({
+      error: 'Failed to update institution configuration',
+      message: error instanceof Error ? error.message : String(error)
+    });
+  }
+});
+
+/**
+ * GET /api/tenants/:tenantId/institution-config - Get institution configuration
+ */
+router.get('/:tenantId/institution-config', (req: TenantRequest, res) => {
+  try {
+    const { tenantId } = req.params;
+    
+    // Check if user can access this tenant
+    if (!isAdmin(req.user) && req.tenantId !== tenantId) {
+      return res.status(403).json({
+        error: 'Forbidden',
+        message: 'Cannot access other tenant configuration'
+      });
+    }
+
+    const tenant = TenantManager.getTenant(tenantId);
+    if (!tenant) {
+      return res.status(404).json({
+        error: 'Tenant not found',
+        message: `Tenant ${tenantId} does not exist`
+      });
+    }
+
+    const institutionConfig = tenant.settings?.institutionConfig || {
+      primaryTypes: [],
+      hideNonApplicable: true,
+      allowUsersToToggle: true
+    };
+
+    res.json({
+      success: true,
+      institutionConfig
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: 'Failed to get institution configuration',
       message: error instanceof Error ? error.message : String(error)
     });
   }

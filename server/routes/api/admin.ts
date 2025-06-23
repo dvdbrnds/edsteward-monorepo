@@ -533,4 +533,76 @@ function getTenantDisplayName(tenantId: string): string {
   }
 }
 
+/**
+ * Institution Configuration Management
+ */
+
+// GET institution configuration for current tenant
+router.get('/institution-config', async (req, res) => {
+  try {
+    const tenantId = req.tenantId || 'admin';
+    
+    // For now, return default configuration since we're focusing on the frontend
+    // In a production system, this would read from the tenant settings in the database
+    const institutionConfig = {
+      primaryTypes: [],
+      hideNonApplicable: true,
+      allowUsersToToggle: true
+    };
+
+    return res.json({ 
+      success: true,
+      institutionConfig,
+      tenantId
+    });
+  } catch (error) {
+    console.error("Error getting institution config:", error);
+    return res.status(500).json({ 
+      error: "Failed to get institution configuration",
+      details: error instanceof Error ? error.message : String(error)
+    });
+  }
+});
+
+// PUT institution configuration for current tenant
+router.put('/institution-config', async (req, res) => {
+  try {
+    const tenantId = req.tenantId || 'admin';
+    const { primaryTypes, hideNonApplicable, allowUsersToToggle } = req.body;
+    
+    // Validate input
+    if (!Array.isArray(primaryTypes)) {
+      return res.status(400).json({
+        error: 'Invalid data',
+        message: 'primaryTypes must be an array'
+      });
+    }
+
+    // For now, just return success since we're focusing on the frontend
+    // In a production system, this would update the tenant settings in the database
+    console.log(`Institution config update for tenant ${tenantId}:`, {
+      primaryTypes,
+      hideNonApplicable,
+      allowUsersToToggle
+    });
+
+    return res.json({ 
+      success: true,
+      message: "Institution configuration updated successfully",
+      institutionConfig: {
+        primaryTypes,
+        hideNonApplicable,
+        allowUsersToToggle
+      },
+      tenantId
+    });
+  } catch (error) {
+    console.error("Error updating institution config:", error);
+    return res.status(500).json({ 
+      error: "Failed to update institution configuration",
+      details: error instanceof Error ? error.message : String(error)
+    });
+  }
+});
+
 export default router; 

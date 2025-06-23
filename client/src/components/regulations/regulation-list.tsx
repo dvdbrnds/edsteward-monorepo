@@ -23,6 +23,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 interface RegulationListProps {
   categoryFilter: string | null;
   jurisdictionFilter: 'federal' | 'state' | null;
+  appliesToFilter?: string[];
   deadlines?: Deadline[];
 }
 
@@ -87,7 +88,7 @@ function calculateComplianceStatus(regulation: Regulation): {
   };
 }
 
-export default function RegulationList({ categoryFilter, jurisdictionFilter, deadlines = [] }: RegulationListProps) {
+export default function RegulationList({ categoryFilter, jurisdictionFilter, appliesToFilter, deadlines = [] }: RegulationListProps) {
   const [search, setSearch] = useState("");
   const [sortConfig, setSortConfig] = useState<SortConfig>(null);
   const [_, navigate] = useLocation();
@@ -146,6 +147,14 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
     }
     if (jurisdictionFilter && reg.jurisdictionSource !== jurisdictionFilter) {
       return false;
+    }
+    if (appliesToFilter && appliesToFilter.length > 0) {
+      const hasMatch = appliesToFilter.some(filterType => 
+        reg.applicableInstitutions?.includes(filterType)
+      );
+      if (!hasMatch) {
+        return false;
+      }
     }
     if (search.trim()) {
       const searchLower = search.toLowerCase();

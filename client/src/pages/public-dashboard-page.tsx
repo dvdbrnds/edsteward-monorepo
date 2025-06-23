@@ -35,6 +35,14 @@ import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import { useAuth } from "@/hooks/use-auth";
 import { EnhancedJurisdictionFilter } from "@/components/filters/enhanced-jurisdiction-filter";
+import { AppliesToFilter, filterRegulationsByAppliesTo } from "@/components/filters/applies-to-filter";
+
+// Institution configuration interface
+interface InstitutionConfig {
+  primaryTypes: string[];
+  hideNonApplicable: boolean;
+  allowUsersToToggle: boolean;
+}
 
 // Calculate compliance status based on regulation data
 function calculateComplianceStatus(regulation: any) {
@@ -99,15 +107,87 @@ export default function DashboardPage() {
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [jurisdictionSourceFilter, setJurisdictionSourceFilter] = useState<string>("all");
   const [institutionTypeFilter, setInstitutionTypeFilter] = useState<string>("all");
+  const [selectedInstitutionTypes, setSelectedInstitutionTypes] = useState<string[]>([]);
   const [complianceFilter, setComplianceFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("name");
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  
+  // Institution configuration state
+  const [institutionConfig, setInstitutionConfig] = useState<InstitutionConfig | null>(null);
+  const [isLoadingConfig, setIsLoadingConfig] = useState(true);
 
   // Check authentication
   const { user, isLoading: authLoading } = useAuth();
 
+  // Fetch regulations from the authenticated API endpoint with institution filtering
+  const { data: regulations = [], isLoading, refetch } = useQuery({
+    queryKey: ["/api/regulations", institutionConfig?.primaryTypes, institutionConfig?.hideNonApplicable],
+    queryFn: async () => {
+      let url = "/api/regulations";
+      
+      // If institution configuration is set to hide non-applicable and we have primary types
+      if (institutionConfig?.hideNonApplicable && institutionConfig.primaryTypes.length > 0) {
+        // Use the first primary type for backend filtering (most specific)
+        const primaryType = institutionConfig.primaryTypes[0];
+        url += `?institutionType=${primaryType}`;
+      }
+      
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error("Failed to fetch regulations");
+      }
+      return response.json();
+    },
+    enabled: !isLoadingConfig, // Only fetch when we have loaded the institution config
+  });
+
+  // Load institution configuration on mount and periodically check for updates
+  useEffect(() => {
+    const loadInstitutionConfig = async () => {
+      try {
+        const response = await fetch('/api/admin/institution-config');
+        if (response.ok) {
+          const data = await response.json();
+          const newConfig = data.institutionConfig;
+          
+          // Check if configuration actually changed
+          const configChanged = JSON.stringify(institutionConfig) !== JSON.stringify(newConfig);
+          
+          setInstitutionConfig(newConfig);
+          
+          // If hideNonApplicable is true, automatically set the primary types as selected
+          if (newConfig.hideNonApplicable && newConfig.primaryTypes.length > 0) {
+            setSelectedInstitutionTypes(newConfig.primaryTypes);
+          } else if (!newConfig.hideNonApplicable) {
+            // Clear selected types if hideNonApplicable is false
+            setSelectedInstitutionTypes([]);
+          }
+          
+          // If this is not the initial load and config changed, refetch regulations
+          if (!isLoadingConfig && configChanged && refetch) {
+            console.log('Institution configuration changed, refetching regulations...');
+            refetch();
+          }
+        }
+      } catch (error) {
+        console.error('Failed to load institution configuration:', error);
+      } finally {
+        setIsLoadingConfig(false);
+      }
+    };
+
+    if (user) {
+      loadInstitutionConfig();
+      
+      // Set up polling to check for configuration changes every 5 seconds
+      const interval = setInterval(loadInstitutionConfig, 5000);
+      
+      return () => clearInterval(interval);
+    }
+  }, [user, institutionConfig, isLoadingConfig, refetch]);
+
   // Redirect to login if not authenticated
-  if (authLoading) {
+  if (authLoading || isLoadingConfig) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
 
@@ -116,11 +196,6 @@ export default function DashboardPage() {
     navigate("/auth");
     return null;
   }
-
-  // Fetch regulations from the authenticated API endpoint
-  const { data: regulations = [], isLoading } = useQuery({
-    queryKey: ["/api/regulations"],
-  });
 
   // Get unique categories for filtering
   const categories = useMemo(() => {
@@ -182,6 +257,9 @@ export default function DashboardPage() {
       return matchesSearch && matchesCategory && matchesJurisdictionSource && matchesInstitutionType && matchesCompliance;
     });
 
+    // Apply the new "applies to" filter using the helper function
+    filtered = filterRegulationsByAppliesTo(filtered, selectedInstitutionTypes);
+
     // Sort regulations
     filtered.sort((a: any, b: any) => {
       let aValue = a[sortBy];
@@ -196,7 +274,7 @@ export default function DashboardPage() {
     });
 
     return filtered;
-  }, [regulations, searchQuery, categoryFilter, jurisdictionSourceFilter, institutionTypeFilter, complianceFilter, sortBy, sortDirection]);
+  }, [regulations, searchQuery, categoryFilter, jurisdictionSourceFilter, institutionTypeFilter, selectedInstitutionTypes, complianceFilter, sortBy, sortDirection]);
 
   if (isLoading) {
     return (
@@ -226,21 +304,62 @@ export default function DashboardPage() {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Regulatory Compliance Dashboard
           </h1>
-          <p className="text-gray-600">
-            Monitor and track regulatory compliance across all jurisdictions
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-gray-600">
+              Monitor and track regulatory compliance across all jurisdictions
+            </p>
+            <div className="flex items-center space-x-2">
+              <Badge variant="secondary" className="bg-blue-100 text-blue-800 text-sm px-3 py-1">
+                <FileText className="h-4 w-4 mr-1" />
+                Regulation Count: {filteredRegulations.length}
+              </Badge>
+              {institutionConfig?.hideNonApplicable && institutionConfig.primaryTypes.length > 0 && (
+                <Badge variant="outline" className="bg-pink-50 text-pink-700 border-pink-200 text-sm px-3 py-1">
+                  <Building className="h-4 w-4 mr-1" />
+                  Filtered for: {institutionConfig.primaryTypes.map(type => 
+                    type.replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())
+                  ).join(', ')}
+                </Badge>
+              )}
+            </div>
+          </div>
         </div>
 
         {/* Statistics Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
           <Card>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Total Regulations</p>
+                  <p className="text-sm font-medium text-gray-600">
+                    {institutionConfig?.hideNonApplicable && institutionConfig.primaryTypes.length > 0 
+                      ? 'Applicable Regulations' 
+                      : 'Total Regulations'}
+                  </p>
+                  <p className="text-3xl font-bold text-gray-900">{filteredRegulations.length}</p>
+                  {institutionConfig?.hideNonApplicable && institutionConfig.primaryTypes.length > 0 && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      of {stats.total} total
+                    </p>
+                  )}
+                </div>
+                <div className="relative">
+                  <FileText className="h-8 w-8 text-blue-600" />
+                  {institutionConfig?.hideNonApplicable && institutionConfig.primaryTypes.length > 0 && (
+                    <div className="absolute -top-1 -right-1 h-3 w-3 bg-pink-500 rounded-full"></div>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-gray-600">Total in Database</p>
                   <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
                 </div>
-                <FileText className="h-8 w-8 text-blue-600" />
+                <FileText className="h-8 w-8 text-gray-400" />
               </div>
             </CardContent>
           </Card>
@@ -347,11 +466,28 @@ export default function DashboardPage() {
                   setCategoryFilter("all");
                   setJurisdictionSourceFilter("all");
                   setInstitutionTypeFilter("all");
+                  // Only clear institution types if hideNonApplicable is false
+                  if (!institutionConfig?.hideNonApplicable) {
+                    setSelectedInstitutionTypes([]);
+                  } else {
+                    // Reset to primary types if hideNonApplicable is true
+                    setSelectedInstitutionTypes(institutionConfig.primaryTypes || []);
+                  }
                   setComplianceFilter("all");
                 }}
               >
                 Clear Filters
               </Button>
+            </div>
+
+            {/* Advanced "Applies To" Filter */}
+            <div className="mt-6 pt-6 border-t">
+              <AppliesToFilter
+                selectedInstitutionTypes={selectedInstitutionTypes}
+                onInstitutionTypesChange={setSelectedInstitutionTypes}
+                showTitle={true}
+                compact={false}
+              />
             </div>
           </CardContent>
         </Card>
@@ -456,22 +592,59 @@ export default function DashboardPage() {
                         </TableCell>
                         <TableCell>
                           <div className="flex flex-wrap gap-1">
-                            {regulation.applicableInstitutions && Array.isArray(regulation.applicableInstitutions) ? (
-                              regulation.applicableInstitutions.slice(0, 3).map((type: string) => (
-                                <Badge key={type} variant="outline" className="text-xs">
-                                  {type.replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                            {(() => {
+                              // If institution config is set to hide non-applicable, only show the primary types
+                              if (institutionConfig?.hideNonApplicable && institutionConfig.primaryTypes.length > 0) {
+                                const relevantTypes = regulation.applicableInstitutions?.filter((type: string) => 
+                                  institutionConfig.primaryTypes.includes(type)
+                                ) || [];
+                                
+                                if (relevantTypes.length > 0) {
+                                  return relevantTypes.slice(0, 3).map((type: string) => (
+                                    <Badge key={type} variant="outline" className="text-xs bg-pink-100 text-pink-800 border-pink-200">
+                                      {type.replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                                    </Badge>
+                                  ));
+                                }
+                              }
+                              
+                              // Default behavior - show all applicable institutions
+                              if (regulation.applicableInstitutions && Array.isArray(regulation.applicableInstitutions)) {
+                                return regulation.applicableInstitutions.slice(0, 3).map((type: string) => (
+                                  <Badge key={type} variant="outline" className="text-xs">
+                                    {type.replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                                  </Badge>
+                                ));
+                              }
+                              
+                              return (
+                                <Badge variant="outline" className="text-xs">
+                                  All Institutions
                                 </Badge>
-                              ))
-                            ) : (
-                              <Badge variant="outline" className="text-xs">
-                                All Institutions
-                              </Badge>
-                            )}
-                            {regulation.applicableInstitutions && regulation.applicableInstitutions.length > 3 && (
-                              <Badge variant="outline" className="text-xs">
-                                +{regulation.applicableInstitutions.length - 3} more
-                              </Badge>
-                            )}
+                              );
+                            })()}
+                            {(() => {
+                              // Show "more" indicator logic
+                              if (institutionConfig?.hideNonApplicable && institutionConfig.primaryTypes.length > 0) {
+                                const relevantTypes = regulation.applicableInstitutions?.filter((type: string) => 
+                                  institutionConfig.primaryTypes.includes(type)
+                                ) || [];
+                                if (relevantTypes.length > 3) {
+                                  return (
+                                    <Badge variant="outline" className="text-xs bg-gray-50 text-gray-600 border-gray-300">
+                                      +{relevantTypes.length - 3} more
+                                    </Badge>
+                                  );
+                                }
+                              } else if (regulation.applicableInstitutions && regulation.applicableInstitutions.length > 3) {
+                                return (
+                                  <Badge variant="outline" className="text-xs bg-gray-50 text-gray-600 border-gray-300">
+                                    +{regulation.applicableInstitutions.length - 3} more
+                                  </Badge>
+                                );
+                              }
+                              return null;
+                            })()}
                           </div>
                         </TableCell>
                         <TableCell>
