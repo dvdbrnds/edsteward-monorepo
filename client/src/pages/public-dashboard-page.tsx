@@ -298,6 +298,13 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Add staging environment indicator */}
+      {process.env.NODE_ENV === 'staging' && (
+        <div className="bg-orange-500 text-white text-center py-2 px-4 text-sm font-medium">
+          🧪 STAGING ENVIRONMENT - Test changes safely before production
+        </div>
+      )}
+      
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
