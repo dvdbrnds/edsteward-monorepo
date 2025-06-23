@@ -16,7 +16,7 @@ async function getTenantStorage(tenantId: string) {
   return new TenantStorage(tenantConfig);
 }
 
-// GET /api/notifications - Get notifications for the current user (or all for admins)
+// GET /api/notifications - Get notifications for the current user ONLY (for dashboard)
 router.get("/", async (req, res) => {
   try {
     if (!req.user) {
@@ -34,25 +34,50 @@ router.get("/", async (req, res) => {
       userId: req.user.id,
       username: req.user.username,
       role: req.user.role,
-      isAdmin: req.user.role === 'admin',
       tenantId: tenantReq.tenantId
     });
 
-    let notifications;
-    
-    // If user is admin, get all notifications; otherwise get user's notifications
-    if (req.user.role === 'admin') {
-      console.log("🔍 Admin user - fetching ALL notifications");
-      notifications = await tenantStorage.getAllNotifications();
-    } else {
-      console.log("🔍 Regular user - fetching user-specific notifications");
-      notifications = await tenantStorage.getNotificationsByUser(req.user.id);
-    }
+    // Always get user-specific notifications for dashboard
+    console.log("🔍 Fetching user-specific notifications for dashboard");
+    const notifications = await tenantStorage.getNotificationsByUser(req.user.id);
     
     console.log("🔍 Notifications result:", {
-      isAdmin: req.user.role === 'admin',
+      userId: req.user.id,
       totalReturned: notifications.length,
-      sampleUserIds: notifications.slice(0, 5).map((n: any) => n.userId),
+      tenantId: tenantReq.tenantId
+    });
+    
+    return res.json(notifications);
+  } catch (error) {
+    console.error("Error fetching notifications:", error);
+    return res.status(500).json({ 
+      error: "Failed to fetch notifications",
+      details: error instanceof Error ? error.message : String(error)
+    });
+  }
+});
+
+// GET /api/notifications/admin - Get ALL notifications (admin only)
+router.get("/admin", async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    // Check for admin role
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+
+    // Get tenant-aware storage for data isolation
+    const tenantReq = req as any;
+    const tenantStorage = tenantReq.tenantId ? await getTenantStorage(tenantReq.tenantId) : storage;
+    
+    console.log("🔍 Admin fetching ALL notifications");
+    const notifications = await tenantStorage.getAllNotifications();
+    
+    console.log("🔍 Admin notifications result:", {
+      totalReturned: notifications.length,
       userIdDistribution: notifications.reduce((acc: Record<number, number>, n: any) => {
         acc[n.userId] = (acc[n.userId] || 0) + 1;
         return acc;
@@ -62,9 +87,9 @@ router.get("/", async (req, res) => {
     
     return res.json(notifications);
   } catch (error) {
-    console.error("Error fetching notifications:", error);
+    console.error("Error fetching admin notifications:", error);
     return res.status(500).json({ 
-      error: "Failed to fetch notifications",
+      error: "Failed to fetch admin notifications",
       details: error instanceof Error ? error.message : String(error)
     });
   }
