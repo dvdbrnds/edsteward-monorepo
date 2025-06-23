@@ -5,8 +5,8 @@
   "license": "MIT",
   "scripts": {
     "dev": "tsx server/index.ts",
-    "build": "vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist",
-    "start": "NODE_ENV=production node dist/index.js",
+    "build": "vite build",
+    "start": "NODE_ENV=production tsx server/index.ts",
     "check": "tsc",
     "lint": "eslint . --max-warnings 0",
     "lint:check": "eslint . --max-warnings 1000",
@@ -69,6 +69,7 @@
     "@types/xml2js": "^0.4.14",
     "axios": "^1.8.1",
     "bcrypt": "^5.1.1",
+    "bcryptjs": "^3.0.2",
     "chai": "^5.2.0",
     "cheerio": "^1.0.0",
     "class-variance-authority": "^0.7.0",

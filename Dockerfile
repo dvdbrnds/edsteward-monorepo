@@ -1,8 +1,8 @@
 # Multi-stage build for production deployment
-FROM --platform=linux/amd64 node:18-alpine AS base
+FROM node:18-alpine AS base
 
 # Install dependencies only when needed
-FROM --platform=linux/amd64 base AS deps
+FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
@@ -13,7 +13,7 @@ COPY package.json package-lock.json ./
 RUN npm ci --only=production --legacy-peer-deps && npm cache clean --force
 
 # Rebuild the source code only when needed
-FROM --platform=linux/amd64 base AS builder
+FROM base AS builder
 WORKDIR /app
 
 # Copy dependency files
@@ -32,8 +32,11 @@ COPY . .
 RUN npm run build
 
 # Production image, copy all the files and run the app
-FROM --platform=linux/amd64 base AS runner
+FROM base AS runner
 WORKDIR /app
+
+# Install wget for health checks
+RUN apk add --no-cache wget
 
 # Create app user for security
 RUN addgroup --system --gid 1001 nodejs
@@ -70,7 +73,7 @@ ENV HOSTNAME=0.0.0.0
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:3000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
 
 # Start the application
-CMD ["node", "dist/index.js"] 
+CMD ["npx", "tsx", "server/index.ts"] 

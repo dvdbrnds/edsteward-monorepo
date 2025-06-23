@@ -1,0 +1,64 @@
+{
+  "family": "edsteward-hostname-fix",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "arn:aws:iam::259661441422:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::259661441422:role/ecsTaskRole",
+  "containerDefinitions": [
+    {
+      "name": "edsteward-app",
+      "image": "259661441422.dkr.ecr.us-east-1.amazonaws.com/edsteward:aws-session-fix-1750705726",
+      "portMappings": [
+        {
+          "containerPort": 3000,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "environment": [
+        {
+          "name": "NODE_ENV",
+          "value": "production"
+        },
+        {
+          "name": "PORT",
+          "value": "3000"
+        },
+        {
+          "name": "HOSTNAME",
+          "value": "0.0.0.0"
+        }
+      ],
+      "secrets": [
+        {
+          "name": "DATABASE_URL",
+          "valueFrom": "arn:aws:ssm:us-east-1:259661441422:parameter/edsteward/database-url"
+        },
+        {
+          "name": "SESSION_SECRET",
+          "valueFrom": "arn:aws:ssm:us-east-1:259661441422:parameter/edsteward/session-secret"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/aws/ecs/edsteward",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "production"
+        }
+      },
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1"
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 120
+      }
+    }
+  ]
+} 
