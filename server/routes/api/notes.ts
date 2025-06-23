@@ -7,9 +7,15 @@ import { insertNoteSchema } from '@shared/schema';
 const router = express.Router();
 
 // Helper function to get tenant-aware storage
-function getTenantStorage(tenantId: string) {
-  const { TenantStorage } = require('../../services/tenantStorage');
-  return new TenantStorage(tenantId, storage);
+async function getTenantStorage(tenantId: string) {
+  const { TenantStorage } = await import('../../services/tenantStorage');
+  const tenantConfig = { 
+    id: tenantId, 
+    name: tenantId, 
+    domain: `${tenantId}.edsteward.local`,
+    database: tenantId 
+  };
+  return new TenantStorage(tenantConfig);
 }
 
 // Simple auth middleware (we'll improve this later)
@@ -25,7 +31,7 @@ router.post("/", requireAuth, async (req, res) => {
   try {
     // Get tenant-aware storage for data isolation
     const tenantReq = req as any;
-    const tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
+    const tenantStorage = tenantReq.tenantId ? await getTenantStorage(tenantReq.tenantId) : storage;
     
     console.log(`[NOTES] Creating note for tenant: ${tenantReq.tenantId || 'default'}`);
     
@@ -60,7 +66,7 @@ router.get("/regulation/:regulationId", requireAuth, async (req, res) => {
   try {
     // Get tenant-aware storage for data isolation
     const tenantReq = req as any;
-    const tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
+    const tenantStorage = tenantReq.tenantId ? await getTenantStorage(tenantReq.tenantId) : storage;
     
     const regulationId = parseInt(req.params.regulationId);
     
@@ -86,7 +92,7 @@ router.delete("/:noteId", requireAuth, async (req, res) => {
   try {
     // Get tenant-aware storage for data isolation
     const tenantReq = req as any;
-    const tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
+    const tenantStorage = tenantReq.tenantId ? await getTenantStorage(tenantReq.tenantId) : storage;
     
     const noteId = parseInt(req.params.noteId);
     

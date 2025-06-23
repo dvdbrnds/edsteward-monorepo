@@ -5,9 +5,15 @@ import type { InsertDeadline, Regulation } from "@shared/schema";
 const router = express.Router();
 
 // Helper function to get tenant-aware storage
-function getTenantStorage(tenantId: string) {
-  const { TenantStorage } = require('../../services/tenantStorage');
-  return new TenantStorage(tenantId, storage);
+async function getTenantStorage(tenantId: string) {
+  const { TenantStorage } = await import('../../services/tenantStorage');
+  const tenantConfig = { 
+    id: tenantId, 
+    name: tenantId, 
+    domain: `${tenantId}.edsteward.local`,
+    database: tenantId 
+  };
+  return new TenantStorage(tenantConfig);
 }
 
 // GET /api/deadlines - Get all deadlines with regulation names (requires authentication)
@@ -19,7 +25,7 @@ router.get("/", async (req, res) => {
 
     // Get tenant-aware storage for data isolation
     const tenantReq = req as any;
-    const tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
+    const tenantStorage = tenantReq.tenantId ? await getTenantStorage(tenantReq.tenantId) : storage;
     
     console.log(`[DEADLINES] Using tenant: ${tenantReq.tenantId || 'default'} with isolation: ${!!tenantReq.tenantId}`);
 
@@ -60,7 +66,7 @@ router.post("/", async (req, res) => {
 
     // Get tenant-aware storage for data isolation
     const tenantReq = req as any;
-    const tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
+    const tenantStorage = tenantReq.tenantId ? await getTenantStorage(tenantReq.tenantId) : storage;
 
     const { regulationId, dueDate, status, assignedTo } = req.body;
 

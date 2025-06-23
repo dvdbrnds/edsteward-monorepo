@@ -9,6 +9,7 @@ import { setupMCPIntegrationApi } from '../mcp-integration-api';
 import { initializeDatabase } from '../db-init';
 import { storage } from '../storage';
 import path from 'path';
+import { tenantMiddleware, TenantService } from '../middleware/tenant';
 
 // Import modular route handlers
 import uploadsRoutes from './api/uploads';
@@ -27,6 +28,13 @@ export function registerRoutes(app: express.Application): Server {
   const httpServer = createServer(app);
 
   // =============================================================================
+  // APPLY TENANT MIDDLEWARE GLOBALLY
+  // =============================================================================
+  
+  // Apply tenant middleware to all routes for consistent tenant detection
+  app.use(tenantMiddleware);
+
+  // =============================================================================
   // NO AUTH REQUIRED ENDPOINTS (health checks only)
   // =============================================================================
   
@@ -35,14 +43,17 @@ export function registerRoutes(app: express.Application): Server {
     res.status(200).send("OK");
   });
 
-  // API health check with database status
-  app.get('/api/health', async (req, res) => {
+  // API health check with database status AND tenant information
+  app.get('/api/health', async (req: any, res) => {
     try {
       const { checkConnectionHealth } = await import('../config/database');
       const { databaseHealthMonitor } = await import('../services/database-health');
       
       const dbHealthy = await checkConnectionHealth();
       const healthStatus = databaseHealthMonitor.getHealthStatus();
+      
+      // Extract tenant information from request
+      const tenantInfo = TenantService.extractTenantFromRequest(req);
       
       const response = {
         status: dbHealthy ? "healthy" : "degraded",
@@ -53,6 +64,15 @@ export function registerRoutes(app: express.Application): Server {
           monitoring: healthStatus.isMonitoring,
           consecutiveFailures: healthStatus.consecutiveFailures,
           maxFailures: healthStatus.maxFailures
+        },
+        tenant: {
+          detected: !!req.tenant,
+          tenantId: req.tenantId || null,
+          tenantName: req.tenant?.name || null,
+          subdomain: req.tenant?.subdomain || tenantInfo.subdomain || null,
+          domain: req.tenant?.domain || tenantInfo.domain || null,
+          detectionMethod: tenantInfo.method,
+          status: req.tenant?.status || null
         }
       };
       
@@ -65,6 +85,10 @@ export function registerRoutes(app: express.Application): Server {
         database: {
           connected: false,
           error: error instanceof Error ? error.message : String(error)
+        },
+        tenant: {
+          detected: false,
+          error: "Could not detect tenant during health check"
         }
       });
     }
@@ -82,8 +106,8 @@ export function registerRoutes(app: express.Application): Server {
   // =============================================================================
 
   // Helper function to get tenant-aware storage
-  function getTenantStorage(tenantId: string) {
-    const { TenantStorage } = require('../services/tenantStorage');
+  async function getTenantStorage(tenantId: string) {
+    const { TenantStorage } = await import('../services/tenantStorage');
     return new TenantStorage(tenantId, storage);
   }
 
@@ -96,7 +120,7 @@ export function registerRoutes(app: express.Application): Server {
 
       // Get tenant-aware storage for data isolation
       const tenantReq = req as any;
-      const tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
+      const tenantStorage = tenantReq.tenantId ? await getTenantStorage(tenantReq.tenantId) : storage;
 
       log(`📋 Checking setup status for tenant: ${tenantReq.tenantId || 'default'}`);
       
