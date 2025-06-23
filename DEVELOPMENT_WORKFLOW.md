@@ -26,9 +26,9 @@ docker-compose -f docker-compose.dev.yml logs -f
 3. See changes immediately in browser
 4. No rebuilds, no waiting!
 
-## GitHub-Based Deployment
+## GitHub-Based Deployment (Staging → Production)
 
-### 1. Commit and Push Changes
+### 1. Deploy to Staging (Test Your Changes)
 ```bash
 # Add your changes
 git add .
@@ -36,23 +36,37 @@ git add .
 # Commit with a meaningful message
 git commit -m "Add regulation count display to dashboard"
 
-# Push to trigger automatic deployment
+# Push to ES-clientside branch → Deploys to STAGING
 git push origin ES-clientside
 ```
 
-### 2. Automatic Deployment
+### 2. Staging Deployment
 - ✅ GitHub Actions automatically runs tests
 - ✅ Builds Docker image for AWS (AMD64)
-- ✅ Pushes to ECR registry
-- ✅ Updates ECS service
-- ✅ Your changes are live in production!
+- ✅ Pushes to ECR registry with `staging-` tag
+- ✅ Updates ECS staging service
+- ✅ Your changes are live in **STAGING** for testing!
 
-## Development vs Production
+### 3. Promote to Production (When Ready)
+```bash
+# Merge to main branch to deploy to production
+git checkout main
+git merge ES-clientside
+git push origin main
+```
+
+### 4. Production Deployment
+- ✅ Same process but deploys to production
+- ✅ Uses `prod-` tags and production ECS service
+- ✅ Your changes are live for real users!
+
+## Development → Staging → Production
 
 | Environment | Command | Purpose | Access |
 |-------------|---------|---------|--------|
 | **Development** | `docker-compose -f docker-compose.dev.yml up -d` | Hot reloading, instant changes | http://localhost:3000 |
-| **Production** | Automatic via GitHub Actions | Deployed to AWS ECS | https://your-production-url.com |
+| **Staging** | `git push origin ES-clientside` | Test changes safely | https://staging.your-domain.com |
+| **Production** | `git push origin main` | Live for real users | https://your-production-url.com |
 
 ## Benefits of This Workflow
 
