@@ -56,20 +56,36 @@ import type {
 import { regulationUpdates, type RegulationUpdate, type InsertRegulationUpdate } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or, like } from "drizzle-orm";
+import { getTenantStorage } from "./services/multi-tenant-database";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
+import { Pool } from "pg";
+import { config } from "./config/environment";
 
 const PostgresSessionStore = connectPg(session);
 
+// Create a separate pool for session store to avoid conflicts
+const sessionPool = new Pool({
+  connectionString: config.DATABASE_URL,
+  ssl: config.DATABASE_URL.includes('neondb') ? { rejectUnauthorized: false } : false,
+  max: 5, // Smaller pool for sessions
+  idleTimeoutMillis: 0, // Never timeout idle connections
+  connectionTimeoutMillis: 10000,
+  // Prevent the pool from being closed accidentally
+  allowExitOnIdle: false,
+});
+
 export interface IStorage {
-  // User methods
-  getUser(id: number): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
-  getAllUsers(): Promise<User[]>;
-  updateUser(id: number, user: Partial<InsertUser>): Promise<User>;
-  deleteUser(id: number): Promise<void>;
+  // User methods - now tenant-aware
+  getUser(id: number, tenantId?: string): Promise<User | undefined>;
+  getUserByUsername(username: string, tenantId?: string): Promise<User | undefined>;
+  getUserByEmail(email: string, tenantId?: string): Promise<User | undefined>;
+  getUserByExternalId(externalId: string, tenantId?: string): Promise<User | undefined>;
+  createUser(user: InsertUser, tenantId?: string): Promise<User>;
+  getAllUsers(tenantId?: string): Promise<User[]>;
+  updateUser(id: number, user: Partial<InsertUser>, tenantId?: string): Promise<User>;
+  deleteUser(id: number, tenantId?: string): Promise<void>;
 
   // Regulation methods
   getRegulations(): Promise<Regulation[]>;
@@ -78,7 +94,9 @@ export interface IStorage {
   createRegulation(regulation: InsertRegulation): Promise<Regulation>;
   updateRegulation(id: number, regulation: Partial<InsertRegulation>): Promise<Regulation>;
   setRegulationApplicability(id: number, isApplicable: boolean): Promise<Regulation>;
-  getRegulationsByJurisdiction(jurisdiction: string): Promise<Regulation[]>;
+  getRegulationsByJurisdiction(jurisdiction: string): Promise<Regulation[]>; // Legacy method
+  getRegulationsByJurisdictionSource(jurisdictionSource: string): Promise<Regulation[]>;
+  getRegulationsByInstitutionType(institutionType: string): Promise<Regulation[]>;
   searchRegulations(searchTerm: string): Promise<Regulation[]>;
   deleteRegulation(id: number): Promise<void>;
   
@@ -131,6 +149,7 @@ export interface IStorage {
 
   // Notification methods
   getNotificationsByUser(userId: number): Promise<Notification[]>;
+  getAllNotifications(): Promise<Notification[]>;
   createNotification(notification: InsertNotification): Promise<Notification>;
   sendEmailNotification(userId: number, subject: string, message: string): Promise<boolean>;
 
@@ -226,8 +245,8 @@ export class DatabaseStorage implements IStorage {
       }
 
       // 2. Update the regulation with the new content
-      // Use raw SQL to ensure large text fields are properly handled
-      await db.execute(
+      // Use parameterized query
+      await pool.query(
         `UPDATE regulations 
          SET requirements = $1, last_updated = $2 
          WHERE id = $3`,
@@ -286,12 +305,12 @@ export class DatabaseStorage implements IStorage {
 
   constructor() {
     this.sessionStore = new PostgresSessionStore({
-      pool,
+      pool: sessionPool,
       createTableIfMissing: true,
     });
   }
 
-  async getUser(id: number): Promise<User | undefined> {
+  async getUser(id: number, tenantId?: string): Promise<User | undefined> {
     try {
       const [user] = await db.select().from(users).where(eq(users.id, id));
       return user;
@@ -301,7 +320,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
+  async getUserByUsername(username: string, tenantId?: string): Promise<User | undefined> {
     try {
       console.log(`Looking up user with username: ${username}`);
       const [user] = await db.select().from(users).where(eq(users.username, username));
@@ -313,16 +332,52 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db.insert(users).values(insertUser).returning();
+  async getUserByEmail(email: string, tenantId?: string): Promise<User | undefined> {
+    try {
+      console.log(`Looking up user with email: ${email}`);
+      const [user] = await db.select().from(users).where(eq(users.email, email));
+      console.log(`User lookup result:`, user ? `Found user with ID ${user.id}` : 'User not found');
+      return user;
+    } catch (error) {
+      console.error(`Error in getUserByEmail for ${email}:`, error);
+      throw error;
+    }
+  }
+
+  async getUserByExternalId(externalId: string, tenantId?: string): Promise<User | undefined> {
+    try {
+      console.log(`Looking up user with external ID: ${externalId}`);
+      const [user] = await db.select().from(users).where(eq(users.externalId, externalId));
+      console.log(`User lookup result:`, user ? `Found user with ID ${user.id}` : 'User not found');
+      return user;
+    } catch (error) {
+      console.error(`Error in getUserByExternalId for ${externalId}:`, error);
+      throw error;
+    }
+  }
+
+  async createUser(insertUser: InsertUser, tenantId?: string): Promise<User> {
+    // Use tenant-specific storage if tenantId provided
+    if (tenantId) {
+      const tenantStorage = getTenantStorage(tenantId);
+      return await tenantStorage.createUser(insertUser);
+    }
+    
+    // Handle optional password for SAML users - ensure we have a valid password or null
+    const userToCreate = {
+      ...insertUser,
+      password: insertUser.password || '' // Use empty string instead of null for database compatibility
+    };
+    
+    const [user] = await db.insert(users).values(userToCreate).returning();
     return user;
   }
 
-  async getAllUsers(): Promise<User[]> {
+  async getAllUsers(tenantId?: string): Promise<User[]> {
     return await db.select().from(users);
   }
 
-  async updateUser(id: number, userData: Partial<InsertUser>): Promise<User> {
+  async updateUser(id: number, userData: Partial<InsertUser>, tenantId?: string): Promise<User> {
     const [user] = await db
       .update(users)
       .set(userData)
@@ -331,7 +386,7 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async deleteUser(id: number): Promise<void> {
+  async deleteUser(id: number, tenantId?: string): Promise<void> {
     await db.delete(users).where(eq(users.id, id));
   }
 
@@ -345,7 +400,7 @@ export class DatabaseStorage implements IStorage {
         .orderBy(desc(regulations.lastUpdated));
 
       console.log(`Successfully fetched ${result.length} regulations from database`);
-      return result;
+      return result as Regulation[];
     } catch (error) {
       console.error("Error in getRegulations:", error);
       // Return empty array instead of throwing to prevent frontend from getting stuck
@@ -355,7 +410,7 @@ export class DatabaseStorage implements IStorage {
 
   async getRegulation(id: number): Promise<Regulation | undefined> {
     const [regulation] = await db.select().from(regulations).where(eq(regulations.id, id));
-    return regulation;
+    return regulation as Regulation | undefined;
   }
 
   async getRegulationById(regulationId: string): Promise<Regulation | null> {
@@ -367,7 +422,7 @@ export class DatabaseStorage implements IStorage {
         .where(eq(regulations.itemId, regulationId));
 
       if (results.length > 0) {
-        return results[0];
+        return results[0] as Regulation;
       }
 
       // Fallback to regular ID if itemId search fails
@@ -375,7 +430,7 @@ export class DatabaseStorage implements IStorage {
         .from(regulations)
         .where(eq(regulations.id, parseInt(regulationId, 10)));
 
-      return fallbackResults.length > 0 ? fallbackResults[0] : null;
+      return fallbackResults.length > 0 ? (fallbackResults[0] as Regulation) : null;
     } catch (error) {
       console.error(`Error fetching regulation with ID ${regulationId}:`, error);
       throw error;
@@ -386,7 +441,7 @@ export class DatabaseStorage implements IStorage {
     console.log("Creating new regulation:", regulation);
     const [newRegulation] = await db.insert(regulations).values(regulation).returning();
     console.log("Created regulation:", newRegulation);
-    return newRegulation;
+    return newRegulation as Regulation;
   }
 
   async updateRegulation(id: number, regulation: Partial<InsertRegulation>): Promise<Regulation> {
@@ -395,8 +450,8 @@ export class DatabaseStorage implements IStorage {
     try {
       // If we're updating content/requirements, handle it differently due to potential size
       if (regulation.requirements) {
-        // First, update the text field directly using SQL
-        await db.execute(
+        // First, update the text field directly using parameterized query
+        await pool.query(
           `UPDATE regulations SET requirements = $1, last_updated = $2 WHERE id = $3`,
           [regulation.requirements, new Date(), id]
         );
@@ -417,7 +472,7 @@ export class DatabaseStorage implements IStorage {
         // Fetch and return the updated regulation
         const results = await db.select().from(regulations).where(eq(regulations.id, id));
         if (results.length > 0) {
-          return results[0];
+          return results[0] as Regulation;
         } else {
           throw new Error(`Regulation with ID ${id} not found after update`);
         }
@@ -433,7 +488,7 @@ export class DatabaseStorage implements IStorage {
           .returning();
           
         console.log("Updated regulation:", updatedRegulation);
-        return updatedRegulation;
+        return updatedRegulation as Regulation;
       }
     } catch (error) {
       console.error(`Error updating regulation ${id}:`, error);
@@ -452,7 +507,7 @@ export class DatabaseStorage implements IStorage {
       .where(eq(regulations.id, id))
       .returning();
     console.log("Updated regulation:", updatedRegulation);
-    return updatedRegulation;
+    return updatedRegulation as Regulation;
   }
 
   async getRegulationsByJurisdiction(jurisdiction: string): Promise<Regulation[]> {
@@ -460,11 +515,40 @@ export class DatabaseStorage implements IStorage {
     const result = await db
       .select()
       .from(regulations)
-      .where(eq(regulations.jurisdiction, jurisdiction));
+      .where(eq(regulations.jurisdictionSource, jurisdiction));
     console.log(`Found ${result.length} ${jurisdiction} regulations`);
-    return result;
+    return result as Regulation[];
   }
 
+  async getRegulationsByJurisdictionSource(jurisdictionSource: string): Promise<Regulation[]> {
+    console.log(`Fetching regulations with jurisdiction source: ${jurisdictionSource}`);
+    const result = await db
+      .select()
+      .from(regulations)
+      .where(eq(regulations.jurisdictionSource, jurisdictionSource));
+    console.log(`Found ${result.length} ${jurisdictionSource} regulations`);
+    return result as Regulation[];
+  }
+
+  async getRegulationsByInstitutionType(institutionType: string): Promise<Regulation[]> {
+    console.log(`Fetching regulations applicable to institution type: ${institutionType}`);
+    
+    // Use raw SQL to query JSONB field
+    const query = `
+      SELECT * FROM regulations 
+      WHERE applicable_institutions @> $1 
+      OR applicable_institutions @> $2
+      ORDER BY last_updated DESC
+    `;
+    
+    const result = await pool.query(query, [
+      JSON.stringify([institutionType]),
+      JSON.stringify(['all-institutions'])
+    ]);
+    
+    console.log(`Found ${result.rows.length} regulations for ${institutionType}`);
+    return result.rows as Regulation[];
+  }
 
   async searchRegulations(searchTerm: string): Promise<Regulation[]> {
     try {
@@ -479,7 +563,7 @@ export class DatabaseStorage implements IStorage {
           )
         );
       console.log(`Found ${results.length} matching regulations`);
-      return results;
+      return results as Regulation[];
     } catch (error) {
       console.error("Error searching regulations:", error);
       return [];
@@ -495,6 +579,13 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(notifications)
       .where(eq(notifications.userId, userId));
+  }
+
+  async getAllNotifications(): Promise<Notification[]> {
+    return await db
+      .select()
+      .from(notifications)
+      .orderBy(notifications.id);
   }
 
   async createNotification(notification: InsertNotification): Promise<Notification> {

@@ -1,0 +1,89 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=regulatorytrackr
+      - POSTGRES_USER=reguser
+      - POSTGRES_PASSWORD=reg_secure_pass_2024
+      - POSTGRES_HOST_AUTH_METHOD=md5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./sql_dump/init_schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./sql_dump/complete_regulations_data.sql:/docker-entrypoint-initdb.d/02-data.sql
+      - ./sql_dump/users_data.sql:/docker-entrypoint-initdb.d/03-users.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U reguser -d regulatorytrackr"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass redis_secure_pass_2024
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--no-auth-warning", "-a", "redis_secure_pass_2024", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.selfcontained
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DATABASE_URL=postgresql://reguser:reg_secure_pass_2024@postgres:5432/regulatorytrackr?sslmode=disable
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=regulatorytrackr
+      - DB_USER=reguser
+      - DB_PASSWORD=reg_secure_pass_2024
+      - DB_SSL=false
+      - REDIS_URL=redis://:redis_secure_pass_2024@redis:6379
+      - SESSION_SECRET=production_session_secret_key_12345_very_secure
+      - BASE_DOMAIN=localhost
+      - ENABLE_MULTI_TENANCY=false
+      - LOG_LEVEL=info
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  app-network:
+    driver: bridge 

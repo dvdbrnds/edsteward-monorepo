@@ -111,34 +111,43 @@ export class SysLogger {
   constructor(config?: Partial<LogConfig>) {
     this.config = {
       logToConsole: true,
-      logToFile: true,
+      logToFile: false, // NEVER enable file logging in production
       logLevel: LogLevel.INFO,
-      logFilePath: path.join(process.cwd(), 'logs', 'system.log'),
-      applicationName: 'compliance-app',
+      logFilePath: '/dev/null', // Safe fallback path that won't cause errors
+      applicationName: 'EdSteward',
       maxFileSize: 10 * 1024 * 1024, // 10MB
       maxFiles: 5,
       rotateDaily: true,
       ...config
     };
 
+    // Force disable file logging in production environment
+    if (process.env.NODE_ENV === 'production') {
+      this.config.logToFile = false;
+    }
+
     this.currentLogFile = this.config.logFilePath;
     this.lastRotateCheck = new Date();
 
-    // Ensure logs directory exists
-    const logsDir = path.dirname(this.config.logFilePath);
-    if (!fs.existsSync(logsDir)) {
-      fs.mkdirSync(logsDir, { recursive: true });
-    }
-
-    this.setupFileStream();
+    // COMPLETELY SKIP all file operations - do not attempt any filesystem access
+    // No directory creation, no file stream setup, nothing
+    console.log(`SysLogger initialized: console=${this.config.logToConsole}, file=${this.config.logToFile}, env=${process.env.NODE_ENV}`);
   }
 
   private setupFileStream(): void {
-    if (this.config.logToFile) {
-      this.fileStream = fs.createWriteStream(this.currentLogFile, { flags: 'a' });
-      this.fileStream.on('error', (error) => {
-        console.error('Error writing to log file:', error);
-      });
+    // NEVER attempt file operations in production - always skip
+    if (process.env.NODE_ENV !== 'production' && this.config.logToFile) {
+      try {
+        this.fileStream = fs.createWriteStream(this.currentLogFile, { flags: 'a' });
+        this.fileStream.on('error', (error) => {
+          console.error('Error writing to log file:', error);
+          this.fileStream = null;
+        });
+      } catch (error) {
+        console.warn('Could not create file stream, disabling file logging:', error);
+        this.fileStream = null;
+        this.config.logToFile = false;
+      }
     }
   }
 
@@ -339,5 +348,9 @@ export class SysLogger {
   }
 }
 
-// Create and export a singleton instance
-export const syslog = new SysLogger();
+// Export configured syslog instance
+export const syslog = new SysLogger({
+  logToFile: process.env.NODE_ENV !== 'production', // Disable file logging in production
+  logToConsole: true,
+  logLevel: process.env.NODE_ENV === 'production' ? LogLevel.INFO : LogLevel.DEBUG
+});

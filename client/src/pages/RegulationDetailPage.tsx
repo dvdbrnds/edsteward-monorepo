@@ -34,7 +34,7 @@ const notificationOverrideSchema = z.object({
   })
 });
 import Navigation from "@/components/layout/navigation";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -383,11 +383,11 @@ function RegulationDetailPage() {
             <div>
               <Button
                 variant="ghost"
-                onClick={() => window.history.back()}
+                onClick={() => navigate("/")}
                 className="mb-4"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Regulations
+                Back to Dashboard
               </Button>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
                 {regulation.name || regulation.topic}
@@ -1065,16 +1065,39 @@ function RegulationDetailPage() {
             regulation={regulation}
             open={showWebPublishDialog}
             onOpenChange={setShowWebPublishDialog}
+            onComplete={() => {
+              const action = regulation.actions?.find(a => a.type === 'website_publish');
+              if (action) {
+                handleActionStatusChange(action, 'completed');
+              }
+              setShowWebPublishDialog(false);
+            }}
           />
           <CommunicationDialog
             regulation={regulation}
             open={showCommunicationDialog}
             onOpenChange={setShowCommunicationDialog}
+            onComplete={() => {
+              const action = regulation.actions?.find(a => a.type === 'community_communication');
+              if (action) {
+                handleActionStatusChange(action, 'completed');
+              }
+              setShowCommunicationDialog(false);
+            }}
           />
           <SubmissionWizard
             regulation={regulation}
             open={showSubmissionWizard}
-            onOpenChange={setShowSubmissionWizard}
+            onOpenChange={(open) => {
+              setShowSubmissionWizard(open);
+              // If dialog was closed by successful submission, mark action as completed
+              if (!open && showSubmissionWizard) {
+                const action = regulation.actions?.find(a => a.type === 'agency_submission');
+                if (action) {
+                  handleActionStatusChange(action, 'completed');
+                }
+              }
+            }}
           />
           
           {/* Full Regulation Text Dialog */}

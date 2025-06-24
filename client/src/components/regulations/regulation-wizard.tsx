@@ -54,7 +54,8 @@ export default function RegulationWizard({ onSuccess }: RegulationWizardProps) {
       agency_name: "",
       agency_contact: "",
       agency_department: "",
-      jurisdiction: "federal",
+      jurisdictionSource: "federal",
+    applicableInstitutions: ["all-institutions"],
       isApplicable: true,
     }
   });

@@ -2,6 +2,32 @@ import { pgTable, text, serial, integer, timestamp, boolean, date, jsonb } from 
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+// Jurisdiction and Institution Type Constants
+export const JURISDICTION_SOURCES = [
+  "federal",
+  "state", 
+  "international",
+  "private-organization",
+  "accreditor",
+  "industry-association"
+] as const;
+
+export const INSTITUTION_TYPES = [
+  "public-universities",
+  "private-universities", 
+  "community-colleges",
+  "conservatories",
+  "technical-institutes",
+  "religious-institutions",
+  "for-profit-institutions",
+  "research-institutes",
+  "professional-schools",
+  "all-institutions"
+] as const;
+
+export type JurisdictionSource = typeof JURISDICTION_SOURCES[number];
+export type InstitutionType = typeof INSTITUTION_TYPES[number];
+
 // Add source interface
 export interface RegulationSource {
   url: string;
@@ -10,19 +36,7 @@ export interface RegulationSource {
   lastChecked?: Date;
 }
 
-// Add after the RegulationSource interface
-export interface RegulationVersion {
-  changes: {
-    field: string;
-    oldValue: string;
-    newValue: string;
-    type: 'addition' | 'deletion' | 'modification';
-  }[];
-  mergeMetadata?: {
-    mergedFrom: string[];
-    conflictResolutions?: Record<string, string>;
-  };
-}
+// RegulationVersion interface moved to database schema section
 
 // Add after RegulationVersion interface
 export interface RegulationAction {
@@ -157,8 +171,8 @@ export const regulations = pgTable("regulations", {
   summary: text("summary"),
   requirements: text("requirements"),
   category: text("category").notNull(),
-  jurisdiction: text("jurisdiction").notNull().default("federal"),
-  // Add DRO field
+  jurisdictionSource: text("jurisdiction_source").notNull().default("federal"), // federal | state | international | private-organization | accreditor | etc.
+  applicableInstitutions: jsonb("applicable_institutions").$type<string[]>(), // ["public-universities", "private-universities", "community-colleges", "conservatories", etc.]
   dro: text("dro").notNull().default(""),
   isApplicable: boolean("is_applicable").notNull().default(true),
   originationDate: timestamp("origination_date"),
@@ -166,7 +180,6 @@ export const regulations = pgTable("regulations", {
   lastUpdated: timestamp("last_updated"),
   lastVerified: timestamp("last_verified"),
   nextReviewDate: timestamp("next_review_date"),
-  // Version control fields remain unchanged
   versionNumber: integer("version_number").notNull().default(1),
   previousVersionId: integer("previous_version_id").references(() => regulations.id),
   versionDate: timestamp("version_date").notNull().defaultNow(),
@@ -257,17 +270,17 @@ console.log("Note insertion schema created successfully");
 // Log schema structure for debugging
 console.log("Note schema fields:", Object.keys(notes));
 
-// Update the insert schema to include PA-specific validation
+// Update the insert schema to include new jurisdiction validation
 export const insertRegulationSchema = createInsertSchema(regulations).extend({
   name: z.string().min(1, "Regulation name is required"),
   dro: z.string().email("DRO must be a valid email address").optional(),
-  jurisdiction: z.enum(["federal", "state"]),
+  jurisdictionSource: z.enum(JURISDICTION_SOURCES),
+  applicableInstitutions: z.array(z.enum(INSTITUTION_TYPES)).optional().nullable(),
   stateCode: z.string().optional(),
   stateAgency: z.string().optional(),
   originationDate: z.date().optional().nullable(),
   effectiveDate: z.date().optional().nullable(),
   nextReviewDate: z.date().optional().nullable(),
-  // Version control validation
   versionNumber: z.number().int().positive().default(1),
   previousVersionId: z.number().int().positive().optional().nullable(),
   versionDate: z.date().default(() => new Date()),
@@ -363,12 +376,7 @@ export const insertRegulationSchema = createInsertSchema(regulations).extend({
 });
 
 // Schema for inserting notifications
-export const insertNotificationSchema = createInsertSchema(notifications).extend({
-  phoneNumber: z
-    .string()
-    .regex(/^\+\d{1,15}$/, "Must be a valid phone number in E.164 format")
-    .optional(),
-});
+export const insertNotificationSchema = createInsertSchema(notifications);
 
 // Schema for inserting deadlines
 export const insertDeadlineSchema = createInsertSchema(deadlines);
@@ -776,3 +784,90 @@ export const insertSystemLogSchema = createInsertSchema(systemLogs).extend({
 // Add to the type exports
 export type SystemLog = typeof systemLogs.$inferSelect;
 export type InsertSystemLog = z.infer<typeof insertSystemLogSchema>;
+
+// ===== MULTI-TENANT ARCHITECTURE =====
+// Tenants table for subdomain-based multi-tenancy
+export const tenants = pgTable("tenants", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  domain: text("domain").notNull(), // moravian.edu
+  subdomain: text("subdomain").notNull().unique(), // moravian (for moravian.edsteward.ai)
+  databaseName: text("database_name").notNull(), // edsteward_moravian
+  status: text("status").notNull().default("active"), // active, inactive, suspended
+  samlConfig: jsonb("saml_config").$type<{
+    entityId: string;
+    ssoUrl: string;
+    sloUrl?: string;
+    certificate: string;
+    attributeMapping?: Record<string, string>;
+  }>(),
+  settings: jsonb("settings").$type<{
+    allowedDomains: string[];
+    defaultRole: 'user' | 'compliance_officer' | 'admin';
+    enableAutoProvisioning: boolean;
+    region?: string;
+    timeZone?: string;
+    customBranding?: {
+      logo?: string;
+      primaryColor?: string;
+      secondaryColor?: string;
+      logoUrl?: string;
+    };
+    features?: {
+      maxUsers?: number;
+      maxRegulations?: number;
+      apiAccess?: boolean;
+      customDomain?: boolean;
+      ssoEnabled?: boolean;
+    };
+    institutionConfig?: {
+      primaryTypes: InstitutionType[];
+      hideNonApplicable: boolean;
+      allowUsersToToggle: boolean;
+    };
+  }>().default({
+    allowedDomains: [],
+    defaultRole: 'user',
+    enableAutoProvisioning: false
+  }),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+// Insert schema for tenants with validation
+export const insertTenantSchema = createInsertSchema(tenants).extend({
+  id: z.string().min(1, "Tenant ID is required").regex(/^[a-z0-9-]+$/, "Tenant ID must be lowercase alphanumeric with hyphens"),
+  name: z.string().min(1, "Tenant name is required"),
+  domain: z.string().min(1, "Domain is required"),
+  subdomain: z.string().min(1, "Subdomain is required").regex(/^[a-z0-9-]+$/, "Subdomain must be lowercase alphanumeric with hyphens"),
+  status: z.enum(["active", "inactive", "suspended"]).default("active"),
+  settings: z.object({
+    allowedDomains: z.array(z.string()),
+    defaultRole: z.enum(['user', 'compliance_officer', 'admin']).default('user'),
+    enableAutoProvisioning: z.boolean().default(false),
+    region: z.string().optional(),
+    timeZone: z.string().optional(),
+    customBranding: z.object({
+      logo: z.string().optional(),
+      primaryColor: z.string().optional(),
+      secondaryColor: z.string().optional(),
+      logoUrl: z.string().url().optional(),
+    }).optional(),
+    features: z.object({
+      maxUsers: z.number().optional(),
+      maxRegulations: z.number().optional(),
+      apiAccess: z.boolean().default(true),
+      customDomain: z.boolean().default(false),
+      ssoEnabled: z.boolean().default(false),
+    }).optional(),
+    institutionConfig: z.object({
+      primaryTypes: z.array(z.enum(INSTITUTION_TYPES)),
+      hideNonApplicable: z.boolean(),
+      allowUsersToToggle: z.boolean(),
+    }).optional(),
+  }).optional(),
+});
+
+// Tenant types
+export type Tenant = typeof tenants.$inferSelect;
+export type InsertTenant = z.infer<typeof insertTenantSchema>;

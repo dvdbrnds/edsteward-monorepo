@@ -10,13 +10,16 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
+import { useTenantBranding } from "@/hooks/use-tenant-branding";
 
-// Import the new logo
+// Import logos
 import moravianLogo from "../assets/Moravian-Monogram-MoravianBlue.png";
+import genericLogo from "../assets/generic-logo.svg";
 
 export default function AuthPage() {
   const { user, loginMutation, registerMutation } = useAuth();
   const [_, setLocation] = useLocation();
+  const branding = useTenantBranding();
 
   const loginForm = useForm({
     resolver: zodResolver(insertUserSchema.pick({ username: true, password: true })),
@@ -57,16 +60,16 @@ export default function AuthPage() {
           {/* Logo centered above the title */}
           <div className="flex items-center justify-center mb-8">
             <img 
-              src={moravianLogo}
-              alt="Moravian University Logo" 
+              src={branding.id === 'moravian' ? moravianLogo : branding.id === 'test' ? genericLogo : moravianLogo}
+              alt={`${branding.name} Logo`}
               className="h-20 w-auto"
             />
           </div>
 
-          <h1 className="text-3xl font-bold text-[#002147] mb-8 text-center">
-            Moravian University
+          <h1 className="text-3xl font-bold mb-8 text-center" style={{ color: branding.primaryColor }}>
+            {branding.name}
             <br />
-            Compliance Portal
+            {branding.id === 'test' ? 'Generic Portal' : 'Compliance Portal'}
           </h1>
 
           <Tabs defaultValue="login" className="w-full">
@@ -109,7 +112,15 @@ export default function AuthPage() {
                           </FormItem>
                         )}
                       />
-                      <Button type="submit" className="w-full bg-[#002147] hover:bg-[#003166]" disabled={loginMutation.isPending}>
+                      <Button 
+                        type="submit" 
+                        className="w-full hover:opacity-90 transition-opacity" 
+                        style={{ 
+                          backgroundColor: branding.primaryColor, 
+                          borderColor: branding.primaryColor 
+                        }}
+                        disabled={loginMutation.isPending}
+                      >
                         {loginMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         Login
                       </Button>

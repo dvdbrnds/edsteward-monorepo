@@ -8,8 +8,10 @@ import * as cheerio from 'cheerio';
 import fetch from 'node-fetch';
 import * as fs from 'fs';
 import * as path from 'path';
-import { drizzle } from 'drizzle-orm/neon-http';
-import { neon } from '@neondatabase/serverless';
+import { drizzle } from 'drizzle-orm/node-postgres';
+import pg from 'pg';
+
+const { Pool } = pg;
 
 class PARegulationCollector {
   private readonly BASE_URLS = {
@@ -83,7 +85,8 @@ class PARegulationCollector {
       }
 
       // Initialize new connection
-      this.dbConnection = drizzle(neon(process.env.DATABASE_URL!));
+      const pool = new Pool({ connectionString: process.env.DATABASE_URL! });
+      this.dbConnection = drizzle(pool);
       this.lastConnectionTime = Date.now();
 
       // Verify connection

@@ -17,5 +17,20 @@ export async function apiRequest(
     throw new Error(error);
   }
 
-  return response;
+  // Handle no content responses
+  if (response.status === 204) {
+    return null;
+  }
+
+  // Safely parse JSON response
+  try {
+    const text = await response.text();
+    if (!text) {
+      return null;
+    }
+    return JSON.parse(text);
+  } catch (e) {
+    console.error('Failed to parse JSON response:', e);
+    throw new Error('Invalid JSON response from server');
+  }
 }

@@ -23,6 +23,7 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 interface RegulationListProps {
   categoryFilter: string | null;
   jurisdictionFilter: 'federal' | 'state' | null;
+  appliesToFilter?: string[];
   deadlines?: Deadline[];
 }
 
@@ -87,7 +88,7 @@ function calculateComplianceStatus(regulation: Regulation): {
   };
 }
 
-export default function RegulationList({ categoryFilter, jurisdictionFilter, deadlines = [] }: RegulationListProps) {
+export default function RegulationList({ categoryFilter, jurisdictionFilter, appliesToFilter, deadlines = [] }: RegulationListProps) {
   const [search, setSearch] = useState("");
   const [sortConfig, setSortConfig] = useState<SortConfig>(null);
   const [_, navigate] = useLocation();
@@ -102,7 +103,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
     staleTime: 1000 * 60, // 1 minute
   });
 
-  const { data: user = {} } = useQuery({
+  const { data: user } = useQuery<{ role?: string }>({
     queryKey: ["/api/user"]
   });
 
@@ -144,8 +145,16 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
     if (categoryFilter && reg.category !== categoryFilter) {
       return false;
     }
-    if (jurisdictionFilter && reg.jurisdiction !== jurisdictionFilter) {
+    if (jurisdictionFilter && reg.jurisdictionSource !== jurisdictionFilter) {
       return false;
+    }
+    if (appliesToFilter && appliesToFilter.length > 0) {
+      const hasMatch = appliesToFilter.some(filterType => 
+        reg.applicableInstitutions?.includes(filterType)
+      );
+      if (!hasMatch) {
+        return false;
+      }
     }
     if (search.trim()) {
       const searchLower = search.toLowerCase();
@@ -241,6 +250,33 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
     }
   };
 
+  const getInstitutionTypeColor = (type: string) => {
+    switch(type) {
+      case 'public-universities':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'private-universities':
+        return 'bg-purple-100 text-purple-800 border-purple-200';
+      case 'community-colleges':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'religious-institutions':
+        return 'bg-amber-100 text-amber-800 border-amber-200';
+      case 'for-profit-institutions':
+        return 'bg-orange-100 text-orange-800 border-orange-200';
+      case 'conservatories':
+        return 'bg-pink-100 text-pink-800 border-pink-200';
+      case 'technical-institutes':
+        return 'bg-cyan-100 text-cyan-800 border-cyan-200';
+      case 'professional-schools':
+        return 'bg-indigo-100 text-indigo-800 border-indigo-200';
+      case 'research-institutes':
+        return 'bg-emerald-100 text-emerald-800 border-emerald-200';
+      case 'all-institutions':
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+      default:
+        return 'bg-slate-100 text-slate-800 border-slate-200';
+    }
+  };
+
   return (
     <Card>
       <CardContent className="p-6">
@@ -286,12 +322,13 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                 </TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Next Deadline</TableHead>
-                <TableHead className="cursor-pointer" onClick={() => handleSort('jurisdiction')}>
+                <TableHead className="cursor-pointer" onClick={() => handleSort('jurisdictionSource')}>
                   <div className="flex items-center gap-2">
                     Jurisdiction
                     <ArrowUpDown className="h-4 w-4" />
                   </div>
                 </TableHead>
+                <TableHead>Applies To</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -382,8 +419,38 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, dea
                       )}
                     </TableCell>
                     <TableCell>
-                      <div className={`text-sm ${regulation.jurisdiction === 'federal' ? 'text-blue-600' : 'text-green-600'}`}>
-                        {regulation.jurisdiction === 'federal' ? 'Federal' : 'State'}
+                      <div className={`text-sm ${regulation.jurisdictionSource === 'federal' ? 'text-blue-600' : 'text-green-600'}`}>
+                        {regulation.jurisdictionSource === 'federal' ? 'Federal' : 'State'}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex flex-wrap gap-1">
+                        {regulation.applicableInstitutions && Array.isArray(regulation.applicableInstitutions) ? (
+                          regulation.applicableInstitutions.slice(0, 3).map((type: string) => (
+                            <Badge 
+                              key={type} 
+                              variant="outline" 
+                              className={`text-xs ${getInstitutionTypeColor(type)}`}
+                            >
+                              {type.replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                            </Badge>
+                          ))
+                        ) : (
+                          <Badge 
+                            variant="outline" 
+                            className={`text-xs ${getInstitutionTypeColor('all-institutions')}`}
+                          >
+                            All Institutions
+                          </Badge>
+                        )}
+                        {regulation.applicableInstitutions && regulation.applicableInstitutions.length > 3 && (
+                          <Badge 
+                            variant="outline" 
+                            className="text-xs bg-gray-50 text-gray-600 border-gray-300"
+                          >
+                            +{regulation.applicableInstitutions.length - 3} more
+                          </Badge>
+                        )}
                       </div>
                     </TableCell>
                   </TableRow>

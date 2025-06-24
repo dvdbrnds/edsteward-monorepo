@@ -1,11 +1,11 @@
-import React from 'react';
+// import _React from 'react'; // Removed unused import
 
 export interface ApiError extends Error {
   status: number;
   retryAfter?: number;
 }
 
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   data: T;
   success: boolean;
   message?: string;
@@ -100,7 +100,7 @@ class ApiClient {
 
   async post<T>(
     endpoint: string, 
-    data?: any, 
+    data?: unknown, 
     options: { includeAuth?: boolean } = {}
   ): Promise<T> {
     const { includeAuth = true } = options;
@@ -116,7 +116,7 @@ class ApiClient {
 
   async put<T>(
     endpoint: string, 
-    data?: any, 
+    data?: unknown, 
     options: { includeAuth?: boolean } = {}
   ): Promise<T> {
     const { includeAuth = true } = options;
@@ -132,7 +132,7 @@ class ApiClient {
 
   async patch<T>(
     endpoint: string, 
-    data?: any, 
+    data?: unknown, 
     options: { includeAuth?: boolean } = {}
   ): Promise<T> {
     const { includeAuth = true } = options;
@@ -163,9 +163,6 @@ class ApiClient {
 
 // Create singleton instance
 export const apiClient = new ApiClient();
-
-// Export API error type for error handling
-export { ApiError };
 
 // Utility function for handling API errors in components
 export function isApiError(error: unknown): error is ApiError {

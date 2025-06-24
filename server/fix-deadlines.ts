@@ -1,7 +1,7 @@
 
 import { storage } from "./storage";
 import type { InsertDeadline } from "@shared/schema";
-import { addYears, addMonths } from "date-fns";
+import { addMonths } from "date-fns";
 
 async function createDeadlines() {
   try {

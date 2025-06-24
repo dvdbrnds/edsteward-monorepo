@@ -1,4 +1,3 @@
-import DebugTools from "@/components/debug-tools";
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,6 +16,7 @@ import Navigation from "@/components/layout/navigation";
 import { apiRequest } from "@/lib/api";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from "date-fns";
+import { InstitutionSettings } from "@/components/admin/institution-settings";
 import {
   Table,
   TableBody,
@@ -90,8 +90,7 @@ export default function SystemSettingsPage() {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
-  const [activeTab, setActiveTab] = useState("email");
-  const [notificationEnabled, setNotificationEnabled] = useState(false);
+  const [activeTab, setActiveTab] = useState("institution");
   const [search, setSearch] = useState("");
   const [level, setLevel] = useState<string>();
   const [facility, setFacility] = useState<string>();
@@ -420,14 +419,25 @@ export default function SystemSettingsPage() {
           <h1 className="text-3xl font-bold text-gray-900 mb-8">System Settings</h1>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-6 mb-4">
+            <TabsList className="grid grid-cols-5 mb-4">
+              <TabsTrigger value="institution">Institution</TabsTrigger>
               <TabsTrigger value="email">Email</TabsTrigger>
               <TabsTrigger value="sms">SMS</TabsTrigger>
-              <TabsTrigger value="notifications">Notifications</TabsTrigger>
               <TabsTrigger value="users">Users</TabsTrigger>
               <TabsTrigger value="logs">System Logs</TabsTrigger>
-              <TabsTrigger value="debug">Debug Tools</TabsTrigger>
             </TabsList>
+
+            <TabsContent value="institution">
+              <InstitutionSettings 
+                tenantId="admin"
+                onConfigUpdate={(config) => {
+                  toast({
+                    title: "Institution Settings Updated",
+                    description: "The institution configuration has been saved successfully.",
+                  });
+                }}
+              />
+            </TabsContent>
 
             <TabsContent value="email">
               <Card>
@@ -581,40 +591,6 @@ export default function SystemSettingsPage() {
                       </Button>
                     </form>
                   </Form>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="notifications">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Notification Settings</CardTitle>
-                  <CardDescription>
-                    Configure system-wide notification settings.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        id="notification-enabled"
-                        checked={notificationEnabled}
-                        onCheckedChange={setNotificationEnabled}
-                      />
-                      <label
-                        htmlFor="notification-enabled"
-                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                      >
-                        Enable System Notifications
-                      </label>
-                    </div>
-
-                    {/* Additional notification settings would go here */}
-
-                    <Button>
-                      Save Notification Settings
-                    </Button>
-                  </div>
                 </CardContent>
               </Card>
             </TabsContent>
@@ -913,20 +889,6 @@ export default function SystemSettingsPage() {
                       </>
                     )}
                   </div>
-                </CardContent>
-              </Card>
-            </TabsContent>
-
-            <TabsContent value="debug">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Debug Tools</CardTitle>
-                  <CardDescription>
-                    Access system debugging and maintenance tools
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <DebugTools />
                 </CardContent>
               </Card>
             </TabsContent>

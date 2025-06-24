@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { PieChart, Pie, Cell, Legend, Tooltip, ResponsiveContainer } from "recharts";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { Download, X } from "lucide-react";
 
 // Extended color palette with Moravian brand colors and complementary shades
@@ -35,7 +35,7 @@ interface ChartData {
 interface CustomPieChartProps {
   data: ChartData[];
   title: string;
-  onSegmentClick: (name: string) => void;
+  onSegmentClick: (_name: string) => void;
   activeFilter: string | null;
   allowExport?: boolean;
 }
@@ -65,10 +65,14 @@ export default function CustomPieChart({
 }: CustomPieChartProps) {
   // Sort data by value for the pie chart while keeping a separate sorted copy for the legend
   const sortedData = [...data].sort((a, b) => b.value - a.value);
-  const legendData = [...data].sort((a, b) => a.name.localeCompare(b.name));
+  const legendData = [...data].sort((a, b) => {
+    const aName = a.name || '';
+    const bName = b.name || '';
+    return aName.localeCompare(bName);
+  });
 
   return (
-    <Card>
+    <Card className="h-[600px]">
       <CardHeader>
         <CardTitle className="flex justify-between items-center">
           <div className="flex items-center gap-2">
@@ -91,8 +95,8 @@ export default function CustomPieChart({
               size="sm"
               onClick={() => downloadCSV(
                 data.map(({ name, value }) => ({
-                  [title.toLowerCase().replace(/ /g, '_')]: name,
-                  count: value,
+                  name,
+                  value,
                 })),
                 `${title.toLowerCase().replace(/ /g, '-')}.csv`
               )}
@@ -103,9 +107,9 @@ export default function CustomPieChart({
           )}
         </CardTitle>
       </CardHeader>
-      <CardContent className="pb-8">
+      <CardContent className="p-0">
         {/* Chart container */}
-        <div className="h-[250px] w-full mb-4">
+        <div className="h-[250px] w-full mb-4 px-6">
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
@@ -146,7 +150,7 @@ export default function CustomPieChart({
         </div>
         
         {/* Custom legend outside of ResponsiveContainer */}
-        <div className="mt-2 px-2">
+        <div className="mt-2 px-8 pb-4">
           <div className="flex flex-wrap justify-center gap-2">
             {legendData.map((entry, index) => (
               <div 

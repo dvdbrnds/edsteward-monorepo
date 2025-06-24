@@ -237,4 +237,4 @@ For support and questions:
 
 ---
 
-**Built with ❤️ for higher education compliance management**
+**Built with ❤️ for higher education compliance management**# Trigger GitHub Actions workflow

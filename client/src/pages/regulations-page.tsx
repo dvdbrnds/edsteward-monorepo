@@ -1,144 +1,21 @@
-import Navigation from "@/components/layout/navigation";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Plus, X, FileCheck } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useQuery } from "@tanstack/react-query";
-import type { Regulation, Deadline } from "@shared/schema";
+import React from "react";
 import { useLocation } from "wouter";
-import RegulationList from "@/components/regulations/regulation-list";
-import CustomPieChart from "@/components/common/custom-pie-chart";
-import RegulationWizard from "@/components/regulations/regulation-wizard";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-// Nine distinct colors from different parts of the color wheel
-const CATEGORY_COLORS = {
-  "Academic Programs": "#FF0000",    // Red
-  "Financial Aid": "#0066FF",        // Blue
-  "Student Services": "#FFD700",     // Yellow
-  "Athletics": "#9400D3",           // Purple
-  "Campus Safety": "#00CC00",       // Green
-  "Research": "#90EE90",            // Lime
-  "Other": "#808080",               // Gray (for misc categories)
-  "Accounting": "#00CCCC",          // Cyan
-  "Human Resources": "#FF6600",      // Orange
-} as const;
-
-const JURISDICTION_COLORS = {
-  "federal": "#4169E1", // Royal Blue
-  "state": "#228B22",   // Forest Green
-} as const;
 
 export default function RegulationsPage() {
-  const [open, setOpen] = useState(false);
-  const [categoryFilter, setCategoryFilter] = useState<string | null>(null);
-  const [jurisdictionFilter, setJurisdictionFilter] = useState<'federal' | 'state' | null>(null);
-  const [_, navigate] = useLocation();
+  const [location, navigate] = useLocation();
 
-  const { data: regulations } = useQuery<Regulation[]>({
-    queryKey: ["/api/regulations"],
-  });
-
-  const { data: deadlines } = useQuery<Deadline[]>({
-    queryKey: ["/api/deadlines"],
-  });
-
-  const categorySummary = regulations?.reduce((acc, reg) => {
-    acc[reg.category] = (acc[reg.category] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>) || {};
-
-  const jurisdictionSummary = regulations?.reduce((acc, reg) => {
-    acc[reg.jurisdiction] = (acc[reg.jurisdiction] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>) || {};
-
-  const categoryChartData = Object.entries(categorySummary).map(([name, value]) => ({
-    name,
-    value,
-  }));
-
-  const jurisdictionChartData = Object.entries(jurisdictionSummary).map(([name, value]) => ({
-    name,
-    value,
-  }));
+  // This page has been decommissioned in favor of the superior dashboard
+  // Redirect users to the main dashboard
+  React.useEffect(() => {
+    navigate("/");
+  }, [navigate]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navigation />
-
-      <main className="py-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">
-              Regulations
-            </h1>
-
-            <div className="space-x-4">
-              <Dialog open={open} onOpenChange={setOpen}>
-                <DialogTrigger asChild>
-                  <Button>
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Regulation
-                  </Button>
-                </DialogTrigger>
-                <DialogContent className="max-w-4xl">
-                  <DialogHeader>
-                    <DialogTitle>Add New Regulation</DialogTitle>
-                  </DialogHeader>
-                  <RegulationWizard onSuccess={() => setOpen(false)} />
-                </DialogContent>
-              </Dialog>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            <Card>
-              <CardHeader>
-                <CardTitle>Filter by Category</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CustomPieChart
-                  data={categoryChartData}
-                  colors={CATEGORY_COLORS}
-                  title="Regulations by Category"
-                  onSegmentClick={setCategoryFilter}
-                  activeFilter={categoryFilter}
-                />
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Filter by Jurisdiction</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <CustomPieChart
-                  data={jurisdictionChartData}
-                  colors={JURISDICTION_COLORS}
-                  title="Regulations by Jurisdiction"
-                  onSegmentClick={setJurisdictionFilter as (value: string | null) => void}
-                  activeFilter={jurisdictionFilter}
-                />
-              </CardContent>
-            </Card>
-          </div>
-
-          <RegulationList 
-            regulations={regulations || []} 
-            deadlines={deadlines} 
-            categoryFilter={categoryFilter}
-            jurisdictionFilter={jurisdictionFilter}
-          />
-        </div>
-      </main>
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="text-center">
+        <h2 className="text-2xl font-bold mb-4">Redirecting to Dashboard</h2>
+        <p className="text-gray-600">The regulations page has been integrated into the main dashboard for a better experience.</p>
+      </div>
     </div>
   );
 }

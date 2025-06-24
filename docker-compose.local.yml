@@ -1,0 +1,59 @@
+services:
+  # Main application
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      target: development
+    environment:
+      - NODE_ENV=development
+      # Main database (used as fallback and for moravian tenant)
+      - DATABASE_URL=postgresql://neondb_owner:npg_foSr6ixkzw7W@ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require
+      # Tenant-specific databases for complete data isolation
+      - ADMIN_DATABASE_URL=postgresql://neondb_owner:npg_foSr6ixkzw7W@ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech/neondb_admin?sslmode=require
+      - MORAVIAN_DATABASE_URL=postgresql://neondb_owner:npg_foSr6ixkzw7W@ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require
+      - TEST_DATABASE_URL=postgresql://neondb_owner:npg_foSr6ixkzw7W@ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech/neondb_test?sslmode=require
+      - DB_HOST=ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech
+      - DB_PORT=5432
+      - DB_NAME=neondb
+      - DB_USER=neondb_owner
+      - DB_PASSWORD=npg_foSr6ixkzw7W
+      - DB_SSL=true
+      - SESSION_SECRET=dev-secret-key-for-local-development-only
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run dev
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+        reservations:
+          memory: 512m
+    networks:
+      - edsteward-network
+
+  # Nginx reverse proxy for subdomain handling
+  nginx:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - app
+    restart: unless-stopped
+    networks:
+      - edsteward-network
+
+networks:
+  edsteward-network:
+    driver: bridge 

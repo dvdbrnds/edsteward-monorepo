@@ -34,7 +34,8 @@ const getDirname = () => {
   }
 };
 
-const currentDir = getDirname();
+
+const _currentDir = getDirname();
 
 /**
  * This script inspects PA regulations to analyze content issues

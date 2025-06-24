@@ -1,0 +1,17 @@
+{
+  "environment_variables": {
+    "DB_HOST": "ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech",
+    "DB_PORT": "5432",
+    "DB_NAME": "neondb",
+    "DB_USER": "neondb_owner",
+    "DB_PASSWORD": "npg_foSr6ixkzw7W",
+    "DB_SSL": "true"
+  },
+  "connection_string": "postgresql://neondb_owner:npg_foSr6ixkzw7W@ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require",
+  "deployment_notes": [
+    "Replace RDS configuration with these Neon environment variables",
+    "Update ECS task definition environment variables",
+    "No VPC or security group changes needed - Neon is external",
+    "SSL is required and handled automatically"
+  ]
+}
