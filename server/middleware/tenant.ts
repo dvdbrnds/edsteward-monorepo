@@ -118,6 +118,28 @@ const FALLBACK_TENANTS: Record<string, Tenant> = {
     },
     createdAt: new Date(),
     updatedAt: new Date()
+  },
+  'staging': {
+    id: 'staging',
+    name: 'EdSteward Staging Environment',
+    domain: 'staging.edsteward.ai',
+    subdomain: 'staging',
+    databaseName: 'edsteward_admin', // Use same database as admin for staging
+    status: 'active',
+    settings: {
+      allowedDomains: ['edsteward.ai', 'staging.edsteward.ai'],
+      defaultRole: 'admin',
+      enableAutoProvisioning: true,
+      features: {
+        apiAccess: true,
+        customDomain: false,
+        ssoEnabled: false,
+        maxUsers: 1000,
+        maxRegulations: 10000
+      }
+    },
+    createdAt: new Date(),
+    updatedAt: new Date()
   }
 };
 
