@@ -1,4 +1,4 @@
-# RegulatoryTrackr Staged Deployment Pipeline
+# EdSteward Staged Deployment Pipeline
 
 This deployment pipeline ensures **no direct AWS deployment** without proper local verification and human approval. Every deployment goes through rigorous local testing and manual verification before reaching production.
 

@@ -1,13 +1,13 @@
-# Okta SAML 2.0 Integration Guide for RegulatoryTrackr
+# Okta SAML 2.0 Integration Guide for EdSteward
 
 ## Overview
 
-This guide walks you through configuring Okta as your SAML 2.0 identity provider for RegulatoryTrackr, supporting both local development and AWS production environments.
+This guide walks you through configuring Okta as your SAML 2.0 identity provider for EdSteward, supporting both local development and AWS production environments.
 
 ## Prerequisites
 
 - Okta administrator access
-- RegulatoryTrackr application running
+- EdSteward application running
 - SAML certificates generated (run `python3 enable_saml_authentication.py`)
 
 ## Part 1: Okta Application Configuration
@@ -24,7 +24,7 @@ This guide walks you through configuring Okta as your SAML 2.0 identity provider
    - Click **Next**
 
 3. **General Settings**
-   - **App name**: `RegulatoryTrackr`
+   - **App name**: `EdSteward`
    - **App logo**: Upload your logo (optional)
    - **App visibility**: Configure as needed
    - Click **Next**
@@ -34,7 +34,7 @@ This guide walks you through configuring Okta as your SAML 2.0 identity provider
 #### SAML Settings (Development)
 ```
 Single sign on URL: http://localhost:3000/auth/saml/callback/okta
-Audience URI (SP Entity ID): urn:regulatorytrackr:sp
+Audience URI (SP Entity ID): urn:edsteward:sp
 Default RelayState: (leave empty)
 Name ID format: EmailAddress
 Application username: Email
@@ -43,7 +43,7 @@ Application username: Email
 #### SAML Settings (Production)
 ```
 Single sign on URL: https://yourdomain.com/auth/saml/callback/okta
-Audience URI (SP Entity ID): urn:regulatorytrackr:sp
+Audience URI (SP Entity ID): urn:edsteward:sp
 Default RelayState: (leave empty)
 Name ID format: EmailAddress
 Application username: Email
@@ -57,7 +57,7 @@ Signature Algorithm: RSA_SHA256
 Digest Algorithm: SHA256
 Assertion Encryption: Encrypted
 SAML Single Logout: Enabled
-SP Issuer: urn:regulatorytrackr:sp
+SP Issuer: urn:edsteward:sp
 Signature Certificate: (upload your SP certificate)
 ```
 
@@ -71,14 +71,14 @@ Configure these attribute mappings:
 | `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname` | URI Reference | `user.firstName` |
 | `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname` | URI Reference | `user.lastName` |
 | `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name` | URI Reference | `user.login` |
-| `http://schemas.microsoft.com/ws/2008/06/identity/claims/groups` | URI Reference | `isMemberOfGroupName("RegulatoryTrackr-Users")` |
+| `http://schemas.microsoft.com/ws/2008/06/identity/claims/groups` | URI Reference | `isMemberOfGroupName("EdSteward-Users")` |
 | `http://schemas.microsoft.com/ws/2008/06/identity/claims/role` | URI Reference | `appuser.role` |
 
 ### Step 4: Group Attribute Statements
 
 | Name | Name format | Filter | Value |
 |------|-------------|--------|-------|
-| `groups` | Basic | Matches regex | `RegulatoryTrackr-.*` | `user.groups` |
+| `groups` | Basic | Matches regex | `EdSteward-.*` | `user.groups` |
 
 ## Part 2: Okta Groups and Users
 
@@ -86,15 +86,15 @@ Configure these attribute mappings:
 
 Create these groups in Okta:
 
-1. **RegulatoryTrackr-Users** (Basic access)
-2. **RegulatoryTrackr-ComplianceOfficers** (Advanced access)
-3. **RegulatoryTrackr-Admins** (Administrative access)
+1. **EdSteward-Users** (Basic access)
+2. **EdSteward-ComplianceOfficers** (Advanced access)
+3. **EdSteward-Admins** (Administrative access)
 
 ### Step 2: Assign Users
 
 1. Go to **Directory** → **People**
 2. Select users and assign to appropriate groups
-3. Assign the RegulatoryTrackr application to users
+3. Assign the EdSteward application to users
 
 ### Step 3: Create Custom Attribute (Optional)
 
@@ -103,9 +103,9 @@ For role mapping, create a custom user attribute:
 1. Go to **Directory** → **Profile Editor**
 2. Select **User (default)**
 3. Add attribute:
-   - **Display name**: `RegulatoryTrackr Role`
+   - **Display name**: `EdSteward Role`
    - **Variable name**: `regulatoryTrackrRole`
-   - **Description**: `Role in RegulatoryTrackr application`
+   - **Description**: `Role in EdSteward application`
    - **Type**: `string`
    - **Enum**: `user`, `compliance_officer`, `admin`
 
@@ -126,7 +126,7 @@ MIICmzCCAYMCBgF...
 -----END CERTIFICATE-----"
 
 # SAML Service Provider
-SAML_SP_ENTITY_ID=urn:regulatorytrackr:sp
+SAML_SP_ENTITY_ID=urn:edsteward:sp
 SAML_CALLBACK_URL=http://localhost:3000/auth/saml/callback
 SAML_SLO_URL=http://localhost:3000/auth/saml/logout
 ENABLE_SAML=true
@@ -143,7 +143,7 @@ MIICmzCCAYMCBgF...
 -----END CERTIFICATE-----"
 
 # SAML Service Provider
-SAML_SP_ENTITY_ID=urn:regulatorytrackr:sp
+SAML_SP_ENTITY_ID=urn:edsteward:sp
 SAML_CALLBACK_URL=https://yourdomain.com/auth/saml/callback
 SAML_SLO_URL=https://yourdomain.com/auth/saml/logout
 ENABLE_SAML=true
@@ -168,9 +168,9 @@ if (idpType === 'okta') {
   // Map Okta groups to application roles
   let role = 'user'; // default
   
-  if (groups.includes('RegulatoryTrackr-Admins')) {
+  if (groups.includes('EdSteward-Admins')) {
     role = 'admin';
-  } else if (groups.includes('RegulatoryTrackr-ComplianceOfficers')) {
+  } else if (groups.includes('EdSteward-ComplianceOfficers')) {
     role = 'compliance_officer';
   }
   
@@ -346,7 +346,7 @@ Monitor SAML events:
 
 ```bash
 # View SAML authentication logs
-docker logs -f regulatorytrackr-app-dev-1 | grep SAML
+docker logs -f edsteward-app-dev-1 | grep SAML
 ```
 
 ## Support

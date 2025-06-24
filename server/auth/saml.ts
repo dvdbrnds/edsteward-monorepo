@@ -83,7 +83,7 @@ export function setupSamlAuth(app: Express) {
           // Base configuration
           const baseConfig = {
             callbackUrl: `${process.env.BASE_URL || 'http://localhost:3000'}/auth/saml/callback/${providerId}`,
-            issuer: process.env.SAML_SP_ENTITY_ID || 'urn:regulatorytrackr:sp',
+            issuer: process.env.SAML_SP_ENTITY_ID || 'urn:edsteward:sp',
             signatureAlgorithm: 'sha256' as const,
             digestAlgorithm: 'sha256' as const,
             skipRequestCompression: false,
@@ -130,7 +130,7 @@ export function setupSamlAuth(app: Express) {
                 logoutUrl: process.env.INCOMMON_SLO_URL || '',
                 identifierFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
                 disableRequestedAuthnContext: false,
-                providerName: 'RegulatoryTrackr',
+                providerName: 'EdSteward',
               };
               break;
               
@@ -298,7 +298,7 @@ export function setupSamlAuth(app: Express) {
 
 // Generate Service Provider metadata
 function generateServiceProviderMetadata(provider: string = 'default'): string {
-  const spEntityId = process.env.SAML_SP_ENTITY_ID || 'urn:regulatorytrackr:sp';
+  const spEntityId = process.env.SAML_SP_ENTITY_ID || 'urn:edsteward:sp';
   const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
   const callbackUrl = `${baseUrl}/auth/saml/callback/${provider}`;
   const sloUrl = `${baseUrl}/auth/saml/logout/${provider}`;
@@ -319,7 +319,7 @@ function generateServiceProviderMetadata(provider: string = 'default'): string {
     <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
                            Location="${sloUrl}"/>
     <md:AttributeConsumingService index="1" isDefault="true">
-      <md:ServiceName xml:lang="en">RegulatoryTrackr</md:ServiceName>
+      <md:ServiceName xml:lang="en">EdSteward</md:ServiceName>
       <md:ServiceDescription xml:lang="en">Regulatory Compliance Tracking System</md:ServiceDescription>
       <md:RequestedAttribute Name="urn:oid:0.9.2342.19200300.100.1.3" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="mail" isRequired="true"/>
       <md:RequestedAttribute Name="urn:oid:2.5.4.42" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="givenName" isRequired="true"/>
@@ -330,12 +330,12 @@ function generateServiceProviderMetadata(provider: string = 'default'): string {
     </md:AttributeConsumingService>
   </md:SPSSODescriptor>
   <md:Organization>
-    <md:OrganizationName xml:lang="en">RegulatoryTrackr</md:OrganizationName>
-    <md:OrganizationDisplayName xml:lang="en">RegulatoryTrackr</md:OrganizationDisplayName>
-    <md:OrganizationURL xml:lang="en">https://regulatorytrackr.com</md:OrganizationURL>
+    <md:OrganizationName xml:lang="en">EdSteward</md:OrganizationName>
+    <md:OrganizationDisplayName xml:lang="en">EdSteward</md:OrganizationDisplayName>
+    <md:OrganizationURL xml:lang="en">https://edsteward.com</md:OrganizationURL>
   </md:Organization>
   <md:ContactPerson contactType="technical">
-    <md:EmailAddress>support@regulatorytrackr.com</md:EmailAddress>
+    <md:EmailAddress>support@edsteward.com</md:EmailAddress>
   </md:ContactPerson>
 </md:EntityDescriptor>`;
 }

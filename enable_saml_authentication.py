@@ -18,13 +18,13 @@ def create_environment_variables():
     # Example Okta configuration (replace with your actual Okta setup)
     saml_env_vars = {
         # Base SAML Configuration
-        'SAML_SP_ENTITY_ID': 'urn:regulatorytrackr:sp',
+        'SAML_SP_ENTITY_ID': 'urn:edsteward:sp',
         'SAML_CALLBACK_URL': 'http://localhost:3000/auth/saml/callback',
         'SAML_SLO_URL': 'http://localhost:3000/auth/saml/logout',
         
         # Okta Configuration (replace with your actual values)
-        'OKTA_SSO_URL': 'https://dev-12345678.okta.com/app/regulatorytrackr/exk1234567890/sso/saml',
-        'OKTA_SLO_URL': 'https://dev-12345678.okta.com/app/regulatorytrackr/exk1234567890/slo/saml', 
+        'OKTA_SSO_URL': 'https://dev-12345678.okta.com/app/edsteward/exk1234567890/sso/saml',
+        'OKTA_SLO_URL': 'https://dev-12345678.okta.com/app/edsteward/exk1234567890/slo/saml', 
         'OKTA_ENTITY_ID': 'http://www.okta.com/exk1234567890',
         'OKTA_CERT': '',  # Add your Okta certificate here
         
@@ -106,7 +106,7 @@ def create_saml_certificates():
         subprocess.run([
             'openssl', 'req', '-new', '-x509', '-key', 'certs/sp-key.pem',
             '-out', 'certs/sp-cert.pem', '-days', '365',
-            '-subj', '/C=US/ST=State/L=City/O=RegulatoryTrackr/OU=IT/CN=localhost'
+            '-subj', '/C=US/ST=State/L=City/O=EdSteward/OU=IT/CN=localhost'
         ], check=True, capture_output=True)
         
         print("✅ SAML certificates created successfully")
@@ -136,7 +136,7 @@ def create_login_page():
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RegulatoryTrackr - SAML Login</title>
+    <title>EdSteward - SAML Login</title>
     <style>
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -208,7 +208,7 @@ def create_login_page():
 <body>
     <div class="login-container">
         <div class="logo">
-            <h1>RegulatoryTrackr</h1>
+            <h1>EdSteward</h1>
         </div>
         <div class="subtitle">
             Select your identity provider to sign in
@@ -289,7 +289,7 @@ def main():
     print("\n📋 Next Steps:")
     print("1. Update your Okta/Shibboleth configurations with:")
     print("   - ACS URL: http://localhost:3000/auth/saml/callback/[provider]")
-    print("   - Entity ID: urn:regulatorytrackr:sp")
+    print("   - Entity ID: urn:edsteward:sp")
     print("   - SLO URL: http://localhost:3000/auth/saml/logout/[provider]")
     print("\n2. Add your actual certificates to the environment variables in docker-compose.dev.yml")
     print("\n3. Restart your local development environment:")

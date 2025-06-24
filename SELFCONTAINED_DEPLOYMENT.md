@@ -1,4 +1,4 @@
-# RegulatoryTrackr Self-Contained Deployment
+# EdSteward Self-Contained Deployment
 
 This setup includes **everything in Docker containers**: Frontend, Backend, PostgreSQL Database, and Redis.
 
@@ -31,7 +31,7 @@ This setup includes **everything in Docker containers**: Frontend, Backend, Post
 ### Database Configuration
 - **Host**: postgres (internal) / localhost (external)
 - **Port**: 5432
-- **Database**: regulatorytrackr  
+- **Database**: edsteward  
 - **Username**: reguser
 - **Password**: reg_secure_pass_2024
 
@@ -108,7 +108,7 @@ docker-compose -f docker-compose.production.yml down
 docker-compose -f docker-compose.production.yml up --build -d
 
 # Access database directly
-docker-compose -f docker-compose.production.yml exec postgres psql -U reguser -d regulatorytrackr
+docker-compose -f docker-compose.production.yml exec postgres psql -U reguser -d edsteward
 
 # Access Redis directly
 docker-compose -f docker-compose.production.yml exec redis redis-cli -a redis_secure_pass_2024
@@ -153,8 +153,8 @@ docker-compose -f docker-compose.production.yml config > ecs-task-definition.jso
 ### Option 2: EC2 with Docker
 ```bash
 # Simply copy files and run
-scp -r . ec2-user@your-instance:/home/ec2-user/regulatorytrackr/
-ssh ec2-user@your-instance "cd regulatorytrackr && ./start-selfcontained.sh"
+scp -r . ec2-user@your-instance:/home/ec2-user/edsteward/
+ssh ec2-user@your-instance "cd edsteward && ./start-selfcontained.sh"
 ```
 
 ### Option 3: Kubernetes
@@ -199,7 +199,7 @@ kompose convert -f docker-compose.production.yml
    ./start-selfcontained.sh --fresh
    
    # Check data loaded
-   docker-compose -f docker-compose.production.yml exec postgres psql -U reguser -d regulatorytrackr -c "SELECT COUNT(*) FROM regulations;"
+   docker-compose -f docker-compose.production.yml exec postgres psql -U reguser -d edsteward -c "SELECT COUNT(*) FROM regulations;"
    ```
 
 ## ✅ Success Verification
@@ -222,17 +222,17 @@ curl http://localhost:3000/api/regulations | jq '.length'
 ### Backup
 ```bash
 # Backup database
-docker-compose -f docker-compose.production.yml exec postgres pg_dump -U reguser regulatorytrackr > backup.sql
+docker-compose -f docker-compose.production.yml exec postgres pg_dump -U reguser edsteward > backup.sql
 
 # Backup volumes
-docker run --rm -v regulatorytrackr_postgres_data:/data -v $(pwd):/backup ubuntu tar czf /backup/postgres_backup.tar.gz /data
+docker run --rm -v edsteward_postgres_data:/data -v $(pwd):/backup ubuntu tar czf /backup/postgres_backup.tar.gz /data
 ```
 
 ### Restore
 ```bash
 # Restore database
-docker-compose -f docker-compose.production.yml exec -T postgres psql -U reguser regulatorytrackr < backup.sql
+docker-compose -f docker-compose.production.yml exec -T postgres psql -U reguser edsteward < backup.sql
 
 # Restore volumes
-docker run --rm -v regulatorytrackr_postgres_data:/data -v $(pwd):/backup ubuntu tar xzf /backup/postgres_backup.tar.gz -C /
+docker run --rm -v edsteward_postgres_data:/data -v $(pwd):/backup ubuntu tar xzf /backup/postgres_backup.tar.gz -C /
 ``` 

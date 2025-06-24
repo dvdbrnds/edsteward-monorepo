@@ -95,7 +95,7 @@ async function exportDatabase() {
       fs.mkdirSync(exportsDir, { recursive: true });
     }
     
-    let fullExport = `-- RegulatoryTrackr Database Export\n`;
+    let fullExport = `-- EdSteward Database Export\n`;
     fullExport += `-- Generated on: ${new Date().toISOString()}\n`;
     fullExport += `-- Source: Replit Database\n\n`;
     

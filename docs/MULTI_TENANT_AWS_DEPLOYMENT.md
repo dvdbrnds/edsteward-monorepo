@@ -1,6 +1,6 @@
 # Multi-Tenant SAML Deployment on AWS
 
-This guide covers deploying RegulatoryTrackr as a multi-tenant SaaS application on AWS with SAML authentication support.
+This guide covers deploying EdSteward as a multi-tenant SaaS application on AWS with SAML authentication support.
 
 ## Architecture Overview
 
@@ -34,7 +34,7 @@ This guide covers deploying RegulatoryTrackr as a multi-tenant SaaS application 
 
 ```bash
 git clone <your-repo-url>
-cd RegulatoryTrackr
+cd EdSteward
 ```
 
 ### 2. Configure Environment Variables
@@ -44,7 +44,7 @@ Create `infrastructure/terraform/terraform.tfvars`:
 ```hcl
 aws_region    = "us-east-1"
 environment   = "production"
-app_name      = "regulatorytrackr"
+app_name      = "edsteward"
 base_domain   = "edsteward.ai"
 db_password   = "your-secure-database-password"
 ```
@@ -74,14 +74,14 @@ This creates:
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <account-id>.dkr.ecr.us-east-1.amazonaws.com
 
 # Build and tag Docker image
-docker build -t regulatorytrackr .
-docker tag regulatorytrackr:latest <account-id>.dkr.ecr.us-east-1.amazonaws.com/regulatorytrackr:latest
+docker build -t edsteward .
+docker tag edsteward:latest <account-id>.dkr.ecr.us-east-1.amazonaws.com/edsteward:latest
 
 # Push to ECR
-docker push <account-id>.dkr.ecr.us-east-1.amazonaws.com/regulatorytrackr:latest
+docker push <account-id>.dkr.ecr.us-east-1.amazonaws.com/edsteward:latest
 
 # Update ECS service
-aws ecs update-service --cluster regulatorytrackr-cluster --service regulatorytrackr-service --force-new-deployment
+aws ecs update-service --cluster edsteward-cluster --service edsteward-service --force-new-deployment
 ```
 
 ### 5. Configure DNS
@@ -98,7 +98,7 @@ Run the multi-tenant database migration:
 
 ```bash
 # Connect to RDS instance
-psql -h <rds-endpoint> -U postgres -d regulatorytrackr
+psql -h <rds-endpoint> -U postgres -d edsteward
 
 # Run multi-tenant schema setup
 \i database/multi-tenant-schema.sql
@@ -131,7 +131,7 @@ Store tenant-specific configurations in AWS Parameter Store:
 ```bash
 # Example tenant configuration
 aws ssm put-parameter \
-  --name "/regulatorytrackr/tenants/acme-corp/config" \
+  --name "/edsteward/tenants/acme-corp/config" \
   --value '{
     "id": "acme-corp",
     "name": "ACME Corporation",
@@ -188,7 +188,7 @@ https://tenant.edsteward.ai/auth/saml/metadata
 For each tenant's IdP (Okta, Shibboleth, etc.):
 
 1. **Create new SAML application** in the IdP
-2. **Configure SP Entity ID**: `urn:regulatorytrackr:sp:{tenant-id}`
+2. **Configure SP Entity ID**: `urn:edsteward:sp:{tenant-id}`
 3. **Set Assertion Consumer Service URL**: `https://{tenant}.edsteward.ai/auth/saml/callback`
 4. **Configure attribute mappings**:
    - Email: `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress`
@@ -209,7 +209,7 @@ For each tenant's IdP (Okta, Shibboleth, etc.):
 
 ### CloudWatch Logs
 
-- Application logs: `/aws/ecs/regulatorytrackr`
+- Application logs: `/aws/ecs/edsteward`
 - Database logs: RDS CloudWatch integration
 - Load balancer logs: ALB access logs
 
@@ -293,16 +293,16 @@ Set up CloudWatch alarms for:
 
 ```bash
 # Check ECS service status
-aws ecs describe-services --cluster regulatorytrackr-cluster --services regulatorytrackr-service
+aws ecs describe-services --cluster edsteward-cluster --services edsteward-service
 
 # View application logs
-aws logs tail /aws/ecs/regulatorytrackr --follow
+aws logs tail /aws/ecs/edsteward --follow
 
 # Test database connectivity
-psql -h <rds-endpoint> -U postgres -d regulatorytrackr -c "SELECT current_database();"
+psql -h <rds-endpoint> -U postgres -d edsteward -c "SELECT current_database();"
 
 # Check Parameter Store values
-aws ssm get-parameters-by-path --path "/regulatorytrackr/tenants" --recursive
+aws ssm get-parameters-by-path --path "/edsteward/tenants" --recursive
 ```
 
 ## Cost Optimization
@@ -332,12 +332,12 @@ aws ssm get-parameters-by-path --path "/regulatorytrackr/tenants" --recursive
 
 ```bash
 # Update application
-docker build -t regulatorytrackr:v2.0 .
-docker tag regulatorytrackr:v2.0 <account-id>.dkr.ecr.us-east-1.amazonaws.com/regulatorytrackr:v2.0
-docker push <account-id>.dkr.ecr.us-east-1.amazonaws.com/regulatorytrackr:v2.0
+docker build -t edsteward:v2.0 .
+docker tag edsteward:v2.0 <account-id>.dkr.ecr.us-east-1.amazonaws.com/edsteward:v2.0
+docker push <account-id>.dkr.ecr.us-east-1.amazonaws.com/edsteward:v2.0
 
 # Update ECS task definition and service
-aws ecs update-service --cluster regulatorytrackr-cluster --service regulatorytrackr-service --task-definition regulatorytrackr-task:v2
+aws ecs update-service --cluster edsteward-cluster --service edsteward-service --task-definition edsteward-task:v2
 ```
 
 ## Support and Documentation

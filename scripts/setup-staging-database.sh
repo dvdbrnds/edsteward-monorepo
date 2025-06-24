@@ -3,7 +3,7 @@
 # 🗄️ Setup Staging Database
 # This script helps you create a separate staging database
 
-echo "🗄️ Setting up staging database for RegulatoryTrackr..."
+echo "🗄️ Setting up staging database for EdSteward..."
 
 # Colors for output
 RED='\033[0;31m'
@@ -33,7 +33,7 @@ case $choice in
         echo ""
         echo -e "${BLUE}📝 Manual Steps for Neon:${NC}"
         echo "1. Go to https://console.neon.tech/"
-        echo "2. Create a new database called 'regulatorytrackr-staging'"
+        echo "2. Create a new database called 'edsteward-staging'"
         echo "3. Copy the connection string"
         echo ""
         echo -n "Enter your staging database URL: "
@@ -47,7 +47,7 @@ case $choice in
         ;;
     3)
         echo -e "${YELLOW}🐘 Setting up local PostgreSQL...${NC}"
-        STAGING_DB_URL="postgresql://postgres:password@localhost:5432/regulatorytrackr_staging"
+        STAGING_DB_URL="postgresql://postgres:password@localhost:5432/edsteward_staging"
         
         # Check if PostgreSQL is installed
         if ! command -v psql &> /dev/null; then
@@ -57,7 +57,7 @@ case $choice in
         fi
         
         # Create staging database
-        createdb regulatorytrackr_staging 2>/dev/null || echo "Database may already exist"
+        createdb edsteward_staging 2>/dev/null || echo "Database may already exist"
         ;;
     *)
         echo -e "${RED}❌ Invalid option${NC}"

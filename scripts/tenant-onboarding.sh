@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Multi-Tenant Onboarding Script for RegulatoryTrackr
+# Multi-Tenant Onboarding Script for EdSteward
 # Usage: ./tenant-onboarding.sh <tenant-id> <tenant-name> <subdomain> <idp-config-file>
 
 set -e
@@ -15,7 +15,7 @@ NC='\033[0m' # No Color
 # Configuration
 AWS_REGION=${AWS_REGION:-"us-east-1"}
 BASE_DOMAIN=${BASE_DOMAIN:-"edsteward.ai"}
-PARAMETER_PREFIX="/regulatorytrackr/tenants"
+PARAMETER_PREFIX="/edsteward/tenants"
 HOSTED_ZONE_ID=${HOSTED_ZONE_ID}
 
 # Functions
@@ -86,7 +86,7 @@ check_tenant_exists() {
 }
 
 get_alb_dns_name() {
-    local alb_name="regulatorytrackr-alb"
+    local alb_name="edsteward-alb"
     
     aws elbv2 describe-load-balancers \
         --names "$alb_name" \
@@ -248,7 +248,7 @@ Tenant Details:
 
 Next Steps:
 1. Configure Identity Provider (IdP):
-   - Entity ID: urn:regulatorytrackr:sp:$tenant_id
+   - Entity ID: urn:edsteward:sp:$tenant_id
    - ACS URL: https://$subdomain.$BASE_DOMAIN/auth/saml/callback
    - Metadata URL: https://$subdomain.$BASE_DOMAIN/auth/saml/metadata
 
@@ -264,7 +264,7 @@ Next Steps:
    - Authenticate with configured IdP
 
 4. Monitor logs:
-   aws logs tail /aws/ecs/regulatorytrackr --follow
+   aws logs tail /aws/ecs/edsteward --follow
 
 Configuration stored in: ${PARAMETER_PREFIX}/${tenant_id}/config
 

@@ -5,7 +5,7 @@
 
 set -e
 
-IMAGE_NAME="${1:-regulatorytrackr-app}"
+IMAGE_NAME="${1:-edsteward-app}"
 AWS_REGION="us-east-1"
 AWS_ACCOUNT_ID=$(aws sts get-caller-identity --query Account --output text)
 ECR_REPOSITORY="edsteward-repo"

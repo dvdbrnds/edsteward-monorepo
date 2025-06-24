@@ -1,5 +1,5 @@
 # 🚀 Complete Step-by-Step AWS Deployment Guide
-## RegulatoryTrackr → EdSteward.ai Production Deployment
+## EdSteward → EdSteward.ai Production Deployment
 
 This guide will take you from your current development environment to a fully deployed AWS production system in approximately 60-90 minutes.
 
@@ -170,7 +170,7 @@ aws sesv2 get-email-identity --email-identity edsteward.ai --region us-east-1
 ### Step 5.1: Prepare Environment Variables
 ```bash
 # Return to project root
-cd /path/to/your/project/RegulatoryTrackr
+cd /path/to/your/project/EdSteward
 
 # Set required environment variables
 export AWS_REGION=us-east-1
@@ -346,4 +346,4 @@ aws logs tail /aws/ecs/edsteward --follow --region us-east-1
 curl -I $(terraform output -raw alb_dns_name)/health
 ```
 
-**🎊 Congratulations! Your RegulatoryTrackr is now EdSteward.ai in production!** 
+**🎊 Congratulations! Your EdSteward is now EdSteward.ai in production!** 

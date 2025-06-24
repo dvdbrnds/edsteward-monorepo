@@ -50,7 +50,7 @@ export class AWSEmailService {
         Tags: [
           {
             Name: 'Application',
-            Value: 'RegulatoryTrackr',
+            Value: 'EdSteward',
           },
           {
             Name: 'Environment',
@@ -86,7 +86,7 @@ export class AWSEmailService {
           <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="background: #f8f9fa; padding: 20px; border-radius: 5px; margin-bottom: 20px;">
               <h1 style="color: #2563eb; margin: 0;">${tenantName}</h1>
-              <p style="margin: 10px 0 0 0; color: #6b7280;">RegulatoryTrackr Notification</p>
+              <p style="margin: 10px 0 0 0; color: #6b7280;">EdSteward Notification</p>
             </div>
             
             <h2 style="color: #374151;">${subject}</h2>
@@ -107,7 +107,7 @@ export class AWSEmailService {
             
             <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e5e7eb; 
                         color: #6b7280; font-size: 14px;">
-              <p>This email was sent from your RegulatoryTrackr account. 
+              <p>This email was sent from your EdSteward account. 
                  If you no longer wish to receive these notifications, 
                  please update your notification preferences in your account settings.</p>
             </div>
@@ -117,7 +117,7 @@ export class AWSEmailService {
     `;
 
     const textBody = `
-${tenantName} - RegulatoryTrackr Notification
+${tenantName} - EdSteward Notification
 
 ${subject}
 
@@ -126,7 +126,7 @@ ${message}
 ${actionUrl ? `View Details: ${actionUrl}` : ''}
 
 ---
-This email was sent from your RegulatoryTrackr account.
+This email was sent from your EdSteward account.
     `.trim();
 
     return this.sendEmail(to, `${tenantName} - ${subject}`, htmlBody, textBody);
@@ -138,9 +138,9 @@ This email was sent from your RegulatoryTrackr account.
     userFirstName: string,
     loginUrl: string
   ): Promise<boolean> {
-    const subject = `Welcome to ${tenantName} - RegulatoryTrackr`;
+    const subject = `Welcome to ${tenantName} - EdSteward`;
     const message = `
-      Welcome ${userFirstName}! Your account has been created for ${tenantName} on RegulatoryTrackr.
+      Welcome ${userFirstName}! Your account has been created for ${tenantName} on EdSteward.
       
       You can now access your compliance tracking dashboard and begin managing regulatory requirements.
     `;

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Setup Neon Database for RegulatoryTrackr
+Setup Neon Database for EdSteward
 ========================================
 Migrate from RDS to Neon PostgreSQL for better reliability
 """
@@ -20,7 +20,7 @@ def create_neon_database():
     print('📋 Step 1: Create Neon Project')
     print('   1. Go to https://console.neon.tech/')
     print('   2. Sign up/Login (GitHub recommended)')
-    print('   3. Create new project: "RegulatoryTrackr"')
+    print('   3. Create new project: "EdSteward"')
     print('   4. Select PostgreSQL 15+')
     print('   5. Choose region: US East (Virginia) to match AWS')
     print()

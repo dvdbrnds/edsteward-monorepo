@@ -1,7 +1,7 @@
 # Docker Container Resilience Guide
 
 ## Overview
-The RegulatoryTrackr Docker container has been enhanced with comprehensive resilience features to ensure reliable startup, operation, and recovery from failures.
+The EdSteward Docker container has been enhanced with comprehensive resilience features to ensure reliable startup, operation, and recovery from failures.
 
 ## Resilience Features Implemented
 
@@ -78,19 +78,19 @@ docker ps
 # Check detailed health
 curl http://localhost:3000/api/health
 # Check Docker health status
-docker inspect --format='{{.State.Health.Status}}' regulatorytrackr-app-1
+docker inspect --format='{{.State.Health.Status}}' edsteward-app-1
 ```
 
 ### Logs & Debugging
 ```bash
 # View startup logs
-docker logs regulatorytrackr-app-1
+docker logs edsteward-app-1
 
 # Follow logs in real-time
-docker logs -f regulatorytrackr-app-1
+docker logs -f edsteward-app-1
 
 # Check resource usage
-docker stats regulatorytrackr-app-1
+docker stats edsteward-app-1
 ```
 
 ## Failure Scenarios Handled
@@ -120,7 +120,7 @@ docker stats regulatorytrackr-app-1
 
 1. **Health Check**: `curl http://localhost:3000/api/health`
 2. **Login Test**: Use credentials `developer:admin123` or `testuser:test123`
-3. **Restart Test**: `docker restart regulatorytrackr-app-1`
+3. **Restart Test**: `docker restart edsteward-app-1`
 4. **Resource Test**: Monitor with `docker stats`
 
 ## Next Steps for Production
@@ -135,7 +135,7 @@ docker stats regulatorytrackr-app-1
 ## Troubleshooting
 
 ### Container Won't Start
-- Check logs: `docker logs regulatorytrackr-app-1`
+- Check logs: `docker logs edsteward-app-1`
 - Verify environment variables in `.env`
 - Ensure database connectivity
 - Check file permissions
@@ -179,4 +179,4 @@ deploy:
       memory: 1g
 ```
 
-This resilient setup ensures your RegulatoryTrackr application can handle various failure scenarios and automatically recover, providing a stable development and production environment. 
+This resilient setup ensures your EdSteward application can handle various failure scenarios and automatically recover, providing a stable development and production environment. 

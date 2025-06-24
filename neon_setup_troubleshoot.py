@@ -32,7 +32,7 @@ def main():
     print('-' * 40)
     print('1. Click "Create Project" or "New Project"')
     print('2. Project settings:')
-    print('   📦 Name: "RegulatoryTrackr"')
+    print('   📦 Name: "EdSteward"')
     print('   🐘 PostgreSQL Version: 17 (latest)')
     print('   🌍 Region: US East (Virginia) - closest to AWS')
     print('   💰 Plan: Free tier is fine for testing')

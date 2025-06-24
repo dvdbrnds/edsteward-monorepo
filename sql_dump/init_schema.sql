@@ -1,5 +1,5 @@
 --
--- RegulatoryTrackr Database Schema
+-- EdSteward Database Schema
 -- Compatible with PostgreSQL 15+
 --
 

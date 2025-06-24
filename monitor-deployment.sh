@@ -6,7 +6,7 @@ echo ""
 
 # Check GitHub Actions (you'll need to check this manually)
 echo "🔗 Check workflow status at:"
-echo "   https://github.com/dvdbrnds/RegulatoryTrackr/actions"
+echo "   https://github.com/dvdbrnds/EdSteward/actions"
 echo ""
 
 # Check latest ECR images

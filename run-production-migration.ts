@@ -5,7 +5,7 @@ import { sql } from 'drizzle-orm';
 import * as schema from './shared/schema';
 import { exit } from 'process';
 
-const PRODUCTION_DATABASE_URL = 'postgresql://postgres:EdSteward2024!Secure@edsteward-db.cvtnqegc5njx.us-east-1.rds.amazonaws.com:5432/regulatorytrackr';
+const PRODUCTION_DATABASE_URL = 'postgresql://postgres:EdSteward2024!Secure@edsteward-db.cvtnqegc5njx.us-east-1.rds.amazonaws.com:5432/edsteward';
 
 async function checkTableExists(tableName: string): Promise<boolean> {
   try {

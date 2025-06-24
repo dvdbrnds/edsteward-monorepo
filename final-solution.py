@@ -164,7 +164,7 @@ EOF
     log("   - No SSH keys or EC2 setup needed")
     
     log("\n🎊 EXPECTED RESULT:")
-    log("   Your RegulatoryTrackr application will have:")
+    log("   Your EdSteward application will have:")
     log("   ✅ All user accounts restored")
     log("   ✅ Database schema recreated")
     log("   ✅ Login functionality working")

@@ -1,7 +1,7 @@
 # ✅ LOCAL DEADLINES IMPLEMENTATION SUCCESS
 
 ## Overview
-Successfully extracted, populated, and tested deadlines functionality in the local RegulatoryTrackr development environment.
+Successfully extracted, populated, and tested deadlines functionality in the local EdSteward development environment.
 
 ## 🎯 What Was Accomplished
 

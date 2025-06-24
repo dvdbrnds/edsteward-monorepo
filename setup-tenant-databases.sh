@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-echo "🏢 Setting up Multi-Tenant Databases for RegulatoryTrackr"
+echo "🏢 Setting up Multi-Tenant Databases for EdSteward"
 echo "======================================================"
 
 # Database connection details

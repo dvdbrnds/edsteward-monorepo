@@ -1,11 +1,11 @@
 #!/bin/bash
 
-# Setup Local PostgreSQL Database for RegulatoryTrackr
+# Setup Local PostgreSQL Database for EdSteward
 echo "🚀 Setting up local PostgreSQL database..."
 
 # Database configuration
-DB_NAME="regulatorytrackr"
-DB_USER="regulatorytrackr_user"
+DB_NAME="edsteward"
+DB_USER="edsteward_user"
 DB_PASS="local_dev_password"
 
 # Check if we're on macOS with Homebrew PostgreSQL

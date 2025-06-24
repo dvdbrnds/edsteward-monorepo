@@ -1,6 +1,6 @@
 # Export Database from Replit to Local
 
-This guide helps you export your RegulatoryTrackr database from Replit and set it up locally.
+This guide helps you export your EdSteward database from Replit and set it up locally.
 
 ## Option 1: Direct Connection (Easiest)
 
@@ -53,14 +53,14 @@ This guide helps you export your RegulatoryTrackr database from Replit and set i
    ```
    
    This creates:
-   - Database: `regulatorytrackr`
-   - User: `regulatorytrackr_user`
+   - Database: `edsteward`
+   - User: `edsteward_user`
    - Password: `local_dev_password`
 
 ### Step 3: Update Local Configuration
 1. **Update `.env` with local database:**
    ```
-   DATABASE_URL=postgresql://regulatorytrackr_user:local_dev_password@localhost:5432/regulatorytrackr
+   DATABASE_URL=postgresql://edsteward_user:local_dev_password@localhost:5432/edsteward
    ```
 
 2. **Create database schema:**
@@ -71,13 +71,13 @@ This guide helps you export your RegulatoryTrackr database from Replit and set i
 ### Step 4: Import Data
 1. **Import the exported data:**
    ```bash
-   psql -U regulatorytrackr_user -d regulatorytrackr -f exports/complete_export.sql
+   psql -U edsteward_user -d edsteward -f exports/complete_export.sql
    ```
    
    Or import specific tables:
    ```bash
-   psql -U regulatorytrackr_user -d regulatorytrackr -f exports/users.sql
-   psql -U regulatorytrackr_user -d regulatorytrackr -f exports/regulations.sql
+   psql -U edsteward_user -d edsteward -f exports/users.sql
+   psql -U edsteward_user -d edsteward -f exports/regulations.sql
    # ... etc
    ```
 
@@ -101,7 +101,7 @@ pg_dump "your-replit-database-url" > replit_backup.sql
 
 ### Import:
 ```bash
-psql -U regulatorytrackr_user -d regulatorytrackr < replit_backup.sql
+psql -U edsteward_user -d edsteward < replit_backup.sql
 ```
 
 ---

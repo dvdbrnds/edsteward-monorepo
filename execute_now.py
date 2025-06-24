@@ -6,7 +6,7 @@ import sys
 import os
 
 # Change to the correct directory
-os.chdir('/Users/dvdbrnds/Desktop/ES Clientside/RegulatoryTrackr')
+os.chdir('/Users/dvdbrnds/Desktop/ES Clientside/EdSteward')
 
 # Execute the restoration script
 try:

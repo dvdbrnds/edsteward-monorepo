@@ -41,4 +41,4 @@ echo "AWS_ACCESS_KEY_ID: $(aws configure get aws_access_key_id)"
 echo "AWS_SECRET_ACCESS_KEY: [Your secret access key]"
 
 echo ""
-echo "🔗 Add secrets at: https://github.com/dvdbrnds/RegulatoryTrackr/settings/secrets/actions" 
+echo "🔗 Add secrets at: https://github.com/dvdbrnds/EdSteward/settings/secrets/actions" 

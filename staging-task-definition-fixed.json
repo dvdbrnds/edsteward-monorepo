@@ -24,7 +24,7 @@
         },
         {
           "name": "DATABASE_URL",
-          "value": "postgresql://regulatorytrackr_staging_owner:gXJPTHFPIlte@ep-bitter-cell-a5b6k5aq.us-east-1.aws.neon.tech/regulatorytrackr_staging?sslmode=require"
+          "value": "postgresql://edsteward_staging_owner:gXJPTHFPIlte@ep-bitter-cell-a5b6k5aq.us-east-1.aws.neon.tech/edsteward_staging?sslmode=require"
         },
         {
           "name": "PORT",

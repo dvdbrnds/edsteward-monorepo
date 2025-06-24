@@ -42,7 +42,7 @@ async function getTenantSamlConfig(tenantId: string, req: Request) {
   return {
     callbackUrl: `${baseUrl}/auth/saml/callback`,
     entryPoint: tenant.samlConfig.ssoUrl,
-    issuer: `urn:regulatorytrackr:sp:${tenant.id}`,
+    issuer: `urn:edsteward:sp:${tenant.id}`,
     idpCert: tenant.samlConfig.certificate,
     logoutUrl: tenant.samlConfig.sloUrl || tenant.samlConfig.ssoUrl,
     identifierFormat: 'urn:oasis:names:tc:SAML:2.0:nameid-format:persistent',
@@ -52,7 +52,7 @@ async function getTenantSamlConfig(tenantId: string, req: Request) {
     wantAuthnResponseSigned: true,
     disableRequestedAuthnContext: false,
     // Tenant-specific metadata
-    providerName: `RegulatoryTrackr - ${tenant.name}`,
+    providerName: `EdSteward - ${tenant.name}`,
     additionalParams: {
       RelayState: tenant.id
     }
@@ -333,7 +333,7 @@ export function setupTenantSamlAuth(app: Express) {
 
 // Generate tenant-specific service provider metadata
 function generateTenantServiceProviderMetadata(tenant: any): string {
-  const spEntityId = `urn:regulatorytrackr:sp:${tenant.id}`;
+  const spEntityId = `urn:edsteward:sp:${tenant.id}`;
   const baseUrl = `https://${tenant.subdomain}.${process.env.BASE_DOMAIN || 'edsteward.ai'}`;
   const callbackUrl = `${baseUrl}/auth/saml/callback`;
   const sloUrl = `${baseUrl}/auth/saml/logout`;
@@ -354,7 +354,7 @@ function generateTenantServiceProviderMetadata(tenant: any): string {
     <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
                            Location="${sloUrl}"/>
     <md:AttributeConsumingService index="1" isDefault="true">
-      <md:ServiceName xml:lang="en">RegulatoryTrackr - ${tenant.name}</md:ServiceName>
+      <md:ServiceName xml:lang="en">EdSteward - ${tenant.name}</md:ServiceName>
       <md:ServiceDescription xml:lang="en">Regulatory Compliance Tracking System for ${tenant.name}</md:ServiceDescription>
       <md:RequestedAttribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress" 
                             NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" 

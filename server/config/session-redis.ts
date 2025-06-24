@@ -33,7 +33,7 @@ const RedisStore = connectRedis(session);
 export const redisSessionConfig: session.SessionOptions = {
   store: new RedisStore({
     client: redisClient,
-    prefix: 'regulatorytrackr:sess:',
+    prefix: 'edsteward:sess:',
     ttl: 24 * 60 * 60, // 24 hours in seconds
   }),
   secret: config.SESSION_SECRET,

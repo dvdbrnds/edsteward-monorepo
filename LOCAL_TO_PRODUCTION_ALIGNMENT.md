@@ -58,9 +58,9 @@ Keep the current setup where:
 In your Okta admin console:
 
 1. **Create SAML 2.0 Application**
-   - Name: `RegulatoryTrackr`
+   - Name: `EdSteward`
    - Single Sign-On URL: `http://localhost:3000/auth/saml/callback`
-   - Audience URI: `urn:regulatorytrackr:sp`
+   - Audience URI: `urn:edsteward:sp`
    - Default RelayState: (leave blank)
 
 2. **Attribute Mappings**

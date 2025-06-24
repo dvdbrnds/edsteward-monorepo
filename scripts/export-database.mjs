@@ -120,7 +120,7 @@ async function exportDatabase() {
       fs.mkdirSync(exportsDir, { recursive: true });
     }
     
-    let fullExport = `-- RegulatoryTrackr Database Export\n`;
+    let fullExport = `-- EdSteward Database Export\n`;
     fullExport += `-- Generated on: ${new Date().toISOString()}\n`;
     fullExport += `-- Source: Replit Database\n\n`;
     
@@ -142,7 +142,7 @@ async function exportDatabase() {
     
     console.log('\n🎉 Database export completed successfully!');
     console.log('\nNext steps:');
-    console.log('1. Import the data: psql -U regulatorytrackr_user -d regulatorytrackr -f exports/complete_export.sql');
+    console.log('1. Import the data: psql -U edsteward_user -d edsteward -f exports/complete_export.sql');
     console.log('2. Test your local setup: npm run dev');
     
   } catch (error) {

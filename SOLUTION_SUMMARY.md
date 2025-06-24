@@ -1,4 +1,4 @@
-# RegulatoryTrackr: Local vs AWS Issue Resolution
+# EdSteward: Local vs AWS Issue Resolution
 
 ## **Problem Summary** 🔍
 

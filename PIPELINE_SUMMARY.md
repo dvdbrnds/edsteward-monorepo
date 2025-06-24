@@ -2,7 +2,7 @@
 
 ## ✅ What Was Implemented
 
-Your RegulatoryTrackr application now has a **comprehensive staged deployment pipeline** that ensures **no AWS deployment without local verification and human approval**.
+Your EdSteward application now has a **comprehensive staged deployment pipeline** that ensures **no AWS deployment without local verification and human approval**.
 
 ### 🛡️ Key Safety Features
 

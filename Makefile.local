@@ -1,4 +1,4 @@
-# RegulatoryTrackr Local Development Pipeline
+# EdSteward Local Development Pipeline
 # Focused on Docker development with staging verification
 
 .PHONY: help clean check-tools dev dev-logs dev-stop dev-restart dev-shell dev-status staging staging-logs staging-stop staging-restart staging-approve build-for-prod
@@ -7,7 +7,7 @@
 SHELL := /bin/zsh
 
 # Configuration
-PROJECT_NAME := regulatorytrackr
+PROJECT_NAME := edsteward
 DEV_COMPOSE := docker-compose.dev.yml
 STAGING_COMPOSE := docker-compose.local-staging.yml
 
@@ -19,7 +19,7 @@ BLUE := \033[0;34m
 NC := \033[0m # No Color
 
 help: ## Show this help message
-	@echo "$(BLUE)RegulatoryTrackr Local Development Pipeline$(NC)"
+	@echo "$(BLUE)EdSteward Local Development Pipeline$(NC)"
 	@echo "============================================="
 	@echo ""
 	@echo "$(GREEN)🚀 Development Workflow:$(NC)"

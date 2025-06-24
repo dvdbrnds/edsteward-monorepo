@@ -2,7 +2,7 @@
 
 ## Overview
 
-The RegulatoryTrackr application has been configured to use `edsteward.ai` as the primary domain for multi-tenant deployment on AWS.
+The EdSteward application has been configured to use `edsteward.ai` as the primary domain for multi-tenant deployment on AWS.
 
 ## Domain Structure
 
@@ -41,8 +41,8 @@ https://{tenant}.edsteward.ai/auth/saml/metadata
 ```
 
 ### Entity IDs
-- **Format**: `urn:regulatorytrackr:sp:{tenant-id}`
-- **Example**: `urn:regulatorytrackr:sp:university1`
+- **Format**: `urn:edsteward:sp:{tenant-id}`
+- **Example**: `urn:edsteward:sp:university1`
 
 ### Callback URLs
 - **Format**: `https://{tenant}.edsteward.ai/auth/saml/callback`

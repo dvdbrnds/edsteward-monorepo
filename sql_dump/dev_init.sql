@@ -133,8 +133,8 @@ CREATE INDEX IF NOT EXISTS IDX_session_expire ON session(expire);
 -- Password for testuser: test123
 INSERT INTO users (external_id, username, email, full_name, role, password) 
 VALUES 
-  ('dev-user-1', 'developer', 'dev@regulatorytrackr.com', 'Development User', 'admin', 'ae4570032cd4849aa31a51186bebe89d8fc8fda991bc01d650cacb1b12c4d7433a31e2f55d062383f39ce9b8be416c030edae4dfc76678a6bee550bf054dc5dd.edbd6e8767ca739244f043ed0c7bd407'),
-  ('test-user-1', 'testuser', 'test@regulatorytrackr.com', 'Test User', 'user', '0dd04a03c1e49e1b8304e51297551c7de32662ee86e6238a42f6b3fe4d4a83537b1e20927f2e57d907820f0965e352b9983105356344c84cb4b4fb33c1217099.0aee7909f1f535c9e922fb9ebd4ca634')
+  ('dev-user-1', 'developer', 'dev@edsteward.com', 'Development User', 'admin', 'ae4570032cd4849aa31a51186bebe89d8fc8fda991bc01d650cacb1b12c4d7433a31e2f55d062383f39ce9b8be416c030edae4dfc76678a6bee550bf054dc5dd.edbd6e8767ca739244f043ed0c7bd407'),
+  ('test-user-1', 'testuser', 'test@edsteward.com', 'Test User', 'user', '0dd04a03c1e49e1b8304e51297551c7de32662ee86e6238a42f6b3fe4d4a83537b1e20927f2e57d907820f0965e352b9983105356344c84cb4b4fb33c1217099.0aee7909f1f535c9e922fb9ebd4ca634')
 ON CONFLICT (username) DO NOTHING;
 
 -- Insert some sample regulations for testing

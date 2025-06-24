@@ -6,19 +6,19 @@ GitHub Actions workflow is not running automatically. The repository needs prope
 ## ✅ Required Setup Steps
 
 ### 1. Enable GitHub Actions
-1. Go to https://github.com/dvdbrnds/RegulatoryTrackr/settings/actions
+1. Go to https://github.com/dvdbrnds/EdSteward/settings/actions
 2. Ensure "Actions permissions" is set to "Allow all actions and reusable workflows"
 3. Enable "Allow GitHub Actions to create and approve pull requests" if needed
 
 ### 2. Add AWS Secrets
-Go to https://github.com/dvdbrnds/RegulatoryTrackr/settings/secrets/actions
+Go to https://github.com/dvdbrnds/EdSteward/settings/secrets/actions
 
 Add these repository secrets:
 - `AWS_ACCESS_KEY_ID`: Your AWS access key ID
 - `AWS_SECRET_ACCESS_KEY`: Your AWS secret access key
 
 ### 3. Create Environments
-Go to https://github.com/dvdbrnds/RegulatoryTrackr/settings/environments
+Go to https://github.com/dvdbrnds/EdSteward/settings/environments
 
 Create two environments:
 - **staging**: For ES-clientside branch deployments
@@ -33,7 +33,7 @@ The workflow should trigger on:
 ## 🔍 Troubleshooting
 
 ### Check if GitHub Actions is running:
-1. Go to https://github.com/dvdbrnds/RegulatoryTrackr/actions
+1. Go to https://github.com/dvdbrnds/EdSteward/actions
 2. Look for recent workflow runs
 3. Check for any error messages
 
@@ -53,7 +53,7 @@ git commit -m "Test GitHub Actions deployment"
 git push origin ES-clientside
 ```
 
-Then check: https://github.com/dvdbrnds/RegulatoryTrackr/actions
+Then check: https://github.com/dvdbrnds/EdSteward/actions
 
 ## 📋 Current Workflow Status
 

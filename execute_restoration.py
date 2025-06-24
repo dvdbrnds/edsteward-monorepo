@@ -3,7 +3,7 @@
 # Execute the database restoration
 import sys
 import os
-sys.path.append('/Users/dvdbrnds/Desktop/ES Clientside/RegulatoryTrackr')
+sys.path.append('/Users/dvdbrnds/Desktop/ES Clientside/EdSteward')
 
 # Import and execute the restoration
-exec(open('/Users/dvdbrnds/Desktop/ES Clientside/RegulatoryTrackr/run_restoration.py').read())
+exec(open('/Users/dvdbrnds/Desktop/ES Clientside/EdSteward/run_restoration.py').read())

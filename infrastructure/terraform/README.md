@@ -1,6 +1,6 @@
-# RegulatoryTrackr AWS Infrastructure
+# EdSteward AWS Infrastructure
 
-This Terraform configuration deploys RegulatoryTrackr as a multi-tenant SaaS application on AWS using ECS Fargate.
+This Terraform configuration deploys EdSteward as a multi-tenant SaaS application on AWS using ECS Fargate.
 
 ## Architecture Overview
 
@@ -60,12 +60,12 @@ export ECR_URL=$(terraform output -raw ecr_repository_url)
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_URL
 
 # Build and push
-docker build -t regulatorytrackr ../../
-docker tag regulatorytrackr:latest $ECR_URL:latest
+docker build -t edsteward ../../
+docker tag edsteward:latest $ECR_URL:latest
 docker push $ECR_URL:latest
 
 # Update ECS service
-aws ecs update-service --cluster regulatorytrackr-cluster --service regulatorytrackr-service --force-new-deployment
+aws ecs update-service --cluster edsteward-cluster --service edsteward-service --force-new-deployment
 ```
 
 ## Multi-Tenant Configuration
@@ -117,7 +117,7 @@ The ECS task includes these environment variables:
 ### Multi-Tenant
 - `ENABLE_MULTI_TENANCY=true`
 - `TENANT_CACHE_TTL=300000`
-- `AWS_PARAMETER_STORE_PREFIX=/regulatorytrackr/tenants`
+- `AWS_PARAMETER_STORE_PREFIX=/edsteward/tenants`
 
 ### AWS Services
 - `S3_BUCKET_NAME`: File upload bucket
@@ -209,16 +209,16 @@ The ECS task includes these environment variables:
 
 ```bash
 # Check ECS service status
-aws ecs describe-services --cluster regulatorytrackr-cluster --services regulatorytrackr-service
+aws ecs describe-services --cluster edsteward-cluster --services edsteward-service
 
 # View application logs
-aws logs tail /aws/ecs/regulatorytrackr --follow
+aws logs tail /aws/ecs/edsteward --follow
 
 # Check database connectivity
-aws rds describe-db-instances --db-instance-identifier regulatorytrackr-db
+aws rds describe-db-instances --db-instance-identifier edsteward-db
 
 # Test tenant configuration
-aws ssm get-parameter --name "/regulatorytrackr/tenants/tenant-id/config"
+aws ssm get-parameter --name "/edsteward/tenants/tenant-id/config"
 ```
 
 ## Outputs

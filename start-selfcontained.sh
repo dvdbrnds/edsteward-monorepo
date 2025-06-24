@@ -1,9 +1,9 @@
 #!/bin/zsh
 
-# Start Self-Contained RegulatoryTrackr
+# Start Self-Contained EdSteward
 # This script starts the complete application with PostgreSQL and Redis containers
 
-echo "🚀 Starting RegulatoryTrackr Self-Contained Environment..."
+echo "🚀 Starting EdSteward Self-Contained Environment..."
 
 # Check if docker-compose is available
 if ! command -v docker-compose &> /dev/null; then
@@ -24,8 +24,8 @@ $COMPOSE_CMD -f docker-compose.production.yml down
 # Remove old volumes if requested
 if [[ "$1" == "--fresh" ]]; then
     echo "🗑️  Removing old data volumes for fresh start..."
-    docker volume rm regulatorytrackr_postgres_data 2>/dev/null || true
-    docker volume rm regulatorytrackr_redis_data 2>/dev/null || true
+    docker volume rm edsteward_postgres_data 2>/dev/null || true
+    docker volume rm edsteward_redis_data 2>/dev/null || true
 fi
 
 # Build and start containers
@@ -45,7 +45,7 @@ echo "📝 Recent logs:"
 $COMPOSE_CMD -f docker-compose.production.yml logs --tail=20
 
 echo ""
-echo "✅ RegulatoryTrackr Self-Contained Environment Started!"
+echo "✅ EdSteward Self-Contained Environment Started!"
 echo "🌐 Application: http://localhost:3000"
 echo "🐘 PostgreSQL: localhost:5432"
 echo "🔴 Redis: localhost:6379"

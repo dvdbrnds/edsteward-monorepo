@@ -3,7 +3,7 @@
 # 🌐 Setup Staging Domain
 # This script helps you configure domain routing for your staging environment
 
-echo "🌐 Setting up staging domain for RegulatoryTrackr..."
+echo "🌐 Setting up staging domain for EdSteward..."
 
 # Colors for output
 RED='\033[0;31m'

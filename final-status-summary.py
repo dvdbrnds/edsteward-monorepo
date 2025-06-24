@@ -48,7 +48,7 @@ def test_aws_infrastructure():
         return False
 
 def main():
-    log("🎯 FINAL STATUS SUMMARY - RegulatoryTrackr System")
+    log("🎯 FINAL STATUS SUMMARY - EdSteward System")
     
     # Test AWS infrastructure one final time
     aws_working = test_aws_infrastructure()

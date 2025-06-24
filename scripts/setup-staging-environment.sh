@@ -3,7 +3,7 @@
 # 🚀 Setup Staging Environment on AWS
 # This script helps you create a staging environment that mirrors production
 
-echo "🎯 Setting up staging environment for RegulatoryTrackr..."
+echo "🎯 Setting up staging environment for EdSteward..."
 
 # Colors for output
 RED='\033[0;31m'

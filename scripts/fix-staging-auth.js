@@ -7,7 +7,7 @@ const { users } = require('../shared/schema');
 const { eq } = require('drizzle-orm');
 
 // Staging database connection
-const STAGING_DATABASE_URL = 'postgresql://regulatorytrackr_staging_owner:gXJPTHFPIlte@ep-bitter-cell-a5b6k5aq.us-east-1.aws.neon.tech/regulatorytrackr_staging?sslmode=require';
+const STAGING_DATABASE_URL = 'postgresql://edsteward_staging_owner:gXJPTHFPIlte@ep-bitter-cell-a5b6k5aq.us-east-1.aws.neon.tech/edsteward_staging?sslmode=require';
 
 async function fixStagingAuth() {
   console.log('🔧 Fixing staging authentication...');

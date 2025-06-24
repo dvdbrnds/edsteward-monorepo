@@ -42,6 +42,19 @@ export async function populateTenantsTable() {
       subdomain: 'moravian',
       databaseName: 'edsteward_moravian',
       status: 'active' as const,
+      samlConfig: {
+        ssoUrl: process.env.MORAVIAN_OKTA_SSO_URL || 'https://your-okta-domain.okta.com/app/edsteward/exk1234567890/sso/saml',
+        sloUrl: process.env.MORAVIAN_OKTA_SLO_URL || 'https://your-okta-domain.okta.com/app/edsteward/exk1234567890/slo/saml',
+        certificate: process.env.MORAVIAN_OKTA_CERT || '',
+        entityId: process.env.MORAVIAN_OKTA_ENTITY_ID || 'http://www.okta.com/exk1234567890',
+        attributeMapping: {
+          email: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress',
+          firstName: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname',
+          lastName: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname',
+          username: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name',
+          groups: 'http://schemas.microsoft.com/ws/2008/06/identity/claims/groups'
+        }
+      },
       settings: {
         allowedDomains: ['moravian.edu'],
         defaultRole: 'user' as const,
@@ -79,6 +92,7 @@ export async function populateTenantsTable() {
             subdomain: tenant.subdomain,
             databaseName: tenant.databaseName,
             status: tenant.status,
+            samlConfig: tenant.samlConfig,
             settings: tenant.settings,
             updatedAt: new Date()
           }

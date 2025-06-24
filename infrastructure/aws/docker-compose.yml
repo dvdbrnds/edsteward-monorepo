@@ -20,7 +20,7 @@ services:
       - TENANT_CACHE_TTL=300000
       
       # SAML Configuration
-      - SAML_SP_ENTITY_ID_PREFIX=urn:regulatorytrackr:sp
+      - SAML_SP_ENTITY_ID_PREFIX=urn:edsteward:sp
       - SAML_SP_PRIVATE_KEY=${SAML_SP_PRIVATE_KEY}
       - SAML_SP_CERT=${SAML_SP_CERT}
       
@@ -30,7 +30,7 @@ services:
       - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
       
       # Parameter Store for tenant configs
-      - AWS_PARAMETER_STORE_PREFIX=/regulatorytrackr/tenants
+      - AWS_PARAMETER_STORE_PREFIX=/edsteward/tenants
       
       # Session Configuration
       - SESSION_SECRET=${SESSION_SECRET}
@@ -56,7 +56,7 @@ services:
     logging:
       driver: awslogs
       options:
-        awslogs-group: /aws/ecs/regulatorytrackr
+        awslogs-group: /aws/ecs/edsteward
         awslogs-region: ${AWS_REGION}
         awslogs-stream-prefix: app
 
@@ -71,7 +71,7 @@ services:
     logging:
       driver: awslogs
       options:
-        awslogs-group: /aws/ecs/regulatorytrackr
+        awslogs-group: /aws/ecs/edsteward
         awslogs-region: ${AWS_REGION}
         awslogs-stream-prefix: redis
 

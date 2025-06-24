@@ -16,7 +16,7 @@ export class S3StorageService {
       } : undefined, // Use IAM role if credentials not provided
     });
     
-    this.bucketName = process.env.S3_BUCKET_NAME || 'regulatorytrackr-uploads';
+    this.bucketName = process.env.S3_BUCKET_NAME || 'edsteward-uploads';
   }
 
   async uploadFile(

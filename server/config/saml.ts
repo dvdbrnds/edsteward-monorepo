@@ -82,7 +82,7 @@ const createSamlCache = (): SamlCache => {
 const baseServiceProviderConfig = {
   callbackUrl: process.env.SAML_CALLBACK_URL || 'http://localhost:3000/auth/saml/callback',
   entryPoint: '', // Will be overridden by each IDP
-  issuer: process.env.SAML_SP_ENTITY_ID || 'urn:regulatorytrackr:sp',
+  issuer: process.env.SAML_SP_ENTITY_ID || 'urn:edsteward:sp',
   idpCert: '', // Will be set by each IDP
   privateCert: getServiceProviderKey(),
   decryptionPvk: getServiceProviderKey(),
@@ -177,7 +177,7 @@ export const identityProviders: IdentityProviderConfig[] = [
       wantAssertionsSigned: true,
       wantAuthnResponseSigned: true,
       // InCommon typically uses discovery service
-      providerName: 'RegulatoryTrackr',
+      providerName: 'EdSteward',
       skipRequestCompression: false,
       authnRequestBinding: 'HTTP-Redirect' as const,
       // Support for multiple institution discovery
@@ -253,7 +253,7 @@ export const attributeMappings = {
 
 // Service Provider metadata generation
 export function generateServiceProviderMetadata(): string {
-  const spEntityId = process.env.SAML_SP_ENTITY_ID || 'urn:regulatorytrackr:sp';
+  const spEntityId = process.env.SAML_SP_ENTITY_ID || 'urn:edsteward:sp';
   const spCert = getServiceProviderCert();
   const callbackUrl = process.env.SAML_CALLBACK_URL || 'http://localhost:3000/auth/saml/callback';
   const sloUrl = process.env.SAML_SLO_URL || 'http://localhost:3000/auth/saml/logout';
@@ -288,7 +288,7 @@ export function generateServiceProviderMetadata(): string {
     <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
                            Location="${sloUrl}"/>
     <md:AttributeConsumingService index="1" isDefault="true">
-      <md:ServiceName xml:lang="en">RegulatoryTrackr</md:ServiceName>
+      <md:ServiceName xml:lang="en">EdSteward</md:ServiceName>
       <md:ServiceDescription xml:lang="en">Regulatory Compliance Tracking System</md:ServiceDescription>
       <md:RequestedAttribute Name="urn:oid:0.9.2342.19200300.100.1.3" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="mail" isRequired="true"/>
       <md:RequestedAttribute Name="urn:oid:2.5.4.42" NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" FriendlyName="givenName" isRequired="true"/>

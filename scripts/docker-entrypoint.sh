@@ -116,7 +116,7 @@ trap cleanup SIGTERM SIGINT
 
 # Main startup sequence
 main() {
-    log "Starting RegulatoryTrackr container..."
+    log "Starting EdSteward container..."
     log "Node version: $(node --version)"
     log "NPM version: $(npm --version)"
     log "Environment: ${NODE_ENV:-development}"

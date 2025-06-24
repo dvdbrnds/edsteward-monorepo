@@ -1,4 +1,4 @@
-# RegulatoryTrackr - Current Status Summary
+# EdSteward - Current Status Summary
 
 *Last Updated: June 24, 2025*
 
@@ -36,7 +36,7 @@ Task Definition: edsteward-multi-tenant-staging:6
 
 ### Database
 ```
-Staging DB: regulatorytrackr-staging (Neon)
+Staging DB: edsteward-staging (Neon)
 Sample Data: ✅ Loaded
 - Moravian University (Conservatory)
 - 5 conservatory regulations

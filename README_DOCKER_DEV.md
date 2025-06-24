@@ -1,4 +1,4 @@
-# RegulatoryTrackr - Local Docker Development
+# EdSteward - Local Docker Development
 
 ## 🚀 Quick Start
 

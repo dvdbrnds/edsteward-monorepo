@@ -2,7 +2,7 @@
 
 ## Overview
 
-RegulatoryTrackr implements a **database-per-tenant** multi-tenancy model that ensures complete data isolation between customers. Each tenant operates with their own dedicated database, providing maximum security, compliance, and performance isolation.
+EdSteward implements a **database-per-tenant** multi-tenancy model that ensures complete data isolation between customers. Each tenant operates with their own dedicated database, providing maximum security, compliance, and performance isolation.
 
 ## Architecture Components
 
@@ -201,7 +201,7 @@ location / {
 ```bash
 # Clone repository
 git clone <repo-url>
-cd RegulatoryTrackr
+cd EdSteward
 
 # Set up environment variables
 cp .env.example .env

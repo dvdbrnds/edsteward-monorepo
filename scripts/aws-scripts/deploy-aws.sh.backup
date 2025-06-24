@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# AWS ECS Deployment Script for RegulatoryTrackr
+# AWS ECS Deployment Script for EdSteward
 # Usage: ./deploy-aws.sh [environment] [image-tag]
 
 set -e
@@ -232,7 +232,7 @@ run_migrations() {
     # For now, just log what should be done
     warning "Database migrations should be run manually if needed"
     echo "Connect to your RDS instance and run:"
-    echo "  psql -h <rds-endpoint> -U postgres -d regulatorytrackr -f database/migrations.sql"
+    echo "  psql -h <rds-endpoint> -U postgres -d edsteward -f database/migrations.sql"
 }
 
 # Main deployment function

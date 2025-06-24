@@ -1,4 +1,4 @@
-# RegulatoryTrackr Staged Deployment Pipeline
+# EdSteward Staged Deployment Pipeline
 # Ensures proper local verification before AWS deployment
 
 .PHONY: help clean check-tools dev dev-logs dev-stop dev-restart dev-shell dev-status dev-ready stage1-build stage1-test stage2-local-staging stage2-integration-tests stage2-approve stage3-production-deploy deploy-safe pipeline logs-staging logs-staging-all stop-staging restart-staging staging-status open-staging approve-staging emergency-stop
@@ -7,7 +7,7 @@
 SHELL := /bin/zsh
 
 # Configuration
-PROJECT_NAME := regulatorytrackr
+PROJECT_NAME := edsteward
 IMAGE_NAME := $(PROJECT_NAME)-app
 CONTAINER_NAME := $(PROJECT_NAME)-test
 STAGING_CONTAINER_NAME := $(PROJECT_NAME)-staging
@@ -31,7 +31,7 @@ BLUE := \033[0;34m
 NC := \033[0m # No Color
 
 help: ## Show this help message
-	@echo "$(BLUE)RegulatoryTrackr Staged Deployment Pipeline$(NC)"
+	@echo "$(BLUE)EdSteward Staged Deployment Pipeline$(NC)"
 	@echo "============================================="
 	@echo ""
 	@echo "$(GREEN)Development workflow:$(NC)"

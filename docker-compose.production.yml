@@ -3,7 +3,7 @@ services:
     image: postgres:15-alpine
     restart: unless-stopped
     environment:
-      - POSTGRES_DB=regulatorytrackr
+      - POSTGRES_DB=edsteward
       - POSTGRES_USER=reguser
       - POSTGRES_PASSWORD=reg_secure_pass_2024
       - POSTGRES_HOST_AUTH_METHOD=md5
@@ -17,7 +17,7 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U reguser -d regulatorytrackr"]
+      test: ["CMD-SHELL", "pg_isready -U reguser -d edsteward"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -49,10 +49,10 @@ services:
     environment:
       - NODE_ENV=production
       - PORT=3000
-      - DATABASE_URL=postgresql://reguser:reg_secure_pass_2024@postgres:5432/regulatorytrackr?sslmode=disable
+      - DATABASE_URL=postgresql://reguser:reg_secure_pass_2024@postgres:5432/edsteward?sslmode=disable
       - DB_HOST=postgres
       - DB_PORT=5432
-      - DB_NAME=regulatorytrackr
+      - DB_NAME=edsteward
       - DB_USER=reguser
       - DB_PASSWORD=reg_secure_pass_2024
       - DB_SSL=false

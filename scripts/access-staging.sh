@@ -1,9 +1,9 @@
 #!/bin/zsh
 
-# RegulatoryTrackr Staging Access Script
+# EdSteward Staging Access Script
 # This script provides access information for the AWS staging environment
 
-echo "🚀 RegulatoryTrackr AWS Staging Environment"
+echo "🚀 EdSteward AWS Staging Environment"
 echo "============================================="
 echo ""
 
