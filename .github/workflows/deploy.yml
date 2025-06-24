@@ -106,7 +106,7 @@ jobs:
     - name: Update ECS production service
       run: |
         aws ecs update-service \
-          --cluster edsteward-multi-tenant-cluster \
-          --service edsteward-multi-tenant-service \
+          --cluster edsteward-cluster \
+          --service edsteward-service \
           --force-new-deployment \
           --region us-east-1 
