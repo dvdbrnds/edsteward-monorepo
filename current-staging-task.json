@@ -1,8 +1,0 @@
-{
-    "family": "edsteward-multi-tenant-staging",
-    "revision": 2,
-    "cpu": "512",
-    "memory": "1024",
-    "taskRoleArn": "arn:aws:iam::259661441422:role/ecsTaskRole",
-    "executionRoleArn": "arn:aws:iam::259661441422:role/ecsTaskExecutionRole"
-}

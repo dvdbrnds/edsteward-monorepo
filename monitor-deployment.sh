@@ -1,73 +1,34 @@
 #!/bin/zsh
 
-echo "🔍 ECS Deployment Monitor for admin.edsteward.ai"
-echo "================================================"
+echo "🚀 Monitoring GitHub Actions Deployment..."
+echo "📅 Current time: $(date)"
 echo ""
 
-# Function to get deployment status
-get_deployment_status() {
-    aws ecs describe-services \
-        --cluster edsteward-cluster \
-        --services edsteward-service \
-        --query 'services[0].deployments[0:2].[id,status,rolloutState,runningCount,desiredCount,taskDefinition]' \
-        --output table | cat
-}
+# Check GitHub Actions (you'll need to check this manually)
+echo "🔗 Check workflow status at:"
+echo "   https://github.com/dvdbrnds/RegulatoryTrackr/actions"
+echo ""
 
-# Function to get recent events
-get_recent_events() {
-    aws ecs describe-services \
-        --cluster edsteward-cluster \
-        --services edsteward-service \
-        --query 'services[0].events[0:3].[createdAt,message]' \
-        --output table | cat
-}
+# Check latest ECR images
+echo "📦 Latest ECR images:"
+export AWS_PAGER=""
+aws ecr describe-images \
+  --repository-name edsteward-multi-tenant \
+  --region us-east-1 \
+  --query 'sort_by(imageDetails,&imagePushedAt)[-3:].[imageTags[0],imagePushedAt]' \
+  --output table
 
-# Function to test the website
-test_website() {
-    echo "🌐 Testing admin.edsteward.ai..."
-    local response_code=$(curl -s -o /dev/null -w "%{http_code}" https://admin.edsteward.ai/)
-    local title=$(curl -s https://admin.edsteward.ai/ | grep -o '<title>[^<]*</title>' | sed 's/<[^>]*>//g')
-    echo "   HTTP Status: $response_code"
-    echo "   Current Title: $title"
-    
-    # Check if immediate title fix is present
-    local has_fix=$(curl -s https://admin.edsteward.ai/ | grep -c "IMMEDIATE TITLE FIX")
-    if [[ $has_fix -gt 0 ]]; then
-        echo "   ✅ Title fix script found in HTML"
-    else
-        echo "   ❌ Title fix script NOT found"
-    fi
-}
+echo ""
 
-# Function to check target health
-check_target_health() {
-    echo "🎯 Load Balancer Target Health:"
-    aws elbv2 describe-target-health \
-        --target-group-arn arn:aws:elasticloadbalancing:us-east-1:259661441422:targetgroup/edsteward-tg-alb/664e01592a97845a \
-        --query 'TargetHealthDescriptions[*].[Target.Id,TargetHealth.State,TargetHealth.Reason]' \
-        --output table | cat
-}
+# Check ECS service status
+echo "🔄 ECS Staging Service Status:"
+aws ecs describe-services \
+  --cluster edsteward-multi-tenant-staging-cluster \
+  --services edsteward-multi-tenant-staging-service \
+  --region us-east-1 \
+  --query 'services[0].{Status:status,Running:runningCount,Desired:desiredCount,LastDeployment:deployments[0].updatedAt}' \
+  --output table
 
-# Main monitoring loop
-while true; do
-    clear
-    echo "🔍 ECS Deployment Monitor - $(date)"
-    echo "================================================"
-    
-    echo "📊 DEPLOYMENT STATUS:"
-    get_deployment_status
-    
-    echo ""
-    echo "📰 RECENT EVENTS:"
-    get_recent_events
-    
-    echo ""
-    test_website
-    
-    echo ""
-    check_target_health
-    
-    echo ""
-    echo "🔄 Refreshing in 30 seconds... (Press Ctrl+C to stop)"
-    sleep 30
-done 
+echo ""
+echo "💡 If GitHub Actions is running, new images should appear in ECR within 3-5 minutes"
+echo "💡 After ECR push, ECS service will update automatically" 
