@@ -28,20 +28,20 @@ export function registerRoutes(app: express.Application): Server {
   const httpServer = createServer(app);
 
   // =============================================================================
+  // NO AUTH REQUIRED ENDPOINTS (health checks only) - BEFORE TENANT MIDDLEWARE
+  // =============================================================================
+  
+  // Basic health check - must be before tenant middleware for ALB health checks
+  app.get('/health', (req, res) => {
+    res.status(200).send("OK");
+  });
+
+  // =============================================================================
   // APPLY TENANT MIDDLEWARE GLOBALLY
   // =============================================================================
   
   // Apply tenant middleware to all routes for consistent tenant detection
   app.use(tenantMiddleware);
-
-  // =============================================================================
-  // NO AUTH REQUIRED ENDPOINTS (health checks only)
-  // =============================================================================
-  
-  // Basic health check
-  app.get('/health', (req, res) => {
-    res.status(200).send("OK");
-  });
 
   // API health check with database status AND tenant information
   app.get('/api/health', async (req: any, res) => {
@@ -107,8 +107,8 @@ export function registerRoutes(app: express.Application): Server {
 
   // Helper function to get tenant-aware storage
   async function getTenantStorage(tenantId: string) {
-    const { TenantStorage } = await import('../services/tenantStorage');
-    return new TenantStorage(tenantId, storage);
+    // For now, return the default storage - will be improved with proper tenant isolation
+    return storage;
   }
 
   // Setup status for frontend navigation (requires auth)

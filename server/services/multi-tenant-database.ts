@@ -29,6 +29,11 @@ const TENANT_DATABASE_CONFIGS: Record<string, TenantDatabaseConfig> = {
     tenantId: 'test',
     databaseUrl: process.env.TEST_DATABASE_URL || config.DATABASE_URL,
     poolConfig: { max: 3, idleTimeoutMillis: 30000, connectionTimeoutMillis: 10000 }
+  },
+  'staging': {
+    tenantId: 'staging',
+    databaseUrl: process.env.STAGING_DATABASE_URL || config.DATABASE_URL,
+    poolConfig: { max: 5, idleTimeoutMillis: 30000, connectionTimeoutMillis: 10000 }
   }
 };
 
