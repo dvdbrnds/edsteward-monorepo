@@ -8,7 +8,7 @@ SHELL := /bin/zsh
 
 # Configuration
 PROJECT_NAME := edsteward
-DEV_COMPOSE := docker-compose.dev.yml
+DEV_COMPOSE := docker-compose.local.yml
 STAGING_COMPOSE := docker-compose.local-staging.yml
 
 # Colors for output
@@ -75,10 +75,11 @@ dev: check-tools ## Start development environment with hot reload
 	@echo ""
 	@echo "$(GREEN)✅ Development environment ready!$(NC)"
 	@echo ""
-	@echo "$(BLUE)🌐 Your application is running at:$(NC)"
-	@echo "  • Main app: $(YELLOW)http://localhost:3000$(NC)"
-	@echo "  • Database: PostgreSQL on localhost:5433"
-	@echo "  • Redis: localhost:6380"
+	@echo "$(BLUE)🌐 Your multi-tenant application is running at:$(NC)"
+	@echo "  • Moravian tenant: $(YELLOW)http://moravian.edsteward.local$(NC)"
+	@echo "  • Admin tenant: $(YELLOW)http://admin.edsteward.local$(NC)"
+	@echo "  • Main domain: $(YELLOW)http://edsteward.local$(NC)"
+	@echo "  • Database: Neon PostgreSQL (multi-tenant)"
 	@echo ""
 	@echo "$(GREEN)🎉 Start coding! Changes will be reflected immediately.$(NC)"
 	@echo ""
@@ -195,12 +196,33 @@ dev-to-staging: dev-stop staging ## Stop dev and start staging
 ready-for-prod: staging-approve ## Quick alias for staging approval
 
 # Status commands
+# Dev Environment Commands
+dev-deploy: ## Deploy current branch to dev environment
+	@echo "$(BLUE)🚀 Deploying to dev environment...$(NC)"
+	@git add . && git commit -m "Deploy to dev: $(shell date)" && git push origin dev || echo "$(YELLOW)⚠️ No changes to commit or push failed$(NC)"
+
+dev-status: ## Check dev environment status  
+	@echo "$(BLUE)📊 Dev Environment Status$(NC)"
+	@echo "=========================="
+	@export AWS_PAGER="" && aws ecs describe-services --cluster edsteward-multi-tenant-dev-cluster --services edsteward-multi-tenant-dev-service --query 'services[0].{Status:status,Running:runningCount,Desired:desiredCount}' --output table
+
+dev-logs: ## View dev environment logs
+	@echo "$(BLUE)📋 Dev Environment Logs$(NC)"
+	@export AWS_PAGER="" && aws logs tail /ecs/edsteward-multi-tenant-dev --follow
+
+dev-health: ## Check dev environment health
+	@echo "$(BLUE)🔍 Checking dev environment health...$(NC)"
+	@curl -f -s https://dev.edsteward.ai/health && echo "$(GREEN)✅ Dev environment is healthy$(NC)" || echo "$(RED)❌ Dev environment health check failed$(NC)"
+
 status: ## Show status of all environments
 	@echo "$(BLUE)📊 Environment Status$(NC)"
 	@echo "====================="
 	@echo ""
-	@echo "$(YELLOW)Development:$(NC)"
+	@echo "$(YELLOW)Local Development:$(NC)"
 	@docker-compose -f $(DEV_COMPOSE) ps 2>/dev/null || echo "  Not running"
 	@echo ""
-	@echo "$(YELLOW)Staging:$(NC)"
+	@echo "$(YELLOW)Dev Environment (AWS):$(NC)"
+	@export AWS_PAGER="" && aws ecs describe-services --cluster edsteward-multi-tenant-dev-cluster --services edsteward-multi-tenant-dev-service --query 'services[0].{Status:status,Running:runningCount}' --output table 2>/dev/null || echo "  Not accessible"
+	@echo ""
+	@echo "$(YELLOW)Staging Environment (AWS):$(NC)"
 	@docker-compose -f $(STAGING_COMPOSE) ps 2>/dev/null || echo "  Not running" 

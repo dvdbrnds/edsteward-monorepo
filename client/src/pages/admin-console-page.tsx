@@ -215,12 +215,13 @@ export default function AdminConsolePage() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="tenants">Tenants</TabsTrigger>
-            <TabsTrigger value="users">Users</TabsTrigger>
-            <TabsTrigger value="system">System</TabsTrigger>
-            <TabsTrigger value="settings">Settings</TabsTrigger>
+                      <TabsList className="grid w-full grid-cols-6">
+                          <TabsTrigger value="overview">Overview</TabsTrigger>
+              <TabsTrigger value="tenants">Tenants</TabsTrigger>
+              <TabsTrigger value="users">Users</TabsTrigger>
+              <TabsTrigger value="features">Feature Flags</TabsTrigger>
+              <TabsTrigger value="system">System</TabsTrigger>
+              <TabsTrigger value="settings">Settings</TabsTrigger>
           </TabsList>
 
           {/* Overview Tab */}
@@ -447,6 +448,153 @@ export default function AdminConsolePage() {
                       </div>
                     </div>
                   ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Feature Flags Tab */}
+          <TabsContent value="features" className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-semibold">Feature Flag Management</h2>
+              <Button onClick={() => setLocation('/admin/feature-management')} className="flex items-center space-x-2">
+                <Settings className="h-4 w-4" />
+                <span>Advanced Management</span>
+              </Button>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Total Features</CardTitle>
+                  <Settings className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">16</div>
+                  <p className="text-xs text-muted-foreground">Available feature flags</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Active Features</CardTitle>
+                  <Activity className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">12</div>
+                  <p className="text-xs text-muted-foreground">Currently enabled</p>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">Adoption Rate</CardTitle>
+                  <BarChart3 className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">75%</div>
+                  <p className="text-xs text-muted-foreground">Average across tenants</p>
+                </CardContent>
+              </Card>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Feature Categories</CardTitle>
+                  <CardDescription>Features organized by category</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">User Interface</span>
+                      <Badge className="bg-blue-100 text-blue-800">4 features</Badge>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">API & Backend</span>
+                      <Badge className="bg-green-100 text-green-800">3 features</Badge>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Integrations</span>
+                      <Badge className="bg-purple-100 text-purple-800">4 features</Badge>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Compliance Tools</span>
+                      <Badge className="bg-orange-100 text-orange-800">3 features</Badge>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Administration</span>
+                      <Badge className="bg-red-100 text-red-800">2 features</Badge>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Quick Actions</CardTitle>
+                  <CardDescription>Common feature flag operations</CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    onClick={() => setLocation('/admin/feature-management')}
+                  >
+                    <Settings className="h-4 w-4 mr-2" />
+                    Manage All Features
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    onClick={() => alert('Bulk enable coming soon!')}
+                  >
+                    <Activity className="h-4 w-4 mr-2" />
+                    Bulk Enable Features
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-start"
+                    onClick={() => alert('Analytics coming soon!')}
+                  >
+                    <BarChart3 className="h-4 w-4 mr-2" />
+                    View Analytics
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Recent Feature Changes</CardTitle>
+                <CardDescription>Latest feature flag updates across tenants</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                    <div className="flex items-center space-x-3">
+                      <Badge variant="outline" className="text-xs">moravian</Badge>
+                      <span className="text-sm">Document AI enabled</span>
+                      <span className="text-xs text-gray-500">by admin</span>
+                    </div>
+                    <span className="text-xs text-gray-400">2 hours ago</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2 border-b border-gray-100">
+                    <div className="flex items-center space-x-3">
+                      <Badge variant="outline" className="text-xs">staging</Badge>
+                      <span className="text-sm">Bulk Operations disabled</span>
+                      <span className="text-xs text-gray-500">by admin</span>
+                    </div>
+                    <span className="text-xs text-gray-400">1 day ago</span>
+                  </div>
+                  <div className="flex items-center justify-between py-2">
+                    <div className="flex items-center space-x-3">
+                      <Badge variant="outline" className="text-xs">admin</Badge>
+                      <span className="text-sm">Advanced Dashboard enabled</span>
+                      <span className="text-xs text-gray-500">by admin</span>
+                    </div>
+                    <span className="text-xs text-gray-400">3 days ago</span>
+                  </div>
                 </div>
               </CardContent>
             </Card>

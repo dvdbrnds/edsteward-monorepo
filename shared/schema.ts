@@ -825,6 +825,7 @@ export const tenants = pgTable("tenants", {
       hideNonApplicable: boolean;
       allowUsersToToggle: boolean;
     };
+    featureFlags?: Record<string, boolean>; // Feature flags per tenant
   }>().default({
     allowedDomains: [],
     defaultRole: 'user',

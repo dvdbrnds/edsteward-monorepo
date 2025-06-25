@@ -1,0 +1,70 @@
+{
+  "containerDefinitions": [
+    {
+      "name": "edsteward-app",
+      "image": "259661441422.dkr.ecr.us-east-1.amazonaws.com/edsteward-multi-tenant:staging-latest",
+      "cpu": 0,
+      "portMappings": [
+        {
+          "containerPort": 3000,
+          "hostPort": 3000,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "environment": [
+        {
+          "name": "NODE_ENV",
+          "value": "development"
+        },
+        {
+          "name": "ENVIRONMENT_NAME",
+          "value": "dev"
+        },
+        {
+          "name": "TENANT_DETECTION_METHOD",
+          "value": "subdomain"
+        },
+        {
+          "name": "CORS_ORIGIN",
+          "value": "https://dev.edsteward.ai"
+        },
+        {
+          "name": "DATABASE_URL",
+          "value": "postgresql://neondb_owner:5EbW9AKb5Tqm@ep-bold-truth-a5jknxpw.us-east-1.aws.neon.tech/regulatorytrackr-staging?sslmode=require"
+        }
+      ],
+      "mountPoints": [],
+      "volumesFrom": [],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/edsteward-multi-tenant-staging",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1"
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      },
+      "systemControls": []
+    }
+  ],
+  "family": "edsteward-multi-tenant-dev",
+  "taskRoleArn": "arn:aws:iam::259661441422:role/ecsTaskRole",
+  "executionRoleArn": "arn:aws:iam::259661441422:role/ecsTaskExecutionRole",
+  "networkMode": "awsvpc",
+  "volumes": [],
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "1024",
+  "memory": "2048"
+}

@@ -1,213 +1,317 @@
-# Moravian University SAML SSO Setup Guide
+# Moravian University SAML 2.0 Integration Guide for EdSteward
 
 ## Overview
-This guide walks you through setting up SAML 2.0 Single Sign-On (SSO) between Moravian University's Okta identity provider and the EdSteward application.
+
+This guide walks you through configuring SAML 2.0 authentication for Moravian University's EdSteward compliance portal, supporting both InCommon Federation and direct Shibboleth IdP integration.
 
 ## Prerequisites
-- Okta administrator access for Moravian University
-- EdSteward application deployed at `moravian.edsteward.ai`
-- SSL certificates configured for the domain
 
-## Part 1: Okta Application Configuration
+- Moravian University IT contact with IdP admin access
+- EdSteward multi-tenant application running
+- Access to Moravian's Identity Provider configuration
 
-### Step 1: Create SAML Application in Okta
+## Part 1: Identify Moravian's Identity Provider
 
-1. **Login to Okta Admin Console**
-   - Navigate to your Moravian University Okta admin dashboard
-   - Go to **Applications** → **Applications**
+### Most Likely Scenarios
 
-2. **Create New Application**
-   - Click **Create App Integration**
-   - Select **SAML 2.0**
-   - Click **Next**
+#### Option A: InCommon Federation (Recommended)
+Moravian University is likely part of InCommon Federation:
+- **Federation**: InCommon (https://incommon.org/)
+- **Typical IdP URL**: `https://idp.moravian.edu`
+- **Entity ID**: `https://idp.moravian.edu/idp/shibboleth`
 
-3. **General Settings**
-   - **App name**: `EdSteward - Moravian University`
-   - **App logo**: Upload Moravian logo if available
-   - **App visibility**: Configure as needed for Moravian users
-   - Click **Next**
+#### Option B: Direct Shibboleth
+If not using InCommon, direct Shibboleth configuration:
+- **IdP Software**: Shibboleth IdP
+- **Discovery**: Manual configuration needed
 
-### Step 2: Configure SAML Settings
+#### Option C: Cloud IdP (Less Common)
+Some universities use cloud providers:
+- **Microsoft Azure AD for Education**
+- **Okta for Education**  
+- **Google Workspace for Education**
 
-#### SAML Settings for Production
+## Part 2: Moravian Service Provider Configuration
+
+### Service Provider Details (What Moravian IT Needs)
+
+Provide these details to Moravian IT for their IdP configuration:
+
 ```
-Single sign on URL: https://moravian.edsteward.ai/auth/saml/callback
-Audience URI (SP Entity ID): urn:edsteward:sp:moravian
-Default RelayState: moravian
-Name ID format: EmailAddress
-Application username: Email
-```
+Service Provider Entity ID: urn:edsteward:sp:moravian
+Assertion Consumer Service URL: https://moravian.edsteward.ai/auth/saml/callback
+Single Logout URL: https://moravian.edsteward.ai/auth/saml/logout
+SP Metadata URL: https://moravian.edsteward.ai/auth/saml/metadata
 
-#### Advanced Settings
-```
-Response: Signed
-Assertion Signature: Signed
-Signature Algorithm: RSA_SHA256
-Digest Algorithm: SHA256
-Assertion Encryption: Unencrypted (recommended for initial setup)
-SAML Single Logout: Enabled
-SP Issuer: urn:edsteward:sp:moravian
+Organization: EdSteward Compliance Platform
+Contact: [Your IT Contact]
+Purpose: Regulatory compliance management for Moravian University
 ```
 
-### Step 3: Attribute Statements (Claims)
+### Required Attributes from Moravian
 
-Configure these attribute mappings for Moravian University:
+Ask Moravian IT to release these attributes:
 
-| Name | Name format | Value |
-|------|-------------|-------|
-| `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress` | URI Reference | `user.email` |
-| `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname` | URI Reference | `user.firstName` |
-| `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname` | URI Reference | `user.lastName` |
-| `http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name` | URI Reference | `user.login` |
-| `http://schemas.microsoft.com/ws/2008/06/identity/claims/groups` | URI Reference | `isMemberOfGroupName("EdSteward-Users")` |
+| Attribute | SAML Name | Purpose |
+|-----------|-----------|---------|
+| Email | `urn:oid:0.9.2342.19200300.100.1.3` | User identification |
+| First Name | `urn:oid:2.5.4.42` | User profile |
+| Last Name | `urn:oid:2.5.4.4` | User profile |
+| Display Name | `urn:oid:2.16.840.1.113730.3.1.241` | User profile |
+| Groups/Affiliation | `urn:oid:1.3.6.1.4.1.5923.1.5.1.1` | Role assignment |
+| Department | `urn:oid:2.5.4.11` | Organization info |
 
-### Step 4: Group Attribute Statements
+### Role Mapping Strategy
 
-| Name | Name format | Filter | Value |
-|------|-------------|--------|-------|
-| `groups` | Basic | Matches regex | `EdSteward-.*` | `user.groups` |
+Map Moravian affiliations to EdSteward roles:
 
-## Part 2: Okta Groups and Users Setup
+```
+eduPersonAffiliation:
+- faculty → compliance_officer
+- staff → compliance_officer  
+- employee → compliance_officer
+- student → user
+- member → user
 
-### Step 1: Create Groups for Moravian University
-
-Create these groups in Okta for role management:
-
-1. **EdSteward-Moravian-Users** (Basic compliance access)
-2. **EdSteward-Moravian-Officers** (Compliance officer access)
-3. **EdSteward-Moravian-Admins** (Administrative access)
-
-### Step 2: Assign Moravian Users
-
-1. Go to **Directory** → **People**
-2. Select Moravian University users with `@moravian.edu` email addresses
-3. Assign to appropriate groups based on their roles:
-   - Faculty → EdSteward-Moravian-Users
-   - Compliance Staff → EdSteward-Moravian-Officers
-   - IT/Admin Staff → EdSteward-Moravian-Admins
-4. Assign the EdSteward application to users
+Specific Groups (if available):
+- compliance-team → admin
+- it-staff → admin
+- department-heads → compliance_officer
+```
 
 ## Part 3: EdSteward Configuration
 
-### Step 1: Update Environment Variables
+### Step 1: Update Moravian Tenant SAML Config
 
-Set the following environment variables in your deployment:
+Connect to your EdSteward database and run:
+
+```sql
+-- Update Moravian tenant with SAML configuration
+UPDATE tenants 
+SET 
+  saml_config = jsonb_build_object(
+    'entityId', 'https://idp.moravian.edu/idp/shibboleth',
+    'ssoUrl', 'https://idp.moravian.edu/idp/profile/SAML2/Redirect/SSO',
+    'sloUrl', 'https://idp.moravian.edu/idp/profile/SAML2/Redirect/SLO',
+    'certificate', '-----BEGIN CERTIFICATE-----
+[MORAVIAN_IDP_CERTIFICATE_HERE]
+-----END CERTIFICATE-----',
+    'attributeMapping', jsonb_build_object(
+      'email', 'urn:oid:0.9.2342.19200300.100.1.3',
+      'firstName', 'urn:oid:2.5.4.42',
+      'lastName', 'urn:oid:2.5.4.4',
+      'username', 'urn:oid:0.9.2342.19200300.100.1.1',
+      'groups', 'urn:oid:1.3.6.1.4.1.5923.1.5.1.1',
+      'department', 'urn:oid:2.5.4.11'
+    )
+  ),
+  settings = settings || jsonb_build_object(
+    'allowedDomains', '["moravian.edu"]'::jsonb,
+    'enableAutoProvisioning', true,
+    'defaultRole', 'user'
+  )
+WHERE id = 'moravian';
+```
+
+### Step 2: Verify Tenant Configuration
+
+Check the configuration:
+
+```sql
+SELECT 
+  id,
+  name,
+  domain,
+  subdomain,
+  saml_config,
+  settings->'allowedDomains' as allowed_domains,
+  settings->'enableAutoProvisioning' as auto_provision
+FROM tenants 
+WHERE id = 'moravian';
+```
+
+### Step 3: Test SAML Metadata Generation
+
+Visit the Moravian SP metadata endpoint:
+```
+https://moravian.edsteward.ai/auth/saml/metadata
+```
+
+This should return valid XML metadata that Moravian IT can import.
+
+## Part 4: Testing the Integration
+
+### Step 1: Initial Test
+
+1. **Visit**: https://moravian.edsteward.ai/auth
+2. **Look for**: "Sign in with Moravian University" button
+3. **Click**: Should redirect to Moravian's IdP
+4. **Login**: Use Moravian credentials
+5. **Return**: Should create user and log into EdSteward
+
+### Step 2: Verify User Creation
+
+Check that users are created properly:
+
+```sql
+SELECT 
+  username,
+  email,
+  role,
+  department,
+  identity_provider,
+  provider_id,
+  created_at
+FROM users 
+WHERE provider_id = 'moravian' 
+ORDER BY created_at DESC 
+LIMIT 10;
+```
+
+### Step 3: Test Role Assignment
+
+Verify roles are assigned correctly based on Moravian groups/affiliations.
+
+## Part 5: Production Deployment
+
+### Environment Variables (if needed)
+
+For any Moravian-specific environment variables:
+
+```env
+# Moravian SAML Configuration (stored in database, not env vars)
+MORAVIAN_DOMAIN=moravian.edu
+MORAVIAN_SUPPORT_EMAIL=it-support@moravian.edu
+
+# Base domain for tenant routing
+BASE_DOMAIN=edsteward.ai
+```
+
+### SSL/HTTPS Requirements
+
+Ensure all Moravian SAML endpoints use HTTPS:
+- ✅ `https://moravian.edsteward.ai/auth/saml/callback`
+- ✅ `https://moravian.edsteward.ai/auth/saml/logout`
+- ✅ `https://moravian.edsteward.ai/auth/saml/metadata`
+
+## Part 6: Moravian IT Checklist
+
+### What Moravian IT Needs to Do
+
+1. **Add Service Provider** to their IdP:
+   - Import metadata from: `https://moravian.edsteward.ai/auth/saml/metadata`
+   - Or configure manually with SP details above
+
+2. **Configure Attribute Release**:
+   - Release required attributes (email, name, groups)
+   - Set up appropriate attribute mappings
+
+3. **Test with Pilot Users**:
+   - Start with IT personnel
+   - Expand to compliance team
+   - Full rollout to intended user base
+
+4. **Provide IdP Details** to EdSteward team:
+   - Entity ID
+   - SSO URL  
+   - SLO URL (if available)
+   - Public certificate
+   - Attribute names and formats
+
+### Communication Template for Moravian IT
+
+```
+Subject: SAML SSO Setup for EdSteward Compliance Platform
+
+Hi [Moravian IT Contact],
+
+We're setting up SAML SSO for Moravian University's EdSteward compliance platform.
+
+Service Provider Details:
+- Application: EdSteward Compliance Portal
+- SP Entity ID: urn:edsteward:sp:moravian
+- ACS URL: https://moravian.edsteward.ai/auth/saml/callback
+- Metadata: https://moravian.edsteward.ai/auth/saml/metadata
+
+We need:
+1. Your IdP Entity ID
+2. SSO URL
+3. Public certificate
+4. Confirmation of attribute release (email, name, groups)
+
+Let us know when you're ready to test!
+
+Thanks,
+[Your Name]
+```
+
+## Part 7: Troubleshooting
+
+### Common Issues
+
+1. **"Invalid SAML Response"**
+   - Check certificate in database matches Moravian's current cert
+   - Verify entity IDs match exactly
+   - Check time synchronization
+
+2. **"User domain not allowed"**
+   - Verify `allowedDomains` includes `moravian.edu`
+   - Check user's email domain from SAML assertion
+
+3. **"Auto-provisioning failed"**
+   - Check required attributes are present
+   - Verify attribute mapping in database
+   - Review SAML assertion content
+
+### Debug Mode
+
+Enable SAML debugging for Moravian tenant:
+
+```sql
+UPDATE tenants 
+SET settings = settings || '{"debug": true}'::jsonb 
+WHERE id = 'moravian';
+```
+
+### Logging
+
+Monitor Moravian SAML events:
 
 ```bash
-# Moravian University SAML/Okta Configuration
-MORAVIAN_OKTA_SSO_URL=https://moravianuniversity.okta.com/app/edsteward/[APP_ID]/sso/saml
-MORAVIAN_OKTA_SLO_URL=https://moravianuniversity.okta.com/app/edsteward/[APP_ID]/slo/saml
-MORAVIAN_OKTA_ENTITY_ID=http://www.okta.com/[APP_ID]
-MORAVIAN_OKTA_CERT="-----BEGIN CERTIFICATE-----
-[OKTA_CERTIFICATE_CONTENT]
------END CERTIFICATE-----"
+# View tenant-specific logs
+curl -s https://moravian.edsteward.ai/api/health | jq .tenant
+
+# Check application logs for SAML events
+docker logs -f edsteward-app | grep -i "moravian\|saml"
 ```
 
-### Step 2: Get Okta Certificate
+## Part 8: Post-Setup Configuration
 
-1. In your Okta app, go to **Sign On** tab
-2. Click **View Setup Instructions**
-3. Copy the X.509 Certificate
-4. Add it to the `MORAVIAN_OKTA_CERT` environment variable
+### User Management
 
-### Step 3: Update Tenant Configuration
+Once SAML is working:
 
-Run the tenant migration to update the Moravian tenant with SAML config:
+1. **Review Auto-Created Users**: Check roles assigned correctly
+2. **Assign Administrators**: Promote key users to admin role
+3. **Department Mapping**: Verify department information is captured
+4. **Group Sync**: Set up any additional group/role synchronization
 
-```bash
-npm run migrate:tenants
-```
+### Ongoing Maintenance
 
-## Part 4: Testing and Validation
+1. **Certificate Rotation**: Monitor for IdP certificate changes
+2. **User Auditing**: Regular review of active users
+3. **Attribute Updates**: Handle changes in Moravian's attribute release
+4. **Access Reviews**: Periodic review of user roles and permissions
 
-### Step 1: Test SAML Configuration
+---
 
-1. **Access the login page**:
-   ```
-   https://moravian.edsteward.ai/login
-   ```
+## Summary
 
-2. **Click "Sign in with Okta"** or navigate directly to:
-   ```
-   https://moravian.edsteward.ai/auth/saml/login/moravian
-   ```
+This setup provides:
+- ✅ **Single Sign-On** for Moravian users
+- ✅ **Automatic User Provisioning** from Moravian directory
+- ✅ **Role-Based Access** based on Moravian groups
+- ✅ **Tenant Isolation** - Moravian users only see Moravian data
+- ✅ **Domain Validation** - Only `@moravian.edu` emails allowed
 
-3. **Verify redirect to Okta** and successful authentication
-
-### Step 2: Test Service Provider Metadata
-
-Access the SP metadata endpoint:
-```
-https://moravian.edsteward.ai/auth/saml/metadata/moravian
-```
-
-This should return valid XML metadata that can be imported into Okta.
-
-### Step 3: Test User Provisioning
-
-1. Login with a test `@moravian.edu` account
-2. Verify user is created automatically in EdSteward
-3. Check that user roles are mapped correctly based on group membership
-
-## Part 5: Role Mapping Configuration
-
-The system automatically maps Okta groups to EdSteward roles:
-
-- **EdSteward-Moravian-Admins** → `admin` role
-- **EdSteward-Moravian-Officers** → `compliance_officer` role
-- **EdSteward-Moravian-Users** → `user` role (default)
-
-## Part 6: Troubleshooting
-
-### Common Issues and Solutions
-
-1. **"SAML not configured for Moravian tenant"**
-   - Ensure environment variables are set correctly
-   - Verify tenant migration has run successfully
-
-2. **"Authentication failed"**
-   - Check Okta certificate is correctly formatted
-   - Verify SSO URL matches exactly
-
-3. **"User domain not allowed"**
-   - Ensure user email domain is `moravian.edu`
-   - Check tenant `allowedDomains` configuration
-
-4. **Role mapping not working**
-   - Verify user is assigned to correct Okta groups
-   - Check group attribute statements in Okta
-
-### Debug Endpoints
-
-- **Metadata**: `https://moravian.edsteward.ai/auth/saml/metadata/moravian`
-- **Login**: `https://moravian.edsteward.ai/auth/saml/login/moravian`
-- **Callback**: `https://moravian.edsteward.ai/auth/saml/callback`
-
-## Part 7: Security Considerations
-
-1. **Certificate Management**
-   - Regularly rotate SAML certificates
-   - Monitor certificate expiration dates
-   - Use secure storage for private keys
-
-2. **User Access Review**
-   - Regularly review user group assignments
-   - Audit login activity
-   - Remove access for departed users
-
-3. **Network Security**
-   - Ensure all SAML traffic uses HTTPS
-   - Configure proper firewall rules
-   - Monitor for suspicious authentication attempts
-
-## Contact Information
-
-For technical support or questions about this setup:
-- **EdSteward Support**: support@edsteward.ai
-- **Moravian IT**: [Moravian IT contact information]
-
-## Additional Resources
-
-- [Okta SAML Documentation](https://developer.okta.com/docs/concepts/saml/)
-- [SAML 2.0 Specification](https://docs.oasis-open.org/security/saml/v2.0/)
-- [EdSteward Documentation](https://docs.edsteward.ai) 
+**Next Steps**: Contact Moravian IT with the Service Provider details and begin testing! 
