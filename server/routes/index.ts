@@ -19,6 +19,7 @@ import deadlinesRouter from './api/deadlines';
 import notificationsRouter from './api/notifications';
 import adminRouter from './api/admin';
 import tenantsRouter from './api/tenants';
+import fixStagingTenantRouter from './api/fix-staging-tenant';
 import { registerDebugRoutes } from './api/debug';
 // @ts-ignore
 import migrationRoutes from './database-migration.js';
@@ -158,6 +159,9 @@ export function registerRoutes(app: express.Application): Server {
   app.use('/api/admin', adminRouter);
   app.use('/api/tenants', tenantsRouter);
   app.use('/api/database-migration', migrationRoutes);
+  
+  // Emergency fix endpoint (development only or with admin key)
+  app.use('/api', fixStagingTenantRouter);
 
   // Register debug routes (no auth required for debugging)
   registerDebugRoutes(app as any);
