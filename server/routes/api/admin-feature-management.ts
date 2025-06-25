@@ -247,7 +247,7 @@ router.put('/feature/:featureKey/bulk', requireAdmin, async (req: Request, res: 
  * GET /api/admin/feature-management/analytics
  * Get feature usage analytics across all tenants
  */
-router.get('/analytics', requireAdmin, async (req: TenantRequest, res) => {
+router.get('/analytics', requireAdmin, async (req: Request, res: Response) => {
   try {
     const allTenants = await db.select().from(tenants);
     const analytics = {
@@ -347,7 +347,7 @@ router.get('/analytics', requireAdmin, async (req: TenantRequest, res) => {
  * POST /api/admin/feature-management/rollout
  * Start a feature rollout to multiple tenants
  */
-router.post('/rollout', requireAdmin, async (req: TenantRequest, res) => {
+router.post('/rollout', requireAdmin, async (req: Request, res: Response) => {
   try {
     const { featureKey, tenantIds, enabled = true, rolloutName } = req.body;
 
@@ -427,7 +427,7 @@ router.post('/rollout', requireAdmin, async (req: TenantRequest, res) => {
  * GET /api/admin/feature-management/tenant/:tenantId/health
  * Get health and feature status for a specific tenant
  */
-router.get('/tenant/:tenantId/health', requireAdmin, async (req: TenantRequest, res) => {
+router.get('/tenant/:tenantId/health', requireAdmin, async (req: Request, res: Response) => {
   try {
     const { tenantId } = req.params;
 
@@ -485,4 +485,4 @@ router.get('/tenant/:tenantId/health', requireAdmin, async (req: TenantRequest, 
   }
 });
 
-export default router; 
+export { router as default }; 

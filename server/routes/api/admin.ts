@@ -5,6 +5,7 @@ import { hashPassword } from "../../auth";
 import { db } from "../../db";
 import { systemLogs } from "@shared/schema";
 import { desc, and, gte, lte, ilike, eq, count } from "drizzle-orm";
+import featureManagementRoutes from "./admin-feature-management";
 
 const router = express.Router();
 
@@ -604,5 +605,8 @@ router.put('/institution-config', async (req, res) => {
     });
   }
 });
+
+// Mount feature management routes
+router.use('/feature-management', featureManagementRoutes);
 
 export default router; 
