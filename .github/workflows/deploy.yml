@@ -1,10 +1,10 @@
-name: Deploy to Staging and Production
+name: Deploy to Dev, Staging and Production
 
 on:
   push:
-    branches: [ main, ES-clientside, staging ]
+    branches: [ main, ES-clientside, staging, dev ]
   pull_request:
-    branches: [ main, staging ]
+    branches: [ main, staging, dev ]
 
 jobs:
   test:
@@ -26,6 +26,49 @@ jobs:
     
     - name: Build frontend
       run: npm run build
+
+  deploy-dev:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/dev'
+    environment: development
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-1
+    
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v2
+    
+    - name: Build and push Docker image to dev
+      env:
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: edsteward-multi-tenant
+        IMAGE_TAG: dev-${{ github.sha }}
+      run: |
+        # Build for AWS (AMD64 platform) with dev tag
+        docker build --platform linux/amd64 -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+        
+        # Also tag as dev-latest
+        docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:dev-latest
+        docker push $ECR_REGISTRY/$ECR_REPOSITORY:dev-latest
+    
+    - name: Update ECS dev service
+      run: |
+        export AWS_PAGER=""
+        aws ecs update-service \
+          --cluster edsteward-multi-tenant-dev-cluster \
+          --service edsteward-multi-tenant-dev-service \
+          --force-new-deployment \
+          --region us-east-1
 
   deploy-staging:
     needs: test
