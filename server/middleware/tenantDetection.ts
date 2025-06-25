@@ -36,6 +36,12 @@ const TENANT_REGISTRY: Record<string, TenantConfig> = {
       cert: process.env.MORAVIAN_SAML_CERT || '',
       issuer: 'moravian-edsteward'
     }
+  },
+  'staging': {
+    id: 'staging',
+    name: 'EdSteward Staging Environment',
+    domain: 'staging.edsteward.ai',
+    database: 'edsteward_staging'
   }
 };
 
