@@ -7,6 +7,64 @@ import { generateServiceProviderMetadata } from '../../config/saml';
 
 const router = Router();
 
+// =============================================================================
+// STANDARD AUTH ENDPOINTS (what the client expects)
+// =============================================================================
+
+// Get current user - alias for /api/user
+router.get('/me', (req: Request, res: Response) => {
+  if (!req.isAuthenticated()) {
+    return res.status(401).json({ error: 'Authentication required' });
+  }
+  
+  // Include tenant info in user response
+  const userWithTenant = {
+    ...req.user,
+    tenantId: (req as any).tenantId,
+    subdomain: (req as any).tenant?.subdomain
+  };
+  
+  res.json(userWithTenant);
+});
+
+// Authentication status check
+router.get('/status', (req: Request, res: Response) => {
+  const isAuthenticated = req.isAuthenticated();
+  const tenantReq = req as any;
+  
+  res.json({
+    authenticated: isAuthenticated,
+    user: isAuthenticated ? req.user : null,
+    tenantId: tenantReq.tenantId || null,
+    subdomain: tenantReq.tenant?.subdomain || null,
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Login endpoint - delegates to main login logic
+router.post('/login', (req: Request, res: Response, next: NextFunction) => {
+  // This endpoint exists for client compatibility
+  // The actual login logic is in setupAuth() at /api/login
+  res.status(501).json({ 
+    error: 'Use /api/login endpoint directly', 
+    redirect: '/api/login' 
+  });
+});
+
+// Logout endpoint - delegates to main logout logic  
+router.post('/logout', (req: Request, res: Response, next: NextFunction) => {
+  // This endpoint exists for client compatibility  
+  // The actual logout logic is in setupAuth() at /api/logout
+  res.status(501).json({ 
+    error: 'Use /api/logout endpoint directly', 
+    redirect: '/api/logout' 
+  });
+});
+
+// =============================================================================
+// SAML AUTH ENDPOINTS (Moravian-specific)
+// =============================================================================
+
 // Add SAML routes for Moravian tenant
 router.get('/saml/login/moravian', async (req: Request, res: Response, next: NextFunction) => {
   try {

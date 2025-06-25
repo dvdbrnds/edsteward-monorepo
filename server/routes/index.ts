@@ -19,6 +19,7 @@ import deadlinesRouter from './api/deadlines';
 import notificationsRouter from './api/notifications';
 import adminRouter from './api/admin';
 import tenantsRouter from './api/tenants';
+import authRouter from './api/auth';
 import fixStagingTenantRouter from './api/fix-staging-tenant';
 import { registerDebugRoutes } from './api/debug';
 // @ts-ignore
@@ -226,6 +227,7 @@ export function registerRoutes(app: express.Application): Server {
   });
 
   // Protected API routes (all require authentication)
+  app.use('/api/auth', authRouter);
   app.use('/api/uploads', uploadsRoutes);
   app.use('/api/regulations', regulationsRouter);
   app.use('/api/notes', notesRouter);
@@ -253,4 +255,4 @@ export function registerRoutes(app: express.Application): Server {
   app.use('/downloads', express.static(path.join(process.cwd(), 'public/downloads')));
 
   return httpServer;
-} # Force restart for tenant cache refresh
+}
