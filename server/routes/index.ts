@@ -228,6 +228,36 @@ export function registerRoutes(app: express.Application): Server {
 
   // Protected API routes (all require authentication)
   app.use('/api/auth', authRouter);
+  
+  // TEMPORARY FIX: Add auth endpoints directly until router issue is resolved
+  app.get('/api/auth/me', (req, res) => {
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+    
+    // Include tenant info in user response
+    const userWithTenant = {
+      ...req.user,
+      tenantId: (req as any).tenantId,
+      subdomain: (req as any).tenant?.subdomain
+    };
+    
+    res.json(userWithTenant);
+  });
+
+  app.get('/api/auth/status', (req, res) => {
+    const isAuthenticated = req.isAuthenticated();
+    const tenantReq = req as any;
+    
+    res.json({
+      authenticated: isAuthenticated,
+      user: isAuthenticated ? req.user : null,
+      tenantId: tenantReq.tenantId || null,
+      subdomain: tenantReq.tenant?.subdomain || null,
+      timestamp: new Date().toISOString()
+    });
+  });
+  
   app.use('/api/uploads', uploadsRoutes);
   app.use('/api/regulations', regulationsRouter);
   app.use('/api/notes', notesRouter);
