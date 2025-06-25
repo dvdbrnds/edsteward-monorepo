@@ -16,6 +16,7 @@ import ReportsPage from "@/pages/reports-page";
 import ValidationPage from "@/pages/validation-page";
 import AdminSettingsPage from "@/pages/admin-settings-page";
 import AdminConsolePage from "@/pages/admin-console-page";
+import AdminFeatureManagementPage from "@/pages/admin-feature-management-page";
 import LogsPage from "@/pages/admin/logs-page";
 import DebugToolsPage from "@/pages/admin/debug-tools-page";
 import UtilitiesIndexPage from "@/pages/utilities/index";
@@ -69,6 +70,7 @@ function Router() {
           <ProtectedRoute path="/" component={AdminConsolePage} />
           <ProtectedRoute path="/console" component={AdminConsolePage} />
           <ProtectedRoute path="/tenants" component={AdminConsolePage} />
+          <ProtectedRoute path="/admin/feature-management" component={AdminFeatureManagementPage} />
           <ProtectedRoute path="/system" component={AdminSettingsPage} />
           <ProtectedRoute path="/admin/settings" component={AdminSettingsPage} />
           <ProtectedRoute path="/admin/logs" component={LogsPage} />
