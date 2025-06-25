@@ -91,8 +91,8 @@ export default function AdminConsolePage() {
   };
 
   // Navigation functions for buttons
-  const handleNavigateToSettings = () => {
-    setLocation('/admin/settings');
+  const handleNavigateToSystemTab = () => {
+    setActiveTab('system');
   };
 
   const handleNavigateToLogs = () => {
@@ -137,7 +137,7 @@ export default function AdminConsolePage() {
         alert('System Reports - Feature coming soon!');
         break;
       case 'server-settings':
-        handleNavigateToSettings();
+        handleNavigateToSystemTab();
         break;
       case 'security-policies':
         alert('Security Policies - Feature coming soon!');

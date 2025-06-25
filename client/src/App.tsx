@@ -71,8 +71,6 @@ function Router() {
           <ProtectedRoute path="/console" component={AdminConsolePage} />
           <ProtectedRoute path="/tenants" component={AdminConsolePage} />
           <ProtectedRoute path="/admin/feature-management" component={AdminFeatureManagementPage} />
-          <ProtectedRoute path="/system" component={AdminSettingsPage} />
-          <ProtectedRoute path="/admin/settings" component={AdminSettingsPage} />
           <ProtectedRoute path="/admin/logs" component={LogsPage} />
           <ProtectedRoute path="/admin/debug" component={DebugToolsPage} />
           <ProtectedRoute path="/logs" component={LogsPage} />
