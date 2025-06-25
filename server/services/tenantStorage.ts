@@ -1,6 +1,6 @@
 import { DatabaseStorage, IStorage } from '../storage';
 import { getTenantDatabase } from './tenantDatabase';
-import { TenantConfig } from '../middleware/tenantDetection';
+import { LegacyTenantConfig as TenantConfig } from '../middleware/tenant';
 import { db as defaultDb } from "../db";
 
 export class TenantStorage implements IStorage {

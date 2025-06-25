@@ -1,5 +1,5 @@
 import pg from 'pg';
-import { TenantConfig } from '../middleware/tenantDetection.js';
+import { LegacyTenantConfig as TenantConfig } from '../middleware/tenant.js';
 
 const { Pool } = pg;
 type PoolType = InstanceType<typeof Pool>;

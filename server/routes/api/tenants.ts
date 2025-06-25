@@ -1,7 +1,6 @@
 import { Router } from 'express';
-import { tenantMiddleware, requireTenant, TenantService } from '../../middleware/tenant';
+import { tenantMiddleware, requireTenant, TenantFinder, TenantManager, ConsolidatedTenantRequest as TenantRequest, Tenant, LegacyTenantConfig as TenantConfig, tenantToLegacyConfig } from '../../middleware/tenant';
 import { createTenantDatabase, runTenantMigrations } from '../../services/tenantDatabase.js';
-import { EdStewardTenantRequest as TenantRequest, TenantConfig, TenantManager } from '../../middleware/tenantDetection';
 import { eq } from 'drizzle-orm';
 import { db } from '../../db';
 import { tenants } from '@shared/schema';

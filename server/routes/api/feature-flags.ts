@@ -1,7 +1,6 @@
 import { Router, Response } from 'express';
-import { tenantMiddleware } from '../../middleware/tenant';
+import { tenantMiddleware, ConsolidatedTenantRequest as TenantRequest } from '../../middleware/tenant';
 import { FEATURE_FLAGS, FEATURE_CATEGORIES } from '@shared/feature-flags';
-import { EdStewardTenantRequest as TenantRequest } from '../../middleware/tenantDetection';
 
 const router = Router();
 

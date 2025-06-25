@@ -1,10 +1,10 @@
 {
     "taskDefinition": {
-        "taskDefinitionArn": "arn:aws:ecs:us-east-1:259661441422:task-definition/edsteward-task-fixed-health:1",
+        "taskDefinitionArn": "arn:aws:ecs:us-east-1:259661441422:task-definition/edsteward-hostname-fix:19",
         "containerDefinitions": [
             {
                 "name": "edsteward-app",
-                "image": "259661441422.dkr.ecr.us-east-1.amazonaws.com/edsteward:aws-session-fix-1750467882",
+                "image": "259661441422.dkr.ecr.us-east-1.amazonaws.com/edsteward:aws-session-fix-1750705726",
                 "cpu": 0,
                 "portMappings": [
                     {
@@ -16,58 +16,56 @@
                 "essential": true,
                 "environment": [
                     {
-                        "name": "SESSION_SECRET",
-                        "value": "production-session-secret-edsteward-2025"
+                        "name": "PORT",
+                        "value": "3000"
+                    },
+                    {
+                        "name": "HOSTNAME",
+                        "value": "0.0.0.0"
                     },
                     {
                         "name": "NODE_ENV",
                         "value": "production"
-                    },
-                    {
-                        "name": "DATABASE_URL",
-                        "value": "postgresql://neondb_owner:npg_foSr6ixkzw7W@ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require"
-                    },
-                    {
-                        "name": "SAML_CERT_PATH",
-                        "value": "/app/ssl/sp.crt"
-                    },
-                    {
-                        "name": "MULTI_TENANT",
-                        "value": "true"
-                    },
-                    {
-                        "name": "SAML_KEY_PATH",
-                        "value": "/app/ssl/sp.key"
                     }
                 ],
                 "mountPoints": [],
                 "volumesFrom": [],
+                "secrets": [
+                    {
+                        "name": "DATABASE_URL",
+                        "valueFrom": "arn:aws:ssm:us-east-1:259661441422:parameter/edsteward/database-url"
+                    },
+                    {
+                        "name": "SESSION_SECRET",
+                        "valueFrom": "arn:aws:ssm:us-east-1:259661441422:parameter/edsteward/session-secret"
+                    }
+                ],
                 "logConfiguration": {
                     "logDriver": "awslogs",
                     "options": {
-                        "awslogs-group": "/ecs/edsteward",
+                        "awslogs-group": "/aws/ecs/edsteward",
                         "awslogs-region": "us-east-1",
-                        "awslogs-stream-prefix": "fixed-health"
+                        "awslogs-stream-prefix": "production"
                     }
                 },
                 "healthCheck": {
                     "command": [
                         "CMD-SHELL",
-                        "curl -f http://localhost:3000/health || exit 1"
+                        "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1"
                     ],
                     "interval": 30,
-                    "timeout": 10,
-                    "retries": 5,
-                    "startPeriod": 120
+                    "timeout": 5,
+                    "retries": 3,
+                    "startPeriod": 60
                 },
                 "systemControls": []
             }
         ],
-        "family": "edsteward-task-fixed-health",
-        "taskRoleArn": "arn:aws:iam::259661441422:role/edsteward-task-role",
+        "family": "edsteward-hostname-fix",
+        "taskRoleArn": "arn:aws:iam::259661441422:role/ecsTaskRole",
         "executionRoleArn": "arn:aws:iam::259661441422:role/ecsTaskExecutionRole",
         "networkMode": "awsvpc",
-        "revision": 1,
+        "revision": 19,
         "volumes": [],
         "status": "ACTIVE",
         "requiresAttributes": [
@@ -93,6 +91,9 @@
                 "name": "ecs.capability.execution-role-ecr-pull"
             },
             {
+                "name": "ecs.capability.secrets.ssm.environment-variables"
+            },
+            {
                 "name": "com.amazonaws.ecs.capability.docker-remote-api.1.18"
             },
             {
@@ -112,7 +113,7 @@
         ],
         "cpu": "512",
         "memory": "1024",
-        "registeredAt": "2025-06-21T06:15:58.712000-04:00",
+        "registeredAt": "2025-06-23T15:10:56.268000-04:00",
         "registeredBy": "arn:aws:iam::259661441422:root"
     },
     "tags": []

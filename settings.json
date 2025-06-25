@@ -1,0 +1,14 @@
+{
+    "window.commandCenter": 1,
+    "editor.accessibilitySupport": "off",
+    "workbench.colorTheme": "Cursor Dark Midnight",
+    "window.newWindowProfile": "B.I.G.",
+    "terminal.integrated.defaultProfile.linux": "zsh",
+    "terminal.integrated.defaultProfile.osx": "zsh",
+    "terminal.integrated.shellIntegration.enabled": false,
+    "mcp.mcpServers": {
+        "context7": {
+            "url": "https://mcp.context7.com/mcp"
+        }
+    }
+} 

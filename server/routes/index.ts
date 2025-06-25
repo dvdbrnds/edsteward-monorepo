@@ -9,7 +9,7 @@ import { setupMCPIntegrationApi } from '../mcp-integration-api';
 import { initializeDatabase } from '../db-init';
 import { storage } from '../storage';
 import path from 'path';
-import { tenantMiddleware, TenantService } from '../middleware/tenant';
+import { tenantMiddleware, TenantFinder } from '../middleware/tenant';
 
 // Import modular route handlers
 import uploadsRoutes from './api/uploads';
@@ -53,7 +53,7 @@ export function registerRoutes(app: express.Application): Server {
       const healthStatus = databaseHealthMonitor.getHealthStatus();
       
       // Extract tenant information from request
-      const tenantInfo = TenantService.extractTenantFromRequest(req);
+      const tenantInfo = TenantFinder.extractTenantFromRequest(req);
       
       const response = {
         status: dbHealthy ? "healthy" : "degraded",
