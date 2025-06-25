@@ -55,7 +55,7 @@ export function registerRoutes(app: express.Application): Server {
         
         try {
           const { db } = await import('../db');
-          const { tenants } = await import('@shared/schema');
+          const { tenants } = await import('../../shared/schema');
           const { eq } = await import('drizzle-orm');
           
           // Check current staging record
