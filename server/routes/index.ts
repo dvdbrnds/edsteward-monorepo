@@ -253,4 +253,4 @@ export function registerRoutes(app: express.Application): Server {
   app.use('/downloads', express.static(path.join(process.cwd(), 'public/downloads')));
 
   return httpServer;
-} 
+} # Force restart for tenant cache refresh
