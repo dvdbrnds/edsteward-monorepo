@@ -726,4 +726,3 @@ export default function TenantFeatureManager() {
     </div>
   );
 }
-</rewritten_file>
