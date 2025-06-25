@@ -124,7 +124,7 @@ const FALLBACK_TENANTS: Record<string, Tenant> = {
     name: 'EdSteward Staging Environment',
     domain: 'staging.edsteward.ai',
     subdomain: 'staging',
-    databaseName: 'edsteward_admin', // Use same database as admin for staging
+    databaseName: 'edsteward_staging', // Use dedicated staging database for proper isolation
     status: 'active',
     settings: {
       allowedDomains: ['edsteward.ai', 'staging.edsteward.ai'],
