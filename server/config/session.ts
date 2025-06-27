@@ -8,11 +8,11 @@ console.log('🔍 Session Store Debug - Context7 AWS ALB Configuration');
 console.log('🔍 Environment:', isProduction ? 'PRODUCTION' : 'DEVELOPMENT');
 console.log('🔍 Trust Proxy: 1 (ALB), Secure Cookies: true (HTTPS ENABLED)');
 console.log('🔍 SUCCESS: ALB has HTTPS listener on port 443!');
-console.log('🔍 PostgreSQL Session Store: ENABLED for persistence');
+console.log('🔍 PostgreSQL Session Store: TEMPORARILY DISABLED for debugging');
 
 export const sessionConfig: session.SessionOptions = {
-  // CRITICAL FIX: Enable PostgreSQL session store for persistence
-  store: storage.sessionStore,
+  // TEMPORARILY DISABLE: PostgreSQL session store causing service outage
+  // store: storage.sessionStore,
   secret: config.SESSION_SECRET,
   resave: false,
   saveUninitialized: false, // CRITICAL: Changed to false for AWS ALB best practices
@@ -29,11 +29,11 @@ export const sessionConfig: session.SessionOptions = {
   // Enhanced debugging based on Context7 documentation
   genid: (req) => {
     const sessionId = crypto.randomBytes(16).toString('hex');
-    console.log(`🔑 Generated session ID: ${sessionId} (PostgreSQL persistent)`);
+    console.log(`🔑 Generated session ID: ${sessionId} (memory store - temporary)`);
     console.log(`🔑 X-Forwarded-Proto:`, req.headers['x-forwarded-proto']);
     console.log(`🔑 Request secure:`, req.secure);
     console.log(`🔑 Environment:`, isProduction ? 'PRODUCTION' : 'DEVELOPMENT');
-    console.log(`🔑 Session Store: PostgreSQL (persistent with rolling expiry)`);
+    console.log(`🔑 Session Store: Memory (temporary - debugging DB issues)`);
     return sessionId;
   }
 }; 
