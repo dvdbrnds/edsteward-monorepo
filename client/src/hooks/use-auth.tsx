@@ -59,12 +59,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     error,
     isLoading,
   } = useQuery<SelectUser | undefined, Error>({
-    queryKey: ["/api/user"],
+    queryKey: ["/api/auth/status"],
     queryFn: async () => {
-      const res = await fetch("/api/user", { credentials: "include" });
-      if (res.status === 401) return null;
+      // Use auth status endpoint to avoid 401 console errors
+      const res = await fetch("/api/auth/status", { credentials: "include" });
       if (!res.ok) throw new Error(res.statusText);
-      return await res.json();
+      const statusData = await res.json();
+      return statusData.authenticated ? statusData.user : null;
     },
   });
 
@@ -73,7 +74,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return await apiRequest("POST", "/api/login", credentials);
     },
     onSuccess: (user: SelectUser) => {
-      queryClient.setQueryData(["/api/user"], user);
+      queryClient.setQueryData(["/api/auth/status"], user);
       // Invalidate all queries to refresh data after login
       queryClient.invalidateQueries({ queryKey: ["/api/notifications"] });
       queryClient.invalidateQueries({ queryKey: ["/api/notifications", "v2"] });
@@ -94,7 +95,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return await apiRequest("POST", "/api/register", credentials);
     },
     onSuccess: (user: SelectUser) => {
-      queryClient.setQueryData(["/api/user"], user);
+      queryClient.setQueryData(["/api/auth/status"], user);
     },
     onError: (error: Error) => {
       toast({
@@ -110,7 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await apiRequest("POST", "/api/logout");
     },
     onSuccess: () => {
-      queryClient.setQueryData(["/api/user"], null);
+      queryClient.setQueryData(["/api/auth/status"], null);
     },
     onError: (error: Error) => {
       toast({
