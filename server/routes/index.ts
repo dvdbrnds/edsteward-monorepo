@@ -10,8 +10,6 @@ import { initializeDatabase } from '../db-init';
 import { storage } from '../storage';
 import path from 'path';
 import { tenantMiddleware, TenantFinder } from '../middleware/tenant';
-import { tenantDetectionMiddleware } from "../middleware/tenant";
-import { authRouter } from "./api/auth";
 
 // Import modular route handlers
 import uploadsRoutes from './api/uploads';
@@ -235,7 +233,7 @@ export function registerRoutes(app: express.Application): Server {
   });
 
   // Protected API routes (all require authentication)
-  app.use('/api/auth', authRouter);
+  // Auth router removed - using setupAuth endpoints instead
   
   // TEMPORARY FIX: Add auth endpoints directly until router issue is resolved
   app.get('/api/auth/me', (req, res) => {
@@ -291,69 +289,6 @@ export function registerRoutes(app: express.Application): Server {
 
   // Serve static files
   app.use('/downloads', express.static(path.join(process.cwd(), 'public/downloads')));
-
-  // Session debug endpoint for testing session persistence
-  app.get('/api/session-debug', (req, res) => {
-    const sessionInfo = {
-      sessionId: req.sessionID,
-      hasSession: !!req.session,
-      sessionKeys: req.session ? Object.keys(req.session) : [],
-      isAuthenticated: req.isAuthenticated ? req.isAuthenticated() : false,
-      user: req.user || null,
-      tenantId: req.tenantId || null,
-      subdomain: req.tenant?.subdomain || null,
-      sessionStore: {
-        type: storage.sessionStore.constructor.name,
-        storeConfigured: !!storage.sessionStore
-      },
-      cookies: req.headers.cookie || null,
-      timestamp: new Date().toISOString()
-    };
-    
-    console.log('🔍 Session Debug Info:', sessionInfo);
-    res.json(sessionInfo);
-  });
-
-  // Session test endpoint - creates a test session value
-  app.post('/api/session-test', (req, res) => {
-    if (!req.session) {
-      return res.status(500).json({ error: 'Session not available' });
-    }
-    
-    const testValue = `test-${Date.now()}`;
-    req.session.testValue = testValue;
-    
-    // Force session save
-    req.session.save((err) => {
-      if (err) {
-        console.error('❌ Session save error:', err);
-        return res.status(500).json({ 
-          error: 'Session save failed', 
-          details: err.message 
-        });
-      }
-      
-      console.log('✅ Session test value saved:', testValue);
-      res.json({ 
-        success: true, 
-        testValue, 
-        sessionId: req.sessionID,
-        message: 'Test value saved to session' 
-      });
-    });
-  });
-
-  // Session retrieve test endpoint
-  app.get('/api/session-test', (req, res) => {
-    const testValue = req.session?.testValue;
-    res.json({
-      sessionId: req.sessionID,
-      hasSession: !!req.session,
-      testValue: testValue || null,
-      exists: !!testValue,
-      timestamp: new Date().toISOString()
-    });
-  });
 
   return httpServer;
 }
