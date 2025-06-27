@@ -262,13 +262,15 @@ export function setupAuth(app: Express) {
   });
 
   app.get("/api/user", (req, res) => {
-    if (!req.isAuthenticated()) return res.sendStatus(401);
+    if (!req.isAuthenticated()) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
     
     // Include tenant info in user response
     const userWithTenant = {
       ...req.user,
-      tenantId: req.tenantId,
-      subdomain: req.tenant?.subdomain
+      tenantId: (req as any).tenantId,
+      subdomain: (req as any).tenant?.subdomain
     };
     
     res.json(userWithTenant);
