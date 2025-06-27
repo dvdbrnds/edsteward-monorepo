@@ -19,7 +19,7 @@ async function getTenantStorage(tenantId: string) {
 // GET /api/notifications - Get notifications for the current user ONLY (for dashboard)
 router.get("/", async (req, res) => {
   try {
-    if (!req.user) {
+    if (!req.isAuthenticated || !req.isAuthenticated()) {
       return res.status(401).json({ error: "Authentication required" });
     }
 
@@ -60,7 +60,7 @@ router.get("/", async (req, res) => {
 // GET /api/notifications/admin - Get ALL notifications (admin only)
 router.get("/admin", async (req, res) => {
   try {
-    if (!req.user) {
+    if (!req.isAuthenticated || !req.isAuthenticated()) {
       return res.status(401).json({ error: "Authentication required" });
     }
 
@@ -98,7 +98,7 @@ router.get("/admin", async (req, res) => {
 // POST /api/notifications - Create a new notification
 router.post("/", async (req, res) => {
   try {
-    if (!req.user) {
+    if (!req.isAuthenticated || !req.isAuthenticated()) {
       return res.status(401).json({ error: "Authentication required" });
     }
 

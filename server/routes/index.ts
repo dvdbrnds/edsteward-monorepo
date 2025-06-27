@@ -191,7 +191,7 @@ export function registerRoutes(app: express.Application): Server {
   // Setup status for frontend navigation (requires auth)
   app.get('/api/setup/status', async (req, res) => {
     try {
-      if (!req.user) {
+      if (!req.isAuthenticated || !req.isAuthenticated()) {
         return res.status(401).json({ error: "Authentication required" });
       }
 

@@ -17,7 +17,7 @@ function getTenantAwareStorage(req: any) {
 
 // Middleware to check admin access
 const requireAdmin = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  if (!req.user) {
+  if (!req.isAuthenticated || !req.isAuthenticated()) {
     return res.status(401).json({ error: "Authentication required" });
   }
 

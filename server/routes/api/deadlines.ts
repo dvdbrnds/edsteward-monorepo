@@ -19,7 +19,7 @@ async function getTenantStorage(tenantId: string) {
 // GET /api/deadlines - Get all deadlines with regulation names (requires authentication)
 router.get("/", async (req, res) => {
   try {
-    if (!req.user) {
+    if (!req.isAuthenticated || !req.isAuthenticated()) {
       return res.status(401).json({ error: "Authentication required" });
     }
 
@@ -60,7 +60,7 @@ router.get("/", async (req, res) => {
 // POST /api/deadlines - Create a new deadline (requires authentication)
 router.post("/", async (req, res) => {
   try {
-    if (!req.user) {
+    if (!req.isAuthenticated || !req.isAuthenticated()) {
       return res.status(401).json({ error: "Authentication required" });
     }
 

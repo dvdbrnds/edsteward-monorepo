@@ -18,14 +18,14 @@ router.get('/test', (req, res) => {
 
 // Simple auth middleware that works with existing session system
 const requireAuth = (req: any, res: any, next: any) => {
-  if (!req.user) {
+  if (!req.isAuthenticated || !req.isAuthenticated()) {
     return res.status(401).json({ error: 'Authentication required' });
   }
   next();
 };
 
 const requireAdmin = (req: any, res: any, next: any) => {
-  if (!req.user || req.user.role?.toLowerCase() !== 'admin') {
+  if (!req.isAuthenticated || !req.isAuthenticated() || req.user.role?.toLowerCase() !== 'admin') {
     return res.status(403).json({ error: 'Admin access required' });
   }
   next();
