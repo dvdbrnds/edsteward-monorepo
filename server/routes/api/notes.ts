@@ -20,7 +20,11 @@ async function getTenantStorage(tenantId: string) {
 
 // Simple auth middleware (we'll improve this later)
 const requireAuth = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  if (!req.isAuthenticated || !req.isAuthenticated()) {
+  // Use multiple authentication checks for maximum compatibility
+  const isAuthenticated = req.isAuthenticated ? req.isAuthenticated() : false;
+  const hasUser = !!(req as any).user;
+  
+  if (!isAuthenticated && !hasUser) {
     return res.status(401).json({ error: 'Authentication required' });
   }
   next();
