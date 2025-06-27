@@ -61,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   } = useQuery<SelectUser | undefined, Error>({
     queryKey: ["/api/auth/status"],
     queryFn: async () => {
-      // Use auth status endpoint to avoid 401 console errors
+      // Context7 Multi-Tenant Fix: Use auth status endpoint to avoid 401 console errors
       const res = await fetch("/api/auth/status", { credentials: "include" });
       if (!res.ok) throw new Error(res.statusText);
       const statusData = await res.json();

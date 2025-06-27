@@ -3,37 +3,69 @@ import { config, isProduction } from './environment';
 import { storage } from '../storage';
 import crypto from 'crypto';
 
-// Enable session debugging based on Context7 documentation
-console.log('🔍 Session Store Debug - Context7 AWS ALB Configuration');
-console.log('🔍 Environment:', isProduction ? 'PRODUCTION' : 'DEVELOPMENT');
-console.log('🔍 Trust Proxy: 1 (ALB), Secure Cookies: true (HTTPS ENABLED)');
-console.log('🔍 SUCCESS: ALB has HTTPS listener on port 443!');
-console.log('🔍 PostgreSQL Session Store: TEMPORARILY DISABLED for debugging');
+// CONTEXT7 SESSION FIX: Comprehensive session configuration for AWS ALB + PostgreSQL
+console.log('🔧 Context7 Session Fix - Comprehensive AWS ALB + PostgreSQL Configuration');
+console.log('🔧 Environment:', isProduction ? 'PRODUCTION' : 'DEVELOPMENT');
+console.log('🔧 Trust Proxy: 1 (AWS ALB), Cookie Security: Enhanced');
 
+/**
+ * Context7 Best Practices for Express Session + AWS ALB:
+ * 1. Use PostgreSQL session store for persistence
+ * 2. Configure proper cookie settings for ALB
+ * 3. Handle X-Forwarded-Proto headers correctly
+ * 4. Implement rolling sessions for security
+ * 5. Use secure session ID generation
+ */
 export const sessionConfig: session.SessionOptions = {
-  // TEMPORARILY DISABLE: PostgreSQL session store causing service outage
-  // store: storage.sessionStore,
+  // CRITICAL FIX: Re-enable PostgreSQL session store for persistence
+  store: storage.sessionStore,
+  
+  // Use strong session secret (256-bit minimum)
   secret: config.SESSION_SECRET,
+  
+  // Context7 Best Practice: Don't resave unchanged sessions
   resave: false,
-  saveUninitialized: false, // CRITICAL: Changed to false for AWS ALB best practices
-  rolling: true, // CRITICAL: Reset session expiry on each request for active users
+  
+  // Context7 Security: Don't save uninitialized sessions (prevents session fixation)
+  saveUninitialized: false,
+  
+  // Context7 Security: Rolling sessions - reset expiry on each request
+  rolling: true,
+  
+  // Custom session name for security
   name: 'edsteward.sid',
+  
+  // Context7 AWS ALB Cookie Configuration
   cookie: {
-    // Use secure cookies only in production (HTTPS)
-    // In development, use HTTP cookies for local testing
-    secure: isProduction, // Only secure in production with HTTPS
+    // CRITICAL AWS ALB FIX: Use 'auto' for secure cookies
+    // This automatically detects HTTPS from X-Forwarded-Proto header
+    secure: isProduction ? 'auto' : false,
+    
+    // Context7 Security: HTTP-only cookies prevent XSS
     httpOnly: true,
-    maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    sameSite: 'lax' // Allow cross-site for load balancer
+    
+    // Context7 Best Practice: 24-hour session lifetime
+    maxAge: 24 * 60 * 60 * 1000, // 24 hours in milliseconds
+    
+    // Context7 AWS ALB: 'lax' allows cross-site requests from load balancer
+    sameSite: 'lax',
+    
+    // Context7 Security: Set domain for subdomain support
+    domain: isProduction ? '.edsteward.ai' : undefined
   },
-  // Enhanced debugging based on Context7 documentation
+  
+  // Context7 Best Practice: Custom session ID generation
   genid: (req) => {
-    const sessionId = crypto.randomBytes(16).toString('hex');
-    console.log(`🔑 Generated session ID: ${sessionId} (memory store - temporary)`);
-    console.log(`🔑 X-Forwarded-Proto:`, req.headers['x-forwarded-proto']);
-    console.log(`🔑 Request secure:`, req.secure);
-    console.log(`🔑 Environment:`, isProduction ? 'PRODUCTION' : 'DEVELOPMENT');
-    console.log(`🔑 Session Store: Memory (temporary - debugging DB issues)`);
+    const sessionId = crypto.randomBytes(32).toString('hex'); // 256-bit session ID
+    
+    // Enhanced debugging for Context7 compliance
+    if (!isProduction) {
+      console.log(`🔑 Session ID Generated: ${sessionId.substring(0, 8)}...`);
+      console.log(`🔑 X-Forwarded-Proto: ${req.headers['x-forwarded-proto']}`);
+      console.log(`🔑 Request Secure: ${req.secure}`);
+      console.log(`🔑 Session Store: PostgreSQL (ENABLED)`);
+    }
+    
     return sessionId;
   }
 }; 

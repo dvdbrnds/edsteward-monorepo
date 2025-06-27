@@ -70,43 +70,54 @@ export function setupAuth(app: Express) {
     })
   );
 
-  passport.serializeUser((user, done) => {
-    done(null, user.id);
+  passport.serializeUser((user: any, done) => {
+    // Context7 Multi-Tenant Fix: Store both user ID and tenant ID in session
+    const sessionData = {
+      userId: user.id,
+      tenantId: user.tenantId || 'admin' // Include tenant context
+    };
+    done(null, sessionData);
   });
 
-  passport.deserializeUser(async (id: number, done) => {
+  passport.deserializeUser(async (sessionData: any, done) => {
     try {
-      if (!id || isNaN(id)) {
-        console.error(`Invalid user ID during deserialization: ${id}`);
-        return done(null, false);
-      }
-
-      // Note: For deserialization, we need to check all tenants since we don't have req context
-      // This is a limitation - in production, we'd store tenantId in session
-      let user = await storage.getUser(id);
+      // Context7 Multi-Tenant Fix: Store both user ID and tenant ID in session
+      let userId: number;
+      let tenantId: string;
       
-      if (!user) {
-        // Try checking tenant storages
-        const tenantStorages = ['admin', 'moravian', 'test'];
-        for (const tenantId of tenantStorages) {
-          try {
-            const tenantStorage = getTenantStorage(tenantId);
-            user = await tenantStorage.getUser(id);
-            if (user) break;
-          } catch (error) {
-            // Continue to next tenant
-          }
-        }
-      }
-
-      if (!user) {
-        console.error(`User with ID ${id} not found during deserialization`);
+      if (typeof sessionData === 'object' && sessionData.userId && sessionData.tenantId) {
+        // New format: { userId: number, tenantId: string }
+        userId = sessionData.userId;
+        tenantId = sessionData.tenantId;
+      } else if (typeof sessionData === 'number') {
+        // Legacy format: just user ID - try to determine tenant
+        userId = sessionData;
+        tenantId = 'admin'; // Default fallback
+        console.warn(`Legacy session format detected for user ${userId}, defaulting to admin tenant`);
+      } else {
+        console.error(`Invalid session data during deserialization:`, sessionData);
         return done(null, false);
       }
 
+      if (!userId || isNaN(userId)) {
+        console.error(`Invalid user ID during deserialization: ${userId}`);
+        return done(null, false);
+      }
+
+      // Use tenant-specific storage for user lookup
+      const tenantStorage = getTenantStorage(tenantId);
+      const user = await tenantStorage.getUser(userId);
+
+      if (!user) {
+        console.error(`User ${userId} not found in tenant ${tenantId} during deserialization`);
+        return done(null, false);
+      }
+
+      // Attach tenant context to user object
+      (user as any).tenantId = tenantId;
       done(null, user);
     } catch (error) {
-      console.error(`Error deserializing user ${id}:`, error);
+      console.error(`Error deserializing user:`, error);
       done(null, false);
     }
   });
@@ -142,9 +153,19 @@ export function setupAuth(app: Express) {
         subdomain: req.tenant?.subdomain
       });
 
+      // Context7 Multi-Tenant Fix: Attach tenant context to user before login
+      (user as any).tenantId = req.tenantId || 'admin';
+
       req.login(user, (err) => {
         if (err) return next(err);
-        res.status(201).json(user);
+        
+        // Return user with tenant context
+        const userWithTenant = {
+          ...user,
+          tenantId: req.tenantId,
+          subdomain: req.tenant?.subdomain
+        };
+        res.status(201).json(userWithTenant);
       });
     } catch (error) {
       await syslog.logAuthEvent(LogLevel.ERROR, "Registration error", undefined, req.body.username, {
@@ -177,6 +198,9 @@ export function setupAuth(app: Express) {
         return res.status(401).json({ error: "Invalid credentials" });
       }
 
+      // Context7 Multi-Tenant Fix: Attach tenant context to user before login
+      (user as any).tenantId = req.tenantId || 'admin';
+
       req.login(user, async (err) => {
         if (err) {
           await syslog.logAuthEvent(LogLevel.ERROR, "Session creation error", user.id, user.username, {
@@ -187,7 +211,7 @@ export function setupAuth(app: Express) {
         }
 
         // Debug session state after login
-        console.log('🔍 Session Debug After Login:', {
+        console.log('🔍 Context7 Multi-Tenant Session Debug After Login:', {
           sessionId: req.sessionID,
           hasSession: !!req.session,
           sessionKeys: req.session ? Object.keys(req.session) : [],
@@ -195,6 +219,7 @@ export function setupAuth(app: Express) {
           isAuthenticated: req.isAuthenticated(),
           tenantId: req.tenantId,
           subdomain: req.tenant?.subdomain,
+          userTenantId: (user as any).tenantId,
           setCookieHeader: res.getHeaders()['set-cookie']
         });
 
@@ -218,9 +243,16 @@ export function setupAuth(app: Express) {
             if (saveErr) {
               console.error('❌ Session save error:', saveErr);
             } else {
-              console.log('✅ Session saved successfully');
+              console.log('✅ Session saved successfully with tenant context');
             }
-            res.status(200).json(user);
+            
+            // Return user with tenant context
+            const userWithTenant = {
+              ...user,
+              tenantId: req.tenantId,
+              subdomain: req.tenant?.subdomain
+            };
+            res.status(200).json(userWithTenant);
           });
         } catch (error) {
           await syslog.error("Failed to update last login timestamp", { 
@@ -228,8 +260,13 @@ export function setupAuth(app: Express) {
             tenantId: req.tenantId,
             error 
           });
-          // Still return success to the user
-          res.status(200).json(user);
+          // Still return success to the user with tenant context
+          const userWithTenant = {
+            ...user,
+            tenantId: req.tenantId,
+            subdomain: req.tenant?.subdomain
+          };
+          res.status(200).json(userWithTenant);
         }
       });
     })(req, res, next);
