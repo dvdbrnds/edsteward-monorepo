@@ -240,7 +240,7 @@ router.get("/:regulationId", async (req, res) => {
 });
 
 // Get evidence files for a regulation
-router.get("/:regulationId/evidence", requireAuth, async (req, res) => {
+router.get("/:regulationId/evidence", async (req, res) => {
   try {
     const startTime = Date.now();
     const regulationId = parseInt(req.params.regulationId);

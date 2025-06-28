@@ -16,16 +16,10 @@ async function getTenantStorage(tenantId: string) {
   return new TenantStorage(tenantConfig);
 }
 
-// GET /api/deadlines - Get all deadlines with regulation names (requires authentication)
+// GET /api/deadlines - Get all deadlines with regulation names (public access like regulations)
 router.get("/", async (req, res) => {
   try {
-    // Use multiple authentication checks for maximum compatibility
-    const isAuthenticated = req.isAuthenticated ? req.isAuthenticated() : false;
-    const hasUser = !!(req as any).user;
-    
-    if (!isAuthenticated && !hasUser) {
-      return res.status(401).json({ error: "Authentication required" });
-    }
+    // Remove authentication requirement to match regulations endpoint behavior
 
     // Get tenant-aware storage for data isolation
     const tenantReq = req as any;
@@ -64,11 +58,8 @@ router.get("/", async (req, res) => {
 // POST /api/deadlines - Create a new deadline (requires authentication)
 router.post("/", async (req, res) => {
   try {
-    // Use multiple authentication checks for maximum compatibility
-    const isAuthenticated = req.isAuthenticated ? req.isAuthenticated() : false;
-    const hasUser = !!(req as any).user;
-    
-    if (!isAuthenticated && !hasUser) {
+    // Keep authentication for POST operations
+    if (!req.isAuthenticated || !req.isAuthenticated()) {
       return res.status(401).json({ error: "Authentication required" });
     }
 
