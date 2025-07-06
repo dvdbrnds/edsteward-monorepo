@@ -13,3 +13,20 @@ vite.config.ts.*
 *.tfvars
 .terraformrc
 terraform.rc
+
+# Documentation - Protect critical files, allow temp/draft exclusions
+# NEVER ignore these critical documentation files
+!references/ARCHITECTURE.md
+!references/DEPLOYMENT_PIPELINE_DOCUMENTATION.md  
+!references/MULTI_TENANT_ARCHITECTURE.md
+!references/AUTHENTICATION_FIX_SUCCESS_SUMMARY.md
+
+# Allow ignoring temporary documentation
+references/temp/
+references/.drafts/
+references/**/*.tmp
+references/**/*.backup
+
+# MkDocs build artifacts
+site/
+docs/_build/

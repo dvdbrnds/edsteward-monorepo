@@ -1,0 +1,34 @@
+site_name: EdSteward Documentation
+
+nav:
+  - Home: 'README.md'
+  - Architecture: 
+    - Overview: 'references/ARCHITECTURE.md'
+    - Multi-Tenant: 'references/MULTI_TENANT_ARCHITECTURE.md'
+    - Database Design: 'references/DATABASE_ARCHITECTURE.md'
+  - Deployment:
+    - Main Guide: 'references/DEPLOYMENT_PIPELINE_DOCUMENTATION.md'
+    - AWS Setup: 'references/AWS_DEPLOYMENT_SETUP.md'
+  - Authentication:
+    - Fix Summary: 'references/AUTHENTICATION_FIX_SUCCESS_SUMMARY.md'
+    - Troubleshooting: 'references/AUTHENTICATION_TROUBLESHOOTING.md'
+  - Development:
+    - Setup: 'references/DEVELOPMENT_SETUP.md'
+    - Testing: 'references/TESTING_STRATEGY.md'
+  - Legacy:
+    - Deprecated Guides: 'references/deprecated/'
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.expand
+
+plugins:
+  - search
+  - monorepo
+
+markdown_extensions:
+  - codehilite
+  - toc:
+      permalink: true 
