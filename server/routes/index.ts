@@ -23,6 +23,7 @@ import tenantsRouter from './api/tenants';
 import fixStagingTenantRouter from './api/fix-staging-tenant';
 import { debugRouter } from './api/debug';
 import { testTenantRouter } from './api/test-tenant';
+import { emergencyMoravianRouter } from './api/emergency-moravian-fix';
 // @ts-ignore
 import migrationRoutes from './database-migration.js';
 
@@ -300,6 +301,16 @@ export function registerRoutes(app: express.Application): Server {
   // Register debug routes (no auth required for debugging)
   app.use('/api/debug', debugRouter);
   app.use('/api/test', testTenantRouter);
+  
+  // Emergency bypass for Moravian tenant - only use when hostname is moravian.edsteward.ai
+  app.use('/api/emergency', (req, res, next) => {
+    const hostname = req.get('host') || '';
+    if (hostname.startsWith('moravian.')) {
+      emergencyMoravianRouter(req, res, next);
+    } else {
+      res.status(404).json({ error: 'Emergency endpoint only available for Moravian tenant' });
+    }
+  });
 
   // Setup additional APIs
   setupRegulationUpdatesApi(app as any);
