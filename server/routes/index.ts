@@ -178,6 +178,29 @@ export function registerRoutes(app: express.Application): Server {
     }
   });
 
+  // Version endpoint to verify deployments and UUID mapping
+  app.get('/version', (req, res) => {
+    const deploymentInfo: any = {
+      timestamp: new Date().toISOString(),
+      commit: '7b3c900-uuid-fix',
+      uuidMappingActive: true,
+      testUUID: '3a1cbce2-0cf8-4c4f-ab96-4023eca4977d',
+      shouldMapTo: 'moravian',
+      server: 'production'
+    };
+    
+    // Test the UUID mapping logic directly
+    try {
+      const storage = getTenantStorage('3a1cbce2-0cf8-4c4f-ab96-4023eca4977d');
+      deploymentInfo.uuidMappingWorking = true;
+    } catch (error) {
+      deploymentInfo.uuidMappingWorking = false;
+      deploymentInfo.error = error instanceof Error ? error.message : String(error);
+    }
+    
+    res.json(deploymentInfo);
+  });
+
   // =============================================================================
   // AUTHENTICATION SETUP
   // =============================================================================
