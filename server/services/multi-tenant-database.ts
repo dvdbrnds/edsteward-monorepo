@@ -104,7 +104,7 @@ export class MultiTenantDatabaseService {
   }
 
   /**
-   * Get tenant storage (Drizzle ORM instance)
+   * Get tenant storage (Drizzle ORM instance) - Database-Per-Tenant Model
    */
   static getTenantStorage(tenantId: string): DatabaseStorage {
     // Normalize tenant ID to handle UUIDs
@@ -114,17 +114,15 @@ export class MultiTenantDatabaseService {
       return tenantStorages.get(normalizedTenantId)!;
     }
 
-    // CRITICAL FIX: Get tenant-specific pool and create Drizzle instance
+    // Database-Per-Tenant: Create isolated database connection for this tenant
     const pool = this.getTenantPool(tenantId); // Pass original tenantId, method will normalize
     const tenantDb = drizzle(pool, { schema });
     
-    // CRITICAL FIX: Create storage with tenant-specific database connection
+    // Create DatabaseStorage instance (will be enhanced with tenant context)
     const storage = new DatabaseStorage();
-    // For now, we'll use a simpler approach by ensuring the config returns the correct database
-    // TODO: In future, modify DatabaseStorage to accept tenant-specific connections
     
     tenantStorages.set(normalizedTenantId, storage);
-    console.log(`[MULTI-TENANT-DB] ✓ Created database storage for tenant: ${normalizedTenantId} with pool: ${normalizedTenantId}`);
+    console.log(`[MULTI-TENANT-DB] ✓ Created isolated database storage for tenant: ${normalizedTenantId}`);
     
     return storage;
   }

@@ -195,6 +195,20 @@ export interface IStorage {
 import { emailService } from './services/email';
 
 export class DatabaseStorage implements IStorage {
+  private db: any;
+  private pool: any;
+
+  constructor(tenantDb?: any, tenantPool?: any) {
+    // Database-Per-Tenant: Use tenant-specific connections if provided
+    this.db = tenantDb || db;
+    this.pool = tenantPool || pool;
+    
+    this.sessionStore = new PostgresSessionStore({
+      pool: this.pool,
+      createTableIfMissing: true,
+    });
+  }
+
   // Regulation Update methods
   async getPendingRegulationUpdates(): Promise<RegulationUpdate[]> {
     try {
