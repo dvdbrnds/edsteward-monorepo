@@ -459,6 +459,13 @@ export class TenantFinder {
   }
 
   /**
+   * Get tenant by ID (alias for backward compatibility)
+   */
+  static getTenantById(tenantId: string): Promise<Tenant | null> {
+    return Promise.resolve(TENANT_REGISTRY[tenantId] || null);
+  }
+
+  /**
    * Update tenant configuration
    */
   static updateTenant(tenantId: string, updates: Partial<Tenant>): boolean {

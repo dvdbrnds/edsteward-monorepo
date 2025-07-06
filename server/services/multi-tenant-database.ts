@@ -13,6 +13,28 @@ interface TenantDatabaseConfig {
   };
 }
 
+// UUID to string tenant ID mapping for legacy compatibility
+const UUID_TENANT_MAPPING: Record<string, string> = {
+  '3a1cbce2-0cf8-4c4f-ab96-4023eca4977d': 'moravian',
+  // Add more mappings as needed
+};
+
+// Function to normalize tenant ID (handle UUIDs)
+function normalizeTenantId(tenantId: string): string {
+  // If it's a UUID, map it to the correct string tenant ID
+  if (tenantId.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i)) {
+    const mappedId = UUID_TENANT_MAPPING[tenantId];
+    if (mappedId) {
+      console.log(`[MULTI-TENANT-DB] Mapped UUID tenant ${tenantId} to ${mappedId}`);
+      return mappedId;
+    } else {
+      console.warn(`[MULTI-TENANT-DB] Unknown UUID tenant ID: ${tenantId}, defaulting to 'moravian'`);
+      return 'moravian'; // Default fallback for now
+    }
+  }
+  return tenantId;
+}
+
 // Tenant database configurations - each tenant gets its own database
 const TENANT_DATABASE_CONFIGS: Record<string, TenantDatabaseConfig> = {
   'admin': {
@@ -46,16 +68,19 @@ export class MultiTenantDatabaseService {
    * Get or create a database pool for a specific tenant
    */
   static getTenantPool(tenantId: string): Pool {
-    if (tenantPools.has(tenantId)) {
-      return tenantPools.get(tenantId)!;
+    // Normalize tenant ID to handle UUIDs
+    const normalizedTenantId = normalizeTenantId(tenantId);
+    
+    if (tenantPools.has(normalizedTenantId)) {
+      return tenantPools.get(normalizedTenantId)!;
     }
 
-    const config = TENANT_DATABASE_CONFIGS[tenantId];
+    const config = TENANT_DATABASE_CONFIGS[normalizedTenantId];
     if (!config) {
-      throw new Error(`No database configuration found for tenant: ${tenantId}`);
+      throw new Error(`No database configuration found for tenant: ${tenantId} (normalized: ${normalizedTenantId})`);
     }
 
-    console.log(`[MULTI-TENANT-DB] Creating pool for tenant ${tenantId} with database: ${config.databaseUrl.split('/').pop()?.split('?')[0]}`);
+    console.log(`[MULTI-TENANT-DB] Creating pool for tenant ${normalizedTenantId} (original: ${tenantId}) with database: ${config.databaseUrl.split('/').pop()?.split('?')[0]}`);
 
     const pool = new Pool({
       connectionString: config.databaseUrl,
@@ -65,34 +90,31 @@ export class MultiTenantDatabaseService {
 
     // Handle pool errors
     pool.on('error', (err) => {
-      console.error(`[MULTI-TENANT-DB] Database pool error for tenant ${tenantId}:`, err);
+      console.error(`[MULTI-TENANT-DB] Database pool error for tenant ${normalizedTenantId}:`, err);
     });
 
-    tenantPools.set(tenantId, pool);
-    console.log(`[MULTI-TENANT-DB] ✓ Created database pool for tenant: ${tenantId}`);
+    tenantPools.set(normalizedTenantId, pool);
+    console.log(`[MULTI-TENANT-DB] ✓ Created database pool for tenant: ${normalizedTenantId}`);
     
     return pool;
   }
 
   /**
-   * Get a tenant-specific database storage instance
+   * Get tenant storage (Drizzle ORM instance)
    */
   static getTenantStorage(tenantId: string): DatabaseStorage {
-    if (tenantStorages.has(tenantId)) {
-      return tenantStorages.get(tenantId)!;
+    // Normalize tenant ID to handle UUIDs
+    const normalizedTenantId = normalizeTenantId(tenantId);
+    
+    if (tenantStorages.has(normalizedTenantId)) {
+      return tenantStorages.get(normalizedTenantId)!;
     }
 
-    const pool = this.getTenantPool(tenantId);
-    const db = drizzle(pool);
-    
-    // Create a tenant-specific storage instance
+    const pool = this.getTenantPool(tenantId); // Pass original tenantId, method will normalize
     const storage = new DatabaseStorage();
-    // Override the db connection with tenant-specific one
-    (storage as any).db = db;
-    (storage as any).pool = pool;
-
-    tenantStorages.set(tenantId, storage);
-    console.log(`[MULTI-TENANT-DB] ✓ Created storage instance for tenant: ${tenantId}`);
+    
+    tenantStorages.set(normalizedTenantId, storage);
+    console.log(`[MULTI-TENANT-DB] ✓ Created database storage for tenant: ${normalizedTenantId}`);
     
     return storage;
   }
