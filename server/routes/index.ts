@@ -22,6 +22,7 @@ import adminRouter from './api/admin';
 import tenantsRouter from './api/tenants';
 import fixStagingTenantRouter from './api/fix-staging-tenant';
 import { debugRouter } from './api/debug';
+import { testTenantRouter } from './api/test-tenant';
 // @ts-ignore
 import migrationRoutes from './database-migration.js';
 
@@ -298,6 +299,7 @@ export function registerRoutes(app: express.Application): Server {
 
   // Register debug routes (no auth required for debugging)
   app.use('/api/debug', debugRouter);
+  app.use('/api/test', testTenantRouter);
 
   // Setup additional APIs
   setupRegulationUpdatesApi(app as any);
