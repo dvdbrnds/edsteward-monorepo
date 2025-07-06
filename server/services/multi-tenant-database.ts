@@ -14,6 +14,7 @@ interface TenantDatabaseConfig {
 }
 
 // UUID to string tenant ID mapping for legacy compatibility
+// Production deployment: force refresh 2025-01-06 to ensure UUID mapping is active
 const UUID_TENANT_MAPPING: Record<string, string> = {
   '3a1cbce2-0cf8-4c4f-ab96-4023eca4977d': 'moravian',
   // Add more mappings as needed
