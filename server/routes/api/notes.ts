@@ -6,17 +6,8 @@ import { insertNoteSchema } from '@shared/schema';
 
 const router = express.Router();
 
-// Helper function to get tenant-aware storage
-async function getTenantStorage(tenantId: string) {
-  const { TenantStorage } = await import('../../services/tenantStorage');
-  const tenantConfig = { 
-    id: tenantId, 
-    name: tenantId, 
-    domain: `${tenantId}.edsteward.local`,
-    database: tenantId 
-  };
-  return new TenantStorage(tenantConfig);
-}
+// Import the properly configured tenant storage with UUID normalization
+import { getTenantStorage } from '../../services/multi-tenant-database';
 
 // Simple auth middleware (we'll improve this later)
 const requireAuth = (req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -35,7 +26,7 @@ router.post("/", requireAuth, async (req, res) => {
   try {
     // Get tenant-aware storage for data isolation
     const tenantReq = req as any;
-    const tenantStorage = tenantReq.tenantId ? await getTenantStorage(tenantReq.tenantId) : storage;
+    const tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
     
     console.log(`[NOTES] Creating note for tenant: ${tenantReq.tenantId || 'default'}`);
     
@@ -70,7 +61,7 @@ router.get("/regulation/:regulationId", requireAuth, async (req, res) => {
   try {
     // Get tenant-aware storage for data isolation
     const tenantReq = req as any;
-    const tenantStorage = tenantReq.tenantId ? await getTenantStorage(tenantReq.tenantId) : storage;
+    const tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
     
     const regulationId = parseInt(req.params.regulationId);
     
@@ -96,7 +87,7 @@ router.delete("/:noteId", requireAuth, async (req, res) => {
   try {
     // Get tenant-aware storage for data isolation
     const tenantReq = req as any;
-    const tenantStorage = tenantReq.tenantId ? await getTenantStorage(tenantReq.tenantId) : storage;
+    const tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
     
     const noteId = parseInt(req.params.noteId);
     

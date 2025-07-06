@@ -8,6 +8,7 @@ import { setupDebugRegulationUpdatesApi } from '../debug-regulation-updates';
 import { setupMCPIntegrationApi } from '../mcp-integration-api';
 import { initializeDatabase } from '../db-init';
 import { storage } from '../storage';
+import { getTenantStorage } from '../services/multi-tenant-database';
 import path from 'path';
 import { tenantMiddleware, TenantFinder } from '../middleware/tenant';
 
@@ -188,11 +189,7 @@ export function registerRoutes(app: express.Application): Server {
   // AUTHENTICATED ENDPOINTS ONLY
   // =============================================================================
 
-  // Helper function to get tenant-aware storage
-  async function getTenantStorage(tenantId: string) {
-    // For now, return the default storage - will be improved with proper tenant isolation
-    return storage;
-  }
+  // The import for getTenantStorage is at the top of the file
 
   // Setup status for frontend navigation (requires auth)
   app.get('/api/setup/status', async (req, res) => {
@@ -203,7 +200,7 @@ export function registerRoutes(app: express.Application): Server {
 
       // Get tenant-aware storage for data isolation
       const tenantReq = req as any;
-      const tenantStorage = tenantReq.tenantId ? await getTenantStorage(tenantReq.tenantId) : storage;
+      const tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
 
       log(`📋 Checking setup status for tenant: ${tenantReq.tenantId || 'default'}`);
       
