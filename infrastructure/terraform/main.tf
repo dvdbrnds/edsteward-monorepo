@@ -298,7 +298,7 @@ variable "ecr_repository_url" {
 variable "database_url" {
   description = "Database connection URL"
   type        = string
-  default     = "postgresql://neondb_owner:npg_ZhQkQoD3Oo2I@ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require"
+  default     = "postgresql://neondb_owner:npg_foSr6ixkzw7W@ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require"
 }
 
 variable "session_secret" {
