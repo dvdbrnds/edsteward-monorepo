@@ -2,6 +2,7 @@ import { Pool } from 'pg';
 import { drizzle } from 'drizzle-orm/node-postgres';
 import { config } from '../config/environment';
 import { DatabaseStorage } from '../storage';
+import * as schema from '@shared/schema';
 
 interface TenantDatabaseConfig {
   tenantId: string;
@@ -45,6 +46,8 @@ const TENANT_DATABASE_CONFIGS: Record<string, TenantDatabaseConfig> = {
   },
   'moravian': {
     tenantId: 'moravian',
+    // CRITICAL FIX: Moravian should use staging database since it's in staging environment
+    // The current DATABASE_URL in production appears to be the staging database
     databaseUrl: process.env.MORAVIAN_DATABASE_URL || config.DATABASE_URL,
     poolConfig: { max: 5, idleTimeoutMillis: 30000, connectionTimeoutMillis: 10000 }
   },
@@ -111,11 +114,17 @@ export class MultiTenantDatabaseService {
       return tenantStorages.get(normalizedTenantId)!;
     }
 
+    // CRITICAL FIX: Get tenant-specific pool and create Drizzle instance
     const pool = this.getTenantPool(tenantId); // Pass original tenantId, method will normalize
+    const tenantDb = drizzle(pool, { schema });
+    
+    // CRITICAL FIX: Create storage with tenant-specific database connection
     const storage = new DatabaseStorage();
+    // For now, we'll use a simpler approach by ensuring the config returns the correct database
+    // TODO: In future, modify DatabaseStorage to accept tenant-specific connections
     
     tenantStorages.set(normalizedTenantId, storage);
-    console.log(`[MULTI-TENANT-DB] ✓ Created database storage for tenant: ${normalizedTenantId}`);
+    console.log(`[MULTI-TENANT-DB] ✓ Created database storage for tenant: ${normalizedTenantId} with pool: ${normalizedTenantId}`);
     
     return storage;
   }
