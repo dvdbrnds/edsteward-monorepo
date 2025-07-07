@@ -45,9 +45,15 @@ app.use(helmet({
   },
 }));
 
-// CORS configuration
+// CORS configuration - support both development and production domains
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [
+  'http://localhost:3000',
+  'https://moravian.edsteward.ai',
+  'https://edsteward.ai'
+];
+
 app.use(cors({
-  origin: process.env.ALLOWED_ORIGINS?.split(',') || 'http://localhost:3000',
+  origin: allowedOrigins,
   credentials: true,
 }));
 
