@@ -58,7 +58,17 @@ app.use(cors({
 }));
 
 // Basic middleware
-app.use(compression());
+// Disable Brotli compression to fix production transfer issues
+app.use(compression({
+  filter: (req, res) => {
+    // Only use gzip compression, avoid Brotli which causes transfer failures
+    const acceptEncoding = req.headers['accept-encoding'];
+    if (acceptEncoding && typeof acceptEncoding === 'string') {
+      req.headers['accept-encoding'] = acceptEncoding.replace(/,?\s*br\s*/g, '');
+    }
+    return compression.filter(req, res);
+  }
+}));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
