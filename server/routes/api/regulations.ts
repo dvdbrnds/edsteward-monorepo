@@ -72,6 +72,22 @@ const detectChanges = (original: any, updated: any): Record<string, { from: any;
 // Get all regulations (with tenant isolation)
 router.get("/", async (req, res) => {
   try {
+    // Handle HEAD requests - only return headers, no body
+    if (req.method === 'HEAD') {
+      const tenantReq = req as any;
+      let tenantStorage;
+      if (tenantReq.tenantId === '3a1cbce2-0cf8-4c4f-ab96-4023eca4977d') {
+        tenantStorage = storage;
+      } else {
+        tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
+      }
+      
+      const regulations = await tenantStorage.getRegulations();
+      res.setHeader('Content-Type', 'application/json; charset=utf-8');
+      res.setHeader('Content-Length', JSON.stringify(regulations).length);
+      return res.status(200).end();
+    }
+    
     const startTime = Date.now();
     
     // Get tenant-aware storage for data isolation
