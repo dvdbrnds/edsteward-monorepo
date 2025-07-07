@@ -79,7 +79,7 @@ configureAuth(app);
 registerRoutes(app);
 
 // Serve static files
-app.use(express.static(path.join(__dirname, '../dist')));
+app.use(express.static(path.join(__dirname, '../dist/public')));
 
 // Institution configuration endpoint
 app.get('/api/config', (req, res) => {
@@ -112,7 +112,7 @@ app.get('/api/health', async (req, res) => {
 
 // Serve React app for all other routes
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../dist/index.html'));
+  res.sendFile(path.join(__dirname, '../dist/public/index.html'));
 });
 
 // Error handling
