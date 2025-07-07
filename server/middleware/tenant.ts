@@ -1,9 +1,12 @@
 // Single-tenant compatibility stub - replaces tenant middleware
 import { Request, Response, NextFunction } from 'express';
 
-// Single-tenant middleware - no tenant detection needed
+// Single-tenant middleware - set up request for single-tenant mode
 export function tenantMiddleware(req: Request, res: Response, next: NextFunction) {
-  // In single-tenant mode, just pass through
+  // In single-tenant mode, ensure the request has the expected properties
+  const tenantReq = req as any;
+  tenantReq.tenantId = null; // Force null to use default storage
+  tenantReq.tenant = null;
   next();
 }
 
