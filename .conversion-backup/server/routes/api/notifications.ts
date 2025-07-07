@@ -1,0 +1,157 @@
+import express from "express";
+import { storage } from "../../storage";
+import type { InsertNotification } from "@shared/schema";
+
+const router = express.Router();
+
+// Import the properly configured tenant storage with UUID normalization
+import { getTenantStorage } from '../../services/multi-tenant-database';
+
+// GET /api/notifications - Get notifications for the current user ONLY (for dashboard)
+router.get("/", async (req, res) => {
+  try {
+    // Use multiple authentication checks for maximum compatibility
+    const isAuthenticated = req.isAuthenticated ? req.isAuthenticated() : false;
+    const hasUser = !!(req as any).user;
+    
+    if (!isAuthenticated && !hasUser) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    // Type-safe user access after authentication check
+    const user = (req as any).user;
+    if (!user) {
+      return res.status(401).json({ error: "User not found" });
+    }
+
+    // Get tenant-aware storage for data isolation
+    const tenantReq = req as any;
+    const tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
+    
+    console.log(`[NOTIFICATIONS] Using tenant: ${tenantReq.tenantId || 'default'} with isolation: ${!!tenantReq.tenantId}`);
+
+    // Debug logging
+    console.log("🔍 Notifications API Debug:", {
+      userId: user.id,
+      username: user.username,
+      role: user.role,
+      tenantId: tenantReq.tenantId
+    });
+
+    // Always get user-specific notifications for dashboard
+    console.log("🔍 Fetching user-specific notifications for dashboard");
+    const notifications = await tenantStorage.getNotificationsByUser(user.id);
+    
+    console.log("🔍 Notifications result:", {
+      userId: user.id,
+      totalReturned: notifications.length,
+      tenantId: tenantReq.tenantId
+    });
+    
+    return res.json(notifications);
+  } catch (error) {
+    console.error("Error fetching notifications:", error);
+    return res.status(500).json({ 
+      error: "Failed to fetch notifications",
+      details: error instanceof Error ? error.message : String(error)
+    });
+  }
+});
+
+// GET /api/notifications/admin - Get ALL notifications (admin only)
+router.get("/admin", async (req, res) => {
+  try {
+    // Use multiple authentication checks for maximum compatibility
+    const isAuthenticated = req.isAuthenticated ? req.isAuthenticated() : false;
+    const hasUser = !!(req as any).user;
+    
+    if (!isAuthenticated && !hasUser) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    // Type-safe user access after authentication check
+    const user = (req as any).user;
+    if (!user) {
+      return res.status(401).json({ error: "User not found" });
+    }
+
+    // Check for admin role
+    if (user.role !== 'admin') {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+
+    // Get tenant-aware storage for data isolation
+    const tenantReq = req as any;
+    const tenantStorage = tenantReq.tenantId ? await getTenantStorage(tenantReq.tenantId) : storage;
+    
+    console.log("🔍 Admin fetching ALL notifications");
+    const notifications = await tenantStorage.getAllNotifications();
+    
+    console.log("🔍 Admin notifications result:", {
+      totalReturned: notifications.length,
+      userIdDistribution: notifications.reduce((acc: Record<number, number>, n: any) => {
+        acc[n.userId] = (acc[n.userId] || 0) + 1;
+        return acc;
+      }, {} as Record<number, number>),
+      tenantId: tenantReq.tenantId
+    });
+    
+    return res.json(notifications);
+  } catch (error) {
+    console.error("Error fetching admin notifications:", error);
+    return res.status(500).json({ 
+      error: "Failed to fetch admin notifications",
+      details: error instanceof Error ? error.message : String(error)
+    });
+  }
+});
+
+// POST /api/notifications - Create a new notification
+router.post("/", async (req, res) => {
+  try {
+    // Use multiple authentication checks for maximum compatibility
+    const isAuthenticated = req.isAuthenticated ? req.isAuthenticated() : false;
+    const hasUser = !!(req as any).user;
+    
+    if (!isAuthenticated && !hasUser) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    // Get tenant-aware storage for data isolation
+    const tenantReq = req as any;
+    const tenantStorage = tenantReq.tenantId ? await getTenantStorage(tenantReq.tenantId) : storage;
+
+    const { regulationId, type, frequency, enabled, phoneNumber } = req.body;
+
+    if (!regulationId || !type || !frequency) {
+      return res.status(400).json({ error: "Missing required fields: regulationId, type, frequency" });
+    }
+
+    // Type-safe user access after authentication check
+    const user = (req as any).user;
+    if (!user) {
+      return res.status(401).json({ error: "User not found" });
+    }
+
+    const notification: InsertNotification = {
+      regulationId,
+      userId: user.id,
+      type,
+      frequency,
+      enabled: enabled !== undefined ? enabled : true,
+      phoneNumber,
+    };
+
+    const createdNotification = await tenantStorage.createNotification(notification);
+    console.log(`[NOTIFICATIONS] Created notification for tenant ${tenantReq.tenantId || 'default'}: ${createdNotification.id}`);
+    return res.json(createdNotification);
+  } catch (error) {
+    console.error("Error creating notification:", error);
+    return res.status(500).json({ 
+      error: "Failed to create notification",
+      details: error instanceof Error ? error.message : String(error)
+    });
+  }
+});
+
+export default router; 

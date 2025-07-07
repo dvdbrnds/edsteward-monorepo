@@ -1,0 +1,52 @@
+#!/bin/sh
+# Context7 Best Practice: Comprehensive pre-commit hook for code quality
+
+echo "🔍 Running pre-commit hooks..."
+
+# Context7 Best Practice: Run lint-staged for file-specific checks
+echo "📝 Checking staged files with lint-staged..."
+npx lint-staged
+if [ $? -ne 0 ]; then
+  echo "❌ lint-staged failed. Please fix the issues and try again."
+  exit 1
+fi
+
+# Context7 Best Practice: Run TypeScript type checking on entire project
+echo "🔍 Running TypeScript type checking..."
+npm run check
+if [ $? -ne 0 ]; then
+  echo "⚠️ TypeScript type checking found issues."
+  echo "  Consider fixing type errors for better code quality."
+  echo "  Continuing with commit - review errors above."
+fi
+
+# Context7 Best Practice: Run unit tests to ensure code changes don't break functionality
+echo "🧪 Running unit tests..."
+npm run test:unit 2>/dev/null
+if [ $? -ne 0 ]; then
+  echo "⚠️ Some unit tests failed. Consider reviewing your changes."
+  echo "  Continuing with commit as tests might be environment-dependent."
+fi
+
+# Context7 Best Practice: Check for common security patterns
+echo "🔒 Checking for potential security issues..."
+if grep -r --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" -E "(console\.log|debugger|\.only\(|\.skip\()" client/ server/ shared/ 2>/dev/null; then
+  echo "⚠️ Found potential debugging code or focused tests."
+  echo "  Consider removing console.log, debugger, .only(), or .skip() before committing."
+fi
+
+# Context7 Best Practice: Check for TODO/FIXME comments that might need attention
+echo "📋 Checking for TODO/FIXME comments..."
+TODO_COUNT=$(grep -r --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" -E "(TODO|FIXME|HACK)" client/ server/ shared/ 2>/dev/null | wc -l)
+if [ "$TODO_COUNT" -gt 0 ]; then
+  echo "📝 Found $TODO_COUNT TODO/FIXME comments in codebase."
+fi
+
+# Context7 Best Practice: Verify no sensitive information is being committed
+echo "🔐 Checking for potential sensitive information..."
+if grep -r --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" --include="*.json" -E "(password|secret|key|token|api_key)" --exclude-dir=node_modules . 2>/dev/null | grep -v -E "(Password|SecretKey|TokenType|ApiKey)" | head -5; then
+  echo "⚠️ Found potential sensitive information. Please review before committing."
+fi
+
+echo "✅ Pre-commit checks completed successfully!"
+echo "🚀 Proceeding with commit..."

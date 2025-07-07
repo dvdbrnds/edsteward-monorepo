@@ -15,7 +15,7 @@
       "environment": [
         {
           "name": "DATABASE_URL",
-          "value": "postgresql://neondb_owner:npg_ZhQkQoD3Oo2I@ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require"
+          "value": "postgresql://neondb_owner:npg_foSr6ixkzw7W@ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require"
         },
         {
           "name": "PORT",

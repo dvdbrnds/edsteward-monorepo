@@ -56,7 +56,7 @@ import type {
 import { regulationUpdates, type RegulationUpdate, type InsertRegulationUpdate } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, or, like } from "drizzle-orm";
-import { getTenantStorage } from "./services/multi-tenant-database";
+import { getDatabaseStorage } from "./services/database";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
@@ -359,7 +359,7 @@ export class DatabaseStorage implements IStorage {
   async createUser(insertUser: InsertUser, tenantId?: string): Promise<User> {
     // Use tenant-specific storage if tenantId provided
     if (tenantId) {
-      const tenantStorage = getTenantStorage(tenantId);
+      const tenantStorage = getDatabaseStorage();
       return await tenantStorage.createUser(insertUser);
     }
     

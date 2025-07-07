@@ -254,4 +254,422 @@ case "$1" in
     *)
         show_usage
         ;;
-esac 
+esac
+
+# 🏢 Multi-Tenant Deployment Strategy
+## How to Deploy Updates to All Tenants vs. Single Tenants Using Feature Flags
+
+*Your question answered: "Moravian is just one of our tenants. How do I deploy updates to all tenants and also single tenants? Feature flags should be used I think."*
+
+---
+
+## 🎯 **Overview**
+
+You're absolutely right! EdSteward uses **feature flags** to control deployments across multiple tenants. Here's how to deploy to all tenants vs. specific tenants safely.
+
+### **Current Tenant Architecture**
+```
+🏢 Production Tenants:
+├── moravian.edsteward.ai    (Moravian University)
+├── admin.edsteward.ai       (Admin/Support)
+└── [future tenants...]
+
+🧪 Staging/Testing:
+├── staging.edsteward.ai     (Testing environment)
+└── dev.edsteward.ai         (Development)
+```
+
+---
+
+## 🚀 **Deployment Strategies**
+
+### **1. Universal Updates (All Tenants)**
+*For features that should go to ALL tenants immediately*
+
+#### **When to Use:**
+- Bug fixes and security patches
+- Core UI/UX improvements
+- Performance optimizations
+- Standard feature enhancements
+
+#### **How to Deploy:**
+```typescript
+// 1. Set defaultValue: true in shared/feature-flags.ts
+'universal_improvement': {
+  key: 'universal_improvement',
+  name: 'Universal Improvement',
+  description: 'Improvement for all tenants',
+  category: 'ui',
+  defaultValue: true  // 👈 ALL TENANTS GET THIS
+}
+
+// 2. Use in components
+const hasImprovement = useFeatureFlag('universal_improvement');
+```
+
+#### **Deployment Commands:**
+```bash
+# Deploy to staging (all staging tenants get it)
+git push origin ES-clientside
+
+# Deploy to production (all production tenants get it)
+git push origin main
+```
+
+### **2. Tenant-Specific Updates (Selected Tenants)**
+*For features that should only go to specific tenants*
+
+#### **When to Use:**
+- Premium features
+- Beta testing
+- Institution-specific functionality
+- Gradual rollouts
+
+#### **How to Deploy:**
+```typescript
+// 1. Set defaultValue: false in shared/feature-flags.ts
+'premium_feature': {
+  key: 'premium_feature',
+  name: 'Premium Feature',
+  description: 'Feature for specific tenants only',
+  category: 'ui',
+  defaultValue: false  // 👈 NO TENANTS GET THIS BY DEFAULT
+}
+
+// 2. Deploy code (feature remains hidden)
+git push origin main
+
+// 3. Enable for specific tenants
+./scripts/manage-tenant-features.sh enable-feature moravian premium_feature
+```
+
+---
+
+## 🛠️ **Practical Deployment Workflows**
+
+### **Scenario 1: Deploy Bug Fix to All Tenants**
+
+```bash
+# 1. Fix the bug with defaultValue: true
+# shared/feature-flags.ts
+'security_fix_2025_01': {
+  key: 'security_fix_2025_01',
+  name: 'Security Fix January 2025',
+  description: 'Critical security patch',
+  category: 'api',
+  defaultValue: true  // All tenants get this immediately
+}
+
+# 2. Deploy to staging for testing
+git checkout ES-clientside
+git add .
+git commit -m "fix: critical security patch"
+git push origin ES-clientside
+
+# 3. Test on staging
+curl -I https://staging.edsteward.ai/health
+curl -I https://moravian.edsteward.ai/health  # Should work on staging
+
+# 4. Deploy to production (all tenants get it)
+git checkout main
+git merge ES-clientside
+git push origin main
+
+# 5. Verify all tenants
+./scripts/health-check-all.sh
+```
+
+### **Scenario 2: Deploy New Feature to Moravian Only**
+
+```bash
+# 1. Develop feature with defaultValue: false
+# shared/feature-flags.ts
+'advanced_analytics': {
+  key: 'advanced_analytics',
+  name: 'Advanced Analytics Dashboard',
+  description: 'Enhanced analytics for premium tenants',
+  category: 'ui',
+  defaultValue: false  // Hidden by default
+}
+
+# 2. Deploy code (feature stays hidden)
+git checkout ES-clientside
+git add .
+git commit -m "feat: advanced analytics dashboard"
+git push origin ES-clientside
+
+# Test on staging - feature should be hidden
+curl -I https://staging.edsteward.ai/
+
+# 3. Deploy to production (still hidden)
+git checkout main
+git merge ES-clientside
+git push origin main
+
+# 4. Enable for Moravian only
+./scripts/manage-tenant-features.sh enable-feature moravian advanced_analytics
+
+# 5. Verify Moravian has it, others don't
+curl -I https://moravian.edsteward.ai/  # Should have feature
+curl -I https://admin.edsteward.ai/     # Should NOT have feature
+```
+
+### **Scenario 3: Gradual Rollout to Multiple Tenants**
+
+```bash
+# 1. Deploy feature (defaultValue: false)
+git push origin main
+
+# 2. Enable for test tenants first
+./scripts/manage-tenant-features.sh rollout beta_feature admin,staging
+
+# 3. Monitor and test
+./scripts/health-check-all.sh
+
+# 4. Roll out to production tenants
+./scripts/manage-tenant-features.sh enable-feature moravian beta_feature
+
+# 5. Eventually enable for all (if successful)
+./scripts/manage-tenant-features.sh bulk-enable beta_feature
+```
+
+---
+
+## 🔧 **Tenant Feature Management Commands**
+
+### **List All Tenants**
+```bash
+./scripts/manage-tenant-features.sh list-tenants
+# Output:
+# moravian    Moravian University         ✅ active
+# admin       EdSteward Admin            ✅ active
+# staging     EdSteward Staging          ✅ active
+```
+
+### **Check Features for a Tenant**
+```bash
+./scripts/manage-tenant-features.sh list-features moravian
+# Shows current feature flag settings for Moravian
+```
+
+### **Enable Feature for Single Tenant**
+```bash
+# Enable for Moravian only
+./scripts/manage-tenant-features.sh enable-feature moravian new_feature
+
+# Enable for admin only
+./scripts/manage-tenant-features.sh enable-feature admin new_feature
+```
+
+### **Enable Feature for All Tenants**
+```bash
+# Enable for ALL active tenants
+./scripts/manage-tenant-features.sh bulk-enable new_feature
+```
+
+### **Progressive Rollout**
+```bash
+# Enable for specific tenants (comma-separated)
+./scripts/manage-tenant-features.sh rollout new_feature moravian,admin,test
+```
+
+### **Emergency Disable**
+```bash
+# Disable for single tenant
+./scripts/manage-tenant-features.sh disable-feature moravian problematic_feature
+
+# Disable for ALL tenants
+./scripts/manage-tenant-features.sh bulk-disable problematic_feature
+```
+
+---
+
+## 📋 **Real-World Examples**
+
+### **Example 1: Enhanced Navigation (All Tenants)**
+```typescript
+// shared/feature-flags.ts
+'enhanced_navigation_2025': {
+  key: 'enhanced_navigation_2025',
+  name: 'Enhanced Navigation 2025',
+  description: 'Improved navigation with breadcrumbs and search',
+  category: 'ui',
+  defaultValue: true  // All tenants benefit immediately
+}
+```
+
+**Deployment:**
+```bash
+git push origin main  # Goes live for all tenants
+```
+
+### **Example 2: AI Document Analysis (Premium Feature)**
+```typescript
+// shared/feature-flags.ts
+'ai_document_analysis': {
+  key: 'ai_document_analysis',
+  name: 'AI Document Analysis',
+  description: 'AI-powered document processing',
+  category: 'integration',
+  defaultValue: false  // Premium feature
+}
+```
+
+**Deployment:**
+```bash
+# Deploy code
+git push origin main
+
+# Enable for Moravian (they pay for premium features)
+./scripts/manage-tenant-features.sh enable-feature moravian ai_document_analysis
+
+# Other tenants don't get it unless they upgrade
+```
+
+### **Example 3: Beta Testing New Dashboard**
+```typescript
+// shared/feature-flags.ts
+'new_dashboard_beta': {
+  key: 'new_dashboard_beta',
+  name: 'New Dashboard Beta',
+  description: 'Beta version of redesigned dashboard',
+  category: 'ui',
+  defaultValue: false  // Beta testing only
+}
+```
+
+**Deployment:**
+```bash
+# Deploy code
+git push origin main
+
+# Enable for internal testing first
+./scripts/manage-tenant-features.sh enable-feature admin new_dashboard_beta
+./scripts/manage-tenant-features.sh enable-feature staging new_dashboard_beta
+
+# After testing, enable for willing beta testers
+./scripts/manage-tenant-features.sh enable-feature moravian new_dashboard_beta
+
+# Eventually roll out to all
+./scripts/manage-tenant-features.sh bulk-enable new_dashboard_beta
+```
+
+---
+
+## 🎯 **Decision Matrix: When to Use Which Strategy**
+
+| Update Type | Strategy | defaultValue | Deployment |
+|-------------|----------|--------------|------------|
+| **Bug Fixes** | Universal | `true` | `git push origin main` |
+| **Security Patches** | Universal | `true` | `git push origin main` |
+| **UI Improvements** | Universal | `true` | `git push origin main` |
+| **Performance Fixes** | Universal | `true` | `git push origin main` |
+| **Premium Features** | Tenant-Specific | `false` | Deploy + Enable per tenant |
+| **Beta Features** | Tenant-Specific | `false` | Deploy + Gradual rollout |
+| **Institution-Specific** | Tenant-Specific | `false` | Deploy + Enable for specific tenant |
+| **Experimental** | Tenant-Specific | `false` | Deploy + Internal testing first |
+
+---
+
+## 🚨 **Emergency Procedures**
+
+### **Rollback Single Tenant**
+```bash
+# If Moravian has issues with a feature
+./scripts/manage-tenant-features.sh disable-feature moravian problematic_feature
+```
+
+### **Rollback All Tenants**
+```bash
+# If feature causes issues for everyone
+./scripts/manage-tenant-features.sh bulk-disable problematic_feature
+```
+
+### **Emergency Feature Toggle**
+```bash
+# Instant disable without code deployment
+./scripts/manage-tenant-features.sh disable-feature moravian feature_name
+
+# Instant enable for urgent fix
+./scripts/manage-tenant-features.sh enable-feature moravian urgent_fix
+```
+
+---
+
+## 📊 **Monitoring & Verification**
+
+### **Check Deployment Status**
+```bash
+# Check all environments are healthy
+./scripts/health-check-all.sh
+
+# Check specific tenant
+curl -I https://moravian.edsteward.ai/health
+```
+
+### **Verify Feature Rollout**
+```bash
+# Check which tenants have a feature
+./scripts/manage-tenant-features.sh list-features moravian
+./scripts/manage-tenant-features.sh list-features admin
+```
+
+### **Monitor Feature Usage**
+```bash
+# Check application logs for feature usage
+aws logs tail /ecs/edsteward-multi-tenant-staging --follow --region us-east-1
+```
+
+---
+
+## 🎉 **Best Practices**
+
+### **1. Safe Feature Development**
+- ✅ Always start with `defaultValue: false` for new features
+- ✅ Test on staging environment first
+- ✅ Enable for internal tenants (admin, staging) before production
+- ✅ Monitor logs after enabling features
+
+### **2. Gradual Rollouts**
+- ✅ Start with 1 tenant → Monitor → Expand
+- ✅ Use `rollout` command for multiple tenants
+- ✅ Keep rollback plan ready
+- ✅ Document which tenants have which features
+
+### **3. Universal Updates**
+- ✅ Use `defaultValue: true` only for stable, tested features
+- ✅ Always test on staging first
+- ✅ Monitor all tenants after deployment
+- ✅ Have emergency disable plan ready
+
+### **4. Communication**
+- ✅ Document feature rollouts
+- ✅ Notify tenants of new features
+- ✅ Keep changelog updated
+- ✅ Track feature adoption
+
+---
+
+## 🚀 **Your Complete Workflow**
+
+### **For Updates to ALL Tenants:**
+1. Set `defaultValue: true` in feature flags
+2. Deploy: `git push origin main`
+3. Verify: `./scripts/health-check-all.sh`
+4. All tenants get the update immediately
+
+### **For Updates to SPECIFIC Tenants:**
+1. Set `defaultValue: false` in feature flags
+2. Deploy: `git push origin main` (feature stays hidden)
+3. Enable: `./scripts/manage-tenant-features.sh enable-feature moravian feature_name`
+4. Only enabled tenants see the feature
+
+### **For GRADUAL Rollouts:**
+1. Deploy with `defaultValue: false`
+2. Test: `./scripts/manage-tenant-features.sh enable-feature admin feature_name`
+3. Rollout: `./scripts/manage-tenant-features.sh rollout feature_name moravian,tenant2`
+4. Monitor and expand as needed
+
+---
+
+**🎯 Your multi-tenant deployment strategy is now enterprise-ready with granular control over which tenants get which features!** 
