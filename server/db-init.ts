@@ -2,7 +2,7 @@ import { db } from './config/database';
 import { sql } from 'drizzle-orm';
 import fs from 'fs';
 import path from 'path';
-import { MultiTenantDatabaseService } from './services/multi-tenant-database';
+import { getDatabaseStorage } from './services/database';
 
 export async function initializeDatabase() {
   console.log('🚀 Starting database initialization...');
@@ -119,14 +119,8 @@ export async function initializeDatabase() {
     const finalUserCount = await db.execute(sql`SELECT COUNT(*) as count FROM users`);
     const finalRegCount = await db.execute(sql`SELECT COUNT(*) as count FROM regulations`);
     
-    // Initialize multi-tenant databases
-    console.log('🏢 Initializing multi-tenant databases...');
-    try {
-      await MultiTenantDatabaseService.initializeAllTenants();
-      console.log('✅ Multi-tenant databases initialized');
-    } catch (error) {
-      console.log('⚠️ Multi-tenant initialization failed, continuing with single tenant:', error);
-    }
+    // Single-tenant mode - database already initialized
+    console.log('✅ Single-tenant database ready');
 
     console.log('🎉 Database initialization completed!');
     console.log(`📊 Users: ${finalUserCount.rows[0]?.count}, Regulations: ${finalRegCount.rows[0]?.count}`);

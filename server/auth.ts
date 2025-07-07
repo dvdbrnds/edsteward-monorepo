@@ -4,7 +4,7 @@ import { Express } from "express";
 import session from "express-session";
 import bcrypt from "bcryptjs";
 import { storage } from "./storage";
-import { getTenantStorage } from "./services/multi-tenant-database";
+import { getDatabaseStorage } from "./services/database";
 import { User as SelectUser } from "@shared/schema";
 import { syslog, LogLevel } from "./services/syslog";
 
@@ -23,10 +23,9 @@ async function comparePasswords(supplied: string, stored: string) {
   return await bcrypt.compare(supplied, stored);
 }
 
-// Get tenant-aware storage for user operations
+// Single-tenant storage for user operations
 function getTenantAwareStorage(req: any) {
-  const tenantId = req.tenantId || req.tenant?.id;
-  return tenantId ? getTenantStorage(tenantId) : storage;
+  return getDatabaseStorage();
 }
 
 export function setupAuth(app: Express) {
@@ -104,8 +103,8 @@ export function setupAuth(app: Express) {
         return done(null, false);
       }
 
-      // Use tenant-specific storage for user lookup
-      const tenantStorage = getTenantStorage(tenantId);
+      // Use single-tenant storage for user lookup
+      const tenantStorage = getDatabaseStorage();
       const user = await tenantStorage.getUser(userId);
 
       if (!user) {

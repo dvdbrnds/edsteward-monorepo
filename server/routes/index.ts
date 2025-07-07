@@ -8,9 +8,9 @@ import { setupDebugRegulationUpdatesApi } from '../debug-regulation-updates';
 import { setupMCPIntegrationApi } from '../mcp-integration-api';
 import { initializeDatabase } from '../db-init';
 import { storage } from '../storage';
-import { getTenantStorage } from '../services/multi-tenant-database';
+import { getDatabaseStorage } from '../services/database';
 import path from 'path';
-import { tenantMiddleware, TenantFinder } from '../middleware/tenant';
+// Tenant middleware disabled in single-tenant mode
 
 // Import modular route handlers
 import uploadsRoutes from './api/uploads';
@@ -51,8 +51,8 @@ export function registerRoutes(app: express.Application): Server {
   // APPLY TENANT MIDDLEWARE GLOBALLY
   // =============================================================================
   
-  // Apply tenant middleware to all routes for consistent tenant detection
-  app.use(tenantMiddleware);
+  // Single-tenant mode - no tenant middleware needed
+  // app.use(tenantMiddleware);
 
   // API health check with database status AND tenant information
   app.get('/api/health', async (req: any, res) => {
@@ -138,8 +138,8 @@ export function registerRoutes(app: express.Application): Server {
       const dbHealthy = await checkConnectionHealth();
       const healthStatus = databaseHealthMonitor.getHealthStatus();
       
-      // Extract tenant information from request
-      const tenantInfo = TenantFinder.extractTenantFromRequest(req);
+      // Single-tenant mode - simplified tenant info
+      const tenantInfo = { subdomain: null, domain: req.get('host'), method: 'single-tenant' };
       
       const response = {
         status: dbHealthy ? "healthy" : "degraded",
@@ -191,12 +191,12 @@ export function registerRoutes(app: express.Application): Server {
       server: 'production'
     };
     
-    // Test the UUID mapping logic directly
+    // Single-tenant mode - storage always available
     try {
-      const storage = getTenantStorage('3a1cbce2-0cf8-4c4f-ab96-4023eca4977d');
-      deploymentInfo.uuidMappingWorking = true;
+      const storage = getDatabaseStorage();
+      deploymentInfo.singleTenantWorking = true;
     } catch (error) {
-      deploymentInfo.uuidMappingWorking = false;
+      deploymentInfo.singleTenantWorking = false;
       deploymentInfo.error = error instanceof Error ? error.message : String(error);
     }
     
@@ -223,9 +223,8 @@ export function registerRoutes(app: express.Application): Server {
         return res.status(401).json({ error: "Authentication required" });
       }
 
-      // Get tenant-aware storage for data isolation
-      const tenantReq = req as any;
-      const tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
+      // Single-tenant storage - always use main database
+      const tenantStorage = getDatabaseStorage();
 
       log(`📋 Checking setup status for tenant: ${tenantReq.tenantId || 'default'}`);
       

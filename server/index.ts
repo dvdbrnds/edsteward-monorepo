@@ -10,10 +10,16 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import path from 'path';
+import { fileURLToPath } from 'url';
+import { dirname } from 'path';
 import { institutionConfig, validateConfig } from './config/institution';
 import { configureAuth } from './auth/single-tenant-auth';
 import { testConnection } from './services/database';
-import { setupApiRoutes } from './routes';
+import { registerRoutes } from './routes';
+
+// ES Module compatibility: Get current file path
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -70,7 +76,7 @@ app.use(passport.session());
 configureAuth(app);
 
 // API routes
-setupApiRoutes(app);
+registerRoutes(app);
 
 // Serve static files
 app.use(express.static(path.join(__dirname, '../dist')));

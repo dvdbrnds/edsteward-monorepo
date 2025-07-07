@@ -13,7 +13,9 @@ const __dirname = dirname(__filename);
 const router = express.Router();
 
 // Configure multer storage - use environment-appropriate path
-const uploadDir = process.env.NODE_ENV === 'production' 
+// Check if we're in a real production container or just local production mode
+const isActualProduction = process.env.NODE_ENV === 'production' && process.env.DOCKER_CONTAINER === 'true';
+const uploadDir = isActualProduction
   ? path.join('/app', 'uploads')
   : path.join(process.cwd(), 'uploads');
 
@@ -91,7 +93,7 @@ router.get('/:filename', (req, res) => {
 // Regulation file downloads with proper content type handling
 router.get('/regulations/:filename', (req, res) => {
   const filename = req.params.filename;
-  const basePath = process.env.NODE_ENV === 'production' ? '/app' : process.cwd();
+  const basePath = isActualProduction ? '/app' : process.cwd();
   const filePath = path.join(basePath, 'public/downloads/regulations', filename);
   
   // Check if file exists
