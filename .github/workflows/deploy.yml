@@ -30,8 +30,7 @@ jobs:
   deploy-dev:
     needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/dev'
-    environment: development
+    if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
     
     steps:
     - uses: actions/checkout@v4
@@ -73,8 +72,7 @@ jobs:
   deploy-staging:
     needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/ES-clientside' || github.ref == 'refs/heads/staging'
-    environment: staging
+    if: (github.ref == 'refs/heads/ES-clientside' || github.ref == 'refs/heads/staging') && github.event_name == 'push'
     
     steps:
     - uses: actions/checkout@v4
@@ -115,8 +113,7 @@ jobs:
   deploy-production:
     needs: test
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
-    environment: production
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     
     steps:
     - uses: actions/checkout@v4

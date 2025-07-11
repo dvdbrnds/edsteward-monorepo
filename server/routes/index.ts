@@ -10,19 +10,17 @@ import { initializeDatabase } from '../db-init';
 import { storage } from '../storage';
 import { getDatabaseStorage } from '../services/database';
 import path from 'path';
+import { institutionConfig } from '../config/institution';
 // Tenant middleware disabled in single-tenant mode
 
 // Import modular route handlers
 import uploadsRoutes from './api/uploads';
-import { regulationsRouter } from './api/regulations';
-import { notesRouter } from './api/notes';
+import regulationsRouter from './api/regulations';
+import notesRouter from './api/notes';
 import deadlinesRouter from './api/deadlines';
 import notificationsRouter from './api/notifications';
 import adminRouter from './api/admin';
-import tenantsRouter from './api/tenants';
-import fixStagingTenantRouter from './api/fix-staging-tenant';
 import { debugRouter } from './api/debug';
-import { testTenantRouter } from './api/test-tenant';
 import { emergencyMoravianRouter } from './api/emergency-moravian-fix';
 // @ts-ignore
 import migrationRoutes from './database-migration.js';
@@ -61,75 +59,13 @@ export function registerRoutes(app: express.Application): Server {
       const shouldFix = req.query.fix === 'staging-tenant';
       
       if (shouldFix) {
-        console.log('🔧 [HEALTH-FIX] Emergency staging tenant fix requested...');
-        
-        try {
-          const { db } = await import('../db');
-          const { tenants } = await import('../../shared/schema');
-          const { eq } = await import('drizzle-orm');
-          
-          // Check current staging record
-          const currentRecord = await db
-            .select()
-            .from(tenants)
-            .where(eq(tenants.subdomain, 'staging'))
-            .limit(1);
-          
-          if (currentRecord.length > 0 && currentRecord[0].id !== 'staging') {
-            console.log(`🔧 [HEALTH-FIX] Found problematic record: id='${currentRecord[0].id}', subdomain='staging'`);
-            
-            // Delete incorrect record
-            await db.delete(tenants).where(eq(tenants.subdomain, 'staging'));
-            console.log('🗑️ [HEALTH-FIX] Deleted incorrect staging record');
-            
-            // Insert correct record
-            await db.insert(tenants).values({
-              id: 'staging',
-              name: 'EdSteward Staging Environment',
-              domain: 'staging.edsteward.ai',
-              subdomain: 'staging',
-              databaseName: 'edsteward_staging',
-              status: 'active',
-              settings: {
-                allowedDomains: ['edsteward.ai', 'staging.edsteward.ai'],
-                defaultRole: 'admin',
-                enableAutoProvisioning: true,
-                features: {
-                  apiAccess: true,
-                  customDomain: false,
-                  ssoEnabled: false,
-                  maxUsers: 1000,
-                  maxRegulations: 10000
-                }
-              }
-            });
-            console.log('✅ [HEALTH-FIX] Inserted correct staging record');
-            
-            return res.json({
-              status: 'healthy',
-              fixApplied: true,
-              message: 'Staging tenant database record has been fixed',
-              timestamp: new Date().toISOString()
-            });
-          } else {
-            console.log('ℹ️ [HEALTH-FIX] Staging record is already correct or not found');
-            return res.json({
-              status: 'healthy',
-              fixApplied: false,
-              message: 'Staging tenant record is already correct',
-              timestamp: new Date().toISOString()
-            });
-          }
-        } catch (fixError) {
-          console.error('❌ [HEALTH-FIX] Fix failed:', fixError);
-          return res.status(500).json({
-            status: 'error',
-            fixApplied: false,
-            error: 'Database fix failed',
-            message: fixError instanceof Error ? fixError.message : String(fixError),
-            timestamp: new Date().toISOString()
-          });
-        }
+        console.log('🔧 [HEALTH-FIX] Single-tenant mode - no tenant fixes needed');
+        return res.json({
+          status: 'healthy',
+          fixApplied: false,
+          message: 'Single-tenant mode - no tenant fixes needed',
+          timestamp: new Date().toISOString()
+        });
       }
       
       const { checkConnectionHealth } = await import('../config/database');
@@ -207,6 +143,25 @@ export function registerRoutes(app: express.Application): Server {
   // AUTHENTICATION SETUP
   // =============================================================================
 
+  // Public branding endpoint (no auth required) for login page styling
+  app.get('/api/branding', async (req, res) => {
+    try {
+      const tenantStorage = getDatabaseStorage();
+      const brandingConfig = await tenantStorage.getBrandingConfig();
+
+      res.json({
+        success: true,
+        branding: brandingConfig,
+      });
+    } catch (error) {
+      console.error("Error fetching public branding config:", error);
+      res.status(500).json({ 
+        error: "Failed to fetch branding config", 
+        details: error instanceof Error ? error.message : String(error) 
+      });
+    }
+  });
+
   // Setup authentication
   setupAuth(app as any);
 
@@ -226,7 +181,7 @@ export function registerRoutes(app: express.Application): Server {
       // Single-tenant storage - always use main database
       const tenantStorage = getDatabaseStorage();
 
-      log(`📋 Checking setup status for tenant: ${tenantReq.tenantId || 'default'}`);
+      log(`📋 Checking setup status for single-tenant: default`);
       
       const users = await tenantStorage.getAllUsers();
       const regulations = await tenantStorage.getRegulations();
@@ -239,10 +194,10 @@ export function registerRoutes(app: express.Application): Server {
         userCount: users.length,
         regulationCount: regulations.length,
         deadlineCount: 0,
-        tenantId: tenantReq.tenantId || 'default'
+        tenantId: 'default'
       };
       
-      log(`✅ Setup status for tenant ${tenantReq.tenantId || 'default'}: ${JSON.stringify(setupStatus)}`);
+      log(`✅ Setup status for single-tenant default: ${JSON.stringify(setupStatus)}`);
       res.json(setupStatus);
     } catch (error) {
       log(`❌ Error checking setup status: ${error}`);
@@ -262,9 +217,16 @@ export function registerRoutes(app: express.Application): Server {
       return res.status(401).json({ error: 'Authentication required' });
     }
     
+    let user = req.user;
+    
+    // Ensure dvdbrnds is always admin
+    if (user && user.username === 'dvdbrnds' && user.role !== 'admin') {
+      user = { ...user, role: 'admin' };
+    }
+    
     // Include tenant info in user response
     const userWithTenant = {
-      ...req.user,
+      ...user,
       tenantId: (req as any).tenantId,
       subdomain: (req as any).tenant?.subdomain
     };
@@ -276,9 +238,16 @@ export function registerRoutes(app: express.Application): Server {
     const isAuthenticated = req.isAuthenticated();
     const tenantReq = req as any;
     
+    let user = isAuthenticated ? req.user : null;
+    
+    // Ensure dvdbrnds is always admin
+    if (user && user.username === 'dvdbrnds' && user.role !== 'admin') {
+      user = { ...user, role: 'admin' };
+    }
+    
     res.json({
       authenticated: isAuthenticated,
-      user: isAuthenticated ? req.user : null,
+      user: user,
       tenantId: tenantReq.tenantId || null,
       subdomain: tenantReq.tenant?.subdomain || null,
       timestamp: new Date().toISOString()
@@ -291,15 +260,10 @@ export function registerRoutes(app: express.Application): Server {
   app.use('/api/deadlines', deadlinesRouter);
   app.use('/api/notifications', notificationsRouter);
   app.use('/api/admin', adminRouter);
-  app.use('/api/tenants', tenantsRouter);
   app.use('/api/database-migration', migrationRoutes);
   
-  // Emergency fix endpoint (development only or with admin key)
-  app.use('/api', fixStagingTenantRouter);
-
   // Register debug routes (no auth required for debugging)
   app.use('/api/debug', debugRouter);
-  app.use('/api/test', testTenantRouter);
   
   // Emergency bypass for Moravian tenant - only use when hostname is moravian.edsteward.ai
   app.use('/api/emergency', (req, res, next) => {
@@ -309,6 +273,39 @@ export function registerRoutes(app: express.Application): Server {
     } else {
       res.status(404).json({ error: 'Emergency endpoint only available for Moravian tenant' });
     }
+  });
+
+  // Institution configuration endpoint for client-side branding
+  app.get('/api/institution-config', (req, res) => {
+    const config = {
+      institution: {
+        name: institutionConfig.name,
+        domain: institutionConfig.domain,
+        branding: {
+          logo: institutionConfig.branding.logo,
+          primaryColor: institutionConfig.branding.primaryColor,
+          secondaryColor: institutionConfig.branding.secondaryColor,
+          favicon: institutionConfig.branding.favicon,
+        },
+      },
+      authentication: {
+        samlEnabled: institutionConfig.authentication.samlEnabled,
+        usernamePasswordEnabled: institutionConfig.authentication.usernamePasswordEnabled,
+        allowSelfRegistration: institutionConfig.authentication.allowSelfRegistration,
+      },
+      features: {
+        maxUsers: institutionConfig.features.maxUsers,
+        maxRegulations: institutionConfig.features.maxRegulations,
+        apiAccess: institutionConfig.features.apiAccess,
+        customDomain: institutionConfig.features.customDomain,
+        ssoEnabled: institutionConfig.features.ssoEnabled,
+      },
+    };
+
+    res.json({
+      success: true,
+      institutionConfig: config,
+    });
   });
 
   // Setup additional APIs
@@ -321,6 +318,17 @@ export function registerRoutes(app: express.Application): Server {
 
   // Serve static files
   app.use('/downloads', express.static(path.join(process.cwd(), 'public/downloads')));
+  
+  // Serve branding assets
+  const assetsPath = path.join(process.cwd(), 'client/public/assets');
+  app.use('/assets', express.static(assetsPath, {
+    setHeaders: (res, path) => {
+      // Set appropriate cache headers for assets
+      if (path.endsWith('.png') || path.endsWith('.jpg') || path.endsWith('.jpeg') || path.endsWith('.svg') || path.endsWith('.ico')) {
+        res.setHeader('Cache-Control', 'public, max-age=86400'); // 24 hours cache
+      }
+    }
+  }));
 
   return httpServer;
 }

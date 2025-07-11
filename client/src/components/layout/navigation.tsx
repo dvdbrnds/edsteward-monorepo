@@ -9,7 +9,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { apiRequest } from "@/lib/queryClient";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   LayoutDashboard,
   Book,
@@ -36,7 +36,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useQuery } from "@tanstack/react-query";
-import { useTenantBranding } from "@/hooks/use-tenant-branding";
+import { useLegacyBranding } from "@/hooks/use-branding";
 
 // Import logos
 import moravianLogo from "@/assets/Screenshot_2025-02-12_at_9.15.57_AM-removebg-preview.png";
@@ -267,7 +267,10 @@ export default function Navigation() {
   const { user, logoutMutation } = useAuth();
   const [location] = useLocation();
   const [changelogOpen, setChangelogOpen] = useState(false);
-  const branding = useTenantBranding();
+  const branding = useLegacyBranding();
+
+  // Note: Document title is now managed by the useBranding hook
+  // No longer needed here as the hook handles title updates
 
   const { data: _setupComplete } = useQuery({
     queryKey: ["/api/setup/status"],
@@ -305,12 +308,12 @@ export default function Navigation() {
                 <Link href="/">
                   <button className="flex items-center focus:outline-none">
                     <img
-                      src={branding.id === 'moravian' ? moravianLogo : branding.id === 'test' ? genericLogo : moravianLogo}
+                      src={branding.logo}
                       alt={`${branding.name} Logo`}
                       className="h-8 hover:opacity-80 transition-opacity"
                     />
                     <span className="text-xl font-bold text-white hover:text-gray-200 transition-colors ml-3">
-                      {branding.id === 'test' ? 'Generic Portal' : 'Compliance Portal'}
+                      Compliance Portal
                     </span>
                   </button>
                 </Link>

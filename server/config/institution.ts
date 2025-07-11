@@ -36,7 +36,7 @@ export interface InstitutionConfig {
 
 // Load configuration from environment variables
 export const institutionConfig: InstitutionConfig = {
-  name: process.env.INSTITUTION_NAME || 'EdSteward Institution',
+  name: (process.env.INSTITUTION_NAME || 'EdSteward Institution').replace(/_/g, ' '),
   domain: process.env.INSTITUTION_DOMAIN || 'localhost',
   branding: {
     logo: process.env.INSTITUTION_LOGO_URL || '/assets/generic-logo.svg',

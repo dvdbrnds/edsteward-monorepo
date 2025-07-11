@@ -10,7 +10,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2 } from "lucide-react";
 import { useEffect } from "react";
-import { useTenantBranding } from "@/hooks/use-tenant-branding";
+import { useBranding } from "@/hooks/use-branding";
 
 // Import logos
 import moravianLogo from "../assets/Moravian-Monogram-MoravianBlue.png";
@@ -19,7 +19,7 @@ import genericLogo from "../assets/generic-logo.svg";
 export default function AuthPage() {
   const { user, loginMutation, registerMutation } = useAuth();
   const [_, setLocation] = useLocation();
-  const branding = useTenantBranding();
+  const branding = useBranding();
 
   const loginForm = useForm({
     resolver: zodResolver(insertUserSchema.pick({ username: true, password: true })),
@@ -53,23 +53,29 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div 
+      className="min-h-screen flex"
+      style={{ backgroundColor: branding.loginScreenBackgroundColor }}
+    >
       {/* Form Section */}
       <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-sm lg:w-96">
           {/* Logo centered above the title */}
           <div className="flex items-center justify-center mb-8">
             <img 
-              src={branding.id === 'moravian' ? moravianLogo : branding.id === 'test' ? genericLogo : moravianLogo}
-              alt={`${branding.name} Logo`}
+              src={branding.logoUrl || moravianLogo}
+              alt={`${branding.institutionName} Logo`}
               className="h-20 w-auto"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = moravianLogo;
+              }}
             />
           </div>
 
-          <h1 className="text-3xl font-bold mb-8 text-center" style={{ color: branding.primaryColor }}>
-            {branding.name}
+          <h1 className="text-3xl font-bold mb-8 text-center" style={{ color: branding.loginScreenTextColor }}>
+            {branding.institutionName}
             <br />
-            {branding.id === 'test' ? 'Generic Portal' : 'Compliance Portal'}
+            <span className="text-xl font-normal opacity-90">Compliance Portal</span>
           </h1>
 
           <Tabs defaultValue="login" className="w-full">
@@ -116,8 +122,8 @@ export default function AuthPage() {
                         type="submit" 
                         className="w-full hover:opacity-90 transition-opacity" 
                         style={{ 
-                          backgroundColor: branding.primaryColor, 
-                          borderColor: branding.primaryColor 
+                          backgroundColor: branding.loginScreenAccentColor, 
+                          borderColor: branding.loginScreenAccentColor 
                         }}
                         disabled={loginMutation.isPending}
                       >
@@ -127,8 +133,8 @@ export default function AuthPage() {
                     </form>
                   </Form>
                   
-                  {/* SAML SSO Login for Moravian University */}
-                  {branding.id === 'moravian' && (
+                  {/* SAML SSO Login - show for institutions that have SAML configured */}
+                  {branding.institutionName.toLowerCase().includes('moravian') && (
                     <div className="mt-6">
                       <div className="relative">
                         <div className="absolute inset-0 flex items-center">
@@ -280,8 +286,13 @@ export default function AuthPage() {
       </div>
 
       {/* Hero Section */}
-      <div className="hidden lg:block relative w-0 flex-1 bg-[#002147]">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#002147] to-[#003166] opacity-90" />
+      <div className="hidden lg:block relative w-0 flex-1" style={{ backgroundColor: branding.loginScreenHeroColor }}>
+        <div 
+          className="absolute inset-0 bg-gradient-to-br opacity-90" 
+          style={{ 
+            background: `linear-gradient(to bottom right, ${branding.loginScreenHeroColor}, ${branding.loginScreenHeroColor}dd)` 
+          }} 
+        />
         <div className="absolute inset-0 flex items-center justify-center p-12">
           <div className="text-white max-w-2xl">
             <h2 className="text-4xl font-bold mb-6">

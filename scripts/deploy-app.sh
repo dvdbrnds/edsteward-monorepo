@@ -22,6 +22,9 @@ NC='\033[0m' # No Color
 
 echo -e "${BLUE}🚀 EdSteward Fast Deployment Started${NC}"
 echo "=================================================="
+echo -e "${YELLOW}💡 Remember: Develop locally using Docker containers${NC}"
+echo -e "${YELLOW}   Command: make -f Makefile.local dev${NC}"
+echo "=================================================="
 
 # Step 1: Build Docker Image
 echo -e "\n${YELLOW}📦 Step 1: Building Docker image...${NC}"

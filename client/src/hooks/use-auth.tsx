@@ -73,9 +73,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     mutationFn: async (credentials: LoginData) => {
       return await apiRequest("POST", "/api/login", credentials);
     },
-    onSuccess: (user: SelectUser) => {
-      queryClient.setQueryData(["/api/auth/status"], user);
-      // Invalidate all queries to refresh data after login
+    onSuccess: (loginResponse: any) => {
+      // Don't set query data directly - let the auth status query refetch with correct structure
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/status"] });
+      // Invalidate all other queries to refresh data after login
       queryClient.invalidateQueries({ queryKey: ["/api/notifications"] });
       queryClient.invalidateQueries({ queryKey: ["/api/notifications", "v2"] });
       queryClient.invalidateQueries({ queryKey: ["/api/deadlines"] });
@@ -94,8 +95,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     mutationFn: async (credentials: InsertUser) => {
       return await apiRequest("POST", "/api/register", credentials);
     },
-    onSuccess: (user: SelectUser) => {
-      queryClient.setQueryData(["/api/auth/status"], user);
+    onSuccess: (registerResponse: any) => {
+      // Don't set query data directly - let the auth status query refetch with correct structure
+      queryClient.invalidateQueries({ queryKey: ["/api/auth/status"] });
     },
     onError: (error: Error) => {
       toast({

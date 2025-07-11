@@ -1,20 +1,26 @@
-# EdSteward Deployment Guide
+# EdSteward Deployment Guide - Single-Tenant On-Premises
 
-## 🎯 **Hybrid Deployment Strategy**
+## 🎯 **Single-Tenant On-Premises Strategy**
 
-EdSteward uses a **two-tier deployment approach** optimized for both infrastructure stability and rapid application updates:
+EdSteward uses a **per-customer deployment approach** where each institution gets their own dedicated server installation:
 
-### **Tier 1: Infrastructure (Terraform) - Infrequent**
-- **Use for**: VPC, ECS Cluster, RDS, Load Balancer, Security Groups
-- **Frequency**: Monthly/Quarterly or when infrastructure changes needed
-- **Time**: 20-30 minutes
-- **Command**: `cd infrastructure/terraform && terraform apply`
+### **Development Phase: Docker Containers**
+- **Use for**: Feature development, testing, debugging
+- **Environment**: Single-tenant Docker configuration
+- **Time**: Instant hot reloading
+- **Command**: `docker-compose -f single-tenant-config/docker-compose.single-tenant.yml up -d`
 
-### **Tier 2: Application (Docker + ECS) - Frequent**
-- **Use for**: Code changes, bug fixes, new features
-- **Frequency**: Daily/Weekly deployments
-- **Time**: 3-5 minutes
-- **Command**: `./scripts/deploy-app.sh`
+### **Packaging Phase: Customer-Specific Builds**
+- **Use for**: Preparing customer deployments
+- **Environment**: Docker image with customer branding/config
+- **Time**: 5-10 minutes
+- **Command**: `./scripts/package-for-customer.sh [customer-name]`
+
+### **Deployment Phase: Customer On-Premises**
+- **Use for**: Production installation at customer site
+- **Environment**: Customer's own infrastructure
+- **Time**: 15-30 minutes (customer runs installer)
+- **Command**: Customer runs `./install.sh` from deployment package
 
 ---
 
@@ -67,19 +73,26 @@ terraform apply
 
 ## 📋 **Deployment Workflows**
 
-### **Daily Development Workflow**
+### **Daily Development Workflow (Docker-First)**
 ```bash
-# 1. Make code changes
+# 1. Start Docker local development environment
+make -f Makefile.local dev
+
+# 2. Make code changes (hot reload enabled in Docker)
+# Edit files in your IDE - changes appear instantly at http://localhost:3000
+
+# 3. Test in production-like staging environment
+make -f Makefile.local staging
+
+# 4. Commit changes for version control
 git add .
 git commit -m "Feature: Add new compliance feature"
+git push origin main
 
-# 2. Test locally
-npm run dev
-
-# 3. Deploy to production
+# 5. Deploy to production using AWS ECS/ECR
 ./scripts/deploy-app.sh
 
-# 4. Verify deployment
+# 6. Verify deployment
 curl https://edsteward.ai/health
 ```
 
@@ -206,9 +219,10 @@ aws elbv2 describe-target-health --target-group-arn <target-group-arn>
 ## 🎯 **Best Practices**
 
 ### **Before Deployment**
-- ✅ Test changes locally with `npm run dev`
+- ✅ Test changes locally with `make -f Makefile.local dev` (Docker environment)
+- ✅ Verify in staging with `make -f Makefile.local staging`
 - ✅ Ensure all tests pass
-- ✅ Commit changes to git
+- ✅ Commit changes to git for version control
 - ✅ Check AWS credentials are valid
 
 ### **During Deployment**
@@ -227,32 +241,6 @@ aws elbv2 describe-target-health --target-group-arn <target-group-arn>
 - ✅ Keep previous versions available
 - ✅ Document rollback procedures
 - ✅ Have monitoring alerts in place
-
----
-
-## 📈 **CI/CD Integration (Future)**
-
-For automated deployments, consider integrating with:
-
-### **GitHub Actions**
-```yaml
-name: Deploy EdSteward
-on:
-  push:
-    branches: [main]
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Deploy to AWS
-        run: ./scripts/deploy-app.sh
-```
-
-### **AWS CodePipeline**
-- Source: GitHub repository
-- Build: CodeBuild with Docker
-- Deploy: ECS service update
 
 ---
 

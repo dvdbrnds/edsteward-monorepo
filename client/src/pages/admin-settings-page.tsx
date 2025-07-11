@@ -17,6 +17,7 @@ import { apiRequest } from "@/lib/api";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from "date-fns";
 import { InstitutionSettings } from "@/components/admin/institution-settings";
+import { BrandingSettingsV2 } from "@/components/admin/branding-settings";
 import {
   Table,
   TableBody,
@@ -419,8 +420,9 @@ export default function SystemSettingsPage() {
           <h1 className="text-3xl font-bold text-gray-900 mb-8">System Settings</h1>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-5 mb-4">
+            <TabsList className="grid grid-cols-6 mb-4">
               <TabsTrigger value="institution">Institution</TabsTrigger>
+              <TabsTrigger value="branding">Branding</TabsTrigger>
               <TabsTrigger value="email">Email</TabsTrigger>
               <TabsTrigger value="sms">SMS</TabsTrigger>
               <TabsTrigger value="users">Users</TabsTrigger>
@@ -434,6 +436,18 @@ export default function SystemSettingsPage() {
                   toast({
                     title: "Institution Settings Updated",
                     description: "The institution configuration has been saved successfully.",
+                  });
+                }}
+              />
+            </TabsContent>
+
+            <TabsContent value="branding">
+              <BrandingSettingsV2 
+                onConfigUpdate={(config) => {
+                  toast({
+                    title: "Branding Updated",
+                    description: "Your branding configuration has been applied successfully. Changes will be visible on the next page load.",
+                    duration: 7000,
                   });
                 }}
               />

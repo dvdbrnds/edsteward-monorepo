@@ -2,9 +2,15 @@ version: '3.8'
 
 services:
   app:
-    image: edsteward-single-tenant:latest
+    image: edsteward-single-tenant:fixed-final
     ports:
       - "3000:3000"
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
     environment:
       # Institution Configuration
       - INSTITUTION_NAME=Moravian University
@@ -13,14 +19,13 @@ services:
       - INSTITUTION_PRIMARY_COLOR=#003366
       - INSTITUTION_SECONDARY_COLOR=#336699
       
-      # Authentication
-      - AUTH_SAML_ENABLED=true
-      - AUTH_SAML_ENTITY_ID=urn:edsteward:sp:moravian
+      # Authentication (SAML disabled for local development)
+      - AUTH_SAML_ENABLED=false
       - AUTH_USERNAME_PASSWORD_ENABLED=true
       - AUTH_ALLOW_SELF_REGISTRATION=false
       
-      # Database
-      - DATABASE_URL=postgresql://postgres:password@db:5432/edsteward
+      # Database (no SSL for local development)
+      - DATABASE_URL=postgresql://postgres:password@db:5432/edsteward?sslmode=disable
       - REDIS_URL=redis://redis:6379
       
       # Application
@@ -55,6 +60,12 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./database/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     restart: unless-stopped
 
   redis:

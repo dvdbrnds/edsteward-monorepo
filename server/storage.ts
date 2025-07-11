@@ -190,6 +190,10 @@ export interface IStorage {
   getEvidenceFilesByRegulation(regulationId: number): Promise<EvidenceFile[]>;
   getEvidenceFile(id: number): Promise<EvidenceFile | undefined>;
   updateEvidenceFileStatus(id: number, status: string): Promise<EvidenceFile>;
+
+  // Branding configuration methods
+  getBrandingConfig(): Promise<any>;
+  saveBrandingConfig(config: any): Promise<any>;
 }
 
 import { emailService } from './services/email';
@@ -1329,20 +1333,97 @@ export class DatabaseStorage implements IStorage {
   }
   
   async rejectVersionConflict(id: number, userId: number): Promise<VersionConflict> {
+    const [versionConflict] = await db
+      .update(versionConflicts)
+      .set({
+        status: 'rejected' as const,
+        resolvedBy: userId,
+        resolvedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(versionConflicts.id, id))
+      .returning();
+
+    if (!versionConflict) {
+      throw new Error(`Version conflict with ID ${id} not found`);
+    }
+
+    return versionConflict;
+  }
+
+  // Branding configuration methods
+  async getBrandingConfig(): Promise<any> {
     try {
-      const [updatedConflict] = await db
-        .update(versionConflicts)
-        .set({
-          status: 'rejected',
-          resolvedAt: new Date(),
-          resolvedBy: userId
-        })
-        .where(eq(versionConflicts.id, id))
-        .returning();
+      // Use raw SQL query to get branding configuration
+      const result = await sessionPool.query(`
+        SELECT config_data 
+        FROM branding_configurations 
+        WHERE id = 1
+      `);
       
-      return updatedConflict;
+      if (result.rows.length > 0) {
+        return result.rows[0].config_data;
+      }
+      
+      // Return default configuration if none exists
+      return {
+        institutionName: "EdSteward Institution",
+        title: "EdSteward Compliance Portal",
+        logoUrl: "/assets/generic-logo.svg",
+        faviconUrl: "/favicon.ico",
+        primaryColor: "#1e3a8a",
+        secondaryColor: "#1e40af",
+        accentColor: "#3b82f6",
+        loginScreenBackgroundColor: "#f8fafc",
+        loginScreenAccentColor: "#1e3a8a",
+        loginScreenTextColor: "#1f2937",
+        loginScreenHeroColor: "#002147",
+      };
     } catch (error) {
-      console.error(`Error rejecting version conflict ${id}:`, error);
+      console.error("Error fetching branding config:", error);
+      // Return default configuration on error
+      return {
+        institutionName: "EdSteward Institution",
+        title: "EdSteward Compliance Portal",
+        logoUrl: "/assets/generic-logo.svg",
+        faviconUrl: "/favicon.ico",
+        primaryColor: "#1e3a8a",
+        secondaryColor: "#1e40af",
+        accentColor: "#3b82f6",
+        loginScreenBackgroundColor: "#f8fafc",
+        loginScreenAccentColor: "#1e3a8a",
+        loginScreenTextColor: "#1f2937",
+        loginScreenHeroColor: "#002147",
+      };
+    }
+  }
+
+  async saveBrandingConfig(config: any): Promise<any> {
+    try {
+      // Create the table if it doesn't exist
+      await sessionPool.query(`
+        CREATE TABLE IF NOT EXISTS branding_configurations (
+          id SERIAL PRIMARY KEY,
+          config_data JSONB NOT NULL,
+          created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+          updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+        )
+      `);
+
+      // Use UPSERT (INSERT ... ON CONFLICT) to save configuration
+      const result = await sessionPool.query(`
+        INSERT INTO branding_configurations (id, config_data, updated_at)
+        VALUES (1, $1, NOW())
+        ON CONFLICT (id) 
+        DO UPDATE SET 
+          config_data = EXCLUDED.config_data,
+          updated_at = NOW()
+        RETURNING config_data
+      `, [JSON.stringify(config)]);
+
+      return result.rows[0].config_data;
+    } catch (error) {
+      console.error("Error saving branding config:", error);
       throw error;
     }
   }

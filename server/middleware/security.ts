@@ -10,21 +10,21 @@ export function securityHeadersMiddleware(req: Request, res: Response, next: Nex
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-XSS-Protection', '1; mode=block');
   
-  // HTTPS enforcement headers
+  // Content Security Policy - always applied (for blob: support in development)
+  res.setHeader('Content-Security-Policy', 
+    "default-src 'self'; " +
+    "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+    "style-src 'self' 'unsafe-inline'; " +
+    "img-src 'self' data: https: blob:; " +
+    "font-src 'self' https:; " +
+    "connect-src 'self' https:; " +
+    (req.secure || req.headers['x-forwarded-proto'] === 'https' ? "upgrade-insecure-requests" : "")
+  );
+
+  // HTTPS enforcement headers (only for secure connections)
   if (req.secure || req.headers['x-forwarded-proto'] === 'https') {
     // Strict Transport Security - forces HTTPS for 1 year
     res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
-    
-    // Content Security Policy - prevents mixed content
-    res.setHeader('Content-Security-Policy', 
-      "default-src 'self'; " +
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
-      "style-src 'self' 'unsafe-inline'; " +
-      "img-src 'self' data: https:; " +
-      "font-src 'self' https:; " +
-      "connect-src 'self' https:; " +
-      "upgrade-insecure-requests"
-    );
   }
   
   next();

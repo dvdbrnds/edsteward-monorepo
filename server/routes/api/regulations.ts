@@ -1,108 +1,36 @@
 import express from 'express';
 import { storage } from '../../storage';
-import { getTenantStorage } from '../../services/multi-tenant-database';
+import { getDatabaseStorage } from '../../services/database';
 import { syslog, LogLevel, LogFacility } from '../../services/syslog';
-import { tenantMiddleware } from '../../middleware/tenant';
 import type { Regulation } from '@shared/schema';
 
 const router = express.Router();
 
-// Apply new tenant middleware to all routes
-router.use(tenantMiddleware);
-
-// Simple auth middleware (we'll improve this later)
+// Simple auth middleware
 const requireAuth = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  if (!req.isAuthenticated || !req.isAuthenticated()) {
+  if (!req.isAuthenticated()) {
     return res.status(401).json({ error: 'Authentication required' });
   }
   next();
 };
 
-// Helper function to log regulation changes with user details
-const logRegulationChange = (
-  action: string,
-  regulationId: number,
-  userId: number,
-  username: string,
-  changes?: Record<string, { from: any; to: any }>,
-  metadata?: any
-) => {
-  const changeDetails = changes 
-    ? Object.entries(changes)
-        .map(([field, { from, to }]) => `${field}: "${from}" → "${to}"`)
-        .join(', ')
-    : '';
-  
-  const message = `${action} regulation ${regulationId} by user ${username} (${userId})${changeDetails ? `: ${changeDetails}` : ''}`;
-  
-  syslog.log(LogFacility.LOCAL0, LogLevel.INFO, message, {
-    id: 'regulation-change',
-    parameters: {
-      userId,
-      username,
-      regulationId,
-      action,
-      changes,
-      ...metadata
-    }
-  });
-};
-
-// Helper function to compare regulation objects and detect changes
-const detectChanges = (original: any, updated: any): Record<string, { from: any; to: any }> => {
-  const changes: Record<string, { from: any; to: any }> = {};
-  const fieldsToTrack = [
-    'name', 'description', 'requirements', 'category', 'jurisdiction', 
-    'isApplicable', 'effectiveDate', 'nextReviewDate', 'agency_name',
-    'agency_contact', 'regulationUrl', 'complianceNotes'
-  ];
-  
-  for (const field of fieldsToTrack) {
-    if (original[field] !== updated[field]) {
-      changes[field] = {
-        from: original[field],
-        to: updated[field]
-      };
-    }
-  }
-  
-  return changes;
-};
-
-// Get all regulations (with tenant isolation)
+// Get all regulations
 router.get("/", async (req, res) => {
   try {
+    const startTime = Date.now();
+    
     // Handle HEAD requests - only return headers, no body
     if (req.method === 'HEAD') {
-      const tenantReq = req as any;
-      let tenantStorage;
-      if (tenantReq.tenantId === '3a1cbce2-0cf8-4c4f-ab96-4023eca4977d') {
-        tenantStorage = storage;
-      } else {
-        tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
-      }
-      
-      const regulations = await tenantStorage.getRegulations();
+      const regulations = await storage.getRegulations();
       res.setHeader('Content-Type', 'application/json; charset=utf-8');
       res.setHeader('Content-Length', JSON.stringify(regulations).length);
       return res.status(200).end();
     }
     
-    const startTime = Date.now();
+    // Single-tenant mode - use direct database storage
+    const tenantStorage = getDatabaseStorage();
     
-    // Get tenant-aware storage for data isolation
-    const tenantReq = req as any;
-    
-    // 🚨 EMERGENCY BYPASS: Handle problematic UUID tenant directly
-    let tenantStorage;
-    if (tenantReq.tenantId === '3a1cbce2-0cf8-4c4f-ab96-4023eca4977d') {
-      console.log('🚨 [EMERGENCY] Using direct storage bypass for UUID tenant:', tenantReq.tenantId);
-      tenantStorage = storage; // Use direct storage to bypass broken getTenantStorage()
-    } else {
-      tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
-    }
-    
-    console.log(`[REGULATIONS] Using tenant: ${tenantReq.tenantId || 'default'} with isolation: ${!!tenantReq.tenantId}`);
+    console.log(`[REGULATIONS] Fetching regulations for single-tenant mode`);
     
     // Parse query parameters
     const {
@@ -184,7 +112,7 @@ router.get("/", async (req, res) => {
     const paginatedRegulations = regulations.slice(offset, offset + limitNum);
     
     const totalTime = Date.now() - startTime;
-    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Fetched ${paginatedRegulations.length} regulations for tenant ${tenantReq.tenantId || 'default'} in ${totalTime}ms`);
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Fetched ${paginatedRegulations.length} regulations in ${totalTime}ms`);
 
     // For compatibility with frontend expecting array directly
     res.json(paginatedRegulations);
@@ -202,13 +130,12 @@ router.get("/ids", requireAuth, async (req, res) => {
   try {
     const startTime = Date.now();
     
-    // Use tenant-specific storage for data isolation
-    const tenantReq = req as any;
-    const tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
+    // Use direct database storage for single-tenant mode
+    const tenantStorage = getDatabaseStorage();
     
     const regulations = await tenantStorage.getRegulations();
     
-    const regulationIds = regulations.map(reg => ({
+    const regulationIds = regulations.map((reg: Regulation) => ({
       id: reg.id,
       itemId: reg.itemId,
       name: reg.name,
@@ -240,9 +167,8 @@ router.get("/:regulationId", async (req, res) => {
       return res.status(400).json({ error: "Invalid regulation ID" });
     }
     
-    // Use tenant-specific storage for data isolation
-    const tenantReq = req as any;
-    const tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
+    // Use direct database storage for single-tenant mode
+    const tenantStorage = getDatabaseStorage();
     
     const regulation = await tenantStorage.getRegulation(regulationId);
     
@@ -273,9 +199,8 @@ router.get("/:regulationId/evidence", async (req, res) => {
       return res.status(400).json({ error: "Invalid regulation ID" });
     }
     
-    // Use tenant-specific storage for data isolation
-    const tenantReq = req as any;
-    const tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
+    // Use direct database storage for single-tenant mode
+    const tenantStorage = getDatabaseStorage();
     
     const evidenceFiles = await tenantStorage.getEvidenceFilesByRegulation(regulationId);
     
@@ -315,8 +240,11 @@ router.patch("/:regulationId/actions/:actionType", requireAuth, async (req, res)
       return res.status(400).json({ error: "Invalid action type" });
     }
     
+    // Use direct database storage for single-tenant mode
+    const tenantStorage = getDatabaseStorage();
+    
     // Get current regulation
-    const regulation = await storage.getRegulation(regulationId);
+    const regulation = await tenantStorage.getRegulation(regulationId);
     if (!regulation) {
       return res.status(404).json({ error: "Regulation not found" });
     }
@@ -351,53 +279,18 @@ router.patch("/:regulationId/actions/:actionType", requireAuth, async (req, res)
     }
     
     // Update the regulation with the new actions
-    await storage.updateRegulation(regulationId, { actions });
+    await tenantStorage.updateRegulation(regulationId, { actions });
     
     const totalTime = Date.now() - startTime;
     
-    // Enhanced logging with user details and action specifics
-    logRegulationChange(
-      `Updated action ${actionType}`,
-      regulationId,
-      req.user!.id,
-      req.user!.username,
-      {
-        [`action_${actionType}_status`]: {
-          from: previousStatus,
-          to: actionUpdate.status || 'pending'
-        }
-      },
-      {
-        actionType,
-        actionEnabled: actionUpdate.enabled,
-        actionRequired: actionUpdate.required,
-        updateTime: totalTime,
-        completedBy: actionUpdate.completedBy,
-        completedAt: actionUpdate.completedAt
-      }
-    );
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Updated action ${actionType} for regulation ${regulationId} in ${totalTime}ms`);
 
     res.json({ 
       success: true, 
       action: actions[actionIndex !== -1 ? actionIndex : actions.length - 1] 
     });
   } catch (error) {
-    const user = req.user!;
-    syslog.log(
-      LogFacility.LOCAL0, 
-      LogLevel.ERROR, 
-      `Failed to update action for regulation ${req.params.regulationId} by user ${user.username} (${user.id}): ${error instanceof Error ? error.message : String(error)}`,
-      {
-        id: 'regulation-action-error',
-        parameters: {
-          userId: user.id,
-          username: user.username,
-          regulationId: req.params.regulationId,
-          actionType: req.params.actionType,
-          error: error instanceof Error ? error.message : String(error)
-        }
-      }
-    );
+    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Failed to update regulation action: ${error instanceof Error ? error.message : String(error)}`);
     res.status(500).json({ 
       error: "Failed to update action", 
       details: error instanceof Error ? error.message : String(error) 
@@ -405,179 +298,4 @@ router.patch("/:regulationId/actions/:actionType", requireAuth, async (req, res)
   }
 });
 
-// Update entire regulation (PUT endpoint)
-router.put("/:regulationId", requireAuth, async (req, res) => {
-  try {
-    const startTime = Date.now();
-    const regulationId = parseInt(req.params.regulationId);
-    const user = req.user!;
-    
-    if (isNaN(regulationId)) {
-      return res.status(400).json({ error: "Invalid regulation ID" });
-    }
-    
-    // Get current regulation for change tracking
-    const currentRegulation = await storage.getRegulation(regulationId);
-    if (!currentRegulation) {
-      return res.status(404).json({ error: "Regulation not found" });
-    }
-    
-    const updateData = req.body;
-    
-    // Validate required fields
-    if (updateData.name && typeof updateData.name !== 'string') {
-      return res.status(400).json({ error: "Name must be a string" });
-    }
-    
-    // Detect changes for audit trail
-    const changes = detectChanges(currentRegulation, updateData);
-    
-    // Update the regulation
-    const updatedRegulation = await storage.updateRegulation(regulationId, updateData);
-    
-    const totalTime = Date.now() - startTime;
-    
-    // Log the regulation update with detailed change tracking
-    logRegulationChange(
-      'Updated',
-      regulationId,
-      user.id,
-      user.username,
-      changes,
-      {
-        fieldsChanged: Object.keys(changes).length,
-        updateTime: totalTime,
-        requestSize: JSON.stringify(updateData).length
-      }
-    );
-
-    res.json(updatedRegulation);
-  } catch (error) {
-    const user = req.user!;
-    syslog.log(
-      LogFacility.LOCAL0, 
-      LogLevel.ERROR, 
-      `Failed to update regulation ${req.params.regulationId} by user ${user.username} (${user.id}): ${error instanceof Error ? error.message : String(error)}`
-    );
-    res.status(500).json({ 
-      error: "Failed to update regulation", 
-      details: error instanceof Error ? error.message : String(error) 
-    });
-  }
-});
-
-// Create new regulation (POST endpoint)
-router.post("/", requireAuth, async (req, res) => {
-  try {
-    const startTime = Date.now();
-    const user = req.user!;
-    const regulationData = req.body;
-    
-    // Validate required fields
-    if (!regulationData.name || typeof regulationData.name !== 'string') {
-      return res.status(400).json({ error: "Name is required and must be a string" });
-    }
-    
-    if (!regulationData.itemId || typeof regulationData.itemId !== 'string') {
-      return res.status(400).json({ error: "Item ID is required and must be a string" });
-    }
-    
-    // Create the regulation
-    const newRegulation = await storage.createRegulation(regulationData);
-    
-    const totalTime = Date.now() - startTime;
-    
-    // Log the regulation creation
-    logRegulationChange(
-      'Created',
-      newRegulation.id,
-      user.id,
-      user.username,
-      undefined,
-      {
-        itemId: newRegulation.itemId,
-        name: newRegulation.name,
-        category: newRegulation.category,
-        jurisdiction: newRegulation.jurisdictionSource,
-        createTime: totalTime
-      }
-    );
-
-    res.status(201).json(newRegulation);
-  } catch (error) {
-    const user = req.user!;
-    syslog.log(
-      LogFacility.LOCAL0, 
-      LogLevel.ERROR, 
-      `Failed to create regulation by user ${user.username} (${user.id}): ${error instanceof Error ? error.message : String(error)}`
-    );
-    res.status(500).json({ 
-      error: "Failed to create regulation", 
-      details: error instanceof Error ? error.message : String(error) 
-    });
-  }
-});
-
-// Delete regulation (DELETE endpoint)
-router.delete("/:regulationId", requireAuth, async (req, res) => {
-  try {
-    const startTime = Date.now();
-    const regulationId = parseInt(req.params.regulationId);
-    const user = req.user!;
-    
-    if (isNaN(regulationId)) {
-      return res.status(400).json({ error: "Invalid regulation ID" });
-    }
-    
-    // Get regulation details before deletion for logging
-    const regulation = await storage.getRegulation(regulationId);
-    if (!regulation) {
-      return res.status(404).json({ error: "Regulation not found" });
-    }
-    
-    // Delete the regulation
-    await storage.deleteRegulation(regulationId);
-    
-    const totalTime = Date.now() - startTime;
-    
-    // Log the regulation deletion
-    logRegulationChange(
-      'Deleted',
-      regulationId,
-      user.id,
-      user.username,
-      undefined,
-      {
-        deletedName: regulation.name,
-        deletedItemId: regulation.itemId,
-        deletedCategory: regulation.category,
-        deletedJurisdiction: regulation.jurisdictionSource,
-        deleteTime: totalTime
-      }
-    );
-
-    res.json({ success: true, message: "Regulation deleted successfully" });
-  } catch (error) {
-    const user = req.user!;
-    syslog.log(
-      LogFacility.LOCAL0, 
-      LogLevel.ERROR, 
-      `Failed to delete regulation ${req.params.regulationId} by user ${user.username} (${user.id}): ${error instanceof Error ? error.message : String(error)}`,
-      {
-        id: 'regulation-delete-error',
-        parameters: {
-          userId: user.id,
-          username: user.username,
-          regulationId: req.params.regulationId,
-          error: error instanceof Error ? error.message : String(error)
-        }
-      }
-    );
-    res.status(500).json({ 
-      error: "Failed to delete regulation", 
-      details: error instanceof Error ? error.message : String(error) 
-    });
-  }
-});
-
-export { router as regulationsRouter }; 
+export default router; 

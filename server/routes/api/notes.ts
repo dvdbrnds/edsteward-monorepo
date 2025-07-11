@@ -3,13 +3,11 @@ import { z } from 'zod';
 import { storage } from '../../storage';
 import { syslog, LogLevel, LogFacility } from '../../services/syslog';
 import { insertNoteSchema } from '@shared/schema';
+import { getDatabaseStorage } from '../../services/database';
 
 const router = express.Router();
 
-// Import the properly configured tenant storage with UUID normalization
-import { getTenantStorage } from '../../services/multi-tenant-database';
-
-// Simple auth middleware (we'll improve this later)
+// Simple auth middleware
 const requireAuth = (req: express.Request, res: express.Response, next: express.NextFunction) => {
   // Use multiple authentication checks for maximum compatibility
   const isAuthenticated = req.isAuthenticated ? req.isAuthenticated() : false;
@@ -24,11 +22,10 @@ const requireAuth = (req: express.Request, res: express.Response, next: express.
 // Create a new note
 router.post("/", requireAuth, async (req, res) => {
   try {
-    // Get tenant-aware storage for data isolation
-    const tenantReq = req as any;
-    const tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
+    // Use direct database storage for single-tenant mode
+    const tenantStorage = getDatabaseStorage();
     
-    console.log(`[NOTES] Creating note for tenant: ${tenantReq.tenantId || 'default'}`);
+    console.log(`[NOTES] Creating note for single-tenant mode`);
     
     // Validate request body
     const validatedData = insertNoteSchema.parse(req.body);
@@ -38,7 +35,7 @@ router.post("/", requireAuth, async (req, res) => {
       userId: req.user?.id || 1 // Default to user 1 for now
     });
 
-    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Created note ${note.id} for regulation ${note.regulationId} in tenant ${tenantReq.tenantId || 'default'}`);
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Created note ${note.id} for regulation ${note.regulationId}`);
     res.status(201).json(note);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -57,11 +54,10 @@ router.post("/", requireAuth, async (req, res) => {
 });
 
 // Get notes for a specific regulation
-router.get("/regulation/:regulationId", requireAuth, async (req, res) => {
+router.get("/regulation/:regulationId", async (req, res) => {
   try {
-    // Get tenant-aware storage for data isolation
-    const tenantReq = req as any;
-    const tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
+    // Use direct database storage for single-tenant mode
+    const tenantStorage = getDatabaseStorage();
     
     const regulationId = parseInt(req.params.regulationId);
     
@@ -71,7 +67,7 @@ router.get("/regulation/:regulationId", requireAuth, async (req, res) => {
 
     const notes = await tenantStorage.getNotesByRegulation(regulationId);
     
-    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Fetched ${notes.length} notes for regulation ${regulationId} in tenant ${tenantReq.tenantId || 'default'}`);
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Fetched ${notes.length} notes for regulation ${regulationId}`);
     res.json(notes);
   } catch (error) {
     syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Failed to fetch notes for regulation ${req.params.regulationId}: ${error instanceof Error ? error.message : String(error)}`);
@@ -85,9 +81,8 @@ router.get("/regulation/:regulationId", requireAuth, async (req, res) => {
 // Delete a note
 router.delete("/:noteId", requireAuth, async (req, res) => {
   try {
-    // Get tenant-aware storage for data isolation
-    const tenantReq = req as any;
-    const tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
+    // Use direct database storage for single-tenant mode
+    const tenantStorage = getDatabaseStorage();
     
     const noteId = parseInt(req.params.noteId);
     
@@ -104,7 +99,7 @@ router.delete("/:noteId", requireAuth, async (req, res) => {
     // For now, allow deletion (later we'll check ownership)
     await tenantStorage.deleteNote(noteId);
     
-    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Deleted note ${noteId} in tenant ${tenantReq.tenantId || 'default'}`);
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Deleted note ${noteId}`);
     res.status(204).send();
   } catch (error) {
     syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Failed to delete note ${req.params.noteId}: ${error instanceof Error ? error.message : String(error)}`);
@@ -115,4 +110,4 @@ router.delete("/:noteId", requireAuth, async (req, res) => {
   }
 });
 
-export { router as notesRouter }; 
+export default router; 

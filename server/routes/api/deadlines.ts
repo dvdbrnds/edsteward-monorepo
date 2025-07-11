@@ -1,84 +1,51 @@
-import express from "express";
-import { storage } from "../../storage";
-import type { InsertDeadline, Regulation } from "@shared/schema";
+import express from 'express';
+import { storage } from '../../storage';
+import { syslog, LogLevel, LogFacility } from '../../services/syslog';
+import { getDatabaseStorage } from '../../services/database';
 
 const router = express.Router();
-
-// Import the properly configured tenant storage with UUID normalization
-import { getTenantStorage } from '../../services/multi-tenant-database';
 
 // GET /api/deadlines - Get all deadlines with regulation names (public access like regulations)
 router.get("/", async (req, res) => {
   try {
-    // Remove authentication requirement to match regulations endpoint behavior
-
-    // Get tenant-aware storage for data isolation
-    const tenantReq = req as any;
-    const tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
+    // Use direct database storage for single-tenant mode
+    const tenantStorage = getDatabaseStorage();
     
-    console.log(`[DEADLINES] Using tenant: ${tenantReq.tenantId || 'default'} with isolation: ${!!tenantReq.tenantId}`);
-
+    console.log('[DEADLINES] Fetching deadlines for single-tenant mode');
+    
     const deadlines = await tenantStorage.getDeadlines();
-    const regulations = await tenantStorage.getRegulations();
     
-    // Create a map for quick regulation lookup
-    const regulationMap = new Map(regulations.map((reg: Regulation) => [reg.id, reg]));
-    
-    // Enhance deadlines with regulation names
-    const enhancedDeadlines = deadlines.map((deadline: any) => {
-      const regulation = regulationMap.get(deadline.regulationId);
-      return {
-        ...deadline,
-        regulationName: regulation?.name || `Regulation #${deadline.regulationId}`,
-        regulationTopic: regulation?.topic,
-        regulationStatuteIds: regulation?.statuteIds
-      };
-    });
-
-    console.log(`[DEADLINES] Found ${enhancedDeadlines.length} deadlines for tenant ${tenantReq.tenantId || 'default'}`);
-    return res.json(enhancedDeadlines);
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Fetched ${deadlines.length} deadlines`);
+    res.json(deadlines);
   } catch (error) {
-    console.error("Error fetching deadlines:", error);
-    return res.status(500).json({ 
-      error: "Failed to fetch deadlines",
-      details: error instanceof Error ? error.message : String(error)
+    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Failed to fetch deadlines: ${error instanceof Error ? error.message : String(error)}`);
+    res.status(500).json({ 
+      error: "Failed to fetch deadlines", 
+      details: error instanceof Error ? error.message : String(error) 
     });
   }
 });
 
-// POST /api/deadlines - Create a new deadline (requires authentication)
+// POST /api/deadlines - Create a new deadline (requires auth)
 router.post("/", async (req, res) => {
   try {
-    // Keep authentication for POST operations
+    // Simple auth check
     if (!req.isAuthenticated || !req.isAuthenticated()) {
-      return res.status(401).json({ error: "Authentication required" });
+      return res.status(401).json({ error: 'Authentication required' });
     }
 
-    // Get tenant-aware storage for data isolation
-    const tenantReq = req as any;
-    const tenantStorage = tenantReq.tenantId ? getTenantStorage(tenantReq.tenantId) : storage;
-
-    const { regulationId, dueDate, status, assignedTo } = req.body;
-
-    if (!regulationId || !dueDate || !status) {
-      return res.status(400).json({ error: "Missing required fields: regulationId, dueDate, status" });
-    }
-
-    const deadline: InsertDeadline = {
-      regulationId,
-      dueDate,
-      status,
-      assignedTo: assignedTo || req.user.id,
-    };
-
-    const createdDeadline = await tenantStorage.createDeadline(deadline);
-    console.log(`[DEADLINES] Created deadline for tenant ${tenantReq.tenantId || 'default'}: ${createdDeadline.id}`);
-    return res.json(createdDeadline);
+    // Use direct database storage for single-tenant mode
+    const tenantStorage = getDatabaseStorage();
+    
+    const deadline = await tenantStorage.createDeadline(req.body);
+    
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Created deadline ${deadline.id}`);
+    res.status(201).json(deadline);
   } catch (error) {
-    console.error("Error creating deadline:", error);
-    return res.status(500).json({ 
-      error: "Failed to create deadline",
-      details: error instanceof Error ? error.message : String(error)
+    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Failed to create deadline: ${error instanceof Error ? error.message : String(error)}`);
+    res.status(500).json({ 
+      error: "Failed to create deadline", 
+      details: error instanceof Error ? error.message : String(error) 
     });
   }
 });

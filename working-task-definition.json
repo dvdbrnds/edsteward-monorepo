@@ -1,38 +1,22 @@
 {
+  "family": "edsteward-production-fixed",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "512",
+  "memory": "1024",
+  "executionRoleArn": "arn:aws:iam::259661441422:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::259661441422:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
       "name": "edsteward-app",
-      "image": "259661441422.dkr.ecr.us-east-1.amazonaws.com/edsteward:aws-session-fix-1750535400",
-      "cpu": 0,
+      "image": "259661441422.dkr.ecr.us-east-1.amazonaws.com/edsteward-multi-tenant:bcrypt-fixed",
       "portMappings": [
         {
           "containerPort": 3000,
-          "hostPort": 3000,
           "protocol": "tcp"
         }
       ],
-      "essential": true,
       "environment": [
-        {
-          "name": "DATABASE_URL",
-          "value": "postgresql://neondb_owner:npg_foSr6ixkzw7W@ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require"
-        },
-        {
-          "name": "PORT",
-          "value": "3000"
-        },
-        {
-          "name": "HOSTNAME",
-          "value": "0.0.0.0"
-        },
-        {
-          "name": "DEFAULT_TENANT",
-          "value": "admin"
-        },
-        {
-          "name": "SESSION_SECRET",
-          "value": "edsteward-production-secret-2025"
-        },
         {
           "name": "NODE_ENV",
           "value": "production"
@@ -40,16 +24,26 @@
         {
           "name": "MULTI_TENANT",
           "value": "true"
+        },
+        {
+          "name": "PORT",
+          "value": "3000"
+        },
+        {
+          "name": "DATABASE_URL",
+          "value": "postgresql://neondb_owner:npg_foSr6ixkzw7W@ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require"
+        },
+        {
+          "name": "SESSION_SECRET",
+          "value": "edsteward-production-session-secret-2025-all-fixes"
         }
       ],
-      "mountPoints": [],
-      "volumesFrom": [],
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/aws/ecs/edsteward",
+          "awslogs-group": "/ecs/edsteward-simple",
           "awslogs-region": "us-east-1",
-          "awslogs-stream-prefix": "hostname-fix"
+          "awslogs-stream-prefix": "ecs"
         }
       },
       "healthCheck": {
@@ -62,17 +56,7 @@
         "retries": 3,
         "startPeriod": 60
       },
-      "systemControls": []
+      "essential": true
     }
-  ],
-  "family": "edsteward-hostname-fix",
-  "executionRoleArn": "arn:aws:iam::259661441422:role/ecsTaskExecutionRole",
-  "networkMode": "awsvpc",
-  "volumes": [],
-  "requiresCompatibilities": [
-    "FARGATE"
-  ],
-  "cpu": "512",
-  "memory": "1024",
-  "taskRoleArn": "arn:aws:iam::259661441422:role/ecsTaskRole"
+  ]
 }
