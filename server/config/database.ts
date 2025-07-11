@@ -51,13 +51,22 @@ try {
     database: url.pathname.replace('/', ''),
     user: url.username,
     password: url.password,
-    // Connection pool settings
-    max: 20,
-    min: 2,
-    connectionTimeoutMillis: 10000,
-    idleTimeoutMillis: 30000,
+    // Connection pool settings - more resilient for Neon
+    max: 10, // Reduced max connections for Neon
+    min: 1,  // Reduced min connections
+    connectionTimeoutMillis: 30000, // Increased from 10s to 30s for Neon
+    idleTimeoutMillis: 60000, // Increased from 30s to 60s
+    acquireTimeoutMillis: 30000, // New: time to wait for connection from pool
+    createTimeoutMillis: 30000, // New: time to wait for new connection creation
+    destroyTimeoutMillis: 5000, // New: time to wait for connection destruction
+    reapIntervalMillis: 1000, // New: how often to check for idle connections
+    createRetryIntervalMillis: 200, // New: wait between connection creation retries
     keepAlive: true,
-    keepAliveInitialDelayMillis: 10000,
+    keepAliveInitialDelayMillis: 30000, // Increased from 10s to 30s
+    // Add query timeout for individual queries
+    query_timeout: 60000, // 60 second query timeout
+    // Add statement timeout (PostgreSQL setting)
+    statement_timeout: 30000, // 30 second statement timeout
   };
   
   // Handle SSL configuration properly
@@ -104,12 +113,22 @@ try {
   poolConfig = {
     connectionString: dbUrl.split('?')[0], // Remove all query parameters
     ssl: isRDSFallback ? { rejectUnauthorized: false } : false, // Enable SSL for RDS
-    max: 20,
-    min: 2,
-    connectionTimeoutMillis: 10000,
-    idleTimeoutMillis: 30000,
+    // Connection pool settings - more resilient for Neon
+    max: 10, // Reduced max connections for Neon
+    min: 1,  // Reduced min connections
+    connectionTimeoutMillis: 30000, // Increased from 10s to 30s for Neon
+    idleTimeoutMillis: 60000, // Increased from 30s to 60s
+    acquireTimeoutMillis: 30000, // New: time to wait for connection from pool
+    createTimeoutMillis: 30000, // New: time to wait for new connection creation
+    destroyTimeoutMillis: 5000, // New: time to wait for connection destruction
+    reapIntervalMillis: 1000, // New: how often to check for idle connections
+    createRetryIntervalMillis: 200, // New: wait between connection creation retries
     keepAlive: true,
-    keepAliveInitialDelayMillis: 10000,
+    keepAliveInitialDelayMillis: 30000, // Increased from 10s to 30s
+    // Add query timeout for individual queries
+    query_timeout: 60000, // 60 second query timeout
+    // Add statement timeout (PostgreSQL setting)
+    statement_timeout: 30000, // 30 second statement timeout
   };
   
   if (isRDSFallback) {
@@ -134,7 +153,7 @@ export const isTest = currentEnv === 'test';
 let lastHealthCheck = 0;
 const HEALTH_CHECK_INTERVAL = 30000; // 30 seconds
 
-export async function testDatabaseConnection(maxRetries: number = 3): Promise<boolean> {
+export async function testDatabaseConnection(maxRetries: number = 5): Promise<boolean> {
   console.log('Testing database connection...');
   
   for (let i = 0; i < maxRetries; i++) {
@@ -144,6 +163,8 @@ export async function testDatabaseConnection(maxRetries: number = 3): Promise<bo
       // Use a simple query with timeout
       const client = await pool.connect();
       try {
+        // Set a shorter statement timeout for the test query
+        await client.query('SET statement_timeout = 15000'); // 15 seconds
         await client.query('SELECT 1');
         console.log("✅ Database connection successful");
         lastHealthCheck = Date.now();
@@ -159,7 +180,22 @@ export async function testDatabaseConnection(maxRetries: number = 3): Promise<bo
       if (error instanceof Error) {
         console.log('Error message:', error.message);
         console.log('Error name:', error.name);
-        console.log('Error stack:', error.stack?.substring(0, 500));
+        
+        // Log specific error types
+        if (error.message.includes('ETIMEDOUT')) {
+          console.log('⏰ Connection timed out - network issue');
+        } else if (error.message.includes('ECONNREFUSED')) {
+          console.log('🚫 Connection refused - server unavailable');
+        } else if (error.message.includes('ENOTFOUND')) {
+          console.log('🔍 Host not found - DNS issue');
+        } else if (error.message.includes('timeout')) {
+          console.log('⏰ Operation timed out');
+        }
+        
+        // Only log stack trace for non-timeout errors
+        if (!error.message.includes('timeout') && !error.message.includes('ETIMEDOUT')) {
+          console.log('Error stack:', error.stack?.substring(0, 300));
+        }
       } else {
         console.log('Error (non-Error object):', JSON.stringify(error, null, 2));
       }
@@ -172,8 +208,12 @@ export async function testDatabaseConnection(maxRetries: number = 3): Promise<bo
         throw new Error(`Database connection failed after ${maxRetries} attempts: ${errorMsg}`);
       }
       
-      const waitTime = Math.min(1000 * (i + 1), 5000); // Progressive backoff, max 5s
-      console.log(`⏳ Waiting ${waitTime}ms before retry...`);
+      // Exponential backoff with jitter: 2^i * 1000ms + random(0-1000ms)
+      const baseWaitTime = Math.pow(2, i) * 1000;
+      const jitter = Math.random() * 1000;
+      const waitTime = Math.min(baseWaitTime + jitter, 30000); // Max 30 seconds
+      
+      console.log(`⏳ Waiting ${Math.round(waitTime)}ms before retry (exponential backoff)...`);
       await new Promise(resolve => setTimeout(resolve, waitTime));
     }
   }
@@ -188,10 +228,12 @@ export async function checkConnectionHealth(): Promise<boolean> {
   }
   
   try {
-    await testDatabaseConnection(1);
+    // Use a more lenient health check - try twice before giving up
+    await testDatabaseConnection(2);
     return true;
   } catch (error) {
-    console.warn('⚠️ Database health check failed:', error);
+    console.warn('⚠️ Database health check failed:', 
+      error instanceof Error ? error.message : String(error));
     return false;
   }
 }
