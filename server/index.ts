@@ -48,6 +48,8 @@ app.use(helmet({
 // CORS configuration - support both development and production domains
 const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [
   'http://localhost:3000',
+  'http://localhost:3001', // Admin console
+  'http://localhost:3002', // Admin console fallback port
   'https://moravian.edsteward.ai',
   'https://edsteward.ai'
 ];
@@ -132,7 +134,7 @@ app.get('*', (req, res) => {
 });
 
 // Error handling
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((err: any, req: express.Request, res: express.Response) => {
   console.error('Server error:', err);
   res.status(500).json({ error: 'Internal server error' });
 });

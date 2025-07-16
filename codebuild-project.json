@@ -1,0 +1,36 @@
+{
+  "name": "edsteward-builder",
+  "description": "Build EdSteward Docker image",
+  "source": {
+    "type": "GITHUB",
+    "location": "https://github.com/your-repo/edsteward.git"
+  },
+  "artifacts": {
+    "type": "NO_ARTIFACTS"
+  },
+  "environment": {
+    "type": "LINUX_CONTAINER",
+    "image": "aws/codebuild/standard:7.0",
+    "computeType": "BUILD_GENERAL1_MEDIUM",
+    "privilegedMode": true,
+    "environmentVariables": [
+      {
+        "name": "AWS_DEFAULT_REGION",
+        "value": "us-east-1"
+      },
+      {
+        "name": "AWS_ACCOUNT_ID",
+        "value": "259661441422"
+      },
+      {
+        "name": "IMAGE_REPO_NAME",
+        "value": "edsteward-multi-tenant"
+      },
+      {
+        "name": "IMAGE_TAG",
+        "value": "prod-ee0971c"
+      }
+    ]
+  },
+  "serviceRole": "arn:aws:iam::259661441422:role/service-role/codebuild-service-role"
+}

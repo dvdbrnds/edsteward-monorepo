@@ -26,7 +26,7 @@ docker-compose -f docker-compose.dev.yml logs -f
 3. See changes immediately in browser
 4. No rebuilds, no waiting!
 
-## GitHub-Based Deployment (Staging → Production)
+## AWS-Based Deployment (Staging → Production)
 
 ### 1. Deploy to Staging (Test Your Changes)
 ```bash
@@ -36,12 +36,12 @@ git add .
 # Commit with a meaningful message
 git commit -m "Add regulation count display to dashboard"
 
-# Push to ES-clientside branch → Deploys to STAGING
-git push origin ES-clientside
+# Deploy to staging
+./scripts/deploy-staging.sh
 ```
 
 ### 2. Staging Deployment
-- ✅ GitHub Actions automatically runs tests
+- ✅ AWS deployment script automatically runs tests
 - ✅ Builds Docker image for AWS (AMD64)
 - ✅ Pushes to ECR registry with `staging-` tag
 - ✅ Updates ECS staging service
@@ -52,7 +52,7 @@ git push origin ES-clientside
 # Merge to main branch to deploy to production
 git checkout main
 git merge ES-clientside
-git push origin main
+./scripts/deploy-production.sh
 ```
 
 ### 4. Production Deployment
@@ -65,8 +65,8 @@ git push origin main
 | Environment | Command | Purpose | Access |
 |-------------|---------|---------|--------|
 | **Development** | `docker-compose -f docker-compose.dev.yml up -d` | Hot reloading, instant changes | http://localhost:3000 |
-| **Staging** | `git push origin ES-clientside` | Test changes safely | https://staging.your-domain.com |
-| **Production** | `git push origin main` | Live for real users | https://your-production-url.com |
+| **Staging** | `./scripts/deploy-staging.sh` | Test changes safely | https://staging.your-domain.com |
+| **Production** | `./scripts/deploy-production.sh` | Live for real users | https://your-production-url.com |
 
 ## Benefits of This Workflow
 
@@ -75,15 +75,15 @@ git push origin main
 - See changes in < 1 second
 - Professional development experience
 
-### 🔄 **Automatic Deployment**
-- Push to GitHub = automatic deployment
-- No manual AWS commands
+### 🔄 **Streamlined Deployment**
+- Single command deployment scripts
+- Direct AWS integration
 - Consistent, reliable deployments
 
 ### 🛡️ **Safety**
 - Tests run before deployment
 - Failed tests block deployment
-- Easy rollbacks via GitHub
+- Easy rollbacks via deployment scripts
 
 ### 👥 **Team Collaboration**
 - All changes tracked in Git
@@ -117,15 +117,15 @@ docker-compose -f docker-compose.dev.yml ps
 3. Restart container: `docker-compose -f docker-compose.dev.yml restart app`
 
 ### If deployment fails:
-1. Check GitHub Actions tab in your repository
-2. Look at the failed step logs
-3. Fix the issue and push again
+1. Check the deployment script logs
+2. Look at the failed step output
+3. Fix the issue and run the deployment script again
 
 ## Next Steps
 
-1. **Set up GitHub Secrets** for AWS deployment:
-   - `AWS_ACCESS_KEY_ID`
-   - `AWS_SECRET_ACCESS_KEY`
+1. **Configure AWS credentials** for local deployment:
+   - Run `aws configure` to set up your credentials
+   - Verify with `aws sts get-caller-identity`
 
 2. **Configure branch protection** for main branch
 
@@ -135,6 +135,6 @@ docker-compose -f docker-compose.dev.yml ps
 
 **🎉 You now have a modern, professional development workflow!**
 - Instant hot reloading for development
-- Automatic deployment via GitHub
+- Streamlined deployment via AWS scripts
 - No more manual container rebuilds
-- Professional CI/CD pipeline 
+- Professional AWS-only deployment pipeline 

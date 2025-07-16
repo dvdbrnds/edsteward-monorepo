@@ -1,12 +1,12 @@
 #!/bin/zsh
 
-echo "🚀 Monitoring GitHub Actions Deployment..."
+echo "🚀 Monitoring AWS Deployment..."
 echo "📅 Current time: $(date)"
 echo ""
 
-# Check GitHub Actions (you'll need to check this manually)
-echo "🔗 Check workflow status at:"
-echo "   https://github.com/dvdbrnds/EdSteward/actions"
+# Check AWS deployment status
+echo "🔗 Check deployment status at:"
+echo "   ./scripts/check-production-status.sh"
 echo ""
 
 # Check latest ECR images
@@ -30,5 +30,5 @@ aws ecs describe-services \
   --output table
 
 echo ""
-echo "💡 If GitHub Actions is running, new images should appear in ECR within 3-5 minutes"
+echo "💡 If AWS deployment is running, new images should appear in ECR within 3-5 minutes"
 echo "💡 After ECR push, ECS service will update automatically" 

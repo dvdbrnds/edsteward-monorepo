@@ -5,7 +5,7 @@
 
 ## 🎯 **Overview**
 
-EdSteward uses a **multi-environment, multi-tenant architecture** with automated GitHub Actions deployments and CNAME-based DNS management.
+EdSteward uses a **multi-environment, multi-tenant architecture** with AWS-based deployments and CNAME-based DNS management.
 
 ### **Environment Structure**
 ```
@@ -41,7 +41,7 @@ Dev:         dev.edsteward.ai       (dev → development) [optional]
 • **Trigger**: Push to `ES-clientside` branch automatically starts deployment
 • **Target**: `staging.edsteward.ai`
 • **Duration**: 5-10 minutes
-• **Monitor**: Check https://github.com/dvdbrnds/EdSteward/actions for progress
+• **Monitor**: Check ./scripts/check-production-status.sh for progress
 
 #### **Step 3: Test on Staging**
 • Run health check:
@@ -69,14 +69,14 @@ Dev:         dev.edsteward.ai       (dev → development) [optional]
 • Merge staging changes:
   ```bash
   git merge ES-clientside
-  git push origin main
+  ./scripts/deploy-production.sh
   ```
 
 #### **Step 2: Automatic Production Deployment**
 • **Trigger**: Push to `main` branch automatically starts deployment
 • **Target**: `moravian.edsteward.ai` (production tenant)
 • **Duration**: 5-10 minutes
-• **Monitor**: Check https://github.com/dvdbrnds/EdSteward/actions for progress
+• **Monitor**: Check ./scripts/check-production-status.sh for progress
 
 #### **Step 3: Verify Production**
 • Run health check:
@@ -104,7 +104,7 @@ Dev:         dev.edsteward.ai       (dev → development) [optional]
 # For bug fixes, security patches, UI improvements
 # 1. Set defaultValue: true in shared/feature-flags.ts
 # 2. Deploy normally
-git push origin main
+./scripts/deploy-production.sh
 # 3. All tenants get the update immediately
 ```
 
@@ -113,7 +113,7 @@ git push origin main
 # For premium features, beta testing, gradual rollouts
 # 1. Set defaultValue: false in shared/feature-flags.ts
 # 2. Deploy code (feature stays hidden)
-git push origin main
+./scripts/deploy-production.sh
 # 3. Enable for specific tenants
 ./scripts/manage-tenant-features.sh enable-feature moravian new_feature
 ```
@@ -225,7 +225,7 @@ curl -I https://staging.edsteward.ai/health
 # 6. Deploy to production
 git checkout main
 git merge hotfix/critical-issue
-git push origin main
+./scripts/deploy-production.sh
 
 # 7. Clean up
 git branch -d hotfix/critical-issue
@@ -236,7 +236,7 @@ git branch -d hotfix/critical-issue
 #### **If Production Deployment Fails**
 ```bash
 # 1. Check GitHub Actions for error details
-open https://github.com/dvdbrnds/EdSteward/actions
+open ./scripts/check-production-status.sh
 
 # 2. Force rollback to previous working commit
 git checkout main
@@ -292,7 +292,7 @@ done
 
 echo ""
 echo "🔗 Useful Links:"
-echo "• GitHub Actions: https://github.com/dvdbrnds/EdSteward/actions"
+echo "• GitHub Actions: ./scripts/check-production-status.sh"
 echo "• AWS ECS Console: https://console.aws.amazon.com/ecs/home?region=us-east-1"
 echo "• CloudWatch Logs: https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups"
 ```
@@ -342,7 +342,7 @@ aws logs tail /ecs/edsteward-multi-tenant-staging --follow --region us-east-1
 #### **1. GitHub Actions Deployment Fails**
 ```bash
 # Check the action logs
-open https://github.com/dvdbrnds/EdSteward/actions
+open ./scripts/check-production-status.sh
 
 # Common fixes:
 # - Docker build issues: Check Dockerfile syntax
@@ -433,7 +433,7 @@ aws acm list-certificates --region us-east-1
 git push origin ES-clientside
 
 # Deploy to production  
-git push origin main
+./scripts/deploy-production.sh
 
 # Add new tenant
 ./scripts/add-new-tenant.sh <tenant-id> "<name>" "<domain>"
@@ -448,7 +448,7 @@ aws ecs update-service --cluster <cluster> --service <service> --force-new-deplo
 ### **Monitoring Commands**
 ```bash
 # View deployment status
-open https://github.com/dvdbrnds/EdSteward/actions
+open ./scripts/check-production-status.sh
 
 # Check application logs
 aws logs tail /ecs/edsteward-multi-tenant-staging --follow --region us-east-1
@@ -493,7 +493,7 @@ aws ecs update-service --cluster <cluster> --service <service> --desired-count 1
 
 ### **Key URLs**
 - **GitHub Repository**: https://github.com/dvdbrnds/EdSteward
-- **GitHub Actions**: https://github.com/dvdbrnds/EdSteward/actions
+- **GitHub Actions**: ./scripts/check-production-status.sh
 - **AWS ECS Console**: https://console.aws.amazon.com/ecs/home?region=us-east-1
 - **CloudWatch Logs**: https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups
 

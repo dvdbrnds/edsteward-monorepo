@@ -1,0 +1,244 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "🐳 Docker: Start Development",
+            "type": "shell",
+            "command": "./dev.sh up",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "detail": "Start EdSteward Docker development environment"
+        },
+        {
+            "label": "🛑 Docker: Stop Development",
+            "type": "shell",
+            "command": "./dev.sh down",
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "detail": "Stop EdSteward Docker development environment"
+        },
+        {
+            "label": "📋 Docker: View Logs",
+            "type": "shell",
+            "command": "./dev.sh logs",
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "new",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "detail": "View real-time Docker container logs"
+        },
+        {
+            "label": "🔄 Docker: Restart Development",
+            "type": "shell",
+            "command": "./dev.sh restart",
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "detail": "Restart Docker development environment"
+        },
+        {
+            "label": "🔨 Docker: Rebuild Container",
+            "type": "shell",
+            "command": "./dev.sh build",
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "detail": "Rebuild Docker container (use after dependency changes)"
+        },
+        {
+            "label": "📊 Docker: Container Status",
+            "type": "shell",
+            "command": "./dev.sh status",
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "new",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "detail": "Check Docker container status"
+        },
+        {
+            "label": "🐚 Docker: Access Container Shell",
+            "type": "shell",
+            "command": "./dev.sh shell",
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "new",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "detail": "Access Docker container shell for debugging"
+        },
+        {
+            "label": "🧹 Docker: Clean System",
+            "type": "shell",
+            "command": "./dev.sh down && docker system prune -f",
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "detail": "Stop containers and clean Docker system"
+        },
+        {
+            "label": "🚀 Deploy: Production",
+            "type": "shell",
+            "command": "./scripts/deploy-production.sh",
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "new",
+                "showReuseMessage": true,
+                "clear": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "detail": "Deploy to AWS production environment",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "🛑 Docker: Stop Development"
+            ]
+        },
+        {
+            "label": "📦 Deploy: Staging",
+            "type": "shell",
+            "command": "./scripts/deploy-staging.sh",
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "new",
+                "showReuseMessage": true,
+                "clear": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "detail": "Deploy to AWS staging environment",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "🛑 Docker: Stop Development"
+            ]
+        },
+        {
+            "label": "🔍 Verify: Docker Environment",
+            "type": "shell",
+            "command": "echo '🔍 Verifying Docker Development Environment...' && echo '' && echo 'Docker Status:' && docker --version && echo '' && echo 'Docker Compose Status:' && docker-compose --version && echo '' && echo 'Container Status:' && ./dev.sh status && echo '' && echo '✅ Verification complete!'",
+            "group": "test",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "new",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "detail": "Verify Docker development environment setup"
+        },
+        {
+            "label": "⚠️ WARNING: npm run dev (DISABLED)",
+            "type": "shell",
+            "command": "echo '❌ ERROR: npm run dev is DISABLED for EdSteward!' && echo '' && echo '🐳 Use Docker development instead:' && echo '   ./dev.sh up' && echo '' && echo 'This prevents deployment issues and ensures consistency.' && exit 1",
+            "group": "build",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": true,
+                "panel": "new",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [],
+            "detail": "⚠️ This command is disabled - use Docker development instead"
+        }
+    ]
+}

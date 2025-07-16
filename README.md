@@ -1,6 +1,8 @@
-# Regulatory Compliance Platform
+# EdSteward - Regulatory Compliance Platform
 
 An advanced AI-powered regulatory compliance platform for higher education accreditation management, delivering intelligent insights across multiple jurisdictions through innovative technology.
+
+> **🐳 CRITICAL:** EdSteward uses Docker-first development. Always use `./dev.sh up` for local development. **NEVER** use `npm run dev` on macOS due to architecture conflicts.
 
 ## 🚀 Features
 
@@ -14,6 +16,7 @@ An advanced AI-powered regulatory compliance platform for higher education accre
 ## 🛠 Technology Stack
 
 ### Frontend
+
 - **React 18** with TypeScript
 - **Vite** for development and building
 - **TanStack Query** for server state management
@@ -22,6 +25,7 @@ An advanced AI-powered regulatory compliance platform for higher education accre
 - **WebSocket** for real-time communication
 
 ### Backend
+
 - **Express.js** with TypeScript
 - **PostgreSQL** with Drizzle ORM
 - **JWT** authentication with refresh tokens
@@ -56,40 +60,83 @@ VITE_APP_ENV=development
 - `VITE_SENTRY_DSN` - Sentry DSN for error tracking
 - `VITE_APP_ENV` - Application environment (development, staging, production)
 
-## 📦 Installation
+## 📦 Installation & Development
 
-1. **Clone the repository**
+### 🐳 Docker Development (REQUIRED)
+
+**This is the ONLY supported development method for EdSteward:**
+
+1. **Prerequisites**
+
    ```bash
-   git clone <repository-url>
-   cd regulatory-compliance-platform
+   # Install Docker Desktop for your platform
+   # Ensure Docker is running
+   docker --version && docker-compose --version
    ```
 
-2. **Install dependencies**
+2. **Clone the repository**
+
    ```bash
-   npm install
+   git clone <repository-url>
+   cd EdSteward
    ```
 
 3. **Set up environment variables**
+
    ```bash
    cp .env.example .env
    # Edit .env with your configuration
    ```
 
-4. **Start development server**
+4. **Start Docker development environment**
+
    ```bash
-   npm run dev
+   ./dev.sh up
+   # Application will be available at http://localhost:3000
    ```
+
+### 📋 Docker Development Commands
+
+```bash
+./dev.sh up       # Start development environment
+./dev.sh down     # Stop development environment
+./dev.sh logs     # View application logs
+./dev.sh shell    # Access container shell for debugging
+./dev.sh status   # Check container status
+./dev.sh help     # View all available commands
+```
+
+### ⚠️ Important Notes
+
+- **NEVER use `npm run dev` on macOS** - causes architecture conflicts
+- **ALWAYS use Docker development** - ensures consistent environment
+- **Hot reload enabled** - code changes reflect automatically
+- See `DOCKER_DEVELOPMENT_GUIDE.md` for comprehensive documentation
 
 ## 🏃‍♂️ Available Scripts
 
-- `npm run dev` - Start development server with hot reload
+### 🐳 Docker Development (Primary)
+
+- `./dev.sh up` - Start Docker development environment with hot reload
+- `./dev.sh down` - Stop Docker development environment
+- `./dev.sh logs` - View real-time application logs
+- `./dev.sh shell` - Access container shell for debugging
+- `./dev.sh build` - Rebuild Docker containers
+- `./dev.sh status` - Check container status
+
+### 📦 Package Scripts (Secondary)
+
 - `npm run build` - Build for production
-- `npm run start` - Start production server
 - `npm run check` - Run TypeScript type checking
 - `npm run test` - Run unit tests with Vitest
 - `npm run test:e2e` - Run end-to-end tests with Cypress
 - `npm run db:push` - Push database schema changes
 - `npm run db:setup` - Set up database tables
+
+### 🚫 Deprecated Commands
+
+- ~~`npm run dev`~~ - **DEPRECATED:** Use `./dev.sh up` instead
+- ~~`npm run start`~~ - **DEPRECATED:** Production deployment only
 
 ## 🔐 Authentication
 
@@ -237,4 +284,4 @@ For support and questions:
 
 ---
 
-**Built with ❤️ for higher education compliance management**# Trigger GitHub Actions workflow
+**Built with ❤️ for higher education compliance management**

@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  app:
+    image: edsteward-single-tenant:beta-test
+    ports:
+      - "3001:3000"  # Use different port to avoid conflicts
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    environment:
+      # Institution Configuration
+      - INSTITUTION_NAME=EdSteward Beta
+      - INSTITUTION_DOMAIN=beta.edsteward.ai
+      - INSTITUTION_LOGO_URL=/assets/institution-logo.png
+      - INSTITUTION_PRIMARY_COLOR=#0066cc
+      - INSTITUTION_SECONDARY_COLOR=#4da6ff
+      
+      # Authentication
+      - AUTH_SAML_ENABLED=false
+      - AUTH_USERNAME_PASSWORD_ENABLED=true
+      - AUTH_ALLOW_SELF_REGISTRATION=false
+      
+      # Database - Will be updated with beta Neon database
+      - DATABASE_URL=postgresql://REPLACE_WITH_BETA_DATABASE_URL
+      - REDIS_URL=redis://redis:6379
+      
+      # Application
+      - NODE_ENV=production
+      - PORT=3000
+      - BASE_URL=https://beta.edsteward.ai
+      - SESSION_SECRET=beta-session-secret-development
+      - MULTI_TENANT=false
+      
+      # Features
+      - FEATURE_MAX_USERS=100
+      - FEATURE_MAX_REGULATIONS=1000
+      - FEATURE_API_ACCESS=true
+      - FEATURE_SSO_ENABLED=false
+    
+    depends_on:
+      - redis
+    
+    volumes:
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+      - ./assets:/app/assets
+    
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+
+volumes:
+  redis_data:

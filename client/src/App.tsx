@@ -14,8 +14,10 @@ import ComplianceWizardPage from "@/pages/compliance-wizard-page";
 import ReportsPage from "@/pages/reports-page";
 import ValidationPage from "@/pages/validation-page";
 import AdminSettingsPage from "@/pages/admin-settings-page";
+import AdminDashboardPage from "@/pages/admin-dashboard-page";
 import LogsPage from "@/pages/admin/logs-page";
 import DebugToolsPage from "@/pages/admin/debug-tools-page";
+import AWSTenantsManagementPage from "@/pages/admin/aws-tenant-management-page";
 import UtilitiesIndexPage from "@/pages/utilities/index";
 import { RegulationViewer } from "@/pages/RegulationViewer";
 import SetupWizardPage from "@/pages/setup-wizard-page";
@@ -38,24 +40,26 @@ export default function App() {
               {/* Authentication Route */}
               <Route path="/auth" component={AuthPage} />
               <Route path="/setup" component={SetupWizardPage} />
-              
+
               {/* Protected Routes - Authentication Required */}
               <ProtectedRoute path="/" component={HomePage} />
+              <ProtectedRoute path="/admin/dashboard" component={AdminDashboardPage} />
               <ProtectedRoute path="/regulations" component={RegulationsPage} />
               <ProtectedRoute path="/regulations/validate" component={ValidationPage} />
               <ProtectedRoute path="/regulations/updates" component={UpdatesListPage} />
               <ProtectedRoute path="/regulations/updates/:id" component={DifferentialViewPage} />
               <ProtectedRoute path="/regulations/diff-test" component={DiffTestPage} />
-              <ProtectedRegulationRoute 
-                path="/regulations/:id" 
-                component={RegulationDetailPage} 
+              <ProtectedRegulationRoute
+                path="/regulations/:id"
+                component={RegulationDetailPage}
               />
-              <ProtectedRegulationRoute 
-                path="/compliance-wizard/:id" 
-                component={ComplianceWizardPage} 
+              <ProtectedRegulationRoute
+                path="/compliance-wizard/:id"
+                component={ComplianceWizardPage}
               />
               <ProtectedRoute path="/reports" component={ReportsPage} />
               <ProtectedRoute path="/admin/settings" component={AdminSettingsPage} />
+              <ProtectedRoute path="/admin/aws-tenant-management" component={AWSTenantsManagementPage} />
               <ProtectedRoute path="/admin/logs" component={LogsPage} />
               <ProtectedRoute path="/admin/debug" component={DebugToolsPage} />
               <ProtectedRoute path="/admin/regulations" component={RegulationViewer} />

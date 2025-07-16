@@ -86,13 +86,13 @@ fi
 
 echo ""
 echo -e "${BLUE}🔗 Useful Links:${NC}"
-echo "• GitHub Actions: https://github.com/dvdbrnds/EdSteward/actions"
+echo "• Deploy to production: ./scripts/deploy-production.sh"
 echo "• AWS ECS Console: https://console.aws.amazon.com/ecs/home?region=us-east-1"
 echo "• CloudWatch Logs: https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups"
 
 echo ""
 echo -e "${BLUE}🔧 Quick Commands:${NC}"
-echo "• Deploy to staging: git push origin ES-clientside"
-echo "• Deploy to production: git push origin main"
+echo "• Deploy to staging: ./scripts/deploy-staging.sh"
+echo "• Deploy to production: ./scripts/deploy-production.sh"
 echo "• Add new tenant: ./scripts/add-new-tenant.sh <id> '<name>' '<domain>'"
 echo "• Force ECS restart: aws ecs update-service --cluster <cluster> --service <service> --force-new-deployment --region us-east-1" 

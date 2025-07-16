@@ -144,7 +144,7 @@ docker run edsteward:TAG
 - Never use plain `docker build` for production deployments
 - Verify architecture before pushing to ECR
 
-### For CI/CD:
+### For AWS-only deployment:
 - Add platform specification to all build steps
 - Include architecture verification in pipeline
 - Test images before deployment

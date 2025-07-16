@@ -1,4 +1,4 @@
-// Minimal test to satisfy GitHub Actions unit test requirement
+// Minimal test to satisfy deployment unit test requirement
 import { describe, it, expect } from 'vitest';
 
 describe('Basic functionality', () => {

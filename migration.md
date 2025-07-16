@@ -70,4 +70,4 @@ While there are no explicit GDPR or HIPAA compliance measures visible, the archi
 ### What kind of deployment frequency do you anticipate?
 The application has comprehensive error handling and structured logging, suggesting it's designed for stable, production use with occasional updates. The codebase includes several utility scripts for data maintenance, suggesting regular operational updates.
 
-The setup with Vite for development and production builds indicates a standard CI/CD approach could be implemented.
+The setup with Vite for development and production builds indicates a standard AWS-only deployment approach could be implemented.

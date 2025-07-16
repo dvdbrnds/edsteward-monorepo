@@ -389,7 +389,7 @@ telnet $DB_ENDPOINT 5432
 1. **SAML Configuration**: Setup tenant-specific SAML authentication
 2. **Monitoring**: Configure CloudWatch dashboards and alerts
 3. **Backup Strategy**: Setup automated RDS backups
-4. **CI/CD Pipeline**: Automate future deployments
+4. **AWS-only deployment Pipeline**: Automate future deployments
 5. **Tenant Onboarding**: Use tenant onboarding script
 6. **Documentation**: Create user guides and admin documentation
 

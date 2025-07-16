@@ -14,7 +14,7 @@
 ### 🔄 **Automated Deployment Pipeline**
 - **ES-clientside branch** → Staging deployment (automatic)
 - **main branch** → Production deployment (automatic)
-- **GitHub Actions**: Fully configured and working
+- **AWS Deployment**: Fully configured and working
 - **No manual Docker builds needed!**
 
 ### 🎨 **Dashboard Fixes**
@@ -69,14 +69,14 @@ docker-compose -f docker-compose.dev.yml up -d
 
 # Deploy to staging
 git push origin ES-clientside
-# Automatic deployment via GitHub Actions
+# AWS-only deployment
 ```
 
 ### Production Deployment
 ```bash
 # Deploy to production
-git push origin main
-# Automatic deployment via GitHub Actions
+./scripts/deploy-production.sh
+# AWS-only deployment
 ```
 
 ## 📊 **Sample Data Available**
@@ -98,7 +98,7 @@ git push origin main
 - **Staging Admin**: https://staging.edsteward.ai/
 - **Moravian (Staging)**: https://moravian.edsteward.ai/
 - **Health Check**: https://staging.edsteward.ai/health
-- **GitHub Actions**: https://github.com/your-repo/actions
+- **AWS Deployment Status**: ./scripts/check-production-status.sh
 - **AWS ECS Console**: https://console.aws.amazon.com/ecs/
 
 ## 🚀 **Next Steps Options**

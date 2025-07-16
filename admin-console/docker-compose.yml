@@ -1,0 +1,53 @@
+services:
+  admin-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=development
+      - ADMIN_PORT=4000
+      - DATABASE_URL=postgresql://neondb_owner:npg_foSr6ixkzw7W@ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require
+      - SESSION_SECRET=your-super-secret-session-key-change-this-in-production
+    volumes:
+      - ./server:/app/server
+      - /app/node_modules
+    depends_on:
+      - admin-redis
+    networks:
+      - admin-network
+    restart: unless-stopped
+
+  admin-frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "3001:3001"
+    environment:
+      - VITE_ADMIN_API_URL=http://localhost:4000
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+      - /app/node_modules
+    depends_on:
+      - admin-backend
+    networks:
+      - admin-network
+    restart: unless-stopped
+
+  admin-redis:
+    image: redis:7-alpine
+    ports:
+      - "6381:6379"
+    networks:
+      - admin-network
+    restart: unless-stopped
+
+networks:
+  admin-network:
+    driver: bridge
+
+volumes:
+  admin_node_modules: 

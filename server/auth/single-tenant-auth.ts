@@ -7,7 +7,7 @@ import { Express, Request, Response } from 'express';
 import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { Strategy as SamlStrategy } from '@node-saml/passport-saml';
-import bcrypt from 'bcrypt';
+import { verifyPassword } from '../auth';  // Import our new scrypt-based function
 import { institutionConfig } from '../config/institution';
 import { getDatabaseStorage } from '../services/database';
 
@@ -31,7 +31,7 @@ export function configureAuth(app: Express): void {
             return done(null, false, { message: 'User not found' });
           }
 
-          const isValidPassword = await bcrypt.compare(password, user.password);
+          const isValidPassword = await verifyPassword(password, user.password);
           if (!isValidPassword) {
             return done(null, false, { message: 'Invalid password' });
           }
@@ -99,12 +99,12 @@ export function configureAuth(app: Express): void {
     try {
       const storage = getDatabaseStorage();
       let user = await storage.getUser(parseInt(id, 10), undefined);
-      
+
       // Ensure dvdbrnds is always admin
       if (user && user.username === 'dvdbrnds' && user.role !== 'admin') {
         user = { ...user, role: 'admin' };
       }
-      
+
       done(null, user);
     } catch (error) {
       done(error);
@@ -123,12 +123,12 @@ function setupAuthRoutes(app: Express): void {
   if (institutionConfig.authentication.usernamePasswordEnabled) {
     app.post('/api/login', passport.authenticate('local'), (req: Request, res: Response) => {
       let user = req.user;
-      
+
       // Ensure dvdbrnds is always admin
       if (user && user.username === 'dvdbrnds' && user.role !== 'admin') {
         user = { ...user, role: 'admin' };
       }
-      
+
       res.json({ success: true, user: user });
     });
   }
@@ -136,8 +136,8 @@ function setupAuthRoutes(app: Express): void {
   // SAML routes
   if (institutionConfig.authentication.samlEnabled) {
     app.get('/auth/saml', passport.authenticate('saml'));
-    
-    app.post('/auth/saml/callback', 
+
+    app.post('/auth/saml/callback',
       passport.authenticate('saml', { failureRedirect: '/login?error=saml' }),
       (req: Request, res: Response) => {
         res.redirect('/dashboard');

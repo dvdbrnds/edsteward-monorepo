@@ -55,7 +55,7 @@ make -f Makefile.local dev
 git push origin ES-clientside
 
 # 3. Deploy to production - ALL tenants get it
-git push origin main
+./scripts/deploy-production.sh
 ```
 
 ---
@@ -104,7 +104,7 @@ make -f Makefile.local dev
 
 # 2. Deploy to staging/production - feature remains hidden
 git push origin ES-clientside
-git push origin main
+./scripts/deploy-production.sh
 
 # 3. Enable for specific tenants via database
 UPDATE tenants SET settings = jsonb_set(
@@ -249,7 +249,7 @@ make -f Makefile.local dev
 4. **Deploy:**
 ```bash
 git push origin ES-clientside  # Goes to all staging tenants
-git push origin main          # Goes to all production tenants
+./scripts/deploy-production.sh          # Goes to all production tenants
 ```
 
 ### **For Your Next Tenant-Specific Feature:**

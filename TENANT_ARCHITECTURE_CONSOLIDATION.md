@@ -74,7 +74,7 @@ The architectural consolidation is complete and tested locally. The staging tena
 # Push to main branch to trigger GitHub Actions deployment
 git add .
 git commit -m "feat: consolidate tenant architecture following Context7 patterns"
-git push origin main
+./scripts/deploy-production.sh
 ```
 
 ## Context7 Best Practices Implemented

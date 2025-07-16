@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Editor } from "@monaco-editor/react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
@@ -44,6 +43,9 @@ Submission Guidelines: ${regulation.submissionGuidelines || ''}
     );
   }
 
+  const previousContent = formatRegulationContent(previousVersion);
+  const currentContent = formatRegulationContent(currentRegulation);
+
   return (
     <Card className="p-4">
       <div className="mb-4 flex items-center justify-between">
@@ -60,18 +62,28 @@ Submission Guidelines: ${regulation.submissionGuidelines || ''}
       </div>
 
       <div className="border rounded-lg overflow-hidden h-[500px]">
-        <Editor
-          height="100%"
-          original={formatRegulationContent(previousVersion)}
-          modified={formatRegulationContent(currentRegulation)}
-          language="markdown"
-          options={{
-            renderSideBySide: true,
-            readOnly: true,
-            minimap: { enabled: false },
-            wordWrap: 'on'
-          }}
-        />
+        <div className="grid grid-cols-2 h-full">
+          <div className="border-r">
+            <div className="bg-red-50 p-2 text-sm font-medium text-red-700 border-b">
+              Previous Version {previousVersion.versionNumber}
+            </div>
+            <div className="p-4 h-full overflow-y-auto">
+              <pre className="text-sm whitespace-pre-wrap font-mono">
+                {previousContent}
+              </pre>
+            </div>
+          </div>
+          <div>
+            <div className="bg-green-50 p-2 text-sm font-medium text-green-700 border-b">
+              Current Version {currentRegulation.versionNumber}
+            </div>
+            <div className="p-4 h-full overflow-y-auto">
+              <pre className="text-sm whitespace-pre-wrap font-mono">
+                {currentContent}
+              </pre>
+            </div>
+          </div>
+        </div>
       </div>
 
       {currentRegulation.versionMetadata?.changes && (

@@ -8,10 +8,10 @@
 git push origin ES-clientside
 
 # Deploy to production (main branch)  
-git push origin main
+./scripts/deploy-production.sh
 
 # Check deployment status
-open https://github.com/dvdbrnds/EdSteward/actions
+./scripts/check-production-status.sh
 ```
 
 ### **Health Checks**
@@ -27,10 +27,10 @@ curl -I https://moravian.edsteward.ai/health
 ### **Multi-Tenant Feature Management**
 ```bash
 # Deploy to ALL tenants (defaultValue: true)
-git push origin main
+./scripts/deploy-production.sh
 
 # Deploy to SPECIFIC tenants (defaultValue: false)
-git push origin main  # Deploy code (hidden)
+./scripts/deploy-production.sh  # Deploy code (hidden)
 ./scripts/manage-tenant-features.sh enable-feature moravian new_feature
 
 # List all tenants
@@ -78,11 +78,11 @@ aws logs tail /ecs/edsteward-multi-tenant-staging --follow --region us-east-1
 
 ## **Branch → Environment Mapping**
 
-| Branch | Environment | Auto-Deploy |
-|--------|-------------|-------------|
-| `main` | Production (moravian.edsteward.ai) | ✅ Yes |
-| `ES-clientside` | Staging (staging.edsteward.ai) | ✅ Yes |
-| `dev` | Dev (dev.edsteward.ai) | ✅ Yes |
+| Branch | Environment | Deployment Method |
+|--------|-------------|-------------------|
+| `main` | Production (moravian.edsteward.ai) | `./scripts/deploy-production.sh` |
+| `ES-clientside` | Staging (staging.edsteward.ai) | `./scripts/deploy-staging.sh` |
+| `dev` | Dev (dev.edsteward.ai) | `./scripts/deploy-dev.sh` |
 
 ---
 
@@ -91,7 +91,7 @@ aws logs tail /ecs/edsteward-multi-tenant-staging --follow --region us-east-1
 ### **Standard Feature Development**
 1. **Work on staging**: `git checkout ES-clientside`
 2. **Make changes**: Code, test, commit
-3. **Deploy to staging**: `git push origin ES-clientside` 
+3. **Deploy to staging**: `./scripts/deploy-staging.sh` 
 4. **Test staging**: Visit https://staging.edsteward.ai
 5. **Deploy to production**: Merge to `main` and push
 
@@ -106,7 +106,7 @@ aws logs tail /ecs/edsteward-multi-tenant-staging --follow --region us-east-1
 ## **Monitoring & Troubleshooting**
 
 ### **Key Monitoring URLs**
-- **GitHub Actions**: https://github.com/dvdbrnds/EdSteward/actions
+- **AWS Deployment Status**: ./scripts/check-production-status.sh
 - **AWS ECS Console**: https://console.aws.amazon.com/ecs/home?region=us-east-1
 - **CloudWatch Logs**: https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups
 
@@ -114,14 +114,14 @@ aws logs tail /ecs/edsteward-multi-tenant-staging --follow --region us-east-1
 | Issue | Quick Fix |
 |-------|-----------|
 | 503/504 errors | Force ECS restart |
-| Deployment fails | Check GitHub Actions logs |
+| Deployment fails | Check deployment script logs |
 | New tenant not working | Verify CNAME and database config |
 | SSL issues | Check ACM certificate status |
 
 ---
 
 ## **Success Indicators**
-- ✅ GitHub Actions shows green checkmark
+- ✅ AWS deployment script completes successfully
 - ✅ Health endpoints return HTTP 200
 - ✅ Application loads in browser
 - ✅ Login works with `dvdbrnds` / `gabadh`

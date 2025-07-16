@@ -19,6 +19,7 @@ import {
   Loader2,
   User,
   Settings,
+  Server,
 } from "lucide-react";
 import {
   Dialog,
@@ -283,16 +284,18 @@ export default function Navigation() {
     { href: "/", label: "Dashboard", icon: LayoutDashboard },
     ...(user?.role?.toLowerCase() === "admin" || user?.role?.toLowerCase() === "compliance_officer"
       ? [
-          { href: "/regulations/updates", label: "Regulation Updates", icon: FileText },
-        ]
+        { href: "/regulations/updates", label: "Regulation Updates", icon: FileText },
+      ]
       : []),
     ...(user?.role?.toLowerCase() === "admin"
       ? [
-          { href: "/admin/settings", label: "System Settings", icon: Settings },
-          // System Logs route is available at /admin/logs but hidden from navigation
-          // Uncomment the following line to show it in the navigation:
-          // { href: "/admin/logs", label: "System Logs", icon: FileText }
-        ]
+        { href: "/admin/dashboard", label: "Admin Dashboard", icon: LayoutDashboard },
+        { href: "/admin/settings", label: "System Settings", icon: Settings },
+        { href: "/admin/aws-tenant-management", label: "AWS Tenant Management", icon: Server },
+        // System Logs route is available at /admin/logs but hidden from navigation
+        // Uncomment the following line to show it in the navigation:
+        // { href: "/admin/logs", label: "System Logs", icon: FileText }
+      ]
       : []),
   ];
 
@@ -368,11 +371,10 @@ export default function Navigation() {
                     <Link key={link.href} href={link.href}>
                       <Button
                         variant="ghost"
-                        className={`${
-                          isActive
-                            ? "text-white border-b-2 border-white"
-                            : "text-gray-300 hover:text-white hover:border-b-2 hover:border-gray-300"
-                        } flex items-center space-x-2 rounded-none px-2 h-16 whitespace-nowrap`}
+                        className={`${isActive
+                          ? "text-white border-b-2 border-white"
+                          : "text-gray-300 hover:text-white hover:border-b-2 hover:border-gray-300"
+                          } flex items-center space-x-2 rounded-none px-2 h-16 whitespace-nowrap`}
                       >
                         <Icon className="h-4 w-4" />
                         <span>{link.label}</span>

@@ -49,7 +49,7 @@ Based on Context7 documentation review, our current implementation aligns with b
 - ✅ **Production Dependencies**: Using `--only=prod` patterns
 - ✅ **Error Handling**: Proper EventEmitter patterns
 - ✅ **Security**: npm audit integration
-- ⚠️ **Missing**: Automated vulnerability scanning in CI/CD
+- ⚠️ **Missing**: Automated vulnerability scanning in AWS-only deployment
 
 #### **Express Best Practices** ✅
 - ✅ **Security**: Helmet middleware configured
@@ -87,7 +87,7 @@ Based on Context7 documentation review, our current implementation aligns with b
 #### **Deployment Infrastructure** ✅
 - [x] Docker containerization
 - [x] AWS ECS deployment
-- [x] GitHub Actions CI/CD
+- [x] GitHub Actions AWS-only deployment
 - [x] Domain configuration (edsteward.ai)
 - [x] SSL/TLS certificates
 - [x] Load balancer configuration

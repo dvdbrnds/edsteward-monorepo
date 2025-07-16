@@ -11,7 +11,6 @@ import { storage } from '../storage';
 import { getDatabaseStorage } from '../services/database';
 import path from 'path';
 import { institutionConfig } from '../config/institution';
-// Tenant middleware disabled in single-tenant mode
 
 // Import modular route handlers
 import uploadsRoutes from './api/uploads';
@@ -19,7 +18,8 @@ import regulationsRouter from './api/regulations';
 import notesRouter from './api/notes';
 import deadlinesRouter from './api/deadlines';
 import notificationsRouter from './api/notifications';
-import adminRouter from './api/admin';
+
+import awsTenantManagementRouter from './api/aws-tenant-management';
 import { debugRouter } from './api/debug';
 import { emergencyMoravianRouter } from './api/emergency-moravian-fix';
 // @ts-ignore
@@ -39,25 +39,37 @@ export function registerRoutes(app: express.Application): Server {
   // =============================================================================
   // NO AUTH REQUIRED ENDPOINTS (health checks only) - BEFORE TENANT MIDDLEWARE
   // =============================================================================
-  
+
   // Basic health check - must be before tenant middleware for ALB health checks
   app.get('/health', (req, res) => {
     res.status(200).send("OK");
   });
 
   // =============================================================================
-  // APPLY TENANT MIDDLEWARE GLOBALLY
+  // SINGLE-TENANT MODE - NO TENANT MIDDLEWARE NEEDED
   // =============================================================================
-  
-  // Single-tenant mode - no tenant middleware needed
-  // app.use(tenantMiddleware);
 
   // API health check with database status AND tenant information
   app.get('/api/health', async (req: any, res) => {
+    // Debug mode: show environment variables
+    if (req.query.debug === 'true') {
+      return res.json({
+        status: "healthy",
+        environment: {
+          NODE_ENV: process.env.NODE_ENV,
+          INSTITUTION_NAME: process.env.INSTITUTION_NAME,
+          INSTITUTION_PRIMARY_COLOR: process.env.INSTITUTION_PRIMARY_COLOR,
+          MULTI_TENANT: process.env.MULTI_TENANT,
+          PORT: process.env.PORT,
+          DATABASE_URL: process.env.DATABASE_URL ? '[HIDDEN]' : undefined
+        },
+        timestamp: new Date().toISOString()
+      });
+    }
     try {
       // Check if this is a fix request
       const shouldFix = req.query.fix === 'staging-tenant';
-      
+
       if (shouldFix) {
         console.log('🔧 [HEALTH-FIX] Single-tenant mode - no tenant fixes needed');
         return res.json({
@@ -67,16 +79,16 @@ export function registerRoutes(app: express.Application): Server {
           timestamp: new Date().toISOString()
         });
       }
-      
+
       const { checkConnectionHealth } = await import('../config/database');
       const { databaseHealthMonitor } = await import('../services/database-health');
-      
+
       const dbHealthy = await checkConnectionHealth();
       const healthStatus = databaseHealthMonitor.getHealthStatus();
-      
+
       // Single-tenant mode - simplified tenant info
       const tenantInfo = { subdomain: null, domain: req.get('host'), method: 'single-tenant' };
-      
+
       const response = {
         status: dbHealthy ? "healthy" : "degraded",
         timestamp: new Date().toISOString(),
@@ -97,7 +109,7 @@ export function registerRoutes(app: express.Application): Server {
           status: req.tenant?.status || null
         }
       };
-      
+
       res.status(dbHealthy ? 200 : 503).json(response);
     } catch (error) {
       res.status(503).json({
@@ -126,7 +138,7 @@ export function registerRoutes(app: express.Application): Server {
       shouldMapTo: 'moravian',
       server: 'production'
     };
-    
+
     // Single-tenant mode - storage always available
     try {
       const storage = getDatabaseStorage();
@@ -135,7 +147,7 @@ export function registerRoutes(app: express.Application): Server {
       deploymentInfo.singleTenantWorking = false;
       deploymentInfo.error = error instanceof Error ? error.message : String(error);
     }
-    
+
     res.json(deploymentInfo);
   });
 
@@ -155,9 +167,9 @@ export function registerRoutes(app: express.Application): Server {
       });
     } catch (error) {
       console.error("Error fetching public branding config:", error);
-      res.status(500).json({ 
-        error: "Failed to fetch branding config", 
-        details: error instanceof Error ? error.message : String(error) 
+      res.status(500).json({
+        error: "Failed to fetch branding config",
+        details: error instanceof Error ? error.message : String(error)
       });
     }
   });
@@ -182,10 +194,10 @@ export function registerRoutes(app: express.Application): Server {
       const tenantStorage = getDatabaseStorage();
 
       log(`📋 Checking setup status for single-tenant: default`);
-      
+
       const users = await tenantStorage.getAllUsers();
       const regulations = await tenantStorage.getRegulations();
-      
+
       const setupStatus = {
         hasUsers: users.length > 0,
         hasRegulations: regulations.length > 0,
@@ -196,75 +208,66 @@ export function registerRoutes(app: express.Application): Server {
         deadlineCount: 0,
         tenantId: 'default'
       };
-      
+
       log(`✅ Setup status for single-tenant default: ${JSON.stringify(setupStatus)}`);
       res.json(setupStatus);
     } catch (error) {
       log(`❌ Error checking setup status: ${error}`);
-      res.status(500).json({ 
-        error: "Failed to check setup status", 
-        details: error instanceof Error ? error.message : String(error) 
+      res.status(500).json({
+        error: "Failed to check setup status",
+        details: error instanceof Error ? error.message : String(error)
       });
     }
   });
 
   // Protected API routes (all require authentication)
   // Auth router removed - using setupAuth endpoints instead
-  
-  // TEMPORARY FIX: Add auth endpoints directly until router issue is resolved
+
+  // Single-tenant auth endpoints
   app.get('/api/auth/me', (req, res) => {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ error: 'Authentication required' });
     }
-    
+
     let user = req.user;
-    
+
     // Ensure dvdbrnds is always admin
     if (user && user.username === 'dvdbrnds' && user.role !== 'admin') {
       user = { ...user, role: 'admin' };
     }
-    
-    // Include tenant info in user response
-    const userWithTenant = {
-      ...user,
-      tenantId: (req as any).tenantId,
-      subdomain: (req as any).tenant?.subdomain
-    };
-    
-    res.json(userWithTenant);
+
+    res.json(user);
   });
 
   app.get('/api/auth/status', (req, res) => {
     const isAuthenticated = req.isAuthenticated();
-    const tenantReq = req as any;
-    
+
     let user = isAuthenticated ? req.user : null;
-    
+
     // Ensure dvdbrnds is always admin
     if (user && user.username === 'dvdbrnds' && user.role !== 'admin') {
       user = { ...user, role: 'admin' };
     }
-    
+
     res.json({
       authenticated: isAuthenticated,
       user: user,
-      tenantId: tenantReq.tenantId || null,
-      subdomain: tenantReq.tenant?.subdomain || null,
       timestamp: new Date().toISOString()
     });
   });
-  
+
   app.use('/api/uploads', uploadsRoutes);
   app.use('/api/regulations', regulationsRouter);
   app.use('/api/notes', notesRouter);
   app.use('/api/deadlines', deadlinesRouter);
   app.use('/api/notifications', notificationsRouter);
-  app.use('/api/admin', adminRouter);
+
+  app.use('/api/aws-tenant-management', awsTenantManagementRouter);
   app.use('/api/database-migration', migrationRoutes);
-  
+
   // Register debug routes (no auth required for debugging)
   app.use('/api/debug', debugRouter);
-  
+
   // Emergency bypass for Moravian tenant - only use when hostname is moravian.edsteward.ai
   app.use('/api/emergency', (req, res, next) => {
     const hostname = req.get('host') || '';
@@ -277,34 +280,54 @@ export function registerRoutes(app: express.Application): Server {
 
   // Institution configuration endpoint for client-side branding
   app.get('/api/institution-config', (req, res) => {
+    // Read environment variables dynamically for true customer isolation
     const config = {
       institution: {
-        name: institutionConfig.name,
-        domain: institutionConfig.domain,
+        name: (process.env.INSTITUTION_NAME || 'EdSteward Institution').replace(/_/g, ' '),
+        domain: process.env.INSTITUTION_DOMAIN || 'localhost',
         branding: {
-          logo: institutionConfig.branding.logo,
-          primaryColor: institutionConfig.branding.primaryColor,
-          secondaryColor: institutionConfig.branding.secondaryColor,
-          favicon: institutionConfig.branding.favicon,
+          logo: process.env.INSTITUTION_LOGO_URL || '/assets/generic-logo.svg',
+          primaryColor: process.env.INSTITUTION_PRIMARY_COLOR || '#0066cc',
+          secondaryColor: process.env.INSTITUTION_SECONDARY_COLOR || '#336699',
+          favicon: process.env.INSTITUTION_FAVICON_URL || '/favicon.ico',
         },
       },
       authentication: {
-        samlEnabled: institutionConfig.authentication.samlEnabled,
-        usernamePasswordEnabled: institutionConfig.authentication.usernamePasswordEnabled,
-        allowSelfRegistration: institutionConfig.authentication.allowSelfRegistration,
+        samlEnabled: process.env.AUTH_SAML_ENABLED === 'true',
+        usernamePasswordEnabled: process.env.AUTH_USERNAME_PASSWORD_ENABLED !== 'false',
+        allowSelfRegistration: process.env.AUTH_ALLOW_SELF_REGISTRATION === 'true',
       },
       features: {
-        maxUsers: institutionConfig.features.maxUsers,
-        maxRegulations: institutionConfig.features.maxRegulations,
-        apiAccess: institutionConfig.features.apiAccess,
-        customDomain: institutionConfig.features.customDomain,
-        ssoEnabled: institutionConfig.features.ssoEnabled,
+        maxUsers: parseInt(process.env.FEATURE_MAX_USERS || '1000'),
+        maxRegulations: parseInt(process.env.FEATURE_MAX_REGULATIONS || '10000'),
+        apiAccess: process.env.FEATURE_API_ACCESS !== 'false',
+        customDomain: process.env.FEATURE_CUSTOM_DOMAIN === 'true',
+        ssoEnabled: process.env.FEATURE_SSO_ENABLED === 'true',
       },
     };
 
     res.json({
       success: true,
       institutionConfig: config,
+    });
+  });
+
+  // Debug endpoint to check environment variables
+  app.get('/api/debug-env', (req, res) => {
+    const envVars = {
+      NODE_ENV: process.env.NODE_ENV,
+      INSTITUTION_NAME: process.env.INSTITUTION_NAME,
+      INSTITUTION_PRIMARY_COLOR: process.env.INSTITUTION_PRIMARY_COLOR,
+      INSTITUTION_TITLE: process.env.INSTITUTION_TITLE,
+      MULTI_TENANT: process.env.MULTI_TENANT,
+      PORT: process.env.PORT,
+      DATABASE_URL: process.env.DATABASE_URL ? '[HIDDEN]' : undefined
+    };
+
+    res.json({
+      success: true,
+      environment: envVars,
+      timestamp: new Date().toISOString()
     });
   });
 
@@ -318,7 +341,7 @@ export function registerRoutes(app: express.Application): Server {
 
   // Serve static files
   app.use('/downloads', express.static(path.join(process.cwd(), 'public/downloads')));
-  
+
   // Serve branding assets
   const assetsPath = path.join(process.cwd(), 'client/public/assets');
   app.use('/assets', express.static(assetsPath, {

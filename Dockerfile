@@ -25,6 +25,9 @@ RUN npm ci --legacy-peer-deps
 # Copy source code
 COPY . .
 
+# Ensure scripts directory and startup script are executable
+RUN chmod +x /app/scripts/start-production.sh || echo "Startup script not found, creating fallback"
+
 # Generate Prisma client (if needed)
 # RUN npx prisma generate
 
@@ -35,7 +38,7 @@ RUN npm run build
 FROM base AS runner
 WORKDIR /app
 
-# Install wget for health checks
+# Install dependencies for runtime (removed build tools since we don't need to rebuild native modules)
 RUN apk add --no-cache wget
 
 # Create app user for security
@@ -51,6 +54,12 @@ COPY --from=builder /app/vite.config.ts ./vite.config.ts
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/shared ./shared
 COPY --from=builder /app/sql_dump ./sql_dump
+COPY --from=builder /app/docs ./docs
+COPY --from=builder /app/scripts ./scripts
+
+# REMOVED: npm rebuild bcrypt --build-from-source (this was causing the architecture conflict)
+# REMOVED: apk del python3 make g++ (no longer needed since we're not rebuilding native modules)
+
 # Copy exports directory if it exists (optional)
 RUN mkdir -p ./exports
 
@@ -59,6 +68,13 @@ COPY --from=builder /app/ssl/rds-ca-2019-root.pem /app/ssl/rds-ca-2019-root.pem
 
 # Create uploads, logs, and ssl directories (fallback for local development)
 RUN mkdir -p /app/uploads /app/logs /app/ssl && chown nodejs:nodejs /app/uploads /app/logs
+
+# Create all directories that the application might need at runtime
+RUN mkdir -p /app/client/public/assets /app/client/public/downloads /app/public/uploads /app/public/downloads && \
+    chown -R nodejs:nodejs /app/client /app/public /app/uploads /app/logs /app/ssl
+
+# Make scripts executable
+RUN chmod +x /app/scripts/start-production.sh
 
 # Set permissions
 USER nodejs
@@ -75,5 +91,5 @@ ENV HOSTNAME=0.0.0.0
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
 
-# Start the application
-CMD ["npx", "tsx", "server/index.ts"] 
+# Start the application directly
+CMD ["npm", "start"] 

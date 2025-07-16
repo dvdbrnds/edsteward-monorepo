@@ -1,0 +1,76 @@
+{
+    "folders": [
+        {
+            "name": "EdSteward (Customer)",
+            "path": "."
+        },
+        {
+            "name": "Admin Console",
+            "path": "./admin-console"
+        }
+    ],
+    "settings": {
+        "typescript.preferences.quoteStyle": "double",
+        "editor.formatOnSave": true,
+        "editor.codeActionsOnSave": {
+            "source.fixAll.eslint": "explicit"
+        },
+        "eslint.workingDirectories": [
+            ".",
+            "./admin-console"
+        ],
+        "search.exclude": {
+            "**/node_modules": true,
+            "**/dist": true,
+            "**/coverage": true,
+            "**/.git": true
+        },
+        "files.watcherExclude": {
+            "**/node_modules/**": true,
+            "**/dist/**": true,
+            "**/coverage/**": true
+        }
+    },
+    "extensions": {
+        "recommendations": [
+            "ms-vscode-remote.remote-containers",
+            "bradlc.vscode-tailwindcss",
+            "esbenp.prettier-vscode",
+            "dbaeumer.vscode-eslint",
+            "ms-vscode.vscode-typescript-next",
+            "streetsidesoftware.code-spell-checker",
+            "ms-vscode.vscode-json",
+            "redhat.vscode-yaml",
+            "ms-azuretools.vscode-docker"
+        ]
+    },
+    "launch": {
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "name": "Debug Customer App",
+                "type": "node",
+                "request": "attach",
+                "port": 9229,
+                "address": "localhost",
+                "localRoot": "${workspaceFolder}",
+                "remoteRoot": "/app",
+                "skipFiles": [
+                    "<node_internals>/**"
+                ]
+            },
+            {
+                "name": "Debug Admin Console",
+                "type": "node",
+                "request": "attach",
+                "port": 9230,
+                "address": "localhost",
+                "localRoot": "${workspaceFolder}/admin-console",
+                "remoteRoot": "/app",
+                "skipFiles": [
+                    "<node_internals>/**"
+                ]
+            }
+        ]
+    }
+}

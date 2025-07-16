@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-echo "🔍 Verifying AWS Setup for GitHub Actions..."
+echo "🔍 Verifying AWS Setup for Manual Deployment..."
 
 # Check AWS credentials
 echo "📋 Checking AWS credentials..."
@@ -36,9 +36,9 @@ for cluster in "edsteward-multi-tenant-staging-cluster" "edsteward-cluster"; do
 done
 
 echo ""
-echo "🔑 For GitHub Actions, you need to add these secrets:"
+echo "🔑 For AWS deployment, these credentials are configured:"
 echo "AWS_ACCESS_KEY_ID: $(aws configure get aws_access_key_id)"
 echo "AWS_SECRET_ACCESS_KEY: [Your secret access key]"
 
 echo ""
-echo "🔗 Add secrets at: https://github.com/dvdbrnds/EdSteward/settings/secrets/actions" 
+echo "🔗 AWS credentials configured locally for manual deployment" 

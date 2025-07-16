@@ -1,0 +1,71 @@
+version: 0.2
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+      - echo Creating production Dockerfile with scrypt authentication...
+      - |
+        cat > Dockerfile.scrypt << 'DOCKEREOF'
+        # Production Dockerfile with scrypt authentication (no bcrypt dependencies)
+        FROM node:18-alpine
+
+        # Install system dependencies
+        RUN apk update && apk add --no-cache git curl
+
+        # Create app user for security
+        RUN addgroup --system --gid 1001 nodejs
+        RUN adduser --system --uid 1001 nodejs
+
+        # Create app directory
+        WORKDIR /app
+
+        # Copy package files
+        COPY package.json package-lock.json ./
+
+        # Install ALL dependencies (including dev dependencies for build)
+        RUN npm ci --legacy-peer-deps
+
+        # Copy source code
+        COPY . .
+
+        # Build the frontend
+        RUN npm run build
+
+        # Create directories with proper permissions
+        RUN mkdir -p /app/client/public/assets /app/client/public/downloads /app/public/uploads /app/public/downloads && \
+            chown -R nodejs:nodejs /app/client /app/public /app/uploads /app/logs /app/ssl
+        
+        # Make startup script executable
+        RUN chmod +x /app/scripts/start-production.sh
+        
+        USER nodejs
+        EXPOSE 3000
+        ENV PORT=3000
+        
+        # Use startup script that runs password fix before starting server
+        CMD ["/app/scripts/start-production.sh"]
+        DOCKEREOF
+        
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building Docker image with scrypt authentication...
+      - docker build -f Dockerfile.scrypt -t $IMAGE_REPO_NAME:$IMAGE_TAG .
+      - echo Tagging Docker image for ECR...
+      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - docker tag $IMAGE_REPO_NAME:$IMAGE_TAG $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest
+      
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing Docker image to ECR...
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:$IMAGE_TAG
+      - docker push $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$IMAGE_REPO_NAME:latest
+      - echo Updating ECS service...
+      - aws ecs update-service --cluster edsteward-cluster --service edsteward-service --force-new-deployment
+      - echo ECS service updated successfully
+
+artifacts:
+  files:
+    - '**/*'

@@ -74,7 +74,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return await apiRequest("POST", "/api/login", credentials);
     },
     onSuccess: (loginResponse: any) => {
-      // Don't set query data directly - let the auth status query refetch with correct structure
+      // CRITICAL FIX: Set query data directly to update authentication state immediately
+      // The loginResponse contains the user data from the successful login
+      if (loginResponse.success && loginResponse.user) {
+        queryClient.setQueryData(["/api/auth/status"], loginResponse.user);
+      }
+      // Also invalidate to ensure fresh data
       queryClient.invalidateQueries({ queryKey: ["/api/auth/status"] });
       // Invalidate all other queries to refresh data after login
       queryClient.invalidateQueries({ queryKey: ["/api/notifications"] });

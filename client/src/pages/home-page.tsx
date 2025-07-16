@@ -1,12 +1,12 @@
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import Navigation from "@/components/layout/navigation";
 import ComplianceOverview from "@/components/dashboard/compliance-overview";
 import UpcomingDeadlines from "@/components/dashboard/upcoming-deadlines";
 import RegulationList from "@/components/regulations/regulation-list";
 import { AppliesToFilter } from "@/components/filters/applies-to-filter";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Bell, CheckCircle, XCircle, Users, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -14,8 +14,18 @@ import type { Notification } from "@shared/schema";
 
 export default function HomePage() {
   const { user } = useAuth();
+  const [, setLocation] = useLocation();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedInstitutionTypes, setSelectedInstitutionTypes] = useState<string[]>([]);
+
+  // Check if we're in admin mode and redirect admin users to admin dashboard
+  useEffect(() => {
+    const isAdminMode = import.meta.env.VITE_ADMIN_MODE === 'true' || window.location.hostname.includes('admin');
+    if (user?.role?.toLowerCase() === "admin" && isAdminMode) {
+      setLocation("/admin/dashboard");
+      return;
+    }
+  }, [user, setLocation]);
 
   const { data: notifications, isLoading: notificationsLoading, error } = useQuery<Notification[]>({
     queryKey: ["/api/notifications", "v2"],
@@ -36,11 +46,11 @@ export default function HomePage() {
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 mb-8 items-stretch">
             <div className="lg:col-span-2">
               <div className="grid grid-cols-1 gap-8 md:grid-cols-2 items-stretch h-full">
-                <ComplianceOverview 
+                <ComplianceOverview
                   onCategorySelect={setSelectedCategory}
                   selectedCategory={selectedCategory}
                 />
-                <UpcomingDeadlines 
+                <UpcomingDeadlines
                   categoryFilter={selectedCategory}
                 />
               </div>
@@ -60,7 +70,7 @@ export default function HomePage() {
                     <p className="text-gray-500 text-center py-4">Loading notifications...</p>
                   ) : Array.isArray(notifications) && notifications.length > 0 ? (
                     notifications.map((notification) => (
-                      <div 
+                      <div
                         key={notification.id}
                         className="flex items-center justify-between p-3 border rounded-lg"
                       >
@@ -105,8 +115,8 @@ export default function HomePage() {
             <CardContent>
               <div className="flex items-center justify-between">
                 <p className="text-sm text-slate-600 max-w-xl">
-                  Access the view-only dashboard providing an overview of our regulatory compliance status. 
-                  This dashboard is designed specifically for the board of trustees to monitor compliance metrics 
+                  Access the view-only dashboard providing an overview of our regulatory compliance status.
+                  This dashboard is designed specifically for the board of trustees to monitor compliance metrics
                   and receive status updates.
                 </p>
                 <Button asChild className="gap-2">
@@ -124,7 +134,7 @@ export default function HomePage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
               {selectedCategory ? `${selectedCategory} Regulations` : 'All Regulations'}
             </h2>
-            
+
             {/* Filters Section */}
             <div className="mb-6">
               <AppliesToFilter
@@ -133,9 +143,9 @@ export default function HomePage() {
                 compact={true}
               />
             </div>
-            
-            <RegulationList 
-              categoryFilter={selectedCategory} 
+
+            <RegulationList
+              categoryFilter={selectedCategory}
               jurisdictionFilter={null}
               appliesToFilter={selectedInstitutionTypes}
             />

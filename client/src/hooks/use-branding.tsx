@@ -75,12 +75,15 @@ export function useBranding(): BrandingConfig {
       console.log('🎨 Applying branding configuration to CSS custom properties:');
       console.log('🔵 Hero color being applied:', brandingData.loginScreenHeroColor);
       console.log('🔵 Full branding config:', brandingData);
-      
+
       const branding = brandingData;
       setAppliedBranding(branding);
 
       // Update document title
       document.title = branding.title;
+
+      // Update meta description
+      updateMetaDescription(branding.institutionName);
 
       // Update favicon
       updateFavicon(branding.faviconUrl);
@@ -99,14 +102,14 @@ export function useBranding(): BrandingConfig {
     heroColor: currentBranding.loginScreenHeroColor,
     isLoading
   });
-  
+
   return currentBranding;
 }
 
 // Legacy hook for backward compatibility
 export function useLegacyBranding(): LegacyBranding {
   const branding = useBranding();
-  
+
   return {
     name: branding.institutionName,
     title: branding.title,
@@ -145,6 +148,21 @@ function updateFavicon(faviconUrl: string) {
     }
   } catch (error) {
     console.error('Failed to update favicon:', error);
+  }
+}
+
+// Update meta description
+function updateMetaDescription(institutionName: string) {
+  const metaDescription = document.querySelector('meta[name="description"]');
+  if (metaDescription) {
+    metaDescription.setAttribute('content', `Welcome to ${institutionName}'s Compliance Portal. Manage your security and regulatory obligations effectively.`);
+    console.log('🎨 Updated meta description for:', institutionName);
+  } else {
+    const newMetaDescription = document.createElement('meta');
+    newMetaDescription.name = 'description';
+    newMetaDescription.content = `Welcome to ${institutionName}'s Compliance Portal. Manage your security and regulatory obligations effectively.`;
+    document.head.appendChild(newMetaDescription);
+    console.log('🎨 Created new meta description for:', institutionName);
   }
 }
 

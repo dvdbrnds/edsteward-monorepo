@@ -281,7 +281,7 @@ git push origin ES-clientside
 
 # Deploy to production  
 git checkout main
-git push origin main
+./scripts/deploy-production.sh
 ```
 
 ---

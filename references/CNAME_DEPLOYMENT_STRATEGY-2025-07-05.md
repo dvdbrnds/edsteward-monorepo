@@ -146,7 +146,7 @@ With CNAME:    Client → Route53 → CNAME → ALB DNS → IP address
 
 ### **No Changes Required**
 
-Your existing `.github/workflows/deploy.yml` remains **completely unchanged**:
+Your existing AWS deployment workflow remains **completely unchanged**:
 
 ```yaml
 # This stays exactly the same

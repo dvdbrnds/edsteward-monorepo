@@ -2,7 +2,8 @@ import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import { Express } from "express";
 import session from "express-session";
-import bcrypt from "bcryptjs";
+import { scrypt, randomBytes, timingSafeEqual } from 'crypto';
+import { promisify } from 'util';
 import { storage } from "./storage";
 import { getDatabaseStorage } from "./services/database";
 import { User as SelectUser } from "@shared/schema";
@@ -10,28 +11,57 @@ import { syslog, LogLevel } from "./services/syslog";
 
 declare global {
   namespace Express {
-    interface User extends SelectUser {}
+    interface User extends SelectUser { }
   }
 }
 
-// Export the hashPassword function
-export async function hashPassword(password: string) {
-  return await bcrypt.hash(password, 10);
+// Convert scrypt to async/await
+const scryptAsync = promisify(scrypt);
+
+/**
+ * Hash a password using scrypt (Node.js built-in, no external dependencies)
+ * @param password - Plain text password
+ * @returns Promise<string> - Hashed password with salt
+ */
+export async function hashPassword(password: string): Promise<string> {
+  const salt = randomBytes(16).toString('hex');
+  const derivedKey = await scryptAsync(password, salt, 32) as Buffer;
+  return `${salt}:${derivedKey.toString('hex')}`;
 }
 
-async function comparePasswords(supplied: string, stored: string) {
-  return await bcrypt.compare(supplied, stored);
+/**
+ * Verify a password against a hash
+ * @param supplied - Plain text password
+ * @param stored - Hashed password from database
+ * @returns Promise<boolean> - True if password matches
+ */
+export async function verifyPassword(supplied: string, stored: string): Promise<boolean> {
+  // Only support scrypt hashes - no more bcrypt compatibility
+  const [salt, hash] = stored.split(':');
+  if (!salt || !hash) {
+    console.error('Invalid password hash format - expected salt:hash');
+    return false;
+  }
+
+  try {
+    const derivedKey = await scryptAsync(supplied, salt, 32) as Buffer;
+    const storedKey = Buffer.from(hash, 'hex');
+    return timingSafeEqual(derivedKey, storedKey);
+  } catch (error) {
+    console.error('Error verifying password:', error);
+    return false;
+  }
 }
 
 // Single-tenant storage for user operations
-function getTenantAwareStorage(req: any) {
+function getSingleTenantStorage() {
   return getDatabaseStorage();
 }
 
 export function setupAuth(app: Express) {
   // Note: Session middleware is already configured in app.ts
   // We only need to set up passport here
-  
+
   if (app.get("env") === "production") {
     app.set("trust proxy", 1);
   }
@@ -42,26 +72,19 @@ export function setupAuth(app: Express) {
   passport.use(
     new LocalStrategy({ passReqToCallback: true }, async (req: any, username: string, password: string, done) => {
       try {
-        // Use tenant-aware storage for user lookup
-        const tenantStorage = getTenantAwareStorage(req);
+        // Use single-tenant storage for user lookup
+        const tenantStorage = getSingleTenantStorage();
         const user = await tenantStorage.getUserByUsername(username);
-        
-        if (!user || !(await comparePasswords(password, user.password))) {
-          await syslog.logAuthEvent(LogLevel.WARNING, "Failed login attempt", undefined, username, {
-            tenantId: req.tenantId,
-            subdomain: req.tenant?.subdomain
-          });
+
+        if (!user || !(await verifyPassword(password, user.password))) {
+          await syslog.logAuthEvent(LogLevel.WARNING, "Failed login attempt", undefined, username, {});
           return done(null, false);
         }
-        
-        await syslog.logAuthEvent(LogLevel.INFO, "Login successful", user.id, username, {
-          tenantId: req.tenantId,
-          subdomain: req.tenant?.subdomain
-        });
+
+        await syslog.logAuthEvent(LogLevel.INFO, "Login successful", user.id, username, {});
         return done(null, user);
       } catch (error) {
         await syslog.logAuthEvent(LogLevel.ERROR, "Login error", undefined, username, {
-          tenantId: req.tenantId,
           error: error instanceof Error ? error.message : String(error)
         });
         return done(error);
@@ -70,50 +93,26 @@ export function setupAuth(app: Express) {
   );
 
   passport.serializeUser((user: any, done) => {
-    // Context7 Multi-Tenant Fix: Store both user ID and tenant ID in session
-    const sessionData = {
-      userId: user.id,
-      tenantId: user.tenantId || 'admin' // Include tenant context
-    };
-    done(null, sessionData);
+    // Single-tenant: Store only user ID in session
+    done(null, user.id);
   });
 
-  passport.deserializeUser(async (sessionData: any, done) => {
+  passport.deserializeUser(async (userId: number, done) => {
     try {
-      // Context7 Multi-Tenant Fix: Store both user ID and tenant ID in session
-      let userId: number;
-      let tenantId: string;
-      
-      if (typeof sessionData === 'object' && sessionData.userId && sessionData.tenantId) {
-        // New format: { userId: number, tenantId: string }
-        userId = sessionData.userId;
-        tenantId = sessionData.tenantId;
-      } else if (typeof sessionData === 'number') {
-        // Legacy format: just user ID - try to determine tenant
-        userId = sessionData;
-        tenantId = 'admin'; // Default fallback
-        console.warn(`Legacy session format detected for user ${userId}, defaulting to admin tenant`);
-      } else {
-        console.error(`Invalid session data during deserialization:`, sessionData);
-        return done(null, false);
-      }
-
       if (!userId || isNaN(userId)) {
         console.error(`Invalid user ID during deserialization: ${userId}`);
         return done(null, false);
       }
 
       // Use single-tenant storage for user lookup
-      const tenantStorage = getDatabaseStorage();
+      const tenantStorage = getSingleTenantStorage();
       const user = await tenantStorage.getUser(userId);
 
       if (!user) {
-        console.error(`User ${userId} not found in tenant ${tenantId} during deserialization`);
+        console.error(`User ${userId} not found during deserialization`);
         return done(null, false);
       }
 
-      // Attach tenant context to user object
-      (user as any).tenantId = tenantId;
       done(null, user);
     } catch (error) {
       console.error(`Error deserializing user:`, error);
@@ -123,9 +122,9 @@ export function setupAuth(app: Express) {
 
   app.post("/api/register", async (req, res, next) => {
     try {
-      // Use tenant-aware storage for user operations
-      const tenantStorage = getTenantAwareStorage(req);
-      
+      // Use single-tenant storage for user operations
+      const tenantStorage = getSingleTenantStorage();
+
       const existingUser = await tenantStorage.getUserByUsername(req.body.username);
       if (existingUser) {
         return res.status(400).json({ error: "Username already exists in this tenant" });
@@ -157,7 +156,7 @@ export function setupAuth(app: Express) {
 
       req.login(user, (err) => {
         if (err) return next(err);
-        
+
         // Return user with tenant context
         const userWithTenant = {
           ...user,
@@ -223,20 +222,20 @@ export function setupAuth(app: Express) {
         });
 
         try {
-          // Use tenant-aware storage for user update
-          const tenantStorage = getTenantAwareStorage(req);
+          // Use single-tenant storage for user update
+          const tenantStorage = getSingleTenantStorage();
           await tenantStorage.updateUser(user.id, { lastLogin: new Date() });
-          
+
           await syslog.logAuthEvent(LogLevel.INFO, "User logged in successfully", user.id, user.username, {
             tenantId: req.tenantId,
             subdomain: req.tenant?.subdomain
           });
-          
+
           // Store tenant info in session for future requests
           if (req.session && req.tenantId) {
             req.session.tenantId = req.tenantId;
           }
-          
+
           // Force session save before responding
           req.session.save((saveErr) => {
             if (saveErr) {
@@ -244,7 +243,7 @@ export function setupAuth(app: Express) {
             } else {
               console.log('✅ Session saved successfully with tenant context');
             }
-            
+
             // Return user with tenant context
             const userWithTenant = {
               ...user,
@@ -254,10 +253,10 @@ export function setupAuth(app: Express) {
             res.status(200).json(userWithTenant);
           });
         } catch (error) {
-          await syslog.error("Failed to update last login timestamp", { 
-            userId: user.id, 
+          await syslog.error("Failed to update last login timestamp", {
+            userId: user.id,
             tenantId: req.tenantId,
-            error 
+            error
           });
           // Still return success to the user with tenant context
           const userWithTenant = {
@@ -284,12 +283,12 @@ export function setupAuth(app: Express) {
         });
         return next(err);
       }
-      
+
       // Clear tenant info from session
       if (req.session) {
         delete req.session.tenantId;
       }
-      
+
       syslog.logAuthEvent(LogLevel.INFO, "User logged out", userId, username, {
         tenantId
       });
@@ -301,14 +300,14 @@ export function setupAuth(app: Express) {
     if (!req.isAuthenticated()) {
       return res.status(401).json({ error: 'Authentication required' });
     }
-    
+
     // Include tenant info in user response
     const userWithTenant = {
       ...req.user,
       tenantId: (req as any).tenantId,
       subdomain: (req as any).tenant?.subdomain
     };
-    
+
     res.json(userWithTenant);
   });
 }

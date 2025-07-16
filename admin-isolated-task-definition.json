@@ -1,0 +1,80 @@
+{
+    "family": "edsteward-admin",
+    "networkMode": "awsvpc",
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "1024",
+    "memory": "2048",
+    "executionRoleArn": "arn:aws:iam::259661441422:role/ecsTaskExecutionRole",
+    "taskRoleArn": "arn:aws:iam::259661441422:role/ecsTaskRole",
+    "containerDefinitions": [
+        {
+            "name": "edsteward-admin-console",
+            "image": "259661441422.dkr.ecr.us-east-1.amazonaws.com/edsteward-multi-tenant:admin-branding-fix",
+            "portMappings": [
+                {
+                    "containerPort": 3000,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "NODE_ENV",
+                    "value": "production"
+                },
+                {
+                    "name": "PORT",
+                    "value": "3000"
+                },
+                {
+                    "name": "MULTI_TENANT",
+                    "value": "false"
+                },
+                {
+                    "name": "INSTITUTION_NAME",
+                    "value": "EdSteward Admin Console"
+                },
+                {
+                    "name": "INSTITUTION_TITLE",
+                    "value": "EdSteward Admin Console - Tenant Management"
+                },
+                        {
+          "name": "DATABASE_URL",
+          "value": "postgresql://neondb_owner:npg_foSr6ixkzw7W@ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require"
+        },
+                {
+                    "name": "SESSION_SECRET",
+                    "value": "admin-session-secret-change-this-in-production-2025"
+                },
+                {
+                    "name": "ADMIN_MODE",
+                    "value": "true"
+                },
+                {
+                    "name": "TENANT_MANAGEMENT_ENABLED",
+                    "value": "true"
+                }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/aws/ecs/edsteward-admin",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            },
+            "healthCheck": {
+                "command": [
+                    "CMD-SHELL",
+                    "curl -f http://localhost:3000/health || exit 1"
+                ],
+                "interval": 30,
+                "timeout": 5,
+                "retries": 3,
+                "startPeriod": 60
+            }
+        }
+    ]
+}

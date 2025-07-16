@@ -175,7 +175,7 @@ Local: Development (*.edsteward.local)
 - **AWS ECS**: Container orchestration
 - **AWS RDS**: Production PostgreSQL databases
 - **Neon Database**: Development and staging databases
-- **GitHub Actions**: CI/CD pipeline
+- **GitHub Actions**: AWS-only deployment pipeline
 - **Docker**: Containerization
 - **NGINX**: Reverse proxy and SSL termination
 

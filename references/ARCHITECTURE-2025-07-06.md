@@ -243,9 +243,9 @@ interface SAMLConfig {
 
 ---
 
-## 🚀 **DevOps & CI/CD**
+## 🚀 **DevOps & AWS-only deployment**
 
-### **GitHub Actions Pipeline** (`.github/workflows/deploy.yml`)
+### **AWS Deployment Pipeline** (AWS ECS/ECR)
 
 #### **Workflow Triggers**
 - **Production**: `main` branch push

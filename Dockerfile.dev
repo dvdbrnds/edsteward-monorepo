@@ -21,9 +21,6 @@ COPY package.json package-lock.json ./
 # Install all dependencies (including dev) - this layer will be cached
 RUN npm ci --legacy-peer-deps --no-audit --no-fund
 
-# Replace bcrypt with bcryptjs for Alpine compatibility
-RUN npm uninstall bcrypt --legacy-peer-deps && npm install bcryptjs @types/bcryptjs --legacy-peer-deps
-
 # Create necessary directories
 RUN mkdir -p /app/uploads /app/logs /app/dist
 

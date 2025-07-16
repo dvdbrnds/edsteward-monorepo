@@ -3,11 +3,11 @@ import { sql } from 'drizzle-orm';
 import fs from 'fs';
 import path from 'path';
 import { getDatabaseStorage } from './services/database';
-import bcrypt from 'bcrypt';
+import { hashPassword } from './auth';  // Import our new scrypt-based function
 
 export async function initializeDatabase() {
   console.log('🚀 Starting database initialization...');
-  
+
   try {
     // Test database connection first
     await db.execute(sql`SELECT 1`);
@@ -18,15 +18,15 @@ export async function initializeDatabase() {
       SELECT COUNT(*) as count FROM information_schema.tables 
       WHERE table_name = 'users'
     `);
-    
+
     if (userCheck.rows[0]?.count === '0') {
       console.log('📋 Creating database schema from init_schema.sql...');
-      
+
       // Load complete schema from file
       const schemaPath = path.join(process.cwd(), 'sql_dump/init_schema.sql');
       if (fs.existsSync(schemaPath)) {
         const schemaSQL = fs.readFileSync(schemaPath, 'utf8');
-        
+
         // Clean and execute schema
         const cleanSchemaSQL = schemaSQL
           .replace(/SET.*?;/g, '')
@@ -67,15 +67,15 @@ export async function initializeDatabase() {
     // Check if we have users
     const existingUsers = await db.execute(sql`SELECT COUNT(*) as count FROM users`);
     const userCount = parseInt(existingUsers.rows[0]?.count || '0');
-    
+
     if (userCount === 0) {
       console.log('👤 Creating essential users...');
-      
+
       // Hash passwords properly
-      const adminPassword = await bcrypt.hash('admin123', 10);
-      const dvdbrndSPassword = await bcrypt.hash('gabadh', 10);
-      const userPassword = await bcrypt.hash('password', 10);
-      
+      const adminPassword = await hashPassword('admin123');
+      const dvdbrndSPassword = await hashPassword('gabadh');
+      const userPassword = await hashPassword('password');
+
       // Create admin user
       await db.execute(sql`
         INSERT INTO users (username, password, email, role, "firstName", "lastName", department)
@@ -103,7 +103,7 @@ export async function initializeDatabase() {
       if (fs.existsSync(exportPath)) {
         console.log('📊 Loading data from exports...');
         const exportSQL = fs.readFileSync(exportPath, 'utf8');
-        
+
         // Extract and execute INSERT statements
         const insertStatements = exportSQL
           .split('\n')
@@ -119,7 +119,7 @@ export async function initializeDatabase() {
             // Continue on errors - some inserts might conflict
           }
         }
-        
+
         console.log(`✅ Loaded ${successCount} records from exports`);
       }
     } catch (error) {
@@ -129,13 +129,13 @@ export async function initializeDatabase() {
     // Final verification
     const finalUserCount = await db.execute(sql`SELECT COUNT(*) as count FROM users`);
     const finalRegCount = await db.execute(sql`SELECT COUNT(*) as count FROM regulations`);
-    
+
     // Single-tenant mode - database already initialized
     console.log('✅ Single-tenant database ready');
 
     console.log('🎉 Database initialization completed!');
     console.log(`📊 Users: ${finalUserCount.rows[0]?.count}, Regulations: ${finalRegCount.rows[0]?.count}`);
-    
+
     return {
       success: true,
       message: 'Database initialized successfully',

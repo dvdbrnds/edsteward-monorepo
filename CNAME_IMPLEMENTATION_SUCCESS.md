@@ -97,7 +97,7 @@ git push origin dev  # Triggers dev deployment via GitHub Actions
 ```bash
 # Your deployment workflow remains exactly the same
 git push origin ES-clientside  # Staging deployment
-git push origin main          # Production deployment
+./scripts/deploy-production.sh          # Production deployment
 ```
 
 ### **3. Monitor and Enjoy Benefits**

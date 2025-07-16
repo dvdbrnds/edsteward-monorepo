@@ -1,0 +1,54 @@
+FROM node:18-alpine as base
+
+# Install system dependencies
+RUN apk add --no-cache \
+    git \
+    curl \
+    bash \
+    vim \
+    tini \
+    python3 \
+    make \
+    g++ \
+    && rm -rf /var/cache/apk/*
+
+# Set working directory
+WORKDIR /app
+
+# Development stage
+FROM base as development
+
+# Copy package files
+COPY package.json package-lock.json* ./
+
+# Install dependencies
+RUN npm ci --legacy-peer-deps --no-audit --no-fund
+
+# Create necessary directories
+RUN mkdir -p /app/logs /app/dist /app/public
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S adminuser -u 1001 -G nodejs
+
+# Copy application code
+COPY . .
+
+# Set permissions
+RUN chown -R adminuser:nodejs /app
+
+# Switch to non-root user
+USER adminuser
+
+# Expose port
+EXPOSE 3001
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:3001/health || exit 1
+
+# Use tini for proper signal handling
+ENTRYPOINT ["/sbin/tini", "--"]
+
+# Start both backend and frontend development servers
+CMD ["npm", "run", "dev:full"]

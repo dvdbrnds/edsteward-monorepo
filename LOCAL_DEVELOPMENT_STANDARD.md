@@ -48,7 +48,7 @@ docker build -f Dockerfile.single-tenant -t edsteward-[customer]:latest .
 # 3. Commit for version control
 git add .
 git commit -m "Your changes"
-git push origin main
+./scripts/deploy-production.sh
 
 # 4. Ship to customer infrastructure
 # (Customer deploys using their docker-compose.yml)

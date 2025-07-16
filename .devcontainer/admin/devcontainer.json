@@ -1,0 +1,68 @@
+{
+    "name": "EdSteward Admin Console Development",
+    "dockerComposeFile": [
+        "../../admin-console/docker-compose.admin.yml"
+    ],
+    "service": "admin-console",
+    "workspaceFolder": "/app",
+    "remoteUser": "node",
+    "features": {
+        "ghcr.io/devcontainers/features/git:1": {},
+        "ghcr.io/devcontainers/features/github-cli:1": {
+            "version": "latest"
+        },
+        "ghcr.io/devcontainers/features/node:1": {
+            "version": "18"
+        }
+    },
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "terminal.integrated.profiles.linux": {
+                    "bash": {
+                        "path": "/bin/bash"
+                    }
+                },
+                "typescript.preferences.quoteStyle": "double",
+                "editor.formatOnSave": true,
+                "editor.codeActionsOnSave": {
+                    "source.fixAll.eslint": "explicit"
+                },
+                "eslint.workingDirectories": [
+                    "/app"
+                ]
+            },
+            "extensions": [
+                "bradlc.vscode-tailwindcss",
+                "esbenp.prettier-vscode",
+                "dbaeumer.vscode-eslint",
+                "ms-vscode.vscode-typescript-next",
+                "streetsidesoftware.code-spell-checker",
+                "ms-vscode.vscode-json",
+                "redhat.vscode-yaml",
+                "ms-vscode-remote.remote-containers"
+            ]
+        }
+    },
+    "forwardPorts": [
+        3001,
+        6380
+    ],
+    "portsAttributes": {
+        "3001": {
+            "label": "EdSteward Admin Console",
+            "onAutoForward": "notify"
+        },
+        "6380": {
+            "label": "Admin Redis",
+            "onAutoForward": "silent"
+        }
+    },
+    "postCreateCommand": "npm install",
+    "shutdownAction": "stopCompose",
+    "remoteEnv": {
+        "NODE_ENV": "development",
+        "VITE_ADMIN_MODE": "true"
+    }
+}

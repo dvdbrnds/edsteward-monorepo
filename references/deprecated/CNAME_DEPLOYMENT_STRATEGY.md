@@ -94,7 +94,7 @@ curl -I https://moravian.edsteward.ai/health
 ```bash
 # Your deployment process remains exactly the same
 git push origin ES-clientside  # Triggers staging deployment
-git push origin main          # Triggers production deployment
+./scripts/deploy-production.sh          # Triggers production deployment
 ```
 
 ---
@@ -146,7 +146,7 @@ With CNAME:    Client → Route53 → CNAME → ALB DNS → IP address
 
 ### **No Changes Required**
 
-Your existing `.github/workflows/deploy.yml` remains **completely unchanged**:
+Your existing AWS deployment workflow remains **completely unchanged**:
 
 ```yaml
 # This stays exactly the same
@@ -245,7 +245,7 @@ Your GitHub Actions pipeline remains **exactly the same** while gaining **signif
 
 # 2. Continue normal deployments
 git push origin ES-clientside  # Staging deployment
-git push origin main          # Production deployment
+./scripts/deploy-production.sh          # Production deployment
 
 # 3. Enjoy enhanced flexibility!
 ```

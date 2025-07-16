@@ -30,3 +30,14 @@ references/**/*.backup
 # MkDocs build artifacts
 site/
 docs/_build/
+# Large files and archives
+*.zip
+*.tar.gz
+*.tar
+
+# Node modules
+node_modules/
+admin-console/node_modules/
+
+# Coverage reports (too large)
+coverage/

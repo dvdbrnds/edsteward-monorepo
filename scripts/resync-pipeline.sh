@@ -99,9 +99,9 @@ fi
 echo "Stopping development environment..."
 docker-compose -f docker-compose.dev.yml down
 
-# Check GitHub Actions status
+# Check AWS deployment status
 echo ""
-echo "🔍 Checking GitHub Actions Status..."
+echo "🔍 Checking AWS Deployment Status..."
 echo ""
 
 # Get latest workflow runs
@@ -109,10 +109,10 @@ if command -v gh &> /dev/null; then
     echo "Latest workflow runs:"
     gh run list --limit 3
     echo ""
-    echo "🔗 View all runs: https://github.com/dvdbrnds/EdSteward/actions"
+    echo "🔗 Check deployment status: ./scripts/check-production-status.sh"
 else
     echo "💡 Install GitHub CLI to check workflow status: brew install gh"
-    echo "🔗 Check manually: https://github.com/dvdbrnds/EdSteward/actions"
+    echo "🔗 Check manually: ./scripts/check-production-status.sh"
 fi
 
 # Sync recommendations
@@ -130,7 +130,7 @@ echo "3. 🎭 Deploy to staging for final verification:"
 echo "   git push origin ES-clientside"
 echo ""
 echo "4. 📦 Deploy to production when ready:"
-echo "   git checkout main && git merge ES-clientside && git push origin main"
+echo "   git checkout main && git merge ES-clientside && ./scripts/deploy-production.sh"
 echo ""
 echo "5. 📚 Follow the new workflow documentation:"
 echo "   See: DEVELOPMENT_WORKFLOW_IMPROVED.md"

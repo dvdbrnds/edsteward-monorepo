@@ -84,29 +84,23 @@ graph TD
 
 ## 🚀 **Deployment Workflows**
 
-### **1. Automated GitHub Actions Pipeline**
+### **1. AWS-Based Deployment Pipeline**
 
-#### **Workflow Triggers**
-```yaml
-on:
-  push:
-    branches: [ main, ES-clientside, staging, dev ]
-  pull_request:
-    branches: [ main, staging, dev ]
+#### **Deployment Triggers**
+```bash
+# Manual deployment triggers
+./scripts/deploy-staging.sh    # Deploy to staging
+./scripts/deploy-production.sh # Deploy to production
 ```
 
 #### **Pipeline Stages**
 
 ##### **Stage 1: Testing & Quality Assurance**
-```yaml
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Setup Node.js 18
-    - name: Install dependencies (npm ci --legacy-peer-deps)
-    - name: Run tests (npm test -- --passWithNoTests)
-    - name: Build frontend (npm run build)
+```bash
+# Automated testing and quality checks
+npm ci --legacy-peer-deps
+npm test -- --passWithNoTests
+npm run build
 ```
 
 **Quality Gates:**
@@ -116,17 +110,16 @@ jobs:
 - ✅ Unit test execution
 
 ##### **Stage 2: Container Build & Push**
-```yaml
-- name: Build and push Docker image
-  env:
-    ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-    ECR_REPOSITORY: edsteward-multi-tenant
-    IMAGE_TAG: ${{ environment }}-${{ github.sha }}
-  run: |
-    docker build --platform linux/amd64 -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-    docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-    docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:${{ environment }}-latest
-    docker push $ECR_REGISTRY/$ECR_REPOSITORY:${{ environment }}-latest
+```bash
+# Build and push Docker image
+ECR_REGISTRY="259661441422.dkr.ecr.us-east-1.amazonaws.com"
+ECR_REPOSITORY="edsteward-multi-tenant"
+IMAGE_TAG="prod-$(git rev-parse --short HEAD)"
+
+docker build --platform linux/amd64 -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+docker tag $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG $ECR_REGISTRY/$ECR_REPOSITORY:latest
+docker push $ECR_REGISTRY/$ECR_REPOSITORY:latest
 ```
 
 **Container Strategy:**
@@ -136,14 +129,13 @@ jobs:
 - 📦 **Layer caching** for faster build times
 
 ##### **Stage 3: ECS Deployment**
-```yaml
-- name: Update ECS service
-  run: |
-    aws ecs update-service \
-      --cluster ${{ cluster-name }} \
-      --service ${{ service-name }} \
-      --force-new-deployment \
-      --region us-east-1
+```bash
+# Update ECS service
+aws ecs update-service \
+  --cluster edsteward-cluster \
+  --service edsteward-service \
+  --force-new-deployment \
+  --region us-east-1
 ```
 
 **Deployment Strategy:**
@@ -356,7 +348,7 @@ COMMIT;   -- When ready
 ### **Build Optimization**
 - **Docker Layer Caching**: Minimize rebuild time
 - **Dependency Optimization**: Production-only dependencies in runtime
-- **Parallel Builds**: Multi-stage builds for faster CI/CD
+- **Parallel Builds**: Multi-stage builds for faster AWS-only deployment
 - **Asset Optimization**: Vite build optimizations for frontend
 
 ### **Deployment Speed**
@@ -600,7 +592,7 @@ aws ecs update-service --cluster $CLUSTER --service $SERVICE --desired-count 1
 
 ### **DevOps Team**
 - ✅ **Infrastructure**: Maintain AWS infrastructure and scaling
-- ✅ **Pipeline Management**: CI/CD optimization and reliability
+- ✅ **Pipeline Management**: AWS-only deployment optimization and reliability
 - ✅ **Monitoring**: System health and performance monitoring
 - ✅ **Security**: Infrastructure security and compliance
 

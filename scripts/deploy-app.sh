@@ -12,6 +12,7 @@ ECR_REPOSITORY="edsteward"
 ECS_CLUSTER="edsteward-cluster"
 ECS_SERVICE="edsteward-service"
 IMAGE_TAG="latest"
+PRODUCTION_URL="https://moravian.edsteward.ai"
 
 # Colors for output
 RED='\033[0;31m'
@@ -24,6 +25,7 @@ echo -e "${BLUE}🚀 EdSteward Fast Deployment Started${NC}"
 echo "=================================================="
 echo -e "${YELLOW}💡 Remember: Develop locally using Docker containers${NC}"
 echo -e "${YELLOW}   Command: make -f Makefile.local dev${NC}"
+echo -e "${BLUE}🎯 Target: ${PRODUCTION_URL}${NC}"
 echo "=================================================="
 
 # Step 1: Build Docker Image
@@ -85,14 +87,20 @@ aws ecs wait services-stable \
     --region ${AWS_REGION}
 
 if [ $? -eq 0 ]; then
-    echo -e "\n${GREEN}🎉 DEPLOYMENT SUCCESSFUL!${NC}"
-    echo "=================================================="
-    echo -e "${GREEN}✅ Your EdSteward platform has been updated${NC}"
-    echo -e "${BLUE}🌐 URL: https://edsteward.ai${NC}"
-    echo -e "${BLUE}⚡ Deployment time: ~3-5 minutes${NC}"
+    echo -e "\n${GREEN}🎉 ECS DEPLOYMENT SUCCESSFUL!${NC}"
 else
-    echo -e "\n${RED}❌ Deployment failed or timed out${NC}"
-    echo "Check AWS Console for details"
+    echo -e "\n${RED}❌ ECS deployment failed or timed out${NC}"
+    echo "Checking service status..."
+    
+    # Show current service status
+    aws ecs describe-services \
+        --cluster ${ECS_CLUSTER} \
+        --services ${ECS_SERVICE} \
+        --region ${AWS_REGION} \
+        --query 'services[0].{ServiceName:serviceName,DesiredCount:desiredCount,RunningCount:runningCount,TaskDefinition:taskDefinition}' \
+        --output table
+    
+    echo -e "\n${RED}❌ Deployment failed - check AWS Console for details${NC}"
     exit 1
 fi
 
@@ -100,22 +108,46 @@ fi
 echo -e "\n${YELLOW}🏥 Step 7: Running health check...${NC}"
 sleep 30 # Give the service time to fully start
 
-# Get the load balancer URL
-LB_URL=$(aws elbv2 describe-load-balancers --region ${AWS_REGION} --query 'LoadBalancers[?contains(LoadBalancerName, `edsteward`)].DNSName' --output text)
+echo "Testing health endpoint: ${PRODUCTION_URL}/health"
+HEALTH_CHECK=$(curl -s -o /dev/null -w "%{http_code}" ${PRODUCTION_URL}/health)
 
-if [ ! -z "$LB_URL" ]; then
-    echo "Testing health endpoint: http://${LB_URL}/health"
-    HEALTH_CHECK=$(curl -s -o /dev/null -w "%{http_code}" http://${LB_URL}/health)
+if [ "$HEALTH_CHECK" = "200" ]; then
+    echo -e "${GREEN}✅ Health check passed${NC}"
     
-    if [ "$HEALTH_CHECK" = "200" ]; then
-        echo -e "${GREEN}✅ Health check passed${NC}"
+    # Test the main application
+    echo "Testing main application..."
+    MAIN_CHECK=$(curl -s -o /dev/null -w "%{http_code}" ${PRODUCTION_URL}/)
+    
+    if [ "$MAIN_CHECK" = "200" ]; then
+        echo -e "${GREEN}✅ Main application responding${NC}"
     else
-        echo -e "${YELLOW}⚠️  Health check returned: ${HEALTH_CHECK}${NC}"
-        echo "Service may still be starting up..."
+        echo -e "${YELLOW}⚠️  Main application returned: ${MAIN_CHECK}${NC}"
     fi
 else
-    echo -e "${YELLOW}⚠️  Could not find load balancer URL${NC}"
+    echo -e "${RED}❌ Health check failed: ${HEALTH_CHECK}${NC}"
+    echo "Checking service status..."
+    
+    # Show service events
+    aws ecs describe-services \
+        --cluster ${ECS_CLUSTER} \
+        --services ${ECS_SERVICE} \
+        --region ${AWS_REGION} \
+        --query 'services[0].events[:5]' \
+        --output table
+    
+    echo -e "\n${YELLOW}💡 Possible issues:${NC}"
+    echo "1. Service may still be starting up"
+    echo "2. Health check endpoint may not be responding"
+    echo "3. ALB target group may not be healthy"
+    echo "4. Check ALB listener rules for moravian.edsteward.ai"
+    
+    exit 1
 fi
 
 echo -e "\n${GREEN}🎯 DEPLOYMENT COMPLETE!${NC}"
-echo "==================================================" 
+echo "=================================================="
+echo -e "${GREEN}✅ Your EdSteward platform has been updated${NC}"
+echo -e "${BLUE}🌐 Production URL: ${PRODUCTION_URL}${NC}"
+echo -e "${BLUE}🌐 Health Check: ${PRODUCTION_URL}/health${NC}"
+echo -e "${BLUE}⚡ Deployment time: ~3-5 minutes${NC}"
+echo -e "${BLUE}🎉 Ready for Moravian University!${NC}" 

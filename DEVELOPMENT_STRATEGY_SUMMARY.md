@@ -86,7 +86,7 @@ git push origin ES-clientside
 # Deploy to production
 git checkout main
 git merge ES-clientside
-git push origin main
+./scripts/deploy-production.sh
 
 # Then gradually enable features per tenant via database
 ```
@@ -207,7 +207,7 @@ WHERE id = 'admin';
 # Deploy to production
 git checkout main
 git merge ES-clientside
-git push origin main
+./scripts/deploy-production.sh
 
 # Enable for specific tenants when ready
 # Moravian gets it first:

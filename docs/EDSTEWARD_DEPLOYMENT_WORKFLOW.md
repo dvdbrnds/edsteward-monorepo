@@ -5,7 +5,7 @@
 
 ## 🎯 **Overview**
 
-EdSteward uses a **multi-environment, multi-tenant architecture** with automated GitHub Actions deployments and CNAME-based DNS management.
+EdSteward uses a **multi-environment, multi-tenant architecture** with AWS-based deployments and CNAME-based DNS management.
 
 ### **Environment Structure**
 ```
@@ -37,11 +37,11 @@ Dev:         dev.edsteward.ai       (dev → development) [optional]
   git push origin ES-clientside
   ```
 
-#### **Step 2: Automatic Staging Deployment**
-• **Trigger**: Push to `ES-clientside` branch automatically starts deployment
+#### **Step 2: Deploy to Staging**
+• **Method**: Use AWS deployment script
 • **Target**: `staging.edsteward.ai`
-• **Duration**: 5-10 minutes
-• **Monitor**: Check https://github.com/dvdbrnds/EdSteward/actions for progress
+• **Duration**: 3-5 minutes
+• **Command**: `./scripts/deploy-staging.sh`
 
 #### **Step 3: Test on Staging**
 • Run health check:
@@ -69,14 +69,14 @@ Dev:         dev.edsteward.ai       (dev → development) [optional]
 • Merge staging changes:
   ```bash
   git merge ES-clientside
-  git push origin main
+  ./scripts/deploy-production.sh
   ```
 
-#### **Step 2: Automatic Production Deployment**
-• **Trigger**: Push to `main` branch automatically starts deployment
+#### **Step 2: Deploy to Production**
+• **Method**: Use AWS deployment script
 • **Target**: `moravian.edsteward.ai` (production tenant)
-• **Duration**: 5-10 minutes
-• **Monitor**: Check https://github.com/dvdbrnds/EdSteward/actions for progress
+• **Duration**: 3-5 minutes
+• **Command**: `./scripts/deploy-production.sh`
 
 #### **Step 3: Verify Production**
 • Run health check:
@@ -104,7 +104,7 @@ Dev:         dev.edsteward.ai       (dev → development) [optional]
 # For bug fixes, security patches, UI improvements
 # 1. Set defaultValue: true in shared/feature-flags.ts
 # 2. Deploy normally
-git push origin main
+./scripts/deploy-production.sh
 # 3. All tenants get the update immediately
 ```
 
@@ -113,7 +113,7 @@ git push origin main
 # For premium features, beta testing, gradual rollouts
 # 1. Set defaultValue: false in shared/feature-flags.ts
 # 2. Deploy code (feature stays hidden)
-git push origin main
+./scripts/deploy-production.sh
 # 3. Enable for specific tenants
 ./scripts/manage-tenant-features.sh enable-feature moravian new_feature
 ```
@@ -217,7 +217,7 @@ npm test
 # 4. Deploy to staging first
 git checkout ES-clientside
 git merge hotfix/critical-issue
-git push origin ES-clientside
+./scripts/deploy-staging.sh
 
 # 5. Test on staging
 curl -I https://staging.edsteward.ai/health
@@ -225,7 +225,7 @@ curl -I https://staging.edsteward.ai/health
 # 6. Deploy to production
 git checkout main
 git merge hotfix/critical-issue
-git push origin main
+./scripts/deploy-production.sh
 
 # 7. Clean up
 git branch -d hotfix/critical-issue
@@ -235,8 +235,8 @@ git branch -d hotfix/critical-issue
 
 #### **If Production Deployment Fails**
 ```bash
-# 1. Check GitHub Actions for error details
-open https://github.com/dvdbrnds/EdSteward/actions
+# 1. Check deployment logs for error details
+./scripts/check-production-status.sh
 
 # 2. Force rollback to previous working commit
 git checkout main
@@ -244,7 +244,8 @@ git reset --hard <previous-working-commit-hash>
 git push --force origin main
 
 # 3. Monitor rollback deployment
-# GitHub Actions will automatically deploy the previous version
+# Use AWS-only deployment script to deploy the previous version
+./scripts/deploy-production.sh
 ```
 
 #### **Database Rollback (If Needed)**
@@ -292,9 +293,9 @@ done
 
 echo ""
 echo "🔗 Useful Links:"
-echo "• GitHub Actions: https://github.com/dvdbrnds/EdSteward/actions"
 echo "• AWS ECS Console: https://console.aws.amazon.com/ecs/home?region=us-east-1"
 echo "• CloudWatch Logs: https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups"
+echo "• Deploy to production: ./scripts/deploy-production.sh"
 ```
 
 #### **Make it executable and run**
@@ -339,10 +340,10 @@ aws logs tail /ecs/edsteward-multi-tenant-staging --follow --region us-east-1
 
 ### **Common Issues & Solutions**
 
-#### **1. GitHub Actions Deployment Fails**
+#### **1. AWS Deployment Fails**
 ```bash
-# Check the action logs
-open https://github.com/dvdbrnds/EdSteward/actions
+# Check deployment logs
+./scripts/check-production-status.sh
 
 # Common fixes:
 # - Docker build issues: Check Dockerfile syntax
@@ -430,10 +431,10 @@ aws acm list-certificates --region us-east-1
 ### **Deployment Commands**
 ```bash
 # Deploy to staging
-git push origin ES-clientside
+./scripts/deploy-staging.sh
 
 # Deploy to production  
-git push origin main
+./scripts/deploy-production.sh
 
 # Add new tenant
 ./scripts/add-new-tenant.sh <tenant-id> "<name>" "<domain>"
@@ -448,7 +449,7 @@ aws ecs update-service --cluster <cluster> --service <service> --force-new-deplo
 ### **Monitoring Commands**
 ```bash
 # View deployment status
-open https://github.com/dvdbrnds/EdSteward/actions
+./scripts/check-production-status.sh
 
 # Check application logs
 aws logs tail /ecs/edsteward-multi-tenant-staging --follow --region us-east-1
@@ -474,7 +475,7 @@ aws ecs update-service --cluster <cluster> --service <service> --desired-count 1
 ## 🎉 **Success Metrics**
 
 ### **Deployment Success Indicators**
-- ✅ GitHub Actions shows green checkmark
+- ✅ AWS deployment script completes successfully
 - ✅ Health endpoints return HTTP 200
 - ✅ Application loads in browser
 - ✅ User authentication works
@@ -493,7 +494,6 @@ aws ecs update-service --cluster <cluster> --service <service> --desired-count 1
 
 ### **Key URLs**
 - **GitHub Repository**: https://github.com/dvdbrnds/EdSteward
-- **GitHub Actions**: https://github.com/dvdbrnds/EdSteward/actions
 - **AWS ECS Console**: https://console.aws.amazon.com/ecs/home?region=us-east-1
 - **CloudWatch Logs**: https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups
 

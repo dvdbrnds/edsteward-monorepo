@@ -313,7 +313,7 @@ const hasImprovement = useFeatureFlag('universal_improvement');
 git push origin ES-clientside
 
 # Deploy to production (all production tenants get it)
-git push origin main
+./scripts/deploy-production.sh
 ```
 
 ### **2. Tenant-Specific Updates (Selected Tenants)**
@@ -337,7 +337,7 @@ git push origin main
 }
 
 // 2. Deploy code (feature remains hidden)
-git push origin main
+./scripts/deploy-production.sh
 
 // 3. Enable for specific tenants
 ./scripts/manage-tenant-features.sh enable-feature moravian premium_feature
@@ -373,7 +373,7 @@ curl -I https://moravian.edsteward.ai/health  # Should work on staging
 # 4. Deploy to production (all tenants get it)
 git checkout main
 git merge ES-clientside
-git push origin main
+./scripts/deploy-production.sh
 
 # 5. Verify all tenants
 ./scripts/health-check-all.sh
@@ -404,7 +404,7 @@ curl -I https://staging.edsteward.ai/
 # 3. Deploy to production (still hidden)
 git checkout main
 git merge ES-clientside
-git push origin main
+./scripts/deploy-production.sh
 
 # 4. Enable for Moravian only
 ./scripts/manage-tenant-features.sh enable-feature moravian advanced_analytics
@@ -418,7 +418,7 @@ curl -I https://admin.edsteward.ai/     # Should NOT have feature
 
 ```bash
 # 1. Deploy feature (defaultValue: false)
-git push origin main
+./scripts/deploy-production.sh
 
 # 2. Enable for test tenants first
 ./scripts/manage-tenant-features.sh rollout beta_feature admin,staging
@@ -500,7 +500,7 @@ git push origin main
 
 **Deployment:**
 ```bash
-git push origin main  # Goes live for all tenants
+./scripts/deploy-production.sh  # Goes live for all tenants
 ```
 
 ### **Example 2: AI Document Analysis (Premium Feature)**
@@ -518,7 +518,7 @@ git push origin main  # Goes live for all tenants
 **Deployment:**
 ```bash
 # Deploy code
-git push origin main
+./scripts/deploy-production.sh
 
 # Enable for Moravian (they pay for premium features)
 ./scripts/manage-tenant-features.sh enable-feature moravian ai_document_analysis
@@ -541,7 +541,7 @@ git push origin main
 **Deployment:**
 ```bash
 # Deploy code
-git push origin main
+./scripts/deploy-production.sh
 
 # Enable for internal testing first
 ./scripts/manage-tenant-features.sh enable-feature admin new_dashboard_beta
@@ -560,10 +560,10 @@ git push origin main
 
 | Update Type | Strategy | defaultValue | Deployment |
 |-------------|----------|--------------|------------|
-| **Bug Fixes** | Universal | `true` | `git push origin main` |
-| **Security Patches** | Universal | `true` | `git push origin main` |
-| **UI Improvements** | Universal | `true` | `git push origin main` |
-| **Performance Fixes** | Universal | `true` | `git push origin main` |
+| **Bug Fixes** | Universal | `true` | `./scripts/deploy-production.sh` |
+| **Security Patches** | Universal | `true` | `./scripts/deploy-production.sh` |
+| **UI Improvements** | Universal | `true` | `./scripts/deploy-production.sh` |
+| **Performance Fixes** | Universal | `true` | `./scripts/deploy-production.sh` |
 | **Premium Features** | Tenant-Specific | `false` | Deploy + Enable per tenant |
 | **Beta Features** | Tenant-Specific | `false` | Deploy + Gradual rollout |
 | **Institution-Specific** | Tenant-Specific | `false` | Deploy + Enable for specific tenant |
@@ -654,13 +654,13 @@ aws logs tail /ecs/edsteward-multi-tenant-staging --follow --region us-east-1
 
 ### **For Updates to ALL Tenants:**
 1. Set `defaultValue: true` in feature flags
-2. Deploy: `git push origin main`
+2. Deploy: `./scripts/deploy-production.sh`
 3. Verify: `./scripts/health-check-all.sh`
 4. All tenants get the update immediately
 
 ### **For Updates to SPECIFIC Tenants:**
 1. Set `defaultValue: false` in feature flags
-2. Deploy: `git push origin main` (feature stays hidden)
+2. Deploy: `./scripts/deploy-production.sh` (feature stays hidden)
 3. Enable: `./scripts/manage-tenant-features.sh enable-feature moravian feature_name`
 4. Only enabled tenants see the feature
 

@@ -1,7 +1,7 @@
 #!/bin/zsh
 
-echo "🔍 Diagnosing GitHub Actions Workflow Failures..."
-echo "=================================================="
+echo "🔍 Diagnosing AWS Deployment Failures..."
+echo "========================================"
 echo ""
 
 # Check if npm test passes locally
@@ -64,7 +64,7 @@ else
 fi
 
 echo ""
-echo "🔗 Common failure causes in GitHub Actions:"
+echo "🔗 Common failure causes in AWS deployment:"
 echo "   • npm ci --legacy-peer-deps fails (dependency issues)"
 echo "   • npm test fails (test failures)"  
 echo "   • npm run build fails (build errors)"
@@ -73,4 +73,4 @@ echo "   • ECR permissions issues"
 echo "   • Docker build platform issues"
 echo ""
 echo "💡 Check the specific error in GitHub Actions logs at:"
-echo "   https://github.com/dvdbrnds/EdSteward/actions" 
+echo "   ./scripts/check-production-status.sh" 

@@ -1,0 +1,69 @@
+{
+    "customer": {
+        "name": "Acme University",
+        "domain": "acme.edu",
+        "subdomain": "acme",
+        "contact": {
+            "supportEmail": "support@acme.edu",
+            "adminEmail": "compliance@acme.edu",
+            "organizationUrl": "https://acme.edu"
+        }
+    },
+    "aws": {
+        "region": "us-east-1",
+        "accountId": "123456789012",
+        "clusterName": "acme-edsteward-cluster",
+        "serviceName": "acme-edsteward-service",
+        "ecrRepository": "acme-edsteward",
+        "logGroup": "/aws/ecs/acme-edsteward"
+    },
+    "database": {
+        "type": "neon",
+        "connectionString": "postgresql://acme_user:password@host/acme_db?sslmode=require",
+        "name": "acme_edsteward"
+    },
+    "branding": {
+        "institutionName": "Acme University",
+        "title": "Acme University Compliance Portal",
+        "logoUrl": "/assets/acme-logo.png",
+        "faviconUrl": "/assets/acme-favicon.ico",
+        "primaryColor": "#003366",
+        "secondaryColor": "#0066cc",
+        "accentColor": "#0099ff",
+        "loginScreenBackgroundColor": "#f0f4f8",
+        "loginScreenAccentColor": "#003366",
+        "loginScreenTextColor": "#1f2937",
+        "loginScreenHeroColor": "#003366"
+    },
+    "authentication": {
+        "samlEnabled": true,
+        "samlEntityId": "urn:edsteward:sp:acme",
+        "samlSsoUrl": "https://sso.acme.edu/saml",
+        "samlCertificate": "-----BEGIN CERTIFICATE-----\nMIIC...certificate...\n-----END CERTIFICATE-----",
+        "usernamePasswordEnabled": true,
+        "allowSelfRegistration": false
+    },
+    "features": {
+        "maxUsers": 500,
+        "maxRegulations": 5000,
+        "apiAccess": true,
+        "customDomain": true,
+        "ssoEnabled": true
+    },
+    "environment": {
+        "nodeEnv": "production",
+        "port": 3000,
+        "multiTenant": false,
+        "sessionSecret": "acme-session-secret-change-this-in-production"
+    },
+    "deployment": {
+        "dockerImage": "acme-edsteward:latest",
+        "taskDefinitionFamily": "acme-edsteward",
+        "desiredCount": 1,
+        "cpu": 1024,
+        "memory": 2048,
+        "healthCheckPath": "/health",
+        "domainName": "compliance.acme.edu",
+        "sslCertificateArn": "arn:aws:acm:us-east-1:123456789012:certificate/12345678-1234-1234-1234-123456789012"
+    }
+}

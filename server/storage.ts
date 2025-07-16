@@ -1,21 +1,21 @@
-import { 
-  users, 
-  regulations, 
-  notifications, 
-  deadlines, 
-  guides, 
-  csvSchemas, 
-  validationRules, 
-  fieldMappings, 
-  notes, 
-  evidenceFiles, 
+import {
+  users,
+  regulations,
+  notifications,
+  deadlines,
+  guides,
+  csvSchemas,
+  validationRules,
+  fieldMappings,
+  notes,
+  evidenceFiles,
   regulationVersions,
   validationStatus,
   syncControl,
   notificationQueue,
   versionConflicts,
-  type EvidenceFile, 
-  type InsertEvidenceFile 
+  type EvidenceFile,
+  type InsertEvidenceFile
 } from "@shared/schema";
 
 import type {
@@ -99,14 +99,14 @@ export interface IStorage {
   getRegulationsByInstitutionType(institutionType: string): Promise<Regulation[]>;
   searchRegulations(searchTerm: string): Promise<Regulation[]>;
   deleteRegulation(id: number): Promise<void>;
-  
+
   // Regulation Update methods
   getPendingRegulationUpdates(): Promise<RegulationUpdate[]>;
   getRegulationUpdateById(id: number): Promise<RegulationUpdate | null>;
   acceptRegulationUpdate(id: number, userId: number, signature: string): Promise<void>;
   rejectRegulationUpdate(id: number, userId: number, signature: string, reason: string): Promise<void>;
   deferRegulationUpdate(id: number, userId: number, signature: string): Promise<void>;
-  
+
   // MCP Regulation Version methods
   getRegulationVersions(regulationId: number): Promise<RegulationVersion[]>;
   getRegulationVersion(id: number): Promise<RegulationVersion | null>;
@@ -120,26 +120,26 @@ export interface IStorage {
       changeType: 'added' | 'removed' | 'modified';
     }>;
   }>;
-  
+
   // MCP Validation Status methods
   getValidationStatus(regulationId: number, versionId?: number): Promise<ValidationStatus[]>;
   createValidationStatus(status: InsertValidationStatus): Promise<ValidationStatus>;
   updateValidationStatus(id: number, status: Partial<InsertValidationStatus>): Promise<ValidationStatus>;
   validateRegulationVersion(versionId: number, userId: number): Promise<ValidationStatus[]>;
-  
+
   // MCP Sync Control methods
   getSyncControl(regulationId: number): Promise<SyncControl | null>;
   createSyncControl(control: InsertSyncControl): Promise<SyncControl>;
   updateSyncControl(id: number, control: Partial<InsertSyncControl>): Promise<SyncControl>;
   scheduleSyncForRegulation(regulationId: number, nextSync: Date): Promise<SyncControl>;
   recordSyncAttempt(regulationId: number, success: boolean, error?: string): Promise<SyncControl>;
-  
+
   // MCP Notification Queue methods
   getNotificationQueue(status?: 'pending' | 'sent' | 'failed'): Promise<NotificationQueue[]>;
   createNotificationQueueItem(item: InsertNotificationQueue): Promise<NotificationQueue>;
   updateNotificationQueueItem(id: number, item: Partial<InsertNotificationQueue>): Promise<NotificationQueue>;
   markNotificationAsSent(id: number): Promise<NotificationQueue>;
-  
+
   // MCP Version Conflict methods
   getVersionConflicts(status?: 'pending' | 'resolved' | 'rejected'): Promise<VersionConflict[]>;
   getVersionConflictsForRegulation(regulationId: number): Promise<VersionConflict[]>;
@@ -216,7 +216,7 @@ export class DatabaseStorage implements IStorage {
         'SELECT * FROM regulation_updates WHERE id = $1',
         [id]
       );
-      
+
       if (result.rows.length > 0) {
         const update = result.rows[0];
         return {
@@ -366,13 +366,13 @@ export class DatabaseStorage implements IStorage {
       const tenantStorage = getDatabaseStorage();
       return await tenantStorage.createUser(insertUser);
     }
-    
+
     // Handle optional password for SAML users - ensure we have a valid password or null
     const userToCreate = {
       ...insertUser,
       password: insertUser.password || '' // Use empty string instead of null for database compatibility
     };
-    
+
     const [user] = await db.insert(users).values(userToCreate).returning();
     return user;
   }
@@ -450,7 +450,7 @@ export class DatabaseStorage implements IStorage {
 
   async updateRegulation(id: number, regulation: Partial<InsertRegulation>): Promise<Regulation> {
     console.log(`Updating regulation ${id} with:`, regulation);
-    
+
     try {
       // If we're updating content/requirements, handle it differently due to potential size
       if (regulation.requirements) {
@@ -459,10 +459,10 @@ export class DatabaseStorage implements IStorage {
           `UPDATE regulations SET requirements = $1, last_updated = $2 WHERE id = $3`,
           [regulation.requirements, new Date(), id]
         );
-        
+
         // Remove the requirements field from the update object
         const { requirements, ...otherFields } = regulation;
-        
+
         // If there are other fields to update, do that separately
         if (Object.keys(otherFields).length > 0) {
           await db.update(regulations)
@@ -472,7 +472,7 @@ export class DatabaseStorage implements IStorage {
             })
             .where(eq(regulations.id, id));
         }
-        
+
         // Fetch and return the updated regulation
         const results = await db.select().from(regulations).where(eq(regulations.id, id));
         if (results.length > 0) {
@@ -490,7 +490,7 @@ export class DatabaseStorage implements IStorage {
           })
           .where(eq(regulations.id, id))
           .returning();
-          
+
         console.log("Updated regulation:", updatedRegulation);
         return updatedRegulation as Regulation;
       }
@@ -536,7 +536,7 @@ export class DatabaseStorage implements IStorage {
 
   async getRegulationsByInstitutionType(institutionType: string): Promise<Regulation[]> {
     console.log(`Fetching regulations applicable to institution type: ${institutionType}`);
-    
+
     // Use raw SQL to query JSONB field
     const query = `
       SELECT * FROM regulations 
@@ -544,12 +544,12 @@ export class DatabaseStorage implements IStorage {
       OR applicable_institutions @> $2
       ORDER BY last_updated DESC
     `;
-    
+
     const result = await pool.query(query, [
       JSON.stringify([institutionType]),
       JSON.stringify(['all-institutions'])
     ]);
-    
+
     console.log(`Found ${result.rows.length} regulations for ${institutionType}`);
     return result.rows as Regulation[];
   }
@@ -793,7 +793,7 @@ export class DatabaseStorage implements IStorage {
             return {
               ...file,
               // Use the user's first and last name if available, or username as fallback
-              uploaderName: (user?.firstName && user?.lastName) 
+              uploaderName: (user?.firstName && user?.lastName)
                 ? `${user.firstName} ${user.lastName}`
                 : user?.username || 'Unknown'
             };
@@ -843,7 +843,7 @@ export class DatabaseStorage implements IStorage {
   // =========================================================================
   // MCP Regulation Version Methods
   // =========================================================================
-  
+
   async getRegulationVersions(regulationId: number): Promise<RegulationVersion[]> {
     try {
       const versions = await db
@@ -851,35 +851,35 @@ export class DatabaseStorage implements IStorage {
         .from(regulationVersions)
         .where(eq(regulationVersions.regulationId, regulationId))
         .orderBy(desc(regulationVersions.versionNumber));
-      
+
       return versions;
     } catch (error) {
       console.error(`Error fetching regulation versions for regulation ${regulationId}:`, error);
       return [];
     }
   }
-  
+
   async getRegulationVersion(id: number): Promise<RegulationVersion | null> {
     try {
       const [version] = await db
         .select()
         .from(regulationVersions)
         .where(eq(regulationVersions.id, id));
-      
+
       return version || null;
     } catch (error) {
       console.error(`Error fetching regulation version ${id}:`, error);
       return null;
     }
   }
-  
+
   async createRegulationVersion(version: InsertRegulationVersion): Promise<RegulationVersion> {
     try {
       const [newVersion] = await db
         .insert(regulationVersions)
         .values(version)
         .returning();
-      
+
       console.log(`Created new regulation version ${newVersion.id} for regulation ${version.regulationId}`);
       return newVersion;
     } catch (error) {
@@ -887,7 +887,7 @@ export class DatabaseStorage implements IStorage {
       throw error;
     }
   }
-  
+
   async getLatestRegulationVersion(regulationId: number): Promise<RegulationVersion | null> {
     try {
       const [latestVersion] = await db
@@ -896,14 +896,14 @@ export class DatabaseStorage implements IStorage {
         .where(eq(regulationVersions.regulationId, regulationId))
         .orderBy(desc(regulationVersions.versionNumber))
         .limit(1);
-      
+
       return latestVersion || null;
     } catch (error) {
       console.error(`Error fetching latest regulation version for regulation ${regulationId}:`, error);
       return null;
     }
   }
-  
+
   async compareRegulationVersions(versionIdA: number, versionIdB: number): Promise<{
     changes: Array<{
       field: string;
@@ -915,30 +915,30 @@ export class DatabaseStorage implements IStorage {
     try {
       const versionA = await this.getRegulationVersion(versionIdA);
       const versionB = await this.getRegulationVersion(versionIdB);
-      
+
       if (!versionA || !versionB) {
         throw new Error(`Cannot compare: One or both versions not found (${versionIdA}, ${versionIdB})`);
       }
-      
+
       // Parse the content to compare fields
       const contentA = JSON.parse(versionA.content);
       const contentB = JSON.parse(versionB.content);
-      
+
       const changes: Array<{
         field: string;
         valueA: string;
         valueB: string;
         changeType: 'added' | 'removed' | 'modified';
       }> = [];
-      
+
       // Get all unique keys from both objects
       const allFields = new Set([...Object.keys(contentA), ...Object.keys(contentB)]);
-      
+
       // Compare each field
       for (const field of allFields) {
         const valueA = contentA[field] !== undefined ? String(contentA[field]) : '';
         const valueB = contentB[field] !== undefined ? String(contentB[field]) : '';
-        
+
         if (valueA && !valueB) {
           changes.push({
             field,
@@ -962,29 +962,29 @@ export class DatabaseStorage implements IStorage {
           });
         }
       }
-      
+
       return { changes };
     } catch (error) {
       console.error(`Error comparing regulation versions ${versionIdA} and ${versionIdB}:`, error);
       return { changes: [] };
     }
   }
-  
+
   // =========================================================================
   // MCP Validation Status Methods
   // =========================================================================
-  
+
   async getValidationStatus(regulationId: number, versionId?: number): Promise<ValidationStatus[]> {
     try {
       let query = db
         .select()
         .from(validationStatus)
         .where(eq(validationStatus.regulationId, regulationId));
-      
+
       if (versionId) {
         query = query.where(eq(validationStatus.versionId, versionId));
       }
-      
+
       const statuses = await query;
       return statuses;
     } catch (error) {
@@ -992,21 +992,21 @@ export class DatabaseStorage implements IStorage {
       return [];
     }
   }
-  
+
   async createValidationStatus(status: InsertValidationStatus): Promise<ValidationStatus> {
     try {
       const [newStatus] = await db
         .insert(validationStatus)
         .values(status)
         .returning();
-      
+
       return newStatus;
     } catch (error) {
       console.error("Error creating validation status:", error);
       throw error;
     }
   }
-  
+
   async updateValidationStatus(id: number, status: Partial<InsertValidationStatus>): Promise<ValidationStatus> {
     try {
       const [updatedStatus] = await db
@@ -1014,31 +1014,31 @@ export class DatabaseStorage implements IStorage {
         .set(status)
         .where(eq(validationStatus.id, id))
         .returning();
-      
+
       return updatedStatus;
     } catch (error) {
       console.error(`Error updating validation status ${id}:`, error);
       throw error;
     }
   }
-  
+
   async validateRegulationVersion(versionId: number, userId: number): Promise<ValidationStatus[]> {
     try {
       // This would typically call validation services for each level
       // For now, we'll create basic validation records
       const version = await this.getRegulationVersion(versionId);
-      
+
       if (!version) {
         throw new Error(`Version ${versionId} not found`);
       }
-      
+
       const results: ValidationStatus[] = [];
-      
+
       // Example: Create validation records for each level
       for (const level of ['A', 'B', 'C', 'D']) {
         // Simulate validation process
         const isPassed = Math.random() > 0.3; // 70% pass rate for demonstration
-        
+
         const validationRecord: InsertValidationStatus = {
           regulationId: version.regulationId,
           versionId: version.id,
@@ -1055,50 +1055,50 @@ export class DatabaseStorage implements IStorage {
           validatedAt: new Date(),
           validatedBy: userId
         };
-        
+
         const savedRecord = await this.createValidationStatus(validationRecord);
         results.push(savedRecord);
       }
-      
+
       return results;
     } catch (error) {
       console.error(`Error validating version ${versionId}:`, error);
       throw error;
     }
   }
-  
+
   // =========================================================================
   // MCP Sync Control Methods
   // =========================================================================
-  
+
   async getSyncControl(regulationId: number): Promise<SyncControl | null> {
     try {
       const [control] = await db
         .select()
         .from(syncControl)
         .where(eq(syncControl.regulationId, regulationId));
-      
+
       return control || null;
     } catch (error) {
       console.error(`Error fetching sync control for regulation ${regulationId}:`, error);
       return null;
     }
   }
-  
+
   async createSyncControl(control: InsertSyncControl): Promise<SyncControl> {
     try {
       const [newControl] = await db
         .insert(syncControl)
         .values(control)
         .returning();
-      
+
       return newControl;
     } catch (error) {
       console.error("Error creating sync control:", error);
       throw error;
     }
   }
-  
+
   async updateSyncControl(id: number, control: Partial<InsertSyncControl>): Promise<SyncControl> {
     try {
       const [updatedControl] = await db
@@ -1109,19 +1109,19 @@ export class DatabaseStorage implements IStorage {
         })
         .where(eq(syncControl.id, id))
         .returning();
-      
+
       return updatedControl;
     } catch (error) {
       console.error(`Error updating sync control ${id}:`, error);
       throw error;
     }
   }
-  
+
   async scheduleSyncForRegulation(regulationId: number, nextSync: Date): Promise<SyncControl> {
     try {
       // Check if sync control already exists
       const existingControl = await this.getSyncControl(regulationId);
-      
+
       if (existingControl) {
         // Update existing control
         return this.updateSyncControl(existingControl.id, {
@@ -1147,12 +1147,12 @@ export class DatabaseStorage implements IStorage {
       throw error;
     }
   }
-  
+
   async recordSyncAttempt(regulationId: number, success: boolean, error?: string): Promise<SyncControl> {
     try {
       const existingControl = await this.getSyncControl(regulationId);
       const now = new Date();
-      
+
       if (!existingControl) {
         // Create new control record if it doesn't exist
         return this.createSyncControl({
@@ -1167,7 +1167,7 @@ export class DatabaseStorage implements IStorage {
           syncState: success ? 'completed' : 'failed'
         });
       }
-      
+
       // Update existing control
       const syncErrors = existingControl.syncErrors || [];
       if (!success && error) {
@@ -1177,7 +1177,7 @@ export class DatabaseStorage implements IStorage {
           code: 'SYNC_ERROR'
         });
       }
-      
+
       return this.updateSyncControl(existingControl.id, {
         lastSyncAttempt: now,
         lastSuccessfulSync: success ? now : existingControl.lastSuccessfulSync,
@@ -1189,40 +1189,40 @@ export class DatabaseStorage implements IStorage {
       throw error;
     }
   }
-  
+
   // =========================================================================
   // MCP Notification Queue Methods
   // =========================================================================
-  
+
   async getNotificationQueue(status?: 'pending' | 'sent' | 'failed'): Promise<NotificationQueue[]> {
     try {
       let query = db.select().from(notificationQueue);
-      
+
       if (status) {
         query = query.where(eq(notificationQueue.status, status));
       }
-      
+
       return await query.orderBy(desc(notificationQueue.createdAt));
     } catch (error) {
       console.error(`Error fetching notification queue:`, error);
       return [];
     }
   }
-  
+
   async createNotificationQueueItem(item: InsertNotificationQueue): Promise<NotificationQueue> {
     try {
       const [newItem] = await db
         .insert(notificationQueue)
         .values(item)
         .returning();
-      
+
       return newItem;
     } catch (error) {
       console.error("Error creating notification queue item:", error);
       throw error;
     }
   }
-  
+
   async updateNotificationQueueItem(id: number, item: Partial<InsertNotificationQueue>): Promise<NotificationQueue> {
     try {
       const [updatedItem] = await db
@@ -1230,14 +1230,14 @@ export class DatabaseStorage implements IStorage {
         .set(item)
         .where(eq(notificationQueue.id, id))
         .returning();
-      
+
       return updatedItem;
     } catch (error) {
       console.error(`Error updating notification queue item ${id}:`, error);
       throw error;
     }
   }
-  
+
   async markNotificationAsSent(id: number): Promise<NotificationQueue> {
     try {
       const [updatedItem] = await db
@@ -1248,33 +1248,33 @@ export class DatabaseStorage implements IStorage {
         })
         .where(eq(notificationQueue.id, id))
         .returning();
-      
+
       return updatedItem;
     } catch (error) {
       console.error(`Error marking notification ${id} as sent:`, error);
       throw error;
     }
   }
-  
+
   // =========================================================================
   // MCP Version Conflict Methods
   // =========================================================================
-  
+
   async getVersionConflicts(status?: 'pending' | 'resolved' | 'rejected'): Promise<VersionConflict[]> {
     try {
       let query = db.select().from(versionConflicts);
-      
+
       if (status) {
         query = query.where(eq(versionConflicts.status, status));
       }
-      
+
       return await query.orderBy(desc(versionConflicts.createdAt));
     } catch (error) {
       console.error(`Error fetching version conflicts:`, error);
       return [];
     }
   }
-  
+
   async getVersionConflictsForRegulation(regulationId: number): Promise<VersionConflict[]> {
     try {
       return await db
@@ -1287,32 +1287,32 @@ export class DatabaseStorage implements IStorage {
       return [];
     }
   }
-  
+
   async createVersionConflict(conflict: InsertVersionConflict): Promise<VersionConflict> {
     try {
       const [newConflict] = await db
         .insert(versionConflicts)
         .values(conflict)
         .returning();
-      
+
       return newConflict;
     } catch (error) {
       console.error("Error creating version conflict:", error);
       throw error;
     }
   }
-  
+
   async resolveVersionConflict(id: number, resolutions: MCPVersionConflict[], userId: number): Promise<VersionConflict> {
     try {
       // Mark all conflicts as resolved with their resolution strategy
       const now = new Date();
-      
+
       const resolvedConflicts = resolutions.map(resolution => ({
         ...resolution,
         resolvedBy: userId,
         resolvedAt: now
       }));
-      
+
       const [updatedConflict] = await db
         .update(versionConflicts)
         .set({
@@ -1324,14 +1324,14 @@ export class DatabaseStorage implements IStorage {
         })
         .where(eq(versionConflicts.id, id))
         .returning();
-      
+
       return updatedConflict;
     } catch (error) {
       console.error(`Error resolving version conflict ${id}:`, error);
       throw error;
     }
   }
-  
+
   async rejectVersionConflict(id: number, userId: number): Promise<VersionConflict> {
     const [versionConflict] = await db
       .update(versionConflicts)
@@ -1354,19 +1354,92 @@ export class DatabaseStorage implements IStorage {
   // Branding configuration methods
   async getBrandingConfig(): Promise<any> {
     try {
-      // Use raw SQL query to get branding configuration
+      // CRITICAL FIX: Check admin mode FIRST to ensure proper admin branding
+      const isAdminMode = process.env.ADMIN_MODE === 'true';
+      if (isAdminMode) {
+        console.log(`🎨 Admin mode detected - forcing admin branding`);
+        const adminConfig = {
+          institutionName: "EdSteward Admin Console",
+          title: "EdSteward Admin Console",
+          logoUrl: "/assets/generic-logo.svg",
+          faviconUrl: "/favicon.ico",
+          primaryColor: "#dc2626", // Red for admin
+          secondaryColor: "#b91c1c",
+          accentColor: "#ef4444",
+          loginScreenBackgroundColor: "#fef2f2",
+          loginScreenAccentColor: "#dc2626",
+          loginScreenTextColor: "#1f2937",
+          loginScreenHeroColor: "#991b1b",
+        };
+        return adminConfig;
+      }
+
+      // Priority 2: Environment variables (for container isolation)
+      const envBrandingConfig = {
+        institutionName: process.env.INSTITUTION_NAME,
+        title: process.env.INSTITUTION_TITLE,
+        logoUrl: process.env.INSTITUTION_LOGO_URL,
+        faviconUrl: process.env.INSTITUTION_FAVICON_URL,
+        primaryColor: process.env.INSTITUTION_PRIMARY_COLOR,
+        secondaryColor: process.env.INSTITUTION_SECONDARY_COLOR,
+        accentColor: process.env.INSTITUTION_ACCENT_COLOR,
+        loginScreenBackgroundColor: process.env.INSTITUTION_LOGIN_BG_COLOR,
+        loginScreenAccentColor: process.env.INSTITUTION_LOGIN_ACCENT_COLOR,
+        loginScreenTextColor: process.env.INSTITUTION_LOGIN_TEXT_COLOR,
+        loginScreenHeroColor: process.env.INSTITUTION_LOGIN_HERO_COLOR,
+      };
+
+      // Check if any environment variables are set
+      const hasEnvConfig = Object.values(envBrandingConfig).some(val => val !== undefined);
+
+      if (hasEnvConfig) {
+        // Use environment variables with fallbacks
+        const config = {
+          institutionName: envBrandingConfig.institutionName || "EdSteward Institution",
+          title: envBrandingConfig.title || "EdSteward Compliance Portal",
+          logoUrl: envBrandingConfig.logoUrl || "/assets/generic-logo.svg",
+          faviconUrl: envBrandingConfig.faviconUrl || "/favicon.ico",
+          primaryColor: envBrandingConfig.primaryColor || "#1e3a8a",
+          secondaryColor: envBrandingConfig.secondaryColor || "#1e40af",
+          accentColor: envBrandingConfig.accentColor || "#3b82f6",
+          loginScreenBackgroundColor: envBrandingConfig.loginScreenBackgroundColor || "#f8fafc",
+          loginScreenAccentColor: envBrandingConfig.loginScreenAccentColor || "#1e3a8a",
+          loginScreenTextColor: envBrandingConfig.loginScreenTextColor || "#1f2937",
+          loginScreenHeroColor: envBrandingConfig.loginScreenHeroColor || "#002147",
+        };
+
+        console.log(`🎨 Using environment-based branding config: ${config.institutionName}`);
+        return config;
+      }
+
+      // Priority 3: Environment-specific database configuration
+      // Use environment-specific table names to ensure isolation
+      const environmentPrefix = process.env.ENVIRONMENT_PREFIX || 'default';
+      const tableName = environmentPrefix === 'default' ? 'branding_configurations' : `branding_configurations_${environmentPrefix}`;
+
+      // Create table if it doesn't exist
+      await sessionPool.query(`
+        CREATE TABLE IF NOT EXISTS ${tableName} (
+          id SERIAL PRIMARY KEY,
+          config_data JSONB NOT NULL,
+          created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+          updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+        )
+      `);
+
       const result = await sessionPool.query(`
         SELECT config_data 
-        FROM branding_configurations 
+        FROM ${tableName} 
         WHERE id = 1
       `);
-      
+
       if (result.rows.length > 0) {
+        console.log(`🎨 Using database branding config from ${tableName}: ${result.rows[0].config_data.institutionName}`);
         return result.rows[0].config_data;
       }
-      
-      // Return default configuration if none exists
-      return {
+
+      // Priority 4: Default configuration
+      const defaultConfig = {
         institutionName: "EdSteward Institution",
         title: "EdSteward Compliance Portal",
         logoUrl: "/assets/generic-logo.svg",
@@ -1379,30 +1452,32 @@ export class DatabaseStorage implements IStorage {
         loginScreenTextColor: "#1f2937",
         loginScreenHeroColor: "#002147",
       };
+
+      console.log(`🎨 Using default branding config: ${defaultConfig.institutionName}`);
+      return defaultConfig;
     } catch (error) {
-      console.error("Error fetching branding config:", error);
-      // Return default configuration on error
-      return {
-        institutionName: "EdSteward Institution",
-        title: "EdSteward Compliance Portal",
-        logoUrl: "/assets/generic-logo.svg",
-        faviconUrl: "/favicon.ico",
-        primaryColor: "#1e3a8a",
-        secondaryColor: "#1e40af",
-        accentColor: "#3b82f6",
-        loginScreenBackgroundColor: "#f8fafc",
-        loginScreenAccentColor: "#1e3a8a",
-        loginScreenTextColor: "#1f2937",
-        loginScreenHeroColor: "#002147",
-      };
+      console.error('Error fetching branding configuration:', error);
+      throw error;
     }
   }
 
   async saveBrandingConfig(config: any): Promise<any> {
     try {
+      // CRITICAL FIX: Prevent admin from saving branding config to database
+      // Admin environments should use environment-only branding
+      const isAdminMode = process.env.ADMIN_MODE === 'true';
+      if (isAdminMode) {
+        console.log(`🎨 Admin mode detected - preventing database branding save to maintain isolation`);
+        throw new Error('Admin environments cannot save branding configuration to database. Use environment variables instead.');
+      }
+
+      // Use environment-specific table names to ensure isolation
+      const environmentPrefix = process.env.ENVIRONMENT_PREFIX || 'default';
+      const tableName = environmentPrefix === 'default' ? 'branding_configurations' : `branding_configurations_${environmentPrefix}`;
+
       // Create the table if it doesn't exist
       await sessionPool.query(`
-        CREATE TABLE IF NOT EXISTS branding_configurations (
+        CREATE TABLE IF NOT EXISTS ${tableName} (
           id SERIAL PRIMARY KEY,
           config_data JSONB NOT NULL,
           created_at TIMESTAMP NOT NULL DEFAULT NOW(),
@@ -1412,7 +1487,7 @@ export class DatabaseStorage implements IStorage {
 
       // Use UPSERT (INSERT ... ON CONFLICT) to save configuration
       const result = await sessionPool.query(`
-        INSERT INTO branding_configurations (id, config_data, updated_at)
+        INSERT INTO ${tableName} (id, config_data, updated_at)
         VALUES (1, $1, NOW())
         ON CONFLICT (id) 
         DO UPDATE SET 

@@ -230,7 +230,7 @@ aws elbv2 describe-target-health --target-group-arn <target-group-arn>
 
 ---
 
-## 📈 **CI/CD Integration (Future)**
+## 📈 **AWS-only deployment Integration (Future)**
 
 For automated deployments, consider integrating with:
 
@@ -242,9 +242,9 @@ on:
     branches: [main]
 jobs:
   deploy:
-    runs-on: ubuntu-latest
+    # Local deployment
     steps:
-      - uses: actions/checkout@v2
+      - # Code checkout
       - name: Deploy to AWS
         run: ./scripts/deploy-app.sh
 ```

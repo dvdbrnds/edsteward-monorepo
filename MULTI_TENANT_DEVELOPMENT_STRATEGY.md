@@ -88,7 +88,7 @@ git push origin ES-clientside
 # Merge to main for production
 git checkout main
 git merge ES-clientside
-git push origin main
+./scripts/deploy-production.sh
 ```
 
 ---

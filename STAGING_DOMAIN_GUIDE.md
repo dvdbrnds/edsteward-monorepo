@@ -163,7 +163,7 @@ git push origin ES-clientside  # → Deploys to staging
 # 4. Promote to production
 git checkout main
 git merge ES-clientside
-git push origin main  # → Deploys to production
+./scripts/deploy-production.sh  # → Deploys to production
 ```
 
 ## 🚨 Troubleshooting

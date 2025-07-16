@@ -1,0 +1,82 @@
+{
+    "family": "edsteward-fixed",
+    "taskRoleArn": "arn:aws:iam::259661441422:role/edsteward-task-role",
+    "executionRoleArn": "arn:aws:iam::259661441422:role/ecsTaskExecutionRole",
+    "networkMode": "awsvpc",
+    "requiresCompatibilities": [
+        "FARGATE"
+    ],
+    "cpu": "256",
+    "memory": "512",
+    "containerDefinitions": [
+        {
+            "name": "edsteward-app",
+            "image": "259661441422.dkr.ecr.us-east-1.amazonaws.com/edsteward-multi-tenant:single-tenant-production-fix-v3",
+            "cpu": 0,
+            "portMappings": [
+                {
+                    "containerPort": 3000,
+                    "hostPort": 3000,
+                    "protocol": "tcp",
+                    "name": "edsteward-app-3000-tcp",
+                    "appProtocol": "http"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                {
+                    "name": "NODE_ENV",
+                    "value": "production"
+                },
+                {
+                    "name": "PORT",
+                    "value": "3000"
+                },
+                {
+                    "name": "MULTI_TENANT",
+                    "value": "false"
+                },
+                {
+                    "name": "DATABASE_URL",
+                    "value": "postgresql://neondb_owner:npg_foSr6ixkzw7W@ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require"
+                },
+                {
+                    "name": "SESSION_SECRET",
+                    "value": "your-super-secret-session-key-replace-in-production-2024"
+                }
+            ],
+            "mountPoints": [],
+            "volumesFrom": [],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/edsteward-production",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            },
+            "healthCheck": {
+                "command": [
+                    "CMD-SHELL",
+                    "wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1"
+                ],
+                "interval": 30,
+                "timeout": 5,
+                "retries": 3,
+                "startPeriod": 60
+            }
+        }
+    ],
+    "volumes": [],
+    "placementConstraints": [],
+    "tags": [
+        {
+            "key": "Deployment",
+            "value": "SingleTenantProductionFix"
+        },
+        {
+            "key": "Version",
+            "value": "2025-01-13"
+        }
+    ]
+}

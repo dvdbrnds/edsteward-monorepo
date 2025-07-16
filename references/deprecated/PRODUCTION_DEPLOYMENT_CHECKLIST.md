@@ -38,7 +38,7 @@ This checklist ensures the enhanced jurisdiction system is safely deployed to pr
 # 1. Ensure all changes are committed
 git add .
 git commit -m "Enhanced jurisdiction system - production ready"
-git push origin main
+./scripts/deploy-production.sh
 
 # 2. Test Docker build locally
 docker build --platform linux/amd64 -t regulatory-trackr:test .

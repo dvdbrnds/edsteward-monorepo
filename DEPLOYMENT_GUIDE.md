@@ -87,7 +87,7 @@ make -f Makefile.local staging
 # 4. Commit changes for version control
 git add .
 git commit -m "Feature: Add new compliance feature"
-git push origin main
+./scripts/deploy-production.sh
 
 # 5. Deploy to production using AWS ECS/ECR
 ./scripts/deploy-app.sh

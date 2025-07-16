@@ -1,4 +1,13 @@
 {
+  "family": "edsteward-fixed",
+  "taskRoleArn": "arn:aws:iam::259661441422:role/edsteward-task-role",
+  "executionRoleArn": "arn:aws:iam::259661441422:role/edsteward-execution-role",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": [
+    "FARGATE"
+  ],
+  "cpu": "256",
+  "memory": "512",
   "containerDefinitions": [
     {
       "name": "edsteward-app",
@@ -8,14 +17,16 @@
         {
           "containerPort": 3000,
           "hostPort": 3000,
-          "protocol": "tcp"
+          "protocol": "tcp",
+          "name": "edsteward-app-3000-tcp",
+          "appProtocol": "http"
         }
       ],
       "essential": true,
       "environment": [
         {
           "name": "SESSION_SECRET",
-          "value": "edsteward-production-secret-2025"
+          "value": "production-session-secret-edsteward-2025"
         },
         {
           "name": "NODE_ENV",
@@ -23,19 +34,11 @@
         },
         {
           "name": "DATABASE_URL",
-          "value": "postgresql://neondb_owner:npg_foSr6ixkzw7W@ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
-        },
-        {
-          "name": "PORT",
-          "value": "3000"
+          "value": "postgresql://neondb_owner:npg_foSr6ixkzw7W@ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require"
         },
         {
           "name": "MULTI_TENANT",
-          "value": "true"
-        },
-        {
-          "name": "DEFAULT_TENANT",
-          "value": "admin"
+          "value": "false"
         }
       ],
       "mountPoints": [],
@@ -43,32 +46,12 @@
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/aws/ecs/edsteward",
+          "awslogs-group": "/ecs/edsteward",
           "awslogs-region": "us-east-1",
-          "awslogs-stream-prefix": "production"
+          "awslogs-stream-prefix": "fixed"
         }
-      },
-      "healthCheck": {
-        "command": [
-          "CMD-SHELL",
-          "curl -f http://localhost:3000/ || exit 1"
-        ],
-        "interval": 30,
-        "timeout": 5,
-        "retries": 3,
-        "startPeriod": 60
       },
       "systemControls": []
     }
-  ],
-  "family": "edsteward-production",
-  "taskRoleArn": "arn:aws:iam::259661441422:role/ecsTaskRole",
-  "executionRoleArn": "arn:aws:iam::259661441422:role/ecsTaskExecutionRole",
-  "networkMode": "awsvpc",
-  "volumes": [],
-  "requiresCompatibilities": [
-    "FARGATE"
-  ],
-  "cpu": "512",
-  "memory": "1024"
+  ]
 }
