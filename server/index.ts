@@ -103,19 +103,20 @@ app.post('/api/authenticate', async (req, res) => {
     console.log('🔍 Login attempt - Body:', req.body);
     console.log('🔍 Login attempt - Content-Type:', req.get('Content-Type'));
     
-    const { email, password } = req.body;
+    const { email, username, password } = req.body;
+    const loginEmail = email || username; // Accept both email and username fields
     
-    console.log('🔍 Extracted - Email:', email, 'Password:', password ? '[PRESENT]' : '[MISSING]');
+    console.log('🔍 Extracted - Email:', email, 'Username:', username, 'Login Email:', loginEmail, 'Password:', password ? '[PRESENT]' : '[MISSING]');
     
-    if (!email || !password) {
-      console.log('❌ Missing credentials - Email:', !!email, 'Password:', !!password);
+    if (!loginEmail || !password) {
+      console.log('❌ Missing credentials - Login Email:', !!loginEmail, 'Password:', !!password);
       return res.status(400).json({ error: 'Email and password required' });
     }
 
     // Import database storage
     const { getDatabaseStorage } = await import('./services/database');
     const tenantStorage = getDatabaseStorage();
-    const user = await tenantStorage.getUserByEmail(email);
+    const user = await tenantStorage.getUserByEmail(loginEmail);
     
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
