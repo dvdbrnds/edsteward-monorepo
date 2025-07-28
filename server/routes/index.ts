@@ -273,9 +273,19 @@ export function registerRoutes(app: express.Application): Server {
         return res.status(401).json({ error: 'Invalid credentials' });
       }
 
-      // Import password verification from auth module
-      const { verifyPassword } = await import('../auth.js');
-      const isValidPassword = await verifyPassword(password, user.password);
+      // Verify password using built-in crypto (scrypt format: salt:hash)
+      const crypto = require('crypto');
+      const { promisify } = require('util');
+      const scryptAsync = promisify(crypto.scrypt);
+      
+      const [salt, hash] = user.password.split(':');
+      if (!salt || !hash) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+      
+      const derivedKey = await scryptAsync(password, salt, 32);
+      const storedKey = Buffer.from(hash, 'hex');
+      const isValidPassword = crypto.timingSafeEqual(derivedKey, storedKey);
 
       if (!isValidPassword) {
         return res.status(401).json({ error: 'Invalid credentials' });
