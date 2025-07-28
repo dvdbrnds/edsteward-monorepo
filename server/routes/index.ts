@@ -183,6 +183,31 @@ export function registerRoutes(app: express.Application): Server {
 
   // The import for getTenantStorage is at the top of the file
 
+  // Current user endpoint
+  app.get('/api/user', (req, res) => {
+    if (!req.isAuthenticated || !req.isAuthenticated()) {
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    // Return current user data
+    const user = req.user;
+    if (!user) {
+      return res.status(401).json({ error: "No user found" });
+    }
+
+    // Ensure dvdbrnds is always admin (legacy compatibility)
+    const userWithRole = user.username === 'dvdbrnds' ? { ...user, role: 'admin' } : user;
+
+    res.json({
+      id: userWithRole.id,
+      username: userWithRole.username,
+      email: userWithRole.email,
+      role: userWithRole.role,
+      createdAt: userWithRole.createdAt,
+      lastLogin: userWithRole.lastLogin
+    });
+  });
+
   // Setup status for frontend navigation (requires auth)
   app.get('/api/setup/status', async (req, res) => {
     try {
