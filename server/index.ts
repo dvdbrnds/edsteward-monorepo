@@ -96,6 +96,64 @@ configureAuth(app);
 // API routes
 registerRoutes(app);
 
+// CRITICAL: Direct login endpoint since routes aren't working
+app.post('/api/login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password required' });
+    }
+
+    // Import database storage
+    const { getDatabaseStorage } = await import('./services/database');
+    const tenantStorage = getDatabaseStorage();
+    const user = await tenantStorage.getUserByEmail(email);
+    
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // Verify scrypt password
+    const crypto = await import('crypto');
+    const { promisify } = await import('util');
+    const scryptAsync = promisify(crypto.scrypt);
+    
+    const [salt, hash] = user.password.split(':');
+    if (!salt || !hash) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+    
+    const derivedKey = await scryptAsync(password, salt, 32) as Buffer;
+    const storedKey = Buffer.from(hash, 'hex');
+    const isValidPassword = crypto.timingSafeEqual(derivedKey, storedKey);
+
+    if (!isValidPassword) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    req.login(user, (err) => {
+      if (err) {
+        return res.status(500).json({ error: 'Login failed' });
+      }
+
+      res.json({
+        success: true,
+        user: {
+          id: user.id,
+          email: user.email,
+          username: user.username,
+          role: user.role
+        }
+      });
+    });
+
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // Serve static files
 app.use(express.static(path.join(__dirname, '../dist/public')));
 
