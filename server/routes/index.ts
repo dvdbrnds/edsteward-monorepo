@@ -299,16 +299,16 @@ export function registerRoutes(app: express.Application): Server {
       }
 
       // Verify password using built-in crypto (scrypt format: salt:hash)
-      const crypto = require('crypto');
-      const { promisify } = require('util');
-      const scryptAsync = promisify(crypto.scrypt);
+      const crypto = await import('crypto');
+      const { promisify } = await import('util');
+      const scryptAsync = promisify(crypto.scrypt as any);
       
       const [salt, hash] = user.password.split(':');
       if (!salt || !hash) {
         return res.status(401).json({ error: 'Invalid credentials' });
       }
       
-      const derivedKey = await scryptAsync(password, salt, 32);
+      const derivedKey = await scryptAsync(password, salt, 32) as Buffer;
       const storedKey = Buffer.from(hash, 'hex');
       const isValidPassword = crypto.timingSafeEqual(derivedKey, storedKey);
 
