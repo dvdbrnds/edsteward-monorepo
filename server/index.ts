@@ -97,7 +97,7 @@ configureAuth(app);
 registerRoutes(app);
 
 // CRITICAL: Direct login endpoint since routes aren't working
-app.post('/api/login', async (req, res) => {
+app.post('/api/authenticate', async (req, res) => {
   try {
     const { email, password } = req.body;
     
