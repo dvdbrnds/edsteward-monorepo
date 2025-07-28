@@ -83,7 +83,7 @@ app.use(session({
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    sameSite: 'lax', // Required for modern browsers to send cookies
+    sameSite: 'lax', // CRITICAL: Required for modern browsers to send cookies
   },
 }));
 
