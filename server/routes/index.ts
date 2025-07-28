@@ -312,6 +312,74 @@ export function registerRoutes(app: express.Application): Server {
     });
   });
 
+  // Admin institution configuration endpoint (for admin dashboard)
+  app.get('/api/admin/institution-config', (req, res) => {
+    // Read environment variables dynamically for true customer isolation
+    const config = {
+      institution: {
+        name: (process.env.INSTITUTION_NAME || 'EdSteward Institution').replace(/_/g, ' '),
+        domain: process.env.INSTITUTION_DOMAIN || 'localhost',
+        branding: {
+          logo: process.env.INSTITUTION_LOGO_URL || '/assets/generic-logo.svg',
+          primaryColor: process.env.INSTITUTION_PRIMARY_COLOR || '#0066cc',
+          secondaryColor: process.env.INSTITUTION_SECONDARY_COLOR || '#336699',
+          favicon: process.env.INSTITUTION_FAVICON_URL || '/favicon.ico',
+        },
+      },
+      authentication: {
+        samlEnabled: process.env.AUTH_SAML_ENABLED === 'true',
+        usernamePasswordEnabled: process.env.AUTH_USERNAME_PASSWORD_ENABLED !== 'false',
+        allowSelfRegistration: process.env.AUTH_ALLOW_SELF_REGISTRATION === 'true',
+      },
+      features: {
+        maxUsers: parseInt(process.env.FEATURE_MAX_USERS || '1000'),
+        maxRegulations: parseInt(process.env.FEATURE_MAX_REGULATIONS || '10000'),
+        apiAccess: process.env.FEATURE_API_ACCESS !== 'false',
+        customDomain: process.env.FEATURE_CUSTOM_DOMAIN === 'true',
+        ssoEnabled: process.env.FEATURE_SSO_ENABLED === 'true',
+      },
+    };
+
+    res.json({
+      success: true,
+      institutionConfig: config,
+    });
+  });
+
+  // ALIAS: Institution endpoint (for compatibility with frontend)
+  app.get('/api/institution', (req, res) => {
+    // Read environment variables dynamically for true customer isolation
+    const config = {
+      institution: {
+        name: (process.env.INSTITUTION_NAME || 'EdSteward Institution').replace(/_/g, ' '),
+        domain: process.env.INSTITUTION_DOMAIN || 'localhost',
+        branding: {
+          logo: process.env.INSTITUTION_LOGO_URL || '/assets/generic-logo.svg',
+          primaryColor: process.env.INSTITUTION_PRIMARY_COLOR || '#0066cc',
+          secondaryColor: process.env.INSTITUTION_SECONDARY_COLOR || '#336699',
+          favicon: process.env.INSTITUTION_FAVICON_URL || '/favicon.ico',
+        },
+      },
+      authentication: {
+        samlEnabled: process.env.AUTH_SAML_ENABLED === 'true',
+        usernamePasswordEnabled: process.env.AUTH_USERNAME_PASSWORD_ENABLED !== 'false',
+        allowSelfRegistration: process.env.AUTH_ALLOW_SELF_REGISTRATION === 'true',
+      },
+      features: {
+        maxUsers: parseInt(process.env.FEATURE_MAX_USERS || '1000'),
+        maxRegulations: parseInt(process.env.FEATURE_MAX_REGULATIONS || '10000'),
+        apiAccess: process.env.FEATURE_API_ACCESS !== 'false',
+        customDomain: process.env.FEATURE_CUSTOM_DOMAIN === 'true',
+        ssoEnabled: process.env.FEATURE_SSO_ENABLED === 'true',
+      },
+    };
+
+    res.json({
+      success: true,
+      institutionConfig: config,
+    });
+  });
+
   // Debug endpoint to check environment variables
   app.get('/api/debug-env', (req, res) => {
     const envVars = {

@@ -13,7 +13,7 @@ import { AlertCircle, CheckCircle, Clock, Cloud, Database, Globe, Shield, Zap } 
 interface TenantConfig {
   // Customer Information
   customerName: string;
-  customerDomain: string;
+  organizationDomain: string;
   customerSubdomain: string;
   contactEmail: string;
   organizationUrl: string;
@@ -52,14 +52,22 @@ interface DeploymentStep {
 
 const TenantCreationWizard: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(1);
+
+  // Set development admin token if not already set
+  React.useEffect(() => {
+    if (!localStorage.getItem('admin_token')) {
+      localStorage.setItem('admin_token', 'admin-token-12345');
+      console.log('Development admin token set');
+    }
+  }, []);
   const [tenantConfig, setTenantConfig] = useState<TenantConfig>({
     customerName: '',
-    customerDomain: '',
+    organizationDomain: '',
     customerSubdomain: '',
     contactEmail: '',
     organizationUrl: '',
     awsRegion: 'us-east-1',
-    awsAccountId: '',
+    awsAccountId: '259661441422',
     clusterName: '',
     serviceName: '',
     ecrRepository: '',
@@ -75,6 +83,7 @@ const TenantCreationWizard: React.FC = () => {
   });
 
   const [deploymentStatus, setDeploymentStatus] = useState<'idle' | 'deploying' | 'completed' | 'failed'>('idle');
+  const [deploymentError, setDeploymentError] = useState<string | null>(null);
   const [deploymentSteps, setDeploymentSteps] = useState<DeploymentStep[]>([
     { id: 'vpc', name: 'Create VPC', description: 'Setting up isolated network infrastructure', status: 'pending' },
     { id: 'ecs', name: 'Create ECS Cluster', description: 'Deploying container orchestration', status: 'pending' },
@@ -113,7 +122,7 @@ const TenantCreationWizard: React.FC = () => {
   const validateStep = (step: number): boolean => {
     switch (step) {
       case 1:
-        return !!(tenantConfig.customerName && tenantConfig.customerDomain && tenantConfig.contactEmail);
+        return !!(tenantConfig.customerName && tenantConfig.organizationDomain && tenantConfig.contactEmail);
       case 2:
         return !!(tenantConfig.awsRegion && tenantConfig.awsAccountId);
       case 3:
@@ -137,45 +146,82 @@ const TenantCreationWizard: React.FC = () => {
 
   const startDeployment = async () => {
     setDeploymentStatus('deploying');
+    setDeploymentError(null);
+    console.log('Deploy button clicked!');
     
     try {
       // Connect to WebSocket for real-time updates
+      console.log('Connecting to WebSocket at ws://localhost:4000/ws/deployment...');
       const ws = new WebSocket(`ws://localhost:4000/ws/deployment`);
       setWebsocket(ws);
 
+      ws.onopen = () => {
+        console.log('WebSocket connection established successfully');
+      };
+
+      ws.onerror = (error) => {
+        console.error('WebSocket connection error:', error);
+      };
+
+      ws.onclose = (event) => {
+        console.log('WebSocket connection closed:', event.code, event.reason);
+      };
+
       ws.onmessage = (event) => {
         const update = JSON.parse(event.data);
+        console.log('WebSocket update received:', update);
+        
         if (update.type === 'step_update') {
           setDeploymentSteps(prev => 
             prev.map(step => 
               step.id === update.stepId 
-                ? { ...step, status: update.status, duration: update.duration, details: update.details }
+                ? { ...step, status: update.status, details: update.details }
                 : step
             )
           );
+        } else if (update.type === 'deployment_complete') {
+          setDeploymentStatus('completed');
+          setDeploymentSteps(prev => 
+            prev.map(step => ({ ...step, status: 'completed' }))
+          );
+        } else if (update.type === 'deployment_failed') {
+          setDeploymentStatus('failed');
+          console.error('Deployment failed:', update.error);
         }
       };
 
       // Start deployment via API
-      const response = await fetch('/api/tenants/provision', {
+      console.log('Starting deployment with config:', tenantConfig);
+      
+      const response = await fetch('http://localhost:4000/api/tenants/provision', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
+          'Authorization': `Bearer ${localStorage.getItem('admin_token') || 'admin-token-12345'}`
         },
         body: JSON.stringify(tenantConfig)
       });
 
+      console.log('API response status:', response.status);
+
       if (!response.ok) {
-        throw new Error('Deployment failed to start');
+        const errorText = await response.text();
+        console.error('API error response:', errorText);
+        throw new Error(`Deployment failed to start: ${response.status} ${errorText}`);
       }
 
       const result = await response.json();
-      console.log('Deployment started:', result);
+      console.log('Deployment started successfully:', result);
 
     } catch (error) {
       console.error('Deployment error:', error);
       setDeploymentStatus('failed');
+      setDeploymentError(error instanceof Error ? error.message : String(error));
+      
+      // Close WebSocket if it exists
+      if (websocket && websocket.readyState === WebSocket.OPEN) {
+        websocket.close();
+      }
     }
   };
 
@@ -193,9 +239,19 @@ const TenantCreationWizard: React.FC = () => {
       case 1:
         return (
           <div className="space-y-6">
+            <div className="bg-blue-50 p-4 rounded-lg">
+              <h4 className="font-semibold flex items-center gap-2">
+                <Globe className="h-5 w-5" />
+                Customer Deployment Information
+              </h4>
+              <p className="text-sm text-gray-600 mt-1">
+                Each customer gets their own subdomain: <strong>{tenantConfig.customerSubdomain || 'customer'}.edsteward.ai</strong>
+              </p>
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="customerName">Customer Name *</Label>
+                <Label htmlFor="customerName">Customer/Organization Name *</Label>
                 <Input
                   id="customerName"
                   value={tenantConfig.customerName}
@@ -204,25 +260,30 @@ const TenantCreationWizard: React.FC = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="customerDomain">Customer Domain *</Label>
+                <Label htmlFor="organizationDomain">Organization Domain *</Label>
                 <Input
-                  id="customerDomain"
-                  value={tenantConfig.customerDomain}
-                  onChange={(e) => handleInputChange('customerDomain', e.target.value)}
+                  id="organizationDomain"
+                  value={tenantConfig.organizationDomain}
+                  onChange={(e) => handleInputChange('organizationDomain', e.target.value)}
                   placeholder="acme.edu"
                 />
+                <p className="text-xs text-gray-500 mt-1">Their actual domain (for reference only)</p>
               </div>
             </div>
             
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="customerSubdomain">Generated Subdomain</Label>
-                <Input
-                  id="customerSubdomain"
-                  value={tenantConfig.customerSubdomain}
-                  readOnly
-                  className="bg-gray-100"
-                />
+                <Label htmlFor="customerSubdomain">EdSteward Deployment URL</Label>
+                <div className="flex items-center space-x-2">
+                  <Input
+                    id="customerSubdomain"
+                    value={tenantConfig.customerSubdomain}
+                    readOnly
+                    className="bg-gray-100"
+                  />
+                  <span className="text-sm text-gray-500">.edsteward.ai</span>
+                </div>
+                <p className="text-xs text-gray-500 mt-1">Auto-generated from customer name</p>
               </div>
               <div>
                 <Label htmlFor="contactEmail">Contact Email *</Label>
@@ -237,13 +298,14 @@ const TenantCreationWizard: React.FC = () => {
             </div>
 
             <div>
-              <Label htmlFor="organizationUrl">Organization URL</Label>
+              <Label htmlFor="organizationUrl">Organization Website URL</Label>
               <Input
                 id="organizationUrl"
                 value={tenantConfig.organizationUrl}
                 onChange={(e) => handleInputChange('organizationUrl', e.target.value)}
-                placeholder="https://acme.edu"
+                placeholder="https://www.acme.edu"
               />
+              <p className="text-xs text-gray-500 mt-1">Link to their main website (for reference)</p>
             </div>
           </div>
         );
@@ -517,8 +579,32 @@ const TenantCreationWizard: React.FC = () => {
                 <CheckCircle className="h-8 w-8 text-green-500 mx-auto mb-2" />
                 <h4 className="font-semibold text-green-700">Deployment Completed!</h4>
                 <p className="text-sm text-green-600">
-                  Customer infrastructure is ready at: {tenantConfig.customerSubdomain}.edsteward.ai
+                  Customer deployment is ready at: <strong>https://{tenantConfig.customerSubdomain}.edsteward.ai</strong>
                 </p>
+                <p className="text-xs text-green-500 mt-1">
+                  Complete AWS isolation with dedicated VPC, ECS cluster, and database
+                </p>
+              </div>
+            )}
+
+            {deploymentStatus === 'failed' && (
+              <div className="text-center p-4 bg-red-50 rounded-lg">
+                <AlertCircle className="h-8 w-8 text-red-500 mx-auto mb-2" />
+                <h4 className="font-semibold text-red-700">Deployment Failed</h4>
+                <p className="text-sm text-red-600">
+                  {deploymentError || 'Please check the logs and try again.'}
+                </p>
+                <Button 
+                  onClick={() => {
+                    setDeploymentStatus('idle');
+                    setDeploymentError(null);
+                    setDeploymentSteps(prev => prev.map(step => ({ ...step, status: 'pending' })));
+                  }}
+                  variant="outline"
+                  className="mt-2"
+                >
+                  Try Again
+                </Button>
               </div>
             )}
           </div>
@@ -546,7 +632,7 @@ const TenantCreationWizard: React.FC = () => {
         <CardContent>
           <Tabs value={currentStep.toString()} className="w-full">
             <TabsList className="grid w-full grid-cols-5">
-              <TabsTrigger value="1">Customer</TabsTrigger>
+              <TabsTrigger value="1">Organization</TabsTrigger>
               <TabsTrigger value="2">AWS</TabsTrigger>
               <TabsTrigger value="3">Database</TabsTrigger>
               <TabsTrigger value="4">Branding</TabsTrigger>

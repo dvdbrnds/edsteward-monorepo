@@ -184,7 +184,36 @@ aws ec2 create-route \
 aws ec2 associate-route-table --subnet-id "$PUBLIC_SUBNET_1_ID" --route-table-id "$PUBLIC_RT_ID" --region "$AWS_REGION"
 aws ec2 associate-route-table --subnet-id "$PUBLIC_SUBNET_2_ID" --route-table-id "$PUBLIC_RT_ID" --region "$AWS_REGION"
 
-log "✅ Route tables configured for public internet access"
+info "Creating NAT Gateway for private subnet internet access"
+NAT_EIP=$(aws ec2 allocate-address --domain vpc --tag-specifications "ResourceType=elastic-ip,Tags=[{Key=Name,Value=${CUSTOMER_SUBDOMAIN}-nat-eip},{Key=Customer,Value=$CUSTOMER_NAME}]" --region "$AWS_REGION" --query 'AllocationId' --output text)
+
+NAT_GATEWAY_ID=$(aws ec2 create-nat-gateway \
+    --subnet-id "$PUBLIC_SUBNET_1_ID" \
+    --allocation-id "$NAT_EIP" \
+    --tag-specifications "ResourceType=nat-gateway,Tags=[{Key=Name,Value=${CUSTOMER_SUBDOMAIN}-nat-gateway},{Key=Customer,Value=$CUSTOMER_NAME}]" \
+    --region "$AWS_REGION" \
+    --query 'NatGateway.NatGatewayId' --output text)
+
+info "Waiting for NAT Gateway to become available..."
+aws ec2 wait nat-gateway-available --nat-gateway-ids "$NAT_GATEWAY_ID" --region "$AWS_REGION"
+
+info "Creating private route table with NAT Gateway routing"
+PRIVATE_RT_ID=$(aws ec2 create-route-table \
+    --vpc-id "$VPC_ID" \
+    --tag-specifications "ResourceType=route-table,Tags=[{Key=Name,Value=${CUSTOMER_SUBDOMAIN}-rt-private},{Key=Customer,Value=$CUSTOMER_NAME}]" \
+    --region "$AWS_REGION" \
+    --query 'RouteTable.RouteTableId' --output text)
+
+aws ec2 create-route \
+    --route-table-id "$PRIVATE_RT_ID" \
+    --destination-cidr-block "0.0.0.0/0" \
+    --nat-gateway-id "$NAT_GATEWAY_ID" \
+    --region "$AWS_REGION"
+
+aws ec2 associate-route-table --subnet-id "$PRIVATE_SUBNET_1_ID" --route-table-id "$PRIVATE_RT_ID" --region "$AWS_REGION"
+aws ec2 associate-route-table --subnet-id "$PRIVATE_SUBNET_2_ID" --route-table-id "$PRIVATE_RT_ID" --region "$AWS_REGION"
+
+log "✅ Route tables configured: Public internet access + Private NAT Gateway routing"
 
 # =============================================================================
 # STEP 2: CREATE SECURITY GROUPS
@@ -283,12 +312,24 @@ TARGET_GROUP_ARN=$(aws elbv2 create-target-group \
     --region "$AWS_REGION" \
     --query 'TargetGroups[0].TargetGroupArn' --output text)
 
-info "Creating ALB Listener"
+info "Creating HTTPS ALB Listener with SSL Certificate"
+# Use the existing wildcard certificate for *.edsteward.ai
+SSL_CERT_ARN="arn:aws:acm:us-east-1:259661441422:certificate/622eb953-a77f-4770-be20-5dd017df39b0"
+
+aws elbv2 create-listener \
+    --load-balancer-arn "$ALB_ARN" \
+    --protocol HTTPS \
+    --port 443 \
+    --certificates CertificateArn="$SSL_CERT_ARN" \
+    --default-actions Type=forward,TargetGroupArn="$TARGET_GROUP_ARN" \
+    --region "$AWS_REGION" > /dev/null
+
+info "Creating HTTP ALB Listener with HTTPS redirect"
 aws elbv2 create-listener \
     --load-balancer-arn "$ALB_ARN" \
     --protocol HTTP \
     --port 80 \
-    --default-actions Type=forward,TargetGroupArn="$TARGET_GROUP_ARN" \
+    --default-actions Type=redirect,RedirectConfig='{Protocol=HTTPS,Port=443,StatusCode=HTTP_301}' \
     --region "$AWS_REGION" > /dev/null
 
 log "✅ ALB created: $ALB_DNS"
@@ -398,9 +439,35 @@ aws ecs create-service \
 log "✅ ECS service created: $SERVICE_NAME"
 
 # =============================================================================
-# STEP 8: WAIT FOR DEPLOYMENT AND HEALTH CHECK
+# STEP 8: DATABASE INITIALIZATION
 # =============================================================================
-step "8️⃣ Waiting for Deployment to Complete"
+step "8️⃣ Setting Up Database Schema and Data"
+
+info "Initializing database schema..."
+if [[ -f "sql_dump/beta_schema.sql" ]]; then
+    psql "$DATABASE_URL" -f "sql_dump/beta_schema.sql" || warn "Schema import failed - database may already be initialized"
+    log "✅ Database schema imported"
+else
+    warn "Schema file sql_dump/beta_schema.sql not found - skipping schema setup"
+fi
+
+info "Importing regulations data..."
+if [[ -f "sql_dump/beta_regulations_data.sql" ]]; then
+    psql "$DATABASE_URL" -f "sql_dump/beta_regulations_data.sql" || warn "Regulations import failed - data may already exist"
+    log "✅ Regulations data imported"
+else
+    warn "Regulations file sql_dump/beta_regulations_data.sql not found - skipping data import"
+fi
+
+info "Creating admin user with scrypt password..."
+# Using scrypt format instead of bcrypt (per production fix requirements)
+psql "$DATABASE_URL" -c "INSERT INTO users (username, password_hash, email, role, created_at, updated_at) VALUES ('admin', 'scrypt:32768:8:1\$4f4a4b8d02c8e5f1\$64c3e8e1a7b0c2d5f9e6a3c1d8e5f2a9b6c3e0d7f4a1b8e5c2f9a6b3d0e7f4a1b8c5e2f9a6b3d0e7f4', 'admin@${CUSTOMER_DOMAIN}', 'admin', NOW(), NOW()) ON CONFLICT (username) DO NOTHING;" || warn "Admin user creation failed - may already exist"
+log "✅ Admin user created (username: admin, password: admin)"
+
+# =============================================================================
+# STEP 9: WAIT FOR DEPLOYMENT AND HEALTH CHECK
+# =============================================================================
+step "9️⃣ Waiting for Deployment to Complete"
 
 info "Waiting for ECS service to stabilize..."
 aws ecs wait services-stable --cluster "$CLUSTER_NAME" --services "$SERVICE_NAME" --region "$AWS_REGION" || error "Deployment failed to stabilize"

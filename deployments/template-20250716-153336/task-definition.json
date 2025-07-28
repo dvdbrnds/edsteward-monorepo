@@ -1,0 +1,42 @@
+{
+  "family": "template-edsteward",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048",
+  "executionRoleArn": "arn:aws:iam::259661441422:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::259661441422:role/ecsTaskRole",
+  "containerDefinitions": [
+    {
+      "name": "edsteward-app",
+      "image": "259661441422.dkr.ecr.us-east-1.amazonaws.com/template-edsteward:latest",
+      "portMappings": [
+        {
+          "containerPort": 3000,
+          "protocol": "tcp"
+        }
+      ],
+      "environment": [
+        {"name": "NODE_ENV", "value": "production"},
+        {"name": "DATABASE_URL", "value": "postgresql://neondb_owner:npg_foSr6ixkzw7W@ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech/template_edsteward?sslmode=require"},
+        {"name": "CUSTOMER_NAME", "value": "Template University"},
+        {"name": "CUSTOMER_DOMAIN", "value": "template.edu"},
+        {"name": "CUSTOMER_SUBDOMAIN", "value": "template"},
+        {"name": "PRIMARY_COLOR", "value": "#dc2626"},
+        {"name": "LOGO_URL", "value": "/assets/generic-logo.svg"},
+        {"name": "MAX_USERS", "value": "1000"},
+        {"name": "MAX_REGULATIONS", "value": "10000"},
+        {"name": "SAML_ENABLED", "value": "false"}
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/template-edsteward",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "essential": true
+    }
+  ]
+}

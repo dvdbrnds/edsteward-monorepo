@@ -1,0 +1,65 @@
+{
+  "customer": {
+    "name": "Template University",
+    "domain": "template.edu",
+    "subdomain": "template",
+    "contact": {
+      "supportEmail": "support@template.edu",
+      "adminEmail": "admin@template.edu",
+      "organizationUrl": "https://template.edu"
+    }
+  },
+  "aws": {
+    "region": "us-east-1",
+    "accountId": "259661441422",
+    "clusterName": "template-cluster",
+    "serviceName": "template-service",
+    "ecrRepository": "template-edsteward",
+    "logGroup": "/ecs/template-edsteward"
+  },
+  "database": {
+    "type": "neon",
+    "connectionString": "postgresql://neondb_owner:npg_foSr6ixkzw7W@ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech/template_edsteward?sslmode=require",
+    "name": "template_edsteward"
+  },
+  "deployment": {
+    "dockerImage": "259661441422.dkr.ecr.us-east-1.amazonaws.com/template-edsteward:latest",
+    "taskDefinitionFamily": "template-edsteward",
+    "domainName": "template.edsteward.ai"
+  },
+  "branding": {
+    "institutionName": "Template University",
+    "title": "Template Compliance Portal",
+    "logoUrl": "/assets/generic-logo.svg",
+    "faviconUrl": "/favicon.ico",
+    "primaryColor": "#dc2626",
+    "secondaryColor": "#b91c1c",
+    "accentColor": "#ef4444",
+    "loginScreenBackgroundColor": "#fef2f2",
+    "loginScreenAccentColor": "#dc2626",
+    "loginScreenTextColor": "#1f2937",
+    "loginScreenHeroColor": "#991b1b"
+  },
+  "authentication": {
+    "samlEnabled": false,
+    "samlEntityId": "urn:edsteward:sp:template",
+    "samlSsoUrl": "",
+    "samlCertificate": "",
+    "usernamePasswordEnabled": true,
+    "allowSelfRegistration": false
+  },
+  "features": {
+    "maxUsers": 1000,
+    "maxRegulations": 10000,
+    "apiAccess": true,
+    "customDomain": true,
+    "ssoEnabled": false,
+    "samlEnabled": false
+  },
+  "environment": {
+    "nodeEnv": "production",
+    "port": 3000,
+    "multiTenant": false,
+    "sessionSecret": "template-session-secret-change-in-production"
+  }
+} 

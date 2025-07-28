@@ -1,7 +1,7 @@
 {
-  "deploymentTime": "2025-07-13T14:24:11Z",
-  "imageTag": "prod-ee0971c",
-  "commitSha": "ee0971c",
+  "deploymentTime": "2025-07-28T14:26:19Z",
+  "imageTag": "prod-7f1ff97",
+  "commitSha": "7f1ff97",
   "ecrUri": "259661441422.dkr.ecr.us-east-1.amazonaws.com/edsteward-multi-tenant",
   "cluster": "edsteward-cluster",
   "service": "edsteward-service",

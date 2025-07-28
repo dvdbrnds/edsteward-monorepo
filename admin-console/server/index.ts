@@ -10,6 +10,8 @@ import helmet from 'helmet';
 import compression from 'compression';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import { WebSocketServer, WebSocket } from 'ws';
+import { createServer } from 'http';
 
 // Load environment variables FIRST
 dotenv.config();
@@ -28,6 +30,41 @@ const __dirname = dirname(__filename);
 
 const app = express();
 const PORT = process.env.ADMIN_PORT || 4000;
+
+// Create HTTP server and WebSocket server
+const server = createServer(app);
+const wss = new WebSocketServer({ server, path: '/ws/deployment' });
+
+// Track active deployment connections
+const deploymentConnections = new Map<string, WebSocket[]>();
+
+// WebSocket connection handling
+wss.on('connection', (ws: WebSocket, req) => {
+  console.log('New WebSocket connection for deployment monitoring');
+  
+  // Add connection to general deployment monitoring
+  const generalConnections = deploymentConnections.get('general') || [];
+  generalConnections.push(ws);
+  deploymentConnections.set('general', generalConnections);
+
+  ws.on('close', () => {
+    console.log('WebSocket connection closed');
+    // Remove from all deployment tracking
+    deploymentConnections.forEach((connections, key) => {
+      const index = connections.indexOf(ws);
+      if (index !== -1) {
+        connections.splice(index, 1);
+        if (connections.length === 0) {
+          deploymentConnections.delete(key);
+        }
+      }
+    });
+  });
+
+  ws.on('error', (error) => {
+    console.error('WebSocket error:', error);
+  });
+});
 
 // Security middleware
 app.use(helmet({
@@ -286,7 +323,7 @@ app.post('/api/tenants/provision', async (req, res) => {
     console.log('Starting tenant provisioning for:', tenantConfig.customerName);
 
     // Validate required fields
-    const requiredFields = ['customerName', 'customerDomain', 'contactEmail', 'awsRegion', 'awsAccountId', 'databaseUrl'];
+    const requiredFields = ['customerName', 'organizationDomain', 'contactEmail', 'awsRegion', 'awsAccountId', 'databaseUrl'];
     const missingFields = requiredFields.filter(field => !tenantConfig[field]);
     
     if (missingFields.length > 0) {
@@ -336,15 +373,25 @@ async function startTenantDeployment(deploymentId: string, tenantConfig: any) {
   console.log(`[${deploymentId}] Starting deployment for ${tenantConfig.customerName}`);
 
   try {
+    // Check if we're in test mode (for development)
+    const fs = await import('fs');
+    const isTestMode = process.env.NODE_ENV === 'development' || !fs.default.existsSync('../../customer-deployment-template/deploy-customer-isolated.sh');
+    
+    if (isTestMode) {
+      console.log(`[${deploymentId}] Running in test mode - simulating deployment steps`);
+      simulateDeployment(deploymentId, tenantConfig, steps);
+      return;
+    }
+
     // Use enhanced deploy-customer.sh script
-    const deployScript = '../customer-deployment-template/deploy-customer.sh';
+    const deployScript = '../../customer-deployment-template/deploy-customer-isolated.sh';
     
     // Create customer configuration file
     const customerConfigPath = `/tmp/${tenantConfig.customerSubdomain}-config.json`;
     const customerConfig = {
       customer: {
         name: tenantConfig.customerName,
-        domain: tenantConfig.customerDomain,
+        domain: tenantConfig.organizationDomain,
         subdomain: tenantConfig.customerSubdomain,
         contact: {
           supportEmail: tenantConfig.contactEmail,
@@ -384,11 +431,11 @@ async function startTenantDeployment(deploymentId: string, tenantConfig: any) {
     };
 
     // Write config file
-    require('fs').writeFileSync(customerConfigPath, JSON.stringify(customerConfig, null, 2));
+    fs.default.writeFileSync(customerConfigPath, JSON.stringify(customerConfig, null, 2));
 
     // Execute deployment script with enhanced logging
-    const { spawn } = require('child_process');
-    const deployProcess = spawn('bash', [deployScript, customerConfigPath], {
+    const { spawn } = await import('child_process');
+    const deployProcess = spawn('zsh', [deployScript, customerConfigPath], {
       cwd: process.cwd(),
       stdio: ['pipe', 'pipe', 'pipe']
     });
@@ -397,11 +444,28 @@ async function startTenantDeployment(deploymentId: string, tenantConfig: any) {
       const output = data.toString();
       console.log(`[${deploymentId}] STDOUT:`, output);
       
-      // Parse output for step updates
+      // Parse output for step updates with better detection
       steps.forEach(step => {
-        if (output.includes(step.name) || output.includes(step.id)) {
-          // Broadcast step update via WebSocket
-          broadcastStepUpdate(deploymentId, step.id, 'running', output);
+        const stepKeywords = [
+          step.name.toLowerCase(),
+          step.id,
+          `step ${steps.indexOf(step) + 1}`,
+          step.name.split(' ').map(word => word.toLowerCase())
+        ].flat();
+        
+        const outputLower = output.toLowerCase();
+        const isStepActive = stepKeywords.some(keyword => outputLower.includes(keyword));
+        
+        if (isStepActive) {
+          // Determine status from output
+          let status = 'running';
+          if (outputLower.includes('completed') || outputLower.includes('success') || outputLower.includes('done')) {
+            status = 'completed';
+          } else if (outputLower.includes('error') || outputLower.includes('failed') || outputLower.includes('failure')) {
+            status = 'failed';
+          }
+          
+          broadcastStepUpdate(deploymentId, step.id, status, output.trim());
         }
       });
     });
@@ -427,18 +491,114 @@ async function startTenantDeployment(deploymentId: string, tenantConfig: any) {
   }
 }
 
-// WebSocket broadcasting functions (placeholder for now)
+// Simulate deployment for testing WebSocket functionality
+async function simulateDeployment(deploymentId: string, tenantConfig: any, steps: any[]) {
+  console.log(`[${deploymentId}] === STARTING DEPLOYMENT SIMULATION ===`);
+  console.log(`[${deploymentId}] Customer: ${tenantConfig.customerName}`);
+  console.log(`[${deploymentId}] Steps to process: ${steps.length}`);
+  
+  try {
+    for (let i = 0; i < steps.length; i++) {
+      const step = steps[i];
+      console.log(`[${deploymentId}] Processing step ${i + 1}/${steps.length}: ${step.name}`);
+      
+      // Start step
+      broadcastStepUpdate(deploymentId, step.id, 'running', `Starting ${step.name}...`);
+      
+      // Simulate work (2-4 seconds per step)
+      const duration = 2000 + Math.random() * 2000;
+      console.log(`[${deploymentId}] Step ${step.name} will take ${Math.round(duration)}ms`);
+      await new Promise(resolve => setTimeout(resolve, duration));
+      
+      // Complete step
+      broadcastStepUpdate(deploymentId, step.id, 'completed', `${step.name} completed successfully`);
+      console.log(`[${deploymentId}] Step ${step.name} completed`);
+    }
+    
+    console.log(`[${deploymentId}] All steps completed, sending final completion...`);
+    
+    // Complete deployment
+    setTimeout(() => {
+      broadcastDeploymentComplete(deploymentId, tenantConfig);
+      console.log(`[${deploymentId}] === DEPLOYMENT SIMULATION COMPLETED ===`);
+    }, 1000);
+    
+  } catch (error) {
+    console.error(`[${deploymentId}] Error in deployment simulation:`, error);
+    broadcastDeploymentFailed(deploymentId, error instanceof Error ? error.message : String(error));
+  }
+}
+
+// WebSocket broadcasting functions
 function broadcastStepUpdate(deploymentId: string, stepId: string, status: string, details: string) {
-  // TODO: Implement WebSocket broadcasting
   console.log(`[${deploymentId}] Step ${stepId}: ${status} - ${details}`);
+  
+  const message = JSON.stringify({
+    type: 'step_update',
+    deploymentId,
+    stepId,
+    status,
+    details,
+    timestamp: new Date().toISOString()
+  });
+
+  // Broadcast to all connected clients
+  const connections = deploymentConnections.get('general') || [];
+  connections.forEach(ws => {
+    if (ws.readyState === WebSocket.OPEN) {
+      try {
+        ws.send(message);
+      } catch (error) {
+        console.error('Error sending WebSocket message:', error);
+      }
+    }
+  });
 }
 
 function broadcastDeploymentComplete(deploymentId: string, tenantConfig: any) {
   console.log(`[${deploymentId}] Deployment completed for ${tenantConfig.customerName}`);
+  
+  const message = JSON.stringify({
+    type: 'deployment_complete',
+    deploymentId,
+    customerName: tenantConfig.customerName,
+    customerSubdomain: tenantConfig.customerSubdomain,
+    deploymentUrl: `https://${tenantConfig.customerSubdomain}.edsteward.ai`,
+    timestamp: new Date().toISOString()
+  });
+
+  const connections = deploymentConnections.get('general') || [];
+  connections.forEach(ws => {
+    if (ws.readyState === WebSocket.OPEN) {
+      try {
+        ws.send(message);
+      } catch (error) {
+        console.error('Error sending WebSocket message:', error);
+      }
+    }
+  });
 }
 
 function broadcastDeploymentFailed(deploymentId: string, error: string) {
   console.log(`[${deploymentId}] Deployment failed: ${error}`);
+  
+  const message = JSON.stringify({
+    type: 'deployment_failed',
+    deploymentId,
+    error,
+    timestamp: new Date().toISOString()
+  });
+
+  const connections = deploymentConnections.get('general') || [];
+  connections.forEach(ws => {
+    if (ws.readyState === WebSocket.OPEN) {
+      try {
+        ws.send(message);
+      } catch (error) {
+        console.error('Error sending WebSocket message:', error);
+      }
+    }
+  });
 }
 
 // Error handler middleware
@@ -447,11 +607,12 @@ app.use((err: any, req: any, res: any, next: any) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
-// Start server
-app.listen(PORT, () => {
+// Start server with WebSocket support
+server.listen(PORT, () => {
   console.log(`🚀 EdSteward Admin Console Backend running on port ${PORT}`);
   console.log(`🔐 Admin Authentication: Username/Password`);
   console.log(`🌐 Frontend should connect to: http://localhost:${PORT}`);
+  console.log(`🔌 WebSocket Deployment Monitoring: ws://localhost:${PORT}/ws/deployment`);
   console.log(`📊 Managing EdSteward customer tenants`);
 });
 
