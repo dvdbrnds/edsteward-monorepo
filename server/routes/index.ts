@@ -256,6 +256,66 @@ export function registerRoutes(app: express.Application): Server {
     });
   });
 
+  // Login endpoint
+  app.post('/api/auth/login', async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      
+      if (!email || !password) {
+        return res.status(400).json({ error: 'Email and password required' });
+      }
+
+      // Get user from database using proper storage methods
+      const tenantStorage = getDatabaseStorage();
+      const user = await tenantStorage.getUserByEmail(email);
+      
+      if (!user) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+
+      // Import password verification from auth module
+      const { verifyPassword } = require('../auth');
+      const isValidPassword = await verifyPassword(password, user.password);
+
+      if (!isValidPassword) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+
+      // Set up session
+      req.login(user, (err) => {
+        if (err) {
+          console.error('Login session error:', err);
+          return res.status(500).json({ error: 'Login failed' });
+        }
+
+        res.json({
+          success: true,
+          user: {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+            role: user.role
+          }
+        });
+      });
+
+    } catch (error) {
+      console.error('Login error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // Logout endpoint
+  app.post('/api/auth/logout', (req, res) => {
+    req.logout((err) => {
+      if (err) {
+        console.error('Logout error:', err);
+        return res.status(500).json({ error: 'Logout failed' });
+      }
+      res.json({ success: true, message: 'Logged out successfully' });
+    });
+  });
+
   app.use('/api/uploads', uploadsRoutes);
   app.use('/api/regulations', regulationsRouter);
   app.use('/api/notes', notesRouter);
