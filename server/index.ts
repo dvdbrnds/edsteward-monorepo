@@ -99,9 +99,16 @@ registerRoutes(app);
 // CRITICAL: Direct login endpoint since routes aren't working
 app.post('/api/authenticate', async (req, res) => {
   try {
+    console.log('🔍 Login attempt - Headers:', req.headers);
+    console.log('🔍 Login attempt - Body:', req.body);
+    console.log('🔍 Login attempt - Content-Type:', req.get('Content-Type'));
+    
     const { email, password } = req.body;
     
+    console.log('🔍 Extracted - Email:', email, 'Password:', password ? '[PRESENT]' : '[MISSING]');
+    
     if (!email || !password) {
+      console.log('❌ Missing credentials - Email:', !!email, 'Password:', !!password);
       return res.status(400).json({ error: 'Email and password required' });
     }
 
