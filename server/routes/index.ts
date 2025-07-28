@@ -274,7 +274,7 @@ export function registerRoutes(app: express.Application): Server {
       }
 
       // Import password verification from auth module
-      const { verifyPassword } = require('../auth');
+      const { verifyPassword } = await import('../auth.js');
       const isValidPassword = await verifyPassword(password, user.password);
 
       if (!isValidPassword) {
