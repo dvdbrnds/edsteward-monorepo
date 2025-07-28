@@ -83,6 +83,7 @@ app.use(session({
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
+    sameSite: 'lax', // Required for modern browsers to send cookies
   },
 }));
 
@@ -99,17 +100,10 @@ registerRoutes(app);
 // CRITICAL: Direct login endpoint since routes aren't working
 app.post('/api/authenticate', async (req, res) => {
   try {
-    console.log('🔍 Login attempt - Headers:', req.headers);
-    console.log('🔍 Login attempt - Body:', req.body);
-    console.log('🔍 Login attempt - Content-Type:', req.get('Content-Type'));
-    
     const { email, username, password } = req.body;
     const loginEmail = email || username; // Accept both email and username fields
     
-    console.log('🔍 Extracted - Email:', email, 'Username:', username, 'Login Email:', loginEmail, 'Password:', password ? '[PRESENT]' : '[MISSING]');
-    
     if (!loginEmail || !password) {
-      console.log('❌ Missing credentials - Login Email:', !!loginEmail, 'Password:', !!password);
       return res.status(400).json({ error: 'Email and password required' });
     }
 
