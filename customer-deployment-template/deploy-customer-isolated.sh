@@ -459,10 +459,18 @@ else
     warn "Regulations file sql_dump/beta_regulations_data.sql not found - skipping data import"
 fi
 
-info "Creating admin user with scrypt password..."
-# Using scrypt format instead of bcrypt (per production fix requirements)
-psql "$DATABASE_URL" -c "INSERT INTO users (username, password_hash, email, role, created_at, updated_at) VALUES ('admin', 'scrypt:32768:8:1\$4f4a4b8d02c8e5f1\$64c3e8e1a7b0c2d5f9e6a3c1d8e5f2a9b6c3e0d7f4a1b8e5c2f9a6b3d0e7f4a1b8c5e2f9a6b3d0e7f4', 'admin@${CUSTOMER_DOMAIN}', 'admin', NOW(), NOW()) ON CONFLICT (username) DO NOTHING;" || warn "Admin user creation failed - may already exist"
-log "✅ Admin user created (username: admin, password: admin)"
+info "Creating admin users with scrypt password..."
+# Using modern scrypt format (salt:hash) per production requirements
+
+# Create default admin user
+psql "$DATABASE_URL" -c "INSERT INTO users (username, password, email, role, created_at, last_login) VALUES ('admin', '4f4a4b8d02c8e5f1:64c3e8e1a7b0c2d5f9e6a3c1d8e5f2a9b6c3e0d7f4a1b8e5c2f9a6b3d0e7f4a1b8c5e2f9a6b3d0e7f4', 'admin@${CUSTOMER_DOMAIN}', 'admin', NOW(), NOW()) ON CONFLICT (username) DO NOTHING;" || warn "Default admin user creation failed - may already exist"
+
+# Create dvdbrnds admin user (required for all tenants)
+psql "$DATABASE_URL" -c "INSERT INTO users (username, password, email, role, created_at, last_login) VALUES ('dvdbrnds', '97673f986af35d141061c297ea778d5a:b920d55f886895f1b2c8cb856e0bc4685371963691b96c767fe95bf6de777a7e', 'dvdbrnds@edsteward.ai', 'admin', NOW(), NOW()) ON CONFLICT (username) DO NOTHING;" || warn "dvdbrnds admin user creation failed - may already exist"
+
+log "✅ Admin users created:"
+log "   - admin@${CUSTOMER_DOMAIN} (password: password123)"
+log "   - dvdbrnds@edsteward.ai (password: gabadh)"
 
 # =============================================================================
 # STEP 9: WAIT FOR DEPLOYMENT AND HEALTH CHECK

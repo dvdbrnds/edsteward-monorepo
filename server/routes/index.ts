@@ -185,7 +185,7 @@ export function registerRoutes(app: express.Application): Server {
 
   // Current user endpoint
   app.get('/api/user', (req, res) => {
-    if (!req.isAuthenticated || !req.isAuthenticated()) {
+    if (!req.isAuthenticated()) {
       return res.status(401).json({ error: "Authentication required" });
     }
 
