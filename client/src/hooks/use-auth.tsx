@@ -71,7 +71,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const loginMutation = useMutation({
     mutationFn: async (credentials: LoginData) => {
-      return await apiRequest("POST", "/api/login", credentials);
+      return await apiRequest("POST", "/api/authenticate", credentials);
     },
     onSuccess: (loginResponse: any) => {
       // CRITICAL FIX: Set query data directly to update authentication state immediately
