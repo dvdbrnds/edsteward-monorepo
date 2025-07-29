@@ -1397,7 +1397,7 @@ export class DatabaseStorage implements IStorage {
         const config = {
           institutionName: envBrandingConfig.institutionName || "EdSteward Institution",
           title: envBrandingConfig.title || "EdSteward Compliance Portal",
-          logoUrl: envBrandingConfig.logoUrl || "/assets/generic-logo.svg",
+          logoUrl: envBrandingConfig.logoUrl || "/assets/es-purple-on-white-logo.png",
           faviconUrl: envBrandingConfig.faviconUrl || "/favicon.ico",
           primaryColor: envBrandingConfig.primaryColor || "#1e3a8a",
           secondaryColor: envBrandingConfig.secondaryColor || "#1e40af",
@@ -1442,7 +1442,7 @@ export class DatabaseStorage implements IStorage {
       const defaultConfig = {
         institutionName: "EdSteward Institution",
         title: "EdSteward Compliance Portal",
-        logoUrl: "/assets/generic-logo.svg",
+        logoUrl: "/assets/es-purple-on-white-logo.png",
         faviconUrl: "/favicon.ico",
         primaryColor: "#1e3a8a",
         secondaryColor: "#1e40af",
