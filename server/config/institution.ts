@@ -39,7 +39,7 @@ export const institutionConfig: InstitutionConfig = {
   name: (process.env.INSTITUTION_NAME || 'EdSteward Institution').replace(/_/g, ' '),
   domain: process.env.INSTITUTION_DOMAIN || 'localhost',
   branding: {
-    logo: process.env.INSTITUTION_LOGO_URL || '/assets/es-purple-on-white-logo.png',
+    logo: process.env.INSTITUTION_LOGO_URL || '/assets/es-white-on-purple-logo.png',
     primaryColor: process.env.INSTITUTION_PRIMARY_COLOR || '#0066cc',
     secondaryColor: process.env.INSTITUTION_SECONDARY_COLOR || '#336699',
     favicon: process.env.INSTITUTION_FAVICON_URL || '/favicon.ico',
