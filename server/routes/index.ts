@@ -1,6 +1,7 @@
 import express from "express";
 import { Server } from 'http';
 import { createServer } from 'http';
+
 import { log } from '../vite';
 import { setupAuth } from '../auth';
 import { setupRegulationUpdatesApi } from '../regulation-updates-api';
@@ -448,6 +449,108 @@ export function registerRoutes(app: express.Application): Server {
       success: true,
       institutionConfig: config,
     });
+  });
+
+  // Admin branding endpoints - Only available on admin.edsteward.ai
+  app.get('/api/admin/branding', async (req, res) => {
+    const hostname = req.get('host') || '';
+    if (!hostname.startsWith('admin.')) {
+      return res.status(404).json({ error: 'Admin endpoints not available on this tenant' });
+    }
+    
+    try {
+      const tenantStorage = getDatabaseStorage();
+      const brandingConfig = await tenantStorage.getBrandingConfig();
+
+      res.json({
+        success: true,
+        branding: brandingConfig,
+      });
+    } catch (error) {
+      console.error("Error fetching admin branding config:", error);
+      res.status(500).json({
+        error: "Failed to fetch branding config",
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  app.post('/api/admin/branding', async (req, res) => {
+    const hostname = req.get('host') || '';
+    if (!hostname.startsWith('admin.')) {
+      return res.status(404).json({ error: 'Admin endpoints not available on this tenant' });
+    }
+    
+    try {
+      const tenantStorage = getDatabaseStorage();
+      const brandingConfig = req.body;
+      
+      await tenantStorage.saveBrandingConfig(brandingConfig);
+
+      res.json({
+        success: true,
+        branding: brandingConfig,
+        message: 'Branding configuration saved successfully'
+      });
+    } catch (error) {
+      console.error("Error saving admin branding config:", error);
+      res.status(500).json({
+        error: "Failed to save branding config",
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  // Admin users endpoints - Only available on admin.edsteward.ai
+  app.get('/api/admin/users', async (req, res) => {
+    const hostname = req.get('host') || '';
+    if (!hostname.startsWith('admin.')) {
+      return res.status(404).json({ error: 'Admin endpoints not available on this tenant' });
+    }
+    
+    try {
+      const tenantStorage = getDatabaseStorage();
+      const users = await tenantStorage.getAllUsers();
+
+      res.json(users);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({
+        error: "Failed to fetch users",
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  app.post('/api/admin/reset-password', async (req, res) => {
+    const hostname = req.get('host') || '';
+    if (!hostname.startsWith('admin.')) {
+      return res.status(404).json({ error: 'Admin endpoints not available on this tenant' });
+    }
+    
+    try {
+      const { id } = req.body;
+      if (!id) {
+        return res.status(400).json({ error: 'User ID is required' });
+      }
+
+      const tenantStorage = getDatabaseStorage();
+      const temporaryPassword = Math.random().toString(36).slice(-8);
+      
+      await tenantStorage.updateUser(id, { password: temporaryPassword });
+
+      res.json({
+        success: true,
+        temporaryPassword,
+        message: 'Password reset successfully'
+      });
+    } catch (error) {
+      console.error("Error resetting password:", error);
+      res.status(500).json({
+        error: "Failed to reset password",
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
   });
 
   // ALIAS: Institution endpoint (for compatibility with frontend)
