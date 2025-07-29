@@ -31,7 +31,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useLegacyBranding } from "@/hooks/use-branding";
 
 // Import logos
-import moravianLogo from "@/assets/Screenshot_2025-02-12_at_9.15.57_AM-removebg-preview.png";
+import edStewardLogo from "@/assets/es-white-on-purple-logo.png";
 import genericLogo from "@/assets/generic-logo.svg";
 
 /**
@@ -119,7 +119,7 @@ export default function Navigation() {
                   <button className="flex-shrink-0 flex items-center">
                     <img
                       className="h-8 w-auto"
-                      src={moravianLogo}
+                      src={edStewardLogo}
                       alt={`${branding.name} Logo`}
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
