@@ -309,7 +309,11 @@ export default function Navigation() {
       : []),
     ...(user?.role?.toLowerCase() === "admin"
       ? [
-        { href: "/admin/dashboard", label: "Admin Dashboard", icon: LayoutDashboard },
+        // Admin Dashboard - Only show on admin.edsteward.ai
+        ...(currentTenant === 'admin' 
+          ? [{ href: "/admin/dashboard", label: "Admin Dashboard", icon: LayoutDashboard }]
+          : []
+        ),
         { href: "/admin/settings", label: "System Settings", icon: Settings },
         // AWS Tenant Management - Only show on admin.edsteward.ai
         ...(currentTenant === 'admin' 

@@ -412,8 +412,12 @@ export function registerRoutes(app: express.Application): Server {
     });
   });
 
-  // Admin institution configuration endpoint (for admin dashboard)
+  // Admin institution configuration endpoint (for admin dashboard) - Only available on admin.edsteward.ai
   app.get('/api/admin/institution-config', (req, res) => {
+    const hostname = req.get('host') || '';
+    if (!hostname.startsWith('admin.')) {
+      return res.status(404).json({ error: 'Admin endpoints not available on this tenant' });
+    }
     // Read environment variables dynamically for true customer isolation
     const config = {
       institution: {

@@ -69,7 +69,10 @@ export default function App() {
 
               {/* Protected Routes - Authentication Required */}
               <ProtectedRoute path="/" component={HomePage} />
-              <ProtectedRoute path="/admin/dashboard" component={AdminDashboardPage} />
+              {/* Admin Dashboard - Only available on admin.edsteward.ai */}
+              {currentTenant === 'admin' && (
+                <ProtectedRoute path="/admin/dashboard" component={AdminDashboardPage} />
+              )}
               <ProtectedRoute path="/regulations" component={RegulationsPage} />
               <ProtectedRoute path="/regulations/validate" component={ValidationPage} />
               <ProtectedRoute path="/regulations/updates" component={UpdatesListPage} />
