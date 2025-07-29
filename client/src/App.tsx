@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/hooks/use-auth";
 import { PageLayout } from "@/components/layout/page-layout";
+import { useEffect, useState } from 'react';
 
 import HomePage from "@/pages/home-page";
 import NotFound from "@/pages/not-found";
@@ -28,8 +29,33 @@ import { ProtectedRoute } from "./lib/protected-route";
 import { ProtectedRegulationRoute } from "./lib/protected-regulation-route";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 
+// Tenant detection utility
+function useCurrentTenant() {
+  const [tenant, setTenant] = useState<string | null>(null);
+  
+  useEffect(() => {
+    const hostname = window.location.hostname;
+    
+    if (hostname.startsWith('admin.')) {
+      setTenant('admin');
+    } else if (hostname.startsWith('moravian.')) {
+      setTenant('moravian');
+    } else if (hostname.startsWith('template.')) {
+      setTenant('template');
+    } else if (hostname.startsWith('staging.')) {
+      setTenant('staging');
+    } else {
+      // Default to admin for edsteward.ai or localhost
+      setTenant('admin');
+    }
+  }, []);
+  
+  return tenant;
+}
+
 export default function App() {
   console.log('[App] Initializing single-tenant application');
+  const currentTenant = useCurrentTenant();
 
   return (
     <ErrorBoundary>
@@ -59,7 +85,12 @@ export default function App() {
               />
               <ProtectedRoute path="/reports" component={ReportsPage} />
               <ProtectedRoute path="/admin/settings" component={AdminSettingsPage} />
-              <ProtectedRoute path="/admin/aws-tenant-management" component={AWSTenantsManagementPage} />
+              
+              {/* AWS Tenant Management - Only available on admin.edsteward.ai */}
+              {currentTenant === 'admin' && (
+                <ProtectedRoute path="/admin/aws-tenant-management" component={AWSTenantsManagementPage} />
+              )}
+              
               <ProtectedRoute path="/admin/logs" component={LogsPage} />
               <ProtectedRoute path="/admin/debug" component={DebugToolsPage} />
               <ProtectedRoute path="/admin/regulations" component={RegulationViewer} />

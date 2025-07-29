@@ -269,6 +269,26 @@ export default function Navigation() {
   const [location] = useLocation();
   const [changelogOpen, setChangelogOpen] = useState(false);
   const branding = useLegacyBranding();
+  
+  // Tenant detection for AWS management visibility
+  const [currentTenant, setCurrentTenant] = useState<string | null>(null);
+  
+  useEffect(() => {
+    const hostname = window.location.hostname;
+    
+    if (hostname.startsWith('admin.')) {
+      setCurrentTenant('admin');
+    } else if (hostname.startsWith('moravian.')) {
+      setCurrentTenant('moravian');
+    } else if (hostname.startsWith('template.')) {
+      setCurrentTenant('template');
+    } else if (hostname.startsWith('staging.')) {
+      setCurrentTenant('staging');
+    } else {
+      // Default to admin for edsteward.ai or localhost
+      setCurrentTenant('admin');
+    }
+  }, []);
 
   // Note: Document title is now managed by the useBranding hook
   // No longer needed here as the hook handles title updates
@@ -291,7 +311,11 @@ export default function Navigation() {
       ? [
         { href: "/admin/dashboard", label: "Admin Dashboard", icon: LayoutDashboard },
         { href: "/admin/settings", label: "System Settings", icon: Settings },
-        { href: "/admin/aws-tenant-management", label: "AWS Tenant Management", icon: Server },
+        // AWS Tenant Management - Only show on admin.edsteward.ai
+        ...(currentTenant === 'admin' 
+          ? [{ href: "/admin/aws-tenant-management", label: "AWS Tenant Management", icon: Server }]
+          : []
+        ),
         // System Logs route is available at /admin/logs but hidden from navigation
         // Uncomment the following line to show it in the navigation:
         // { href: "/admin/logs", label: "System Logs", icon: FileText }

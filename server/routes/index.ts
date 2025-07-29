@@ -353,7 +353,16 @@ export function registerRoutes(app: express.Application): Server {
   app.use('/api/deadlines', deadlinesRouter);
   app.use('/api/notifications', notificationsRouter);
 
-  app.use('/api/aws-tenant-management', awsTenantManagementRouter);
+  // AWS Tenant Management - Only available on admin.edsteward.ai
+  app.use('/api/aws-tenant-management', (req, res, next) => {
+    const hostname = req.get('host') || '';
+    if (hostname.startsWith('admin.')) {
+      awsTenantManagementRouter(req, res, next);
+    } else {
+      res.status(404).json({ error: 'AWS tenant management only available on admin.edsteward.ai' });
+    }
+  });
+  
   app.use('/api/database-migration', migrationRoutes);
 
   // Register debug routes (no auth required for debugging)
