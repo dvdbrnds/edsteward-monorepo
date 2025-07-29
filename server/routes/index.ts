@@ -360,7 +360,7 @@ export function registerRoutes(app: express.Application): Server {
     if (hostname.startsWith('admin.')) {
       awsTenantManagementRouter(req, res, next);
     } else {
-      res.status(404).json({ error: 'AWS tenant management only available on admin.edsteward.ai' });
+      res.status(403).json({ error: 'AWS tenant management only available on admin.edsteward.ai' });
     }
   });
   
@@ -417,7 +417,7 @@ export function registerRoutes(app: express.Application): Server {
   app.get('/api/admin/institution-config', (req, res) => {
     const hostname = req.get('host') || '';
     if (!hostname.startsWith('admin.')) {
-      return res.status(404).json({ error: 'Admin endpoints not available on this tenant' });
+      return res.status(403).json({ error: 'Admin endpoints not available on this tenant' });
     }
     // Read environment variables dynamically for true customer isolation
     const config = {
@@ -455,7 +455,7 @@ export function registerRoutes(app: express.Application): Server {
   app.get('/api/admin/branding', async (req, res) => {
     const hostname = req.get('host') || '';
     if (!hostname.startsWith('admin.')) {
-      return res.status(404).json({ error: 'Admin endpoints not available on this tenant' });
+      return res.status(403).json({ error: 'Admin endpoints not available on this tenant' });
     }
     
     try {
@@ -478,7 +478,7 @@ export function registerRoutes(app: express.Application): Server {
   app.post('/api/admin/branding', async (req, res) => {
     const hostname = req.get('host') || '';
     if (!hostname.startsWith('admin.')) {
-      return res.status(404).json({ error: 'Admin endpoints not available on this tenant' });
+      return res.status(403).json({ error: 'Admin endpoints not available on this tenant' });
     }
     
     try {
@@ -505,7 +505,7 @@ export function registerRoutes(app: express.Application): Server {
   app.get('/api/admin/users', async (req, res) => {
     const hostname = req.get('host') || '';
     if (!hostname.startsWith('admin.')) {
-      return res.status(404).json({ error: 'Admin endpoints not available on this tenant' });
+      return res.status(403).json({ error: 'Admin endpoints not available on this tenant' });
     }
     
     try {
@@ -525,7 +525,7 @@ export function registerRoutes(app: express.Application): Server {
   app.post('/api/admin/reset-password', async (req, res) => {
     const hostname = req.get('host') || '';
     if (!hostname.startsWith('admin.')) {
-      return res.status(404).json({ error: 'Admin endpoints not available on this tenant' });
+      return res.status(403).json({ error: 'Admin endpoints not available on this tenant' });
     }
     
     try {
