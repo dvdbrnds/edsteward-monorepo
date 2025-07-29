@@ -10,6 +10,7 @@ import { setupMCPIntegrationApi } from '../mcp-integration-api';
 import { initializeDatabase } from '../db-init';
 import { storage } from '../storage';
 import { getDatabaseStorage } from '../services/database';
+import { syslog, LogLevel, LogFacility } from '../services/syslog';
 import path from 'path';
 import { institutionConfig } from '../config/institution';
 
@@ -338,12 +339,51 @@ export function registerRoutes(app: express.Application): Server {
   });
 
   // Logout endpoint
-  app.post('/api/auth/logout', (req, res) => {
-    req.logout((err) => {
+  app.post('/api/auth/logout', async (req, res) => {
+    const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
+    const userAgent = req.get('User-Agent') || 'unknown';
+    const user = req.user as any; // Get user info before logout
+    
+    req.logout(async (err) => {
       if (err) {
+        // Log logout error
+        await syslog.log(
+          LogFacility.AUTH,
+          LogLevel.ERROR,
+          `Logout error for user: ${user?.email || 'unknown'}`,
+          {
+            id: 'auth-logout-error',
+            parameters: {
+              email: user?.email || 'unknown',
+              username: user?.username || 'unknown',
+              ip: clientIp,
+              userAgent,
+              error: err.message,
+              reason: 'logout_error'
+            }
+          }
+        );
         console.error('Logout error:', err);
         return res.status(500).json({ error: 'Logout failed' });
       }
+      
+      // Log successful logout
+      await syslog.log(
+        LogFacility.AUTH,
+        LogLevel.INFO,
+        `Successful logout for user: ${user?.email || 'unknown'}`,
+        {
+          id: 'auth-logout-success',
+          parameters: {
+            email: user?.email || 'unknown',
+            username: user?.username || 'unknown',
+            userId: user?.id || 'unknown',
+            ip: clientIp,
+            userAgent
+          }
+        }
+      );
+      
       res.json({ success: true, message: 'Logged out successfully' });
     });
   });
@@ -694,8 +734,25 @@ export function registerRoutes(app: express.Application): Server {
   app.post('/api/login', async (req, res) => {
     try {
       const { email, password } = req.body;
+      const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
+      const userAgent = req.get('User-Agent') || 'unknown';
       
       if (!email || !password) {
+        // Log failed login attempt - missing credentials
+        await syslog.log(
+          LogFacility.AUTH,
+          LogLevel.WARNING,
+          `Login attempt with missing credentials`,
+          {
+            id: 'auth-missing-creds',
+            parameters: {
+              email: email || 'missing',
+              ip: clientIp,
+              userAgent,
+              reason: 'missing_credentials'
+            }
+          }
+        );
         return res.status(400).json({ error: 'Email and password required' });
       }
 
@@ -703,6 +760,21 @@ export function registerRoutes(app: express.Application): Server {
       const user = await tenantStorage.getUserByEmail(email);
       
       if (!user) {
+        // Log failed login attempt - user not found
+        await syslog.log(
+          LogFacility.AUTH,
+          LogLevel.WARNING,
+          `Login attempt for non-existent user: ${email}`,
+          {
+            id: 'auth-user-not-found',
+            parameters: {
+              email,
+              ip: clientIp,
+              userAgent,
+              reason: 'user_not_found'
+            }
+          }
+        );
         return res.status(401).json({ error: 'Invalid credentials' });
       }
 
@@ -713,6 +785,22 @@ export function registerRoutes(app: express.Application): Server {
       
       const [salt, hash] = user.password.split(':');
       if (!salt || !hash) {
+        // Log failed login attempt - invalid password format
+        await syslog.log(
+          LogFacility.AUTH,
+          LogLevel.ERROR,
+          `Login attempt for user with invalid password format: ${email}`,
+          {
+            id: 'auth-invalid-password-format',
+            parameters: {
+              email,
+              username: user.username,
+              ip: clientIp,
+              userAgent,
+              reason: 'invalid_password_format'
+            }
+          }
+        );
         return res.status(401).json({ error: 'Invalid credentials' });
       }
       
@@ -721,13 +809,64 @@ export function registerRoutes(app: express.Application): Server {
       const isValidPassword = crypto.timingSafeEqual(derivedKey, storedKey);
 
       if (!isValidPassword) {
+        // Log failed login attempt - wrong password
+        await syslog.log(
+          LogFacility.AUTH,
+          LogLevel.WARNING,
+          `Failed login attempt for user: ${email}`,
+          {
+            id: 'auth-wrong-password',
+            parameters: {
+              email,
+              username: user.username,
+              ip: clientIp,
+              userAgent,
+              reason: 'wrong_password'
+            }
+          }
+        );
         return res.status(401).json({ error: 'Invalid credentials' });
       }
 
-      req.login(user, (err) => {
+      req.login(user, async (err) => {
         if (err) {
+          // Log login session error
+          await syslog.log(
+            LogFacility.AUTH,
+            LogLevel.ERROR,
+            `Login session error for user: ${email}`,
+            {
+              id: 'auth-session-error',
+              parameters: {
+                email,
+                username: user.username,
+                ip: clientIp,
+                userAgent,
+                error: err.message,
+                reason: 'session_error'
+              }
+            }
+          );
           return res.status(500).json({ error: 'Login failed' });
         }
+
+        // Log successful login
+        await syslog.log(
+          LogFacility.AUTH,
+          LogLevel.INFO,
+          `Successful login for user: ${email}`,
+          {
+            id: 'auth-login-success',
+            parameters: {
+              email,
+              username: user.username,
+              userId: user.id,
+              role: user.role,
+              ip: clientIp,
+              userAgent
+            }
+          }
+        );
 
         res.json({
           success: true,
@@ -742,6 +881,24 @@ export function registerRoutes(app: express.Application): Server {
 
     } catch (error) {
       console.error('Login error:', error);
+      const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
+      const userAgent = req.get('User-Agent') || 'unknown';
+      
+      // Log system error during login
+      await syslog.log(
+        LogFacility.AUTH,
+        LogLevel.ERROR,
+        `System error during login attempt`,
+        {
+          id: 'auth-system-error',
+          parameters: {
+            ip: clientIp,
+            userAgent,
+            error: error instanceof Error ? error.message : String(error),
+            reason: 'system_error'
+          }
+        }
+      );
       res.status(500).json({ error: 'Internal server error' });
     }
   });
