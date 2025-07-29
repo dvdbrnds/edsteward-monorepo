@@ -533,6 +533,110 @@ export function registerRoutes(app: express.Application): Server {
     }
   });
 
+  // Admin logs endpoint - Available to all tenants for their own system logs
+  app.get('/api/admin/logs', async (req, res) => {
+    try {
+      const { systemLogs } = await import('@shared/schema');
+      const { desc, eq, gte, lte, ilike, count } = await import('drizzle-orm');
+      const { db } = await import('../db');
+      
+      const { search, level, facility, startDate, endDate, page = 1 } = req.query;
+      const limit = 50;
+      const offset = (parseInt(page as string) - 1) * limit;
+
+      // Build conditions array
+      let conditions: any[] = [];
+
+      if (search) {
+        conditions.push(ilike(systemLogs.message, `%${search}%`));
+      }
+
+      if (level && level !== 'all') {
+        conditions.push(eq(systemLogs.severity, parseInt(level as string)));
+      }
+
+      if (facility && facility !== 'all') {
+        conditions.push(eq(systemLogs.facility, parseInt(facility as string)));
+      }
+
+      if (startDate) {
+        conditions.push(gte(systemLogs.timestamp, new Date(startDate as string)));
+      }
+
+      if (endDate) {
+        conditions.push(lte(systemLogs.timestamp, new Date(endDate as string)));
+      }
+
+      // Get total count for pagination
+      const totalCountResult = await db
+        .select({ count: count() })
+        .from(systemLogs)
+        .where(conditions.length > 0 ? conditions.reduce((acc, condition) => acc && condition) : undefined);
+      
+      const totalLogs = totalCountResult[0]?.count || 0;
+      const totalPages = Math.ceil(totalLogs / limit);
+
+      // Fetch logs with filters and pagination
+      const logs = await db
+        .select({
+          id: systemLogs.id,
+          timestamp: systemLogs.timestamp,
+          facility: systemLogs.facility,
+          severity: systemLogs.severity,
+          hostname: systemLogs.hostname,
+          appName: systemLogs.appName,
+          procId: systemLogs.procId,
+          msgId: systemLogs.msgId,
+          message: systemLogs.message,
+          structuredData: systemLogs.structuredData
+        })
+        .from(systemLogs)
+        .where(conditions.length > 0 ? conditions.reduce((acc, condition) => acc && condition) : undefined)
+        .orderBy(desc(systemLogs.timestamp))
+        .limit(limit)
+        .offset(offset);
+
+      // Format logs for frontend consumption
+      const formattedLogs = logs.map(log => ({
+        id: log.id,
+        timestamp: log.timestamp,
+        facility: log.facility,
+        severity: log.severity,
+        hostname: log.hostname,
+        appName: log.appName,
+        procId: log.procId,
+        msgId: log.msgId,
+        message: log.message,
+        structuredData: log.structuredData,
+        // Extract user information from structured data if available
+        username: (log.structuredData as any)?.username || 'system',
+        ip: (log.structuredData as any)?.ip || '-',
+        userAgent: (log.structuredData as any)?.userAgent || '-'
+      }));
+
+      res.json({
+        success: true,
+        logs: formattedLogs,
+        pagination: {
+          page: parseInt(page as string),
+          limit,
+          totalLogs,
+          totalPages
+        },
+        total: totalLogs,
+        totalPages
+      });
+
+    } catch (error) {
+      console.error("Error fetching logs:", error);
+      res.status(500).json({
+        success: false,
+        error: "Failed to fetch logs",
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
   // ALIAS: Institution endpoint (for compatibility with frontend)
   app.get('/api/institution', (req, res) => {
     // Read environment variables dynamically for true customer isolation
