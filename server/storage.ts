@@ -1399,13 +1399,13 @@ export class DatabaseStorage implements IStorage {
           title: envBrandingConfig.title || "EdSteward Compliance Portal",
           logoUrl: envBrandingConfig.logoUrl || "/assets/es-white-on-purple-logo.png",
           faviconUrl: envBrandingConfig.faviconUrl || "/favicon.ico",
-          primaryColor: envBrandingConfig.primaryColor || "#1e3a8a",
+          primaryColor: envBrandingConfig.primaryColor || "#3d1a5a",
           secondaryColor: envBrandingConfig.secondaryColor || "#1e40af",
           accentColor: envBrandingConfig.accentColor || "#3b82f6",
           loginScreenBackgroundColor: envBrandingConfig.loginScreenBackgroundColor || "#f8fafc",
-          loginScreenAccentColor: envBrandingConfig.loginScreenAccentColor || "#1e3a8a",
+          loginScreenAccentColor: envBrandingConfig.loginScreenAccentColor || "#3d1a5a",
           loginScreenTextColor: envBrandingConfig.loginScreenTextColor || "#1f2937",
-          loginScreenHeroColor: envBrandingConfig.loginScreenHeroColor || "#002147",
+          loginScreenHeroColor: envBrandingConfig.loginScreenHeroColor || "#3d1a5a",
         };
 
         console.log(`🎨 Using environment-based branding config: ${config.institutionName}`);
@@ -1444,13 +1444,13 @@ export class DatabaseStorage implements IStorage {
         title: "EdSteward Compliance Portal",
         logoUrl: "/assets/es-white-on-purple-logo.png",
         faviconUrl: "/favicon.ico",
-        primaryColor: "#1e3a8a",
+        primaryColor: "#3d1a5a",
         secondaryColor: "#1e40af",
         accentColor: "#3b82f6",
         loginScreenBackgroundColor: "#f8fafc",
-        loginScreenAccentColor: "#1e3a8a",
+        loginScreenAccentColor: "#3d1a5a",
         loginScreenTextColor: "#1f2937",
-        loginScreenHeroColor: "#002147",
+        loginScreenHeroColor: "#3d1a5a",
       };
 
       console.log(`🎨 Using default branding config: ${defaultConfig.institutionName}`);
