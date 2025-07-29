@@ -87,6 +87,8 @@ export default function App() {
                 component={ComplianceWizardPage}
               />
               <ProtectedRoute path="/reports" component={ReportsPage} />
+              
+              {/* System Settings - Available to all tenants */}
               <ProtectedRoute path="/admin/settings" component={AdminSettingsPage} />
               
               {/* AWS Tenant Management - Only available on admin.edsteward.ai */}
