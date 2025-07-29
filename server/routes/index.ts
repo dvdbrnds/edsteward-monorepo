@@ -451,13 +451,8 @@ export function registerRoutes(app: express.Application): Server {
     });
   });
 
-  // Admin branding endpoints - Only available on admin.edsteward.ai
+  // Tenant branding endpoints - Available to all tenants for their own branding
   app.get('/api/admin/branding', async (req, res) => {
-    const hostname = req.get('host') || '';
-    if (!hostname.startsWith('admin.')) {
-      return res.status(403).json({ error: 'Admin endpoints not available on this tenant' });
-    }
-    
     try {
       const tenantStorage = getDatabaseStorage();
       const brandingConfig = await tenantStorage.getBrandingConfig();
@@ -467,7 +462,7 @@ export function registerRoutes(app: express.Application): Server {
         branding: brandingConfig,
       });
     } catch (error) {
-      console.error("Error fetching admin branding config:", error);
+      console.error("Error fetching tenant branding config:", error);
       res.status(500).json({
         error: "Failed to fetch branding config",
         details: error instanceof Error ? error.message : String(error)
@@ -476,11 +471,6 @@ export function registerRoutes(app: express.Application): Server {
   });
 
   app.post('/api/admin/branding', async (req, res) => {
-    const hostname = req.get('host') || '';
-    if (!hostname.startsWith('admin.')) {
-      return res.status(403).json({ error: 'Admin endpoints not available on this tenant' });
-    }
-    
     try {
       const tenantStorage = getDatabaseStorage();
       const brandingConfig = req.body;
@@ -493,7 +483,7 @@ export function registerRoutes(app: express.Application): Server {
         message: 'Branding configuration saved successfully'
       });
     } catch (error) {
-      console.error("Error saving admin branding config:", error);
+      console.error("Error saving tenant branding config:", error);
       res.status(500).json({
         error: "Failed to save branding config",
         details: error instanceof Error ? error.message : String(error)
@@ -501,13 +491,8 @@ export function registerRoutes(app: express.Application): Server {
     }
   });
 
-  // Admin users endpoints - Only available on admin.edsteward.ai
+  // Tenant user management endpoints - Available to all tenants for their own users
   app.get('/api/admin/users', async (req, res) => {
-    const hostname = req.get('host') || '';
-    if (!hostname.startsWith('admin.')) {
-      return res.status(403).json({ error: 'Admin endpoints not available on this tenant' });
-    }
-    
     try {
       const tenantStorage = getDatabaseStorage();
       const users = await tenantStorage.getAllUsers();
@@ -523,11 +508,6 @@ export function registerRoutes(app: express.Application): Server {
   });
 
   app.post('/api/admin/reset-password', async (req, res) => {
-    const hostname = req.get('host') || '';
-    if (!hostname.startsWith('admin.')) {
-      return res.status(403).json({ error: 'Admin endpoints not available on this tenant' });
-    }
-    
     try {
       const { id } = req.body;
       if (!id) {
