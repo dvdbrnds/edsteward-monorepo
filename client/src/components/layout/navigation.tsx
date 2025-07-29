@@ -12,8 +12,6 @@ import { apiRequest } from "@/lib/queryClient";
 import { useState, useEffect } from "react";
 import {
   LayoutDashboard,
-  Book,
-  Bell,
   FileText,
   LogOut,
   Loader2,
@@ -21,13 +19,6 @@ import {
   Settings,
   Server,
 } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,217 +35,6 @@ import moravianLogo from "@/assets/Screenshot_2025-02-12_at_9.15.57_AM-removebg-
 import genericLogo from "@/assets/generic-logo.svg";
 
 /**
- * @constant CHANGELOG
- * @description Version history and feature changelog for the application
- * @type {Array<{version: string, date: string, changes: string[]}>}
- */
-const CHANGELOG = [
-  {
-    version: "0.3.2",
-    date: "March 21, 2025",
-    changes: [
-      "Added regulation timeline visualization for tracking regulation history",
-      "Implemented evidence file preview functionality",
-      "Enhanced regulation detail page with historical version tracking",
-      "Improved user interface for compliance status indicators",
-      "Fixed various display issues in timeline components"
-    ],
-  },
-  {
-    version: "0.3.1",
-    date: "March 15, 2025",
-    changes: [
-      "Fixed regulation detail page cards missing due to component version mismatch",
-      "Consolidated regulation detail components into single source",
-      "Restored complete set of information cards including Agency Information and Timeline",
-      "Enhanced card layout and organization for better readability"
-    ],
-  },
-  {
-    version: "0.3.0",
-    date: "March 15, 2025",
-    changes: [
-      "Redesigned regulations list for improved readability",
-      "Added Directly Responsible Office (DRO) column",
-      "Optimized column ordering for better user experience",
-      "Enhanced ID number search functionality",
-      "Improved status visualization with streamlined layout"
-    ],
-  },
-  {
-    version: "0.2.9",
-    date: "March 15, 2025",
-    changes: [
-      "Enhanced action icons with improved color psychology",
-      "Bug Fixes"
-    ],
-  },
-  {
-    version: "0.2.8",
-    date: "March 14, 2025",
-    changes: [
-      "Added hover preview functionality for evidence files",
-      "Enhanced evidence files display with uploader information",
-      "Bug Fixes"
-    ],
-  },
-  {
-    version: "0.2.7",
-    date: "March 12, 2025",
-    changes: [
-      "Enhanced PA regulation collector with improved error handling",
-      "Bug Fixes"
-    ],
-  },
-  {
-    version: "0.2.6",
-    date: "March 12, 2025",
-    changes: [
-      "Added dedicated endpoint for updating regulation categories",
-      "Bug Fixes"
-    ],
-  },
-  {
-    version: "0.2.5",
-    date: "March 4, 2025",
-    changes: [
-      "Added CSV export functionality to system logs",
-      "Enhanced system logs display with improved formatting",
-      "Replaced comments with comprehensive diary functionality",
-      "Bug Fixes"
-    ],
-  },
-  {
-    version: "0.2.4",
-    date: "February 27, 2025",
-    changes: [
-      "Added comprehensive JSDoc documentation",
-      "Bug Fixes"
-    ],
-  },
-  {
-    version: "0.2.3",
-    date: "February 27, 2025",
-    changes: [
-      "Enhanced user management in admin settings",
-      "Added password reset functionality",
-      "Bug Fixes"
-    ],
-  },
-  {
-    version: "0.2.2",
-    date: "February 24, 2025",
-    changes: [
-      "Added interactive health score dashboard",
-      "Implemented dynamic circular progress indicators",
-      "Enhanced category breakdown visualization"
-    ],
-  },
-  {
-    version: "0.2.1",
-    date: "February 24, 2025",
-    changes: [
-      "Added jurisdiction filtering for regulations",
-      "Implemented sortable columns in regulations table",
-      "Bug Fixes"
-    ],
-  },
-  {
-    version: "0.2.0",
-    date: "February 21, 2025",
-    changes: [
-      "Added comprehensive submission guidelines system",
-      "Enhanced compliance wizard with category requirements",
-      "Added regulation-specific notification override",
-      "Improved deadline tracking visualization"
-    ],
-  },
-  {
-    version: "0.1.9",
-    date: "February 21, 2025",
-    changes: [
-      "Updated pie chart colors with distinct color scheme",
-      "Bug Fixes"
-    ],
-  },
-  {
-    version: "0.1.8",
-    date: "February 20, 2025",
-    changes: [
-      "Updated setup wizard to focus on compliance offices",
-      "Added support for department distribution lists",
-      "Bug Fixes"
-    ],
-  },
-  {
-    version: "0.1.7",
-    date: "February 20, 2025",
-    changes: [
-      "Moved notification controls to Admin Settings",
-      "Added Recent Notifications card to dashboard",
-      "Enhanced notification management workflow"
-    ],
-  },
-  {
-    version: "0.1.6",
-    date: "February 18, 2025",
-    changes: [
-      "Improved regulation title display in Upcoming Deadlines",
-      "Added combined view of regulation IDs and topics"
-    ],
-  },
-  {
-    version: "0.1.5",
-    date: "February 18, 2025",
-    changes: [
-      "Bug Fixes"
-    ],
-  },
-  {
-    version: "0.1.4",
-    date: "February 18, 2025",
-    changes: [
-      "Added in-platform submission guide feature",
-      "Integrated guide system with markdown support",
-      "Bug Fixes"
-    ],
-  },
-  {
-    version: "0.1.3",
-    date: "February 18, 2025",
-    changes: [
-      "Bug Fixes"
-    ],
-  },
-  {
-    version: "0.1.2",
-    date: "February 18, 2025",
-    changes: [
-      "Bug Fixes"
-    ],
-  },
-  {
-    version: "0.1.1",
-    date: "February 18, 2025",
-    changes: [
-      "Added changelog tracking system",
-      "Bug Fixes"
-    ],
-  },
-  {
-    version: "0.1.0",
-    date: "February 12, 2025",
-    changes: [
-      "Initial alpha release",
-      "Core authentication system",
-      "Basic compliance tracking",
-      "Department-specific views",
-      "Responsive design implementation"
-    ],
-  },
-] as const;
-
-/**
  * @component Navigation
  * @description Main navigation component with role-based access control
  * @returns {JSX.Element} The rendered navigation bar
@@ -267,7 +47,6 @@ const CHANGELOG = [
 export default function Navigation() {
   const { user, logoutMutation } = useAuth();
   const [location] = useLocation();
-  const [changelogOpen, setChangelogOpen] = useState(false);
   const branding = useLegacyBranding();
   
   // Tenant detection for AWS management visibility
@@ -293,7 +72,7 @@ export default function Navigation() {
   // Note: Document title is now managed by the useBranding hook
   // No longer needed here as the hook handles title updates
 
-  const { data: _setupComplete } = useQuery({
+  useQuery({
     queryKey: ["/api/setup/status"],
     queryFn: async () => {
       return await apiRequest("GET", "/api/setup/status");
@@ -337,55 +116,22 @@ export default function Navigation() {
             <div className="flex-shrink-0 flex items-center">
               <div className="flex items-center">
                 <Link href="/">
-                  <button className="flex items-center focus:outline-none">
+                  <button className="flex-shrink-0 flex items-center">
                     <img
-                      src={branding.logo}
+                      className="h-8 w-auto"
+                      src={moravianLogo}
                       alt={`${branding.name} Logo`}
-                      className="h-8 hover:opacity-80 transition-opacity"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = genericLogo;
+                      }}
                     />
+
                     <span className="text-xl font-bold text-white hover:text-gray-200 transition-colors ml-3">
                       Compliance Portal
                     </span>
                   </button>
                 </Link>
-                <Dialog open={changelogOpen} onOpenChange={setChangelogOpen}>
-                  <DialogTrigger asChild>
-                    <button
-                      className="text-xs text-gray-300 ml-2 hover:text-white transition-colors"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        setChangelogOpen(true);
-                      }}
-                    >
-                      Alpha v0.3.2
-                    </button>
-                  </DialogTrigger>
-                  <DialogContent className="max-h-[80vh] overflow-y-auto">
-                    <DialogHeader>
-                      <DialogTitle>Changelog</DialogTitle>
-                    </DialogHeader>
-                    <div className="space-y-6 pr-2">
-                      {CHANGELOG.map((release) => (
-                        <div key={release.version} className="pb-4">
-                          <h3 className="text-lg font-semibold flex items-center gap-2 sticky top-0 bg-background pt-2">
-                            v{release.version}
-                            <span className="text-sm font-normal text-gray-500">
-                              {release.date}
-                            </span>
-                          </h3>
-                          <ul className="mt-2 list-disc list-inside space-y-1">
-                            {release.changes.map((change, idx) => (
-                              <li key={idx} className="text-sm text-gray-600 pl-2">
-                                {change}
-                              </li>
-                            ))}
-                          </ul>
-                        </div>
-                      ))}
-                    </div>
-                  </DialogContent>
-                </Dialog>
               </div>
             </div>
 
