@@ -1,81 +1,39 @@
 {
   "name": "MCP Engine Development Container",
   "image": "mcr.microsoft.com/devcontainers/javascript-node:18",
-  "features": {
-    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
-  },
-  "forwardPorts": [3002, 3010, 3050, 5432, 6379, 8083, 9092],
+  "forwardPorts": [3002, 3010, 3050],
   "portsAttributes": {
     "3002": {
       "label": "LLM Gateway",
       "onAutoForward": "notify"
     },
     "3010": {
-      "label": "Registry API",
+      "label": "Registry API", 
       "onAutoForward": "notify"
     },
     "3050": {
       "label": "Frontend",
       "onAutoForward": "notify"
-    },
-    "5432": {
-      "label": "PostgreSQL",
-      "onAutoForward": "silent"
-    },
-    "6379": {
-      "label": "Redis",
-      "onAutoForward": "silent"
-    },
-    "8083": {
-      "label": "Debezium",
-      "onAutoForward": "silent"
-    },
-    "9092": {
-      "label": "Kafka",
-      "onAutoForward": "silent"
     }
   },
-  "onCreateCommand": "sudo apt-get update && sudo apt-get install -y curl git vim htop tree jq postgresql-client redis-tools bc netcat-openbsd && sudo npm install -g nodemon pm2 eslint prettier parcel",
-  "postCreateCommand": "chmod +x .devcontainer/*.sh && ./.devcontainer/setup-mcp.sh",
-  "postStartCommand": "./.devcontainer/monitor-processes.sh",
+  "postCreateCommand": "npm install",
   "customizations": {
     "vscode": {
       "extensions": [
         "ms-vscode.vscode-typescript-next",
         "esbenp.prettier-vscode",
         "ms-vscode.vscode-eslint",
-        "bradlc.vscode-tailwindcss",
-        "ms-vscode.vscode-json",
-        "ms-python.python",
-        "ms-vscode.remote-containers",
-        "GitHub.copilot",
-        "ms-vscode.remote-ssh"
+        "ms-vscode.vscode-json"
       ],
       "settings": {
-        "terminal.integrated.defaultProfile.linux": "bash",
         "editor.formatOnSave": true,
         "editor.codeActionsOnSave": {
           "source.fixAll.eslint": true
-        },
-        "typescript.preferences.importModuleSpecifier": "relative",
-        "javascript.preferences.importModuleSpecifier": "relative",
-        "files.exclude": {
-          "**/node_modules": true,
-          "**/.git": true,
-          "**/.DS_Store": true,
-          "**/dist": true,
-          "**/build": true,
-          "**/.parcel-cache": true
         }
       }
     }
   },
-  "mounts": [
-    "source=${localWorkspaceFolder}/.cursor,target=/home/vscode/.cursor,type=bind,consistency=cached"
-  ],
-  "remoteUser": "vscode",
-  "workspaceFolder": "/workspace",
-  "shutdownAction": "stopContainer"
+  "remoteUser": "vscode"
 }
 
 
