@@ -1,39 +1,6 @@
 {
-  "name": "MCP Engine Development Container",
-  "image": "mcr.microsoft.com/devcontainers/javascript-node:18",
-  "forwardPorts": [3002, 3010, 3050],
-  "portsAttributes": {
-    "3002": {
-      "label": "LLM Gateway",
-      "onAutoForward": "notify"
-    },
-    "3010": {
-      "label": "Registry API", 
-      "onAutoForward": "notify"
-    },
-    "3050": {
-      "label": "Frontend",
-      "onAutoForward": "notify"
-    }
-  },
-  "postCreateCommand": "npm install",
-  "customizations": {
-    "vscode": {
-      "extensions": [
-        "ms-vscode.vscode-typescript-next",
-        "esbenp.prettier-vscode",
-        "ms-vscode.vscode-eslint",
-        "ms-vscode.vscode-json"
-      ],
-      "settings": {
-        "editor.formatOnSave": true,
-        "editor.codeActionsOnSave": {
-          "source.fixAll.eslint": true
-        }
-      }
-    }
-  },
-  "remoteUser": "vscode"
+  "name": "MCP Engine",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:18"
 }
 
 
