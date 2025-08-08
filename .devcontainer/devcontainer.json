@@ -1,14 +1,8 @@
 {
   "name": "MCP Engine Development Container",
-  "build": {
-    "dockerfile": "Dockerfile"
-  },
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:18",
   "features": {
-    "ghcr.io/devcontainers/features/node:1": {
-      "version": "18"
-    },
-    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {},
-    "ghcr.io/devcontainers/features/git:1": {}
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
   },
   "forwardPorts": [3002, 3010, 3050, 5432, 6379, 8083, 9092],
   "portsAttributes": {
@@ -41,8 +35,9 @@
       "onAutoForward": "silent"
     }
   },
-  "postCreateCommand": ".devcontainer/setup-mcp.sh",
-  "postStartCommand": ".devcontainer/monitor-processes.sh",
+  "onCreateCommand": "sudo apt-get update && sudo apt-get install -y curl git vim htop tree jq postgresql-client redis-tools bc netcat-openbsd && sudo npm install -g nodemon pm2 eslint prettier parcel",
+  "postCreateCommand": "chmod +x .devcontainer/*.sh && ./.devcontainer/setup-mcp.sh",
+  "postStartCommand": "./.devcontainer/monitor-processes.sh",
   "customizations": {
     "vscode": {
       "extensions": [

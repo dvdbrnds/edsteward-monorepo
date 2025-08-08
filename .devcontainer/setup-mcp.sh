@@ -16,10 +16,17 @@ mkdir -p /home/vscode/.cursor
 mkdir -p logs
 mkdir -p data
 
-# Set proper permissions
-sudo chown -R vscode:vscode /home/vscode/.cursor
-sudo chown -R vscode:vscode /workspace/logs
-sudo chown -R vscode:vscode /workspace/data
+# Set proper permissions (if we have sudo access)
+if command -v sudo >/dev/null 2>&1; then
+    sudo chown -R vscode:vscode /home/vscode/.cursor 2>/dev/null || true
+    sudo chown -R vscode:vscode /workspace/logs 2>/dev/null || true
+    sudo chown -R vscode:vscode /workspace/data 2>/dev/null || true
+else
+    # Fallback for when we don't have sudo
+    chown -R vscode:vscode /home/vscode/.cursor 2>/dev/null || true
+    chown -R vscode:vscode /workspace/logs 2>/dev/null || true
+    chown -R vscode:vscode /workspace/data 2>/dev/null || true
+fi
 
 # Install project dependencies if not already installed
 if [ ! -d "node_modules" ]; then
@@ -77,8 +84,12 @@ cat > /home/vscode/.cursor/mcp.json << 'EOF'
 EOF
 
 # Set proper permissions on MCP config
-sudo chown vscode:vscode /home/vscode/.cursor/mcp.json
-chmod 644 /home/vscode/.cursor/mcp.json
+if command -v sudo >/dev/null 2>&1; then
+    sudo chown vscode:vscode /home/vscode/.cursor/mcp.json 2>/dev/null || true
+else
+    chown vscode:vscode /home/vscode/.cursor/mcp.json 2>/dev/null || true
+fi
+chmod 644 /home/vscode/.cursor/mcp.json 2>/dev/null || true
 
 # Create environment file if it doesn't exist
 if [ ! -f ".env" ]; then
