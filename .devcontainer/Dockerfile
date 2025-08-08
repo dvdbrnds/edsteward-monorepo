@@ -11,6 +11,8 @@ RUN apt-get update && apt-get install -y \
     jq \
     postgresql-client \
     redis-tools \
+    bc \
+    netcat-openbsd \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
@@ -18,30 +20,26 @@ RUN apt-get update && apt-get install -y \
 RUN npm install -g \
     nodemon \
     pm2 \
-    @parcel/bundler \
     eslint \
-    prettier
+    prettier \
+    parcel
 
-# Set up workspace
-WORKDIR /workspace
-
-# Copy package files for dependency installation
-COPY package*.json ./
-
-# Install project dependencies
-RUN npm install
-
-# Create necessary directories
-RUN mkdir -p /home/vscode/.cursor \
-    && mkdir -p /workspace/logs \
+# Create necessary directories with proper permissions
+RUN mkdir -p /workspace/logs \
     && mkdir -p /workspace/data \
-    && chown -R vscode:vscode /home/vscode/.cursor \
+    && mkdir -p /home/vscode/.cursor \
+    && chown -R vscode:vscode /home/vscode \
     && chown -R vscode:vscode /workspace
-
-# Switch to vscode user
-USER vscode
 
 # Set environment variables
 ENV NODE_ENV=development
 ENV MCP_ENVIRONMENT=devcontainer
 ENV PATH="/home/vscode/.local/bin:$PATH"
+
+# Set workspace as working directory
+WORKDIR /workspace
+
+# Switch to vscode user
+USER vscode
+
+

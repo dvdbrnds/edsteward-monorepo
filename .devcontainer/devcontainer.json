@@ -1,8 +1,7 @@
 {
   "name": "MCP Engine Development Container",
   "build": {
-    "dockerfile": "Dockerfile",
-    "context": ".."
+    "dockerfile": "Dockerfile"
   },
   "features": {
     "ghcr.io/devcontainers/features/node:1": {
@@ -83,3 +82,5 @@
   "workspaceFolder": "/workspace",
   "shutdownAction": "stopContainer"
 }
+
+

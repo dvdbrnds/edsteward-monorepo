@@ -161,3 +161,5 @@ log_with_timestamp "📊 Use 'scripts/monitor-status.sh' to check status"
 
 # Keep the script running (it will be managed by the container lifecycle)
 wait $MONITOR_PID
+
+
