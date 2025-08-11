@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency REG-66 Technical Console Access</title>
+    <style>
+        body {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            margin: 0;
+            padding: 0;
+            background: #f8f9fa;
+            color: #212529;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .emergency-container {
+            background: #ffffff;
+            border: 2px solid #dee2e6;
+            border-radius: 12px;
+            padding: 40px;
+            max-width: 800px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            color: #dc3545;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(220, 53, 69, 0.2);
+        }
+        
+        .status-indicators {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .status-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .status-title {
+            color: #212529;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .status-value {
+            color: #198754;
+            font-size: 1.1em;
+        }
+        
+        .description {
+            font-size: 1.1em;
+            margin: 20px 0;
+            line-height: 1.6;
+            color: #495057;
+        }
+        
+        .access-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+        
+        .access-button {
+            background: linear-gradient(135deg, #198754, #20c997);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .access-button:hover {
+            background: linear-gradient(135deg, #20c997, #198754);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(25, 135, 84, 0.3);
+        }
+        
+        .access-button.secondary {
+            background: linear-gradient(135deg, #0d6efd, #6f42c1);
+        }
+        
+        .access-button.secondary:hover {
+            background: linear-gradient(135deg, #6f42c1, #0d6efd);
+            box-shadow: 0 6px 12px rgba(13, 110, 253, 0.3);
+        }
+        
+        .features-list {
+            text-align: left;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #dee2e6;
+            color: #495057;
+        }
+        
+        .feature-item:last-child {
+            border-bottom: none;
+        }
+        
+        .feature-icon {
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div class="emergency-container">
+        <h1>🚨 REG-66 Technical Console</h1>
+        
+        <div class="status-indicators">
+            <div class="status-card">
+                <div class="status-title">LinearEngine API</div>
+                <div class="status-value" id="apiStatus">CHECKING...</div>
+            </div>
+            <div class="status-card">
+                <div class="status-title">Console Interface</div>
+                <div class="status-value">READY</div>
+            </div>
+            <div class="status-card">
+                <div class="status-title">Validation Pipeline</div>
+                <div class="status-value">STANDBY</div>
+            </div>
+        </div>
+        
+        <div class="description">
+            <p><strong>Advanced Technical Console with Live Validation Phases</strong></p>
+            <p>Real-time monitoring, error tracking, system diagnostics, and comprehensive workflow execution</p>
+        </div>
+        
+        <div class="features-list">
+            <div class="feature-item">
+                <span class="feature-icon">🔧</span>
+                <span>Live system diagnostics and health monitoring</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">📊</span>
+                <span>Real-time progress tracking with validation phases</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">🚨</span>
+                <span>Advanced error detection and reporting</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">📈</span>
+                <span>Live metrics: API calls, data points, validation rates</span>
+            </div>
+            <div class="feature-item">
+                <span class="feature-icon">⏱️</span>
+                <span>Runtime tracking and performance monitoring</span>
+            </div>
+        </div>
+        
+        <div class="access-buttons">
+            <a href="/reg-66-advanced-console.html" class="access-button">
+                🚀 Technical Console
+            </a>
+            <a href="/reg-66-test.html" class="access-button secondary">
+                📋 Simple Interface
+            </a>
+        </div>
+    </div>
+
+    <script>
+        async function checkApiStatus() {
+            try {
+                const response = await fetch('http://localhost:3366/health');
+                if (response.ok) {
+                    document.getElementById('apiStatus').textContent = 'ONLINE';
+                    document.getElementById('apiStatus').style.color = '#198754';
+                } else {
+                    document.getElementById('apiStatus').textContent = 'OFFLINE';
+                    document.getElementById('apiStatus').style.color = '#dc3545';
+                }
+            } catch (error) {
+                document.getElementById('apiStatus').textContent = 'OFFLINE';
+                document.getElementById('apiStatus').style.color = '#dc3545';
+            }
+        }
+        
+        // Check API status on load
+        setTimeout(checkApiStatus, 1000);
+        
+        // Periodic status check
+        setInterval(checkApiStatus, 5000);
+    </script>
+</body>
+</html>

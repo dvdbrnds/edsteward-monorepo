@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import StatusIndicator from '../../components/StatusIndicator';
 import mcpApiClient from '../../api/MCPApiClient';
 
+
 const DetailContainer = styled.div`
   padding: 20px;
 `;
@@ -285,6 +286,13 @@ const MCPServerDetail = () => {
             regulationType = 'ccpa';
             regulationName = 'California Consumer Privacy Act';
             regulationId = 'ccpa-2018';
+          }
+          else if (serverId.toLowerCase().includes('reg-66') || 
+                   serverId.toLowerCase().includes('ferpa') || 
+                   serverId.toLowerCase().includes('education')) {
+            regulationType = 'reg-66';
+            regulationName = 'FERPA Section 66 - Advanced LinearEngine Template';
+            regulationId = 'reg-66';
           }
           // Default is gdpr which is already set above
           
@@ -775,6 +783,8 @@ await server.connect(transport);`;
           )}
         </ActionButtons>
       </ServerInfoCard>
+
+
 
       <InspectorSection>
         <InspectorCard>

@@ -19,6 +19,37 @@
       "url": "http://localhost:3299/mcp"
     }
   },
+  "reg-66": {
+    "id": "reg-66",
+    "name": "FERPA Section 66 - Advanced LinearEngine Template",
+    "category": "Education Privacy",
+    "description": "ADVANCED TEMPLATE: FERPA Section 66 regulation server with LinearEngine workflow processing, real-time government data integration, differential analysis, and advanced compliance analytics. This serves as the model for all future regulation implementations.",
+    "version": "2.0.0",
+    "year": "1974",
+    "statute": "66",
+    "statuteReference": "20 U.S.C. § 1232g (FERPA Section 66)",
+    "regulation": "34 C.F.R. § 99",
+    "regulationReference": "34 C.F.R. § 99 - FERPA Educational Records",
+    "deadline": "Annual Review Required",
+    "deadlineType": "12-Annual",
+    "validationFrequency": "annually",
+    "advancedFeatures": {
+      "linearEngine": true,
+      "realTimeData": true,
+      "differentialAnalysis": true,
+      "complianceAnalytics": true,
+      "templateStatus": "MASTER_TEMPLATE"
+    },
+    "server": {
+      "port": 3366,
+      "running": true,
+      "lastStarted": "2025-08-08T14:45:00.000Z",
+      "url": "http://localhost:3366/api/v1/reg-66",
+      "mcpUrl": "http://localhost:3366/mcp",
+      "linearEngineUrl": "http://localhost:3366/api/v1/reg-66/linear-engine",
+      "analyticsUrl": "http://localhost:3366/api/v1/reg-66/analytics"
+    }
+  },
   "Acade-1692-XXXX": {
     "id": "Acade-1692-XXXX",
     "name": "Age Discrimination Act of 1975",

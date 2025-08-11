@@ -30,6 +30,14 @@ const REGULATION_SERVERS = {
     entryPoint: join(__dirname, 'src/regulation-server/hipaa-server-entry.js'),
     defaultPort: 3001,
     description: 'Validates content against HIPAA (Health Insurance Portability and Accountability Act) requirements.'
+  },
+  'reg-66': {
+    name: 'REG-66 Advanced Validation Server (Template)',
+    entryPoint: join(__dirname, 'src/regulation-server/reg-66-server-entry.js'),
+    defaultPort: 3366,
+    description: 'Advanced template server for FERPA Section 66 compliance with enhanced features: real-time monitoring, analytics, audit trail, and custom APIs.',
+    template: true,
+    features: ['Real-time Monitoring', 'Analytics Dashboard', 'Audit Trail', 'Custom API', 'Compliance Scoring']
   }
 };
 
