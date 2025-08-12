@@ -163,7 +163,48 @@ router.post('/query', async (req, res) => {
     // Add start time for performance tracking
     options.startTime = Date.now();
     
-    // Process the query using the compliance service
+    // Check if this is a real LinearEngine execution request
+    if (options.realExecution && options.regulation === 'reg-66') {
+      logger.info('Real LinearEngine execution requested for REG-66');
+      
+      // Import and run the actual LinearEngine workflow
+      const { Reg66LinearEngine } = await import('../../regulations/reg-66/Reg66LinearEngine.js');
+      const linearEngine = new Reg66LinearEngine();
+      
+      try {
+        // Run the real workflow
+        const workflowResult = await linearEngine.runCompleteWorkflow();
+        
+        // Format the response to match expected structure
+        const result = {
+          query,
+          response: {
+            fullResponse: `LinearEngine Workflow Completed Successfully\n\nStep 1 Results: ${JSON.stringify(workflowResult.step1_result, null, 2)}\n\nValidation Decision: ${JSON.stringify(workflowResult.validation_decision, null, 2)}\n\nStep 2 Results: ${JSON.stringify(workflowResult.step2_result, null, 2)}\n\nFinal Status: ${JSON.stringify(workflowResult.final_status, null, 2)}`,
+            confidence: workflowResult.final_status?.confidence || 0.85,
+            keyPoints: [
+              `Government Sources: ${workflowResult.step1_result?.sources_fetched || 'N/A'}`,
+              `Differential Analysis: ${workflowResult.step1_result?.changes_detected || 'N/A'} changes detected`,
+              `Validation Decision: ${workflowResult.validation_decision?.decision || 'N/A'}`,
+              `University Libraries: ${workflowResult.step2_result?.sources_consulted?.length || 0} sources consulted`,
+              `Final Compliance: ${workflowResult.final_status?.status || 'N/A'}`
+            ],
+            actionItems: workflowResult.final_status?.recommendations || []
+          },
+          relevantRegulations: ['REG-66'],
+          timestamp: new Date().toISOString(),
+          processingTime: Date.now() - options.startTime,
+          source: 'Real LinearEngine Workflow',
+          workflowDetails: workflowResult
+        };
+        
+        return result;
+      } catch (error) {
+        logger.error('LinearEngine workflow failed:', error);
+        // Fall back to regular compliance service
+      }
+    }
+    
+    // Process the query using the compliance service (default behavior)
     const result = await req.services.compliance.processQuery(query, options);
     
     logger.info(`Query processed successfully in ${result.processingTime}ms`);

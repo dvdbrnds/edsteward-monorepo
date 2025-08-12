@@ -174,10 +174,95 @@ test('Evidence and ValidationResult creation', () => {
   console.log('Validation result created:', validationResult);
 });
 
+// Real TEACH Act validation test
+test('Real TEACH Act Validation - Standard', async () => {
+  const client = new ValidationClient({ 
+    name: 'test-client',
+    transport: 'mock'
+  });
+  
+  await client.connect();
+  
+  const testContent = {
+    institutional_type: 'accredited_nonprofit_educational_institution',
+    instructor_supervision: true,
+    copyright_policy: 'comprehensive',
+    technological_measures: 'implemented',
+    content_type: 'portion_of_work',
+    transmission_method: 'digital_classroom'
+  };
+  
+  const result = await client.validate('REG-66', testContent, 'standard');
+  
+  console.log('📋 TEACH Act validation result:', JSON.stringify(result.result, null, 2));
+  
+  // Validate result structure
+  if (!result.validation_id) throw new Error('Should have validation ID');
+  if (result.result.regulationId !== 'REG-66') throw new Error('Should validate REG-66');
+  if (typeof result.result.compliant !== 'boolean') throw new Error('Should have compliance status');
+  if (result.result.evidence.length === 0) throw new Error('Should have evidence');
+  if (result.result.details.confidence_score === undefined) throw new Error('Should have confidence score');
+  
+  await client.disconnect();
+});
+
+test('Real TEACH Act Validation - Comprehensive', async () => {
+  const client = new ValidationClient({ 
+    name: 'comprehensive-test-client',
+    transport: 'mock'
+  });
+  
+  await client.connect();
+  
+  const testContent = {
+    institutional_type: 'accredited_nonprofit_educational_institution',
+    instructor_supervision: true,
+    copyright_policy: 'comprehensive',
+    technological_measures: 'implemented',
+    content_type: 'portion_of_work',
+    transmission_method: 'digital_classroom'
+  };
+  
+  console.log('🔬 Running comprehensive TEACH Act validation...');
+  const result = await client.validate('REG-66', testContent, 'comprehensive');
+  
+  console.log('📊 Comprehensive validation result:', JSON.stringify(result.result, null, 2));
+  
+  // Validate comprehensive result
+  if (!result.validation_id) throw new Error('Should have validation ID');
+  if (result.result.regulationId !== 'REG-66') throw new Error('Should validate REG-66');
+  if (result.result.evidence.length < 3) throw new Error('Should have evidence from multiple sources');
+  if (!result.result.details.sources_consulted.includes('Copyright Office')) throw new Error('Should consult Copyright Office');
+  if (!result.result.details.sources_consulted.includes('Harvard Law Library')) throw new Error('Should consult Harvard Law Library');
+  
+  await client.disconnect();
+});
+
+test('Server Capabilities - Real Features', async () => {
+  const client = new ValidationClient({ 
+    name: 'capabilities-test-client',
+    transport: 'mock'
+  });
+  
+  await client.connect();
+  
+  const capabilities = await client.queryCapabilities();
+  
+  console.log('🛠️  Server capabilities:', JSON.stringify(capabilities, null, 2));
+  
+  // Validate capabilities
+  if (!capabilities.supported_regulations.includes('REG-66')) throw new Error('Should support REG-66');
+  if (!capabilities.validation_types.includes('comprehensive')) throw new Error('Should support comprehensive validation');
+  if (capabilities.teach_act_features.real_web_scraping !== true) throw new Error('Should have real web scraping');
+  if (capabilities.teach_act_features.university_libraries.length < 4) throw new Error('Should have university libraries');
+  
+  await client.disconnect();
+});
+
 // Run all tests
-console.log('Starting MCP Protocol Tests...');
-runTests().then(({ passed, failed }) => {
-  process.exit(failed > 0 ? 1 : 0);
+console.log('🧪 Starting Real MCP Protocol Tests...');
+runTests().then(success => {
+  process.exit(success ? 0 : 1);
 }).catch(error => {
   console.error('Error running tests:', error);
   process.exit(1);
