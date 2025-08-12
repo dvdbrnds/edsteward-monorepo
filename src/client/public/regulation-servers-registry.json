@@ -21,44 +21,44 @@
   },
   "reg-66": {
     "id": "reg-66",
-    "name": "Education Records Privacy Act - Section 66",
-    "category": "Education Privacy",
-    "description": "Educational privacy regulation governing the protection and handling of student educational records and data, ensuring confidentiality and compliance with federal privacy requirements.",
+    "name": "Technology, Education and Copyright Harmonization Act",
+    "category": "Copyright Education",
+    "description": "Educational transmission exemption regulation governing the use of copyrighted works in distance education, ensuring compliance with federal copyright requirements for educational institutions.",
     "version": "1.0.0",
-    "year": "1974",
-    "statute": "66",
-    "statuteReference": "20 U.S.C. § 1232g (Section 66)",
-    "regulation": "34 C.F.R. § 99.66",
+    "year": "2002",
+    "statute": "110",
+    "statuteReference": "17 U.S.C. § 110 (TEACH Act)",
+    "regulation": "Copyright Office TEACH Act Guidance",
     "regulationReference": "34 C.F.R. § 99.66 - FERPA Educational Records",
     "deadline": "Annual Review Required",
     "deadlineType": "12-Annual",
     "validationFrequency": "annually",
     "server": {
-      "port": 3366,
+      "port": 3002,
       "running": true,
       "lastStarted": "2025-08-08T14:00:00.000Z",
-      "url": "http://localhost:3366/mcp"
+      "url": "http://localhost:3002/api/llm"
     }
   },
   "reg-66": {
     "id": "reg-66",
-    "name": "Education Records Privacy Act - Section 66",
-    "category": "Education Privacy",
-    "description": "Educational privacy regulation governing the protection and handling of student educational records and data, ensuring confidentiality and compliance with federal privacy requirements.",
+    "name": "Technology, Education and Copyright Harmonization Act",
+    "category": "Copyright Education",
+    "description": "Educational transmission exemption regulation governing the use of copyrighted works in distance education, ensuring compliance with federal copyright requirements for educational institutions.",
     "version": "1.0.0",
-    "year": "1974",
-    "statute": "66",
-    "statuteReference": "20 U.S.C. § 1232g (Section 66)",
-    "regulation": "34 C.F.R. § 99.66",
+    "year": "2002",
+    "statute": "110",
+    "statuteReference": "17 U.S.C. § 110 (TEACH Act)",
+    "regulation": "Copyright Office TEACH Act Guidance",
     "regulationReference": "34 C.F.R. § 99.66 - FERPA Educational Records",
     "deadline": "Annual Review Required",
     "deadlineType": "12-Annual",
     "validationFrequency": "annually",
     "server": {
-      "port": 3366,
+      "port": 3002,
       "running": true,
       "lastStarted": "2025-08-08T14:00:00.000Z",
-      "url": "http://localhost:3366/mcp"
+      "url": "http://localhost:3002/api/llm"
     }
   },
   "Acade-1692-XXXX": {
@@ -3395,10 +3395,10 @@
     "deadlineType": "14-No Deadline",
     "validationFrequency": "asNeeded",
     "server": {
-      "port": 3366,
+      "port": 3002,
       "running": true,
       "lastStarted": "2025-04-24T22:00:49.506Z",
-      "url": "http://localhost:3366/mcp"
+      "url": "http://localhost:3002/api/llm"
     }
   },
   "Infor-16011602-XXXX": {

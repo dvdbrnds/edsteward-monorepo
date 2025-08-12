@@ -215,10 +215,10 @@
                     <strong>Public Law:</strong> Pub. L. 93-380 (1974)
                 </div>
                 <div class="detail-item">
-                    <strong>USC Citation:</strong> 20 U.S.C. § 1232g
+                    <strong>USC Citation:</strong> 17 U.S.C. § 110
                 </div>
                 <div class="detail-item">
-                    <strong>CFR Reference:</strong> 34 CFR Part 99
+                    <strong>Guidance:</strong> Copyright Office TEACH Act
                 </div>
                 <div class="detail-item">
                     <strong>Key Provisions:</strong> Educational records privacy, parent access rights, disclosure restrictions
@@ -262,11 +262,11 @@
         let currentStep = 0;
 
         const steps = [
-            { id: 1, text: "📖 Government source collection (USC 20 §1232g)", icon: "📖" },
+            { id: 1, text: "📖 Government source collection (USC 17 §110)", icon: "📖" },
             { id: 2, text: "🔍 Differential analysis vs. existing data", icon: "🔍" },
             { id: 3, text: "🏛️ Stanford Law Library cross-reference", icon: "🏛️" },
             { id: 4, text: "📚 University library validation", icon: "📚" },
-            { id: 5, text: "📜 CFR 34 Part 99 integration", icon: "📜" },
+            { id: 5, text: "📜 Copyright Office TEACH Act guidance integration", icon: "📜" },
             { id: 6, text: "⚖️ Comprehensive compliance assessment", icon: "⚖️" }
         ];
 
@@ -362,7 +362,7 @@
         // Test server connectivity on page load
         window.addEventListener('load', async () => {
             try {
-                const response = await fetch('http://localhost:3366/health');
+                const response = await fetch('http://localhost:3002/api/llm/health');
                 if (response.ok) {
                     const health = await response.json();
                     console.log('✅ REG-66 LinearEngine Server is healthy:', health);

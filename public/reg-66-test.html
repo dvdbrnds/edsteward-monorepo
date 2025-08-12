@@ -249,11 +249,15 @@
 
             try {
                 // Call the reg-66 LinearEngine API
-                const response = await fetch('http://localhost:3366/api/v1/reg-66/linear-engine/run', {
+                const response = await fetch('http://localhost:3002/api/llm/query', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
-                    }
+                    },
+                    body: JSON.stringify({ 
+                        query: 'Execute REG-66 LinearEngine workflow for FERPA compliance',
+                        options: { workflow: 'standard', regulation: 'reg-66' }
+                    })
                 });
                 
                 if (response.ok) {
@@ -303,7 +307,7 @@
                 button.textContent = '🚀 Run LinearEngine Workflow';
                 
                 status.className = 'status error';
-                status.textContent = `❌ Error: ${error.message}. Make sure the reg-66 LinearEngine server is running on port 3366.`;
+                status.textContent = `❌ Error: ${error.message}. Make sure the LLM Gateway is running on port 3002.`;
                 
                 workflow.style.display = 'none';
             }
@@ -312,7 +316,7 @@
         // Test server connectivity on page load
         window.addEventListener('load', async () => {
             try {
-                const response = await fetch('http://localhost:3366/health');
+                const response = await fetch('http://localhost:3002/api/llm/health');
                 if (response.ok) {
                     const health = await response.json();
                     console.log('✅ REG-66 LinearEngine Server is healthy:', health);

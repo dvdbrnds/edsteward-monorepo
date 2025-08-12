@@ -1471,7 +1471,7 @@
                 </div>
                 <div class="log-entry">
                     <span class="log-timestamp">[CONFIG]</span>
-                    <span class="log-level-info">📡 API Endpoint: http://localhost:3366/api/v1/reg-66/linear-engine</span>
+                    <span class="log-level-info">📡 API Endpoint: http://localhost:3002/api/llm/query</span>
                 </div>
                 <div class="log-entry">
                     <span class="log-timestamp">[STATUS]</span>
@@ -1667,7 +1667,7 @@
         
         async function checkSystemHealth() {
             try {
-                const response = await fetch('http://localhost:3366/health');
+                const response = await fetch('http://localhost:3002/api/llm/health');
                 if (response.ok) {
                     document.getElementById('apiStatus').textContent = 'ONLINE';
                     document.getElementById('apiStatus').className = 'diagnostic-status ok';
@@ -1716,9 +1716,13 @@
                 updateStepStatus(1, 'running');
                 addConsoleLog('📖 STEP 1: Fetching original government sources...', 'step');
                 
-                const response = await fetch('http://localhost:3366/api/v1/reg-66/linear-engine/run', {
+                const response = await fetch('http://localhost:3002/api/llm/query', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        query: 'Execute REG-66 comprehensive LinearEngine workflow for TEACH Act compliance validation',
+                        options: { workflow: 'comprehensive', regulation: 'reg-66' }
+                    })
                 });
                 
                 metrics.apiCalls++;
@@ -1731,8 +1735,8 @@
                 
                 const result = await response.json();
                 addConsoleLog(`✅ Workflow ${result.workflowId || 'REG-66'} initiated successfully`, 'success');
-                addConsoleLog('   - USC 20 Section 1232g (FERPA) ✓', 'info');
-                addConsoleLog('   - CFR 34 Part 99 (FERPA Regulations) ✓', 'info');
+                addConsoleLog('   - USC 17 Section 110 (TEACH Act) ✓', 'info');
+                addConsoleLog('   - Copyright Office TEACH Act Guidance ✓', 'info');
                 metrics.dataPoints += 2;
                 updateStepStatus(1, 'completed');
                 updateProgress(16.7);
@@ -1789,8 +1793,8 @@
                 // Step 5: CFR Integration
                 currentStep = 5;
                 updateStepStatus(5, 'running');
-                addConsoleLog('📜 STEP 5: CFR integration and analysis...', 'step');
-                addConsoleLog('   - CFR 34 Part 99 detailed analysis ✓', 'info');
+                addConsoleLog('📜 STEP 5: Copyright Office integration and analysis...', 'step');
+                addConsoleLog('   - TEACH Act regulatory guidance analysis ✓', 'info');
                 addConsoleLog('   - Regulatory interpretation updates ✓', 'info');
                 addConsoleLog('   - Mapped 18 compliance requirements', 'debug');
                 metrics.apiCalls++;
@@ -1849,8 +1853,8 @@
         setTimeout(() => {
             addConsoleLog('🔧 System diagnostics initialized', 'info');
             addConsoleLog('📡 Monitoring API endpoints...', 'debug');
-            addConsoleLog('📋 Regulation preview loaded: FERPA Section 66', 'info');
-            addConsoleLog('🎯 FERPA Section 66 LinearEngine ready for execution', 'info');
+            addConsoleLog('📋 Regulation preview loaded: TEACH Act', 'info');
+            addConsoleLog('🎯 TEACH Act LinearEngine ready for execution', 'info');
             
             // Update regulation status dynamically
             updateRegulationStatus();

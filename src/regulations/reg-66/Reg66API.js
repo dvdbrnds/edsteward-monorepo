@@ -1,6 +1,6 @@
 /**
- * REG-66 (FERPA Section 66) RESTful API Server
- * Provides customer access to FERPA regulation data and compliance tools
+ * REG-66 (TEACH Act) RESTful API Server
+ * Provides customer access to TEACH Act regulation data and compliance tools
  * ADVANCED TEMPLATE API server for regulation processing
  */
 

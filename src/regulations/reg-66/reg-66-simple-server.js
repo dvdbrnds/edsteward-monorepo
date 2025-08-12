@@ -27,7 +27,7 @@ app.use((req, res, next) => {
 app.get('/health', (req, res) => {
   res.json({
     status: 'healthy',
-    regulation: 'REG-66 (FERPA Section 66)',
+    regulation: 'REG-66 (TEACH Act)',
     server_version: '2.0.0',
     linearEngine: 'enabled'
   });
@@ -37,7 +37,7 @@ app.get('/health', (req, res) => {
 app.get('/api/v1/reg-66/linear-engine/status', (req, res) => {
   res.json({
     status: 'ready',
-    regulation: 'REG-66 (FERPA Section 66)',
+    regulation: 'REG-66 (TEACH Act)',
     engine: 'LinearEngine v2.0',
     capabilities: ['government_data_fetch', 'differential_analysis', 'university_libraries'],
     processingState: linearEngine.processingState || 'idle'
@@ -61,11 +61,11 @@ app.post('/api/v1/reg-66/linear-engine/run', async (req, res) => {
       workflowId: workflowId,
       estimatedDuration: '3-5 minutes',
       steps: [
-        'Government source collection (USC 20 §1232g)',
+        'Government source collection (USC 17 §110)',
         'Differential analysis vs. current data',
         'Stanford Law Library cross-reference',
         'University library validation',
-        'CFR 34 Part 99 integration',
+        'Copyright Office TEACH Act guidance integration',
         'Compliance assessment'
       ]
     });
@@ -99,11 +99,11 @@ app.post('/api/v1/reg-66/linear-engine/run', async (req, res) => {
 // Data endpoints for the console
 app.get('/api/v1/reg-66/data/usc', (req, res) => {
   res.json({
-    source: '20 USC 1232g (FERPA)',
-    title: 'Family Educational Rights and Privacy Act',
-    section: '1232g',
+    source: '17 USC 110 (TEACH Act)',
+    title: 'Technology, Education and Copyright Harmonization Act',
+    section: '110',
     lastUpdated: new Date().toISOString(),
-    content: 'Educational records privacy provisions...',
+    content: 'Educational transmission exemption provisions...',
     fetchedFrom: 'uscode.house.gov',
     status: 'live'
   });

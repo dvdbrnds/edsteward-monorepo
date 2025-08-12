@@ -264,25 +264,20 @@ app.post('/api/regulations/:id/query', async (req, res) => {
     // Use the MCP server to query the regulation
     try {
       const response = await queryRegulation(regulation.regulationId, query);
-      console.log('First 5 servers:', (response.servers || response.data).slice(0, 5));
+      console.log('Regulation query response received:', response.source || 'unknown source');
       res.json(response);
     } catch (error) {
       console.error(`Error querying regulation ${regulation.regulationId}:`, error);
       
-      // Fall back to mock responses if MCP server query fails
-      const mockResponses = {
-        'GDPR': 'The GDPR (General Data Protection Regulation) provides several rights to data subjects including: right to access, right to rectification, right to erasure, right to restriction of processing, right to data portability, right to object, and rights related to automated decision making and profiling.',
-        'HIPAA': 'HIPAA (Health Insurance Portability and Accountability Act) provides patients with several rights including: right to access their health information, right to request corrections, right to receive a notice of privacy practices, right to request restrictions, right to confidential communications, right to an accounting of disclosures, and right to file complaints.',
-        'CCPA': 'The CCPA (California Consumer Privacy Act) provides California residents with rights including: right to know what personal information is collected, right to delete personal information, right to opt-out of the sale of personal information, and right to non-discrimination for exercising these rights.',
-        default: 'This regulation has not been fully processed yet. Please check back later or initiate data collection.'
-      };
-      
-      const response = mockResponses[regulation.name] || mockResponses.default;
-      res.json({ 
-        response, 
+      // The queryRegulation function now handles its own fallbacks to real data
+      // If we get here, it means the MCP server itself failed completely
+      res.status(503).json({ 
+        error: 'Regulation query service temporarily unavailable',
         regulation: regulation.name, 
+        regulationId: regulation.regulationId,
         query,
-        note: 'Response generated from fallback system as MCP server was unavailable'
+        message: error.message,
+        note: 'Both primary LLM Gateway and regulation database fallback failed'
       });
     }
   } catch (error) {

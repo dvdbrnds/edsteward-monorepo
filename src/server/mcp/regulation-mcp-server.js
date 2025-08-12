@@ -7,6 +7,7 @@ import { spawn } from 'child_process';
 import { fileURLToPath } from 'url';
 import path from 'path';
 import fs from 'fs';
+import { parse } from 'csv-parse/sync';
 
 // Get current directory in ESM
 const __filename = fileURLToPath(import.meta.url);
@@ -221,16 +222,157 @@ export const queryRegulation = async (regulationId, query) => {
 
   const serverInfo = activeServers.get(regulationId);
   
-  // In a real implementation, we would use the MCP client SDK to send a query
-  // to the server. For now, we'll simulate a response.
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  
-  return {
-    response: `This is a simulated response for your query: ${query}`,
-    regulation: serverInfo.name,
-    query
-  };
+  try {
+    // Query the LLM Gateway with the regulation-specific context
+    const llmResponse = await fetch('http://localhost:3002/api/llm/query', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        query: `${query} (Context: ${serverInfo.name})`,
+        options: {
+          regulation: regulationId,
+          context: serverInfo.description || `Compliance analysis for ${serverInfo.name}`
+        }
+      })
+    });
+
+    if (!llmResponse.ok) {
+      throw new Error(`LLM Gateway returned ${llmResponse.status}: ${llmResponse.statusText}`);
+    }
+
+    const llmData = await llmResponse.json();
+    
+    if (!llmData.success) {
+      throw new Error(`LLM Gateway error: ${llmData.error || 'Unknown error'}`);
+    }
+
+    // Return structured response with real AI analysis
+    return {
+      response: llmData.data.response.fullResponse,
+      confidence: llmData.data.response.confidence,
+      keyPoints: llmData.data.response.keyPoints,
+      actionItems: llmData.data.response.actionItems,
+      regulation: serverInfo.name,
+      regulationId: regulationId,
+      query: query,
+      timestamp: llmData.data.timestamp,
+      processingTime: llmData.data.processingTime,
+      source: 'LLM Gateway (OpenAI)',
+      note: 'Real AI-generated compliance analysis'
+    };
+    
+  } catch (error) {
+    console.error(`Error querying LLM Gateway for ${regulationId}:`, error.message);
+    
+    // If LLM Gateway fails, try to provide regulation-specific information
+    // from the compmat.csv data instead of generic mock responses
+    const regulationData = await getRegulationDataFromCSV(regulationId, serverInfo.name);
+    
+    return {
+      response: regulationData.response,
+      regulation: serverInfo.name,
+      regulationId: regulationId,
+      query: query,
+      timestamp: new Date().toISOString(),
+      source: 'Regulation Database',
+      note: 'Fallback response from regulation database (LLM Gateway unavailable)',
+      error: error.message
+    };
+  }
 };
+
+/**
+ * Get regulation data from compmat.csv as fallback
+ * @param {string} regulationId - The regulation ID
+ * @param {string} regulationName - The regulation name
+ * @returns {Promise<Object>} Regulation data response
+ */
+async function getRegulationDataFromCSV(regulationId, regulationName) {
+  try {
+    // Path to the CSV file
+    const csvPath = path.join(__dirname, '../../../compmat.csv');
+    
+    if (!fs.existsSync(csvPath)) {
+      throw new Error('Regulation database (compmat.csv) not found');
+    }
+
+    // Read and parse CSV
+    const csvContent = fs.readFileSync(csvPath, 'utf8');
+    const records = parse(csvContent, {
+      columns: true,
+      skip_empty_lines: true
+    });
+
+    // Search for relevant regulations by name or statute
+    const relevantRegulations = records.filter(record => {
+      const statuteName = record['Statute Name'] || '';
+      const topic = record['Topic'] || '';
+      const summary = record['Statutory Summary'] || '';
+      
+      // Match by regulation name or search for key terms
+      return statuteName.toLowerCase().includes(regulationName.toLowerCase()) ||
+             topic.toLowerCase().includes(regulationName.toLowerCase()) ||
+             summary.toLowerCase().includes(regulationName.toLowerCase());
+    });
+
+    if (relevantRegulations.length === 0) {
+      return {
+        response: `No specific information found for ${regulationName} in the regulation database. This regulation may require additional data collection or manual processing.`,
+        dataSource: 'compmat.csv',
+        recordsFound: 0
+      };
+    }
+
+    // Build a comprehensive response from the CSV data
+    const regulation = relevantRegulations[0]; // Use the first match
+    let response = `**${regulation['Statute Name']}**\n\n`;
+    
+    if (regulation['Statutory Summary']) {
+      response += `**Summary:** ${regulation['Statutory Summary']}\n\n`;
+    }
+    
+    if (regulation['Reporting Requirements']) {
+      response += `**Reporting Requirements:** ${regulation['Reporting Requirements']}\n\n`;
+    }
+    
+    if (regulation['Deadlines']) {
+      response += `**Deadlines:** ${regulation['Deadlines']}\n\n`;
+    }
+
+    // Add regulations references
+    const regulations = [];
+    for (let i = 1; i <= 5; i++) {
+      const reg = regulation[`Regulation ${i}`];
+      if (reg && reg.trim()) {
+        regulations.push(reg);
+      }
+    }
+    
+    if (regulations.length > 0) {
+      response += `**Related Regulations:** ${regulations.join(', ')}\n\n`;
+    }
+
+    response += `\n*Source: Compliance Matrix Database (${relevantRegulations.length} related records found)*`;
+
+    return {
+      response: response,
+      dataSource: 'compmat.csv',
+      recordsFound: relevantRegulations.length,
+      lastUpdated: regulation['Last Updated'] || 'Unknown'
+    };
+
+  } catch (error) {
+    console.error('Error reading regulation data from CSV:', error.message);
+    
+    return {
+      response: `Unable to retrieve specific information for ${regulationName} from the regulation database. Error: ${error.message}. Please consult with compliance experts for guidance on this regulation.`,
+      dataSource: 'error',
+      error: error.message
+    };
+  }
+}
 
 /**
  * Create MCP servers for all regulations at startup

@@ -32,7 +32,7 @@ app.use((req, res, next) => {
 app.get('/health', (req, res) => {
   res.json({
     status: 'healthy',
-    regulation: 'REG-66 (FERPA Section 66)',
+    regulation: 'REG-66 (TEACH Act)',
     server_version: '2.0.0',
     linearEngine: 'enabled',
     advancedFeatures: ['government_data', 'differential_analysis', 'university_libraries']
@@ -43,7 +43,7 @@ app.get('/health', (req, res) => {
 app.get('/', (req, res) => {
   res.json({
     server: 'REG-66 Advanced LinearEngine Server',
-    regulation: 'FERPA Section 66 - Educational Records Privacy',
+    regulation: 'TEACH Act - Technology, Education and Copyright Harmonization Act',
     version: '2.0.0',
     status: 'operational',
     template: 'MASTER_TEMPLATE',
@@ -67,7 +67,7 @@ app.get('/', (req, res) => {
 app.get('/api/v1/reg-66/linear-engine/status', (req, res) => {
   res.json({
     status: 'ready',
-    regulation: 'REG-66 (FERPA Section 66)',
+    regulation: 'REG-66 (TEACH Act)',
     engine: 'LinearEngine v2.0 - ADVANCED TEMPLATE',
     capabilities: [
       'government_data_fetch',
@@ -101,11 +101,11 @@ app.post('/api/v1/reg-66/linear-engine/run', async (req, res) => {
       workflowId: workflowId,
       estimatedDuration: '3-5 minutes',
       steps: [
-        'Step 1: Original government source collection (USC 20 §1232g)',
+        'Step 1: Original government source collection (USC 17 §110)',
         'Step 2: Differential analysis against existing data',
         'Step 3: Stanford Law Library cross-reference',
         'Step 4: University library validation (Harvard, Yale, Columbia)',
-        'Step 5: CFR 34 Part 99 integration',
+        'Step 5: Copyright Office TEACH Act guidance integration',
         'Step 6: Comprehensive compliance assessment'
       ],
       advancedFeatures: {
@@ -120,8 +120,8 @@ app.post('/api/v1/reg-66/linear-engine/run', async (req, res) => {
     setTimeout(async () => {
       try {
         console.log('STEP 1: Fetching original government sources...');
-        console.log('   - USC 20 Section 1232g (FERPA)');
-        console.log('   - CFR 34 Part 99 (FERPA Regulations)');
+        console.log('   - USC 17 Section 110 (TEACH Act)');
+        console.log('   - Copyright Office TEACH Act Guidance');
         engineState.currentStep = 1;
         
         // Simulate government data collection
@@ -149,9 +149,9 @@ app.post('/api/v1/reg-66/linear-engine/run', async (req, res) => {
         
         await new Promise(resolve => setTimeout(resolve, 2500));
         
-        console.log('STEP 5: CFR integration and analysis...');
-        console.log('   - CFR 34 Part 99 detailed analysis');
-        console.log('   - Regulatory interpretation updates');
+        console.log('STEP 5: Copyright Office integration and analysis...');
+        console.log('   - TEACH Act regulatory guidance analysis');
+        console.log('   - Educational exemption interpretation updates');
         engineState.currentStep = 5;
         
         await new Promise(resolve => setTimeout(resolve, 1000));
@@ -187,11 +187,11 @@ app.post('/api/v1/reg-66/linear-engine/run', async (req, res) => {
 // Data endpoints for the console
 app.get('/api/v1/reg-66/data/usc', (req, res) => {
   res.json({
-    source: '20 USC 1232g (FERPA)',
-    title: 'Family Educational Rights and Privacy Act',
-    section: '1232g',
+    source: '17 USC 110 (TEACH Act)',
+    title: 'Technology, Education and Copyright Harmonization Act',
+    section: '110',
     lastUpdated: new Date().toISOString(),
-    content: 'Educational records privacy provisions...',
+    content: 'Educational transmission exemption provisions...',
     fetchedFrom: 'uscode.house.gov',
     status: 'live',
     differential: 'No changes since last check',
@@ -202,7 +202,7 @@ app.get('/api/v1/reg-66/data/usc', (req, res) => {
 app.get('/api/v1/reg-66/data/cfr', (req, res) => {
   res.json({
     source: '34 CFR 99',
-    title: 'FERPA Regulations - Educational Records',
+    title: 'TEACH Act Regulations - Educational Transmissions',
     section: 'Part 99',
     lastUpdated: new Date().toISOString(),
     content: 'Detailed educational records regulations...',
@@ -216,7 +216,7 @@ app.get('/api/v1/reg-66/data/cfr', (req, res) => {
 app.get('/api/v1/reg-66/data/stanford', (req, res) => {
   res.json({
     source: 'Stanford Law Library',
-    title: 'FERPA Comprehensive Analysis Database',
+    title: 'TEACH Act Comprehensive Analysis Database',
     lastUpdated: new Date().toISOString(),
     content: 'Extensive legal analysis and case law interpretation...',
     fetchedFrom: 'law.stanford.edu',
@@ -288,7 +288,7 @@ app.listen(port, () => {
   console.log(`   • Stanford Law Library integration`);
   console.log(`   • University libraries (Harvard, Yale, Columbia)`);
   console.log(`   • Advanced compliance scoring`);
-  console.log(`Regulation: FERPA Section 66 (Educational Records Privacy)`);
+  console.log(`Regulation: TEACH Act Section 110 (Educational Transmission Exemptions)`);
   console.log(`Template: MASTER TEMPLATE for all future regulations`);
   console.log(`\nReady for comprehensive LinearEngine workflows`);
 });
