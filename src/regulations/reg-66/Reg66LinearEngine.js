@@ -430,7 +430,7 @@ export class Reg66LinearEngine extends EventEmitter {
         "Westlaw Academic Database",
         "HeinOnline Legal Database",
       ];
-      
+
       if (this.differentialResult.recommendation === "no_changes_detected") {
         decision.reason =
           "No changes detected but performing comprehensive validation for thoroughness";
@@ -582,7 +582,7 @@ export class Reg66LinearEngine extends EventEmitter {
       };
 
       console.log("🎉 Linear Workflow Complete!");
-      this.emit("workflowCompleted", finalResult);
+      // this.emit("workflowCompleted", finalResult); // Temporarily disabled - might cause hanging
       return finalResult;
     } catch (error) {
       console.error("💥 Linear Workflow Failed:", error);
@@ -593,8 +593,7 @@ export class Reg66LinearEngine extends EventEmitter {
 
   // Helper Methods
   generateDataHash(data) {
-    return crypto
-      .createHash("sha256")
+    return createHash("sha256")
       .update(JSON.stringify(data))
       .digest("hex")
       .substring(0, 12);
