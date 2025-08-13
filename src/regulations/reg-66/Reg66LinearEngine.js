@@ -8,8 +8,8 @@
  */
 
 import { EventEmitter } from "events";
+import { createHash } from "crypto";
 import axios from "axios";
-import crypto from "crypto";
 import * as cheerio from "cheerio";
 
 export class Reg66LinearEngine extends EventEmitter {
@@ -234,8 +234,7 @@ export class Reg66LinearEngine extends EventEmitter {
    * Generate content hash for comparison
    */
   generateContentHash(content) {
-    const crypto = require('crypto');
-    return crypto.createHash('sha256').update(content).digest('hex').substring(0, 16);
+    return createHash('sha256').update(content).digest('hex').substring(0, 16);
   }
 
   /**
@@ -420,35 +419,35 @@ export class Reg66LinearEngine extends EventEmitter {
         throw new Error("Step 1 must be completed before validation");
       }
 
+      // ALWAYS proceed to Step 2 for comprehensive validation (no shortcuts)
+      decision.proceedToStep2 = true;
+      decision.sources_needed = [
+        "Stanford Law Library",
+        "Harvard Law Library",
+        "Yale Law Library", 
+        "Columbia Law Library",
+        "Legal Information Institute (Cornell)",
+        "Westlaw Academic Database",
+        "HeinOnline Legal Database",
+      ];
+      
       if (this.differentialResult.recommendation === "no_changes_detected") {
-        decision.proceedToStep2 = false;
         decision.reason =
-          "No changes detected in original sources - current MCP engine data is valid";
+          "No changes detected but performing comprehensive validation for thoroughness";
         decision.confidence = 95;
       } else if (
         this.differentialResult.recommendation === "minor_changes_only"
       ) {
-        decision.proceedToStep2 = false;
         decision.reason =
-          "Only minor metadata changes - no corroboration needed";
+          "Minor changes detected - performing university validation for verification";
         decision.confidence = 85;
       } else if (
         this.differentialResult.recommendation === "proceed_to_validation"
       ) {
         // Content was modified - need to validate with corroborating sources
-        decision.proceedToStep2 = true;
         decision.reason =
           "Content changes detected - corroborating sources needed for validation";
         decision.confidence = 90;
-        decision.sources_needed = [
-          "Stanford Law Library",
-          "Harvard Law Library",
-          "Yale Law Library", 
-          "Columbia Law Library",
-          "Legal Information Institute (Cornell)",
-          "Westlaw Academic Database",
-          "HeinOnline Legal Database",
-        ];
       }
 
       this.validationDecision = decision;
