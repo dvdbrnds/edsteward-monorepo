@@ -1160,81 +1160,25 @@
                     
                     <div id="compliance" class="tab-content">
                         <div class="regulation-section">
-                            <h4>TEACH Act Compliance Guidelines</h4>
-                            <div class="compliance-sections">
-                                <div class="compliance-section">
-                                    <h5>Institutional Requirements</h5>
-                                    <div class="checklist">
-                                        <div class="checklist-item">
-                                            <span class="check">✓</span>
-                                            <span>Copyright policy developed and implemented</span>
+                            <div id="compliance-loading" style="text-align: center; padding: 40px; color: #6e7681;">
+                                <div style="font-size: 16px; margin-bottom: 10px;">📋 Generating Real TEACH Act Compliance Guidance...</div>
+                                <div style="font-size: 14px;">Calculating institutional requirements and risk assessments</div>
                                         </div>
-                                        <div class="checklist-item">
-                                            <span class="check">✓</span>
-                                            <span>Faculty and staff copyright training programs</span>
+                            <div id="compliance-content" style="display: none;">
+                                <h4 id="compliance-title">TEACH Act Compliance Guidelines</h4>
+                                <div id="compliance-metadata" style="font-size: 12px; color: #6e7681; margin-bottom: 20px; padding: 8px; background: #f0f6ff; border-radius: 4px; border-left: 3px solid #0969da;">
+                                    <div id="compliance-score">Overall Compliance: Loading...</div>
+                                    <div id="compliance-updated">Last Assessment: Loading...</div>
+                                    <div id="compliance-source">Data Source: Loading...</div>
                                         </div>
-                                        <div class="checklist-item">
-                                            <span class="check">✓</span>
-                                            <span>Student copyright notices in course materials</span>
+                                <div class="compliance-sections" id="compliance-sections">
+                                    <!-- Dynamic compliance content will be loaded here -->
                                         </div>
-                                        <div class="checklist-item">
-                                            <span class="check">✓</span>
-                                            <span>Technological protection measures implemented</span>
                                         </div>
-                                        <div class="checklist-item">
-                                            <span class="check">✓</span>
-                                            <span>Access controls for enrolled students only</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="compliance-section">
-                                    <h5>Risk Areas</h5>
-                                    <div class="risk-list">
-                                        <div class="risk-item high">
-                                            <span class="risk-level">HIGH</span>
-                                            <span>Unauthorized redistribution of copyrighted works</span>
-                                        </div>
-                                        <div class="risk-item high">
-                                            <span class="risk-level">HIGH</span>
-                                            <span>Retention beyond class session period</span>
-                                        </div>
-                                        <div class="risk-item medium">
-                                            <span class="risk-level">MEDIUM</span>
-                                            <span>Inadequate technological protection measures</span>
-                                        </div>
-                                        <div class="risk-item medium">
-                                            <span class="risk-level">MEDIUM</span>
-                                            <span>Excessive use of dramatic works</span>
-                                        </div>
-                                        <div class="risk-item low">
-                                            <span class="risk-level">LOW</span>
-                                            <span>Missing copyright notifications</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="compliance-section">
-                                    <h5>Copyright Enforcement Statistics</h5>
-                                    <div class="enforcement-stats">
-                                        <div class="stat-item">
-                                            <span class="stat-number">234</span>
-                                            <span class="stat-label">DMCA Takedowns (2023)</span>
-                                        </div>
-                                        <div class="stat-item">
-                                            <span class="stat-number">89</span>
-                                            <span class="stat-label">Educational Institution Cases</span>
-                                        </div>
-                                        <div class="stat-item">
-                                            <span class="stat-number">$150K</span>
-                                            <span class="stat-label">Maximum Statutory Damages</span>
-                                        </div>
-                                        <div class="stat-item">
-                                            <span class="stat-number">76%</span>
-                                            <span class="stat-label">Compliance Rate</span>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div id="compliance-error" style="display: none; text-align: center; padding: 40px; color: #d73a49;">
+                                <div style="font-size: 16px; margin-bottom: 10px;">❌ Unable to Load Real Compliance Guidance</div>
+                                <div id="compliance-error-message" style="font-size: 14px;">Network error - please check connectivity</div>
+                                <button onclick="loadRealComplianceGuide()" style="margin-top: 15px; padding: 8px 16px; background: #0969da; color: white; border: none; border-radius: 4px; cursor: pointer;">🔄 Retry</button>
                             </div>
                         </div>
                     </div>
@@ -1242,61 +1186,16 @@
                     <div id="staging" class="tab-content">
                         <div class="regulation-section">
                             <h4>TEACH Act Update Staging System</h4>
-                            <div class="staging-dashboard">
-                                <div class="staging-overview">
-                                    <div class="staging-card">
-                                        <h5>Current Version</h5>
-                                        <div class="version-info">
-                                            <span class="version-number">v2.0.3</span>
-                                            <span class="version-date">2024-11-02</span>
-                                            <span class="version-status deployed">DEPLOYED</span>
+                            <div id="staging-loading" class="loading-state">
+                                <div class="loading-spinner"></div>
+                                <p>Loading real system versioning data...</p>
                                         </div>
+                            <div id="staging-error" class="error-state" style="display: none;">
+                                <p>❌ Failed to load versioning data</p>
+                                <button onclick="loadRealVersioningData()">Retry</button>
                                     </div>
-                                    
-                                    <div class="staging-card">
-                                        <h5>Staging Version</h5>
-                                        <div class="version-info">
-                                            <span class="version-number">v2.1.0</span>
-                                            <span class="version-date">2025-01-15</span>
-                                            <span class="version-status staging">STAGING</span>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="staging-card">
-                                        <h5>Active Customers</h5>
-                                        <div class="customer-stats">
-                                            <span class="customer-count">147</span>
-                                            <span class="customer-label">Active Subscriptions</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="staging-controls">
-                                    <button class="staging-button primary">SCAN FOR UPDATES</button>
-                                    <button class="staging-button secondary">VALIDATE STAGING</button>
-                                    <button class="staging-button warning">DEPLOY TO CUSTOMERS</button>
-                                </div>
-                                
-                                <div class="staging-logs">
-                                    <h6>Recent Update Activity</h6>
-                                    <div class="log-entries">
-                                        <div class="log-entry">
-                                            <span class="log-time">2025-01-15 14:23</span>
-                                            <span class="log-action">Updated</span>
-                                            <span class="log-detail">Copyright Office Circular 21 revision detected</span>
-                                        </div>
-                                        <div class="log-entry">
-                                            <span class="log-time">2025-01-12 09:45</span>
-                                            <span class="log-action">Staged</span>
-                                            <span class="log-detail">17 USC 110(2) interpretation clarification</span>
-                                        </div>
-                                        <div class="log-entry">
-                                            <span class="log-time">2025-01-08 16:30</span>
-                                            <span class="log-action">Validated</span>
-                                            <span class="log-detail">Stanford Law Library cross-reference completed</span>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div id="staging-content" style="display: none;">
+                                <!-- Real staging content will be dynamically inserted here -->
                             </div>
                         </div>
                     </div>
@@ -1349,36 +1248,13 @@
                                 
                                 <div class="customer-usage">
                                     <h6>Customer Database Sync Status</h6>
-                                    <div class="usage-table">
-                                        <div class="table-header">
-                                            <span>Customer</span>
-                                            <span>Version</span>
-                                            <span>Last Sync</span>
-                                            <span>Status</span>
+                                    <div style="padding: 30px; text-align: center; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; margin-top: 20px;">
+                                        <div style="font-size: 16px; color: #856404; margin-bottom: 12px;">🗄️ <strong>Customer Database Required</strong></div>
+                                        <div style="font-size: 14px; color: #6c757d; margin-bottom: 15px;">
+                                            Real customer sync data requires connection to production customer database.
                                         </div>
-                                        <div class="table-row">
-                                            <span>University of California</span>
-                                            <span>v2.0.3</span>
-                                            <span>2025-01-15 08:30</span>
-                                            <span class="status synced">SYNCED</span>
-                                        </div>
-                                        <div class="table-row">
-                                            <span>Harvard University</span>
-                                            <span>v2.0.2</span>
-                                            <span>2025-01-14 22:15</span>
-                                            <span class="status pending">PENDING</span>
-                                        </div>
-                                        <div class="table-row">
-                                            <span>MIT</span>
-                                            <span>v2.0.3</span>
-                                            <span>2025-01-15 09:45</span>
-                                            <span class="status synced">SYNCED</span>
-                                        </div>
-                                        <div class="table-row">
-                                            <span>Stanford University</span>
-                                            <span>v2.0.1</span>
-                                            <span>2025-01-12 14:20</span>
-                                            <span class="status outdated">OUTDATED</span>
+                                        <div style="font-size: 13px; color: #6c757d; font-style: italic;">
+                                            Configure database connection in environment settings to view live customer synchronization status and regulation version distribution.
                                         </div>
                                     </div>
                                 </div>
@@ -1780,7 +1656,8 @@
                 
                 // Check if we have real university data from LinearEngine
                 const step2Data = result.data?.workflowDetails?.step2_result;
-                const universityResults = step2Data?.university_validations || {};
+                const universityResults = result.data?.universityConfidenceScores || {};
+                const universitySources = step2Data?.sources || [];
                 
                 // Stanford Law Library
                 await new Promise(resolve => setTimeout(resolve, 500));
@@ -1788,14 +1665,14 @@
                 addConsoleLog('   🏛️ Accessing Stanford Law Library - Copyright & Fair Use Project...', 'info');
                 await new Promise(resolve => setTimeout(resolve, 800));
                 
-                const stanfordResult = universityResults['Stanford Law Library'];
-                if (stanfordResult) {
-                    addConsoleLog(`     ✓ Stanford analysis: ${stanfordResult.analysis || 'Found case law and analysis references'}`, 'debug');
-                    addConsoleLog(`     ✓ Validation confidence: ${Math.round(stanfordResult.confidence * 100)}%`, 'debug');
-                    updateUniversitySubstep('stanford', 'completed', Math.round(stanfordResult.confidence * 100));
+                const stanfordConfidence = universityResults['Stanford Law Library'];
+                if (stanfordConfidence) {
+                    addConsoleLog('     ✓ Stanford analysis: Found case law and analysis references', 'debug');
+                    addConsoleLog(`     ✓ Validation confidence: ${stanfordConfidence}% (REAL)`, 'debug');
+                    updateUniversitySubstep('stanford', 'completed', stanfordConfidence);
                 } else {
                     addConsoleLog('     ✓ Stanford analysis: Found case law and analysis references', 'debug');
-                    addConsoleLog('     ✓ Validation confidence: 90%', 'debug');
+                    addConsoleLog('     ✓ Validation confidence: 90% (FALLBACK)', 'debug');
                     updateUniversitySubstep('stanford', 'completed', 90);
                 }
                 
@@ -1805,14 +1682,14 @@
                 addConsoleLog('   📖 Accessing Harvard Law Library Legal Research Database...', 'info');
                 await new Promise(resolve => setTimeout(resolve, 800));
                 
-                const harvardResult = universityResults['Harvard Law Library'];
-                if (harvardResult) {
-                    addConsoleLog(`     ✓ Harvard analysis: ${harvardResult.analysis || 'Found TEACH Act references'}`, 'debug');
-                    addConsoleLog(`     ✓ Validation confidence: ${Math.round(harvardResult.confidence * 100)}%`, 'debug');
-                    updateUniversitySubstep('harvard', 'completed', Math.round(harvardResult.confidence * 100));
+                const harvardConfidence = universityResults['Harvard Law Library'];
+                if (harvardConfidence) {
+                    addConsoleLog('     ✓ Harvard analysis: Found TEACH Act references', 'debug');
+                    addConsoleLog(`     ✓ Validation confidence: ${harvardConfidence}% (REAL)`, 'debug');
+                    updateUniversitySubstep('harvard', 'completed', harvardConfidence);
                 } else {
                     addConsoleLog('     ✓ Harvard analysis: Found TEACH Act references', 'debug');
-                    addConsoleLog('     ✓ Validation confidence: 92%', 'debug');
+                    addConsoleLog('     ✓ Validation confidence: 92% (FALLBACK)', 'debug');
                     updateUniversitySubstep('harvard', 'completed', 92);
                 }
                 
@@ -1822,14 +1699,14 @@
                 addConsoleLog('   📖 Accessing Yale Law School Digital Collection...', 'info');
                 await new Promise(resolve => setTimeout(resolve, 900));
                 
-                const yaleResult = universityResults['Yale Law Library'];
-                if (yaleResult) {
-                    addConsoleLog(`     ✓ Yale analysis: ${yaleResult.analysis || 'Found digital rights references'}`, 'debug');
-                    addConsoleLog(`     ✓ Validation confidence: ${Math.round(yaleResult.confidence * 100)}%`, 'debug');
-                    updateUniversitySubstep('yale', 'completed', Math.round(yaleResult.confidence * 100));
+                const yaleConfidence = universityResults['Yale Law Library'];
+                if (yaleConfidence) {
+                    addConsoleLog('     ✓ Yale analysis: Found digital rights references', 'debug');
+                    addConsoleLog(`     ✓ Validation confidence: ${yaleConfidence}% (REAL)`, 'debug');
+                    updateUniversitySubstep('yale', 'completed', yaleConfidence);
                 } else {
                     addConsoleLog('     ✓ Yale analysis: Found digital rights references', 'debug');
-                    addConsoleLog('     ✓ Validation confidence: 90%', 'debug');
+                    addConsoleLog('     ✓ Validation confidence: 90% (FALLBACK)', 'debug');
                     updateUniversitySubstep('yale', 'completed', 90);
                 }
                 
@@ -1839,14 +1716,14 @@
                 addConsoleLog('   📖 Accessing Columbia Law Library Resources...', 'info');
                 await new Promise(resolve => setTimeout(resolve, 800));
                 
-                const columbiaResult = universityResults['Columbia Law Library'];
-                if (columbiaResult) {
-                    addConsoleLog(`     ✓ Columbia analysis: ${columbiaResult.analysis || 'Found copyright analysis references'}`, 'debug');
-                    addConsoleLog(`     ✓ Validation confidence: ${Math.round(columbiaResult.confidence * 100)}%`, 'debug');
-                    updateUniversitySubstep('columbia', 'completed', Math.round(columbiaResult.confidence * 100));
+                const columbiaConfidence = universityResults['Columbia Law Library'];
+                if (columbiaConfidence) {
+                    addConsoleLog('     ✓ Columbia analysis: Found copyright analysis references', 'debug');
+                    addConsoleLog(`     ✓ Validation confidence: ${columbiaConfidence}% (REAL)`, 'debug');
+                    updateUniversitySubstep('columbia', 'completed', columbiaConfidence);
                 } else {
                     addConsoleLog('     ✓ Columbia analysis: Found copyright analysis references', 'debug');
-                    addConsoleLog('     ✓ Validation confidence: 91%', 'debug');
+                    addConsoleLog('     ✓ Validation confidence: 91% (FALLBACK)', 'debug');
                     updateUniversitySubstep('columbia', 'completed', 91);
                 }
                 
@@ -2316,6 +2193,326 @@
             }
         }
 
+        // Load real compliance guide function
+        async function loadRealComplianceGuide() {
+            const loadingDiv = document.getElementById('compliance-loading');
+            const contentDiv = document.getElementById('compliance-content');
+            const errorDiv = document.getElementById('compliance-error');
+            
+            loadingDiv.style.display = 'block';
+            contentDiv.style.display = 'none';
+            errorDiv.style.display = 'none';
+            
+            try {
+                console.log('📋 Fetching real TEACH Act compliance guidance from API...');
+                
+                const response = await fetch('http://localhost:3002/api/llm/compliance/teach-act');
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    const complianceData = result.data;
+                    
+                    document.getElementById('compliance-score').textContent = `Overall Compliance: ${complianceData.overallCompliance}% ${complianceData.metadata.isReal ? '✅ REAL' : '❌ FALLBACK'}`;
+                    document.getElementById('compliance-updated').textContent = `Last Assessment: ${new Date(complianceData.lastUpdated).toLocaleDateString()}`;
+                    document.getElementById('compliance-source').textContent = `Data Source: ${complianceData.metadata.dataSource}`;
+                    
+                    document.getElementById('compliance-title').textContent = complianceData.title;
+                    
+                    const sectionsDiv = document.getElementById('compliance-sections');
+                    sectionsDiv.innerHTML = '';
+                    
+                    // Create Institutional Requirements section
+                    const reqSection = createInstitutionalRequirementsSection(complianceData.institutionalRequirements);
+                    sectionsDiv.appendChild(reqSection);
+                    
+                    // Create Risk Assessment section
+                    const riskSection = createRiskAssessmentSection(complianceData.riskAssessment);
+                    sectionsDiv.appendChild(riskSection);
+                    
+                    // Create Enforcement Statistics section
+                    const statsSection = createEnforcementStatsSection(complianceData.enforcementStatistics);
+                    sectionsDiv.appendChild(statsSection);
+                    
+                    loadingDiv.style.display = 'none';
+                    contentDiv.style.display = 'block';
+                    
+                    console.log('✅ Real compliance guidance loaded successfully');
+                    
+                } else {
+                    throw new Error(result.error || 'Failed to load compliance data');
+                }
+                
+            } catch (error) {
+                console.error('❌ Failed to load real compliance guidance:', error.message);
+                
+                loadingDiv.style.display = 'none';
+                errorDiv.style.display = 'block';
+                document.getElementById('compliance-error-message').textContent = error.message;
+            }
+        }
+
+        // Helper function to create institutional requirements section
+        function createInstitutionalRequirementsSection(requirements) {
+            const section = document.createElement('div');
+            section.className = 'compliance-section';
+            
+            const title = document.createElement('h5');
+            title.textContent = 'Institutional Requirements';
+            section.appendChild(title);
+            
+            const checklist = document.createElement('div');
+            checklist.className = 'checklist';
+            
+            requirements.forEach(req => {
+                const item = document.createElement('div');
+                item.className = 'checklist-item';
+                
+                const check = document.createElement('span');
+                check.className = 'check';
+                check.textContent = req.status === 'implemented' ? '✓' : req.status === 'partial' ? '⚠' : '✗';
+                check.style.color = req.status === 'implemented' ? '#28a745' : req.status === 'partial' ? '#ffc107' : '#dc3545';
+                
+                const text = document.createElement('span');
+                text.textContent = req.requirement;
+                
+                const compliance = document.createElement('span');
+                compliance.textContent = ` (${req.compliance}%)`;
+                compliance.style.fontSize = '12px';
+                compliance.style.color = req.compliance >= 90 ? '#28a745' : req.compliance >= 70 ? '#ffc107' : '#dc3545';
+                compliance.style.fontWeight = 'bold';
+                
+                item.appendChild(check);
+                item.appendChild(text);
+                item.appendChild(compliance);
+                
+                checklist.appendChild(item);
+            });
+            
+            section.appendChild(checklist);
+            return section;
+        }
+
+        // Helper function to create risk assessment section
+        function createRiskAssessmentSection(risks) {
+            const section = document.createElement('div');
+            section.className = 'compliance-section';
+            
+            const title = document.createElement('h5');
+            title.textContent = 'Risk Areas';
+            section.appendChild(title);
+            
+            const riskList = document.createElement('div');
+            riskList.className = 'risk-list';
+            
+            risks.forEach(risk => {
+                const item = document.createElement('div');
+                item.className = `risk-item ${risk.level.toLowerCase()}`;
+                
+                const level = document.createElement('span');
+                level.className = 'risk-level';
+                level.textContent = risk.level;
+                level.style.backgroundColor = risk.level === 'HIGH' ? '#dc3545' : risk.level === 'MEDIUM' ? '#ffc107' : '#28a745';
+                level.style.color = 'white';
+                level.style.padding = '2px 6px';
+                level.style.borderRadius = '3px';
+                level.style.fontSize = '11px';
+                level.style.fontWeight = 'bold';
+                
+                const riskText = document.createElement('span');
+                riskText.textContent = risk.risk;
+                riskText.style.marginLeft = '10px';
+                
+                const probability = document.createElement('span');
+                probability.textContent = ` (${risk.probability}% probability)`;
+                probability.style.fontSize = '12px';
+                probability.style.color = '#6e7681';
+                
+                item.appendChild(level);
+                item.appendChild(riskText);
+                item.appendChild(probability);
+                
+                riskList.appendChild(item);
+            });
+            
+            section.appendChild(riskList);
+            return section;
+        }
+
+        // Helper function to create enforcement statistics section
+        function createEnforcementStatsSection(stats) {
+            const section = document.createElement('div');
+            section.className = 'compliance-section';
+            
+            const title = document.createElement('h5');
+            title.textContent = 'Copyright Enforcement Statistics';
+            section.appendChild(title);
+            
+            const statsDiv = document.createElement('div');
+            statsDiv.className = 'enforcement-stats';
+            statsDiv.style.display = 'grid';
+            statsDiv.style.gridTemplateColumns = 'repeat(auto-fit, minmax(200px, 1fr))';
+            statsDiv.style.gap = '15px';
+            
+            const statItems = [
+                { number: stats.dmcaTakedowns.count, label: `DMCA Takedowns (${stats.dmcaTakedowns.year})` },
+                { number: stats.educationalCases.count, label: 'Educational Institution Cases' },
+                { number: `$${stats.maxDamages.amount / 1000}K`, label: 'Maximum Statutory Damages' },
+                { number: `${stats.complianceRate.percentage}%`, label: 'Compliance Rate' },
+                { number: `$${Math.round(stats.averageSettlement.amount / 1000)}K`, label: 'Average Settlement' }
+            ];
+            
+            statItems.forEach(stat => {
+                const item = document.createElement('div');
+                item.className = 'stat-item';
+                item.style.textAlign = 'center';
+                item.style.padding = '15px';
+                item.style.backgroundColor = '#f8f9fa';
+                item.style.borderRadius = '8px';
+                item.style.border = '1px solid #e9ecef';
+                
+                const number = document.createElement('span');
+                number.className = 'stat-number';
+                number.textContent = stat.number;
+                number.style.display = 'block';
+                number.style.fontSize = '24px';
+                number.style.fontWeight = 'bold';
+                number.style.color = '#0969da';
+                number.style.marginBottom = '5px';
+                
+                const label = document.createElement('span');
+                label.className = 'stat-label';
+                label.textContent = stat.label;
+                label.style.fontSize = '12px';
+                label.style.color = '#6e7681';
+                
+                item.appendChild(number);
+                item.appendChild(label);
+                
+                statsDiv.appendChild(item);
+            });
+            
+            section.appendChild(statsDiv);
+            return section;
+        }
+
+        // Function to load real versioning/staging data
+        async function loadRealVersioningData() {
+            const loadingDiv = document.getElementById('staging-loading');
+            const contentDiv = document.getElementById('staging-content');
+            const errorDiv = document.getElementById('staging-error');
+            
+            loadingDiv.style.display = 'block';
+            contentDiv.style.display = 'none';
+            errorDiv.style.display = 'none';
+            
+            try {
+                console.log('🔄 Loading real versioning data...');
+                const response = await fetch('http://localhost:3002/api/llm/versioning/system-info');
+                const result = await response.json();
+                
+                if (result.success && result.data) {
+                    const data = result.data;
+                    
+                    // Create regulation versioning dashboard with REAL data only
+                    contentDiv.innerHTML = `
+                        <div class="staging-dashboard">
+                            <div class="staging-overview">
+                                <div class="staging-card">
+                                    <h5>Current Regulation Version</h5>
+                                    <div class="version-info">
+                                        <span class="version-number">${data.currentRegulation.version}</span>
+                                        <span class="version-date">${data.currentRegulation.lastUpdated ? new Date(data.currentRegulation.lastUpdated).toISOString().split('T')[0] : 'Unknown'}</span>
+                                        <span class="version-status deployed">${data.currentRegulation.status}</span>
+                                    </div>
+                                    <div style="margin-top: 8px; font-size: 12px; color: #6e7681;">
+                                        USC: ${data.currentRegulation.sources.usc} | CFR: ${data.currentRegulation.sources.cfr}
+                                    </div>
+                                </div>
+                                
+                                <div class="staging-card">
+                                    <h5>Staging Regulation</h5>
+                                    <div class="version-info">
+                                        <span class="version-number">${data.stagingRegulation.version}</span>
+                                        <span class="version-date">${data.stagingRegulation.lastCheck ? new Date(data.stagingRegulation.lastCheck).toISOString().split('T')[0] : 'Unknown'}</span>
+                                        <span class="version-status staging">${data.stagingRegulation.status}</span>
+                                    </div>
+                                    <div style="margin-top: 8px; font-size: 12px; color: #6e7681;">
+                                        ${data.stagingRegulation.note}
+                                    </div>
+                                </div>
+                                
+                                <div class="staging-card">
+                                    <h5>Customer Distribution</h5>
+                                    <div class="customer-stats">
+                                        <span class="customer-count" style="font-size: 14px;">N/A</span>
+                                        <span class="customer-label">Database Required</span>
+                                    </div>
+                                    <div style="margin-top: 8px; font-size: 12px; color: #6e7681;">
+                                        ${data.customerDistribution.displayMessage}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="staging-controls">
+                                <button class="staging-button primary">SCAN FOR UPDATES</button>
+                                <button class="staging-button secondary">VALIDATE STAGING</button>
+                                <button class="staging-button warning">DEPLOY TO CUSTOMERS</button>
+                            </div>
+                            
+                            <div class="staging-logs">
+                                <h6>Recent Regulation Update Activity (Real Source Monitoring)</h6>
+                                <div class="log-entries">
+                                    ${data.updateActivity.map(log => `
+                                        <div class="log-entry">
+                                            <span class="log-time">${log.date} ${log.time}</span>
+                                            <span class="log-action">${log.action}</span>
+                                            <span class="log-detail">${log.detail}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <div class="system-health-panel" style="margin-top: 24px; padding: 20px; background: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef;">
+                                <h6 style="margin: 0 0 15px 0; color: #1a1a1a;">Regulation Source Status</h6>
+                                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                                    <div style="text-align: center;">
+                                        <div style="font-size: 14px; font-weight: 600; color: #28a745;">${data.regulationSources.usc17_110.status.toUpperCase()}</div>
+                                        <div style="font-size: 12px; color: #6e7681;">USC 17 Section 110</div>
+                                        <div style="font-size: 11px; color: #8b949e;">${data.regulationSources.usc17_110.source}</div>
+                                    </div>
+                                    <div style="text-align: center;">
+                                        <div style="font-size: 14px; font-weight: 600; color: #28a745;">${data.regulationSources.cfrGuidance.status.toUpperCase()}</div>
+                                        <div style="font-size: 12px; color: #6e7681;">CFR Guidance</div>
+                                        <div style="font-size: 11px; color: #8b949e;">${data.regulationSources.cfrGuidance.source}</div>
+                                    </div>
+                                </div>
+                                <div style="margin-top: 15px; font-size: 12px; color: #6e7681; text-align: center;">
+                                    Real regulation monitoring - ${data.metadata.source}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    loadingDiv.style.display = 'none';
+                    contentDiv.style.display = 'block';
+                    
+                    console.log(`✅ Real regulation versioning data loaded - ${data.currentRegulation.version} (${data.metadata.source})`);
+                    
+                } else {
+                    throw new Error(result.error || 'Failed to load versioning data');
+                }
+                
+            } catch (error) {
+                console.error('❌ Error loading versioning data:', error);
+                loadingDiv.style.display = 'none';
+                errorDiv.style.display = 'block';
+                errorDiv.innerHTML = `
+                    <p>❌ Failed to load versioning data: ${error.message}</p>
+                    <button onclick="loadRealVersioningData()" style="margin-top: 15px; padding: 8px 16px; background: #0969da; color: white; border: none; border-radius: 4px; cursor: pointer;">🔄 Retry</button>
+                `;
+            }
+        }
+
         // Auto-load data when specific tabs are shown
         const originalShowTab = showTab;
         showTab = function(tabId) {
@@ -2326,6 +2523,10 @@
                 loadRealCFRGuidance();
             } else if (tabId === 'analysis') {
                 loadRealAnalysisData();
+            } else if (tabId === 'compliance') {
+                loadRealComplianceGuide();
+            } else if (tabId === 'staging') {
+                loadRealVersioningData();
             }
         };
 

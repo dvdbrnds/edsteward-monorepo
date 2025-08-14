@@ -167,38 +167,56 @@ router.post('/query', async (req, res) => {
     if (options.realExecution && options.regulation === 'reg-66') {
       logger.info('Real LinearEngine execution requested for REG-66');
       
-      // For debugging: Return a simple mock result first
-      const mockResult = {
-        step1_result: { sources_fetched: 'Test', changes_detected: 0 },
-        validation_decision: { decision: 'PROCEED' },
-        step2_result: { sources_consulted: [{ name: 'Test University' }] },
-        final_status: { status: 'test_compliant', confidence: 0.95, recommendations: ['Test recommendation'] },
-        processed_at: new Date().toISOString()
-      };
+      try {
+        // Import and execute the real Reg66LinearEngine
+        const { Reg66LinearEngine } = await import('../regulations/reg-66/Reg66LinearEngine.js');
+        const linearEngine = new Reg66LinearEngine();
+        
+        // Execute the comprehensive LinearEngine workflow
+        logger.info('Executing real Reg66LinearEngine workflow...');
+        const workflowResult = await linearEngine.runCompleteWorkflow();
+        
+        // Extract university confidence scores from the workflow result
+        const universityConfidenceScores = {};
+        if (workflowResult.step2_result?.sources) {
+          workflowResult.step2_result.sources.forEach(source => {
+            if (source.confidence !== undefined) {
+              universityConfidenceScores[source.name] = source.confidence;
+            }
+          });
+        }
         
         // Format the response to match expected structure
         const result = {
           query,
           response: {
-            fullResponse: `LinearEngine Workflow Completed Successfully (Debug Mode)\n\nStep 1 Results: ${JSON.stringify(mockResult.step1_result, null, 2)}\n\nValidation Decision: ${JSON.stringify(mockResult.validation_decision, null, 2)}\n\nStep 2 Results: ${JSON.stringify(mockResult.step2_result, null, 2)}\n\nFinal Status: ${JSON.stringify(mockResult.final_status, null, 2)}`,
-            confidence: mockResult.final_status?.confidence || 0.85,
+            fullResponse: `Real LinearEngine Workflow Completed Successfully\n\nStep 1 Results: ${JSON.stringify(workflowResult.step1_result, null, 2)}\n\nValidation Decision: ${JSON.stringify(workflowResult.validation_decision, null, 2)}\n\nStep 2 Results: ${JSON.stringify(workflowResult.step2_result, null, 2)}\n\nFinal Status: ${JSON.stringify(workflowResult.final_status, null, 2)}`,
+            confidence: workflowResult.final_status?.confidence || 0.85,
             keyPoints: [
-              `Government Sources: ${mockResult.step1_result?.sources_fetched || 'N/A'}`,
-              `Differential Analysis: ${mockResult.step1_result?.changes_detected || 'N/A'} changes detected`,
-              `Validation Decision: ${mockResult.validation_decision?.decision || 'N/A'}`,
-              `University Libraries: ${mockResult.step2_result?.sources_consulted?.length || 0} sources consulted`,
-              `Final Compliance: ${mockResult.final_status?.status || 'N/A'}`
+              `Government Sources: ${workflowResult.step1_result?.sources_fetched || 'N/A'}`,
+              `Differential Analysis: ${workflowResult.step1_result?.changes_detected || 'N/A'} changes detected`,
+              `Validation Decision: ${workflowResult.validation_decision?.decision || 'N/A'}`,
+              `University Libraries: ${workflowResult.step2_result?.sources_consulted?.length || 0} sources consulted`,
+              `Final Compliance: ${workflowResult.final_status?.status || 'N/A'}`
             ],
-            actionItems: mockResult.final_status?.recommendations || []
+            actionItems: workflowResult.final_status?.recommendations || []
           },
           relevantRegulations: ['REG-66'],
           timestamp: new Date().toISOString(),
           processingTime: Date.now() - options.startTime,
-          source: 'Debug LinearEngine Workflow',
-          workflowDetails: mockResult
+          source: 'Real LinearEngine Workflow',
+          workflowDetails: workflowResult,
+          universityConfidenceScores: universityConfidenceScores
         };
         
         return res.json({ success: true, data: result });
+        
+      } catch (error) {
+        logger.error('Real LinearEngine execution failed:', error.message);
+        
+        // Fall back to compliance service if LinearEngine fails
+        logger.info('Falling back to standard compliance processing');
+      }
     }
     
     // Process the query using the compliance service (default behavior)
@@ -444,6 +462,68 @@ router.get('/usc/:title/:section', async (req, res) => {
     res.status(500).json({
       success: false,
       error: 'Failed to fetch real USC text',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// Compliance Guide endpoint - Real TEACH Act compliance guidance and risk assessment
+router.get('/compliance/teach-act', async (req, res) => {
+  try {
+    console.log('📋 Generating real TEACH Act compliance guidance...');
+    
+    // Dynamic import for ES modules
+    const { default: ComplianceService } = await import('./compliance-service.js');
+    const complianceService = new ComplianceService();
+    
+    const complianceData = await complianceService.generateComplianceGuide();
+    
+    res.json({
+      success: true,
+      data: complianceData,
+      timestamp: new Date().toISOString(),
+      source: 'Real Compliance Service'
+    });
+    
+    console.log(`✅ Served real compliance guidance (overall score: ${complianceData.overallCompliance}%)`);
+    
+  } catch (error) {
+    console.error('❌ Compliance API error:', error.message);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to generate real compliance guidance',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
+// Regulation Versioning/Staging endpoint - Real TEACH Act regulation versioning data
+router.get('/versioning/system-info', async (req, res) => {
+  try {
+    console.log('📊 Fetching real TEACH Act regulation versioning data...');
+    
+    // Dynamic import for ES modules
+    const { default: RegulationVersioningService } = await import('./regulation-versioning-service.js');
+    const regulationVersioningService = new RegulationVersioningService();
+    
+    const regulationVersioningData = await regulationVersioningService.getRegulationVersionInfo();
+    
+    res.json({
+      success: true,
+      data: regulationVersioningData,
+      timestamp: new Date().toISOString(),
+      source: 'Real Regulation Versioning Service'
+    });
+    
+    console.log(`✅ Served real regulation versioning data (Current: ${regulationVersioningData.currentRegulation.version})`);
+    
+  } catch (error) {
+    console.error('❌ Regulation versioning API error:', error.message);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch real regulation versioning data',
       message: error.message,
       timestamp: new Date().toISOString()
     });
