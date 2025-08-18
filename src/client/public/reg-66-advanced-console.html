@@ -1878,7 +1878,8 @@
             });
             
             regulationClient.on('error', (error) => {
-                addConsoleLog(`❌ Real-time update error: ${error.message}`, 'error');
+                const errorMsg = error?.message || error?.type || 'Connection failed';
+                addConsoleLog(`❌ Real-time update error: ${errorMsg}`, 'error');
             });
             
             regulationClient.on('reconnecting', (data) => {
