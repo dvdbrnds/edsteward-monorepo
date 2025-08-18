@@ -16,6 +16,31 @@ export interface RegulationVersionEvent {
   timestamp: string;
 }
 
+// MCP Engine message format
+export interface MCPRegulationUpdateEvent {
+  type: 'regulation_updated';
+  regulationId: string;
+  version: number;
+  timestamp: string;
+  data: {
+    changeType: string;
+    summary?: any;
+  };
+}
+
+// MCP Engine connection events
+export interface MCPConnectionEvent {
+  type: 'connected';
+  clientId: string;
+  timestamp: string;
+}
+
+export interface MCPSubscriptionEvent {
+  type: 'subscription_confirmed';
+  regulationIds: string[];
+  timestamp: string;
+}
+
 export interface WebSocketHookOptions {
   autoConnect?: boolean;
   reconnectAttempts?: number;
@@ -32,6 +57,8 @@ export function useWebSocket(options: WebSocketHookOptions = {}) {
   } = options;
 
   const { getToken, isAuthenticated } = useAuth();
+  const [clientId, setClientId] = useState<string | null>(null);
+  const [subscribedRegulations, setSubscribedRegulations] = useState<string[]>([]);
   const queryClient = useQueryClient();
   const { toast } = useToast();
 
@@ -41,7 +68,9 @@ export function useWebSocket(options: WebSocketHookOptions = {}) {
   const [connectionState, setConnectionState] = useState<'disconnected' | 'connecting' | 'connected' | 'error'>('disconnected');
   const [reconnectCount, setReconnectCount] = useState(0);
 
-  const wsUrl = import.meta.env.VITE_WS_URL || import.meta.env.VITE_API_URL?.replace(/^http/, 'ws');
+  // Use MCP Engine URL if configured, otherwise fall back to internal WebSocket
+  const wsUrl = import.meta.env.VITE_MCP_WS_URL || import.meta.env.VITE_WS_URL || import.meta.env.VITE_API_URL?.replace(/^http/, 'ws');
+  const useMCPEngine = !!import.meta.env.VITE_MCP_WS_URL;
 
   const cleanup = useCallback(() => {
     if (reconnectTimeoutRef.current) {
@@ -72,7 +101,20 @@ export function useWebSocket(options: WebSocketHookOptions = {}) {
       const message: WebSocketMessage = JSON.parse(event.data);
       
       switch (message.type) {
+        case 'regulation_updated': {
+          // MCP Engine format
+          const mcpEvent = message as MCPRegulationUpdateEvent;
+          // Invalidate regulations queries to trigger refetch
+          queryClient.invalidateQueries({ queryKey: ['regulations'] });
+          
+          toast({
+            title: "Regulation Updated",
+            description: `Regulation ${mcpEvent.regulationId} has been updated to version ${mcpEvent.version}`,
+          });
+          break;
+        }
         case 'reg_version_advanced': {
+          // Legacy internal format
           const regEvent = message as RegulationVersionEvent;
           // Invalidate regulations queries to trigger refetch
           queryClient.invalidateQueries({ queryKey: ['regulations'] });
@@ -81,6 +123,20 @@ export function useWebSocket(options: WebSocketHookOptions = {}) {
             title: "Regulation Updated",
             description: `Regulation ${regEvent.reg_id} has been updated to version ${regEvent.version}`,
           });
+          break;
+        }
+        case 'connected': {
+          // MCP Engine connection confirmation
+          const connEvent = message as MCPConnectionEvent;
+          setClientId(connEvent.clientId);
+          console.log('Connected to MCP Engine with client ID:', connEvent.clientId);
+          break;
+        }
+        case 'subscription_confirmed': {
+          // MCP Engine subscription confirmation
+          const subEvent = message as MCPSubscriptionEvent;
+          setSubscribedRegulations(subEvent.regulationIds);
+          console.log('Subscribed to regulations:', subEvent.regulationIds);
           break;
         }
         case 'pong':
@@ -103,8 +159,15 @@ export function useWebSocket(options: WebSocketHookOptions = {}) {
   }, [queryClient, toast]);
 
   const connect = useCallback(async () => {
-    if (!isAuthenticated || !wsUrl) {
+    if (!wsUrl) {
       return;
+    }
+
+    // For MCP Engine, we don't require authentication
+    if (useMCPEngine || !isAuthenticated) {
+      if (!useMCPEngine && !isAuthenticated) {
+        return;
+      }
     }
 
     // Don't connect if already connecting or connected
@@ -116,13 +179,20 @@ export function useWebSocket(options: WebSocketHookOptions = {}) {
     try {
       setConnectionState('connecting');
       
-      const token = await getToken();
-      if (!token) {
-        setConnectionState('error');
-        return;
+      let url: string;
+      if (useMCPEngine) {
+        // Connect directly to MCP Engine
+        url = wsUrl;
+      } else {
+        // Use legacy internal WebSocket with authentication
+        const token = await getToken();
+        if (!token) {
+          setConnectionState('error');
+          return;
+        }
+        url = `${wsUrl}/stream?token=${encodeURIComponent(token)}`;
       }
-
-      const url = `${wsUrl}/stream?token=${encodeURIComponent(token)}`;
+      
       const ws = new WebSocket(url);
       wsRef.current = ws;
 
@@ -130,7 +200,18 @@ export function useWebSocket(options: WebSocketHookOptions = {}) {
         setConnectionState('connected');
         setReconnectCount(0);
         startHeartbeat();
-        console.log('WebSocket connected');
+        
+        if (useMCPEngine) {
+          console.log('Connected to MCP Engine');
+          // Subscribe to all regulations (you can make this configurable)
+          const subscribeMessage = {
+            type: 'subscribe',
+            regulationIds: ['REG-66'] // Start with REG-66, expand as needed
+          };
+          ws.send(JSON.stringify(subscribeMessage));
+        } else {
+          console.log('WebSocket connected to internal server');
+        }
       };
 
       ws.onmessage = handleMessage;
@@ -164,7 +245,7 @@ export function useWebSocket(options: WebSocketHookOptions = {}) {
       console.error('Failed to connect WebSocket:', error);
       setConnectionState('error');
     }
-  }, [isAuthenticated, wsUrl, getToken, reconnectCount, reconnectAttempts, reconnectDelay, handleMessage, startHeartbeat, cleanup, toast]);
+  }, [isAuthenticated, wsUrl, getToken, reconnectCount, reconnectAttempts, reconnectDelay, handleMessage, startHeartbeat, cleanup, toast, useMCPEngine]);
 
   const disconnect = useCallback(() => {
     cleanup();
@@ -184,18 +265,18 @@ export function useWebSocket(options: WebSocketHookOptions = {}) {
     return false;
   }, []);
 
-  // Auto-connect when authenticated
+  // Auto-connect when authenticated (or immediately for MCP Engine)
   useEffect(() => {
-    if (autoConnect && isAuthenticated) {
+    if (autoConnect && (isAuthenticated || useMCPEngine)) {
       connect();
-    } else if (!isAuthenticated) {
+    } else if (!isAuthenticated && !useMCPEngine) {
       disconnect();
     }
 
     return () => {
       disconnect();
     };
-  }, [autoConnect, isAuthenticated, connect, disconnect]);
+  }, [autoConnect, isAuthenticated, connect, disconnect, useMCPEngine]);
 
   // Cleanup on unmount
   useEffect(() => {
@@ -207,12 +288,29 @@ export function useWebSocket(options: WebSocketHookOptions = {}) {
     };
   }, [cleanup]);
 
+  // Method to subscribe to additional regulations
+  const subscribeToRegulations = useCallback((regulationIds: string[]) => {
+    if (useMCPEngine && wsRef.current?.readyState === WebSocket.OPEN) {
+      const subscribeMessage = {
+        type: 'subscribe',
+        regulationIds
+      };
+      wsRef.current.send(JSON.stringify(subscribeMessage));
+      return true;
+    }
+    return false;
+  }, [useMCPEngine]);
+
   return {
     connectionState,
     reconnectCount,
     connect,
     disconnect,
     sendMessage,
+    subscribeToRegulations,
+    clientId,
+    subscribedRegulations,
+    useMCPEngine,
     isConnected: connectionState === 'connected',
     isConnecting: connectionState === 'connecting',
     hasError: connectionState === 'error',

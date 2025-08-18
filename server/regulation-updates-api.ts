@@ -2,6 +2,7 @@ import { Express, Request, Response } from 'express';
 import { storage } from './storage';
 import { calculateTextChangeDiff } from './services/diff-calculator';
 import { z } from 'zod';
+import { insertRegulationUpdateSchema } from '@shared/schema';
 
 /**
  * Schema for accepting a regulation update
@@ -30,6 +31,38 @@ const deferUpdateSchema = z.object({
  * @param app Express application
  */
 export function setupRegulationUpdatesApi(app: Express) {
+  // Create a new regulation update (for MCP Engine integration)
+  app.post('/api/regulation-updates', async (req: Request, res: Response) => {
+    try {
+      console.log('📋 MCP Engine regulation update received:', req.body);
+      
+      // Validate the request body
+      const validationResult = insertRegulationUpdateSchema.safeParse(req.body);
+      
+      if (!validationResult.success) {
+        console.error('❌ Validation failed:', validationResult.error.message);
+        return res.status(400).json({ 
+          error: 'Invalid regulation update data', 
+          details: validationResult.error.issues 
+        });
+      }
+      
+      // Create the regulation update
+      const newUpdate = await storage.createRegulationUpdate(validationResult.data);
+      
+      console.log('✅ Regulation update created successfully:', newUpdate.id);
+      
+      res.status(201).json({
+        success: true,
+        update: newUpdate,
+        message: `Regulation update ${newUpdate.id} created and ready for review`
+      });
+    } catch (error) {
+      console.error('❌ Error creating regulation update:', error);
+      res.status(500).json({ error: 'Failed to create regulation update' });
+    }
+  });
+
   // Get all pending regulation updates
   app.get('/api/regulation-updates/pending', async (req: Request, res: Response) => {
     try {

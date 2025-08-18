@@ -103,6 +103,7 @@ export interface IStorage {
   // Regulation Update methods
   getPendingRegulationUpdates(): Promise<RegulationUpdate[]>;
   getRegulationUpdateById(id: number): Promise<RegulationUpdate | null>;
+  createRegulationUpdate(data: InsertRegulationUpdate): Promise<RegulationUpdate>;
   acceptRegulationUpdate(id: number, userId: number, signature: string): Promise<void>;
   rejectRegulationUpdate(id: number, userId: number, signature: string, reason: string): Promise<void>;
   deferRegulationUpdate(id: number, userId: number, signature: string): Promise<void>;
@@ -237,6 +238,16 @@ export class DatabaseStorage implements IStorage {
     } catch (error) {
       console.error(`Error fetching regulation update with ID ${id}:`, error);
       return null;
+    }
+  }
+
+  async createRegulationUpdate(data: InsertRegulationUpdate): Promise<RegulationUpdate> {
+    try {
+      const [newUpdate] = await db.insert(regulationUpdates).values(data).returning();
+      return newUpdate;
+    } catch (error) {
+      console.error("Error creating regulation update:", error);
+      throw error;
     }
   }
 

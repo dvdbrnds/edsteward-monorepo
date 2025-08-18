@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useQuery } from "@tanstack/react-query";
 import { useLegacyBranding } from "@/hooks/use-branding";
+import { WebSocketStatus } from "@/components/ui/websocket-status";
 
 // Import logos
 import edStewardLogo from "@/assets/es-white-on-purple-logo.png";
@@ -160,8 +161,9 @@ export default function Navigation() {
             </div>
           </div>
 
-          {/* User Menu Dropdown */}
-          <div className="flex items-center flex-shrink-0">
+          {/* WebSocket Status and User Menu */}
+          <div className="flex items-center flex-shrink-0 gap-3">
+            <WebSocketStatus />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button

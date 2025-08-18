@@ -12,6 +12,7 @@ import compression from 'compression';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
+import fs from 'fs';
 import { institutionConfig, validateConfig } from './config/institution';
 import { configureAuth } from './auth/single-tenant-auth';
 import { testConnection } from './services/database';
@@ -39,8 +40,10 @@ app.use(helmet({
     directives: {
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts for MCP test page
+      scriptSrcAttr: ["'unsafe-inline'"], // Allow inline event handlers
       imgSrc: ["'self'", "data:", "https:", "blob:"],
+      connectSrc: ["'self'", "ws://localhost:3003", "http://localhost:3003"], // Allow WebSocket connections to MCP Engine
     },
   },
 }));
@@ -159,6 +162,143 @@ app.post('/api/authenticate', async (req, res) => {
 // Serve static files
 app.use(express.static(path.join(__dirname, '../dist/public')));
 
+// Serve MCP client script
+app.get('/mcp-client.js', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/mcp-client.js'));
+});
+
+// MCP Engine Test Page
+app.get('/mcp-test.html', (req, res) => {
+  const testPageContent = `<!DOCTYPE html>
+<html>
+<head>
+    <title>MCP Engine Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .connected { background: #d4edda; color: #155724; }
+        .disconnected { background: #f8d7da; color: #721c24; }
+        .connecting { background: #fff3cd; color: #856404; }
+        #messages { border: 1px solid #ccc; height: 300px; overflow-y: scroll; padding: 10px; }
+        button { padding: 10px 20px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🚀 MCP Engine WebSocket Test</h1>
+    
+    <div id="status" class="status disconnected">❌ Not Connected</div>
+    
+    <button onclick="connect()">Connect to MCP Engine</button>
+    <button onclick="sendTest()">Send Test Update</button>
+    <button onclick="clearMessages()">Clear Messages</button>
+    
+    <h3>Messages:</h3>
+    <div id="messages"></div>
+    
+    <script>
+        let ws = null;
+        const statusDiv = document.getElementById('status');
+        const messagesDiv = document.getElementById('messages');
+        
+        function addMessage(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+            div.innerHTML = '<strong>' + timestamp + '</strong>: ' + message;
+            div.style.color = type === 'error' ? 'red' : type === 'success' ? 'green' : 'black';
+            messagesDiv.appendChild(div);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            console.log('[' + timestamp + '] ' + message);
+        }
+        
+        function connect() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                addMessage('Already connected!', 'info');
+                return;
+            }
+            
+            statusDiv.textContent = '🟡 Connecting to MCP Engine...';
+            statusDiv.className = 'status connecting';
+            addMessage('Attempting to connect to ws://localhost:3003/regulation-updates');
+            
+            ws = new WebSocket('ws://localhost:3003/regulation-updates');
+            
+            ws.onopen = function() {
+                statusDiv.textContent = '✅ Connected to MCP Engine';
+                statusDiv.className = 'status connected';
+                addMessage('✅ Connected to MCP Engine WebSocket!', 'success');
+                
+                // Subscribe to REG-66
+                const subscribeMessage = {
+                    type: 'subscribe',
+                    regulationIds: ['REG-66']
+                };
+                ws.send(JSON.stringify(subscribeMessage));
+                addMessage('📋 Sent subscription for REG-66', 'success');
+            };
+            
+            ws.onmessage = function(event) {
+                const message = JSON.parse(event.data);
+                addMessage('📥 Received: ' + JSON.stringify(message, null, 2), 'success');
+                
+                if (message.type === 'regulation_updated') {
+                    addMessage('🚨 REGULATION UPDATE: ' + message.regulationId + ' version ' + message.version, 'success');
+                }
+            };
+            
+            ws.onclose = function(event) {
+                statusDiv.textContent = '❌ Disconnected from MCP Engine';
+                statusDiv.className = 'status disconnected';
+                addMessage('❌ WebSocket connection closed. Code: ' + event.code, 'error');
+            };
+            
+            ws.onerror = function(error) {
+                statusDiv.textContent = '❌ WebSocket Error';
+                statusDiv.className = 'status disconnected';
+                addMessage('❌ WebSocket error: ' + JSON.stringify(error), 'error');
+                addMessage('❌ Error details: ' + error.toString(), 'error');
+                console.error('WebSocket error details:', error);
+            };
+        }
+        
+        function sendTest() {
+            // Send a test update via HTTP to trigger WebSocket notification
+            fetch('http://localhost:3003/api/simulate-change/REG-66', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    changeType: 'MANUAL_TEST',
+                    mockData: {
+                        impact: 'high',
+                        message: 'Manual test from MCP test page'
+                    }
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                addMessage('📤 Sent test update: ' + JSON.stringify(data), 'info');
+            })
+            .catch(error => {
+                addMessage('❌ Failed to send test update: ' + error, 'error');
+            });
+        }
+        
+        function clearMessages() {
+            messagesDiv.innerHTML = '';
+        }
+        
+        // Auto-connect on page load
+        window.onload = function() {
+            addMessage('🚀 MCP Engine Test Page Loaded');
+            addMessage('Click "Connect to MCP Engine" to start WebSocket connection');
+        };
+    </script>
+</body>
+</html>`;
+  res.send(testPageContent);
+});
+
 // Institution configuration endpoint
 app.get('/api/config', (req, res) => {
   // Return public configuration (no secrets)
@@ -190,11 +330,22 @@ app.get('/api/health', async (req, res) => {
 
 // Serve React app for all other routes
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../dist/public/index.html'));
+  const htmlPath = path.join(__dirname, '../dist/public/index.html');
+  
+  // Read the HTML file and inject MCP client script
+  let html = fs.readFileSync(htmlPath, 'utf8');
+  
+  // Inject MCP client script after title-setter script
+  html = html.replace(
+    '<script src="/title-setter.js"></script>',
+    '<script src="/title-setter.js"></script>\n    \n    <!-- MCP Engine Integration - Real-time regulation updates -->\n    <script src="/mcp-client.js"></script>'
+  );
+  
+  res.send(html);
 });
 
 // Error handling
-app.use((err: any, req: express.Request, res: express.Response) => {
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error('Server error:', err);
   res.status(500).json({ error: 'Internal server error' });
 });

@@ -372,6 +372,23 @@ export class MockStorage implements IStorage {
     return [];
   }
 
+  async createRegulationUpdate(data: InsertRegulationUpdate): Promise<RegulationUpdate> {
+    // Mock implementation - just return a basic regulation update
+    return {
+      id: Math.floor(Math.random() * 1000),
+      regulationId: data.regulationId,
+      name: data.name,
+      originalContent: data.originalContent,
+      updatedContent: data.updatedContent,
+      status: data.status || "pending",
+      updateDate: new Date(),
+      signature: data.signature,
+      userId: data.userId,
+      rejectionReason: data.rejectionReason,
+      processedAt: data.processedAt
+    };
+  }
+
   async getRegulationUpdateById(id: number): Promise<RegulationUpdate | null> {
     return null;
   }

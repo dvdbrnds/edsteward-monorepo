@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { useWebSocket } from '@/hooks/useWebSocket';
 
 interface DebugToolsProps {
   className?: string;
@@ -20,6 +21,17 @@ declare global {
 }
 
 const DebugTools: React.FC<DebugToolsProps> = ({ className }) => {
+  const { 
+    connectionState, 
+    useMCPEngine, 
+    clientId, 
+    subscribedRegulations, 
+    reconnectCount,
+    connect,
+    disconnect,
+    subscribeToRegulations
+  } = useWebSocket();
+
   const handleClearCache = () => {
     localStorage.clear();
     sessionStorage.clear();
@@ -101,6 +113,74 @@ const DebugTools: React.FC<DebugToolsProps> = ({ className }) => {
               >
                 Reload Page
               </Button>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-sm font-medium mb-2">WebSocket Status (MCP Engine Integration)</h3>
+            <div className="space-y-2">
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="flex justify-between p-2 bg-muted rounded">
+                  <span className="font-medium">Connection:</span>
+                  <Badge variant={connectionState === 'connected' ? 'default' : 'secondary'}>
+                    {connectionState}
+                  </Badge>
+                </div>
+                <div className="flex justify-between p-2 bg-muted rounded">
+                  <span className="font-medium">MCP Engine:</span>
+                  <Badge variant={useMCPEngine ? 'default' : 'secondary'}>
+                    {useMCPEngine ? 'Enabled' : 'Disabled'}
+                  </Badge>
+                </div>
+                <div className="flex justify-between p-2 bg-muted rounded">
+                  <span className="font-medium">Client ID:</span>
+                  <span className="text-muted-foreground truncate ml-2">
+                    {clientId || 'Not connected'}
+                  </span>
+                </div>
+                <div className="flex justify-between p-2 bg-muted rounded">
+                  <span className="font-medium">Subscriptions:</span>
+                  <span className="text-muted-foreground">
+                    {subscribedRegulations.length > 0 ? subscribedRegulations.join(', ') : 'None'}
+                  </span>
+                </div>
+                <div className="flex justify-between p-2 bg-muted rounded">
+                  <span className="font-medium">Reconnect Count:</span>
+                  <span className="text-muted-foreground">{reconnectCount}</span>
+                </div>
+                <div className="flex justify-between p-2 bg-muted rounded">
+                  <span className="font-medium">WebSocket URL:</span>
+                  <span className="text-muted-foreground text-xs">
+                    {useMCPEngine ? 'ws://localhost:3003/regulation-updates' : 'Internal WebSocket'}
+                  </span>
+                </div>
+              </div>
+              <div className="flex gap-2 mt-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => connect()}
+                  disabled={connectionState === 'connected' || connectionState === 'connecting'}
+                >
+                  Connect
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => disconnect()}
+                  disabled={connectionState === 'disconnected'}
+                >
+                  Disconnect
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => subscribeToRegulations(['REG-66'])}
+                  disabled={connectionState !== 'connected'}
+                >
+                  Subscribe REG-66
+                </Button>
+              </div>
             </div>
           </div>
 

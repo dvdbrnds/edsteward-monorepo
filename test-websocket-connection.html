@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Test</title>
+</head>
+<body>
+    <h1>MCP Engine WebSocket Test</h1>
+    <div id="status">Connecting...</div>
+    <div id="messages"></div>
+    
+    <script>
+        const statusDiv = document.getElementById('status');
+        const messagesDiv = document.getElementById('messages');
+        
+        function addMessage(message) {
+            const div = document.createElement('div');
+            div.textContent = new Date().toLocaleTimeString() + ': ' + message;
+            messagesDiv.appendChild(div);
+            console.log(message);
+        }
+        
+        // Test connection to MCP Engine
+        const ws = new WebSocket('ws://localhost:3003/regulation-updates');
+        
+        ws.onopen = function() {
+            statusDiv.textContent = '✅ Connected to MCP Engine';
+            statusDiv.style.color = 'green';
+            addMessage('Connected to MCP Engine WebSocket');
+            
+            // Subscribe to REG-66
+            const subscribeMessage = {
+                type: 'subscribe',
+                regulationIds: ['REG-66']
+            };
+            ws.send(JSON.stringify(subscribeMessage));
+            addMessage('Sent subscription for REG-66');
+        };
+        
+        ws.onmessage = function(event) {
+            const message = JSON.parse(event.data);
+            addMessage('Received: ' + JSON.stringify(message, null, 2));
+            
+            if (message.type === 'regulation_updated') {
+                statusDiv.textContent = '🚨 Regulation Update Received!';
+                statusDiv.style.color = 'orange';
+            }
+        };
+        
+        ws.onclose = function() {
+            statusDiv.textContent = '❌ Disconnected from MCP Engine';
+            statusDiv.style.color = 'red';
+            addMessage('WebSocket connection closed');
+        };
+        
+        ws.onerror = function(error) {
+            statusDiv.textContent = '❌ WebSocket Error';
+            statusDiv.style.color = 'red';
+            addMessage('WebSocket error: ' + error);
+        };
+    </script>
+</body>
+</html>
