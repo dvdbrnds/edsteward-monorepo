@@ -1268,6 +1268,9 @@
                 <button id="runButton" class="run-button" onclick="runLinearEngine()">
                     ▶ EXECUTE COMPREHENSIVE WORKFLOW
                 </button>
+                <button id="autoWorkflowToggle" onclick="toggleAutoWorkflow()" class="run-button" style="background: #6b7280; margin-left: 12px; font-size: 12px;">
+                    🤖 AUTO-WORKFLOW: OFF
+                </button>
             </div>
             
             <div class="console-output" id="consoleOutput">
@@ -1807,12 +1810,194 @@
         // Periodic health checks
         setInterval(checkSystemHealth, 30000);
         
+        // Initialize Real-Time Regulation Updates
+        let regulationClient = null;
+        
+        function initializeRealtimeUpdates() {
+            try {
+                // Load the client SDK
+                const script = document.createElement('script');
+                script.src = '/regulation-update-client.js';
+                script.onload = () => {
+                    setupRealtimeConnection();
+                };
+                script.onerror = () => {
+                    addConsoleLog('⚠️ Real-time updates unavailable - using polling mode', 'warning');
+                };
+                document.head.appendChild(script);
+            } catch (error) {
+                addConsoleLog('⚠️ Real-time updates failed to initialize', 'warning');
+                console.error('Real-time update initialization error:', error);
+            }
+        }
+        
+        function setupRealtimeConnection() {
+            if (typeof REG66UpdateClient === 'undefined') {
+                addConsoleLog('⚠️ Real-time client not available', 'warning');
+                return;
+            }
+            
+            regulationClient = new REG66UpdateClient({
+                wsUrl: 'ws://localhost:3003/regulation-updates',
+                autoReconnect: true
+            });
+            
+            // Set up event handlers
+            regulationClient.on('connected', () => {
+                addConsoleLog('🔗 Connected to real-time regulation updates', 'success');
+                updateConnectionStatus(true);
+            });
+            
+            regulationClient.on('disconnected', () => {
+                addConsoleLog('📴 Disconnected from real-time updates', 'warning');
+                updateConnectionStatus(false);
+            });
+            
+            regulationClient.on('regulation_updated', (data) => {
+                addConsoleLog(`📋 REAL-TIME UPDATE: REG-66 regulation updated (v${data.version})`, 'update');
+                addConsoleLog(`   - Change type: ${data.data.changeType}`, 'info');
+                addConsoleLog(`   - Impact level: ${data.data.summary?.impactLevel || 'medium'}`, 'debug');
+                addConsoleLog(`   - Timestamp: ${new Date(data.timestamp).toLocaleString()}`, 'debug');
+                
+                // Show visual notification
+                showRegulationUpdateNotification(data);
+                
+                // Update regulation status
+                updateRegulationStatus();
+                
+                // Trigger automatic workflow if configured
+                if (autoWorkflowEnabled) {
+                    setTimeout(() => {
+                        addConsoleLog('🤖 Auto-workflow triggered by regulation update', 'info');
+                        runLinearEngine();
+                    }, 2000);
+                }
+            });
+            
+            regulationClient.on('error', (error) => {
+                addConsoleLog(`❌ Real-time update error: ${error.message}`, 'error');
+            });
+            
+            regulationClient.on('reconnecting', (data) => {
+                addConsoleLog(`🔄 Reconnecting to updates (attempt ${data.attempt})...`, 'info');
+            });
+            
+            // Connect
+            regulationClient.connect().catch(error => {
+                addConsoleLog('❌ Failed to connect to real-time updates', 'error');
+                console.error('Connection error:', error);
+            });
+        }
+        
+        function updateConnectionStatus(connected) {
+            const statusDot = document.getElementById('statusDot');
+            const statusText = document.getElementById('statusText');
+            
+            if (connected) {
+                statusDot.className = 'status-dot success';
+                if (statusText.textContent === 'IDLE') {
+                    statusText.textContent = 'CONNECTED';
+                }
+            } else {
+                if (statusDot.className.includes('success') && statusText.textContent === 'CONNECTED') {
+                    statusDot.className = 'status-dot warning';
+                    statusText.textContent = 'RECONNECTING';
+                }
+            }
+        }
+        
+        function showRegulationUpdateNotification(updateData) {
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = 'regulation-update-notification';
+            notification.innerHTML = `
+                <div style="
+                    position: fixed;
+                    top: 80px;
+                    right: 20px;
+                    background: linear-gradient(135deg, #10b981, #065f46);
+                    color: white;
+                    padding: 16px 24px;
+                    border-radius: 12px;
+                    box-shadow: 0 8px 32px rgba(16, 185, 129, 0.3);
+                    z-index: 10000;
+                    font-family: 'Courier New', monospace;
+                    font-size: 14px;
+                    max-width: 400px;
+                    border: 1px solid rgba(255,255,255,0.2);
+                    backdrop-filter: blur(10px);
+                    animation: slideIn 0.3s ease-out;
+                ">
+                    <div style="font-weight: bold; margin-bottom: 8px;">
+                        📋 REG-66 REGULATION UPDATED
+                    </div>
+                    <div style="font-size: 13px; opacity: 0.9;">
+                        Version: ${updateData.version}<br>
+                        Type: ${updateData.data.changeType}<br>
+                        Impact: ${updateData.data.summary?.impactLevel || 'medium'}
+                    </div>
+                    <div style="margin-top: 12px; font-size: 12px; opacity: 0.8;">
+                        ${new Date(updateData.timestamp).toLocaleString()}
+                    </div>
+                </div>
+            `;
+            
+            // Add animation CSS if not already present
+            if (!document.getElementById('notification-styles')) {
+                const style = document.createElement('style');
+                style.id = 'notification-styles';
+                style.textContent = `
+                    @keyframes slideIn {
+                        from { transform: translateX(100%); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                    @keyframes slideOut {
+                        from { transform: translateX(0); opacity: 1; }
+                        to { transform: translateX(100%); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+            
+            document.body.appendChild(notification);
+            
+            // Remove after 8 seconds with fade out
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.style.animation = 'slideOut 0.3s ease-in';
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 300);
+                }
+            }, 8000);
+        }
+        
+        // Auto-workflow setting
+        let autoWorkflowEnabled = false;
+        
+        function toggleAutoWorkflow() {
+            autoWorkflowEnabled = !autoWorkflowEnabled;
+            const button = document.getElementById('autoWorkflowToggle');
+            if (button) {
+                button.textContent = autoWorkflowEnabled ? '🤖 AUTO-WORKFLOW: ON' : '🤖 AUTO-WORKFLOW: OFF';
+                button.style.background = autoWorkflowEnabled ? '#10b981' : '#6b7280';
+            }
+            
+            addConsoleLog(`🤖 Auto-workflow ${autoWorkflowEnabled ? 'enabled' : 'disabled'}`, 'info');
+        }
+        
         // Initialize diagnostics and regulation status
         setTimeout(() => {
             addConsoleLog('🔧 System diagnostics initialized', 'info');
             addConsoleLog('📡 Monitoring API endpoints...', 'debug');
             addConsoleLog('📋 Regulation preview loaded: TEACH Act', 'info');
             addConsoleLog('🎯 TEACH Act LinearEngine ready for execution', 'info');
+            
+            // Initialize real-time updates
+            addConsoleLog('🔗 Initializing real-time regulation updates...', 'info');
+            initializeRealtimeUpdates();
             
             // Update regulation status dynamically
             updateRegulationStatus();
