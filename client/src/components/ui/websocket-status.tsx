@@ -3,7 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { Wifi, WifiOff, Loader2 } from "lucide-react";
 
 export function WebSocketStatus() {
-  const { connectionState, useMCPEngine, clientId, subscribedRegulations } = useWebSocket();
+  const { connectionState, useMCPEngine, subscribedRegulations } = useWebSocket();
 
   const getStatusColor = () => {
     switch (connectionState) {
