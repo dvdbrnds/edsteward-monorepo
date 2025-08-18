@@ -1,6 +1,6 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { useAuth } from '@/hooks/useAuth';
+import { useAuth } from '@/hooks/use-auth';
 import { useToast } from '@/hooks/use-toast';
 
 export interface WebSocketMessage {
@@ -104,8 +104,9 @@ export function useWebSocket(options: WebSocketHookOptions = {}) {
         case 'regulation_updated': {
           // MCP Engine format
           const mcpEvent = message as MCPRegulationUpdateEvent;
-          // Invalidate regulations queries to trigger refetch
+          // Invalidate both regulations and regulation updates queries to trigger refetch
           queryClient.invalidateQueries({ queryKey: ['regulations'] });
+          queryClient.invalidateQueries({ queryKey: ['/api/regulation-updates/pending'] });
           
           toast({
             title: "Regulation Updated",
@@ -116,8 +117,9 @@ export function useWebSocket(options: WebSocketHookOptions = {}) {
         case 'reg_version_advanced': {
           // Legacy internal format
           const regEvent = message as RegulationVersionEvent;
-          // Invalidate regulations queries to trigger refetch
+          // Invalidate both regulations and regulation updates queries to trigger refetch
           queryClient.invalidateQueries({ queryKey: ['regulations'] });
+          queryClient.invalidateQueries({ queryKey: ['/api/regulation-updates/pending'] });
           
           toast({
             title: "Regulation Updated",

@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { useWebSocket } from '@/hooks/useWebSocket';
+// import { useAuth } from '@/hooks/use-auth'; // Temporarily disabled
 
 interface DebugToolsProps {
   className?: string;
@@ -21,16 +21,15 @@ declare global {
 }
 
 const DebugTools: React.FC<DebugToolsProps> = ({ className }) => {
-  const { 
-    connectionState, 
-    useMCPEngine, 
-    clientId, 
-    subscribedRegulations, 
-    reconnectCount,
-    connect,
-    disconnect,
-    subscribeToRegulations
-  } = useWebSocket();
+  // Temporarily disabled due to circular dependency fix
+  const connectionState = 'disconnected';
+  const useMCPEngine = false;
+  const clientId = null;
+  const subscribedRegulations: string[] = [];
+  const reconnectCount = 0;
+  const connect = () => console.log('WebSocket connect disabled');
+  const disconnect = () => console.log('WebSocket disconnect disabled');
+  const subscribeToRegulations = () => false;
 
   const handleClearCache = () => {
     localStorage.clear();

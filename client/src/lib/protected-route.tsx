@@ -13,17 +13,28 @@ export function ProtectedRoute({
 }) {
   const { user, isLoading } = useAuth();
 
+  console.log(`🔐 ProtectedRoute ${path}:`, { 
+    user: !!user, 
+    isLoading, 
+    userEmail: user?.email,
+    currentPath: window.location.pathname,
+    timestamp: new Date().toISOString()
+  });
+
   if (isLoading) {
+    console.log(`⏳ ProtectedRoute ${path}: Loading...`);
     return (
       <Route path={path}>
         <div className="flex items-center justify-center min-h-screen">
           <Loader2 className="h-8 w-8 animate-spin text-border" />
+          <p className="ml-2">Loading authentication...</p>
         </div>
       </Route>
     );
   }
 
   if (!user) {
+    console.log(`❌ ProtectedRoute ${path}: No user, redirecting to /auth`);
     return (
       <Route path={path}>
         <Redirect to="/auth" />
@@ -31,6 +42,7 @@ export function ProtectedRoute({
     );
   }
 
+  console.log(`✅ ProtectedRoute ${path}: User authenticated, rendering component`);
   return (
     <ErrorBoundary>
       <Component />

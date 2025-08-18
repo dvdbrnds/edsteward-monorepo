@@ -18,7 +18,6 @@ import {
 import { User as SelectUser, InsertUser } from "@shared/schema";
 import { apiRequest, queryClient } from "../lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
-import { useWebSocket } from "@/hooks/useWebSocket";
 
 /**
  * @interface AuthContextType
@@ -37,6 +36,7 @@ type AuthContextType = {
   logoutMutation: UseMutationResult<void, Error, void>;
   /** Mutation for handling user registration */
   registerMutation: UseMutationResult<SelectUser, Error, InsertUser>;
+  // WebSocket integration temporarily removed to fix circular dependency
 };
 
 /**
@@ -56,8 +56,7 @@ export const AuthContext = createContext<AuthContextType | null>(null);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const { toast } = useToast();
   
-  // Initialize WebSocket connection for MCP Engine integration
-  useWebSocket({ autoConnect: true });
+  // WebSocket integration temporarily removed to fix circular dependency
   const {
     data: user,
     error,
@@ -104,7 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     mutationFn: async (credentials: InsertUser) => {
       return await apiRequest("POST", "/api/register", credentials);
     },
-    onSuccess: (registerResponse: any) => {
+          onSuccess: () => {
       // Don't set query data directly - let the auth status query refetch with correct structure
       queryClient.invalidateQueries({ queryKey: ["/api/auth/status"] });
     },
@@ -143,6 +142,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         loginMutation,
         logoutMutation,
         registerMutation,
+        // WebSocket integration temporarily removed to fix circular dependency
       }}
     >
       {children}

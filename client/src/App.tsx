@@ -1,4 +1,4 @@
-import { Switch, Route } from "wouter";
+import { Switch, Route, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -56,6 +56,15 @@ function useCurrentTenant() {
 export default function App() {
   console.log('[App] Initializing single-tenant application');
   const currentTenant = useCurrentTenant();
+  const [location] = useLocation();
+  
+  // Debug current location - this will update when routes change
+  console.log('[App] Current location from wouter:', location);
+  console.log('[App] Current location from window:', window.location.pathname);
+  
+  useEffect(() => {
+    console.log('[App] Route changed to:', location);
+  }, [location]);
 
   return (
     <ErrorBoundary>
@@ -73,15 +82,23 @@ export default function App() {
               {currentTenant === 'admin' && (
                 <ProtectedRoute path="/admin/dashboard" component={AdminDashboardPage} />
               )}
-              <ProtectedRoute path="/regulations" component={RegulationsPage} />
+              {/* More specific routes MUST come before general ones */}
               <ProtectedRoute path="/regulations/validate" component={ValidationPage} />
-              <ProtectedRoute path="/regulations/updates" component={UpdatesListPage} />
               <ProtectedRoute path="/regulations/updates/:id" component={DifferentialViewPage} />
+              <ProtectedRoute path="/regulations/updates" component={UpdatesListPage} />
+              {/* Debug route */}
+              <Route path="/test-route">
+                <div style={{padding: '20px', backgroundColor: 'yellow'}}>
+                  <h1>🧪 TEST ROUTE WORKING!</h1>
+                  <p>If you see this, routing is working. Current path: {window.location.pathname}</p>
+                </div>
+              </Route>
               <ProtectedRoute path="/regulations/diff-test" component={DiffTestPage} />
               <ProtectedRegulationRoute
                 path="/regulations/:id"
                 component={RegulationDetailPage}
               />
+              <ProtectedRoute path="/regulations" component={RegulationsPage} />
               <ProtectedRegulationRoute
                 path="/compliance-wizard/:id"
                 component={ComplianceWizardPage}
