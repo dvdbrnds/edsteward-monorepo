@@ -1271,6 +1271,9 @@
                 <button id="autoWorkflowToggle" onclick="toggleAutoWorkflow()" class="run-button" style="background: #6b7280; margin-left: 12px; font-size: 12px;">
                     🤖 AUTO-WORKFLOW: OFF
                 </button>
+                <button id="pushUpdateButton" onclick="pushRegulationUpdate()" class="run-button" style="background: #059669; margin-left: 12px; font-size: 12px;">
+                    📤 PUSH UPDATE TO CLIENTS
+                </button>
             </div>
             
             <div class="console-output" id="consoleOutput">
@@ -1986,6 +1989,53 @@
             }
             
             addConsoleLog(`🤖 Auto-workflow ${autoWorkflowEnabled ? 'enabled' : 'disabled'}`, 'info');
+        }
+
+        async function pushRegulationUpdate() {
+            const button = document.getElementById('pushUpdateButton');
+            if (!button) return;
+            
+            // Disable button during operation
+            const originalText = button.textContent;
+            const originalBackground = button.style.background;
+            button.textContent = '📤 PUSHING...';
+            button.style.background = '#f59e0b';
+            button.disabled = true;
+            
+            try {
+                addConsoleLog('📤 Initiating manual regulation update push...', 'info');
+                
+                // Call the delivery system API to trigger a manual update
+                const response = await fetch('http://localhost:3003/api/trigger-update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        regulationId: 'REG-66',
+                        changeType: 'MANUAL_PUSH',
+                        message: 'Manual update triggered from console',
+                        timestamp: new Date().toISOString()
+                    })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    addConsoleLog(`✅ Update pushed successfully to ${result.clientsNotified || 'all'} clients`, 'success');
+                    addConsoleLog(`📋 Update ID: ${result.updateId || 'N/A'} | Version: ${result.version || 'N/A'}`, 'info');
+                } else {
+                    const errorText = await response.text();
+                    addConsoleLog(`❌ Failed to push update: ${response.status} - ${errorText}`, 'error');
+                }
+            } catch (error) {
+                addConsoleLog(`❌ Error pushing update: ${error.message}`, 'error');
+                console.error('Push update error:', error);
+            } finally {
+                // Re-enable button
+                button.textContent = originalText;
+                button.style.background = originalBackground;
+                button.disabled = false;
+            }
         }
         
         // Initialize diagnostics and regulation status

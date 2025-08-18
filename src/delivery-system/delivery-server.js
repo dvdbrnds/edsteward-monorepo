@@ -226,6 +226,65 @@ class DeliveryServer {
         });
       }
     });
+
+    // Manual trigger for regulation updates (from console)
+    this.app.post('/api/trigger-update', async (req, res) => {
+      const { regulationId = 'REG-66', changeType = 'MANUAL_PUSH', message = 'Manual update triggered' } = req.body;
+      
+      if (!this.deliveryEngine) {
+        return res.status(503).json({ 
+          error: 'Delivery engine not ready',
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      try {
+        console.log(`📤 Manual update triggered for ${regulationId} via console`);
+        
+        // Create a manual update event
+        const updateData = {
+          regulationId,
+          changeType,
+          message,
+          timestamp: new Date().toISOString(),
+          source: 'console_manual_trigger',
+          data: {
+            before: { content: 'Current regulation content...' },
+            after: { 
+              content: 'Updated regulation content (manual trigger)...',
+              impact: 'medium',
+              message: message
+            },
+            contentHash: 'manual_' + Date.now()
+          }
+        };
+
+        // Trigger the delivery engine by emitting a content change event through the CDC
+        await this.deliveryEngine.cdc.emit(REGULATION_EVENTS.CONTENT_CHANGED, updateData);
+        
+        // Get current status for response
+        const status = this.deliveryEngine.getStatus();
+        const currentVersion = status?.regulations?.[regulationId]?.version || 'unknown';
+        
+        res.json({
+          success: true,
+          message: `Manual update triggered for ${regulationId}`,
+          regulationId,
+          version: currentVersion,
+          updateId: updateData.contentHash,
+          clientsNotified: status?.regulations?.[regulationId]?.connectedClients || 0,
+          timestamp: new Date().toISOString()
+        });
+        
+      } catch (error) {
+        console.error('❌ Manual trigger error:', error);
+        res.status(500).json({
+          error: error.message,
+          regulationId,
+          timestamp: new Date().toISOString()
+        });
+      }
+    });
   }
 
   async start() {
