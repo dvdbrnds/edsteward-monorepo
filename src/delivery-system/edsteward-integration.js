@@ -14,7 +14,7 @@ export class EdStewardIntegration {
     
     // Regulation ID mapping (MCP Engine -> EdSteward)
     this.regulationMapping = {
-      'REG-66': 4661,  // TEACH Act in EdSteward
+      'REG-66': 4524,  // TEACH Act in EdSteward (updated per client spec)
       'REG-17': 4662,  // Copyright Act
       'REG-DMCA': 4663 // DMCA
     };
@@ -38,15 +38,7 @@ export class EdStewardIntegration {
       name: this.getRegulationName(mcpUpdate.regulationId),
       originalContent: mcpUpdate.data.before?.content || "Previous regulation text...",
       updatedContent: mcpUpdate.data.after?.content || "New regulation text with changes...",
-      status: "pending",
-      metadata: {
-        mcpRegulationId: mcpUpdate.regulationId,
-        mcpVersion: mcpUpdate.version,
-        changeType: mcpUpdate.data.changeType,
-        impact: mcpUpdate.data.after?.impact,
-        timestamp: mcpUpdate.timestamp,
-        contentHash: mcpUpdate.data.contentHash
-      }
+      status: "pending"
     };
 
     console.log(`📤 Sending update to EdSteward for ${mcpUpdate.regulationId} -> ${edstewardId}`);
