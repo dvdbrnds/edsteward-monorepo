@@ -1,0 +1,9 @@
+{
+  "title": "TUF Demo Regulation",
+  "version": "1.0.0",
+  "sections": [
+    "This is a demonstration regulation for TUF workflow"
+  ],
+  "lastUpdated": "2025-08-19T16:04:20.592Z",
+  "demoFlag": true
+}

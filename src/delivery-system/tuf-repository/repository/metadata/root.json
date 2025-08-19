@@ -1,0 +1,71 @@
+{
+  "signed": {
+    "_type": "root",
+    "spec_version": "1.0.0",
+    "consistent_snapshot": true,
+    "version": 1,
+    "expires": "2026-08-19T16:03:46.861Z",
+    "keys": {
+      "cd6dcaccf07957708fd94460e26d040922ad8bdb4d47e598c864bdb7974e5eb4": {
+        "keytype": "ed25519",
+        "scheme": "ed25519",
+        "keyval": {
+          "public": "QmL+XIZsjxiRNbwQ5HSMf3rUa5OXryeYnlJAJsjaAqc="
+        }
+      },
+      "f64145fee2fcda4ca8751525072bbb31bd024ad6dcd4c4aa385134370e6d48b2": {
+        "keytype": "ed25519",
+        "scheme": "ed25519",
+        "keyval": {
+          "public": "LvzE6kSHIzjdzNwcX0nAEdidlq/D+PbXERherDBX2po="
+        }
+      },
+      "e3d69599a7b3f5cf1edde828d5f812846af68bfab954d4029af201b783a7de1c": {
+        "keytype": "ed25519",
+        "scheme": "ed25519",
+        "keyval": {
+          "public": "F3ekZbLgqqtInenKpdaVli2zkPsXqWfjPsZIkwpq6K8="
+        }
+      },
+      "8217bfeb16ccd50ecd68f4356490ae3dd047f8f3184e64bd9c4e52aed6bc93be": {
+        "keytype": "ed25519",
+        "scheme": "ed25519",
+        "keyval": {
+          "public": "XEOGpktmUcGDRZD03PRRw9sV3ZLbjxrZjzHVig4OJfo="
+        }
+      }
+    },
+    "roles": {
+      "root": {
+        "keyids": [
+          "cd6dcaccf07957708fd94460e26d040922ad8bdb4d47e598c864bdb7974e5eb4"
+        ],
+        "threshold": 1
+      },
+      "targets": {
+        "keyids": [
+          "f64145fee2fcda4ca8751525072bbb31bd024ad6dcd4c4aa385134370e6d48b2"
+        ],
+        "threshold": 1
+      },
+      "snapshot": {
+        "keyids": [
+          "e3d69599a7b3f5cf1edde828d5f812846af68bfab954d4029af201b783a7de1c"
+        ],
+        "threshold": 1
+      },
+      "timestamp": {
+        "keyids": [
+          "8217bfeb16ccd50ecd68f4356490ae3dd047f8f3184e64bd9c4e52aed6bc93be"
+        ],
+        "threshold": 1
+      }
+    }
+  },
+  "signatures": [
+    {
+      "keyid": "cd6dcaccf07957708fd94460e26d040922ad8bdb4d47e598c864bdb7974e5eb4",
+      "sig": "rltKgVyxN/GrZ+bFmlvivVZMuVeFb5AJhh3gz5HRDgZmhW7UnI6ho/hiYZWNtH8slfClXXKIV4WUZbDp0ZOYCQ=="
+    }
+  ]
+}

@@ -2,7 +2,7 @@
   "metadata": {
     "regulation": "TEACH Act Section 110(2)",
     "publicLaw": "Pub. L. 107-273, 116 Stat. 1758 (2002)",
-    "lastUpdated": "2025-07-15T14:59:51.340Z",
+    "lastUpdated": "2025-07-20T13:13:28.447Z",
     "dataQuality": "authoritative",
     "version": "baseline",
     "source": "generated_baseline"
@@ -22,12 +22,12 @@
           "D"
         ],
         "sourceUrl": "https://uscode.house.gov/view.xhtml?req=17+USC+110&f=treesort&fq=true&num=0&hl=true",
-        "fetchedAt": "2025-08-14T14:59:50.916Z",
+        "fetchedAt": "2025-08-19T13:13:27.760Z",
         "method": "live_scraping"
       },
-      "fetchedAt": "2025-08-14T14:59:50.916Z",
+      "fetchedAt": "2025-08-19T13:13:27.760Z",
       "hash": "abafabef515bf3db",
-      "lastChecked": "2025-07-15T14:59:51.340Z"
+      "lastChecked": "2025-07-20T13:13:28.447Z"
     },
     {
       "name": "Copyright Office TEACH Act Guidance",
@@ -38,14 +38,14 @@
         "content": "Except as otherwise provided in this title, as used in this title, the following terms and their variant forms mean the following: An “anonymous work” is a work on the copies or phonorecords of which no natural person is identified as author. An “architectural work” is the design of a building as embodied in any tangible medium of expression, including a building, architectural plans, or drawings. The work includes the overall form as well as the arrangement and composition of spaces and elements in the design, but does not include individual standard features.3 “Audiovisual works” are works that consist of a series of related images which are intrinsically intended to be shown by the use of machines or devices such as projectors, viewers, or electronic equipment, together with accompanying sounds, if any, regardless of the nature of the material objects, such as films or tapes, in which the works are embodied The “Berne Convention” is the Convention for the Protection of Literary and Artistic Works, signed at Berne, Switzerland, on September 9, 1886, and all acts, protocols, and revisions thereto.4 The “best edition” of a work is the edition, published in the United States at any time before the date of deposit, that the Library of Congress determines to be most suitable for its purposes. A person’s “children” are that person’s immediate offspring, whether legitimate or not, and any children legally adopted by that person. A “collective work” is a work, such as a periodical issue, anthology, or encyclopedia, in which a number of contributions, constituting separate and independent works in themselves, are assembled into a collective whole. A “compilation” is a work formed by the collection and assembling of preexisting materials or of data that are selected, coordinated, or arranged in such a way that the resulting work as a whole constitutes an original work of authorship. The term “compilation” includes collective works. A “computer program” is a set of statements or instructions to be used directly or indirectly in a computer in order to bring about a certain result.5 “Copies” are material objects, other than phonorecords, in which a work is fixed by any method now known or later developed, and from which the work can be perceived, reproduced, or otherwise communicated, either directly or with the aid of a machine or device. The term “copies” includes the material object, other than a phonorecord, in which the work is first fixed. “Copyright owner”, with respect to any one of the exclusive rights comprised in a copyright, refers to the owner of that particular right. A \"Copyright Royalty Judge” is a Copyright Royalty Judge appointed under section 802 of this title, and includes any individual serving as an interim Copyright Royalty Judge under such section.6 A work is “created” when it is fixed in a copy or phonorecord for the first time; where a work is prepared over a period of time, the portion of it that has been fixed at any particular time constitutes the work as of that time, and where the work has been prepared in different versions, each version constitutes a separate work. A “derivative work” is a work based upon one or more preexisting works, such as a translation, musical arrangement, dramatization, fictionalization, motion picture version, sound recording, art reproduction, abridgment, condensation, or any other form in which a work may be recast, transformed, or adapted. A work consisting of editorial revisions, annotations, elaborations, or other modifications, which, as a whole, represent an original work of authorship, is a “derivative work”. A “digital transmission” is a transmission in whole or in part in a digital or other nonanalog format.7 To “display” a work means to show a copy of it, either directly or by means of a film, slide, television image, or any other device or process or, in the case of a motion picture or other audiovisual work, to show individual images nonsequentially. An “establishment” is a store, shop, or any similar place of business open to the general public for the primary purpose of selling goods or services in which the majority of the gross square feet of space that is nonresidential is used for that purpose, and in which nondramatic musical works are performed publicly.8 The term “financial gain” includes receipt, or expectation of receipt, of anything of value, including the receipt of other copyrighted works.9 A work is “fixed” in a tangible medium of expression when its embodiment in a copy or phonorecord, by or under the authority of the author, is sufficiently permanent or stable to permit it to be perceived, reproduced, or otherwise communicated for a period of more than transitory duration. A work consisting of sounds, images, or both, that are being transmitted, is “fixed” for purposes of this title if a fixation of the work is being made simultaneously with its transmission. A “food service or drinking establishment” is a restaurant, inn, bar, tav",
         "sourceUrl": "https://www.copyright.gov/title17/92chap1.html#110",
         "agency": "U.S. Copyright Office",
-        "lastRevised": "2025-08-14T14:59:50.991Z",
-        "fetchedAt": "2025-08-14T14:59:50.991Z",
+        "lastRevised": "2025-08-19T13:13:27.914Z",
+        "fetchedAt": "2025-08-19T13:13:27.914Z",
         "method": "live_scraping",
         "dataSize": 435112
       },
-      "fetchedAt": "2025-08-14T14:59:50.991Z",
+      "fetchedAt": "2025-08-19T13:13:27.914Z",
       "hash": "abafabef515bf3db",
-      "lastChecked": "2025-07-15T14:59:51.340Z"
+      "lastChecked": "2025-07-20T13:13:28.447Z"
     },
     {
       "name": "Legislative History",
@@ -64,14 +64,14 @@
         "summary": "Amends Federal copyright law to provide exemptions for distance education by accredited educational institutions",
         "sourceUrl": "https://api.congress.gov/v3/bill/107/senate/487",
         "apiVersion": "v3",
-        "fetchedAt": "2025-08-14T14:59:51.197Z",
+        "fetchedAt": "2025-08-19T13:13:28.202Z",
         "method": "fallback_cached",
-        "fetchError": "Request failed with status code 429",
+        "fetchError": "Request failed with status code 404",
         "needsApiKey": false
       },
-      "fetchedAt": "2025-08-14T14:59:51.197Z",
+      "fetchedAt": "2025-08-19T13:13:28.202Z",
       "hash": "abafabef515bf3db",
-      "lastChecked": "2025-07-15T14:59:51.340Z"
+      "lastChecked": "2025-07-20T13:13:28.447Z"
     },
     {
       "name": "Copyright Office Guidance",
@@ -93,12 +93,12 @@
           "https://www.copyright.gov/circs/circ21.pdf",
           "https://www.copyright.gov/title17/92chap1.html#110"
         ],
-        "fetchedAt": "2025-08-14T14:59:51.340Z",
+        "fetchedAt": "2025-08-19T13:13:28.447Z",
         "method": "live_scraping"
       },
-      "fetchedAt": "2025-08-14T14:59:51.340Z",
+      "fetchedAt": "2025-08-19T13:13:28.447Z",
       "hash": "abafabef515bf3db",
-      "lastChecked": "2025-07-15T14:59:51.340Z"
+      "lastChecked": "2025-07-20T13:13:28.447Z"
     }
   ]
 }

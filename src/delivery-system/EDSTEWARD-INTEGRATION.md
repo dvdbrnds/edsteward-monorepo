@@ -294,3 +294,7 @@ const integration = new EdStewardIntegration({
 Your MCP Engine now automatically pushes regulation updates to EdSteward in real-time. Compliance officers will receive immediate notifications when regulations change, ensuring your institution stays compliant with the latest requirements.
 
 **Support**: Check logs in both systems for detailed error messages and integration status.
+
+
+
+

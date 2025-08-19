@@ -4,13 +4,15 @@
  */
 
 import fetch from 'node-fetch';
+import WebSocket from 'ws';
 
 export class EdStewardIntegration {
   constructor(options = {}) {
-    this.edstewardUrl = options.edstewardUrl || 'http://localhost:3000';
-    this.apiKey = options.apiKey || null;
+    this.edstewardUrl = options.edstewardUrl || process.env.EDSTEWARD_URL || 'http://localhost:3000';
+    this.apiKey = options.apiKey || process.env.EDSTEWARD_API_KEY || null;
     this.retryAttempts = options.retryAttempts || 3;
     this.retryDelay = options.retryDelay || 1000;
+    this.websocketUrl = options.websocketUrl || process.env.EDSTEWARD_WS_URL || 'ws://localhost:3000/ws';
     
     // Regulation ID mapping (MCP Engine -> EdSteward)
     this.regulationMapping = {
@@ -75,6 +77,14 @@ export class EdStewardIntegration {
       console.log(`✅ EdSteward update successful: ${result.update?.id || 'Unknown ID'}`);
       console.log(`   Regulation: ${payload.regulationId} (${payload.name})`);
       console.log(`   Status: ${payload.status}`);
+      
+      // Send WebSocket notification for instant UI refresh
+      await this.sendWebSocketNotification({
+        regulationId: payload.regulationId,
+        updateId: result.update?.id,
+        name: payload.name,
+        timestamp: new Date().toISOString()
+      });
       
       return {
         success: true,
@@ -156,5 +166,56 @@ export class EdStewardIntegration {
    */
   getMappings() {
     return { ...this.regulationMapping };
+  }
+
+  /**
+   * Send WebSocket notification to EdSteward for instant UI refresh
+   */
+  async sendWebSocketNotification(updateData) {
+    return new Promise((resolve) => {
+      try {
+        console.log(`📡 Sending WebSocket notification to ${this.websocketUrl}`);
+        
+        const ws = new WebSocket(this.websocketUrl);
+        
+        ws.on('open', () => {
+          const message = {
+            type: 'regulation_updated',
+            data: {
+              regulationId: updateData.regulationId,
+              updateId: updateData.updateId,
+              name: updateData.name,
+              timestamp: updateData.timestamp
+            }
+          };
+          
+          ws.send(JSON.stringify(message));
+          console.log(`✅ WebSocket notification sent: Update ID ${updateData.updateId}`);
+          ws.close();
+          resolve(true);
+        });
+        
+        ws.on('error', (error) => {
+          console.warn(`⚠️ WebSocket notification failed: ${error.message}`);
+          resolve(false);
+        });
+        
+        ws.on('close', () => {
+          resolve(true);
+        });
+        
+        // Timeout after 5 seconds
+        setTimeout(() => {
+          if (ws.readyState === WebSocket.OPEN) {
+            ws.close();
+          }
+          resolve(false);
+        }, 5000);
+        
+      } catch (error) {
+        console.warn(`⚠️ WebSocket notification error: ${error.message}`);
+        resolve(false);
+      }
+    });
   }
 }

@@ -504,7 +504,8 @@ class RegulationDeliveryEngine extends Emittery {
       await this.emit(REGULATION_EVENTS.DELIVERY_CONFIRMED, {
         regulationId: changeData.regulationId,
         eventId: event.eventId,
-        clientsNotified: this.pushService.getConnectionStats().subscriptions[changeData.regulationId] || 0
+        clientsNotified: this.pushService.getConnectionStats().subscriptions[changeData.regulationId] || 0,
+        updateData: changeData
       });
     });
 

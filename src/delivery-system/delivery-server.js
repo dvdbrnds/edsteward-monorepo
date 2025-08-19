@@ -8,12 +8,17 @@
 import express from 'express';
 import { createServer } from 'http';
 import cors from 'cors';
+import fetch from 'node-fetch';
+import dotenv from 'dotenv';
 import { RegulationDeliveryEngine, REGULATION_EVENTS } from './regulation-delivery-engine.js';
 import { EdStewardIntegration } from './edsteward-integration.js';
 
+// Load environment variables
+dotenv.config();
+
 class DeliveryServer {
   constructor(options = {}) {
-    this.port = options.port || 3003;
+    this.port = options.port || 3051;
     this.app = express();
     this.server = createServer(this.app);
     this.deliveryEngine = null;
@@ -241,7 +246,10 @@ class DeliveryServer {
       try {
         console.log(`📤 Manual update triggered for ${regulationId} via console`);
         
-        // Create a manual update event
+        // Fetch the REAL regulation content from the MCP Engine
+        const regulationContent = await this.fetchFullRegulationContent(regulationId);
+        
+        // Create a manual update event with REAL data
         const updateData = {
           regulationId,
           changeType,
@@ -249,12 +257,8 @@ class DeliveryServer {
           timestamp: new Date().toISOString(),
           source: 'console_manual_trigger',
           data: {
-            before: { content: 'Current regulation content...' },
-            after: { 
-              content: 'Updated regulation content (manual trigger)...',
-              impact: 'medium',
-              message: message
-            },
+            before: { content: 'Previous regulation state...' },
+            after: regulationContent,
             contentHash: 'manual_' + Date.now()
           }
         };
@@ -264,14 +268,14 @@ class DeliveryServer {
         
         // Get current status for response
         const status = this.deliveryEngine.getStatus();
-        const currentVersion = status?.regulations?.[regulationId]?.version || 'unknown';
+        const realVersion = regulationContent.version || 'unknown';
         
         res.json({
           success: true,
           message: `Manual update triggered for ${regulationId}`,
           regulationId,
-          version: currentVersion,
-          updateId: updateData.contentHash,
+          version: realVersion,
+          updateId: updateData.data.contentHash,
           clientsNotified: status?.regulations?.[regulationId]?.connectedClients || 0,
           timestamp: new Date().toISOString()
         });
@@ -345,6 +349,101 @@ class DeliveryServer {
     }
   }
 
+  /**
+   * Fetch complete regulation content from MCP Engine
+   */
+  async fetchFullRegulationContent(regulationId) {
+    try {
+      console.log(`🔍 Fetching full content for ${regulationId} from MCP Engine...`);
+      
+      // Fetch all the regulation data components
+      const [uscResponse, cfrResponse, complianceResponse, versioningResponse] = await Promise.all([
+        // USC Text
+        fetch('http://localhost:3002/api/llm/usc/17/110', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        }),
+        // CFR Guidance  
+        fetch('http://localhost:3002/api/llm/cfr/teach-act', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        }),
+        // Compliance Guide
+        fetch('http://localhost:3002/api/llm/compliance/teach-act', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        }),
+        // Versioning Data
+        fetch('http://localhost:3002/api/llm/versioning/system-info', {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        })
+      ]);
+
+      // Parse all responses
+      const [uscData, cfrData, complianceData, versioningData] = await Promise.all([
+        uscResponse.ok ? uscResponse.json() : { error: 'USC fetch failed' },
+        cfrResponse.ok ? cfrResponse.json() : { error: 'CFR fetch failed' },
+        complianceResponse.ok ? complianceResponse.json() : { error: 'Compliance fetch failed' },
+        versioningResponse.ok ? versioningResponse.json() : { error: 'Versioning fetch failed' }
+      ]);
+
+      // Also run the LinearEngine workflow for comprehensive analysis
+      const workflowResponse = await fetch('http://localhost:3002/api/llm/query', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: `Get comprehensive analysis for ${regulationId}`,
+          options: { regulation: regulationId, realExecution: true }
+        })
+      });
+
+      const workflowData = workflowResponse.ok ? await workflowResponse.json() : { error: 'Workflow fetch failed' };
+
+      // Construct the complete regulation payload
+      const fullContent = {
+        regulationId,
+        timestamp: new Date().toISOString(),
+        version: versioningData?.data?.currentRegulation?.version || versioningData?.currentVersion || 'unknown',
+        components: {
+          uscText: uscData,
+          cfrGuidance: cfrData,
+          complianceGuide: complianceData,
+          versioningInfo: versioningData,
+          workflowAnalysis: workflowData
+        },
+        summary: {
+          title: `${regulationId} - TEACH Act Compliance Update`,
+          impact: 'high',
+          changeType: 'comprehensive_update',
+          affectedAreas: ['copyright', 'fair_use', 'educational_exemptions'],
+          message: 'Complete regulation content with real-time analysis'
+        }
+      };
+
+      console.log(`✅ Successfully fetched full content for ${regulationId}`);
+      return fullContent;
+
+    } catch (error) {
+      console.error(`❌ Failed to fetch full content for ${regulationId}:`, error.message);
+      
+      // Return a fallback payload with error information
+      return {
+        regulationId,
+        timestamp: new Date().toISOString(),
+        version: 'error',
+        error: error.message,
+        components: {},
+        summary: {
+          title: `${regulationId} - Content Fetch Error`,
+          impact: 'low',
+          changeType: 'error',
+          message: `Failed to fetch regulation content: ${error.message}`
+        }
+      };
+    }
+  }
+
   async stop() {
     console.log('⏹️ Stopping delivery server...');
     
@@ -362,7 +461,7 @@ export { DeliveryServer };
 // Start the server if this file is run directly
 if (import.meta.url === `file://${process.argv[1]}`) {
   const server = new DeliveryServer({
-    port: process.env.DELIVERY_PORT || 3003
+    port: process.env.DELIVERY_PORT || 3051
   });
   
   server.start().catch(error => {

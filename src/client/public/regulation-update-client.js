@@ -7,7 +7,7 @@
 
 class RegulationUpdateClient {
   constructor(options = {}) {
-    this.wsUrl = options.wsUrl || 'ws://localhost:3051/regulation-updates';
+    this.wsUrl = options.wsUrl || 'ws://localhost:3003/regulation-updates';
     this.autoReconnect = options.autoReconnect !== false;
     this.reconnectDelay = options.reconnectDelay || 5000;
     this.maxReconnectAttempts = options.maxReconnectAttempts || 10;
@@ -376,4 +376,5 @@ if (typeof module !== 'undefined' && module.exports) {
   window.REG66UpdateClient = REG66UpdateClient;
 }
 
-export { RegulationUpdateClient, REG66UpdateClient };
+// Remove ES module export for browser compatibility
+// export { RegulationUpdateClient, REG66UpdateClient };
