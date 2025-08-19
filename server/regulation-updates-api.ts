@@ -27,6 +27,66 @@ const deferUpdateSchema = z.object({
 });
 
 /**
+ * Schema for MCP Engine complex payload
+ */
+const mcpEngineUpdateSchema = z.object({
+  regulationId: z.number(),
+  name: z.string(),
+  status: z.enum(["pending", "accepted", "rejected", "deferred"]).default("pending"),
+  effectiveDate: z.string().optional(),
+  content: z.object({
+    uscText: z.object({
+      title: z.string(),
+      section: z.string(),
+      text: z.string(),
+      lastUpdated: z.string()
+    }).optional(),
+    cfrGuidance: z.object({
+      title: z.string(),
+      sections: z.array(z.any()),
+      lastUpdated: z.string()
+    }).optional(),
+    complianceGuide: z.object({
+      title: z.string(),
+      riskAssessment: z.any(),
+      recommendations: z.array(z.any()),
+      lastUpdated: z.string()
+    }).optional(),
+    analysis: z.object({
+      workflow: z.string(),
+      universityConfidenceScores: z.any(),
+      summary: z.string(),
+      lastUpdated: z.string()
+    }).optional(),
+    versioning: z.object({
+      currentVersion: z.string(),
+      systemInfo: z.any(),
+      lastUpdated: z.string()
+    }).optional(),
+    summary: z.object({
+      version: z.string(),
+      impact: z.string(),
+      changeType: z.string(),
+      description: z.string()
+    }).optional()
+  }).optional()
+});
+
+/**
+ * Schema for TUF-verified regulation update payload
+ */
+const tufUpdateSchema = z.object({
+  regulationId: z.string(),
+  verified: z.boolean(),
+  hash: z.string(),
+  updateTime: z.string(),
+  tufPath: z.string(),
+  content: z.any(),
+  metadata: z.any().optional(),
+  source: z.literal("tuf")
+});
+
+/**
  * Sets up the regulation update API routes
  * @param app Express application
  */
@@ -34,32 +94,97 @@ export function setupRegulationUpdatesApi(app: Express) {
   // Create a new regulation update (for MCP Engine integration)
   app.post('/api/regulation-updates', async (req: Request, res: Response) => {
     try {
-      console.log('📋 MCP Engine regulation update received:', req.body);
+      console.log('📋 Regulation update received:', req.body);
       
-      // Validate the request body
-      const validationResult = insertRegulationUpdateSchema.safeParse(req.body);
+      let updateData;
+      let isTUFVerified = false;
       
-      if (!validationResult.success) {
-        console.error('❌ Validation failed:', validationResult.error.message);
-        return res.status(400).json({ 
-          error: 'Invalid regulation update data', 
-          details: validationResult.error.issues 
-        });
+      // Try to parse as TUF-verified format first
+      const tufValidation = tufUpdateSchema.safeParse(req.body);
+      
+      if (tufValidation.success) {
+        console.log('🔒 Detected TUF-verified format');
+        const tufData = tufValidation.data;
+        
+        if (!tufData.verified) {
+          console.error('❌ TUF verification failed - refusing unverified content');
+          return res.status(400).json({ 
+            success: false,
+            error: 'TUF verification failed - content not cryptographically verified' 
+          });
+        }
+        
+        // Convert TUF format to EdSteward format
+        updateData = {
+          regulationId: parseInt(tufData.regulationId.replace('REG-', '')) || 0,
+          name: `TUF-Verified: ${tufData.regulationId}`,
+          status: 'pending',
+          originalContent: JSON.stringify(tufData.metadata, null, 2) || "TUF metadata",
+          updatedContent: JSON.stringify(tufData.content, null, 2) || "TUF-verified content",
+          // Add TUF-specific metadata
+          tufHash: tufData.hash,
+          tufPath: tufData.tufPath,
+          tufUpdateTime: tufData.updateTime,
+          cryptographicallyVerified: true
+        };
+        
+        isTUFVerified = true;
+        
+      } else {
+        // Try to parse as MCP Engine format
+        const mcpValidation = mcpEngineUpdateSchema.safeParse(req.body);
+        
+        if (mcpValidation.success) {
+          console.log('✅ Detected MCP Engine format');
+          const mcpData = mcpValidation.data;
+          
+          // Convert MCP Engine format to EdSteward format
+          updateData = {
+            regulationId: mcpData.regulationId,
+            name: mcpData.name,
+            status: mcpData.status,
+            originalContent: mcpData.content?.uscText?.text || "Original content from MCP Engine",
+            updatedContent: JSON.stringify(mcpData.content, null, 2) || "Updated content from MCP Engine"
+          };
+        } else {
+          // Try simple format
+          const simpleValidation = insertRegulationUpdateSchema.safeParse(req.body);
+          
+          if (!simpleValidation.success) {
+            console.error('❌ Validation failed for all formats');
+            console.error('TUF format errors:', tufValidation.error.issues);
+            console.error('MCP format errors:', mcpValidation.error.issues);
+            console.error('Simple format errors:', simpleValidation.error.issues);
+            
+            return res.status(400).json({ 
+              error: 'Invalid regulation update data', 
+              details: simpleValidation.error.issues 
+            });
+          }
+          
+          console.log('✅ Detected simple format');
+          updateData = simpleValidation.data;
+        }
       }
       
       // Create the regulation update
-      const newUpdate = await storage.createRegulationUpdate(validationResult.data);
+      const newUpdate = await storage.createRegulationUpdate(updateData);
       
-      console.log('✅ Regulation update created successfully:', newUpdate.id);
+      console.log(`✅ Regulation update created successfully: ${newUpdate.id} ${isTUFVerified ? '(TUF-verified)' : ''}`);
       
-      res.status(201).json({
+      // Return format expected by MCP Engine
+      res.status(200).json({
         success: true,
-        update: newUpdate,
-        message: `Regulation update ${newUpdate.id} created and ready for review`
+        updateId: newUpdate.id.toString(),
+        verified: isTUFVerified,
+        hash: isTUFVerified ? updateData.tufHash : undefined
       });
     } catch (error) {
       console.error('❌ Error creating regulation update:', error);
-      res.status(500).json({ error: 'Failed to create regulation update' });
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to create regulation update' 
+      });
     }
   });
 
@@ -273,6 +398,99 @@ export function setupRegulationUpdatesApi(app: Express) {
     } catch (error) {
       console.error('Error deferring regulation update:', error);
       res.status(500).json({ error: 'Failed to defer regulation update' });
+    }
+  });
+
+  // TUF-specific endpoints
+  
+  // Get TUF repository health
+  app.get('/api/tuf/health', async (req: Request, res: Response) => {
+    try {
+      const { getTUFService } = await import('./services/tuf-service.js');
+      const tufService = getTUFService();
+      const health = await tufService.getHealth();
+      
+      res.json({
+        tufRepository: health,
+        edstewardIntegration: {
+          status: 'healthy',
+          timestamp: new Date().toISOString()
+        }
+      });
+    } catch (error) {
+      console.error('❌ TUF health check failed:', error);
+      res.status(500).json({ 
+        error: 'TUF repository health check failed',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+  
+  // Get available regulations from TUF repository
+  app.get('/api/tuf/regulations', async (req: Request, res: Response) => {
+    try {
+      const { getTUFService } = await import('./services/tuf-service.js');
+      const tufService = getTUFService();
+      const regulations = await tufService.getAvailableRegulations();
+      
+      res.json({
+        regulations,
+        count: regulations.length,
+        source: 'TUF',
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('❌ Failed to get TUF regulations:', error);
+      res.status(500).json({ 
+        error: 'Failed to get regulations from TUF repository',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+  
+  // Download specific regulation from TUF repository
+  app.get('/api/tuf/regulations/:regulationId', async (req: Request, res: Response) => {
+    try {
+      const { getTUFService } = await import('./services/tuf-service.js');
+      const regulationId = req.params.regulationId;
+      const tufService = getTUFService();
+      
+      const regulation = await tufService.downloadRegulation(regulationId);
+      
+      res.json({
+        regulation,
+        verified: regulation.verified,
+        source: 'TUF',
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error(`❌ Failed to download TUF regulation ${req.params.regulationId}:`, error);
+      res.status(500).json({ 
+        error: 'Failed to download regulation from TUF repository',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
+    }
+  });
+  
+  // Check for TUF regulation updates
+  app.get('/api/tuf/check-updates', async (req: Request, res: Response) => {
+    try {
+      const { getTUFService } = await import('./services/tuf-service.js');
+      const tufService = getTUFService();
+      const updates = await tufService.checkForUpdates();
+      
+      res.json({
+        updates,
+        count: updates.length,
+        source: 'TUF',
+        timestamp: new Date().toISOString()
+      });
+    } catch (error) {
+      console.error('❌ Failed to check TUF updates:', error);
+      res.status(500).json({ 
+        error: 'Failed to check for TUF updates',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      });
     }
   });
 }

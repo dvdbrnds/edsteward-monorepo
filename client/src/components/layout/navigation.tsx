@@ -30,6 +30,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { useLegacyBranding } from "@/hooks/use-branding";
 import { WebSocketStatus } from "@/components/ui/websocket-status";
+import { TUFStatus } from "@/components/ui/tuf-status";
 
 // Import logos
 import edStewardLogo from "@/assets/es-white-on-purple-logo.png";
@@ -161,8 +162,9 @@ export default function Navigation() {
             </div>
           </div>
 
-          {/* WebSocket Status and User Menu */}
+          {/* Security Status and User Menu */}
           <div className="flex items-center flex-shrink-0 gap-3">
+            <TUFStatus />
             <WebSocketStatus />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>

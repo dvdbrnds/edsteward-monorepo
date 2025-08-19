@@ -1,6 +1,7 @@
 import express from "express";
 import { Server } from 'http';
 import { createServer } from 'http';
+import { setupWebSocketServer } from '../websocket-server';
 
 import { log } from '../vite';
 import { setupAuth } from '../auth';
@@ -8,11 +9,9 @@ import { setupRegulationUpdatesApi } from '../regulation-updates-api';
 import { setupDebugRegulationUpdatesApi } from '../debug-regulation-updates';
 import { setupMCPIntegrationApi } from '../mcp-integration-api';
 import { initializeDatabase } from '../db-init';
-import { storage } from '../storage';
 import { getDatabaseStorage } from '../services/database';
 import { syslog, LogLevel, LogFacility } from '../services/syslog';
 import path from 'path';
-import { institutionConfig } from '../config/institution';
 
 // Import modular route handlers
 import uploadsRoutes from './api/uploads';
@@ -35,8 +34,16 @@ declare module 'express-session' {
 }
 
 export function registerRoutes(app: express.Application): Server {
+  console.log('🚀 registerRoutes called - setting up HTTP and WebSocket servers...');
+  
   // Create HTTP server
   const httpServer = createServer(app);
+  console.log('✅ HTTP server created');
+  
+  // Setup WebSocket server for MCP Engine integration
+  console.log('🔌 About to setup WebSocket server...');
+  setupWebSocketServer(httpServer);
+  console.log('✅ WebSocket server setup completed');
 
   // =============================================================================
   // NO AUTH REQUIRED ENDPOINTS (health checks only) - BEFORE TENANT MIDDLEWARE
@@ -53,6 +60,11 @@ export function registerRoutes(app: express.Application): Server {
 
   // API health check with database status AND tenant information
   app.get('/api/health', async (req: any, res) => {
+    // Simple mode for MCP Engine integration
+    if (req.query.simple === 'true' || req.headers['user-agent']?.includes('MCP') || req.headers['x-mcp-client']) {
+      return res.json({ status: "ok" });
+    }
+    
     // Debug mode: show environment variables
     if (req.query.debug === 'true') {
       return res.json({
@@ -143,7 +155,7 @@ export function registerRoutes(app: express.Application): Server {
 
     // Single-tenant mode - storage always available
     try {
-      const storage = getDatabaseStorage();
+      getDatabaseStorage();
       deploymentInfo.singleTenantWorking = true;
     } catch (error) {
       deploymentInfo.singleTenantWorking = false;

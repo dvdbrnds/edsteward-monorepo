@@ -1,12 +1,10 @@
-// import { useAuth } from "@/hooks/use-auth"; // Temporarily disabled
 import { Badge } from "@/components/ui/badge";
 import { Wifi, WifiOff, Loader2 } from "lucide-react";
+import { useWebSocket } from "@/hooks/useWebSocket";
 
 export function WebSocketStatus() {
-  // Temporarily disabled due to circular dependency fix
-  const connectionState = 'disconnected';
-  const useMCPEngine = false;
-  const subscribedRegulations: string[] = [];
+  const webSocket = useWebSocket({ autoConnect: true });
+  const { connectionState, useMCPEngine, subscribedRegulations } = webSocket;
 
   const getStatusColor = () => {
     switch (connectionState) {

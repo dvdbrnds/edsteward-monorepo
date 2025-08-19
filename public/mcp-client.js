@@ -10,47 +10,16 @@
     const maxReconnectAttempts = 5;
     const reconnectDelay = 3000;
 
-    // Create connection status indicator
+    // Status indicator functions (disabled to prevent overlap with React component)
     function createStatusIndicator() {
-        const indicator = document.createElement('div');
-        indicator.id = 'mcp-status-indicator';
-        indicator.style.cssText = `
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            padding: 8px 12px;
-            border-radius: 4px;
-            color: white;
-            font-size: 12px;
-            font-weight: bold;
-            z-index: 10000;
-            transition: all 0.3s ease;
-        `;
-        updateStatusIndicator(indicator, 'disconnected');
-        document.body.appendChild(indicator);
-        return indicator;
+        // Return null - status is now handled by React WebSocketStatus component
+        return null;
     }
 
-    // Update status indicator
+    // Update status indicator (disabled)
     function updateStatusIndicator(indicator, status) {
-        switch(status) {
-            case 'connected':
-                indicator.textContent = '🟢 MCP Engine Connected';
-                indicator.style.backgroundColor = '#28a745';
-                break;
-            case 'connecting':
-                indicator.textContent = '🟡 Connecting to MCP...';
-                indicator.style.backgroundColor = '#ffc107';
-                break;
-            case 'disconnected':
-                indicator.textContent = '🔴 MCP Engine Offline';
-                indicator.style.backgroundColor = '#dc3545';
-                break;
-            case 'error':
-                indicator.textContent = '❌ MCP Engine Error';
-                indicator.style.backgroundColor = '#dc3545';
-                break;
-        }
+        // Status updates now handled by React WebSocketStatus component
+        console.log('MCP Engine status:', status);
     }
 
     // Show toast notification
@@ -188,7 +157,7 @@
             }
         };
 
-        ws.onclose = function(event) {
+        ws.onclose = function(_event) {
             connectionStatus = 'disconnected';
             const indicator = document.getElementById('mcp-status-indicator');
             if (indicator) updateStatusIndicator(indicator, 'disconnected');
