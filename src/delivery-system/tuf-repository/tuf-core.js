@@ -123,6 +123,10 @@ export class TargetsRole extends TUFRole {
     };
   }
 
+  clearTargets() {
+    this.targets = {};
+  }
+
   removeTarget(path) {
     delete this.targets[path];
   }

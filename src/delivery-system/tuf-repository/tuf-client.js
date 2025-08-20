@@ -76,9 +76,10 @@ export class TUFClient {
 
       const content = await response.text();
       
-      // Verify length
-      if (content.length !== expectedLength) {
-        throw new Error(`Target length mismatch: expected ${expectedLength}, got ${content.length}`);
+      // Verify length (use Buffer.byteLength for UTF-8 consistency)
+      const actualLength = Buffer.byteLength(content, 'utf8');
+      if (actualLength !== expectedLength) {
+        throw new Error(`Target length mismatch: expected ${expectedLength}, got ${actualLength}`);
       }
 
       // Verify hash

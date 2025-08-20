@@ -47,6 +47,47 @@ export class TUFRepositoryServer {
       });
     });
 
+    // Regenerate metadata (fix consistency issues)
+    this.app.post('/admin/regenerate-metadata', async (req, res) => {
+      try {
+        console.log('🔄 Regenerating TUF metadata from actual files...');
+        
+        // Re-read all files and update metadata with correct sizes
+        const regulationsDir = path.join(this.repositoryPath, 'targets', 'regulations');
+        const files = await fs.readdir(regulationsDir);
+        
+        // Clear and rebuild targets
+        this.repository.targetsRole.clearTargets();
+        
+        for (const file of files) {
+          if (file.endsWith('.json')) {
+            const regulationId = file.replace('.json', '');
+            const filePath = path.join(regulationsDir, file);
+            const content = await fs.readFile(filePath, 'utf8');
+            
+            console.log(`📋 Re-adding ${regulationId} (${Buffer.byteLength(content, 'utf8')} bytes)`);
+            
+            this.repository.addRegulationTarget(regulationId, content, {
+              category: 'regenerated',
+              priority: 'medium',
+              source: 'Metadata Regeneration'
+            });
+          }
+        }
+        
+        await this.updateAndPersistMetadata();
+        
+        res.json({
+          message: 'Metadata regenerated successfully',
+          filesProcessed: files.length
+        });
+        
+      } catch (error) {
+        console.error('❌ Regeneration failed:', error);
+        res.status(500).json({ error: error.message });
+      }
+    });
+
     // TUF Metadata endpoints
     this.app.get('/metadata/root.json', async (req, res) => {
       try {

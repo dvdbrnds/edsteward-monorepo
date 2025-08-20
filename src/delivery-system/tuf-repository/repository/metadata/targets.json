@@ -2,67 +2,14 @@
   "signed": {
     "_type": "targets",
     "spec_version": "1.0.0",
-    "version": 5,
-    "expires": "2026-08-19T16:03:46.861Z",
-    "targets": {
-      "regulations/REG-66.json": {
-        "length": 194,
-        "hashes": {
-          "sha256": "4b2214bc8c8d01eb2b6d980ce91e9e425b9cd0abb45a425a5ec320c8ddb9b288"
-        },
-        "custom": {
-          "regulationId": "REG-66",
-          "updateTime": "2025-08-19T16:03:57.497Z",
-          "category": "copyright-law",
-          "priority": "high",
-          "source": "MCP Engine"
-        }
-      },
-      "regulations/EDSTEWARD-TEST-001.json": {
-        "length": 199,
-        "hashes": {
-          "sha256": "36d6ef48058875a96c126f5ffe788015a176facb3b2c7be8e91abe06d5b17a80"
-        },
-        "custom": {
-          "regulationId": "EDSTEWARD-TEST-001",
-          "updateTime": "2025-08-19T16:04:03.757Z",
-          "category": "test",
-          "priority": "low",
-          "source": "TUF Integration Test"
-        }
-      },
-      "regulations/TEST-1755619449043.json": {
-        "length": 191,
-        "hashes": {
-          "sha256": "3d9277653d61cefaa5b5bf4b0ff81ff395d3828218bafccacb522a68f550acac"
-        },
-        "custom": {
-          "regulationId": "TEST-1755619449043",
-          "updateTime": "2025-08-19T16:04:09.043Z",
-          "category": "test",
-          "priority": "low",
-          "source": "TUF Integration Test"
-        }
-      },
-      "regulations/DEMO-1755619460592.json": {
-        "length": 202,
-        "hashes": {
-          "sha256": "fc8505587711d08623c007a20ef8df3ccaa632646d8f51fc026427f7510acca2"
-        },
-        "custom": {
-          "regulationId": "DEMO-1755619460592",
-          "updateTime": "2025-08-19T16:04:20.596Z",
-          "category": "demonstration",
-          "priority": "low",
-          "source": "TUF Workflow Demo"
-        }
-      }
-    }
+    "version": 1,
+    "expires": "2026-08-20T12:50:32.087Z",
+    "targets": {}
   },
   "signatures": [
     {
-      "keyid": "f64145fee2fcda4ca8751525072bbb31bd024ad6dcd4c4aa385134370e6d48b2",
-      "sig": "1zGupkVmimv97UKaWkw+eKXu2zEHtFXfsjlALA7/sG2Rnvmw28x3+ql0aKTkf3huWTSTFGqI+df2o6w2vqZNAg=="
+      "keyid": "207bdc3fca41e62da5f674b2113efea91041f1943fcdd84df88e15de68391b69",
+      "sig": "KMnlOBNP2HWArJJRdeG4A5MPrdjpwWQukVsfGr7+hNZA8GeUR8/BJ79cHsNCuJFBAVPKpeZ5tet8CVD8npRKBw=="
     }
   ]
 }
