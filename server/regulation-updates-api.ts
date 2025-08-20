@@ -131,39 +131,39 @@ export function setupRegulationUpdatesApi(app: Express) {
         isTUFVerified = true;
         
       } else {
-        // Try to parse as MCP Engine format
-        const mcpValidation = mcpEngineUpdateSchema.safeParse(req.body);
+        // Try simple format first (most common from MCP Engine)
+        const simpleValidation = insertRegulationUpdateSchema.safeParse(req.body);
         
-        if (mcpValidation.success) {
-          console.log('✅ Detected MCP Engine format');
-          const mcpData = mcpValidation.data;
-          
-          // Convert MCP Engine format to EdSteward format
-          updateData = {
-            regulationId: mcpData.regulationId,
-            name: mcpData.name,
-            status: mcpData.status,
-            originalContent: mcpData.content?.uscText?.text || "Original content from MCP Engine",
-            updatedContent: JSON.stringify(mcpData.content, null, 2) || "Updated content from MCP Engine"
-          };
+        if (simpleValidation.success) {
+          console.log('✅ Detected simple format');
+          updateData = simpleValidation.data;
         } else {
-          // Try simple format
-          const simpleValidation = insertRegulationUpdateSchema.safeParse(req.body);
+          // Try to parse as MCP Engine complex format
+          const mcpValidation = mcpEngineUpdateSchema.safeParse(req.body);
           
-          if (!simpleValidation.success) {
+          if (mcpValidation.success) {
+            console.log('✅ Detected MCP Engine complex format');
+            const mcpData = mcpValidation.data;
+            
+            // Convert MCP Engine format to EdSteward format
+            updateData = {
+              regulationId: mcpData.regulationId,
+              name: mcpData.name,
+              status: mcpData.status,
+              originalContent: mcpData.content?.uscText?.text || "Original content from MCP Engine",
+              updatedContent: JSON.stringify(mcpData.content, null, 2) || "Updated content from MCP Engine"
+            };
+          } else {
             console.error('❌ Validation failed for all formats');
             console.error('TUF format errors:', tufValidation.error.issues);
-            console.error('MCP format errors:', mcpValidation.error.issues);
             console.error('Simple format errors:', simpleValidation.error.issues);
+            console.error('MCP complex format errors:', mcpValidation.error.issues);
             
             return res.status(400).json({ 
               error: 'Invalid regulation update data', 
               details: simpleValidation.error.issues 
             });
           }
-          
-          console.log('✅ Detected simple format');
-          updateData = simpleValidation.data;
         }
       }
       
