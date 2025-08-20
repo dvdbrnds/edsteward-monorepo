@@ -249,7 +249,16 @@ class DeliveryServer {
         // Fetch the REAL regulation content from the MCP Engine
         const regulationContent = await this.fetchFullRegulationContent(regulationId);
         
-        // Create a manual update event with REAL data
+        // Create a manual update event with COMPLETE USC TEXT for differential view
+        const uscFullText = regulationContent.fullText || regulationContent.content || '';
+        
+        // For EdSteward differential view, we need COMPLETE text in both fields
+        // originalContent = current USC text, updatedContent = same text with simulated changes
+        const simulatedUpdate = uscFullText.replace(
+          'Notwithstanding the provisions of section 106',
+          'Notwithstanding the provisions of section 106 and the enhanced digital learning provisions'
+        );
+        
         const updateData = {
           regulationId,
           changeType,
@@ -258,14 +267,14 @@ class DeliveryServer {
           source: 'console_manual_trigger',
           data: {
             before: { 
-              content: regulationContent.fullText ? 
-                regulationContent.fullText.substring(0, Math.floor(regulationContent.fullText.length * 0.9)) + '\n\n[Previous version - content truncated for differential view]' :
-                'Previous USC 17 Section 110 regulation text...',
+              content: uscFullText, // COMPLETE USC 17 Section 110 text
+              fullText: uscFullText, // Alias for compatibility
               version: (regulationContent.version || 'unknown').replace(/\.\d+$/, '.0') // Previous version
             },
             after: {
               ...regulationContent,
-              content: regulationContent.fullText || regulationContent.content || 'Updated regulation content...',
+              content: simulatedUpdate, // COMPLETE USC text with simulated changes
+              fullText: simulatedUpdate, // Alias for compatibility
               message: `${message} - Updated via MCP Engine with complete USC 17 Section 110 text`
             },
             contentHash: 'manual_' + Date.now()

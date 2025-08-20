@@ -42,9 +42,9 @@ export class EdStewardIntegration {
     console.log(`  - data.after.fullText length:`, mcpUpdate.data.after?.fullText?.length || 'undefined');
     console.log(`  - data.after.content length:`, mcpUpdate.data.after?.content?.length || 'undefined');
 
-    // Extract the actual USC regulation text for EdSteward differential view
-    const originalText = mcpUpdate.data.before?.content || mcpUpdate.data.before?.fullText || "Previous USC 17 Section 110 regulation text...";
-    const updatedText = mcpUpdate.data.after?.content || mcpUpdate.data.after?.fullText || "Updated USC 17 Section 110 regulation text...";
+    // Extract the COMPLETE USC regulation text for EdSteward differential view
+    const originalText = mcpUpdate.data.before?.content || mcpUpdate.data.before?.fullText || "";
+    const updatedText = mcpUpdate.data.after?.content || mcpUpdate.data.after?.fullText || "";
     
     console.log(`📋 Content lengths - Original: ${originalText.length}, Updated: ${updatedText.length}`);
     console.log(`📋 Original text preview: ${originalText.substring(0, 100)}...`);
@@ -59,6 +59,10 @@ export class EdStewardIntegration {
     };
 
     console.log(`📤 Sending update to EdSteward for ${mcpUpdate.regulationId} -> ${edstewardId}`);
+    console.log(`🔍 PAYLOAD DEBUG - originalContent length: ${updatePayload.originalContent.length}`);
+    console.log(`🔍 PAYLOAD DEBUG - updatedContent length: ${updatePayload.updatedContent.length}`);
+    console.log(`🔍 PAYLOAD DEBUG - originalContent preview: ${updatePayload.originalContent.substring(0, 100)}...`);
+    console.log(`🔍 PAYLOAD DEBUG - updatedContent preview: ${updatePayload.updatedContent.substring(0, 100)}...`);
     
     return await this.sendWithRetry(updatePayload);
   }
