@@ -45,7 +45,7 @@ app.use(helmet({
       scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts for MCP test page
       scriptSrcAttr: ["'unsafe-inline'"], // Allow inline event handlers
       imgSrc: ["'self'", "data:", "https:", "blob:"],
-      connectSrc: ["'self'", "ws://localhost:3003", "http://localhost:3003"], // Allow WebSocket connections to MCP Engine
+      connectSrc: ["'self'", "ws://localhost:3003", "http://localhost:3003", "ws://localhost:3000", "ws://*:3000"], // Allow WebSocket connections to MCP Engine and external access
     },
   },
 }));
@@ -359,11 +359,12 @@ const httpServer = createServer(app);
 setupWebSocketServer(httpServer);
 
 // Start server
-httpServer.listen(PORT, async () => {
+httpServer.listen(PORT, '0.0.0.0', async () => {
   console.log(`🚀 Single-Tenant EdSteward running on port ${PORT}`);
   console.log(`🏢 Institution: ${institutionConfig.name}`);
   console.log(`🔐 Authentication: ${institutionConfig.authentication.samlEnabled ? 'SAML + ' : ''}${institutionConfig.authentication.usernamePasswordEnabled ? 'Username/Password' : ''}`);
   console.log(`🌐 Access: http://localhost:${PORT}`);
+  console.log(`🌍 Network Access: http://0.0.0.0:${PORT} (accessible from external networks)`);
   
   // Initialize TUF service for cryptographically secure regulation updates (optional feature)
   try {
