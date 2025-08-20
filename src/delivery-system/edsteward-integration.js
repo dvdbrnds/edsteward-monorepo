@@ -35,11 +35,26 @@ export class EdStewardIntegration {
       return { success: false, error: 'No regulation mapping found' };
     }
 
+    // Debug: Log the structure of mcpUpdate to understand the data format
+    console.log(`🔍 DEBUG: mcpUpdate structure for ${mcpUpdate.regulationId}:`);
+    console.log(`  - data.before keys:`, mcpUpdate.data.before ? Object.keys(mcpUpdate.data.before) : 'undefined');
+    console.log(`  - data.after keys:`, mcpUpdate.data.after ? Object.keys(mcpUpdate.data.after) : 'undefined');
+    console.log(`  - data.after.fullText length:`, mcpUpdate.data.after?.fullText?.length || 'undefined');
+    console.log(`  - data.after.content length:`, mcpUpdate.data.after?.content?.length || 'undefined');
+
+    // Extract the actual USC regulation text for EdSteward differential view
+    const originalText = mcpUpdate.data.before?.content || mcpUpdate.data.before?.fullText || "Previous USC 17 Section 110 regulation text...";
+    const updatedText = mcpUpdate.data.after?.content || mcpUpdate.data.after?.fullText || "Updated USC 17 Section 110 regulation text...";
+    
+    console.log(`📋 Content lengths - Original: ${originalText.length}, Updated: ${updatedText.length}`);
+    console.log(`📋 Original text preview: ${originalText.substring(0, 100)}...`);
+    console.log(`📋 Updated text preview: ${updatedText.substring(0, 100)}...`);
+
     const updatePayload = {
       regulationId: edstewardId,
       name: this.getRegulationName(mcpUpdate.regulationId),
-      originalContent: mcpUpdate.data.before?.content || "Previous regulation text...",
-      updatedContent: mcpUpdate.data.after?.content || "New regulation text with changes...",
+      originalContent: originalText,
+      updatedContent: updatedText,
       status: "pending"
     };
 

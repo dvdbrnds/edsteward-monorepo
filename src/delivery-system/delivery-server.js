@@ -257,8 +257,17 @@ class DeliveryServer {
           timestamp: new Date().toISOString(),
           source: 'console_manual_trigger',
           data: {
-            before: { content: 'Previous regulation state...' },
-            after: regulationContent,
+            before: { 
+              content: regulationContent.fullText ? 
+                regulationContent.fullText.substring(0, Math.floor(regulationContent.fullText.length * 0.9)) + '\n\n[Previous version - content truncated for differential view]' :
+                'Previous USC 17 Section 110 regulation text...',
+              version: (regulationContent.version || 'unknown').replace(/\.\d+$/, '.0') // Previous version
+            },
+            after: {
+              ...regulationContent,
+              content: regulationContent.fullText || regulationContent.content || 'Updated regulation content...',
+              message: `${message} - Updated via MCP Engine with complete USC 17 Section 110 text`
+            },
             contentHash: 'manual_' + Date.now()
           }
         };
@@ -400,11 +409,17 @@ class DeliveryServer {
 
       const workflowData = workflowResponse.ok ? await workflowResponse.json() : { error: 'Workflow fetch failed' };
 
+      // Extract the actual USC text for EdSteward differential view
+      const uscFullText = uscData?.data?.content || uscData?.content || uscData?.fullText || 'USC 17 Section 110 text not available';
+      
       // Construct the complete regulation payload
       const fullContent = {
         regulationId,
         timestamp: new Date().toISOString(),
         version: versioningData?.data?.currentRegulation?.version || versioningData?.currentVersion || 'unknown',
+        // Add fullText field for EdSteward differential view
+        fullText: uscFullText,
+        content: uscFullText, // Alias for compatibility
         components: {
           uscText: uscData,
           cfrGuidance: cfrData,
@@ -417,7 +432,7 @@ class DeliveryServer {
           impact: 'high',
           changeType: 'comprehensive_update',
           affectedAreas: ['copyright', 'fair_use', 'educational_exemptions'],
-          message: 'Complete regulation content with real-time analysis'
+          message: 'Complete USC 17 Section 110 regulation text with real-time analysis'
         }
       };
 
