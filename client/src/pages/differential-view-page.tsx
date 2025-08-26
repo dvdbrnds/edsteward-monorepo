@@ -14,40 +14,40 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 
-interface RegulationUpdate {
-  id: number;
-  regulationId: number;
-  name: string;
-  originalContent: string;
-  updatedContent: string;
-  status: string;
-  updateDate: string;
-}
+// interface RegulationUpdate {
+//   id: number;
+//   regulationId: number;
+//   name: string;
+//   originalContent: string;
+//   updatedContent: string;
+//   status: string;
+//   updateDate: string;
+// }
 
-interface RegulationDetail {
-  id: number;
-  name: string;
-  jurisdiction: string;
-  agency_name?: string;
-  agency_department?: string;
-  lastUpdated?: string;
-}
+// interface RegulationDetail {
+//   id: number;
+//   name: string;
+//   jurisdiction: string;
+//   agency_name?: string;
+//   agency_department?: string;
+//   lastUpdated?: string;
+// }
 
-interface DiffData {
-  addedChars: number;
-  removedChars: number;
-  changedChars: number;
-  originalLength: number;
-  updatedLength: number;
-  addedPercentage: number;
-  removedPercentage: number;
-  changedPercentage: number;
-  differences: any[];
-}
+// interface DiffData {
+//   addedChars: number;
+//   removedChars: number;
+//   changedChars: number;
+//   originalLength: number;
+//   updatedLength: number;
+//   addedPercentage: number;
+//   removedPercentage: number;
+//   changedPercentage: number;
+//   differences: any[];
+// }
 
 const DifferentialViewPage: React.FC = () => {
   const [match, params] = useRoute<{ id: string }>('/regulations/updates/:id');
-  const [_, setLocation] = useLocation();
+  const [, setLocation] = useLocation();
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [signatureModalOpen, setSignatureModalOpen] = useState(false);
   const [action, setAction] = useState<'approve' | 'reject' | 'defer' | null>(null);
@@ -98,7 +98,6 @@ const DifferentialViewPage: React.FC = () => {
           
           let addedChars = 0;
           let removedChars = 0;
-          let changedChars = 0;
           
           differences.forEach(part => {
             if (part.added) {
@@ -142,27 +141,31 @@ const DifferentialViewPage: React.FC = () => {
       setSignatureModalOpen(false);
       
       // API call to approve the update
-      const response = await fetch(`/api/regulation-updates/${updateId}/approve`, {
+      const response = await fetch(`/api/regulation-updates/${updateId}/accept`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
+        credentials: 'include', // Include cookies for authentication
         body: JSON.stringify({
-          signature,
-          notes: reason
+          signature
         })
       });
       
       if (!response.ok) {
-        throw new Error('Failed to approve update');
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Approval failed:', response.status, errorData);
+        throw new Error(`Failed to approve update: ${response.status} ${errorData.error || response.statusText}`);
       }
+      
+      console.log('✅ Update approved successfully');
       
       // Redirect to success page or list
       setLocation('/regulations/updates');
       
     } catch (err) {
       console.error('Error approving update:', err);
-      // Show error notification
+      alert(`Error approving update: ${err.message}`);
     }
   };
   
@@ -176,6 +179,7 @@ const DifferentialViewPage: React.FC = () => {
         headers: {
           'Content-Type': 'application/json'
         },
+        credentials: 'include', // Include cookies for authentication
         body: JSON.stringify({
           signature,
           reason
@@ -183,15 +187,19 @@ const DifferentialViewPage: React.FC = () => {
       });
       
       if (!response.ok) {
-        throw new Error('Failed to reject update');
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Rejection failed:', response.status, errorData);
+        throw new Error(`Failed to reject update: ${response.status} ${errorData.error || response.statusText}`);
       }
+      
+      console.log('✅ Update rejected successfully');
       
       // Redirect to list
       setLocation('/regulations/updates');
       
     } catch (err) {
       console.error('Error rejecting update:', err);
-      // Show error notification
+      alert(`Error rejecting update: ${err.message}`);
     }
   };
   

@@ -347,7 +347,7 @@ app.get('*', (req, res) => {
 });
 
 // Error handling
-app.use((err: any, _req: express.Request, res: express.Response) => {
+app.use((err: Error, _req: express.Request, res: express.Response) => {
   console.error('Server error:', err);
   res.status(500).json({ error: 'Internal server error' });
 });
@@ -375,7 +375,7 @@ httpServer.listen(PORT, '0.0.0.0', async () => {
     const tufService = getTUFService();
     
     // Listen for TUF regulation updates and forward to EdSteward
-    tufService.on('regulation_updated', async (update: any) => {
+    tufService.on('regulation_updated', async (update: unknown) => {
       try {
         console.log(`🔄 Processing TUF regulation update: ${update.regulationId}`);
         

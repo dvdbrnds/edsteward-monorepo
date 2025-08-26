@@ -17,6 +17,15 @@ export function TUFStatus({ className = '' }: TUFStatusProps) {
   useEffect(() => {
     const checkTUFStatus = async () => {
       try {
+        // Check if TUF service is available first
+        const healthResponse = await fetch('/api/tuf/health');
+        
+        if (!healthResponse.ok) {
+          // TUF service is not available/disabled - don't show error
+          setStatus('unknown');
+          return;
+        }
+        
         // Check TUF repository health
         const health = await getHealth();
         
@@ -33,9 +42,10 @@ export function TUFStatus({ className = '' }: TUFStatusProps) {
         
         setLastCheck(new Date());
         
-      } catch (error) {
-        console.error('TUF status check failed:', error);
-        setStatus('error');
+      } catch {
+        // TUF is likely disabled - don't show as error
+        console.log('TUF service not available (disabled)');
+        setStatus('unknown');
         setLastCheck(new Date());
       }
     };
@@ -84,9 +94,14 @@ export function TUFStatus({ className = '' }: TUFStatusProps) {
       case 'error':
         return 'TUF Error';
       default:
-        return 'TUF Checking...';
+        return null; // Don't show anything when TUF is disabled
     }
   };
+
+  // Don't render anything if TUF is disabled/unknown
+  if (status === 'unknown') {
+    return null;
+  }
 
   return (
     <div 
