@@ -68,8 +68,8 @@ export function useWebSocket(options: WebSocketHookOptions = {}) {
   const [connectionState, setConnectionState] = useState<'disconnected' | 'connecting' | 'connected' | 'error'>('disconnected');
   const [reconnectCount, setReconnectCount] = useState(0);
 
-  // Use MCP Engine URL if configured, otherwise fall back to internal WebSocket
-  const wsUrl = import.meta.env.VITE_MCP_WS_URL || import.meta.env.VITE_WS_URL || import.meta.env.VITE_API_URL?.replace(/^http/, 'ws');
+  // Use MCP Engine URL if configured, otherwise disable WebSocket
+  const wsUrl = import.meta.env.VITE_MCP_WS_URL;
   const useMCPEngine = !!import.meta.env.VITE_MCP_WS_URL;
 
   const cleanup = useCallback(() => {
@@ -162,12 +162,16 @@ export function useWebSocket(options: WebSocketHookOptions = {}) {
 
   const connect = useCallback(async () => {
     if (!wsUrl) {
+      console.log('WebSocket connection skipped: no URL configured');
+      setConnectionState('disconnected');
       return;
     }
 
     // For MCP Engine, we don't require authentication
     if (useMCPEngine || !isAuthenticated) {
       if (!useMCPEngine && !isAuthenticated) {
+        console.log('WebSocket connection skipped: not authenticated');
+        setConnectionState('disconnected');
         return;
       }
     }
@@ -230,11 +234,14 @@ export function useWebSocket(options: WebSocketHookOptions = {}) {
           }, reconnectDelay) as unknown as number;
         } else if (reconnectCount >= reconnectAttempts) {
           setConnectionState('error');
-          toast({
-            title: "Connection Lost",
-            description: "Failed to reconnect to real-time updates. Please refresh the page.",
-            variant: "destructive",
-          });
+          // Only show toast for MCP Engine connection failures, not internal WebSocket
+          if (useMCPEngine) {
+            toast({
+              title: "MCP Engine Disconnected",
+              description: "Real-time regulation updates are unavailable.",
+              variant: "destructive",
+            });
+          }
         }
       };
 

@@ -7,6 +7,10 @@ export function WebSocketStatus() {
   const { connectionState, useMCPEngine, subscribedRegulations } = webSocket;
 
   const getStatusColor = () => {
+    if (!useMCPEngine) {
+      return 'bg-gray-400'; // Neutral color when MCP is disabled
+    }
+    
     switch (connectionState) {
       case 'connected':
         return 'bg-green-500';
@@ -20,6 +24,10 @@ export function WebSocketStatus() {
   };
 
   const getStatusIcon = () => {
+    if (!useMCPEngine) {
+      return <WifiOff className="h-3 w-3 opacity-60" />; // Dimmed icon when disabled
+    }
+    
     switch (connectionState) {
       case 'connected':
         return <Wifi className="h-3 w-3" />;
@@ -46,16 +54,8 @@ export function WebSocketStatus() {
           return 'MCP Disconnected';
       }
     } else {
-      switch (connectionState) {
-        case 'connected':
-          return 'WebSocket Connected';
-        case 'connecting':
-          return 'Connecting...';
-        case 'error':
-          return 'Connection Error';
-        default:
-          return 'Disconnected';
-      }
+      // When MCP is disabled, show a neutral status
+      return 'Real-time Updates Disabled';
     }
   };
 
