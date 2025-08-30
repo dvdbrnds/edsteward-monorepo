@@ -12,7 +12,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/api";
-import { Palette, Upload, Eye, Monitor, Smartphone, Save, AlertCircle, CheckCircle2, ImageIcon, X, FileImage } from "lucide-react";
+import { Palette, Upload, Eye, Monitor, Smartphone, Save, AlertCircle, CheckCircle2, X, FileImage } from "lucide-react";
 
 // Utility function to generate favicon from logo
 const generateFaviconFromLogo = (logoFile: File): Promise<File> => {
@@ -138,7 +138,7 @@ const FileUploadField: React.FC<{
   onFileSelect: (file: File) => void | Promise<void>;
   accept: string;
   type: 'logo' | 'favicon';
-}> = ({ label, description, currentUrl, onFileSelect, accept, type }) => {
+}> = ({ label, description, currentUrl, onFileSelect, accept, type: _type }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState(currentUrl || '');
   const [isProcessing, setIsProcessing] = useState(false);
@@ -323,7 +323,7 @@ const FileUploadField: React.FC<{
 // Color picker component
 const ColorPicker: React.FC<{
   value: string;
-  onChange: (color: string) => void;
+  onChange: (_color: string) => void;
   label: string;
   description?: string;
 }> = ({ value, onChange, label, description }) => {
