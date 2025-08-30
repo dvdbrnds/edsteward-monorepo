@@ -276,7 +276,12 @@ export class TUFService {
     try {
       return await this.tufClient.getRepositoryHealth();
     } catch (error) {
-      console.error('❌ TUF health check failed:', error);
+      // Reduce log spam - only log TUF errors once per minute
+      const now = Date.now();
+      if (!(global as any).lastTufServiceErrorLog || now - (global as any).lastTufServiceErrorLog > 60000) {
+        console.error('❌ TUF service health check failed:', error instanceof Error ? error.message : 'Unknown error');
+        (global as any).lastTufServiceErrorLog = now;
+      }
       throw error;
     }
   }
