@@ -66,7 +66,8 @@ export class TUFService {
       
     } catch (error) {
       console.error('❌ TUF service initialization failed:', error);
-      throw error;
+      // Don't throw error - make it non-blocking so server can start
+      console.log('⚠️  TUF service will be disabled - EdSteward will continue without MCP Engine integration');
     }
   }
 

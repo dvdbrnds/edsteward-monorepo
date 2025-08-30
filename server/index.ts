@@ -115,7 +115,12 @@ app.post('/api/authenticate', async (req, res) => {
     // Import database storage
     const { getDatabaseStorage } = await import('./services/database');
     const tenantStorage = getDatabaseStorage();
-    const user = await tenantStorage.getUserByEmail(loginEmail);
+    
+    // Try to get user by email first, then by username
+    let user = await tenantStorage.getUserByEmail(loginEmail);
+    if (!user) {
+      user = await tenantStorage.getUserByUsername(loginEmail);
+    }
     
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
@@ -367,55 +372,58 @@ httpServer.listen(PORT, '0.0.0.0', async () => {
   console.log(`🌍 Network Access: http://0.0.0.0:${PORT} (accessible from external networks)`);
   
   // Initialize TUF service for cryptographically secure regulation updates (optional feature)
-  try {
-    console.log('🔒 Initializing TUF service for secure regulation delivery...');
-    
-    // Import TUF service dynamically to handle potential import issues
-    const { getTUFService } = await import('./services/tuf-service.js');
-    const tufService = getTUFService();
-    
-    // Listen for TUF regulation updates and forward to EdSteward
-    tufService.on('regulation_updated', async (update: unknown) => {
-      try {
-        console.log(`🔄 Processing TUF regulation update: ${update.regulationId}`);
-        
-        // Convert TUF update to EdSteward format and store
-        const response = await fetch(`http://localhost:${PORT}/api/regulation-updates`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            regulationId: update.regulationId,
-            verified: update.verified,
-            hash: update.hash,
-            updateTime: update.updateTime,
-            tufPath: update.tufPath,
-            content: update.content,
-            metadata: update.metadata,
-            source: 'tuf'
-          })
-        });
-        
-        if (response.ok) {
-          const result = await response.json();
-          console.log(`✅ TUF regulation update stored: ${result.updateId}`);
-        } else {
-          console.error('❌ Failed to store TUF regulation update:', await response.text());
+  // Run this asynchronously so it doesn't block server startup
+  setImmediate(async () => {
+    try {
+      console.log('🔒 Initializing TUF service for secure regulation delivery...');
+      
+      // Import TUF service dynamically to handle potential import issues
+      const { getTUFService } = await import('./services/tuf-service.js');
+      const tufService = getTUFService();
+      
+      // Listen for TUF regulation updates and forward to EdSteward
+      tufService.on('regulation_updated', async (update: unknown) => {
+        try {
+          console.log(`🔄 Processing TUF regulation update: ${update.regulationId}`);
+          
+          // Convert TUF update to EdSteward format and store
+          const response = await fetch(`http://localhost:${PORT}/api/regulation-updates`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              regulationId: update.regulationId,
+              verified: update.verified,
+              hash: update.hash,
+              updateTime: update.updateTime,
+              tufPath: update.tufPath,
+              content: update.content,
+              metadata: update.metadata,
+              source: 'tuf'
+            })
+          });
+          
+          if (response.ok) {
+            const result = await response.json();
+            console.log(`✅ TUF regulation update stored: ${result.updateId}`);
+          } else {
+            console.error('❌ Failed to store TUF regulation update:', await response.text());
+          }
+          
+        } catch (error) {
+          console.error('❌ Error processing TUF regulation update:', error);
         }
-        
-      } catch (error) {
-        console.error('❌ Error processing TUF regulation update:', error);
-      }
-    });
-    
-    console.log('✅ TUF service integration completed');
-    
-  } catch (error) {
-    console.warn('⚠️ TUF service initialization failed (optional feature):', error.message || error);
-    console.log('📋 EdSteward will continue without TUF integration');
-    console.log('💡 To enable TUF: ensure MCP Engine TUF repository is running on port 3052');
-  }
+      });
+      
+      console.log('✅ TUF service integration completed');
+      
+    } catch (error) {
+      console.warn('⚠️ TUF service initialization failed (optional feature):', error.message || error);
+      console.log('📋 EdSteward will continue without TUF integration');
+      console.log('💡 To enable TUF: ensure MCP Engine TUF repository is running on port 3052');
+    }
+  });
 });
 
 // Graceful shutdown
