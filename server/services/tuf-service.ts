@@ -9,8 +9,8 @@ export interface TUFServiceConfig extends TUFClientConfig {
 
 export interface TUFRegulationUpdate {
   regulationId: string;
-  content: any;
-  metadata: any;
+  content: unknown;
+  metadata: Record<string, unknown>;
   hash: string;
   updateTime: string;
   verified: boolean;
@@ -272,7 +272,7 @@ export class TUFService {
   /**
    * Get TUF repository health
    */
-  async getHealth(): Promise<any> {
+  async getHealth(): Promise<Record<string, unknown>> {
     try {
       return await this.tufClient.getRepositoryHealth();
     } catch (error) {
@@ -284,20 +284,20 @@ export class TUFService {
   /**
    * Simple event emitter for regulation updates
    */
-  private listeners: { [event: string]: Array<(...args: any[]) => void> } = {};
+  private listeners: { [event: string]: Array<(..._args: unknown[]) => void> } = {};
 
-  on(event: string, listener: (...args: any[]) => void): void {
+  on(event: string, listener: (...args: unknown[]) => void): void {
     if (!this.listeners[event]) {
       this.listeners[event] = [];
     }
     this.listeners[event].push(listener);
   }
 
-  private emit(event: string, ...args: any[]): void {
+  private emit(event: string, ..._args: unknown[]): void {
     if (this.listeners[event]) {
       for (const listener of this.listeners[event]) {
         try {
-          listener(...args);
+          listener(..._args);
         } catch (error) {
           console.error(`❌ Event listener error for ${event}:`, error);
         }

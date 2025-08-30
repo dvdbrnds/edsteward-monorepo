@@ -486,7 +486,12 @@ export function setupRegulationUpdatesApi(app: Express) {
         }
       });
     } catch (error) {
-      console.error('❌ TUF health check failed:', error);
+      // Reduce log spam - only log TUF errors once per minute
+      const now = Date.now();
+      if (!(global as any).lastTufErrorLog || now - (global as any).lastTufErrorLog > 60000) {
+        console.error('❌ TUF health check failed:', error instanceof Error ? error.message : 'Unknown error');
+        (global as any).lastTufErrorLog = now;
+      }
       res.status(500).json({ 
         error: 'TUF repository health check failed',
         details: error instanceof Error ? error.message : 'Unknown error'

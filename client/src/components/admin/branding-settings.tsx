@@ -660,7 +660,7 @@ export function BrandingSettingsV2({ onConfigUpdate }: BrandingSettingsProps) {
         shouldGenerateFavicon: isDefaultOrGenerated && !currentPendingFiles.favicon,
         form_faviconUrl: form.getValues('faviconUrl'),
         reasoning: !isDefaultOrGenerated ? 'Custom favicon already exists' : 
-                  !!currentPendingFiles.favicon ? 'Favicon already pending' : 'Conditions met'
+                  currentPendingFiles.favicon ? 'Favicon already pending' : 'Conditions met'
       });
       
       // Generate favicon if no custom favicon exists and no favicon is pending

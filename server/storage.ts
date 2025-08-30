@@ -75,7 +75,7 @@ const sessionPool = new Pool({
   allowExitOnIdle: false,
 });
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
+ 
 export interface IStorage {
   // User methods - now tenant-aware
   getUser(id: number, tenantId?: string): Promise<User | undefined>;
@@ -107,6 +107,7 @@ export interface IStorage {
   acceptRegulationUpdate(id: number, userId: number, signature: string): Promise<void>;
   rejectRegulationUpdate(id: number, userId: number, signature: string, reason: string): Promise<void>;
   deferRegulationUpdate(id: number, userId: number, signature: string): Promise<void>;
+  bulkDeleteRegulationUpdates(ids: number[]): Promise<void>;
 
   // MCP Regulation Version methods
   getRegulationVersions(regulationId: number): Promise<RegulationVersion[]>;
@@ -196,7 +197,7 @@ export interface IStorage {
   getBrandingConfig(): Promise<{ [key: string]: unknown }>;
   saveBrandingConfig(config: { [key: string]: unknown }): Promise<{ [key: string]: unknown }>;
 }
-/* eslint-enable @typescript-eslint/no-unused-vars */
+ 
 
 import { emailService } from './services/email';
 
@@ -204,7 +205,9 @@ export class DatabaseStorage implements IStorage {
   // Regulation Update methods
   async getPendingRegulationUpdates(): Promise<RegulationUpdate[]> {
     try {
-      return await db.select().from(regulationUpdates).where(eq(regulationUpdates.status, "pending"));
+      return await db.select().from(regulationUpdates)
+        .where(eq(regulationUpdates.status, "pending"))
+        .orderBy(desc(regulationUpdates.updateDate));
     } catch (error) {
       console.error("Error fetching pending regulation updates:", error);
       return [];
@@ -317,6 +320,21 @@ export class DatabaseStorage implements IStorage {
       throw error;
     }
   }
+
+  async bulkDeleteRegulationUpdates(ids: number[]): Promise<void> {
+    try {
+      // Use raw SQL for bulk delete with IN clause
+      const placeholders = ids.map((_, index) => `$${index + 1}`).join(',');
+      await pool.query(
+        `DELETE FROM regulation_updates WHERE id IN (${placeholders})`,
+        ids
+      );
+    } catch (error) {
+      console.error(`Error bulk deleting regulation updates:`, error);
+      throw error;
+    }
+  }
+
   sessionStore: session.Store;
 
   constructor() {
