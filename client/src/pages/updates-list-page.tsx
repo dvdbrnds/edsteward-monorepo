@@ -1,14 +1,18 @@
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
+import React, { useState } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Loader2, FileText, Eye, Calendar, Clock, RefreshCw } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Loader2, FileText, Eye, Calendar, Clock, RefreshCw, Trash2 } from 'lucide-react';
 import Navigation from "@/components/layout/navigation";
 
 const UpdatesListPage: React.FC = () => {
   console.log('🚀 UpdatesListPage component is rendering!');
   console.log('🚀 UpdatesListPage: Current URL:', window.location.pathname);
+  
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const queryClient = useQueryClient();
   
   const { data: pendingUpdates = [], isLoading, error, refetch, dataUpdatedAt } = useQuery({
     queryKey: ['/api/regulation-updates/pending'],
@@ -37,6 +41,66 @@ const UpdatesListPage: React.FC = () => {
   });
 
   console.log('📋 Current state:', { pendingUpdates, isLoading, error });
+
+  // Bulk delete mutation
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (ids: number[]) => {
+      const response = await fetch('/api/regulation-updates/bulk', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ ids }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to delete updates');
+      }
+      
+      return response.json();
+    },
+    onSuccess: (data) => {
+      console.log(`✅ Successfully deleted ${data.deletedCount} updates`);
+      setSelectedIds([]);
+      queryClient.invalidateQueries({ queryKey: ['/api/regulation-updates/pending'] });
+    },
+    onError: (error) => {
+      console.error('❌ Bulk delete failed:', error);
+      alert(`Failed to delete updates: ${error.message}`);
+    },
+  });
+
+  // Selection handlers
+  const handleSelectAll = (checked: boolean) => {
+    if (checked) {
+      setSelectedIds(pendingUpdates.map(update => update.id));
+    } else {
+      setSelectedIds([]);
+    }
+  };
+
+  const handleSelectUpdate = (updateId: number, checked: boolean) => {
+    if (checked) {
+      setSelectedIds(prev => [...prev, updateId]);
+    } else {
+      setSelectedIds(prev => prev.filter(id => id !== updateId));
+    }
+  };
+
+  const handleBulkDelete = () => {
+    if (selectedIds.length === 0) return;
+    
+    const confirmMessage = `Are you sure you want to delete ${selectedIds.length} regulation update${selectedIds.length > 1 ? 's' : ''}? This action cannot be undone.`;
+    
+    if (window.confirm(confirmMessage)) {
+      bulkDeleteMutation.mutate(selectedIds);
+    }
+  };
+
+  const isAllSelected = pendingUpdates.length > 0 && selectedIds.length === pendingUpdates.length;
+  const isSomeSelected = selectedIds.length > 0 && selectedIds.length < pendingUpdates.length;
 
   if (isLoading) {
     console.log('⏳ Rendering loading state');
@@ -97,6 +161,55 @@ const UpdatesListPage: React.FC = () => {
           </div>
         </div>
 
+        {/* Bulk Actions Bar */}
+        {pendingUpdates.length > 0 && (
+          <div className="bg-white rounded-lg border p-4 mb-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    checked={isAllSelected}
+                    onCheckedChange={handleSelectAll}
+                    ref={(el) => {
+                      if (el) {
+                        el.indeterminate = isSomeSelected;
+                      }
+                    }}
+                  />
+                  <span className="text-sm font-medium">
+                    {selectedIds.length === 0 
+                      ? 'Select all' 
+                      : `${selectedIds.length} selected`
+                    }
+                  </span>
+                </div>
+                {selectedIds.length > 0 && (
+                  <Badge variant="outline" className="text-xs">
+                    Testing Mode
+                  </Badge>
+                )}
+              </div>
+              
+              {selectedIds.length > 0 && (
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleBulkDelete}
+                  disabled={bulkDeleteMutation.isPending}
+                  className="flex items-center gap-1"
+                >
+                  {bulkDeleteMutation.isPending ? (
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-4 w-4" />
+                  )}
+                  Delete Selected ({selectedIds.length})
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
+
         {pendingUpdates.length === 0 ? (
           <div className="text-center py-12">
             <div className="text-gray-400 mb-4">
@@ -112,7 +225,14 @@ const UpdatesListPage: React.FC = () => {
             {pendingUpdates.map((update) => (
               <Card key={update.id} className="hover:shadow-md transition-shadow">
                 <CardContent className="p-6">
-                  <div className="flex items-start justify-between">
+                  <div className="flex items-start gap-4">
+                    <div className="pt-1">
+                      <Checkbox
+                        checked={selectedIds.includes(update.id)}
+                        onCheckedChange={(checked) => handleSelectUpdate(update.id, checked as boolean)}
+                      />
+                    </div>
+                    
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
                         <h3 className="text-lg font-semibold text-gray-900">
@@ -135,7 +255,7 @@ const UpdatesListPage: React.FC = () => {
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-2 ml-4">
+                    <div className="flex items-center gap-2">
                       <Button
                         variant="outline"
                         size="sm"

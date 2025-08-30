@@ -1,10 +1,38 @@
 import nacl from 'tweetnacl';
-import { decodeUTF8, decodeBase64 } from 'tweetnacl-util';
+import * as util from 'tweetnacl-util';
 import stringify from 'fast-json-stable-stringify';
 import crypto from 'crypto';
 
+export interface TUFKey {
+  keytype: string;
+  scheme: string;
+  keyval: {
+    public: string;
+  };
+}
+
+export interface TUFTargetInfo {
+  length: number;
+  hashes: {
+    sha256: string;
+  };
+  custom?: {
+    updateTime?: string;
+    [key: string]: unknown;
+  };
+}
+
+export interface TUFSigned {
+  _type: string;
+  version: number;
+  expires: string;
+  keys?: { [keyId: string]: TUFKey };
+  targets?: { [path: string]: TUFTargetInfo };
+  [key: string]: unknown;
+}
+
 export interface TUFMetadata {
-  signed: any;
+  signed: TUFSigned;
   signatures: Array<{
     keyid: string;
     signature: string;
@@ -17,8 +45,8 @@ export interface RegulationTarget {
   hash: string;
   length: number;
   updateTime: string;
-  metadata: any;
-  content?: any;
+  metadata: { [key: string]: unknown };
+  content?: unknown;
   verified?: boolean;
 }
 
@@ -32,8 +60,8 @@ export interface TUFClientConfig {
 export class TUFClient {
   private repositoryUrl: string;
   private trustedKeys: { [keyId: string]: string } = {};
-  private rootMetadata: any = null;
-  private targetsMetadata: any = null;
+  private rootMetadata: TUFMetadata | null = null;
+  private targetsMetadata: TUFMetadata | null = null;
 
   constructor(config: TUFClientConfig) {
     this.repositoryUrl = config.repositoryUrl;
@@ -58,8 +86,8 @@ export class TUFClient {
     // Extract trusted keys from root metadata
     const rootSigned = trustedRoot.signed;
     if (rootSigned.keys) {
-      for (const [keyId, keyData] of Object.entries(rootSigned.keys as any)) {
-        this.trustedKeys[keyId] = (keyData as any).keyval.public;
+      for (const [keyId, keyData] of Object.entries(rootSigned.keys)) {
+        this.trustedKeys[keyId] = keyData.keyval.public;
       }
     }
 
@@ -94,20 +122,21 @@ export class TUFClient {
       const regulations: RegulationTarget[] = [];
       const targets = targetsMetadata.signed.targets;
       
-      for (const [path, targetInfo] of Object.entries(targets)) {
-        if (path.startsWith('regulations/') && path.endsWith('.json')) {
-          const regulationId = path.replace('regulations/', '').replace('.json', '');
-          const target = targetInfo as any;
-          
-          regulations.push({
-            regulationId,
-            path,
-            hash: target.hashes.sha256,
-            length: target.length,
-            updateTime: target.custom?.updateTime || new Date().toISOString(),
-            metadata: target.custom || {},
-            verified: false
-          });
+      if (targets) {
+        for (const [path, targetInfo] of Object.entries(targets)) {
+          if (path.startsWith('regulations/') && path.endsWith('.json')) {
+            const regulationId = path.replace('regulations/', '').replace('.json', '');
+            
+            regulations.push({
+              regulationId,
+              path,
+              hash: targetInfo.hashes.sha256,
+              length: targetInfo.length,
+              updateTime: targetInfo.custom?.updateTime || new Date().toISOString(),
+              metadata: targetInfo.custom || {},
+              verified: false
+            });
+          }
         }
       }
 
@@ -131,7 +160,8 @@ export class TUFClient {
     }
 
     const targetPath = `regulations/${regulationId}.json`;
-    const targetInfo = this.targetsMetadata.signed.targets[targetPath];
+    const targets = this.targetsMetadata?.signed.targets;
+    const targetInfo = targets?.[targetPath];
     
     if (!targetInfo) {
       throw new Error(`Regulation ${regulationId} not found in TUF repository`);
@@ -197,16 +227,16 @@ export class TUFClient {
     }
 
     // Canonical JSON encoding of signed portion
-    const signedBytes = decodeUTF8(stringify(signed));
+    const signedBytes = util.decodeUTF8(stringify(signed));
 
     // Verify at least one signature
     for (const signature of signatures) {
       const keyId = signature.keyid;
-      const signatureBytes = decodeBase64(signature.signature);
+      const signatureBytes = util.decodeBase64(signature.signature);
       
       if (this.trustedKeys[keyId]) {
         try {
-          const publicKeyBytes = decodeBase64(this.trustedKeys[keyId]);
+          const publicKeyBytes = util.decodeBase64(this.trustedKeys[keyId]);
           const isValid = nacl.sign.detached.verify(signedBytes, signatureBytes, publicKeyBytes);
           
           if (isValid) {
@@ -226,7 +256,7 @@ export class TUFClient {
   /**
    * Get repository health status
    */
-  async getRepositoryHealth(): Promise<any> {
+  async getRepositoryHealth(): Promise<{ [key: string]: unknown }> {
     try {
       const healthUrl = `${this.repositoryUrl}/health`;
       const response = await fetch(healthUrl);
@@ -258,7 +288,8 @@ export class BrowserTUFClient extends TUFClient {
     }
 
     const targetPath = `regulations/${regulationId}.json`;
-    const targetInfo = this.targetsMetadata.signed.targets[targetPath];
+    const targets = this.targetsMetadata?.signed.targets;
+    const targetInfo = targets?.[targetPath];
     
     if (!targetInfo) {
       throw new Error(`Regulation ${regulationId} not found in TUF repository`);

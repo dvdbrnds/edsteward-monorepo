@@ -6,24 +6,26 @@ import { insertRegulationUpdateSchema } from '@shared/schema';
 
 /**
  * Schema for accepting a regulation update
+ * Note: Signature is now auto-generated from user login information
  */
 const acceptUpdateSchema = z.object({
-  signature: z.string().min(1, "Signature is required"),
+  // No manual signature required - will be auto-generated
 });
 
 /**
  * Schema for rejecting a regulation update
+ * Note: Signature is now auto-generated from user login information
  */
 const rejectUpdateSchema = z.object({
-  signature: z.string().min(1, "Signature is required"),
   reason: z.string().min(1, "Rejection reason is required"),
 });
 
 /**
  * Schema for deferring a regulation update
+ * Note: Signature is now auto-generated from user login information
  */
 const deferUpdateSchema = z.object({
-  signature: z.string().min(1, "Signature is required"),
+  reason: z.string().optional(),
 });
 
 /**
@@ -302,11 +304,19 @@ export function setupRegulationUpdatesApi(app: Express) {
         return res.status(403).json({ error: 'Unauthorized to perform this action' });
       }
       
+      // Generate signature automatically from user login information
+      const timestamp = new Date().toISOString();
+      const fullName = user.firstName && user.lastName 
+        ? `${user.firstName} ${user.lastName}` 
+        : user.username;
+      
+      const autoSignature = `Digitally approved by ${fullName} (${user.username}) on ${timestamp}`;
+      
       // Accept the update
       await storage.acceptRegulationUpdate(
         updateId,
         user.id,
-        validationResult.data.signature
+        autoSignature
       );
       
       res.json({ success: true });
@@ -344,11 +354,19 @@ export function setupRegulationUpdatesApi(app: Express) {
         return res.status(403).json({ error: 'Unauthorized to perform this action' });
       }
       
+      // Generate signature automatically from user login information
+      const timestamp = new Date().toISOString();
+      const fullName = user.firstName && user.lastName 
+        ? `${user.firstName} ${user.lastName}` 
+        : user.username;
+      
+      const autoSignature = `Digitally rejected by ${fullName} (${user.username}) on ${timestamp}`;
+      
       // Reject the update
       await storage.rejectRegulationUpdate(
         updateId,
         user.id,
-        validationResult.data.signature,
+        autoSignature,
         validationResult.data.reason
       );
       
@@ -387,11 +405,19 @@ export function setupRegulationUpdatesApi(app: Express) {
         return res.status(403).json({ error: 'Unauthorized to perform this action' });
       }
       
+      // Generate signature automatically from user login information
+      const timestamp = new Date().toISOString();
+      const fullName = user.firstName && user.lastName 
+        ? `${user.firstName} ${user.lastName}` 
+        : user.username;
+      
+      const autoSignature = `Digitally deferred by ${fullName} (${user.username}) on ${timestamp}`;
+      
       // Defer the update
       await storage.deferRegulationUpdate(
         updateId,
         user.id,
-        validationResult.data.signature
+        autoSignature
       );
       
       res.json({ success: true });
@@ -399,8 +425,50 @@ export function setupRegulationUpdatesApi(app: Express) {
       console.error('Error deferring regulation update:', error);
       res.status(500).json({ error: 'Failed to defer regulation update' });
     }
-  });
+    });
 
+  // Bulk delete regulation updates (for testing)
+  app.delete('/api/regulation-updates/bulk', async (req: Request, res: Response) => {
+    try {
+      const { ids } = req.body;
+      
+      if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ error: 'Invalid or empty ids array' });
+      }
+      
+      // Validate all IDs are numbers
+      const validIds = ids.filter(id => typeof id === 'number' && !isNaN(id));
+      if (validIds.length !== ids.length) {
+        return res.status(400).json({ error: 'All IDs must be valid numbers' });
+      }
+      
+      // Get user from session for logging
+      if (!req.session || !req.user) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+      
+      const user = req.user;
+      
+      // Only admins and compliance officers can bulk delete
+      if (user.role !== 'admin' && user.role !== 'compliance_officer') {
+        return res.status(403).json({ error: 'Unauthorized to perform this action' });
+      }
+      
+      await storage.bulkDeleteRegulationUpdates(validIds);
+      
+      console.log(`✅ Bulk deleted ${validIds.length} regulation updates by user ${user.username}`);
+      
+      res.json({ 
+        success: true, 
+        deletedCount: validIds.length,
+        deletedIds: validIds
+      });
+    } catch (error) {
+      console.error('Error bulk deleting regulation updates:', error);
+      res.status(500).json({ error: 'Failed to bulk delete regulation updates' });
+    }
+  });
+  
   // TUF-specific endpoints
   
   // Get TUF repository health

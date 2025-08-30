@@ -48,7 +48,6 @@ import type {
   InsertNotificationQueue,
   VersionConflict,
   InsertVersionConflict,
-  MCPValidationResult,
   MCPVersionConflict
 } from "@shared/schema";
 
@@ -76,6 +75,7 @@ const sessionPool = new Pool({
   allowExitOnIdle: false,
 });
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 export interface IStorage {
   // User methods - now tenant-aware
   getUser(id: number, tenantId?: string): Promise<User | undefined>;
@@ -123,79 +123,80 @@ export interface IStorage {
   }>;
 
   // MCP Validation Status methods
-  getValidationStatus(regulationId: number, versionId?: number): Promise<ValidationStatus[]>;
-  createValidationStatus(status: InsertValidationStatus): Promise<ValidationStatus>;
-  updateValidationStatus(id: number, status: Partial<InsertValidationStatus>): Promise<ValidationStatus>;
-  validateRegulationVersion(versionId: number, userId: number): Promise<ValidationStatus[]>;
+  getValidationStatus(_regulationId: number, _versionId?: number): Promise<ValidationStatus[]>;
+  createValidationStatus(_status: InsertValidationStatus): Promise<ValidationStatus>;
+  updateValidationStatus(_id: number, _status: Partial<InsertValidationStatus>): Promise<ValidationStatus>;
+  validateRegulationVersion(_versionId: number, _userId: number): Promise<ValidationStatus[]>;
 
   // MCP Sync Control methods
-  getSyncControl(regulationId: number): Promise<SyncControl | null>;
-  createSyncControl(control: InsertSyncControl): Promise<SyncControl>;
-  updateSyncControl(id: number, control: Partial<InsertSyncControl>): Promise<SyncControl>;
-  scheduleSyncForRegulation(regulationId: number, nextSync: Date): Promise<SyncControl>;
-  recordSyncAttempt(regulationId: number, success: boolean, error?: string): Promise<SyncControl>;
+  getSyncControl(_regulationId: number): Promise<SyncControl | null>;
+  createSyncControl(_control: InsertSyncControl): Promise<SyncControl>;
+  updateSyncControl(_id: number, _control: Partial<InsertSyncControl>): Promise<SyncControl>;
+  scheduleSyncForRegulation(_regulationId: number, _nextSync: Date): Promise<SyncControl>;
+  recordSyncAttempt(_regulationId: number, _success: boolean, _error?: string): Promise<SyncControl>;
 
   // MCP Notification Queue methods
-  getNotificationQueue(status?: 'pending' | 'sent' | 'failed'): Promise<NotificationQueue[]>;
-  createNotificationQueueItem(item: InsertNotificationQueue): Promise<NotificationQueue>;
-  updateNotificationQueueItem(id: number, item: Partial<InsertNotificationQueue>): Promise<NotificationQueue>;
-  markNotificationAsSent(id: number): Promise<NotificationQueue>;
+  getNotificationQueue(_status?: 'pending' | 'sent' | 'failed'): Promise<NotificationQueue[]>;
+  createNotificationQueueItem(_item: InsertNotificationQueue): Promise<NotificationQueue>;
+  updateNotificationQueueItem(_id: number, _item: Partial<InsertNotificationQueue>): Promise<NotificationQueue>;
+  markNotificationAsSent(_id: number): Promise<NotificationQueue>;
 
   // MCP Version Conflict methods
-  getVersionConflicts(status?: 'pending' | 'resolved' | 'rejected'): Promise<VersionConflict[]>;
-  getVersionConflictsForRegulation(regulationId: number): Promise<VersionConflict[]>;
-  createVersionConflict(conflict: InsertVersionConflict): Promise<VersionConflict>;
-  resolveVersionConflict(id: number, resolutions: MCPVersionConflict[], userId: number): Promise<VersionConflict>;
-  rejectVersionConflict(id: number, userId: number): Promise<VersionConflict>;
+  getVersionConflicts(_status?: 'pending' | 'resolved' | 'rejected'): Promise<VersionConflict[]>;
+  getVersionConflictsForRegulation(_regulationId: number): Promise<VersionConflict[]>;
+  createVersionConflict(_conflict: InsertVersionConflict): Promise<VersionConflict>;
+  resolveVersionConflict(_id: number, _resolutions: MCPVersionConflict[], _userId: number): Promise<VersionConflict>;
+  rejectVersionConflict(_id: number, _userId: number): Promise<VersionConflict>;
 
   // Notification methods
-  getNotificationsByUser(userId: number): Promise<Notification[]>;
+  getNotificationsByUser(_userId: number): Promise<Notification[]>;
   getAllNotifications(): Promise<Notification[]>;
-  createNotification(notification: InsertNotification): Promise<Notification>;
-  sendEmailNotification(userId: number, subject: string, message: string): Promise<boolean>;
+  createNotification(_notification: InsertNotification): Promise<Notification>;
+  sendEmailNotification(_userId: number, _subject: string, _message: string): Promise<boolean>;
 
   // Deadline methods
   getDeadlines(): Promise<Deadline[]>;
   getAllIncompleteDeadlines(): Promise<Deadline[]>;
-  createDeadline(deadline: InsertDeadline): Promise<Deadline>;
+  createDeadline(_deadline: InsertDeadline): Promise<Deadline>;
 
   // Guide methods
   getGuides(): Promise<Guide[]>;
-  getGuidesByCategory(category: string): Promise<Guide[]>;
-  getGuide(id: number): Promise<Guide | undefined>;
-  createGuide(guide: InsertGuide): Promise<Guide>;
-  updateGuide(id: number, guide: Partial<InsertGuide>): Promise<Guide>;
+  getGuidesByCategory(_category: string): Promise<Guide[]>;
+  getGuide(_id: number): Promise<Guide | undefined>;
+  createGuide(_guide: InsertGuide): Promise<Guide>;
+  updateGuide(_id: number, _guide: Partial<InsertGuide>): Promise<Guide>;
 
   // ETL methods
   getCsvSchemas(): Promise<CsvSchema[]>;
-  getCsvSchema(id: number): Promise<CsvSchema | undefined>;
-  createCsvSchema(schema: InsertCsvSchema): Promise<CsvSchema>;
-  getValidationRules(schemaId: number): Promise<ValidationRule[]>;
-  createValidationRule(rule: InsertValidationRule): Promise<ValidationRule>;
-  createFieldMapping(mapping: InsertFieldMapping): Promise<FieldMapping>;
+  getCsvSchema(_id: number): Promise<CsvSchema | undefined>;
+  createCsvSchema(_schema: InsertCsvSchema): Promise<CsvSchema>;
+  getValidationRules(_schemaId: number): Promise<ValidationRule[]>;
+  createValidationRule(_rule: InsertValidationRule): Promise<ValidationRule>;
+  createFieldMapping(_mapping: InsertFieldMapping): Promise<FieldMapping>;
 
   // Session store
   sessionStore: session.Store;
   hasAdmin(): Promise<boolean>;
 
   // Note methods
-  getNotesByRegulation(regulationId: number): Promise<Note[]>;
-  getNotesByUser(userId: number): Promise<Note[]>;
-  getNote(id: number): Promise<Note | null>;
-  createNote(note: InsertNote): Promise<Note>;
-  updateNote(id: number, note: Partial<InsertNote>): Promise<Note>;
-  deleteNote(id: number): Promise<void>;
+  getNotesByRegulation(_regulationId: number): Promise<Note[]>;
+  getNotesByUser(_userId: number): Promise<Note[]>;
+  getNote(_id: number): Promise<Note | null>;
+  createNote(_note: InsertNote): Promise<Note>;
+  updateNote(_id: number, _note: Partial<InsertNote>): Promise<Note>;
+  deleteNote(_id: number): Promise<void>;
 
   // Evidence file methods
-  createEvidenceFile(file: InsertEvidenceFile): Promise<EvidenceFile>;
-  getEvidenceFilesByRegulation(regulationId: number): Promise<EvidenceFile[]>;
-  getEvidenceFile(id: number): Promise<EvidenceFile | undefined>;
-  updateEvidenceFileStatus(id: number, status: string): Promise<EvidenceFile>;
+  createEvidenceFile(_file: InsertEvidenceFile): Promise<EvidenceFile>;
+  getEvidenceFilesByRegulation(_regulationId: number): Promise<EvidenceFile[]>;
+  getEvidenceFile(_id: number): Promise<EvidenceFile | undefined>;
+  updateEvidenceFileStatus(_id: number, _status: string): Promise<EvidenceFile>;
 
   // Branding configuration methods
-  getBrandingConfig(): Promise<any>;
-  saveBrandingConfig(config: any): Promise<any>;
+  getBrandingConfig(): Promise<{ [key: string]: unknown }>;
+  saveBrandingConfig(config: { [key: string]: unknown }): Promise<{ [key: string]: unknown }>;
 }
+/* eslint-enable @typescript-eslint/no-unused-vars */
 
 import { emailService } from './services/email';
 
@@ -325,7 +326,7 @@ export class DatabaseStorage implements IStorage {
     });
   }
 
-  async getUser(id: number, tenantId?: string): Promise<User | undefined> {
+  async getUser(id: number, _tenantId?: string): Promise<User | undefined> {
     try {
       const [user] = await db.select().from(users).where(eq(users.id, id));
       return user;
@@ -335,7 +336,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async getUserByUsername(username: string, tenantId?: string): Promise<User | undefined> {
+  async getUserByUsername(username: string, _tenantId?: string): Promise<User | undefined> {
     try {
       console.log(`Looking up user with username: ${username}`);
       const [user] = await db.select().from(users).where(eq(users.username, username));
@@ -347,7 +348,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async getUserByEmail(email: string, tenantId?: string): Promise<User | undefined> {
+  async getUserByEmail(email: string, _tenantId?: string): Promise<User | undefined> {
     try {
       console.log(`Looking up user with email: ${email}`);
       const [user] = await db.select().from(users).where(eq(users.email, email));
@@ -359,7 +360,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async getUserByExternalId(externalId: string, tenantId?: string): Promise<User | undefined> {
+  async getUserByExternalId(externalId: string, _tenantId?: string): Promise<User | undefined> {
     try {
       console.log(`Looking up user with external ID: ${externalId}`);
       const [user] = await db.select().from(users).where(eq(users.externalId, externalId));
@@ -371,9 +372,9 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async createUser(insertUser: InsertUser, tenantId?: string): Promise<User> {
+  async createUser(insertUser: InsertUser, _tenantId?: string): Promise<User> {
     // Use tenant-specific storage if tenantId provided
-    if (tenantId) {
+    if (_tenantId) {
       const tenantStorage = getDatabaseStorage();
       return await tenantStorage.createUser(insertUser);
     }
@@ -388,11 +389,11 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async getAllUsers(tenantId?: string): Promise<User[]> {
+  async getAllUsers(_tenantId?: string): Promise<User[]> {
     return await db.select().from(users);
   }
 
-  async updateUser(id: number, userData: Partial<InsertUser>, tenantId?: string): Promise<User> {
+  async updateUser(id: number, userData: Partial<InsertUser>, _tenantId?: string): Promise<User> {
     const [user] = await db
       .update(users)
       .set(userData)
@@ -401,7 +402,7 @@ export class DatabaseStorage implements IStorage {
     return user;
   }
 
-  async deleteUser(id: number, tenantId?: string): Promise<void> {
+  async deleteUser(id: number, _tenantId?: string): Promise<void> {
     await db.delete(users).where(eq(users.id, id));
   }
 
@@ -472,7 +473,7 @@ export class DatabaseStorage implements IStorage {
         );
 
         // Remove the requirements field from the update object
-        const { requirements, ...otherFields } = regulation;
+        const { requirements: _requirements, ...otherFields } = regulation;
 
         // If there are other fields to update, do that separately
         if (Object.keys(otherFields).length > 0) {
@@ -1363,7 +1364,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   // Branding configuration methods
-  async getBrandingConfig(): Promise<any> {
+  async getBrandingConfig(): Promise<{ [key: string]: unknown }> {
     try {
       // CRITICAL FIX: Check admin mode FIRST to ensure proper admin branding
       const isAdminMode = process.env.ADMIN_MODE === 'true';
@@ -1472,7 +1473,7 @@ export class DatabaseStorage implements IStorage {
     }
   }
 
-  async saveBrandingConfig(config: any): Promise<any> {
+  async saveBrandingConfig(config: { [key: string]: unknown }): Promise<{ [key: string]: unknown }> {
     try {
       // CRITICAL FIX: Prevent admin from saving branding config to database
       // Admin environments should use environment-only branding

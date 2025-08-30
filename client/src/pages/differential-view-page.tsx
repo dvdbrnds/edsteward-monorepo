@@ -49,10 +49,9 @@ const DifferentialViewPage: React.FC = () => {
   const [match, params] = useRoute<{ id: string }>('/regulations/updates/:id');
   const [, setLocation] = useLocation();
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const [signatureModalOpen, setSignatureModalOpen] = useState(false);
+  const [showReasonDialog, setShowReasonDialog] = useState(false);
   const [action, setAction] = useState<'approve' | 'reject' | 'defer' | null>(null);
   const [reason, setReason] = useState('');
-  const [signature, setSignature] = useState('');
   
   // Parse query parameters to see if we should show a dialog
   useEffect(() => {
@@ -138,18 +137,16 @@ const DifferentialViewPage: React.FC = () => {
   
   const handleApproveUpdate = async () => {
     try {
-      setSignatureModalOpen(false);
+      setShowConfirmDialog(false);
       
-      // API call to approve the update
+      // API call to approve the update (signature is auto-generated on backend)
       const response = await fetch(`/api/regulation-updates/${updateId}/accept`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
         credentials: 'include', // Include cookies for authentication
-        body: JSON.stringify({
-          signature
-        })
+        body: JSON.stringify({})
       });
       
       if (!response.ok) {
@@ -171,9 +168,9 @@ const DifferentialViewPage: React.FC = () => {
   
   const handleRejectUpdate = async () => {
     try {
-      setSignatureModalOpen(false);
+      setShowConfirmDialog(false);
       
-      // API call to reject the update
+      // API call to reject the update (signature is auto-generated on backend)
       const response = await fetch(`/api/regulation-updates/${updateId}/reject`, {
         method: 'POST',
         headers: {
@@ -181,7 +178,6 @@ const DifferentialViewPage: React.FC = () => {
         },
         credentials: 'include', // Include cookies for authentication
         body: JSON.stringify({
-          signature,
           reason
         })
       });
@@ -205,16 +201,16 @@ const DifferentialViewPage: React.FC = () => {
   
   const handleDeferUpdate = async () => {
     try {
-      setSignatureModalOpen(false);
+      setShowConfirmDialog(false);
       
-      // API call to defer the update
+      // API call to defer the update (signature is auto-generated on backend)
       const response = await fetch(`/api/regulation-updates/${updateId}/defer`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
+        credentials: 'include', // Include cookies for authentication
         body: JSON.stringify({
-          signature,
           reason
         })
       });
@@ -234,18 +230,19 @@ const DifferentialViewPage: React.FC = () => {
   
   const handleConfirmAction = () => {
     setShowConfirmDialog(false);
-    setSignatureModalOpen(true);
-  };
-  
-  const handleSignatureSubmit = () => {
-    if (!signature) {
-      // Show error or validation
-      return;
-    }
     
     if (action === 'approve') {
       handleApproveUpdate();
-    } else if (action === 'reject') {
+    } else if (action === 'reject' || action === 'defer') {
+      // Show reason dialog for reject and defer actions
+      setShowReasonDialog(true);
+    }
+  };
+  
+  const handleReasonSubmit = () => {
+    setShowReasonDialog(false);
+    
+    if (action === 'reject') {
       handleRejectUpdate();
     } else if (action === 'defer') {
       handleDeferUpdate();
@@ -470,15 +467,15 @@ const DifferentialViewPage: React.FC = () => {
         </AlertDialogContent>
       </AlertDialog>
       
-      {/* Signature Modal */}
-      <Dialog open={signatureModalOpen} onOpenChange={setSignatureModalOpen}>
+      {/* Reason Dialog for Reject/Defer */}
+      <Dialog open={showReasonDialog} onOpenChange={setShowReasonDialog}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
             <DialogTitle>
-              {action === 'approve' ? 'Approve' : action === 'reject' ? 'Reject' : 'Defer'} with Signature
+              {action === 'reject' ? 'Reject' : 'Defer'} Regulation Update
             </DialogTitle>
             <DialogDescription>
-              Please provide your signature and reason for this action.
+              Please provide a reason for this action. Your signature will be automatically generated.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -489,30 +486,24 @@ const DifferentialViewPage: React.FC = () => {
                 value={reason}
                 onChange={(e) => setReason(e.target.value)}
                 placeholder={
-                  action === 'approve' 
-                    ? 'Reason for approval...' 
-                    : action === 'reject'
-                      ? 'Reason for rejection...'
-                      : 'Reason for deferral...'
+                  action === 'reject'
+                    ? 'Reason for rejection...'
+                    : 'Reason for deferral...'
                 }
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="signature">Digital Signature</Label>
-              <Textarea
-                id="signature"
-                value={signature}
-                onChange={(e) => setSignature(e.target.value)}
-                placeholder="Type your full name to sign"
-                className="h-10"
+                rows={4}
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setSignatureModalOpen(false)}>
+            <Button variant="outline" onClick={() => setShowReasonDialog(false)}>
               Cancel
             </Button>
-            <Button onClick={handleSignatureSubmit}>Submit</Button>
+            <Button 
+              onClick={handleReasonSubmit}
+              disabled={action === 'reject' && !reason.trim()}
+            >
+              {action === 'reject' ? 'Reject' : 'Defer'}
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
