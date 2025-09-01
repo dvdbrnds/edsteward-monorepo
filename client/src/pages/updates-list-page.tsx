@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Loader2, FileText, Eye, Calendar, Clock, RefreshCw, Trash2 } from 'lucide-react';
+import { Loader2, FileText, Eye, Calendar, Clock, RefreshCw, Trash2, PlayCircle, Zap } from 'lucide-react';
 import Navigation from "@/components/layout/navigation";
 
 const UpdatesListPage: React.FC = () => {
@@ -211,14 +211,104 @@ const UpdatesListPage: React.FC = () => {
         )}
 
         {pendingUpdates.length === 0 ? (
-          <div className="text-center py-12">
-            <div className="text-gray-400 mb-4">
-              <FileText className="h-16 w-16 mx-auto" />
+          <div className="space-y-8">
+            <div className="text-center py-12">
+              <div className="text-gray-400 mb-4">
+                <FileText className="h-16 w-16 mx-auto" />
+              </div>
+              <h3 className="text-lg font-medium text-gray-900 mb-2">No pending updates</h3>
+              <p className="text-gray-500">
+                All regulation updates have been reviewed and processed.
+              </p>
             </div>
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No pending updates</h3>
-            <p className="text-gray-500">
-              All regulation updates have been reviewed and processed.
-            </p>
+
+            {/* Demo Section */}
+            <div className="border-t pt-8">
+              <div className="text-center mb-6">
+                <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                  <Zap className="h-5 w-5 inline mr-2 text-blue-500" />
+                  Differential View Demo
+                </h2>
+                <p className="text-gray-600">
+                  Experience the powerful regulation change tracking and review system
+                </p>
+              </div>
+
+              <Card className="max-w-2xl mx-auto border-blue-200 bg-blue-50/30">
+                <CardContent className="p-6">
+                  <div className="flex items-start gap-4">
+                    <div className="pt-1">
+                      <PlayCircle className="h-6 w-6 text-blue-500" />
+                    </div>
+                    
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <h3 className="text-lg font-semibold text-gray-900">
+                          Title IX Educational Amendments - 2024 Update
+                        </h3>
+                        <Badge variant="secondary" className="bg-blue-100 text-blue-700">
+                          Demo
+                        </Badge>
+                      </div>
+                      
+                      <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
+                        <span className="flex items-center gap-1">
+                          <Calendar className="h-4 w-4" />
+                          {new Date().toLocaleDateString()}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-4 w-4" />
+                          {new Date().toLocaleTimeString()}
+                        </span>
+                        <span className="bg-green-100 text-green-700 px-2 py-1 rounded-full text-xs font-medium">
+                          15% Changed
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-3 gap-4 mb-4 text-sm">
+                        <div className="text-center p-3 bg-green-50 rounded-lg">
+                          <div className="font-semibold text-green-700">+8%</div>
+                          <div className="text-green-600">Added</div>
+                        </div>
+                        <div className="text-center p-3 bg-red-50 rounded-lg">
+                          <div className="font-semibold text-red-700">-3%</div>
+                          <div className="text-red-600">Removed</div>
+                        </div>
+                        <div className="text-center p-3 bg-blue-50 rounded-lg">
+                          <div className="font-semibold text-blue-700">4</div>
+                          <div className="text-blue-600">Sections</div>
+                        </div>
+                      </div>
+
+                      <p className="text-sm text-gray-600 mb-4">
+                        <strong>Summary:</strong> Updated compliance requirements for educational institutions, 
+                        including new reporting procedures and enhanced protection measures for students and staff.
+                      </p>
+                    </div>
+                    
+                    <div className="flex flex-col gap-2">
+                      <Button
+                        variant="default"
+                        size="sm"
+                        className="bg-blue-600 hover:bg-blue-700"
+                        onClick={() => window.open('/regulations/updates/demo', '_blank')}
+                      >
+                        <Eye className="h-4 w-4 mr-1" />
+                        View Demo
+                      </Button>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <div className="text-center mt-6">
+                <p className="text-sm text-gray-500">
+                  This demo showcases the differential view feature with sample regulation changes.
+                  <br />
+                  In production, this section will display real pending regulation updates.
+                </p>
+              </div>
+            </div>
           </div>
         ) : (
           <div className="space-y-4">

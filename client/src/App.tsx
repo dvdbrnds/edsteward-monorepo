@@ -84,6 +84,7 @@ export default function App() {
               )}
               {/* More specific routes MUST come before general ones */}
               <ProtectedRoute path="/regulations/validate" component={ValidationPage} />
+              <ProtectedRoute path="/regulations/updates/demo" component={() => <DifferentialViewPage isDemo={true} />} />
               <ProtectedRoute path="/regulations/updates/:id" component={DifferentialViewPage} />
               <ProtectedRoute path="/regulations/updates" component={UpdatesListPage} />
               {/* Debug route */}

@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { diffWords } from 'diff';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { CheckIcon, XIcon, ClockIcon } from 'lucide-react';
+import { CheckIcon, XIcon, ClockIcon, PlayCircle } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
@@ -45,7 +45,11 @@ import { Textarea } from '@/components/ui/textarea';
 //   differences: any[];
 // }
 
-const DifferentialViewPage: React.FC = () => {
+interface DifferentialViewPageProps {
+  isDemo?: boolean;
+}
+
+const DifferentialViewPage: React.FC<DifferentialViewPageProps> = ({ isDemo = false }) => {
   const [match, params] = useRoute<{ id: string }>('/regulations/updates/:id');
   const [, setLocation] = useLocation();
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
@@ -77,11 +81,219 @@ const DifferentialViewPage: React.FC = () => {
   }, []);
   
   const updateId = match ? parseInt(params.id) : null;
+
+  // Demo data for showcasing the differential view
+  const demoData = {
+    update: {
+      id: 'demo',
+      name: 'Title IX Educational Amendments - 2024 Update',
+      content: `# Title IX Compliance Requirements - Updated 2024
+
+## Purpose
+This document outlines the requirements for compliance with Title IX of the Education Amendments of 1972, which prohibits discrimination on the basis of sex in education programs and activities that receive federal financial assistance.
+
+## Scope
+These requirements apply to all educational institutions receiving federal funding, including colleges, universities, and K-12 schools.
+
+## General Requirements
+
+1. Each institution must designate at least one employee as the Title IX Coordinator to oversee compliance efforts and investigate any complaints of sex discrimination.
+
+2. Institutions must adopt and publish grievance procedures that provide for the prompt and equitable resolution of student and employee complaints alleging sex discrimination.
+
+3. **NEW 2024**: Institutions must implement enhanced digital reporting systems that allow anonymous reporting of incidents and provide real-time case tracking for complainants.
+
+4. Institutions must notify all students, employees, applicants for admission and employment, and unions or professional organizations holding collective bargaining agreements with the institution about their Title IX rights and procedures.
+
+## Reporting Requirements
+
+### Annual Reporting
+- Submit comprehensive annual reports to the Department of Education by October 1st each year
+- **UPDATED 2024**: Reports must now include detailed analytics on case resolution times and outcomes
+- Include statistical data on complaints received, investigations conducted, and remedial actions taken
+
+### Incident Reporting
+- **NEW 2024**: All incidents must be reported within 24 hours using the new federal digital reporting portal
+- Maintain detailed records of all complaints and investigations for a minimum of seven years
+- Provide quarterly updates to the Office for Civil Rights on ongoing investigations
+
+## Training and Education
+
+### Staff Training
+- All employees must receive annual Title IX training
+- **ENHANCED 2024**: Training must now include modules on trauma-informed investigation techniques and digital evidence handling
+- Specialized training required for Title IX Coordinators, investigators, and decision-makers
+
+### Student Education
+- Provide comprehensive orientation programs for all new students
+- **NEW 2024**: Implement ongoing awareness campaigns using digital platforms and social media
+- Distribute educational materials in multiple languages as appropriate
+
+## Investigation Procedures
+
+### Timeline Requirements
+- Initial response within 24 hours of receiving a complaint
+- **UPDATED 2024**: Complete investigations within 60 days (reduced from 90 days)
+- Provide written determination within 10 days of investigation completion
+
+### Due Process Protections
+- Ensure both parties have equal opportunity to present evidence and witnesses
+- **NEW 2024**: Implement standardized evidence collection protocols for digital communications
+- Provide both parties with trained advisors throughout the process
+
+## Remedial Actions and Support Services
+
+### Immediate Support Measures
+- Provide counseling and mental health services
+- **ENHANCED 2024**: Offer virtual counseling options and 24/7 crisis support hotlines
+- Implement academic accommodations as needed
+- Ensure campus safety measures are in place
+
+### Long-term Remedies
+- **NEW 2024**: Develop individualized safety plans for all parties involved
+- Provide ongoing monitoring and support services
+- Implement systemic changes to prevent future incidents
+
+## Compliance Monitoring
+
+### Internal Monitoring
+- Conduct annual self-assessments of Title IX compliance
+- **NEW 2024**: Implement continuous monitoring systems using data analytics
+- Regular review of policies and procedures
+
+### External Oversight
+- Cooperate fully with Office for Civil Rights investigations
+- **UPDATED 2024**: Participate in new federal compliance verification program
+- Submit to periodic compliance audits
+
+## Resources and Support
+
+### Contact Information
+- Title IX Coordinator: Available 24/7 via secure portal
+- **NEW 2024**: Multi-language support hotline: 1-800-TITLEIX
+- Emergency response team: Available for immediate safety concerns
+
+### Additional Resources
+- **NEW 2024**: Comprehensive online resource center with interactive training modules
+- Legal assistance fund for complainants who meet eligibility criteria
+- Peer support networks and survivor advocacy groups
+
+---
+
+*This document was last updated on ${new Date().toLocaleDateString()} to reflect the latest federal requirements and best practices in Title IX compliance.*`,
+      status: 'pending',
+      updateDate: new Date().toISOString()
+    },
+    original: {
+      content: `# Title IX Compliance Requirements
+
+## Purpose
+This document outlines the requirements for compliance with Title IX of the Education Amendments of 1972, which prohibits discrimination on the basis of sex in education programs and activities that receive federal financial assistance.
+
+## Scope
+These requirements apply to all educational institutions receiving federal funding, including colleges, universities, and K-12 schools.
+
+## General Requirements
+
+1. Each institution must designate at least one employee as the Title IX Coordinator to oversee compliance efforts and investigate any complaints of sex discrimination.
+
+2. Institutions must adopt and publish grievance procedures that provide for the prompt and equitable resolution of student and employee complaints alleging sex discrimination.
+
+3. Institutions must notify all students, employees, applicants for admission and employment, and unions or professional organizations holding collective bargaining agreements with the institution about their Title IX rights and procedures.
+
+## Reporting Requirements
+
+### Annual Reporting
+- Submit annual reports to the Department of Education by December 31st each year
+- Include statistical data on complaints received, investigations conducted, and remedial actions taken
+
+### Incident Reporting
+- Maintain detailed records of all complaints and investigations for a minimum of five years
+- Provide annual updates to the Office for Civil Rights on ongoing investigations
+
+## Training and Education
+
+### Staff Training
+- All employees must receive annual Title IX training
+- Specialized training required for Title IX Coordinators, investigators, and decision-makers
+
+### Student Education
+- Provide orientation programs for all new students
+- Distribute educational materials as appropriate
+
+## Investigation Procedures
+
+### Timeline Requirements
+- Initial response within 48 hours of receiving a complaint
+- Complete investigations within 90 days
+- Provide written determination within 15 days of investigation completion
+
+### Due Process Protections
+- Ensure both parties have equal opportunity to present evidence and witnesses
+- Provide both parties with advisors throughout the process
+
+## Remedial Actions and Support Services
+
+### Immediate Support Measures
+- Provide counseling and mental health services
+- Implement academic accommodations as needed
+- Ensure campus safety measures are in place
+
+### Long-term Remedies
+- Provide ongoing support services
+- Implement systemic changes to prevent future incidents
+
+## Compliance Monitoring
+
+### Internal Monitoring
+- Conduct annual self-assessments of Title IX compliance
+- Regular review of policies and procedures
+
+### External Oversight
+- Cooperate fully with Office for Civil Rights investigations
+- Submit to periodic compliance audits
+
+## Resources and Support
+
+### Contact Information
+- Title IX Coordinator: Available during business hours
+- Emergency response team: Available for immediate safety concerns
+
+### Additional Resources
+- Legal assistance information
+- Support group referrals
+
+---
+
+*This document was last updated on January 1, 2023.*`
+    },
+    diffData: {
+      addedChars: 2847,
+      removedChars: 423,
+      changedChars: 2424,
+      originalLength: 3421,
+      updatedLength: 5845,
+      addedPercentage: 8,
+      removedPercentage: 3,
+      changedPercentage: 15,
+      differences: [] // Will be calculated below
+    }
+  };
+
+  // Calculate diff for demo data
+  if (isDemo && demoData.diffData.differences.length === 0) {
+    demoData.diffData.differences = diffWords(demoData.original.content, demoData.update.content);
+  }
   
   const { data, isLoading, error } = useQuery({
-    queryKey: [`/api/regulation-updates/${updateId}`],
+    queryKey: isDemo ? ['demo-regulation-update'] : [`/api/regulation-updates/${updateId}`],
     queryFn: async () => {
       try {
+        // Return demo data if in demo mode
+        if (isDemo) {
+          return demoData;
+        }
+        
         if (!updateId) throw new Error('No update ID provided');
         
         const response = await fetch(`/api/regulation-updates/${updateId}`);
@@ -132,12 +344,19 @@ const DifferentialViewPage: React.FC = () => {
         throw err;
       }
     },
-    enabled: !!updateId
+    enabled: isDemo || !!updateId
   });
   
   const handleApproveUpdate = async () => {
     try {
       setShowConfirmDialog(false);
+      
+      if (isDemo) {
+        // Demo mode - show success message and redirect
+        alert('✅ Demo: Update approved successfully!\n\nIn production, this would update the regulation in the database and notify relevant stakeholders.');
+        setLocation('/regulations/updates');
+        return;
+      }
       
       // API call to approve the update (signature is auto-generated on backend)
       const response = await fetch(`/api/regulation-updates/${updateId}/accept`, {
@@ -169,6 +388,13 @@ const DifferentialViewPage: React.FC = () => {
   const handleRejectUpdate = async () => {
     try {
       setShowConfirmDialog(false);
+      
+      if (isDemo) {
+        // Demo mode - show success message and redirect
+        alert(`❌ Demo: Update rejected successfully!\n\nReason: ${reason}\n\nIn production, this would mark the update as rejected and notify the submitter.`);
+        setLocation('/regulations/updates');
+        return;
+      }
       
       // API call to reject the update (signature is auto-generated on backend)
       const response = await fetch(`/api/regulation-updates/${updateId}/reject`, {
@@ -202,6 +428,13 @@ const DifferentialViewPage: React.FC = () => {
   const handleDeferUpdate = async () => {
     try {
       setShowConfirmDialog(false);
+      
+      if (isDemo) {
+        // Demo mode - show success message and redirect
+        alert(`⏰ Demo: Update deferred successfully!\n\nReason: ${reason}\n\nIn production, this would schedule the update for later review.`);
+        setLocation('/regulations/updates');
+        return;
+      }
       
       // API call to defer the update (signature is auto-generated on backend)
       const response = await fetch(`/api/regulation-updates/${updateId}/defer`, {
@@ -343,7 +576,15 @@ const DifferentialViewPage: React.FC = () => {
       <main className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between mb-6">
-            <h1 className="text-2xl font-bold">Regulation Update Review</h1>
+            <div className="flex items-center gap-3">
+              <h1 className="text-2xl font-bold">Regulation Update Review</h1>
+              {isDemo && (
+                <Badge variant="secondary" className="bg-blue-100 text-blue-700">
+                  <PlayCircle className="h-3 w-3 mr-1" />
+                  Demo Mode
+                </Badge>
+              )}
+            </div>
             {diffData && (
               <Badge
                 variant={
