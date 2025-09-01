@@ -486,11 +486,22 @@ export function setupRegulationUpdatesApi(app: Express) {
         }
       });
     } catch (error) {
+      // Check if error indicates circuit breaker is open
+      if (error instanceof Error && error.message.includes('temporarily disabled')) {
+        res.status(503).json({ 
+          error: 'TUF service temporarily disabled',
+          details: 'Circuit breaker open - service will retry automatically',
+          retryAfter: 300 // 5 minutes
+        });
+        return;
+      }
+      
       // Reduce log spam - only log TUF errors once per minute
       const now = Date.now();
-      if (!(global as any).lastTufErrorLog || now - (global as any).lastTufErrorLog > 60000) {
+      const globalObj = global as Record<string, unknown>;
+      if (!globalObj.lastTufErrorLog || now - (globalObj.lastTufErrorLog as number) > 60000) {
         console.error('❌ TUF health check failed:', error instanceof Error ? error.message : 'Unknown error');
-        (global as any).lastTufErrorLog = now;
+        globalObj.lastTufErrorLog = now;
       }
       res.status(500).json({ 
         error: 'TUF repository health check failed',

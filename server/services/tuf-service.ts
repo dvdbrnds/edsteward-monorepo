@@ -247,9 +247,10 @@ export class TUFService {
       } catch (error) {
         // Rate limit polling errors - only log once per 5 minutes
         const now = Date.now();
-        if (!(global as any).lastTufPollingErrorLog || now - (global as any).lastTufPollingErrorLog > 300000) {
+        const globalObj = global as Record<string, unknown>;
+        if (!globalObj.lastTufPollingErrorLog || now - (globalObj.lastTufPollingErrorLog as number) > 300000) {
           console.error('❌ TUF polling error:', error instanceof Error ? error.message : 'Unknown error');
-          (global as any).lastTufPollingErrorLog = now;
+          globalObj.lastTufPollingErrorLog = now;
         }
       }
       
@@ -351,9 +352,10 @@ export class TUFService {
       
       // Reduce log spam - only log TUF errors once per minute
       const now = Date.now();
-      if (!(global as any).lastTufServiceErrorLog || now - (global as any).lastTufServiceErrorLog > 60000) {
+      const globalObj = global as Record<string, unknown>;
+      if (!globalObj.lastTufServiceErrorLog || now - (globalObj.lastTufServiceErrorLog as number) > 60000) {
         console.error('❌ TUF service health check failed:', error instanceof Error ? error.message : 'Unknown error');
-        (global as any).lastTufServiceErrorLog = now;
+        globalObj.lastTufServiceErrorLog = now;
       }
       throw error;
     }
@@ -371,11 +373,11 @@ export class TUFService {
     this.listeners[event].push(listener);
   }
 
-  private emit(event: string, ..._args: unknown[]): void {
+  private emit(event: string, ...args: unknown[]): void {
     if (this.listeners[event]) {
       for (const listener of this.listeners[event]) {
         try {
-          listener(..._args);
+          listener(...args);
         } catch (error) {
           console.error(`❌ Event listener error for ${event}:`, error);
         }
