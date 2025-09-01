@@ -18,6 +18,7 @@ import BatchTestingPanel from './components/BatchTestingPanel';
 import RequestInspector from './components/RequestInspector';
 import ColorGuide from './components/ColorGuide';
 import AdminDebugPanel from './components/AdminDebugPanel';
+import ModernDashboard from './components/ModernDashboard';
 import GlobalStyle from './GlobalStyle';
 import MCPEditorTool from './pages/MCPEditorTool';
 import MCPServerDetail from './pages/MCPServerDetail';
@@ -161,19 +162,20 @@ const DevClientApp = () => {
       }}>
         <AppContainer>
           <Header>
-            <AppTitle>MCP Editor Tool</AppTitle>
+            <AppTitle>MCP Engine Dashboard</AppTitle>
             <Nav>
-              <NavLink to="/">MCP Editor</NavLink>
+              <NavLink to="/">Dashboard</NavLink>
+              <NavLink to="/editor">MCP Editor</NavLink>
               <NavLink to="/batch">Batch Testing</NavLink>
               <NavLink to="/debug">Debug</NavLink>
               <NavLink to="/admin">Admin</NavLink>
-              <NavLink to="/colors">Colors</NavLink>
             </Nav>
           </Header>
           
           <Main>
             <Routes>
-              <Route path="/" element={<MCPEditorTool />} />
+              <Route path="/" element={<ModernDashboard />} />
+              <Route path="/editor" element={<MCPEditorTool />} />
               <Route path="/servers/:serverId" element={<MCPServerDetail />} />
               <Route path="/batch" element={<BatchTestingPanel />} />
               <Route path="/debug" element={<RequestInspector />} />
@@ -181,7 +183,7 @@ const DevClientApp = () => {
               <Route path="/colors" element={<ColorGuide />} />
               <Route path="/validate" element={<ValidationForm />} />
               <Route path="/results/:id" element={<ValidationResults />} />
-              <Route path="*" element={<MCPEditorTool />} />
+              <Route path="*" element={<ModernDashboard />} />
             </Routes>
           </Main>
           

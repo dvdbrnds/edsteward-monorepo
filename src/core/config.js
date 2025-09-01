@@ -50,7 +50,7 @@ export const config = {
   
   // Security settings
   security: {
-    allowedOrigins: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['http://localhost:3050'],
+    allowedOrigins: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : ['http://localhost:3050', 'http://localhost:3010'],
     jwtSecret: process.env.JWT_SECRET || 'your-secret-key',
     rateLimitEnabled: process.env.ENABLE_RATE_LIMIT === 'true',
     rateLimitMax: parseInt(process.env.RATE_LIMIT_MAX) || 100,

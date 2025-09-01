@@ -39,7 +39,7 @@ export class ConsoleGenerator {
 
     // Extract and clean regulation data
     const regulationData = {
-      REGULATION_ID: regulation['Item ID'] || regulation.id || 'unknown',
+      REGULATION_ID: regulation['Item ID'] || regulation.id || 'REG-' + Date.now(),
       REGULATION_NAME: this.cleanText(regulation['Statute Name'] || regulation.name || 'Unknown Regulation'),
       TOPIC: this.cleanText(regulation.Topic || regulation.topic || 'General Compliance'),
       STATUTE_NAME: this.cleanText(regulation['Statute Name'] || regulation.statuteName || ''),
@@ -50,22 +50,54 @@ export class ConsoleGenerator {
       REGULATION_SLUG: this.getRegulationSlug(regulation),
       STATUTE_REFERENCE: this.generateStatuteReference(regulation)
     };
+    
+    // Debug logging to see what we're working with
+    console.log(`🔧 Generating console for: ${regulationData.REGULATION_NAME}`);
+    console.log(`📋 Topic: ${regulationData.TOPIC}`);
+    console.log(`📖 Statute Reference: ${regulationData.STATUTE_REFERENCE}`);
 
     // Start with the REG-66 template and customize it for this regulation
     let html = this.template;
 
     // Replace REG-66 specific content with dynamic regulation content
-    html = html.replace(/FERPA Section 66 - Advanced LinearEngine Template/g, `${regulationData.REGULATION_NAME} - Advanced LinearEngine Console`);
+    html = html.replace(/REG-66 Advanced LinearEngine Console/g, `${regulationData.REGULATION_NAME} - Advanced LinearEngine Console`);
     html = html.replace(/REG-66/g, regulationData.REGULATION_ID);
-    html = html.replace(/TEACH Act/g, regulationData.TOPIC);
-    html = html.replace(/USC 17 Section 110/g, regulationData.STATUTE_REFERENCE);
-    html = html.replace(/Copyright & Fair Use Project/g, `${regulationData.TOPIC} & Compliance Project`);
-    html = html.replace(/TEACH Act research database/g, `${regulationData.TOPIC} research database`);
-    html = html.replace(/Educational exemption research/g, `${regulationData.TOPIC} regulatory research`);
-    html = html.replace(/Digital copyright analysis/g, `${regulationData.TOPIC} legal analysis`);
+    
+    // Special handling for TEACH Act - preserve original content
+    if (regulationData.REGULATION_SLUG === 'technology-education-and-copyright-harmonization-a') {
+      // For TEACH Act, keep the original USC 17/110 content and endpoints
+      console.log('🎯 Preserving original TEACH Act USC content and endpoints');
+    } else {
+      // For other regulations, replace TEACH Act references with regulation-specific content
+      html = html.replace(/TEACH Act/g, regulationData.REGULATION_NAME);
+      html = html.replace(/USC 17 Section 110/g, regulationData.STATUTE_REFERENCE);
+      html = html.replace(/Copyright & Fair Use Project/g, `${regulationData.TOPIC} & Compliance Project`);
+      html = html.replace(/TEACH Act research database/g, `${regulationData.REGULATION_NAME} research database`);
+      html = html.replace(/Educational exemption research/g, `${regulationData.TOPIC} regulatory research`);
+      html = html.replace(/Digital copyright analysis/g, `${regulationData.TOPIC} legal analysis`);
+    }
+    
+    // Fix the "unknown" title issue - replace any remaining "unknown" with regulation name
+    html = html.replace(/unknown Advanced LinearEngine Console/g, `${regulationData.REGULATION_NAME} Advanced LinearEngine Console`);
+    html = html.replace(/Starting unknown COMPREHENSIVE LinearEngine workflow/g, `Starting ${regulationData.REGULATION_NAME} COMPREHENSIVE LinearEngine workflow`);
+    html = html.replace(/unknown regulation/g, regulationData.REGULATION_NAME);
+    html = html.replace(/Unknown Regulation/g, regulationData.REGULATION_NAME);
 
-    // Update API endpoints to use the correct regulation ID
-    html = html.replace(/api\/llm\/usc\/17\/110/g, `api/llm/regulation/${encodeURIComponent(regulationData.REGULATION_ID)}`);
+    // Update API endpoints to use regulation-specific data
+    if (regulationData.REGULATION_SLUG === 'technology-education-and-copyright-harmonization-a') {
+      // For TEACH Act, keep original endpoints (USC 17/110, CFR teach-act, compliance teach-act)
+      console.log('🎯 Preserving original TEACH Act API endpoints');
+    } else {
+      // Replace USC 17/110 with the actual statute for this regulation
+      const statuteInfo = this.parseStatuteReference(regulationData.STATUTE_REFERENCE);
+      if (statuteInfo.title && statuteInfo.section) {
+        html = html.replace(/api\/llm\/usc\/17\/110/g, `api/llm/usc/${statuteInfo.title}/${statuteInfo.section}`);
+      }
+      
+      // Update CFR endpoints to be regulation-specific
+      html = html.replace(/api\/llm\/cfr\/teach-act/g, `api/llm/cfr/${regulationData.REGULATION_SLUG}`);
+      html = html.replace(/api\/llm\/compliance\/teach-act/g, `api/llm/compliance/${regulationData.REGULATION_SLUG}`);
+    }
     
     // Replace any remaining template placeholders
     Object.entries(regulationData).forEach(([key, value]) => {
@@ -156,6 +188,57 @@ export class ConsoleGenerator {
     } else {
       return `${topic} Regulation`;
     }
+  }
+
+  /**
+   * Parse statute reference to extract title and section for API calls
+   */
+  parseStatuteReference(statuteReference) {
+    // Default to USC 17/110 if we can't parse
+    let title = '17';
+    let section = '110';
+    
+    if (statuteReference) {
+      // PRIORITY 1: Look for "X U.S. Code § Y" or "X U.S.C. § Y" patterns first
+      const uscCodeMatch = statuteReference.match(/(\d+)\s+U\.S\.?\s*Code?\s*§\s*(\d+)/i);
+      if (uscCodeMatch) {
+        title = uscCodeMatch[1];
+        section = uscCodeMatch[2];
+        console.log(`📋 Parsed USC Code reference: ${title} U.S.C. § ${section}`);
+        return { title, section };
+      }
+      
+      // PRIORITY 2: Look for "USC X Section Y" patterns
+      const uscMatch = statuteReference.match(/USC\s+(\d+).*?Section\s+(\d+)/i);
+      if (uscMatch) {
+        title = uscMatch[1];
+        section = uscMatch[2];
+        console.log(`📋 Parsed USC Section reference: USC ${title} Section ${section}`);
+        return { title, section };
+      }
+      
+      // PRIORITY 3: Try to extract from U.S.C. patterns (e.g., "42 U.S.C. Chapter 21G" -> title: 42, section: 21)
+      const uscPatternMatch = statuteReference.match(/(\d+)\s+U\.S\.C\.\s+(?:Chapter\s+)?(\w+)/i);
+      if (uscPatternMatch) {
+        title = uscPatternMatch[1];
+        section = uscPatternMatch[2].replace(/[^0-9]/g, ''); // Extract just the numbers from "21G" -> "21"
+        console.log(`📋 Parsed U.S.C. Chapter reference: ${title} U.S.C. Chapter ${section}`);
+        return { title, section };
+      }
+      
+      // PRIORITY 4: Try to extract from item ID patterns (e.g., "29-794" -> title: 29, section: 794)
+      const idMatch = statuteReference.match(/(\d+)-(\d+)/);
+      if (idMatch) {
+        title = idMatch[1];
+        section = idMatch[2];
+        console.log(`📋 Parsed ID pattern reference: ${title}-${section}`);
+        return { title, section };
+      }
+      
+      console.log(`⚠️  Could not parse statute reference: "${statuteReference}", using default USC 17/110`);
+    }
+    
+    return { title, section };
   }
 }
 

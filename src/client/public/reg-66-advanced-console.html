@@ -2135,24 +2135,28 @@
                     cfrData.sections.forEach(section => {
                         const sectionDiv = document.createElement('div');
                         sectionDiv.className = 'subsection';
+                        sectionDiv.style.marginBottom = '20px';
+                        sectionDiv.style.padding = '16px';
+                        sectionDiv.style.border = '1px solid #e1e4e8';
+                        sectionDiv.style.borderRadius = '6px';
                         
                         const title = document.createElement('strong');
-                        title.textContent = section.title;
+                        title.textContent = `${section.section || ''} ${section.title}`;
                         title.style.display = 'block';
-                        title.style.marginBottom = '8px';
+                        title.style.marginBottom = '12px';
                         title.style.color = '#0969da';
-                        
-                        const subtitle = document.createElement('p');
-                        subtitle.textContent = section.subtitle;
-                        subtitle.style.fontStyle = 'italic';
-                        subtitle.style.marginBottom = '12px';
-                        subtitle.style.color = '#6e7681';
+                        title.style.fontSize = '16px';
                         
                         sectionDiv.appendChild(title);
-                        sectionDiv.appendChild(subtitle);
                         
-                        // Render section content
-                        if (Array.isArray(section.content)) {
+                        // Render section content (handle both string and array)
+                        if (typeof section.content === 'string') {
+                            const contentDiv = document.createElement('div');
+                            contentDiv.style.lineHeight = '1.6';
+                            contentDiv.style.color = '#24292f';
+                            contentDiv.textContent = section.content;
+                            sectionDiv.appendChild(contentDiv);
+                        } else if (Array.isArray(section.content)) {
                             section.content.forEach(item => {
                                 const itemDiv = document.createElement('div');
                                 itemDiv.className = 'definition';
@@ -2368,7 +2372,7 @@
                     mainSection.className = 'subsection';
                     
                     // Format the USC content - split into paragraphs
-                    const contentParagraphs = uscData.content.split('\n\n').filter(p => p.trim().length > 0);
+                    const contentParagraphs = (uscData.fullText || uscData.content).split('\n\n').filter(p => p.trim().length > 0);
                     
                     contentParagraphs.forEach((paragraph, index) => {
                         const paraDiv = document.createElement('div');

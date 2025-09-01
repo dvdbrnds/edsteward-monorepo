@@ -42,6 +42,9 @@ const CONFIG = {
 
 // Process tracking
 const processes = new Map();
+const restartCounts = new Map();
+const MAX_RESTARTS = 5;
+const RESTART_WINDOW = 300000; // 5 minutes
 let isShuttingDown = false;
 
 // Logging utilities
@@ -57,6 +60,30 @@ const log = {
  */
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+/**
+ * Check if service can be restarted
+ */
+function canRestart(serviceName) {
+  const now = Date.now();
+  const restartData = restartCounts.get(serviceName) || { count: 0, firstRestart: now };
+  
+  // Reset count if restart window has passed
+  if (now - restartData.firstRestart > RESTART_WINDOW) {
+    restartData.count = 0;
+    restartData.firstRestart = now;
+  }
+  
+  if (restartData.count >= MAX_RESTARTS) {
+    log.error(`Service ${serviceName} has reached maximum restart limit (${MAX_RESTARTS})`, serviceName);
+    return false;
+  }
+  
+  restartData.count++;
+  restartCounts.set(serviceName, restartData);
+  log.info(`Restart attempt ${restartData.count}/${MAX_RESTARTS} for ${serviceName}`, serviceName);
+  return true;
 }
 
 /**
@@ -144,7 +171,15 @@ async function startRegistryServer() {
   registryProcess.on('close', (code) => {
     if (!isShuttingDown) {
       log.error(`Registry server exited with code ${code}`, 'REGISTRY');
-      shutdown(1);
+      if (canRestart('registry')) {
+        setTimeout(() => {
+          if (!isShuttingDown) {
+            startRegistryServer();
+          }
+        }, 2000);
+      } else {
+        log.error('Registry server restart limit reached, system will continue without it', 'REGISTRY');
+      }
     }
   });
 
@@ -167,7 +202,7 @@ async function startRegistryServer() {
 async function startLLMGateway() {
   log.info('Starting LLM Gateway...', 'LLM');
 
-  const llmProcess = spawn('node', ['src/llm-gateway/start-llm-gateway-refactored.js'], {
+  const llmProcess = spawn('node', ['src/llm-gateway/simple-usc-gateway.js'], {
     stdio: ['ignore', 'pipe', 'pipe'],
     cwd: process.cwd()
   });
@@ -194,7 +229,15 @@ async function startLLMGateway() {
   llmProcess.on('close', (code) => {
     if (!isShuttingDown) {
       log.error(`LLM Gateway exited with code ${code}`, 'LLM');
-      shutdown(1);
+      if (canRestart('llm')) {
+        setTimeout(() => {
+          if (!isShuttingDown) {
+            startLLMGateway();
+          }
+        }, 2000);
+      } else {
+        log.error('LLM Gateway restart limit reached, system will continue without it', 'LLM');
+      }
     }
   });
 
@@ -244,7 +287,15 @@ async function startFrontend() {
   frontendProcess.on('close', (code) => {
     if (!isShuttingDown) {
       log.error(`Frontend server exited with code ${code}`, 'FRONTEND');
-      shutdown(1);
+      if (canRestart('frontend')) {
+        setTimeout(() => {
+          if (!isShuttingDown) {
+            startFrontendServer();
+          }
+        }, 2000);
+      } else {
+        log.error('Frontend server restart limit reached, system will continue without it', 'FRONTEND');
+      }
     }
   });
 
@@ -316,7 +367,7 @@ async function main() {
       execSync('pkill -f "node.*start-all.js" || true', { stdio: 'ignore' });
       execSync('pkill -f "vite.*3050" || true', { stdio: 'ignore' });
       execSync('pkill -f "registry-server.js" || true', { stdio: 'ignore' });
-      execSync('pkill -f "start-llm-gateway" || true', { stdio: 'ignore' });
+      execSync('pkill -f "simple-usc-gateway" || true', { stdio: 'ignore' });
     } catch (e) {
       // Ignore cleanup errors
     }
