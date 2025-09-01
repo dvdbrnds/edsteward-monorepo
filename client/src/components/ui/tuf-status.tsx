@@ -53,8 +53,8 @@ export function TUFStatus({ className = '' }: TUFStatusProps) {
     // Initial check
     checkTUFStatus();
     
-    // Check every 30 seconds
-    const interval = setInterval(checkTUFStatus, 30000);
+    // Check every 2 minutes (less aggressive to reduce server load)
+    const interval = setInterval(checkTUFStatus, 120000);
     
     return () => clearInterval(interval);
   }, [getHealth, getAvailableRegulations]);

@@ -33,11 +33,11 @@ const UpdatesListPage: React.FC = () => {
       console.log(`📊 [${timestamp}] API response (${jsonData.length} items):`, jsonData);
       return Array.isArray(jsonData) ? jsonData : [];
     },
-    refetchInterval: 3000, // Refetch every 3 seconds for more aggressive testing
+    refetchInterval: 30000, // Refetch every 30 seconds (reduced from 3 seconds)
     refetchOnWindowFocus: true, // Refetch when window gains focus
     refetchOnMount: true, // Always refetch on mount
-    staleTime: 0, // Consider data stale immediately
-    cacheTime: 0, // Don't cache data
+    staleTime: 10000, // Consider data stale after 10 seconds
+    cacheTime: 60000, // Cache data for 1 minute
   });
 
   console.log('📋 Current state:', { pendingUpdates, isLoading, error });

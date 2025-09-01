@@ -25,6 +25,13 @@ export class TUFService {
   private isPolling: boolean = false;
   private knownRegulations: Map<string, string> = new Map(); // regulationId -> hash
   
+  // Circuit breaker pattern for resilience
+  private failureCount: number = 0;
+  private lastFailureTime: number = 0;
+  private isCircuitOpen: boolean = false;
+  private readonly maxFailures: number = 5;
+  private readonly circuitResetTime: number = 300000; // 5 minutes
+  
   constructor(config: TUFServiceConfig) {
     this.tufClient = new TUFClient(config);
     this.websocketUrl = config.websocketUrl || config.repositoryUrl.replace('http', 'ws').replace(':3052', ':3053');
@@ -75,9 +82,17 @@ export class TUFService {
    * Get all available regulations from TUF repository
    */
   async getAvailableRegulations(): Promise<RegulationTarget[]> {
+    // Circuit breaker check
+    if (!this.canMakeRequest()) {
+      throw new Error('TUF service temporarily disabled due to repeated failures');
+    }
+    
     try {
-      return await this.tufClient.checkForRegulationUpdates();
+      const regulations = await this.tufClient.checkForRegulationUpdates();
+      this.recordSuccess();
+      return regulations;
     } catch (error) {
+      this.recordFailure();
       console.error('❌ Failed to get available regulations:', error);
       throw error;
     }
@@ -230,7 +245,12 @@ export class TUFService {
         }
         
       } catch (error) {
-        console.error('❌ TUF polling error:', error);
+        // Rate limit polling errors - only log once per 5 minutes
+        const now = Date.now();
+        if (!(global as any).lastTufPollingErrorLog || now - (global as any).lastTufPollingErrorLog > 300000) {
+          console.error('❌ TUF polling error:', error instanceof Error ? error.message : 'Unknown error');
+          (global as any).lastTufPollingErrorLog = now;
+        }
       }
       
       // Schedule next poll
@@ -270,12 +290,65 @@ export class TUFService {
   }
 
   /**
+   * Check if circuit breaker should allow requests
+   */
+  private canMakeRequest(): boolean {
+    const now = Date.now();
+    
+    // If circuit is open, check if enough time has passed to try again
+    if (this.isCircuitOpen) {
+      if (now - this.lastFailureTime > this.circuitResetTime) {
+        console.log('🔄 TUF circuit breaker: Attempting to reset after cooldown period');
+        this.isCircuitOpen = false;
+        this.failureCount = 0;
+        return true;
+      }
+      return false;
+    }
+    
+    return true;
+  }
+  
+  /**
+   * Record a failure and potentially open the circuit
+   */
+  private recordFailure(): void {
+    this.failureCount++;
+    this.lastFailureTime = Date.now();
+    
+    if (this.failureCount >= this.maxFailures) {
+      this.isCircuitOpen = true;
+      console.warn(`⚠️ TUF circuit breaker: OPEN - Too many failures (${this.failureCount}). Disabling TUF for ${this.circuitResetTime / 60000} minutes.`);
+    }
+  }
+  
+  /**
+   * Record a success and reset failure count
+   */
+  private recordSuccess(): void {
+    this.failureCount = 0;
+    if (this.isCircuitOpen) {
+      this.isCircuitOpen = false;
+      console.log('✅ TUF circuit breaker: CLOSED - Service recovered');
+    }
+  }
+
+  /**
    * Get TUF repository health
    */
   async getHealth(): Promise<Record<string, unknown>> {
+    // Circuit breaker check
+    if (!this.canMakeRequest()) {
+      throw new Error('TUF service temporarily disabled due to repeated failures');
+    }
+    
     try {
-      return await this.tufClient.getRepositoryHealth();
+      const health = await this.tufClient.getRepositoryHealth();
+      this.recordSuccess();
+      return health;
     } catch (error) {
+      this.recordFailure();
+      
       // Reduce log spam - only log TUF errors once per minute
       const now = Date.now();
       if (!(global as any).lastTufServiceErrorLog || now - (global as any).lastTufServiceErrorLog > 60000) {
