@@ -409,6 +409,7 @@ let tufServiceInstance: TUFService | null = null;
  */
 export function getTUFService(): TUFService {
   if (!tufServiceInstance) {
+    // Use MCP Engine TUF Repository (port 3052 is reserved for MCP Engine)
     const mcpEngineUrl = process.env.MCP_ENGINE_TUF_URL || 'http://localhost:3052';
     const websocketUrl = process.env.TUF_WEBSOCKET_URL || 'ws://localhost:3053';
     

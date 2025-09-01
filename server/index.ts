@@ -371,9 +371,13 @@ httpServer.listen(PORT, '0.0.0.0', async () => {
   console.log(`🌐 Access: http://localhost:${PORT}`);
   console.log(`🌍 Network Access: http://0.0.0.0:${PORT} (accessible from external networks)`);
   
-  // TUF service temporarily disabled to prevent startup issues
-  console.log('⚠️ TUF service disabled - EdSteward running without MCP Engine integration');
-  console.log('💡 To enable TUF: ensure MCP Engine is available and restart server');
+  // MCP Engine Integration Status
+  console.log('🔌 MCP Engine Integration:');
+  console.log('   - Port 3003: MCP Engine WebSocket (regulation updates)');
+  console.log('   - Port 3052: MCP Engine TUF Repository (reserved)');
+  console.log('   - Port 3053: MCP Engine TUF WebSocket (reserved)');
+  console.log('⚠️ TUF service disabled - EdSteward running without MCP Engine TUF integration');
+  console.log('💡 MCP Engine ports 3052-3053 are reserved for TUF services');
 });
 
 // Graceful shutdown
