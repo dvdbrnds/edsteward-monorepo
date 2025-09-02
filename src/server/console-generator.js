@@ -123,6 +123,11 @@ export class ConsoleGenerator {
       html = html.replace(/validation rate on TEACH Act interpretation/g, `validation rate on ${regulationData.REGULATION_NAME} interpretation`);
       html = html.replace(/Academic consensus: High agreement on TEACH Act interpretation/g, `Academic consensus: High agreement on ${regulationData.REGULATION_NAME} interpretation`);
       
+      // Replace hardcoded workflow step references
+      html = html.replace(/STEP 4: Copyright Office integration and analysis/g, `STEP 4: ${regulationData.ENFORCEMENT_AGENCY} integration and analysis`);
+      html = html.replace(/TEACH Act regulatory guidance analysis/g, `${regulationData.REGULATION_NAME} regulatory guidance analysis`);
+      html = html.replace(/Fetching real CFR TEACH Act guidance from API/g, `Fetching real CFR ${regulationData.REGULATION_NAME} guidance from API`);
+      
       // Fix duplicate topic words (e.g., "disabilities disabilities")
       const topicWord = regulationData.TOPIC.toLowerCase();
       const duplicatePattern = new RegExp(`${topicWord}\\s+${topicWord}`, 'g');
