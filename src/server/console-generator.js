@@ -37,7 +37,7 @@ export class ConsoleGenerator {
       throw new Error('Console template not loaded');
     }
 
-    // Extract and clean regulation data
+    // Extract and clean regulation data with comprehensive CSV field mapping
     const regulationData = {
       REGULATION_ID: regulation['Item ID'] || regulation.id || 'REG-' + Date.now(),
       REGULATION_NAME: this.cleanText(regulation['Statute Name'] || regulation.name || 'Unknown Regulation'),
@@ -46,15 +46,23 @@ export class ConsoleGenerator {
       DESCRIPTION: this.cleanText(regulation['Statutory Summary'] || regulation.description || 'No description available'),
       LAST_UPDATED: regulation['Last Updated'] || regulation.lastUpdated || new Date().toLocaleDateString(),
       REPORTING_REQUIREMENTS: this.cleanText(regulation['Reporting Requirements'] || regulation.reportingRequirements || 'See regulation text for details'),
+      DEADLINES: this.cleanText(regulation['Deadlines'] || regulation.deadlines || 'See regulation for specific deadlines'),
+      ADDITIONAL_RESOURCES_1: this.cleanText(regulation['Additional Resources 1'] || ''),
+      ADDITIONAL_RESOURCES_2: this.cleanText(regulation['Additional Resources 2'] || ''),
       KEY_PROVISIONS: this.generateKeyProvisions(regulation),
       REGULATION_SLUG: this.getRegulationSlug(regulation),
-      STATUTE_REFERENCE: this.generateStatuteReference(regulation)
+      STATUTE_REFERENCE: this.generateStatuteReference(regulation),
+      TOPIC_CATEGORY: this.getTopicCategory(regulation.Topic, regulation['Statute Name']),
+      ENFORCEMENT_AGENCY: this.getEnforcementAgency(regulation.Topic, this.getTopicCategory(regulation.Topic, regulation['Statute Name']), regulation['Statute Name']),
+      COMPLIANCE_FOCUS: this.getComplianceFocus(regulation.Topic, this.getTopicCategory(regulation.Topic, regulation['Statute Name']), regulation['Statute Name'])
     };
     
     // Debug logging to see what we're working with
     console.log(`🔧 Generating console for: ${regulationData.REGULATION_NAME}`);
-    console.log(`📋 Topic: ${regulationData.TOPIC}`);
+    console.log(`📋 Topic: ${regulationData.TOPIC} (${regulationData.TOPIC_CATEGORY})`);
     console.log(`📖 Statute Reference: ${regulationData.STATUTE_REFERENCE}`);
+    console.log(`🏛️ Enforcement Agency: ${regulationData.ENFORCEMENT_AGENCY}`);
+    console.log(`🎯 Compliance Focus: ${regulationData.COMPLIANCE_FOCUS}`);
 
     // Start with the REG-66 template and customize it for this regulation
     let html = this.template;
@@ -71,10 +79,22 @@ export class ConsoleGenerator {
       // For other regulations, replace TEACH Act references with regulation-specific content
       html = html.replace(/TEACH Act/g, regulationData.REGULATION_NAME);
       html = html.replace(/USC 17 Section 110/g, regulationData.STATUTE_REFERENCE);
-      html = html.replace(/Copyright & Fair Use Project/g, `${regulationData.TOPIC} & Compliance Project`);
+      html = html.replace(/Copyright & Fair Use Project/g, `${regulationData.COMPLIANCE_FOCUS} Project`);
       html = html.replace(/TEACH Act research database/g, `${regulationData.REGULATION_NAME} research database`);
       html = html.replace(/Educational exemption research/g, `${regulationData.TOPIC} regulatory research`);
       html = html.replace(/Digital copyright analysis/g, `${regulationData.TOPIC} legal analysis`);
+      
+      // Add comprehensive topic-specific replacements
+      html = html.replace(/Department of Education/g, regulationData.ENFORCEMENT_AGENCY);
+      html = html.replace(/Educational compliance/g, regulationData.COMPLIANCE_FOCUS);
+      html = html.replace(/Copyright compliance/g, `${regulationData.TOPIC} compliance`);
+      html = html.replace(/Fair use guidelines/g, `${regulationData.TOPIC} guidelines`);
+      html = html.replace(/Educational technology/g, `${regulationData.TOPIC} technology`);
+      
+      // Replace generic compliance terms with regulation-specific ones
+      html = html.replace(/educational institutions/g, this.getInstitutionType(regulationData.TOPIC_CATEGORY));
+      html = html.replace(/copyright law/g, `${regulationData.TOPIC} law`);
+      html = html.replace(/intellectual property/g, `${regulationData.TOPIC} requirements`);
     }
     
     // Fix the "unknown" title issue - replace any remaining "unknown" with regulation name
@@ -265,6 +285,116 @@ export class ConsoleGenerator {
       return topic;
     } else {
       return `${topic} Regulation`;
+    }
+  }
+
+  /**
+   * Get topic category for regulation-specific customization
+   * @param {string} topic 
+   * @returns {string}
+   */
+  getTopicCategory(topic, regulationName = '') {
+    if (!topic) return 'general';
+    
+    const topicLower = topic.toLowerCase();
+    const nameLower = regulationName.toLowerCase();
+    
+    // Check regulation name for civil rights indicators first (higher priority)
+    if (nameLower.includes('title ix') || nameLower.includes('title vii') || nameLower.includes('title vi') || 
+        nameLower.includes('discrimination') || nameLower.includes('civil rights') || 
+        nameLower.includes('ada') || nameLower.includes('disabilities') || nameLower.includes('rehabilitation act')) {
+      return 'civil-rights';
+    }
+    
+    if (topicLower.includes('civil rights') || topicLower.includes('discrimination') || topicLower.includes('diversity')) return 'civil-rights';
+    if (topicLower.includes('academic') || topicLower.includes('education')) return 'education';
+    if (topicLower.includes('health') || topicLower.includes('medical') || topicLower.includes('hipaa')) return 'healthcare';
+    if (topicLower.includes('financial') || topicLower.includes('accounting') || topicLower.includes('audit')) return 'financial';
+    if (topicLower.includes('employment') || topicLower.includes('human resources')) return 'employment';
+    if (topicLower.includes('environmental') || topicLower.includes('safety')) return 'environmental';
+    if (topicLower.includes('research') || topicLower.includes('grants')) return 'research';
+    if (topicLower.includes('student') || topicLower.includes('admissions')) return 'student-services';
+    
+    return 'general';
+  }
+
+  /**
+   * Get primary enforcement agency based on topic
+   * @param {string} topic 
+   * @returns {string}
+   */
+  getEnforcementAgency(topic, topicCategory = '', regulationName = '') {
+    if (!topic) return 'Various Federal Agencies';
+    
+    const topicLower = topic.toLowerCase();
+    const nameLower = regulationName.toLowerCase();
+    
+    // Civil rights regulations get OCR regardless of topic
+    if (topicCategory === 'civil-rights' || 
+        nameLower.includes('title ix') || nameLower.includes('title vii') || nameLower.includes('title vi') ||
+        nameLower.includes('discrimination') || nameLower.includes('civil rights') ||
+        nameLower.includes('ada') || nameLower.includes('disabilities')) {
+      return 'Office for Civil Rights (OCR)';
+    }
+    
+    if (topicLower.includes('academic') || topicLower.includes('education') || topicLower.includes('student')) return 'Department of Education (ED)';
+    if (topicLower.includes('civil rights') || topicLower.includes('discrimination') || topicLower.includes('title')) return 'Office for Civil Rights (OCR)';
+    if (topicLower.includes('health') || topicLower.includes('medical') || topicLower.includes('hipaa')) return 'Department of Health & Human Services (HHS)';
+    if (topicLower.includes('financial') || topicLower.includes('accounting') || topicLower.includes('audit')) return 'Department of Treasury / SEC';
+    if (topicLower.includes('employment') || topicLower.includes('human resources') || topicLower.includes('labor')) return 'Department of Labor (DOL)';
+    if (topicLower.includes('environmental') || topicLower.includes('safety')) return 'Environmental Protection Agency (EPA)';
+    if (topicLower.includes('research') || topicLower.includes('grants')) return 'National Science Foundation (NSF)';
+    
+    return 'Various Federal Agencies';
+  }
+
+  /**
+   * Get compliance focus area based on topic
+   * @param {string} topic 
+   * @returns {string}
+   */
+  getComplianceFocus(topic, topicCategory = '', regulationName = '') {
+    if (!topic) return 'General Compliance';
+    
+    const topicLower = topic.toLowerCase();
+    const nameLower = regulationName.toLowerCase();
+    
+    // Civil rights regulations get specific focus
+    if (topicCategory === 'civil-rights' || 
+        nameLower.includes('title ix') || nameLower.includes('title vii') || nameLower.includes('title vi') ||
+        nameLower.includes('discrimination') || nameLower.includes('civil rights') ||
+        nameLower.includes('ada') || nameLower.includes('disabilities')) {
+      return 'Non-Discrimination & Equal Access';
+    }
+    
+    if (topicLower.includes('academic') || topicLower.includes('education')) return 'Educational Program Compliance';
+    if (topicLower.includes('civil rights') || topicLower.includes('discrimination')) return 'Non-Discrimination & Equal Access';
+    if (topicLower.includes('health') || topicLower.includes('medical')) return 'Health Information Privacy & Security';
+    if (topicLower.includes('financial') || topicLower.includes('accounting')) return 'Financial Reporting & Audit Compliance';
+    if (topicLower.includes('employment') || topicLower.includes('human resources')) return 'Employment Law & Workplace Rights';
+    if (topicLower.includes('environmental') || topicLower.includes('safety')) return 'Environmental Health & Safety';
+    if (topicLower.includes('research') || topicLower.includes('grants')) return 'Research Integrity & Grant Compliance';
+    if (topicLower.includes('student') || topicLower.includes('admissions')) return 'Student Rights & Services';
+    
+    return 'General Regulatory Compliance';
+  }
+
+  /**
+   * Get appropriate institution type based on topic category
+   * @param {string} topicCategory 
+   * @returns {string}
+   */
+  getInstitutionType(topicCategory) {
+    switch (topicCategory) {
+      case 'education': return 'educational institutions';
+      case 'civil-rights': return 'covered entities';
+      case 'healthcare': return 'healthcare providers';
+      case 'financial': return 'financial institutions';
+      case 'employment': return 'employers';
+      case 'environmental': return 'regulated facilities';
+      case 'research': return 'research institutions';
+      case 'student-services': return 'educational institutions';
+      default: return 'covered entities';
     }
   }
 
