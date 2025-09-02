@@ -311,18 +311,30 @@ class DeliveryServer {
 
   async start() {
     try {
+      console.log('🔧 [START] Creating EdSteward integration...');
+      
       // Create EdSteward integration
       this.edstewardIntegration = new EdStewardIntegration({
         edstewardUrl: process.env.EDSTEWARD_URL || 'http://localhost:3000',
         apiKey: process.env.EDSTEWARD_API_KEY
       });
+      console.log('✅ [START] EdSteward integration created');
 
-      // Test EdSteward connection
-      await this.edstewardIntegration.testConnection();
+      // Test EdSteward connection (non-blocking)
+      console.log('🔧 [START] Testing EdSteward connection...');
+      try {
+        await this.edstewardIntegration.testConnection();
+        console.log('✅ [START] EdSteward connection successful');
+      } catch (error) {
+        console.warn('⚠️ [START] EdSteward connection failed during startup, will retry later:', error.message);
+      }
 
+      console.log('🔧 [START] Creating delivery engine...');
       // Initialize delivery engine
       this.deliveryEngine = new RegulationDeliveryEngine(this.server);
+      console.log('✅ [START] Delivery engine created');
       
+      console.log('🔧 [START] Setting up event handlers...');
       // Set up delivery engine event handlers
       this.deliveryEngine.on(REGULATION_EVENTS.SYSTEM_READY, (data) => {
         console.log('🎯 Delivery system ready:', data);
@@ -349,20 +361,39 @@ class DeliveryServer {
       this.deliveryEngine.on(REGULATION_EVENTS.PERFORMANCE_ALERT, (data) => {
         console.warn('⚠️ Performance alert:', data);
       });
+      console.log('✅ [START] Event handlers set up');
 
+      console.log('🔧 [START] Starting delivery engine...');
       // Start the delivery engine
       await this.deliveryEngine.start();
+      console.log('✅ [START] Delivery engine started');
       
+      console.log('🔧 [START] Starting HTTP server...');
       // Start HTTP server
-      this.server.listen(this.port, () => {
-        console.log(`🚀 Regulation Delivery Server running on port ${this.port}`);
-        console.log(`📡 WebSocket endpoint: ws://localhost:${this.port}/regulation-updates`);
-        console.log(`🔍 Health check: http://localhost:${this.port}/health`);
-        console.log(`📋 WebSocket info: http://localhost:${this.port}/api/websocket-info`);
+      await new Promise((resolve, reject) => {
+        const server = this.server.listen(this.port, (error) => {
+          if (error) {
+            reject(error);
+          } else {
+            console.log(`🚀 Regulation Delivery Server running on port ${this.port}`);
+            console.log(`📡 WebSocket endpoint: ws://localhost:${this.port}/regulation-updates`);
+            console.log(`🔍 Health check: http://localhost:${this.port}/health`);
+            console.log(`📋 WebSocket info: http://localhost:${this.port}/api/websocket-info`);
+            resolve();
+          }
+        });
+        
+        server.on('error', (error) => {
+          console.error('❌ [START] HTTP server error:', error);
+          reject(error);
+        });
       });
+      
+      console.log('✅ [START] HTTP server started successfully');
 
     } catch (error) {
-      console.error('❌ Failed to start delivery server:', error);
+      console.error('❌ [START] Failed to start delivery server:', error);
+      console.error('❌ [START] Stack:', error.stack);
       throw error;
     }
   }
@@ -482,26 +513,66 @@ class DeliveryServer {
 
 export { DeliveryServer };
 
+// Add comprehensive error handling
+process.on('uncaughtException', (error) => {
+  console.error('💥 UNCAUGHT EXCEPTION in delivery system:', error);
+  console.error('Stack:', error.stack);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('💥 UNHANDLED REJECTION in delivery system:', reason);
+  console.error('Promise:', promise);
+  process.exit(1);
+});
+
 // Start the server if this file is run directly
-if (import.meta.url === `file://${process.argv[1]}`) {
+// More robust check that works with different path formats
+const isMainModule = process.argv[1] && (
+  process.argv[1].endsWith('delivery-server.js') || 
+  process.argv[1].includes('delivery-server.js')
+);
+
+console.log('🔧 [DEBUG] Module check:');
+console.log('  import.meta.url:', import.meta.url);
+console.log('  process.argv[1]:', process.argv[1]);
+console.log('  isMainModule:', isMainModule);
+
+if (isMainModule) {
+  console.log('🚀 [STARTUP] Delivery server starting...');
+  console.log('🔧 [STARTUP] Process arguments:', process.argv);
+  console.log('🔧 [STARTUP] Working directory:', process.cwd());
+  console.log('🔧 [STARTUP] Node version:', process.version);
+  
   const server = new DeliveryServer({
     port: process.env.DELIVERY_PORT || 3051
   });
   
-  server.start().catch(error => {
-    console.error('❌ Server startup failed:', error);
+  console.log('🔧 [STARTUP] Server instance created, calling start()...');
+  
+  server.start().then(() => {
+    console.log('✅ [STARTUP] Server started successfully, keeping process alive...');
+    
+    // Keep the process alive
+    setInterval(() => {
+      console.log('💚 [HEARTBEAT] Delivery system alive');
+    }, 30000);
+    
+  }).catch(error => {
+    console.error('❌ [STARTUP] Server startup failed:', error);
+    console.error('❌ [STARTUP] Stack:', error.stack);
     process.exit(1);
   });
   
   // Graceful shutdown
   process.on('SIGINT', async () => {
-    console.log('\n🛑 Received SIGINT, shutting down gracefully...');
+    console.log('\n🛑 [SHUTDOWN] Received SIGINT, shutting down gracefully...');
     await server.stop();
     process.exit(0);
   });
 
   process.on('SIGTERM', async () => {
-    console.log('\n🛑 Received SIGTERM, shutting down gracefully...');
+    console.log('\n🛑 [SHUTDOWN] Received SIGTERM, shutting down gracefully...');
     await server.stop();
     process.exit(0);
   });

@@ -27,7 +27,8 @@ const CONFIG = {
   ports: {
     registry: 3010,
     llmGateway: 3002,
-    frontend: 3050
+    frontend: 3050,
+    delivery: 3051
   },
   healthCheck: {
     maxRetries: 15,
@@ -255,6 +256,53 @@ async function startLLMGateway() {
 }
 
 /**
+ * Start Delivery System
+ */
+async function startDeliverySystem() {
+  log.info('Starting Delivery System...', 'DELIVERY');
+
+  const deliveryProcess = spawn('node', ['src/delivery-system/delivery-server.js'], {
+    stdio: ['ignore', 'pipe', 'pipe'],
+    cwd: process.cwd()
+  });
+
+  deliveryProcess.stdout.on('data', (data) => {
+    const output = data.toString().trim();
+    if (output) {
+      log.info(output, 'DELIVERY');
+    }
+  });
+
+  deliveryProcess.stderr.on('data', (data) => {
+    const output = data.toString().trim();
+    if (output) {
+      log.error(output, 'DELIVERY');
+    }
+  });
+
+  deliveryProcess.on('close', (code) => {
+    if (!isShuttingDown) {
+      log.error(`Delivery System exited with code ${code}`, 'DELIVERY');
+      if (canRestart('delivery')) {
+        setTimeout(() => {
+          if (!isShuttingDown) {
+            startDeliverySystem();
+          }
+        }, 2000);
+      } else {
+        log.error('Delivery System restart limit reached, system will continue without it', 'DELIVERY');
+      }
+    }
+  });
+
+  processes.set('delivery', deliveryProcess);
+  log.info(`Delivery System PID: ${deliveryProcess.pid}`, 'DELIVERY');
+
+  // Give delivery system time to start
+  await new Promise(resolve => setTimeout(resolve, 2000));
+}
+
+/**
  * Start Frontend Development Server
  */
 async function startFrontend() {
@@ -368,6 +416,7 @@ async function main() {
       execSync('pkill -f "vite.*3050" || true', { stdio: 'ignore' });
       execSync('pkill -f "registry-server.js" || true', { stdio: 'ignore' });
       execSync('pkill -f "simple-usc-gateway" || true', { stdio: 'ignore' });
+      execSync('pkill -f "delivery-server.js" || true', { stdio: 'ignore' });
     } catch (e) {
       // Ignore cleanup errors
     }
@@ -395,6 +444,9 @@ async function main() {
     // Start LLM Gateway (AI processing)
     await startLLMGateway();
 
+    // Start Delivery System (regulation updates & real-time)
+    await startDeliverySystem();
+
     // Start Frontend (user interface)
     await startFrontend();
 
@@ -403,6 +455,7 @@ async function main() {
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('📊 Registry API:     http://localhost:' + CONFIG.ports.registry);
     console.log('🤖 LLM Gateway:      http://localhost:' + CONFIG.ports.llmGateway);
+    console.log('🚀 Delivery System:  http://localhost:' + CONFIG.ports.delivery);
     console.log('🌐 Frontend:         http://localhost:' + CONFIG.ports.frontend);
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('\n✨ All services are ready for compliance management!');

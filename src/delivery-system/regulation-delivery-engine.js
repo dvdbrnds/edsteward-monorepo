@@ -69,19 +69,43 @@ class RegulationCDCService extends Emittery {
     this.isActive = true;
     console.log('🔍 Starting CDC monitoring for regulations...');
     
-    // Monitor REG-66 specifically for this test
-    this.monitorRegulation('REG-66');
+    // Initialize baseline state for REG-66 without triggering updates
+    await this.initializeRegulationBaseline('REG-66');
     
-    // Set up periodic checks
-    this.pollTimer = setInterval(() => {
-      this.checkAllRegulations();
-    }, this.pollInterval);
+    // DISABLED: Automatic polling to prevent spam updates
+    // Only manual triggers via API will cause updates now
+    console.log('📋 CDC ready for manual triggers (automatic polling disabled)');
     
     await this.emit(REGULATION_EVENTS.SYSTEM_READY, {
       service: 'CDC',
       timestamp: new Date().toISOString(),
-      regulations: ['REG-66']
+      regulations: ['REG-66'],
+      mode: 'manual_trigger_only'
     });
+  }
+
+  /**
+   * Initialize baseline state without triggering updates
+   */
+  async initializeRegulationBaseline(regulationId) {
+    try {
+      console.log(`📋 Initializing baseline for ${regulationId}...`);
+      const currentState = await this.fetchRegulationState(regulationId);
+      const contentHash = this.generateContentHash(currentState);
+      
+      // Set initial state without triggering change events
+      this.contentHashes.set(regulationId, contentHash);
+      this.lastKnownVersions.set(regulationId, currentState);
+      
+      console.log(`✅ Baseline established for ${regulationId}`);
+    } catch (error) {
+      console.warn(`⚠️ Could not initialize baseline for ${regulationId}: ${error.message}`);
+      console.log(`📋 Will retry baseline initialization when LLM Gateway is available`);
+      
+      // Set empty baseline to prevent crashes
+      this.contentHashes.set(regulationId, 'initial_empty');
+      this.lastKnownVersions.set(regulationId, { error: 'LLM Gateway not ready' });
+    }
   }
 
   async monitorRegulation(regulationId) {
@@ -144,20 +168,8 @@ class RegulationCDCService extends Emittery {
     return 'content_update';
   }
 
-  async checkAllRegulations() {
-    if (!this.isActive) return;
-    
-    const regulations = ['REG-66']; // Start with REG-66
-    for (const regulationId of regulations) {
-      await this.monitorRegulation(regulationId);
-    }
-  }
-
   async stopMonitoring() {
     this.isActive = false;
-    if (this.pollTimer) {
-      clearInterval(this.pollTimer);
-    }
     console.log('⏹️ CDC monitoring stopped');
   }
 }
