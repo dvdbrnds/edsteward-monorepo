@@ -99,6 +99,8 @@ export class ConsoleGenerator {
       // Replace hardcoded workflow references with regulation-specific ones
       html = html.replace(/USC 17 Section 110 \(TEACH Act\)/g, `${regulationData.STATUTE_REFERENCE}`);
       html = html.replace(/Copyright Office TEACH Act Guidance/g, `${regulationData.ENFORCEMENT_AGENCY} ${regulationData.REGULATION_NAME} Guidance`);
+      html = html.replace(/Copyright Office Fair Housing Act, Section 6 Guidance/g, `${regulationData.ENFORCEMENT_AGENCY} ${regulationData.REGULATION_NAME} Guidance`);
+      html = html.replace(/Copyright Office ([^\\n]+) Guidance/g, `${regulationData.ENFORCEMENT_AGENCY} $1 Guidance`);
       html = html.replace(/TEACH Act interpretation across institutions/g, `${regulationData.REGULATION_NAME} interpretation across institutions`);
       html = html.replace(/Copyright Office integration and analysis/g, `${regulationData.ENFORCEMENT_AGENCY} integration and analysis`);
       html = html.replace(/digital rights references/g, `${regulationData.TOPIC.toLowerCase()} references`);
@@ -113,6 +115,16 @@ export class ConsoleGenerator {
       html = html.replace(/Regulatory interpretation updates/g, `${regulationData.REGULATION_NAME} interpretation updates`);
       html = html.replace(/Mapped (\d+) compliance requirements/g, `Mapped $1 ${regulationData.TOPIC.toLowerCase()} compliance requirements`);
       html = html.replace(/compliance requirements/g, `${regulationData.TOPIC.toLowerCase()} compliance requirements`);
+      
+      // Replace JavaScript hardcoded TEACH Act references
+      html = html.replace(/High agreement on TEACH Act interpretation/g, `High agreement on ${regulationData.REGULATION_NAME} interpretation`);
+      html = html.replace(/validation rate on TEACH Act interpretation/g, `validation rate on ${regulationData.REGULATION_NAME} interpretation`);
+      html = html.replace(/Academic consensus: High agreement on TEACH Act interpretation/g, `Academic consensus: High agreement on ${regulationData.REGULATION_NAME} interpretation`);
+      
+      // Fix duplicate topic words (e.g., "disabilities disabilities")
+      const topicWord = regulationData.TOPIC.toLowerCase();
+      const duplicatePattern = new RegExp(`${topicWord}\\s+${topicWord}`, 'g');
+      html = html.replace(duplicatePattern, topicWord);
     }
     
     // Fix the "unknown" title issue - replace any remaining "unknown" with regulation name
