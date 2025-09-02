@@ -89,9 +89,23 @@ export class ConsoleGenerator {
       console.log('🎯 Preserving original TEACH Act API endpoints');
     } else {
       // Replace USC 17/110 with the actual statute for this regulation
-      const statuteInfo = this.parseStatuteReference(regulationData.STATUTE_REFERENCE);
-      if (statuteInfo.title && statuteInfo.section) {
+      const statuteInfo = this.parseStatuteReference(regulationData.STATUTE_REFERENCE, regulation);
+      
+      if (statuteInfo.type === 'cfr') {
+        // For CFR-based regulations, replace USC endpoints with CFR endpoints
+        console.log(`🔧 Converting USC endpoints to CFR for ${regulationData.REGULATION_NAME}`);
+        html = html.replace(/api\/llm\/usc\/17\/110/g, `api/llm/cfr/${statuteInfo.title}/${statuteInfo.section}`);
+        
+        // Update the USC section title and content to reflect CFR
+        html = html.replace(/USC 17 Section 110/g, `${statuteInfo.title} C.F.R. Part ${statuteInfo.section}`);
+        html = html.replace(/United States Code/g, 'Code of Federal Regulations');
+        html = html.replace(/USC Text/g, 'CFR Text');
+        html = html.replace(/loadRealUSCText/g, 'loadRealCFRText');
+        
+      } else if (statuteInfo.title && statuteInfo.section) {
+        // For USC-based regulations, replace with correct USC reference
         html = html.replace(/api\/llm\/usc\/17\/110/g, `api/llm/usc/${statuteInfo.title}/${statuteInfo.section}`);
+        html = html.replace(/USC 17 Section 110/g, `USC ${statuteInfo.title} Section ${statuteInfo.section}`);
       }
       
       // Update CFR endpoints to be regulation-specific
@@ -193,7 +207,13 @@ export class ConsoleGenerator {
   /**
    * Parse statute reference to extract title and section for API calls
    */
-  parseStatuteReference(statuteReference) {
+  parseStatuteReference(statuteReference, regulation) {
+    // Check if this is a CFR-based regulation first
+    const cfrInfo = this.parseCFRReference(regulation);
+    if (cfrInfo.isCFR) {
+      return cfrInfo;
+    }
+    
     // Default to USC 17/110 if we can't parse
     let title = '17';
     let section = '110';
@@ -205,7 +225,7 @@ export class ConsoleGenerator {
         title = uscCodeMatch[1];
         section = uscCodeMatch[2];
         console.log(`📋 Parsed USC Code reference: ${title} U.S.C. § ${section}`);
-        return { title, section };
+        return { title, section, type: 'usc' };
       }
       
       // PRIORITY 2: Look for "USC X Section Y" patterns
@@ -214,7 +234,7 @@ export class ConsoleGenerator {
         title = uscMatch[1];
         section = uscMatch[2];
         console.log(`📋 Parsed USC Section reference: USC ${title} Section ${section}`);
-        return { title, section };
+        return { title, section, type: 'usc' };
       }
       
       // PRIORITY 3: Try to extract from U.S.C. patterns (e.g., "42 U.S.C. Chapter 21G" -> title: 42, section: 21)
@@ -223,7 +243,7 @@ export class ConsoleGenerator {
         title = uscPatternMatch[1];
         section = uscPatternMatch[2].replace(/[^0-9]/g, ''); // Extract just the numbers from "21G" -> "21"
         console.log(`📋 Parsed U.S.C. Chapter reference: ${title} U.S.C. Chapter ${section}`);
-        return { title, section };
+        return { title, section, type: 'usc' };
       }
       
       // PRIORITY 4: Try to extract from item ID patterns (e.g., "29-794" -> title: 29, section: 794)
@@ -232,13 +252,41 @@ export class ConsoleGenerator {
         title = idMatch[1];
         section = idMatch[2];
         console.log(`📋 Parsed ID pattern reference: ${title}-${section}`);
-        return { title, section };
+        return { title, section, type: 'usc' };
       }
       
       console.log(`⚠️  Could not parse statute reference: "${statuteReference}", using default USC 17/110`);
     }
     
-    return { title, section };
+    return { title, section, type: 'usc' };
+  }
+
+  /**
+   * Parse CFR reference from regulation data
+   */
+  parseCFRReference(regulation) {
+    // Check Regulation 1-5 fields for CFR patterns
+    for (let i = 1; i <= 5; i++) {
+      const regField = regulation[`Regulation ${i}`];
+      if (regField) {
+        // Look for "X C.F.R. Part Y" or "X C.F.R. § Y" patterns
+        const cfrMatch = regField.match(/(\d+)\s+C\.F\.R\.\s+(?:Part\s+)?(\d+)/i);
+        if (cfrMatch) {
+          const title = cfrMatch[1];
+          const part = cfrMatch[2];
+          console.log(`📋 Parsed CFR reference: ${title} C.F.R. Part ${part}`);
+          return { 
+            title, 
+            section: part, 
+            type: 'cfr', 
+            isCFR: true,
+            fullReference: regField
+          };
+        }
+      }
+    }
+    
+    return { isCFR: false };
   }
 }
 
