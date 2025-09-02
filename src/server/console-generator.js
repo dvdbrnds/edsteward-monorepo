@@ -102,6 +102,70 @@ export class ConsoleGenerator {
         html = html.replace(/USC Text/g, 'CFR Text');
         html = html.replace(/loadRealUSCText/g, 'loadRealCFRText');
         
+        // Replace USC data processing logic with CFR data processing logic
+        html = html.replace(
+          /const contentParagraphs = \(uscData\.fullText \|\| uscData\.content\)\.split\('\\n\\n'\)\.filter\(p => p\.trim\(\)\.length > 0\);/g,
+          'const cfrSections = uscData.sections || [];'
+        );
+        
+        // Replace USC paragraph processing with CFR section processing
+        html = html.replace(
+          /contentParagraphs\.forEach\(\(paragraph, index\) => \{[\s\S]*?\}\);/g,
+          `cfrSections.forEach(section => {
+            const sectionDiv = document.createElement('div');
+            sectionDiv.className = 'subsection';
+            sectionDiv.style.marginBottom = '20px';
+            sectionDiv.style.padding = '16px';
+            sectionDiv.style.border = '1px solid #e1e4e8';
+            sectionDiv.style.borderRadius = '6px';
+            
+            const title = document.createElement('strong');
+            title.textContent = \`\${section.section || ''} \${section.title}\`;
+            title.style.display = 'block';
+            title.style.marginBottom = '12px';
+            title.style.color = '#0969da';
+            title.style.fontSize = '16px';
+            
+            sectionDiv.appendChild(title);
+            
+            if (typeof section.content === 'string') {
+              const contentDiv = document.createElement('div');
+              contentDiv.style.lineHeight = '1.6';
+              contentDiv.style.color = '#24292f';
+              contentDiv.textContent = section.content;
+              sectionDiv.appendChild(contentDiv);
+            } else if (Array.isArray(section.content)) {
+              section.content.forEach(item => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'definition';
+                itemDiv.style.marginBottom = '12px';
+                
+                const itemTitle = document.createElement('strong');
+                itemTitle.textContent = \`\${item.provision}:\`;
+                
+                const itemDesc = document.createElement('span');
+                itemDesc.textContent = \` \${item.description}\`;
+                
+                itemDiv.appendChild(itemTitle);
+                itemDiv.appendChild(itemDesc);
+                
+                if (item.details) {
+                  const details = document.createElement('div');
+                  details.textContent = item.details;
+                  details.style.marginTop = '4px';
+                  details.style.fontSize = '13px';
+                  details.style.color = '#6e7681';
+                  itemDiv.appendChild(details);
+                }
+                
+                sectionDiv.appendChild(itemDiv);
+              });
+            }
+            
+            mainSection.appendChild(sectionDiv);
+          });`
+        );
+        
       } else if (statuteInfo.title && statuteInfo.section) {
         // For USC-based regulations, replace with correct USC reference
         html = html.replace(/api\/llm\/usc\/17\/110/g, `api/llm/usc/${statuteInfo.title}/${statuteInfo.section}`);
@@ -270,7 +334,7 @@ export class ConsoleGenerator {
       const regField = regulation[`Regulation ${i}`];
       if (regField) {
         // Look for "X C.F.R. Part Y" or "X C.F.R. § Y" patterns
-        const cfrMatch = regField.match(/(\d+)\s+C\.F\.R\.\s+(?:Part\s+)?(\d+)/i);
+        const cfrMatch = regField.match(/(\d+)\s+C\.F\.R\.\s+(?:Part\s+|§\s+)?(\d+)/i);
         if (cfrMatch) {
           const title = cfrMatch[1];
           const part = cfrMatch[2];
