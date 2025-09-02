@@ -101,6 +101,8 @@ export class ConsoleGenerator {
       html = html.replace(/Copyright Office TEACH Act Guidance/g, `${regulationData.ENFORCEMENT_AGENCY} ${regulationData.REGULATION_NAME} Guidance`);
       html = html.replace(/Copyright Office Fair Housing Act, Section 6 Guidance/g, `${regulationData.ENFORCEMENT_AGENCY} ${regulationData.REGULATION_NAME} Guidance`);
       html = html.replace(/Copyright Office ([^\\n]+) Guidance/g, `${regulationData.ENFORCEMENT_AGENCY} $1 Guidance`);
+      html = html.replace(/U\.S\. Copyright Office/g, regulationData.ENFORCEMENT_AGENCY);
+      html = html.replace(/Loading official guidance from U\.S\. Copyright Office/g, `Loading official guidance from ${regulationData.ENFORCEMENT_AGENCY}`);
       html = html.replace(/TEACH Act interpretation across institutions/g, `${regulationData.REGULATION_NAME} interpretation across institutions`);
       html = html.replace(/Copyright Office integration and analysis/g, `${regulationData.ENFORCEMENT_AGENCY} integration and analysis`);
       html = html.replace(/digital rights references/g, `${regulationData.TOPIC.toLowerCase()} references`);
