@@ -95,6 +95,24 @@ export class ConsoleGenerator {
       html = html.replace(/educational institutions/g, this.getInstitutionType(regulationData.TOPIC_CATEGORY));
       html = html.replace(/copyright law/g, `${regulationData.TOPIC} law`);
       html = html.replace(/intellectual property/g, `${regulationData.TOPIC} requirements`);
+      
+      // Replace hardcoded workflow references with regulation-specific ones
+      html = html.replace(/USC 17 Section 110 \(TEACH Act\)/g, `${regulationData.STATUTE_REFERENCE}`);
+      html = html.replace(/Copyright Office TEACH Act Guidance/g, `${regulationData.ENFORCEMENT_AGENCY} ${regulationData.REGULATION_NAME} Guidance`);
+      html = html.replace(/TEACH Act interpretation across institutions/g, `${regulationData.REGULATION_NAME} interpretation across institutions`);
+      html = html.replace(/Copyright Office integration and analysis/g, `${regulationData.ENFORCEMENT_AGENCY} integration and analysis`);
+      html = html.replace(/digital rights references/g, `${regulationData.TOPIC.toLowerCase()} references`);
+      html = html.replace(/copyright analysis references/g, `${regulationData.TOPIC.toLowerCase()} analysis references`);
+      html = html.replace(/Copyright & Fair Use Project/g, `${regulationData.COMPLIANCE_FOCUS} Project`);
+      
+      // Replace university library project references
+      html = html.replace(/General Regulatory Compliance Project/g, `${regulationData.COMPLIANCE_FOCUS} Project`);
+      
+      // Replace additional workflow-specific references
+      html = html.replace(/regulatory guidance analysis/g, `${regulationData.TOPIC.toLowerCase()} regulatory guidance analysis`);
+      html = html.replace(/Regulatory interpretation updates/g, `${regulationData.REGULATION_NAME} interpretation updates`);
+      html = html.replace(/Mapped (\d+) compliance requirements/g, `Mapped $1 ${regulationData.TOPIC.toLowerCase()} compliance requirements`);
+      html = html.replace(/compliance requirements/g, `${regulationData.TOPIC.toLowerCase()} compliance requirements`);
     }
     
     // Fix the "unknown" title issue - replace any remaining "unknown" with regulation name
@@ -302,7 +320,8 @@ export class ConsoleGenerator {
     // Check regulation name for civil rights indicators first (higher priority)
     if (nameLower.includes('title ix') || nameLower.includes('title vii') || nameLower.includes('title vi') || 
         nameLower.includes('discrimination') || nameLower.includes('civil rights') || 
-        nameLower.includes('ada') || nameLower.includes('disabilities') || nameLower.includes('rehabilitation act')) {
+        nameLower.includes('ada') || nameLower.includes('disabilities') || nameLower.includes('rehabilitation act') ||
+        nameLower.includes('fair housing') || nameLower.includes('housing act')) {
       return 'civil-rights';
     }
     
@@ -328,6 +347,11 @@ export class ConsoleGenerator {
     
     const topicLower = topic.toLowerCase();
     const nameLower = regulationName.toLowerCase();
+    
+    // Fair Housing Act gets HUD
+    if (nameLower.includes('fair housing') || nameLower.includes('housing act')) {
+      return 'Department of Housing and Urban Development (HUD)';
+    }
     
     // Civil rights regulations get OCR regardless of topic
     if (topicCategory === 'civil-rights' || 
@@ -358,6 +382,11 @@ export class ConsoleGenerator {
     
     const topicLower = topic.toLowerCase();
     const nameLower = regulationName.toLowerCase();
+    
+    // Fair Housing Act gets specific focus
+    if (nameLower.includes('fair housing') || nameLower.includes('housing act')) {
+      return 'Fair Housing & Non-Discrimination';
+    }
     
     // Civil rights regulations get specific focus
     if (topicCategory === 'civil-rights' || 
