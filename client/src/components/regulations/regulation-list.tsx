@@ -1,8 +1,8 @@
-import { useQuery, useMutation } from "@tanstack/react-query";
-import type { Regulation, Deadline, InsertDeadline, RegulationAction } from "@shared/schema";
+import { useQuery } from "@tanstack/react-query";
+import type { Regulation, Deadline, RegulationAction } from "@shared/schema";
 import { useLocation } from "wouter";
-import { Search, ExternalLink, CheckCircle, AlertCircle, Clock, Loader2, ArrowUpDown, Check, Globe, Mail, FileText, AlertTriangle, Info } from "lucide-react";
-import { differenceInDays, format } from "date-fns";
+import { Search, CheckCircle, AlertCircle, Clock, Loader2, ArrowUpDown, Check, Globe, Mail, FileText } from "lucide-react";
+import { format } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
@@ -15,16 +15,12 @@ import {
 } from "@/components/ui/table";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
-import { useToast } from "@/hooks/use-toast";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { apiRequest, queryClient } from "@/lib/queryClient";
 
 interface RegulationListProps {
   categoryFilter: string | null;
   jurisdictionFilter: 'federal' | 'state' | null;
   appliesToFilter?: string[];
-  deadlines?: Deadline[];
 }
 
 type SortConfig = {
@@ -32,67 +28,12 @@ type SortConfig = {
   direction: 'asc' | 'desc';
 } | null;
 
-// Calculate compliance status with beautiful icons
-function calculateComplianceStatus(regulation: Regulation): {
-  status: "compliant" | "needs-attention" | "at-risk" | "unknown";
-  icon: JSX.Element;
-  label: string;
-  className: string;
-} {
-  // If no last update or verification, it's unknown
-  if (!regulation.lastUpdated && !regulation.lastVerified) {
-    return {
-      status: "unknown",
-      icon: <Info className="h-4 w-4 text-gray-500" />,
-      label: "Unknown",
-      className: "text-gray-500 bg-gray-100",
-    };
-  }
 
-  // Calculate days since last update
-  const daysSinceUpdate = regulation.lastUpdated
-    ? differenceInDays(new Date(), new Date(regulation.lastUpdated))
-    : 999;
 
-  // Check if next review date is past due
-  const isReviewOverdue = regulation.nextReviewDate
-    ? differenceInDays(new Date(), new Date(regulation.nextReviewDate)) > 0
-    : false;
-
-  // At risk if overdue by more than 90 days or review date is past due
-  if (daysSinceUpdate > 90 || isReviewOverdue) {
-    return {
-      status: "at-risk",
-      icon: <AlertCircle className="h-4 w-4 text-red-500" />,
-      label: "At Risk",
-      className: "text-red-600 bg-red-50",
-    };
-  }
-
-  // Needs attention if overdue by more than 30 days
-  if (daysSinceUpdate > 30) {
-    return {
-      status: "needs-attention",
-      icon: <AlertTriangle className="h-4 w-4 text-yellow-500" />,
-      label: "Needs Attention",
-      className: "text-yellow-600 bg-yellow-50",
-    };
-  }
-
-  // Compliant - recently updated
-  return {
-    status: "compliant",
-    icon: <CheckCircle className="h-4 w-4 text-green-500" />,
-    label: "Compliant",
-    className: "text-green-600 bg-green-50",
-  };
-}
-
-export default function RegulationList({ categoryFilter, jurisdictionFilter, appliesToFilter, deadlines = [] }: RegulationListProps) {
+export default function RegulationList({ categoryFilter, jurisdictionFilter, appliesToFilter }: RegulationListProps) {
   const [search, setSearch] = useState("");
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'lastUpdated', direction: 'desc' });
-  const [_, navigate] = useLocation();
-  const { toast } = useToast();
+  const [, navigate] = useLocation();
 
   const { data: regulations = [], isLoading: regulationsLoading, error: regulationsError } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
@@ -103,11 +44,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
     staleTime: 1000 * 60, // 1 minute
   });
 
-  const { data: user } = useQuery<{ role?: string }>({
-    queryKey: ["/api/user"]
-  });
 
-  const isAdmin = user?.role?.toLowerCase() === "admin";
 
   const handleRowClick = (regulation: Regulation) => {
     if (regulation && regulation.id) {
@@ -381,7 +318,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
                           { type: 'website_publish', enabled: true, required: false, status: 'pending' },
                           { type: 'community_communication', enabled: true, required: false, status: 'pending' },
                           { type: 'agency_submission', enabled: true, required: true, status: 'pending' }
-                        ]).map(action => (
+                        ]).map((action: RegulationAction) => (
                           <div
                             key={action.type}
                             className={cn(

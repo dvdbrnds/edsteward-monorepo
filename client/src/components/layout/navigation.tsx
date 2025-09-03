@@ -32,8 +32,7 @@ import { useLegacyBranding } from "@/hooks/use-branding";
 import { WebSocketStatus } from "@/components/ui/websocket-status";
 import { TUFStatus } from "@/components/ui/tuf-status";
 
-// Import logos
-import edStewardLogo from "@/assets/es-white-on-purple-logo.png";
+// Import fallback logo
 import genericLogo from "@/assets/generic-logo.svg";
 
 /**
@@ -121,7 +120,7 @@ export default function Navigation() {
                   <button className="flex-shrink-0 flex items-center">
                     <img
                       className="h-8 w-auto"
-                      src={edStewardLogo}
+                      src={branding.logo}
                       alt={`${branding.name} Logo`}
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;

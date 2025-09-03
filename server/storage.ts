@@ -1404,7 +1404,33 @@ export class DatabaseStorage implements IStorage {
         return adminConfig;
       }
 
-      // Priority 2: Environment variables (for container isolation)
+      // Priority 2: Environment-specific database configuration (check database first in development)
+      // Use environment-specific table names to ensure isolation
+      const environmentPrefix = process.env.ENVIRONMENT_PREFIX || 'default';
+      const tableName = environmentPrefix === 'default' ? 'branding_configurations' : `branding_configurations_${environmentPrefix}`;
+
+      // Create table if it doesn't exist
+      await sessionPool.query(`
+        CREATE TABLE IF NOT EXISTS ${tableName} (
+          id SERIAL PRIMARY KEY,
+          config_data JSONB NOT NULL,
+          created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+          updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+        )
+      `);
+
+      const result = await sessionPool.query(`
+        SELECT config_data 
+        FROM ${tableName} 
+        WHERE id = 1
+      `);
+
+      if (result.rows.length > 0) {
+        console.log(`🎨 Using database branding config from ${tableName}: ${result.rows[0].config_data.institutionName}`);
+        return result.rows[0].config_data;
+      }
+
+      // Priority 3: Environment variables (for container isolation - fallback only)
       const envBrandingConfig = {
         institutionName: process.env.INSTITUTION_NAME,
         title: process.env.INSTITUTION_TITLE,
@@ -1438,34 +1464,8 @@ export class DatabaseStorage implements IStorage {
           loginScreenHeroColor: envBrandingConfig.loginScreenHeroColor || "#3d1a5a",
         };
 
-        console.log(`🎨 Using environment-based branding config: ${config.institutionName}`);
+        console.log(`🎨 Using environment-based branding config (fallback): ${config.institutionName}`);
         return config;
-      }
-
-      // Priority 3: Environment-specific database configuration
-      // Use environment-specific table names to ensure isolation
-      const environmentPrefix = process.env.ENVIRONMENT_PREFIX || 'default';
-      const tableName = environmentPrefix === 'default' ? 'branding_configurations' : `branding_configurations_${environmentPrefix}`;
-
-      // Create table if it doesn't exist
-      await sessionPool.query(`
-        CREATE TABLE IF NOT EXISTS ${tableName} (
-          id SERIAL PRIMARY KEY,
-          config_data JSONB NOT NULL,
-          created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-          updated_at TIMESTAMP NOT NULL DEFAULT NOW()
-        )
-      `);
-
-      const result = await sessionPool.query(`
-        SELECT config_data 
-        FROM ${tableName} 
-        WHERE id = 1
-      `);
-
-      if (result.rows.length > 0) {
-        console.log(`🎨 Using database branding config from ${tableName}: ${result.rows[0].config_data.institutionName}`);
-        return result.rows[0].config_data;
       }
 
       // Priority 4: Default configuration

@@ -138,7 +138,7 @@ const FileUploadField: React.FC<{
   onFileSelect: (file: File) => void | Promise<void>;
   accept: string;
   type: 'logo' | 'favicon';
-}> = ({ label, description, currentUrl, onFileSelect, accept, type: _type }) => {
+}> = ({ label, description, currentUrl, onFileSelect, accept, type }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState(currentUrl || '');
   const [isProcessing, setIsProcessing] = useState(false);
