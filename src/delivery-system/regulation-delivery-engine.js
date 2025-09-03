@@ -139,14 +139,30 @@ class RegulationCDCService extends Emittery {
   }
 
   async fetchRegulationState(regulationId) {
-    // Call the existing LinearEngine to get current state
-    const response = await fetch('http://localhost:3002/api/llm/query', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        query: `Get current state of ${regulationId}`,
-        options: { regulation: regulationId, realExecution: true }
-      })
+    // Determine the correct endpoint based on regulation type
+    let endpoint;
+    let method = 'GET';
+    
+    // Check if it's a CFR regulation (most OSHA, etc.)
+    if (regulationId.includes('osha') || regulationId.includes('cfr') || 
+        regulationId.includes('emergency-action-plan') || regulationId.includes('safety')) {
+      endpoint = `http://localhost:3002/api/llm/cfr/${regulationId}`;
+    }
+    // Check if it's a USC regulation (TEACH Act, Copyright, etc.)
+    else if (regulationId.includes('REG-66') || regulationId.includes('teach') || 
+             regulationId.includes('copyright') || regulationId.includes('REG-17')) {
+      endpoint = `http://localhost:3002/api/llm/usc/17/110`; // TEACH Act specific
+    }
+    // Default to compliance endpoint for other regulations
+    else {
+      endpoint = `http://localhost:3002/api/llm/compliance/${regulationId}`;
+    }
+    
+    console.log(`🔍 Fetching regulation content from: ${endpoint}`);
+    
+    const response = await fetch(endpoint, {
+      method,
+      headers: { 'Content-Type': 'application/json' }
     });
     
     if (!response.ok) {
@@ -464,6 +480,54 @@ class RegulationPushService extends Emittery {
       )
     };
   }
+
+  /**
+   * Add client subscription for regulation updates
+   */
+  addSubscription(regulationId, clientId) {
+    if (!this.subscriptions.has(regulationId)) {
+      this.subscriptions.set(regulationId, new Set());
+    }
+    this.subscriptions.get(regulationId).add(clientId);
+    
+    // Update client's subscription list
+    const client = this.clients.get(clientId);
+    if (client) {
+      client.subscriptions.add(regulationId);
+    }
+    
+    console.log(`📋 Client ${clientId} subscribed to ${regulationId}`);
+    return true;
+  }
+
+  /**
+   * Remove client subscription
+   */
+  removeSubscription(regulationId, clientId) {
+    const regulationSubs = this.subscriptions.get(regulationId);
+    if (regulationSubs) {
+      regulationSubs.delete(clientId);
+      if (regulationSubs.size === 0) {
+        this.subscriptions.delete(regulationId);
+      }
+    }
+    
+    // Update client's subscription list
+    const client = this.clients.get(clientId);
+    if (client) {
+      client.subscriptions.delete(regulationId);
+    }
+    
+    console.log(`📋 Client ${clientId} unsubscribed from ${regulationId}`);
+    return true;
+  }
+
+  /**
+   * Get all subscriptions for a regulation
+   */
+  getSubscriptions(regulationId) {
+    return Array.from(this.subscriptions.get(regulationId) || []);
+  }
 }
 
 /**
@@ -605,6 +669,27 @@ class RegulationDeliveryEngine extends Emittery {
       },
       pushService: this.pushService.getConnectionStats()
     };
+  }
+
+  /**
+   * Add client subscription for regulation updates
+   */
+  addSubscription(regulationId, clientId) {
+    return this.pushService.addSubscription(regulationId, clientId);
+  }
+
+  /**
+   * Remove client subscription
+   */
+  removeSubscription(regulationId, clientId) {
+    return this.pushService.removeSubscription(regulationId, clientId);
+  }
+
+  /**
+   * Get all subscriptions for a regulation
+   */
+  getSubscriptions(regulationId) {
+    return this.pushService.getSubscriptions(regulationId);
   }
 }
 

@@ -195,3 +195,5 @@ migrateCSVToDatabase()
     console.error('💥 MISSION CRITICAL FAILURE:', error);
     process.exit(1);
   });
+
+

@@ -28,6 +28,37 @@ export class ConsoleGenerator {
   }
 
   /**
+   * Get proper regulation ID based on regulation data
+   * Uses the regulation slug instead of timestamp-based IDs
+   */
+  getProperRegulationId(regulation) {
+    // First try to use the regulation slug (from URL path)
+    const slug = this.getRegulationSlug(regulation);
+    if (slug && slug !== 'unknown-regulation') {
+      return slug;
+    }
+    
+    // Fallback to Item ID if available
+    if (regulation['Item ID']) {
+      return `REG-${regulation['Item ID']}`;
+    }
+    
+    // Last resort: use regulation.id or generate from statute name
+    if (regulation.id) {
+      return regulation.id;
+    }
+    
+    // Generate from statute name as last resort
+    const statuteName = regulation['Statute Name'] || 'Unknown Regulation';
+    return statuteName.toLowerCase()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/\s+/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '')
+      .substring(0, 50);
+  }
+
+  /**
    * Generate a regulation-specific console page
    * @param {Object} regulation - Regulation data from CSV
    * @returns {string} - Generated HTML content
@@ -39,7 +70,7 @@ export class ConsoleGenerator {
 
     // Extract and clean regulation data with comprehensive CSV field mapping
     const regulationData = {
-      REGULATION_ID: regulation['Item ID'] || regulation.id || 'REG-' + Date.now(),
+      REGULATION_ID: this.getProperRegulationId(regulation),
       REGULATION_NAME: this.cleanText(regulation['Statute Name'] || regulation.name || 'Unknown Regulation'),
       TOPIC: this.cleanText(regulation.Topic || regulation.topic || 'General Compliance'),
       STATUTE_NAME: this.cleanText(regulation['Statute Name'] || regulation.statuteName || ''),
@@ -49,12 +80,15 @@ export class ConsoleGenerator {
       DEADLINES: this.cleanText(regulation['Deadlines'] || regulation.deadlines || 'See regulation for specific deadlines'),
       ADDITIONAL_RESOURCES_1: this.cleanText(regulation['Additional Resources 1'] || ''),
       ADDITIONAL_RESOURCES_2: this.cleanText(regulation['Additional Resources 2'] || ''),
+      STATUTORY_SUMMARY: this.cleanText(regulation['Statutory Summary'] || ''),
       KEY_PROVISIONS: this.generateKeyProvisions(regulation),
       REGULATION_SLUG: this.getRegulationSlug(regulation),
       STATUTE_REFERENCE: this.generateStatuteReference(regulation),
       TOPIC_CATEGORY: this.getTopicCategory(regulation.Topic, regulation['Statute Name']),
       ENFORCEMENT_AGENCY: this.getEnforcementAgency(regulation.Topic, this.getTopicCategory(regulation.Topic, regulation['Statute Name']), regulation['Statute Name']),
-      COMPLIANCE_FOCUS: this.getComplianceFocus(regulation.Topic, this.getTopicCategory(regulation.Topic, regulation['Statute Name']), regulation['Statute Name'])
+      COMPLIANCE_FOCUS: this.getComplianceFocus(regulation.Topic, this.getTopicCategory(regulation.Topic, regulation['Statute Name']), regulation['Statute Name']),
+      COMPLIANCE_DEADLINE_INFO: this.generateComplianceDeadlineInfo(regulation),
+      REPORTING_SUMMARY: this.generateReportingSummary(regulation)
     };
     
     // Debug logging to see what we're working with
@@ -132,6 +166,17 @@ export class ConsoleGenerator {
       const topicWord = regulationData.TOPIC.toLowerCase();
       const duplicatePattern = new RegExp(`${topicWord}\\s+${topicWord}`, 'g');
       html = html.replace(duplicatePattern, topicWord);
+      
+      // Inject CSV data into console sections
+      html = html.replace(/Reporting Requirements: See regulation text for details/g, `Reporting Requirements: ${regulationData.REPORTING_REQUIREMENTS}`);
+      html = html.replace(/Compliance Deadlines: See regulation for specific deadlines/g, `Compliance Deadlines: ${regulationData.DEADLINES}`);
+      html = html.replace(/Additional Resources: Contact your compliance office/g, `Additional Resources: ${regulationData.REPORTING_SUMMARY}`);
+      
+      // Add statutory summary if available
+      if (regulationData.STATUTORY_SUMMARY) {
+        html = html.replace(/No description available/g, regulationData.STATUTORY_SUMMARY);
+        html = html.replace(/General compliance requirements/g, regulationData.STATUTORY_SUMMARY);
+      }
     }
     
     // Fix the "unknown" title issue - replace any remaining "unknown" with regulation name
@@ -344,12 +389,18 @@ export class ConsoleGenerator {
       return 'civil-rights';
     }
     
+    // Check for campus safety regulations (Clery Act, etc.)
+    if (nameLower.includes('clery') || nameLower.includes('campus security') || nameLower.includes('campus crime') ||
+        topicLower.includes('campus safety') || topicLower.includes('campus security')) {
+      return 'campus-safety';
+    }
+    
     if (topicLower.includes('civil rights') || topicLower.includes('discrimination') || topicLower.includes('diversity')) return 'civil-rights';
     if (topicLower.includes('academic') || topicLower.includes('education')) return 'education';
     if (topicLower.includes('health') || topicLower.includes('medical') || topicLower.includes('hipaa')) return 'healthcare';
     if (topicLower.includes('financial') || topicLower.includes('accounting') || topicLower.includes('audit')) return 'financial';
     if (topicLower.includes('employment') || topicLower.includes('human resources')) return 'employment';
-    if (topicLower.includes('environmental') || topicLower.includes('safety')) return 'environmental';
+    if (topicLower.includes('environmental') || topicLower.includes('safety') && !topicLower.includes('campus')) return 'environmental';
     if (topicLower.includes('research') || topicLower.includes('grants')) return 'research';
     if (topicLower.includes('student') || topicLower.includes('admissions')) return 'student-services';
     
@@ -366,6 +417,13 @@ export class ConsoleGenerator {
     
     const topicLower = topic.toLowerCase();
     const nameLower = regulationName.toLowerCase();
+    
+    // Campus safety regulations get Department of Education
+    if (topicCategory === 'campus-safety' || nameLower.includes('clery') || 
+        nameLower.includes('campus security') || nameLower.includes('campus crime') ||
+        topicLower.includes('campus safety')) {
+      return 'Department of Education (ED)';
+    }
     
     // Fair Housing Act gets HUD
     if (nameLower.includes('fair housing') || nameLower.includes('housing act')) {
@@ -401,6 +459,13 @@ export class ConsoleGenerator {
     
     const topicLower = topic.toLowerCase();
     const nameLower = regulationName.toLowerCase();
+    
+    // Campus safety regulations get specific focus
+    if (topicCategory === 'campus-safety' || nameLower.includes('clery') || 
+        nameLower.includes('campus security') || nameLower.includes('campus crime') ||
+        topicLower.includes('campus safety')) {
+      return 'Campus Safety & Security Reporting';
+    }
     
     // Fair Housing Act gets specific focus
     if (nameLower.includes('fair housing') || nameLower.includes('housing act')) {
@@ -529,6 +594,44 @@ export class ConsoleGenerator {
     }
     
     return { isCFR: false };
+  }
+
+  generateComplianceDeadlineInfo(regulation) {
+    const deadlines = regulation['Deadlines'] || '';
+    const reportingReqs = regulation['Reporting Requirements'] || '';
+    
+    if (!deadlines && !reportingReqs) {
+      return 'Ongoing compliance required - see regulation for specific timelines';
+    }
+    
+    let info = '';
+    if (deadlines) {
+      info += `Deadlines: ${deadlines}`;
+    }
+    if (reportingReqs && deadlines) {
+      info += ' | ';
+    }
+    if (reportingReqs) {
+      info += `Reporting: ${reportingReqs}`;
+    }
+    
+    return info;
+  }
+
+  generateReportingSummary(regulation) {
+    const reportingReqs = regulation['Reporting Requirements'] || '';
+    const additionalRes1 = regulation['Additional Resources 1'] || '';
+    const additionalRes2 = regulation['Additional Resources 2'] || '';
+    
+    let summary = reportingReqs || 'See regulation text for reporting requirements';
+    
+    if (additionalRes1 || additionalRes2) {
+      summary += ' | Additional Resources: ';
+      const resources = [additionalRes1, additionalRes2].filter(r => r).join(', ');
+      summary += resources;
+    }
+    
+    return summary;
   }
 }
 

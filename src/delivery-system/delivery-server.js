@@ -30,7 +30,7 @@ class DeliveryServer {
 
   setupMiddleware() {
     this.app.use(cors({
-      origin: ['http://localhost:3050', 'http://localhost:3000'],
+      origin: ['http://localhost:3050', 'http://localhost:3000', 'http://localhost:3010'],
       credentials: true
     }));
     
@@ -39,15 +39,44 @@ class DeliveryServer {
   }
 
   setupRoutes() {
-    // Health check endpoint
+    // Health check endpoint (with timeout protection)
     this.app.get('/health', (req, res) => {
-      const status = this.deliveryEngine ? this.deliveryEngine.getStatus() : null;
-      res.json({
-        service: 'RegulationDeliveryEngine',
-        status: status ? 'healthy' : 'initializing',
-        timestamp: new Date().toISOString(),
-        details: status
-      });
+      try {
+        // Set a response timeout to prevent hanging
+        const timeout = setTimeout(() => {
+          if (!res.headersSent) {
+            res.status(503).json({
+              service: 'RegulationDeliveryEngine',
+              status: 'timeout',
+              timestamp: new Date().toISOString(),
+              error: 'Health check timed out'
+            });
+          }
+        }, 2000); // 2 second timeout
+
+        const status = this.deliveryEngine ? this.deliveryEngine.getStatus() : null;
+        
+        clearTimeout(timeout);
+        
+        if (!res.headersSent) {
+          res.json({
+            service: 'RegulationDeliveryEngine',
+            status: status ? 'healthy' : 'initializing',
+            timestamp: new Date().toISOString(),
+            details: status,
+            uptime: process.uptime()
+          });
+        }
+      } catch (error) {
+        if (!res.headersSent) {
+          res.status(500).json({
+            service: 'RegulationDeliveryEngine',
+            status: 'error',
+            timestamp: new Date().toISOString(),
+            error: error.message
+          });
+        }
+      }
     });
 
     // Trigger manual regulation check (for testing)
@@ -233,6 +262,54 @@ class DeliveryServer {
     });
 
     // Manual trigger for regulation updates (from console)
+    // WebSocket subscription management
+    this.app.post('/api/subscribe/:regulationId', (req, res) => {
+      const { regulationId } = req.params;
+      const { clientId } = req.body;
+      
+      if (!clientId) {
+        return res.status(400).json({ error: 'clientId required' });
+      }
+
+      try {
+        if (this.deliveryEngine) {
+          this.deliveryEngine.addSubscription(regulationId, clientId);
+          res.json({
+            success: true,
+            message: `Subscribed client ${clientId} to ${regulationId}`,
+            regulationId,
+            clientId,
+            timestamp: new Date().toISOString()
+          });
+        } else {
+          res.status(503).json({ error: 'Delivery engine not ready' });
+        }
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+
+    this.app.delete('/api/subscribe/:regulationId/:clientId', (req, res) => {
+      const { regulationId, clientId } = req.params;
+      
+      try {
+        if (this.deliveryEngine) {
+          this.deliveryEngine.removeSubscription(regulationId, clientId);
+          res.json({
+            success: true,
+            message: `Unsubscribed client ${clientId} from ${regulationId}`,
+            regulationId,
+            clientId,
+            timestamp: new Date().toISOString()
+          });
+        } else {
+          res.status(503).json({ error: 'Delivery engine not ready' });
+        }
+      } catch (error) {
+        res.status(500).json({ error: error.message });
+      }
+    });
+
     this.app.post('/api/trigger-update', async (req, res) => {
       const { regulationId = 'REG-66', changeType = 'MANUAL_PUSH', message = 'Manual update triggered' } = req.body;
       
@@ -267,15 +344,15 @@ class DeliveryServer {
           source: 'console_manual_trigger',
           data: {
             before: { 
-              content: uscFullText, // COMPLETE USC 17 Section 110 text
-              fullText: uscFullText, // Alias for compatibility
+              content: regulationContent.content || regulationContent.fullText, // Current regulation text
+              fullText: regulationContent.content || regulationContent.fullText, // Alias for compatibility
               version: (regulationContent.version || 'unknown').replace(/\.\d+$/, '.0') // Previous version
             },
             after: {
               ...regulationContent,
-              content: simulatedUpdate, // COMPLETE USC text with simulated changes
-              fullText: simulatedUpdate, // Alias for compatibility
-              message: `${message} - Updated via MCP Engine with complete USC 17 Section 110 text`
+              content: regulationContent.content || regulationContent.fullText, // Current regulation text
+              fullText: regulationContent.content || regulationContent.fullText, // Alias for compatibility
+              message: `${message} - Updated via MCP Engine with complete regulation text`
             },
             contentHash: 'manual_' + Date.now()
           }
@@ -405,23 +482,74 @@ class DeliveryServer {
     try {
       console.log(`🔍 Fetching full content for ${regulationId} from MCP Engine...`);
       
+      // Determine correct endpoints based on regulation type
+      let uscEndpoint, cfrEndpoint, complianceEndpoint;
+      
+      // Endpoint mapping for REAL regulations that exist in the system
+      if (regulationId.includes('osha') || regulationId.includes('emergency-action-plan') || regulationId.includes('safety') || regulationId.includes('REG-4580') || regulationId.includes('REG-1813')) {
+        // OSHA regulations use BOTH USC (predominant) and CFR endpoints
+        uscEndpoint = 'http://localhost:3002/api/llm/usc/29/651'; // Occupational Safety and Health Act
+        cfrEndpoint = `http://localhost:3002/api/llm/cfr/${regulationId}`;
+        complianceEndpoint = `http://localhost:3002/api/llm/compliance/${regulationId}`;
+      } else if (regulationId.includes('REG-66') || regulationId.includes('reg-66') || regulationId.includes('teach')) {
+        // TEACH Act uses USC endpoints
+        uscEndpoint = 'http://localhost:3002/api/llm/usc/17/110';
+        cfrEndpoint = 'http://localhost:3002/api/llm/cfr/teach-act';
+        complianceEndpoint = 'http://localhost:3002/api/llm/compliance/teach-act';
+      } else if (regulationId.includes('drug-free-schools') || regulationId.includes('REG-1807')) {
+        // Drug-Free Schools and Communities Act (Item ID 1807)
+        uscEndpoint = 'http://localhost:3002/api/llm/usc/20/1011i'; // Drug-Free Schools USC
+        cfrEndpoint = `http://localhost:3002/api/llm/cfr/drug-free-schools`;
+        complianceEndpoint = `http://localhost:3002/api/llm/compliance/drug-free-schools`;
+      } else if (regulationId.includes('age-discrimination') || regulationId.includes('REG-1785')) {
+        // Age Discrimination Act of 1975 (Item ID 1785)
+        uscEndpoint = 'http://localhost:3002/api/llm/usc/42/6101'; // Age Discrimination USC
+        cfrEndpoint = `http://localhost:3002/api/llm/cfr/age-discrimination`;
+        complianceEndpoint = `http://localhost:3002/api/llm/compliance/age-discrimination`;
+      } else if (regulationId.includes('americans-with-disabilities') || regulationId.includes('REG-1786')) {
+        // Americans with Disabilities Act of 1990 (Item ID 1786)
+        uscEndpoint = 'http://localhost:3002/api/llm/usc/42/12101'; // ADA USC
+        cfrEndpoint = `http://localhost:3002/api/llm/cfr/ada`;
+        complianceEndpoint = `http://localhost:3002/api/llm/compliance/ada`;
+      } else if (regulationId.includes('higher-education-act-institutional') || regulationId.includes('REG-1982')) {
+        // Higher Education Act: Institutional Information (Item ID 1982)
+        uscEndpoint = 'http://localhost:3002/api/llm/usc/20/1092'; // HEA USC
+        cfrEndpoint = `http://localhost:3002/api/llm/cfr/hea-institutional`;
+        complianceEndpoint = `http://localhost:3002/api/llm/compliance/hea-institutional`;
+      } else {
+        // Generic fallback for unknown regulations
+        uscEndpoint = null;
+        cfrEndpoint = `http://localhost:3002/api/llm/cfr/${regulationId}`;
+        complianceEndpoint = `http://localhost:3002/api/llm/compliance/${regulationId}`;
+      }
+      
+      console.log(`🔍 Using endpoints - USC: ${uscEndpoint}, CFR: ${cfrEndpoint}, Compliance: ${complianceEndpoint}`);
+      
+      // Build fetch promises based on available endpoints
+      const fetchPromises = [];
+      
+      if (uscEndpoint) {
+        fetchPromises.push(fetch(uscEndpoint, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' }
+        }));
+      } else {
+        fetchPromises.push(Promise.resolve(null)); // No USC data
+      }
+      
+      fetchPromises.push(fetch(cfrEndpoint, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      }));
+      
+      fetchPromises.push(fetch(complianceEndpoint, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      }));
+      
       // Fetch all the regulation data components
       const [uscResponse, cfrResponse, complianceResponse, versioningResponse] = await Promise.all([
-        // USC Text
-        fetch('http://localhost:3002/api/llm/usc/17/110', {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' }
-        }),
-        // CFR Guidance  
-        fetch('http://localhost:3002/api/llm/cfr/teach-act', {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' }
-        }),
-        // Compliance Guide
-        fetch('http://localhost:3002/api/llm/compliance/teach-act', {
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' }
-        }),
+        ...fetchPromises,
         // Versioning Data
         fetch('http://localhost:3002/api/llm/versioning/system-info', {
           method: 'GET',
@@ -429,9 +557,9 @@ class DeliveryServer {
         })
       ]);
 
-      // Parse all responses
+      // Parse all responses (handle null USC response)
       const [uscData, cfrData, complianceData, versioningData] = await Promise.all([
-        uscResponse.ok ? uscResponse.json() : { error: 'USC fetch failed' },
+        uscResponse ? (uscResponse.ok ? uscResponse.json() : { error: 'USC fetch failed' }) : { data: null },
         cfrResponse.ok ? cfrResponse.json() : { error: 'CFR fetch failed' },
         complianceResponse.ok ? complianceResponse.json() : { error: 'Compliance fetch failed' },
         versioningResponse.ok ? versioningResponse.json() : { error: 'Versioning fetch failed' }
@@ -449,8 +577,77 @@ class DeliveryServer {
 
       const workflowData = workflowResponse.ok ? await workflowResponse.json() : { error: 'Workflow fetch failed' };
 
-      // Extract the actual USC text for EdSteward differential view
-      const uscFullText = uscData?.data?.content || uscData?.content || uscData?.fullText || 'USC 17 Section 110 text not available';
+      // Extract the appropriate regulation text based on regulation type
+      let regulationFullText;
+      
+      if (regulationId.includes('osha') || regulationId.includes('emergency-action-plan') || regulationId.includes('safety') || regulationId.includes('REG-4580') || regulationId.includes('REG-1813')) {
+        // For OSHA regulations, USC is predominant with CFR implementation details
+        const uscContent = uscData?.data?.content || uscData?.content || uscData?.fullText || '';
+        const cfrContent = cfrData?.data?.sections?.map(section => 
+          `${section.section} ${section.title}: ${section.content}`
+        ).join('\n\n') || cfrData?.content || cfrData?.fullText || '';
+        
+        // Combine with USC predominant
+        if (uscContent && cfrContent) {
+          regulationFullText = `${uscContent}\n\n--- IMPLEMENTATION DETAILS (CFR) ---\n\n${cfrContent}`;
+        } else {
+          regulationFullText = uscContent || cfrContent || complianceData?.content || 'OSHA regulation text not available';
+        }
+      } else if (regulationId.includes('REG-66') || regulationId.includes('reg-66') || regulationId.includes('teach')) {
+        // For TEACH Act, use USC data
+        regulationFullText = uscData?.data?.content || uscData?.content || uscData?.fullText || 'USC 17 Section 110 text not available';
+      } else if (regulationId.includes('gdpr') || regulationId.includes('GDPR')) {
+        // For GDPR, use compliance data (EU regulation)
+        regulationFullText = complianceData?.content || complianceData?.data?.content || 'GDPR regulation text not available';
+      } else if (regulationId.includes('hipaa') || regulationId.includes('HIPAA')) {
+        // For HIPAA, combine USC and CFR with compliance
+        const uscContent = uscData?.data?.content || uscData?.content || uscData?.fullText || '';
+        const cfrContent = cfrData?.data?.sections?.map(section => 
+          `${section.section} ${section.title}: ${section.content}`
+        ).join('\n\n') || cfrData?.content || cfrData?.fullText || '';
+        const complianceContent = complianceData?.content || complianceData?.data?.content || '';
+        
+        regulationFullText = [uscContent, cfrContent, complianceContent].filter(Boolean).join('\n\n--- SECTION BREAK ---\n\n') || 'HIPAA regulation text not available';
+      } else if (regulationId.includes('ccpa') || regulationId.includes('CCPA')) {
+        // For CCPA, use compliance data (state law)
+        regulationFullText = complianceData?.content || complianceData?.data?.content || 'CCPA regulation text not available';
+      } else if (regulationId.includes('title-ix') || regulationId.includes('REG-4001') || 
+                 regulationId.includes('ferpa') || regulationId.includes('REG-4004') ||
+                 regulationId.includes('ada') || regulationId.includes('REG-4003') || regulationId.includes('Acade-1701') ||
+                 regulationId.includes('clery') || regulationId.includes('REG-4002')) {
+        // For educational and civil rights regulations, combine USC and CFR
+        const uscContent = uscData?.data?.content || uscData?.content || uscData?.fullText || '';
+        const cfrContent = cfrData?.data?.sections?.map(section => 
+          `${section.section} ${section.title}: ${section.content}`
+        ).join('\n\n') || cfrData?.content || cfrData?.fullText || '';
+        
+        if (uscContent && cfrContent) {
+          regulationFullText = `${uscContent}\n\n--- REGULATORY IMPLEMENTATION (CFR) ---\n\n${cfrContent}`;
+        } else {
+          regulationFullText = uscContent || cfrContent || complianceData?.content || `${regulationId} regulation text not available`;
+        }
+      } else if (regulationId.includes('Acade-1605') || regulationId.includes('REG-4007') ||
+                 regulationId.includes('Acade-1636') || regulationId.includes('REG-4008') ||
+                 regulationId.includes('Acade-1692') || regulationId.includes('REG-4006')) {
+        // For Higher Education Act provisions, use USC with CFR implementation
+        const uscContent = uscData?.data?.content || uscData?.content || uscData?.fullText || '';
+        const cfrContent = cfrData?.data?.sections?.map(section => 
+          `${section.section} ${section.title}: ${section.content}`
+        ).join('\n\n') || cfrData?.content || cfrData?.fullText || '';
+        
+        regulationFullText = [uscContent, cfrContent].filter(Boolean).join('\n\n--- IMPLEMENTATION DETAILS ---\n\n') || complianceData?.content || `${regulationId} regulation text not available`;
+      } else if (regulationId.includes('TEST-GDPR-DEMO')) {
+        // For test regulations, use compliance data
+        regulationFullText = complianceData?.content || complianceData?.data?.content || 'Test regulation content not available';
+      } else {
+        // Generic fallback for unknown regulations
+        const cfrContent = cfrData?.data?.sections?.map(section => 
+          `${section.section} ${section.title}: ${section.content}`
+        ).join('\n\n') || cfrData?.content || cfrData?.fullText;
+        regulationFullText = cfrContent || complianceData?.content || complianceData?.data?.content || `${regulationId} regulation text not available`;
+      }
+      
+      console.log(`📋 Extracted regulation text (${regulationFullText.length} chars): ${regulationFullText.substring(0, 100)}...`);
       
       // Construct the complete regulation payload
       const fullContent = {
@@ -458,8 +655,8 @@ class DeliveryServer {
         timestamp: new Date().toISOString(),
         version: versioningData?.data?.currentRegulation?.version || versioningData?.currentVersion || 'unknown',
         // Add fullText field for EdSteward differential view
-        fullText: uscFullText,
-        content: uscFullText, // Alias for compatibility
+        fullText: regulationFullText,
+        content: regulationFullText, // Alias for compatibility
         components: {
           uscText: uscData,
           cfrGuidance: cfrData,
