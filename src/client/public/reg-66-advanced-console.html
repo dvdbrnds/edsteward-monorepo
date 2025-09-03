@@ -2779,7 +2779,171 @@
 
         // Auto-load USC text on page load since it's the default active tab
         document.addEventListener('DOMContentLoaded', function() {
+            // Check if this is the static template being accessed directly
+            if (window.location.pathname.includes('reg-66-advanced-console.html')) {
+                // Redirect to a real regulation console (Age Discrimination Act)
+                addConsoleLog('🔄 Redirecting to dynamic regulation console...', 'info');
+                window.location.href = 'http://localhost:3010/console/age-discrimination-act-of-1975';
+                return;
+            }
+            
             loadRealUSCText();
+            initializeWebSocketConnection();
+        });
+
+        // WebSocket connection for real-time regulation updates
+        let regulationWebSocket = null;
+        let reconnectAttempts = 0;
+        const maxReconnectAttempts = 5;
+        const reconnectDelay = 3000;
+
+        function initializeWebSocketConnection() {
+            try {
+                addConsoleLog('🔌 Connecting to real-time regulation update service...', 'info');
+                
+                regulationWebSocket = new WebSocket('ws://localhost:3051/regulation-updates');
+                
+                regulationWebSocket.onopen = function() {
+                    addConsoleLog('✅ Connected to real-time update service', 'success');
+                    reconnectAttempts = 0;
+                    
+                    // Subscribe to updates for this specific regulation
+                    const subscriptionMessage = {
+                        type: 'subscribe',
+                        regulationIds: ['REG-66'] // This will be replaced by console generator
+                    };
+                    
+                    regulationWebSocket.send(JSON.stringify(subscriptionMessage));
+                    addConsoleLog('📋 Subscribed to REG-66 regulation updates', 'info');
+                };
+                
+                regulationWebSocket.onmessage = function(event) {
+                    try {
+                        const message = JSON.parse(event.data);
+                        handleWebSocketMessage(message);
+                    } catch (error) {
+                        console.error('Failed to parse WebSocket message:', error);
+                        addConsoleLog('❌ Real-time update error: ' + error.message, 'error');
+                    }
+                };
+                
+                regulationWebSocket.onclose = function(event) {
+                    addConsoleLog('📴 Real-time update connection closed', 'warning');
+                    
+                    // Attempt to reconnect if not intentionally closed
+                    if (event.code !== 1000 && reconnectAttempts < maxReconnectAttempts) {
+                        reconnectAttempts++;
+                        addConsoleLog(`🔄 Attempting to reconnect (${reconnectAttempts}/${maxReconnectAttempts})...`, 'info');
+                        setTimeout(initializeWebSocketConnection, reconnectDelay);
+                    } else if (reconnectAttempts >= maxReconnectAttempts) {
+                        addConsoleLog('❌ Max reconnection attempts reached. Please refresh the page.', 'error');
+                    }
+                };
+                
+                regulationWebSocket.onerror = function(error) {
+                    console.error('WebSocket error:', error);
+                    addConsoleLog('❌ Real-time update error: ' + (error.message || 'Connection failed'), 'error');
+                };
+                
+            } catch (error) {
+                console.error('Failed to initialize WebSocket:', error);
+                addConsoleLog('❌ Failed to connect to real-time updates: ' + error.message, 'error');
+            }
+        }
+
+        function handleWebSocketMessage(message) {
+            switch (message.type) {
+                case 'connected':
+                    addConsoleLog(`🎯 Real-time connection established (Client ID: ${message.clientId})`, 'success');
+                    break;
+                    
+                case 'subscription_confirmed':
+                    addConsoleLog(`✅ Subscription confirmed for: ${message.regulationIds.join(', ')}`, 'success');
+                    break;
+                    
+                case 'regulation_updated':
+                    handleRegulationUpdate(message);
+                    break;
+                    
+                default:
+                    console.log('Unknown WebSocket message type:', message.type);
+            }
+        }
+
+        function handleRegulationUpdate(updateMessage) {
+            addConsoleLog(`🚨 REGULATION UPDATE RECEIVED!`, 'success');
+            addConsoleLog(`📋 Regulation: ${updateMessage.regulationId}`, 'info');
+            addConsoleLog(`📊 Version: ${updateMessage.version}`, 'info');
+            addConsoleLog(`🔄 Change Type: ${updateMessage.data?.changeType || 'Unknown'}`, 'info');
+            addConsoleLog(`⏰ Timestamp: ${new Date(updateMessage.timestamp).toLocaleString()}`, 'info');
+            
+            // Show notification banner
+            showUpdateNotification(updateMessage);
+            
+            // Optionally refresh data automatically
+            if (updateMessage.data?.changeType !== 'MANUAL_PUSH') {
+                addConsoleLog('🔄 Auto-refreshing regulation data...', 'info');
+                setTimeout(() => {
+                    // Refresh the currently active tab
+                    const activeTab = document.querySelector('.tab-button.active');
+                    if (activeTab) {
+                        const tabId = activeTab.getAttribute('onclick').match(/'([^']+)'/)[1];
+                        showTab(tabId);
+                    }
+                }, 2000);
+            }
+        }
+
+        function showUpdateNotification(updateMessage) {
+            // Create notification banner
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #28a745;
+                color: white;
+                padding: 15px 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 10000;
+                max-width: 400px;
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            `;
+            
+            notification.innerHTML = `
+                <div style="font-weight: 600; margin-bottom: 5px;">🚨 Regulation Update</div>
+                <div style="font-size: 14px; opacity: 0.9;">
+                    ${updateMessage.regulationId} has been updated to version ${updateMessage.version}
+                </div>
+                <button onclick="this.parentElement.remove()" style="
+                    position: absolute;
+                    top: 5px;
+                    right: 10px;
+                    background: none;
+                    border: none;
+                    color: white;
+                    font-size: 18px;
+                    cursor: pointer;
+                    opacity: 0.7;
+                ">×</button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto-remove after 10 seconds
+            setTimeout(() => {
+                if (notification.parentElement) {
+                    notification.remove();
+                }
+            }, 10000);
+        }
+
+        // Cleanup WebSocket on page unload
+        window.addEventListener('beforeunload', function() {
+            if (regulationWebSocket) {
+                regulationWebSocket.close(1000, 'Page unloading');
+            }
         });
 
     </script>

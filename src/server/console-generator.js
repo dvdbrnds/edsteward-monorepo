@@ -105,6 +105,9 @@ export class ConsoleGenerator {
     html = html.replace(/REG-66 Advanced LinearEngine Console/g, `${regulationData.REGULATION_NAME} - Advanced LinearEngine Console`);
     html = html.replace(/REG-66/g, regulationData.REGULATION_ID);
     
+    // Ensure WebSocket subscription messages use the correct regulation ID
+    html = html.replace(/Subscribed to REG-66 regulation updates/g, `Subscribed to ${regulationData.REGULATION_ID} regulation updates`);
+    
     // Special handling for TEACH Act - preserve original content
     if (regulationData.REGULATION_SLUG === 'technology-education-and-copyright-harmonization-a') {
       // For TEACH Act, keep the original USC 17/110 content and endpoints
