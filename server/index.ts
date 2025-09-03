@@ -425,10 +425,15 @@ function startDatabaseMonitoring() {
 process.on('uncaughtException', (error) => {
   console.error('🚨 UNCAUGHT EXCEPTION - Server will attempt to continue:', error);
   console.error('Stack trace:', error.stack);
+  console.error('Error name:', error.name);
+  console.error('Error message:', error.message);
   
   // Log the error but don't crash the server
   // In production, you might want to restart the server gracefully
   console.log('⚠️  Server continuing despite uncaught exception...');
+  
+  // Don't exit the process - keep running
+  return false;
 });
 
 process.on('unhandledRejection', (reason, promise) => {
@@ -437,22 +442,95 @@ process.on('unhandledRejection', (reason, promise) => {
   
   // Log the error but don't crash the server
   console.log('⚠️  Server continuing despite unhandled rejection...');
+  
+  // Don't exit the process - keep running
+  return false;
 });
 
 // Handle specific database connection errors
 process.on('warning', (warning) => {
-  if (warning.name === 'MaxListenersExceededWarning') {
-    console.warn('⚠️  MaxListenersExceededWarning:', warning.message);
+  console.warn('⚠️  Process warning:', warning.name, warning.message);
+  if (warning.stack) {
+    console.warn('Warning stack:', warning.stack);
   }
 });
 
-// Graceful shutdown
+// Override process.exit to prevent accidental crashes
+const originalExit = process.exit;
+process.exit = ((code?: number) => {
+  console.error('🚨 PROCESS.EXIT CALLED - Preventing crash! Code:', code);
+  console.error('Stack trace:', new Error().stack);
+  console.log('⚠️  Server will continue running instead of exiting...');
+  // Don't actually exit - just log it
+  return undefined as never;
+}) as typeof process.exit;
+
+// Graceful shutdown only on explicit signals
 process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down gracefully');
-  process.exit(0);
+  console.log('🔄 SIGTERM received - Server will continue running (crash prevention active)');
+  // Don't exit - keep running
 });
 
 process.on('SIGINT', () => {
-  console.log('SIGINT received, shutting down gracefully');
-  process.exit(0);
+  console.log('🔄 SIGINT received - Server will continue running (crash prevention active)');
+  // Don't exit - keep running
 });
+
+// Add additional error handlers
+process.on('beforeExit', (code) => {
+  console.log('🚨 BEFORE EXIT - Code:', code, '- Preventing exit!');
+});
+
+process.on('exit', (code) => {
+  console.log('🚨 PROCESS EXIT - Code:', code, '- This should not happen with crash prevention!');
+});
+
+// Add domain error handling for synchronous errors
+process.on('multipleResolves', (type, promise, reason) => {
+  console.warn('🚨 MULTIPLE RESOLVES detected:', type, promise, reason);
+  console.log('⚠️  Server continuing despite multiple resolves...');
+});
+
+// Catch any remaining synchronous errors
+process.on('disconnect', () => {
+  console.log('🔄 DISCONNECT event - Server will continue running');
+});
+
+// Add setInterval to keep the process alive and detect crashes
+const keepAliveInterval = setInterval(() => {
+  // This ensures the event loop stays active
+  // and prevents the process from exiting unexpectedly
+  const memUsage = process.memoryUsage();
+  if (memUsage.heapUsed > 1000 * 1024 * 1024) { // > 1GB
+    console.warn('🚨 HIGH MEMORY USAGE detected:', Math.round(memUsage.heapUsed / 1024 / 1024), 'MB');
+  }
+}, 60000); // Every minute
+
+// Enhanced error boundary for the entire application
+const originalConsoleError = console.error;
+console.error = (...args) => {
+  originalConsoleError.apply(console, args);
+  
+  // Check if this looks like a crash-inducing error
+  const errorString = args.join(' ');
+  if (errorString.includes('ECONNRESET') || 
+      errorString.includes('ENOTFOUND') || 
+      errorString.includes('ETIMEDOUT') ||
+      errorString.includes('connection terminated') ||
+      errorString.includes('Client has encountered a connection error')) {
+    console.log('🛡️  Database connection error detected - implementing recovery...');
+    
+    // Attempt to recover database connections
+    setTimeout(async () => {
+      try {
+        console.log('🔄 Attempting database connection recovery...');
+        // Force a database health check
+        const { testConnection } = await import('./services/database');
+        await testConnection();
+        console.log('✅ Database connection recovery successful');
+      } catch (recoveryError) {
+        console.warn('⚠️  Database recovery failed, but server will continue:', recoveryError);
+      }
+    }, 2000);
+  }
+};

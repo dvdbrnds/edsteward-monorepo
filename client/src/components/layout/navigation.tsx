@@ -17,7 +17,7 @@ import {
   Loader2,
   User,
   Settings,
-  Server,
+
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useQuery } from "@tanstack/react-query";
 import { useLegacyBranding } from "@/hooks/use-branding";
-import { WebSocketStatus } from "@/components/ui/websocket-status";
+
 import { TUFStatus } from "@/components/ui/tuf-status";
 
 // Import fallback logo
@@ -124,7 +124,15 @@ export default function Navigation() {
                       alt={`${branding.name} Logo`}
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
-                        target.src = genericLogo;
+                        console.warn('Logo failed to load:', branding.logo, 'Falling back to generic logo');
+                        // Only fallback if we haven't already fallen back
+                        if (target.src !== genericLogo) {
+                          target.src = genericLogo;
+                        }
+                      }}
+                      onLoad={() => {
+                        console.log('🖼️  NAVIGATION: Logo loaded successfully:', branding.logo);
+                        console.log('🖼️  NAVIGATION: Full branding object:', branding);
                       }}
                     />
 

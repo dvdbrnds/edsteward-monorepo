@@ -26,7 +26,48 @@ export function getDatabasePool(): Pool {
     });
 
     pool.on('error', (err) => {
-      console.error('Unexpected error on idle client', err);
+      console.error('🚨 Database pool error detected:', err);
+      console.error('Error details:', {
+        message: err.message,
+        code: (err as any).code,
+        errno: (err as any).errno,
+        syscall: (err as any).syscall
+      });
+      
+      // Don't let database errors crash the server
+      console.log('🛡️  Database pool error handled - server will continue running');
+      
+      // Attempt to recover the connection pool
+      setTimeout(() => {
+        console.log('🔄 Attempting to recover database pool...');
+        try {
+          // Force a connection test to see if we can recover
+          testConnection().then(success => {
+            if (success) {
+              console.log('✅ Database pool recovery successful');
+            } else {
+              console.warn('⚠️  Database pool recovery failed, but server continues');
+            }
+          }).catch(recoveryError => {
+            console.warn('⚠️  Database pool recovery error:', recoveryError);
+          });
+        } catch (syncError) {
+          console.warn('⚠️  Database pool recovery sync error:', syncError);
+        }
+      }, 5000);
+    });
+    
+    // Add connection event handlers
+    pool.on('connect', (client) => {
+      console.log('🔗 Database client connected');
+    });
+    
+    pool.on('acquire', (client) => {
+      console.log('📥 Database client acquired from pool');
+    });
+    
+    pool.on('remove', (client) => {
+      console.log('📤 Database client removed from pool');
     });
   }
 

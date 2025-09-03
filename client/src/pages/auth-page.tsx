@@ -67,7 +67,15 @@ export default function AuthPage() {
               alt={`${branding.institutionName} Logo`}
               className="h-20 w-auto"
               onError={(e) => {
-                (e.target as HTMLImageElement).src = moravianLogo;
+                const target = e.target as HTMLImageElement;
+                console.warn('Auth page logo failed to load:', branding.logoUrl, 'Falling back to moravian logo');
+                // Only fallback if we haven't already fallen back
+                if (target.src !== moravianLogo) {
+                  target.src = moravianLogo;
+                }
+              }}
+              onLoad={() => {
+                console.log('Auth page logo loaded successfully:', branding.logoUrl);
               }}
             />
           </div>

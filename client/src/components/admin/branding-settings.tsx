@@ -144,8 +144,17 @@ const FileUploadField: React.FC<{
   const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
+    console.log(`🔄 FILEUPLOAD: ${type} currentUrl changed from ${previewUrl} to ${currentUrl}`);
     setPreviewUrl(currentUrl || '');
-  }, [currentUrl]);
+  }, [currentUrl, type]);
+
+  // Force update when currentUrl changes - this ensures UI updates immediately
+  useEffect(() => {
+    if (currentUrl && currentUrl !== previewUrl) {
+      console.log(`🔄 FORCE UPDATE: ${type} forcing preview update to ${currentUrl}`);
+      setPreviewUrl(currentUrl);
+    }
+  }, [currentUrl, type]);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     console.log(`🚀 UPLOAD: handleFileChange triggered for ${type}`);
@@ -268,28 +277,48 @@ const FileUploadField: React.FC<{
       {/* Preview */}
       {previewUrl && (
         <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+          {console.log(`🔍 PREVIEW: Rendering preview container for ${type} with URL:`, previewUrl)}
           <div className="flex-shrink-0">
             {type === 'favicon' ? (
-              <div className="w-8 h-8 border border-gray-200 rounded bg-white flex items-center justify-center">
+              <div className="w-8 h-8 border-2 border-gray-300 rounded bg-gray-800 flex items-center justify-center">
                 <img 
                   src={previewUrl} 
                   alt="Favicon preview" 
                   className="w-4 h-4 object-contain"
                   onError={(e) => {
-                    console.error('Failed to load favicon preview:', previewUrl);
-                    (e.target as HTMLImageElement).style.display = 'none';
+                    console.error('❌ PREVIEW: Failed to load favicon preview:', previewUrl);
+                    console.error('❌ PREVIEW: Error details:', e);
+                    const img = e.target as HTMLImageElement;
+                    console.error('❌ PREVIEW: Favicon src:', img.src);
+                    img.style.display = 'none';
+                  }}
+                  onLoad={(e) => {
+                    const img = e.target as HTMLImageElement;
+                    console.log('✅ PREVIEW: Favicon preview loaded successfully:', previewUrl);
+                    console.log('✅ PREVIEW: Favicon dimensions:', img.naturalWidth, 'x', img.naturalHeight);
                   }}
                 />
               </div>
             ) : (
-              <div className="w-16 h-16 border border-gray-200 rounded bg-white flex items-center justify-center">
+              <div className="w-16 h-16 border-2 border-gray-300 rounded bg-gray-800 flex items-center justify-center">
                 <img 
                   src={previewUrl} 
                   alt="Logo preview" 
                   className="w-14 h-14 object-contain"
                   onError={(e) => {
-                    console.error('Failed to load logo preview:', previewUrl);
-                    (e.target as HTMLImageElement).style.display = 'none';
+                    console.error('❌ PREVIEW: Failed to load logo preview:', previewUrl);
+                    console.error('❌ PREVIEW: Error details:', e);
+                    console.error('❌ PREVIEW: Image element:', e.target);
+                    const img = e.target as HTMLImageElement;
+                    console.error('❌ PREVIEW: Image src:', img.src);
+                    console.error('❌ PREVIEW: Image naturalWidth:', img.naturalWidth);
+                    console.error('❌ PREVIEW: Image naturalHeight:', img.naturalHeight);
+                    img.style.display = 'none';
+                  }}
+                  onLoad={(e) => {
+                    const img = e.target as HTMLImageElement;
+                    console.log('✅ PREVIEW: Logo preview loaded successfully:', previewUrl);
+                    console.log('✅ PREVIEW: Image dimensions:', img.naturalWidth, 'x', img.naturalHeight);
                   }}
                 />
               </div>
@@ -499,6 +528,9 @@ export function BrandingSettingsV2({ onConfigUpdate }: BrandingSettingsProps) {
     }
   }, [brandingData, form]);
 
+  // Track if files have been uploaded immediately
+  const [hasUploadedFiles, setHasUploadedFiles] = useState(false);
+
   // Watch for form changes
   const watchedValues = form.watch();
   useEffect(() => {
@@ -506,9 +538,9 @@ export function BrandingSettingsV2({ onConfigUpdate }: BrandingSettingsProps) {
       const hasFormChanges = Object.keys(watchedValues).some(
         (key) => watchedValues[key as keyof BrandingFormData] !== brandingData[key as keyof BrandingFormData]
       );
-      setHasChanges(hasFormChanges || Object.keys(pendingFiles).length > 0);
+      setHasChanges(hasFormChanges || Object.keys(pendingFiles).length > 0 || hasUploadedFiles);
     }
-  }, [watchedValues, brandingData, pendingFiles]);
+  }, [watchedValues, brandingData, pendingFiles, hasUploadedFiles]);
 
   // File upload mutation
   const uploadMutation = useMutation({
@@ -580,17 +612,27 @@ export function BrandingSettingsV2({ onConfigUpdate }: BrandingSettingsProps) {
     },
     onSuccess: (response) => {
       console.log('🎨 Branding save successful, updating cache immediately:', response.branding);
+      console.log('🔄 SAVE SUCCESS: Server returned logoUrl:', response.branding.logoUrl);
+      console.log('🔄 SAVE SUCCESS: Current form logoUrl before update:', form.watch('logoUrl'));
       
-      // Option A: Immediate cache update + forced refetch
-      // 1. Immediately update cache with saved data (no waiting for refetch)
+      // CRITICAL: Update form values with server response FIRST
+      console.log('🔄 SAVE SUCCESS: Updating form with server response...');
+      form.setValue('logoUrl', response.branding.logoUrl, { shouldDirty: false });
+      form.setValue('faviconUrl', response.branding.faviconUrl, { shouldDirty: false });
+      console.log('🔄 SAVE SUCCESS: Form updated - logoUrl:', response.branding.logoUrl);
+      console.log('🔄 SAVE SUCCESS: Form logoUrl after setValue:', form.watch('logoUrl'));
+      
+      // Then update cache with saved data
       queryClient.setQueryData(["/api/branding"], response.branding);
       queryClient.setQueryData(["/api/admin/branding"], { success: true, branding: response.branding });
       
-      // 2. Force refetch to ensure data is fresh from server (bypasses staleTime)
+      // Force refetch to ensure navigation updates
+      console.log('🔄 SAVE SUCCESS: About to refetch branding queries...');
       queryClient.refetchQueries({ queryKey: ["/api/branding"], type: 'active' });
       queryClient.refetchQueries({ queryKey: ["/api/admin/branding"], type: 'active' });
       
       console.log('🔄 Cache updated and refetch forced for branding data');
+      console.log('🔄 SAVE SUCCESS: Final form logoUrl after all operations:', form.watch('logoUrl'));
       
       toast({
         title: "Branding Updated",
@@ -599,15 +641,20 @@ export function BrandingSettingsV2({ onConfigUpdate }: BrandingSettingsProps) {
       });
       setHasChanges(false);
       setPendingFiles({});
-      onConfigUpdate?.(response.branding);
+      setHasUploadedFiles(false); // Reset uploaded files flag
     },
-    onError: (error: Error) => {
+    onError: (error) => {
+      console.error('❌ SAVE ERROR: Branding save failed:', error);
       toast({
         title: "Save Failed",
-        description: error.message || "Failed to save branding configuration",
+        description: error.message || "Failed to save branding configuration. Please try again.",
         variant: "destructive",
+        duration: 5000,
       });
-    },
+      
+      // On error, don't reset form state - keep the uploaded values
+      console.log('🔄 SAVE ERROR: Keeping form state due to save failure');
+    }
   });
 
   const onSubmit = (data: BrandingFormData) => {
@@ -623,13 +670,58 @@ export function BrandingSettingsV2({ onConfigUpdate }: BrandingSettingsProps) {
     
     console.log(`🚀 HANDLE: Current pendingFiles state:`, pendingFiles);
     
-    // Update pending files with the selected file
-    console.log(`🚀 HANDLE: Updating pendingFiles state to add ${type} file...`);
-    setPendingFiles(prev => {
-      const newState = { ...prev, [type]: file };
-      console.log(`🚀 HANDLE: New pendingFiles state will be:`, newState);
-      return newState;
-    });
+    // IMMEDIATE UPLOAD: Upload the file immediately instead of waiting for form save
+    try {
+      console.log(`🚀 IMMEDIATE: Starting immediate upload for ${type}...`);
+      
+      const uploadResponse = await uploadMutation.mutateAsync({ [type]: file });
+      console.log(`✅ IMMEDIATE: ${type} uploaded successfully:`, uploadResponse);
+      
+      // Update form with the new URL immediately
+      if (type === 'logo' && uploadResponse.assets.logoUrl) {
+        form.setValue('logoUrl', uploadResponse.assets.logoUrl, { shouldDirty: true });
+        console.log(`🔄 IMMEDIATE: Updated form logoUrl to:`, uploadResponse.assets.logoUrl);
+      }
+      if (type === 'favicon' && uploadResponse.assets.faviconUrl) {
+        form.setValue('faviconUrl', uploadResponse.assets.faviconUrl, { shouldDirty: true });
+        console.log(`🔄 IMMEDIATE: Updated form faviconUrl to:`, uploadResponse.assets.faviconUrl);
+      }
+      
+      // Force cache invalidation immediately
+      console.log(`🔄 IMMEDIATE: Invalidating branding cache...`);
+      queryClient.invalidateQueries({ queryKey: ["/api/branding"] });
+      queryClient.refetchQueries({ queryKey: ["/api/branding"], type: 'active' });
+      
+      // Also invalidate the public branding endpoint used by navigation
+      console.log(`🔄 IMMEDIATE: Invalidating public branding cache...`);
+      queryClient.invalidateQueries({ queryKey: ["/api/branding/public"] });
+      queryClient.refetchQueries({ queryKey: ["/api/branding/public"], type: 'active' });
+      
+      // Clear pending files since upload is complete
+      setPendingFiles(prev => {
+        const newState = { ...prev };
+        delete newState[type];
+        console.log(`🚀 IMMEDIATE: Cleared ${type} from pendingFiles:`, newState);
+        return newState;
+      });
+      
+      // Force hasChanges to true since we just uploaded a file
+      console.log(`🔄 IMMEDIATE: Setting hasChanges to true after successful upload`);
+      setHasChanges(true);
+      
+      // Mark that files have been uploaded to enable save button persistently
+      console.log(`🔄 IMMEDIATE: Setting hasUploadedFiles to true to enable save button`);
+      setHasUploadedFiles(true);
+      
+    } catch (error) {
+      console.error(`❌ IMMEDIATE: Failed to upload ${type}:`, error);
+      // Fall back to pending files approach
+      setPendingFiles(prev => {
+        const newState = { ...prev, [type]: file };
+        console.log(`🚀 HANDLE: Fallback - New pendingFiles state will be:`, newState);
+        return newState;
+      });
+    }
     
     // Auto-generate favicon from logo if this is a logo upload and no custom favicon exists
     if (type === 'logo') {
@@ -831,7 +923,9 @@ export function BrandingSettingsV2({ onConfigUpdate }: BrandingSettingsProps) {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {/* Upload Only - No URL Fields */}
                   <div>
+                    {console.log('🔍 FORM: Rendering logo FileUploadField with currentUrl:', form.watch('logoUrl'))}
                     <FileUploadField
+                      key={`logo-${form.watch('logoUrl') || 'empty'}`}
                       label="Logo"
                       description="Your institution's logo. Used in navigation and login screens."
                       currentUrl={form.watch('logoUrl')}
@@ -843,6 +937,7 @@ export function BrandingSettingsV2({ onConfigUpdate }: BrandingSettingsProps) {
 
                   <div>
                     <FileUploadField
+                      key={`favicon-${form.watch('faviconUrl') || 'empty'}`}
                       label="Favicon"
                       description={
                         pendingFiles.favicon && !form.watch('faviconUrl') 

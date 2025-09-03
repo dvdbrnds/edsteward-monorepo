@@ -15,10 +15,8 @@ import ComplianceWizardPage from "@/pages/compliance-wizard-page";
 import ReportsPage from "@/pages/reports-page";
 import ValidationPage from "@/pages/validation-page";
 import AdminSettingsPage from "@/pages/admin-settings-page";
-import AdminDashboardPage from "@/pages/admin-dashboard-page";
 import LogsPage from "@/pages/admin/logs-page";
 import DebugToolsPage from "@/pages/admin/debug-tools-page";
-import AWSTenantsManagementPage from "@/pages/admin/aws-tenant-management-page";
 import UtilitiesIndexPage from "@/pages/utilities/index";
 import { RegulationViewer } from "@/pages/RegulationViewer";
 import SetupWizardPage from "@/pages/setup-wizard-page";
@@ -56,7 +54,6 @@ function useCurrentTenant() {
 
 export default function App() {
   console.log('[App] Initializing single-tenant application');
-  const currentTenant = useCurrentTenant();
   const [location] = useLocation();
   
   // Debug current location - this will update when routes change
