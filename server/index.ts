@@ -378,10 +378,81 @@ httpServer.listen(PORT, '0.0.0.0', async () => {
   console.log('   - Port 3053: MCP Engine TUF WebSocket (reserved)');
   console.log('⚠️ TUF service disabled - EdSteward running without MCP Engine TUF integration');
   console.log('💡 MCP Engine ports 3052-3053 are reserved for TUF services');
+  
+  // Start database connection monitoring to prevent crashes
+  startDatabaseMonitoring();
+});
+
+// DATABASE MONITORING: Prevent database-related crashes
+function startDatabaseMonitoring() {
+  console.log('🔍 Starting database connection monitoring...');
+  
+  // Check database health every 30 seconds
+  setInterval(async () => {
+    try {
+      await testConnection();
+      // Connection is healthy, no action needed
+    } catch (error) {
+      console.warn('⚠️  Database health check failed:', error instanceof Error ? error.message : String(error));
+      // Log the error but don't crash - the connection pool will handle reconnection
+    }
+  }, 30000); // 30 seconds
+  
+  console.log('✅ Database monitoring started (30s intervals)');
+  
+  // Monitor memory usage to prevent memory leaks
+  setInterval(() => {
+    const memUsage = process.memoryUsage();
+    const memUsageMB = {
+      rss: Math.round(memUsage.rss / 1024 / 1024),
+      heapTotal: Math.round(memUsage.heapTotal / 1024 / 1024),
+      heapUsed: Math.round(memUsage.heapUsed / 1024 / 1024),
+      external: Math.round(memUsage.external / 1024 / 1024)
+    };
+    
+    // Log memory usage every 5 minutes, warn if high
+    if (memUsageMB.heapUsed > 500) { // Warn if heap usage > 500MB
+      console.warn('⚠️  High memory usage detected:', memUsageMB);
+    } else {
+      console.log('📊 Memory usage:', memUsageMB);
+    }
+  }, 300000); // 5 minutes
+  
+  console.log('✅ Memory monitoring started (5min intervals)');
+}
+
+// CRASH PREVENTION: Handle uncaught exceptions and unhandled rejections
+process.on('uncaughtException', (error) => {
+  console.error('🚨 UNCAUGHT EXCEPTION - Server will attempt to continue:', error);
+  console.error('Stack trace:', error.stack);
+  
+  // Log the error but don't crash the server
+  // In production, you might want to restart the server gracefully
+  console.log('⚠️  Server continuing despite uncaught exception...');
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('🚨 UNHANDLED PROMISE REJECTION at:', promise);
+  console.error('Reason:', reason);
+  
+  // Log the error but don't crash the server
+  console.log('⚠️  Server continuing despite unhandled rejection...');
+});
+
+// Handle specific database connection errors
+process.on('warning', (warning) => {
+  if (warning.name === 'MaxListenersExceededWarning') {
+    console.warn('⚠️  MaxListenersExceededWarning:', warning.message);
+  }
 });
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
   console.log('SIGTERM received, shutting down gracefully');
+  process.exit(0);
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT received, shutting down gracefully');
   process.exit(0);
 });

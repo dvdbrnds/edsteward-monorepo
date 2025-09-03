@@ -89,17 +89,17 @@ export default function Navigation() {
       : []),
     ...(user?.role?.toLowerCase() === "admin"
       ? [
-        // Admin Dashboard - Only show on admin.edsteward.ai
-        ...(currentTenant === 'admin' 
-          ? [{ href: "/admin/dashboard", label: "Admin Dashboard", icon: LayoutDashboard }]
-          : []
-        ),
+        // Admin Dashboard - DISABLED
+        // ...(currentTenant === 'admin' 
+        //   ? [{ href: "/admin/dashboard", label: "Admin Dashboard", icon: LayoutDashboard }]
+        //   : []
+        // ),
         { href: "/admin/settings", label: "System Settings", icon: Settings },
-        // AWS Tenant Management - Only show on admin.edsteward.ai
-        ...(currentTenant === 'admin' 
-          ? [{ href: "/admin/aws-tenant-management", label: "AWS Tenant Management", icon: Server }]
-          : []
-        ),
+        // AWS Tenant Management - DISABLED
+        // ...(currentTenant === 'admin' 
+        //   ? [{ href: "/admin/aws-tenant-management", label: "AWS Tenant Management", icon: Server }]
+        //   : []
+        // ),
         // System Logs route is available at /admin/logs but hidden from navigation
         // Uncomment the following line to show it in the navigation:
         // { href: "/admin/logs", label: "System Logs", icon: FileText }
@@ -164,7 +164,7 @@ export default function Navigation() {
           {/* Security Status and User Menu */}
           <div className="flex items-center flex-shrink-0 gap-3">
             <TUFStatus />
-            <WebSocketStatus />
+{/* <WebSocketStatus /> */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button

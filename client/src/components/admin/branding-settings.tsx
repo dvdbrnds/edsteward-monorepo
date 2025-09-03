@@ -127,7 +127,7 @@ const brandingSchema = z.object({
 type BrandingFormData = z.infer<typeof brandingSchema>;
 
 interface BrandingSettingsProps {
-  onConfigUpdate?: (config: BrandingFormData) => void;
+  onConfigUpdate?: (_config: BrandingFormData) => void;
 }
 
 // File upload component - UPLOAD ONLY, NO URL INPUTS
@@ -135,7 +135,7 @@ const FileUploadField: React.FC<{
   label: string;
   description: string;
   currentUrl?: string;
-  onFileSelect: (file: File) => void | Promise<void>;
+  onFileSelect: (_file: File) => void | Promise<void>;
   accept: string;
   type: 'logo' | 'favicon';
 }> = ({ label, description, currentUrl, onFileSelect, accept, type }) => {
@@ -323,7 +323,7 @@ const FileUploadField: React.FC<{
 // Color picker component
 const ColorPicker: React.FC<{
   value: string;
-  onChange: (_color: string) => void;
+  onChange: (color: string) => void;
   label: string;
   description?: string;
 }> = ({ value, onChange, label, description }) => {

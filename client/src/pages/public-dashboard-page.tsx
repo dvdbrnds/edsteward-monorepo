@@ -109,8 +109,8 @@ export default function DashboardPage() {
   const [institutionTypeFilter, setInstitutionTypeFilter] = useState<string>("all");
   const [selectedInstitutionTypes, setSelectedInstitutionTypes] = useState<string[]>([]);
   const [complianceFilter, setComplianceFilter] = useState<string>("all");
-  const [sortBy, setSortBy] = useState<string>("name");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+  const [sortBy, setSortBy] = useState<string>("lastUpdated");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
   
   // Institution configuration state
   const [institutionConfig, setInstitutionConfig] = useState<InstitutionConfig | null>(null);
@@ -686,6 +686,15 @@ export default function DashboardPage() {
                     </TableHead>
                     <TableHead 
                       className="cursor-pointer hover:bg-gray-50"
+                      onClick={() => handleSort('lastUpdated')}
+                    >
+                      <div className="flex items-center gap-2">
+                        Last Updated
+                        <ArrowUpDown className="h-4 w-4" />
+                      </div>
+                    </TableHead>
+                    <TableHead 
+                      className="cursor-pointer hover:bg-gray-50"
                       onClick={() => handleSort('nextReviewDate')}
                     >
                       <div className="flex items-center gap-2">
@@ -812,6 +821,18 @@ export default function DashboardPage() {
                             </div>
                           ) : (
                             <span className="text-sm text-gray-500">Not verified</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
+                          {regulation.lastUpdated ? (
+                            <div className="flex items-center gap-2">
+                              <Calendar className="h-4 w-4 text-blue-400" />
+                              <span className="text-sm font-medium text-blue-700">
+                                {format(parseISO(regulation.lastUpdated), 'MMM dd, yyyy')}
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="text-sm text-gray-500">Never updated</span>
                           )}
                         </TableCell>
                         <TableCell>

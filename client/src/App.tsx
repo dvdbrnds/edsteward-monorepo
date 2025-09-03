@@ -25,6 +25,7 @@ import SetupWizardPage from "@/pages/setup-wizard-page";
 import UpdatesListPage from "@/pages/updates-list-page";
 import DifferentialViewPage from "@/pages/differential-view-page";
 import DiffTestPage from "@/pages/diff-test-page";
+import PublicDashboardPage from "@/pages/public-dashboard-page";
 import { ProtectedRoute } from "./lib/protected-route";
 import { ProtectedRegulationRoute } from "./lib/protected-regulation-route";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
@@ -75,13 +76,16 @@ export default function App() {
               {/* Authentication Route */}
               <Route path="/auth" component={AuthPage} />
               <Route path="/setup" component={SetupWizardPage} />
+              
+              {/* Public Dashboard - No authentication required */}
+              <Route path="/public-dashboard" component={PublicDashboardPage} />
 
               {/* Protected Routes - Authentication Required */}
               <ProtectedRoute path="/" component={HomePage} />
-              {/* Admin Dashboard - Only available on admin.edsteward.ai */}
-              {currentTenant === 'admin' && (
+              {/* Admin Dashboard - DISABLED */}
+              {/* {currentTenant === 'admin' && (
                 <ProtectedRoute path="/admin/dashboard" component={AdminDashboardPage} />
-              )}
+              )} */}
               {/* More specific routes MUST come before general ones */}
               <ProtectedRoute path="/regulations/validate" component={ValidationPage} />
               <ProtectedRoute path="/regulations/updates/demo" component={() => <DifferentialViewPage isDemo={true} />} />
@@ -109,10 +113,10 @@ export default function App() {
               {/* System Settings - Available to all tenants */}
               <ProtectedRoute path="/admin/settings" component={AdminSettingsPage} />
               
-              {/* AWS Tenant Management - Only available on admin.edsteward.ai */}
-              {currentTenant === 'admin' && (
+              {/* AWS Tenant Management - DISABLED */}
+              {/* {currentTenant === 'admin' && (
                 <ProtectedRoute path="/admin/aws-tenant-management" component={AWSTenantsManagementPage} />
-              )}
+              )} */}
               
               <ProtectedRoute path="/admin/logs" component={LogsPage} />
               <ProtectedRoute path="/admin/debug" component={DebugToolsPage} />
