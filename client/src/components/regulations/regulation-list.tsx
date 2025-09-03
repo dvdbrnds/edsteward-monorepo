@@ -90,7 +90,7 @@ function calculateComplianceStatus(regulation: Regulation): {
 
 export default function RegulationList({ categoryFilter, jurisdictionFilter, appliesToFilter, deadlines = [] }: RegulationListProps) {
   const [search, setSearch] = useState("");
-  const [sortConfig, setSortConfig] = useState<SortConfig>(null);
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'lastUpdated', direction: 'desc' });
   const [_, navigate] = useLocation();
   const { toast } = useToast();
 
@@ -179,6 +179,14 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
     if (!aValue && !bValue) return 0;
     if (!aValue) return 1;
     if (!bValue) return -1;
+
+    // Handle date sorting for lastUpdated field
+    if (sortConfig.key === 'lastUpdated') {
+      const aTime = new Date(aValue as string).getTime();
+      const bTime = new Date(bValue as string).getTime();
+      const comparison = aTime - bTime;
+      return sortConfig.direction === 'asc' ? comparison : -comparison;
+    }
 
     const comparison = String(aValue).localeCompare(String(bValue));
     return sortConfig.direction === 'asc' ? comparison : -comparison;
@@ -322,6 +330,12 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
                 </TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Next Deadline</TableHead>
+                <TableHead className="cursor-pointer" onClick={() => handleSort('lastUpdated')}>
+                  <div className="flex items-center gap-2">
+                    Last Updated
+                    <ArrowUpDown className="h-4 w-4" />
+                  </div>
+                </TableHead>
                 <TableHead className="cursor-pointer" onClick={() => handleSort('jurisdictionSource')}>
                   <div className="flex items-center gap-2">
                     Jurisdiction
@@ -416,6 +430,15 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
                         </div>
                       ) : (
                         <span className="text-gray-500">No deadlines</span>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      {regulation.lastUpdated ? (
+                        <div className="text-sm text-blue-700">
+                          {format(new Date(regulation.lastUpdated), "PP")}
+                        </div>
+                      ) : (
+                        <span className="text-gray-500">Not updated</span>
                       )}
                     </TableCell>
                     <TableCell>
