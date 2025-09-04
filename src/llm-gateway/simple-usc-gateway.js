@@ -1782,6 +1782,17 @@ app.get('/api/llm/versioning/system-info', async (req, res) => {
   }
 });
 
+// Health endpoint with redirect for compatibility
+app.get('/health', (req, res) => {
+  res.json({
+    service: 'Simple USC Gateway',
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    memory: process.memoryUsage()
+  });
+});
+
 // Health check
 app.get('/api/llm/health', (req, res) => {
   res.json({
