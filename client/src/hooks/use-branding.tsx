@@ -55,8 +55,25 @@ export function useBranding(): BrandingConfig {
         // Use public endpoint for all users - it works for both authenticated and unauthenticated
         const response = await apiRequest("GET", "/api/branding");
         console.log('🎨 Fetched branding config successfully:', response.branding);
-        console.log('🔵 Hero color in fetched data:', response.branding?.loginScreenHeroColor || 'NOT FOUND');
-        return response.branding;
+        
+        // Map API response to expected format
+        const apiData = response.branding;
+        const mappedBranding: BrandingConfig = {
+          institutionName: apiData.institutionName || apiData.title || DEFAULT_BRANDING.institutionName,
+          title: apiData.title || DEFAULT_BRANDING.title,
+          logoUrl: apiData.logoUrl || DEFAULT_BRANDING.logoUrl,
+          faviconUrl: apiData.faviconUrl || DEFAULT_BRANDING.faviconUrl,
+          primaryColor: apiData.primaryColor || DEFAULT_BRANDING.primaryColor,
+          secondaryColor: apiData.secondaryColor || DEFAULT_BRANDING.secondaryColor,
+          accentColor: apiData.accentColor || DEFAULT_BRANDING.accentColor,
+          loginScreenBackgroundColor: apiData.loginScreenBackgroundColor || DEFAULT_BRANDING.loginScreenBackgroundColor,
+          loginScreenAccentColor: apiData.loginScreenAccentColor || DEFAULT_BRANDING.loginScreenAccentColor,
+          loginScreenTextColor: apiData.loginScreenTextColor || DEFAULT_BRANDING.loginScreenTextColor,
+          loginScreenHeroColor: apiData.heroColor || apiData.loginScreenHeroColor || DEFAULT_BRANDING.loginScreenHeroColor,
+        };
+        
+        console.log('🔵 Hero color in fetched data:', mappedBranding.loginScreenHeroColor);
+        return mappedBranding;
       } catch (error) {
         console.warn("⚠️ Failed to fetch branding configuration, using defaults:", error);
         console.log('🔴 Using default hero color:', DEFAULT_BRANDING.loginScreenHeroColor);
