@@ -43,6 +43,12 @@ const mcpEngineUpdateSchema = z.object({
       text: z.string(),
       lastUpdated: z.string()
     }).optional(),
+    requirements: z.object({
+      generated: z.boolean(),
+      llmModel: z.string().optional(),
+      generatedAt: z.string(),
+      content: z.string()
+    }).optional(),
     cfrGuidance: z.object({
       title: z.string(),
       sections: z.array(z.any()),
@@ -93,15 +99,15 @@ const tufUpdateSchema = z.object({
  * @param mcpId Sequential ID from MCP Engine (1-354)
  * @returns Actual EdSteward regulation ID or null if invalid
  */
-function mapMCPIdToEdStewardId(mcpId: number): number | null {
-  // MCP Engine uses sequential IDs 1-354
-  // EdSteward uses IDs 4459-4852 (354 regulations total)
-  if (mcpId < 1 || mcpId > 354) {
+function validateRegulationId(regulationId: number): number | null {
+  // EdSteward now uses Master Key Field system: sequential IDs 1-354
+  // No mapping needed - use regulation IDs directly
+  if (regulationId < 1 || regulationId > 354) {
     return null;
   }
   
-  // Convert: MCP ID 1 → EdSteward ID 4459, MCP ID 2 → EdSteward ID 4460, etc.
-  return 4459 + (mcpId - 1);
+  // Return the regulation ID as-is (no conversion needed)
+  return regulationId;
 }
 
 /**
@@ -156,23 +162,23 @@ export function setupRegulationUpdatesApi(app: Express) {
           console.log('✅ Detected simple format');
           const rawData = simpleValidation.data;
           
-          // Map MCP Engine sequential ID to actual EdSteward ID
-          const mappedRegulationId = mapMCPIdToEdStewardId(rawData.regulationId);
-          
-          if (mappedRegulationId === null) {
-            console.error(`❌ Invalid MCP regulation ID: ${rawData.regulationId}. Must be between 1-354.`);
-            return res.status(400).json({ 
-              success: false,
-              error: `Invalid regulation ID: ${rawData.regulationId}. Use IDs 1-354 for MCP Engine integration.` 
-            });
-          }
-          
-          console.log(`🔄 Mapped MCP ID ${rawData.regulationId} → EdSteward ID ${mappedRegulationId}`);
-          
-          updateData = {
-            ...rawData,
-            regulationId: mappedRegulationId
-          };
+                      // Validate regulation ID (Master Key Field system: 1-354)
+            const validRegulationId = validateRegulationId(rawData.regulationId);
+            
+            if (validRegulationId === null) {
+              console.error(`❌ Invalid regulation ID: ${rawData.regulationId}. Must be between 1-354.`);
+              return res.status(400).json({ 
+                success: false,
+                error: `Invalid regulation ID: ${rawData.regulationId}. Use IDs 1-354 for Master Key Field system.` 
+              });
+            }
+            
+            console.log(`✅ Using Master Key Field ID ${validRegulationId} directly`);
+            
+            updateData = {
+              ...rawData,
+              regulationId: validRegulationId
+            };
         } else {
           // Try to parse as MCP Engine complex format
           const mcpValidation = mcpEngineUpdateSchema.safeParse(req.body);
@@ -181,27 +187,34 @@ export function setupRegulationUpdatesApi(app: Express) {
             console.log('✅ Detected MCP Engine complex format');
             const mcpData = mcpValidation.data;
             
-            // Map MCP Engine sequential ID to actual EdSteward ID
-            const mappedRegulationId = mapMCPIdToEdStewardId(mcpData.regulationId);
+            // Validate regulation ID (Master Key Field system: 1-354)
+            const validRegulationId = validateRegulationId(mcpData.regulationId);
             
-            if (mappedRegulationId === null) {
-              console.error(`❌ Invalid MCP regulation ID: ${mcpData.regulationId}. Must be between 1-354.`);
+            if (validRegulationId === null) {
+              console.error(`❌ Invalid regulation ID: ${mcpData.regulationId}. Must be between 1-354.`);
               return res.status(400).json({ 
                 success: false,
-                error: `Invalid regulation ID: ${mcpData.regulationId}. Use IDs 1-354 for MCP Engine integration.` 
+                error: `Invalid regulation ID: ${mcpData.regulationId}. Use IDs 1-354 for Master Key Field system.` 
               });
             }
             
-            console.log(`🔄 Mapped MCP ID ${mcpData.regulationId} → EdSteward ID ${mappedRegulationId}`);
+            console.log(`✅ Using Master Key Field ID ${validRegulationId} directly`);
             
             // Convert MCP Engine format to EdSteward format
             updateData = {
-              regulationId: mappedRegulationId,
+              regulationId: validRegulationId,
               name: mcpData.name,
               status: mcpData.status,
               originalContent: mcpData.content?.uscText?.text || "Original content from MCP Engine",
-              updatedContent: JSON.stringify(mcpData.content, null, 2) || "Updated content from MCP Engine"
+              updatedContent: mcpData.content?.uscText?.text || "Updated content from MCP Engine",
+              requirements: mcpData.content?.requirements?.content || null
             };
+            
+            console.log('🔍 Debug updateData object:');
+            console.log('   regulationId:', updateData.regulationId);
+            console.log('   name:', updateData.name);
+            console.log('   updatedContent length:', updateData.updatedContent?.length);
+            console.log('   requirements:', updateData.requirements ? `HAS_CONTENT (${updateData.requirements.length} chars)` : 'NULL');
           } else {
             console.error('❌ Validation failed for all formats');
             console.error('TUF format errors:', tufValidation.error.issues);

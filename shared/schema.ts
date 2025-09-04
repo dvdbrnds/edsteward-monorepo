@@ -57,10 +57,14 @@ export interface RegulationAction {
 
 // MCP Validation Levels
 export enum ValidationLevel {
-  A = "A", // Basic structural validation
-  B = "B", // Content-level validation
-  C = "C", // Business rules validation
-  D = "D"  // Contextual/cross-reference validation
+  // Basic structural validation
+  A = "A",
+  // Content-level validation  
+  B = "B",
+  // Business rules validation
+  C = "C",
+  // Contextual/cross-reference validation
+  D = "D"
 }
 
 // MCP Integration Types
@@ -491,6 +495,7 @@ export const regulationUpdates = pgTable("regulation_updates", {
   name: text("name").notNull(),
   originalContent: text("original_content").notNull(),
   updatedContent: text("updated_content").notNull(),
+  requirements: text("requirements"), // New field for AI-generated requirements
   status: text("status").notNull().default("pending"),
   updateDate: timestamp("update_date").notNull().defaultNow(),
   signature: text("signature"),
@@ -504,6 +509,7 @@ export const insertRegulationUpdateSchema = createInsertSchema(regulationUpdates
   status: z.enum(["pending", "accepted", "rejected", "deferred"]).default("pending"),
   signature: z.string().optional(),
   rejectionReason: z.string().optional(),
+  requirements: z.string().optional().nullable(),
 });
 
 // Types for regulation updates

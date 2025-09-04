@@ -78,43 +78,43 @@ const sessionPool = new Pool({
  
 export interface IStorage {
   // User methods - now tenant-aware
-  getUser(id: number, tenantId?: string): Promise<User | undefined>;
-  getUserByUsername(username: string, tenantId?: string): Promise<User | undefined>;
-  getUserByEmail(email: string, tenantId?: string): Promise<User | undefined>;
-  getUserByExternalId(externalId: string, tenantId?: string): Promise<User | undefined>;
-  createUser(user: InsertUser, tenantId?: string): Promise<User>;
-  getAllUsers(tenantId?: string): Promise<User[]>;
-  updateUser(id: number, user: Partial<InsertUser>, tenantId?: string): Promise<User>;
-  deleteUser(id: number, tenantId?: string): Promise<void>;
+  getUser(_id: number, _tenantId?: string): Promise<User | undefined>;
+  getUserByUsername(_username: string, _tenantId?: string): Promise<User | undefined>;
+  getUserByEmail(_email: string, _tenantId?: string): Promise<User | undefined>;
+  getUserByExternalId(_externalId: string, _tenantId?: string): Promise<User | undefined>;
+  createUser(_user: InsertUser, _tenantId?: string): Promise<User>;
+  getAllUsers(_tenantId?: string): Promise<User[]>;
+  updateUser(_id: number, _user: Partial<InsertUser>, _tenantId?: string): Promise<User>;
+  deleteUser(_id: number, _tenantId?: string): Promise<void>;
 
   // Regulation methods
   getRegulations(): Promise<Regulation[]>;
-  getRegulation(id: number): Promise<Regulation | undefined>;
-  getRegulationById(regulationId: string): Promise<Regulation | null>;
-  createRegulation(regulation: InsertRegulation): Promise<Regulation>;
-  updateRegulation(id: number, regulation: Partial<InsertRegulation>): Promise<Regulation>;
-  setRegulationApplicability(id: number, isApplicable: boolean): Promise<Regulation>;
-  getRegulationsByJurisdiction(jurisdiction: string): Promise<Regulation[]>; // Legacy method
-  getRegulationsByJurisdictionSource(jurisdictionSource: string): Promise<Regulation[]>;
-  getRegulationsByInstitutionType(institutionType: string): Promise<Regulation[]>;
-  searchRegulations(searchTerm: string): Promise<Regulation[]>;
-  deleteRegulation(id: number): Promise<void>;
+  getRegulation(_id: number): Promise<Regulation | undefined>;
+  getRegulationById(_regulationId: string): Promise<Regulation | null>;
+  createRegulation(_regulation: InsertRegulation): Promise<Regulation>;
+  updateRegulation(_id: number, _regulation: Partial<InsertRegulation>): Promise<Regulation>;
+  setRegulationApplicability(_id: number, _isApplicable: boolean): Promise<Regulation>;
+  getRegulationsByJurisdiction(_jurisdiction: string): Promise<Regulation[]>; // Legacy method
+  getRegulationsByJurisdictionSource(_jurisdictionSource: string): Promise<Regulation[]>;
+  getRegulationsByInstitutionType(_institutionType: string): Promise<Regulation[]>;
+  searchRegulations(_searchTerm: string): Promise<Regulation[]>;
+  deleteRegulation(_id: number): Promise<void>;
 
   // Regulation Update methods
   getPendingRegulationUpdates(): Promise<RegulationUpdate[]>;
-  getRegulationUpdateById(id: number): Promise<RegulationUpdate | null>;
-  createRegulationUpdate(data: InsertRegulationUpdate): Promise<RegulationUpdate>;
-  acceptRegulationUpdate(id: number, userId: number, signature: string): Promise<void>;
-  rejectRegulationUpdate(id: number, userId: number, signature: string, reason: string): Promise<void>;
-  deferRegulationUpdate(id: number, userId: number, signature: string): Promise<void>;
-  bulkDeleteRegulationUpdates(ids: number[]): Promise<void>;
+  getRegulationUpdateById(_id: number): Promise<RegulationUpdate | null>;
+  createRegulationUpdate(_data: InsertRegulationUpdate): Promise<RegulationUpdate>;
+  acceptRegulationUpdate(_id: number, _userId: number, _signature: string): Promise<void>;
+  rejectRegulationUpdate(_id: number, _userId: number, _signature: string, _reason: string): Promise<void>;
+  deferRegulationUpdate(_id: number, _userId: number, _signature: string): Promise<void>;
+  bulkDeleteRegulationUpdates(_ids: number[]): Promise<void>;
 
   // MCP Regulation Version methods
-  getRegulationVersions(regulationId: number): Promise<RegulationVersion[]>;
-  getRegulationVersion(id: number): Promise<RegulationVersion | null>;
-  createRegulationVersion(version: InsertRegulationVersion): Promise<RegulationVersion>;
-  getLatestRegulationVersion(regulationId: number): Promise<RegulationVersion | null>;
-  compareRegulationVersions(versionIdA: number, versionIdB: number): Promise<{
+  getRegulationVersions(_regulationId: number): Promise<RegulationVersion[]>;
+  getRegulationVersion(_id: number): Promise<RegulationVersion | null>;
+  createRegulationVersion(_version: InsertRegulationVersion): Promise<RegulationVersion>;
+  getLatestRegulationVersion(_regulationId: number): Promise<RegulationVersion | null>;
+  compareRegulationVersions(_versionIdA: number, _versionIdB: number): Promise<{
     changes: Array<{
       field: string;
       valueA: string;
@@ -195,7 +195,7 @@ export interface IStorage {
 
   // Branding configuration methods
   getBrandingConfig(): Promise<{ [key: string]: unknown }>;
-  saveBrandingConfig(config: { [key: string]: unknown }): Promise<{ [key: string]: unknown }>;
+  saveBrandingConfig(_config: { [key: string]: unknown }): Promise<{ [key: string]: unknown }>;
 }
  
 
@@ -264,12 +264,33 @@ export class DatabaseStorage implements IStorage {
       }
 
       // 2. Update the regulation with the new content
-      // Use parameterized query
+      // Handle both regulation_text and requirements fields separately
+      const updateFields = [];
+      const updateValues = [];
+      let paramIndex = 1;
+
+      // Always update regulation_text with the full text
+      updateFields.push(`regulation_text = $${paramIndex++}`);
+      updateValues.push(update.updatedContent);
+
+      // Update requirements field if provided
+      if (update.requirements) {
+        updateFields.push(`requirements = $${paramIndex++}`);
+        updateValues.push(update.requirements);
+      }
+
+      // Always update last_updated timestamp
+      updateFields.push(`last_updated = $${paramIndex++}`);
+      updateValues.push(new Date());
+
+      // Add the regulation ID for WHERE clause
+      updateValues.push(update.regulationId);
+
       await pool.query(
         `UPDATE regulations 
-         SET requirements = $1, last_updated = $2 
-         WHERE id = $3`,
-        [update.updatedContent, new Date(), update.regulationId]
+         SET ${updateFields.join(', ')} 
+         WHERE id = $${paramIndex}`,
+        updateValues
       );
 
       // 3. Mark the update as accepted
@@ -491,7 +512,7 @@ export class DatabaseStorage implements IStorage {
         );
 
         // Remove the requirements field from the update object
-        const { requirements: _requirements, ...otherFields } = regulation;
+        const { requirements, ...otherFields } = regulation;
 
         // If there are other fields to update, do that separately
         if (Object.keys(otherFields).length > 0) {
