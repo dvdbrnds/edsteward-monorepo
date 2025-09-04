@@ -5,13 +5,13 @@
  * and process regulatory data from various sources.
  */
 
-const axios = require('axios');
+import axios from 'axios';
 
 // Configuration for LLM API calls
 const LLM_CONFIG = {
-  apiEndpoint: process.env.LLM_API_ENDPOINT || 'https://api.openai.com/v1/chat/completions',
+  apiEndpoint: process.env.LLM_API_ENDPOINT || 'https://api.anthropic.com/v1/messages',
   apiKey: process.env.LLM_API_KEY,
-  defaultModel: process.env.LLM_DEFAULT_MODEL || 'gpt-4o',
+  defaultModel: process.env.LLM_DEFAULT_MODEL || 'claude-3-5-sonnet-20241022',
   defaultTemperature: 0.1, // Low temperature for more deterministic responses
   requestTimeout: 60000, // 60 seconds
 };
@@ -28,48 +28,43 @@ async function callLLM(prompt, options = {}) {
     temperature = LLM_CONFIG.defaultTemperature,
     model = LLM_CONFIG.defaultModel,
     responseFormat = null,
+    apiKey = LLM_CONFIG.apiKey,
+    systemMessage = null,
+    maxTokens = 4000
   } = options;
 
-  if (!LLM_CONFIG.apiKey) {
-    throw new Error('LLM API key not configured. Set LLM_API_KEY environment variable.');
+  if (!apiKey) {
+    throw new Error('LLM API key not configured. Set LLM_API_KEY environment variable or provide apiKey in options.');
   }
 
   try {
-    const messages = [
-      {
-        role: 'system',
-        content: 'You are a regulatory compliance expert assistant specialized in analyzing, structuring, and extracting information from regulatory documents. Always provide output in the exact format requested.'
-      },
-      {
-        role: 'user',
-        content: prompt
-      }
-    ];
-
     const requestBody = {
       model,
-      messages,
+      max_tokens: maxTokens,
       temperature,
+      system: systemMessage || 'You are a regulatory compliance expert assistant specialized in analyzing, structuring, and extracting information from regulatory documents. Always provide output in the exact format requested.',
+      messages: [
+        {
+          role: 'user',
+          content: prompt
+        }
+      ]
     };
-
-    // Add response format if specified
-    if (responseFormat) {
-      requestBody.response_format = responseFormat;
-    }
 
     const response = await axios.post(
       LLM_CONFIG.apiEndpoint,
       requestBody,
       {
         headers: {
-          'Authorization': `Bearer ${LLM_CONFIG.apiKey}`,
-          'Content-Type': 'application/json'
+          'x-api-key': apiKey,
+          'Content-Type': 'application/json',
+          'anthropic-version': '2023-06-01'
         },
         timeout: LLM_CONFIG.requestTimeout
       }
     );
 
-    return response.data.choices[0].message.content;
+    return response.data.content[0].text;
   } catch (error) {
     console.error('LLM API call failed:', error.message);
     if (error.response) {
@@ -344,7 +339,7 @@ ${regulationText.substring(0, 8000)} ${regulationText.length > 8000 ? '[text tru
   }
 }
 
-module.exports = {
+export {
   extractRequirements,
   summarizeRegulation,
   detectRegulationChanges,

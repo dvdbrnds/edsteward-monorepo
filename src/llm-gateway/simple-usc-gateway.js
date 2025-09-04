@@ -8,12 +8,26 @@
 import express from 'express';
 import cors from 'cors';
 import GovernmentSourceFetcher from './government-source-fetcher.js';
+import { EnhancedSummaryIntegration } from '../services/enhanced-summary-integration.js';
+import { RequirementsGenerationService } from '../services/requirements-generation-service.js';
 
 const app = express();
 const PORT = 3002;
 
 // EdSteward integration configuration
 const EDSTEWARD_URL = process.env.EDSTEWARD_URL || 'http://localhost:3000';
+
+// Initialize Enhanced Summary Integration
+const enhancedSummaryIntegration = new EnhancedSummaryIntegration({
+  enableEdStewardDelivery: true,
+  enableConsistencyChecking: true,
+  enableBatchProcessing: true
+});
+
+// Initialize Requirements Generation Service
+const requirementsService = new RequirementsGenerationService({
+  logger: console
+});
 
 /**
  * Fetch summary from EdSteward if available
@@ -1062,21 +1076,35 @@ Violations of this part may result in civil penalties as provided by law, includ
     // Generate LLM-powered summary for ALL regulations if not already set
     if (!summary) {
       try {
-        // Use LLM to generate intelligent summary from the regulation content
-        const summaryPrompt = `Based on this regulation content, create a concise 1-2 sentence summary that explains what this regulation does in plain English for business users:
-
-Regulation: ${regulationTitle}
-Content: ${fullText.substring(0, 1000)}...
-
-Summary should be practical and focus on what organizations need to know. Avoid legal jargon.`;
-
-        // Generate customer-focused summary that explains what the regulation means for organizations
-        summary = generateCustomerFocusedSummary(regulationSlug, regulationTitle, fullText);
+        console.log(`🚀 Using Enhanced Summary Integration for ${regulationSlug}...`);
         
-        console.log(`📝 Generated intelligent summary for ${regulationSlug}: ${summary.substring(0, 100)}...`);
+        // Use the new Enhanced Summary Integration service
+        const enhancedResponse = await enhancedSummaryIntegration.enhanceRegulationForGateway(
+          regulationSlug,
+          regulationTitle,
+          fullText
+        );
+        
+        if (enhancedResponse.success && enhancedResponse.data.summary) {
+          summary = enhancedResponse.data.summary;
+          console.log(`✅ Generated enhanced summary for ${regulationSlug}: ${summary.substring(0, 100)}...`);
+          
+          // Use enhanced data if available
+          if (enhancedResponse.data.keyRequirements) {
+            // Store enhanced data for potential use in response
+            enhancedSummary = summary;
+            citations = enhancedResponse.data.citations || [];
+          }
+        } else {
+          throw new Error('Enhanced summary generation failed');
+        }
+        
       } catch (error) {
-        console.error(`❌ Failed to generate summary for ${regulationSlug}:`, error);
-        summary = `Federal regulation governing ${regulationSlug.replace(/-/g, ' ')}.`;
+        console.error(`❌ Enhanced summary failed for ${regulationSlug}, falling back to basic:`, error);
+        
+        // Fallback to basic customer-focused summary
+        summary = generateCustomerFocusedSummary(regulationSlug, regulationTitle, fullText);
+        console.log(`📝 Generated fallback summary for ${regulationSlug}: ${summary.substring(0, 100)}...`);
       }
     }
 
@@ -2325,6 +2353,95 @@ app.get('/api/llm/versioning/system-info', async (req, res) => {
       success: false, 
       error: 'Failed to fetch system info',
       details: error.message 
+    });
+  }
+});
+
+// NEW: Enhanced regulation endpoint with both summaries AND requirements
+app.get('/api/llm/enhanced/:regulationSlug', async (req, res) => {
+  const { regulationSlug } = req.params;
+  
+  try {
+    console.log(`🎯 [ENHANCED] Fetching enhanced data for: ${regulationSlug}`);
+    
+    // Get the base regulation data based on slug
+    let baseData;
+    let regulationTitle;
+    let regulationText;
+    
+    if (regulationSlug === 'teach-act') {
+      const response = await fetch('http://localhost:3002/api/llm/cfr/teach-act');
+      const data = await response.json();
+      baseData = data.data;
+      regulationTitle = 'Technology, Education and Copyright Harmonization Act (TEACH Act) of 2002';
+      regulationText = baseData.fullText;
+    } else if (regulationSlug === 'ferpa') {
+      regulationTitle = 'Family Educational Rights and Privacy Act (FERPA)';
+      regulationText = `Family Educational Rights and Privacy Act (FERPA) - 20 U.S.C. § 1232g
+No funds shall be made available under any applicable program to any educational agency or institution which has a policy or practice of permitting the release of education records of students without the written consent of their parents...`;
+      baseData = { title: regulationTitle, fullText: regulationText };
+    } else if (regulationSlug === 'title-ix') {
+      regulationTitle = 'Title IX - Education Amendments of 1972';
+      regulationText = `Title IX of the Education Amendments of 1972 - 20 U.S.C. § 1681
+No person in the United States shall, on the basis of sex, be excluded from participation in, be denied the benefits of, or be subjected to discrimination under any education program or activity receiving Federal financial assistance...`;
+      baseData = { title: regulationTitle, fullText: regulationText };
+    } else if (regulationSlug === 'ada') {
+      regulationTitle = 'Americans with Disabilities Act (ADA) - Title II';
+      regulationText = `Americans with Disabilities Act (ADA) - Title II - 42 U.S.C. § 12132
+No qualified individual with a disability shall, by reason of such disability, be excluded from participation in or be denied the benefits of the services, programs, or activities of a public entity...`;
+      baseData = { title: regulationTitle, fullText: regulationText };
+    } else {
+      return res.status(404).json({
+        success: false,
+        error: 'Regulation not found',
+        availableRegulations: ['teach-act', 'ferpa', 'title-ix', 'ada']
+      });
+    }
+    
+    // Generate enhanced summary
+    console.log(`🤖 [ENHANCED] Generating enhanced summary for ${regulationSlug}...`);
+    const enhancedResult = await enhancedSummaryIntegration.enhanceRegulationForGateway(
+      regulationSlug,
+      regulationTitle,
+      regulationText
+    );
+    
+    // Generate structured requirements
+    console.log(`📋 [ENHANCED] Generating structured requirements for ${regulationSlug}...`);
+    const requirementsResult = await requirementsService.generateComplianceRequirements(
+      regulationSlug,
+      regulationTitle,
+      regulationText
+    );
+    
+    // Combine everything
+    const enhancedData = {
+      ...baseData,
+      enhancedSummary: enhancedResult.summary,
+      enhancedSummaryMetadata: enhancedResult.metadata,
+      structuredRequirements: requirementsResult.requirements,
+      requirementsMetadata: requirementsResult.metadata,
+      masterKeyFields: {
+        summaryApiKey: 'first-api-key-used',
+        requirementsApiKey: 'second-api-key-used',
+        generatedAt: new Date().toISOString(),
+        qualityScore: requirementsResult.metadata.qualityScore
+      }
+    };
+    
+    console.log(`✅ [ENHANCED] Enhanced data generated for ${regulationSlug}`);
+    
+    res.json({
+      success: true,
+      data: enhancedData
+    });
+    
+  } catch (error) {
+    console.error(`❌ [ENHANCED] Error generating enhanced data for ${regulationSlug}:`, error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to generate enhanced regulation data',
+      details: error.message
     });
   }
 });

@@ -1,6 +1,6 @@
 # Byterover Handbook
 
-*Generated: December 28, 2024 | Updated: January 2, 2025*
+*Generated: December 28, 2024*
 
 ## Layer 1: System Overview
 
@@ -35,8 +35,6 @@
 
 **Core Modules**:
 - **LLM Gateway** (`src/llm-gateway/`): Express.js API server with intelligent routing, multiple implementations (refactored, phase4, simple)
-- **LLM Text Enhancement** (`src/regulatory-sources/llm-processing.js`): Advanced LLM processing for regulation summarization, requirements extraction, and change detection
-- **Customer-Focused Summaries** (`src/llm-gateway/simple-usc-gateway.js`): Intelligent summary generation with EdSteward integration and practical business explanations
 - **Service Layer** (`src/shared/services/`): Business logic services (ComplianceService, LLMService) with dependency injection
 - **Repository Layer** (`src/shared/repositories/`): Data access abstraction (RegulationRepository, MemoryCacheRepository)
 - **Client Application** (`src/client/`): Modern React application with Vite, routing, and styled components
@@ -78,11 +76,9 @@ LLM Gateway (Port 3002):
 - GET /api/llm/health - Health check with service status
 - POST /api/llm/query - Compliance query processing
 - GET /api/llm/compliance/{regulation-slug} - Specific regulation compliance data
-- GET /api/llm/cfr/{regulation-slug} - CFR content with enhanced summaries
 - GET /api/llm/usc/{title}/{section} - USC content retrieval
 - GET /api/llm/regulations - List all regulations
 - POST /api/llm/regulations - Create regulation
-- POST /api/llm/summary - Generate compliance summary with LLM
 - GET /api/llm/metrics - Prometheus metrics
 
 Registry API (Port 3010):
@@ -158,45 +154,11 @@ Delivery System (Port 3051):
 - **Monitoring Plugins**: Custom metrics and alerting in observability layer
 
 **Recent Changes**:
-- **Customer-Focused Regulation Summaries**: Implemented intelligent LLM-powered summaries with practical business explanations (January 2025)
-- **Enhanced Text Processing**: Added comprehensive LLM processing for requirements extraction, change detection, and regulation classification
-- **EdSteward Summary Integration**: Dual-source summaries with attribution (EdSteward vs MCP Engine generated)
 - **Friday Beta Deployment**: System verified ready for Moravian University deployment
 - **295 Federal Regulations**: Complete coverage of federal compliance requirements
 - **EdSteward Integration**: Real-time WebSocket updates to customer AWS systems
 - **Database Migration**: Transition from CSV to PostgreSQL (postponed to post-beta)
 - **LLM Gateway Consolidation**: Multiple implementations available for different use cases
-
----
-
-## LLM Text Enhancement System
-
-**Overview**: Advanced LLM-powered text processing system that transforms complex legal regulation text into comprehensive, readable summaries and structured data for compliance professionals.
-
-**Key Features**:
-- **Customer-Focused Summaries**: Practical business explanations that explain what organizations must DO vs just legal text
-- **Dual-Source Attribution**: Summaries sourced from EdSteward customer database or MCP Engine generation with clear attribution
-- **Structured Requirements Extraction**: JSON-formatted compliance requirements with criticality ratings
-- **Change Detection**: Intelligent comparison of regulation versions with impact analysis
-- **Regulation Classification**: Automated categorization by topic, industry, risk level, and implementation complexity
-
-**Implementation**:
-- **Primary Module**: `src/regulatory-sources/llm-processing.js` - Core LLM processing functions
-- **Summary Generation**: `generateCustomerFocusedSummary()` in `src/llm-gateway/simple-usc-gateway.js`
-- **API Integration**: OpenAI GPT-4 with structured JSON responses and error handling
-- **Console Integration**: Enhanced regulation consoles display summaries with source attribution
-
-**Example Enhanced Summary**:
-```
-Original: "Permits an instructor to display virtually all types of works during on-line instruction..."
-Enhanced: "Your educational institution can use copyrighted materials in online classes without permission, provided you limit access to enrolled students, prevent downloading, and implement copyright policies."
-```
-
-**Technical Configuration**:
-- **LLM Model**: GPT-4 (configurable via `LLM_DEFAULT_MODEL`)
-- **Temperature**: 0.1 for deterministic compliance responses
-- **Response Format**: Structured JSON for requirements extraction
-- **Fallback Strategy**: Template-based summaries if LLM unavailable
 
 ---
 
