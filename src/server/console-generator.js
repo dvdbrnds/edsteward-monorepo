@@ -196,90 +196,39 @@ export class ConsoleGenerator {
       // Replace USC 17/110 with the actual statute for this regulation
       const statuteInfo = this.parseStatuteReference(regulationData.STATUTE_REFERENCE, regulation);
       
-      if (statuteInfo.type === 'cfr') {
-        // For CFR-based regulations, replace USC endpoints with CFR endpoints
-        console.log(`🔧 Converting USC endpoints to CFR for ${regulationData.REGULATION_NAME}`);
-        html = html.replace(/api\/llm\/usc\/17\/110/g, `api/llm/cfr/${statuteInfo.title}/${statuteInfo.section}`);
-        
-        // Update the USC section title and content to reflect CFR
+      // FORCE ALL REGULATIONS TO USE CFR (not USC) - CFR is what institutions follow
+      console.log(`🔧 Converting ALL regulations to CFR for ${regulationData.REGULATION_NAME}`);
+      html = html.replace(/api\/llm\/usc\/17\/110/g, `api/llm/cfr/${regulationData.REGULATION_SLUG}`);
+      
+      // Update ALL content to reflect CFR (regardless of original statute type)
+      if (statuteInfo.type === 'cfr' && statuteInfo.title && statuteInfo.section) {
         html = html.replace(/USC 17 Section 110/g, `${statuteInfo.title} C.F.R. Part ${statuteInfo.section}`);
-        html = html.replace(/United States Code/g, 'Code of Federal Regulations');
-        html = html.replace(/USC Text/g, 'CFR Text');
-        html = html.replace(/loadRealUSCText/g, 'loadRealCFRText');
-        
-        // Replace USC data processing logic with CFR data processing logic
-        html = html.replace(
-          /const contentParagraphs = \(uscData\.fullText \|\| uscData\.content\)\.split\('\\n\\n'\)\.filter\(p => p\.trim\(\)\.length > 0\);/g,
-          'const cfrSections = uscData.sections || [];'
-        );
-        
-        // Replace USC paragraph processing with CFR section processing
-        html = html.replace(
-          /contentParagraphs\.forEach\(\(paragraph, index\) => \{[\s\S]*?\}\);/g,
-          `cfrSections.forEach(section => {
-            const sectionDiv = document.createElement('div');
-            sectionDiv.className = 'subsection';
-            sectionDiv.style.marginBottom = '20px';
-            sectionDiv.style.padding = '16px';
-            sectionDiv.style.border = '1px solid #e1e4e8';
-            sectionDiv.style.borderRadius = '6px';
-            
-            const title = document.createElement('strong');
-            title.textContent = \`\${section.section || ''} \${section.title}\`;
-            title.style.display = 'block';
-            title.style.marginBottom = '12px';
-            title.style.color = '#0969da';
-            title.style.fontSize = '16px';
-            
-            sectionDiv.appendChild(title);
-            
-            if (typeof section.content === 'string') {
-              const contentDiv = document.createElement('div');
-              contentDiv.style.lineHeight = '1.6';
-              contentDiv.style.color = '#24292f';
-              contentDiv.textContent = section.content;
-              sectionDiv.appendChild(contentDiv);
-            } else if (Array.isArray(section.content)) {
-              section.content.forEach(item => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'definition';
-                itemDiv.style.marginBottom = '12px';
-                
-                const itemTitle = document.createElement('strong');
-                itemTitle.textContent = \`\${item.provision}:\`;
-                
-                const itemDesc = document.createElement('span');
-                itemDesc.textContent = \` \${item.description}\`;
-                
-                itemDiv.appendChild(itemTitle);
-                itemDiv.appendChild(itemDesc);
-                
-                if (item.details) {
-                  const details = document.createElement('div');
-                  details.textContent = item.details;
-                  details.style.marginTop = '4px';
-                  details.style.fontSize = '13px';
-                  details.style.color = '#6e7681';
-                  itemDiv.appendChild(details);
-                }
-                
-                sectionDiv.appendChild(itemDiv);
-              });
-            }
-            
-            mainSection.appendChild(sectionDiv);
-          });`
-        );
-        
-      } else if (statuteInfo.title && statuteInfo.section) {
-        // For USC-based regulations, replace with correct USC reference
-        html = html.replace(/api\/llm\/usc\/17\/110/g, `api/llm/usc/${statuteInfo.title}/${statuteInfo.section}`);
-        html = html.replace(/USC 17 Section 110/g, `USC ${statuteInfo.title} Section ${statuteInfo.section}`);
+      } else {
+        // For USC-based regulations, convert to appropriate CFR title
+        const cfrTitle = this.getCFRTitleForRegulation(regulationData.REGULATION_SLUG);
+        html = html.replace(/USC 17 Section 110/g, `${cfrTitle} C.F.R. Implementation`);
       }
+      
+      html = html.replace(/United States Code/g, 'Code of Federal Regulations');
+      html = html.replace(/USC Text/g, 'CFR Text');
+      html = html.replace(/loadRealUSCText/g, 'loadRealCFRText');
       
       // Update CFR endpoints to be regulation-specific
       html = html.replace(/api\/llm\/cfr\/teach-act/g, `api/llm/cfr/${regulationData.REGULATION_SLUG}`);
       html = html.replace(/api\/llm\/compliance\/teach-act/g, `api/llm/compliance/${regulationData.REGULATION_SLUG}`);
+      
+      // CRITICAL: Inject VISIBLE government source URL into console
+      // Replace generic "Government sources" with specific agency source
+      html = html.replace(
+        /Government sources/g, 
+        `Government sources: API endpoint /api/llm/compliance/${regulationData.REGULATION_SLUG}`
+      );
+      
+      // Add government source info to the workflow log
+      html = html.replace(
+        /Workflow includes: Government sources, Differential analysis, University libraries/g,
+        `Workflow includes: Government sources (${regulationData.ENFORCEMENT_AGENCY}), Differential analysis, University libraries`
+      );
     }
     
     // Replace any remaining template placeholders
@@ -524,6 +473,31 @@ export class ConsoleGenerator {
       case 'research': return 'research institutions';
       case 'student-services': return 'educational institutions';
       default: return 'covered entities';
+    }
+  }
+
+  /**
+   * Get appropriate CFR title based on regulation type
+   */
+  getCFRTitleForRegulation(regulationSlug) {
+    const regulationName = regulationSlug.replace(/-/g, ' ').toLowerCase();
+    
+    if (regulationName.includes('credit') || regulationName.includes('financial') || regulationName.includes('banking')) {
+      return 'Title 12'; // Banking
+    } else if (regulationName.includes('tax') || regulationName.includes('irs') || regulationName.includes('revenue')) {
+      return 'Title 26'; // Internal Revenue
+    } else if (regulationName.includes('antitrust') || regulationName.includes('trade') || regulationName.includes('commerce') || regulationName.includes('clayton') || regulationName.includes('sherman')) {
+      return 'Title 16'; // Commercial Practices
+    } else if (regulationName.includes('security') || regulationName.includes('sox') || regulationName.includes('securities')) {
+      return 'Title 17'; // Commodity and Securities Exchanges
+    } else if (regulationName.includes('social') || regulationName.includes('disability') || regulationName.includes('welfare')) {
+      return 'Title 20'; // Social Security
+    } else if (regulationName.includes('education') || regulationName.includes('ferpa') || regulationName.includes('title-ix')) {
+      return 'Title 34'; // Education
+    } else if (regulationName.includes('health') || regulationName.includes('hipaa') || regulationName.includes('medical')) {
+      return 'Title 45'; // Public Welfare
+    } else {
+      return 'Title 29'; // Labor (default)
     }
   }
 
