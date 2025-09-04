@@ -433,7 +433,8 @@
                 
                 <div class="regulation-tabs">
                     <button class="tab-button active" onclick="showTab('regulation-text')">Regulation Text</button>
-                    <button class="tab-button" onclick="showTab('cfr-regs')">CFR Regulations</button>
+                    <button class="tab-button" onclick="showTab('summary')">Plain Summary</button>
+                    <button class="tab-button" onclick="showTab('cfr-regs')">CFR Text</button>
                     <button class="tab-button" onclick="showTab('analysis')">Analysis & Scope</button>
                     <button class="tab-button" onclick="showTab('compliance')">Compliance Guide</button>
                     <button class="tab-button" onclick="showTab('staging')">Update Staging</button>
@@ -451,6 +452,26 @@
                                 <h4>{{REGULATION_NAME}} - Full Legal Text</h4>
                                 <div class="legal-text" id="regulation-legal-text">
                                     <!-- Dynamic regulation content will be loaded here -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="summary" class="tab-content">
+                        <div class="regulation-section">
+                            <div id="summary-loading" class="loading-state">
+                                <div class="loading-spinner"></div>
+                                <p>📋 Loading Plain Text Summary...</p>
+                            </div>
+                            <div id="summary-content" style="display: none;">
+                                <h4>Plain Text Summary - {{REGULATION_NAME}}</h4>
+                                <div class="summary-box" style="background: #f0f9ff; border: 1px solid #0ea5e9; border-radius: 8px; padding: 20px; margin: 16px 0;">
+                                    <div class="summary-text" id="regulation-summary" style="font-size: 16px; line-height: 1.6; color: #0c4a6e;">
+                                        <!-- Dynamic summary content will be loaded here -->
+                                    </div>
+                                </div>
+                                <div style="margin-top: 16px; padding: 12px; background: #fef3c7; border-radius: 6px; font-size: 14px; color: #92400e;">
+                                    <strong>💡 EdSteward Integration:</strong> This summary is designed for customer-facing displays and automated compliance communications.
                                 </div>
                             </div>
                         </div>
@@ -677,6 +698,9 @@
                 case 'regulation-text':
                     await loadRegulationText();
                     break;
+                case 'summary':
+                    await loadSummary();
+                    break;
                 case 'cfr-regs':
                     await loadCFRRegulations();
                     break;
@@ -762,6 +786,50 @@
                 
             } catch (error) {
                 addConsoleLog(`❌ Failed to load CFR regulations: ${error.message}`, 'error');
+            }
+        }
+
+        // Load plain text summary
+        async function loadSummary() {
+            const loading = document.getElementById('summary-loading');
+            const content = document.getElementById('summary-content');
+            const summaryElement = document.getElementById('regulation-summary');
+            
+            try {
+                loading.style.display = 'block';
+                content.style.display = 'none';
+                
+                addConsoleLog(`📋 Fetching plain text summary for ${regulationData.name}...`, 'info');
+                
+                // Fetch summary from CFR API
+                const response = await fetch(`/api/llm/cfr/${regulationData.id}`);
+                const data = await response.json();
+                
+                if (data.success && data.data.summary) {
+                    summaryElement.innerHTML = `
+                        <p style="font-weight: 500; margin-bottom: 12px;">📋 ${regulationData.name}</p>
+                        <p>${data.data.summary}</p>
+                    `;
+                    addConsoleLog(`✅ Summary loaded successfully`, 'success');
+                } else {
+                    summaryElement.innerHTML = `
+                        <p style="color: #dc2626;">❌ Summary not available</p>
+                        <p style="font-size: 14px; color: #6b7280;">This regulation may not have a plain text summary configured yet.</p>
+                    `;
+                    addConsoleLog(`⚠️ No summary available for ${regulationData.name}`, 'warning');
+                }
+                
+                loading.style.display = 'none';
+                content.style.display = 'block';
+                
+            } catch (error) {
+                summaryElement.innerHTML = `
+                    <p style="color: #dc2626;">❌ Failed to load summary</p>
+                    <p style="font-size: 14px; color: #6b7280;">Error: ${error.message}</p>
+                `;
+                loading.style.display = 'none';
+                content.style.display = 'block';
+                addConsoleLog(`❌ Failed to load summary: ${error.message}`, 'error');
             }
         }
 

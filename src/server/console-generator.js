@@ -236,6 +236,9 @@ export class ConsoleGenerator {
       const regex = new RegExp(`{{${key}}}`, 'g');
       html = html.replace(regex, value);
     });
+    
+    // Ensure REGULATION_SLUG is replaced
+    html = html.replace(/{{REGULATION_SLUG}}/g, regulationData.REGULATION_SLUG);
 
     return html;
   }
