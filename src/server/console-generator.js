@@ -421,6 +421,19 @@ export class ConsoleGenerator {
     const topicLower = topic.toLowerCase();
     const nameLower = regulationName.toLowerCase();
     
+    // Pennsylvania state regulations
+    if (nameLower.includes('pennsylvania') || nameLower.includes('pa ') || 
+        nameLower.includes('pa.c.s') || nameLower.includes('pa dept') ||
+        nameLower.includes('pa department')) {
+      if (nameLower.includes('crime') || nameLower.includes('police')) {
+        return 'Pennsylvania State Police (PA-PSP)';
+      }
+      if (nameLower.includes('ethics') || nameLower.includes('gift')) {
+        return 'Pennsylvania State Ethics Commission (PA-SEC)';
+      }
+      return 'Pennsylvania Department of Education (PA-ED)';
+    }
+    
     // Campus safety regulations get Department of Education
     if (topicCategory === 'campus-safety' || nameLower.includes('clery') || 
         nameLower.includes('campus security') || nameLower.includes('campus crime') ||

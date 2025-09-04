@@ -131,7 +131,7 @@ app.get('/api/regulations', (req, res) => {
 });
 
 // Get all regulations with console URLs (must come before /:id route)
-app.get('/api/regulations/all', ensureRegulationsLoaded, (req, res) => {
+app.get('/api/regulations/all', ensureRegulationsLoaded, async (req, res) => {
   try {
     const regulationsWithConsoles = allRegulations.map(reg => ({
       id: reg['Item ID'] || reg.id,
@@ -141,9 +141,57 @@ app.get('/api/regulations/all', ensureRegulationsLoaded, (req, res) => {
       consoleUrl: `/console/${reg['Item ID'] || consoleGenerator.getRegulationSlug(reg)}`,
       lastUpdated: reg['Last Updated'] || reg.lastUpdated || new Date().toISOString()
     }));
+
+    // Add Pennsylvania regulations from LLM Gateway
+    const pennsylvaniaRegulations = [
+      {
+        id: '4220',
+        name: 'Pennsylvania Uniform Crime Reporting Act',
+        topic: 'Campus Safety',
+        slug: 'pennsylvania-uniform-crime-reporting-act',
+        consoleUrl: '/console/pennsylvania-uniform-crime-reporting-act',
+        lastUpdated: 'December 28, 2024'
+      },
+      {
+        id: '4221',
+        name: 'Pennsylvania Sexual Violence Education Act',
+        topic: 'Sexual Misconduct',
+        slug: 'pennsylvania-sexual-violence-education-act-article-',
+        consoleUrl: '/console/pennsylvania-sexual-violence-education-act-article-',
+        lastUpdated: 'December 28, 2024'
+      },
+      {
+        id: '4222',
+        name: 'Pennsylvania Higher Education Gift Disclosure Act',
+        topic: 'Financial Reporting',
+        slug: 'pennsylvania-higher-education-gift-disclosure-act',
+        consoleUrl: '/console/pennsylvania-higher-education-gift-disclosure-act',
+        lastUpdated: 'December 28, 2024'
+      },
+      {
+        id: '4223',
+        name: 'Pennsylvania English Fluency in Higher Education Act',
+        topic: 'Academic Programs',
+        slug: 'pennsylvania-english-fluency-in-higher-education-a',
+        consoleUrl: '/console/pennsylvania-english-fluency-in-higher-education-a',
+        lastUpdated: 'December 28, 2024'
+      },
+      {
+        id: '4224',
+        name: 'Pennsylvania Graduation Rates Reporting Act',
+        topic: 'Academic Programs',
+        slug: 'pennsylvania-graduation-rates-reporting-act-88-of-',
+        consoleUrl: '/console/pennsylvania-graduation-rates-reporting-act-88-of-',
+        lastUpdated: 'December 28, 2024'
+      }
+    ];
+
+    // Combine federal and Pennsylvania regulations
+    const allRegulationsData = [...regulationsWithConsoles, ...pennsylvaniaRegulations];
+
     res.json({
-      data: regulationsWithConsoles,
-      total: regulationsWithConsoles.length
+      data: allRegulationsData,
+      total: allRegulationsData.length
     });
   } catch (error) {
     console.error('Error fetching regulations:', error);
@@ -377,6 +425,57 @@ app.get('/console/:regulationId', ensureRegulationsLoaded, (req, res) => {
     });
     
     if (!regulation) {
+      // Check if it's a Pennsylvania regulation
+      const pennsylvaniaRegulations = {
+        'pennsylvania-uniform-crime-reporting-act': {
+          'Item ID': '4220',
+          'Statute Name': 'Pennsylvania Uniform Crime Reporting Act',
+          'Topic': 'Campus Safety',
+          'Statutory Summary': 'Annual crime reporting by postsecondary institutions in Pennsylvania.',
+          'Reporting Requirements': 'Annual crime statistics report due by October 1st each year to Pennsylvania State Police.',
+          'Deadlines': 'October 1st annually'
+        },
+        'pennsylvania-sexual-violence-education-act-article-': {
+          'Item ID': '4221',
+          'Statute Name': 'Pennsylvania Sexual Violence Education Act',
+          'Topic': 'Sexual Misconduct',
+          'Statutory Summary': 'Sexual violence education programs required for students and employees.',
+          'Reporting Requirements': 'Annual reporting of sexual violence education program implementation.',
+          'Deadlines': 'September 30th annually'
+        },
+        'pennsylvania-higher-education-gift-disclosure-act': {
+          'Item ID': '4222',
+          'Statute Name': 'Pennsylvania Higher Education Gift Disclosure Act',
+          'Topic': 'Financial Reporting',
+          'Statutory Summary': 'Report certain gifts received from foreign or domestic sources exceeding thresholds.',
+          'Reporting Requirements': 'Disclosure report for gifts exceeding $50000 from single source due within 60 days.',
+          'Deadlines': 'March 31st annually'
+        },
+        'pennsylvania-english-fluency-in-higher-education-a': {
+          'Item ID': '4223',
+          'Statute Name': 'Pennsylvania English Fluency in Higher Education Act',
+          'Topic': 'Academic Programs',
+          'Statutory Summary': 'Faculty English fluency assessment and remediation procedures required.',
+          'Reporting Requirements': 'Annual certification of faculty English fluency assessment procedures.',
+          'Deadlines': 'August 15th annually'
+        },
+        'pennsylvania-graduation-rates-reporting-act-88-of-': {
+          'Item ID': '4224',
+          'Statute Name': 'Pennsylvania Graduation Rates Reporting Act',
+          'Topic': 'Academic Programs',
+          'Statutory Summary': 'Disclose graduation rates and employment outcomes to prospective students.',
+          'Reporting Requirements': 'Annual graduation rates and employment outcomes report due by December 1st.',
+          'Deadlines': 'December 1st annually'
+        }
+      };
+
+      const paRegulation = pennsylvaniaRegulations[regulationId];
+      if (paRegulation) {
+        const consoleHtml = consoleGenerator.generateConsole(paRegulation);
+        res.setHeader('Content-Type', 'text/html');
+        return res.send(consoleHtml);
+      }
+
       return res.status(404).send(`
         <html>
           <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px;">

@@ -100,7 +100,10 @@ INSERT INTO enforcement_agencies (tenant_id, agency_code, agency_name, agency_ty
   ('default', 'HHS', 'Department of Health and Human Services', 'federal', 'U.S. Department of Health and Human Services', 'https://www.hhs.gov'),
   ('default', 'EPA', 'Environmental Protection Agency', 'federal', 'U.S. Environmental Protection Agency', 'https://www.epa.gov'),
   ('default', 'COPYRIGHT', 'U.S. Copyright Office', 'federal', 'U.S. Copyright Office (Library of Congress)', 'https://www.copyright.gov'),
-  ('default', 'EEOC', 'Equal Employment Opportunity Commission', 'federal', 'U.S. Equal Employment Opportunity Commission', 'https://www.eeoc.gov')
+  ('default', 'EEOC', 'Equal Employment Opportunity Commission', 'federal', 'U.S. Equal Employment Opportunity Commission', 'https://www.eeoc.gov'),
+  ('default', 'PA-ED', 'Pennsylvania Department of Education', 'state', 'Pennsylvania Department of Education', 'https://www.pa.gov/agencies/education/'),
+  ('default', 'PA-PSP', 'Pennsylvania State Police', 'state', 'Pennsylvania State Police', 'https://www.psp.pa.gov/'),
+  ('default', 'PA-SEC', 'Pennsylvania State Ethics Commission', 'state', 'Pennsylvania State Ethics Commission', 'https://www.ethics.pa.gov/')
 ON CONFLICT (tenant_id, agency_code) DO NOTHING;
 
 -- Create enhanced view for regulation data with all metadata
@@ -271,6 +274,7 @@ BEGIN
   LIMIT p_limit OFFSET p_offset;
 END;
 $$ LANGUAGE plpgsql;
+
 
 
 

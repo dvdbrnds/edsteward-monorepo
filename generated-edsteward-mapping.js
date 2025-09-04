@@ -889,6 +889,29 @@
       'qualified-tuition-reductions': 1934,
       'REG-1934': 1934,
       
+      
+      // ✅ PENNSYLVANIA STATE REGULATIONS - CRITICAL GAP FIXED
+      // Pennsylvania Uniform Crime Reporting Act (Item ID: 4220)
+      'pennsylvania-uniform-crime-reporting-act': 4220,
+      'REG-4220': 4220,
+      'PA-UCR': 4220,
+      // Pennsylvania Sexual Violence Education Act (Item ID: 4221)
+      'pennsylvania-sexual-violence-education-act-article-': 4221,
+      'REG-4221': 4221,
+      'PA-SVE': 4221,
+      // Pennsylvania Higher Education Gift Disclosure Act (Item ID: 4222)
+      'pennsylvania-higher-education-gift-disclosure-act': 4222,
+      'REG-4222': 4222,
+      'PA-HEGDA': 4222,
+      // Pennsylvania English Fluency in Higher Education Act (Item ID: 4223)
+      'pennsylvania-english-fluency-in-higher-education-a': 4223,
+      'REG-4223': 4223,
+      'PA-EFHEA': 4223,
+      // Pennsylvania Graduation Rates Reporting (Act 88 of 2002) (Item ID: 4224)
+      'pennsylvania-graduation-rates-reporting-act-88-of-': 4224,
+      'REG-4224': 4224,
+      'PA-GRR': 4224,
+
       // No fallback - all regulations explicitly mapped
       '_FALLBACK_BASE_ID': null
     };

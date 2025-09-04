@@ -108,6 +108,13 @@ function getEnforcementAgencyCode(topicName, regulationName) {
     return 'HHS';
   }
   
+  // Pennsylvania state regulations
+  if (name.includes('pennsylvania') || name.includes('pa ') || 
+      name.includes('pa.c.s') || name.includes('pa dept') ||
+      name.includes('pa department')) {
+    return 'PA-ED'; // Pennsylvania Department of Education
+  }
+  
   // Education regulations
   if (topic.includes('education') || topic.includes('academic') ||
       topic.includes('student')) {
@@ -368,6 +375,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
 }
 
 export { migrateCSVToDatabase };
+
 
 
 
