@@ -102,27 +102,60 @@ export class EdStewardIntegration {
   }
 
   /**
-   * Get or create EdSteward ID for a regulation
+   * Get EdSteward ID using Master Key Field System (1-354)
+   * EdSteward uses sequential master key field numbers 1-354
    */
   getEdStewardId(regulationId) {
-    // Check for explicit mapping first
-    if (this.regulationMapping[regulationId]) {
-      console.log(`✅ EdSteward mapping: ${regulationId} -> ${this.regulationMapping[regulationId]}`);
-      return this.regulationMapping[regulationId];
+    // MASTER KEY FIELD MAPPING - Sequential 1-354 as agreed with EdSteward
+    const MASTER_KEY_MAPPING = {
+      // TEACH Act - Master Key 55 (as established)
+      'reg-66': 55,
+      'REG-66': 55,
+      'technology-education-and-copyright-harmonization-a': 55,
+      'teach-act': 55,
+      '1821': 55,
+      
+      // Qualified Tuition Reductions - Master Key 269 (as established)
+      'qualified-tuition-reductions': 269,
+      'REG-1934': 269,
+      '1934': 269,
+      
+      // Pennsylvania regulations - Master Key 296-300
+      'pennsylvania-uniform-crime-reporting-act': 296,
+      'REG-4220': 296,
+      '4220': 296,
+      
+      'pennsylvania-sexual-violence-education-act': 297,
+      'REG-4221': 297,
+      '4221': 297,
+      
+      'pennsylvania-higher-education-gift-disclosure-act': 298,
+      'REG-4222': 298,
+      '4222': 298,
+      
+      'pennsylvania-english-fluency-in-higher-education-a': 299,
+      'REG-4223': 299,
+      '4223': 299,
+      
+      'pennsylvania-graduation-rates-reporting-act-88-of-': 300,
+      'REG-4224': 300,
+      '4224': 300
+    };
+    
+    // Check for explicit master key field mapping
+    if (MASTER_KEY_MAPPING[regulationId]) {
+      const masterKeyId = MASTER_KEY_MAPPING[regulationId];
+      console.log(`✅ Master Key Field: ${regulationId} -> ${masterKeyId}`);
+      return masterKeyId;
     }
     
-    // NEW SCHEMA: Use simple sequential numbers 1-354 (all guaranteed to exist in EdSteward)
-    // Generate consistent ID based on regulation hash, within valid range 1-354
-    const hash = createHash('md5').update(regulationId).digest('hex');
-    const edstewardId = 1 + (parseInt(hash.substring(0, 8), 16) % 354); // Range: 1-354
+    // For unmapped regulations, assign sequential master key fields 1-354
+    // This ensures all regulations get a valid EdSteward ID
+    const hash = require('crypto').createHash('md5').update(regulationId).digest('hex');
+    const masterKeyId = 1 + (parseInt(hash.substring(0, 8), 16) % 354);
     
-    // Cache the mapping for consistency
-    this.regulationMapping[regulationId] = edstewardId;
-    
-    console.log(`🆕 Generated EdSteward ID: ${regulationId} -> ${edstewardId} (range 1-354)`);
-    console.log(`📊 Total mapped regulations: ${Object.keys(this.regulationMapping).filter(k => !k.startsWith('_')).length}`);
-    
-    return edstewardId;
+    console.log(`🆕 Generated Master Key Field: ${regulationId} -> ${masterKeyId} (range 1-354)`);
+    return masterKeyId;
   }
 
   /**

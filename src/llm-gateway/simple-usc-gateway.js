@@ -1094,7 +1094,7 @@ Summary should be practical and focus on what organizations need to know. Avoid 
         'IRC Section 6672 - Personal Liability for Trust Fund Taxes'
       ];
     }
-
+    
     const cfrData = {
       success: true,
       data: {
