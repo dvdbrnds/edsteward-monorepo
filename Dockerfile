@@ -54,8 +54,8 @@ COPY --from=builder /app/vite.config.ts ./vite.config.ts
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/shared ./shared
 COPY --from=builder /app/sql_dump ./sql_dump
-COPY --from=builder /app/docs ./docs
-COPY --from=builder /app/scripts ./scripts
+# COPY --from=builder /app/docs ./docs (directory doesn't exist)
+# COPY --from=builder /app/scripts ./scripts (directory doesn't exist)
 
 # REMOVED: npm rebuild bcrypt --build-from-source (this was causing the architecture conflict)
 # REMOVED: apk del python3 make g++ (no longer needed since we're not rebuilding native modules)
@@ -63,18 +63,18 @@ COPY --from=builder /app/scripts ./scripts
 # Copy exports directory if it exists (optional)
 RUN mkdir -p ./exports
 
-# Copy AWS RDS SSL certificate
-COPY --from=builder /app/ssl/rds-ca-2019-root.pem /app/ssl/rds-ca-2019-root.pem
+# Copy SSL directory (create instead of copy since it doesn't exist)
+# COPY --from=builder /app/ssl ./ssl (directory doesn't exist)
 
 # Create uploads, logs, and ssl directories (fallback for local development)
 RUN mkdir -p /app/uploads /app/logs /app/ssl && chown nodejs:nodejs /app/uploads /app/logs
 
 # Create all directories that the application might need at runtime
 RUN mkdir -p /app/client/public/assets /app/client/public/downloads /app/public/uploads /app/public/downloads && \
-    chown -R nodejs:nodejs /app/client /app/public /app/uploads /app/logs /app/ssl
+  chown -R nodejs:nodejs /app/client /app/public /app/uploads /app/logs /app/ssl
 
-# Make scripts executable
-RUN chmod +x /app/scripts/start-production.sh
+# Make scripts executable (script doesn't exist, skipping)
+# RUN chmod +x /app/scripts/start-production.sh
 
 # Set permissions
 USER nodejs
