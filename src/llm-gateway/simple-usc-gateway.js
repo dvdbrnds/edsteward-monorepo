@@ -7,6 +7,9 @@
 
 import express from 'express';
 import cors from 'cors';
+import fs from 'fs';
+import path from 'path';
+import { parse } from 'csv-parse/sync';
 import GovernmentSourceFetcher from './government-source-fetcher.js';
 import { EnhancedSummaryIntegration } from '../services/enhanced-summary-integration.js';
 import { RequirementsGenerationService } from '../services/requirements-generation-service.js';
@@ -28,6 +31,158 @@ const enhancedSummaryIntegration = new EnhancedSummaryIntegration({
 const requirementsService = new RequirementsGenerationService({
   logger: console
 });
+
+// HECA CSV cache and configuration
+let hecaRegulations = null;
+const HECA_CSV_PATH = path.resolve(process.cwd(), 'compmat.csv');
+
+/**
+ * Load HECA regulations from CSV file
+ */
+async function loadHECARegulations() {
+  if (hecaRegulations) {
+    return hecaRegulations; // Return cached data
+  }
+  
+  try {
+    console.log(`📖 Loading HECA regulations from: ${HECA_CSV_PATH}`);
+    
+    if (!fs.existsSync(HECA_CSV_PATH)) {
+      console.warn(`⚠️ HECA CSV file not found: ${HECA_CSV_PATH}`);
+      return null;
+    }
+    
+    const csvContent = fs.readFileSync(HECA_CSV_PATH, 'utf8');
+    const records = parse(csvContent, {
+      columns: true,
+      skip_empty_lines: true
+    });
+    
+    // Create a lookup map for faster access
+    hecaRegulations = new Map();
+    
+    records.forEach((record, index) => {
+      const itemId = record['Item ID'];
+      const statuteName = record['Statute Name'];
+      const summary = record['Statutory Summary'];
+      
+      // Debug first few records
+      if (index < 3) {
+        console.log(`🔍 [DEBUG] Record ${index}:`, { itemId, statuteName: statuteName?.substring(0, 50), summary: summary?.substring(0, 50) });
+      }
+      
+      // More lenient condition - just need statute name and summary
+      if (statuteName && summary && statuteName.trim() && summary.trim()) {
+        // Create multiple lookup keys for flexibility
+        const cleanName = statuteName.toLowerCase().trim();
+        const slug = cleanName.replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        
+        const regulationData = {
+          itemId: itemId || `generated-${index}`, // Use index if itemId is missing
+          statuteName,
+          summary: summary.trim(),
+          topic: record['Topic'],
+          reportingRequirements: record['Reporting Requirements'],
+          deadlines: record['Deadlines'],
+          lastUpdated: record['Last Updated']
+        };
+        
+        // Store under multiple keys for flexible lookup
+        hecaRegulations.set(itemId, regulationData);
+        hecaRegulations.set(cleanName, regulationData);
+        hecaRegulations.set(slug, regulationData);
+        
+        // Add specific mappings for common regulation names
+        if (cleanName.includes('ferpa')) {
+          hecaRegulations.set('ferpa', regulationData);
+          hecaRegulations.set('family-educational-rights-and-privacy-act', regulationData);
+        }
+        if (cleanName.includes('title ix')) {
+          hecaRegulations.set('title-ix', regulationData);
+          hecaRegulations.set('title-ix-of-the-education-amendment-of-1972', regulationData);
+        }
+        if (cleanName.includes('ada') || cleanName.includes('americans with disabilities')) {
+          hecaRegulations.set('ada', regulationData);
+          hecaRegulations.set('americans-with-disabilities-act', regulationData);
+          hecaRegulations.set('americans-with-disabilities-act-of-1990', regulationData);
+        }
+        if (cleanName.includes('age discrimination')) {
+          hecaRegulations.set('age-discrimination-act', regulationData);
+          hecaRegulations.set('age-discrimination-act-of-1975', regulationData);
+        }
+        // Specific mapping for TEACH Act (Technology Education and Copyright Harmonization Act)
+        if (cleanName.includes('technology education and copyright harmonization') || 
+            cleanName.includes('teach act') && cleanName.includes('2002')) {
+          hecaRegulations.set('teach-act', regulationData);
+          hecaRegulations.set('reg-66', regulationData);
+          hecaRegulations.set('technology-education-and-copyright-harmonization-act', regulationData);
+          hecaRegulations.set('teach-act-of-2002', regulationData);
+          console.log(`🎯 [DEBUG] Mapped TEACH Act: ${statuteName}`);
+        }
+        // General teacher-related regulations (but not the main TEACH Act)
+        else if (cleanName.includes('teach') && !cleanName.includes('2002')) {
+          hecaRegulations.set(`teacher-${slug}`, regulationData);
+          console.log(`📚 [DEBUG] Mapped teacher regulation: ${statuteName}`);
+        }
+      }
+    });
+    
+    console.log(`✅ Loaded ${records.length} HECA regulations with ${hecaRegulations.size} lookup keys`);
+    return hecaRegulations;
+    
+  } catch (error) {
+    console.error(`❌ Error loading HECA regulations: ${error.message}`);
+    return null;
+  }
+}
+
+/**
+ * Fetch summary from HECA CSV (highest priority source)
+ */
+async function fetchSummaryFromHECA(regulationSlug) {
+  try {
+    console.log(`🔍 Attempting to fetch summary from HECA for: ${regulationSlug}`);
+    
+    const hecaData = await loadHECARegulations();
+    if (!hecaData) {
+      console.log(`⚠️ HECA data not available`);
+      return null;
+    }
+    
+    // Try multiple lookup strategies
+    const lookupKeys = [
+      regulationSlug,
+      regulationSlug.toLowerCase(),
+      regulationSlug.replace(/-/g, ' ').toLowerCase(),
+      regulationSlug.replace(/-/g, '').toLowerCase()
+    ];
+    
+    console.log(`🔍 [DEBUG] Trying ${lookupKeys.length} lookup keys for ${regulationSlug}:`, lookupKeys);
+    console.log(`🔍 [DEBUG] HECA data has ${hecaData.size} entries`);
+    
+    for (const key of lookupKeys) {
+      const regulation = hecaData.get(key);
+      console.log(`🔍 [DEBUG] Trying key "${key}": ${regulation ? 'FOUND' : 'NOT FOUND'}`);
+      if (regulation && regulation.summary) {
+        console.log(`✅ Retrieved HECA summary for ${regulationSlug} using key: ${key}`);
+        return {
+          summary: regulation.summary,
+          source: 'HECA',
+          statuteName: regulation.statuteName,
+          topic: regulation.topic,
+          lastUpdated: regulation.lastUpdated
+        };
+      }
+    }
+    
+    console.log(`ℹ️ No HECA summary found for ${regulationSlug}`);
+    return null;
+    
+  } catch (error) {
+    console.log(`⚠️ Error fetching HECA summary for ${regulationSlug}:`, error.message);
+    return null;
+  }
+}
 
 /**
  * Fetch summary from EdSteward if available
@@ -78,7 +233,56 @@ function getEdStewardId(regulationSlug) {
 }
 
 /**
+ * Get the best available summary using three-source priority system:
+ * 1. HECA CSV (highest priority - human-curated)
+ * 2. EdSteward (medium priority - customer database)
+ * 3. AI Generated (lowest priority - fallback)
+ */
+async function getBestAvailableSummary(regulationSlug, regulationTitle, fullText) {
+  console.log(`🎯 Getting best available summary for: ${regulationSlug}`);
+  
+  // Priority 1: Try HECA CSV first (highest quality)
+  const hecaSummary = await fetchSummaryFromHECA(regulationSlug);
+  if (hecaSummary && hecaSummary.summary) {
+    console.log(`✅ Using HECA summary for ${regulationSlug}`);
+    return {
+      summary: hecaSummary.summary,
+      source: 'HECA',
+      sourceDetails: {
+        statuteName: hecaSummary.statuteName,
+        topic: hecaSummary.topic,
+        lastUpdated: hecaSummary.lastUpdated
+      }
+    };
+  }
+  
+  // Priority 2: Try EdSteward if HECA not available
+  const edstewardSummary = await fetchSummaryFromEdSteward(regulationSlug);
+  if (edstewardSummary) {
+    console.log(`✅ Using EdSteward summary for ${regulationSlug}`);
+    return {
+      summary: edstewardSummary,
+      source: 'EdSteward',
+      sourceDetails: {
+        system: 'EdSteward Customer Database'
+      }
+    };
+  }
+  
+  // Priority 3: NO AI FALLBACK - Return error if no HECA/EdSteward content available
+  console.log(`❌ No HECA or EdSteward summary available for ${regulationSlug} - AI fallback disabled`);
+  return {
+    summary: `No human-curated summary available for ${regulationSlug}. Please check HECA database or EdSteward system.`,
+    source: 'No Source Available',
+    sourceDetails: {
+      system: 'AI Fallback Disabled - HECA/EdSteward Only'
+    }
+  };
+}
+
+/**
  * Generate customer-focused summary that explains what the regulation means for organizations
+ * (Legacy function - now used as fallback in three-source priority system)
  */
 function generateCustomerFocusedSummary(regulationSlug, regulationTitle, fullText) {
   const regulationName = regulationSlug.replace(/-/g, ' ').toLowerCase();
@@ -373,6 +577,12 @@ app.get('/api/llm/cfr/teach-act', async (req, res) => {
   try {
     console.log('📖 Fetching CFR TEACH Act guidance...');
     
+    // Get HECA summary for TEACH Act
+    console.log('🔍 [DEBUG] About to call getBestAvailableSummary for teach-act');
+    const summaryResult = await getBestAvailableSummary('teach-act', 'Technology, Education and Copyright Harmonization Act (TEACH Act) of 2002', '');
+    console.log(`🎯 Using ${summaryResult.source} summary for TEACH Act`);
+    console.log(`📝 [DEBUG] Summary: ${summaryResult.summary.substring(0, 100)}...`);
+    
     const cfrContent = {
       success: true,
       data: {
@@ -381,6 +591,9 @@ app.get('/api/llm/cfr/teach-act', async (req, res) => {
         title: "CFR Title 37 - TEACH Act Implementation",
         source: "Code of Federal Regulations",
         content: "CFR guidance on TEACH Act implementation for educational institutions",
+        summary: summaryResult.summary,
+        summarySource: summaryResult.source,
+        summarySourceDetails: summaryResult.sourceDetails,
         fullText: `Code of Federal Regulations - Title 37: Patents, Trademarks, and Copyrights
 
 TEACH Act Implementation Requirements:
@@ -714,6 +927,8 @@ app.get('/api/llm/cfr/:regulationSlug', async (req, res) => {
     let regulationTitle = '';
     let confidence = 85;
     let summary = ''; // Declare summary at function level
+    let summarySource = 'MCP Engine'; // Default source
+    let summarySourceDetails = { system: 'MCP Engine AI Summary Generator' };
     
     if (regulationSlug === 'age-discrimination-act-of-1975') {
       regulationTitle = 'Age Discrimination Act of 1975 - CFR Implementation';
@@ -1073,38 +1288,39 @@ Violations of this part may result in civil penalties as provided by law, includ
       // Summary will be generated by the customer-focused function below
     }
     
-    // Generate LLM-powered summary for ALL regulations if not already set
+    // Generate summary using HECA priority system first
     if (!summary) {
       try {
-        console.log(`🚀 Using Enhanced Summary Integration for ${regulationSlug}...`);
+        console.log(`🚀 Using HECA Priority System for ${regulationSlug}...`);
         
-        // Use the new Enhanced Summary Integration service
-        const enhancedResponse = await enhancedSummaryIntegration.enhanceRegulationForGateway(
-          regulationSlug,
-          regulationTitle,
-          fullText
-        );
+        // Use the new three-source priority system (HECA > EdSteward > AI)
+        const summaryResult = await getBestAvailableSummary(regulationSlug, regulationTitle, fullText);
+        summary = summaryResult.summary;
+        summarySource = summaryResult.source;
+        summarySourceDetails = summaryResult.sourceDetails;
+        console.log(`📝 Using ${summaryResult.source} summary for ${regulationSlug}: ${summary.substring(0, 100)}...`);
         
-        if (enhancedResponse.success && enhancedResponse.data.summary) {
-          summary = enhancedResponse.data.summary;
-          console.log(`✅ Generated enhanced summary for ${regulationSlug}: ${summary.substring(0, 100)}...`);
+        // Try to get enhanced research data (but keep HECA summary)
+        try {
+          const enhancedResponse = await enhancedSummaryIntegration.enhanceRegulationForGateway(
+            regulationSlug,
+            regulationTitle,
+            fullText
+          );
           
-          // Use enhanced data if available
-          if (enhancedResponse.data.keyRequirements) {
-            // Store enhanced data for potential use in response
-            enhancedSummary = summary;
+          if (enhancedResponse.success && enhancedResponse.data.keyRequirements) {
+            // Use enhanced research data but keep HECA summary
             citations = enhancedResponse.data.citations || [];
+            console.log(`✅ Enhanced research data available for ${regulationSlug}`);
           }
-        } else {
-          throw new Error('Enhanced summary generation failed');
+        } catch (enhancedError) {
+          console.log(`ℹ️ Enhanced research not available for ${regulationSlug}, using ${summaryResult.source} summary only`);
         }
         
       } catch (error) {
-        console.error(`❌ Enhanced summary failed for ${regulationSlug}, falling back to basic:`, error);
-        
-        // Fallback to basic customer-focused summary
-        summary = generateCustomerFocusedSummary(regulationSlug, regulationTitle, fullText);
-        console.log(`📝 Generated fallback summary for ${regulationSlug}: ${summary.substring(0, 100)}...`);
+        console.error(`❌ HECA Priority System failed for ${regulationSlug}:`, error);
+        // If HECA system fails completely, we already have fallback logic in getBestAvailableSummary
+        // This should not happen, but if it does, we'll have a basic summary
       }
     }
 
@@ -1131,7 +1347,8 @@ Violations of this part may result in civil penalties as provided by law, includ
         content: fullText,
         fullText: fullText,
         summary: enhancedSummary,
-        summarySource: 'MCP Engine', // Customer-focused summaries generated by MCP Engine
+        summarySource: summarySource, // Source from HECA/EdSteward/AI priority system
+        summarySourceDetails: summarySourceDetails,
         baseSummary: summary, // Original summary before workflow enhancement
         citations: citations,
         workflowStatus: citations.length > 0 ? 'enhanced' : 'basic',
@@ -2398,6 +2615,10 @@ No qualified individual with a disability shall, by reason of such disability, b
       });
     }
     
+    // Get the best available summary using three-source priority system
+    console.log(`🎯 [ENHANCED] Getting best available summary for ${regulationSlug}...`);
+    const summaryResult = await getBestAvailableSummary(regulationSlug, regulationTitle, regulationText);
+    
     // Generate enhanced summary
     console.log(`🤖 [ENHANCED] Generating enhanced summary for ${regulationSlug}...`);
     const enhancedResult = await enhancedSummaryIntegration.enhanceRegulationForGateway(
@@ -2414,18 +2635,23 @@ No qualified individual with a disability shall, by reason of such disability, b
       regulationText
     );
     
-    // Combine everything
+    // Combine everything with HECA source attribution
     const enhancedData = {
       ...baseData,
-      enhancedSummary: enhancedResult.summary,
-      enhancedSummaryMetadata: enhancedResult.metadata,
+      enhancedSummary: summaryResult.summary, // Use HECA/EdSteward/AI summary instead of AI-only
+      enhancedSummaryMetadata: {
+        ...enhancedResult.metadata,
+        summarySource: summaryResult.source,
+        summarySourceDetails: summaryResult.sourceDetails
+      },
       structuredRequirements: requirementsResult.requirements,
       requirementsMetadata: requirementsResult.metadata,
       masterKeyFields: {
-        summaryApiKey: 'first-api-key-used',
+        summaryApiKey: summaryResult.source === 'HECA' ? 'heca-csv-source' : 'first-api-key-used',
         requirementsApiKey: 'second-api-key-used',
         generatedAt: new Date().toISOString(),
-        qualityScore: requirementsResult.metadata.qualityScore
+        qualityScore: requirementsResult.metadata.qualityScore,
+        summarySource: summaryResult.source
       }
     };
     

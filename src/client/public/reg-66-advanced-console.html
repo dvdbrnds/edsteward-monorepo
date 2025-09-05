@@ -2156,7 +2156,7 @@
             summaryDiv.innerHTML = 'Loading summary...';
             
             try {
-                const response = await fetch(`http://localhost:3002/api/llm/cfr/{{REGULATION_SLUG}}`);
+                const response = await fetch(`http://localhost:3002/api/llm/cfr/reg-66`);
                 const result = await response.json();
                 
                 if (result.success && result.data && result.data.summary) {
@@ -2228,7 +2228,7 @@
             try {
                 console.log('📋 Fetching real CFR guidance from API...');
                 
-                const response = await fetch(`http://localhost:3002/api/llm/cfr/{{REGULATION_SLUG}}`);
+                const response = await fetch(`http://localhost:3002/api/llm/cfr/reg-66`);
                 const result = await response.json();
                 
                 if (result.success && result.data) {

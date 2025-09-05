@@ -2,19 +2,6 @@
 
 *Generated: December 28, 2024 | Updated: January 2, 2025*
 
-## RECENT CRITICAL UPDATES (January 2025)
-
-**🎯 MASTER KEY FIELD Enhancement**: LLM-Generated Summaries & Requirements system complete with EdSteward integration (Commit: 34c77b2)
-
-**🔧 CRITICAL FIXES COMPLETED**:
-- All 354 Regulations Master Key Field Mapping - EdSteward Integration 100% Operational
-- Customer-focused regulation summaries with practical business explanations
-- Universal CFR Implementation - All 295 Regulations return full CFR legal text
-- Dynamic Content Engine System restored and operational
-- Pennsylvania Regulations Integration with frontend filter fixes
-
-**🚀 SYSTEM STATUS**: All services operational - Registry API (3010), LLM Gateway (3002), Delivery System (3051), Frontend (3050)
-
 ## Layer 1: System Overview
 
 **Purpose**: Enterprise-grade compliance management platform that leverages Large Language Models (LLMs) for intelligent compliance analysis and regulation management. The MCP Engine serves as a comprehensive solution for universities and educational institutions to manage federal and state regulatory compliance requirements.
@@ -37,12 +24,10 @@
 - MCP (Model Context Protocol) for LLM integration
 
 **Entry Points**: 
-- **Main startup**: `mcp-start.js` (unified startup script for all services)
-- **LLM Gateway**: `src/llm-gateway/simple-usc-gateway.js` (current production gateway)
-- **Alternative Gateways**: `start-llm-gateway-refactored.js`, `start-llm-gateway-phase4.js`
-- **Frontend**: `src/client/index.jsx` (React application)
-- **Registry API**: `src/server/registry-api/registry-server.js`
-- **Delivery System**: `src/delivery-system/delivery-server.js`
+- Main startup: `mcp-start.js`
+- LLM Gateway: `src/llm-gateway/start-llm-gateway-refactored.js`
+- Frontend: `src/client/index.jsx`
+- Registry API: `src/server/registry-api/registry-server.js`
 
 ---
 
