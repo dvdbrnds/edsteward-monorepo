@@ -18,6 +18,15 @@ services:
       - SESSION_SECRET=dev-secret-key-for-local-development-only
       - HOSTNAME=0.0.0.0
       - PORT=3000
+      # SAML Authentication Configuration
+      - AUTH_SAML_ENABLED=true
+      - AUTH_SAML_ENTITY_ID=urn:edsteward:sp
+      - AUTH_SAML_SSO_URL=https://login.moravian.edu/app/moravian_edstewardlocaldevelopment_1/exk1dzve5y4scxwes0x8/sso/saml
+      - AUTH_ALLOW_SELF_REGISTRATION=true
+      - BASE_URL=http://localhost:3000
+      - SAML_SP_ENTITY_ID=urn:edsteward:sp
+      - SAML_CALLBACK_URL=http://localhost:3000/auth/saml/callback
+      - SAML_SLO_URL=http://localhost:3000/auth/saml/logout
     volumes:
       - .:/app
       - /app/node_modules

@@ -3,6 +3,13 @@
  * Replaces multi-tenant system with environment-based configuration
  */
 
+import { readFileSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 export interface InstitutionConfig {
   name: string;
   domain: string;
@@ -48,7 +55,18 @@ export const institutionConfig: InstitutionConfig = {
     samlEnabled: process.env.AUTH_SAML_ENABLED === 'true',
     samlEntityId: process.env.AUTH_SAML_ENTITY_ID,
     samlSsoUrl: process.env.AUTH_SAML_SSO_URL,
-    samlCertificate: process.env.AUTH_SAML_CERT,
+    samlCertificate: process.env.AUTH_SAML_CERT || (process.env.AUTH_SAML_ENABLED === 'true' ? 
+      (() => {
+        try {
+          const certContent = readFileSync(join(__dirname, '../../certs/okta-cert.pem'), 'utf8');
+          console.log('🔐 Full certificate length:', certContent.length);
+          console.log('🔐 Certificate starts with:', certContent.substring(0, 30));
+          return certContent.trim();
+        } catch (error) {
+          console.error('Failed to read SAML certificate file:', error);
+          return undefined;
+        }
+      })() : undefined),
     usernamePasswordEnabled: process.env.AUTH_USERNAME_PASSWORD_ENABLED !== 'false',
     allowSelfRegistration: process.env.AUTH_ALLOW_SELF_REGISTRATION === 'true',
   },
@@ -80,6 +98,9 @@ export function validateConfig(): void {
     }
     if (!institutionConfig.authentication.samlSsoUrl) {
       errors.push('AUTH_SAML_SSO_URL is required when SAML is enabled');
+    }
+    if (!institutionConfig.authentication.samlCertificate) {
+      errors.push('AUTH_SAML_CERT is required when SAML is enabled');
     }
   }
 

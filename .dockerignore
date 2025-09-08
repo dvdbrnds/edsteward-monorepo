@@ -143,6 +143,8 @@ coverage/
 !eslint.config.js
 !theme.json
 !drizzle.config.ts
+!.env
+!certs/
 !src/
 !server/
 !client/

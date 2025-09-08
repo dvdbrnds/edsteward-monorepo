@@ -70,8 +70,11 @@ export default function App() {
         <AuthProvider>
           <PageLayout>
             <Switch>
-              {/* Authentication Route */}
-              <Route path="/auth" component={AuthPage} />
+              {/* Authentication Route - Exclude SAML routes */}
+              <Route path="/auth" nest>
+                {/* Only match /auth exactly, not /auth/saml/* */}
+                <Route path="/" component={AuthPage} />
+              </Route>
               <Route path="/setup" component={SetupWizardPage} />
               
               {/* Public Dashboard - No authentication required */}
