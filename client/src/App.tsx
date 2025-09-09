@@ -1,4 +1,5 @@
 import { Switch, Route, useLocation } from "wouter";
+import { useEffect } from "react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -23,7 +24,7 @@ import SetupWizardPage from "@/pages/setup-wizard-page";
 import UpdatesListPage from "@/pages/updates-list-page";
 import DifferentialViewPage from "@/pages/differential-view-page";
 import DiffTestPage from "@/pages/diff-test-page";
-import PublicDashboardPage from "@/pages/public-dashboard-page";
+import TrusteesDashboard from "@/pages/trustees-dashboard";
 import { ProtectedRoute } from "./lib/protected-route";
 import { ProtectedRegulationRoute } from "./lib/protected-regulation-route";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
@@ -53,7 +54,10 @@ export default function App() {
               <Route path="/setup" component={SetupWizardPage} />
               
               {/* Public Dashboard - No authentication required */}
-              <Route path="/public-dashboard" component={PublicDashboardPage} />
+              <Route path="/public-dashboard" component={TrusteesDashboard} />
+              
+              {/* Legacy public dashboard route - redirect to new trustees dashboard */}
+              <Route path="/trustees-dashboard" component={TrusteesDashboard} />
 
               {/* Protected Routes - Authentication Required */}
               <ProtectedRoute path="/" component={HomePage} />
