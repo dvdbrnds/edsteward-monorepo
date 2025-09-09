@@ -4,7 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/hooks/use-auth";
 import { PageLayout } from "@/components/layout/page-layout";
-import { useEffect, useState } from 'react';
+// React imports removed - using single-tenant mode
 
 import HomePage from "@/pages/home-page";
 import NotFound from "@/pages/not-found";
@@ -28,29 +28,7 @@ import { ProtectedRoute } from "./lib/protected-route";
 import { ProtectedRegulationRoute } from "./lib/protected-regulation-route";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
 
-// Tenant detection utility
-function useCurrentTenant() {
-  const [tenant, setTenant] = useState<string | null>(null);
-  
-  useEffect(() => {
-    const hostname = window.location.hostname;
-    
-    if (hostname.startsWith('admin.')) {
-      setTenant('admin');
-    } else if (hostname.startsWith('moravian.')) {
-      setTenant('moravian');
-    } else if (hostname.startsWith('template.')) {
-      setTenant('template');
-    } else if (hostname.startsWith('staging.')) {
-      setTenant('staging');
-    } else {
-      // Default to admin for edsteward.ai or localhost
-      setTenant('admin');
-    }
-  }, []);
-  
-  return tenant;
-}
+// Tenant detection utility removed - using single-tenant mode
 
 export default function App() {
   console.log('[App] Initializing single-tenant application');
@@ -70,11 +48,8 @@ export default function App() {
         <AuthProvider>
           <PageLayout>
             <Switch>
-              {/* Authentication Route - Exclude SAML routes */}
-              <Route path="/auth" nest>
-                {/* Only match /auth exactly, not /auth/saml/* */}
-                <Route path="/" component={AuthPage} />
-              </Route>
+              {/* Authentication Route - Exact match only, don't intercept SAML routes */}
+              <Route path="/auth" component={AuthPage} />
               <Route path="/setup" component={SetupWizardPage} />
               
               {/* Public Dashboard - No authentication required */}

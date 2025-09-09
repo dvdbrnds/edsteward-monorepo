@@ -54,6 +54,7 @@ COPY --from=builder /app/vite.config.ts ./vite.config.ts
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/shared ./shared
 COPY --from=builder /app/sql_dump ./sql_dump
+COPY --from=builder /app/certs ./certs
 # COPY --from=builder /app/docs ./docs (directory doesn't exist)
 # COPY --from=builder /app/scripts ./scripts (directory doesn't exist)
 

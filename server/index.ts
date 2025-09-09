@@ -352,7 +352,8 @@ app.get('*', (req, res) => {
 });
 
 // Error handling
-app.use((err: Error, _req: express.Request, res: express.Response) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error('Server error:', err);
   res.status(500).json({ error: 'Internal server error' });
 });
@@ -456,7 +457,8 @@ process.on('warning', (warning) => {
 });
 
 // Override process.exit to prevent accidental crashes
-const originalExit = process.exit;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _originalExit = process.exit;
 process.exit = ((code?: number) => {
   console.error('🚨 PROCESS.EXIT CALLED - Preventing crash! Code:', code);
   console.error('Stack trace:', new Error().stack);
@@ -497,7 +499,8 @@ process.on('disconnect', () => {
 });
 
 // Add setInterval to keep the process alive and detect crashes
-const keepAliveInterval = setInterval(() => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _keepAliveInterval = setInterval(() => {
   // This ensures the event loop stays active
   // and prevents the process from exiting unexpectedly
   const memUsage = process.memoryUsage();
