@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+// Tabs components removed - not used in public dashboard
 import { 
   Table, 
   TableBody, 
@@ -16,8 +16,6 @@ import {
 import { 
   Search, 
   Filter, 
-  TrendingUp, 
-  TrendingDown, 
   AlertTriangle, 
   CheckCircle2, 
   Clock,
@@ -25,15 +23,12 @@ import {
   Building,
   Calendar,
   ExternalLink,
-  ArrowUpDown,
-  Download,
-  Users,
-  Bell
+  ArrowUpDown
 } from "lucide-react";
 import { format, differenceInDays, parseISO } from "date-fns";
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
-import { useAuth } from "@/hooks/use-auth";
+// useAuth removed to prevent hydration mismatch
 import { EnhancedJurisdictionFilter } from "@/components/filters/enhanced-jurisdiction-filter";
 import { AppliesToFilter, filterRegulationsByAppliesTo } from "@/components/filters/applies-to-filter";
 
@@ -102,7 +97,7 @@ function getStatusIcon(status: string) {
 }
 
 export default function PublicDashboardPage() {
-  const [location, navigate] = useLocation();
+  const [, navigate] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [jurisdictionSourceFilter, setJurisdictionSourceFilter] = useState<string>("all");
@@ -121,30 +116,8 @@ export default function PublicDashboardPage() {
   const isLoadingConfigRef = useRef(true);
   const refetchRef = useRef<any>(null);
 
-  // Update refs when state changes
-  useEffect(() => {
-    institutionConfigRef.current = institutionConfig;
-  }, [institutionConfig]);
-
-  useEffect(() => {
-    isLoadingConfigRef.current = isLoadingConfig;
-  }, [isLoadingConfig]);
-
-  // For public dashboard, we don't require authentication - use a simple check
-  const [authState, setAuthState] = useState<{ user: any; isLoading: boolean }>({ user: null, isLoading: true });
+  // For public dashboard, we don't require authentication
   
-  // Check authentication status without using the hook that causes hydration issues
-  useEffect(() => {
-    fetch('/api/auth/status')
-      .then(res => res.json())
-      .then(data => {
-        setAuthState({ user: data.user, isLoading: false });
-      })
-      .catch(() => {
-        setAuthState({ user: null, isLoading: false });
-      });
-  }, []);
-
   // Fetch regulations from the public API endpoint with institution filtering
   const isQueryEnabled = !isLoadingConfig && institutionConfig !== null;
   console.log('[REACT-QUERY-ENABLED] Query enabled status:', isQueryEnabled, { isLoadingConfig, hasConfig: !!institutionConfig });
@@ -273,21 +246,15 @@ export default function PublicDashboardPage() {
     return () => clearInterval(interval);
   }, []); // FIXED: Remove institutionConfig from dependencies to prevent infinite loop
 
-  // Show loading state while checking authentication and config
-  if (authState.isLoading || isLoadingConfig) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
-  }
+  // Public dashboard - no authentication required
 
-  // Public dashboard - no authentication required, but show different content based on auth status
-  const isAuthenticated = !!authState.user;
-
-  // Get unique categories for filtering
+  // Get unique categories for filtering - MOVED BEFORE EARLY RETURN
   const categories = useMemo(() => {
     if (!regulations || !Array.isArray(regulations)) return [];
     return Array.from(new Set(regulations.map((reg: any) => reg.category))).sort();
   }, [regulations]);
 
-  // Calculate statistics
+  // Calculate statistics - MOVED BEFORE EARLY RETURN
   const stats = useMemo(() => {
     if (!regulations || !Array.isArray(regulations)) {
       return {
@@ -359,6 +326,11 @@ export default function PublicDashboardPage() {
 
     return filtered;
   }, [regulations, searchQuery, categoryFilter, jurisdictionSourceFilter, institutionTypeFilter, selectedInstitutionTypes, complianceFilter, sortBy, sortDirection]);
+
+  // Show loading state while checking config
+  if (isLoadingConfig) {
+    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+  }
 
   if (isLoading) {
     return (
