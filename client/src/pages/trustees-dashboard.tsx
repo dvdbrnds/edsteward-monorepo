@@ -141,8 +141,10 @@ export default function TrusteesDashboard() {
     fetchRegulations();
   }, []);
 
-  // Calculate stats
+  // Calculate stats - only run when not loading to avoid empty data calculations
   const stats: Stats = React.useMemo(() => {
+    if (loading || error) return { total: 0, compliant: 0, needsAttention: 0, atRisk: 0 };
+    
     const total = regulations.length;
     let compliant = 0;
     let needsAttention = 0;
@@ -164,21 +166,25 @@ export default function TrusteesDashboard() {
     });
 
     return { total, compliant, needsAttention, atRisk };
-  }, [regulations]);
+  }, [regulations, loading, error]);
 
-  // Get unique categories and jurisdictions
+  // Get unique categories and jurisdictions - safe defaults when loading
   const categories = React.useMemo(() => {
+    if (loading || error) return [];
     const cats = Array.from(new Set(regulations.map(reg => reg.category).filter(Boolean)));
     return cats.sort();
-  }, [regulations]);
+  }, [regulations, loading, error]);
 
   const jurisdictions = React.useMemo(() => {
+    if (loading || error) return [];
     const juris = Array.from(new Set(regulations.map(reg => reg.jurisdiction).filter(Boolean)));
     return juris.sort();
-  }, [regulations]);
+  }, [regulations, loading, error]);
 
-  // Filter and sort regulations
+  // Filter and sort regulations - safe defaults when loading
   const filteredRegulations = React.useMemo(() => {
+    if (loading || error) return [];
+    
     let filtered = regulations.filter(reg => {
       const matchesSearch = !searchQuery || 
         reg.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -210,7 +216,7 @@ export default function TrusteesDashboard() {
     });
 
     return filtered;
-  }, [regulations, searchQuery, categoryFilter, jurisdictionFilter, complianceFilter, sortBy, sortDirection]);
+  }, [regulations, searchQuery, categoryFilter, jurisdictionFilter, complianceFilter, sortBy, sortDirection, loading, error]);
 
   const handleSort = (column: string) => {
     if (sortBy === column) {
@@ -228,7 +234,7 @@ export default function TrusteesDashboard() {
     setComplianceFilter("all");
   };
 
-  // Loading state
+  // Now we can safely use early returns after ALL hooks have been called
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
@@ -240,7 +246,6 @@ export default function TrusteesDashboard() {
     );
   }
 
-  // Error state
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
