@@ -26,7 +26,7 @@ export function configureAuth(app: Express): void {
         usernameField: 'username',
         passwordField: 'password',
       },
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+       
       async (username: string, password: string, done: (_error: any, _user?: any, _info?: any) => void) => {
         try {
           const storage = getDatabaseStorage();
@@ -49,8 +49,8 @@ export function configureAuth(app: Express): void {
     ));
   }
 
-  // SAML strategy
-  if (institutionConfig.authentication.samlEnabled) {
+  // SAML strategy - Skip for development
+  if (institutionConfig.authentication.samlEnabled && process.env.NODE_ENV !== 'development') {
     console.log('🔐 SAML Certificate loaded:', !!institutionConfig.authentication.samlCertificate);
     console.log('🔐 SAML Certificate length:', institutionConfig.authentication.samlCertificate?.length || 0);
     
@@ -84,7 +84,7 @@ export function configureAuth(app: Express): void {
         validateInResponseTo: 'never', // Disable InResponseTo validation
         disableRequestedAuthnContext: true,
       },
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+       
       async (profile: any, done: (_error: any, _user?: any, _info?: any) => void) => {
         try {
           const storage = getDatabaseStorage();
@@ -141,7 +141,7 @@ export function configureAuth(app: Express): void {
     done(null, user.id);
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   passport.deserializeUser(async (id: string, done: (_error: any, _user?: any) => void) => {
     try {
       const storage = getDatabaseStorage();

@@ -55,8 +55,8 @@ export const institutionConfig: InstitutionConfig = {
     samlEnabled: process.env.AUTH_SAML_ENABLED === 'true',
     samlEntityId: process.env.AUTH_SAML_ENTITY_ID,
     samlSsoUrl: process.env.AUTH_SAML_SSO_URL,
-    samlCertificate: process.env.AUTH_SAML_CERT || (process.env.AUTH_SAML_ENABLED === 'true' ? 
-      (() => {
+    samlCertificate: process.env.AUTH_SAML_ENABLED === 'true' ? (
+      process.env.AUTH_SAML_CERT || (() => {
         try {
           const certContent = readFileSync(join(__dirname, '../../certs/okta-cert.pem'), 'utf8');
           console.log('🔐 Full certificate length:', certContent.length);
@@ -66,7 +66,8 @@ export const institutionConfig: InstitutionConfig = {
           console.error('Failed to read SAML certificate file:', error);
           return undefined;
         }
-      })() : undefined),
+      })()
+    ) : undefined,
     usernamePasswordEnabled: process.env.AUTH_USERNAME_PASSWORD_ENABLED !== 'false',
     allowSelfRegistration: process.env.AUTH_ALLOW_SELF_REGISTRATION === 'true',
   },
