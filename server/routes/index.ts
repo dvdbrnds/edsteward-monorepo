@@ -402,6 +402,7 @@ export function registerRoutes(app: express.Application): Server {
 
   app.use('/api/uploads', uploadsRoutes);
   app.use('/api/regulations', regulationsRouter);
+  app.use('/api/public/regulations', regulationsRouter); // Public access to regulations for trustees dashboard
   app.use('/api/notes', notesRouter);
   app.use('/api/deadlines', deadlinesRouter);
   app.use('/api/notifications', notificationsRouter);

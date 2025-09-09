@@ -101,7 +101,7 @@ function getStatusIcon(status: string) {
   }
 }
 
-export default function DashboardPage() {
+export default function PublicDashboardPage() {
   const [location, navigate] = useLocation();
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
@@ -130,22 +130,34 @@ export default function DashboardPage() {
     isLoadingConfigRef.current = isLoadingConfig;
   }, [isLoadingConfig]);
 
-  // Check authentication
-  const { user, isLoading: authLoading } = useAuth();
+  // For public dashboard, we don't require authentication - use a simple check
+  const [authState, setAuthState] = useState<{ user: any; isLoading: boolean }>({ user: null, isLoading: true });
+  
+  // Check authentication status without using the hook that causes hydration issues
+  useEffect(() => {
+    fetch('/api/auth/status')
+      .then(res => res.json())
+      .then(data => {
+        setAuthState({ user: data.user, isLoading: false });
+      })
+      .catch(() => {
+        setAuthState({ user: null, isLoading: false });
+      });
+  }, []);
 
-  // Fetch regulations from the authenticated API endpoint with institution filtering
+  // Fetch regulations from the public API endpoint with institution filtering
   const isQueryEnabled = !isLoadingConfig && institutionConfig !== null;
   console.log('[REACT-QUERY-ENABLED] Query enabled status:', isQueryEnabled, { isLoadingConfig, hasConfig: !!institutionConfig });
   
   const { data: regulations = [], isLoading, refetch } = useQuery({
-    queryKey: ["/api/regulations", institutionConfig?.primaryTypes, institutionConfig?.hideNonApplicable],
+    queryKey: ["/api/public/regulations", institutionConfig?.primaryTypes, institutionConfig?.hideNonApplicable],
     queryFn: async () => {
-      console.log('[REACT-QUERY] Starting regulations fetch...');
+      console.log('[REACT-QUERY] Starting public regulations fetch...');
       console.log('[REACT-QUERY] Institution config:', institutionConfig);
       console.log('[REACT-QUERY] hideNonApplicable:', institutionConfig?.hideNonApplicable);
       console.log('[REACT-QUERY] primaryTypes:', institutionConfig?.primaryTypes);
       
-      let url = "/api/regulations";
+      let url = "/api/public/regulations";
       
       // If institution configuration is set to hide non-applicable and we have primary types
       if (institutionConfig?.hideNonApplicable && institutionConfig.primaryTypes.length > 0) {
@@ -261,17 +273,13 @@ export default function DashboardPage() {
     return () => clearInterval(interval);
   }, []); // FIXED: Remove institutionConfig from dependencies to prevent infinite loop
 
-  // Redirect to login if not authenticated
-  if (authLoading || isLoadingConfig) {
+  // Show loading state while checking authentication and config
+  if (authState.isLoading || isLoadingConfig) {
     return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
   }
 
-  // For SaaS product: Users must ALWAYS be authenticated - redirect to login if not
-  if (!user) {
-    console.log('[DASHBOARD] User not authenticated, redirecting to login');
-    navigate("/auth");
-    return <div className="flex items-center justify-center min-h-screen">Redirecting to login...</div>;
-  }
+  // Public dashboard - no authentication required, but show different content based on auth status
+  const isAuthenticated = !!authState.user;
 
   // Get unique categories for filtering
   const categories = useMemo(() => {
