@@ -7,8 +7,7 @@ import { Skeleton } from '../ui/skeleton';
  * Enhanced lazy loading wrapper with error boundaries and loading states
  */
 export function createLazyComponent<T extends ComponentType<any>>(
-  importFn: () => Promise<{ default: T }>,
-  fallback?: ComponentType
+  importFn: () => Promise<{ default: T }>
 ): LazyExoticComponent<T> {
   const LazyComponent = lazy(importFn);
   
@@ -220,7 +219,7 @@ export const LazyRegulationDetailPage = createLazyComponent(
 
 // Dashboard components
 export const LazyDashboardPage = createLazyComponent(
-  () => import('../../pages/public-dashboard-page')
+  () => import('../../pages/trustees-dashboard')
 );
 
 // Note: Uncomment these once components have proper default exports
@@ -255,7 +254,7 @@ export function withPerformanceMonitoring<P extends object>(
   componentName: string
 ) {
   return function PerformanceMonitoredComponent(props: P) {
-    const startTime = performance.now();
+    const startTime = React.useMemo(() => performance.now(), []);
     
     React.useEffect(() => {
       const endTime = performance.now();
@@ -272,7 +271,7 @@ export function withPerformanceMonitoring<P extends object>(
       if (process.env.NODE_ENV === 'production') {
         // Example: analytics.track('component_render', { component: componentName, time: renderTime });
       }
-    }, []);
+    }, [startTime, componentName]);
     
     return <WrappedComponent {...props} />;
   };
@@ -281,7 +280,7 @@ export function withPerformanceMonitoring<P extends object>(
 /**
  * Hook for preloading components on user interaction
  */
-export function usePreloadComponent(importFn: () => Promise<any>) {
+export function usePreloadComponent(importFn: () => Promise<unknown>) {
   const [isPreloaded, setIsPreloaded] = React.useState(false);
   
   const preload = React.useCallback(() => {
