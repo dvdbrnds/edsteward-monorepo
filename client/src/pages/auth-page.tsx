@@ -14,11 +14,10 @@ import { useBranding } from "@/hooks/use-branding";
 
 // Import logos
 import moravianLogo from "../assets/Moravian-Monogram-MoravianBlue.png";
-import genericLogo from "../assets/generic-logo.svg";
 
 export default function AuthPage() {
   const { user, loginMutation, registerMutation } = useAuth();
-  const [_, setLocation] = useLocation();
+  const [, setLocation] = useLocation();
   const branding = useBranding();
 
   const loginForm = useForm({
@@ -160,7 +159,7 @@ export default function AuthPage() {
                           variant="outline"
                           className="w-full"
                           onClick={() => {
-                            window.location.href = '/auth/saml/login/moravian';
+                            window.location.href = '/auth/saml';
                           }}
                         >
                           <img 
