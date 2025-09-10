@@ -159,7 +159,7 @@ export default function AuthPage() {
                           variant="outline"
                           className="w-full"
                           onClick={() => {
-                            window.location.href = '/auth/saml';
+                            window.location.href = 'https://moravian.edsteward.ai/auth/saml';
                           }}
                         >
                           <img 
