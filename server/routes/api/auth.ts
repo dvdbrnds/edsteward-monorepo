@@ -1,6 +1,5 @@
-import { Router, Request, Response, NextFunction } from 'express';
+import { Router, Request, Response } from 'express';
 import passport from 'passport';
-import { MultiSamlStrategy } from '@node-saml/passport-saml';
 import { TenantService } from '../../middleware/tenant';
 import { syslog, LogLevel } from '../../services/syslog';
 import { generateServiceProviderMetadata } from '../../config/saml';
@@ -42,7 +41,7 @@ router.get('/status', (req: Request, res: Response) => {
 });
 
 // Login endpoint - delegates to main login logic
-router.post('/login', (req: Request, res: Response, next: NextFunction) => {
+router.post('/login', (req: Request, res: Response) => {
   // This endpoint exists for client compatibility
   // The actual login logic is in setupAuth() at /api/login
   res.status(501).json({ 
@@ -52,7 +51,7 @@ router.post('/login', (req: Request, res: Response, next: NextFunction) => {
 });
 
 // Logout endpoint - delegates to main logout logic  
-router.post('/logout', (req: Request, res: Response, next: NextFunction) => {
+router.post('/logout', (req: Request, res: Response) => {
   // This endpoint exists for client compatibility  
   // The actual logout logic is in setupAuth() at /api/logout
   res.status(501).json({ 
@@ -66,7 +65,7 @@ router.post('/logout', (req: Request, res: Response, next: NextFunction) => {
 // =============================================================================
 
 // Add SAML routes for Moravian tenant
-router.get('/saml/login/moravian', async (req: Request, res: Response, next: NextFunction) => {
+router.get('/saml', async (req: Request, res: Response) => {
   try {
     const tenant = await TenantService.getTenantBySubdomain('moravian');
     if (!tenant || !tenant.samlConfig) {
