@@ -492,9 +492,9 @@ class DeliveryServer {
         cfrEndpoint = `http://localhost:3002/api/llm/cfr/${regulationId}`;
         complianceEndpoint = `http://localhost:3002/api/llm/compliance/${regulationId}`;
       } else if (regulationId.includes('REG-66') || regulationId.includes('reg-66') || regulationId.includes('teach')) {
-        // TEACH Act uses USC endpoints
+        // TEACH Act uses enhanced CFR endpoint with Federal Register integration
         uscEndpoint = 'http://localhost:3002/api/llm/usc/17/110';
-        cfrEndpoint = 'http://localhost:3002/api/llm/cfr/teach-act';
+        cfrEndpoint = 'http://localhost:3002/api/llm/cfr/enhanced/teach-act?federal_register=true';
         complianceEndpoint = 'http://localhost:3002/api/llm/compliance/teach-act';
       } else if (regulationId.includes('drug-free-schools') || regulationId.includes('REG-1807')) {
         // Drug-Free Schools and Communities Act (Item ID 1807)

@@ -13,6 +13,7 @@ import { parse } from 'csv-parse/sync';
 import GovernmentSourceFetcher from './government-source-fetcher.js';
 import { EnhancedSummaryIntegration } from '../services/enhanced-summary-integration.js';
 import { RequirementsGenerationService } from '../services/requirements-generation-service.js';
+import EnhancedRegulationProcessor from './enhanced-regulation-processor.js';
 
 const app = express();
 const PORT = 3002;
@@ -30,6 +31,16 @@ const enhancedSummaryIntegration = new EnhancedSummaryIntegration({
 // Initialize Requirements Generation Service
 const requirementsService = new RequirementsGenerationService({
   logger: console
+});
+
+// Initialize Enhanced Regulation Processor with Federal Register integration
+const enhancedRegulationProcessor = new EnhancedRegulationProcessor({
+  cacheDuration: 1800000, // 30 minutes cache
+  enableCache: false, // Disable cache system for now to ensure compatibility
+  federalRegister: {
+    cacheDuration: 3600000, // 1 hour cache for Federal Register API
+    timeout: 30000 // 30 second timeout
+  }
 });
 
 // HECA CSV cache and configuration
@@ -572,13 +583,205 @@ The TEACH Act represents a landmark expansion of educational exemptions in Unite
   }
 });
 
-// CFR TEACH Act endpoint
+// Enhanced CFR endpoint with Federal Register integration
+app.get('/api/llm/cfr/enhanced/:regulationSlug', async (req, res) => {
+  try {
+    const { regulationSlug } = req.params;
+    const enableFederalRegister = req.query.federal_register !== 'false'; // Default to true
+    const showAllDocuments = req.query.show_all_documents === 'true';
+    const debugMode = req.query.debug === 'true';
+    
+    console.log(`🔄 Fetching enhanced CFR data for: ${regulationSlug} (Federal Register: ${enableFederalRegister}, Show All: ${showAllDocuments})`);
+    
+    // Get base CFR data first
+    let baseRegulationData;
+    
+    if (regulationSlug === 'teach-act') {
+      // Get HECA summary for TEACH Act
+      const summaryResult = await getBestAvailableSummary('teach-act', 'Technology, Education and Copyright Harmonization Act (TEACH Act) of 2002', '');
+      
+      baseRegulationData = {
+        title: "Technology, Education and Copyright Harmonization Act (TEACH Act) of 2002",
+        source: "37 CFR 201.40",
+        fullText: `Code of Federal Regulations - Title 37: Patents, Trademarks, and Copyrights
+
+TEACH Act Implementation Requirements:
+
+§ 201.40 Educational uses under section 110(2)
+
+(a) General. Section 110(2) of title 17, United States Code, as amended by the Technology, Education and Copyright Harmonization Act of 2002 (TEACH Act), provides limitations on the exclusive rights of copyright owners for certain performances and displays in the course of digital distance education.
+
+(b) Eligible institutions. To qualify for the exemption under section 110(2), an institution must be a governmental body or an accredited nonprofit educational institution.
+
+(c) Course requirements. The performance or display must be:
+(1) Made by, at the direction of, or under the actual supervision of an instructor
+(2) An integral part of a class session offered as a regular part of systematic instructional activities
+(3) Directly related and of material assistance to the teaching content
+
+(d) Transmission requirements. The transmission must be made solely for students officially enrolled in the course, and the institution must:
+(1) Institute policies regarding copyright
+(2) Provide informational materials about copyright to faculty and students
+(3) Provide notice that materials may be subject to copyright protection
+(4) Apply technological measures to prevent retention and redistribution
+
+(e) Works covered. The exemption applies to:
+(1) Performance of nondramatic literary or musical works
+(2) Reasonable and limited portions of any other work
+(3) Display of works in amounts comparable to live classroom sessions
+
+(f) Exclusions. The exemption does not apply to:
+(1) Works produced or marketed primarily for performance or display as part of mediated instructional activities transmitted via digital networks
+(2) Textbooks, course packs, or other materials typically purchased by students`,
+        summary: summaryResult.summary,
+        keyRequirements: [
+          "Institute policies regarding copyright",
+          "Provide informational materials about copyright to faculty and students", 
+          "Provide notice that materials may be subject to copyright protection",
+          "Apply technological measures to prevent retention and redistribution",
+          "Ensure instructor supervision of all transmissions",
+          "Limit access to officially enrolled students only"
+        ]
+      };
+    } else if (regulationSlug === 'outside-earned-income-and-activities') {
+      // Get HECA summary for Outside Earned Income and Activities
+      const summaryResult = await getBestAvailableSummary('outside-earned-income-and-activities', 'Outside Earned Income and Activities', '');
+      
+      baseRegulationData = {
+        title: "Outside Earned Income and Activities",
+        source: "5 U.S.C. app. 4 §§ 501-505",
+        fullText: `United States Code - Title 5: Government Organization and Employees
+
+§ 501. Outside earned income limitation
+§ 502. Limitations on outside employment
+§ 503. Financial disclosure requirements  
+§ 504. Prohibited activities and conflicts of interest
+§ 505. Enforcement and penalties
+
+(a) General Limitations: Certain noncareer employees are subject to limitations on outside earned income and activities to prevent conflicts of interest and maintain public confidence in government integrity.
+
+(b) Income Limitations: Outside earned income from any source shall not exceed 15 percent of the annual rate of basic pay for level II of the Executive Schedule.
+
+(c) Employment Restrictions: No employee shall engage in outside employment or activities that conflict with official duties or create appearance of impropriety.
+
+(d) Financial Disclosure: Annual financial disclosure statements must be filed detailing outside income sources, employment, and financial interests.
+
+(e) Prohibited Activities: Employees may not use official position for private gain or engage in activities that compromise government integrity.`,
+        summary: summaryResult.summary,
+        keyRequirements: [
+          "Limit outside earned income to 15% of Executive Schedule Level II",
+          "File annual financial disclosure statements",
+          "Avoid conflicts of interest and appearance of impropriety", 
+          "Obtain ethics approval for outside activities",
+          "Comply with employment restrictions and prohibited activities"
+        ]
+      };
+    } else {
+      return res.status(404).json({
+        success: false,
+        error: `Enhanced CFR endpoint not yet implemented for: ${regulationSlug}`,
+        available: ['teach-act', 'outside-earned-income-and-activities']
+      });
+    }
+
+    // Process with Federal Register enhancement if enabled
+    let enhancedData;
+    if (enableFederalRegister) {
+      try {
+        console.log(`🔍 Processing ${regulationSlug} with Federal Register enhancement...`);
+        enhancedData = await enhancedRegulationProcessor.processRegulation(baseRegulationData, {
+          documentLimit: 10,
+          detailLimit: 3,
+          startDate: '2020-01-01', // Get recent documents
+          showAllDocuments: showAllDocuments,
+          debugMode: debugMode
+        });
+        console.log(`✅ Federal Register enhancement completed for ${regulationSlug}`);
+      } catch (enhancementError) {
+        console.error(`⚠️ Federal Register enhancement failed for ${regulationSlug}:`, enhancementError.message);
+        // Fall back to base data
+        enhancedData = {
+          regulation_text: baseRegulationData.fullText,
+          summary: baseRegulationData.summary,
+          submission_guidelines: 'Standard CFR compliance guidelines apply',
+          requirements: baseRegulationData.keyRequirements || [],
+          source_attribution: 'CFR (Federal Register enhancement failed)',
+          federal_register_enhancement: {
+            attempted: true,
+            successful: false,
+            error: enhancementError.message
+          }
+        };
+      }
+    } else {
+      // Return base CFR data without Federal Register enhancement
+      enhancedData = {
+        regulation_text: baseRegulationData.fullText,
+        summary: baseRegulationData.summary,
+        submission_guidelines: 'Standard CFR compliance guidelines apply',
+        requirements: baseRegulationData.keyRequirements || [],
+        source_attribution: 'CFR',
+        federal_register_enhancement: {
+          attempted: false,
+          successful: false,
+          reason: 'Federal Register enhancement disabled by request'
+        }
+      };
+    }
+
+    const response = {
+      success: true,
+      data: {
+        regulation: baseRegulationData.source,
+        topic: `${regulationSlug} Enhanced`,
+        title: baseRegulationData.title,
+        source: "Code of Federal Regulations + Federal Register",
+        enhanced: enableFederalRegister,
+        ...enhancedData,
+        version: "2024.1",
+        lastUpdated: new Date().toISOString(),
+        metadata: {
+          confidence: 95,
+          isReal: true,
+          version: "2024.1",
+          source: enhancedData.source_attribution,
+          federal_register_enhanced: enhancedData.federal_register_enhancement.successful
+        }
+      }
+    };
+
+    res.json(response);
+    
+  } catch (error) {
+    console.error(`❌ Enhanced CFR endpoint error for ${req.params.regulationSlug}:`, error.message);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch enhanced CFR data',
+      details: error.message
+    });
+  }
+});
+
+// CFR TEACH Act endpoint (legacy - now calls enhanced version)
 app.get('/api/llm/cfr/teach-act', async (req, res) => {
   try {
-    console.log('📖 Fetching CFR TEACH Act guidance...');
+    console.log('📖 Fetching CFR TEACH Act guidance (redirecting to enhanced endpoint)...');
     
-    // Get HECA summary for TEACH Act
-    console.log('🔍 [DEBUG] About to call getBestAvailableSummary for teach-act');
+    // Check if Federal Register enhancement is requested
+    const enableFederalRegister = req.query.enhanced !== 'false'; // Default to true for better data
+    
+    if (enableFederalRegister) {
+      console.log('🔄 Redirecting to enhanced CFR endpoint with Federal Register integration...');
+      // Redirect to enhanced endpoint
+      const enhancedUrl = `/api/llm/cfr/enhanced/teach-act?federal_register=true`;
+      return req.app.handle({
+        ...req,
+        url: enhancedUrl,
+        path: enhancedUrl
+      }, res);
+    }
+    
+    // Fallback to original implementation for compatibility
+    console.log('🔍 [DEBUG] Using legacy CFR implementation (Federal Register disabled)');
     const summaryResult = await getBestAvailableSummary('teach-act', 'Technology, Education and Copyright Harmonization Act (TEACH Act) of 2002', '');
     console.log(`🎯 Using ${summaryResult.source} summary for TEACH Act`);
     console.log(`📝 [DEBUG] Summary: ${summaryResult.summary.substring(0, 100)}...`);

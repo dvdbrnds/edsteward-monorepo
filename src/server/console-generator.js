@@ -214,7 +214,17 @@ export class ConsoleGenerator {
       html = html.replace(/loadRealUSCText/g, 'loadRealCFRText');
       
       // Update CFR endpoints to be regulation-specific
-      html = html.replace(/api\/llm\/cfr\/teach-act/g, `api/llm/cfr/${regulationData.REGULATION_SLUG}`);
+      // Special handling for TEACH Act to use Federal Register enhanced endpoint
+      if (regulationData.REGULATION_SLUG === 'technology-education-and-copyright-harmonization-a' || 
+          regulationData.REGULATION_NAME.toLowerCase().includes('teach act') ||
+          regulationData.REGULATION_NAME.toLowerCase().includes('technology, education and copyright')) {
+        console.log(`🔍 Using Federal Register enhanced endpoint for TEACH Act: ${regulationData.REGULATION_NAME}`);
+        html = html.replace(/api\/llm\/cfr\/teach-act/g, `api/llm/cfr/enhanced/teach-act?federal_register=true`);
+        html = html.replace(/api\/llm\/cfr\/reg-66/g, `api/llm/cfr/enhanced/teach-act?federal_register=true`);
+      } else {
+        html = html.replace(/api\/llm\/cfr\/teach-act/g, `api/llm/cfr/${regulationData.REGULATION_SLUG}`);
+        html = html.replace(/api\/llm\/cfr\/reg-66/g, `api/llm/cfr/${regulationData.REGULATION_SLUG}`);
+      }
       html = html.replace(/api\/llm\/compliance\/teach-act/g, `api/llm/compliance/${regulationData.REGULATION_SLUG}`);
       
       // CRITICAL: Inject VISIBLE government source URL into console

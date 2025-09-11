@@ -309,9 +309,39 @@ export class EdStewardIntegration {
     console.log(`  - data.after.fullText length:`, mcpUpdate.data.after?.fullText?.length || 'undefined');
     console.log(`  - data.after.content length:`, mcpUpdate.data.after?.content?.length || 'undefined');
 
-    // Extract the COMPLETE USC regulation text for EdSteward differential view
-    const originalText = mcpUpdate.data.before?.content || mcpUpdate.data.before?.fullText || "";
-    const updatedText = mcpUpdate.data.after?.content || mcpUpdate.data.after?.fullText || "";
+    // Extract regulation content - handle both legacy and enhanced formats
+    let originalText = "";
+    let updatedText = "";
+    let enhancedPayload = {};
+
+    // Check if this is an enhanced regulation package with Federal Register data
+    if (mcpUpdate.data.after?.regulation_text) {
+      console.log(`🔍 Processing enhanced regulation package with Federal Register integration`);
+      
+      originalText = mcpUpdate.data.before?.regulation_text || mcpUpdate.data.before?.content || mcpUpdate.data.before?.fullText || "";
+      updatedText = mcpUpdate.data.after.regulation_text;
+      
+      // Include enhanced fields for EdSteward
+      enhancedPayload = {
+        summary: mcpUpdate.data.after.summary,
+        submission_guidelines: mcpUpdate.data.after.submission_guidelines,
+        requirements: mcpUpdate.data.after.requirements,
+        source_attribution: mcpUpdate.data.after.source_attribution,
+        federal_register_enhancement: mcpUpdate.data.after.federal_register_enhancement,
+        processing_metadata: mcpUpdate.data.after.processing_metadata
+      };
+      
+      console.log(`📊 Enhanced regulation stats:`);
+      console.log(`  - Federal Register enhanced: ${enhancedPayload.federal_register_enhancement?.successful || false}`);
+      console.log(`  - Requirements count: ${enhancedPayload.requirements?.length || 0}`);
+      console.log(`  - Source attribution: ${enhancedPayload.source_attribution}`);
+      
+    } else {
+      console.log(`🔍 Processing legacy regulation format`);
+      // Legacy format - extract the COMPLETE USC regulation text for EdSteward differential view
+      originalText = mcpUpdate.data.before?.content || mcpUpdate.data.before?.fullText || "";
+      updatedText = mcpUpdate.data.after?.content || mcpUpdate.data.after?.fullText || "";
+    }
     
     console.log(`📋 Content lengths - Original: ${originalText.length}, Updated: ${updatedText.length}`);
     console.log(`📋 Original text preview: ${originalText.substring(0, 100)}...`);
@@ -322,7 +352,15 @@ export class EdStewardIntegration {
       name: this.getRegulationName(mcpUpdate.regulationId),
       originalContent: originalText,
       updatedContent: updatedText,
-      status: "pending"
+      status: "pending",
+      ...enhancedPayload, // Include enhanced fields if available
+      metadata: {
+        mcpEngineId: mcpUpdate.regulationId,
+        timestamp: new Date().toISOString(),
+        enhanced: !!mcpUpdate.data.after?.regulation_text,
+        federalRegisterEnhanced: enhancedPayload.federal_register_enhancement?.successful || false,
+        ...mcpUpdate.metadata
+      }
     };
 
     console.log(`📤 Sending update to EdSteward for ${mcpUpdate.regulationId} -> ${edstewardId}`);
