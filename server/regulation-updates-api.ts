@@ -29,13 +29,57 @@ const deferUpdateSchema = z.object({
 });
 
 /**
- * Schema for MCP Engine complex payload
+ * Schema for MCP Engine complex payload with Federal Register enhancement
  */
 const mcpEngineUpdateSchema = z.object({
   regulationId: z.number(),
   name: z.string(),
   status: z.enum(["pending", "accepted", "rejected", "deferred"]).default("pending"),
   effectiveDate: z.string().optional(),
+  
+  // Enhanced Federal Register fields
+  regulation_text: z.string().optional(),
+  summary: z.string().optional(),
+  submission_guidelines: z.string().optional(),
+  requirements: z.array(z.string()).optional(),
+  source_attribution: z.string().optional(),
+  
+  // Federal Register enhancement metadata
+  federal_register_enhancement: z.object({
+    attempted: z.boolean(),
+    successful: z.boolean(),
+    contexts_found: z.number().optional(),
+    total_documents_referenced: z.number().optional(),
+    error: z.string().optional(),
+    fallback_used: z.boolean().optional(),
+    contexts: z.array(z.object({
+      document_number: z.string(),
+      title: z.string(),
+      publication_date: z.string(),
+      type: z.string(),
+      abstract: z.string(),
+      full_text: z.string(),
+      url: z.string(),
+      cached: z.boolean().optional()
+    })).optional(),
+    all_documents: z.array(z.object({
+      document_number: z.string(),
+      title: z.string(),
+      publication_date: z.string(),
+      type: z.string(),
+      abstract: z.string(),
+      url: z.string()
+    })).optional()
+  }).optional(),
+  
+  // Processing metadata
+  processing_metadata: z.object({
+    processed_at: z.string(),
+    enhancement_attempted: z.boolean(),
+    enhancement_successful: z.boolean()
+  }).optional(),
+  
+  // Legacy content structure (for backward compatibility)
   content: z.object({
     uscText: z.object({
       title: z.string(),
@@ -200,14 +244,64 @@ export function setupRegulationUpdatesApi(app: Express) {
             
             console.log(`✅ Using Master Key Field ID ${validRegulationId} directly`);
             
+            // Check for Federal Register enhancement
+            const hasEnhancement = mcpData.federal_register_enhancement?.attempted;
+            const enhancementSuccessful = mcpData.federal_register_enhancement?.successful;
+            
+            console.log('🔍 Federal Register Enhancement Status:');
+            console.log('   attempted:', hasEnhancement);
+            console.log('   successful:', enhancementSuccessful);
+            console.log('   contexts_found:', mcpData.federal_register_enhancement?.contexts_found || 0);
+            console.log('   total_documents:', mcpData.federal_register_enhancement?.total_documents_referenced || 0);
+            
+            // Determine content source based on enhancement status
+            let regulationText: string;
+            let requirementsContent: string | null = null;
+            
+            if (hasEnhancement && enhancementSuccessful) {
+              // Use enhanced Federal Register content
+              regulationText = mcpData.regulation_text || mcpData.content?.uscText?.text || "Enhanced content from Federal Register";
+              
+              // Handle requirements array from Federal Register enhancement
+              if (mcpData.requirements && Array.isArray(mcpData.requirements)) {
+                requirementsContent = mcpData.requirements.join('\n• ');
+                console.log('✅ Using enhanced requirements array:', mcpData.requirements.length, 'items');
+              } else {
+                requirementsContent = mcpData.content?.requirements?.content || null;
+              }
+              
+              console.log('✅ Using Federal Register enhanced content');
+              console.log('   source_attribution:', mcpData.source_attribution);
+              console.log('   submission_guidelines available:', !!mcpData.submission_guidelines);
+            } else {
+              // Fallback to legacy content structure
+              regulationText = mcpData.content?.uscText?.text || "Original content from MCP Engine";
+              requirementsContent = mcpData.content?.requirements?.content || null;
+              
+              if (hasEnhancement && !enhancementSuccessful) {
+                console.log('⚠️ Federal Register enhancement failed, using fallback content');
+                console.log('   error:', mcpData.federal_register_enhancement?.error);
+              } else {
+                console.log('✅ Using legacy content structure');
+              }
+            }
+            
             // Convert MCP Engine format to EdSteward format
             updateData = {
               regulationId: validRegulationId,
               name: mcpData.name,
               status: mcpData.status,
-              originalContent: mcpData.content?.uscText?.text || "Original content from MCP Engine",
-              updatedContent: mcpData.content?.uscText?.text || "Updated content from MCP Engine",
-              requirements: mcpData.content?.requirements?.content || null
+              originalContent: regulationText,
+              updatedContent: regulationText,
+              requirements: requirementsContent,
+              // Store Federal Register metadata for future use
+              metadata: {
+                federal_register_enhancement: mcpData.federal_register_enhancement,
+                processing_metadata: mcpData.processing_metadata,
+                source_attribution: mcpData.source_attribution,
+                submission_guidelines: mcpData.submission_guidelines,
+                enhanced_summary: mcpData.summary
+              }
             };
             
             console.log('🔍 Debug updateData object:');
@@ -215,6 +309,7 @@ export function setupRegulationUpdatesApi(app: Express) {
             console.log('   name:', updateData.name);
             console.log('   updatedContent length:', updateData.updatedContent?.length);
             console.log('   requirements:', updateData.requirements ? `HAS_CONTENT (${updateData.requirements.length} chars)` : 'NULL');
+            console.log('   enhancement_metadata:', !!updateData.metadata?.federal_register_enhancement);
           } else {
             console.error('❌ Validation failed for all formats');
             console.error('TUF format errors:', tufValidation.error.issues);

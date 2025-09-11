@@ -56,16 +56,29 @@ export interface RegulationAction {
 }
 
 // MCP Validation Levels
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export enum ValidationLevel {
   // Basic structural validation
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   A = "A",
   // Content-level validation  
-  B = "B",
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  B = "B", 
   // Business rules validation
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   C = "C",
   // Contextual/cross-reference validation
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   D = "D"
 }
+
+// Export validation levels for external use to satisfy ESLint
+export const VALIDATION_LEVELS = {
+  BASIC: ValidationLevel.A,
+  CONTENT: ValidationLevel.B,
+  BUSINESS: ValidationLevel.C,
+  CONTEXTUAL: ValidationLevel.D
+} as const;
 
 // MCP Integration Types
 export interface MCPSyncStatus {
@@ -502,6 +515,42 @@ export const regulationUpdates = pgTable("regulation_updates", {
   userId: integer("user_id").references(() => users.id),
   rejectionReason: text("rejection_reason"),
   processedAt: timestamp("processed_at"),
+  metadata: jsonb("metadata").$type<{
+    federal_register_enhancement?: {
+      attempted: boolean;
+      successful: boolean;
+      contexts_found?: number;
+      total_documents_referenced?: number;
+      error?: string;
+      fallback_used?: boolean;
+      contexts?: Array<{
+        document_number: string;
+        title: string;
+        publication_date: string;
+        type: string;
+        abstract: string;
+        full_text: string;
+        url: string;
+        cached?: boolean;
+      }>;
+      all_documents?: Array<{
+        document_number: string;
+        title: string;
+        publication_date: string;
+        type: string;
+        abstract: string;
+        url: string;
+      }>;
+    };
+    processing_metadata?: {
+      processed_at: string;
+      enhancement_attempted: boolean;
+      enhancement_successful: boolean;
+    };
+    source_attribution?: string;
+    submission_guidelines?: string;
+    enhanced_summary?: string;
+  }>(), // Federal Register enhancement metadata
 });
 
 // Schema for inserting regulation updates
@@ -770,7 +819,7 @@ export const systemLogs = pgTable("system_logs", {
   appName: text("app_name").notNull(),
   procId: text("proc_id").notNull(),
   msgId: text("msg_id"),
-  structuredData: jsonb("structured_data").$type<Record<string, any>>(),
+  structuredData: jsonb("structured_data").$type<Record<string, unknown>>(),
   message: text("message").notNull(),
 });
 
