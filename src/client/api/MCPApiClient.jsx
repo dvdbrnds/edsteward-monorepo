@@ -48,7 +48,17 @@ class MCPApiClient {
    */
   async getServers() {
     try {
-      // Get core servers
+      // Get current MCP Engine services from the updated API
+      const response = await this.regulationRegistry.get('/api/mcp/servers');
+      
+      if (response.status === 200 && response.data) {
+        return {
+          success: true,
+          data: response.data
+        };
+      }
+      
+      // Fallback to old method if new API fails
       const coreServers = await this.getServerStatus();
       
       // Get regulation servers from registry file
@@ -791,6 +801,20 @@ class MCPApiClient {
       };
     } catch (error) {
       console.error(`Error getting MCP Inspector output for server ${serverId}:`, error);
+      throw error;
+    }
+  }
+
+  // Get regulation statistics
+  async getRegulationStats() {
+    try {
+      const response = await this.regulationRegistry.get('/api/regulations/stats');
+      return {
+        success: true,
+        data: response.data.data // API returns { success: true, data: {...} }
+      };
+    } catch (error) {
+      console.error('Error fetching regulation statistics:', error);
       throw error;
     }
   }

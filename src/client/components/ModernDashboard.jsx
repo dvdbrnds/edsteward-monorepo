@@ -233,6 +233,17 @@ const ModernDashboard = () => {
     stoppedServers: 0,
     errorServers: 0
   });
+  const [regulationStats, setRegulationStats] = useState({
+    total: 0,
+    federal: 0,
+    state: 0,
+    thirdParty: 0,
+    breakdown: {
+      categories: {},
+      states: {},
+      topics: {}
+    }
+  });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   
@@ -244,8 +255,9 @@ const ModernDashboard = () => {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      const response = await mcpApiClient.getServers();
       
+      // Load server statistics
+      const response = await mcpApiClient.getServers();
       if (response && response.data) {
         const servers = response.data;
         
@@ -259,6 +271,18 @@ const ModernDashboard = () => {
         
         setStats(newStats);
       }
+
+      // Load regulation statistics
+      try {
+        const regulationResponse = await mcpApiClient.getRegulationStats();
+        if (regulationResponse && regulationResponse.data) {
+          setRegulationStats(regulationResponse.data);
+        }
+      } catch (regulationError) {
+        console.error('Error loading regulation statistics:', regulationError);
+        // Keep default regulation stats if API fails
+      }
+      
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     } finally {
@@ -378,6 +402,54 @@ const ModernDashboard = () => {
           </StatChange>
         </StatCard>
       </StatsContainer>
+
+      {/* Regulation Statistics Section */}
+      <div style={{ margin: '24px 0' }}>
+        <h3 style={{ 
+          color: '#1f2937', 
+          fontSize: '18px', 
+          fontWeight: '600', 
+          marginBottom: '16px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px'
+        }}>
+          📋 Regulation Coverage
+        </h3>
+        <StatsContainer>
+          <StatCard>
+            <StatValue color="#7c3aed">{regulationStats.total}</StatValue>
+            <StatLabel>Total Regulations</StatLabel>
+            <StatChange positive={true}>
+              Complete compliance coverage
+            </StatChange>
+          </StatCard>
+          
+          <StatCard>
+            <StatValue color="#2563eb">{regulationStats.federal}</StatValue>
+            <StatLabel>Federal Regulations</StatLabel>
+            <StatChange positive={true}>
+              CFR + Federal Register
+            </StatChange>
+          </StatCard>
+          
+          <StatCard>
+            <StatValue color="#059669">{regulationStats.state}</StatValue>
+            <StatLabel>State Regulations</StatLabel>
+            <StatChange positive={regulationStats.state > 0}>
+              {regulationStats.breakdown?.states?.Pennsylvania ? `Pennsylvania: ${regulationStats.breakdown.states.Pennsylvania}` : 'Pennsylvania coverage'}
+            </StatChange>
+          </StatCard>
+          
+          <StatCard>
+            <StatValue color="#d97706">{regulationStats.thirdParty}</StatValue>
+            <StatLabel>Third-Party Agencies</StatLabel>
+            <StatChange positive={false}>
+              {regulationStats.thirdParty > 0 ? 'Active integrations' : 'Coming soon'}
+            </StatChange>
+          </StatCard>
+        </StatsContainer>
+      </div>
       
       <QuickActions>
         {quickActions.map((action, index) => (

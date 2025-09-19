@@ -597,7 +597,7 @@ app.get('/api/llm/cfr/enhanced/:regulationSlug', async (req, res) => {
     let baseRegulationData;
     
     if (regulationSlug === 'teach-act') {
-      // Get HECA summary for TEACH Act
+    // Get HECA summary for TEACH Act
       const summaryResult = await getBestAvailableSummary('teach-act', 'Technology, Education and Copyright Harmonization Act (TEACH Act) of 2002', '');
       
       baseRegulationData = {
@@ -2136,7 +2136,34 @@ app.get('/api/llm/compliance/:regulationSlug', async (req, res) => {
     const { regulationSlug } = req.params;
     
           // CRITICAL: For ALL FEDERAL regulations, route to CFR first as source of truth
-      if (regulationSlug === 'teach-act' ||
+      // BUT exclude PA regulations from federal routing
+      const PA_REGULATION_SLUGS = [
+        'pennsylvania-uniform-crime-reporting-act',
+        'pennsylvania-sexual-violence-education-act-article-',
+        'pennsylvania-higher-education-gift-disclosure-act',
+        'pennsylvania-english-fluency-in-higher-education-a',
+        'pennsylvania-graduation-rates-reporting-act-88-of-',
+        'programs-majors', 'state-board-of-higher-education', 'academic-standards',
+        'accreditation-requirements', 'faculty-qualifications', 'student-services',
+        'financial-aid-administration', 'institutional-research', 'assessment-and-evaluation',
+        'quality-assurance', 'compliance-monitoring', 'reporting-requirements',
+        'record-keeping', 'privacy-protection', 'information-security',
+        'data-management', 'technology-standards', 'infrastructure-requirements',
+        'safety-and-security', 'emergency-preparedness', 'risk-management',
+        'insurance-requirements', 'liability-coverage', 'property-protection',
+        'family-educational-rights-and-privacy-act-ferpa-20', 'student-right-to-know-act',
+        'campus-security-act', 'americans-with-disabilities-act-compliance',
+        'section-504-compliance', 'title-ix-compliance', 'civil-rights-compliance',
+        'equal-opportunity-employment', 'affirmative-action', 'diversity-and-inclusion',
+        'non-discrimination-policies', 'harassment-prevention', 'workplace-safety',
+        'environmental-health', 'occupational-health', 'public-health',
+        'community-health', 'global-health', 'health-promotion',
+        'pa-paeducation-1741813075070', 'pa-padeptEd-1741813075521',
+        'student-complaints-html', 'pa-padeptEd-1741813212673'
+      ];
+      
+      if (!PA_REGULATION_SLUGS.includes(regulationSlug) && (
+          regulationSlug === 'teach-act' ||
           regulationSlug === 'technology-education-and-copyright-harmonization-a' ||
           regulationSlug === 'age-discrimination-act-of-1975' || 
           regulationSlug.includes('discrimination') || 
@@ -2162,7 +2189,6 @@ app.get('/api/llm/compliance/:regulationSlug', async (req, res) => {
           regulationSlug.includes('fair-labor-standards') ||
           regulationSlug.includes('davis-bacon') ||
           regulationSlug.includes('equal-pay') ||
-          regulationSlug.includes('civil-rights') ||
           regulationSlug.includes('emergency-planning') ||
           regulationSlug.includes('epcra') ||
           regulationSlug.includes('drug-free-schools') ||
@@ -2170,7 +2196,7 @@ app.get('/api/llm/compliance/:regulationSlug', async (req, res) => {
           regulationSlug.includes('federal') ||
           regulationSlug.includes('act-of-') ||
           regulationSlug.includes('u-s-c') ||
-          regulationSlug.includes('usc')) {
+          regulationSlug.includes('usc'))) {
         try {
           console.log(`📋 Routing ${regulationSlug} to CFR endpoint for real legal text...`);
           const cfrResponse = await fetch(`http://localhost:3002/api/llm/cfr/${regulationSlug}`);
@@ -2199,39 +2225,11 @@ app.get('/api/llm/compliance/:regulationSlug', async (req, res) => {
         }
       }
 
-      // CRITICAL: Try to fetch from REAL government sources FIRST
-      try {
-        console.log(`🏛️ Attempting to fetch ${regulationSlug} from REAL government sources...`);
-        const governmentData = await governmentFetcher.getRegulationBySlug(regulationSlug);
-
-        console.log(`✅ Successfully fetched ${regulationSlug} from ${governmentData.source}`);
-
-        // Return actual government regulation data
-        return res.json({
-          success: true,
-          data: {
-            content: governmentData.fullText,
-            sections: governmentData.sections,
-            metadata: {
-              source: governmentData.source,
-              citation: governmentData.citation,
-              sourceUrl: governmentData.sourceUrl,
-              enforcementAgency: governmentData.enforcementAgency,
-              lastUpdated: governmentData.lastUpdated,
-              regulationType: governmentData.regulationType,
-              category: governmentData.category
-            },
-            title: governmentData.title,
-            regulationSlug: regulationSlug
-          }
-        });
-      } catch (governmentError) {
-        console.log(`⚠️ Government source fetch failed for ${regulationSlug}: ${governmentError.message}`);
-        console.log(`📋 Falling back to topic-specific compliance for ${regulationSlug}...`);
-      }
+    // Check if this is a Pennsylvania regulation - route to PA service FIRST
+    // (before government fetcher to prevent federal fallback)
+    // Use the PA_REGULATION_SLUGS array defined above in federal routing section
     
-    // Check if this is a Pennsylvania regulation - route to PA service
-    if (regulationSlug.startsWith('pennsylvania-')) {
+    if (PA_REGULATION_SLUGS.includes(regulationSlug)) {
       console.log(`📋 Routing Pennsylvania regulation to PA service: ${regulationSlug}...`);
       
       try {
@@ -2277,41 +2275,69 @@ app.get('/api/llm/compliance/:regulationSlug', async (req, res) => {
                 priority: "high",
                 compliance: 90,
                 description: `Reporting obligations under ${paRegulationData.citation} to Pennsylvania Department of Education`
+              }
+            ],
+            complianceActions: [
+              {
+                action: `Review ${paRegulationData.title} requirements`,
+                priority: "high",
+                deadline: "immediate",
+                status: "completed",
+                description: `Ensure institutional policies align with ${paRegulationData.citation}`
               },
               {
-                requirement: `Maintain documentation for ${paRegulationData.title}`,
-                status: "implemented",
-                priority: "medium", 
-                compliance: 88,
-                description: `Record keeping and documentation requirements under Pennsylvania state regulation`
+                action: `Implement ${paRegulationData.title} reporting procedures`,
+                priority: "high", 
+                deadline: paRegulationData.reportingDeadline || "annual",
+                status: "in_progress",
+                description: `Establish reporting workflow for ${paRegulationData.citation} compliance`
               }
-            ],
-            riskAssessment: [
-              {
-                risk: `Non-compliance with ${paRegulationData.title}`,
-                level: "HIGH",
-                probability: 15,
-                impact: "State regulatory penalties and potential loss of operating authority in Pennsylvania"
-              }
-            ],
-            enforcementStatistics: {
-              totalViolations: { count: 12, year: 2024, trend: "decreasing" },
-              averageFine: { amount: 75000, currency: "USD" },
-              maxDamages: { amount: 500000, currency: "USD" },
-              complianceRate: { percentage: 94, industry: "Pennsylvania Higher Education" }
-            }
+            ]
           }
         };
         
-        res.json(complianceResponse);
-        console.log(`✅ Served PA regulation content for ${regulationSlug} (actual PA regulation data)`);
-        return;
+        console.log(`✅ Successfully processed PA regulation: ${regulationSlug}`);
+        return res.json(complianceResponse);
         
       } catch (paError) {
-        console.error(`❌ Error fetching PA regulation ${regulationSlug}:`, paError.message);
-        // Fall through to generic compliance if PA service fails
+        console.error(`❌ PA regulation service failed for ${regulationSlug}:`, paError.message);
+        console.log(`📋 Falling back to government sources for ${regulationSlug}...`);
+        // Continue to government fetcher as fallback
       }
     }
+
+      // CRITICAL: Try to fetch from REAL government sources FIRST
+      try {
+        console.log(`🏛️ Attempting to fetch ${regulationSlug} from REAL government sources...`);
+        const governmentData = await governmentFetcher.getRegulationBySlug(regulationSlug);
+
+        console.log(`✅ Successfully fetched ${regulationSlug} from ${governmentData.source}`);
+
+        // Return actual government regulation data
+        return res.json({
+          success: true,
+          data: {
+            content: governmentData.fullText,
+            sections: governmentData.sections,
+            metadata: {
+              source: governmentData.source,
+              citation: governmentData.citation,
+              sourceUrl: governmentData.sourceUrl,
+              enforcementAgency: governmentData.enforcementAgency,
+              lastUpdated: governmentData.lastUpdated,
+              regulationType: governmentData.regulationType,
+              category: governmentData.category
+            },
+            title: governmentData.title,
+            regulationSlug: regulationSlug
+          }
+        });
+      } catch (governmentError) {
+        console.log(`⚠️ Government source fetch failed for ${regulationSlug}: ${governmentError.message}`);
+        console.log(`📋 Falling back to topic-specific compliance for ${regulationSlug}...`);
+      }
+    
+    // PA regulation check now handled above before government fetcher
     
     // Federal regulations with specific content engines - only handle the ones with actual USC/CFR content
     try {

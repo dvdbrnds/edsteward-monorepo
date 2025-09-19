@@ -22,6 +22,8 @@ import ModernDashboard from './components/ModernDashboard';
 import GlobalStyle from './GlobalStyle';
 import MCPEditorTool from './pages/MCPEditorTool';
 import MCPServerDetail from './pages/MCPServerDetail';
+import SystemHealthDashboard from './components/SystemHealthDashboard';
+import SystemSettings from './components/SystemSettings';
 
 // Theme configuration with Material Design color palette
 const theme = {
@@ -176,7 +178,11 @@ const DevClientApp = () => {
             <Routes>
               <Route path="/" element={<ModernDashboard />} />
               <Route path="/editor" element={<MCPEditorTool />} />
+              <Route path="/create-server" element={<MCPEditorTool />} />
+              <Route path="/servers" element={<MCPEditorTool />} />
               <Route path="/servers/:serverId" element={<MCPServerDetail />} />
+              <Route path="/health" element={<SystemHealthDashboard />} />
+              <Route path="/settings" element={<SystemSettings />} />
               <Route path="/batch" element={<BatchTestingPanel />} />
               <Route path="/debug" element={<RequestInspector />} />
               <Route path="/admin" element={<AdminDebugPanel />} />
