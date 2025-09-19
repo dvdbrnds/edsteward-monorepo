@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Button, Spin, Empty } from 'antd';
-import { PlusOutlined, ReloadOutlined, SettingOutlined } from '@ant-design/icons';
+import { PlusOutlined, ReloadOutlined, SettingOutlined, SendOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import ModernServerList from './ModernServerList';
 import mcpApiClient from '../api/MCPApiClient.jsx';
@@ -312,6 +312,14 @@ const ModernDashboard = () => {
       color: '#e3f2fd',
       iconColor: '#1976d2',
       onClick: handleCreateServer
+    },
+    {
+      title: 'Customer Delivery',
+      description: 'Push regulations to specific customers',
+      icon: <SendOutlined />,
+      color: '#fef3c7',
+      iconColor: '#d97706',
+      onClick: () => navigate('/customer-delivery')
     },
     {
       title: 'Server Management',
