@@ -36,6 +36,7 @@ const notificationOverrideSchema = z.object({
 import Navigation from "@/components/layout/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
@@ -45,7 +46,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
 import { 
@@ -75,19 +75,16 @@ import {
   AlertCircle,
   ArrowLeft,
   Loader2,
-  Bell,
   Shield,
   History,
   Check,
   CheckCircle2,
-  Clock4
+  Zap
 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 import { toast } from "@/hooks/use-toast";
-import CircularProgress from "@/components/common/circular-progress";
-import { format, differenceInDays } from "date-fns";
+import { format } from "date-fns";
 import { NoteSection } from "@/components/regulations/note-section";
-import { RegulationChanges } from "@/components/regulations/regulation-changes";
+import { EnhancedRegulationTimeline } from "@/components/regulations/enhanced-regulation-timeline";
 import { RegulationTimeline } from "@/components/regulations/regulation-timeline";
 import { WebPublishDialog } from "@/components/regulations/web-publish-dialog";
 import { CommunicationDialog } from "@/components/regulations/communication-dialog";
@@ -131,6 +128,17 @@ function RegulationDetailPage() {
       return response.json();
     },
     enabled: !!user && !!regulationId,
+  });
+
+  // Fetch pending updates for this regulation
+  const { data: pendingUpdates = [] } = useQuery({
+    queryKey: ['/api/regulations', regulationId, 'pending-updates'],
+    queryFn: async () => {
+      const response = await fetch(`/api/regulations/${regulationId}/pending-updates`);
+      if (!response.ok) throw new Error('Failed to fetch pending updates');
+      return response.json();
+    },
+    enabled: !!regulationId && !!user
   });
 
   console.log("Regulation data:", regulation);
@@ -380,6 +388,78 @@ function RegulationDetailPage() {
       <main className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="space-y-8">
+            {/* Pending Updates Notification Banner */}
+            {pendingUpdates.length > 0 && (
+              <div className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 border-l-4 border-yellow-400 rounded-lg shadow-sm">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="flex-shrink-0">
+                      <AlertCircle className="h-6 w-6 text-yellow-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-medium text-yellow-800">
+                        {pendingUpdates.length} Pending Update{pendingUpdates.length > 1 ? 's' : ''} Available
+                      </h3>
+                      <p className="text-sm text-yellow-700 mt-1">
+                        This regulation has updates waiting for review and approval. 
+                        {pendingUpdates.some((update: any) => update.name?.includes('MCP Engine')) && 
+                          ' Some updates are from the MCP Engine with enhanced Federal Register data.'
+                        }
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => navigate('/regulations/updates')}
+                      className="bg-white hover:bg-yellow-50 border-yellow-300"
+                    >
+                      <FileText className="h-4 w-4 mr-2" />
+                      Review Updates
+                    </Button>
+                    {isAdmin && (
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => setShowVersionHistory(true)}
+                        className="bg-yellow-600 hover:bg-yellow-700 text-white"
+                      >
+                        <History className="h-4 w-4 mr-2" />
+                        View Timeline
+                      </Button>
+                    )}
+                  </div>
+                </div>
+                
+                {/* Quick preview of recent updates */}
+                <div className="mt-3 space-y-2">
+                  {pendingUpdates.slice(0, 2).map((update: any) => (
+                    <div key={update.id} className="flex items-center justify-between text-sm bg-white bg-opacity-50 rounded px-3 py-2">
+                      <div className="flex items-center space-x-2">
+                        <Clock className="h-4 w-4 text-yellow-600" />
+                        <span className="font-medium text-yellow-800">{update.name}</span>
+                        {update.name?.includes('MCP Engine') && (
+                          <Badge variant="secondary" className="text-xs">
+                            <Zap className="h-3 w-3 mr-1" />
+                            Enhanced
+                          </Badge>
+                        )}
+                      </div>
+                      <span className="text-yellow-600 text-xs">
+                        {new Date(update.updateDate).toLocaleDateString()}
+                      </span>
+                    </div>
+                  ))}
+                  {pendingUpdates.length > 2 && (
+                    <div className="text-sm text-yellow-700 text-center py-1">
+                      +{pendingUpdates.length - 2} more update{pendingUpdates.length - 2 > 1 ? 's' : ''}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
             <div>
               <Button
                 variant="ghost"
@@ -582,7 +662,7 @@ function RegulationDetailPage() {
                     <div className="space-y-4">
                       {categoryVisible && (
                         <div>
-                          <h3 className="font-medium text-gray-900">Version History</h3>
+                          <h3 className="font-medium text-gray-900">Enhanced Version Control</h3>
                           <div className="mt-2">
                             <Button
                               variant="outline"
@@ -590,11 +670,14 @@ function RegulationDetailPage() {
                               onClick={() => setShowVersionHistory(!showVersionHistory)}
                             >
                               <History className="h-4 w-4" />
-                              {showVersionHistory ? 'Hide Version History' : 'Show Version History'}
+                              {showVersionHistory ? 'Hide Timeline & Versions' : 'Show Timeline & Versions'}
                             </Button>
-                            {showVersionHistory && regulation?.previousVersionId && (
+                            {showVersionHistory && (
                               <div className="mt-4">
-                                <RegulationChanges currentRegulation={regulation} />
+                                <EnhancedRegulationTimeline 
+                                  regulation={regulation} 
+                                  showRollback={isAdmin}
+                                />
                               </div>
                             )}
                           </div>

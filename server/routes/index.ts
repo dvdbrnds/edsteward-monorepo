@@ -1007,6 +1007,10 @@ export function registerRoutes(app: express.Application): Server {
   setupRegulationUpdatesApi(app as any);
   setupDebugRegulationUpdatesApi(app as any);
   setupMCPIntegrationApi(app as any);
+  
+  // Setup enhanced version control API
+  const { setupRegulationVersionControlApi } = await import('../regulation-version-control-api');
+  setupRegulationVersionControlApi(app as any);
 
   // Initialize database
   initializeDatabase().catch(console.error);

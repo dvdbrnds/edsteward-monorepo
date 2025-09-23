@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Browser Console</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .debug-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; background: #f9f9f9; }
+        .error { color: red; font-weight: bold; }
+        .success { color: green; font-weight: bold; }
+        .warning { color: orange; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug Browser Console for Accept All Button</h1>
+    
+    <div class="debug-section">
+        <h2>Step-by-Step Debugging:</h2>
+        <ol>
+            <li><strong>Open EdSteward in incognito mode:</strong> <a href="http://localhost:3000/auth" target="_blank">http://localhost:3000/auth</a></li>
+            <li><strong>Login with:</strong> dvdbrnds / gabadh</li>
+            <li><strong>Navigate to:</strong> <a href="http://localhost:3000/regulations/updates" target="_blank">http://localhost:3000/regulations/updates</a></li>
+            <li><strong>Open Developer Tools:</strong> Press F12</li>
+            <li><strong>Check Console tab for errors</strong></li>
+        </ol>
+    </div>
+    
+    <div class="debug-section">
+        <h2>What to Look For in Console:</h2>
+        <ul>
+            <li><span class="error">Red errors</span> - JavaScript compilation or runtime errors</li>
+            <li><span class="warning">Yellow warnings</span> - React warnings or deprecations</li>
+            <li><span class="success">Console logs</span> - Look for "UpdatesListPage component is rendering!"</li>
+        </ul>
+    </div>
+    
+    <div class="debug-section">
+        <h2>Common Issues to Check:</h2>
+        <ul>
+            <li><strong>Import errors:</strong> Missing CheckCircle import from lucide-react</li>
+            <li><strong>React Query errors:</strong> Issues with useMutation hook</li>
+            <li><strong>TypeScript errors:</strong> Type mismatches in the component</li>
+            <li><strong>Component not rendering:</strong> Conditional rendering logic issues</li>
+        </ul>
+    </div>
+    
+    <div class="debug-section">
+        <h2>Expected Console Output:</h2>
+        <pre>
+🚀 UpdatesListPage component is rendering!
+🚀 UpdatesListPage: Current URL: /regulations/updates
+📋 Current state: { pendingUpdates: [...], isLoading: false, error: null }
+📋 Rendering updates list with 213 items
+        </pre>
+    </div>
+    
+    <div class="debug-section">
+        <h2>If You See Errors:</h2>
+        <p>Copy the exact error message and we can fix it. Common fixes:</p>
+        <ul>
+            <li><strong>Import error:</strong> Missing dependency or wrong import path</li>
+            <li><strong>Hook error:</strong> React hooks called conditionally</li>
+            <li><strong>Type error:</strong> TypeScript compilation issue</li>
+        </ul>
+    </div>
+    
+    <script>
+        console.log('🔍 Debug page loaded - now check the EdSteward app console');
+        console.log('📋 Look for errors in the Console tab when you visit the regulation updates page');
+    </script>
+</body>
+</html>

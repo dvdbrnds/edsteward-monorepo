@@ -512,7 +512,7 @@ export class DatabaseStorage implements IStorage {
         );
 
         // Remove the requirements field from the update object
-        const { requirements, ...otherFields } = regulation;
+        const { requirements: _requirements, ...otherFields } = regulation;
 
         // If there are other fields to update, do that separately
         if (Object.keys(otherFields).length > 0) {
@@ -935,6 +935,168 @@ export class DatabaseStorage implements IStorage {
       return newVersion;
     } catch (error) {
       console.error("Error creating regulation version:", error);
+      throw error;
+    }
+  }
+
+  // Enhanced Version Control Methods for API
+  async getPendingUpdatesForRegulation(regulationId: number): Promise<any[]> {
+    try {
+      const result = await sessionPool.query(`
+        SELECT 
+          ru.id,
+          ru.regulation_id as "regulationId",
+          ru.name,
+          ru.status,
+          ru.update_date as "updateDate",
+          ru.signature,
+          ru.user_id as "userId",
+          u.username,
+          u.first_name as "firstName",
+          u.last_name as "lastName"
+        FROM regulation_updates ru
+        LEFT JOIN users u ON ru.user_id = u.id
+        WHERE ru.regulation_id = $1 AND ru.status = 'pending'
+        ORDER BY ru.update_date DESC
+      `, [regulationId]);
+
+      return result.rows.map(row => ({
+        ...row,
+        updateDate: row.updateDate.toISOString(),
+        user: row.username ? {
+          username: row.username,
+          firstName: row.firstName,
+          lastName: row.lastName
+        } : undefined
+      }));
+    } catch (error) {
+      console.error('Error fetching pending updates:', error);
+      throw error;
+    }
+  }
+
+
+  async updateRegulationContent(regulationId: number, content: string, _userId: number): Promise<void> {
+    try {
+      await sessionPool.query(`
+        UPDATE regulations 
+        SET summary = $1, last_updated = NOW()
+        WHERE id = $2
+      `, [content, regulationId]);
+    } catch (error) {
+      console.error('Error updating regulation content:', error);
+      throw error;
+    }
+  }
+
+  async createAuditLogEntry(entry: {
+    userId: number;
+    action: string;
+    resourceType: string;
+    resourceId: number;
+    details: any;
+  }): Promise<void> {
+    // Log to console for now - in production this would go to an audit_logs table
+    console.log('📋 AUDIT LOG:', {
+      timestamp: new Date().toISOString(),
+      ...entry
+    });
+  }
+
+  async getRegulationTimeline(regulationId: number): Promise<any[]> {
+    try {
+      // Get versions
+      const versions = await this.getRegulationVersions(regulationId);
+      
+      // Get pending updates
+      const pendingUpdates = await this.getPendingUpdatesForRegulation(regulationId);
+      
+      // Get regulation milestones
+      const regulation = await this.getRegulation(regulationId);
+      
+      const timeline = [];
+      
+      // Add version events
+      versions.forEach(version => {
+        timeline.push({
+          id: `version-${version.id}`,
+          date: version.createdAt,
+          type: 'version',
+          title: `Version ${version.versionNumber}`,
+          description: `${version.source === 'mcp' ? 'MCP Engine Update' : 
+                       version.source === 'import' ? 'Imported Update' :
+                       version.source === 'rollback' ? 'Rolled Back' : 'Manual Update'}`,
+          data: version,
+          status: 'completed'
+        });
+      });
+      
+      // Add pending update events
+      pendingUpdates.forEach(update => {
+        timeline.push({
+          id: `update-${update.id}`,
+          date: update.updateDate,
+          type: 'update',
+          title: 'Pending Update',
+          description: update.name,
+          data: update,
+          status: 'pending'
+        });
+      });
+      
+      // Add regulation milestones
+      if (regulation?.originationDate) {
+        timeline.push({
+          id: 'originated',
+          date: regulation.originationDate,
+          type: 'milestone',
+          title: 'Regulation Originated',
+          description: 'Initial publication',
+          data: null,
+          status: 'completed'
+        });
+      }
+      
+      if (regulation?.effectiveDate) {
+        timeline.push({
+          id: 'effective',
+          date: regulation.effectiveDate,
+          type: 'milestone',
+          title: 'Became Effective',
+          description: 'Regulation became legally effective',
+          data: null,
+          status: 'completed'
+        });
+      }
+      
+      // Sort by date (newest first)
+      return timeline.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    } catch (error) {
+      console.error('Error fetching regulation timeline:', error);
+      throw error;
+    }
+  }
+
+  async getRegulationVersionStats(regulationId: number): Promise<any> {
+    try {
+      const versions = await this.getRegulationVersions(regulationId);
+      const pendingUpdates = await this.getPendingUpdatesForRegulation(regulationId);
+      
+      const sourceStats = versions.reduce((acc, version) => {
+        acc[version.source] = (acc[version.source] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+      
+      return {
+        totalVersions: versions.length,
+        pendingUpdates: pendingUpdates.length,
+        sourceBreakdown: sourceStats,
+        latestVersion: versions[0]?.versionNumber || 0,
+        firstCreated: versions[versions.length - 1]?.createdAt,
+        lastUpdated: versions[0]?.createdAt
+      };
+    } catch (error) {
+      console.error('Error fetching version statistics:', error);
       throw error;
     }
   }
@@ -1553,6 +1715,7 @@ export class DatabaseStorage implements IStorage {
       throw error;
     }
   }
+
 }
 
 export const storage = new DatabaseStorage();

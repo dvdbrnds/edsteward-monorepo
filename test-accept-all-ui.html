@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Accept All Button Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .accept-button { 
+            background: #16a34a; 
+            color: white; 
+            padding: 8px 16px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer;
+        }
+        .delete-button { 
+            background: #dc2626; 
+            color: white; 
+            padding: 8px 16px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Accept All Button UI Test</h1>
+    
+    <div class="test-section">
+        <h2>Expected UI Layout:</h2>
+        <p>This is what you should see on the regulation updates page:</p>
+        
+        <div style="border: 2px solid #e5e7eb; padding: 15px; margin: 10px 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h3>Regulation Updates</h3>
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <button class="accept-button">✓ Accept All Updates</button>
+                    <button style="background: #6b7280; color: white; padding: 8px 16px; border: none; border-radius: 4px;">🔄 Refresh</button>
+                    <span style="background: #f3f4f6; padding: 4px 8px; border-radius: 4px; font-size: 12px;">213 pending updates</span>
+                </div>
+            </div>
+            
+            <div style="background: white; border: 1px solid #e5e7eb; padding: 15px; border-radius: 8px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="checkbox"> <span>Select all 213 selected</span>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button class="accept-button">✓ Accept All (213)</button>
+                        <button class="delete-button">🗑️ Delete Selected</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Troubleshooting Steps:</h2>
+        <ol>
+            <li><strong>Clear Browser Cache:</strong> Press Ctrl+Shift+R (or Cmd+Shift+R on Mac) to hard refresh</li>
+            <li><strong>Check URL:</strong> Make sure you're at <code>http://localhost:3000/regulations/updates</code></li>
+            <li><strong>Login Status:</strong> Ensure you're logged in with dvdbrnds/gabadh</li>
+            <li><strong>Browser Console:</strong> Press F12 and check for JavaScript errors</li>
+        </ol>
+    </div>
+    
+    <div class="test-section">
+        <h2>Quick Links:</h2>
+        <p><a href="http://localhost:3000/auth" target="_blank">Login Page</a></p>
+        <p><a href="http://localhost:3000/regulations/updates" target="_blank">Regulation Updates Page</a></p>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🧪 Accept All Button Test Page Loaded');
+            console.log('📋 Expected buttons: "Accept All Updates" (green) and "Accept All (X)" (green)');
+            console.log('🔍 If you don\'t see these buttons, try the troubleshooting steps above');
+        });
+    </script>
+</body>
+</html>
