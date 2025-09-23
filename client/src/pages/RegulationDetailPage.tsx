@@ -110,7 +110,6 @@ function RegulationDetailPage() {
   const [location, navigate] = useLocation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
-  const [showVersionHistory, setShowVersionHistory] = useState(false);
   const [showWebPublishDialog, setShowWebPublishDialog] = useState(false);
   const [showCommunicationDialog, setShowCommunicationDialog] = useState(false);
   const [showSubmissionWizard, setShowSubmissionWizard] = useState(false);
@@ -402,7 +401,7 @@ function RegulationDetailPage() {
                       </h3>
                       <p className="text-sm text-yellow-700 mt-1">
                         This regulation has updates waiting for review and approval. 
-                        {pendingUpdates.some((update: any) => update.name?.includes('MCP Engine')) && 
+                        {pendingUpdates.some((update) => update.name?.includes('MCP Engine')) && 
                           ' Some updates are from the MCP Engine with enhanced Federal Register data.'
                         }
                       </p>
@@ -422,7 +421,13 @@ function RegulationDetailPage() {
                       <Button
                         variant="default"
                         size="sm"
-                        onClick={() => setShowVersionHistory(true)}
+                        onClick={() => {
+                          // Scroll to the enhanced timeline section
+                          const timelineElement = document.querySelector('[data-testid="enhanced-timeline"]');
+                          if (timelineElement) {
+                            timelineElement.scrollIntoView({ behavior: 'smooth' });
+                          }
+                        }}
                         className="bg-yellow-600 hover:bg-yellow-700 text-white"
                       >
                         <History className="h-4 w-4 mr-2" />
@@ -434,7 +439,7 @@ function RegulationDetailPage() {
                 
                 {/* Quick preview of recent updates */}
                 <div className="mt-3 space-y-2">
-                  {pendingUpdates.slice(0, 2).map((update: any) => (
+                  {pendingUpdates.slice(0, 2).map((update) => (
                     <div key={update.id} className="flex items-center justify-between text-sm bg-white bg-opacity-50 rounded px-3 py-2">
                       <div className="flex items-center space-x-2">
                         <Clock className="h-4 w-4 text-yellow-600" />
@@ -542,8 +547,17 @@ function RegulationDetailPage() {
               </Button>
             </div>
 
-            {/* Timeline */}
-            <RegulationTimeline regulation={regulation} />
+            {/* Enhanced Timeline for Admins, Basic Timeline for Users */}
+            {isAdmin ? (
+              <div data-testid="enhanced-timeline">
+                <EnhancedRegulationTimeline 
+                  regulation={regulation} 
+                  showRollback={true}
+                />
+              </div>
+            ) : (
+              <RegulationTimeline regulation={regulation} />
+            )}
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 space-y-6">
@@ -662,25 +676,11 @@ function RegulationDetailPage() {
                     <div className="space-y-4">
                       {categoryVisible && (
                         <div>
-                          <h3 className="font-medium text-gray-900">Enhanced Version Control</h3>
-                          <div className="mt-2">
-                            <Button
-                              variant="outline"
-                              className="flex items-center gap-2"
-                              onClick={() => setShowVersionHistory(!showVersionHistory)}
-                            >
-                              <History className="h-4 w-4" />
-                              {showVersionHistory ? 'Hide Timeline & Versions' : 'Show Timeline & Versions'}
-                            </Button>
-                            {showVersionHistory && (
-                              <div className="mt-4">
-                                <EnhancedRegulationTimeline 
-                                  regulation={regulation} 
-                                  showRollback={isAdmin}
-                                />
-                              </div>
-                            )}
-                          </div>
+                          <h3 className="font-medium text-gray-900">Admin Tools</h3>
+                          <p className="text-sm text-gray-600 mt-1">
+                            Enhanced version control timeline is shown above for admin users.
+                            Use the timeline to view version history, compare versions, and rollback changes.
+                          </p>
                         </div>
                       )}
                       
