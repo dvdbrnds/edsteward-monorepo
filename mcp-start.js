@@ -28,7 +28,8 @@ const CONFIG = {
     registry: 3010,
     llmGateway: 3002,
     frontend: 3050,
-    delivery: 3051
+    delivery: 3051,
+    customerManagement: 3060
   },
   healthCheck: {
     maxRetries: 15,
@@ -303,6 +304,52 @@ async function startDeliverySystem() {
 }
 
 /**
+ * Start Customer Management API
+ */
+async function startCustomerManagement() {
+  log.info('Starting Customer Management API...', 'CUSTOMER');
+
+  const customerProcess = spawn('node', ['src/server/customer-management-api.js'], {
+    stdio: ['ignore', 'pipe', 'pipe'],
+    cwd: process.cwd()
+  });
+
+  customerProcess.stdout.on('data', (data) => {
+    const output = data.toString().trim();
+    if (output) {
+      log.info(output, 'CUSTOMER');
+    }
+  });
+
+  customerProcess.stderr.on('data', (data) => {
+    const output = data.toString().trim();
+    if (output) {
+      log.error(output, 'CUSTOMER');
+    }
+  });
+
+  customerProcess.on('close', (code) => {
+    if (!isShuttingDown) {
+      log.error(`Customer Management API exited with code ${code}`, 'CUSTOMER');
+      if (canRestart('customer')) {
+        setTimeout(() => {
+          if (!isShuttingDown) {
+            startCustomerManagement();
+          }
+        }, 2000);
+      } else {
+        log.error('Customer Management API restart limit reached, system will continue without it', 'CUSTOMER');
+      }
+    }
+  });
+
+  processes.set('customer', customerProcess);
+  log.info(`Customer Management API PID: ${customerProcess.pid}`, 'CUSTOMER');
+
+  return customerProcess;
+}
+
+/**
  * Start Frontend Development Server
  */
 async function startFrontend() {
@@ -417,6 +464,7 @@ async function main() {
       execSync('pkill -f "registry-server.js" || true', { stdio: 'ignore' });
       execSync('pkill -f "simple-usc-gateway" || true', { stdio: 'ignore' });
       execSync('pkill -f "delivery-server.js" || true', { stdio: 'ignore' });
+      execSync('pkill -f "customer-management-api.js" || true', { stdio: 'ignore' });
     } catch (e) {
       // Ignore cleanup errors
     }
@@ -447,6 +495,9 @@ async function main() {
     // Start Delivery System (regulation updates & real-time)
     await startDeliverySystem();
 
+    // Start Customer Management API (customer data & delivery)
+    await startCustomerManagement();
+
     // Start Frontend (user interface)
     await startFrontend();
 
@@ -456,6 +507,7 @@ async function main() {
     console.log('📊 Registry API:     http://localhost:' + CONFIG.ports.registry);
     console.log('🤖 LLM Gateway:      http://localhost:' + CONFIG.ports.llmGateway);
     console.log('🚀 Delivery System:  http://localhost:' + CONFIG.ports.delivery);
+    console.log('👥 Customer API:     http://localhost:' + CONFIG.ports.customerManagement);
     console.log('🌐 Frontend:         http://localhost:' + CONFIG.ports.frontend);
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
     console.log('\n✨ All services are ready for compliance management!');
