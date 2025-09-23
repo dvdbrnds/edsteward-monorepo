@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
-import { Loader2, FileText, Eye, Calendar, Clock, RefreshCw, Trash2, PlayCircle, Zap } from 'lucide-react';
+import { Loader2, FileText, Eye, Calendar, Clock, RefreshCw, Trash2, PlayCircle, Zap, CheckCircle } from 'lucide-react';
 import Navigation from "@/components/layout/navigation";
 
 const UpdatesListPage: React.FC = () => {
@@ -72,6 +72,56 @@ const UpdatesListPage: React.FC = () => {
     },
   });
 
+  // Bulk accept mutation
+  const bulkAcceptMutation = useMutation({
+    mutationFn: async (ids: number[]) => {
+      const results = [];
+      for (const id of ids) {
+        try {
+          const response = await fetch(`/api/regulation-updates/${id}/accept`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({}), // Auto-signature is generated server-side
+          });
+          
+          if (!response.ok) {
+            const errorData = await response.json().catch(() => ({}));
+            throw new Error(errorData.error || `Failed to accept update ${id}`);
+          }
+          
+          results.push({ id, success: true });
+        } catch (error) {
+          results.push({ id, success: false, error: error.message });
+        }
+      }
+      return results;
+    },
+    onSuccess: (results) => {
+      const successCount = results.filter(r => r.success).length;
+      const failCount = results.filter(r => !r.success).length;
+      
+      console.log(`✅ Bulk accept completed: ${successCount} accepted, ${failCount} failed`);
+      
+      if (successCount > 0) {
+        alert(`Successfully accepted ${successCount} regulation update${successCount > 1 ? 's' : ''}${failCount > 0 ? `. ${failCount} failed.` : '.'}`);
+      }
+      
+      if (failCount > 0 && successCount === 0) {
+        alert(`Failed to accept ${failCount} regulation update${failCount > 1 ? 's' : ''}.`);
+      }
+      
+      setSelectedIds([]);
+      queryClient.invalidateQueries({ queryKey: ['/api/regulation-updates/pending'] });
+    },
+    onError: (error) => {
+      console.error('❌ Bulk accept failed:', error);
+      alert(`Failed to accept updates: ${error.message}`);
+    },
+  });
+
   // Selection handlers
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
@@ -96,6 +146,16 @@ const UpdatesListPage: React.FC = () => {
     
     if (window.confirm(confirmMessage)) {
       bulkDeleteMutation.mutate(selectedIds);
+    }
+  };
+
+  const handleBulkAccept = () => {
+    if (selectedIds.length === 0) return;
+    
+    const confirmMessage = `Are you sure you want to accept ${selectedIds.length} regulation update${selectedIds.length > 1 ? 's' : ''}? This will apply all changes to the regulations.`;
+    
+    if (window.confirm(confirmMessage)) {
+      bulkAcceptMutation.mutate(selectedIds);
     }
   };
 
@@ -146,6 +206,28 @@ const UpdatesListPage: React.FC = () => {
             </p>
           </div>
           <div className="flex items-center gap-2">
+            {pendingUpdates.length > 0 && (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => {
+                  const confirmMessage = `Accept all ${pendingUpdates.length} pending regulation updates? This will apply all changes immediately.`;
+                  if (window.confirm(confirmMessage)) {
+                    const allIds = pendingUpdates.map(update => update.id);
+                    bulkAcceptMutation.mutate(allIds);
+                  }
+                }}
+                disabled={bulkAcceptMutation.isPending}
+                className="flex items-center gap-1 bg-green-600 hover:bg-green-700"
+              >
+                {bulkAcceptMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <CheckCircle className="h-4 w-4" />
+                )}
+                Accept All Updates
+              </Button>
+            )}
             <Button
               variant="outline"
               size="sm"
@@ -191,20 +273,36 @@ const UpdatesListPage: React.FC = () => {
               </div>
               
               {selectedIds.length > 0 && (
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={handleBulkDelete}
-                  disabled={bulkDeleteMutation.isPending}
-                  className="flex items-center gap-1"
-                >
-                  {bulkDeleteMutation.isPending ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    <Trash2 className="h-4 w-4" />
-                  )}
-                  Delete Selected ({selectedIds.length})
-                </Button>
+                <div className="flex items-center gap-2">
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={handleBulkAccept}
+                    disabled={bulkAcceptMutation.isPending}
+                    className="flex items-center gap-1 bg-green-600 hover:bg-green-700"
+                  >
+                    {bulkAcceptMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <CheckCircle className="h-4 w-4" />
+                    )}
+                    Accept All ({selectedIds.length})
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={handleBulkDelete}
+                    disabled={bulkDeleteMutation.isPending}
+                    className="flex items-center gap-1"
+                  >
+                    {bulkDeleteMutation.isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Trash2 className="h-4 w-4" />
+                    )}
+                    Delete Selected ({selectedIds.length})
+                  </Button>
+                </div>
               )}
             </div>
           </div>
