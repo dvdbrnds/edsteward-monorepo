@@ -196,6 +196,9 @@ const CustomerDeliveryDashboard = () => {
           duration: 5
         });
 
+        // Start polling for delivery status updates
+        startDeliveryPolling(data.data.deliveryId);
+
         // Refresh customer data to update last delivery time
         loadCustomers();
       } else {
@@ -210,6 +213,50 @@ const CustomerDeliveryDashboard = () => {
     } finally {
       setLoading(prev => ({ ...prev, delivery: false }));
     }
+  };
+
+  // Start polling for delivery status updates
+  const startDeliveryPolling = (deliveryId) => {
+    const pollInterval = setInterval(async () => {
+      try {
+        const response = await fetch(`${API_BASE}/delivery/status/${deliveryId}`);
+        const data = await response.json();
+        
+        if (data.success) {
+          setDeliveryStatus(data.data);
+          
+          // Stop polling if delivery is completed or failed
+          if (data.data.status === 'completed' || data.data.status === 'failed') {
+            clearInterval(pollInterval);
+            
+            if (data.data.status === 'completed') {
+              notification.success({
+                message: 'Delivery Completed',
+                description: `Successfully delivered ${data.data.progress.total} regulations`,
+                duration: 8
+              });
+            } else {
+              notification.error({
+                message: 'Delivery Failed',
+                description: 'Bulk delivery encountered errors',
+                duration: 8
+              });
+            }
+            
+            // Refresh customer data
+            loadCustomers();
+          }
+        }
+      } catch (error) {
+        console.error('Status polling error:', error);
+        clearInterval(pollInterval);
+      }
+    }, 2000); // Poll every 2 seconds
+
+    // Clean up interval after 10 minutes to prevent infinite polling
+    setTimeout(() => {
+      clearInterval(pollInterval);
+    }, 600000);
   };
 
   // Get customer type color
@@ -472,25 +519,26 @@ const CustomerDeliveryDashboard = () => {
             <Col span={12}>
               <Descriptions column={1} size="small">
                 <Descriptions.Item label="Delivery ID">{deliveryStatus.deliveryId}</Descriptions.Item>
-                <Descriptions.Item label="Customer">{deliveryStatus.customer.name}</Descriptions.Item>
+                <Descriptions.Item label="Customer">{deliveryStatus.customer?.name || 'Unknown Customer'}</Descriptions.Item>
                 <Descriptions.Item label="Status">
                   <Tag color={deliveryStatus.status === 'completed' ? 'green' : 'blue'}>
                     {deliveryStatus.status.toUpperCase()}
                   </Tag>
                 </Descriptions.Item>
-                <Descriptions.Item label="Started">{new Date(deliveryStatus.delivery.startTime).toLocaleString()}</Descriptions.Item>
+                <Descriptions.Item label="Started">{deliveryStatus.delivery?.startTime ? new Date(deliveryStatus.delivery.startTime).toLocaleString() : 'Not available'}</Descriptions.Item>
               </Descriptions>
             </Col>
             <Col span={12}>
               <div style={{ padding: '16px' }}>
-                <Text strong>Progress: {deliveryStatus.progress.completed}/{deliveryStatus.progress.total}</Text>
+                <Text strong>Progress: {deliveryStatus.progress?.completed || 0}/{deliveryStatus.progress?.total || 0}</Text>
                 <Progress 
-                  percent={Math.round((deliveryStatus.progress.completed / deliveryStatus.progress.total) * 100)}
+                  percent={deliveryStatus.progress?.completed && deliveryStatus.progress?.total ? 
+                    Math.round((deliveryStatus.progress.completed / deliveryStatus.progress.total) * 100) : 0}
                   status={deliveryStatus.status === 'completed' ? 'success' : 'active'}
                   style={{ marginTop: '8px' }}
                 />
                 <Text type="secondary" style={{ fontSize: '12px' }}>
-                  {deliveryStatus.progress.currentPhase}
+                  {deliveryStatus.progress?.currentPhase || 'Initializing...'}
                 </Text>
               </div>
             </Col>

@@ -25,6 +25,11 @@ const apiRequest = async (endpoint, options = {}) => {
 
 // Define API service methods
 const api = {
+  // Generic GET method for API requests
+  get: async (endpoint) => {
+    return apiRequest(`http://localhost:3010/api${endpoint}`);
+  },
+
   // Get list of recent validations
   getValidations: async () => {
     return apiRequest(API_ENDPOINTS.VALIDATIONS);

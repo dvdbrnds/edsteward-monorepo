@@ -79,9 +79,10 @@ class DeliveryServer {
       }
     });
 
-    // Trigger manual regulation check (for testing)
+    // Trigger manual regulation check and EdSteward delivery
     this.app.post('/api/trigger-check/:regulationId', async (req, res) => {
       const { regulationId } = req.params;
+      const { customerId, customerName, deliveryId } = req.body;
       
       if (!this.deliveryEngine) {
         return res.status(503).json({ 
@@ -90,16 +91,49 @@ class DeliveryServer {
         });
       }
 
+      if (!this.edstewardIntegration) {
+        return res.status(503).json({ 
+          error: 'EdSteward integration not ready',
+          timestamp: new Date().toISOString()
+        });
+      }
+
       try {
         // Manually trigger a regulation check
         await this.deliveryEngine.cdc.monitorRegulation(regulationId);
         
+        // Create regulation update for EdSteward
+        const regulationUpdate = {
+          regulationId: regulationId,
+          data: {
+            before: { content: `Previous ${regulationId} content` },
+            after: { 
+              content: `Updated ${regulationId} content from MCP Engine`,
+              impact: 'medium',
+              message: `Bulk delivery update for ${customerName}`,
+              timestamp: new Date().toISOString()
+            }
+          },
+          metadata: {
+            customerId,
+            customerName,
+            deliveryId,
+            bulkDelivery: true,
+            mcpEngineTriggered: true
+          }
+        };
+
+        // Send to EdSteward
+        const edstewardResult = await this.edstewardIntegration.sendRegulationUpdate(regulationUpdate);
+        
         res.json({
           success: true,
           message: `Manual check triggered for ${regulationId}`,
+          edstewardDelivery: edstewardResult,
           timestamp: new Date().toISOString()
         });
       } catch (error) {
+        console.error(`❌ Error in trigger-check for ${regulationId}:`, error);
         res.status(500).json({
           error: error.message,
           regulationId,
@@ -393,7 +427,9 @@ class DeliveryServer {
       // Create EdSteward integration
       this.edstewardIntegration = new EdStewardIntegration({
         edstewardUrl: process.env.EDSTEWARD_URL || 'http://localhost:3000',
-        apiKey: process.env.EDSTEWARD_API_KEY
+        apiKey: process.env.EDSTEWARD_API_KEY,
+        username: process.env.EDSTEWARD_USERNAME,
+        password: process.env.EDSTEWARD_PASSWORD
       });
       console.log('✅ [START] EdSteward integration created');
 

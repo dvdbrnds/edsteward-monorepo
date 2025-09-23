@@ -11,6 +11,8 @@ export class EdStewardIntegration {
   constructor(options = {}) {
     this.edstewardUrl = options.edstewardUrl || process.env.EDSTEWARD_URL || 'http://localhost:3000';
     this.apiKey = options.apiKey || process.env.EDSTEWARD_API_KEY || null;
+    this.username = options.username || process.env.EDSTEWARD_USERNAME || null;
+    this.password = options.password || process.env.EDSTEWARD_PASSWORD || null;
     this.retryAttempts = options.retryAttempts || 3;
     this.retryDelay = options.retryDelay || 1000;
     this.websocketUrl = options.websocketUrl || process.env.EDSTEWARD_WS_URL || 'ws://localhost:3000/ws';
@@ -381,7 +383,11 @@ export class EdStewardIntegration {
         'Content-Type': 'application/json'
       };
       
-      if (this.apiKey) {
+      // Use Basic Auth if username/password provided, otherwise Bearer token
+      if (this.username && this.password) {
+        const credentials = Buffer.from(`${this.username}:${this.password}`).toString('base64');
+        headers['Authorization'] = `Basic ${credentials}`;
+      } else if (this.apiKey) {
         headers['Authorization'] = `Bearer ${this.apiKey}`;
       }
 

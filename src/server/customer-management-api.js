@@ -11,6 +11,9 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// In-memory store for delivery status tracking
+const deliveryStatusStore = new Map();
+
 // Sample customer data representing different scenarios
 const SAMPLE_CUSTOMERS = [
   {
@@ -665,8 +668,43 @@ app.post('/api/delivery/bulk/:customerId', async (req, res) => {
       }
     };
 
+    // Store delivery status for tracking
+    deliveryStatusStore.set(deliveryId, deliveryResult);
+
     console.log(`🚀 REAL bulk delivery initiated for ${customer.name} (${customer.id})`);
     console.log(`📊 Triggering ${applicableRegulations.total} EdSteward deliveries (${applicableRegulations.federal.length} federal, ${applicableRegulations.state.length} state, ${applicableRegulations.thirdParty.length} third-party)`);
+
+    // Simulate progress updates (in real implementation, this would be updated by actual delivery callbacks)
+    setTimeout(() => {
+      const storedDelivery = deliveryStatusStore.get(deliveryId);
+      if (storedDelivery) {
+        storedDelivery.progress.completed = Math.floor(applicableRegulations.total * 0.25);
+        storedDelivery.progress.currentPhase = 'Processing federal regulations...';
+        storedDelivery.lastUpdated = new Date().toISOString();
+        deliveryStatusStore.set(deliveryId, storedDelivery);
+      }
+    }, 5000);
+
+    setTimeout(() => {
+      const storedDelivery = deliveryStatusStore.get(deliveryId);
+      if (storedDelivery) {
+        storedDelivery.progress.completed = Math.floor(applicableRegulations.total * 0.75);
+        storedDelivery.progress.currentPhase = 'Processing state regulations...';
+        storedDelivery.lastUpdated = new Date().toISOString();
+        deliveryStatusStore.set(deliveryId, storedDelivery);
+      }
+    }, 15000);
+
+    setTimeout(() => {
+      const storedDelivery = deliveryStatusStore.get(deliveryId);
+      if (storedDelivery) {
+        storedDelivery.progress.completed = applicableRegulations.total;
+        storedDelivery.progress.currentPhase = 'Delivery completed';
+        storedDelivery.status = 'completed';
+        storedDelivery.lastUpdated = new Date().toISOString();
+        deliveryStatusStore.set(deliveryId, storedDelivery);
+      }
+    }, 30000);
 
     res.json({
       success: true,
@@ -726,25 +764,37 @@ app.get('/api/test/connectivity', async (req, res) => {
 // Get delivery status
 app.get('/api/delivery/status/:deliveryId', (req, res) => {
   try {
-    // Simulate delivery progress
     const deliveryId = req.params.deliveryId;
-    const progress = Math.min(100, Math.floor(Math.random() * 100) + 1);
     
-    const status = {
-      deliveryId,
-      status: progress === 100 ? 'completed' : 'in_progress',
-      progress: {
-        completed: progress,
-        total: 100,
-        currentPhase: progress === 100 ? 'Delivery completed' : 'Delivering regulations...'
-      },
-      lastUpdated: new Date().toISOString()
-    };
-
-    res.json({
-      success: true,
-      data: status
-    });
+    // Get real delivery progress from stored delivery data
+    const storedDelivery = deliveryStatusStore.get(deliveryId);
+    
+    if (storedDelivery) {
+      // Return actual delivery progress
+      const status = {
+        deliveryId,
+        status: storedDelivery.status,
+        progress: {
+          completed: storedDelivery.progress.completed,
+          total: storedDelivery.progress.total,
+          currentPhase: storedDelivery.progress.currentPhase
+        },
+        customer: storedDelivery.customer,
+        delivery: storedDelivery.delivery,
+        lastUpdated: storedDelivery.lastUpdated || new Date().toISOString()
+      };
+      
+      res.json({
+        success: true,
+        data: status
+      });
+    } else {
+      // If no stored delivery found, return not found
+      res.status(404).json({
+        success: false,
+        error: 'Delivery not found'
+      });
+    }
   } catch (error) {
     console.error('Error fetching delivery status:', error);
     res.status(500).json({ error: 'Failed to fetch delivery status' });

@@ -25,6 +25,7 @@ import MCPServerDetail from './pages/MCPServerDetail';
 import SystemHealthDashboard from './components/SystemHealthDashboard';
 import SystemSettings from './components/SystemSettings';
 import CustomerDeliveryDashboard from './components/CustomerDeliveryDashboard';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Theme configuration with Material Design color palette
 const theme = {
@@ -184,7 +185,11 @@ const DevClientApp = () => {
               <Route path="/servers/:serverId" element={<MCPServerDetail />} />
               <Route path="/health" element={<SystemHealthDashboard />} />
               <Route path="/settings" element={<SystemSettings />} />
-              <Route path="/customer-delivery" element={<CustomerDeliveryDashboard />} />
+              <Route path="/customer-delivery" element={
+                <ErrorBoundary>
+                  <CustomerDeliveryDashboard />
+                </ErrorBoundary>
+              } />
               <Route path="/batch" element={<BatchTestingPanel />} />
               <Route path="/debug" element={<RequestInspector />} />
               <Route path="/admin" element={<AdminDebugPanel />} />
