@@ -8,6 +8,7 @@ import { setupAuth } from '../auth';
 import { setupRegulationUpdatesApi } from '../regulation-updates-api';
 import { setupDebugRegulationUpdatesApi } from '../debug-regulation-updates';
 import { setupMCPIntegrationApi } from '../mcp-integration-api';
+import { setupRegulationVersionControlApi } from '../regulation-version-control-api';
 import { initializeDatabase } from '../db-init';
 import { getDatabaseStorage } from '../services/database';
 import { syslog, LogLevel, LogFacility } from '../services/syslog';
@@ -1009,7 +1010,6 @@ export function registerRoutes(app: express.Application): Server {
   setupMCPIntegrationApi(app as any);
   
   // Setup enhanced version control API
-  const { setupRegulationVersionControlApi } = await import('../regulation-version-control-api');
   setupRegulationVersionControlApi(app as any);
 
   // Initialize database
