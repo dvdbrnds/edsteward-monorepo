@@ -1,11 +1,10 @@
 import { Router } from 'express';
-import { authenticateAdminToken } from './admin-auth.js';
-import { Pool } from 'pg';
+import { requireAdmin, requireAuth } from '../../middleware/role-based-auth';
 
 const router = Router();
 
-// GET /admin/api/dashboard/stats
-router.get('/stats', authenticateAdminToken, async (req, res) => {
+// GET /admin/api/dashboard/stats - requires admin role
+router.get('/stats', requireAuth, requireAdmin, async (req, res) => {
   try {
     // Mock data for now - replace with real database queries
     const stats = {
@@ -33,8 +32,8 @@ router.get('/stats', authenticateAdminToken, async (req, res) => {
   }
 });
 
-// GET /admin/api/dashboard/health
-router.get('/health', authenticateAdminToken, async (req, res) => {
+// GET /admin/api/dashboard/health - requires admin role
+router.get('/health', requireAuth, requireAdmin, async (req, res) => {
   try {
     const healthStatus = {
       database: 'connected',

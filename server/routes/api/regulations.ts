@@ -3,16 +3,16 @@ import { storage } from '../../storage';
 import { getDatabaseStorage } from '../../services/database';
 import { syslog, LogLevel, LogFacility } from '../../services/syslog';
 import type { Regulation } from '@shared/schema';
+import { 
+  requireAuth, 
+  requireComplianceOfficer,
+  attachUserPermissions
+} from '../../middleware/role-based-auth';
 
 const router = express.Router();
 
-// Simple auth middleware
-const requireAuth = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-  if (!req.isAuthenticated()) {
-    return res.status(401).json({ error: 'Authentication required' });
-  }
-  next();
-};
+// Apply user permissions to all routes
+router.use(attachUserPermissions);
 
 // Get all regulations
 router.get("/", async (req, res) => {
@@ -217,8 +217,8 @@ router.get("/:regulationId/evidence", async (req, res) => {
   }
 });
 
-// Update a regulation action
-router.patch("/:regulationId/actions/:actionType", requireAuth, async (req, res) => {
+// Update a regulation action - requires compliance officer or admin
+router.patch("/:regulationId/actions/:actionType", requireAuth, requireComplianceOfficer, async (req, res) => {
   try {
     const startTime = Date.now();
     const regulationId = parseInt(req.params.regulationId);
@@ -253,13 +253,13 @@ router.patch("/:regulationId/actions/:actionType", requireAuth, async (req, res)
     const actions = regulation.actions || [];
     const actionIndex = actions.findIndex(action => action.type === actionType);
     
-    // Store the previous status for logging
-    const previousStatus = actionIndex !== -1 ? actions[actionIndex].status : 'not_exists';
+    // Store the previous status for logging (for future use)
+    // const previousStatus = actionIndex !== -1 ? actions[actionIndex].status : 'not_exists';
     
     if (actionIndex === -1) {
       // Action doesn't exist, create it
       actions.push({
-        type: actionType as any,
+        type: actionType as 'attestation' | 'website_publish' | 'community_communication' | 'agency_submission',
         enabled: actionUpdate.enabled ?? true,
         required: actionUpdate.required ?? false,
         status: actionUpdate.status ?? 'pending',
@@ -274,7 +274,7 @@ router.patch("/:regulationId/actions/:actionType", requireAuth, async (req, res)
       actions[actionIndex] = {
         ...actions[actionIndex],
         ...actionUpdate,
-        type: actionType as any // Ensure type doesn't change
+        type: actionType as 'attestation' | 'website_publish' | 'community_communication' | 'agency_submission' // Ensure type doesn't change
       };
     }
     

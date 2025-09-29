@@ -1,10 +1,11 @@
 import passport from 'passport';
-import { Strategy as SamlStrategy, MultiSamlStrategy } from '@node-saml/passport-saml';
+import { MultiSamlStrategy } from '@node-saml/passport-saml';
 import { Express, Request, Response, NextFunction } from 'express';
 import { storage } from '../storage';
 import { getTenantStorage } from '../services/multi-tenant-database';
 import { attributeMappings } from '../config/saml';
 import { syslog, LogLevel } from '../services/syslog';
+import { mapOktaGroupsToRoles, getHighestPriorityRole } from '../config/role-mapping';
 
 // Extend session type for SAML
 declare module 'express-session' {
@@ -24,12 +25,24 @@ interface SamlProfile {
   groups?: string[];
   department?: string;
   organization?: string;
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 // Extract user attributes from SAML profile based on IDP type
-function extractUserAttributes(profile: SamlProfile, idpType: string): any {
+function extractUserAttributes(profile: SamlProfile, idpType: string): Record<string, unknown> {
   const mapping = attributeMappings[idpType as keyof typeof attributeMappings] || attributeMappings.okta;
+  
+  // Extract groups from SAML profile
+  let groups: string[] = [];
+  if (profile.groups) {
+    groups = Array.isArray(profile.groups) ? profile.groups : [profile.groups];
+  } else if (profile[mapping.groups]) {
+    const groupData = profile[mapping.groups];
+    groups = Array.isArray(groupData) ? groupData : [groupData];
+  }
+  
+  // Log groups for debugging
+  console.log(`🔐 SAML Groups extracted for ${profile.email}:`, groups);
   
   const extractedData = {
     email: profile.email || profile[mapping.email] || profile.nameID,
@@ -40,29 +53,51 @@ function extractUserAttributes(profile: SamlProfile, idpType: string): any {
     externalId: profile.nameID,
     identityProvider: idpType,
     providerId: idpType,
-    role: 'user', // default role
+    groups: groups,
+    roles: [] as string[],
+    role: 'viewer', // default role for backwards compatibility
     organization: ''
   };
 
-  // For educational institutions (Shibboleth/InCommon)
-  if (idpType === 'shibboleth' || idpType === 'incommon') {
-    // Extract affiliation information for role mapping
+  // Map groups to roles based on IDP type
+  if (idpType === 'okta' || idpType === 'okta-demo') {
+    // For Okta, use the group-to-role mapping
+    const mappedRoles = mapOktaGroupsToRoles(groups);
+    extractedData.roles = mappedRoles;
+    extractedData.role = getHighestPriorityRole(mappedRoles);
+    
+    console.log(`🔐 Okta groups mapped to roles for ${profile.email}:`, {
+      groups: groups,
+      mappedRoles: mappedRoles,
+      primaryRole: extractedData.role
+    });
+  } else if (idpType === 'shibboleth' || idpType === 'incommon') {
+    // For educational institutions (Shibboleth/InCommon)
     const affiliation = profile[mapping.affiliation] || '';
     const entitlement = profile[mapping.entitlement] || '';
     
     // Map educational roles to application roles
-    let role = 'user'; // default role
+    const roles: string[] = ['viewer'];
+    
     if (affiliation) {
       if (affiliation.includes('faculty') || affiliation.includes('staff')) {
-        role = 'compliance_officer';
+        roles.push('compliance_officer');
       }
       if (entitlement && entitlement.includes('admin')) {
-        role = 'admin';
+        roles.push('admin');
       }
     }
     
-    extractedData.role = role;
+    extractedData.roles = [...new Set(roles)]; // Remove duplicates
+    extractedData.role = getHighestPriorityRole(extractedData.roles);
     extractedData.organization = profile[mapping.organization] || '';
+    
+    console.log(`🔐 Educational institution roles mapped for ${profile.email}:`, {
+      affiliation: affiliation,
+      entitlement: entitlement,
+      mappedRoles: extractedData.roles,
+      primaryRole: extractedData.role
+    });
   }
 
   return extractedData;
@@ -166,39 +201,73 @@ export function setupSamlAuth(app: Express) {
         }
 
         if (user) {
-          // Update existing user's login timestamp and SAML data
-          await userStorage.updateUser(user.id, {
+          // Update existing user's login timestamp, SAML data, and roles
+          const updateData: Record<string, unknown> = {
             lastLogin: new Date(),
             identityProvider: userData.identityProvider,
-            providerId: userData.providerId
-          });
+            providerId: userData.providerId,
+            role: userData.role // Update primary role
+          };
+          
+          // Add roles array if supported by storage layer
+          if (userData.roles && userData.roles.length > 0) {
+            updateData.roles = JSON.stringify(userData.roles);
+          }
+          
+          await userStorage.updateUser(user.id, updateData);
+          
+          // Enhance user object with roles for session
+          const enhancedUser = {
+            ...user,
+            role: userData.role,
+            roles: userData.roles || [userData.role],
+            groups: userData.groups || []
+          };
           
           await syslog.logAuthEvent(LogLevel.INFO, `SAML login successful via ${idpType}`, user.id, user.username, {
             tenantId,
-            provider: idpType
+            provider: idpType,
+            roles: userData.roles,
+            groups: userData.groups
           });
-          return done(null, user);
+          return done(null, enhancedUser);
         } else {
           // Create new user from SAML profile - password is optional for SAML users
-          const newUser = await userStorage.createUser({
+          const createUserData: Record<string, unknown> = {
             username: userData.username,
             email: userData.email,
             firstName: userData.firstName,
             lastName: userData.lastName,
-            role: userData.role || 'user',
+            role: userData.role || 'viewer',
             department: userData.department,
             externalId: userData.externalId,
             identityProvider: userData.identityProvider,
             providerId: userData.providerId,
             lastLogin: new Date()
             // Note: no password for SAML users, tenantId handled by storage layer
-          });
+          };
+          
+          // Add roles array if supported by storage layer
+          if (userData.roles && userData.roles.length > 0) {
+            createUserData.roles = JSON.stringify(userData.roles);
+          }
+          
+          const newUser = await userStorage.createUser(createUserData);
+          
+          // Enhance user object with roles for session
+          const enhancedUser = {
+            ...newUser,
+            roles: userData.roles || [userData.role],
+            groups: userData.groups || []
+          };
           
           await syslog.logAuthEvent(LogLevel.INFO, `New SAML user created via ${idpType}`, newUser.id, newUser.username, {
             tenantId,
-            provider: idpType
+            provider: idpType,
+            roles: userData.roles,
+            groups: userData.groups
           });
-          return done(null, newUser);
+          return done(null, enhancedUser);
         }
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -266,14 +335,14 @@ export function setupSamlAuth(app: Express) {
   // Service Provider metadata endpoint
   app.get('/auth/saml/metadata/:provider?', (req: Request, res: Response) => {
     try {
-      const provider = req.params.provider || 'default';
+      const _provider = req.params.provider || 'default';
       
       // Generate metadata based on provider
-      const metadata = generateServiceProviderMetadata(provider);
+      const metadata = generateServiceProviderMetadata(_provider);
       
       res.type('application/xml');
       res.status(200).send(metadata);
-    } catch (error) {
+    } catch (_error) {
       res.status(500).send('Error generating metadata');
     }
   });
@@ -297,11 +366,11 @@ export function setupSamlAuth(app: Express) {
 }
 
 // Generate Service Provider metadata
-function generateServiceProviderMetadata(provider: string = 'default'): string {
+function generateServiceProviderMetadata(_provider: string = 'default'): string {
   const spEntityId = process.env.SAML_SP_ENTITY_ID || 'urn:edsteward:sp';
   const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
-  const callbackUrl = `${baseUrl}/auth/saml/callback/${provider}`;
-  const sloUrl = `${baseUrl}/auth/saml/logout/${provider}`;
+  const callbackUrl = `${baseUrl}/auth/saml/callback/${_provider}`;
+  const sloUrl = `${baseUrl}/auth/saml/logout/${_provider}`;
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"

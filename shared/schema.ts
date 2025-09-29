@@ -121,7 +121,8 @@ export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
   password: text("password").notNull(),
-  role: text("role").notNull().default("user"),
+  role: text("role").notNull().default("viewer"),
+  roles: text("roles"), // JSON string array of roles for multi-role support
   department: text("department"),
   email: text("email").notNull(),
   firstName: text("firstName"),
@@ -138,7 +139,8 @@ export const users = pgTable("users", {
 // Schema for inserting users
 export const insertUserSchema = createInsertSchema(users).extend({
   password: z.string().min(6).optional(), // Optional because SAML users won't have password
-  role: z.enum(["admin", "compliance_officer", "user"]),
+  role: z.enum(["admin", "compliance_officer", "department_head", "viewer", "user"]), // Updated role options
+  roles: z.string().optional(), // JSON string of roles array
   department: z.string().optional(),
   email: z.string().email(),
   firstName: z.string().min(1, "First name is required"),
