@@ -16,6 +16,7 @@ import ComplianceWizardPage from "@/pages/compliance-wizard-page";
 import ReportsPage from "@/pages/reports-page";
 import ValidationPage from "@/pages/validation-page";
 import AdminSettingsPage from "@/pages/admin-settings-page";
+import AccountSettingsPage from "@/pages/account-settings-page";
 import LogsPage from "@/pages/admin/logs-page";
 import DebugToolsPage from "@/pages/admin/debug-tools-page";
 import UtilitiesIndexPage from "@/pages/utilities/index";
@@ -88,6 +89,9 @@ export default function App() {
                 component={ComplianceWizardPage}
               />
               <ProtectedRoute path="/reports" component={ReportsPage} />
+              
+              {/* User Account Settings */}
+              <ProtectedRoute path="/account/settings" component={AccountSettingsPage} />
               
               {/* System Settings - Available to all tenants */}
               <ProtectedRoute path="/admin/settings" component={AdminSettingsPage} />

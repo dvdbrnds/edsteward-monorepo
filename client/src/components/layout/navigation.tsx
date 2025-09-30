@@ -188,11 +188,12 @@ export default function Navigation() {
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem disabled className="flex items-center">
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Account Settings</span>
-                  <span className="ml-auto text-xs text-muted-foreground">(Coming Soon)</span>
-                </DropdownMenuItem>
+                <Link href="/account/settings">
+                  <DropdownMenuItem className="flex items-center cursor-pointer">
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>Account Settings</span>
+                  </DropdownMenuItem>
+                </Link>
                 <DropdownMenuItem
                   onClick={() => logoutMutation.mutate()}
                   disabled={logoutMutation.isPending}
