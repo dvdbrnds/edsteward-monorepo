@@ -39,12 +39,12 @@ export default function MFASetup() {
   // Check current MFA status
   const { data: mfaStatus, refetch: refetchStatus } = useQuery<MFAStatus>({
     queryKey: ["mfa-status"],
-    queryFn: () => apiRequest("/api/mfa/status"),
+    queryFn: () => apiRequest("GET", "/api/mfa/status"),
   });
 
   // Generate MFA setup data
   const { data: setupData, mutate: generateSetup, isPending: isGenerating } = useMutation<MFASetupData>({
-    mutationFn: () => apiRequest("/api/mfa/setup/generate", { method: "POST" }),
+    mutationFn: () => apiRequest("POST", "/api/mfa/setup/generate"),
     onError: (error: any) => {
       toast({
         title: "Setup Failed",
@@ -57,11 +57,7 @@ export default function MFASetup() {
   // Verify and enable MFA
   const { mutate: verifyAndEnable, isPending: isVerifying } = useMutation({
     mutationFn: (code: string) =>
-      apiRequest("/api/mfa/setup/verify", {
-        method: "POST",
-        body: JSON.stringify({ code }),
-        headers: { "Content-Type": "application/json" },
-      }),
+      apiRequest("POST", "/api/mfa/setup/verify", { code }),
     onSuccess: () => {
       toast({
         title: "MFA Enabled Successfully",
@@ -81,7 +77,7 @@ export default function MFASetup() {
 
   // Generate backup codes
   const { data: backupCodes, mutate: generateBackupCodes, isPending: isGeneratingCodes } = useMutation<{ codes: string[] }>({
-    mutationFn: () => apiRequest("/api/mfa/backup-codes/generate", { method: "POST" }),
+    mutationFn: () => apiRequest("POST", "/api/mfa/backup-codes/generate"),
     onError: (error: any) => {
       toast({
         title: "Backup Code Generation Failed",
