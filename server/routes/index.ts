@@ -20,6 +20,7 @@ import regulationsRouter from './api/regulations';
 import notesRouter from './api/notes';
 import deadlinesRouter from './api/deadlines';
 import notificationsRouter from './api/notifications';
+import mfaRouter from './api/mfa';
 
 import awsTenantManagementRouter from './api/aws-tenant-management';
 import { debugRouter } from './api/debug';
@@ -407,6 +408,7 @@ export function registerRoutes(app: express.Application): Server {
   app.use('/api/notes', notesRouter);
   app.use('/api/deadlines', deadlinesRouter);
   app.use('/api/notifications', notificationsRouter);
+  app.use('/api/mfa', mfaRouter); // Multi-Factor Authentication for local accounts
 
   // AWS Tenant Management - Only available on admin.edsteward.ai
   app.use('/api/aws-tenant-management', (req, res, next) => {

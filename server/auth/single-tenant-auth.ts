@@ -168,7 +168,7 @@ export function configureAuth(app: Express): void {
 function setupAuthRoutes(app: Express): void {
   // Local login
   if (institutionConfig.authentication.usernamePasswordEnabled) {
-    app.post('/api/login', passport.authenticate('local'), (req: Request, res: Response) => {
+    app.post('/api/login', passport.authenticate('local'), async (req: Request, res: Response) => {
       let user = req.user;
 
       // Ensure dvdbrnds is always admin
@@ -176,7 +176,85 @@ function setupAuthRoutes(app: Express): void {
         user = { ...user, role: 'admin' };
       }
 
+      // Check if user has MFA enabled (required for local accounts)
+      if (user && user.mfaEnabled) {
+        // Store user in session but mark as needing MFA verification
+        req.session.pendingMFAUser = user;
+        req.logout(() => {}); // Log out until MFA is verified
+        
+        return res.json({ 
+          success: false, 
+          requiresMFA: true,
+          message: 'MFA verification required',
+          isEmergencyAccount: user.identityProvider === 'local_emergency'
+        });
+      }
+
+      // HECVAT 4.0 Requirement: Local accounts should have MFA enabled
+      if (user && user.identityProvider !== 'saml' && !user.mfaEnabled) {
+        console.log(`⚠️ Local account ${user.username} should enable MFA for HECVAT 4.0 compliance`);
+        
+        return res.json({ 
+          success: true, 
+          user: user,
+          mfaRecommended: true,
+          message: 'MFA setup recommended for enhanced security'
+        });
+      }
+
       res.json({ success: true, user: user });
+    });
+
+    // MFA verification endpoint for login
+    app.post('/api/login/mfa', async (req: Request, res: Response) => {
+      try {
+        const { code } = req.body;
+        const pendingUser = req.session.pendingMFAUser;
+
+        if (!pendingUser) {
+          return res.status(400).json({
+            success: false,
+            error: 'No pending MFA verification'
+          });
+        }
+
+        // Import MFA service
+        const { MFAService } = await import('../services/mfa');
+        const result = await MFAService.verifyMFA(pendingUser.id, code);
+
+        if (result.success) {
+          // Clear pending user and log them in
+          delete req.session.pendingMFAUser;
+          
+          // Manually log in the user
+          req.login(pendingUser, (err) => {
+            if (err) {
+              return res.status(500).json({
+                success: false,
+                error: 'Login failed after MFA verification'
+              });
+            }
+            
+            res.json({
+              success: true,
+              user: pendingUser,
+              message: result.message,
+              backupCodeUsed: result.backupCodeUsed
+            });
+          });
+        } else {
+          res.status(400).json({
+            success: false,
+            error: result.message
+          });
+        }
+      } catch (error) {
+        console.error('❌ MFA login verification error:', error);
+        res.status(500).json({
+          success: false,
+          error: 'MFA verification failed'
+        });
+      }
     });
   }
 
