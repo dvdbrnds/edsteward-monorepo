@@ -33,7 +33,7 @@ if (!process.env.MFA_ENCRYPTION_KEY) {
  * Encrypt sensitive MFA data using AES-256-GCM (Context7 best practice)
  */
 function encrypt(text: string): string {
-  const iv = crypto.randomBytes(16); // Cryptographically secure IV
+  const _iv = crypto.randomBytes(16); // Cryptographically secure IV
   const cipher = crypto.createCipherGCM(ALGORITHM, Buffer.from(ENCRYPTION_KEY, 'hex'));
   cipher.setIVLength(16);
   
@@ -42,7 +42,7 @@ function encrypt(text: string): string {
   
   const authTag = cipher.getAuthTag();
   
-  return iv.toString('hex') + ':' + authTag.toString('hex') + ':' + encrypted;
+  return _iv.toString('hex') + ':' + authTag.toString('hex') + ':' + encrypted;
 }
 
 /**
@@ -137,12 +137,19 @@ export class MFAService {
    * Enable MFA for a user
    */
   static async enableMFA(userId: number, secret: string, verificationCode: string, backupCodes: string[]): Promise<boolean> {
-    // Verify the code before enabling
-    const isValid = authenticator.verify({
-      token: verificationCode,
-      secret: secret,
-      window: MFA_CONFIG.window,
+    // Verify the code before enabling using OTPAuth
+    const totp = new OTPAuth.TOTP({
+      secret: OTPAuth.Secret.fromBase32(secret),
+      algorithm: MFA_CONFIG.algorithm,
+      digits: MFA_CONFIG.digits,
+      period: MFA_CONFIG.period,
     });
+    
+    const delta = totp.validate({ 
+      token: verificationCode, 
+      window: MFA_CONFIG.window 
+    });
+    const isValid = delta !== null;
 
     if (!isValid) {
       return false;
@@ -184,12 +191,19 @@ export class MFAService {
       // Decrypt secret
       const secret = decrypt(user.mfaSecret);
       
-      // First try TOTP verification
-      const isValidTOTP = authenticator.verify({
-        token: code,
-        secret: secret,
-        window: MFA_CONFIG.window,
+      // First try TOTP verification using OTPAuth
+      const totp = new OTPAuth.TOTP({
+        secret: OTPAuth.Secret.fromBase32(secret),
+        algorithm: MFA_CONFIG.algorithm,
+        digits: MFA_CONFIG.digits,
+        period: MFA_CONFIG.period,
       });
+      
+      const delta = totp.validate({ 
+        token: code, 
+        window: MFA_CONFIG.window 
+      });
+      const isValidTOTP = delta !== null;
 
       if (isValidTOTP) {
         return {

@@ -19,3 +19,10 @@ COMMENT ON COLUMN users.mfa_backup_codes IS 'Encrypted JSON array of backup code
 COMMENT ON COLUMN users.mfa_setup_at IS 'Timestamp when MFA was first set up';
 
 COMMIT;
+
+
+
+
+
+
+

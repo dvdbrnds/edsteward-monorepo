@@ -27,7 +27,7 @@ export function configureAuth(app: Express): void {
         passwordField: 'password',
       },
        
-      async (username: string, password: string, done: (_error: any, _user?: any, _info?: any) => void) => {
+      async (username: string, password: string, done: (error: unknown, user?: unknown, info?: unknown) => void) => {
         try {
           const storage = getDatabaseStorage();
           const user = await storage.getUserByUsername(username, undefined);
@@ -85,17 +85,18 @@ export function configureAuth(app: Express): void {
         disableRequestedAuthnContext: true,
       },
        
-      async (profile: any, done: (_error: any, _user?: any, _info?: any) => void) => {
+      async (profile: unknown, done: (error: unknown, user?: unknown, info?: unknown) => void) => {
         try {
           const storage = getDatabaseStorage();
-          const email = profile.email || profile.nameID;
+          const samlProfile = profile as Record<string, unknown>;
+          const email = samlProfile.email || samlProfile.nameID;
 
           console.log('🔐 SAML Profile received:', {
-            email: profile.email,
-            nameID: profile.nameID,
-            firstName: profile.firstName,
-            lastName: profile.lastName,
-            displayName: profile.displayName
+            email: samlProfile.email,
+            nameID: samlProfile.nameID,
+            firstName: samlProfile.firstName,
+            lastName: samlProfile.lastName,
+            displayName: samlProfile.displayName
           });
 
           if (!email) {
@@ -113,12 +114,12 @@ export function configureAuth(app: Express): void {
           if (!user && institutionConfig.authentication.allowSelfRegistration) {
             console.log('🔐 Creating new user via auto-provisioning...');
             user = await storage.createUser({
-              email,
-              username: email,
-              firstName: profile.firstName || profile.displayName || '',
-              lastName: profile.lastName || '',
+              email: email as string,
+              username: email as string,
+              firstName: (samlProfile.firstName || samlProfile.displayName || '') as string,
+              lastName: (samlProfile.lastName || '') as string,
               role: 'user',
-              externalId: profile.nameID,
+              externalId: samlProfile.nameID as string,
             }, undefined);
             console.log('🔐 New user created:', !!user);
           }
@@ -137,12 +138,13 @@ export function configureAuth(app: Express): void {
   }
 
   // Passport serialization
-  passport.serializeUser((user: any, done) => {
-    done(null, user.id);
+  passport.serializeUser((user: unknown, done) => {
+    const userObj = user as Record<string, unknown>;
+    done(null, userObj.id);
   });
 
    
-  passport.deserializeUser(async (id: string, done: (_error: any, _user?: any) => void) => {
+  passport.deserializeUser(async (id: string, done: (error: unknown, user?: unknown) => void) => {
     try {
       const storage = getDatabaseStorage();
       let user = await storage.getUser(parseInt(id, 10), undefined);

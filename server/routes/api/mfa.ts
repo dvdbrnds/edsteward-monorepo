@@ -232,7 +232,7 @@ router.post('/backup-codes/regenerate', requireAuth, async (req: Request, res: R
  */
 router.post('/disable', requireAuth, async (req: Request, res: Response) => {
   try {
-    const { password, confirmDisable } = disableMFASchema.parse(req.body);
+    const { password, confirmDisable: _confirmDisable } = disableMFASchema.parse(req.body);
     const user = req.user!;
     
     // Verify password before disabling MFA
