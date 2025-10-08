@@ -156,19 +156,7 @@ const mcpEngineUpdateSchema = z.object({
   }).optional()
 });
 
-/**
- * Schema for TUF-verified regulation update payload
- */
-const tufUpdateSchema = z.object({
-  regulationId: z.string(),
-  verified: z.boolean(),
-  hash: z.string(),
-  updateTime: z.string(),
-  tufPath: z.string(),
-  content: z.any(),
-  metadata: z.any().optional(),
-  source: z.literal("tuf")
-});
+// TUF schema removed - deprecated system
 
 /**
  * Maps MCP Engine sequential IDs (1-354) to actual EdSteward regulation IDs (4459-4852)
@@ -211,7 +199,7 @@ export function setupRegulationUpdatesApi(app: Express) {
         database: dbHealth ? 'connected' : 'disconnected',
         pendingUpdates: pendingCount.length,
         maxBatchSize: 500, // Support up to 500 simultaneous updates
-        supportedFormats: ['mcp-engine', 'tuf-verified', 'simple'],
+        supportedFormats: ['mcp-engine', 'simple'],
         federalRegisterEnhancement: true,
         timestamp: new Date().toISOString()
       });
@@ -243,51 +231,18 @@ export function setupRegulationUpdatesApi(app: Express) {
       }
       
       let updateData;
-      let isTUFVerified = false;
       
-      // Try to parse as TUF-verified format first
-      const tufValidation = tufUpdateSchema.safeParse(req.body);
+      // Try simple format first (most common from MCP Engine)
+      const simpleValidation = insertRegulationUpdateSchema.safeParse(req.body);
       
-      if (tufValidation.success) {
-        console.log('🔒 Detected TUF-verified format');
-        const tufData = tufValidation.data;
+      if (simpleValidation.success) {
+        console.log('✅ Detected simple format');
+        const rawData = simpleValidation.data;
         
-        if (!tufData.verified) {
-          console.error('❌ TUF verification failed - refusing unverified content');
-          return res.status(400).json({ 
-            success: false,
-            error: 'TUF verification failed - content not cryptographically verified' 
-          });
-        }
+        // Validate regulation ID (Master Key Field system: 1-354)
+        const validRegulationId = validateRegulationId(rawData.regulationId);
         
-        // Convert TUF format to EdSteward format
-        updateData = {
-          regulationId: parseInt(tufData.regulationId.replace('REG-', '')) || 0,
-          name: `TUF-Verified: ${tufData.regulationId}`,
-          status: 'pending',
-          originalContent: JSON.stringify(tufData.metadata, null, 2) || "TUF metadata",
-          updatedContent: JSON.stringify(tufData.content, null, 2) || "TUF-verified content",
-          // Add TUF-specific metadata
-          tufHash: tufData.hash,
-          tufPath: tufData.tufPath,
-          tufUpdateTime: tufData.updateTime,
-          cryptographicallyVerified: true
-        };
-        
-        isTUFVerified = true;
-        
-      } else {
-        // Try simple format first (most common from MCP Engine)
-        const simpleValidation = insertRegulationUpdateSchema.safeParse(req.body);
-        
-        if (simpleValidation.success) {
-          console.log('✅ Detected simple format');
-          const rawData = simpleValidation.data;
-          
-                      // Validate regulation ID (Master Key Field system: 1-354)
-            const validRegulationId = validateRegulationId(rawData.regulationId);
-            
-            if (validRegulationId === null) {
+        if (validRegulationId === null) {
               console.error(`❌ Invalid regulation ID: ${rawData.regulationId}. Must be between 1-354.`);
               return res.status(400).json({ 
                 success: false,
@@ -390,7 +345,6 @@ export function setupRegulationUpdatesApi(app: Express) {
             console.log('   enhancement_metadata:', !!updateData.metadata?.federal_register_enhancement);
           } else {
             console.error('❌ Validation failed for all formats');
-            console.error('TUF format errors:', tufValidation.error.issues);
             console.error('Simple format errors:', simpleValidation.error.issues);
             console.error('MCP complex format errors:', mcpValidation.error.issues);
             
@@ -405,14 +359,14 @@ export function setupRegulationUpdatesApi(app: Express) {
       // Create the regulation update with optimized bulk processing
       const newUpdate = await storage.createRegulationUpdate(updateData);
       
-      console.log(`✅ [BULK-IMPORT] Regulation ${regulationId} processed successfully - Update ID: ${newUpdate.id} ${isTUFVerified ? '(TUF-verified)' : ''}`);
+      console.log(`✅ [BULK-IMPORT] Regulation ${regulationId} processed successfully - Update ID: ${newUpdate.id}`);
       
       // Return exact format expected by MCP Engine for bulk import tracking
       res.status(200).json({
         success: true,
         updateId: newUpdate.id.toString(),
-        verified: isTUFVerified,
-        hash: isTUFVerified ? updateData.tufHash : undefined,
+        verified: false,
+        hash: undefined,
         // Additional fields for MCP Engine bulk import tracking
         regulationId: regulationId,
         timestamp: timestamp,
@@ -706,112 +660,5 @@ export function setupRegulationUpdatesApi(app: Express) {
     }
   });
   
-  // TUF-specific endpoints
-  
-  // Get TUF repository health
-  app.get('/api/tuf/health', async (req: Request, res: Response) => {
-    try {
-      const { getTUFService } = await import('./services/tuf-service.js');
-      const tufService = getTUFService();
-      const health = await tufService.getHealth();
-      
-      res.json({
-        tufRepository: health,
-        edstewardIntegration: {
-          status: 'healthy',
-          timestamp: new Date().toISOString()
-        }
-      });
-    } catch (error) {
-      // Check if error indicates circuit breaker is open
-      if (error instanceof Error && error.message.includes('temporarily disabled')) {
-        res.status(503).json({ 
-          error: 'TUF service temporarily disabled',
-          details: 'Circuit breaker open - service will retry automatically',
-          retryAfter: 300 // 5 minutes
-        });
-        return;
-      }
-      
-      // Reduce log spam - only log TUF errors once per minute
-      const now = Date.now();
-      const globalObj = global as Record<string, unknown>;
-      if (!globalObj.lastTufErrorLog || now - (globalObj.lastTufErrorLog as number) > 60000) {
-        console.error('❌ TUF health check failed:', error instanceof Error ? error.message : 'Unknown error');
-        globalObj.lastTufErrorLog = now;
-      }
-      res.status(500).json({ 
-        error: 'TUF repository health check failed',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      });
-    }
-  });
-  
-  // Get available regulations from TUF repository
-  app.get('/api/tuf/regulations', async (req: Request, res: Response) => {
-    try {
-      const { getTUFService } = await import('./services/tuf-service.js');
-      const tufService = getTUFService();
-      const regulations = await tufService.getAvailableRegulations();
-      
-      res.json({
-        regulations,
-        count: regulations.length,
-        source: 'TUF',
-        timestamp: new Date().toISOString()
-      });
-    } catch (error) {
-      console.error('❌ Failed to get TUF regulations:', error);
-      res.status(500).json({ 
-        error: 'Failed to get regulations from TUF repository',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      });
-    }
-  });
-  
-  // Download specific regulation from TUF repository
-  app.get('/api/tuf/regulations/:regulationId', async (req: Request, res: Response) => {
-    try {
-      const { getTUFService } = await import('./services/tuf-service.js');
-      const regulationId = req.params.regulationId;
-      const tufService = getTUFService();
-      
-      const regulation = await tufService.downloadRegulation(regulationId);
-      
-      res.json({
-        regulation,
-        verified: regulation.verified,
-        source: 'TUF',
-        timestamp: new Date().toISOString()
-      });
-    } catch (error) {
-      console.error(`❌ Failed to download TUF regulation ${req.params.regulationId}:`, error);
-      res.status(500).json({ 
-        error: 'Failed to download regulation from TUF repository',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      });
-    }
-  });
-  
-  // Check for TUF regulation updates
-  app.get('/api/tuf/check-updates', async (req: Request, res: Response) => {
-    try {
-      const { getTUFService } = await import('./services/tuf-service.js');
-      const tufService = getTUFService();
-      const updates = await tufService.checkForUpdates();
-      
-      res.json({
-        updates,
-        count: updates.length,
-        source: 'TUF',
-        timestamp: new Date().toISOString()
-      });
-    } catch (error) {
-      console.error('❌ Failed to check TUF updates:', error);
-      res.status(500).json({ 
-        error: 'Failed to check for TUF updates',
-        details: error instanceof Error ? error.message : 'Unknown error'
-      });
-    }
-  });
+  console.log('📋 Regulation Updates API routes registered (TUF endpoints removed)');
 }

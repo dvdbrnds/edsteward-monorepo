@@ -375,10 +375,6 @@ httpServer.listen(PORT, '0.0.0.0', async () => {
   // MCP Engine Integration Status
   console.log('🔌 MCP Engine Integration:');
   console.log('   - Port 3003: MCP Engine WebSocket (regulation updates)');
-  console.log('   - Port 3052: MCP Engine TUF Repository (reserved)');
-  console.log('   - Port 3053: MCP Engine TUF WebSocket (reserved)');
-  console.log('⚠️ TUF service disabled - EdSteward running without MCP Engine TUF integration');
-  console.log('💡 MCP Engine ports 3052-3053 are reserved for TUF services');
   
   // Start database connection monitoring to prevent crashes
   startDatabaseMonitoring();

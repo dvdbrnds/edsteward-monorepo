@@ -30,7 +30,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { useLegacyBranding } from "@/hooks/use-branding";
 
-import { TUFStatus } from "@/components/ui/tuf-status";
+// TUF component removed - deprecated system
 
 // Import fallback logo
 import genericLogo from "@/assets/generic-logo.svg";
@@ -171,7 +171,7 @@ export default function Navigation() {
 
           {/* Security Status and User Menu */}
           <div className="flex items-center flex-shrink-0 gap-3">
-            <TUFStatus />
+            {/* TUF Status removed - deprecated system */}
 {/* <WebSocketStatus /> */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
