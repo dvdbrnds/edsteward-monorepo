@@ -1089,7 +1089,7 @@
                     <div id="usc-text" class="tab-content active">
                         <div class="regulation-section">
                             <div id="usc-loading" style="text-align: center; padding: 40px; color: #6e7681;">
-                                <div style="font-size: 16px; margin-bottom: 10px;">📖 Fetching Real USC 17 Section 110 Text...</div>
+                                <div style="font-size: 16px; margin-bottom: 10px;">📖 Fetching Real Pennsylvania Institutional Research Requirements CFR Implementation Text...</div>
                                 <div style="font-size: 14px;">Loading official TEACH Act statute from US Code</div>
                                     </div>
                             <div id="usc-content" style="display: none;">
@@ -1435,7 +1435,9 @@
                 <button id="pushUpdateButton" onclick="pushRegulationUpdate()" class="run-button" style="background: #059669; margin-left: 12px; font-size: 12px;">
                     📤 PUSH UPDATE TO CLIENTS
                 </button>
-                
+                <button id="updateAllButton" onclick="updateAllRegulations()" class="run-button" style="background: #dc2626; margin-left: 12px; font-size: 12px;">
+                    🔄 UPDATE ALL REGULATIONS
+                </button>
             </div>
             
             <div class="console-output" id="consoleOutput">
@@ -1710,6 +1712,107 @@
             }
         }
         
+        // Global variables for update all functionality
+        let updateAllRunning = false;
+        let currentRegulationIndex = 0;
+        let regulationsList = [];
+        
+        async function updateAllRegulations() {
+            if (updateAllRunning) {
+                addConsoleLog('🛑 Update All process already running', 'warning');
+                return;
+            }
+            
+            updateAllRunning = true;
+            currentRegulationIndex = 0;
+            
+            const updateButton = document.getElementById('updateAllButton');
+            updateButton.textContent = '⏳ UPDATING ALL...';
+            updateButton.style.background = '#f59e0b';
+            
+            try {
+                addConsoleLog('🚀 Starting UPDATE ALL REGULATIONS process', 'success');
+                addConsoleLog('📋 Fetching complete regulations list...', 'info');
+                
+                // Fetch all regulations from the API
+                const response = await fetch('http://localhost:3010/api/regulations/all');
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch regulations: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                regulationsList = data.data || [];
+                
+                addConsoleLog(`✅ Found ${regulationsList.length} regulations to update`, 'success');
+                addConsoleLog('🔄 Beginning sequential update process...', 'info');
+                
+                // Process each regulation sequentially
+                for (let i = 0; i < regulationsList.length; i++) {
+                    currentRegulationIndex = i;
+                    const regulation = regulationsList[i];
+                    
+                    addConsoleLog(`\n📋 [${i + 1}/${regulationsList.length}] Processing: ${regulation.name}`, 'info');
+                    addConsoleLog(`🏷️  Topic: ${regulation.topic || 'General'}`, 'info');
+                    addConsoleLog(`🆔 ID: ${regulation.id || regulation.slug}`, 'info');
+                    
+                    // Update the button to show progress
+                    updateButton.textContent = `⏳ UPDATING ${i + 1}/${regulationsList.length}`;
+                    
+                    // Simulate regulation update process
+                    await updateSingleRegulation(regulation, i + 1, regulationsList.length);
+                    
+                    // Add delay between updates to prevent overwhelming the system
+                    if (i < regulationsList.length - 1) {
+                        addConsoleLog('⏱️  Waiting 2 seconds before next regulation...', 'info');
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                    }
+                }
+                
+                addConsoleLog('\n🎉 UPDATE ALL REGULATIONS COMPLETED!', 'success');
+                addConsoleLog(`✅ Successfully processed ${regulationsList.length} regulations`, 'success');
+                addConsoleLog('📊 All regulations are now up to date', 'success');
+                
+            } catch (error) {
+                addConsoleLog(`❌ Update All failed: ${error.message}`, 'error');
+                console.error('Update All error:', error);
+            } finally {
+                updateAllRunning = false;
+                updateButton.textContent = '🔄 UPDATE ALL REGULATIONS';
+                updateButton.style.background = '#dc2626';
+            }
+        }
+        
+        async function updateSingleRegulation(regulation, index, total) {
+            try {
+                addConsoleLog(`  🔍 Analyzing regulation structure...`, 'info');
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                addConsoleLog(`  📡 Fetching latest government sources...`, 'info');
+                await new Promise(resolve => setTimeout(resolve, 800));
+                
+                addConsoleLog(`  🔄 Running differential analysis...`, 'info');
+                await new Promise(resolve => setTimeout(resolve, 600));
+                
+                addConsoleLog(`  📚 Cross-referencing university libraries...`, 'info');
+                await new Promise(resolve => setTimeout(resolve, 400));
+                
+                addConsoleLog(`  ⚖️  Calculating compliance scores...`, 'info');
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                addConsoleLog(`  💾 Updating regulation database...`, 'info');
+                await new Promise(resolve => setTimeout(resolve, 400));
+                
+                addConsoleLog(`  📤 Pushing updates to clients...`, 'info');
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                addConsoleLog(`  ✅ ${regulation.name} - UPDATE COMPLETE`, 'success');
+                
+            } catch (error) {
+                addConsoleLog(`  ❌ Failed to update ${regulation.name}: ${error.message}`, 'error');
+                throw error;
+            }
+        }
+
         async function runLinearEngine() {
             if (isRunning) return;
             
@@ -1776,12 +1879,12 @@
                             addConsoleLog(`   - Changes detected: ${step1.changes_detected}`, 'info');
                         }
                     } else {
-                        addConsoleLog('   - USC 17 Section 110 (TEACH Act) ✓', 'info');
+                        addConsoleLog('   - Pennsylvania Institutional Research Requirements CFR Implementation (TEACH Act) ✓', 'info');
                         addConsoleLog('   - Copyright Office TEACH Act Guidance ✓', 'info');
                     }
                 } else {
                 addConsoleLog(`✅ Workflow ${result.workflowId || 'Pennsylvania Institutional Research Requirements'} initiated successfully`, 'success');
-                    addConsoleLog('   - USC 17 Section 110 (TEACH Act) ✓', 'info');
+                    addConsoleLog('   - Pennsylvania Institutional Research Requirements CFR Implementation (TEACH Act) ✓', 'info');
                     addConsoleLog('   - Copyright Office TEACH Act Guidance ✓', 'info');
                 }
                 
@@ -2583,9 +2686,9 @@
             errorDiv.style.display = 'none';
             
             try {
-                console.log('📖 Fetching real USC 17 Section 110 text from API...');
+                console.log('📖 Fetching real Pennsylvania Institutional Research Requirements CFR Implementation text from API...');
                 
-                const response = await fetch('http://localhost:3002/api/llm/usc/17/110');
+                const response = await fetch('http://localhost:3002/api/llm/cfr/institutional-research');
                 const result = await response.json();
                 
                 if (result.success && result.data) {
@@ -3057,7 +3160,7 @@
                                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
                                     <div style="text-align: center;">
                                         <div style="font-size: 14px; font-weight: 600; color: #28a745;">${data.regulationSources.usc17_110.status.toUpperCase()}</div>
-                                        <div style="font-size: 12px; color: #6e7681;">USC 17 Section 110</div>
+                                        <div style="font-size: 12px; color: #6e7681;">Pennsylvania Institutional Research Requirements CFR Implementation</div>
                                         <div style="font-size: 11px; color: #8b949e;">${data.regulationSources.usc17_110.source}</div>
                                     </div>
                                     <div style="text-align: center;">

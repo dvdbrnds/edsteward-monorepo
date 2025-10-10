@@ -1,0 +1,38 @@
+{
+  "name": "mcp-engine-mvp",
+  "version": "1.0.0-mvp",
+  "description": "MCP Engine MVP - Minimum viable deployment for patent claims",
+  "main": "src/lambda/orchestrator/index.js",
+  "scripts": {
+    "deploy": "serverless deploy --config serverless-mvp.yml",
+    "deploy:dev": "serverless deploy --stage dev --config serverless-mvp.yml", 
+    "deploy:prod": "serverless deploy --stage prod --config serverless-mvp.yml",
+    "remove": "serverless remove --config serverless-mvp.yml",
+    "logs:orchestrator": "serverless logs -f orchestrator --config serverless-mvp.yml",
+    "logs:level1": "serverless logs -f level1-validator --config serverless-mvp.yml",
+    "test:local": "serverless offline --config serverless-mvp.yml",
+    "test:endpoint": "node test-mcp-endpoint.js"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.1691.0",
+    "joi": "^17.13.3",
+    "uuid": "^10.0.0"
+  },
+  "devDependencies": {
+    "serverless": "^3.38.0",
+    "serverless-offline": "^13.8.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol", 
+    "validation",
+    "compliance",
+    "serverless",
+    "aws-lambda"
+  ],
+  "author": "MCP Engine Team",
+  "license": "MIT"
+}
