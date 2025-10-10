@@ -161,12 +161,15 @@ const DEFAULT_COMPLIANCE_STEPS = [
 ];
 
 const MCPServerDetail = () => {
-  const { serverId } = useParams();
+  const { serverId, regulationId } = useParams(); // Get both serverId and regulationId
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [server, setServer] = useState(null);
   const [regulationInfo, setRegulationInfo] = useState(null);
   const [error, setError] = useState(null);
+
+  // Use regulationId if available (from console route), otherwise use serverId
+  const currentId = regulationId || serverId;
 
   // Get the original server ID from the route parameter
   const getOriginalId = (routeId) => {
@@ -370,7 +373,51 @@ const MCPServerDetail = () => {
     const loadServer = async () => {
       setLoading(true);
       try {
-        // Fetch the regulation registry
+        console.log('Loading regulation details for ID:', currentId);
+        
+        // If we're coming from console route, try to fetch from regulations API first
+        if (regulationId) {
+          try {
+            const response = await fetch('http://localhost:3010/api/regulations/all');
+            const data = await response.json();
+            
+            if (data && data.data) {
+              // Find regulation by slug, name, or id
+              const regulation = data.data.find(reg => 
+                reg.slug === currentId || 
+                reg.name?.toLowerCase().includes(currentId.toLowerCase()) ||
+                reg.id === currentId
+              );
+              
+              if (regulation) {
+                console.log('Found regulation in API:', regulation);
+                // Convert regulation to server format
+                const serverData = {
+                  id: regulation.id || regulation.slug,
+                  name: regulation.name,
+                  type: regulation.topic || 'Regulation',
+                  status: 'running',
+                  description: `MCP Engine for ${regulation.name}`,
+                  lastUpdated: regulation.lastUpdated,
+                  uptime: '24/7',
+                  validationLevel: 'A',
+                  version: '1.0',
+                  consoleUrl: regulation.consoleUrl
+                };
+                
+                setServer(serverData);
+                setRegulationInfo(regulation);
+                setError(null);
+                setLoading(false);
+                return;
+              }
+            }
+          } catch (apiError) {
+            console.warn('Failed to fetch from regulations API:', apiError);
+          }
+        }
+        
+        // Fallback to original registry approach
         const registry = await fetchRegulationRegistry();
         
         if (!registry) {
@@ -378,10 +425,10 @@ const MCPServerDetail = () => {
         }
         
         // Find the regulation in the registry
-        const regulation = findRegulationById(registry, serverId);
+        const regulation = findRegulationById(registry, currentId);
         
         if (!regulation) {
-          console.warn(`Regulation not found for ID: ${serverId}`);
+          console.warn(`Regulation not found for ID: ${currentId}`);
           throw new Error('Regulation not found');
         }
         
@@ -400,7 +447,7 @@ const MCPServerDetail = () => {
     };
     
     loadServer();
-  }, [serverId]);
+  }, [currentId, regulationId]);
 
   const handleGoBack = () => {
     navigate('/');

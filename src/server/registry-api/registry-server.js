@@ -130,6 +130,140 @@ app.get('/api/regulations', (req, res) => {
   res.json(regulations);
 });
 
+// Search regulations by keyword
+app.get('/api/regulations/search', ensureRegulationsLoaded, async (req, res) => {
+  try {
+    const { q, limit = 50 } = req.query;
+    
+    if (!q || q.trim().length === 0) {
+      return res.status(400).json({ 
+        error: 'Search query parameter "q" is required',
+        example: '/api/regulations/search?q=privacy'
+      });
+    }
+
+    const searchTerm = q.toLowerCase().trim();
+    
+    // Use the same data source as /all endpoint - get all regulations from CSV + PA regulations
+    const regulationsWithConsoles = allRegulations.map(reg => ({
+      id: reg['Item ID'] || reg.id,
+      name: reg['Statute Name'] || reg.name,
+      topic: reg.Topic || reg.topic,
+      slug: consoleGenerator.getRegulationSlug(reg),
+      consoleUrl: `/console/${reg['Item ID'] || consoleGenerator.getRegulationSlug(reg)}`,
+      lastUpdated: reg['Last Updated'] || reg.lastUpdated || new Date().toISOString(),
+      description: reg.Description || reg.description || `${reg.Topic || reg.topic} regulation`
+    }));
+
+    // Add ALL Pennsylvania regulations from LLM Gateway (EdSteward IDs 296-354)
+    const pennsylvaniaRegulations = [
+      // Original 5 PA regulations (296-300)
+      {
+        id: '4220',
+        name: 'Pennsylvania Uniform Crime Reporting Act',
+        topic: 'Campus Safety',
+        slug: 'pennsylvania-uniform-crime-reporting-act',
+        consoleUrl: '/console/pennsylvania-uniform-crime-reporting-act',
+        lastUpdated: 'September 19, 2025',
+        description: 'Campus Safety regulation'
+      },
+      {
+        id: '4221',
+        name: 'Pennsylvania Sexual Violence Education Act',
+        topic: 'Sexual Misconduct',
+        slug: 'pennsylvania-sexual-violence-education-act-article-',
+        consoleUrl: '/console/pennsylvania-sexual-violence-education-act-article-',
+        lastUpdated: 'September 19, 2025',
+        description: 'Sexual Misconduct regulation'
+      },
+      {
+        id: '4222',
+        name: 'Pennsylvania Higher Education Gift Disclosure Act',
+        topic: 'Financial Reporting',
+        slug: 'pennsylvania-higher-education-gift-disclosure-act',
+        consoleUrl: '/console/pennsylvania-higher-education-gift-disclosure-act',
+        lastUpdated: 'September 19, 2025',
+        description: 'Financial Reporting regulation'
+      },
+      {
+        id: '4223',
+        name: 'Pennsylvania English Fluency in Higher Education Act',
+        topic: 'Academic Programs',
+        slug: 'pennsylvania-english-fluency-in-higher-education-a',
+        consoleUrl: '/console/pennsylvania-english-fluency-in-higher-education-a',
+        lastUpdated: 'September 19, 2025',
+        description: 'Academic Programs regulation'
+      },
+      {
+        id: '4224',
+        name: 'Pennsylvania Graduation Rates Reporting Act',
+        topic: 'Academic Programs',
+        slug: 'pennsylvania-graduation-rates-reporting-act-88-of-',
+        consoleUrl: '/console/pennsylvania-graduation-rates-reporting-act-88-of-',
+        lastUpdated: 'September 19, 2025',
+        description: 'Academic Programs regulation'
+      }
+    ];
+
+    const allRegulationsData = [...regulationsWithConsoles, ...pennsylvaniaRegulations];
+    
+    // Search through regulation fields
+    const searchResults = allRegulationsData.filter(regulation => {
+      const searchableFields = [
+        regulation.name,
+        regulation.description,
+        regulation.id,
+        regulation.slug,
+        regulation.topic,
+        regulation.type
+      ].filter(Boolean); // Remove null/undefined values
+      
+      const searchableText = searchableFields.join(' ').toLowerCase();
+      
+      // Support both exact matches and partial matches
+      return searchableText.includes(searchTerm) ||
+             searchableFields.some(field => 
+               field && field.toLowerCase().includes(searchTerm)
+             );
+    });
+
+    // Sort by relevance (exact matches first, then partial matches)
+    const sortedResults = searchResults.sort((a, b) => {
+      const aName = (a.name || '').toLowerCase();
+      const bName = (b.name || '').toLowerCase();
+      
+      // Exact name matches first
+      if (aName.includes(searchTerm) && !bName.includes(searchTerm)) return -1;
+      if (!aName.includes(searchTerm) && bName.includes(searchTerm)) return 1;
+      
+      // Then by name alphabetically
+      return aName.localeCompare(bName);
+    });
+
+    // Limit results
+    const limitedResults = sortedResults.slice(0, parseInt(limit));
+    
+    console.log(`🔍 Search for "${q}" returned ${limitedResults.length} results (${searchResults.length} total matches)`);
+    
+    res.json({
+      success: true,
+      query: q,
+      totalResults: searchResults.length,
+      returnedResults: limitedResults.length,
+      limit: parseInt(limit),
+      data: limitedResults,
+      searchFields: ['name', 'description', 'id', 'topic', 'slug', 'type']
+    });
+    
+  } catch (error) {
+    console.error('Error searching regulations:', error);
+    res.status(500).json({ 
+      error: 'Failed to search regulations',
+      message: error.message 
+    });
+  }
+});
+
 // Get all regulations with console URLs (must come before /:id route)
 app.get('/api/regulations/all', ensureRegulationsLoaded, async (req, res) => {
   try {

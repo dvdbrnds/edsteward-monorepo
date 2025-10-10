@@ -312,17 +312,51 @@ const ModernServerList = ({ onServerSelect }) => {
   }, []);
   
   // Apply filters to server list
-  const applyFilters = (serverList = null) => {
+  const applyFilters = async (serverList = null) => {
+    console.log("ModernServerList: Applying filters with search term:", filters.search);
+    
     let result = [...(serverList || servers)];
     
-    // Apply search filter
-    if (filters.search) {
-      const search = filters.search.toLowerCase();
-      result = result.filter(server => 
-        server.name.toLowerCase().includes(search) ||
-        server.description?.toLowerCase().includes(search) ||
-        server.type?.toLowerCase().includes(search)
-      );
+    // If there's a search term, use the backend search API
+    if (filters.search && filters.search.trim()) {
+      try {
+        console.log("ModernServerList: Using backend search API for:", filters.search);
+        const response = await fetch(`http://localhost:3010/api/regulations/search?q=${encodeURIComponent(filters.search)}&limit=100`);
+        const searchData = await response.json();
+        
+        if (searchData.success && searchData.data) {
+          console.log("ModernServerList: Search API returned", searchData.data.length, "results");
+          
+          // Transform search results to server format
+          result = searchData.data.map((reg, index) => ({
+            id: `${reg.slug}-${index}`,
+            name: reg.name,
+            type: reg.topic || 'Regulation',
+            status: 'running',
+            description: reg.description || `${reg.topic} regulation`,
+            lastUpdated: reg.lastUpdated || new Date().toISOString(),
+            uptime: '24/7',
+            validationLevel: 'A',
+            isTestData: false,
+            version: '1.0',
+            consoleUrl: reg.consoleUrl,
+            slug: reg.slug,
+            originalIndex: index
+          }));
+        } else {
+          console.log("ModernServerList: Search API returned no results");
+          result = [];
+        }
+      } catch (error) {
+        console.error("ModernServerList: Search API error:", error);
+        // Fall back to local filtering if API fails
+        const search = filters.search.toLowerCase();
+        result = result.filter(server => 
+          server.name.toLowerCase().includes(search) ||
+          server.description?.toLowerCase().includes(search) ||
+          server.type?.toLowerCase().includes(search)
+        );
+      }
     }
     
     // Apply regulation type filter
@@ -371,6 +405,7 @@ const ModernServerList = ({ onServerSelect }) => {
       });
     }
     
+    console.log("ModernServerList: Final filtered results:", result.length);
     setFilteredServers(result);
   };
   

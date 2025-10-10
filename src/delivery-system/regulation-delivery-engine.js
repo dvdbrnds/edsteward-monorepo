@@ -139,22 +139,48 @@ class RegulationCDCService extends Emittery {
   }
 
   async fetchRegulationState(regulationId) {
-    // Determine the correct endpoint based on regulation type
+    // Determine the correct endpoint based on regulation-specific mapping
     let endpoint;
     let method = 'GET';
     
-    // Check if it's a CFR regulation (most OSHA, etc.)
-    if (regulationId.includes('osha') || regulationId.includes('cfr') || 
-        regulationId.includes('emergency-action-plan') || regulationId.includes('safety')) {
+    // REGULATION-SPECIFIC ENDPOINT MAPPING
+    // Each regulation should get its own proper USC/CFR text, not generic copyright text
+    
+    if (regulationId.includes('age-discrimination-act') || regulationId.includes('age-discrimination')) {
+      // Age Discrimination Act: 42 U.S.C. §§ 6101-6107 + CFR regulations
       endpoint = `http://localhost:3002/api/llm/cfr/${regulationId}`;
     }
-    // Check if it's a USC regulation (TEACH Act, Copyright, etc.)
-    else if (regulationId.includes('REG-66') || regulationId.includes('teach') || 
-             regulationId.includes('copyright') || regulationId.includes('REG-17')) {
-      endpoint = `http://localhost:3002/api/llm/usc/17/110`; // TEACH Act specific
+    else if (regulationId.includes('fair-credit-reporting-act') || regulationId.includes('fcra')) {
+      // Fair Credit Reporting Act: 15 U.S.C. §§ 1681-1681v + 16 C.F.R. § 600
+      endpoint = `http://localhost:3002/api/llm/cfr/${regulationId}`;
     }
-    // Default to compliance endpoint for other regulations
+    else if (regulationId.includes('americans-with-disabilities-act') || regulationId.includes('ada')) {
+      // ADA: 42 U.S.C. §§ 12101-12213 + multiple CFR sections
+      endpoint = `http://localhost:3002/api/llm/cfr/${regulationId}`;
+    }
+    else if (regulationId.includes('family-educational-rights') || regulationId.includes('ferpa')) {
+      // FERPA: 20 U.S.C. § 1232g + 34 C.F.R. § 99
+      endpoint = `http://localhost:3002/api/llm/cfr/${regulationId}`;
+    }
+    else if (regulationId.includes('REG-66') || regulationId.includes('teach-act') || regulationId.includes('teach')) {
+      // TEACH Act: 17 U.S.C. § 110(2) - ONLY for actual TEACH Act
+      endpoint = `http://localhost:3002/api/llm/usc/17/110`;
+    }
+    else if (regulationId.includes('clery-act') || regulationId.includes('clery')) {
+      // Clery Act: 20 U.S.C. § 1092(f) + 34 C.F.R. § 668.46
+      endpoint = `http://localhost:3002/api/llm/cfr/${regulationId}`;
+    }
+    else if (regulationId.includes('title-ix') || regulationId.includes('title-9')) {
+      // Title IX: 20 U.S.C. §§ 1681-1688 + 34 C.F.R. § 106
+      endpoint = `http://localhost:3002/api/llm/cfr/${regulationId}`;
+    }
+    else if (regulationId.includes('osha') || regulationId.includes('emergency-action-plan') || 
+             regulationId.includes('safety') || regulationId.includes('occupational-safety')) {
+      // OSHA: 29 U.S.C. §§ 651-678 + 29 C.F.R. § 1910
+      endpoint = `http://localhost:3002/api/llm/cfr/${regulationId}`;
+    }
     else {
+      // Default to compliance endpoint which should route to correct CFR endpoint
       endpoint = `http://localhost:3002/api/llm/compliance/${regulationId}`;
     }
     

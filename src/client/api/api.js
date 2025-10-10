@@ -52,6 +52,12 @@ const api = {
   getRegulations: async () => {
     return apiRequest(API_ENDPOINTS.REGULATIONS);
   },
+
+  // Search regulations by keyword
+  searchRegulations: async (query, limit = 50) => {
+    const params = new URLSearchParams({ q: query, limit: limit.toString() });
+    return apiRequest(`http://localhost:3010/api/regulations/search?${params}`);
+  },
   
   // Upload regulations from Excel file
   uploadRegulations: async (regulations) => {

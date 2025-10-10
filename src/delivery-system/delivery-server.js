@@ -422,25 +422,29 @@ class DeliveryServer {
 
   async start() {
     try {
-      console.log('🔧 [START] Creating EdSteward integration...');
-      
-      // Create EdSteward integration
+      // Create EdSteward integration (optional)
       this.edstewardIntegration = new EdStewardIntegration({
         edstewardUrl: process.env.EDSTEWARD_URL || 'http://localhost:3000',
         apiKey: process.env.EDSTEWARD_API_KEY,
         username: process.env.EDSTEWARD_USERNAME,
         password: process.env.EDSTEWARD_PASSWORD
       });
-      console.log('✅ [START] EdSteward integration created');
+      console.log('✅ [START] EdSteward integration created (optional service)');
 
-      // Test EdSteward connection (non-blocking)
-      console.log('🔧 [START] Testing EdSteward connection...');
-      try {
-        await this.edstewardIntegration.testConnection();
-        console.log('✅ [START] EdSteward connection successful');
-      } catch (error) {
-        console.warn('⚠️ [START] EdSteward connection failed during startup, will retry later:', error.message);
-      }
+      // Test EdSteward connection in background (don't wait for it)
+      setImmediate(async () => {
+        console.log('🔧 [BACKGROUND] Testing EdSteward connection...');
+        try {
+          const connected = await this.edstewardIntegration.testConnection();
+          if (connected) {
+            console.log('✅ [BACKGROUND] EdSteward connection successful');
+          } else {
+            console.log('⚠️ [BACKGROUND] EdSteward not available - delivery system running independently');
+          }
+        } catch (error) {
+          console.log('⚠️ [BACKGROUND] EdSteward connection failed - delivery system running independently');
+        }
+      });
 
       console.log('🔧 [START] Creating delivery engine...');
       // Initialize delivery engine

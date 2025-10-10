@@ -478,9 +478,18 @@ export class EdStewardIntegration {
     try {
       console.log('🧪 Testing EdSteward connection...');
       
+      // Use AbortController for proper timeout
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 2000);
+      
       const response = await fetch(`${this.edstewardUrl}/api/health`, {
-        timeout: 5000
+        signal: controller.signal,
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
+      
+      clearTimeout(timeoutId);
       
       if (response.ok) {
         console.log('✅ EdSteward connection successful');
@@ -490,7 +499,11 @@ export class EdStewardIntegration {
         return false;
       }
     } catch (error) {
-      console.error('❌ EdSteward connection failed:', error.message);
+      if (error.name === 'AbortError') {
+        console.error('❌ EdSteward connection timeout');
+      } else {
+        console.error('❌ EdSteward connection failed:', error.message);
+      }
       return false;
     }
   }

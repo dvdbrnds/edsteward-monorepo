@@ -40,40 +40,74 @@ export class TUFDeliveryIntegration {
     try {
       console.log(`📋 Fetching regulation content for: ${regulationId}`);
       
+      // REGULATION-SPECIFIC ENDPOINT MAPPING
+      // Each regulation gets its proper USC/CFR endpoint, not hardcoded copyright text
+      let primaryEndpoint, secondaryEndpoint, complianceEndpoint;
+      
+      if (regulationId.includes('age-discrimination-act') || regulationId.includes('age-discrimination')) {
+        primaryEndpoint = `${this.llmGatewayUrl}/api/llm/cfr/${regulationId}`;
+        complianceEndpoint = `${this.llmGatewayUrl}/api/llm/compliance/${regulationId}`;
+      }
+      else if (regulationId.includes('fair-credit-reporting-act') || regulationId.includes('fcra')) {
+        primaryEndpoint = `${this.llmGatewayUrl}/api/llm/cfr/${regulationId}`;
+        complianceEndpoint = `${this.llmGatewayUrl}/api/llm/compliance/${regulationId}`;
+      }
+      else if (regulationId.includes('REG-66') || regulationId.includes('teach-act') || regulationId.includes('teach')) {
+        // TEACH Act is the ONLY regulation that should use USC 17/110
+        primaryEndpoint = `${this.llmGatewayUrl}/api/llm/usc/17/110`;
+        secondaryEndpoint = `${this.llmGatewayUrl}/api/llm/cfr/teach-act`;
+        complianceEndpoint = `${this.llmGatewayUrl}/api/llm/compliance/teach-act`;
+      }
+      else {
+        // All other regulations use their specific CFR endpoints
+        primaryEndpoint = `${this.llmGatewayUrl}/api/llm/cfr/${regulationId}`;
+        complianceEndpoint = `${this.llmGatewayUrl}/api/llm/compliance/${regulationId}`;
+      }
+
       const endpoints = [
-        `${this.llmGatewayUrl}/api/llm/usc/17/110`,
-        `${this.llmGatewayUrl}/api/llm/cfr/teach-act`,
-        `${this.llmGatewayUrl}/api/llm/compliance/teach-act`,
+        primaryEndpoint,
+        secondaryEndpoint,
+        complianceEndpoint,
         `${this.llmGatewayUrl}/api/llm/versioning/system-info`
-      ];
+      ].filter(Boolean); // Remove null/undefined endpoints
 
-      const [uscResponse, cfrResponse, complianceResponse, versioningResponse] = 
-        await Promise.all(endpoints.map(url => 
-          fetch(url, { 
-            method: 'GET',
-            headers: { 'Content-Type': 'application/json' },
-            timeout: 30000 
-          })
-        ));
+      const responses = await Promise.all(endpoints.map(url => 
+        fetch(url, { 
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          timeout: 30000 
+        }).catch(error => {
+          console.warn(`⚠️ Failed to fetch ${url}:`, error.message);
+          return null;
+        })
+      ));
 
-      const [uscData, cfrData, complianceData, versioningData] = await Promise.all([
-        uscResponse.ok ? uscResponse.json() : null,
-        cfrResponse.ok ? cfrResponse.json() : null,
-        complianceResponse.ok ? complianceResponse.json() : null,
-        versioningResponse.ok ? versioningResponse.json() : null
-      ]);
+      const responseData = await Promise.all(responses.map(async (response, index) => {
+        if (!response || !response.ok) {
+          console.warn(`⚠️ Failed response from ${endpoints[index]}`);
+          return null;
+        }
+        try {
+          return await response.json();
+        } catch (error) {
+          console.warn(`⚠️ Failed to parse JSON from ${endpoints[index]}`);
+          return null;
+        }
+      }));
+
+      const [primaryData, secondaryData, complianceData, versioningData] = responseData;
 
       // Construct comprehensive regulation content
       const regulationContent = {
         regulationId: regulationId,
-        title: `${regulationId} - TEACH Act Compliance Regulation`,
+        title: primaryData?.data?.title || `${regulationId} Regulation`,
         version: versioningData?.data?.currentRegulation?.version || 
                  versioningData?.currentVersion || 
                  `1.${Date.now()}`,
         lastUpdated: new Date().toISOString(),
         components: {
-          usc: uscData || { error: 'USC data unavailable' },
-          cfr: cfrData || { error: 'CFR data unavailable' },
+          primary: primaryData || { error: 'Primary data unavailable' },
+          secondary: secondaryData || { error: 'Secondary data unavailable' },
           compliance: complianceData || { error: 'Compliance data unavailable' },
           versioning: versioningData || { error: 'Versioning data unavailable' }
         },

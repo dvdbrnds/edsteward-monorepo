@@ -25,6 +25,7 @@ import MCPServerDetail from './pages/MCPServerDetail';
 import SystemHealthDashboard from './components/SystemHealthDashboard';
 import SystemSettings from './components/SystemSettings';
 import CustomerDeliveryDashboard from './components/CustomerDeliveryDashboard';
+import RegulationSearch from './components/RegulationSearch';
 import ErrorBoundary from './components/ErrorBoundary';
 
 // Theme configuration with Material Design color palette
@@ -183,6 +184,7 @@ const DevClientApp = () => {
               <Route path="/create-server" element={<MCPEditorTool />} />
               <Route path="/servers" element={<MCPEditorTool />} />
               <Route path="/servers/:serverId" element={<MCPServerDetail />} />
+              <Route path="/console/:regulationId" element={<MCPServerDetail />} />
               <Route path="/health" element={<SystemHealthDashboard />} />
               <Route path="/settings" element={<SystemSettings />} />
               <Route path="/customer-delivery" element={
