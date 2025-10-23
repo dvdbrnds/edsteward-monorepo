@@ -33,6 +33,7 @@ interface MFAStatus {
  * @description Complete MFA setup wizard with QR code generation and backup codes
  */
 export default function MFASetup() {
+  console.log('🚨 MFA COMPONENT LOADING!!!');
   const [verificationCode, setVerificationCode] = useState("");
   const [showBackupCodes, setShowBackupCodes] = useState(false);
   const [copiedCodes, setCopiedCodes] = useState(false);
@@ -41,10 +42,18 @@ export default function MFASetup() {
   const { toast } = useToast();
 
   // Check current MFA status
-  const { data: mfaStatus, refetch: refetchStatus } = useQuery<MFAStatus>({
+  const { data: mfaStatusResponse, refetch: refetchStatus } = useQuery<{mfa: MFAStatus}>({
     queryKey: ["mfa-status"],
     queryFn: () => apiRequest("GET", "/api/mfa/status"),
   });
+  
+  const mfaStatus = mfaStatusResponse?.mfa;
+  
+  // Debug logging - FRONTEND
+  console.log('🔧 FRONTEND MFA Status Response:', mfaStatusResponse);
+  console.log('🔧 FRONTEND MFA Status:', mfaStatus);
+  console.log('🔧 FRONTEND MFA Status Enabled Check:', mfaStatus?.enabled);
+  console.log('🔧 FRONTEND Component will render:', mfaStatus?.enabled ? 'ENABLED UI' : 'SETUP UI');
 
   // Generate MFA setup data
   const { mutate: generateSetup, isPending: isGenerating } = useMutation<MFASetupData>({
@@ -90,6 +99,28 @@ export default function MFASetup() {
       toast({
         title: "Backup Code Generation Failed",
         description: error.message || "Failed to generate backup codes",
+        variant: "destructive",
+      });
+    },
+  });
+
+  // Disable MFA
+  const { mutate: disableMFA, isPending: isDisabling } = useMutation({
+    mutationFn: () => apiRequest("POST", "/api/mfa/disable"),
+    onSuccess: () => {
+      toast({
+        title: "MFA Disabled",
+        description: "Multi-factor authentication has been disabled for your account",
+      });
+      setSetupData(null);
+      setForceShowQR(false);
+      setShowBackupCodes(false);
+      refetchStatus();
+    },
+    onError: (error: any) => {
+      toast({
+        title: "Disable Failed",
+        description: error.message || "Failed to disable MFA",
         variant: "destructive",
       });
     },
@@ -150,6 +181,19 @@ export default function MFASetup() {
             >
               {isGeneratingCodes && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Generate New Backup Codes
+            </Button>
+            
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (window.confirm("Are you sure you want to disable MFA? This will reduce your account security.")) {
+                  disableMFA();
+                }
+              }}
+              disabled={isDisabling}
+            >
+              {isDisabling && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Disable MFA
             </Button>
           </div>
 

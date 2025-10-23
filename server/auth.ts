@@ -1,10 +1,8 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import { Express } from "express";
-import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from 'crypto';
 import { promisify } from 'util';
-import { storage } from "./storage";
 import { getDatabaseStorage } from "./services/database";
 import { User as SelectUser } from "@shared/schema";
 import { syslog, LogLevel } from "./services/syslog";
@@ -179,7 +177,7 @@ export function setupAuth(app: Express) {
       return res.status(400).json({ error: "Content-Type must be application/json" });
     }
 
-    passport.authenticate("local", async (err: Error | null, user: SelectUser | false, info: any) => {
+    passport.authenticate("local", async (err: Error | null, user: SelectUser | false) => {
       if (err) {
         await syslog.logAuthEvent(LogLevel.ERROR, "Login error", undefined, req.body.username, {
           tenantId: req.tenantId,

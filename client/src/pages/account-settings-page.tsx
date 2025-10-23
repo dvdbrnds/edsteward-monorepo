@@ -134,7 +134,20 @@ export default function AccountSettingsPage() {
 
         {/* MFA Settings - Only show for local accounts */}
         {user.identityProvider !== 'saml' && (
-          <MFASetup />
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Shield className="h-5 w-5" />
+                Multi-Factor Authentication
+              </CardTitle>
+              <CardDescription>
+                Enhance your account security with Google Authenticator (HECVAT 4.0 requirement)
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <MFASetup />
+            </CardContent>
+          </Card>
         )}
 
         {/* SAML Account Notice */}

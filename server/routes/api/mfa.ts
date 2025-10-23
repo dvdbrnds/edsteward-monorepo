@@ -33,10 +33,17 @@ router.get('/status', requireAuth, async (req: Request, res: Response) => {
     const userId = req.user!.id;
     const status = await MFAService.getMFAStatus(userId);
     
-    res.json({
+    console.log('🔧 DEBUG: MFA Status API called for user', userId);
+    console.log('🔧 DEBUG: MFA Status from service:', status);
+    
+    const response = {
       success: true,
       mfa: status,
-    });
+    };
+    
+    console.log('🔧 DEBUG: Sending MFA status response:', response);
+    
+    res.json(response);
   } catch (error) {
     console.error('❌ Error getting MFA status:', error);
     res.status(500).json({
@@ -196,6 +203,36 @@ router.post('/verify', requireAuth, async (req: Request, res: Response) => {
 });
 
 /**
+ * POST /api/mfa/disable
+ * Disable MFA for the authenticated user
+ */
+router.post('/disable', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({
+        success: false,
+        error: 'User not authenticated',
+      });
+    }
+
+    // Disable MFA for the user
+    await MFAService.disableMFA(userId);
+
+    res.json({
+      success: true,
+      message: 'MFA has been disabled for your account',
+    });
+  } catch (error) {
+    console.error('❌ Error disabling MFA:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to disable MFA',
+    });
+  }
+});
+
+/**
  * POST /api/mfa/backup-codes/regenerate
  * Regenerate backup codes
  */
@@ -232,7 +269,7 @@ router.post('/backup-codes/regenerate', requireAuth, async (req: Request, res: R
  */
 router.post('/disable', requireAuth, async (req: Request, res: Response) => {
   try {
-    const { password, confirmDisable: _confirmDisable } = disableMFASchema.parse(req.body);
+    const { password } = disableMFASchema.parse(req.body);
     const user = req.user!;
     
     // Verify password before disabling MFA

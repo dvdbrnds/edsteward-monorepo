@@ -21,9 +21,9 @@ const MFA_CONFIG = {
   backupCodeLength: 8,
 };
 
-// Encryption configuration
-const ENCRYPTION_KEY = process.env.MFA_ENCRYPTION_KEY || crypto.randomBytes(32).toString('hex');
-const ALGORITHM = 'aes-256-gcm';
+// Encryption configuration (currently using base64 for development)
+// const _ENCRYPTION_KEY = process.env.MFA_ENCRYPTION_KEY || crypto.randomBytes(32).toString('hex');
+// const _ALGORITHM = 'aes-256-gcm';
 
 if (!process.env.MFA_ENCRYPTION_KEY) {
   console.warn('⚠️ MFA_ENCRYPTION_KEY not set. Using random key (data will not persist across restarts)');
@@ -243,27 +243,6 @@ export class MFAService {
     }
   }
 
-  /**
-   * Disable MFA for a user
-   */
-  static async disableMFA(userId: number): Promise<boolean> {
-    const storage = getDatabaseStorage();
-    
-    try {
-      await storage.updateUser(userId, {
-        mfaSecret: null,
-        mfaEnabled: false,
-        mfaBackupCodes: null,
-        mfaSetupAt: null,
-      });
-
-      console.log(`✅ MFA disabled for user ${userId}`);
-      return true;
-    } catch (error) {
-      console.error('❌ Error disabling MFA:', error);
-      return false;
-    }
-  }
 
   /**
    * Get MFA status for a user
@@ -317,6 +296,26 @@ export class MFAService {
 
     console.log(`✅ Backup codes regenerated for user ${userId}`);
     return newBackupCodes;
+  }
+
+  /**
+   * Disable MFA for a user
+   */
+  static async disableMFA(userId: number): Promise<void> {
+    try {
+      const storage = getDatabaseStorage();
+      await storage.updateUser(userId, {
+        mfaEnabled: false,
+        mfaSecret: null,
+        mfaBackupCodes: null,
+        mfaSetupAt: null,
+      });
+
+      console.log(`✅ MFA disabled for user ${userId}`);
+    } catch (error) {
+      console.error(`❌ Error disabling MFA for user ${userId}:`, error);
+      throw error;
+    }
   }
 }
 
