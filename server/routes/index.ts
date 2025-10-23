@@ -820,7 +820,7 @@ export function registerRoutes(app: express.Application): Server {
         return res.status(401).json({ error: 'Invalid credentials' });
       }
       
-      const derivedKey = await scryptAsync(password, salt, 32) as Buffer;
+      const derivedKey = await scryptAsync(password, Buffer.from(salt, 'hex'), 32) as Buffer;
       const storedKey = Buffer.from(hash, 'hex');
       const isValidPassword = crypto.timingSafeEqual(derivedKey, storedKey);
 
@@ -842,6 +842,24 @@ export function registerRoutes(app: express.Application): Server {
           }
         );
         return res.status(401).json({ error: 'Invalid credentials' });
+      }
+
+      // Check if MFA is enabled for this user
+      if (user.mfa_enabled) {
+        // Store user info in session for MFA verification
+        req.session.mfaUser = {
+          id: user.id,
+          email: user.email,
+          username: user.username,
+          role: user.role,
+          loginAttemptTime: new Date()
+        };
+        
+        return res.json({
+          success: true,
+          mfaRequired: true,
+          message: 'Please enter your MFA code'
+        });
       }
 
       req.login(user, async (err) => {
@@ -919,6 +937,281 @@ export function registerRoutes(app: express.Application): Server {
     }
   });
 
+  // MFA verification endpoint for login
+  app.post('/api/auth/verify-mfa', async (req, res) => {
+    try {
+      const { code } = req.body;
+      const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
+      const userAgent = req.get('User-Agent') || 'unknown';
+      
+      if (!code) {
+        return res.status(400).json({ error: 'MFA code required' });
+      }
+
+      // Get user from session
+      const mfaUser = req.session.mfaUser;
+      if (!mfaUser) {
+        return res.status(400).json({ error: 'No MFA session found. Please login again.' });
+      }
+
+      // Check if MFA session is not too old (5 minutes max)
+      const sessionAge = Date.now() - new Date(mfaUser.loginAttemptTime).getTime();
+      if (sessionAge > 5 * 60 * 1000) {
+        delete req.session.mfaUser;
+        return res.status(400).json({ error: 'MFA session expired. Please login again.' });
+      }
+
+      // Get full user from database
+      const tenantStorage = getDatabaseStorage();
+      const user = await tenantStorage.getUserByEmail(mfaUser.email);
+      
+      if (!user || !user.mfa_enabled) {
+        delete req.session.mfaUser;
+        return res.status(400).json({ error: 'MFA not enabled for this user' });
+      }
+
+      // Verify MFA code
+      const { MFAService } = await import('../services/mfa');
+      const isValidCode = await MFAService.verifyCode(user.id, code);
+
+      if (!isValidCode) {
+        await syslog.log(
+          LogFacility.AUTH,
+          LogLevel.WARNING,
+          `Failed MFA verification for user: ${user.email}`,
+          {
+            id: 'auth-mfa-failed',
+            parameters: {
+              email: user.email,
+              username: user.username,
+              ip: clientIp,
+              userAgent,
+              reason: 'invalid_mfa_code'
+            }
+          }
+        );
+        return res.status(401).json({ error: 'Invalid MFA code' });
+      }
+
+      // MFA verification successful, complete login
+      delete req.session.mfaUser;
+      
+      req.login(user, async (err) => {
+        if (err) {
+          await syslog.log(
+            LogFacility.AUTH,
+            LogLevel.ERROR,
+            `MFA login session error for user: ${user.email}`,
+            {
+              id: 'auth-mfa-session-error',
+              parameters: {
+                email: user.email,
+                username: user.username,
+                ip: clientIp,
+                userAgent,
+                error: err.message,
+                reason: 'session_error'
+              }
+            }
+          );
+          return res.status(500).json({ error: 'Login failed' });
+        }
+
+        // Log successful MFA login
+        await syslog.log(
+          LogFacility.AUTH,
+          LogLevel.INFO,
+          `Successful MFA login for user: ${user.email}`,
+          {
+            id: 'auth-mfa-login-success',
+            parameters: {
+              email: user.email,
+              username: user.username,
+              userId: user.id,
+              role: user.role,
+              ip: clientIp,
+              userAgent
+            }
+          }
+        );
+
+        res.json({
+          success: true,
+          user: {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+            role: user.role
+          }
+        });
+      });
+
+    } catch (error) {
+      console.error('MFA verification error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  // Frontend authentication endpoint (handles MFA flow)
+  app.post('/api/authenticate', async (req, res) => {
+    try {
+      const { username, password, mfaCode } = req.body;
+      const clientIp = req.ip || req.connection.remoteAddress || 'unknown';
+      const userAgent = req.get('User-Agent') || 'unknown';
+      
+      if (!username || !password) {
+        return res.status(400).json({ error: 'Username and password required' });
+      }
+
+      const tenantStorage = getDatabaseStorage();
+      const user = await tenantStorage.getUserByUsername(username);
+      
+      if (!user) {
+        await syslog.log(
+          LogFacility.AUTH,
+          LogLevel.WARNING,
+          `Login attempt for non-existent user: ${username}`,
+          {
+            id: 'auth-user-not-found',
+            parameters: {
+              username,
+              ip: clientIp,
+              userAgent,
+              reason: 'user_not_found'
+            }
+          }
+        );
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+
+      // Verify password
+      const crypto = await import('crypto');
+      const { promisify } = await import('util');
+      const scryptAsync = promisify(crypto.scrypt);
+      
+      const [salt, hash] = user.password.split(':');
+      if (!salt || !hash) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+      
+      const derivedKey = await scryptAsync(password, Buffer.from(salt, 'hex'), 32) as Buffer;
+      const storedKey = Buffer.from(hash, 'hex');
+      const isValidPassword = crypto.timingSafeEqual(derivedKey, storedKey);
+
+      if (!isValidPassword) {
+        await syslog.log(
+          LogFacility.AUTH,
+          LogLevel.WARNING,
+          `Failed login attempt for user: ${username}`,
+          {
+            id: 'auth-wrong-password',
+            parameters: {
+              username,
+              ip: clientIp,
+              userAgent,
+              reason: 'wrong_password'
+            }
+          }
+        );
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+
+      // Check if MFA is enabled
+      if (user.mfa_enabled || user.mfaEnabled) {
+        if (!mfaCode) {
+          // First step: password verified, now need MFA code
+          req.session.mfaUser = {
+            id: user.id,
+            email: user.email,
+            username: user.username,
+            role: user.role,
+            loginAttemptTime: new Date()
+          };
+          
+          return res.json({
+            success: true,
+            mfaRequired: true,
+            message: 'Please enter your MFA code'
+          });
+        } else {
+          // Second step: verify MFA code
+          const { MFAService } = await import('../services/mfa');
+          const isValidCode = await MFAService.verifyCode(user.id, mfaCode);
+
+          if (!isValidCode) {
+            await syslog.log(
+              LogFacility.AUTH,
+              LogLevel.WARNING,
+              `Failed MFA verification for user: ${username}`,
+              {
+                id: 'auth-mfa-failed',
+                parameters: {
+                  username,
+                  ip: clientIp,
+                  userAgent,
+                  reason: 'invalid_mfa_code'
+                }
+              }
+            );
+            return res.status(401).json({ error: 'Invalid MFA code' });
+          }
+        }
+      }
+
+      // Login successful (either no MFA or MFA verified)
+      req.login(user, async (err) => {
+        if (err) {
+          await syslog.log(
+            LogFacility.AUTH,
+            LogLevel.ERROR,
+            `Login session error for user: ${username}`,
+            {
+              id: 'auth-session-error',
+              parameters: {
+                username,
+                ip: clientIp,
+                userAgent,
+                error: err.message,
+                reason: 'session_error'
+              }
+            }
+          );
+          return res.status(500).json({ error: 'Login failed' });
+        }
+
+        // Log successful login
+        await syslog.log(
+          LogFacility.AUTH,
+          LogLevel.INFO,
+          `Successful login for user: ${username}`,
+          {
+            id: 'auth-login-success',
+            parameters: {
+              username,
+              userId: user.id,
+              role: user.role,
+              ip: clientIp,
+              userAgent,
+              mfaUsed: !!user.mfa_enabled
+            }
+          }
+        );
+
+        res.json({
+          id: user.id,
+          email: user.email,
+          username: user.username,
+          role: user.role,
+          identityProvider: 'local'
+        });
+      });
+
+    } catch (error) {
+      console.error('Authentication error:', error);
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
   // Alternative auth login endpoint 
   app.post('/api/auth/login', async (req, res) => {
     try {
@@ -945,7 +1238,7 @@ export function registerRoutes(app: express.Application): Server {
         return res.status(401).json({ error: 'Invalid credentials' });
       }
       
-      const derivedKey = await scryptAsync(password, salt, 32) as Buffer;
+      const derivedKey = await scryptAsync(password, Buffer.from(salt, 'hex'), 32) as Buffer;
       const storedKey = Buffer.from(hash, 'hex');
       const isValidPassword = crypto.timingSafeEqual(derivedKey, storedKey);
 

@@ -45,7 +45,7 @@ app.use(helmet({
       scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts for MCP test page
       scriptSrcAttr: ["'unsafe-inline'"], // Allow inline event handlers
       imgSrc: ["'self'", "data:", "https:", "blob:"],
-      connectSrc: ["'self'", "ws://localhost:3003", "http://localhost:3003", "ws://localhost:3000", "ws://*:3000"], // Allow WebSocket connections to MCP Engine and external access
+      connectSrc: ["'self'", "ws://localhost:3051", "http://localhost:3051", "ws://localhost:3003", "http://localhost:3003", "ws://localhost:3000", "ws://*:3000"], // Allow WebSocket connections to MCP Engine and external access
     },
   },
 }));
@@ -136,7 +136,7 @@ app.post('/api/authenticate', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
     
-    const derivedKey = await scryptAsync(password, salt, 32) as Buffer;
+    const derivedKey = await scryptAsync(password, Buffer.from(salt, 'hex'), 32) as Buffer;
     const storedKey = Buffer.from(hash, 'hex');
     const isValidPassword = crypto.timingSafeEqual(derivedKey, storedKey);
 

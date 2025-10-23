@@ -73,14 +73,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   });
 
   const loginMutation = useMutation({
-    mutationFn: async (credentials: LoginData) => {
+    mutationFn: async (credentials: LoginData & { mfaCode?: string }) => {
       return await apiRequest("POST", "/api/authenticate", credentials);
     },
     onSuccess: (loginResponse: any) => {
+      // Handle MFA challenge
+      if (loginResponse.mfaRequired) {
+        // Don't update auth state yet, just return the MFA challenge
+        return;
+      }
+      
       // CRITICAL FIX: Set query data directly to update authentication state immediately
       // The loginResponse contains the user data from the successful login
-      if (loginResponse.success && loginResponse.user) {
-        queryClient.setQueryData(["/api/auth/status"], loginResponse.user);
+      if (loginResponse.id) {
+        queryClient.setQueryData(["/api/auth/status"], loginResponse);
       }
       // Also invalidate to ensure fresh data
       queryClient.invalidateQueries({ queryKey: ["/api/auth/status"] });

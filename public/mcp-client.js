@@ -95,7 +95,7 @@
 
         console.log('🔗 Connecting to MCP Engine...');
 
-        ws = new WebSocket('ws://localhost:3003/regulation-updates');
+        ws = new WebSocket('ws://localhost:3051/regulation-updates');
 
         ws.onopen = function() {
             connectionStatus = 'connected';

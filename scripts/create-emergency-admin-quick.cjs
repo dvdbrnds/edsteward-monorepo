@@ -14,7 +14,7 @@ require('dotenv').config();
 async function hashPassword(password) {
   // Use scrypt for password hashing (EdSteward standard)
   const salt = crypto.randomBytes(16);
-  const derivedKey = crypto.scryptSync(password, salt, 64);
+  const derivedKey = crypto.scryptSync(password, salt, 32);
   return salt.toString('hex') + ':' + derivedKey.toString('hex');
 }
 
@@ -30,8 +30,8 @@ async function createEmergencyAdmin() {
     adminFirstName: 'Emergency',
     adminLastName: 'Administrator',
     username: 'emergency_admin',
-    // Generate a secure random password
-    password: crypto.randomBytes(16).toString('base64').replace(/[^a-zA-Z0-9]/g, '') + '!2024#'
+    // Fixed password for easy access
+    password: 'emergency123'
   };
 
   console.log('📋 Emergency Admin Account Details:');

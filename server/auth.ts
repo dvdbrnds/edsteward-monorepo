@@ -44,7 +44,7 @@ export async function verifyPassword(supplied: string, stored: string): Promise<
   }
 
   try {
-    const derivedKey = await scryptAsync(supplied, salt, 32) as Buffer;
+    const derivedKey = await scryptAsync(supplied, Buffer.from(salt, 'hex'), 32) as Buffer;
     const storedKey = Buffer.from(hash, 'hex');
     return timingSafeEqual(derivedKey, storedKey);
   } catch (error) {

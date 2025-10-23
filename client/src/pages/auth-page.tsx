@@ -9,7 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2 } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useBranding } from "@/hooks/use-branding";
 
 // Import logos
@@ -19,6 +19,9 @@ export default function AuthPage() {
   const { user, loginMutation, registerMutation } = useAuth();
   const [, setLocation] = useLocation();
   const branding = useBranding();
+  const [mfaRequired, setMfaRequired] = useState(false);
+  const [mfaCode, setMfaCode] = useState("");
+  const [loginCredentials, setLoginCredentials] = useState<{ username: string; password: string } | null>(null);
 
   const loginForm = useForm({
     resolver: zodResolver(insertUserSchema.pick({ username: true, password: true })),
@@ -98,7 +101,16 @@ export default function AuthPage() {
                 </CardHeader>
                 <CardContent>
                   <Form {...loginForm}>
-                    <form onSubmit={loginForm.handleSubmit((data) => loginMutation.mutate(data))} className="space-y-4">
+                    <form onSubmit={loginForm.handleSubmit((data) => {
+                      setLoginCredentials(data);
+                      loginMutation.mutate(data, {
+                        onSuccess: (response: any) => {
+                          if (response.mfaRequired) {
+                            setMfaRequired(true);
+                          }
+                        }
+                      });
+                    })} className="space-y-4">
                       <FormField
                         control={loginForm.control}
                         name="username"
@@ -125,20 +137,76 @@ export default function AuthPage() {
                           </FormItem>
                         )}
                       />
-                      <Button 
-                        type="submit" 
-                        className="w-full hover:opacity-90 transition-opacity" 
-                        style={{ 
-                          backgroundColor: branding.loginScreenAccentColor, 
-                          borderColor: branding.loginScreenAccentColor 
-                        }}
-                        disabled={loginMutation.isPending}
-                      >
-                        {loginMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Login
-                      </Button>
+                      {!mfaRequired && (
+                        <Button 
+                          type="submit" 
+                          className="w-full hover:opacity-90 transition-opacity" 
+                          style={{ 
+                            backgroundColor: branding.loginScreenAccentColor, 
+                            borderColor: branding.loginScreenAccentColor 
+                          }}
+                          disabled={loginMutation.isPending}
+                        >
+                          {loginMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                          Login
+                        </Button>
+                      )}
                     </form>
                   </Form>
+
+                  {/* MFA Code Input */}
+                  {mfaRequired && (
+                    <div className="mt-6 space-y-4">
+                      <div className="text-center">
+                        <h3 className="text-lg font-semibold">Multi-Factor Authentication</h3>
+                        <p className="text-sm text-gray-600 mt-1">
+                          Enter the 6-digit code from your authenticator app
+                        </p>
+                      </div>
+                      <div className="space-y-4">
+                        <Input
+                          type="text"
+                          placeholder="000000"
+                          value={mfaCode}
+                          onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                          className="text-center text-lg tracking-widest"
+                          maxLength={6}
+                        />
+                        <div className="flex space-x-2">
+                          <Button
+                            variant="outline"
+                            onClick={() => {
+                              setMfaRequired(false);
+                              setMfaCode("");
+                              setLoginCredentials(null);
+                            }}
+                            className="flex-1"
+                          >
+                            Back
+                          </Button>
+                          <Button
+                            onClick={() => {
+                              if (loginCredentials && mfaCode.length === 6) {
+                                loginMutation.mutate({
+                                  ...loginCredentials,
+                                  mfaCode
+                                });
+                              }
+                            }}
+                            disabled={mfaCode.length !== 6 || loginMutation.isPending}
+                            className="flex-1"
+                            style={{ 
+                              backgroundColor: branding.loginScreenAccentColor, 
+                              borderColor: branding.loginScreenAccentColor 
+                            }}
+                          >
+                            {loginMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                            Verify
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
                   
                   {/* SAML SSO Login - show for institutions that have SAML configured */}
                   {branding.institutionName.toLowerCase().includes('moravian') && (

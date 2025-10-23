@@ -16,9 +16,11 @@ import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
 
 interface MFASetupData {
-  secret: string;
-  qrCode: string;
-  backupCodes: string[];
+  setup: {
+    qrCodeUrl: string;
+    manualEntryKey: string;
+    backupCodes: string[];
+  };
 }
 
 interface MFAStatus {
@@ -34,6 +36,8 @@ export default function MFASetup() {
   const [verificationCode, setVerificationCode] = useState("");
   const [showBackupCodes, setShowBackupCodes] = useState(false);
   const [copiedCodes, setCopiedCodes] = useState(false);
+  const [setupData, setSetupData] = useState<MFASetupData | null>(null);
+  const [forceShowQR, setForceShowQR] = useState(false);
   const { toast } = useToast();
 
   // Check current MFA status
@@ -43,8 +47,12 @@ export default function MFASetup() {
   });
 
   // Generate MFA setup data
-  const { data: setupData, mutate: generateSetup, isPending: isGenerating } = useMutation<MFASetupData>({
+  const { mutate: generateSetup, isPending: isGenerating } = useMutation<MFASetupData>({
     mutationFn: () => apiRequest("POST", "/api/mfa/setup/generate"),
+    onSuccess: (data) => {
+      setSetupData(data);
+      setForceShowQR(true);
+    },
     onError: (error: any) => {
       toast({
         title: "Setup Failed",
@@ -57,7 +65,7 @@ export default function MFASetup() {
   // Verify and enable MFA
   const { mutate: verifyAndEnable, isPending: isVerifying } = useMutation({
     mutationFn: (code: string) =>
-      apiRequest("POST", "/api/mfa/setup/verify", { code }),
+      apiRequest("POST", "/api/mfa/setup/verify", { verificationCode: code }),
     onSuccess: () => {
       toast({
         title: "MFA Enabled Successfully",
@@ -77,7 +85,7 @@ export default function MFASetup() {
 
   // Generate backup codes
   const { data: backupCodes, mutate: generateBackupCodes, isPending: isGeneratingCodes } = useMutation<{ codes: string[] }>({
-    mutationFn: () => apiRequest("POST", "/api/mfa/backup-codes/generate"),
+    mutationFn: () => apiRequest("POST", "/api/mfa/backup-codes/regenerate"),
     onError: (error: any) => {
       toast({
         title: "Backup Code Generation Failed",
@@ -100,7 +108,7 @@ export default function MFASetup() {
   };
 
   const copyBackupCodes = () => {
-    const codes = setupData?.backupCodes || backupCodes?.codes || [];
+    const codes = setupData?.setup?.backupCodes || backupCodes?.codes || [];
     const codeText = codes.join("\n");
     navigator.clipboard.writeText(codeText);
     setCopiedCodes(true);
@@ -198,7 +206,7 @@ export default function MFASetup() {
             </AlertDescription>
           </Alert>
 
-          {!setupData ? (
+          {!setupData && !forceShowQR ? (
             <Button onClick={() => generateSetup()} disabled={isGenerating}>
               {isGenerating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               <Smartphone className="mr-2 h-4 w-4" />
@@ -213,7 +221,7 @@ export default function MFASetup() {
                   <div className="flex-shrink-0">
                     <div className="bg-white p-4 rounded-lg border inline-block">
                       <img
-                        src={setupData.qrCode}
+                        src={setupData.setup.qrCodeUrl}
                         alt="MFA QR Code"
                         className="w-48 h-48"
                       />
@@ -236,7 +244,7 @@ export default function MFASetup() {
                     </div>
                     <div className="mt-4 p-3 bg-gray-50 rounded">
                       <p className="text-xs text-gray-500 mb-1">Manual entry key:</p>
-                      <code className="text-sm font-mono break-all">{setupData.secret}</code>
+                      <code className="text-sm font-mono break-all">{setupData.setup.manualEntryKey}</code>
                     </div>
                   </div>
                 </div>
@@ -271,7 +279,7 @@ export default function MFASetup() {
               </div>
 
               {/* Backup Codes Preview */}
-              {showBackupCodes && setupData.backupCodes && (
+              {showBackupCodes && setupData.setup.backupCodes && (
                 <Card className="bg-yellow-50 border-yellow-200">
                   <CardHeader>
                     <CardTitle className="text-sm flex items-center gap-2">
@@ -284,7 +292,7 @@ export default function MFASetup() {
                   </CardHeader>
                   <CardContent>
                     <div className="grid grid-cols-2 gap-2 font-mono text-sm">
-                      {setupData.backupCodes.map((code, index) => (
+                      {setupData.setup.backupCodes.map((code, index) => (
                         <div key={index} className="bg-white p-2 rounded border">
                           {code}
                         </div>
