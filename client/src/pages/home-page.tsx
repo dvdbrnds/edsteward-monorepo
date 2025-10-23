@@ -4,6 +4,7 @@ import { Link, useLocation } from "wouter";
 import Navigation from "@/components/layout/navigation";
 import ComplianceOverview from "@/components/dashboard/compliance-overview";
 import UpcomingDeadlines from "@/components/dashboard/upcoming-deadlines";
+import DashboardStats from "@/components/dashboard/dashboard-stats";
 import RegulationList from "@/components/regulations/regulation-list";
 import { AppliesToFilter } from "@/components/filters/applies-to-filter";
 import { useState, useEffect } from "react";
@@ -42,6 +43,11 @@ export default function HomePage() {
           <h1 className="text-3xl font-bold text-[#002147] mb-8">
             Welcome, {user?.username}
           </h1>
+
+          {/* Dashboard Statistics */}
+          <div className="mb-8">
+            <DashboardStats />
+          </div>
 
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 mb-8 items-stretch">
             <div className="lg:col-span-2">

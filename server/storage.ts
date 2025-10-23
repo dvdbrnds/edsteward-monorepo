@@ -54,7 +54,7 @@ import type {
 // Import RegulationUpdate type from schema
 import { regulationUpdates, type RegulationUpdate, type InsertRegulationUpdate } from "@shared/schema";
 import { db } from "./db";
-import { eq, desc, or, like } from "drizzle-orm";
+import { eq, desc, or, like, sql } from "drizzle-orm";
 import { getDatabaseStorage } from "./services/database";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
@@ -464,7 +464,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getRegulation(id: number): Promise<Regulation | undefined> {
-    const [regulation] = await db.select().from(regulations).where(eq(regulations.id, id));
+    // Use raw SQL query to ensure regulation_text is included
+    const result = await db.execute(sql`SELECT *, regulation_text FROM regulations WHERE id = ${id} LIMIT 1`);
+    const regulation = result.rows[0] as any;
+    
+    if (regulation) {
+      // Map snake_case to camelCase for consistency
+      regulation.regulationText = regulation.regulation_text;
+    }
+    
     return regulation as Regulation | undefined;
   }
 

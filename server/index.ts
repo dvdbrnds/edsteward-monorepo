@@ -36,18 +36,9 @@ try {
   process.exit(1);
 }
 
-// Security middleware
+// Security middleware - CSP temporarily disabled for iOS simulator testing
 app.use(helmet({
-  contentSecurityPolicy: {
-    directives: {
-      defaultSrc: ["'self'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts for MCP test page
-      scriptSrcAttr: ["'unsafe-inline'"], // Allow inline event handlers
-      imgSrc: ["'self'", "data:", "https:", "blob:"],
-      connectSrc: ["'self'", "ws://localhost:3051", "http://localhost:3051", "ws://localhost:3003", "http://localhost:3003", "ws://localhost:3000", "ws://*:3000"], // Allow WebSocket connections to MCP Engine and external access
-    },
-  },
+  contentSecurityPolicy: false, // Temporarily disable CSP
 }));
 
 // CORS configuration - support both development and production domains

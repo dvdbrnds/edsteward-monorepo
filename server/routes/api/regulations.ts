@@ -176,6 +176,7 @@ router.get("/:regulationId", async (req, res) => {
       return res.status(404).json({ error: "Regulation not found" });
     }
 
+
     const totalTime = Date.now() - startTime;
     syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Fetched regulation ${regulationId} in ${totalTime}ms`);
 
