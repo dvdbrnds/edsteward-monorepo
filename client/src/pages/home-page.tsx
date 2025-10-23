@@ -28,7 +28,7 @@ export default function HomePage() {
     }
   }, [user, setLocation]);
 
-  const { data: notifications, isLoading: notificationsLoading, error } = useQuery<Notification[]>({
+  const { data: notifications, isLoading: notificationsLoading, error: _error } = useQuery<Notification[]>({
     queryKey: ["/api/notifications", "v2"],
   });
 

@@ -8,6 +8,7 @@ import {
   requireComplianceOfficer,
   attachUserPermissions
 } from '../../middleware/role-based-auth';
+import { upload } from './uploads';
 
 const router = express.Router();
 
@@ -214,6 +215,73 @@ router.get("/:regulationId/evidence", async (req, res) => {
     res.status(500).json({ 
       error: "Failed to fetch evidence files", 
       details: error instanceof Error ? error.message : String(error) 
+    });
+  }
+});
+
+// Upload evidence file for a regulation
+router.post("/:regulationId/evidence", requireAuth, upload.single('file'), async (req, res) => {
+  try {
+    if (!req.user) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized evidence upload attempt");
+      return res.status(401).json({ error: "Authentication required" });
+    }
+
+    const regulationId = parseInt(req.params.regulationId);
+
+    if (isNaN(regulationId)) {
+      return res.status(400).json({ error: "Invalid regulation ID" });
+    }
+
+    if (!req.file) {
+      return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    const file = req.file;
+    const description = req.body.description || '';
+    const isOfficial = req.body.isOfficial === 'true';
+
+    try {
+      const tenantStorage = getDatabaseStorage();
+      const evidenceFile = await tenantStorage.createEvidenceFile({
+        regulationId: regulationId,
+        fileName: file.originalname,
+        fileSize: file.size,
+        fileType: file.mimetype,
+        description,
+        uploadedBy: req.user.id,
+        status: "pending",
+        storagePath: file.path,
+        isOfficial
+      });
+
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
+        `Successfully uploaded evidence file for regulation ${regulationId}`);
+
+      return res.json({
+        message: "File uploaded successfully",
+        file: evidenceFile
+      });
+
+    } catch (dbError) {
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Database error saving evidence file", {
+        error: dbError instanceof Error ? dbError.message : String(dbError)
+      });
+
+      return res.status(500).json({
+        error: "Database error saving evidence file",
+        details: dbError instanceof Error ? dbError.message : String(dbError)
+      });
+    }
+
+  } catch (error) {
+    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Evidence upload error", {
+      error: error instanceof Error ? error.message : String(error)
+    });
+
+    return res.status(500).json({
+      error: "Failed to upload evidence file",
+      details: error instanceof Error ? error.message : String(error)
     });
   }
 });

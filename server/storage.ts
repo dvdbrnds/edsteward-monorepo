@@ -960,8 +960,8 @@ export class DatabaseStorage implements IStorage {
           ru.signature,
           ru.user_id as "userId",
           u.username,
-          u.first_name as "firstName",
-          u.last_name as "lastName"
+          u."firstName" as "firstName",
+          u."lastName" as "lastName"
         FROM regulation_updates ru
         LEFT JOIN users u ON ru.user_id = u.id
         WHERE ru.regulation_id = $1 AND ru.status = 'pending'

@@ -85,6 +85,7 @@ import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { NoteSection } from "@/components/regulations/note-section";
 import { RegulationTimeline } from "@/components/regulations/regulation-timeline";
+import { EnhancedRegulationTimeline } from "@/components/regulations/enhanced-regulation-timeline";
 import { WebPublishDialog } from "@/components/regulations/web-publish-dialog";
 import { CommunicationDialog } from "@/components/regulations/communication-dialog";
 import { SubmissionWizard } from "@/components/regulations/submission-wizard";
@@ -548,23 +549,9 @@ function RegulationDetailPage() {
 
             {/* Enhanced Timeline for Admins, Basic Timeline for Users */}
             <div className="mb-6">
-              <div className="bg-blue-100 border border-blue-300 rounded p-4 mb-4 text-sm">
-                🔍 Debug Info:<br/>
-                - isAdmin: {isAdmin ? 'true' : 'false'}<br/>
-                - user role: {user?.role || 'undefined'}<br/>
-                - user object: {JSON.stringify(user)}<br/>
-                - regulation ID: {regulation?.id}
-              </div>
               {isAdmin ? (
-                <div data-testid="enhanced-timeline" className="border-4 border-green-500 p-4 rounded">
-                  <div className="bg-green-100 border border-green-300 rounded p-4 mb-4 text-lg font-bold">
-                    ✅ ADMIN DETECTED - Enhanced Timeline Should Render Here
-                  </div>
-                  <div className="bg-yellow-50 border border-yellow-300 rounded p-4 mb-4">
-                    <h3 className="font-bold text-lg mb-2">🚀 Enhanced Version Control System</h3>
-                    <p>This is where the enhanced timeline with version control, rollback, and comparison features should appear.</p>
-                    <p className="mt-2 text-sm text-gray-600">If you see this message, the admin detection is working but the EnhancedRegulationTimeline component may have an issue.</p>
-                  </div>
+                <div data-testid="enhanced-timeline">
+                  <EnhancedRegulationTimeline regulation={regulation} />
                 </div>
               ) : (
                 <div className="border-4 border-yellow-500 p-4 rounded">
