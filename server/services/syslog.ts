@@ -346,6 +346,16 @@ export class SysLogger {
       this.fileStream = null;
     }
   }
+
+  /**
+   * Log an audit event with structured data
+   */
+  logAuditEvent(level: LogLevel, message: string, auditData: Record<string, any>): void {
+    const structuredData: StructuredData = {
+      audit: auditData
+    };
+    this.log(LogFacility.LOCAL0, level, `[AUDIT] ${message}`, structuredData);
+  }
 }
 
 // Export configured syslog instance

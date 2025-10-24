@@ -4,7 +4,7 @@
  */
 
 import { Request, Response, NextFunction } from 'express';
-import { hasPermission, getCombinedPermissions, edStewardRoles, type RolePermissions } from '../config/role-mapping';
+import { hasPermission, getCombinedPermissions, type RolePermissions } from '../config/role-mapping';
 
 // Helper function to safely parse user roles
 function parseUserRoles(user: any): string[] {
@@ -14,7 +14,7 @@ function parseUserRoles(user: any): string[] {
     try {
       const roles = typeof user.roles === 'string' ? JSON.parse(user.roles) : user.roles;
       return Array.isArray(roles) ? roles : [user.role || 'user'];
-    } catch (e) {
+    } catch {
       return [user.role || 'user'];
     }
   }

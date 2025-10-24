@@ -8,6 +8,7 @@ import {
   requireComplianceOfficer,
   attachUserPermissions
 } from '../../middleware/role-based-auth';
+import { auditRegulationAction, auditEvidence } from '../../middleware/audit-middleware';
 import { upload } from './uploads';
 
 const router = express.Router();
@@ -220,7 +221,7 @@ router.get("/:regulationId/evidence", async (req, res) => {
 });
 
 // Upload evidence file for a regulation
-router.post("/:regulationId/evidence", requireAuth, upload.single('file'), async (req, res) => {
+router.post("/:regulationId/evidence", requireAuth, ...auditEvidence('create'), upload.single('file'), async (req, res) => {
   try {
     if (!req.user) {
       syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized evidence upload attempt");
@@ -287,7 +288,7 @@ router.post("/:regulationId/evidence", requireAuth, upload.single('file'), async
 });
 
 // Update a regulation action - requires compliance officer or admin
-router.patch("/:regulationId/actions/:actionType", requireAuth, requireComplianceOfficer, async (req, res) => {
+router.patch("/:regulationId/actions/:actionType", requireAuth, requireComplianceOfficer, ...auditRegulationAction(), async (req, res) => {
   try {
     const startTime = Date.now();
     const regulationId = parseInt(req.params.regulationId);

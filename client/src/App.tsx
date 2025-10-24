@@ -19,6 +19,7 @@ import AdminSettingsPage from "@/pages/admin-settings-page";
 import AccountSettingsPage from "@/pages/account-settings-page";
 import LogsPage from "@/pages/admin/logs-page";
 import DebugToolsPage from "@/pages/admin/debug-tools-page";
+import AuditTrailPage from "@/pages/audit-trail-page";
 import UtilitiesIndexPage from "@/pages/utilities/index";
 import { RegulationViewer } from "@/pages/RegulationViewer";
 import SetupWizardPage from "@/pages/setup-wizard-page";
@@ -103,6 +104,7 @@ export default function App() {
               
               <ProtectedRoute path="/admin/logs" component={LogsPage} />
               <ProtectedRoute path="/admin/debug" component={DebugToolsPage} />
+              <ProtectedRoute path="/audit-trail" component={AuditTrailPage} />
               <ProtectedRoute path="/admin/regulations" component={RegulationViewer} />
               <Route path="/utilities" component={UtilitiesIndexPage} />
               <Route component={NotFound} />

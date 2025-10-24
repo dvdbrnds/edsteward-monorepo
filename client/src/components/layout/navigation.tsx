@@ -17,6 +17,7 @@ import {
   Loader2,
   User,
   Settings,
+  Shield,
 
 } from "lucide-react";
 import {
@@ -95,6 +96,7 @@ export default function Navigation() {
         //   : []
         // ),
         { href: "/admin/settings", label: "System Settings", icon: Settings },
+        { href: "/audit-trail", label: "Audit Trail", icon: Shield },
         // AWS Tenant Management - DISABLED
         // ...(currentTenant === 'admin' 
         //   ? [{ href: "/admin/aws-tenant-management", label: "AWS Tenant Management", icon: Server }]

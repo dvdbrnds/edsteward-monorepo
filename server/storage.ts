@@ -1088,11 +1088,28 @@ export class DatabaseStorage implements IStorage {
     resourceId: number;
     details: any;
   }): Promise<void> {
-    // Log to console for now - in production this would go to an audit_logs table
-    console.log('📋 AUDIT LOG:', {
-      timestamp: new Date().toISOString(),
-      ...entry
-    });
+    // Import AuditService dynamically to avoid circular dependencies
+    const { AuditService } = await import('./services/audit');
+    
+    try {
+      await AuditService.logAudit({
+        entityType: entry.resourceType,
+        entityId: entry.resourceId.toString(),
+        action: entry.action as any,
+        metadata: entry.details,
+        complianceImpact: 'medium'
+      }, {
+        userId: entry.userId,
+        requestId: `legacy_${Date.now()}`
+      });
+    } catch (error) {
+      // Fallback to console logging if audit service fails
+      console.log('📋 AUDIT LOG (fallback):', {
+        timestamp: new Date().toISOString(),
+        ...entry,
+        error: error instanceof Error ? error.message : String(error)
+      });
+    }
   }
 
   async getRegulationTimeline(regulationId: number): Promise<any[]> {

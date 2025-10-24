@@ -1,5 +1,4 @@
 import express from 'express';
-import { storage } from '../../storage';
 import { syslog, LogLevel, LogFacility } from '../../services/syslog';
 import { getDatabaseStorage } from '../../services/database';
 import { sendDeadlineCreationNotification } from '../../services/deadline-notifications';

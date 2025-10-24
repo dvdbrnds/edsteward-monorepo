@@ -571,21 +571,34 @@ function RegulationDetailPage() {
                       Review Updates
                     </Button>
                     {isAdmin && (
-                      <Button
-                        variant="default"
-                        size="sm"
-                        onClick={() => {
-                          // Scroll to the enhanced timeline section
-                          const timelineElement = document.querySelector('[data-testid="enhanced-timeline"]');
-                          if (timelineElement) {
-                            timelineElement.scrollIntoView({ behavior: 'smooth' });
-                          }
-                        }}
-                        className="bg-yellow-600 hover:bg-yellow-700 text-white"
-                      >
-                        <History className="h-4 w-4 mr-2" />
-                        View Timeline
-                      </Button>
+                      <>
+                        <Button
+                          variant="default"
+                          size="sm"
+                          onClick={() => {
+                            // Scroll to the enhanced timeline section
+                            const timelineElement = document.querySelector('[data-testid="enhanced-timeline"]');
+                            if (timelineElement) {
+                              timelineElement.scrollIntoView({ behavior: 'smooth' });
+                            }
+                          }}
+                          className="bg-yellow-600 hover:bg-yellow-700 text-white"
+                        >
+                          <History className="h-4 w-4 mr-2" />
+                          View Timeline
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            window.open(`/audit-trail?regulationId=${regulationId}`, '_blank');
+                          }}
+                          className="gap-2"
+                        >
+                          <Shield className="h-4 w-4" />
+                          Audit Trail
+                        </Button>
+                      </>
                     )}
                   </div>
                 </div>

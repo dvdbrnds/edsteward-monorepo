@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, timestamp, boolean, date, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, timestamp, boolean, date, jsonb, index } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -880,6 +880,68 @@ export const insertSystemLogSchema = createInsertSchema(systemLogs).extend({
 // Add to the type exports
 export type SystemLog = typeof systemLogs.$inferSelect;
 export type InsertSystemLog = z.infer<typeof insertSystemLogSchema>;
+
+// Audit Logs table for compliance action tracking
+export const auditLogs = pgTable("audit_logs", {
+  id: serial("id").primaryKey(),
+  entityType: text("entity_type").notNull(), // 'regulation_action', 'deadline', 'note', etc.
+  entityId: text("entity_id").notNull(), // ID of the entity being audited
+  action: text("action").notNull(), // 'create', 'update', 'delete', 'view'
+  userId: integer("user_id").references(() => users.id),
+  userEmail: text("user_email"), // Backup in case user is deleted
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
+  timestamp: timestamp("timestamp").notNull().defaultNow(),
+  
+  // Change tracking
+  previousValues: jsonb("previous_values").$type<Record<string, any>>(),
+  newValues: jsonb("new_values").$type<Record<string, any>>(),
+  changes: jsonb("changes").$type<Record<string, { old: any; new: any }>>(),
+  
+  // Context and metadata
+  regulationId: integer("regulation_id").references(() => regulations.id), // For regulation-related actions
+  sessionId: text("session_id"), // Session identifier
+  requestId: text("request_id"), // Request tracking ID
+  metadata: jsonb("metadata").$type<Record<string, any>>(), // Additional context
+  
+  // Compliance specific fields
+  complianceImpact: text("compliance_impact"), // 'high', 'medium', 'low'
+  riskLevel: text("risk_level"), // 'critical', 'high', 'medium', 'low'
+  
+}, (table) => {
+  return {
+    entityTypeIdx: index("audit_logs_entity_type_idx").on(table.entityType),
+    entityIdIdx: index("audit_logs_entity_id_idx").on(table.entityId),
+    userIdIdx: index("audit_logs_user_id_idx").on(table.userId),
+    timestampIdx: index("audit_logs_timestamp_idx").on(table.timestamp),
+    regulationIdIdx: index("audit_logs_regulation_id_idx").on(table.regulationId),
+    actionIdx: index("audit_logs_action_idx").on(table.action),
+  };
+});
+
+// Schema for inserting audit logs
+export const insertAuditLogSchema = createInsertSchema(auditLogs).extend({
+  entityType: z.string(),
+  entityId: z.string(),
+  action: z.enum(['create', 'update', 'delete', 'view']),
+  userId: z.number().optional(),
+  userEmail: z.string().optional(),
+  ipAddress: z.string().optional(),
+  userAgent: z.string().optional(),
+  previousValues: z.record(z.string(), z.any()).optional(),
+  newValues: z.record(z.string(), z.any()).optional(),
+  changes: z.record(z.string(), z.object({ old: z.any(), new: z.any() })).optional(),
+  regulationId: z.number().optional(),
+  sessionId: z.string().optional(),
+  requestId: z.string().optional(),
+  metadata: z.record(z.string(), z.any()).optional(),
+  complianceImpact: z.enum(['high', 'medium', 'low']).optional(),
+  riskLevel: z.enum(['critical', 'high', 'medium', 'low']).optional(),
+});
+
+// Add to the type exports
+export type AuditLog = typeof auditLogs.$inferSelect;
+export type InsertAuditLog = z.infer<typeof insertAuditLogSchema>;
 
 // ===== SINGLE-TENANT ARCHITECTURE =====
 // Single-tenant configuration is handled via environment variables and config files
