@@ -73,18 +73,6 @@ export default function AuditTrailPage() {
     }
   });
 
-  // Fetch regulation-specific audit trail
-  const _fetchRegulationAudit = async (regulationId: string) => {
-    const response = await fetch(`/api/audit/regulation/${regulationId}`, {
-      credentials: 'include'
-    });
-
-    if (!response.ok) {
-      throw new Error('Failed to fetch regulation audit trail');
-    }
-
-    return response.json();
-  };
 
   const handleSearch = () => {
     setQueryParams({ ...queryParams, offset: 0 });

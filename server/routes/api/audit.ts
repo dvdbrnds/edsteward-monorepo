@@ -31,7 +31,7 @@ const auditQuerySchema = z.object({
  * GET /api/audit/logs - Query audit logs with filtering
  * Requires admin or compliance officer permissions
  */
-router.get('/logs', requireAuth, requirePermission('audit_view'), async (req, res) => {
+router.get('/logs', requireAuth, requirePermission('canViewSystemLogs'), async (req, res) => {
   try {
     const startTime = Date.now();
     
@@ -93,7 +93,7 @@ router.get('/logs', requireAuth, requirePermission('audit_view'), async (req, re
  * GET /api/audit/entity/:entityType/:entityId - Get audit trail for specific entity
  * Requires admin or compliance officer permissions
  */
-router.get('/entity/:entityType/:entityId', requireAuth, requirePermission('audit_view'), async (req, res) => {
+router.get('/entity/:entityType/:entityId', requireAuth, requirePermission('canViewSystemLogs'), async (req, res) => {
   try {
     const { entityType, entityId } = req.params;
     
@@ -143,7 +143,7 @@ router.get('/entity/:entityType/:entityId', requireAuth, requirePermission('audi
  * GET /api/audit/summary - Get audit summary for compliance reporting
  * Requires admin or compliance officer permissions
  */
-router.get('/summary', requireAuth, requirePermission('audit_view'), async (req, res) => {
+router.get('/summary', requireAuth, requirePermission('canViewSystemLogs'), async (req, res) => {
   try {
     const { startDate, endDate } = req.query;
     
@@ -186,7 +186,7 @@ router.get('/summary', requireAuth, requirePermission('audit_view'), async (req,
  * GET /api/audit/regulation/:regulationId - Get all audit logs for a specific regulation
  * Requires admin or compliance officer permissions
  */
-router.get('/regulation/:regulationId', requireAuth, requirePermission('audit_view'), async (req, res) => {
+router.get('/regulation/:regulationId', requireAuth, requirePermission('canViewSystemLogs'), async (req, res) => {
   try {
     const regulationId = parseInt(req.params.regulationId);
     
@@ -241,7 +241,7 @@ router.get('/regulation/:regulationId', requireAuth, requirePermission('audit_vi
  * GET /api/audit/compliance-report - Generate compliance audit report
  * Requires admin permissions
  */
-router.get('/compliance-report', requireAuth, requirePermission('audit_admin'), async (req, res) => {
+router.get('/compliance-report', requireAuth, requirePermission('canManageSystemSettings'), async (req, res) => {
   try {
     const { startDate, endDate, format = 'json' } = req.query;
     
