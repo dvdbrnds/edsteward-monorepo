@@ -6,7 +6,7 @@
 import { Request } from 'express';
 import { db } from '../db';
 import { auditLogs, type InsertAuditLog, type AuditLog } from '@shared/schema';
-import { eq, and, desc, gte, lte, ilike, or } from 'drizzle-orm';
+import { eq, and, desc, gte, lte, ilike, or, sql } from 'drizzle-orm';
 import { syslog, LogLevel, LogFacility } from './syslog';
 
 export interface AuditContext {
@@ -159,7 +159,7 @@ export class AuditService {
         );
       }
 
-      const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+      const whereClause = conditions.length > 0 ? and(...conditions) : sql`1=1`;
 
       // Get total count
       const [{ count }] = await db
