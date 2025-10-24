@@ -340,12 +340,15 @@ export function getHighestPriorityRole(roles: string[]): string {
  * @returns True if user has the permission
  */
 export function hasPermission(userRoles: string[], permission: keyof RolePermissions): boolean {
-  if (!userRoles || userRoles.length === 0) {
+  // Ensure userRoles is always an array
+  const roles = Array.isArray(userRoles) ? userRoles : [];
+  
+  if (!roles || roles.length === 0) {
     return false;
   }
   
   // Check if any of the user's roles has the permission
-  return userRoles.some(roleName => {
+  return roles.some(roleName => {
     const role = edStewardRoles[roleName];
     return role && role.permissions[permission];
   });
