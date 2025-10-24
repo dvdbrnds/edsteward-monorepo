@@ -169,6 +169,24 @@ export const notes = pgTable("notes", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// Note history table for tracking modifications
+export const noteHistory = pgTable("note_history", {
+  id: serial("id").primaryKey(),
+  noteId: integer("note_id").notNull(),
+  userId: integer("user_id").notNull(), // Who made the change
+  action: text("action").notNull(), // 'created', 'updated', 'deleted'
+  previousTitle: text("previous_title"),
+  previousContent: text("previous_content"),
+  previousCategory: text("previous_category"),
+  previousIsPrivate: boolean("previous_is_private"),
+  newTitle: text("new_title"),
+  newContent: text("new_content"),
+  newCategory: text("new_category"),
+  newIsPrivate: boolean("new_is_private"),
+  changeReason: text("change_reason"), // Optional reason for the change
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 // Add after the notes table definition
 export const evidenceFiles = pgTable("evidence_files", {
   id: serial("id").primaryKey(),
@@ -282,17 +300,26 @@ export const guides = pgTable("guides", {
 
 // Notes schema is already defined above
 
+// Note history types
+export type NoteHistory = typeof noteHistory.$inferSelect;
+export type InsertNoteHistory = typeof noteHistory.$inferInsert;
+
+// Note categories enum
+export const NOTE_CATEGORIES = ["general", "compliance", "legal", "technical", "administrative", "deadline", "evidence", "review"] as const;
+
 // Notes insertion schema with detailed logging
 console.log("Creating note insertion schema with validation rules");
 export const insertNoteSchema = createInsertSchema(notes).extend({
   regulationId: z.number().positive("Regulation ID must be a positive number"),
   title: z.string().min(1, "Title is required"),
   content: z.string().min(1, "Content is required"),
+  category: z.enum(NOTE_CATEGORIES).default("general"),
 }).omit({
   userId: true, // userId is added server-side from authenticated user
   id: true,     // id is auto-generated
   createdAt: true, // createdAt is auto-generated
   updatedAt: true, // updatedAt is auto-generated
+  isPrivate: true, // All notes are public by design
 });
 console.log("Note insertion schema created successfully");
 
@@ -408,7 +435,9 @@ export const insertRegulationSchema = createInsertSchema(regulations).extend({
 export const insertNotificationSchema = createInsertSchema(notifications);
 
 // Schema for inserting deadlines
-export const insertDeadlineSchema = createInsertSchema(deadlines);
+export const insertDeadlineSchema = createInsertSchema(deadlines).omit({
+  id: true, // id is auto-generated
+});
 
 // Schema for inserting guides
 export const insertGuideSchema = createInsertSchema(guides).extend({

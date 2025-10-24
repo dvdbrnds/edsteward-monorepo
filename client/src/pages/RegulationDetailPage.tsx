@@ -6,6 +6,58 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import type { Regulation, Deadline, RegulationAction } from "@shared/schema";
 
+// Helper function to calculate compliance status
+function calculateComplianceStatus(actions: RegulationAction[], deadlines: Deadline[]) {
+  const requiredActions = actions.filter(action => action.required);
+  const completedRequiredActions = requiredActions.filter(action => action.status === 'completed');
+  
+  const overdueDeadlines = deadlines.filter(deadline => 
+    deadline.status === 'overdue' || 
+    (deadline.status === 'pending' && new Date(deadline.dueDate) < new Date())
+  );
+  
+  const upcomingDeadlines = deadlines.filter(deadline => 
+    deadline.status === 'pending' && 
+    new Date(deadline.dueDate) >= new Date() &&
+    new Date(deadline.dueDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // Next 30 days
+  );
+  
+  // Determine overall status
+  if (overdueDeadlines.length > 0) {
+    return {
+      status: 'non-compliant' as const,
+      level: 'critical' as const,
+      message: `${overdueDeadlines.length} overdue deadline${overdueDeadlines.length > 1 ? 's' : ''}`,
+      color: 'red'
+    };
+  }
+  
+  if (requiredActions.length > 0 && completedRequiredActions.length < requiredActions.length) {
+    return {
+      status: 'partial-compliance' as const,
+      level: 'warning' as const,
+      message: `${requiredActions.length - completedRequiredActions.length} required action${requiredActions.length - completedRequiredActions.length > 1 ? 's' : ''} pending`,
+      color: 'yellow'
+    };
+  }
+  
+  if (upcomingDeadlines.length > 0) {
+    return {
+      status: 'compliant-with-upcoming' as const,
+      level: 'info' as const,
+      message: `${upcomingDeadlines.length} deadline${upcomingDeadlines.length > 1 ? 's' : ''} due within 30 days`,
+      color: 'blue'
+    };
+  }
+  
+  return {
+    status: 'compliant' as const,
+    level: 'success' as const,
+    message: 'All requirements met',
+    color: 'green'
+  };
+}
+
 // Extended type that includes actions and other UI-specific properties
 type RegulationWithOverride = Regulation & {
   actions: RegulationAction[];
@@ -79,7 +131,11 @@ import {
   History,
   Check,
   CheckCircle2,
-  Zap
+  Zap,
+  Plus,
+  Edit,
+  Trash2,
+  Calendar
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
@@ -87,6 +143,7 @@ import { NoteSection } from "@/components/regulations/note-section";
 import { RegulationTimeline } from "@/components/regulations/regulation-timeline";
 import { EnhancedRegulationTimeline } from "@/components/regulations/enhanced-regulation-timeline";
 import { WebPublishDialog } from "@/components/regulations/web-publish-dialog";
+import DeadlineForm from "@/components/regulations/deadline-form";
 import { CommunicationDialog } from "@/components/regulations/communication-dialog";
 import { SubmissionWizard } from "@/components/regulations/submission-wizard";
 import { EvidenceFiles } from "@/components/regulations/evidence-files";
@@ -114,6 +171,8 @@ function RegulationDetailPage() {
   const [showCommunicationDialog, setShowCommunicationDialog] = useState(false);
   const [showSubmissionWizard, setShowSubmissionWizard] = useState(false);
   const [showFullTextDialog, setShowFullTextDialog] = useState(false);
+  const [showCreateDeadlineDialog, setShowCreateDeadlineDialog] = useState(false);
+  const [editingDeadline, setEditingDeadline] = useState<Deadline | null>(null);
   const regulationId = location.split("/")[2];
   const isAdmin = user?.role?.toLowerCase() === "admin";
 
@@ -290,6 +349,100 @@ function RegulationDetailPage() {
     },
   });
 
+  // Deadline management mutations
+  const createDeadlineMutation = useMutation({
+    mutationFn: async (deadlineData: { dueDate: string; status: string; assignedTo: number }) => {
+      const response = await fetch('/api/deadlines', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({
+          ...deadlineData,
+          regulationId: parseInt(regulationId),
+        }),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to create deadline');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Deadline Created",
+        description: "New deadline has been created successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/deadlines"] });
+      setShowCreateDeadlineDialog(false);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Creation Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updateDeadlineMutation = useMutation({
+    mutationFn: async ({ id, ...deadlineData }: { id: number; dueDate?: string; status?: string; assignedTo?: number }) => {
+      const response = await fetch(`/api/deadlines/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(deadlineData),
+      });
+      if (!response.ok) {
+        throw new Error('Failed to update deadline');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: "Deadline Updated",
+        description: "Deadline has been updated successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/deadlines"] });
+      setEditingDeadline(null);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Update Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteDeadlineMutation = useMutation({
+    mutationFn: async (deadlineId: number) => {
+      const response = await fetch(`/api/deadlines/${deadlineId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        throw new Error('Failed to delete deadline');
+      }
+    },
+    onSuccess: () => {
+      toast({
+        title: "Deadline Deleted",
+        description: "Deadline has been deleted successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/deadlines"] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Deletion Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
   const handleActionStatusChange = (action: RegulationAction, newStatus: RegulationAction['status']) => {
     const updatedAction = { ...action, status: newStatus };
 
@@ -336,7 +489,7 @@ function RegulationDetailPage() {
     );
   }
 
-  const regulationDeadlines = deadlines.filter(d => d.regulationId === regulationId) || [];
+  const regulationDeadlines = deadlines.filter(d => d.regulationId === parseInt(regulationId)) || [];
   const nextDeadline = regulationDeadlines.length > 0
     ? regulationDeadlines.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0]
     : null;
@@ -1055,6 +1208,201 @@ function RegulationDetailPage() {
                   </CardContent>
                 </Card>
 
+                {/* Compliance Status Card */}
+                {(() => {
+                  const complianceStatus = calculateComplianceStatus(regulation.actions || [], regulationDeadlines);
+                  return (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                          <span>Compliance Status</span>
+                          <Badge 
+                            variant={complianceStatus.level === 'critical' ? 'destructive' : 
+                                   complianceStatus.level === 'warning' ? 'secondary' :
+                                   complianceStatus.level === 'info' ? 'outline' : 'default'}
+                            className={
+                              complianceStatus.color === 'red' ? 'bg-red-100 text-red-800 border-red-200' :
+                              complianceStatus.color === 'yellow' ? 'bg-yellow-100 text-yellow-800 border-yellow-200' :
+                              complianceStatus.color === 'blue' ? 'bg-blue-100 text-blue-800 border-blue-200' :
+                              'bg-green-100 text-green-800 border-green-200'
+                            }
+                          >
+                            {complianceStatus.status === 'compliant' ? 'Compliant' :
+                             complianceStatus.status === 'partial-compliance' ? 'Partial Compliance' :
+                             complianceStatus.status === 'compliant-with-upcoming' ? 'Compliant' :
+                             'Non-Compliant'}
+                          </Badge>
+                        </CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="space-y-4">
+                          <div className={`p-4 rounded-lg border-l-4 ${
+                            complianceStatus.color === 'red' ? 'bg-red-50 border-red-400' :
+                            complianceStatus.color === 'yellow' ? 'bg-yellow-50 border-yellow-400' :
+                            complianceStatus.color === 'blue' ? 'bg-blue-50 border-blue-400' :
+                            'bg-green-50 border-green-400'
+                          }`}>
+                            <div className="flex items-center gap-2">
+                              {complianceStatus.color === 'red' ? (
+                                <AlertCircle className="h-5 w-5 text-red-600" />
+                              ) : complianceStatus.color === 'yellow' ? (
+                                <Clock className="h-5 w-5 text-yellow-600" />
+                              ) : complianceStatus.color === 'blue' ? (
+                                <Calendar className="h-5 w-5 text-blue-600" />
+                              ) : (
+                                <CheckCircle className="h-5 w-5 text-green-600" />
+                              )}
+                              <span className={`font-medium ${
+                                complianceStatus.color === 'red' ? 'text-red-800' :
+                                complianceStatus.color === 'yellow' ? 'text-yellow-800' :
+                                complianceStatus.color === 'blue' ? 'text-blue-800' :
+                                'text-green-800'
+                              }`}>
+                                {complianceStatus.message}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          {/* Quick stats */}
+                          <div className="grid grid-cols-2 gap-4 text-sm">
+                            <div className="space-y-1">
+                              <p className="text-gray-500">Required Actions</p>
+                              <p className="font-medium">
+                                {regulation.actions?.filter(a => a.status === 'completed' && a.required).length || 0} / {regulation.actions?.filter(a => a.required).length || 0} Complete
+                              </p>
+                            </div>
+                            <div className="space-y-1">
+                              <p className="text-gray-500">Active Deadlines</p>
+                              <p className="font-medium">
+                                {regulationDeadlines.filter(d => d.status === 'pending').length} Pending
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })()}
+
+                {/* Deadlines Card */}
+                <Card>
+                  <CardHeader>
+                    <div className="flex justify-between items-center">
+                      <CardTitle>Deadlines</CardTitle>
+                      {isAdmin && (
+                        <Button
+                          size="sm"
+                          onClick={() => setShowCreateDeadlineDialog(true)}
+                          className="gap-2"
+                        >
+                          <Plus className="h-4 w-4" />
+                          Add Deadline
+                        </Button>
+                      )}
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-4">
+                      {regulationDeadlines.map((deadline) => (
+                        <div
+                          key={deadline.id}
+                          className="p-4 border rounded-lg space-y-3"
+                        >
+                          {/* Main deadline info */}
+                          <div className="flex items-start gap-3">
+                            <div
+                              className={`p-2 rounded-full flex-shrink-0 ${
+                                deadline.status === "completed"
+                                  ? "bg-green-50"
+                                  : deadline.status === "overdue"
+                                  ? "bg-red-50"
+                                  : "bg-yellow-50"
+                              }`}
+                            >
+                              {deadline.status === "completed" ? (
+                                <CheckCircle className="h-5 w-5 text-green-500" />
+                              ) : deadline.status === "overdue" ? (
+                                <AlertCircle className="h-5 w-5 text-red-500" />
+                              ) : (
+                                <Clock className="h-5 w-5 text-yellow-500" />
+                              )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-medium text-gray-900 break-words">
+                                Due: {format(new Date(deadline.dueDate), "PP")}
+                              </p>
+                              <span
+                                className={`inline-block text-sm font-medium px-2 py-1 rounded-full mt-1 ${
+                                  deadline.status === "completed"
+                                    ? "bg-green-100 text-green-700"
+                                    : deadline.status === "overdue"
+                                    ? "bg-red-100 text-red-700"
+                                    : "bg-yellow-100 text-yellow-700"
+                                }`}
+                              >
+                                {deadline.status.charAt(0).toUpperCase() +
+                                  deadline.status.slice(1)}
+                              </span>
+                            </div>
+                          </div>
+                          
+                          {/* Action buttons */}
+                          {isAdmin && (
+                            <div className="flex flex-wrap items-center gap-2 pt-2 border-t">
+                              {deadline.status !== "completed" && (
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => updateDeadlineMutation.mutate({ 
+                                    id: deadline.id, 
+                                    status: "completed" 
+                                  })}
+                                  className="gap-2 text-xs"
+                                >
+                                  <CheckCircle className="h-3 w-3" />
+                                  Complete
+                                </Button>
+                              )}
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => setEditingDeadline(deadline)}
+                                className="gap-2 text-xs"
+                              >
+                                <Edit className="h-3 w-3" />
+                                Edit
+                              </Button>
+                              <Button
+                                size="sm"
+                                variant="ghost"
+                                onClick={() => {
+                                  if (confirm('Are you sure you want to delete this deadline?')) {
+                                    deleteDeadlineMutation.mutate(deadline.id);
+                                  }
+                                }}
+                                className="gap-2 text-xs text-red-600 hover:text-red-700"
+                              >
+                                <Trash2 className="h-3 w-3" />
+                                Delete
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                      
+                      {regulationDeadlines.length === 0 && (
+                        <div className="text-center py-8 text-gray-500">
+                          <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+                          <p>No deadlines set for this regulation</p>
+                          {isAdmin && (
+                            <p className="text-sm mt-1">Click "Add Deadline" to create one</p>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
+
                 {/* Evidence Files Card */}
                 <Card>
                   <CardHeader>
@@ -1065,58 +1413,13 @@ function RegulationDetailPage() {
                   </CardContent>
                 </Card>
 
-                {/* Deadlines Card */}
+                {/* Notes Card */}
                 <Card>
                   <CardHeader>
-                    <CardTitle>Deadlines</CardTitle>
+                    <CardTitle>Notes & Comments</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
-                      {regulationDeadlines.map((deadline) => (
-                        <div
-                          key={deadline.id}
-                          className="flex items-center gap-3 p-3 border rounded-lg"
-                        >
-                          <div
-                            className={`p-2 rounded-full ${
-                              deadline.status === "completed"
-                                ? "bg-green-50"
-                                : deadline.status === "overdue"
-                                ? "bg-red-50"
-                                : "bg-yellow-50"
-                            }`}
-                          >
-                            {deadline.status === "completed" ? (
-                              <CheckCircle className="h-5 w-5 text-green-500" />
-                            ) : deadline.status === "overdue" ? (
-                              <AlertCircle className="h-5 w-5 text-red-500" />
-                            ) : (
-                              <Clock className="h-5 w-5 text-yellow-500" />
-                            )}
-                          </div>
-                          <div>
-                            <p className="font-medium">
-                              Due: {format(new Date(deadline.dueDate), "PP")}
-                            </p>
-                            <span
-                              className={`text-sm ${
-                                deadline.status === "completed"
-                                  ? "text-green-600"
-                                  : deadline.status === "overdue"
-                                  ? "text-red-600"
-                                  : "text-yellow-600"
-                              }`}
-                            >
-                              {deadline.status.charAt(0).toUpperCase() +
-                                deadline.status.slice(1)}
-                            </span>
-                          </div>
-                        </div>
-                      ))}
-                      {regulationDeadlines.length === 0 && (
-                        <p className="text-gray-500 italic">No deadlines set</p>
-                      )}
-                    </div>
+                    <NoteSection regulationId={regulationId} />
                   </CardContent>
                 </Card>
 
@@ -1210,6 +1513,43 @@ function RegulationDetailPage() {
               <DialogFooter className="mt-6">
                 <Button onClick={() => setShowFullTextDialog(false)}>Close</Button>
               </DialogFooter>
+            </DialogContent>
+          </Dialog>
+
+          {/* Create Deadline Dialog */}
+          <Dialog open={showCreateDeadlineDialog} onOpenChange={setShowCreateDeadlineDialog}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create New Deadline</DialogTitle>
+                <DialogDescription>
+                  Add a new deadline for {regulation.name || regulation.topic}
+                </DialogDescription>
+              </DialogHeader>
+              <DeadlineForm
+                regulationId={parseInt(regulationId)}
+                onSubmit={(data) => createDeadlineMutation.mutate(data)}
+                onCancel={() => setShowCreateDeadlineDialog(false)}
+              />
+            </DialogContent>
+          </Dialog>
+
+          {/* Edit Deadline Dialog */}
+          <Dialog open={!!editingDeadline} onOpenChange={() => setEditingDeadline(null)}>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Edit Deadline</DialogTitle>
+                <DialogDescription>
+                  Update deadline for {regulation.name || regulation.topic}
+                </DialogDescription>
+              </DialogHeader>
+              {editingDeadline && (
+                <DeadlineForm
+                  regulationId={parseInt(regulationId)}
+                  initialData={editingDeadline}
+                  onSubmit={(data) => updateDeadlineMutation.mutate({ id: editingDeadline.id, ...data })}
+                  onCancel={() => setEditingDeadline(null)}
+                />
+              )}
             </DialogContent>
           </Dialog>
         </>

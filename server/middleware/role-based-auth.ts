@@ -6,6 +6,22 @@
 import { Request, Response, NextFunction } from 'express';
 import { hasPermission, getCombinedPermissions, edStewardRoles, type RolePermissions } from '../config/role-mapping';
 
+// Helper function to safely parse user roles
+function parseUserRoles(user: any): string[] {
+  if (!user) return [];
+  
+  if (user.roles) {
+    try {
+      const roles = typeof user.roles === 'string' ? JSON.parse(user.roles) : user.roles;
+      return Array.isArray(roles) ? roles : [user.role || 'user'];
+    } catch (e) {
+      return [user.role || 'user'];
+    }
+  }
+  
+  return [user.role || 'user'];
+}
+
 // Extend Express Request type to include user with roles
 declare global {
   namespace Express {
@@ -51,7 +67,8 @@ export function requireRole(requiredRoles: string | string[]) {
     }
 
     const user = req.user;
-    const userRoles = user.roles || [user.role];
+    const userRoles = parseUserRoles(user);
+    
     const allowedRoles = Array.isArray(requiredRoles) ? requiredRoles : [requiredRoles];
 
     // Check if user has any of the required roles
@@ -86,7 +103,7 @@ export function requirePermission(permission: keyof RolePermissions) {
     }
 
     const user = req.user;
-    const userRoles = user.roles || [user.role];
+    const userRoles = parseUserRoles(user);
 
     if (!hasPermission(userRoles, permission)) {
       res.status(403).json({
@@ -138,7 +155,7 @@ export function requireDepartmentAccess(departmentField: string = 'department') 
     }
 
     const user = req.user;
-    const userRoles = user.roles || [user.role];
+    const userRoles = parseUserRoles(user);
     
     // Admin and compliance officers can access all departments
     if (hasPermission(userRoles, 'canViewAllReports')) {
@@ -169,7 +186,7 @@ export function requireDepartmentAccess(departmentField: string = 'department') 
 export function attachUserPermissions(req: Request, res: Response, next: NextFunction): void {
   if (req.isAuthenticated() && req.user) {
     const user = req.user;
-    const userRoles = user.roles || [user.role];
+    const userRoles = parseUserRoles(user);
     
     // Attach permissions to request for easy access in route handlers
     (req as Record<string, unknown>).userPermissions = getCombinedPermissions(userRoles);
@@ -188,7 +205,7 @@ export function checkUserPermission(req: Request, permission: keyof RolePermissi
   }
   
   const user = req.user;
-  const userRoles = user.roles || [user.role];
+  const userRoles = parseUserRoles(user);
   return hasPermission(userRoles, permission);
 }
 
@@ -201,7 +218,7 @@ export function getUserPermissions(req: Request): RolePermissions | null {
   }
   
   const user = req.user;
-  const userRoles = user.roles || [user.role];
+  const userRoles = parseUserRoles(user);
   return getCombinedPermissions(userRoles);
 }
 
@@ -249,7 +266,7 @@ export function requireRoleHierarchy(req: Request, res: Response, next: NextFunc
 export function debugUserRoles(req: Request, res: Response, next: NextFunction): void {
   if (req.isAuthenticated() && req.user) {
     const user = req.user;
-    const userRoles = user.roles || [user.role];
+    const userRoles = parseUserRoles(user);
     const permissions = getCombinedPermissions(userRoles);
     
     console.log(`🔐 Debug - User: ${user.username}, Roles: ${userRoles.join(', ')}, Groups: ${user.groups?.join(', ') || 'none'}`);

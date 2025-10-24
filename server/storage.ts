@@ -8,6 +8,7 @@ import {
   validationRules,
   fieldMappings,
   notes,
+  noteHistory,
   evidenceFiles,
   regulationVersions,
   validationStatus,
@@ -15,7 +16,9 @@ import {
   notificationQueue,
   versionConflicts,
   type EvidenceFile,
-  type InsertEvidenceFile
+  type InsertEvidenceFile,
+  type NoteHistory,
+  type InsertNoteHistory
 } from "@shared/schema";
 
 import type {
@@ -159,6 +162,8 @@ export interface IStorage {
   getDeadlines(): Promise<Deadline[]>;
   getAllIncompleteDeadlines(): Promise<Deadline[]>;
   createDeadline(_deadline: InsertDeadline): Promise<Deadline>;
+  updateDeadline(_id: number, _deadline: Partial<InsertDeadline>): Promise<Deadline>;
+  deleteDeadline(_id: number): Promise<void>;
 
   // Guide methods
   getGuides(): Promise<Guide[]>;
@@ -184,8 +189,12 @@ export interface IStorage {
   getNotesByUser(_userId: number): Promise<Note[]>;
   getNote(_id: number): Promise<Note | null>;
   createNote(_note: InsertNote): Promise<Note>;
-  updateNote(_id: number, _note: Partial<InsertNote>): Promise<Note>;
+  updateNote(_id: number, _note: Partial<InsertNote>, _userId?: number): Promise<Note>;
   deleteNote(_id: number): Promise<void>;
+  
+  // Note history methods
+  createNoteHistory(_history: InsertNoteHistory): Promise<NoteHistory>;
+  getNoteHistory(_noteId: number): Promise<NoteHistory[]>;
 
   // Evidence file methods
   createEvidenceFile(_file: InsertEvidenceFile): Promise<EvidenceFile>;
@@ -687,6 +696,19 @@ export class DatabaseStorage implements IStorage {
     return newDeadline;
   }
 
+  async updateDeadline(id: number, deadlineData: Partial<InsertDeadline>): Promise<Deadline> {
+    const [updatedDeadline] = await db
+      .update(deadlines)
+      .set(deadlineData)
+      .where(eq(deadlines.id, id))
+      .returning();
+    return updatedDeadline;
+  }
+
+  async deleteDeadline(id: number): Promise<void> {
+    await db.delete(deadlines).where(eq(deadlines.id, id));
+  }
+
   async getGuides(): Promise<Guide[]> {
     return await db.select().from(guides);
   }
@@ -802,7 +824,14 @@ export class DatabaseStorage implements IStorage {
     return newNote;
   }
 
-  async updateNote(id: number, noteData: Partial<InsertNote>): Promise<Note> {
+  async updateNote(id: number, noteData: Partial<InsertNote>, userId?: number): Promise<Note> {
+    // Get the current note state before updating
+    const currentNote = await this.getNote(id);
+    if (!currentNote) {
+      throw new Error(`Note with id ${id} not found`);
+    }
+
+    // Update the note
     const [updatedNote] = await db
       .update(notes)
       .set({
@@ -811,11 +840,66 @@ export class DatabaseStorage implements IStorage {
       })
       .where(eq(notes.id, id))
       .returning();
+
+    // Create history record if userId is provided
+    if (userId) {
+      await this.createNoteHistory({
+        noteId: id,
+        userId: userId,
+        action: 'updated',
+        previousTitle: currentNote.title,
+        previousContent: currentNote.content,
+        previousCategory: currentNote.category,
+        previousIsPrivate: currentNote.isPrivate,
+        newTitle: noteData.title || currentNote.title,
+        newContent: noteData.content || currentNote.content,
+        newCategory: noteData.category || currentNote.category,
+        newIsPrivate: noteData.isPrivate !== undefined ? noteData.isPrivate : currentNote.isPrivate,
+      });
+    }
+
     return updatedNote;
   }
 
   async deleteNote(id: number): Promise<void> {
     await db.delete(notes).where(eq(notes.id, id));
+  }
+
+  async createNoteHistory(history: InsertNoteHistory): Promise<NoteHistory> {
+    const [noteHistoryRecord] = await db
+      .insert(noteHistory)
+      .values(history)
+      .returning();
+    return noteHistoryRecord;
+  }
+
+  async getNoteHistory(noteId: number): Promise<NoteHistory[]> {
+    return await db
+      .select({
+        id: noteHistory.id,
+        noteId: noteHistory.noteId,
+        userId: noteHistory.userId,
+        action: noteHistory.action,
+        previousTitle: noteHistory.previousTitle,
+        previousContent: noteHistory.previousContent,
+        previousCategory: noteHistory.previousCategory,
+        previousIsPrivate: noteHistory.previousIsPrivate,
+        newTitle: noteHistory.newTitle,
+        newContent: noteHistory.newContent,
+        newCategory: noteHistory.newCategory,
+        newIsPrivate: noteHistory.newIsPrivate,
+        changeReason: noteHistory.changeReason,
+        createdAt: noteHistory.createdAt,
+        user: {
+          id: users.id,
+          firstName: users.firstName,
+          lastName: users.lastName,
+        }
+      })
+      .from(noteHistory)
+      .leftJoin(users, eq(noteHistory.userId, users.id))
+      .where(eq(noteHistory.noteId, noteId))
+      .orderBy(desc(noteHistory.createdAt));
   }
 
   async createEvidenceFile(file: InsertEvidenceFile): Promise<EvidenceFile> {

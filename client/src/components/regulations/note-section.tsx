@@ -14,13 +14,20 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { apiRequest } from "@/lib/queryClient";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Trash2, Edit, Eye, History } from "lucide-react";
+// import { apiRequest } from "@/lib/queryClient"; // Unused - using direct fetch with credentials
 import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/use-auth";
+
+const NOTE_CATEGORIES = ["general", "compliance", "legal", "technical", "administrative", "deadline", "evidence", "review"] as const;
 
 const formSchema = z.object({
   title: z.string().min(1, "Title is required"),
   content: z.string().min(1, "Content is required"),
-  isPrivate: z.boolean().default(false),
+  category: z.enum(NOTE_CATEGORIES).default("general"),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -30,10 +37,29 @@ interface NoteSectionProps {
   initialData?: Partial<FormValues> & { id?: string };
 }
 
+interface User {
+  id: number;
+  role: string;
+  roles?: string;
+}
+
 export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [notes, setNotes] = useState<any[]>([]);
+  const [editingNote, setEditingNote] = useState<any | null>(null);
+  const [viewingNote, setViewingNote] = useState<any | null>(null);
+  const [viewingHistory, setViewingHistory] = useState<any | null>(null);
+  const [noteHistory, setNoteHistory] = useState<any[]>([]);
+
+  // Check if user can edit/delete a note
+  const canModifyNote = (note: any) => {
+    if (!user) return false;
+    const isAdmin = user.role === 'admin' || (user.roles && JSON.parse(user.roles).includes('admin'));
+    const isCreator = note.userId === user.id;
+    return isAdmin || isCreator;
+  };
 
   // Use form hook
   const form = useForm<FormValues>({
@@ -41,17 +67,90 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
     defaultValues: {
       title: initialData?.title || "",
       content: initialData?.content || "",
-      isPrivate: initialData?.isPrivate || false,
+      category: (initialData as any)?.category || "general",
     },
   });
 
   const fetchNotes = useCallback(async () => {
-    const updatedResponse = await fetch(`/api/notes/regulation/${regulationId}`);
+    const updatedResponse = await fetch(`/api/notes/regulation/${regulationId}`, {
+      credentials: 'include'
+    });
     if (updatedResponse.ok) {
       const updatedData = await updatedResponse.json();
       setNotes(updatedData);
     }
   }, [regulationId]);
+
+  const deleteNote = async (noteId: number) => {
+    if (!confirm('Are you sure you want to delete this note?')) return;
+    
+    try {
+      const response = await fetch(`/api/notes/${noteId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      
+      if (response.ok) {
+        toast({
+          title: "Success",
+          description: "Note deleted successfully",
+        });
+        fetchNotes(); // Refresh notes list
+      } else {
+        throw new Error('Failed to delete note');
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete note",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const startEditNote = (note: any) => {
+    setEditingNote(note);
+    form.reset({
+      title: note.title,
+      content: note.content,
+      category: note.category || "general",
+    });
+  };
+
+  const cancelEdit = () => {
+    setEditingNote(null);
+    form.reset({
+      title: "",
+      content: "",
+      category: "general",
+    });
+  };
+
+  const viewNoteHistory = async (note: any) => {
+    try {
+      const response = await fetch(`/api/notes/${note.id}/history`, {
+        credentials: 'include'
+      });
+      
+      if (response.ok) {
+        const history = await response.json();
+        setNoteHistory(history);
+        setViewingHistory(note);
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to load note history",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load note history",
+        variant: "destructive",
+      });
+    }
+  };
 
   // Fetch notes when component loads
   useEffect(() => {
@@ -62,17 +161,17 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
     try {
       setIsSubmitting(true);
 
-      const endpoint = initialData?.id
-        ? `/api/notes/${initialData.id}`
+      const endpoint = editingNote?.id
+        ? `/api/notes/${editingNote.id}`
         : "/api/notes";
 
-      const method = initialData?.id ? "PUT" : "POST";
+      const method = editingNote?.id ? "PUT" : "POST";
 
       const payload = {
         ...data,
         regulationId: parseInt(regulationId),
-        category: "general", // Required by database schema
         status: "active", // Required by database schema
+        isPrivate: false, // All notes are public by design
       };
 
       const response = await fetch(endpoint, {
@@ -103,18 +202,17 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
       // Refresh notes after successful submission
       await fetchNotes();
 
-      // Reset form if creating a new note
-      if (!initialData?.id) {
-        form.reset({
-          title: "",
-          content: "",
-          isPrivate: false,
-        });
-      }
+      // Reset form and editing state
+      form.reset({
+        title: "",
+        content: "",
+        category: "general",
+      });
+      setEditingNote(null);
 
       toast({
         title: "Success",
-        description: initialData?.id
+        description: editingNote
           ? "Note updated successfully"
           : "Note created successfully",
       });
@@ -153,6 +251,31 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="category"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Category</FormLabel>
+                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a category" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {NOTE_CATEGORIES.map((category) => (
+                      <SelectItem key={category} value={category}>
+                        {category.charAt(0).toUpperCase() + category.slice(1)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <FormMessage />
               </FormItem>
             )}
@@ -212,43 +335,252 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
           />
           */}
 
-          <Button type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Saving..." : "Save Entry"}
-          </Button>
+          <div className="flex gap-2">
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Saving..." : (editingNote ? "Update Note" : "Save Note")}
+            </Button>
+            {editingNote && (
+              <Button type="button" variant="outline" onClick={cancelEdit}>
+                Cancel
+              </Button>
+            )}
+          </div>
         </form>
       </Form>
 
       {/* Display existing notes */}
       <div className="mt-8">
-        <h3 className="text-lg font-medium mb-4">Diary Entries</h3>
+        <h3 className="text-lg font-medium mb-4">Notes ({notes.length})</h3>
         {notes.length === 0 ? (
           <p className="text-sm text-gray-500">No notes found for this regulation.</p>
         ) : (
-          <ul className="space-y-4"> {/* Changed to ul for better list rendering */}
+          <div className="space-y-4">
             {notes.map((note) => (
-              <li key={note.id} className="border p-4 rounded-md"> {/* Changed to li */}
-                <div className="flex justify-between items-start">
-                  <h4 className="text-md font-medium">{note.title}</h4>
-                  <div className="text-xs text-gray-500">
-                    {note.user && `By ${note.user.firstName} ${note.user.lastName}`}
-                    {note.createdAt && (
-                      <span className="ml-2">
-                        {new Date(note.createdAt).toLocaleString()}
-                      </span>
-                    )}
-                    {note.isPrivate && <span className="ml-2">(Private)</span>}
+              <Card key={note.id} className="cursor-pointer hover:shadow-md transition-shadow">
+                <CardHeader className="pb-2">
+                  <div className="flex justify-between items-start">
+                    <div className="flex items-center gap-2">
+                      <CardTitle className="text-base">{note.title}</CardTitle>
+                      <Badge variant="secondary" className="text-xs">
+                        {note.category?.charAt(0).toUpperCase() + note.category?.slice(1) || 'General'}
+                      </Badge>
+                    </div>
+                    <div className="flex gap-1">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setViewingNote(note)}
+                        className="h-8 w-8 p-0"
+                        title="View note"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
+                      {canModifyNote(note) && (
+                        <>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => startEditNote(note)}
+                            className="h-8 w-8 p-0"
+                            title="Edit note"
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => viewNoteHistory(note)}
+                            className="h-8 w-8 p-0"
+                            title="View history"
+                          >
+                            <History className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => deleteNote(note.id)}
+                            className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                            title="Delete note"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </>
+                      )}
+                    </div>
                   </div>
-                </div>
-                <div
-                  className="mt-2 text-sm"
-                  dangerouslySetInnerHTML={{ __html: note.content }}
-                />
-                {/* Removed status display */}
-              </li>
+                  <div className="text-xs text-gray-500">
+                    {note.user && `By ${note.user.firstName} ${note.user.lastName} • `}
+                    {note.createdAt && new Date(note.createdAt).toLocaleString()}
+                  </div>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <div
+                    className="text-sm line-clamp-3"
+                    dangerouslySetInnerHTML={{ __html: note.content }}
+                    onClick={() => setViewingNote(note)}
+                  />
+                </CardContent>
+              </Card>
             ))}
-          </ul>
+          </div>
         )}
       </div>
+
+      {/* Note viewing modal */}
+      {viewingNote && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <Card className="max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <CardHeader>
+              <div className="flex justify-between items-start">
+                <div>
+                  <CardTitle>{viewingNote.title}</CardTitle>
+                  <div className="flex items-center gap-2 mt-2">
+                    <Badge variant="secondary">
+                      {viewingNote.category?.charAt(0).toUpperCase() + viewingNote.category?.slice(1) || 'General'}
+                    </Badge>
+                  </div>
+                  <div className="text-sm text-gray-500 mt-2">
+                    {viewingNote.user && `By ${viewingNote.user.firstName} ${viewingNote.user.lastName} • `}
+                    {viewingNote.createdAt && new Date(viewingNote.createdAt).toLocaleString()}
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  onClick={() => setViewingNote(null)}
+                  className="h-8 w-8 p-0"
+                >
+                  ✕
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div
+                className="prose max-w-none"
+                dangerouslySetInnerHTML={{ __html: viewingNote.content }}
+              />
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Note history modal */}
+      {viewingHistory && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <Card className="max-w-4xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <CardHeader>
+              <div className="flex justify-between items-start">
+                <div>
+                  <CardTitle>Note History: {viewingHistory.title}</CardTitle>
+                  <div className="text-sm text-gray-500 mt-2">
+                    {noteHistory.length} modification{noteHistory.length !== 1 ? 's' : ''} found
+                  </div>
+                </div>
+                <Button
+                  variant="ghost"
+                  onClick={() => {
+                    setViewingHistory(null);
+                    setNoteHistory([]);
+                  }}
+                  className="h-8 w-8 p-0"
+                >
+                  ✕
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              {noteHistory.length === 0 ? (
+                <p className="text-gray-500">No modification history found for this note.</p>
+              ) : (
+                <div className="space-y-4">
+                  {noteHistory.map((historyItem, index) => (
+                    <Card key={historyItem.id} className="border-l-4 border-l-blue-500">
+                      <CardHeader className="pb-2">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <div className="flex items-center gap-2">
+                              <Badge variant="outline" className="text-xs">
+                                {historyItem.action.toUpperCase()}
+                              </Badge>
+                              <span className="text-sm font-medium">
+                                {historyItem.user ? 
+                                  `${historyItem.user.firstName} ${historyItem.user.lastName}` : 
+                                  'Unknown User'
+                                }
+                              </span>
+                            </div>
+                            <div className="text-xs text-gray-500 mt-1">
+                              {new Date(historyItem.createdAt).toLocaleString()}
+                            </div>
+                          </div>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <div className="space-y-3">
+                          {/* Title changes */}
+                          {historyItem.previousTitle !== historyItem.newTitle && (
+                            <div>
+                              <div className="text-sm font-medium text-gray-700">Title:</div>
+                              <div className="text-sm">
+                                <span className="bg-red-100 text-red-800 px-2 py-1 rounded line-through">
+                                  {historyItem.previousTitle || '(empty)'}
+                                </span>
+                                {' → '}
+                                <span className="bg-green-100 text-green-800 px-2 py-1 rounded">
+                                  {historyItem.newTitle || '(empty)'}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Category changes */}
+                          {historyItem.previousCategory !== historyItem.newCategory && (
+                            <div>
+                              <div className="text-sm font-medium text-gray-700">Category:</div>
+                              <div className="text-sm">
+                                <span className="bg-red-100 text-red-800 px-2 py-1 rounded line-through">
+                                  {historyItem.previousCategory || '(empty)'}
+                                </span>
+                                {' → '}
+                                <span className="bg-green-100 text-green-800 px-2 py-1 rounded">
+                                  {historyItem.newCategory || '(empty)'}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                          
+                          {/* Content changes */}
+                          {historyItem.previousContent !== historyItem.newContent && (
+                            <div>
+                              <div className="text-sm font-medium text-gray-700">Content:</div>
+                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
+                                <div>
+                                  <div className="text-xs text-gray-500 mb-1">Previous:</div>
+                                  <div 
+                                    className="text-sm bg-red-50 border border-red-200 p-2 rounded max-h-32 overflow-y-auto"
+                                    dangerouslySetInnerHTML={{ __html: historyItem.previousContent || '(empty)' }}
+                                  />
+                                </div>
+                                <div>
+                                  <div className="text-xs text-gray-500 mb-1">New:</div>
+                                  <div 
+                                    className="text-sm bg-green-50 border border-green-200 p-2 rounded max-h-32 overflow-y-auto"
+                                    dangerouslySetInnerHTML={{ __html: historyItem.newContent || '(empty)' }}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                          
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
