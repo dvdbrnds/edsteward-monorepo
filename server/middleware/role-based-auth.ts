@@ -13,7 +13,9 @@ function parseUserRoles(user: any): string[] {
   if (user.roles) {
     try {
       const roles = typeof user.roles === 'string' ? JSON.parse(user.roles) : user.roles;
-      return Array.isArray(roles) ? roles : [user.role || 'user'];
+      const result = Array.isArray(roles) ? roles : [user.role || 'user'];
+      // Ensure we always return an array
+      return Array.isArray(result) ? result : [user.role || 'user'];
     } catch {
       return [user.role || 'user'];
     }
