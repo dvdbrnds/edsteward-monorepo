@@ -74,7 +74,7 @@ export default function AuditTrailPage() {
   });
 
   // Fetch regulation-specific audit trail
-  const fetchRegulationAudit = async (regulationId: string) => {
+  const _fetchRegulationAudit = async (regulationId: string) => {
     const response = await fetch(`/api/audit/regulation/${regulationId}`, {
       credentials: 'include'
     });
@@ -174,14 +174,14 @@ export default function AuditTrailPage() {
                 <div>
                   <label className="text-sm font-medium">Entity Type</label>
                   <Select
-                    value={queryParams.entityType || ''}
-                    onValueChange={(value) => setQueryParams({ ...queryParams, entityType: value || undefined })}
+                    value={queryParams.entityType || 'all'}
+                    onValueChange={(value) => setQueryParams({ ...queryParams, entityType: value === 'all' ? undefined : value })}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="All types" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All types</SelectItem>
+                      <SelectItem value="all">All types</SelectItem>
                       <SelectItem value="regulation_action">Regulation Actions</SelectItem>
                       <SelectItem value="deadline">Deadlines</SelectItem>
                       <SelectItem value="note">Notes</SelectItem>
@@ -193,14 +193,14 @@ export default function AuditTrailPage() {
                 <div>
                   <label className="text-sm font-medium">Action</label>
                   <Select
-                    value={queryParams.action || ''}
-                    onValueChange={(value) => setQueryParams({ ...queryParams, action: value || undefined })}
+                    value={queryParams.action || 'all'}
+                    onValueChange={(value) => setQueryParams({ ...queryParams, action: value === 'all' ? undefined : value })}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="All actions" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All actions</SelectItem>
+                      <SelectItem value="all">All actions</SelectItem>
                       <SelectItem value="create">Create</SelectItem>
                       <SelectItem value="update">Update</SelectItem>
                       <SelectItem value="delete">Delete</SelectItem>
@@ -212,14 +212,14 @@ export default function AuditTrailPage() {
                 <div>
                   <label className="text-sm font-medium">Risk Level</label>
                   <Select
-                    value={queryParams.riskLevel || ''}
-                    onValueChange={(value) => setQueryParams({ ...queryParams, riskLevel: value || undefined })}
+                    value={queryParams.riskLevel || 'all'}
+                    onValueChange={(value) => setQueryParams({ ...queryParams, riskLevel: value === 'all' ? undefined : value })}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="All levels" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">All levels</SelectItem>
+                      <SelectItem value="all">All levels</SelectItem>
                       <SelectItem value="critical">Critical</SelectItem>
                       <SelectItem value="high">High</SelectItem>
                       <SelectItem value="medium">Medium</SelectItem>
