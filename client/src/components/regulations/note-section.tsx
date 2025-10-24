@@ -71,6 +71,8 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
       const payload = {
         ...data,
         regulationId: parseInt(regulationId),
+        category: "general", // Required by database schema
+        status: "active", // Required by database schema
       };
 
       const response = await fetch(endpoint, {
@@ -78,6 +80,7 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'include', // Required for authentication cookies
         body: JSON.stringify(payload),
       });
 

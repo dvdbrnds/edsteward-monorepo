@@ -288,6 +288,11 @@ export const insertNoteSchema = createInsertSchema(notes).extend({
   regulationId: z.number().positive("Regulation ID must be a positive number"),
   title: z.string().min(1, "Title is required"),
   content: z.string().min(1, "Content is required"),
+}).omit({
+  userId: true, // userId is added server-side from authenticated user
+  id: true,     // id is auto-generated
+  createdAt: true, // createdAt is auto-generated
+  updatedAt: true, // updatedAt is auto-generated
 });
 console.log("Note insertion schema created successfully");
 

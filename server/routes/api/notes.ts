@@ -26,9 +26,11 @@ router.post("/", requireAuth, async (req, res) => {
     const tenantStorage = getDatabaseStorage();
     
     console.log(`[NOTES] Creating note for single-tenant mode`);
+    console.log(`[NOTES] Request body:`, JSON.stringify(req.body, null, 2));
     
     // Validate request body
     const validatedData = insertNoteSchema.parse(req.body);
+    console.log(`[NOTES] Validation successful:`, JSON.stringify(validatedData, null, 2));
     
     const note = await tenantStorage.createNote({
       ...validatedData,

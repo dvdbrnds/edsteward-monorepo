@@ -30,7 +30,7 @@ export default function DashboardStats() {
   }
 
   const totalRegulations = Array.isArray(regulations) ? regulations.length : 0;
-  const _totalDeadlines = Array.isArray(deadlines) ? deadlines.length : 0;
+  const totalDeadlines = Array.isArray(deadlines) ? deadlines.length : 0;
   
   // Calculate deadline statistics
   const now = new Date();
