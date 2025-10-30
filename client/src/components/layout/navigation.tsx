@@ -18,7 +18,7 @@ import {
   User,
   Settings,
   Shield,
-
+  Bell,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -83,6 +83,7 @@ export default function Navigation() {
 
   const links = [
     { href: "/", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/notifications", label: "Notifications", icon: Bell },
     ...(user?.role?.toLowerCase() === "admin" || user?.role?.toLowerCase() === "compliance_officer"
       ? [
         { href: "/regulations/updates", label: "Regulation Updates", icon: FileText },

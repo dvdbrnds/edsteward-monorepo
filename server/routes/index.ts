@@ -1301,6 +1301,15 @@ export function registerRoutes(app: express.Application): Server {
     });
   });
 
+  // Register modular API routes
+  app.use('/api/uploads', uploadsRoutes);
+  app.use('/api/regulations', regulationsRouter);
+  app.use('/api/notes', notesRouter);
+  app.use('/api/deadlines', deadlinesRouter);
+  app.use('/api/notifications', notificationsRouter);
+  app.use('/api/mfa', mfaRouter);
+  app.use('/api/audit', auditRouter);
+
   // Setup additional APIs
   setupRegulationUpdatesApi(app as any);
   setupDebugRegulationUpdatesApi(app as any);

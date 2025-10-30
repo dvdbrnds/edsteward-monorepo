@@ -20,6 +20,7 @@ import AccountSettingsPage from "@/pages/account-settings-page";
 import LogsPage from "@/pages/admin/logs-page";
 import DebugToolsPage from "@/pages/admin/debug-tools-page";
 import AuditTrailPage from "@/pages/audit-trail-page";
+import NotificationsPage from "@/pages/notifications-page";
 import UtilitiesIndexPage from "@/pages/utilities/index";
 import { RegulationViewer } from "@/pages/RegulationViewer";
 import SetupWizardPage from "@/pages/setup-wizard-page";
@@ -90,6 +91,7 @@ export default function App() {
                 component={ComplianceWizardPage}
               />
               <ProtectedRoute path="/reports" component={ReportsPage} />
+              <ProtectedRoute path="/notifications" component={NotificationsPage} />
               
               {/* User Account Settings */}
               <ProtectedRoute path="/account/settings" component={AccountSettingsPage} />

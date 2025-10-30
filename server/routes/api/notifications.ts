@@ -78,4 +78,29 @@ router.patch("/:id", requireAuth, async (req, res) => {
   }
 });
 
+// DELETE /api/notifications/:id - Delete notification
+router.delete("/:id", requireAuth, async (req, res) => {
+  try {
+    const notificationId = parseInt(req.params.id);
+    
+    if (isNaN(notificationId)) {
+      return res.status(400).json({ error: "Invalid notification ID" });
+    }
+
+    // Use direct database storage for single-tenant mode
+    const tenantStorage = getDatabaseStorage();
+    
+    await tenantStorage.deleteNotification(notificationId);
+    
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Deleted notification ${notificationId}`);
+    res.json({ success: true });
+  } catch (error) {
+    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Failed to delete notification: ${error instanceof Error ? error.message : String(error)}`);
+    res.status(500).json({ 
+      error: "Failed to delete notification", 
+      details: error instanceof Error ? error.message : String(error) 
+    });
+  }
+});
+
 export default router; 
