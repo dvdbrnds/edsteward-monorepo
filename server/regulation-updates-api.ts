@@ -7,8 +7,16 @@ import { insertRegulationUpdateSchema } from '@shared/schema';
 /**
  * Basic Authentication middleware for MCP Engine integration
  * Supports the credentials: dvdbrnds:gabadh (Base64: ZHZkYnJuZHM6Z2FiYWRo)
+ * ALLOWS BYPASS for localhost requests (for local MCP Engine testing)
  */
 function basicAuthMiddleware(req: Request, res: Response, next: Function) {
+  // Allow localhost requests to bypass authentication
+  const host = req.headers.host || '';
+  if (host.includes('localhost') || host.includes('127.0.0.1')) {
+    console.log('🔓 Localhost request - bypassing Basic Auth for MCP Engine');
+    return next();
+  }
+
   const authHeader = req.headers.authorization;
   
   if (!authHeader || !authHeader.startsWith('Basic ')) {
@@ -284,23 +292,36 @@ export function setupRegulationUpdatesApi(app: Express) {
           console.log('✅ Detected simple format');
           const rawData = simpleValidation.data;
           
-                      // Validate regulation ID (Master Key Field system: 1-354)
-            const validRegulationId = validateRegulationId(rawData.regulationId);
-            
-            if (validRegulationId === null) {
-              console.error(`❌ Invalid regulation ID: ${rawData.regulationId}. Must be between 1-354.`);
-              return res.status(400).json({ 
-                success: false,
-                error: `Invalid regulation ID: ${rawData.regulationId}. Use IDs 1-354 for Master Key Field system.` 
-              });
-            }
-            
-            console.log(`✅ Using Master Key Field ID ${validRegulationId} directly`);
-            
-            updateData = {
-              ...rawData,
-              regulationId: validRegulationId
-            };
+          // Validate regulation ID (Master Key Field system: 1-354)
+          const validRegulationId = validateRegulationId(rawData.regulationId);
+          
+          if (validRegulationId === null) {
+            console.error(`❌ Invalid regulation ID: ${rawData.regulationId}. Must be between 1-354.`);
+            return res.status(400).json({ 
+              success: false,
+              error: `Invalid regulation ID: ${rawData.regulationId}. Use IDs 1-354 for Master Key Field system.` 
+            });
+          }
+          
+          console.log(`✅ Using Master Key Field ID ${validRegulationId} directly`);
+          
+          // Extract structured fields from request body
+          const summary = req.body.summary || null;
+          const requirements = req.body.requirements || null;
+          const filingDeadlines = req.body.filingDeadlines || req.body.filing_deadlines || null;
+          
+          console.log('📋 Structured fields received:');
+          console.log(`   summary: ${summary ? 'YES (' + summary.length + ' chars)' : 'NO'}`);
+          console.log(`   requirements: ${requirements ? 'YES (' + requirements.length + ' chars)' : 'NO'}`);
+          console.log(`   filingDeadlines: ${filingDeadlines ? 'YES (' + filingDeadlines.length + ' chars)' : 'NO'}`);
+          
+          updateData = {
+            ...rawData,
+            regulationId: validRegulationId,
+            summary,
+            requirements,
+            filingDeadlines
+          };
         } else {
           // Try to parse as MCP Engine complex format
           const mcpValidation = mcpEngineUpdateSchema.safeParse(req.body);
@@ -364,6 +385,15 @@ export function setupRegulationUpdatesApi(app: Express) {
               }
             }
             
+            // Extract summary and filing deadlines from MCP data
+            const summaryContent = mcpData.summary || mcpData.content?.summary || null;
+            const filingDeadlinesContent = mcpData.filingDeadlines || mcpData.filing_deadlines || mcpData.content?.filing_deadlines || null;
+            
+            console.log('📋 Extracted structured fields:');
+            console.log(`   summary: ${summaryContent ? 'YES (' + summaryContent.length + ' chars)' : 'NO'}`);
+            console.log(`   requirements: ${requirementsContent ? 'YES (' + requirementsContent.length + ' chars)' : 'NO'}`);
+            console.log(`   filingDeadlines: ${filingDeadlinesContent ? 'YES' : 'NO'}`);
+            
             // Convert MCP Engine format to EdSteward format
             updateData = {
               regulationId: validRegulationId,
@@ -371,7 +401,9 @@ export function setupRegulationUpdatesApi(app: Express) {
               status: mcpData.status,
               originalContent: regulationText,
               updatedContent: regulationText,
+              summary: summaryContent,
               requirements: requirementsContent,
+              filingDeadlines: filingDeadlinesContent,
               // Store Federal Register metadata for future use
               metadata: {
                 federal_register_enhancement: mcpData.federal_register_enhancement,

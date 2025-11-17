@@ -193,6 +193,7 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
       const response = await fetch(`/api/regulations/${regulation.id}/evidence`, {
         method: 'POST',
         body: formData,
+        credentials: 'include', // Include session cookies for authentication
       });
 
       if (!response.ok) {

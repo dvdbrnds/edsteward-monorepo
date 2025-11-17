@@ -99,12 +99,16 @@
 
         ws.onopen = function() {
             connectionStatus = 'connected';
+            const wasReconnecting = reconnectAttempts > 0;
             reconnectAttempts = 0;
             const indicator = document.getElementById('mcp-status-indicator');
             if (indicator) updateStatusIndicator(indicator, 'connected');
 
             console.log('✅ Connected to MCP Engine');
-            showToast('MCP Engine Connected', 'Real-time regulation updates are now active', 'success');
+            // Only show toast when reconnecting after failures, not on initial connection
+            if (wasReconnecting) {
+                showToast('MCP Engine Reconnected', 'Real-time regulation updates restored', 'success');
+            }
 
             // Subscribe to REG-66
             const subscribeMessage = {

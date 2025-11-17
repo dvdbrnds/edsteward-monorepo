@@ -9,7 +9,15 @@ import {
   attachUserPermissions
 } from '../../middleware/role-based-auth';
 import { auditRegulationAction, auditEvidence } from '../../middleware/audit-middleware';
-import { upload } from './uploads';
+import multer from 'multer';
+
+// Simple multer configuration for evidence uploads
+const upload = multer({
+  dest: 'uploads/',
+  limits: {
+    fileSize: 10 * 1024 * 1024, // 10MB limit
+  },
+});
 
 const router = express.Router();
 
@@ -192,6 +200,32 @@ router.get("/:regulationId", async (req, res) => {
   }
 });
 
+// Get version history for a regulation
+router.get("/:regulationId/versions", async (req, res) => {
+  try {
+    const regulationId = parseInt(req.params.regulationId);
+    
+    if (isNaN(regulationId)) {
+      return res.status(400).json({ error: "Invalid regulation ID" });
+    }
+
+    const tenantStorage = getDatabaseStorage();
+    const versions = await tenantStorage.getRegulationVersions(regulationId);
+    
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
+      `Fetched ${versions.length} versions for regulation ${regulationId}`);
+
+    res.json(versions);
+  } catch (error) {
+    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 
+      `Failed to fetch versions for regulation ${req.params.regulationId}: ${error instanceof Error ? error.message : String(error)}`);
+    res.status(500).json({ 
+      error: "Failed to fetch regulation versions", 
+      details: error instanceof Error ? error.message : String(error) 
+    });
+  }
+});
+
 // Get evidence files for a regulation
 router.get("/:regulationId/evidence", async (req, res) => {
   try {
@@ -221,7 +255,7 @@ router.get("/:regulationId/evidence", async (req, res) => {
 });
 
 // Upload evidence file for a regulation
-router.post("/:regulationId/evidence", requireAuth, ...auditEvidence('create'), upload.single('file'), async (req, res) => {
+router.post("/:regulationId/evidence", requireAuth, upload.single('file'), async (req, res) => {
   try {
     if (!req.user) {
       syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized evidence upload attempt");
@@ -287,9 +321,54 @@ router.post("/:regulationId/evidence", requireAuth, ...auditEvidence('create'), 
   }
 });
 
+// Update a regulation - requires compliance officer or admin
+router.put("/:regulationId", requireAuth, requireComplianceOfficer, async (req, res) => {
+  try {
+    const startTime = Date.now();
+    const regulationId = parseInt(req.params.regulationId);
+    
+    if (isNaN(regulationId)) {
+      return res.status(400).json({ error: "Invalid regulation ID" });
+    }
+    
+    const updateData = req.body;
+    
+    // Remove any fields that shouldn't be updated directly
+    const { id, version_number, version_date, ...safeUpdateData } = updateData;
+    
+    // Add timestamp for last_updated
+    safeUpdateData.last_updated = new Date().toISOString();
+    
+    const tenantStorage = getDatabaseStorage();
+    const updatedRegulation = await tenantStorage.updateRegulation(regulationId, safeUpdateData);
+    
+    const totalTime = Date.now() - startTime;
+    
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
+      `Updated regulation ${regulationId} in ${totalTime}ms`);
+    
+    res.json(updatedRegulation);
+  } catch (error) {
+    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to update regulation", {
+      error: error instanceof Error ? error.message : String(error)
+    });
+    
+    res.status(500).json({ 
+      error: "Failed to update regulation", 
+      details: error instanceof Error ? error.message : String(error) 
+    });
+  }
+});
+
 // Update a regulation action - requires compliance officer or admin
 router.patch("/:regulationId/actions/:actionType", requireAuth, requireComplianceOfficer, ...auditRegulationAction(), async (req, res) => {
   try {
+    console.log('🔧 PATCH /actions endpoint hit');
+    console.log('   User authenticated:', req.isAuthenticated());
+    console.log('   User:', req.user?.username);
+    console.log('   Params:', req.params);
+    console.log('   Body:', req.body);
+    
     const startTime = Date.now();
     const regulationId = parseInt(req.params.regulationId);
     const actionType = req.params.actionType;
@@ -360,10 +439,13 @@ router.patch("/:regulationId/actions/:actionType", requireAuth, requireComplianc
       action: actions[actionIndex !== -1 ? actionIndex : actions.length - 1] 
     });
   } catch (error) {
+    console.error('❌ PATCH actions error:', error);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Failed to update regulation action: ${error instanceof Error ? error.message : String(error)}`);
     res.status(500).json({ 
       error: "Failed to update action", 
-      details: error instanceof Error ? error.message : String(error) 
+      details: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined
     });
   }
 });

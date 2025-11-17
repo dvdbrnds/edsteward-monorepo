@@ -381,19 +381,62 @@ export const EnhancedRegulationTimeline: React.FC<EnhancedRegulationTimelineProp
                         )}
                       </div>
 
-                      {/* Additional metadata */}
+                      {/* Additional metadata and change summary */}
                       {event.type === 'version' && event.data && (
-                        <div className="mt-2 text-xs text-gray-500">
-                          {event.data.createdByUser && (
-                            <span>
-                              by {event.data.createdByUser.firstName} {event.data.createdByUser.lastName} 
-                              ({event.data.createdByUser.username})
-                            </span>
-                          )}
-                          {event.data.sourceId && (
-                            <span className="ml-2">• Source ID: {event.data.sourceId}</span>
-                          )}
-                        </div>
+                        <>
+                          {/* Parse version content to show what changed */}
+                          {(() => {
+                            try {
+                              const versionData = JSON.parse(event.data.content);
+                              const changes: string[] = [];
+                              
+                              if (versionData.regulation_text) {
+                                const textLength = versionData.regulation_text.length;
+                                changes.push(`📄 Regulation text (${textLength.toLocaleString()} chars)`);
+                              }
+                              
+                              if (versionData.summary) {
+                                changes.push(`📝 Summary updated`);
+                              }
+                              
+                              if (versionData.requirements) {
+                                changes.push(`✅ Requirements updated`);
+                              }
+                              
+                              if (versionData.filing_deadlines) {
+                                const deadlineCount = versionData.filing_deadlines.split('\n').filter((d: string) => d.trim()).length;
+                                changes.push(`📅 ${deadlineCount} filing deadline${deadlineCount !== 1 ? 's' : ''}`);
+                              }
+                              
+                              return changes.length > 0 ? (
+                                <div className="mt-2 p-2 bg-blue-50 rounded border border-blue-200">
+                                  <div className="text-xs font-medium text-blue-900 mb-1">Changes in this version:</div>
+                                  <div className="flex flex-wrap gap-2">
+                                    {changes.map((change, idx) => (
+                                      <span key={idx} className="text-xs bg-white px-2 py-1 rounded border border-blue-300 text-blue-700">
+                                        {change}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              ) : null;
+                            } catch (e) {
+                              return null;
+                            }
+                          })()}
+                          
+                          <div className="mt-2 text-xs text-gray-500">
+                            {event.data.createdByUser && (
+                              <span>
+                                by {event.data.createdByUser.firstName} {event.data.createdByUser.lastName} 
+                                ({event.data.createdByUser.username})
+                              </span>
+                            )}
+                            {event.data.sourceId && (
+                              <span className="ml-2">• Source ID: {event.data.sourceId}</span>
+                            )}
+                          </div>
+                        </>
                       )}
                     </div>
                   </div>

@@ -4,12 +4,20 @@ import { differenceInDays, differenceInHours as _differenceInHours, format } fro
 import type { Deadline, Regulation, User } from '@shared/schema';
 import { getDatabaseStorage } from './database';
 
-// Default notification schedules if not specified in regulation
+// Compliance notification timeline per user requirements:
+// 90 days: Email to Compliance Officer
+// 60 days: Email to Compliance Officer  
+// 30 days: Email to Compliance Officer
+// 7 days: Weekly emails to Compliance Officer
+// Final week: Daily emails to Compliance Officer + CCO/Legal/Admin
 const DEFAULT_NOTIFICATION_SCHEDULES = {
-  initialReminder: 90, // days before
-  weeklyReminder: 30, // start weekly reminders
-  dailyReminder: 7,   // start daily reminders
-  finalDayReminders: true // three times on the final day
+  initialReminder: 90,     // 90-day notice to Compliance Officer
+  secondReminder: 60,      // 60-day notice to Compliance Officer
+  thirdReminder: 30,       // 30-day notice to Compliance Officer
+  weeklyReminder: 7,       // Weekly reminders in final approach (7 days)
+  dailyReminder: 7,        // Daily reminders in final week (escalated to all stakeholders)
+  finalDayReminders: true, // Multiple times on final day
+  escalateToAllStakeholders: 7 // Days before deadline to include CCO/Legal/Admin
 } as const;
 
 interface NotificationContext {
@@ -17,6 +25,49 @@ interface NotificationContext {
   regulation: Regulation;
   assignedUser: User;
   daysRemaining: number;
+}
+
+/**
+ * Get notification recipients based on timeline and roles
+ * - Days 90-8: Only Compliance Officers
+ * - Final week (≤7 days): Compliance Officers + CCO + Legal + Admin
+ */
+async function getNotificationRecipients(daysRemaining: number): Promise<User[]> {
+  const tenantStorage = getDatabaseStorage();
+  const allUsers = await tenantStorage.getAllUsers();
+  
+  // Always include compliance officers
+  const complianceOfficers = allUsers.filter(user => {
+    const userRoles = Array.isArray(user.roles) ? user.roles : 
+                     typeof user.roles === 'string' ? JSON.parse(user.roles || '[]') : [];
+    
+    return userRoles.includes('compliance') || 
+           user.department === 'Compliance' ||
+           user.role === 'compliance_officer';
+  });
+
+  // If more than 7 days remaining, only send to compliance officers
+  if (daysRemaining > DEFAULT_NOTIFICATION_SCHEDULES.escalateToAllStakeholders) {
+    return complianceOfficers;
+  }
+
+  // Final week: Include CCO, Legal, and Admin stakeholders
+  const allStakeholders = allUsers.filter(user => {
+    const userRoles = Array.isArray(user.roles) ? user.roles : 
+                     typeof user.roles === 'string' ? JSON.parse(user.roles || '[]') : [];
+    
+    return userRoles.includes('compliance') || 
+           userRoles.includes('cco') || 
+           userRoles.includes('chief_compliance_officer') ||
+           userRoles.includes('legal') || 
+           userRoles.includes('admin') ||
+           user.department === 'Compliance' ||
+           user.department === 'Legal' ||
+           user.role === 'admin' ||
+           user.role === 'compliance_officer';
+  });
+
+  return allStakeholders;
 }
 
 export async function checkAndSendDeadlineNotifications() {
@@ -58,63 +109,169 @@ async function sendDeadlineNotification(context: NotificationContext) {
   // Determine if we should send a notification based on the schedule
   if (!shouldSendNotification(daysRemaining, regulation)) return;
 
-  const subject = `Regulation Deadline Reminder: ${regulation.name}`;
+  // Get role-based recipients based on timeline
+  const recipients = await getNotificationRecipients(daysRemaining);
+  
+  if (recipients.length === 0) {
+    console.log(`No recipients found for deadline notification (${daysRemaining} days remaining)`);
+    return;
+  }
+
+  const urgencyLevel = getUrgencyLevel(daysRemaining);
+  const subject = `${urgencyLevel === 'CRITICAL' ? '[URGENT] ' : ''}Compliance Deadline: ${regulation.name} - ${formatTimeRemaining(daysRemaining)}`;
   const dueDate = format(new Date(deadline.dueDate), 'PPPP');
 
-  let urgencyLevel = getUrgencyLevel(daysRemaining);
+  // Determine recipient context for email
+  const isEscalated = daysRemaining <= DEFAULT_NOTIFICATION_SCHEDULES.escalateToAllStakeholders;
+  const recipientContext = isEscalated ? 
+    'This notification has been escalated to all compliance stakeholders due to the approaching deadline.' :
+    'This notification is being sent to compliance officers for review and action.';
 
   const emailContent = `
-    <h2>Regulation Compliance Deadline Reminder</h2>
-    <p>This is a reminder about an upcoming compliance deadline:</p>
+    <h2>🚨 Compliance Deadline Notification</h2>
+    <p>${recipientContext}</p>
 
-    <h3>Regulation Details:</h3>
-    <ul>
-      <li><strong>Name:</strong> ${regulation.name}</li>
-      <li><strong>Due Date:</strong> ${dueDate}</li>
-      <li><strong>Time Remaining:</strong> ${formatTimeRemaining(daysRemaining)}</li>
-      <li><strong>Urgency:</strong> ${urgencyLevel}</li>
-    </ul>
+    <div style="background-color: ${urgencyLevel === 'CRITICAL' ? '#fee2e2' : urgencyLevel === 'HIGH' ? '#fef3c7' : '#f0f9ff'}; 
+                border-left: 4px solid ${urgencyLevel === 'CRITICAL' ? '#dc2626' : urgencyLevel === 'HIGH' ? '#d97706' : '#0284c7'}; 
+                padding: 15px; margin: 20px 0;">
+      <h3>📋 Regulation Details:</h3>
+      <ul style="list-style: none; padding: 0;">
+        <li><strong>📄 Regulation:</strong> ${regulation.name}</li>
+        <li><strong>📅 Due Date:</strong> ${dueDate}</li>
+        <li><strong>⏰ Time Remaining:</strong> ${formatTimeRemaining(daysRemaining)}</li>
+        <li><strong>🚩 Urgency Level:</strong> ${urgencyLevel}</li>
+        <li><strong>👤 Assigned To:</strong> ${assignedUser.firstName} ${assignedUser.lastName} (${assignedUser.email})</li>
+      </ul>
+    </div>
 
-    <p><strong>Required Action:</strong> Please review and complete the compliance requirements for this regulation.</p>
+    <h3>📋 Required Action:</h3>
+    <p>Please review and complete the compliance requirements for this regulation. ${
+      isEscalated ? 
+      '<strong>This deadline is approaching rapidly and requires immediate attention from all stakeholders.</strong>' :
+      'Please coordinate with the assigned team member to ensure timely completion.'
+    }</p>
 
-    <p>You can view the regulation details and mark it as complete by clicking the link below:</p>
-    <a href="${process.env.APP_URL}/regulations/${regulation.id}">View Regulation Details</a>
+    <p style="text-align: center; margin: 30px 0;">
+      <a href="${process.env.BASE_URL || 'http://localhost:3000'}/regulations/${regulation.id}" 
+         style="background-color: #0284c7; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; display: inline-block;">
+        📖 View Regulation Details & Update Status
+      </a>
+    </p>
 
-    <p>If you have any questions, please contact the compliance office.</p>
+    <div style="background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-top: 20px;">
+      <p><strong>📧 This notification was sent to:</strong></p>
+      <ul>
+        ${recipients.map(user => `<li>• ${user.firstName} ${user.lastName} (${user.email}) - ${getUserRoleDescription(user)}</li>`).join('')}
+      </ul>
+    </div>
+
+    <hr style="margin: 30px 0; border: none; border-top: 1px solid #dee2e6;">
+    <p style="font-size: 12px; color: #6c757d;">
+      🔔 Notification Schedule: 90 days → 60 days → 30 days → Daily (final week) → Hourly (final day)
+      <br>
+      🔧 This is an automated notification from the EdSteward Compliance Management System.
+    </p>
   `;
 
-  await emailService.sendEmail(assignedUser.email, subject, emailContent);
+  // Send emails to all recipients
+  const emailPromises = recipients.map(recipient => 
+    emailService.sendEmail(recipient.email, subject, emailContent)
+  );
+  
+  await Promise.allSettled(emailPromises);
 
   // Log notification sent
-  console.log(`Sent ${urgencyLevel} deadline notification to ${assignedUser.email} for regulation ${regulation.id}`);
+  const recipientEmails = recipients.map(r => r.email).join(', ');
+  console.log(`✅ Sent ${urgencyLevel} deadline notification for regulation ${regulation.id} (${daysRemaining} days remaining) to: ${recipientEmails}`);
+}
+
+/**
+ * Get user role description for email display
+ */
+function getUserRoleDescription(user: User): string {
+  const userRoles = Array.isArray(user.roles) ? user.roles : 
+                   typeof user.roles === 'string' ? JSON.parse(user.roles || '[]') : [];
+  
+  if (userRoles.includes('cco') || userRoles.includes('chief_compliance_officer')) {
+    return 'Chief Compliance Officer';
+  }
+  if (userRoles.includes('legal')) {
+    return 'Legal Counsel';
+  }
+  if (userRoles.includes('admin') || user.role === 'admin') {
+    return 'Administrator';
+  }
+  if (userRoles.includes('compliance') || user.department === 'Compliance') {
+    return 'Compliance Officer';
+  }
+  return 'Team Member';
 }
 
 function shouldSendNotification(daysRemaining: number, regulation: Regulation): boolean {
-  const schedules = regulation.notificationSchedule || DEFAULT_NOTIFICATION_SCHEDULES;
-  const hoursRemaining = daysRemaining * 24;
+  // Check if notifications are disabled for this regulation
+  if (regulation.notificationsDisabled) {
+    console.log(`Notifications disabled for regulation ${regulation.name} (ID: ${regulation.id})`);
+    return false;
+  }
 
-  // Initial reminder
+  const schedules = regulation.notificationSchedule || DEFAULT_NOTIFICATION_SCHEDULES;
+
+  // 90-day notice (initial reminder to Compliance Officer)
   if (daysRemaining === schedules.initialReminder) return true;
 
-  // Weekly reminders between weekly threshold and daily threshold
-  if (daysRemaining <= schedules.weeklyReminder &&
-      daysRemaining > schedules.dailyReminder &&
-      daysRemaining % 7 === 0) return true;
+  // 60-day notice (second reminder to Compliance Officer)  
+  if (daysRemaining === schedules.secondReminder) return true;
 
-  // Daily reminders in the final week
-  if (daysRemaining <= schedules.dailyReminder &&
-      daysRemaining > 1) return true;
+  // 30-day notice (third reminder to Compliance Officer)
+  if (daysRemaining === schedules.thirdReminder) return true;
 
-  // Three times on the last day if enabled
-  if (daysRemaining <= 1 && schedules.finalDayReminders) {
+  // Final week (≤7 days): Daily reminders to all stakeholders
+  if (daysRemaining <= schedules.dailyReminder && daysRemaining > 0) {
+    // Send daily notifications every morning at 9 AM
     const hour = new Date().getHours();
-    return hour === 9 || hour === 13 || hour === 17;
+    return hour === 9;
+  }
+
+  // Final day: Multiple notifications throughout the day
+  if (daysRemaining <= 1 && daysRemaining >= 0 && schedules.finalDayReminders) {
+    const hour = new Date().getHours();
+    return hour === 9 || hour === 13 || hour === 17; // 9 AM, 1 PM, 5 PM
+  }
+
+  // OVERDUE NOTIFICATIONS
+  if (daysRemaining < 0) {
+    const daysOverdue = Math.abs(daysRemaining);
+    
+    // Day 1 overdue: Immediate alert
+    if (daysOverdue === 1) return true;
+    
+    // Days 2-7 overdue: Daily urgent reminders at 9 AM
+    if (daysOverdue >= 2 && daysOverdue <= 7) {
+      const hour = new Date().getHours();
+      return hour === 9;
+    }
+    
+    // Week 2+ overdue: Weekly critical alerts on Mondays at 9 AM
+    if (daysOverdue > 7) {
+      const now = new Date();
+      const isMonday = now.getDay() === 1;
+      const hour = now.getHours();
+      return isMonday && hour === 9;
+    }
   }
 
   return false;
 }
 
 function getUrgencyLevel(daysRemaining: number): string {
+  // Overdue cases
+  if (daysRemaining < 0) {
+    const daysOverdue = Math.abs(daysRemaining);
+    if (daysOverdue > 7) return 'CRITICAL - EXECUTIVE ESCALATION';
+    return 'CRITICAL - OVERDUE';
+  }
+  
+  // Pre-deadline cases
   if (daysRemaining <= 1) return 'CRITICAL';
   if (daysRemaining <= 7) return 'HIGH';
   if (daysRemaining <= 30) return 'MEDIUM';
@@ -122,6 +279,11 @@ function getUrgencyLevel(daysRemaining: number): string {
 }
 
 function formatTimeRemaining(daysRemaining: number): string {
+  if (daysRemaining < 0) {
+    const daysOverdue = Math.abs(daysRemaining);
+    if (daysOverdue === 1) return '1 day overdue';
+    return `${daysOverdue} days overdue`;
+  }
   if (daysRemaining === 0) return 'Due today';
   if (daysRemaining === 1) return 'Due tomorrow';
   return `${daysRemaining} days remaining`;
@@ -259,4 +421,41 @@ export async function sendDeadlineCreationNotification(deadline: Deadline) {
     console.error(`❌ Error sending deadline creation notification:`, error);
     throw error;
   }
+}
+
+/**
+ * Test function to visualize notification timeline for a specific number of days
+ * Useful for testing and validation
+ */
+export async function getNotificationTimelineSummary(daysFromNow: number[] = [90, 60, 30, 14, 7, 3, 1, 0]): Promise<void> {
+  console.log('\n📋 COMPLIANCE NOTIFICATION TIMELINE SUMMARY');
+  console.log('=' .repeat(60));
+  
+  for (const days of daysFromNow) {
+    const wouldSend = shouldSendNotification(days, { notificationSchedule: DEFAULT_NOTIFICATION_SCHEDULES } as Regulation);
+    const recipients = await getNotificationRecipients(days);
+    const urgency = getUrgencyLevel(days);
+    const timeDesc = formatTimeRemaining(days);
+    
+    console.log(`\n📅 ${days} days remaining (${timeDesc}):`);
+    console.log(`   🔔 Send Notification: ${wouldSend ? '✅ YES' : '❌ NO'}`);
+    console.log(`   🚩 Urgency Level: ${urgency}`);
+    console.log(`   👥 Recipients (${recipients.length}):`);
+    
+    if (recipients.length > 0) {
+      recipients.forEach(user => {
+        console.log(`      • ${user.firstName} ${user.lastName} (${user.email}) - ${getUserRoleDescription(user)}`);
+      });
+    } else {
+      console.log(`      • No recipients found`);
+    }
+  }
+  
+  console.log('\n📋 NOTIFICATION SCHEDULE RULES:');
+  console.log(`   • 90 days: Email to Compliance Officers`);
+  console.log(`   • 60 days: Email to Compliance Officers`);
+  console.log(`   • 30 days: Email to Compliance Officers`);
+  console.log(`   • ≤7 days: Daily emails (9 AM) to ALL stakeholders`);
+  console.log(`   • Final day: 3x daily (9 AM, 1 PM, 5 PM) to ALL stakeholders`);
+  console.log('=' .repeat(60));
 }

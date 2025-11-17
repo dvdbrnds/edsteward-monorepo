@@ -1,94 +1,137 @@
-import Navigation from "@/components/layout/navigation";
-import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
-import type { Notification } from "@shared/schema";
+import Navigation from "@/components/layout/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-// Removed unused Shadcn Select imports - using native HTML select instead
-import { Bell, CheckCircle, XCircle, Plus, Trash2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Bell, Clock, CheckCircle, XCircle, AlertTriangle, ArrowUpDown, ArrowUp, ArrowDown, Filter, Plus, Users } from "lucide-react";
 import React, { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/hooks/use-auth";
+import CreateNotificationModal from "@/components/notifications/create-notification-modal";
+import { Link } from "wouter";
+import { format } from "date-fns";
+
+interface NotificationHistoryItem {
+  id: number;
+  type: string;
+  status: 'pending' | 'sent' | 'failed';
+  priority: 'high' | 'normal' | 'low';
+  content: any;
+  createdAt: string;
+  sentAt: string | null;
+  retryCount: number;
+  regulation: {
+    id: number;
+    name: string;
+    category: string;
+  } | null;
+  user: {
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+  } | null;
+}
+
+interface NotificationHistoryResponse {
+  notifications: NotificationHistoryItem[];
+  total: number;
+  offset: number;
+  limit: number;
+}
+
+type SortField = 'createdAt' | 'sentAt' | 'type' | 'status' | 'priority';
+type SortOrder = 'asc' | 'desc';
 
 export default function NotificationsPage() {
   const { user } = useAuth();
-  const queryClient = useQueryClient();
-  const [editingNotification, setEditingNotification] = useState<number | null>(null);
-  
+  const [sortField, setSortField] = useState<SortField>('createdAt');
+  const [sortOrder, setSortOrder] = useState<SortOrder>('desc');
+  const [statusFilter, setStatusFilter] = useState<'all' | 'sent' | 'pending' | 'failed'>('sent');
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-  // Helper function to get clean frequency display text
-  const getFrequencyDisplayText = (frequency: string) => {
-    switch (frequency) {
-      case 'daily': return 'Daily';
-      case 'weekly': return 'Weekly';
-      case 'monthly': return 'Monthly';
-      default: return frequency;
+  const { data: notificationHistory, isLoading } = useQuery<NotificationHistoryResponse>({
+    queryKey: ["/api/notification-history", { status: statusFilter === 'all' ? undefined : statusFilter, sortBy: sortField, sortOrder }],
+    refetchInterval: 30000, // Refresh every 30 seconds
+  });
+
+  const handleSort = (field: SortField) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortOrder('desc');
     }
   };
 
-  const { data: notifications, isLoading } = useQuery<Notification[]>({
-    queryKey: ["/api/notifications"],
-  });
-
-
-  // Update notification mutation
-  const updateNotificationMutation = useMutation({
-    mutationFn: async ({ id, updates }: { id: number; updates: Partial<Notification> }) => {
-      const response = await fetch(`/api/notifications/${id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(updates),
-      });
-      if (!response.ok) throw new Error('Failed to update notification');
-      return response.json();
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/notifications"] });
-      setEditingNotification(null);
-    },
-  });
-
-  // Delete notification mutation
-  const deleteNotificationMutation = useMutation({
-    mutationFn: async (id: number) => {
-      const response = await fetch(`/api/notifications/${id}`, {
-        method: 'DELETE',
-        credentials: 'include',
-      });
-      if (!response.ok) throw new Error('Failed to delete notification');
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/notifications"] });
-    },
-  });
-
-  const handleToggleEnabled = (id: number, enabled: boolean) => {
-    updateNotificationMutation.mutate({ id, updates: { enabled } });
+  const getSortIcon = (field: SortField) => {
+    if (sortField !== field) return <ArrowUpDown className="h-4 w-4" />;
+    return sortOrder === 'asc' ? <ArrowUp className="h-4 w-4" /> : <ArrowDown className="h-4 w-4" />;
   };
 
-  const handleFrequencyChange = (id: number, frequency: string) => {
-    updateNotificationMutation.mutate({ id, updates: { frequency } });
-  };
-
-  const handleDeleteNotification = (id: number) => {
-    if (confirm('Are you sure you want to delete this notification?')) {
-      deleteNotificationMutation.mutate(id);
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'sent':
+        return <Badge variant="default" className="bg-green-100 text-green-800 border-green-200">
+          <CheckCircle className="h-3 w-3 mr-1" />
+          Sent
+        </Badge>;
+      case 'pending':
+        return <Badge variant="default" className="bg-yellow-100 text-yellow-800 border-yellow-200">
+          <Clock className="h-3 w-3 mr-1" />
+          Pending
+        </Badge>;
+      case 'failed':
+        return <Badge variant="default" className="bg-red-100 text-red-800 border-red-200">
+          <XCircle className="h-3 w-3 mr-1" />
+          Failed
+        </Badge>;
+      default:
+        return <Badge variant="secondary">{status}</Badge>;
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Navigation />
-        <main className="py-10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            Loading...
-          </div>
-        </main>
-      </div>
-    );
-  }
+  const getPriorityBadge = (priority: string) => {
+    switch (priority) {
+      case 'high':
+        return <Badge variant="destructive">
+          <AlertTriangle className="h-3 w-3 mr-1" />
+          High
+        </Badge>;
+      case 'normal':
+        return <Badge variant="secondary">Normal</Badge>;
+      case 'low':
+        return <Badge variant="outline">Low</Badge>;
+      default:
+        return <Badge variant="secondary">{priority}</Badge>;
+    }
+  };
+
+  const getNotificationTitle = (notification: NotificationHistoryItem) => {
+    if (notification.regulation) {
+      return `${notification.type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}: ${notification.regulation.name}`;
+    }
+    
+    // Try to extract title from content
+    if (notification.content && typeof notification.content === 'object') {
+      if (notification.content.title) return notification.content.title;
+      if (notification.content.subject) return notification.content.subject;
+    }
+    
+    return notification.type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  };
+
+  const getNotificationDescription = (notification: NotificationHistoryItem) => {
+    if (notification.content && typeof notification.content === 'object') {
+      if (notification.content.message) return notification.content.message;
+      if (notification.content.body) return notification.content.body;
+    }
+    
+    if (typeof notification.content === 'string') {
+      return notification.content;
+    }
+    
+    return 'No description available';
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -96,130 +139,312 @@ export default function NotificationsPage() {
       
       <main className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center mb-8">
-            <Bell className="h-6 w-6 mr-3 text-blue-500" />
-            <h1 className="text-3xl font-bold text-gray-900">
-              Notifications
-            </h1>
-          </div>
-          
-
-          <Card className="shadow-sm">
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
-              <CardTitle className="text-xl font-semibold">Notification Settings</CardTitle>
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center">
+              <Bell className="h-6 w-6 mr-3 text-blue-500" />
+              <h1 className="text-3xl font-bold text-gray-900">
+                Notifications
+              </h1>
+            </div>
+            <div className="flex items-center gap-3">
               <Button
-                onClick={() => {
-                  // TODO: Add new notification functionality
-                  alert('Add new notification feature coming soon!');
-                }}
+                onClick={() => setIsCreateModalOpen(true)}
                 size="sm"
                 className="flex items-center gap-2"
               >
                 <Plus className="h-4 w-4" />
-                Add Notification
+                Send Notification
               </Button>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Information Section */}
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <div className="flex items-start gap-3">
-                  <Bell className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                  <div className="flex-1">
-                    <h3 className="font-medium text-blue-900 mb-3">How Notifications Work</h3>
-                    <div className="text-sm text-blue-800 space-y-3">
-                      <div>
-                        <p className="font-medium mb-1">Default Settings:</p>
-                        <p>Email notifications are enabled weekly for compliance alerts.</p>
-                      </div>
-                      
-                      <div>
-                        <p className="font-medium mb-1">When You'll Receive Notifications:</p>
-                        <ul className="ml-4 space-y-1">
-                          <li>• <strong>Out of Compliance:</strong> When regulations fall out of compliance status</li>
-                          <li>• <strong>Due Date Alerts:</strong> When deadlines approach or are overdue</li>
-                          <li>• <strong>No Spam:</strong> Compliant regulations with no upcoming deadlines won't trigger notifications</li>
-                        </ul>
-                      </div>
-                      
-                      <div>
-                        <p className="font-medium mb-1">Frequency Options:</p>
-                        <ul className="ml-4 space-y-1">
-                          <li>• <strong>Daily:</strong> Check for compliance issues every day at 9:00 AM</li>
-                          <li>• <strong>Weekly:</strong> Check for compliance issues every Monday at 9:00 AM (recommended)</li>
-                          <li>• <strong>Monthly:</strong> Check for compliance issues on the 1st of each month at 9:00 AM</li>
-                        </ul>
-                      </div>
-                      
-                      <div className="pt-1 border-t border-blue-200">
-                        <p><strong>Note:</strong> SMS notifications require a valid phone number in your profile.</p>
-                      </div>
+            </div>
+          </div>
+
+          {/* Smart Notification System Info - Always Visible */}
+          <Card className="shadow-sm mb-6">
+              <CardHeader>
+                <CardTitle className="text-xl font-semibold flex items-center gap-2">
+                  <CheckCircle className="h-5 w-5 text-green-600" />
+                  Smart Compliance Notification System
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                {/* How It Works */}
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <p className="font-medium mb-2 flex items-center gap-2 text-blue-900">
+                        <Clock className="h-4 w-4" />
+                        Notification Schedule:
+                      </p>
+                      <ul className="ml-6 space-y-1 text-sm text-blue-800">
+                        <li>• <strong>90 days before:</strong> Initial notice</li>
+                        <li>• <strong>60 days before:</strong> Second reminder</li>
+                        <li>• <strong>30 days before:</strong> Third reminder</li>
+                        <li>• <strong>7-1 days before:</strong> Daily reminders</li>
+                        <li>• <strong>Final day:</strong> Multiple reminders (morning, afternoon, evening)</li>
+                        <li className="border-t border-red-200 pt-2 mt-2">
+                          <strong className="text-red-700">Overdue Escalation:</strong>
+                        </li>
+                        <li className="text-red-800">• <strong>Day 1 overdue:</strong> Immediate alert to all stakeholders</li>
+                        <li className="text-red-800">• <strong>Days 2-7 overdue:</strong> Daily urgent reminders</li>
+                        <li className="text-red-800">• <strong>Week 2+ overdue:</strong> Weekly critical alerts + executive escalation</li>
+                      </ul>
+                    </div>
+                    
+                    <div>
+                      <p className="font-medium mb-2 flex items-center gap-2 text-blue-900">
+                        <Users className="h-4 w-4" />
+                        Role-Based Escalation:
+                      </p>
+                      <ul className="ml-6 space-y-1 text-sm text-blue-800">
+                        <li>• <strong>90-8 days:</strong> Compliance Officers only</li>
+                        <li>• <strong>7-1 days:</strong> All stakeholders</li>
+                        <li className="text-xs text-blue-600 mt-2">
+                          (CCO, Legal Counsel, Administrators)
+                        </li>
+                      </ul>
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Notification List */}
-              {notifications?.map((notification) => (
-                <div 
-                  key={notification.id}
-                  className="flex items-center justify-between p-4 border rounded-lg bg-white shadow-sm"
-                >
-                  <div className="flex items-center gap-4 flex-1">
-                    {notification.enabled ? (
-                      <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
-                    ) : (
-                      <XCircle className="h-5 w-5 text-red-500 flex-shrink-0" />
-                    )}
-                    
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-900 mb-2">
-                        {notification.type === 'email' ? 'Email' : 'SMS'} Notification
-                      </p>
-                      
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-500">Frequency:</span>
-                        <select
-                          value={notification.frequency}
-                          onChange={(e) => handleFrequencyChange(notification.id, e.target.value)}
-                          className="w-auto min-w-[120px] h-8 text-sm border border-gray-300 rounded-md px-2 py-1 bg-white"
-                        >
-                          <option value="daily">Daily</option>
-                          <option value="weekly">Weekly</option>
-                          <option value="monthly">Monthly</option>
-                        </select>
+                {/* System Status */}
+                <div className="grid md:grid-cols-3 gap-4">
+                  <div className="bg-green-50 border border-green-200 rounded-lg p-3">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle className="h-4 w-4 text-green-600" />
+                      <div>
+                        <p className="font-medium text-green-900 text-sm">System Active</p>
+                        <p className="text-xs text-green-700">Monitoring all deadlines</p>
                       </div>
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-4 flex-shrink-0">
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-gray-500">Enabled:</span>
-                      <Switch
-                        checked={notification.enabled}
-                        onCheckedChange={(checked) => handleToggleEnabled(notification.id, checked)}
-                      />
+                      <Bell className="h-4 w-4 text-blue-600" />
+                      <div>
+                        <p className="font-medium text-blue-900 text-sm">Email Delivery</p>
+                        <p className="text-xs text-blue-700">Automatic notifications</p>
+                      </div>
                     </div>
-                    
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleDeleteNotification(notification.id)}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                  </div>
+                  
+                  <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                    <div className="flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4 text-purple-600" />
+                      <div>
+                        <p className="font-medium text-purple-900 text-sm">Smart Filtering</p>
+                        <p className="text-xs text-purple-700">Only when needed</p>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              ))}
-              {(!notifications || notifications.length === 0) && (
-                <p className="text-gray-500 text-center py-4">
-                  No notifications found
-                </p>
+
+                {/* Override Controls */}
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                  <div className="flex items-start gap-2">
+                    <AlertTriangle className="h-4 w-4 text-yellow-600 mt-0.5 flex-shrink-0" />
+                    <div>
+                      <p className="font-medium text-yellow-900 text-sm mb-1">Notification Override</p>
+                      <p className="text-xs text-yellow-800">
+                        Compliance officers can disable notifications for specific regulations when appropriate. 
+                        Override controls are available on individual regulation pages.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* No Configuration Needed */}
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-center">
+                  <p className="text-sm text-gray-600">
+                    <strong>Automatic System:</strong> Monitors compliance deadlines and sends targeted notifications 
+                    based on your role and urgency. Officers can override notifications per regulation as needed.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
+
+          {/* Filter and Stats Bar */}
+          <div className="flex items-center justify-between mb-6 p-4 bg-white rounded-lg border">
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <Filter className="h-4 w-4 text-gray-500" />
+                <span className="text-sm font-medium text-gray-700">Filter:</span>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value as any)}
+                  className="border border-gray-300 rounded-md px-3 py-1 text-sm"
+                >
+                  <option value="all">All Notifications</option>
+                  <option value="sent">Sent Only</option>
+                  <option value="pending">Pending Only</option>
+                  <option value="failed">Failed Only</option>
+                </select>
+              </div>
+            </div>
+            
+            <div className="text-sm text-gray-600">
+              {notificationHistory ? (
+                <>Showing {notificationHistory.notifications.length} of {notificationHistory.total} notifications</>
+              ) : (
+                'Loading...'
+              )}
+            </div>
+          </div>
+
+          <Card className="shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-xl font-semibold">Notification History</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              {isLoading ? (
+                <div className="p-8 text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
+                  <p className="text-gray-500">Loading notification history...</p>
+                </div>
+              ) : !notificationHistory?.notifications.length ? (
+                <div className="p-8 text-center">
+                  <Bell className="h-12 w-12 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500 text-lg mb-2">No notifications found</p>
+                  <p className="text-gray-400 text-sm">
+                    {statusFilter === 'all' 
+                      ? 'No notifications have been sent yet.' 
+                      : `No ${statusFilter} notifications found.`}
+                  </p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50 border-b">
+                      <tr>
+                        <th className="px-6 py-3 text-left">
+                          <button
+                            onClick={() => handleSort('type')}
+                            className="flex items-center gap-2 text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700"
+                          >
+                            Notification
+                            {getSortIcon('type')}
+                          </button>
+                        </th>
+                        <th className="px-6 py-3 text-left">
+                          <button
+                            onClick={() => handleSort('status')}
+                            className="flex items-center gap-2 text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700"
+                          >
+                            Status
+                            {getSortIcon('status')}
+                          </button>
+                        </th>
+                        <th className="px-6 py-3 text-left">
+                          <button
+                            onClick={() => handleSort('priority')}
+                            className="flex items-center gap-2 text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700"
+                          >
+                            Priority
+                            {getSortIcon('priority')}
+                          </button>
+                        </th>
+                        <th className="px-6 py-3 text-left">
+                          <button
+                            onClick={() => handleSort('createdAt')}
+                            className="flex items-center gap-2 text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700"
+                          >
+                            Created
+                            {getSortIcon('createdAt')}
+                          </button>
+                        </th>
+                        <th className="px-6 py-3 text-left">
+                          <button
+                            onClick={() => handleSort('sentAt')}
+                            className="flex items-center gap-2 text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700"
+                          >
+                            Sent
+                            {getSortIcon('sentAt')}
+                          </button>
+                        </th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          Recipient
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-white divide-y divide-gray-200">
+                      {notificationHistory.notifications.map((notification) => (
+                        <tr key={notification.id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4">
+                            <div className="max-w-xs">
+                              <p className="text-sm font-medium text-gray-900 truncate">
+                                {getNotificationTitle(notification)}
+                              </p>
+                              <p className="text-sm text-gray-500 truncate">
+                                {getNotificationDescription(notification)}
+                              </p>
+                              {notification.regulation && (
+                                <p className="text-xs text-blue-600 mt-1">
+                                  {notification.regulation.category}
+                                </p>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            {getStatusBadge(notification.status)}
+                            {notification.retryCount > 0 && (
+                              <p className="text-xs text-gray-500 mt-1">
+                                Retries: {notification.retryCount}
+                              </p>
+                            )}
+                          </td>
+                          <td className="px-6 py-4">
+                            {getPriorityBadge(notification.priority)}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-900">
+                            {format(new Date(notification.createdAt), 'MMM d, yyyy')}
+                            <br />
+                            <span className="text-xs text-gray-500">
+                              {format(new Date(notification.createdAt), 'h:mm a')}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-900">
+                            {notification.sentAt ? (
+                              <>
+                                {format(new Date(notification.sentAt), 'MMM d, yyyy')}
+                                <br />
+                                <span className="text-xs text-gray-500">
+                                  {format(new Date(notification.sentAt), 'h:mm a')}
+                                </span>
+                              </>
+                            ) : (
+                              <span className="text-gray-400">Not sent</span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 text-sm text-gray-900">
+                            {notification.user ? (
+                              <>
+                                <p className="font-medium">
+                                  {notification.user.firstName} {notification.user.lastName}
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                  {notification.user.email}
+                                </p>
+                              </>
+                            ) : (
+                              <span className="text-gray-400">System</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               )}
             </CardContent>
           </Card>
         </div>
       </main>
+
+      {/* Create Notification Modal */}
+      <CreateNotificationModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+      />
     </div>
   );
 }

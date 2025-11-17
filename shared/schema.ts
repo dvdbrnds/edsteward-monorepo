@@ -245,6 +245,11 @@ export const regulations = pgTable("regulations", {
   submissionGuideUrl: text("submission_guide_url"),
   formsUrl: text("forms_url"),
   submissionGuidelines: text("submission_guidelines"),
+  // Notification override fields
+  notificationsDisabled: boolean("notifications_disabled").notNull().default(false),
+  notificationsDisabledBy: integer("notifications_disabled_by").references(() => users.id),
+  notificationsDisabledAt: timestamp("notifications_disabled_at"),
+  notificationsDisabledReason: text("notifications_disabled_reason"),
   regulationText: text("regulation_text"),
   applicableforms: jsonb("applicable_forms").$type<string[]>(),
   relatedRegulations: jsonb("related_regulations").$type<string[]>(),
@@ -550,7 +555,9 @@ export const regulationUpdates = pgTable("regulation_updates", {
   name: text("name").notNull(),
   originalContent: text("original_content").notNull(),
   updatedContent: text("updated_content").notNull(),
-  requirements: text("requirements"), // New field for AI-generated requirements
+  requirements: text("requirements"), // AI-generated compliance requirements
+  summary: text("summary"), // Brief summary of the regulation
+  filingDeadlines: text("filing_deadlines"), // Deadlines for filing/reporting
   status: text("status").notNull().default("pending"),
   updateDate: timestamp("update_date").notNull().defaultNow(),
   signature: text("signature"),

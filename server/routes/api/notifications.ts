@@ -1,5 +1,5 @@
 import express from 'express';
-import { storage } from '../../storage';
+// Removed unused storage import - using getDatabaseStorage() directly
 import { syslog, LogLevel, LogFacility } from '../../services/syslog';
 import { getDatabaseStorage } from '../../services/database';
 

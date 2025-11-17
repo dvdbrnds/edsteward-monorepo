@@ -20,6 +20,9 @@ import regulationsRouter from './api/regulations';
 import notesRouter from './api/notes';
 import deadlinesRouter from './api/deadlines';
 import notificationsRouter from './api/notifications';
+import notificationHistoryRouter from './api/notification-history';
+import regulationNotificationsRouter from './api/regulation-notifications';
+import usersRouter from './api/users';
 import mfaRouter from './api/mfa';
 import auditRouter from './api/audit';
 
@@ -409,6 +412,9 @@ export function registerRoutes(app: express.Application): Server {
   app.use('/api/notes', notesRouter);
   app.use('/api/deadlines', deadlinesRouter);
   app.use('/api/notifications', notificationsRouter);
+  app.use('/api/notification-history', notificationHistoryRouter);
+  app.use('/api/regulation-notifications', regulationNotificationsRouter);
+  app.use('/api/users', usersRouter);
   app.use('/api/mfa', mfaRouter); // Multi-Factor Authentication for local accounts
   app.use('/api/audit', auditRouter); // Audit trail for compliance tracking
 
@@ -474,7 +480,8 @@ export function registerRoutes(app: express.Application): Server {
   // Admin institution configuration endpoint (for admin dashboard) - Only available on admin.edsteward.ai
   app.get('/api/admin/institution-config', (req, res) => {
     const hostname = req.get('host') || '';
-    if (!hostname.startsWith('admin.')) {
+    // Allow localhost for development
+    if (!hostname.startsWith('admin.') && !hostname.startsWith('localhost')) {
       return res.status(403).json({ error: 'Admin endpoints not available on this tenant' });
     }
     // Read environment variables dynamically for true customer isolation
@@ -1301,14 +1308,7 @@ export function registerRoutes(app: express.Application): Server {
     });
   });
 
-  // Register modular API routes
-  app.use('/api/uploads', uploadsRoutes);
-  app.use('/api/regulations', regulationsRouter);
-  app.use('/api/notes', notesRouter);
-  app.use('/api/deadlines', deadlinesRouter);
-  app.use('/api/notifications', notificationsRouter);
-  app.use('/api/mfa', mfaRouter);
-  app.use('/api/audit', auditRouter);
+  // Additional modular API routes are already registered above
 
   // Setup additional APIs
   setupRegulationUpdatesApi(app as any);

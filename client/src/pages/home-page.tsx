@@ -28,8 +28,21 @@ export default function HomePage() {
     }
   }, [user, setLocation]);
 
-  const { data: notifications, isLoading: notificationsLoading } = useQuery<Notification[]>({
-    queryKey: ["/api/notifications", "v2"],
+  const { data: notificationHistory, isLoading: notificationsLoading } = useQuery<{
+    notifications: Array<{
+      id: number;
+      type: string;
+      status: string;
+      priority: string;
+      content: any;
+      createdAt: string;
+      sentAt: string | null;
+      regulation: { id: number; name: string; category: string } | null;
+      user: { id: number; firstName: string; lastName: string; email: string } | null;
+    }>;
+    total: number;
+  }>({
+    queryKey: ["/api/notification-history", { status: 'sent', limit: 10 }],
   });
 
 
@@ -74,25 +87,57 @@ export default function HomePage() {
                 <div className="space-y-2 max-h-[515px] overflow-y-auto pr-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400 px-6 pb-4">
                   {notificationsLoading ? (
                     <p className="text-gray-500 text-center py-4">Loading notifications...</p>
-                  ) : Array.isArray(notifications) && notifications.length > 0 ? (
-                    notifications.map((notification) => (
+                  ) : notificationHistory?.notifications && notificationHistory.notifications.length > 0 ? (
+                    notificationHistory.notifications.map((notification) => (
                       <div
                         key={notification.id}
-                        className="flex items-center justify-between p-3 border rounded-lg"
+                        className="p-3 border rounded-lg hover:bg-gray-50"
                       >
-                        <div className="flex items-center gap-3">
-                          {notification.enabled ? (
-                            <CheckCircle className="h-5 w-5 text-green-500" />
-                          ) : (
-                            <XCircle className="h-5 w-5 text-red-500" />
-                          )}
-                          <div>
-                            <p className="font-medium">
-                              {notification.type === 'email' ? 'Email' : 'SMS'} Notification
-                            </p>
-                            <p className="text-sm text-gray-500">
-                              Frequency: {notification.frequency}
-                            </p>
+                        <div className="flex items-start gap-3">
+                          <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
+                          <div className="flex-1 min-w-0 space-y-1">
+                            <div className="flex items-start justify-between gap-2">
+                              <p className="font-medium text-sm leading-tight overflow-hidden" style={{
+                                display: '-webkit-box',
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: 'vertical'
+                              }}>
+                                {notification.regulation 
+                                  ? (
+                                    <>
+                                      <span className="text-blue-600">
+                                        {notification.type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}:
+                                      </span>
+                                      <span className="ml-1">
+                                        {notification.regulation.name.length > 60 
+                                          ? `${notification.regulation.name.substring(0, 60)}...`
+                                          : notification.regulation.name
+                                        }
+                                      </span>
+                                    </>
+                                  )
+                                  : notification.type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())
+                                }
+                              </p>
+                              {notification.priority === 'high' && (
+                                <span className="text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full font-medium flex-shrink-0">
+                                  High Priority
+                                </span>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                              <span>
+                                {new Date(notification.sentAt || notification.createdAt).toLocaleDateString()}
+                              </span>
+                              {notification.regulation && (
+                                <>
+                                  <span>•</span>
+                                  <span className="text-blue-600 truncate max-w-[120px]">
+                                    {notification.regulation.category}
+                                  </span>
+                                </>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>

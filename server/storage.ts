@@ -56,7 +56,7 @@ import type {
 
 // Import RegulationUpdate type from schema
 import { regulationUpdates, type RegulationUpdate, type InsertRegulationUpdate } from "@shared/schema";
-import { db } from "./db";
+import { getDatabase } from "./services/database";
 import { eq, desc, or, like, sql } from "drizzle-orm";
 import { getDatabaseStorage } from "./services/database";
 import session from "express-session";
@@ -211,10 +211,13 @@ export interface IStorage {
 import { emailService } from './services/email';
 
 export class DatabaseStorage implements IStorage {
+  private get db() {
+    return getDatabase();
+  }
   // Regulation Update methods
   async getPendingRegulationUpdates(): Promise<RegulationUpdate[]> {
     try {
-      return await db.select().from(regulationUpdates)
+      return await this.db.select().from(regulationUpdates)
         .where(eq(regulationUpdates.status, "pending"))
         .orderBy(desc(regulationUpdates.updateDate));
     } catch (error) {
@@ -256,7 +259,7 @@ export class DatabaseStorage implements IStorage {
 
   async createRegulationUpdate(data: InsertRegulationUpdate): Promise<RegulationUpdate> {
     try {
-      const [newUpdate] = await db.insert(regulationUpdates).values(data).returning();
+      const [newUpdate] = await this.db.insert(regulationUpdates).values(data).returning();
       return newUpdate;
     } catch (error) {
       console.error("Error creating regulation update:", error);
@@ -273,7 +276,7 @@ export class DatabaseStorage implements IStorage {
       }
 
       // 2. Update the regulation with the new content
-      // Handle both regulation_text and requirements fields separately
+      // Handle regulation_text, requirements, summary, and deadlines
       const updateFields = [];
       const updateValues = [];
       let paramIndex = 1;
@@ -286,6 +289,18 @@ export class DatabaseStorage implements IStorage {
       if (update.requirements) {
         updateFields.push(`requirements = $${paramIndex++}`);
         updateValues.push(update.requirements);
+      }
+
+      // Update summary field if provided
+      if (update.summary) {
+        updateFields.push(`summary = $${paramIndex++}`);
+        updateValues.push(update.summary);
+      }
+
+      // Update filing_deadlines field if provided
+      if (update.filingDeadlines) {
+        updateFields.push(`filing_deadlines = $${paramIndex++}`);
+        updateValues.push(update.filingDeadlines);
       }
 
       // Always update last_updated timestamp
@@ -302,8 +317,43 @@ export class DatabaseStorage implements IStorage {
         updateValues
       );
 
-      // 3. Mark the update as accepted
-      await db.update(regulationUpdates)
+      // 3. Create a version record for this update
+      // Calculate next version number by finding the max version number for this regulation
+      const existingVersions = await this.db
+        .select({ versionNumber: regulationVersions.versionNumber })
+        .from(regulationVersions)
+        .where(eq(regulationVersions.regulationId, update.regulationId))
+        .orderBy(desc(regulationVersions.versionNumber))
+        .limit(1);
+      
+      const nextVersionNumber = existingVersions.length > 0 
+        ? (existingVersions[0].versionNumber + 1) 
+        : 1;
+      
+      console.log(`Creating version ${nextVersionNumber} for regulation ${update.regulationId}`);
+      
+      const changeSummary = `Updated via regulation update #${id}`;
+      const versionContent = JSON.stringify({
+        regulation_text: update.updatedContent,
+        requirements: update.requirements || null,
+        summary: update.summary || null,
+        filing_deadlines: update.filingDeadlines || null,
+        updated_by: userId,
+        update_id: id
+      });
+
+      await this.db.insert(regulationVersions).values({
+        regulationId: update.regulationId,
+        versionNumber: nextVersionNumber,
+        content: versionContent,
+        createdBy: userId,
+        source: 'regulation_update',
+        sourceId: id.toString(),
+        validationStatus: 'approved'
+      });
+
+      // 4. Mark the update as accepted
+      await this.db.update(regulationUpdates)
         .set({
           status: "accepted",
           signature,
@@ -320,7 +370,7 @@ export class DatabaseStorage implements IStorage {
 
   async rejectRegulationUpdate(id: number, userId: number, signature: string, reason: string): Promise<void> {
     try {
-      await db.update(regulationUpdates)
+      await this.db.update(regulationUpdates)
         .set({
           status: "rejected",
           signature,
@@ -337,7 +387,7 @@ export class DatabaseStorage implements IStorage {
 
   async deferRegulationUpdate(id: number, userId: number, signature: string): Promise<void> {
     try {
-      await db.update(regulationUpdates)
+      await this.db.update(regulationUpdates)
         .set({
           status: "deferred",
           signature,
@@ -376,7 +426,7 @@ export class DatabaseStorage implements IStorage {
 
   async getUser(id: number, _tenantId?: string): Promise<User | undefined> {
     try {
-      const [user] = await db.select().from(users).where(eq(users.id, id));
+      const [user] = await this.db.select().from(users).where(eq(users.id, id));
       return user;
     } catch (error) {
       console.error("Error in getUser:", error);
@@ -387,7 +437,7 @@ export class DatabaseStorage implements IStorage {
   async getUserByUsername(username: string, _tenantId?: string): Promise<User | undefined> {
     try {
       console.log(`Looking up user with username: ${username}`);
-      const [user] = await db.select().from(users).where(eq(users.username, username));
+      const [user] = await this.db.select().from(users).where(eq(users.username, username));
       console.log(`User lookup result:`, user ? `Found user with ID ${user.id}` : 'User not found');
       return user;
     } catch (error) {
@@ -399,7 +449,7 @@ export class DatabaseStorage implements IStorage {
   async getUserByEmail(email: string, _tenantId?: string): Promise<User | undefined> {
     try {
       console.log(`Looking up user with email: ${email}`);
-      const [user] = await db.select().from(users).where(eq(users.email, email));
+      const [user] = await this.db.select().from(users).where(eq(users.email, email));
       console.log(`User lookup result:`, user ? `Found user with ID ${user.id}` : 'User not found');
       return user;
     } catch (error) {
@@ -411,7 +461,7 @@ export class DatabaseStorage implements IStorage {
   async getUserByExternalId(externalId: string, _tenantId?: string): Promise<User | undefined> {
     try {
       console.log(`Looking up user with external ID: ${externalId}`);
-      const [user] = await db.select().from(users).where(eq(users.externalId, externalId));
+      const [user] = await this.db.select().from(users).where(eq(users.externalId, externalId));
       console.log(`User lookup result:`, user ? `Found user with ID ${user.id}` : 'User not found');
       return user;
     } catch (error) {
@@ -433,16 +483,16 @@ export class DatabaseStorage implements IStorage {
       password: insertUser.password || '' // Use empty string instead of null for database compatibility
     };
 
-    const [user] = await db.insert(users).values(userToCreate).returning();
+    const [user] = await this.db.insert(users).values(userToCreate).returning();
     return user;
   }
 
   async getAllUsers(_tenantId?: string): Promise<User[]> {
-    return await db.select().from(users);
+    return await this.db.select().from(users);
   }
 
   async updateUser(id: number, userData: Partial<InsertUser>, _tenantId?: string): Promise<User> {
-    const [user] = await db
+    const [user] = await this.db
       .update(users)
       .set(userData)
       .where(eq(users.id, id))
@@ -451,22 +501,57 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteUser(id: number, _tenantId?: string): Promise<void> {
-    await db.delete(users).where(eq(users.id, id));
+    await this.db.delete(users).where(eq(users.id, id));
   }
 
   async getRegulations(): Promise<Regulation[]> {
     try {
-      console.log("Fetching regulations from database...");
-      // Add more detailed logging
-      const result = await db
-        .select()
-        .from(regulations)
-        .orderBy(desc(regulations.lastUpdated));
+      console.log("🔍 [DEBUG] Fetching regulations from database...");
+      console.log("🔍 [DEBUG] Database connection status:", this.db ? "Connected" : "Not connected");
+      
+      // Temporary fix: Use raw SQL to bypass Drizzle column mapping issues
+      const result = await this.db.execute(sql`
+        SELECT * FROM regulations 
+        ORDER BY last_updated DESC 
+        LIMIT 1000
+      `);
+      
+      // Convert raw result to proper format
+      const formattedResult = result.rows.map((row: any) => ({
+        ...row,
+        jurisdictionSource: row.jurisdiction_source,
+        lastUpdated: row.last_updated,
+        lastVerified: row.last_verified,
+        nextReviewDate: row.next_review_date,
+        originationDate: row.origination_date,
+        effectiveDate: row.effective_date,
+        versionNumber: row.version_number,
+        previousVersionId: row.previous_version_id,
+        isApplicable: row.is_applicable,
+        applicableInstitutions: row.applicable_institutions,
+        filingDeadlines: row.filing_deadlines,
+        relatedRegulations: row.related_regulations,
+        notificationSchedule: row.notification_schedule,
+        notificationOverride: row.notification_override,
+        versionMetadata: row.version_metadata
+      }));
 
-      console.log(`Successfully fetched ${result.length} regulations from database`);
-      return result as Regulation[];
+      console.log(`✅ [DEBUG] Successfully fetched ${formattedResult.length} regulations from database`);
+      
+      if (formattedResult.length > 0) {
+        console.log("📝 [DEBUG] Sample regulation:", {
+          id: formattedResult[0].id,
+          name: formattedResult[0].name,
+          category: formattedResult[0].category
+        });
+      } else {
+        console.log("⚠️ [DEBUG] No regulations found in query result");
+      }
+      
+      return formattedResult as Regulation[];
     } catch (error) {
-      console.error("Error in getRegulations:", error);
+      console.error("❌ [DEBUG] Error in getRegulations:", error);
+      console.error("❌ [DEBUG] Error stack:", error.stack);
       // Return empty array instead of throwing to prevent frontend from getting stuck
       return [];
     }
@@ -474,12 +559,29 @@ export class DatabaseStorage implements IStorage {
 
   async getRegulation(id: number): Promise<Regulation | undefined> {
     // Use raw SQL query to ensure regulation_text is included
-    const result = await db.execute(sql`SELECT *, regulation_text FROM regulations WHERE id = ${id} LIMIT 1`);
+    const result = await this.db.execute(sql`SELECT *, regulation_text FROM regulations WHERE id = ${id} LIMIT 1`);
     const regulation = result.rows[0] as any;
     
     if (regulation) {
       // Map snake_case to camelCase for consistency
       regulation.regulationText = regulation.regulation_text;
+      
+      // Parse JSON fields that come back as strings from raw SQL
+      if (typeof regulation.actions === 'string') {
+        try {
+          regulation.actions = JSON.parse(regulation.actions);
+        } catch (e) {
+          regulation.actions = [];
+        }
+      }
+      
+      if (typeof regulation.sections === 'string') {
+        try {
+          regulation.sections = JSON.parse(regulation.sections);
+        } catch (e) {
+          regulation.sections = [];
+        }
+      }
     }
     
     return regulation as Regulation | undefined;
@@ -489,7 +591,7 @@ export class DatabaseStorage implements IStorage {
     try {
       console.log(`Looking up regulation with ID: ${regulationId}`);
       // First try to find by itemId (which is what the UI uses)
-      const results = await db.select()
+      const results = await this.db.select()
         .from(regulations)
         .where(eq(regulations.itemId, regulationId));
 
@@ -498,7 +600,7 @@ export class DatabaseStorage implements IStorage {
       }
 
       // Fallback to regular ID if itemId search fails
-      const fallbackResults = await db.select()
+      const fallbackResults = await this.db.select()
         .from(regulations)
         .where(eq(regulations.id, parseInt(regulationId, 10)));
 
@@ -511,7 +613,7 @@ export class DatabaseStorage implements IStorage {
 
   async createRegulation(regulation: InsertRegulation): Promise<Regulation> {
     console.log("Creating new regulation:", regulation);
-    const [newRegulation] = await db.insert(regulations).values(regulation).returning();
+    const [newRegulation] = await this.db.insert(regulations).values(regulation).returning();
     console.log("Created regulation:", newRegulation);
     return newRegulation as Regulation;
   }
@@ -533,7 +635,7 @@ export class DatabaseStorage implements IStorage {
 
         // If there are other fields to update, do that separately
         if (Object.keys(otherFields).length > 0) {
-          await db.update(regulations)
+          await this.db.update(regulations)
             .set({
               ...otherFields,
               lastUpdated: new Date()
@@ -542,7 +644,7 @@ export class DatabaseStorage implements IStorage {
         }
 
         // Fetch and return the updated regulation
-        const results = await db.select().from(regulations).where(eq(regulations.id, id));
+        const results = await this.db.select().from(regulations).where(eq(regulations.id, id));
         if (results.length > 0) {
           return results[0] as Regulation;
         } else {
@@ -550,7 +652,7 @@ export class DatabaseStorage implements IStorage {
         }
       } else {
         // No requirements field, regular update
-        const [updatedRegulation] = await db
+        const [updatedRegulation] = await this.db
           .update(regulations)
           .set({
             ...regulation,
@@ -570,7 +672,7 @@ export class DatabaseStorage implements IStorage {
 
   async setRegulationApplicability(id: number, isApplicable: boolean): Promise<Regulation> {
     console.log(`Setting regulation ${id} applicability to: ${isApplicable}`);
-    const [updatedRegulation] = await db
+    const [updatedRegulation] = await this.db
       .update(regulations)
       .set({
         isApplicable,
@@ -584,7 +686,7 @@ export class DatabaseStorage implements IStorage {
 
   async getRegulationsByJurisdiction(jurisdiction: string): Promise<Regulation[]> {
     console.log(`Fetching regulations with jurisdiction: ${jurisdiction}`);
-    const result = await db
+    const result = await this.db
       .select()
       .from(regulations)
       .where(eq(regulations.jurisdictionSource, jurisdiction));
@@ -594,7 +696,7 @@ export class DatabaseStorage implements IStorage {
 
   async getRegulationsByJurisdictionSource(jurisdictionSource: string): Promise<Regulation[]> {
     console.log(`Fetching regulations with jurisdiction source: ${jurisdictionSource}`);
-    const result = await db
+    const result = await this.db
       .select()
       .from(regulations)
       .where(eq(regulations.jurisdictionSource, jurisdictionSource));
@@ -625,7 +727,7 @@ export class DatabaseStorage implements IStorage {
   async searchRegulations(searchTerm: string): Promise<Regulation[]> {
     try {
       console.log(`Searching for regulations with term: ${searchTerm}`);
-      const results = await db.select()
+      const results = await this.db.select()
         .from(regulations)
         .where(
           or(
@@ -643,25 +745,25 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteRegulation(id: number): Promise<void> {
-    await db.delete(regulations).where(eq(regulations.id, id));
+    await this.db.delete(regulations).where(eq(regulations.id, id));
   }
 
   async getNotificationsByUser(userId: number): Promise<Notification[]> {
-    return await db
+    return await this.db
       .select()
       .from(notifications)
       .where(eq(notifications.userId, userId));
   }
 
   async getAllNotifications(): Promise<Notification[]> {
-    return await db
+    return await this.db
       .select()
       .from(notifications)
       .orderBy(notifications.id);
   }
 
   async createNotification(notification: InsertNotification): Promise<Notification> {
-    const [newNotification] = await db
+    const [newNotification] = await this.db
       .insert(notifications)
       .values(notification)
       .returning();
@@ -681,23 +783,23 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getDeadlines(): Promise<Deadline[]> {
-    return await db.select().from(deadlines);
+    return await this.db.select().from(deadlines);
   }
 
   async getAllIncompleteDeadlines(): Promise<Deadline[]> {
-    return await db
+    return await this.db
       .select()
       .from(deadlines)
       .where(eq(deadlines.status, "pending"));
   }
 
   async createDeadline(deadline: InsertDeadline): Promise<Deadline> {
-    const [newDeadline] = await db.insert(deadlines).values(deadline).returning();
+    const [newDeadline] = await this.db.insert(deadlines).values(deadline).returning();
     return newDeadline;
   }
 
   async updateDeadline(id: number, deadlineData: Partial<InsertDeadline>): Promise<Deadline> {
-    const [updatedDeadline] = await db
+    const [updatedDeadline] = await this.db
       .update(deadlines)
       .set(deadlineData)
       .where(eq(deadlines.id, id))
@@ -706,32 +808,32 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteDeadline(id: number): Promise<void> {
-    await db.delete(deadlines).where(eq(deadlines.id, id));
+    await this.db.delete(deadlines).where(eq(deadlines.id, id));
   }
 
   async getGuides(): Promise<Guide[]> {
-    return await db.select().from(guides);
+    return await this.db.select().from(guides);
   }
 
   async getGuidesByCategory(category: string): Promise<Guide[]> {
-    return await db
+    return await this.db
       .select()
       .from(guides)
       .where(eq(guides.category, category));
   }
 
   async getGuide(id: number): Promise<Guide | undefined> {
-    const [guide] = await db.select().from(guides).where(eq(guides.id, id));
+    const [guide] = await this.db.select().from(guides).where(eq(guides.id, id));
     return guide;
   }
 
   async createGuide(guide: InsertGuide): Promise<Guide> {
-    const [newGuide] = await db.insert(guides).values(guide).returning();
+    const [newGuide] = await this.db.insert(guides).values(guide).returning();
     return newGuide;
   }
 
   async updateGuide(id: number, guide: Partial<InsertGuide>): Promise<Guide> {
-    const [updatedGuide] = await db
+    const [updatedGuide] = await this.db
       .update(guides)
       .set(guide)
       .where(eq(guides.id, id))
@@ -740,7 +842,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async hasAdmin(): Promise<boolean> {
-    const [adminUser] = await db
+    const [adminUser] = await this.db
       .select()
       .from(users)
       .where(eq(users.role, "admin"))
@@ -749,11 +851,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getCsvSchemas(): Promise<CsvSchema[]> {
-    return await db.select().from(csvSchemas);
+    return await this.db.select().from(csvSchemas);
   }
 
   async getCsvSchema(id: number): Promise<CsvSchema | undefined> {
-    const [schema] = await db
+    const [schema] = await this.db
       .select()
       .from(csvSchemas)
       .where(eq(csvSchemas.id, id));
@@ -761,7 +863,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createCsvSchema(schema: InsertCsvSchema): Promise<CsvSchema> {
-    const [newSchema] = await db
+    const [newSchema] = await this.db
       .insert(csvSchemas)
       .values(schema)
       .returning();
@@ -769,14 +871,14 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getValidationRules(schemaId: number): Promise<ValidationRule[]> {
-    return await db
+    return await this.db
       .select()
       .from(validationRules)
       .where(eq(validationRules.schemaId, schemaId));
   }
 
   async createValidationRule(rule: InsertValidationRule): Promise<ValidationRule> {
-    const [newRule] = await db
+    const [newRule] = await this.db
       .insert(validationRules)
       .values(rule)
       .returning();
@@ -784,7 +886,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createFieldMapping(mapping: InsertFieldMapping): Promise<FieldMapping> {
-    const [newMapping] = await db
+    const [newMapping] = await this.db
       .insert(fieldMappings)
       .values(mapping)
       .returning();
@@ -792,7 +894,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getNotesByRegulation(regulationId: number): Promise<Note[]> {
-    return await db
+    return await this.db
       .select()
       .from(notes)
       .where(eq(notes.regulationId, regulationId))
@@ -800,7 +902,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getNotesByUser(userId: number): Promise<Note[]> {
-    return await db
+    return await this.db
       .select()
       .from(notes)
       .where(eq(notes.userId, userId))
@@ -808,7 +910,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getNote(id: number): Promise<Note | null> {
-    const result = await db
+    const result = await this.db
       .select()
       .from(notes)
       .where(eq(notes.id, id))
@@ -817,7 +919,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createNote(note: InsertNote): Promise<Note> {
-    const [newNote] = await db
+    const [newNote] = await this.db
       .insert(notes)
       .values(note)
       .returning();
@@ -832,7 +934,7 @@ export class DatabaseStorage implements IStorage {
     }
 
     // Update the note
-    const [updatedNote] = await db
+    const [updatedNote] = await this.db
       .update(notes)
       .set({
         ...noteData,
@@ -862,11 +964,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteNote(id: number): Promise<void> {
-    await db.delete(notes).where(eq(notes.id, id));
+    await this.db.delete(notes).where(eq(notes.id, id));
   }
 
   async createNoteHistory(history: InsertNoteHistory): Promise<NoteHistory> {
-    const [noteHistoryRecord] = await db
+    const [noteHistoryRecord] = await this.db
       .insert(noteHistory)
       .values(history)
       .returning();
@@ -874,7 +976,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getNoteHistory(noteId: number): Promise<NoteHistory[]> {
-    return await db
+    return await this.db
       .select({
         id: noteHistory.id,
         noteId: noteHistory.noteId,
@@ -905,7 +1007,7 @@ export class DatabaseStorage implements IStorage {
   async createEvidenceFile(file: InsertEvidenceFile): Promise<EvidenceFile> {
     try {
       console.log("Creating new evidence file:", file);
-      const [evidenceFile] = await db
+      const [evidenceFile] = await this.db
         .insert(evidenceFiles)
         .values(file)
         .returning();
@@ -922,7 +1024,7 @@ export class DatabaseStorage implements IStorage {
     try {
       console.log(`Fetching evidence files for regulation ${regulationId}`);
       // First, get the evidence files
-      const files = await db
+      const files = await this.db
         .select()
         .from(evidenceFiles)
         .where(eq(evidenceFiles.regulationId, regulationId))
@@ -958,7 +1060,7 @@ export class DatabaseStorage implements IStorage {
 
   async getEvidenceFile(id: number): Promise<EvidenceFile | undefined> {
     try {
-      const [file] = await db
+      const [file] = await this.db
         .select()
         .from(evidenceFiles)
         .where(eq(evidenceFiles.id, id));
@@ -971,7 +1073,7 @@ export class DatabaseStorage implements IStorage {
 
   async updateEvidenceFileStatus(id: number, status: string): Promise<EvidenceFile> {
     try {
-      const [file] = await db
+      const [file] = await this.db
         .update(evidenceFiles)
         .set({ status })
         .where(eq(evidenceFiles.id, id))
@@ -989,7 +1091,7 @@ export class DatabaseStorage implements IStorage {
 
   async getRegulationVersions(regulationId: number): Promise<RegulationVersion[]> {
     try {
-      const versions = await db
+      const versions = await this.db
         .select()
         .from(regulationVersions)
         .where(eq(regulationVersions.regulationId, regulationId))
@@ -1004,7 +1106,7 @@ export class DatabaseStorage implements IStorage {
 
   async getRegulationVersion(id: number): Promise<RegulationVersion | null> {
     try {
-      const [version] = await db
+      const [version] = await this.db
         .select()
         .from(regulationVersions)
         .where(eq(regulationVersions.id, id));
@@ -1018,7 +1120,7 @@ export class DatabaseStorage implements IStorage {
 
   async createRegulationVersion(version: InsertRegulationVersion): Promise<RegulationVersion> {
     try {
-      const [newVersion] = await db
+      const [newVersion] = await this.db
         .insert(regulationVersions)
         .values(version)
         .returning();
@@ -1212,7 +1314,7 @@ export class DatabaseStorage implements IStorage {
 
   async getLatestRegulationVersion(regulationId: number): Promise<RegulationVersion | null> {
     try {
-      const [latestVersion] = await db
+      const [latestVersion] = await this.db
         .select()
         .from(regulationVersions)
         .where(eq(regulationVersions.regulationId, regulationId))
@@ -1317,7 +1419,7 @@ export class DatabaseStorage implements IStorage {
 
   async createValidationStatus(status: InsertValidationStatus): Promise<ValidationStatus> {
     try {
-      const [newStatus] = await db
+      const [newStatus] = await this.db
         .insert(validationStatus)
         .values(status)
         .returning();
@@ -1331,7 +1433,7 @@ export class DatabaseStorage implements IStorage {
 
   async updateValidationStatus(id: number, status: Partial<InsertValidationStatus>): Promise<ValidationStatus> {
     try {
-      const [updatedStatus] = await db
+      const [updatedStatus] = await this.db
         .update(validationStatus)
         .set(status)
         .where(eq(validationStatus.id, id))
@@ -1395,7 +1497,7 @@ export class DatabaseStorage implements IStorage {
 
   async getSyncControl(regulationId: number): Promise<SyncControl | null> {
     try {
-      const [control] = await db
+      const [control] = await this.db
         .select()
         .from(syncControl)
         .where(eq(syncControl.regulationId, regulationId));
@@ -1409,7 +1511,7 @@ export class DatabaseStorage implements IStorage {
 
   async createSyncControl(control: InsertSyncControl): Promise<SyncControl> {
     try {
-      const [newControl] = await db
+      const [newControl] = await this.db
         .insert(syncControl)
         .values(control)
         .returning();
@@ -1423,7 +1525,7 @@ export class DatabaseStorage implements IStorage {
 
   async updateSyncControl(id: number, control: Partial<InsertSyncControl>): Promise<SyncControl> {
     try {
-      const [updatedControl] = await db
+      const [updatedControl] = await this.db
         .update(syncControl)
         .set({
           ...control,
@@ -1518,7 +1620,7 @@ export class DatabaseStorage implements IStorage {
 
   async getNotificationQueue(status?: 'pending' | 'sent' | 'failed'): Promise<NotificationQueue[]> {
     try {
-      let query = db.select().from(notificationQueue);
+      let query = this.db.select().from(notificationQueue);
 
       if (status) {
         query = query.where(eq(notificationQueue.status, status));
@@ -1533,7 +1635,7 @@ export class DatabaseStorage implements IStorage {
 
   async createNotificationQueueItem(item: InsertNotificationQueue): Promise<NotificationQueue> {
     try {
-      const [newItem] = await db
+      const [newItem] = await this.db
         .insert(notificationQueue)
         .values(item)
         .returning();
@@ -1547,7 +1649,7 @@ export class DatabaseStorage implements IStorage {
 
   async updateNotificationQueueItem(id: number, item: Partial<InsertNotificationQueue>): Promise<NotificationQueue> {
     try {
-      const [updatedItem] = await db
+      const [updatedItem] = await this.db
         .update(notificationQueue)
         .set(item)
         .where(eq(notificationQueue.id, id))
@@ -1562,7 +1664,7 @@ export class DatabaseStorage implements IStorage {
 
   async markNotificationAsSent(id: number): Promise<NotificationQueue> {
     try {
-      const [updatedItem] = await db
+      const [updatedItem] = await this.db
         .update(notificationQueue)
         .set({
           status: 'sent',
@@ -1584,7 +1686,7 @@ export class DatabaseStorage implements IStorage {
 
   async getVersionConflicts(status?: 'pending' | 'resolved' | 'rejected'): Promise<VersionConflict[]> {
     try {
-      let query = db.select().from(versionConflicts);
+      let query = this.db.select().from(versionConflicts);
 
       if (status) {
         query = query.where(eq(versionConflicts.status, status));
@@ -1599,7 +1701,7 @@ export class DatabaseStorage implements IStorage {
 
   async getVersionConflictsForRegulation(regulationId: number): Promise<VersionConflict[]> {
     try {
-      return await db
+      return await this.db
         .select()
         .from(versionConflicts)
         .where(eq(versionConflicts.regulationId, regulationId))
@@ -1612,7 +1714,7 @@ export class DatabaseStorage implements IStorage {
 
   async createVersionConflict(conflict: InsertVersionConflict): Promise<VersionConflict> {
     try {
-      const [newConflict] = await db
+      const [newConflict] = await this.db
         .insert(versionConflicts)
         .values(conflict)
         .returning();
@@ -1635,7 +1737,7 @@ export class DatabaseStorage implements IStorage {
         resolvedAt: now
       }));
 
-      const [updatedConflict] = await db
+      const [updatedConflict] = await this.db
         .update(versionConflicts)
         .set({
           conflicts: resolvedConflicts,
@@ -1655,7 +1757,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async rejectVersionConflict(id: number, userId: number): Promise<VersionConflict> {
-    const [versionConflict] = await db
+    const [versionConflict] = await this.db
       .update(versionConflicts)
       .set({
         status: 'rejected' as const,
@@ -1827,21 +1929,21 @@ export class DatabaseStorage implements IStorage {
 
   // Notification methods
   async getNotificationsByUser(userId: number): Promise<Notification[]> {
-    return await db
+    return await this.db
       .select()
       .from(notifications)
       .where(eq(notifications.userId, userId));
   }
 
   async getAllNotifications(): Promise<Notification[]> {
-    return await db
+    return await this.db
       .select()
       .from(notifications)
       .orderBy(notifications.id);
   }
 
   async createNotification(notification: InsertNotification): Promise<Notification> {
-    const [result] = await db
+    const [result] = await this.db
       .insert(notifications)
       .values(notification)
       .returning();
@@ -1849,7 +1951,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateNotification(id: number, updates: Partial<Notification>): Promise<Notification> {
-    const [result] = await db
+    const [result] = await this.db
       .update(notifications)
       .set(updates)
       .where(eq(notifications.id, id))
@@ -1858,7 +1960,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async deleteNotification(id: number): Promise<void> {
-    await db
+    await this.db
       .delete(notifications)
       .where(eq(notifications.id, id));
   }

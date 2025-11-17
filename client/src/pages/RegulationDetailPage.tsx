@@ -147,6 +147,7 @@ import DeadlineForm from "@/components/regulations/deadline-form";
 import { CommunicationDialog } from "@/components/regulations/communication-dialog";
 import { SubmissionWizard } from "@/components/regulations/submission-wizard";
 import { EvidenceFiles } from "@/components/regulations/evidence-files";
+import { NotificationOverrideControl } from "@/components/regulations/notification-override-control";
 import { useAuth } from "@/hooks/use-auth";
 
 const CATEGORIES = [
@@ -324,11 +325,18 @@ function RegulationDetailPage() {
           headers: {
             "Content-Type": "application/json",
           },
+          credentials: 'include',
           body: JSON.stringify(action),
         }
       );
       if (!response.ok) {
-        throw new Error("Failed to update action");
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Action update failed:', {
+          status: response.status,
+          statusText: response.statusText,
+          errorData
+        });
+        throw new Error(errorData.error || errorData.message || "Failed to update action");
       }
       return response.json();
     },
@@ -572,21 +580,21 @@ function RegulationDetailPage() {
                     </Button>
                     {isAdmin && (
                       <>
-                        <Button
-                          variant="default"
-                          size="sm"
-                          onClick={() => {
-                            // Scroll to the enhanced timeline section
-                            const timelineElement = document.querySelector('[data-testid="enhanced-timeline"]');
-                            if (timelineElement) {
-                              timelineElement.scrollIntoView({ behavior: 'smooth' });
-                            }
-                          }}
-                          className="bg-yellow-600 hover:bg-yellow-700 text-white"
-                        >
-                          <History className="h-4 w-4 mr-2" />
-                          View Timeline
-                        </Button>
+                      <Button
+                        variant="default"
+                        size="sm"
+                        onClick={() => {
+                          // Scroll to the enhanced timeline section
+                          const timelineElement = document.querySelector('[data-testid="enhanced-timeline"]');
+                          if (timelineElement) {
+                            timelineElement.scrollIntoView({ behavior: 'smooth' });
+                          }
+                        }}
+                        className="bg-yellow-600 hover:bg-yellow-700 text-white"
+                      >
+                        <History className="h-4 w-4 mr-2" />
+                        View Timeline
+                      </Button>
                         <Button
                           variant="outline"
                           size="sm"
@@ -644,8 +652,8 @@ function RegulationDetailPage() {
                 {regulation.name || regulation.topic}
               </h1>
               <div className="flex items-center space-x-2 text-sm text-gray-500">
-                <span className="px-2 py-1 bg-gray-100 rounded">
-                  ID: {regulation.itemId}
+                <span className="px-3 py-1 bg-gray-100 rounded-md font-medium">
+                  ID: {regulation.itemId || regulation.item_id || regulation.id || 'N/A'}
                 </span>
                 {categoryVisible ? (
                   <Select
@@ -711,22 +719,6 @@ function RegulationDetailPage() {
                 <Mail className="h-4 w-4" />
                 Contact Compliance Office
               </Button>
-            </div>
-
-            {/* Enhanced Timeline for Admins, Basic Timeline for Users */}
-            <div className="mb-6">
-              {isAdmin ? (
-                <div data-testid="enhanced-timeline">
-                  <EnhancedRegulationTimeline regulation={regulation} />
-                </div>
-              ) : (
-                <div className="border-4 border-yellow-500 p-4 rounded">
-                  <div className="bg-yellow-100 border border-yellow-300 rounded p-4 mb-4 text-lg font-bold">
-                    📋 Regular User - Basic Timeline
-                  </div>
-                  <RegulationTimeline regulation={regulation} />
-                </div>
-              )}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -807,6 +799,20 @@ function RegulationDetailPage() {
                   </CardContent>
                 </Card>
 
+                {/* Enhanced Timeline for Admins, Basic Timeline for Users */}
+                {isAdmin ? (
+                  <div data-testid="enhanced-timeline">
+                    <EnhancedRegulationTimeline regulation={regulation} />
+                  </div>
+                ) : (
+                  <div className="border-4 border-yellow-500 p-4 rounded">
+                    <div className="bg-yellow-100 border border-yellow-300 rounded p-4 mb-4 text-lg font-bold">
+                      📋 Regular User - Basic Timeline
+                    </div>
+                    <RegulationTimeline regulation={regulation} />
+                  </div>
+                )}
+
                 {/* Submission Guidelines Card */}
                 <Card>
                   <CardHeader>
@@ -854,166 +860,11 @@ function RegulationDetailPage() {
                         </div>
                       )}
                       
-                      {/* Notification Override Section - Admin only */}
-                      {notificationOverrideVisible && (
-                        <div className="pt-4 pb-4 border-2 border-[#5B2C8F] border-dashed rounded-md p-4 relative">
-                          <div className="absolute -top-2 -right-2 bg-[#5B2C8F] text-white text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
-                            <Shield className="h-3 w-3" />
-                            Admin
-                          </div>
-                          <h3 className="font-medium text-gray-900">Notification Override</h3>
-                          <p className="text-sm text-gray-500 mb-4">
-                            Set custom notification settings for this regulation. These settings will override the system defaults.
-                          </p>
-                          <Form {...overrideForm}>
-                            <form onSubmit={overrideForm.handleSubmit(data => overrideMutation.mutate(data))} className="space-y-4">
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <FormField
-                                  control={overrideForm.control}
-                                  name="email"
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel>Notification Email</FormLabel>
-                                      <FormControl>
-                                        <Input
-                                          placeholder="admin@example.com"
-                                          {...field}
-                                          className="w-full"
-                                        />
-                                      </FormControl>
-                                      <FormDescription>
-                                        Override default notification email
-                                      </FormDescription>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
-                                <FormField
-                                  control={overrideForm.control}
-                                  name="phone"
-                                  render={({ field }) => (
-                                    <FormItem>
-                                      <FormLabel>Notification Phone</FormLabel>
-                                      <FormControl>
-                                        <Input
-                                          placeholder="+12345678901"
-                                          {...field}
-                                          className="w-full"
-                                        />
-                                      </FormControl>
-                                      <FormDescription>
-                                        Override default notification phone
-                                      </FormDescription>
-                                      <FormMessage />
-                                    </FormItem>
-                                  )}
-                                />
-                              </div>
-                              
-                              <div className="pt-2">
-                                <h4 className="font-medium text-sm text-gray-900 mb-2">Notification Schedule</h4>
-                                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                  <FormField
-                                    control={overrideForm.control}
-                                    name="notificationSchedule.initialReminder"
-                                    render={({ field }) => (
-                                      <FormItem>
-                                        <FormLabel>Initial Reminder (days)</FormLabel>
-                                        <FormControl>
-                                          <Input
-                                            type="number"
-                                            min={1}
-                                            max={365}
-                                            {...field}
-                                            onChange={(e) => field.onChange(parseInt(e.target.value))}
-                                            className="w-full"
-                                          />
-                                        </FormControl>
-                                        <FormMessage />
-                                      </FormItem>
-                                    )}
-                                  />
-                                  <FormField
-                                    control={overrideForm.control}
-                                    name="notificationSchedule.weeklyReminder"
-                                    render={({ field }) => (
-                                      <FormItem>
-                                        <FormLabel>Weekly Reminder (days)</FormLabel>
-                                        <FormControl>
-                                          <Input
-                                            type="number"
-                                            min={1}
-                                            max={52}
-                                            {...field}
-                                            onChange={(e) => field.onChange(parseInt(e.target.value))}
-                                            className="w-full"
-                                          />
-                                        </FormControl>
-                                        <FormMessage />
-                                      </FormItem>
-                                    )}
-                                  />
-                                  <FormField
-                                    control={overrideForm.control}
-                                    name="notificationSchedule.dailyReminder"
-                                    render={({ field }) => (
-                                      <FormItem>
-                                        <FormLabel>Daily Reminder (days)</FormLabel>
-                                        <FormControl>
-                                          <Input
-                                            type="number"
-                                            min={1}
-                                            max={14}
-                                            {...field}
-                                            onChange={(e) => field.onChange(parseInt(e.target.value))}
-                                            className="w-full"
-                                          />
-                                        </FormControl>
-                                        <FormMessage />
-                                      </FormItem>
-                                    )}
-                                  />
-                                </div>
-                                <div className="mt-4">
-                                  <FormField
-                                    control={overrideForm.control}
-                                    name="notificationSchedule.finalDayReminders"
-                                    render={({ field }) => (
-                                      <FormItem className="flex flex-row items-center space-x-3 space-y-0">
-                                        <FormControl>
-                                          <Checkbox
-                                            checked={field.value}
-                                            onCheckedChange={field.onChange}
-                                          />
-                                        </FormControl>
-                                        <div className="space-y-1 leading-none">
-                                          <FormLabel>Enable Final Day Reminders</FormLabel>
-                                          <FormDescription>
-                                            Send additional reminders on the due date
-                                          </FormDescription>
-                                        </div>
-                                      </FormItem>
-                                    )}
-                                  />
-                                </div>
-                              </div>
-                              
-                              <div className="flex justify-end">
-                                <Button 
-                                  type="submit" 
-                                  disabled={overrideMutation.isPending}
-                                  className="flex items-center gap-2"
-                                >
-                                  {overrideMutation.isPending && (
-                                    <Loader2 className="h-4 w-4 animate-spin" />
-                                  )}
-                                  Save Notification Settings
-                                </Button>
-                              </div>
-                            </form>
-                          </Form>
-                        </div>
-                      )}
+                      {/* Notification Override Control */}
+                      <NotificationOverrideControl 
+                        regulationId={parseInt(regulationId)} 
+                        regulationName={regulation?.name || regulation?.topic || 'Unknown Regulation'} 
+                      />
 
                       <div>
                         <h3 className="font-medium text-gray-900">Statute</h3>
@@ -1225,8 +1076,8 @@ function RegulationDetailPage() {
                 {(() => {
                   const complianceStatus = calculateComplianceStatus(regulation.actions || [], regulationDeadlines);
                   return (
-                    <Card>
-                      <CardHeader>
+                <Card>
+                  <CardHeader>
                         <CardTitle className="flex items-center gap-2">
                           <span>Compliance Status</span>
                           <Badge 
@@ -1246,8 +1097,8 @@ function RegulationDetailPage() {
                              'Non-Compliant'}
                           </Badge>
                         </CardTitle>
-                      </CardHeader>
-                      <CardContent>
+                  </CardHeader>
+                  <CardContent>
                         <div className="space-y-4">
                           <div className={`p-4 rounded-lg border-l-4 ${
                             complianceStatus.color === 'red' ? 'bg-red-50 border-red-400' :
@@ -1292,8 +1143,8 @@ function RegulationDetailPage() {
                             </div>
                           </div>
                         </div>
-                      </CardContent>
-                    </Card>
+                  </CardContent>
+                </Card>
                   );
                 })()}
 
@@ -1301,7 +1152,7 @@ function RegulationDetailPage() {
                 <Card>
                   <CardHeader>
                     <div className="flex justify-between items-center">
-                      <CardTitle>Deadlines</CardTitle>
+                    <CardTitle>Deadlines</CardTitle>
                       {isAdmin && (
                         <Button
                           size="sm"
@@ -1323,40 +1174,40 @@ function RegulationDetailPage() {
                         >
                           {/* Main deadline info */}
                           <div className="flex items-start gap-3">
-                            <div
+                          <div
                               className={`p-2 rounded-full flex-shrink-0 ${
-                                deadline.status === "completed"
-                                  ? "bg-green-50"
-                                  : deadline.status === "overdue"
-                                  ? "bg-red-50"
-                                  : "bg-yellow-50"
-                              }`}
-                            >
-                              {deadline.status === "completed" ? (
-                                <CheckCircle className="h-5 w-5 text-green-500" />
-                              ) : deadline.status === "overdue" ? (
-                                <AlertCircle className="h-5 w-5 text-red-500" />
-                              ) : (
-                                <Clock className="h-5 w-5 text-yellow-500" />
-                              )}
-                            </div>
+                              deadline.status === "completed"
+                                ? "bg-green-50"
+                                : deadline.status === "overdue"
+                                ? "bg-red-50"
+                                : "bg-yellow-50"
+                            }`}
+                          >
+                            {deadline.status === "completed" ? (
+                              <CheckCircle className="h-5 w-5 text-green-500" />
+                            ) : deadline.status === "overdue" ? (
+                              <AlertCircle className="h-5 w-5 text-red-500" />
+                            ) : (
+                              <Clock className="h-5 w-5 text-yellow-500" />
+                            )}
+                          </div>
                             <div className="flex-1 min-w-0">
                               <p className="font-medium text-gray-900 break-words">
-                                Due: {format(new Date(deadline.dueDate), "PP")}
-                              </p>
-                              <span
+                              Due: {format(new Date(deadline.dueDate), "PP")}
+                            </p>
+                            <span
                                 className={`inline-block text-sm font-medium px-2 py-1 rounded-full mt-1 ${
-                                  deadline.status === "completed"
+                                deadline.status === "completed"
                                     ? "bg-green-100 text-green-700"
-                                    : deadline.status === "overdue"
+                                  : deadline.status === "overdue"
                                     ? "bg-red-100 text-red-700"
                                     : "bg-yellow-100 text-yellow-700"
-                                }`}
-                              >
-                                {deadline.status.charAt(0).toUpperCase() +
-                                  deadline.status.slice(1)}
-                              </span>
-                            </div>
+                              }`}
+                            >
+                              {deadline.status.charAt(0).toUpperCase() +
+                                deadline.status.slice(1)}
+                            </span>
+                          </div>
                           </div>
                           
                           {/* Action buttons */}
