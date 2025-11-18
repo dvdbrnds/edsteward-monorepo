@@ -10,6 +10,7 @@ import { Strategy as SamlStrategy } from '@node-saml/passport-saml';
 import { verifyPassword } from '../auth';  // Import our new scrypt-based function
 import { institutionConfig } from '../config/institution';
 import { getDatabaseStorage } from '../services/database';
+import { mapOktaGroupsToRoles, getHighestPriorityRole } from '../config/role-mapping';
 
 /**
  * Configure authentication strategies
@@ -83,6 +84,8 @@ export function configureAuth(app: Express): void {
         wantAuthnResponseSigned: true,
         validateInResponseTo: 'never', // Disable InResponseTo validation
         disableRequestedAuthnContext: true,
+        // Request groups attribute in SAML assertion
+        identifierFormat: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
       },
        
       async (profile: unknown, done: (error: unknown, user?: unknown, info?: unknown) => void) => {
@@ -91,12 +94,27 @@ export function configureAuth(app: Express): void {
           const samlProfile = profile as Record<string, unknown>;
           const email = samlProfile.email || samlProfile.nameID;
 
+          // Extract groups from SAML profile
+          let groups: string[] = [];
+          if (samlProfile.groups) {
+            groups = Array.isArray(samlProfile.groups) 
+              ? samlProfile.groups as string[] 
+              : [samlProfile.groups as string];
+          }
+
+          // Map Okta groups to EdSteward roles
+          const mappedRoles = mapOktaGroupsToRoles(groups);
+          const primaryRole = getHighestPriorityRole(mappedRoles);
+
           console.log('🔐 SAML Profile received:', {
             email: samlProfile.email,
             nameID: samlProfile.nameID,
             firstName: samlProfile.firstName,
             lastName: samlProfile.lastName,
-            displayName: samlProfile.displayName
+            displayName: samlProfile.displayName,
+            groups: groups,
+            mappedRoles: mappedRoles,
+            primaryRole: primaryRole
           });
 
           if (!email) {
@@ -112,16 +130,31 @@ export function configureAuth(app: Express): void {
           console.log('🔐 Environment AUTH_ALLOW_SELF_REGISTRATION:', process.env.AUTH_ALLOW_SELF_REGISTRATION);
 
           if (!user && institutionConfig.authentication.allowSelfRegistration) {
-            console.log('🔐 Creating new user via auto-provisioning...');
+            console.log('🔐 Creating new user via auto-provisioning with role:', primaryRole);
             user = await storage.createUser({
               email: email as string,
               username: email as string,
               firstName: (samlProfile.firstName || samlProfile.displayName || '') as string,
               lastName: (samlProfile.lastName || '') as string,
-              role: 'user',
+              role: primaryRole, // ✅ Now uses Okta group mapping!
+              roles: JSON.stringify(mappedRoles), // Store all roles
               externalId: samlProfile.nameID as string,
+              identityProvider: 'saml',
             }, undefined);
-            console.log('🔐 New user created:', !!user);
+            console.log('🔐 New user created with roles:', mappedRoles);
+          } else if (user) {
+            // Update existing user's role based on current Okta groups
+            console.log('🔐 Updating existing user role from', user.role, 'to', primaryRole);
+            await storage.updateUser(user.id, {
+              role: primaryRole,
+              roles: JSON.stringify(mappedRoles),
+              identityProvider: 'saml',
+              lastLogin: new Date(),
+            }, undefined);
+            
+            // Refresh user object with updated role
+            user = await storage.getUserByEmail(email, undefined);
+            console.log('🔐 User roles updated to:', mappedRoles);
           }
 
           if (!user) {
@@ -131,6 +164,7 @@ export function configureAuth(app: Express): void {
 
           return done(null, user);
         } catch (error) {
+          console.error('🔐 SAML authentication error:', error);
           return done(error, false);
         }
       }
