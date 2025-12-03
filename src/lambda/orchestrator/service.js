@@ -12,7 +12,7 @@ class OrchestratorService {
       cacheTTL: config.cacheTTL || 3600,
       parallelValidation: config.parallelValidation !== false
     };
-    
+
     this.lambda = new AWS.Lambda({
       region: process.env.AWS_REGION || 'us-east-1'
     });
@@ -69,7 +69,7 @@ class OrchestratorService {
       request: request,
       configuration: {
         textMatchThreshold: 0.85, // Slightly lower for MVP
-        useCache: this.config.useCache
+      useCache: this.config.useCache
       }
     };
 
@@ -86,7 +86,7 @@ class OrchestratorService {
       
       if (result.FunctionError) {
         throw new Error(`Level 1 validator error: ${result.FunctionError}`);
-      }
+  }
 
       const response = JSON.parse(result.Payload);
       

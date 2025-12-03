@@ -171,6 +171,7 @@ const DevClientApp = () => {
             <Nav>
               <NavLink to="/">Dashboard</NavLink>
               <NavLink to="/editor">MCP Editor</NavLink>
+              <NavLink to="/health">Health</NavLink>
               <NavLink to="/batch">Batch Testing</NavLink>
               <NavLink to="/debug">Debug</NavLink>
               <NavLink to="/admin">Admin</NavLink>

@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Button, Spin, Empty } from 'antd';
+import { Button, Spin, Empty, Tabs } from 'antd';
 import { PlusOutlined, ReloadOutlined, SettingOutlined, SendOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import SimpleRegulationSearch from './SimpleRegulationSearch';
 import mcpApiClient from '../api/MCPApiClient.jsx';
+
+const { TabPane } = Tabs;
 
 // Modern styled components following reg-66 template
 const DashboardContainer = styled.div`
@@ -521,33 +523,37 @@ const ModernDashboard = () => {
       </QuickActions>
       
       <MainContent>
-        <ContentSection>
-          <SectionHeader>
-            <SectionTitle>Regulation Search</SectionTitle>
-            <Button 
-              type="primary" 
-              danger
-              size="large"
-              onClick={handleUpdateAllRegulations}
-              loading={updateAllRunning}
-              style={{ 
-                background: updateAllRunning ? '#f59e0b' : '#dc2626',
-                borderColor: updateAllRunning ? '#f59e0b' : '#dc2626',
-                fontWeight: '600'
-              }}
-            >
-              {updateAllRunning ? '⏳ UPDATING ALL...' : '🔄 UPDATE ALL REGULATIONS'}
-            </Button>
-          </SectionHeader>
-          
-          <SimpleRegulationSearch 
-            placeholder="Search regulations by name, topic, keywords, or requirements..."
-            onRegulationSelect={(regulation) => {
-              console.log('Selected regulation:', regulation);
-              // Could navigate to regulation details or open a modal
-            }}
-          />
-        </ContentSection>
+        <Tabs defaultActiveKey="search" size="large">
+          <TabPane tab="🔍 Regulation Search" key="search">
+            <ContentSection>
+              <SectionHeader>
+                <SectionTitle>Regulation Search</SectionTitle>
+                <Button 
+                  type="primary" 
+                  danger
+                  size="large"
+                  onClick={handleUpdateAllRegulations}
+                  loading={updateAllRunning}
+                  style={{ 
+                    background: updateAllRunning ? '#f59e0b' : '#dc2626',
+                    borderColor: updateAllRunning ? '#f59e0b' : '#dc2626',
+                    fontWeight: '600'
+                  }}
+                >
+                  {updateAllRunning ? '⏳ UPDATING ALL...' : '🔄 UPDATE ALL REGULATIONS'}
+                </Button>
+              </SectionHeader>
+              
+              <SimpleRegulationSearch 
+                placeholder="Search regulations by name, topic, keywords, or requirements..."
+                onRegulationSelect={(regulation) => {
+                  console.log('Selected regulation:', regulation);
+                  // Could navigate to regulation details or open a modal
+                }}
+              />
+            </ContentSection>
+          </TabPane>
+        </Tabs>
       </MainContent>
     </DashboardContainer>
   );

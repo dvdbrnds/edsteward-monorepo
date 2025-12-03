@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP Engine API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>🧪 MCP Engine API Connectivity Test</h1>
+    
+    <div class="test-section">
+        <h3>Service Health Checks</h3>
+        <button onclick="testRegistryAPI()">Test Registry API (3010)</button>
+        <button onclick="testLLMGateway()">Test LLM Gateway (3002)</button>
+        <button onclick="testDeliverySystem()">Test Delivery System (3051)</button>
+        <div id="healthResults"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>Manual Update Push Test</h3>
+        <button onclick="testManualUpdate()">Test Manual Update Push</button>
+        <div id="updateResults"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>WebSocket Connection Test</h3>
+        <button onclick="testWebSocket()">Test WebSocket Connection</button>
+        <button onclick="disconnectWebSocket()">Disconnect WebSocket</button>
+        <div id="websocketResults"></div>
+    </div>
+
+    <script>
+        let ws = null;
+
+        async function testRegistryAPI() {
+            const resultsDiv = document.getElementById('healthResults');
+            try {
+                const response = await fetch('http://localhost:3010/api/regulations');
+                const data = await response.json();
+                resultsDiv.innerHTML += `<div class="success">✅ Registry API: ${data.length} regulations loaded</div>`;
+            } catch (error) {
+                resultsDiv.innerHTML += `<div class="error">❌ Registry API: ${error.message}</div>`;
+            }
+        }
+
+        async function testLLMGateway() {
+            const resultsDiv = document.getElementById('healthResults');
+            try {
+                const response = await fetch('http://localhost:3002/api/llm/health');
+                const data = await response.json();
+                resultsDiv.innerHTML += `<div class="success">✅ LLM Gateway: ${data.status} (${data.uptime}s uptime)</div>`;
+            } catch (error) {
+                resultsDiv.innerHTML += `<div class="error">❌ LLM Gateway: ${error.message}</div>`;
+            }
+        }
+
+        async function testDeliverySystem() {
+            const resultsDiv = document.getElementById('healthResults');
+            try {
+                const response = await fetch('http://localhost:3051/health');
+                const data = await response.json();
+                resultsDiv.innerHTML += `<div class="success">✅ Delivery System: ${data.status}</div>`;
+            } catch (error) {
+                resultsDiv.innerHTML += `<div class="error">❌ Delivery System: ${error.message}</div>`;
+            }
+        }
+
+        async function testManualUpdate() {
+            const resultsDiv = document.getElementById('updateResults');
+            resultsDiv.innerHTML = '<div class="info">🔄 Testing manual update push...</div>';
+            
+            try {
+                console.log('Making request to delivery system...');
+                const response = await fetch('http://localhost:3051/api/trigger-update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        regulationId: 'API-TEST-REGULATION',
+                        changeType: 'API_CONNECTIVITY_TEST',
+                        message: 'Testing API connectivity from browser',
+                        timestamp: new Date().toISOString()
+                    })
+                });
+
+                console.log('Response received:', response.status, response.statusText);
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('Response data:', result);
+                    resultsDiv.innerHTML = `<div class="success">
+                        ✅ Manual update successful!<br>
+                        <strong>Update ID:</strong> ${result.updateId}<br>
+                        <strong>Clients Notified:</strong> ${result.clientsNotified}<br>
+                        <strong>Version:</strong> ${result.version}
+                        <pre>${JSON.stringify(result, null, 2)}</pre>
+                    </div>`;
+                } else {
+                    const errorText = await response.text();
+                    console.error('Response error:', response.status, errorText);
+                    resultsDiv.innerHTML = `<div class="error">❌ Request failed: ${response.status} - ${errorText}</div>`;
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                resultsDiv.innerHTML = `<div class="error">
+                    ❌ Failed to fetch: ${error.message}<br>
+                    <strong>Error Type:</strong> ${error.name}<br>
+                    <strong>Stack:</strong> ${error.stack}
+                </div>`;
+            }
+        }
+
+        function testWebSocket() {
+            const resultsDiv = document.getElementById('websocketResults');
+            resultsDiv.innerHTML = '<div class="info">🔄 Connecting to WebSocket...</div>';
+            
+            try {
+                ws = new WebSocket('ws://localhost:3051/regulation-updates');
+                
+                ws.onopen = function() {
+                    resultsDiv.innerHTML += '<div class="success">✅ WebSocket connected</div>';
+                    
+                    // Subscribe to test regulation
+                    ws.send(JSON.stringify({
+                        type: 'subscribe',
+                        regulationIds: ['API-TEST-REGULATION']
+                    }));
+                };
+                
+                ws.onmessage = function(event) {
+                    const data = JSON.parse(event.data);
+                    resultsDiv.innerHTML += `<div class="info">📨 Message: ${data.type}</div>`;
+                };
+                
+                ws.onerror = function(error) {
+                    resultsDiv.innerHTML += `<div class="error">❌ WebSocket error: ${error}</div>`;
+                };
+                
+                ws.onclose = function() {
+                    resultsDiv.innerHTML += '<div class="info">📴 WebSocket disconnected</div>';
+                };
+                
+            } catch (error) {
+                resultsDiv.innerHTML += `<div class="error">❌ WebSocket connection failed: ${error.message}</div>`;
+            }
+        }
+
+        function disconnectWebSocket() {
+            if (ws) {
+                ws.close();
+                ws = null;
+            }
+        }
+
+        // Test on page load
+        window.addEventListener('load', function() {
+            console.log('🧪 MCP Engine API Test Page Loaded');
+            console.log('Current origin:', window.location.origin);
+            console.log('User agent:', navigator.userAgent);
+        });
+    </script>
+</body>
+</html>
+
+

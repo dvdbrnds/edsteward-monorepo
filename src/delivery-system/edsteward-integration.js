@@ -6,6 +6,7 @@
 import fetch from 'node-fetch';
 import WebSocket from 'ws';
 import { createHash } from 'crypto';
+import { getEdStewardId as getCorrectEdStewardId } from './edsteward-regulation-id-map.js';
 
 export class EdStewardIntegration {
   constructor(options = {}) {
@@ -104,10 +105,19 @@ export class EdStewardIntegration {
   }
 
   /**
-   * Get EdSteward ID using Master Key Field System (1-354)
-   * EdSteward uses sequential master key field numbers 1-354
+   * Get EdSteward ID using corrected mapping from EdSteward team
+   * Updated December 1, 2025 with verified IDs for Friday demo
    */
   getEdStewardId(regulationId) {
+    // ✅ NEW: Use corrected mapping from EdSteward team (December 1, 2025)
+    const correctId = getCorrectEdStewardId(regulationId);
+    if (correctId) {
+      console.log(`✅ Found EdSteward ID ${correctId} for ${regulationId} (VERIFIED CORRECT)`);
+      return correctId;
+    }
+    
+    // Fallback to old mapping for regulations not yet in new mapping
+    console.warn(`⚠️  Using fallback mapping for ${regulationId} - may not be correct!`);
     // COMPLETE MASTER KEY FIELD MAPPING - ALL 354 regulations as provided by EdSteward
     const MASTER_KEY_MAPPING = {
       // Key regulations (confirmed working)
@@ -277,7 +287,7 @@ export class EdStewardIntegration {
     
     // For unmapped regulations, assign sequential master key fields 1-354
     // This ensures all regulations get a valid EdSteward ID
-    const hash = require('crypto').createHash('md5').update(regulationId).digest('hex');
+    const hash = createHash('md5').update(regulationId).digest('hex');
     const masterKeyId = 1 + (parseInt(hash.substring(0, 8), 16) % 354);
     
     console.log(`🆕 Generated Master Key Field: ${regulationId} -> ${masterKeyId} (range 1-354)`);
@@ -341,8 +351,21 @@ export class EdStewardIntegration {
     } else {
       console.log(`🔍 Processing legacy regulation format`);
       // Legacy format - extract the COMPLETE USC regulation text for EdSteward differential view
-      originalText = mcpUpdate.data.before?.content || mcpUpdate.data.before?.fullText || "";
-      updatedText = mcpUpdate.data.after?.content || mcpUpdate.data.after?.fullText || "";
+      
+      // ✅ CRITICAL FIX: Only send update if we have BOTH before and after content
+      // This prevents sending garbage when we only have baseline initialization
+      const beforeContent = mcpUpdate.data.before?.content || mcpUpdate.data.before?.fullText || "";
+      const afterContent = mcpUpdate.data.after?.content || mcpUpdate.data.after?.fullText || "";
+      
+      // If this is initial baseline (no before state), use a meaningful placeholder
+      if (!beforeContent || beforeContent.length === 0) {
+        console.log(`⚠️ No 'before' content - this appears to be initial baseline, not a real change`);
+        originalText = `[Initial Baseline - No Previous Version]`;
+      } else {
+        originalText = beforeContent;
+      }
+      
+      updatedText = afterContent;
     }
     
     console.log(`📋 Content lengths - Original: ${originalText.length}, Updated: ${updatedText.length}`);
@@ -355,12 +378,34 @@ export class EdStewardIntegration {
       originalContent: originalText,
       updatedContent: updatedText,
       status: "pending",
+      
+      // ✅ CRITICAL: Include ALL structured fields for end clients
+      // 1. UPDATED CONTENT (already included above)
+      // 2. SUMMARY (REQUIRED)
+      summary: mcpUpdate.data.after?.summary || mcpUpdate.data.summary || 
+               'This regulation establishes compliance requirements for higher education institutions.',
+      
+      // 3. REQUIREMENTS (REQUIRED) - Detailed markdown-formatted compliance requirements
+      requirements: mcpUpdate.data.after?.requirements || mcpUpdate.data.requirements || null,
+      
+      // 4. FILING DEADLINES (if applicable)
+      filingDeadlines: mcpUpdate.data.after?.filingDeadlines || mcpUpdate.data.filingDeadlines || null,
+      
+      // Legacy deadline fields (for backward compatibility)
+      deadline: mcpUpdate.data.after?.deadline || mcpUpdate.data.deadline || null,
+      deadlineMonth: mcpUpdate.data.after?.deadlineMonth || mcpUpdate.data.deadlineMonth || null,
+      deadlineLabel: mcpUpdate.data.after?.deadlineLabel || mcpUpdate.data.deadlineLabel || null,
+      reportingRequirements: mcpUpdate.data.after?.reportingRequirements || mcpUpdate.data.reportingRequirements || null,
+      effectiveDate: mcpUpdate.data.after?.effectiveDate || mcpUpdate.data.effectiveDate || null,
+      enactedDate: mcpUpdate.data.after?.enactedDate || mcpUpdate.data.enactedDate || null,
+      
       ...enhancedPayload, // Include enhanced fields if available
       metadata: {
         mcpEngineId: mcpUpdate.regulationId,
         timestamp: new Date().toISOString(),
         enhanced: !!mcpUpdate.data.after?.regulation_text,
         federalRegisterEnhanced: enhancedPayload.federal_register_enhancement?.successful || false,
+        structuredFieldsIncluded: !!(mcpUpdate.data.after?.summary && mcpUpdate.data.after?.requirements),
         ...mcpUpdate.metadata
       }
     };
@@ -370,6 +415,11 @@ export class EdStewardIntegration {
     console.log(`🔍 PAYLOAD DEBUG - updatedContent length: ${updatePayload.updatedContent.length}`);
     console.log(`🔍 PAYLOAD DEBUG - originalContent preview: ${updatePayload.originalContent.substring(0, 100)}...`);
     console.log(`🔍 PAYLOAD DEBUG - updatedContent preview: ${updatePayload.updatedContent.substring(0, 100)}...`);
+    console.log(`📋 STRUCTURED FIELDS:`);
+    console.log(`   - summary: ${updatePayload.summary?.substring(0, 80)}...`);
+    console.log(`   - requirements: ${updatePayload.requirements ? updatePayload.requirements.length + ' chars' : 'not included'}`);
+    console.log(`   - filingDeadlines: ${updatePayload.filingDeadlines || 'not specified'}`);
+    console.log(`   - metadata.structuredFieldsIncluded: ${updatePayload.metadata.structuredFieldsIncluded}`);
     
     return await this.sendWithRetry(updatePayload);
   }
@@ -502,7 +552,7 @@ export class EdStewardIntegration {
       if (error.name === 'AbortError') {
         console.error('❌ EdSteward connection timeout');
       } else {
-        console.error('❌ EdSteward connection failed:', error.message);
+      console.error('❌ EdSteward connection failed:', error.message);
       }
       return false;
     }

@@ -350,12 +350,12 @@ const ModernServerList = ({ onServerSelect }) => {
       } catch (error) {
         console.error("ModernServerList: Search API error:", error);
         // Fall back to local filtering if API fails
-        const search = filters.search.toLowerCase();
-        result = result.filter(server => 
-          server.name.toLowerCase().includes(search) ||
-          server.description?.toLowerCase().includes(search) ||
-          server.type?.toLowerCase().includes(search)
-        );
+      const search = filters.search.toLowerCase();
+      result = result.filter(server => 
+        server.name.toLowerCase().includes(search) ||
+        server.description?.toLowerCase().includes(search) ||
+        server.type?.toLowerCase().includes(search)
+      );
       }
     }
     

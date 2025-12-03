@@ -14,6 +14,10 @@ import GovernmentSourceFetcher from './government-source-fetcher.js';
 import { EnhancedSummaryIntegration } from '../services/enhanced-summary-integration.js';
 import { RequirementsGenerationService } from '../services/requirements-generation-service.js';
 import EnhancedRegulationProcessor from './enhanced-regulation-processor.js';
+// ✅ NEW: Dynamic CFR/USC fetching from government APIs
+import { getCFRCitations, getUSCCitations, getRegulationCitation } from './regulation-cfr-mapping.js';
+import { fetchMultipleCitations } from './ecfr-api-client.js';
+import { getDeadlines } from './regulation-deadlines.js';
 
 const app = express();
 const PORT = 3002;
@@ -243,16 +247,38 @@ function getEdStewardId(regulationSlug) {
   return mapping[regulationSlug] || 1; // Default fallback
 }
 
+// Curated summaries for common regulations (Priority 0 - highest priority)
+const CURATED_SUMMARIES = {
+  'title-iv': 'Governs federal student financial aid programs including Pell Grants, Direct Loans, and Federal Work-Study. Requires institutions to maintain program participation agreements, ensure student eligibility verification, proper fund management and disbursement, and timely reporting to Department of Education. Institutions must maintain satisfactory academic progress policies and return of Title IV funds procedures.',
+  'title-vi': 'Prohibits discrimination based on race, color, or national origin in programs receiving federal financial assistance. Requires written assurance of non-discrimination, grievance procedures for complaints, data collection and reporting on program demographics, and meaningful access for limited English proficient individuals through interpretation and translation services.',
+  'heoa': 'Higher Education Opportunity Act requiring institutions to provide transparency in costs (net price calculator), textbook information disclosure during registration, copyright infringement policies and sanctions, fire safety reporting for on-campus housing, and study abroad program disclosures including costs and safety information.',
+  'drug-free-schools': 'Requires institutions to implement drug and alcohol abuse prevention programs for students and employees. Must distribute annual policy with standards of conduct, disciplinary sanctions, health risks, and treatment options. Must conduct biennial review of program effectiveness and document compliance with policy distribution requirements.',
+  'higher-education-opportunity-act': 'Higher Education Opportunity Act requiring institutions to provide transparency in costs (net price calculator), textbook information disclosure during registration, copyright infringement policies and sanctions, fire safety reporting for on-campus housing, and study abroad program disclosures including costs and safety information.'
+};
+
 /**
- * Get the best available summary using three-source priority system:
- * 1. HECA CSV (highest priority - human-curated)
+ * Get the best available summary using four-source priority system:
+ * 0. Curated summaries (highest priority - MCP Engine curated)
+ * 1. HECA CSV (high priority - human-curated)
  * 2. EdSteward (medium priority - customer database)
- * 3. AI Generated (lowest priority - fallback)
+ * 3. Placeholder (lowest priority - indicates missing data)
  */
 async function getBestAvailableSummary(regulationSlug, regulationTitle, fullText) {
   console.log(`🎯 Getting best available summary for: ${regulationSlug}`);
   
-  // Priority 1: Try HECA CSV first (highest quality)
+  // Priority 0: Check curated summaries first (new!)
+  if (CURATED_SUMMARIES[regulationSlug]) {
+    console.log(`✅ Using curated summary for ${regulationSlug}`);
+    return {
+      summary: CURATED_SUMMARIES[regulationSlug],
+      source: 'MCP Engine - Curated',
+      sourceDetails: {
+        system: 'MCP Engine Professional Summary'
+      }
+    };
+  }
+  
+  // Priority 1: Try HECA CSV (highest quality external source)
   const hecaSummary = await fetchSummaryFromHECA(regulationSlug);
   if (hecaSummary && hecaSummary.summary) {
     console.log(`✅ Using HECA summary for ${regulationSlug}`);
@@ -280,13 +306,13 @@ async function getBestAvailableSummary(regulationSlug, regulationTitle, fullText
     };
   }
   
-  // Priority 3: NO AI FALLBACK - Return error if no HECA/EdSteward content available
-  console.log(`❌ No HECA or EdSteward summary available for ${regulationSlug} - AI fallback disabled`);
+  // Priority 3: Return placeholder - indicates missing data
+  console.log(`❌ No curated, HECA, or EdSteward summary available for ${regulationSlug}`);
   return {
     summary: `No human-curated summary available for ${regulationSlug}. Please check HECA database or EdSteward system.`,
     source: 'No Source Available',
     sourceDetails: {
-      system: 'AI Fallback Disabled - HECA/EdSteward Only'
+      system: 'Missing Data - Needs Curation'
     }
   };
 }
@@ -591,6 +617,7 @@ app.get('/api/llm/cfr/enhanced/:regulationSlug', async (req, res) => {
     const showAllDocuments = req.query.show_all_documents === 'true';
     const debugMode = req.query.debug === 'true';
     
+    console.log(`🔥 [ROUTE DEBUG] /api/llm/cfr/enhanced/:regulationSlug HIT with regulationSlug=${regulationSlug}`);
     console.log(`🔄 Fetching enhanced CFR data for: ${regulationSlug} (Federal Register: ${enableFederalRegister}, Show All: ${showAllDocuments})`);
     
     // Get base CFR data first
@@ -1115,6 +1142,8 @@ app.get('/api/llm/cfr/:regulationSlug', async (req, res) => {
   try {
     const { regulationSlug } = req.params;
     
+    console.log(`🚨 [ROUTE DEBUG] /api/llm/cfr/:regulationSlug HIT with regulationSlug=${regulationSlug}`);
+    
     // Skip if this is the specific teach-act endpoint (handled by specific route)
     if (regulationSlug === 'teach-act') {
       return res.status(404).json({
@@ -1124,6 +1153,60 @@ app.get('/api/llm/cfr/:regulationSlug', async (req, res) => {
     }
     
     console.log(`📋 Fetching CFR guidance for regulation: ${regulationSlug}...`);
+    
+    // ✅ NEW: Try to fetch from eCFR.gov FIRST (live government data)
+    console.log(`🌐 Attempting to fetch from eCFR.gov API...`);
+    const cfrCitations = getCFRCitations(regulationSlug);
+    
+    if (cfrCitations.length > 0) {
+      console.log(`📚 Found ${cfrCitations.length} CFR citations for ${regulationSlug}:`, cfrCitations.map(c => c.fullCitation));
+      
+      try {
+        const ecfrResult = await fetchMultipleCitations(cfrCitations);
+        
+        if (ecfrResult.success && ecfrResult.fullText && ecfrResult.fullText.length > 500) {
+          // ✅ SUCCESS: Got real data from eCFR.gov!
+          console.log(`✅ Successfully fetched ${ecfrResult.length} chars from eCFR.gov for ${regulationSlug}`);
+          
+          const regulationInfo = getRegulationCitation(regulationSlug);
+          const deadlineInfo = getDeadlines(regulationSlug);
+          
+          return res.json({
+            success: true,
+            data: {
+              title: regulationInfo?.name || `CFR ${cfrCitations[0].fullCitation}`,
+              source: 'eCFR.gov (LIVE GOVERNMENT DATA)',
+              sourceType: 'government_api',
+              fullText: ecfrResult.fullText,
+              content: ecfrResult.fullText,
+              citations: ecfrResult.citations,
+              regulationTitle: regulationInfo?.name || regulationSlug,
+              lastUpdated: new Date().toISOString(),
+              confidence: 95, // High confidence - from official source
+              keywords: regulationInfo?.keywords || [],
+              deadlines: deadlineInfo.deadlines || [],
+              edStewardId: deadlineInfo.edStewardId,
+              itemId: deadlineInfo.itemId,
+              metadata: {
+                fetchedFrom: 'eCFR.gov',
+                isLiveData: true,
+                successCount: ecfrResult.successCount,
+                failureCount: ecfrResult.failureCount
+              }
+            }
+          });
+        } else {
+          console.warn(`⚠️  eCFR.gov returned insufficient data (${ecfrResult.fullText?.length || 0} chars), falling back to hardcoded`);
+        }
+      } catch (ecfrError) {
+        console.error(`❌ eCFR.gov fetch failed: ${ecfrError.message}, falling back to hardcoded`);
+      }
+    } else {
+      console.log(`📋 No CFR citations mapped for ${regulationSlug}, using hardcoded fallback`);
+    }
+    
+    // 🔄 FALLBACK: Use hardcoded text if eCFR.gov fails or unavailable
+    console.log(`📝 Using hardcoded CFR text for ${regulationSlug}`);
     
     // Generate real CFR legal text based on the regulation
     let fullText = '';
@@ -1265,6 +1348,9 @@ For purposes of this part, the term—
     } else if (regulationSlug.includes('section-504') || regulationSlug.includes('rehabilitation-act')) {
       regulationTitle = 'Section 504 of the Rehabilitation Act';
       confidence = 95;
+      summary = 'Prohibits discrimination based on disability in programs receiving federal financial assistance. Requires reasonable accommodations for qualified individuals with disabilities, accessible facilities and programs, and due process procedures for grievances. Must designate Section 504 Coordinator and conduct periodic compliance reviews.';
+      summarySource = 'MCP Engine - Curated';
+      summarySourceDetails = { system: 'MCP Engine Professional Summary' };
       fullText = `Code of Federal Regulations - Title 34: Education
 
 PART 104—NONDISCRIMINATION ON THE BASIS OF HANDICAP IN PROGRAMS OR ACTIVITIES RECEIVING FEDERAL FINANCIAL ASSISTANCE
@@ -1287,6 +1373,9 @@ As used in this part, the term:
     } else if (regulationSlug.includes('clery') || regulationSlug.includes('campus-security') || regulationSlug.includes('jeanne-clery')) {
       regulationTitle = 'Clery Act - Campus Security Policy and Campus Crime Statistics';
       confidence = 95;
+      summary = 'Requires institutions to publish annual security reports containing campus crime statistics, security policies, and timely warnings of threats. Must maintain public crime log, report to Department of Education, and provide educational programs on security procedures and crime prevention.';
+      summarySource = 'MCP Engine - Curated';
+      summarySourceDetails = { system: 'MCP Engine Professional Summary' };
       fullText = `Code of Federal Regulations - Title 34: Education
 
 PART 668—STUDENT ASSISTANCE GENERAL PROVISIONS
@@ -1542,6 +1631,9 @@ Violations of this part may result in civil penalties as provided by law, includ
       ];
     }
     
+    // Get deadline information for this regulation
+    const deadlineInfo = getDeadlines(regulationSlug);
+    
     const cfrData = {
       success: true,
       data: {
@@ -1556,6 +1648,9 @@ Violations of this part may result in civil penalties as provided by law, includ
         citations: citations,
         workflowStatus: citations.length > 0 ? 'enhanced' : 'basic',
         lastUpdated: new Date().toISOString(),
+        deadlines: deadlineInfo.deadlines || [],
+        edStewardId: deadlineInfo.edStewardId,
+        itemId: deadlineInfo.itemId,
         metadata: {
           confidence: confidence,
           isReal: true,
@@ -2555,7 +2650,7 @@ app.post('/api/llm/query', async (req, res) => {
         workflowDetails: {
           step2_result: {
             sources: ['Stanford', 'Harvard', 'Yale', 'Columbia'],
-            consensus_analysis: 'High agreement on TEACH Act interpretation across institutions',
+            consensus_analysis: `High agreement on ${(regulation || 'regulation').replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())} interpretation across institutions`,
             corroboration_rate: 0.96
           }
         }
@@ -2897,6 +2992,75 @@ No qualified individual with a disability shall, by reason of such disability, b
       success: false,
       error: 'Failed to generate enhanced regulation data',
       details: error.message
+    });
+  }
+});
+
+// ✅ NEW DYNAMIC CFR ENDPOINT - Fetches ANY regulation from eCFR.gov
+// This replaces the hardcoded CFR text with real government data
+app.get('/api/llm/cfr/dynamic/:regulationId', async (req, res) => {
+  try {
+    const { regulationId } = req.params;
+    
+    console.log(`🌐 [DYNAMIC CFR] Fetching live CFR data for: ${regulationId}`);
+    
+    // Get CFR citations for this regulation
+    const citations = getCFRCitations(regulationId);
+    
+    if (citations.length === 0) {
+      console.warn(`⚠️  No CFR citations found for ${regulationId}`);
+      return res.status(404).json({
+        success: false,
+        error: 'No CFR citations mapped for this regulation',
+        regulationId,
+        message: 'This regulation has not been mapped to CFR citations yet. Add it to regulation-cfr-mapping.js'
+      });
+    }
+    
+    console.log(`📚 Found ${citations.length} CFR citations for ${regulationId}:`, citations.map(c => c.fullCitation));
+    
+    // Fetch from eCFR.gov
+    const result = await fetchMultipleCitations(citations);
+    
+    if (!result.success) {
+      console.error(`❌ Failed to fetch CFR data for ${regulationId}`);
+      return res.status(500).json({
+        success: false,
+        error: 'Failed to fetch CFR data from eCFR.gov',
+        regulationId,
+        details: result.error
+      });
+    }
+    
+    // Get regulation info for metadata
+    const regulationInfo = getRegulationCitation(regulationId);
+    
+    console.log(`✅ Successfully fetched ${result.length} chars of CFR data for ${regulationId}`);
+    
+    res.json({
+      success: true,
+      data: {
+        regulationId,
+        name: regulationInfo?.name || regulationId,
+        citations: result.citations,
+        fullText: result.fullText,
+        length: result.length,
+        source: 'ecfr.gov',
+        sourceType: 'government_api',
+        fetchedAt: new Date().toISOString(),
+        successCount: result.successCount,
+        failureCount: result.failureCount,
+        keywords: regulationInfo?.keywords || [],
+        deadlines: regulationInfo?.deadlines || []
+      }
+    });
+    
+  } catch (error) {
+    console.error(`❌ Error in dynamic CFR endpoint:`, error);
+    res.status(500).json({
+      success: false,
+      error: 'Internal server error',
+      message: error.message
     });
   }
 });

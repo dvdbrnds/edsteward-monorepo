@@ -57,7 +57,9 @@ class RegulationCDCService extends Emittery {
     
     this.lastKnownVersions = new Map();
     this.contentHashes = new Map();
-    this.pollInterval = options.pollInterval || 5000; // 5 seconds
+    this.pollInterval = options.pollInterval || parseInt(process.env.REGULATION_POLL_INTERVAL || '30000'); // 30 seconds default for production
+    this.batchSize = options.batchSize || parseInt(process.env.REGULATION_BATCH_SIZE || '10'); // Process 10 at a time
+    this.currentBatchIndex = 0;
     this.isActive = false;
   }
 
@@ -65,22 +67,115 @@ class RegulationCDCService extends Emittery {
    * Start monitoring regulation changes
    * Uses hash-based change detection for efficiency
    */
-  async startMonitoring() {
+  async startMonitoring(options = {}) {
     this.isActive = true;
     console.log('🔍 Starting CDC monitoring for regulations...');
     
-    // Initialize baseline state for REG-66 without triggering updates
-    await this.initializeRegulationBaseline('REG-66');
+    // ✅ SCALABLE: Fetch regulation list from Registry API or use provided list
+    let regulationsToMonitor = options.regulations;
     
-    // DISABLED: Automatic polling to prevent spam updates
-    // Only manual triggers via API will cause updates now
-    console.log('📋 CDC ready for manual triggers (automatic polling disabled)');
+    if (!regulationsToMonitor) {
+      try {
+        console.log('📋 Fetching regulation list from Registry API...');
+        const registryResponse = await fetch('http://localhost:3010/api/regulations');
+        const registryData = await registryResponse.json();
+        
+        // Registry returns an array directly, not wrapped in .regulations
+        const regulationsArray = Array.isArray(registryData) ? registryData : (registryData.regulations || []);
+        
+        // Extract slugs from all regulations in Registry
+        regulationsToMonitor = regulationsArray
+          .map(reg => reg.regulationId || reg.slug || reg.id)
+          .filter(slug => slug && slug.length > 0);
+        
+        console.log(`✅ Found ${regulationsToMonitor.length} regulations in Registry`);
+        console.log(`🚀 PRODUCTION MODE: Monitoring ALL ${regulationsToMonitor.length} regulations`);
+        
+        // Filter out any invalid slugs (empty, null, undefined)
+        regulationsToMonitor = regulationsToMonitor.filter(slug => 
+          slug && typeof slug === 'string' && slug.trim().length > 0
+        );
+        
+        console.log(`📋 After filtering: ${regulationsToMonitor.length} valid regulation slugs`);
+        
+        // If for some reason we want to limit for testing, set MAX_REGULATIONS env var
+        const maxRegulations = parseInt(process.env.MAX_REGULATIONS || '0');
+        if (maxRegulations > 0 && regulationsToMonitor.length > maxRegulations) {
+          console.log(`⚠️  MAX_REGULATIONS set to ${maxRegulations}, limiting from ${regulationsToMonitor.length}`);
+          regulationsToMonitor = regulationsToMonitor.slice(0, maxRegulations);
+        }
+      } catch (error) {
+        console.error('❌ Failed to fetch from Registry, using fallback list:', error.message);
+        // Fallback to top 10 for Friday demo
+        regulationsToMonitor = [
+          'clery-act',
+          'family-educational-rights-and-privacy-act-ferpa',
+          'title-ix-of-the-education-amendment-of-1972',
+          'higher-education-act-title-iv-student-financial-a',
+          'violence-against-women-reauthorization-act',
+          'americans-with-disabilities-act-of-1990',
+          'section-504-of-the-rehabilitation-act-of-1973',
+          'title-vi-of-the-civil-rights-act-of-1964',
+          'technology-education-and-copyright-harmonization-a',
+          'drug-free-schools-and-communities-act',
+          'higher-education-opportunity-act-sections-152-and-'
+        ];
+      }
+    }
+    
+    // Store the list for polling
+    this.monitoredRegulations = regulationsToMonitor;
+    
+    // Initialize baseline state for all regulations without triggering updates
+    console.log(`📋 Initializing baselines for ${regulationsToMonitor.length} regulations...`);
+    for (const regId of regulationsToMonitor) {
+      await this.initializeRegulationBaseline(regId);
+    }
+    
+    // ✅ PRODUCTION: Staggered batch polling for efficient monitoring of all regulations
+    // Processes regulations in batches to avoid overwhelming the system
+    const totalRegulations = this.monitoredRegulations.length;
+    const batchCount = Math.ceil(totalRegulations / this.batchSize);
+    
+    console.log(`📋 CDC active: Monitoring ${totalRegulations} regulations`);
+    console.log(`   • Batch size: ${this.batchSize} regulations`);
+    console.log(`   • Total batches: ${batchCount}`);
+    console.log(`   • Poll interval: ${this.pollInterval}ms`);
+    console.log(`   • Full cycle time: ${Math.ceil((batchCount * this.pollInterval) / 1000)}s`);
+    
+    this.pollTimer = setInterval(async () => {
+      if (this.isActive && this.monitoredRegulations.length > 0) {
+        // Get current batch of regulations
+        const startIdx = this.currentBatchIndex * this.batchSize;
+        const endIdx = Math.min(startIdx + this.batchSize, totalRegulations);
+        const currentBatch = this.monitoredRegulations.slice(startIdx, endIdx);
+        
+        if (currentBatch.length > 0) {
+          console.log(`🔄 Polling batch ${this.currentBatchIndex + 1}/${batchCount} (${currentBatch.length} regulations)...`);
+          
+          // Process batch in parallel
+          await Promise.all(currentBatch.map(async (regId) => {
+            try {
+              await this.monitorRegulation(regId);
+            } catch (error) {
+              console.error(`❌ CDC polling error for ${regId}:`, error.message);
+            }
+          }));
+        }
+        
+        // Move to next batch (circular)
+        this.currentBatchIndex = (this.currentBatchIndex + 1) % batchCount;
+      }
+    }, this.pollInterval);
     
     await this.emit(REGULATION_EVENTS.SYSTEM_READY, {
       service: 'CDC',
       timestamp: new Date().toISOString(),
-      regulations: ['REG-66'],
-      mode: 'manual_trigger_only'
+      regulations: regulationsToMonitor,
+      regulationCount: regulationsToMonitor.length,
+      mode: 'automatic_polling_with_hash_detection',
+      pollInterval: this.pollInterval,
+      scalable: true
     });
   }
 
@@ -116,8 +211,13 @@ class RegulationCDCService extends Emittery {
       
       // Check if content has changed
       const lastHash = this.contentHashes.get(regulationId);
-      if (lastHash && lastHash !== contentHash) {
-        console.log(`📋 Change detected in ${regulationId}`);
+      
+      // ✅ CRITICAL FIX: Only trigger update if hash exists AND is different
+      // Skip if lastHash is 'initial_empty' (baseline not yet established)
+      if (lastHash && lastHash !== 'initial_empty' && lastHash !== contentHash) {
+        console.log(`📋 REAL CHANGE DETECTED in ${regulationId}`);
+        console.log(`   Previous hash: ${lastHash}`);
+        console.log(`   New hash: ${contentHash}`);
         
         await this.emit(REGULATION_EVENTS.CONTENT_CHANGED, {
           regulationId,
@@ -127,6 +227,11 @@ class RegulationCDCService extends Emittery {
           timestamp: new Date().toISOString(),
           contentHash
         });
+      } else if (!lastHash || lastHash === 'initial_empty') {
+        console.log(`📋 Establishing baseline for ${regulationId} (hash: ${contentHash.substring(0, 8)}...)`);
+      } else {
+        // Hash is the same - no change, no spam
+        console.log(`📋 No change in ${regulationId} (hash: ${contentHash.substring(0, 8)}...)`);
       }
       
       // Update our tracking
@@ -138,69 +243,326 @@ class RegulationCDCService extends Emittery {
     }
   }
 
+  /**
+   * Extract and structure ALL required fields for regulation updates
+   * ✅ REQUIRED FIELDS: updatedContent, summary, requirements, filingDeadlines
+   */
+  extractStructuredFields(regulationData) {
+    const { uscData, cfrData, complianceData, fullText } = regulationData;
+    
+    console.log(`📋 Extracting structured fields for regulation update...`);
+    
+    // 1. UPDATED CONTENT (REQUIRED) - Complete full text
+    const updatedContent = fullText;
+    
+    // 2. SUMMARY (REQUIRED) - Extract from compliance data or generate
+    let summary = complianceData?.data?.summary || 
+                  complianceData?.summary ||
+                  uscData?.data?.summary ||
+                  uscData?.summary ||
+                  'This regulation establishes compliance requirements for higher education institutions.';
+    
+    // 3. REQUIREMENTS (REQUIRED) - Structured markdown format
+    const requirements = this.extractRequirements(complianceData, uscData, cfrData);
+    
+    // 4. FILING DEADLINES (if applicable)
+    const filingDeadlines = this.extractFilingDeadlines(complianceData, uscData, cfrData, fullText);
+    
+    return {
+      updatedContent,
+      summary,
+      requirements,
+      filingDeadlines
+    };
+  }
+  
+  /**
+   * Extract detailed compliance requirements in markdown format
+   */
+  extractRequirements(complianceData, uscData, cfrData) {
+    // Try to get structured requirements from compliance data
+    const complianceRequirements = complianceData?.data?.requirements || 
+                                    complianceData?.requirements ||
+                                    complianceData?.data?.content ||
+                                    complianceData?.content;
+    
+    if (typeof complianceRequirements === 'string' && complianceRequirements.includes('**')) {
+      // Already formatted in markdown
+      return complianceRequirements;
+    }
+    
+    // Build structured requirements from available data
+    let requirements = '**Key Compliance Requirements:**\n\n';
+    
+    // Extract key requirements
+    if (complianceData?.data?.keyRequirements) {
+      complianceData.data.keyRequirements.forEach((req, idx) => {
+        requirements += `${idx + 1}. **${req.title || 'Requirement'}**\n`;
+        requirements += `   ${req.description || req.content}\n\n`;
+      });
+    } else {
+      requirements += '1. Comply with all provisions of the regulation as stated in the official source document\n';
+      requirements += '2. Maintain institutional policies and procedures aligned with regulatory requirements\n';
+      requirements += '3. Ensure all personnel are trained on compliance obligations\n\n';
+    }
+    
+    // Documentation Requirements
+    requirements += '**Documentation Requirements:**\n\n';
+    if (complianceData?.data?.documentationRequirements) {
+      requirements += complianceData.data.documentationRequirements + '\n\n';
+    } else {
+      requirements += '- Maintain records of all compliance activities and decisions\n';
+      requirements += '- Document training completion for all relevant personnel\n';
+      requirements += '- Retain records for the period specified in the regulation\n\n';
+    }
+    
+    // Reporting Requirements
+    requirements += '**Reporting Requirements:**\n\n';
+    if (complianceData?.data?.reportingRequirements) {
+      requirements += complianceData.data.reportingRequirements + '\n\n';
+    } else {
+      requirements += '- Submit required reports to appropriate regulatory agencies as specified\n';
+      requirements += '- Maintain internal reporting mechanisms for compliance oversight\n\n';
+    }
+    
+    // Training Requirements
+    requirements += '**Training Requirements:**\n\n';
+    if (complianceData?.data?.trainingRequirements) {
+      requirements += complianceData.data.trainingRequirements + '\n\n';
+    } else {
+      requirements += '- Provide initial training for all personnel with compliance responsibilities\n';
+      requirements += '- Conduct annual refresher training to ensure continued compliance awareness\n';
+      requirements += '- Document all training activities and maintain completion records\n\n';
+    }
+    
+    // Monitoring & Compliance
+    requirements += '**Monitoring & Compliance:**\n\n';
+    if (complianceData?.data?.monitoringRequirements) {
+      requirements += complianceData.data.monitoringRequirements + '\n\n';
+    } else {
+      requirements += '- Conduct regular internal audits of compliance activities\n';
+      requirements += '- Review and update policies and procedures annually or as regulations change\n';
+      requirements += '- Establish accountability mechanisms for compliance oversight\n';
+      requirements += '- Address identified deficiencies promptly and document corrective actions\n';
+    }
+    
+    return requirements;
+  }
+  
+  /**
+   * Extract filing deadlines from regulation content
+   */
+  extractFilingDeadlines(complianceData, uscData, cfrData, fullText) {
+    const deadlines = [];
+    
+    // Check for explicit deadline fields
+    if (complianceData?.data?.deadline || complianceData?.deadline) {
+      const deadline = complianceData.data?.deadline || complianceData.deadline;
+      const description = complianceData.data?.deadlineLabel || complianceData.deadlineLabel || 'Annual compliance deadline';
+      deadlines.push(`${description}: ${deadline}`);
+    }
+    
+    if (complianceData?.data?.reportingRequirements && 
+        typeof complianceData.data.reportingRequirements === 'string') {
+      const reportingText = complianceData.data.reportingRequirements;
+      
+      // Extract deadline patterns from text
+      const deadlinePatterns = [
+        /(?:by|before|on or before|no later than)\s+((?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2}(?:st|nd|rd|th)?)/gi,
+        /(?:annually|each year)\s+(?:by|on|before)\s+((?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2}(?:st|nd|rd|th)?)/gi,
+        /deadline[:\s]+([^.\n]+)/gi
+      ];
+      
+      for (const pattern of deadlinePatterns) {
+        let match;
+        while ((match = pattern.exec(reportingText)) !== null) {
+          deadlines.push(`Reporting deadline: ${match[1].trim()}`);
+    }
+      }
+    }
+    
+    // Parse full text for deadline mentions if no explicit deadlines found
+    if (deadlines.length === 0 && fullText) {
+      const sentences = fullText.split(/[.!?]\s+/);
+      for (const sentence of sentences) {
+        if (sentence.match(/deadline|due date|filing date|submission date/i)) {
+          const dateMatch = sentence.match(/(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2}(?:st|nd|rd|th)?/i);
+          if (dateMatch) {
+            deadlines.push(`Compliance deadline: ${dateMatch[0]}`);
+            break; // Only get the first meaningful deadline
+          }
+        }
+      }
+    }
+    
+    // Default to July 1 if no deadlines found
+    if (deadlines.length === 0) {
+      deadlines.push('Annual compliance review: July 1');
+    }
+    
+    return deadlines.join('\n');
+  }
+
   async fetchRegulationState(regulationId) {
-    // Determine the correct endpoint based on regulation-specific mapping
-    let endpoint;
-    let method = 'GET';
+    // ✅ CRITICAL FIX: Fetch FULL regulation content for EdSteward delivery
+    // Was fetching only short text (86 chars), now gets complete regulation with all compliance requirements
     
-    // REGULATION-SPECIFIC ENDPOINT MAPPING
-    // Each regulation should get its own proper USC/CFR text, not generic copyright text
+    console.log(`🔍 Fetching FULL regulation content for ${regulationId} (including all compliance requirements)...`);
     
-    if (regulationId.includes('age-discrimination-act') || regulationId.includes('age-discrimination')) {
-      // Age Discrimination Act: 42 U.S.C. §§ 6101-6107 + CFR regulations
-      endpoint = `http://localhost:3002/api/llm/cfr/${regulationId}`;
-    }
-    else if (regulationId.includes('fair-credit-reporting-act') || regulationId.includes('fcra')) {
-      // Fair Credit Reporting Act: 15 U.S.C. §§ 1681-1681v + 16 C.F.R. § 600
-      endpoint = `http://localhost:3002/api/llm/cfr/${regulationId}`;
-    }
-    else if (regulationId.includes('americans-with-disabilities-act') || regulationId.includes('ada')) {
-      // ADA: 42 U.S.C. §§ 12101-12213 + multiple CFR sections
-      endpoint = `http://localhost:3002/api/llm/cfr/${regulationId}`;
-    }
-    else if (regulationId.includes('family-educational-rights') || regulationId.includes('ferpa')) {
-      // FERPA: 20 U.S.C. § 1232g + 34 C.F.R. § 99
-      endpoint = `http://localhost:3002/api/llm/cfr/${regulationId}`;
-    }
-    else if (regulationId.includes('REG-66') || regulationId.includes('teach-act') || regulationId.includes('teach')) {
-      // TEACH Act: 17 U.S.C. § 110(2) - ONLY for actual TEACH Act
-      endpoint = `http://localhost:3002/api/llm/usc/17/110`;
-    }
-    else if (regulationId.includes('clery-act') || regulationId.includes('clery')) {
-      // Clery Act: 20 U.S.C. § 1092(f) + 34 C.F.R. § 668.46
-      endpoint = `http://localhost:3002/api/llm/cfr/${regulationId}`;
-    }
-    else if (regulationId.includes('title-ix') || regulationId.includes('title-9')) {
-      // Title IX: 20 U.S.C. §§ 1681-1688 + 34 C.F.R. § 106
-      endpoint = `http://localhost:3002/api/llm/cfr/${regulationId}`;
-    }
-    else if (regulationId.includes('osha') || regulationId.includes('emergency-action-plan') || 
-             regulationId.includes('safety') || regulationId.includes('occupational-safety')) {
-      // OSHA: 29 U.S.C. §§ 651-678 + 29 C.F.R. § 1910
-      endpoint = `http://localhost:3002/api/llm/cfr/${regulationId}`;
-    }
-    else {
-      // Default to compliance endpoint which should route to correct CFR endpoint
-      endpoint = `http://localhost:3002/api/llm/compliance/${regulationId}`;
+    // Determine correct endpoints based on regulation type
+    let uscEndpoint, cfrEndpoint, complianceEndpoint;
+    
+    // Endpoint mapping for regulations
+    if (regulationId.includes('REG-66') || regulationId.includes('reg-66') || regulationId.includes('teach')) {
+      // TEACH Act uses enhanced CFR endpoint with Federal Register integration
+      uscEndpoint = 'http://localhost:3002/api/llm/usc/17/110';
+      cfrEndpoint = 'http://localhost:3002/api/llm/cfr/enhanced/teach-act?federal_register=true';
+      complianceEndpoint = 'http://localhost:3002/api/llm/compliance/teach-act';
+    } else if (regulationId.includes('osha') || regulationId.includes('emergency-action-plan') || regulationId.includes('safety')) {
+      uscEndpoint = 'http://localhost:3002/api/llm/usc/29/651';
+      cfrEndpoint = `http://localhost:3002/api/llm/cfr/${regulationId}`;
+      complianceEndpoint = `http://localhost:3002/api/llm/compliance/${regulationId}`;
+    } else if (regulationId.includes('age-discrimination')) {
+      uscEndpoint = 'http://localhost:3002/api/llm/usc/42/6101';
+      cfrEndpoint = `http://localhost:3002/api/llm/cfr/age-discrimination`;
+      complianceEndpoint = `http://localhost:3002/api/llm/compliance/age-discrimination`;
+    } else if (regulationId.includes('americans-with-disabilities') || regulationId.includes('ada')) {
+      uscEndpoint = 'http://localhost:3002/api/llm/usc/42/12101';
+      cfrEndpoint = `http://localhost:3002/api/llm/cfr/ada`;
+      complianceEndpoint = `http://localhost:3002/api/llm/compliance/ada`;
+    } else {
+      uscEndpoint = null;
+      cfrEndpoint = `http://localhost:3002/api/llm/cfr/${regulationId}`;
+      complianceEndpoint = `http://localhost:3002/api/llm/compliance/${regulationId}`;
     }
     
-    console.log(`🔍 Fetching regulation content from: ${endpoint}`);
+    // Build fetch promises
+    const fetchPromises = [];
     
-    const response = await fetch(endpoint, {
-      method,
+    if (uscEndpoint) {
+      fetchPromises.push(fetch(uscEndpoint, {
+        method: 'GET',
       headers: { 'Content-Type': 'application/json' }
+      }));
+    } else {
+      fetchPromises.push(Promise.resolve(null));
+    }
+    
+    fetchPromises.push(fetch(cfrEndpoint, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    }));
+    
+    fetchPromises.push(fetch(complianceEndpoint, {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    }));
+    
+    // Fetch all regulation data components
+    const [uscResponse, cfrResponse, complianceResponse] = await Promise.all(fetchPromises);
+    
+    // Parse responses
+    const [uscData, cfrData, complianceData] = await Promise.all([
+      uscResponse ? (uscResponse.ok ? uscResponse.json() : { error: 'USC fetch failed' }) : { data: null },
+      cfrResponse.ok ? cfrResponse.json() : { error: 'CFR fetch failed' },
+      complianceResponse.ok ? complianceResponse.json() : { error: 'Compliance fetch failed' }
+    ]);
+    
+    // ✅ CRITICAL FIX: Extract regulation full text with comprehensive fallback logic
+    // Priority: fullText > content, USC > CFR > Compliance
+    let fullText;
+    
+    if (regulationId.includes('REG-66') || regulationId.includes('reg-66') || regulationId.includes('teach')) {
+      // ✅ CRITICAL: For TEACH Act, use fullText field which contains COMPLETE regulation (13K+ chars)
+      // NOT content field which only has 86-char summary
+      const uscFullText = uscData?.data?.fullText || uscData?.fullText || uscData?.data?.content || uscData?.content || '';
+      const complianceFullText = complianceData?.data?.fullText || complianceData?.fullText || complianceData?.data?.content || complianceData?.content || '';
+      fullText = uscFullText || complianceFullText || 'USC 17 Section 110 text not available';
+    } else if (regulationId.includes('osha')) {
+      const uscContent = uscData?.data?.fullText || uscData?.fullText || uscData?.data?.content || uscData?.content || '';
+      const cfrContent = cfrData?.data?.sections?.map(section => 
+        `${section.section} ${section.title}: ${section.content}`
+      ).join('\n\n') || cfrData?.content || cfrData?.fullText || '';
+      fullText = uscContent && cfrContent ? `${uscContent}\n\n--- CFR IMPLEMENTATION ---\n\n${cfrContent}` : (uscContent || cfrContent);
+    } else {
+      // ✅ CRITICAL FIX: Comprehensive fallback for ALL other regulations
+      // Try: USC fullText → USC content → CFR sections → CFR content → Compliance fullText → Compliance content
+      const uscFullText = uscData?.data?.fullText || uscData?.fullText || '';
+      const uscContent = uscData?.data?.content || uscData?.content || '';
+      const cfrSections = cfrData?.data?.sections?.map(section => 
+        `${section.section} ${section.title}: ${section.content}`
+      ).join('\n\n') || '';
+      const cfrContent = cfrData?.data?.fullText || cfrData?.fullText || cfrData?.data?.content || cfrData?.content || '';
+      const complianceFullText = complianceData?.data?.fullText || complianceData?.fullText || '';
+      const complianceContent = complianceData?.data?.content || complianceData?.content || '';
+      
+      // Build fullText with all available data, prioritizing fullText fields
+      const sources = [
+        uscFullText,
+        uscContent,
+        cfrSections,
+        cfrContent,
+        complianceFullText,
+        complianceContent
+      ].filter(text => text && text.length > 50); // Only include substantial content
+      
+      if (sources.length === 0) {
+        fullText = `${regulationId} regulation text not available`;
+      } else if (sources.length === 1) {
+        fullText = sources[0];
+      } else {
+        // Combine multiple sources with clear delimiters
+        fullText = sources.join('\n\n═══════════════════════════════════════════════\n\n');
+      }
+    }
+    
+    console.log(`📋 Fetched FULL regulation content (${fullText.length} chars): ${fullText.substring(0, 100)}...`);
+    
+    // ✅ CRITICAL: Extract structured fields for EdSteward and client delivery
+    const structuredFields = this.extractStructuredFields({
+      uscData,
+      cfrData,
+      complianceData,
+      fullText
     });
     
-    if (!response.ok) {
-      throw new Error(`Failed to fetch ${regulationId}: ${response.statusText}`);
-    }
+    console.log(`📋 Structured fields extracted:`);
+    console.log(`   - updatedContent: ${structuredFields.updatedContent.length} chars`);
+    console.log(`   - summary: ${structuredFields.summary.substring(0, 80)}...`);
+    console.log(`   - requirements: ${structuredFields.requirements.length} chars`);
+    console.log(`   - filingDeadlines: ${structuredFields.filingDeadlines}`);
     
-    return await response.json();
+    // Return structure compatible with EdSteward integration
+    return {
+      regulationId,
+      content: fullText,
+      fullText: fullText,
+      // ✅ NEW: Include all structured fields
+      updatedContent: structuredFields.updatedContent,
+      summary: structuredFields.summary,
+      requirements: structuredFields.requirements,
+      filingDeadlines: structuredFields.filingDeadlines,
+      components: {
+        usc: uscData,
+        cfr: cfrData,
+        compliance: complianceData
+      },
+      timestamp: new Date().toISOString()
+    };
   }
 
   generateContentHash(content) {
+    // ✅ CRITICAL FIX: Only hash the actual regulation content, not timestamps or metadata
+    // This prevents false positives where timestamps change but content doesn't
+    const contentToHash = {
+      regulationId: content.regulationId,
+      fullText: content.fullText,
+      content: content.content
+      // Deliberately exclude: timestamp, components.data.lastUpdated, etc.
+    };
+    
     return createHash('sha256')
-      .update(JSON.stringify(content))
+      .update(JSON.stringify(contentToHash))
       .digest('hex')
       .substring(0, 16);
   }
@@ -442,18 +804,55 @@ class RegulationPushService extends Emittery {
   }
 
   /**
+   * Get all regulation ID aliases (for matching subscriptions)
+   */
+  getRegulationAliases(regulationId) {
+    const aliases = {
+      // TEACH Act aliases
+      'REG-66': ['REG-66', 'reg-66', 'technology-education-and-copyright-harmonization-a', 'teach-act'],
+      'reg-66': ['REG-66', 'reg-66', 'technology-education-and-copyright-harmonization-a', 'teach-act'],
+      'technology-education-and-copyright-harmonization-a': ['REG-66', 'reg-66', 'technology-education-and-copyright-harmonization-a', 'teach-act'],
+      'teach-act': ['REG-66', 'reg-66', 'technology-education-and-copyright-harmonization-a', 'teach-act'],
+      
+      // Age Discrimination Act aliases
+      'age-discrimination-act-of-1975': ['age-discrimination-act-of-1975', 'REG-1785'],
+      'REG-1785': ['age-discrimination-act-of-1975', 'REG-1785'],
+      
+      // ADA aliases
+      'americans-with-disabilities-act-of-1990': ['americans-with-disabilities-act-of-1990', 'ada', 'REG-1786'],
+      'ada': ['americans-with-disabilities-act-of-1990', 'ada', 'REG-1786'],
+      'REG-1786': ['americans-with-disabilities-act-of-1990', 'ada', 'REG-1786']
+    };
+    
+    return aliases[regulationId] || [regulationId];
+  }
+
+  /**
    * Push regulation update to subscribed clients
    */
   async pushRegulationUpdate(regulationId, updateData) {
-    const subscribedClients = this.subscriptions.get(regulationId);
-    if (!subscribedClients || subscribedClients.size === 0) {
-      console.log(`📭 No clients subscribed to ${regulationId}`);
+    // ✅ CRITICAL FIX: Check all regulation ID aliases for subscriptions
+    // This allows REG-66 updates to reach clients subscribed to "technology-education-and-copyright-harmonization-a"
+    const aliases = this.getRegulationAliases(regulationId);
+    const allSubscribedClients = new Set();
+    
+    for (const alias of aliases) {
+      const clients = this.subscriptions.get(alias);
+      if (clients) {
+        clients.forEach(clientId => allSubscribedClients.add(clientId));
+      }
+    }
+    
+    if (allSubscribedClients.size === 0) {
+      console.log(`📭 No clients subscribed to ${regulationId} (checked aliases: ${aliases.join(', ')})`);
       return;
     }
 
+    console.log(`📨 Found ${allSubscribedClients.size} clients subscribed via aliases: ${aliases.join(', ')}`);
+
     const notification = {
       type: 'regulation_updated',
-      regulationId,
+      regulationId, // Keep original ID in notification
       timestamp: new Date().toISOString(),
       data: updateData,
       version: updateData.version || 'unknown'
@@ -462,7 +861,7 @@ class RegulationPushService extends Emittery {
     let successCount = 0;
     let failureCount = 0;
 
-    for (const clientId of subscribedClients) {
+    for (const clientId of allSubscribedClients) {
       try {
         await this.sendToClient(clientId, notification);
         successCount++;
@@ -591,14 +990,21 @@ class RegulationDeliveryEngine extends Emittery {
         changeData
       );
       
-      // Push to clients
+      // Push to clients with FULL structured fields
       await this.pushService.pushRegulationUpdate(
         changeData.regulationId,
         {
           changeType: changeData.changeType,
           version: event.aggregateVersion,
           timestamp: event.timestamp,
-          summary: this.generateChangeSummary(changeData)
+          // ✅ CRITICAL: Include ALL structured fields from changeData.after
+          updatedContent: changeData.after?.updatedContent || changeData.after?.fullText || changeData.after?.content,
+          summary: changeData.after?.summary,
+          requirements: changeData.after?.requirements,
+          filingDeadlines: changeData.after?.filingDeadlines,
+          // Include full after data for compatibility
+          ...changeData.after,
+          changeSummary: this.generateChangeSummary(changeData)
         }
       );
       

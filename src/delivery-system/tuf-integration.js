@@ -72,15 +72,15 @@ export class TUFDeliveryIntegration {
       ].filter(Boolean); // Remove null/undefined endpoints
 
       const responses = await Promise.all(endpoints.map(url => 
-        fetch(url, { 
-          method: 'GET',
-          headers: { 'Content-Type': 'application/json' },
-          timeout: 30000 
+          fetch(url, { 
+            method: 'GET',
+            headers: { 'Content-Type': 'application/json' },
+            timeout: 30000 
         }).catch(error => {
           console.warn(`⚠️ Failed to fetch ${url}:`, error.message);
           return null;
-        })
-      ));
+          })
+        ));
 
       const responseData = await Promise.all(responses.map(async (response, index) => {
         if (!response || !response.ok) {

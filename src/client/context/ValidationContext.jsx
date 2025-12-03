@@ -107,66 +107,26 @@ const ValidationProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       
-      // Fetch real validation data from the MCP Engine API
+      // Try to fetch real validation data from the MCP Engine API
+      try {
       const response = await api.get('/validations/recent');
       
       if (response.data && response.data.validations) {
         setValidations(response.data.validations);
-      } else {
-        // If no real data available, provide realistic TEACH Act examples
-        const teachActValidations = [
-          {
-            id: 'teach-act-recent-1',
-            regulationId: 'TEACH-ACT-2024-01',
-            status: 'PASS',
-            confidence: 0.94,
-            timestamp: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(), // 2 days ago
-            levels: ['level1', 'level2', 'level3', 'level4'],
-            regulation: 'TEACH Act - 17 USC 110(2)',
-            findings: [],
-            validationSources: [
-              'Stanford Law Library (90% confidence)',
-              'Harvard Law Library (92% confidence)',
-              'Yale Law Library (90% confidence)',
-              'Columbia Law Library (91% confidence)'
-            ]
-          },
-          {
-            id: 'teach-act-recent-2',
-            regulationId: 'TEACH-ACT-2024-02',
-            status: 'PARTIAL',
-            confidence: 0.78,
-            timestamp: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days ago
-            levels: ['level1', 'level2', 'level3'],
-            regulation: 'TEACH Act - Educational Transmission Compliance',
-            findings: [
-              {
-                id: 'TEACH-FINDING-001',
-                path: 'institution.accreditation',
-                severity: 'WARNING',
-                message: 'Accredited nonprofit educational institution status needs verification'
-              },
-              {
-                id: 'TEACH-FINDING-002',
-                path: 'transmission.technologicalMeasures',
-                severity: 'ERROR',
-                message: 'Missing required technological measures to prevent retention beyond class session'
-              }
-            ],
-            validationSources: [
-              'Copyright Office Guidance',
-              'Cornell Legal Information Institute',
-              'Academic consensus analysis'
-            ]
-          }
-        ];
-        
-        setValidations(teachActValidations);
+          return; // Success - exit early
+        }
+      } catch (apiError) {
+        // API endpoint doesn't exist or failed - silently fall back to empty state
+        console.debug('Validations API not available, using empty state');
       }
+      
+      // Silently set empty validations array - this feature is deprecated
+      setValidations([]);
+      
     } catch (err) {
-      console.error('Error fetching validations:', err);
-      setError('Failed to load recent validations');
-      toast.error('Failed to load recent validations');
+      console.debug('Validation context initialization:', err.message);
+      // Silently handle - no error toast needed for deprecated feature
+      setValidations([]);
     } finally {
       setLoading(false);
     }

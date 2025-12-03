@@ -1050,7 +1050,9 @@
             background: #fee2e2;
             color: #991b1b;
         }
-    </style>
+    
+                @keyframes spin { to { transform: rotate(360deg); } }
+            </style>
 </head>
 <body>
     <div class="console-container">
@@ -1090,7 +1092,7 @@
                         <div class="regulation-section">
                             <div id="usc-loading" style="text-align: center; padding: 40px; color: #6e7681;">
                                 <div style="font-size: 16px; margin-bottom: 10px;">📖 Fetching Real Unrelated Business Income Tax (UBIT) CFR Implementation Text...</div>
-                                <div style="font-size: 14px;">Loading official TEACH Act statute from US Code</div>
+                                <div style="font-size: 14px;">Loading official Unrelated Business Income Tax Ubit statute from CFR</div>
                                     </div>
                             <div id="usc-content" style="display: none;">
                                 <h4 id="usc-title">Regulation: Unrelated Business Income Tax (UBIT) - Unrelated Business Income Tax (UBIT)</h4>
@@ -1126,11 +1128,11 @@
                     <div id="cfr-regs" class="tab-content">
                         <div class="regulation-section">
                             <div id="cfr-loading" style="text-align: center; padding: 40px; color: #6e7681;">
-                                <div style="font-size: 16px; margin-bottom: 10px;">📋 Fetching Real CFR TEACH Act Guidance...</div>
-                                <div style="font-size: 14px;">Loading official guidance from U.S. Copyright Office</div>
+                                <div style="font-size: 16px; margin-bottom: 10px;">📋 Fetching Real CFR Unrelated Business Income Tax Ubit Guidance...</div>
+                                <div style="font-size: 14px;">Loading official guidance from Department of Education</div>
                                 </div>
                             <div id="cfr-content" style="display: none;">
-                                <h4 id="cfr-title">TEACH Act Implementation Guidelines</h4>
+                                <h4 id="cfr-title">Unrelated Business Income Tax Ubit Implementation Guidelines</h4>
                                 <div id="cfr-metadata" style="font-size: 12px; color: #6e7681; margin-bottom: 20px; padding: 8px; background: #f0f6ff; border-radius: 4px; border-left: 3px solid #0969da;">
                                     <div id="cfr-source">Source: Loading...</div>
                                     <div id="cfr-updated">Last Updated: Loading...</div>
@@ -1176,11 +1178,11 @@
                     <div id="compliance" class="tab-content">
                         <div class="regulation-section">
                             <div id="compliance-loading" style="text-align: center; padding: 40px; color: #6e7681;">
-                                <div style="font-size: 16px; margin-bottom: 10px;">📋 Generating Real TEACH Act Compliance Guidance...</div>
-                                <div style="font-size: 14px;">Calculating institutional requirements and risk assessments</div>
+                                <div style="font-size: 16px; margin-bottom: 10px;">📋 Generating Real Unrelated Business Income Tax Ubit Compliance Guidance...</div>
+                                <div style="font-size: 14px;">Calculating institutional compliance requirements and risk assessments</div>
                                         </div>
                             <div id="compliance-content" style="display: none;">
-                                <h4 id="compliance-title">TEACH Act Compliance Guidelines</h4>
+                                <h4 id="compliance-title">Unrelated Business Income Tax Ubit Compliance Guidelines</h4>
                                 <div id="compliance-metadata" style="font-size: 12px; color: #6e7681; margin-bottom: 20px; padding: 8px; background: #f0f6ff; border-radius: 4px; border-left: 3px solid #0969da;">
                                     <div id="compliance-score">Overall Compliance: Loading...</div>
                                     <div id="compliance-updated">Last Assessment: Loading...</div>
@@ -1227,7 +1229,7 @@
                     
                     <div id="staging" class="tab-content">
                         <div class="regulation-section">
-                            <h4>TEACH Act Update Staging System</h4>
+                            <h4>Unrelated Business Income Tax Ubit Update Staging System</h4>
                             <div id="staging-loading" class="loading-state">
                                 <div class="loading-spinner"></div>
                                 <p>Loading real system versioning data...</p>
@@ -1244,7 +1246,7 @@
                     
                     <div id="api-distribution" class="tab-content">
                         <div class="regulation-section">
-                            <h4>TEACH Act Customer API Distribution</h4>
+                            <h4>Unrelated Business Income Tax Ubit Customer API Distribution</h4>
                             <div class="api-dashboard">
                                 <div class="api-endpoints">
                                     <div class="endpoint-card">
@@ -1435,9 +1437,7 @@
                 <button id="pushUpdateButton" onclick="pushRegulationUpdate()" class="run-button" style="background: #059669; margin-left: 12px; font-size: 12px;">
                     📤 PUSH UPDATE TO CLIENTS
                 </button>
-                <button id="updateAllButton" onclick="updateAllRegulations()" class="run-button" style="background: #dc2626; margin-left: 12px; font-size: 12px;">
-                    🔄 UPDATE ALL REGULATIONS
-                </button>
+                
             </div>
             
             <div class="console-output" id="consoleOutput">
@@ -1565,6 +1565,28 @@
             <div class="error-panel" id="errorPanel">
                 <div class="error-title">🚨 Error Details</div>
                 <div class="error-message" id="errorMessage"></div>
+            </div>
+        
+            <h3 style="margin-top: 24px;">🤖 AI Quality Auditor</h3>
+            <div id="inquisitorWidget" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; padding: 16px; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);">
+                <button id="inquisitorBtn" onclick="runInquisitorAudit()" style="background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.3); color: white; padding: 12px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: 600; font-size: 14px; transition: all 0.3s;">
+                    ⚡ Run AI Audit
+                </button>
+                <div id="inquisitorProgress" style="display: none; background: rgba(255, 255, 255, 0.95); margin-top: 12px; padding: 12px; border-radius: 8px;">
+                    <div style="font-size: 12px; color: #495057; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                        <span style="display: inline-block; width: 12px; height: 12px; border: 2px solid #667eea; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite;"></span>
+                        <span>AI analyzing regulation quality...</span>
+                    </div>
+                    <div style="background: #e9ecef; height: 8px; border-radius: 4px; overflow: hidden;">
+                        <div id="inquisitorProgressBar" style="height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); width: 0%; transition: width 0.5s ease;"></div>
+                    </div>
+                    <div id="inquisitorProgressText" style="text-align: center; font-size: 11px; color: #6c757d; margin-top: 6px; font-weight: 600;">0%</div>
+                </div>
+                <div id="inquisitorResults" style="display: none; background: white; margin-top: 12px; padding: 12px; border-radius: 8px;">
+                    <div style="font-weight: 600; margin-bottom: 8px;">Quality Report</div>
+                    <div id="inquisitorScores" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;"></div>
+                </div>
+                <div id="inquisitorError" style="display: none; background: #fee; color: #dc2626; padding: 10px; border-radius: 6px; margin-top: 12px; font-size: 12px;"></div>
             </div>
         </div>
     </div>
@@ -1717,70 +1739,7 @@
         let currentRegulationIndex = 0;
         let regulationsList = [];
         
-        async function updateAllRegulations() {
-            if (updateAllRunning) {
-                addConsoleLog('🛑 Update All process already running', 'warning');
-                return;
-            }
-            
-            updateAllRunning = true;
-            currentRegulationIndex = 0;
-            
-            const updateButton = document.getElementById('updateAllButton');
-            updateButton.textContent = '⏳ UPDATING ALL...';
-            updateButton.style.background = '#f59e0b';
-            
-            try {
-                addConsoleLog('🚀 Starting UPDATE ALL REGULATIONS process', 'success');
-                addConsoleLog('📋 Fetching complete regulations list...', 'info');
-                
-                // Fetch all regulations from the API
-                const response = await fetch('http://localhost:3010/api/regulations/all');
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch regulations: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                regulationsList = data.data || [];
-                
-                addConsoleLog(`✅ Found ${regulationsList.length} regulations to update`, 'success');
-                addConsoleLog('🔄 Beginning sequential update process...', 'info');
-                
-                // Process each regulation sequentially
-                for (let i = 0; i < regulationsList.length; i++) {
-                    currentRegulationIndex = i;
-                    const regulation = regulationsList[i];
-                    
-                    addConsoleLog(`\n📋 [${i + 1}/${regulationsList.length}] Processing: ${regulation.name}`, 'info');
-                    addConsoleLog(`🏷️  Topic: ${regulation.topic || 'General'}`, 'info');
-                    addConsoleLog(`🆔 ID: ${regulation.id || regulation.slug}`, 'info');
-                    
-                    // Update the button to show progress
-                    updateButton.textContent = `⏳ UPDATING ${i + 1}/${regulationsList.length}`;
-                    
-                    // Simulate regulation update process
-                    await updateSingleRegulation(regulation, i + 1, regulationsList.length);
-                    
-                    // Add delay between updates to prevent overwhelming the system
-                    if (i < regulationsList.length - 1) {
-                        addConsoleLog('⏱️  Waiting 2 seconds before next regulation...', 'info');
-                        await new Promise(resolve => setTimeout(resolve, 2000));
-                    }
-                }
-                
-                addConsoleLog('\n🎉 UPDATE ALL REGULATIONS COMPLETED!', 'success');
-                addConsoleLog(`✅ Successfully processed ${regulationsList.length} regulations`, 'success');
-                addConsoleLog('📊 All regulations are now up to date', 'success');
-                
-            } catch (error) {
-                addConsoleLog(`❌ Update All failed: ${error.message}`, 'error');
-                console.error('Update All error:', error);
-            } finally {
-                updateAllRunning = false;
-                updateButton.textContent = '🔄 UPDATE ALL REGULATIONS';
-                updateButton.style.background = '#dc2626';
-            }
-        }
+        
         
         async function updateSingleRegulation(regulation, index, total) {
             try {
@@ -1850,7 +1809,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        query: 'Execute Unrelated Business Income Tax (UBIT) comprehensive LinearEngine workflow for TEACH Act compliance validation',
+                        query: 'Execute Unrelated Business Income Tax (UBIT) comprehensive LinearEngine workflow for Unrelated Business Income Tax Ubit compliance validation',
                         options: { workflow: 'comprehensive', regulation: 'unrelated-business-income-tax-ubit', realExecution: true }
                     })
                 });
@@ -1879,13 +1838,13 @@
                             addConsoleLog(`   - Changes detected: ${step1.changes_detected}`, 'info');
                         }
                     } else {
-                        addConsoleLog('   - Unrelated Business Income Tax (UBIT) CFR Implementation (TEACH Act) ✓', 'info');
-                        addConsoleLog('   - Copyright Office TEACH Act Guidance ✓', 'info');
+                        addConsoleLog('   - Unrelated Business Income Tax (UBIT) CFR Implementation  ✓', 'info');
+                        addConsoleLog('   - Department of Education Unrelated Business Income Tax Ubit Guidance ✓', 'info');
                     }
                 } else {
                 addConsoleLog(`✅ Workflow ${result.workflowId || 'Unrelated Business Income Tax (UBIT)'} initiated successfully`, 'success');
-                    addConsoleLog('   - Unrelated Business Income Tax (UBIT) CFR Implementation (TEACH Act) ✓', 'info');
-                    addConsoleLog('   - Copyright Office TEACH Act Guidance ✓', 'info');
+                    addConsoleLog('   - Unrelated Business Income Tax (UBIT) CFR Implementation  ✓', 'info');
+                    addConsoleLog('   - Department of Education Unrelated Business Income Tax Ubit Guidance ✓', 'info');
                 }
                 
                 metrics.dataPoints += 2;
@@ -1955,11 +1914,11 @@
                 
                 const harvardConfidence = universityResults['Harvard Law Library'];
                 if (harvardConfidence) {
-                    addConsoleLog('     ✓ Harvard analysis: Found TEACH Act references', 'debug');
+                    addConsoleLog('     ✓ Harvard analysis: Found Unrelated Business Income Tax Ubit references', 'debug');
                     addConsoleLog(`     ✓ Validation confidence: ${harvardConfidence}% (REAL)`, 'debug');
                     updateUniversitySubstep('harvard', 'completed', harvardConfidence);
                 } else {
-                    addConsoleLog('     ✓ Harvard analysis: Found TEACH Act references', 'debug');
+                    addConsoleLog('     ✓ Harvard analysis: Found Unrelated Business Income Tax Ubit references', 'debug');
                     addConsoleLog('     ✓ Validation confidence: 92% (FALLBACK)', 'debug');
                     updateUniversitySubstep('harvard', 'completed', 92);
                 }
@@ -2006,7 +1965,7 @@
                     addConsoleLog(`     ✓ Academic consensus: ${step2Data.consensus_analysis}`, 'debug');
                     addConsoleLog(`     ✓ Corroborated ${Math.round(step2Data.corroboration_rate * 100)}% of government source materials`, 'debug');
                 } else {
-                    addConsoleLog('     ✓ Academic consensus: High agreement on TEACH Act interpretation', 'debug');
+                    addConsoleLog('     ✓ Academic consensus: High agreement on Unrelated Business Income Tax Ubit interpretation', 'debug');
                     addConsoleLog('     ✓ Corroborated 94% of government source materials', 'debug');
                 }
                 
@@ -2022,8 +1981,8 @@
                 // Step 4: CFR Integration
                 currentStep = 4;
                 updateStepStatus(4, 'running');
-                addConsoleLog('📜 STEP 4: Copyright Office integration and analysis...', 'step');
-                addConsoleLog('   - TEACH Act regulatory guidance analysis ✓', 'info');
+                addConsoleLog('📜 STEP 4: Department of Education integration and analysis...', 'step');
+                addConsoleLog('   - Unrelated Business Income Tax Ubit regulatory guidance analysis ✓', 'info');
                 addConsoleLog('   - Regulatory interpretation updates ✓', 'info');
                 addConsoleLog('   - Mapped 18 compliance requirements', 'debug');
                 metrics.apiCalls++;
@@ -2285,7 +2244,7 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        regulationId: 'Unrelated Business Income Tax (UBIT)',
+                        regulationId: 'unrelated-business-income-tax-ubit',
                         changeType: 'MANUAL_PUSH',
                         message: 'Manual update triggered from console',
                         timestamp: new Date().toISOString()
@@ -2315,8 +2274,8 @@
         setTimeout(() => {
             addConsoleLog('🔧 System diagnostics initialized', 'info');
             addConsoleLog('📡 Monitoring API endpoints...', 'debug');
-            addConsoleLog('📋 Regulation preview loaded: TEACH Act', 'info');
-            addConsoleLog('🎯 TEACH Act LinearEngine ready for execution', 'info');
+            addConsoleLog('📋 Regulation preview loaded: Unrelated Business Income Tax Ubit', 'info');
+            addConsoleLog('🎯 Unrelated Business Income Tax Ubit LinearEngine ready for execution', 'info');
             
             // Initialize real-time updates
             addConsoleLog('🔗 Initializing real-time regulation updates...', 'info');
@@ -2644,7 +2603,7 @@
                 const statusIcon = university.status === 'validated' ? '✅' : '⚡';
                 
                 let description = 'Legal research database';
-                if (university.university.includes('Harvard')) description = 'TEACH Act research database';
+                if (university.university.includes('Harvard')) description = 'Unrelated Business Income Tax Ubit research database';
                 if (university.university.includes('Yale')) description = 'Digital copyright analysis';
                 if (university.university.includes('Columbia')) description = 'Educational exemption research';
                 if (university.university.includes('Stanford')) description = 'Copyright & Fair Use Project';
@@ -2666,7 +2625,7 @@
             // Add academic consensus note
             const consensusItem = document.createElement('li');
             const validationRate = Math.round((universities.filter(u => u.status === 'validated').length / universities.length) * 100);
-            consensusItem.innerHTML = `<strong>Academic Consensus:</strong> ${validationRate}% validation rate on TEACH Act interpretation`;
+            consensusItem.innerHTML = `<strong>Academic Consensus:</strong> ${validationRate}% validation rate on Unrelated Business Income Tax Ubit interpretation`;
             list.appendChild(consensusItem);
             
             card.appendChild(titleElement);
@@ -2787,9 +2746,9 @@
             errorDiv.style.display = 'none';
             
             try {
-                console.log('📋 Fetching real TEACH Act compliance guidance from API...');
+                console.log('📋 Fetching real compliance guidance from API...');
                 
-                const response = await fetch('http://localhost:3002/api/llm/compliance/teach-act');
+                const response = await fetch('http://localhost:3002/api/llm/cfr/unrelated-business-income-tax-ubit');
                 const result = await response.json();
                 
                 if (result.success && result.data) {
@@ -2990,11 +2949,11 @@
                 
                 // For demo purposes, use our generated requirements
                 const enhancedRequirements = {
-                    title: 'TEACH Act Enhanced Requirements',
+                    title: 'Unrelated Business Income Tax Ubit Enhanced Requirements',
                     qualityScore: '100/100',
                     generatedAt: new Date().toISOString(),
                     apiKey: 'Requirements API Key (Second Key)',
-                    requirements: `**Key Compliance Requirements for TEACH Act:**
+                    requirements: `**Key Compliance Requirements for Unrelated Business Income Tax Ubit:**
 
 1. **Technology Infrastructure Requirements**
    - IT Department must implement access control systems limiting content to enrolled students
@@ -3009,7 +2968,7 @@
    - Review/update annually before academic year
 
 3. **Course Material Management**
-   - Faculty must verify materials meet TEACH Act requirements before use
+   - Faculty must verify materials meet regulatory requirements before use
    - Department chairs must approve copyrighted content usage
    - Instructors must supervise all digital transmissions directly
    - Verify compliance before each term
@@ -3204,11 +3163,11 @@
             // Update status to loading
             statusDiv.innerHTML = `
                 <div style="font-size: 16px; color: #495057; margin-bottom: 15px;">🔄 Loading Enhanced Data...</div>
-                <div style="font-size: 14px; color: #6c757d;">Fetching TEACH Act regulation with Federal Register integration...</div>
+                <div style="font-size: 14px; color: #6c757d;">Fetching Regulation regulation with Federal Register integration...</div>
             `;
             
             try {
-                console.log('📡 Fetching enhanced TEACH Act data for EdSteward preview...');
+                console.log('📡 Fetching enhanced Regulation data for EdSteward preview...');
                 
                 const response = await fetch('http://localhost:3002/api/llm/cfr/enhanced/teach-act?federal_register=true');
                 const data = await response.json();
@@ -3222,7 +3181,7 @@
                 // Update status to success
                 statusDiv.innerHTML = `
                     <div style="font-size: 16px; color: #198754; margin-bottom: 10px;">✅ EdSteward Preview Loaded Successfully!</div>
-                    <div style="font-size: 14px; color: #6c757d;">Enhanced TEACH Act data with ${enhancedData.federal_register_enhancement?.total_documents_referenced || 0} Federal Register documents</div>
+                    <div style="font-size: 14px; color: #6c757d;">Enhanced Regulation data with ${enhancedData.federal_register_enhancement?.total_documents_referenced || 0} Federal Register documents</div>
                 `;
                 
                 // Populate enhancement stats
@@ -3767,6 +3726,98 @@
             }
         });
 
+    </script>
+
+    <script>
+    // Inquisitor AI Quality Auditor
+    async function runInquisitorAudit() {
+        const btn = document.getElementById('inquisitorBtn');
+        const results = document.getElementById('inquisitorResults');
+        const scores = document.getElementById('inquisitorScores');
+        const errorDiv = document.getElementById('inquisitorError');
+        
+        btn.disabled = true;
+        btn.textContent = '🔄 Analyzing...';
+        btn.style.opacity = '0.6';
+        results.style.display = 'none';
+        errorDiv.style.display = 'none';
+        progress.style.display = 'block';
+        
+        // Animate progress bar from 0 to 90% over ~8 seconds
+        let currentProgress = 0;
+        const progressInterval = setInterval(() => {
+            currentProgress = Math.min(currentProgress + 10, 90);
+            progressBar.style.width = currentProgress + '%';
+            progressText.textContent = currentProgress + '%';
+        }, 800);
+        results.style.display = 'none';
+        errorDiv.style.display = 'none';
+        
+        // Get regulation slug from URL
+        const slug = window.location.pathname.split('/').pop().replace('-console.html', '');
+        
+        try {
+            const response = await fetch('http://localhost:3061/api/inquisitor/audit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ regulationSlug: slug }),
+                signal: AbortSignal.timeout(60000)
+            });
+            
+            clearInterval(progressInterval);
+            progressBar.style.width = '100%';
+            progressText.textContent = '100% Complete!';
+            
+            if (!response.ok) throw new Error('Audit failed');
+            
+            const data = await response.json();
+            if (data.success && data.audit) {
+                const audit = data.audit;
+                scores.innerHTML = `
+                    <div style="text-align: center; padding: 10px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <div style="font-size: 11px; color: #6c757d; font-weight: 600;">OVERALL</div>
+                        <div style="font-size: 24px; font-weight: 700; color: ${audit.overallScore >= 90 ? '#10b981' : audit.overallScore >= 75 ? '#3b82f6' : audit.overallScore >= 60 ? '#f59e0b' : '#ef4444'};">${audit.overallScore}</div>
+                    </div>
+                    <div style="text-align: center; padding: 10px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <div style="font-size: 11px; color: #6c757d; font-weight: 600;">CERTAINTY</div>
+                        <div style="font-size: 24px; font-weight: 700;">${audit.certaintyLevel || 'D'}</div>
+                    </div>
+                    <div style="text-align: center; padding: 10px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <div style="font-size: 11px; color: #6c757d; font-weight: 600;">CONTENT</div>
+                        <div style="font-size: 24px; font-weight: 700;">${audit.scores?.content || 0}</div>
+                    </div>
+                    <div style="text-align: center; padding: 10px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <div style="font-size: 11px; color: #6c757d; font-weight: 600;">SUMMARY</div>
+                        <div style="font-size: 24px; font-weight: 700;">${audit.scores?.summary || 0}</div>
+                    </div>
+                `;
+                if (audit.aiAnalysis && audit.aiAnalysis.enabled) {
+                    scores.innerHTML += `
+                        <div style="grid-column: 1 / -1; background: #f8f9fa; padding: 10px; border-radius: 6px; margin-top: 8px;">
+                            <div style="font-weight: 600; margin-bottom: 6px;">🤖 AI Analysis</div>
+                            <div style="font-size: 11px;">Legal Accuracy: <strong>${audit.aiAnalysis.legalAccuracy?.score || 0}/100</strong></div>
+                            <div style="font-size: 11px;">Completeness: <strong>${audit.aiAnalysis.completeness?.score || 0}/100</strong></div>
+                            <div style="font-size: 11px; margin-top: 6px; padding: 6px; background: white; border-radius: 4px;">${audit.aiAnalysis.overallAssessment || 'No assessment'}</div>
+                        </div>
+                    `;
+                }
+                results.style.display = 'block';
+            }
+        } catch (err) {
+            clearInterval(progressInterval);
+            errorDiv.textContent = '⚠️ Error: ' + err.message;
+            errorDiv.style.display = 'block';
+        } finally {
+            setTimeout(() => {
+                progress.style.display = 'none';
+                progressBar.style.width = '0%';
+                progressText.textContent = '0%';
+            }, 1500);
+            btn.disabled = false;
+            btn.textContent = '⚡ Run AI Audit';
+            btn.style.opacity = '1';
+        }
+    }
     </script>
 </body>
 </html>

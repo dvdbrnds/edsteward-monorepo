@@ -172,6 +172,86 @@ class GovernmentSourceFetcher {
   }
 
   /**
+   * Extract deadline from regulation text
+   * RULE: Every regulation MUST have a deadline. If none found, default to July 1.
+   */
+  extractDeadline(regulationText, effectiveDate = null) {
+    // Common deadline patterns in regulatory text
+    const deadlinePatterns = [
+      /(?:deadline|due|submit|file|report).*?(?:by|on|before|no later than)\s+((?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2}(?:st|nd|rd|th)?)/gi,
+      /(?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2}(?:st|nd|rd|th)?\s+(?:deadline|due date|filing date)/gi,
+      /(?:annually|each year)\s+(?:by|on|before)\s+((?:January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2}(?:st|nd|rd|th)?)/gi
+    ];
+    
+    // Try to find deadline in text
+    for (const pattern of deadlinePatterns) {
+      const match = regulationText?.match(pattern);
+      if (match && match[1]) {
+        console.log(`📅 Found deadline in regulation text: ${match[1]}`);
+        return this.normalizeDeadline(match[1]);
+      }
+    }
+    
+    // Check if effective date can be used as deadline
+    if (effectiveDate) {
+      const effectiveYear = new Date(effectiveDate).getFullYear();
+      const currentYear = new Date().getFullYear();
+      // Only use effective date as deadline if it's within 2 years
+      if (Math.abs(effectiveYear - currentYear) <= 2) {
+        const month = new Date(effectiveDate).toLocaleString('en-US', { month: 'long' });
+        const day = new Date(effectiveDate).getDate();
+        console.log(`📅 Using effective date as deadline: ${month} ${day}`);
+        return this.normalizeDeadline(`${month} ${day}`);
+      }
+    }
+    
+    // ✅ CRITICAL RULE: Default to July 1 if no deadline found
+    console.log(`📅 No deadline found - defaulting to July 1`);
+    return {
+      deadline: 'July 1',
+      deadlineMonth: '7',
+      deadlineLabel: '7-Jul'
+    };
+  }
+
+  /**
+   * Normalize deadline to consistent format
+   */
+  normalizeDeadline(deadlineText) {
+    const monthMap = {
+      'january': { num: '1', abbr: 'Jan' },
+      'february': { num: '2', abbr: 'Feb' },
+      'march': { num: '3', abbr: 'Mar' },
+      'april': { num: '4', abbr: 'Apr' },
+      'may': { num: '5', abbr: 'May' },
+      'june': { num: '6', abbr: 'Jun' },
+      'july': { num: '7', abbr: 'Jul' },
+      'august': { num: '8', abbr: 'Aug' },
+      'september': { num: '9', abbr: 'Sep' },
+      'october': { num: '10', abbr: 'Oct' },
+      'november': { num: '11', abbr: 'Nov' },
+      'december': { num: '12', abbr: 'Dec' }
+    };
+    
+    const cleanText = deadlineText.toLowerCase().trim();
+    for (const [month, data] of Object.entries(monthMap)) {
+      if (cleanText.includes(month)) {
+        return {
+          deadline: deadlineText,
+          deadlineMonth: data.num,
+          deadlineLabel: `${data.num}-${data.abbr}`
+        };
+      }
+    }
+    
+    return {
+      deadline: deadlineText,
+      deadlineMonth: null,
+      deadlineLabel: null
+    };
+  }
+
+  /**
    * Fetch from Federal Register API - REAL DATA with correct format
    */
   async fetchFromFederalRegister(documentNumber) {
@@ -183,16 +263,24 @@ class GovernmentSourceFetcher {
       
       const data = JSON.parse(response.data);
       
+      // ✅ CRITICAL: Extract deadline from regulation text
+      const fullText = data.body || data.abstract || '';
+      const deadlineInfo = this.extractDeadline(fullText, data.effective_on);
+      
       return {
         title: data.title,
         source: 'Federal Register',
         citation: data.citation,
         sourceUrl: data.html_url,
-        fullText: data.body || data.abstract,
+        fullText: fullText,
         documentNumber: data.document_number,
         agency: data.agencies?.[0]?.name || 'Federal Government',
         publicationDate: data.publication_date,
         effectiveDate: data.effective_on,
+        // ✅ CRITICAL: Include extracted deadline information
+        deadline: deadlineInfo.deadline,
+        deadlineMonth: deadlineInfo.deadlineMonth,
+        deadlineLabel: deadlineInfo.deadlineLabel,
         enforcementAgency: data.agencies?.[0]?.name || 'Federal Government',
         lastUpdated: new Date().toISOString(),
         regulationType: 'Federal Regulation'

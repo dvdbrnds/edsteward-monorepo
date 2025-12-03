@@ -357,8 +357,9 @@ class DeliveryServer {
       try {
         console.log(`📤 Manual update triggered for ${regulationId} via console`);
         
-        // Fetch the REAL regulation content from the MCP Engine
-        const regulationContent = await this.fetchFullRegulationContent(regulationId);
+        // ✅ CRITICAL: Use CDC's fetchRegulationState which includes FULL structured field extraction
+        // This ensures we get: updatedContent, summary, requirements, filingDeadlines
+        const regulationContent = await this.deliveryEngine.cdc.fetchRegulationState(regulationId);
         
         // Create a manual update event with COMPLETE USC TEXT for differential view
         const uscFullText = regulationContent.fullText || regulationContent.content || '';
@@ -378,14 +379,14 @@ class DeliveryServer {
           source: 'console_manual_trigger',
           data: {
             before: { 
-              content: regulationContent.content || regulationContent.fullText, // Current regulation text
-              fullText: regulationContent.content || regulationContent.fullText, // Alias for compatibility
+              content: regulationContent.fullText || regulationContent.content, // ✅ CRITICAL: Prioritize fullText (13K+ chars) over content (86 chars)
+              fullText: regulationContent.fullText || regulationContent.content, // Alias for compatibility
               version: (regulationContent.version || 'unknown').replace(/\.\d+$/, '.0') // Previous version
             },
             after: {
               ...regulationContent,
-              content: regulationContent.content || regulationContent.fullText, // Current regulation text
-              fullText: regulationContent.content || regulationContent.fullText, // Alias for compatibility
+              content: regulationContent.fullText || regulationContent.content, // ✅ CRITICAL: Prioritize fullText for complete regulation text
+              fullText: regulationContent.fullText || regulationContent.content, // Alias for compatibility
               message: `${message} - Updated via MCP Engine with complete regulation text`
             },
             contentHash: 'manual_' + Date.now()
@@ -399,6 +400,7 @@ class DeliveryServer {
         const status = this.deliveryEngine.getStatus();
         const realVersion = regulationContent.version || 'unknown';
         
+        // ✅ CRITICAL: Return COMPLETE regulation data for validation
         res.json({
           success: true,
           message: `Manual update triggered for ${regulationId}`,
@@ -406,7 +408,9 @@ class DeliveryServer {
           version: realVersion,
           updateId: updateData.data.contentHash,
           clientsNotified: status?.regulations?.[regulationId]?.connectedClients || 0,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          // ✅ NEW: Include complete regulation data for validation and inspection
+          regulationData: updateData.data.after
         });
         
       } catch (error) {
@@ -434,16 +438,16 @@ class DeliveryServer {
       // Test EdSteward connection in background (don't wait for it)
       setImmediate(async () => {
         console.log('🔧 [BACKGROUND] Testing EdSteward connection...');
-        try {
+      try {
           const connected = await this.edstewardIntegration.testConnection();
           if (connected) {
             console.log('✅ [BACKGROUND] EdSteward connection successful');
           } else {
             console.log('⚠️ [BACKGROUND] EdSteward not available - delivery system running independently');
           }
-        } catch (error) {
+      } catch (error) {
           console.log('⚠️ [BACKGROUND] EdSteward connection failed - delivery system running independently');
-        }
+      }
       });
 
       console.log('🔧 [START] Creating delivery engine...');
@@ -531,7 +535,7 @@ class DeliveryServer {
         uscEndpoint = 'http://localhost:3002/api/llm/usc/29/651'; // Occupational Safety and Health Act
         cfrEndpoint = `http://localhost:3002/api/llm/cfr/${regulationId}`;
         complianceEndpoint = `http://localhost:3002/api/llm/compliance/${regulationId}`;
-      } else if (regulationId.includes('REG-66') || regulationId.includes('reg-66') || regulationId.includes('teach')) {
+      } else if (regulationId.includes('REG-66') || regulationId.includes('reg-66') || regulationId.includes('teach') || regulationId.includes('technology-education-and-copyright-harmonization')) {
         // TEACH Act uses enhanced CFR endpoint with Federal Register integration
         uscEndpoint = 'http://localhost:3002/api/llm/usc/17/110';
         cfrEndpoint = 'http://localhost:3002/api/llm/cfr/enhanced/teach-act?federal_register=true';
@@ -633,9 +637,9 @@ class DeliveryServer {
         } else {
           regulationFullText = uscContent || cfrContent || complianceData?.content || 'OSHA regulation text not available';
         }
-      } else if (regulationId.includes('REG-66') || regulationId.includes('reg-66') || regulationId.includes('teach')) {
-        // For TEACH Act, use USC data
-        regulationFullText = uscData?.data?.content || uscData?.content || uscData?.fullText || 'USC 17 Section 110 text not available';
+      } else if (regulationId.includes('REG-66') || regulationId.includes('reg-66') || regulationId.includes('teach') || regulationId.includes('technology-education-and-copyright-harmonization')) {
+        // ✅ CRITICAL FIX: For TEACH Act, prioritize fullText field (13K+ chars) over content field (86 chars)
+        regulationFullText = uscData?.data?.fullText || uscData?.fullText || uscData?.data?.content || uscData?.content || 'USC 17 Section 110 text not available';
       } else if (regulationId.includes('gdpr') || regulationId.includes('GDPR')) {
         // For GDPR, use compliance data (EU regulation)
         regulationFullText = complianceData?.content || complianceData?.data?.content || 'GDPR regulation text not available';

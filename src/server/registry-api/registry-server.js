@@ -124,10 +124,88 @@ app.get('/health', (req, res) => {
   });
 });
 
-// Get all regulations
-app.get('/api/regulations', (req, res) => {
-  const regulations = readRegulations();
-  res.json(regulations);
+/**
+ * Extract and normalize deadline information
+ * RULE: Every regulation MUST have a deadline. If none specified, default to July 1.
+ */
+function extractDeadlineInfo(reg) {
+  const rawDeadline = reg['Deadlines'];
+  const sortableMonth = reg['Sortable Month'];
+  const reportingRequirements = reg['Reporting Requirements'];
+  
+  // Check if deadline exists and is meaningful
+  const hasDeadline = rawDeadline && 
+                      rawDeadline.trim() !== '' && 
+                      rawDeadline.toLowerCase() !== 'not applicable' &&
+                      rawDeadline.toLowerCase() !== 'n/a' &&
+                      rawDeadline.toLowerCase() !== 'none';
+  
+  // ✅ CRITICAL RULE: Every regulation MUST have a deadline
+  // If no deadline specified, default to July 1
+  if (!hasDeadline) {
+    console.log(`📅 No deadline specified for "${reg['Statute Name']}" - defaulting to July 1`);
+    return {
+      deadline: 'July 1',
+      deadlineMonth: '7',
+      deadlineLabel: '7-Jul',
+      reportingRequirements: reportingRequirements || 'Annual compliance review recommended by July 1'
+    };
+  }
+  
+  // Extract month number from sortable month field
+  const monthNumber = sortableMonth ? sortableMonth.split('-')[0] : null;
+  
+  return {
+    deadline: rawDeadline,
+    deadlineMonth: monthNumber,
+    deadlineLabel: sortableMonth,
+    reportingRequirements: reportingRequirements
+  };
+}
+
+// Get all regulations - Enhanced with deadline data from CSV
+app.get('/api/regulations', ensureRegulationsLoaded, (req, res) => {
+  try {
+    // Transform CSV data to API format with COMPLETE deadline information
+    // ✅ CRITICAL FIX: Removed .slice(0, 50) to serve ALL 295 regulations for Friday demo
+    const apiRegulations = allRegulations.map((reg, index) => {
+      // ✅ CRITICAL: Extract deadline with July 1 default fallback
+      const deadlineInfo = extractDeadlineInfo(reg);
+      
+      return {
+        regulationId: consoleGenerator.getRegulationSlug(reg) || `reg-${index}`,
+        name: reg['Statute Name'] || 'Unknown Regulation',
+        description: reg['Statutory Summary'] || 'No description available',
+        version: '1.0',
+        enactedDate: reg['Last Updated'] || new Date().toISOString(),
+        publicLaw: reg['Statute 1'] || 'Unknown',
+        
+        // ✅ CRITICAL: Include deadline and compliance data (with July 1 default)
+        deadline: deadlineInfo.deadline,
+        deadlineMonth: deadlineInfo.deadlineMonth,
+        deadlineLabel: deadlineInfo.deadlineLabel,
+        reportingRequirements: deadlineInfo.reportingRequirements,
+        
+        // Additional metadata
+        topic: reg.Topic || 'Uncategorized',
+        statutes: [reg['Statute 1'], reg['Statute 2'], reg['Statute 3'], reg['Statute 4']].filter(Boolean),
+        regulations: [reg['Regulation 1'], reg['Regulation 2'], reg['Regulation 3'], reg['Regulation 4'], reg['Regulation 5']].filter(Boolean),
+        
+        keyProvisions: [
+          {
+            title: reg.Topic || 'General Compliance',
+            description: reg['Reporting Requirements'] || 'See regulation for details'
+          }
+        ],
+        updatedAt: new Date().toISOString()
+      };
+    });
+    
+    res.json(apiRegulations);
+  } catch (error) {
+    console.error('Error serving regulations:', error);
+    res.status(500).json({ error: 'Failed to load regulations' });
+  }
 });
 
 // Search regulations by keyword

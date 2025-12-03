@@ -73,10 +73,10 @@ const SimpleRegulationSearch = ({ onRegulationSelect, placeholder = "Search regu
   // Load all regulations on component mount
   useEffect(() => {
     const loadAllRegulations = async () => {
-      setLoading(true);
-      setError(null);
+    setLoading(true);
+    setError(null);
 
-      try {
+    try {
         console.log('🔍 Loading all regulations...');
         const response = await fetch('http://localhost:3010/api/regulations/all');
         const data = await response.json();
@@ -85,17 +85,17 @@ const SimpleRegulationSearch = ({ onRegulationSelect, placeholder = "Search regu
           console.log(`✅ Loaded ${data.data.length} regulations`);
           setAllRegulations(data.data);
           setFilteredRegulations(data.data); // Show all initially
-        } else {
+      } else {
           throw new Error('No regulation data returned');
-        }
-      } catch (err) {
+      }
+    } catch (err) {
         console.error('Error loading regulations:', err);
-        setError(err.message);
+      setError(err.message);
         setAllRegulations([]);
         setFilteredRegulations([]);
-      } finally {
-        setLoading(false);
-      }
+    } finally {
+      setLoading(false);
+    }
     };
 
     loadAllRegulations();
@@ -175,31 +175,31 @@ const SimpleRegulationSearch = ({ onRegulationSelect, placeholder = "Search regu
           
           <ResultsContainer>
             {filteredRegulations.map((regulation, index) => (
-              <ResultItem 
+            <ResultItem 
                 key={regulation.id || index}
-                onClick={() => handleRegulationClick(regulation)}
-              >
-                <ResultTitle>{regulation.name || 'Unnamed Regulation'}</ResultTitle>
+              onClick={() => handleRegulationClick(regulation)}
+            >
+              <ResultTitle>{regulation.name || 'Unnamed Regulation'}</ResultTitle>
                 <ResultId>{regulation.id}</ResultId>
                 {regulation.topic && (
-                  <Tag color="blue" style={{ marginTop: '8px' }}>
-                    {regulation.topic}
-                  </Tag>
-                )}
+                <Tag color="blue" style={{ marginTop: '8px' }}>
+                  {regulation.topic}
+                </Tag>
+              )}
                 {regulation.lastUpdated && (
                   <Tag color="default" style={{ marginTop: '8px' }}>
                     Updated: {new Date(regulation.lastUpdated).toLocaleDateString()}
                   </Tag>
                 )}
-              </ResultItem>
-            ))}
+            </ResultItem>
+          ))}
           </ResultsContainer>
 
           {!loading && filteredRegulations.length === 0 && searchQuery && (
             <div style={{ textAlign: 'center', padding: '20px', color: '#8c8c8c' }}>
               <Text>No regulations found matching "{searchQuery}"</Text>
-            </div>
-          )}
+        </div>
+      )}
         </>
       )}
     </SearchContainer>
