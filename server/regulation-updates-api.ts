@@ -184,9 +184,10 @@ const tufUpdateSchema = z.object({
  * @returns Actual EdSteward regulation ID or null if invalid
  */
 function validateRegulationId(regulationId: number): number | null {
-  // EdSteward now uses Master Key Field system: sequential IDs 1-354
+  // EdSteward now uses Master Key Field system: sequential IDs
+  // Allow IDs 1-500 to accommodate all regulations including Clery Act (355)
   // No mapping needed - use regulation IDs directly
-  if (regulationId < 1 || regulationId > 354) {
+  if (regulationId < 1 || regulationId > 500) {
     return null;
   }
   
@@ -296,10 +297,10 @@ export function setupRegulationUpdatesApi(app: Express) {
           const validRegulationId = validateRegulationId(rawData.regulationId);
           
           if (validRegulationId === null) {
-            console.error(`❌ Invalid regulation ID: ${rawData.regulationId}. Must be between 1-354.`);
+            console.error(`❌ Invalid regulation ID: ${rawData.regulationId}. Must be between 1-500.`);
             return res.status(400).json({ 
               success: false,
-              error: `Invalid regulation ID: ${rawData.regulationId}. Use IDs 1-354 for Master Key Field system.` 
+              error: `Invalid regulation ID: ${rawData.regulationId}. Use IDs 1-500 for Master Key Field system.` 
             });
           }
           
@@ -334,10 +335,10 @@ export function setupRegulationUpdatesApi(app: Express) {
             const validRegulationId = validateRegulationId(mcpData.regulationId);
             
             if (validRegulationId === null) {
-              console.error(`❌ Invalid regulation ID: ${mcpData.regulationId}. Must be between 1-354.`);
+              console.error(`❌ Invalid regulation ID: ${mcpData.regulationId}. Must be between 1-500.`);
               return res.status(400).json({ 
                 success: false,
-                error: `Invalid regulation ID: ${mcpData.regulationId}. Use IDs 1-354 for Master Key Field system.` 
+                error: `Invalid regulation ID: ${mcpData.regulationId}. Use IDs 1-500 for Master Key Field system.` 
               });
             }
             

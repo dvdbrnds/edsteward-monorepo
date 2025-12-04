@@ -625,6 +625,118 @@ These requirements apply to all educational institutions receiving federal fundi
               </div>
             </CardContent>
           </Card>
+
+          {/* 📋 SUMMARY SECTION - Most Important! */}
+          {update.summary && (
+            <Card className="mb-6" style={{
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              color: 'white',
+              border: 'none'
+            }}>
+              <CardHeader>
+                <CardTitle className="text-white">📋 Summary</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p style={{fontSize: '1.1rem', lineHeight: '1.6', margin: 0}}>
+                  {update.summary}
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* ✅ REQUIREMENTS SECTION */}
+          {update.requirements && (
+            <Card className="mb-6" style={{
+              borderLeft: '4px solid #28a745'
+            }}>
+              <CardHeader>
+                <CardTitle>✅ Compliance Requirements</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <pre style={{
+                  whiteSpace: 'pre-wrap',
+                  fontFamily: 'inherit',
+                  margin: 0,
+                  lineHeight: '1.6'
+                }}>
+                  {update.requirements}
+                </pre>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* 📅 DEADLINES SECTION */}
+          {update.filingDeadlines && (() => {
+            try {
+              const deadlines = typeof update.filingDeadlines === 'string' 
+                ? JSON.parse(update.filingDeadlines) 
+                : update.filingDeadlines;
+              
+              return (
+                <Card className="mb-6" style={{
+                  background: '#fff3cd',
+                  borderLeft: '4px solid #ffc107'
+                }}>
+                  <CardHeader>
+                    <CardTitle>📅 Important Deadlines</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="space-y-3">
+                      {deadlines.map((deadline: any, idx: number) => (
+                        <div key={idx} style={{
+                          background: 'white',
+                          padding: '1rem',
+                          borderRadius: '4px',
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+                        }}>
+                          <div style={{marginBottom: '0.5rem'}}>
+                            <Badge variant="default" className="mr-2">
+                              {deadline.type}
+                            </Badge>
+                            {deadline.recurring && (
+                              <Badge variant="secondary">
+                                🔁 Recurring
+                              </Badge>
+                            )}
+                          </div>
+                          <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            flexWrap: 'wrap',
+                            gap: '0.5rem'
+                          }}>
+                            <strong>{deadline.description}</strong>
+                            <span style={{color: '#666', fontStyle: 'italic'}}>
+                              {deadline.date}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            } catch (e) {
+              return (
+                <Card className="mb-6">
+                  <CardContent>
+                    <p className="text-red-600">Error parsing deadlines: {(e as Error).message}</p>
+                  </CardContent>
+                </Card>
+              );
+            }
+          })()}
+
+          {/* ℹ️ UPDATE METADATA */}
+          {update.metadata && (
+            <div className="mb-6 p-4 bg-gray-100 rounded-lg text-sm">
+              <strong>Update Info:</strong> 
+              {' '}ID #{update.id}
+              {' • '}Source: {update.metadata.source || 'MCP_ENGINE'}
+              {' • '}Received: {new Date(update.updateDate).toLocaleString()}
+            </div>
+          )}
           
           <Tabs defaultValue="diff" className="mb-6">
             <TabsList>

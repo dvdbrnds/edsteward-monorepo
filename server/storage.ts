@@ -239,15 +239,19 @@ export class DatabaseStorage implements IStorage {
         return {
           id: update.id,
           regulationId: update.regulation_id,
+          name: update.name,
           originalContent: update.original_content,
           updatedContent: update.updated_content,
+          summary: update.summary,
+          requirements: update.requirements,
+          filingDeadlines: update.filing_deadlines,
           status: update.status,
           updateDate: update.created_at ? new Date(update.created_at) : new Date(),
           signature: update.signature_data,
           userId: update.reviewer_id,
           rejectionReason: update.rejection_reason,
           processedAt: update.reviewed_at ? new Date(update.reviewed_at) : null,
-          name: update.summary || `Update #${update.id}`
+          metadata: update.metadata
         } as RegulationUpdate;
       }
       return null;

@@ -7,6 +7,26 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Loader2, FileText, Eye, Calendar, Clock, RefreshCw, Trash2, PlayCircle, Zap, CheckCircle } from 'lucide-react';
 import Navigation from "@/components/layout/navigation";
 
+// Type definition for regulation updates with rich fields
+interface RegulationUpdate {
+  id: number;
+  regulationId: number;
+  name: string;
+  originalContent: string;
+  updatedContent: string;
+  summary?: string | null;
+  requirements?: string | null;
+  filingDeadlines?: string | null;
+  status: string;
+  updateDate: string;
+  metadata?: any;
+  changeStats?: {
+    addedPercentage: number;
+    removedPercentage: number;
+    changedPercentage: number;
+  };
+}
+
 const UpdatesListPage: React.FC = () => {
   console.log('🚀 UpdatesListPage component is rendering!');
   console.log('🚀 UpdatesListPage: Current URL:', window.location.pathname);
@@ -14,7 +34,7 @@ const UpdatesListPage: React.FC = () => {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const queryClient = useQueryClient();
   
-  const { data: pendingUpdates = [], isLoading, error, refetch, dataUpdatedAt } = useQuery({
+  const { data: pendingUpdates = [], isLoading, error, refetch, dataUpdatedAt } = useQuery<RegulationUpdate[]>({
     queryKey: ['/api/regulation-updates/pending'],
     queryFn: async () => {
       const timestamp = new Date().toLocaleTimeString();
@@ -31,6 +51,11 @@ const UpdatesListPage: React.FC = () => {
       }
       const jsonData = await response.json();
       console.log(`📊 [${timestamp}] API response (${jsonData.length} items):`, jsonData);
+      console.log(`📊 [${timestamp}] First update fields:`, jsonData[0] ? {
+        hasSummary: !!jsonData[0].summary,
+        hasRequirements: !!jsonData[0].requirements,
+        hasDeadlines: !!jsonData[0].filingDeadlines
+      } : 'No updates');
       return Array.isArray(jsonData) ? jsonData : [];
     },
     refetchInterval: 30000, // Refetch every 30 seconds (reduced from 3 seconds)
@@ -431,7 +456,7 @@ const UpdatesListPage: React.FC = () => {
                         </Badge>
                       </div>
                       
-                      <div className="flex items-center gap-4 text-sm text-gray-500">
+                      <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
                         <span className="flex items-center gap-1">
                           <Calendar className="h-4 w-4" />
                           {new Date(update.updateDate).toLocaleDateString()}
@@ -440,6 +465,55 @@ const UpdatesListPage: React.FC = () => {
                           <Clock className="h-4 w-4" />
                           {new Date(update.updateDate).toLocaleTimeString()}
                         </span>
+                      </div>
+                      
+                      {/* Quality Indicators */}
+                      <div className="flex flex-wrap gap-2">
+                        {/* Content Badge */}
+                        <Badge 
+                          variant={update.updatedContent && update.updatedContent.length >= 100 ? "default" : "destructive"}
+                          className="text-xs"
+                        >
+                          {update.updatedContent && update.updatedContent.length >= 100 ? '✅' : '❌'} Content
+                          {update.updatedContent && ` (${update.updatedContent.length} chars)`}
+                        </Badge>
+                        
+                        {/* Summary Badge */}
+                        <Badge 
+                          variant={update.summary ? "default" : "outline"}
+                          className="text-xs"
+                        >
+                          {update.summary ? '✅' : '❌'} Summary
+                          {update.summary && ` (${update.summary.length} chars)`}
+                        </Badge>
+                        
+                        {/* Requirements Badge */}
+                        <Badge 
+                          variant={update.requirements ? "default" : "outline"}
+                          className="text-xs"
+                        >
+                          {update.requirements ? '✅' : '❌'} Requirements
+                        </Badge>
+                        
+                        {/* Deadlines Badge */}
+                        <Badge 
+                          variant={update.filingDeadlines ? "default" : "outline"}
+                          className="text-xs"
+                        >
+                          {update.filingDeadlines ? '✅' : '❌'} Deadlines
+                          {update.filingDeadlines && 
+                            (() => {
+                              try {
+                                const parsed = typeof update.filingDeadlines === 'string' 
+                                  ? JSON.parse(update.filingDeadlines) 
+                                  : update.filingDeadlines;
+                                return ` (${parsed.length})`;
+                              } catch {
+                                return '';
+                              }
+                            })()
+                          }
+                        </Badge>
                       </div>
                     </div>
                     
