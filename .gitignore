@@ -49,3 +49,7 @@ coverage/
 .kiro/steering/byterover-rules.md
 .qoder/rules/byterover-rules.md
 .augment/rules/byterover-rules.md
+# Database backups
+backups/*.sql
+backups/*.sql.gz
+backups/*.json

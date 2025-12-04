@@ -18,6 +18,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from "date-fns";
 import { InstitutionSettings } from "@/components/admin/institution-settings";
 import { BrandingSettingsV2 } from "@/components/admin/branding-settings";
+import { BackupManagement } from "@/components/admin/backup-management";
 import {
   Table,
   TableBody,
@@ -420,12 +421,13 @@ export default function SystemSettingsPage() {
           <h1 className="text-3xl font-bold text-gray-900 mb-8">System Settings</h1>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-6 mb-4">
+            <TabsList className="grid grid-cols-7 mb-4">
               <TabsTrigger value="institution">Institution</TabsTrigger>
               <TabsTrigger value="branding">Branding</TabsTrigger>
               <TabsTrigger value="email">Email</TabsTrigger>
               <TabsTrigger value="sms">SMS</TabsTrigger>
               <TabsTrigger value="users">Users</TabsTrigger>
+              <TabsTrigger value="backups">Backups</TabsTrigger>
               <TabsTrigger value="logs">System Logs</TabsTrigger>
             </TabsList>
 
@@ -700,6 +702,10 @@ export default function SystemSettingsPage() {
                   </div>
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            <TabsContent value="backups">
+              <BackupManagement />
             </TabsContent>
 
             <TabsContent value="logs">

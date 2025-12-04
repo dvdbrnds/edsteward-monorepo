@@ -32,8 +32,8 @@ RUN npm run build
 FROM base AS runner
 WORKDIR /app
 
-# Install wget for health checks
-RUN apk add --no-cache wget
+# Install wget for health checks and postgresql-client for database backups
+RUN apk add --no-cache wget postgresql-client
 
 # Create app user for security
 RUN addgroup --system --gid 1001 nodejs
@@ -57,8 +57,8 @@ RUN apk add --no-cache python3 make g++
 # Rebuild native modules for Alpine
 RUN npm rebuild bcrypt --build-from-source
 
-# Create necessary directories
-RUN mkdir -p ./uploads ./logs ./assets && chown nodejs:nodejs ./uploads ./logs ./assets
+# Create necessary directories (including backups for database backup feature)
+RUN mkdir -p ./uploads ./logs ./assets ./backups && chown nodejs:nodejs ./uploads ./logs ./assets ./backups
 
 # Set permissions
 USER nodejs
@@ -70,6 +70,7 @@ EXPOSE 3000
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
+ENV DOCKER_CONTAINER=true
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \

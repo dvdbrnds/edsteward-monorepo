@@ -39,7 +39,8 @@ FROM base AS runner
 WORKDIR /app
 
 # Install dependencies for runtime (removed build tools since we don't need to rebuild native modules)
-RUN apk add --no-cache wget
+# postgresql-client provides pg_dump and psql for database backups
+RUN apk add --no-cache wget postgresql-client
 
 # Create app user for security
 RUN addgroup --system --gid 1001 nodejs
@@ -67,8 +68,8 @@ RUN mkdir -p ./exports
 # Copy SSL directory (create instead of copy since it doesn't exist)
 # COPY --from=builder /app/ssl ./ssl (directory doesn't exist)
 
-# Create uploads, logs, and ssl directories (fallback for local development)
-RUN mkdir -p /app/uploads /app/logs /app/ssl && chown nodejs:nodejs /app/uploads /app/logs
+# Create uploads, logs, ssl, and backups directories (fallback for local development)
+RUN mkdir -p /app/uploads /app/logs /app/ssl /app/backups && chown nodejs:nodejs /app/uploads /app/logs /app/backups
 
 # Create all directories that the application might need at runtime
 RUN mkdir -p /app/client/public/assets /app/client/public/downloads /app/public/uploads /app/public/downloads && \
@@ -87,6 +88,7 @@ EXPOSE 3000
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0
+ENV DOCKER_CONTAINER=true
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \

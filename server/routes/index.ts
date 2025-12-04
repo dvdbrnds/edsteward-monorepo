@@ -18,6 +18,8 @@ import path from 'path';
 import uploadsRoutes from './api/uploads';
 import regulationsRouter from './api/regulations';
 import notesRouter from './api/notes';
+import backupsRouter from './api/backups';
+import { initializeBackupScheduler } from '../services/backup-service';
 import deadlinesRouter from './api/deadlines';
 import notificationsRouter from './api/notifications';
 import notificationHistoryRouter from './api/notification-history';
@@ -407,6 +409,7 @@ export function registerRoutes(app: express.Application): Server {
   });
 
   app.use('/api/uploads', uploadsRoutes);
+  app.use('/api/backups', backupsRouter);
   app.use('/api/regulations', regulationsRouter);
   app.use('/api/public/regulations', regulationsRouter); // Public access to regulations for trustees dashboard
   app.use('/api/notes', notesRouter);
@@ -1320,6 +1323,9 @@ export function registerRoutes(app: express.Application): Server {
 
   // Initialize database
   initializeDatabase().catch(console.error);
+
+  // Initialize backup scheduler (production only by default)
+  initializeBackupScheduler();
 
   // Serve static files
   app.use('/downloads', express.static(path.join(process.cwd(), 'public/downloads')));
