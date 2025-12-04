@@ -143,16 +143,19 @@ router.post('/branding', requireAdmin, brandingUpload.fields([
   try {
     const files = req.files as { [fieldname: string]: Express.Multer.File[] };
     const results: { [key: string]: string } = {};
+    const timestamp = Date.now(); // Cache-busting timestamp
     
     if (files.logo && files.logo[0]) {
       const logoFile = files.logo[0];
-      results.logoUrl = `/assets/${logoFile.filename}`;
+      // Add cache-busting timestamp to URL to force browser refresh
+      results.logoUrl = `/assets/${logoFile.filename}?v=${timestamp}`;
       syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Logo uploaded: ${logoFile.filename}`);
     }
     
     if (files.favicon && files.favicon[0]) {
       const faviconFile = files.favicon[0];
-      results.faviconUrl = `/assets/${faviconFile.filename}`;
+      // Add cache-busting timestamp to URL to force browser refresh
+      results.faviconUrl = `/assets/${faviconFile.filename}?v=${timestamp}`;
       syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Favicon uploaded: ${faviconFile.filename}`);
     }
     
