@@ -69,28 +69,9 @@ const writeRegulations = (regulations) => {
 const consoleGenerator = new ConsoleGenerator();
 let allRegulations = [];
 
-// Load all regulations from emergency JSON file (bypass broken CSV)
+// Load all regulations from CSV asynchronously
 const loadAllRegulations = async () => {
   try {
-    // EMERGENCY: Load from consolidated JSON file for presentation
-    const emergencyJsonPath = path.join(__dirname, '../../../regulations-for-registry-api.json');
-    
-    if (fs.existsSync(emergencyJsonPath)) {
-      console.log('🚨 EMERGENCY MODE: Loading from consolidated JSON file');
-      const jsonContent = fs.readFileSync(emergencyJsonPath, 'utf8');
-      allRegulations = JSON.parse(jsonContent);
-      
-      const federal = allRegulations.filter(r => r._jurisdiction === 'federal');
-      const pa = allRegulations.filter(r => r._state === 'PA');
-      
-      console.log(`✅ Loaded ${allRegulations.length} total regulations`);
-      console.log(`   - Federal: ${federal.length}`);
-      console.log(`   - Pennsylvania: ${pa.length}`);
-      console.log(`   - Ready for presentation! 🎤`);
-      return;
-    }
-    
-    // Fallback to CSV if emergency file doesn't exist
     const csvPath = path.join(__dirname, '../../../compmat.csv');
     if (fs.existsSync(csvPath)) {
       const csvContent = fs.readFileSync(csvPath, 'utf8');
@@ -101,10 +82,10 @@ const loadAllRegulations = async () => {
       allRegulations = records;
       console.log(`Loaded ${allRegulations.length} regulations from CSV`);
     } else {
-      console.warn('No regulation data found!');
+      console.warn('CSV file not found at:', csvPath);
     }
   } catch (error) {
-    console.error('Error loading regulations:', error);
+    console.error('Error loading regulations from CSV:', error);
   }
 };
 

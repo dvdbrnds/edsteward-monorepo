@@ -128,8 +128,8 @@ const SimpleRegulationSearch = ({ onRegulationSelect, placeholder = "Search regu
     console.log('Regulation selected:', regulation);
     
     // Navigate to the regulation's dedicated console page
-    const regulationSlug = regulation.slug || regulation.id || 'unknown-regulation';
-    const consoleUrl = `/regulations/${regulationSlug}-console.html`;
+    const regulationSlug = regulation.slug || regulation.regulationId || regulation.id || 'unknown-regulation';
+    const consoleUrl = `/public/regulations/${regulationSlug}-console.html`;
     
     // Navigate to the specific regulation console page
     window.location.href = consoleUrl;
