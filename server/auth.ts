@@ -22,9 +22,9 @@ const scryptAsync = promisify(scrypt);
  * @returns Promise<string> - Hashed password with salt
  */
 export async function hashPassword(password: string): Promise<string> {
-  const salt = randomBytes(16).toString('hex');
+  const salt = randomBytes(16);
   const derivedKey = await scryptAsync(password, salt, 32) as Buffer;
-  return `${salt}:${derivedKey.toString('hex')}`;
+  return `${salt.toString('hex')}:${derivedKey.toString('hex')}`;
 }
 
 /**

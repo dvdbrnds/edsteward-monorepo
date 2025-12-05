@@ -252,6 +252,12 @@ function RegulationDetailPage() {
     },
   });
 
+  // Fetch users for owner assignment dropdown (admins only)
+  const { data: users = [] } = useQuery<Array<{ id: number; username: string; firstName?: string; lastName?: string; role: string }>>({
+    queryKey: ["/api/users"],
+    enabled: isAdmin,
+  });
+
   const categoryMutation = useMutation({
     mutationFn: async (category: string) => {
       console.log('Updating category for regulation:', regulation?.id, 'to:', category);
@@ -287,6 +293,47 @@ function RegulationDetailPage() {
     onError: (error: Error) => {
       toast({
         title: "Update Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const ownerMutation = useMutation({
+    mutationFn: async (ownerId: string | null) => {
+      if (!regulation?.id) {
+        throw new Error('No regulation ID available');
+      }
+      
+      const response = await fetch(
+        `/api/regulations/${regulation.id}/owner`,
+        {
+          method: "PATCH",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ ownerId: ownerId === "unassigned" ? null : ownerId }),
+        }
+      );
+      
+      if (!response.ok) {
+        throw new Error("Failed to update owner");
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Owner Updated",
+        description: "The regulation has been assigned successfully.",
+      });
+      // Force refetch of regulation data
+      queryClient.invalidateQueries({ queryKey: ["/api/regulations"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/regulations", regulationId] });
+      queryClient.refetchQueries({ queryKey: ["/api/regulations", regulationId] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Assignment Failed",
         description: error.message,
         variant: "destructive",
       });
@@ -633,23 +680,58 @@ function RegulationDetailPage() {
                   ID: {regulation.itemId || regulation.item_id || regulation.id || 'N/A'}
                 </span>
                 {categoryVisible ? (
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-500">Category:</span>
-                    <Select
-                      defaultValue={regulation.category || "Other"}
-                      onValueChange={(value) => categoryMutation.mutate(value)}
-                    >
-                      <SelectTrigger className="w-[180px] bg-gray-100 border rounded-md hover:bg-gray-50 transition-colors">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {CATEGORIES.map((category) => (
-                          <SelectItem key={category} value={category}>
-                            {category}
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500">Category:</span>
+                      <Select
+                        defaultValue={regulation.category || "Other"}
+                        onValueChange={(value) => categoryMutation.mutate(value)}
+                      >
+                        <SelectTrigger className="w-[180px] bg-gray-100 border rounded-md hover:bg-gray-50 transition-colors">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {CATEGORIES.map((category) => (
+                            <SelectItem key={category} value={category}>
+                              {category}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-gray-500">Assigned to:</span>
+                      <Select
+                        key={`owner-${regulation.ownerId || 'none'}`}
+                        value={regulation.ownerId?.toString() || "unassigned"}
+                        onValueChange={(value) => ownerMutation.mutate(value)}
+                      >
+                        <SelectTrigger className="w-[200px] bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors">
+                          <SelectValue placeholder="Select owner...">
+                            {regulation.ownerId 
+                              ? users.find(u => u.id === regulation.ownerId)?.username || `User ${regulation.ownerId}`
+                              : "— Unassigned —"}
+                          </SelectValue>
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="unassigned">
+                            <span className="text-gray-500">— Unassigned —</span>
                           </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                          {users
+                            .filter(u => u.role === 'compliance_officer' || u.role === 'admin')
+                            .map((user) => (
+                              <SelectItem key={user.id} value={user.id.toString()}>
+                                {user.firstName && user.lastName 
+                                  ? `${user.firstName} ${user.lastName}` 
+                                  : user.username}
+                                <span className="text-xs text-gray-400 ml-2">
+                                  ({user.role === 'admin' ? 'Admin' : 'Officer'})
+                                </span>
+                              </SelectItem>
+                            ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 ) : (
                   <span className="px-2 py-1 bg-gray-100 rounded">
@@ -906,14 +988,18 @@ function RegulationDetailPage() {
 
               <div className="space-y-6">
 
-                {/* Actions Required Card */}
+                {/* Actions Required Card - Only show actions marked as required by admin */}
+                {(regulation.actions?.filter(a => a.required).length > 0 || isAdmin) && (
                 <Card>
                   <CardHeader>
                     <CardTitle>Actions Required</CardTitle>
+                    {isAdmin && (
+                      <p className="text-xs text-gray-500">Admin: Toggle switches to mark actions as required</p>
+                    )}
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {regulation.actions?.map((action) => (
+                      {(isAdmin ? regulation.actions : regulation.actions?.filter(a => a.required))?.map((action) => (
                         <div
                           key={action.type}
                           className={`p-4 border rounded-lg ${
@@ -1039,9 +1125,14 @@ function RegulationDetailPage() {
                           </div>
                         </div>
                       ))}
+                      {/* Show message if no required actions for non-admin users */}
+                      {!isAdmin && regulation.actions?.filter(a => a.required).length === 0 && (
+                        <p className="text-sm text-gray-500 italic">No required actions have been set for this regulation.</p>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
+                )}
 
                 {/* Compliance Status Card */}
                 {(() => {

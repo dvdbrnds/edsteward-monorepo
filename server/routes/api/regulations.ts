@@ -67,7 +67,11 @@ router.get("/", async (req: any, res) => {
     // Compliance officers only see regulations specifically assigned to them
     if (user && isComplianceOfficer && !isAdmin) {
       const beforeCount = regulations.length;
-      regulations = regulations.filter((reg: Regulation) => reg.ownerId === user.id);
+      // Check for both camelCase and snake_case field names (Drizzle vs raw SQL)
+      regulations = regulations.filter((reg: any) => {
+        const ownerId = reg.ownerId ?? reg.owner_id;
+        return ownerId === user.id;
+      });
       console.log(`[REGULATIONS] Filtered from ${beforeCount} to ${regulations.length} regulations for compliance officer ${user.username} (id: ${user.id})`);
     }
     
@@ -370,6 +374,76 @@ router.put("/:regulationId", requireAuth, requireComplianceOfficer, async (req, 
       error: "Failed to update regulation", 
       details: error instanceof Error ? error.message : String(error) 
     });
+  }
+});
+
+// Update regulation category - requires admin
+router.patch("/:regulationId/category", requireAuth, async (req: any, res) => {
+  try {
+    const regulationId = parseInt(req.params.regulationId);
+    const { category } = req.body;
+    
+    if (isNaN(regulationId)) {
+      return res.status(400).json({ error: "Invalid regulation ID" });
+    }
+    
+    if (!category) {
+      return res.status(400).json({ error: "Category is required" });
+    }
+    
+    // Check if user is admin
+    if (req.user?.role !== 'admin') {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+    
+    const tenantStorage = getDatabaseStorage();
+    const updatedRegulation = await tenantStorage.updateRegulation(regulationId, { category });
+    
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
+      `Updated category for regulation ${regulationId} to ${category}`);
+    
+    res.json(updatedRegulation);
+  } catch (error) {
+    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to update category", {
+      error: error instanceof Error ? error.message : String(error)
+    });
+    res.status(500).json({ error: "Failed to update category" });
+  }
+});
+
+// Update regulation owner (assign to user) - requires admin
+router.patch("/:regulationId/owner", requireAuth, async (req: any, res) => {
+  try {
+    const regulationId = parseInt(req.params.regulationId);
+    const { ownerId } = req.body;
+    
+    if (isNaN(regulationId)) {
+      return res.status(400).json({ error: "Invalid regulation ID" });
+    }
+    
+    // Check if user is admin
+    if (req.user?.role !== 'admin') {
+      return res.status(403).json({ error: "Admin access required" });
+    }
+    
+    const tenantStorage = getDatabaseStorage();
+    
+    // Allow null to unassign
+    const ownerValue = ownerId === null || ownerId === '' ? null : parseInt(ownerId);
+    
+    const updatedRegulation = await tenantStorage.updateRegulation(regulationId, { 
+      ownerId: ownerValue 
+    });
+    
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
+      `Updated owner for regulation ${regulationId} to user ${ownerValue || 'unassigned'}`);
+    
+    res.json(updatedRegulation);
+  } catch (error) {
+    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to update owner", {
+      error: error instanceof Error ? error.message : String(error)
+    });
+    res.status(500).json({ error: "Failed to update owner" });
   }
 });
 
