@@ -91,7 +91,6 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
 import {
   Dialog,
   DialogContent,
@@ -100,15 +99,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { 
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
 import { 
   Select,
   SelectContent,
@@ -211,7 +201,7 @@ function RegulationDetailPage() {
   
   // Make admin tools visible if the user is an admin and regulation exists
   const categoryVisible = isAdmin && hasRegulation;
-  const notificationOverrideVisible = isAdmin && hasRegulation;
+  // Note: notificationOverrideVisible removed - now using NotificationOverrideControl component
   
   console.log("Admin tools visibility check:", { 
     hasRegulation, 
@@ -220,24 +210,11 @@ function RegulationDetailPage() {
     actionsLength: actions.length
   });
 
-  // Initialize the notification override form
-  const overrideForm = useForm<z.infer<typeof notificationOverrideSchema>>({
-    resolver: zodResolver(notificationOverrideSchema),
-    defaultValues: {
-      email: regulation?.notificationOverride?.email || "",
-      phone: regulation?.notificationOverride?.phone || "",
-      notificationSchedule: regulation?.notificationSchedule || {
-        initialReminder: 90,
-        weeklyReminder: 30,
-        dailyReminder: 7,
-        finalDayReminders: true
-      }
-    },
-  });
+  // Note: overrideForm and overrideMutation moved to NotificationOverrideControl component
 
-  // Mutation for updating notification override
-  const overrideMutation = useMutation({
-    mutationFn: async (data: z.infer<typeof notificationOverrideSchema>) => {
+  // Placeholder for backward compatibility
+  const _overrideMutation = useMutation({
+    mutationFn: async (_data: z.infer<typeof notificationOverrideSchema>) => {
       if (!regulation?.id) {
         throw new Error('No regulation ID available');
       }
@@ -249,7 +226,7 @@ function RegulationDetailPage() {
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(data),
+          body: JSON.stringify(_data),
         }
       );
       
@@ -656,33 +633,27 @@ function RegulationDetailPage() {
                   ID: {regulation.itemId || regulation.item_id || regulation.id || 'N/A'}
                 </span>
                 {categoryVisible ? (
-                  <Select
-                    defaultValue={regulation.category || "Other"}
-                    onValueChange={(value) => categoryMutation.mutate(value)}
-                  >
-                    <SelectTrigger className="w-[180px] bg-gray-100 border-2 border-[#5B2C8F] rounded-md relative group hover:bg-purple-50/50 transition-colors">
-                      <div className="absolute -top-2 -right-2 bg-[#5B2C8F] text-white text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
-                        <Shield className="h-3 w-3" />
-                        Admin
-                      </div>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {CATEGORIES.map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {category}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-500">Category:</span>
+                    <Select
+                      defaultValue={regulation.category || "Other"}
+                      onValueChange={(value) => categoryMutation.mutate(value)}
+                    >
+                      <SelectTrigger className="w-[180px] bg-gray-100 border rounded-md hover:bg-gray-50 transition-colors">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {CATEGORIES.map((category) => (
+                          <SelectItem key={category} value={category}>
+                            {category}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 ) : (
                   <span className="px-2 py-1 bg-gray-100 rounded">
                     {regulation.category || 'Uncategorized'}
-                  </span>
-                )}
-                {categoryVisible && (
-                  <span className="px-2 py-1 bg-green-100 text-green-800 rounded font-bold">
-                    Admin Mode Active
                   </span>
                 )}
               </div>

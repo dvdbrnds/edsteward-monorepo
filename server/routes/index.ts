@@ -601,6 +601,149 @@ export function registerRoutes(app: express.Application): Server {
     }
   });
 
+  // Email configuration endpoints
+  app.get('/api/admin/email-config', async (req, res) => {
+    try {
+      const { emailConfigs } = await import('@shared/schema');
+      const { db } = await import('../db');
+      
+      const configs = await db.select().from(emailConfigs).limit(1);
+      
+      if (configs.length === 0) {
+        return res.json(null);
+      }
+      
+      const config = configs[0];
+      // Return config without password for security
+      res.json({
+        host: config.smtpHost,
+        port: config.smtpPort,
+        username: config.smtpUser,
+        password: '********', // Mask password
+        from: config.fromEmail,
+        secure: config.smtpSecure
+      });
+    } catch (error) {
+      console.error("Error fetching email config:", error);
+      res.status(500).json({
+        error: "Failed to fetch email configuration",
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  app.post('/api/admin/email-config', async (req, res) => {
+    try {
+      const { emailConfigs } = await import('@shared/schema');
+      const { db } = await import('../db');
+      const { eq } = await import('drizzle-orm');
+      
+      const { host, port, username, password, from, secure = true } = req.body;
+      
+      // Validate required fields
+      if (!host || !port || !username || !from) {
+        return res.status(400).json({
+          error: "Missing required fields: host, port, username, from"
+        });
+      }
+      
+      // Check if config exists
+      const existing = await db.select().from(emailConfigs).limit(1);
+      
+      if (existing.length > 0) {
+        // Update existing config
+        const updateData: any = {
+          smtpHost: host,
+          smtpPort: port,
+          smtpUser: username,
+          fromEmail: from,
+          smtpSecure: secure,
+          updatedAt: new Date(),
+          updatedBy: req.user?.id || 1
+        };
+        
+        // Only update password if not masked
+        if (password && password !== '********') {
+          updateData.smtpPass = password;
+        }
+        
+        await db.update(emailConfigs)
+          .set(updateData)
+          .where(eq(emailConfigs.id, existing[0].id));
+          
+        res.json({ success: true, message: "Email configuration updated" });
+      } else {
+        // Create new config
+        if (!password || password === '********') {
+          return res.status(400).json({
+            error: "Password is required for new configuration"
+          });
+        }
+        
+        await db.insert(emailConfigs).values({
+          smtpHost: host,
+          smtpPort: port,
+          smtpUser: username,
+          smtpPass: password,
+          fromEmail: from,
+          smtpSecure: secure,
+          updatedBy: req.user?.id || 1
+        });
+        
+        res.json({ success: true, message: "Email configuration created" });
+      }
+    } catch (error) {
+      console.error("Error saving email config:", error);
+      res.status(500).json({
+        error: "Failed to save email configuration",
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  // Test email endpoint
+  app.post('/api/admin/email-config/test', async (req, res) => {
+    try {
+      const { emailService } = await import('../services/email');
+      const { to } = req.body;
+      
+      if (!to) {
+        return res.status(400).json({ error: "Recipient email address is required" });
+      }
+      
+      const testSubject = "🧪 EdSteward Test Email";
+      const testContent = `
+        <h2>✅ Email Configuration Test</h2>
+        <p>This is a test email from EdSteward Compliance Management System.</p>
+        <p>If you received this email, your SMTP configuration is working correctly!</p>
+        <div style="background-color: #f0f9ff; border-left: 4px solid #0284c7; padding: 15px; margin: 20px 0;">
+          <p><strong>Test Details:</strong></p>
+          <ul>
+            <li>Sent at: ${new Date().toLocaleString()}</li>
+            <li>Recipient: ${to}</li>
+          </ul>
+        </div>
+        <p style="font-size: 12px; color: #6c757d;">
+          🔧 EdSteward Compliance Management System
+        </p>
+      `;
+      
+      const success = await emailService.sendEmail(to, testSubject, testContent);
+      
+      if (success) {
+        res.json({ success: true, message: `Test email sent to ${to}` });
+      } else {
+        res.status(500).json({ error: "Failed to send test email. Check SMTP configuration." });
+      }
+    } catch (error) {
+      console.error("Error sending test email:", error);
+      res.status(500).json({
+        error: "Failed to send test email",
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
   // Admin logs endpoint - Available to all tenants for their own system logs
   app.get('/api/admin/logs', async (req, res) => {
     try {

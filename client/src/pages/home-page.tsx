@@ -91,7 +91,12 @@ export default function HomePage() {
                     notificationHistory.notifications.map((notification) => (
                       <div
                         key={notification.id}
-                        className="p-3 border rounded-lg hover:bg-gray-50"
+                        className={`p-3 border rounded-lg hover:bg-gray-50 transition-colors ${notification.regulation ? 'cursor-pointer hover:border-blue-300' : ''}`}
+                        onClick={() => {
+                          if (notification.regulation) {
+                            window.location.href = `/regulations/${notification.regulation.id}`;
+                          }
+                        }}
                       >
                         <div className="flex items-start gap-3">
                           <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0 mt-0.5" />
@@ -133,7 +138,7 @@ export default function HomePage() {
                                 <>
                                   <span>•</span>
                                   <span className="text-blue-600 truncate max-w-[120px]">
-                                    {notification.regulation.category}
+                                    {notification.regulation.category} →
                                   </span>
                                 </>
                               )}

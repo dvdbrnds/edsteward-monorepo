@@ -18,7 +18,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import type { Regulation, Deadline, Guide, RegulationAction } from "@shared/schema";
+import type { Regulation, Deadline, RegulationAction } from "@shared/schema";
 import Navigation from "@/components/layout/navigation";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -493,25 +493,24 @@ export default function RegulationDetailPage() {
                   ID: {regulation?.itemId}
                 </span>
                 {user?.role === "admin" ? (
-                  <Select
-                    defaultValue={regulation?.category}
-                    onValueChange={(value) => categoryMutation.mutate(value)}
-                  >
-                    <SelectTrigger className="w-[180px] bg-gray-100 border-2 border-[#5B2C8F] rounded-md relative group hover:bg-purple-50/50 transition-colors">
-                      <div className="absolute -top-2 -right-2 bg-[#5B2C8F] text-white text-xs px-2 py-0.5 rounded-full flex items-center gap-1">
-                        <Shield className="h-3 w-3" />
-                        Admin
-                      </div>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {CATEGORIES.map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {category}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-500">Category:</span>
+                    <Select
+                      defaultValue={regulation?.category}
+                      onValueChange={(value) => categoryMutation.mutate(value)}
+                    >
+                      <SelectTrigger className="w-[180px] bg-gray-100 border rounded-md hover:bg-gray-50 transition-colors">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {CATEGORIES.map((category) => (
+                          <SelectItem key={category} value={category}>
+                            {category}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 ) : (
                   <span className="px-2 py-1 bg-gray-100 rounded">
                     {regulation?.category}

@@ -25,7 +25,7 @@ const router = express.Router();
 router.use(attachUserPermissions);
 
 // Get all regulations
-router.get("/", async (req, res) => {
+router.get("/", async (req: any, res) => {
   try {
     const startTime = Date.now();
     
@@ -40,7 +40,12 @@ router.get("/", async (req, res) => {
     // Single-tenant mode - use direct database storage
     const tenantStorage = getDatabaseStorage();
     
-    console.log(`[REGULATIONS] Fetching regulations for single-tenant mode`);
+    // Get user info for filtering
+    const user = req.user;
+    const isAdmin = user?.role === 'admin';
+    const isComplianceOfficer = user?.role === 'compliance_officer';
+    
+    console.log(`[REGULATIONS] Fetching regulations for user: ${user?.username || 'anonymous'}, role: ${user?.role || 'none'}`);
     
     // Parse query parameters
     const {
@@ -57,6 +62,14 @@ router.get("/", async (req, res) => {
     } = req.query;
 
     let regulations = await tenantStorage.getRegulations();
+    
+    // Filter by ownership for compliance officers (admins see all)
+    // Compliance officers only see regulations specifically assigned to them
+    if (user && isComplianceOfficer && !isAdmin) {
+      const beforeCount = regulations.length;
+      regulations = regulations.filter((reg: Regulation) => reg.ownerId === user.id);
+      console.log(`[REGULATIONS] Filtered from ${beforeCount} to ${regulations.length} regulations for compliance officer ${user.username} (id: ${user.id})`);
+    }
     
     // Apply filters
     // Legacy jurisdiction filter support

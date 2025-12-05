@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import Navigation from '@/components/layout/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -120,8 +121,10 @@ export default function AuditTrailPage() {
   };
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="min-h-screen bg-gray-50">
+      <Navigation />
+      <div className="container mx-auto p-6 space-y-6">
+        <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Audit Trail</h1>
           <p className="text-gray-600">Monitor compliance actions and system changes</p>
@@ -431,6 +434,7 @@ export default function AuditTrailPage() {
           </div>
         </div>
       )}
+      </div>
     </div>
   );
 }

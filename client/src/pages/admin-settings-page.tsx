@@ -74,6 +74,7 @@ const LOG_LEVELS = {
 const insertEmailConfigSchema = z.object({
   host: z.string().min(1, "Host is required"),
   port: z.number().int().positive(),
+  secure: z.boolean().default(false),
   username: z.string().min(1, "Username is required"),
   password: z.string().min(1, "Password is required"),
   from: z.string().email("Must be a valid email address"),
@@ -98,6 +99,8 @@ export default function SystemSettingsPage() {
   const [facility, setFacility] = useState<string>();
   const [startDate, setStartDate] = useState<Date>();
   const [endDate, setEndDate] = useState<Date>();
+  const [testEmailAddress, setTestEmailAddress] = useState("");
+  const [isSendingTest, setIsSendingTest] = useState(false);
   const [page, setPage] = useState(1);
   const [autoRefresh, setAutoRefresh] = useState(false);
   const [logs, setLogs] = useState<any[]>([]);
@@ -134,6 +137,7 @@ export default function SystemSettingsPage() {
     defaultValues: {
       host: "",
       port: 587,
+      secure: false,
       username: "",
       password: "",
       from: "",
@@ -480,23 +484,55 @@ export default function SystemSettingsPage() {
                         )}
                       />
 
-                      <FormField
-                        control={form.control}
-                        name="port"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Port</FormLabel>
-                            <FormControl>
-                              <Input
-                                type="number"
-                                {...field}
-                                onChange={(e) => field.onChange(parseInt(e.target.value))}
-                              />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
+                      <div className="grid grid-cols-2 gap-4">
+                        <FormField
+                          control={form.control}
+                          name="port"
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormLabel>Port</FormLabel>
+                              <FormControl>
+                                <Input
+                                  type="number"
+                                  {...field}
+                                  onChange={(e) => {
+                                    const port = parseInt(e.target.value);
+                                    field.onChange(port);
+                                    // Auto-set secure based on port
+                                    if (port === 465) {
+                                      form.setValue('secure', true);
+                                    } else if (port === 587 || port === 25) {
+                                      form.setValue('secure', false);
+                                    }
+                                  }}
+                                />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={form.control}
+                          name="secure"
+                          render={({ field }) => (
+                            <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3">
+                              <div className="space-y-0.5">
+                                <FormLabel>Use SSL/TLS</FormLabel>
+                                <FormDescription className="text-xs">
+                                  Port 465 = ON, Port 587 = OFF
+                                </FormDescription>
+                              </div>
+                              <FormControl>
+                                <Switch
+                                  checked={field.value}
+                                  onCheckedChange={field.onChange}
+                                />
+                              </FormControl>
+                            </FormItem>
+                          )}
+                        />
+                      </div>
 
                       <FormField
                         control={form.control}
@@ -545,6 +581,82 @@ export default function SystemSettingsPage() {
                       </Button>
                     </form>
                   </Form>
+
+                  {/* Test Email Section */}
+                  <div className="mt-6 pt-6 border-t">
+                    <h4 className="font-medium mb-3">Test Email Configuration</h4>
+                    <p className="text-sm text-gray-500 mb-4">
+                      Send a test email to verify your SMTP settings are working correctly.
+                    </p>
+                    <div className="flex gap-3 items-end">
+                      <div className="flex-1">
+                        <label className="text-sm font-medium mb-1 block">Send Test To</label>
+                        <Input 
+                          type="email"
+                          placeholder="test@example.com"
+                          value={testEmailAddress}
+                          onChange={(e) => setTestEmailAddress(e.target.value)}
+                        />
+                      </div>
+                      <Button 
+                        type="button" 
+                        variant="outline"
+                        disabled={!testEmailAddress || isSendingTest}
+                        onClick={async () => {
+                          if (!testEmailAddress) {
+                            toast({
+                              title: "Email Required",
+                              description: "Please enter an email address to send the test to.",
+                              variant: "destructive",
+                            });
+                            return;
+                          }
+                          setIsSendingTest(true);
+                          toast({
+                            title: "Sending...",
+                            description: `Sending test email to ${testEmailAddress}`,
+                          });
+                          try {
+                            const response = await fetch("/api/admin/email-config/test", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ to: testEmailAddress })
+                            });
+                            const data = await response.json();
+                            if (response.ok) {
+                              toast({
+                                title: "✅ Test Email Sent!",
+                                description: `Check ${testEmailAddress} for the test message.`,
+                              });
+                            } else {
+                              toast({
+                                title: "❌ Test Failed",
+                                description: data.error || "Failed to send test email. Check your SMTP settings.",
+                                variant: "destructive",
+                              });
+                            }
+                          } catch (error) {
+                            toast({
+                              title: "❌ Error",
+                              description: "Failed to send test email. Check server logs for details.",
+                              variant: "destructive",
+                            });
+                          } finally {
+                            setIsSendingTest(false);
+                          }
+                        }}
+                      >
+                        {isSendingTest ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Sending...
+                          </>
+                        ) : (
+                          "Send Test Email"
+                        )}
+                      </Button>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </TabsContent>

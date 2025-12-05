@@ -105,10 +105,7 @@
             if (indicator) updateStatusIndicator(indicator, 'connected');
 
             console.log('✅ Connected to MCP Engine');
-            // Only show toast when reconnecting after failures, not on initial connection
-            if (wasReconnecting) {
-                showToast('MCP Engine Reconnected', 'Real-time regulation updates restored', 'success');
-            }
+            // Toast disabled - MCP connection status is shown in UI badge instead
 
             // Subscribe to REG-66
             const subscribeMessage = {
@@ -135,22 +132,8 @@
                     
                     case 'regulation_updated':
                         console.log('🚨 REGULATION UPDATE:', message);
-                        showToast(
-                            `${message.regulationId} Updated`,
-                            `Version ${message.version} - ${message.data?.changeType || 'Content changed'}`,
-                            'success'
-                        );
-                        
-                        // Trigger page refresh of regulations data if possible
-                        if (window.location.pathname.includes('regulation') || window.location.pathname === '/') {
-                            console.log('🔄 Refreshing regulation data...');
-                            // Try to trigger a page refresh or data reload
-                            setTimeout(() => {
-                                if (confirm('Regulation data has been updated. Refresh the page to see changes?')) {
-                                    window.location.reload();
-                                }
-                            }, 2000);
-                        }
+                        // Toast and refresh prompt disabled - updates are handled silently
+                        // The React app's query invalidation will refresh data automatically
                         break;
                     
                     default:
@@ -175,7 +158,7 @@
                 setTimeout(connect, reconnectDelay);
             } else {
                 console.log('❌ Max reconnection attempts reached');
-                showToast('MCP Engine Disconnected', 'Real-time updates are not available', 'error');
+                // Toast disabled - MCP connection status is shown in UI badge instead
             }
         };
 

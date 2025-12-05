@@ -4,6 +4,7 @@
  */
 
 import { useAuth } from "@/hooks/use-auth";
+import Navigation from "@/components/layout/navigation";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { User, Shield, Mail, Calendar, Building } from "lucide-react";
@@ -25,9 +26,11 @@ export default function AccountSettingsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Account Settings</h1>
+    <div className="min-h-screen bg-gray-50">
+      <Navigation />
+      <div className="container mx-auto px-4 py-8 max-w-4xl">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Account Settings</h1>
         <p className="text-gray-600 mt-2">
           Manage your account security and preferences
         </p>
@@ -179,6 +182,7 @@ export default function AccountSettingsPage() {
             </CardContent>
           </Card>
         )}
+        </div>
       </div>
     </div>
   );

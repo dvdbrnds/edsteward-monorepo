@@ -368,18 +368,26 @@ export default function NotificationsPage() {
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {notificationHistory.notifications.map((notification) => (
-                        <tr key={notification.id} className="hover:bg-gray-50">
+                        <tr 
+                          key={notification.id} 
+                          className={`hover:bg-gray-50 ${notification.regulation ? 'cursor-pointer' : ''}`}
+                          onClick={() => {
+                            if (notification.regulation) {
+                              window.location.href = `/regulations/${notification.regulation.id}`;
+                            }
+                          }}
+                        >
                           <td className="px-6 py-4">
                             <div className="max-w-xs">
-                              <p className="text-sm font-medium text-gray-900 truncate">
+                              <p className={`text-sm font-medium truncate ${notification.regulation ? 'text-blue-600' : 'text-gray-900'}`}>
                                 {getNotificationTitle(notification)}
                               </p>
                               <p className="text-sm text-gray-500 truncate">
                                 {getNotificationDescription(notification)}
                               </p>
                               {notification.regulation && (
-                                <p className="text-xs text-blue-600 mt-1">
-                                  {notification.regulation.category}
+                                <p className="text-xs text-blue-500 mt-1">
+                                  {notification.regulation.category} →
                                 </p>
                               )}
                             </div>

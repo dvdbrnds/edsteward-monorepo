@@ -271,7 +271,9 @@ export const regulations = pgTable("regulations", {
     identifiers?: string[];
   }[]>(),
   sources: jsonb("sources").$type<RegulationSource[]>(),
-  actions: jsonb("actions").$type<RegulationAction[]>()
+  actions: jsonb("actions").$type<RegulationAction[]>(),
+  // Owner/assignment field - compliance officer responsible for this regulation
+  ownerId: integer("owner_id").references(() => users.id),
 });
 
 // Notifications table
