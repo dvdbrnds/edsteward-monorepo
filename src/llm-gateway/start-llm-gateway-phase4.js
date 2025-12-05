@@ -443,26 +443,32 @@ class EnhancedLLMGateway {
           const workflowId = `WF-${Date.now()}-${Math.random().toString(36).substring(7)}`;
           
           logger.info(`[query] 🔬 Running REAL comprehensive workflow for ${regulationSlug}`);
-          logger.info(`[query] 🌐 Calling REAL government APIs (NO MOCK DATA)...`);
+          logger.info(`[query] 🌐 Calling REAL government & academic APIs (NO MOCK DATA)...`);
           
-          // CALL REAL CROSS-REFERENCE SERVICE - Actually hits government APIs!
+          // CALL REAL CROSS-REFERENCE SERVICE v2.0 - Actually hits government APIs!
           const crossRefResult = await performRealCrossReference(regulationSlug);
+          
+          const govSources = crossRefResult.governmentSources;
+          const academicSources = crossRefResult.academicSources;
           
           timer.end();
           return res.json({
             success: true,
             workflowId: workflowId,
             data: {
-              source: 'REAL LinearEngine Workflow - Live API Calls',
+              source: 'REAL LinearEngine Workflow v2.0 - Live API Calls',
               regulation: title,
               timestamp: crossRefResult.timestamp,
               duration: crossRefResult.duration,
               isReal: true,
               noMockData: true,
+              allApiCallsReal: true,
               workflowDetails: {
                 step1_result: {
+                  title: 'Government Source Verification',
                   workflowId: workflowId,
-                  sources_fetched: crossRefResult.summary.successfulFetches,
+                  sources_fetched: govSources.overall.sourcesFetched,
+                  sources_checked: govSources.overall.sourcesChecked,
                   content_hash: Buffer.from(regulationSlug).toString('base64').substring(0, 16),
                   changes_detected: crossRefResult.summary.overallStatus === 'validated' 
                     ? 'Sources verified - regulation content confirmed' 
@@ -470,48 +476,97 @@ class EnhancedLLMGateway {
                   government_sources: [
                     { 
                       name: 'eCFR (ecfr.gov)', 
-                      status: crossRefResult.governmentSources.ecfr.status, 
-                      confidence: crossRefResult.governmentSources.ecfr.confidence,
+                      status: govSources.ecfr.status, 
+                      confidence: govSources.ecfr.confidence,
+                      url: govSources.ecfr.url,
                       isReal: true
                     },
                     { 
                       name: 'Federal Register', 
-                      status: crossRefResult.governmentSources.federalRegister.status, 
-                      confidence: crossRefResult.governmentSources.federalRegister.confidence,
-                      documentCount: crossRefResult.governmentSources.federalRegister.documentCount,
-                      recentDocuments: crossRefResult.governmentSources.federalRegister.recentDocuments,
-                      isReal: true
-                    },
-                    { 
-                      name: 'Cornell Law School (LII)', 
-                      status: crossRefResult.governmentSources.cornellLII.status, 
-                      confidence: crossRefResult.governmentSources.cornellLII.confidence,
-                      url: crossRefResult.governmentSources.cornellLII.url,
+                      status: govSources.federalRegister.status, 
+                      confidence: govSources.federalRegister.confidence,
+                      documentCount: govSources.federalRegister.data?.totalDocuments || 0,
+                      recentDocuments: govSources.federalRegister.data?.recentDocuments || [],
                       isReal: true
                     },
                     { 
                       name: 'Congress.gov', 
-                      status: crossRefResult.governmentSources.congressGov.status, 
-                      confidence: crossRefResult.governmentSources.congressGov.confidence,
-                      note: crossRefResult.governmentSources.congressGov.note,
+                      status: govSources.congressGov.status, 
+                      confidence: govSources.congressGov.confidence,
+                      note: govSources.congressGov.error || null,
+                      isReal: true
+                    },
+                    { 
+                      name: 'GovInfo (GPO)', 
+                      status: govSources.govInfo.status, 
+                      confidence: govSources.govInfo.confidence,
+                      isReal: true
+                    },
+                    { 
+                      name: 'Library of Congress', 
+                      status: govSources.libraryOfCongress.status, 
+                      confidence: govSources.libraryOfCongress.confidence,
                       isReal: true
                     }
                   ]
                 },
                 step2_result: {
+                  title: 'Academic Cross-Reference',
+                  sources_fetched: academicSources.overall.sourcesFetched,
+                  sources_checked: academicSources.overall.sourcesChecked,
                   crossReferenceComplete: true,
+                  academic_sources: [
+                    {
+                      name: 'Cornell LII',
+                      status: academicSources.cornellLII.status,
+                      confidence: academicSources.cornellLII.confidence,
+                      url: academicSources.cornellLII.url,
+                      isReal: true
+                    },
+                    {
+                      name: 'CORE.ac.uk',
+                      status: academicSources.core.status,
+                      confidence: academicSources.core.confidence,
+                      papers: academicSources.core.data?.totalPapers || 0,
+                      isReal: true
+                    },
+                    {
+                      name: 'OpenAlex',
+                      status: academicSources.openAlex.status,
+                      confidence: academicSources.openAlex.confidence,
+                      works: academicSources.openAlex.data?.totalWorks || 0,
+                      isReal: true
+                    },
+                    {
+                      name: 'Semantic Scholar',
+                      status: academicSources.semanticScholar.status,
+                      confidence: academicSources.semanticScholar.confidence,
+                      isReal: true
+                    }
+                  ],
                   validationSummary: crossRefResult.summary,
                   citations: crossRefResult.citations
                 },
                 step3_result: {
-                  cfr_integration: crossRefResult.governmentSources.ecfr.status === 'fetched' ? 'Complete' : 'Partial',
-                  compliance_assessment: crossRefResult.summary.averageConfidence >= 80 ? 'High' : 'Medium',
+                  title: 'Compliance Assessment',
+                  cfr_integration: govSources.ecfr.status === 'fetched' ? 'Complete' : 'Partial',
+                  federal_register_docs: govSources.federalRegister.data?.totalDocuments || 0,
+                  compliance_assessment: crossRefResult.summary.averageConfidence >= 80 ? 'High' : (crossRefResult.summary.averageConfidence >= 60 ? 'Medium' : 'Low'),
                   certainty_level: crossRefResult.summary.certaintyLevel,
                   overall_score: crossRefResult.summary.averageConfidence
                 }
               },
-              realApiResults: crossRefResult.governmentSources,
-              summary: `REAL cross-reference completed for ${crossRefResult.regulationName || title}. ${crossRefResult.summary.successfulFetches}/4 government sources fetched. Average confidence: ${crossRefResult.summary.averageConfidence}%. Certainty: ${crossRefResult.summary.certaintyLevel}`
+              sourceConfidenceScores: {
+                government: govSources.overall.averageConfidence,
+                academic: academicSources.overall.averageConfidence,
+                overall: crossRefResult.summary.averageConfidence
+              },
+              realApiResults: {
+                government: govSources,
+                academic: academicSources,
+                legalResearch: crossRefResult.legalResearchSources
+              },
+              summary: `REAL cross-reference v2.0 completed for ${crossRefResult.regulationName || title}. Government: ${govSources.overall.sourcesFetched}/${govSources.overall.sourcesChecked} sources. Academic: ${academicSources.overall.sourcesFetched}/${academicSources.overall.sourcesChecked} sources. Overall confidence: ${crossRefResult.summary.averageConfidence}%. Certainty: ${crossRefResult.summary.certaintyLevel}. NO MOCK DATA.`
             }
           });
         }
@@ -959,43 +1014,89 @@ The Family Educational Rights and Privacy Act (FERPA) is a federal law that prot
       }
     });
 
-    // Analysis validation scores endpoint
+    // Analysis validation scores endpoint - REAL API CALLS ONLY
     router.get('/analysis/validation-scores', async (req, res) => {
       try {
         const timer = metricsCollector.createTimer('analysis_fetch');
+        const { regulation } = req.query;
+        const regulationSlug = regulation || 'family-educational-rights-and-privacy-act-ferpa';
         
-        // Return mock analysis data that matches the console's expected format
+        logger.info(`[analysis-endpoint] Performing REAL cross-reference for: ${regulationSlug}`);
+        
+        // Call REAL cross-reference service - NO MOCK DATA
+        const crossRefResults = await performRealCrossReference(regulationSlug);
+        
         timer.end();
+        
+        // Build response from REAL API results only
+        const govSources = crossRefResults.governmentSources;
+        const academicSources = crossRefResults.academicSources;
+        const legalSources = crossRefResults.legalResearchSources;
+        
+        // Convert real results to display format
+        const governmentSourcesList = [
+          { name: 'eCFR', description: 'Electronic Code of Federal Regulations', confidence: govSources.ecfr.confidence, status: govSources.ecfr.status, isReal: true },
+          { name: 'Federal Register', description: 'Federal agency rulemaking', confidence: govSources.federalRegister.confidence, status: govSources.federalRegister.status, isReal: true },
+          { name: 'Congress.gov', description: 'Legislative history', confidence: govSources.congressGov.confidence, status: govSources.congressGov.status, isReal: true },
+          { name: 'GovInfo (GPO)', description: 'Government Publishing Office', confidence: govSources.govInfo.confidence, status: govSources.govInfo.status, isReal: true },
+          { name: 'Library of Congress', description: 'National library resources', confidence: govSources.libraryOfCongress.confidence, status: govSources.libraryOfCongress.status, isReal: true }
+        ];
+        
+        const academicSourcesList = [
+          { name: 'Cornell LII', description: 'Legal Information Institute', confidence: academicSources.cornellLII.confidence, status: academicSources.cornellLII.status, isReal: true },
+          { name: 'CORE.ac.uk', description: 'Open Access Research', confidence: academicSources.core.confidence, status: academicSources.core.status, isReal: true },
+          { name: 'OpenAlex', description: 'Open Scholarly Metadata', confidence: academicSources.openAlex.confidence, status: academicSources.openAlex.status, isReal: true },
+          { name: 'Semantic Scholar', description: 'AI Research Database', confidence: academicSources.semanticScholar.confidence, status: academicSources.semanticScholar.status, isReal: true }
+        ];
+        
+        const legalResearchSourcesList = [
+          { name: 'LexisNexis', description: 'Legal research platform', confidence: 0, status: legalSources.lexisNexis.status, isReal: true, note: 'Credentials pending' }
+        ];
+        
         res.json({
           success: true,
           data: {
             title: 'Regulation Validation Analysis',
-            overallConfidence: 94,
-            lastUpdated: new Date().toISOString(),
-            metadata: { isReal: true },
-            researchMetrics: { totalSources: 12 },
+            overallConfidence: crossRefResults.summary.averageConfidence,
+            certaintyLevel: crossRefResults.summary.certaintyLevel,
+            lastUpdated: crossRefResults.timestamp,
+            duration: crossRefResults.duration,
+            metadata: { 
+              isReal: true, 
+              noMockData: true, 
+              allApiCallsReal: true,
+              regulation: regulationSlug
+            },
+            researchMetrics: { 
+              totalSources: crossRefResults.summary.totalSources,
+              successfulFetches: crossRefResults.summary.successfulFetches,
+              pendingCredentials: crossRefResults.summary.pendingCredentials,
+              failed: crossRefResults.summary.failed
+            },
             governmentSources: {
-              confidence: 97,
-              sources: [
-                { name: 'eCFR', description: 'Official Code of Federal Regulations', confidence: 99 },
-                { name: 'Federal Register', description: 'Federal agency rulemaking', confidence: 96 },
-                { name: 'Congress.gov', description: 'Legislative history', confidence: 95 }
-              ]
+              confidence: govSources.overall.averageConfidence,
+              sourcesChecked: govSources.overall.sourcesChecked,
+              sourcesFetched: govSources.overall.sourcesFetched,
+              sources: governmentSourcesList.filter(s => s.confidence > 0 || s.status !== 'unavailable')
+            },
+            academicSources: {
+              confidence: academicSources.overall.averageConfidence,
+              sourcesChecked: academicSources.overall.sourcesChecked,
+              sourcesFetched: academicSources.overall.sourcesFetched,
+              sources: academicSourcesList.filter(s => s.confidence > 0 || s.status !== 'unavailable')
             },
             legalResearchSources: {
-              confidence: 92,
-              sources: [
-                { name: 'Westlaw', description: 'Legal research database', confidence: 94 },
-                { name: 'LexisNexis', description: 'Legal research platform', confidence: 91 },
-                { name: 'HeinOnline', description: 'Legal history database', confidence: 90 }
-              ]
+              confidence: 0,
+              status: 'credentials_pending',
+              sources: legalResearchSourcesList
             },
-            universityLibraries: [
-              { university: 'Stanford Law Library', confidence: 93, status: 'validated' },
-              { university: 'Harvard Law Library', confidence: 91, status: 'validated' },
-              { university: 'Yale Law Library', confidence: 89, status: 'validated' },
-              { university: 'Columbia Law Library', confidence: 88, status: 'validated' }
-            ]
+            // NO FAKE UNIVERSITY LIBRARIES - removed until real APIs available
+            universityLibraries: {
+              status: 'not_available',
+              note: 'University law library APIs require institutional access - using open academic sources instead',
+              alternativeSources: academicSourcesList.filter(s => s.confidence > 0)
+            },
+            citations: crossRefResults.citations
           }
         });
       } catch (error) {
@@ -1004,68 +1105,99 @@ The Family Educational Rights and Privacy Act (FERPA) is a federal law that prot
       }
     });
 
-    // Comprehensive LinearEngine Workflow endpoint
+    // Comprehensive LinearEngine Workflow endpoint - REAL API CALLS ONLY
     router.post('/workflow/comprehensive', async (req, res) => {
       try {
         const { regulation, slug } = req.body;
         const regulationSlug = slug || regulation || 'unknown-regulation';
         const title = regulationSlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
         
-        logger.info(`[workflow] Running comprehensive LinearEngine workflow for ${regulationSlug}`);
+        logger.info(`[workflow] Running REAL comprehensive LinearEngine workflow for ${regulationSlug}`);
         
-        // Simulate the multi-step workflow with real-looking data
         const workflowId = `WF-${Date.now()}-${Math.random().toString(36).substring(7)}`;
         const timestamp = new Date().toISOString();
+        
+        // STEP 1: Call REAL cross-reference API - NO MOCK DATA
+        logger.info(`[workflow] Step 1: Initiating REAL government API cross-reference...`);
+        const crossRefResults = await performRealCrossReference(regulationSlug);
+        
+        // Build response from REAL API results only
+        const govSources = crossRefResults.governmentSources;
+        const academicSources = crossRefResults.academicSources;
+        
+        // Convert REAL results to step format
+        const realGovernmentSources = [
+          { name: 'eCFR', status: govSources.ecfr.status, confidence: govSources.ecfr.confidence, url: govSources.ecfr.url, isReal: true },
+          { name: 'Federal Register', status: govSources.federalRegister.status, confidence: govSources.federalRegister.confidence, documents: govSources.federalRegister.data?.totalDocuments || 0, isReal: true },
+          { name: 'Congress.gov', status: govSources.congressGov.status, confidence: govSources.congressGov.confidence, isReal: true },
+          { name: 'GovInfo (GPO)', status: govSources.govInfo.status, confidence: govSources.govInfo.confidence, isReal: true },
+          { name: 'Library of Congress', status: govSources.libraryOfCongress.status, confidence: govSources.libraryOfCongress.confidence, isReal: true }
+        ].filter(s => s.status === 'fetched' || s.status === 'partial');
+        
+        const realAcademicSources = [
+          { name: 'Cornell LII', status: academicSources.cornellLII.status, confidence: academicSources.cornellLII.confidence, specialization: 'Legal Information Institute', isReal: true },
+          { name: 'CORE.ac.uk', status: academicSources.core.status, confidence: academicSources.core.confidence, specialization: 'Open Access Research', papers: academicSources.core.data?.totalPapers || 0, isReal: true },
+          { name: 'OpenAlex', status: academicSources.openAlex.status, confidence: academicSources.openAlex.confidence, specialization: 'Scholarly Metadata', works: academicSources.openAlex.data?.totalWorks || 0, isReal: true },
+          { name: 'Semantic Scholar', status: academicSources.semanticScholar.status, confidence: academicSources.semanticScholar.confidence, specialization: 'AI Research Database', isReal: true }
+        ].filter(s => s.status === 'fetched' || s.status === 'partial');
         
         res.json({
           success: true,
           workflowId: workflowId,
+          isReal: true,
+          noMockData: true,
+          allApiCallsReal: true,
           data: {
-            source: 'Real LinearEngine Workflow',
+            source: 'REAL LinearEngine Workflow v2.0',
             regulation: title,
             timestamp: timestamp,
+            duration: crossRefResults.duration,
             workflowDetails: {
               step1_result: {
+                title: 'Government Source Verification',
                 workflowId: workflowId,
-                sources_fetched: 4,
-                content_hash: Buffer.from(regulationSlug).toString('base64').substring(0, 16),
-                changes_detected: 'Minor regulatory guidance updates detected',
-                differential_analysis: {
-                  type: 'Full content comparison',
-                  previous_version: '2024-11-15',
-                  current_version: timestamp.split('T')[0]
-                },
-                government_sources: [
-                  { name: 'USC Title 20', status: 'fetched', confidence: 98 },
-                  { name: 'eCFR 34 Part 99', status: 'fetched', confidence: 97 },
-                  { name: 'Department of Education Guidance', status: 'fetched', confidence: 95 },
-                  { name: 'Federal Register', status: 'fetched', confidence: 94 }
-                ]
+                sources_fetched: govSources.overall.sourcesFetched,
+                sources_checked: govSources.overall.sourcesChecked,
+                average_confidence: govSources.overall.averageConfidence,
+                content_hash: Buffer.from(regulationSlug + timestamp).toString('base64').substring(0, 16),
+                government_sources: realGovernmentSources,
+                citations: crossRefResults.citations,
+                isReal: true,
+                noMockData: true
               },
               step2_result: {
-                sources: [
-                  { name: 'Stanford Law Library', confidence: 96, status: 'validated', specialization: 'Copyright & Educational Law' },
-                  { name: 'Harvard Law Library', confidence: 94, status: 'validated', specialization: 'Constitutional & Privacy Law' },
-                  { name: 'Yale Law Library', confidence: 93, status: 'validated', specialization: 'Administrative Law' },
-                  { name: 'Columbia Law Library', confidence: 91, status: 'validated', specialization: 'Higher Education Law' }
-                ],
-                validation_complete: true,
-                cross_reference_score: 94
+                title: 'Academic Cross-Reference',
+                sources_fetched: academicSources.overall.sourcesFetched,
+                sources_checked: academicSources.overall.sourcesChecked,
+                average_confidence: academicSources.overall.averageConfidence,
+                sources: realAcademicSources,
+                validation_complete: crossRefResults.summary.successfulFetches >= 3,
+                cross_reference_score: crossRefResults.summary.averageConfidence,
+                // NOTE: University law libraries removed - they don't have public APIs
+                university_libraries_note: 'University law library APIs require institutional access. Using open academic databases instead.',
+                isReal: true,
+                noMockData: true
               },
               step3_result: {
-                cfr_integration: 'Complete',
-                compliance_assessment: 'High',
-                certainty_level: 'A',
-                overall_score: 95
+                title: 'Compliance Assessment',
+                cfr_integration: govSources.ecfr.status === 'fetched' ? 'Complete' : 'Partial',
+                federal_register_docs: govSources.federalRegister.data?.totalDocuments || 0,
+                academic_papers: (academicSources.core.data?.totalPapers || 0) + (academicSources.openAlex.data?.totalWorks || 0),
+                compliance_assessment: crossRefResults.summary.averageConfidence >= 80 ? 'High' : (crossRefResults.summary.averageConfidence >= 60 ? 'Medium' : 'Low'),
+                certainty_level: crossRefResults.summary.certaintyLevel,
+                overall_score: crossRefResults.summary.averageConfidence,
+                isReal: true,
+                noMockData: true
               }
             },
-            universityConfidenceScores: {
-              stanford: 96,
-              harvard: 94,
-              yale: 93,
-              columbia: 91
+            // Real confidence scores from actual API responses
+            sourceConfidenceScores: {
+              government: govSources.overall.averageConfidence,
+              academic: academicSources.overall.averageConfidence,
+              overall: crossRefResults.summary.averageConfidence
             },
-            summary: `Comprehensive LinearEngine workflow completed for ${title}. All government sources verified, university law libraries cross-referenced, and compliance assessment generated with high certainty.`
+            summary: `REAL comprehensive workflow completed for ${title}. ${govSources.overall.sourcesFetched}/${govSources.overall.sourcesChecked} government sources verified, ${academicSources.overall.sourcesFetched}/${academicSources.overall.sourcesChecked} academic databases cross-referenced. Overall certainty: ${crossRefResults.summary.certaintyLevel} (${crossRefResults.summary.averageConfidence}%). NO MOCK DATA - all API calls real.`,
+            fullResults: crossRefResults
           }
         });
       } catch (error) {
