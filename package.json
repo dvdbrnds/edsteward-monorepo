@@ -16,7 +16,7 @@
     "start:servers": "node src/start-mcp-servers.js",
     "start:mock": "node src/mock-server.js",
     "start:registry": "node src/server/registry-api/registry-server.js",
-    "start:llm": "node src/llm-gateway/simple-usc-gateway.js",
+    "start:llm": "node src/llm-gateway/start-llm-gateway-phase4.js",
     "start:frontend": "vite --port 3050 --host",
     "dev": "node mcp-start.js",
     "dev:client": "vite --port 3050",

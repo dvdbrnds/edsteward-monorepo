@@ -1509,22 +1509,22 @@
                     <div class="step-substeps" style="margin-left: 20px; font-size: 0.9em; color: #666; margin-top: 5px;">
                         <div class="university-substep" id="stanford-substep">
                             <span class="substep-icon">○</span>
-                    <span>Stanford Law Library</span>
+                    
                             <span class="substep-confidence" id="stanford-confidence" style="margin-left: 10px; color: #0d6efd; font-weight: 600;"></span>
                         </div>
                         <div class="university-substep" id="harvard-substep">
                             <span class="substep-icon">○</span>
-                            <span>Harvard Law Library</span>
+                            
                             <span class="substep-confidence" id="harvard-confidence" style="margin-left: 10px; color: #0d6efd; font-weight: 600;"></span>
                         </div>
                         <div class="university-substep" id="yale-substep">
                             <span class="substep-icon">○</span>
-                            <span>Yale Law Library</span>
+                            
                             <span class="substep-confidence" id="yale-confidence" style="margin-left: 10px; color: #0d6efd; font-weight: 600;"></span>
                         </div>
                         <div class="university-substep" id="columbia-substep">
                             <span class="substep-icon">○</span>
-                            <span>Columbia Law Library</span>
+                            
                             <span class="substep-confidence" id="columbia-confidence" style="margin-left: 10px; color: #0d6efd; font-weight: 600;"></span>
                         </div>
                     </div>
@@ -1739,9 +1739,7 @@
         let updateAllRunning = false;
         let currentRegulationIndex = 0;
         let regulationsList = [];
-        
-        
-        
+
         async function updateSingleRegulation(regulation, index, total) {
             try {
                 addConsoleLog(`  🔍 Analyzing regulation structure...`, 'info');
@@ -1890,14 +1888,11 @@
                 const universityResults = result.data?.universityConfidenceScores || {};
                 const universitySources = step2Data?.sources || [];
                 
-                // Stanford Law Library
-                await new Promise(resolve => setTimeout(resolve, 500));
+                                await new Promise(resolve => setTimeout(resolve, 500));
                 updateUniversitySubstep('stanford', 'running');
-                addConsoleLog('   🏛️ Accessing Stanford Law Library - Copyright & Fair Use Project...', 'info');
-                await new Promise(resolve => setTimeout(resolve, 800));
+                                await new Promise(resolve => setTimeout(resolve, 800));
                 
-                const stanfordConfidence = universityResults['Stanford Law Library'];
-                if (stanfordConfidence) {
+                                if (stanfordConfidence) {
                     addConsoleLog('     ✓ Stanford analysis: Found case law and analysis references', 'debug');
                     addConsoleLog(`     ✓ Validation confidence: ${stanfordConfidence}% (REAL)`, 'debug');
                     updateUniversitySubstep('stanford', 'completed', stanfordConfidence);
@@ -1907,14 +1902,11 @@
                     updateUniversitySubstep('stanford', 'completed', 90);
                 }
                 
-                // Harvard Law Library
-                await new Promise(resolve => setTimeout(resolve, 600));
+                                await new Promise(resolve => setTimeout(resolve, 600));
                 updateUniversitySubstep('harvard', 'running');
-                addConsoleLog('   📖 Accessing Harvard Law Library Legal Research Database...', 'info');
-                await new Promise(resolve => setTimeout(resolve, 800));
+                                await new Promise(resolve => setTimeout(resolve, 800));
                 
-                const harvardConfidence = universityResults['Harvard Law Library'];
-                if (harvardConfidence) {
+                                if (harvardConfidence) {
                     addConsoleLog('     ✓ Harvard analysis: Found Higher Education Act Perkins Loans references', 'debug');
                     addConsoleLog(`     ✓ Validation confidence: ${harvardConfidence}% (REAL)`, 'debug');
                     updateUniversitySubstep('harvard', 'completed', harvardConfidence);
@@ -1924,14 +1916,11 @@
                     updateUniversitySubstep('harvard', 'completed', 92);
                 }
                 
-                // Yale Law Library
-                await new Promise(resolve => setTimeout(resolve, 600));
+                                await new Promise(resolve => setTimeout(resolve, 600));
                 updateUniversitySubstep('yale', 'running');
-                addConsoleLog('   📖 Accessing Yale Law School Digital Collection...', 'info');
-                await new Promise(resolve => setTimeout(resolve, 900));
+                                await new Promise(resolve => setTimeout(resolve, 900));
                 
-                const yaleConfidence = universityResults['Yale Law Library'];
-                if (yaleConfidence) {
+                                if (yaleConfidence) {
                     addConsoleLog('     ✓ Yale analysis: Found digital rights references', 'debug');
                     addConsoleLog(`     ✓ Validation confidence: ${yaleConfidence}% (REAL)`, 'debug');
                     updateUniversitySubstep('yale', 'completed', yaleConfidence);
@@ -1941,14 +1930,11 @@
                     updateUniversitySubstep('yale', 'completed', 90);
                 }
                 
-                // Columbia Law Library
-                await new Promise(resolve => setTimeout(resolve, 700));
+                                await new Promise(resolve => setTimeout(resolve, 700));
                 updateUniversitySubstep('columbia', 'running');
-                addConsoleLog('   📖 Accessing Columbia Law Library Resources...', 'info');
-                await new Promise(resolve => setTimeout(resolve, 800));
+                                await new Promise(resolve => setTimeout(resolve, 800));
                 
-                const columbiaConfidence = universityResults['Columbia Law Library'];
-                if (columbiaConfidence) {
+                                if (columbiaConfidence) {
                     addConsoleLog('     ✓ Columbia analysis: Found copyright analysis references', 'debug');
                     addConsoleLog(`     ✓ Validation confidence: ${columbiaConfidence}% (REAL)`, 'debug');
                     updateUniversitySubstep('columbia', 'completed', columbiaConfidence);

@@ -16,8 +16,6 @@
  * 
  * Future (credentials needed):
  *   - LexisNexis (credentials pending)
- *   - Westlaw (requires subscription)
- *   - HeinOnline (requires subscription)
  */
 
 import https from 'https';
@@ -39,10 +37,8 @@ const APIS = {
   openAlex: 'https://api.openalex.org',
   semanticScholar: 'https://api.semanticscholar.org/graph/v1',
   
-  // Future: Paid Services (placeholders)
-  lexisNexis: null, // Will be configured when credentials are provided
-  westlaw: null,    // Requires subscription
-  heinOnline: null  // Requires subscription
+  // Future: Paid Services
+  lexisNexis: null // Will be configured when credentials are provided
 };
 
 // API Keys from environment (if available)

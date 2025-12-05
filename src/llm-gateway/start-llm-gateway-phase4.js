@@ -1088,13 +1088,8 @@ The Family Educational Rights and Privacy Act (FERPA) is a federal law that prot
             legalResearchSources: {
               confidence: 0,
               status: 'credentials_pending',
-              sources: legalResearchSourcesList
-            },
-            // NO FAKE UNIVERSITY LIBRARIES - removed until real APIs available
-            universityLibraries: {
-              status: 'not_available',
-              note: 'University law library APIs require institutional access - using open academic sources instead',
-              alternativeSources: academicSourcesList.filter(s => s.confidence > 0)
+              sources: legalResearchSourcesList,
+              note: 'LexisNexis credentials pending'
             },
             citations: crossRefResults.citations
           }
@@ -1173,8 +1168,6 @@ The Family Educational Rights and Privacy Act (FERPA) is a federal law that prot
                 sources: realAcademicSources,
                 validation_complete: crossRefResults.summary.successfulFetches >= 3,
                 cross_reference_score: crossRefResults.summary.averageConfidence,
-                // NOTE: University law libraries removed - they don't have public APIs
-                university_libraries_note: 'University law library APIs require institutional access. Using open academic databases instead.',
                 isReal: true,
                 noMockData: true
               },
