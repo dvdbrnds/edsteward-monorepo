@@ -1,0 +1,20 @@
+{
+  "regulationId": "truth-in-lending-act",
+  "enhanced": {
+    "fullText": "The Truth in Lending Act (TILA), codified at 15 U.S.C. §§ 1601-1693r, is a federal consumer protection law that mandates clear disclosure of credit terms and costs to borrowers. For higher education institutions, TILA's application is significantly limited by specific exemptions for federal student aid programs. Under 15 U.S.C. § 1603(1) and implementing regulations at 12 CFR § 1026.3(a)(1), loans made, insured, or guaranteed pursuant to Title IV of the Higher Education Act are exempt from TILA requirements. This exemption encompasses Federal Direct Loans, Federal Perkins Loans, Federal Family Education Loans (FFEL), and PLUS loans. However, institutions must comply with TILA for non-federal educational credit products, including institutional payment plans exceeding four installments under 12 CFR § 1026.2(a)(20), private education loans from third-party lenders that don't qualify for exemptions, and emergency or bridge loans offered directly by the institution. TILA requires disclosure of Annual Percentage Rate (APR), finance charges, total amount financed, total of payments, and payment schedule within specific timeframes outlined in 12 CFR § 1026.18. For open-end credit plans, periodic statements must include information specified in 12 CFR § 1026.7. Enforcement is primarily conducted by the Consumer Financial Protection Bureau (CFPB) under 12 U.S.C. § 5514, with civil penalties up to $1,000,000 per day for knowing violations per 12 U.S.C. § 5565(c). The CFPB has supervisory authority over institutions with over $10 billion in assets. Private rights of action exist under 15 U.S.C. § 1640, allowing borrowers to recover actual damages plus statutory damages up to $4,000 for individual actions. Recent amendments through the Dodd-Frank Act transferred rulemaking authority from the Federal Reserve to the CFPB in 2011, while the Economic Growth, Regulatory Relief, and Consumer Protection Act of 2018 modified certain disclosure requirements for qualified mortgages. Institutions must maintain compliance documentation for two years minimum under 12 CFR § 1026.25, and ensure staff training on TILA requirements for any covered credit products. Non-compliance risks include regulatory sanctions, civil monetary penalties, and private litigation exposure.",
+    "summary": "TILA mandates credit disclosure requirements but exempts most federal student loans under Title IV programs. Higher education institutions must comply only for non-federal educational credit products and payment plans.",
+    "requirements": "## Core Disclosure Requirements\n- Provide APR, finance charges, and payment terms for covered credit products per 12 CFR § 1026.18\n- Deliver disclosures before credit consummation or within three business days for applications\n- Maintain disclosure documentation for minimum two years under 12 CFR § 1026.25\n\n## Exempt Programs Identification\n- Verify Title IV program status for federal student loans per 15 U.S.C. § 1603(1)\n- Document exemption basis for Federal Direct, Perkins, and PLUS loans\n- Apply TILA requirements to institutional payment plans exceeding four installments\n\n## Staff Training and Compliance\n- Train financial aid staff on TILA applicability and exemptions\n- Establish procedures for non-federal educational credit products\n- Monitor third-party lender compliance for private education loans",
+    "reportingRequirements": "No routine federal reporting required. Institutions must maintain TILA disclosure records for two years per 12 CFR § 1026.25. CFPB may request compliance documentation during examinations for institutions exceeding $10 billion in assets."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T15:42:08.382Z"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "regulationId": "controlling-the-assault-of-non-solicited-pornograp",
+  "enhanced": {
+    "fullText": "The Controlling the Assault of Non-Solicited Pornography And Marketing Act of 2003 (CAN-SPAM Act), codified at 15 U.S.C. §§ 7701-7713, establishes comprehensive federal standards for commercial email communications that directly impact higher education institutions' fundraising and development activities. This regulation governs all commercial electronic mail messages, defined under 15 U.S.C. § 7702(2) as any electronic mail message whose primary purpose is commercial advertisement or promotion of commercial products or services.\n\nFor higher education institutions, CAN-SPAM compliance is critical for alumni relations, fundraising campaigns, continuing education promotions, and event marketing. The Act's provisions under 15 U.S.C. § 7704 mandate several key requirements: (1) prohibition of false or misleading header information, including accurate 'From,' 'To,' and routing information; (2) prohibition of deceptive subject lines that mislead recipients about message content; (3) clear identification of commercial messages as advertisements when not sent to existing customers; (4) inclusion of valid physical postal address of sender; (5) provision of clear opt-out mechanisms that remain functional for at least 30 days; and (6) prompt processing of opt-out requests within 10 business days as specified in 15 U.S.C. § 7704(a)(4).\n\nThe Federal Trade Commission (FTC) enforces CAN-SPAM violations under 15 U.S.C. § 7706, with civil penalties reaching $46,517 per violation as of 2023 adjustments. Universities must ensure their advancement offices, continuing education divisions, and third-party vendors comply with these standards. The Act's extraterritorial reach under 15 U.S.C. § 7703 covers emails sent to U.S. recipients regardless of sender location, affecting international recruitment communications. Recent FTC enforcement actions have emphasized the importance of vendor oversight, making institutional compliance programs essential for managing email marketing relationships with external fundraising consultants and technology providers.",
+    "summary": "Federal law regulating commercial email communications requiring truthful headers, clear subject lines, sender identification, opt-out mechanisms, and prompt unsubscribe processing for university fundraising and marketing emails.",
+    "requirements": "## Email Content Standards\n- Ensure all 'From,' 'To,' and routing information accurately identifies sender per 15 U.S.C. § 7704(a)(1)\n- Prohibit deceptive subject lines that mislead about message content\n- Include valid physical postal address in all commercial messages\n- Clearly identify promotional emails as advertisements when sent to non-donors\n\n## Opt-Out Compliance\n- Provide conspicuous unsubscribe mechanism in every commercial email\n- Process opt-out requests within 10 business days maximum\n- Maintain functional unsubscribe links for minimum 30 days after sending\n- Prohibit sharing email addresses of individuals who opted out\n\n## Vendor Management\n- Establish written agreements requiring CAN-SPAM compliance from third-party email service providers\n- Monitor fundraising consultants and marketing vendors for regulatory adherence\n- Implement oversight procedures for all commercial email campaigns\n\n## Institutional Oversight\n- Designate compliance responsibility to advancement operations or legal counsel\n- Conduct regular audits of email marketing practices across all university departments",
+    "reportingRequirements": "No specific federal reporting requirements under CAN-SPAM Act. Institutions must maintain internal records of opt-out requests processing, vendor compliance agreements, and email campaign documentation for potential FTC investigations."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T17:52:57.687Z"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "regulationId": "deferred-compensation",
+  "enhanced": {
+    "fullText": "Section 457 of the Internal Revenue Code (26 U.S.C. § 457) governs eligible deferred compensation plans for state and local government employees, including public higher education institutions. This regulation establishes the tax treatment framework for compensation deferred under qualifying plans, stipulating that deferred amounts and attributable income are includible in gross income only when distributed to participants.\n\nHigher education institutions classified as state or local government entities may sponsor 457(b) plans for employees, subject to strict compliance requirements under 26 U.S.C. § 457(b) and implementing Treasury Regulations 1.457-1 through 1.457-12. The annual deferral limit for 2024 is $23,000, with catch-up contributions of $7,500 for participants age 50 and older (26 U.S.C. § 457(b)(2)). Universities must ensure plan documents comply with 26 U.S.C. § 457(b)(4), requiring assets be held in trust for exclusive benefit of participants and beneficiaries.\n\nEligible employers include public universities, community colleges, and related educational entities as defined under 26 U.S.C. § 457(e)(1)(A). Plans must satisfy distribution restrictions under 26 U.S.C. § 457(d), permitting distributions only upon separation from service, unforeseeable emergency, or attainment of age 70½. Treasury Regulation 1.457-6 defines unforeseeable emergencies as severe financial hardships resulting from illness, casualty loss, or extraordinary circumstances.\n\nCompliance obligations include annual Form 5500 filing requirements under ERISA Section 104 for plans with 100 or more participants, due seven months after plan year-end with available extensions. Institutions must maintain qualified domestic relations order procedures per 26 U.S.C. § 457(d)(1)(C) and ensure proper beneficiary designations under Treasury Regulation 1.457-6(b)(2).\n\nThe SECURE Act of 2019 modified distribution rules, extending required minimum distribution age to 72 under 26 U.S.C. § 401(a)(9). Universities face potential plan disqualification penalties under 26 U.S.C. § 457(f) for non-compliance, resulting in immediate income inclusion for participants. Regular plan administration reviews and timely regulatory updates are essential for maintaining qualified status and protecting institutional liability exposure.",
+    "summary": "26 U.S.C. § 457 governs deferred compensation plans for public higher education employees, requiring tax deferral until distribution and strict compliance with contribution limits, distribution restrictions, and administrative requirements.",
+    "requirements": "## Plan Administration Requirements\n- Maintain qualified plan documents per 26 U.S.C. § 457(b)(4)\n- Establish participant-only trust arrangements for asset protection\n- Monitor annual deferral limits ($23,000 for 2024, plus catch-up contributions)\n- Document eligible participant status under governmental plan provisions\n\n## Distribution Controls\n- Restrict distributions to separation from service, age 70½, or unforeseeable emergency per 26 U.S.C. § 457(d)\n- Implement emergency hardship procedures under Treasury Regulation 1.457-6\n- Process required minimum distributions beginning at age 72\n\n## Compliance Monitoring\n- File annual Form 5500 for plans with 100+ participants\n- Conduct periodic plan document reviews for regulatory changes\n- Maintain QDRO procedures and beneficiary designation systems\n- Monitor SECURE Act implementation requirements",
+    "reportingRequirements": "Form 5500 annual filing due 7 months after plan year-end for plans with 100+ participants. File Form 1099-R for all distributions by January 31. Submit plan amendments within required timeframes for regulatory changes."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T17:59:41.927Z"
+  }
+}

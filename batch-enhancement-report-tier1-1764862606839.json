@@ -1,0 +1,83 @@
+{
+  "startTime": "2025-12-04T15:36:16.631Z",
+  "tier": 1,
+  "total": 10,
+  "succeeded": 5,
+  "failed": 5,
+  "needsReview": 0,
+  "averageScore": "94.2",
+  "details": [
+    {
+      "regulationId": "age-discrimination-act-of-1975",
+      "success": true,
+      "score": 93,
+      "needsReview": false,
+      "error": null
+    },
+    {
+      "regulationId": "bankruptcy-abuse-prevention-consumer-protection-ac",
+      "success": true,
+      "score": 96,
+      "needsReview": false,
+      "error": null
+    },
+    {
+      "regulationId": "clayton-antitrust-act-of-1914",
+      "success": true,
+      "score": 93,
+      "needsReview": false,
+      "error": null
+    },
+    {
+      "regulationId": "federal-insurance-contributions-act-fica",
+      "success": true,
+      "score": 93,
+      "needsReview": false,
+      "error": null
+    },
+    {
+      "regulationId": "federal-unemployment-tax-act-futa",
+      "success": true,
+      "score": 96,
+      "needsReview": false,
+      "error": null
+    },
+    {
+      "regulationId": "regulation-e-electronic-fund-transfers",
+      "success": false,
+      "score": 0,
+      "needsReview": false,
+      "error": "Invalid response from Claude API"
+    },
+    {
+      "regulationId": "sarbanes-oxley-act-of-2002-sox",
+      "success": false,
+      "score": 0,
+      "needsReview": false,
+      "error": "Invalid response from Claude API"
+    },
+    {
+      "regulationId": "sherman-antitrust-act",
+      "success": false,
+      "score": 0,
+      "needsReview": false,
+      "error": "Invalid response from Claude API"
+    },
+    {
+      "regulationId": "social-security-act",
+      "success": false,
+      "score": 0,
+      "needsReview": false,
+      "error": "Invalid response from Claude API"
+    },
+    {
+      "regulationId": "tax-cuts-and-jobs-act-of-2017-endowment-excise-tax",
+      "success": false,
+      "score": 0,
+      "needsReview": false,
+      "error": "Invalid response from Claude API"
+    }
+  ],
+  "endTime": "2025-12-04T15:36:46.839Z",
+  "totalTime": 0.5
+}

@@ -1,0 +1,20 @@
+{
+  "regulationId": "federal-funding-accountability-and-transparency-ac",
+  "enhanced": {
+    "fullText": "The Federal Funding Accountability and Transparency Act of 2006 (FFATA), codified at 31 U.S.C. § 6101 et seq., represents a landmark transparency initiative requiring comprehensive disclosure of federal spending through a centralized, publicly accessible database. For higher education institutions, this statute imposes significant reporting obligations that extend beyond the institution itself to include sub-recipients and vendors.\n\nEnacted as Public Law 109-282 and subsequently amended by the Government Funding Transparency Act (P.L. 110-252, § 6202), FFATA mandates that all federal awards exceeding $25,000 must be reported to USASpending.gov within 30 days of obligation. Universities receiving federal grants, contracts, or cooperative agreements must ensure complete transparency regarding fund distribution and utilization.\n\nKey provisions under 31 U.S.C. § 6102 require institutions to report: (1) the name and unique identifier of each receiving entity; (2) award amounts and funding sources; (3) transaction types and responsible federal agencies; (4) recipient locations and primary performance sites; (5) executive compensation data for sub-recipients receiving $25,000+ annually; and (6) North American Industry Classification System codes where applicable.\n\nThe Act's scope encompasses all federal funding streams common to higher education, including research grants from NSF, NIH, and DOE, as well as student aid administrative funds and facilities grants. Compliance obligations extend to sub-awards, creating a cascading responsibility where universities must ensure sub-recipients also meet FFATA requirements.\n\nEnforcement mechanisms include award suspension, termination, and debarment procedures outlined in 2 CFR Part 180. The Federal Funding Accountability and Transparency Act Subaward Reporting System (FSRS) serves as the primary reporting mechanism for sub-award data.\n\nRecent amendments through the DATA Act (P.L. 113-101) enhanced reporting requirements and established standardized data elements, requiring universities to maintain more granular financial tracking systems to ensure compliance with evolving transparency mandates.",
+    "summary": "FFATA requires universities to publicly report all federal awards exceeding $25,000 through USASpending.gov, including detailed recipient information, funding amounts, and executive compensation data for sub-recipients.",
+    "requirements": "## Core Disclosure Requirements\n- Report all federal awards exceeding $25,000 within 30 days of obligation per 31 U.S.C. § 6102\n- Maintain unique recipient entity identifiers (DUNS numbers) for all sub-recipients\n- Submit data through Federal Funding Accountability and Transparency Act Subaward Reporting System (FSRS)\n\n## Sub-recipient Reporting Obligations\n- Collect executive compensation data for first-tier sub-recipients receiving $25,000+ annually\n- Verify sub-recipient compliance with FFATA disclosure requirements\n- Document primary performance locations and recipient entity addresses\n\n## Data Quality and Verification\n- Ensure accuracy of transaction types, funding sources, and federal agency identification\n- Maintain NAICS codes for applicable awards and sub-awards\n- Implement internal controls per 2 CFR Part 200 standards for data integrity\n\n## Vendor and Contractor Coverage\n- Apply reporting requirements to vendors and sub-grantees meeting threshold amounts\n- Establish contractual clauses requiring contractor compliance with transparency obligations",
+    "reportingRequirements": "Submit award data to USASpending.gov within 30 days of federal fund obligation. Monthly updates required for ongoing awards. Executive compensation reporting due annually by March 31st for prior fiscal year sub-recipient data exceeding $25,000 threshold."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T18:53:53.646Z"
+  }
+}

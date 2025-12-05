@@ -1,0 +1,20 @@
+{
+  "regulationId": "immigration-and-nationality-act",
+  "enhanced": {
+    "fullText": "The Immigration and Nationality Act (INA), codified at 8 U.S.C. §§ 1101-1537, establishes the comprehensive legal framework governing foreign national admission, employment, and verification in the United States. For higher education institutions, the INA's employment eligibility verification provisions under 8 U.S.C. § 1324a are particularly critical, requiring verification of all employees' work authorization through Form I-9 completion within three business days of hire.\n\nUnder 8 U.S.C. § 1324a(a)(1)(A), universities are prohibited from knowingly hiring unauthorized workers, with civil penalties ranging from $573 to $4,586 per violation for first-time offenders under 8 CFR § 274a.10. The statute's anti-discrimination provisions at 8 U.S.C. § 1324b prohibit employment discrimination based on national origin or citizenship status, requiring institutions to accept any acceptable Form I-9 documentation and avoid preferential treatment based on document type.\n\nHigher education institutions must maintain I-9 records for all employees, including faculty, staff, and student workers, for three years after hire or one year after termination, whichever is later, pursuant to 8 CFR § 274a.2(b)(2). The INA's scope extends to student visa compliance under 8 U.S.C. § 1101(a)(15)(F), requiring institutions to maintain Student and Exchange Visitor Information System (SEVIS) records and report student status changes.\n\nEnforcement mechanisms include Immigration and Customs Enforcement (ICE) audits, with potential penalties including criminal charges under 8 U.S.C. § 1324a(f) for pattern or practice violations, carrying fines up to $3,000 per unauthorized worker and potential imprisonment. The Department of Justice Office of Special Counsel handles anti-discrimination enforcement under 8 U.S.C. § 1324b(d), with penalties ranging from $573 to $4,586 for first violations.\n\nRecent amendments include the 2019 adjustment of civil monetary penalties under the Federal Civil Penalties Inflation Adjustment Act, increasing maximum fines to $22,927 for repeat I-9 violations. Universities must also comply with E-Verify requirements if holding federal contracts exceeding $150,000 under Executive Order 12989, as implemented through FAR 22.1803.",
+    "summary": "The INA mandates employment eligibility verification for all university employees through Form I-9, prohibits hiring unauthorized workers, and requires anti-discrimination compliance in employment practices with penalties up to $22,927.",
+    "requirements": "## Employment Verification\n- Complete Form I-9 for all employees within three business days of hire per 8 U.S.C. § 1324a\n- Verify work authorization documents without discriminating based on document type\n- Maintain I-9 records for three years post-hire or one year post-termination per 8 CFR § 274a.2(b)(2)\n\n## Anti-Discrimination Compliance\n- Accept any acceptable Form I-9 documentation under 8 U.S.C. § 1324b\n- Avoid citizenship status or national origin discrimination in hiring\n- Train HR personnel on proper verification procedures\n\n## Student Visa Management\n- Maintain SEVIS records for F-1 students under 8 U.S.C. § 1101(a)(15)(F)\n- Report student status changes within required timeframes\n- Verify student worker eligibility before employment\n\n## Federal Contract Compliance\n- Implement E-Verify for federal contracts exceeding $150,000\n- Ensure subcontractor E-Verify compliance where applicable",
+    "reportingRequirements": "SEVIS reporting required within 21 days for F-1 student status changes. E-Verify queries must be initiated within three business days of hire for covered employees. No routine I-9 reporting required unless ICE audit requested."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T16:06:28.929Z"
+  }
+}

@@ -1,0 +1,2641 @@
+{
+  "total": 295,
+  "processed": 263,
+  "skipped": 32,
+  "failed": 0,
+  "excellent": [
+    {
+      "slug": "higher-education-opportunity-act-sections-152-and-",
+      "name": "Higher Education Opportunity Act Sections 152 and 153",
+      "score": 93,
+      "certainty": "A",
+      "contentScore": 100,
+      "summaryScore": 100,
+      "reqScore": 90,
+      "needsImprovement": false
+    },
+    {
+      "slug": "higher-education-opportunity-act",
+      "name": "Higher Education Opportunity Act",
+      "score": 93,
+      "certainty": "A",
+      "contentScore": 100,
+      "summaryScore": 100,
+      "reqScore": 90,
+      "needsImprovement": false
+    },
+    {
+      "slug": "higher-education-opportunity-act",
+      "name": "Higher Education Opportunity Act",
+      "score": 93,
+      "certainty": "A",
+      "contentScore": 100,
+      "summaryScore": 100,
+      "reqScore": 90,
+      "needsImprovement": false
+    }
+  ],
+  "good": [],
+  "needsWork": [
+    {
+      "slug": "age-discrimination-act-of-1975",
+      "name": "Age Discrimination Act of 1975",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "bankruptcy-abuse-prevention-consumer-protection-ac",
+      "name": "Bankruptcy Abuse Prevention & Consumer Protection Act of 2005",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "clayton-antitrust-act-of-1914",
+      "name": "Clayton Antitrust Act of 1914",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "federal-insurance-contributions-act-fica",
+      "name": "Federal Insurance Contributions Act (FICA)",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "federal-unemployment-tax-act-futa",
+      "name": "Federal Unemployment Tax Act (FUTA)",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "regulation-e-electronic-fund-transfers",
+      "name": "Regulation E: Electronic Fund Transfers",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "sarbanes-oxley-act-of-2002-sox",
+      "name": "Sarbanes Oxley Act of 2002 (SOX)",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "sherman-antitrust-act",
+      "name": "Sherman Antitrust Act",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "social-security-act",
+      "name": "Social Security Act",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "tax-cuts-and-jobs-act-of-2017-endowment-excise-tax",
+      "name": "Tax Cuts and Jobs Act of 2017 (endowment excise tax)",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "truth-in-lending-act",
+      "name": "Truth in Lending Act",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "age-discrimination-act-of-1975",
+      "name": "Age Discrimination Act of 1975",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-readmission-requirements-for-",
+      "name": "Higher Education Act: Readmission Requirements for Servicemembers",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-drug-and-alcohol-abuse-preven",
+      "name": "Higher Education Act: Drug and Alcohol Abuse Prevention",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "occupational-safety-and-health-act-of-1970",
+      "name": "Occupational Safety and Health Act of 1970",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "anti-kickback-act-of-1986",
+      "name": "Anti-Kickback Act of 1986",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "anti-discrimination-laws-for-federal-contractors",
+      "name": "Anti-discrimination laws for federal contractors",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "davis-bacon-act",
+      "name": "Davis-Bacon Act",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "e-verify-executive-order-13465-amending-executive-",
+      "name": "E-Verify Executive Order 13465-Amending Executive Order 12989",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "health-insurance-portability-and-accountability-ac",
+      "name": "Health Insurance Portability and Accountability Act of 1996 (HIPAA)",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-foreign-gift-and-contract-rep",
+      "name": "Higher Education Act: Foreign Gift and Contract Reports",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "small-business-act-and-small-business-investment-a",
+      "name": "Small Business Act and Small Business Investment Act of 1958",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "trade-sanctions-reform-and-export-enhancement",
+      "name": "Trade Sanctions Reform and Export Enhancement",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "non-retaliation-for-disclosure-of-compensation-inf",
+      "name": "Non-Retaliation for Disclosure of Compensation Information",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "copyright-act",
+      "name": "Copyright Act",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "digital-millennium-copyright-act-dmca",
+      "name": "Digital Millennium Copyright Act (DMCA)",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "lanham-act",
+      "name": "Lanham Act",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "technology-education-and-copyright-harmonization-a",
+      "name": "Technology Education and Copyright Harmonization Act (TEACH ACT) of 2002",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "fair-housing-act-section-6",
+      "name": "Fair Housing Act, Section 6",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "patient-protection-and-affordable-care-act-section",
+      "name": "Patient Protection and Affordable Care Act (Section 1557)",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "the-family-and-medical-leave-act-of-1993",
+      "name": "The Family and Medical Leave Act of 1993",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "age-discrimination-in-employment-act-of-1967",
+      "name": "Age Discrimination in Employment Act of 1967",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "equal-employment-opportunity",
+      "name": "Equal Employment Opportunity",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "equal-employment-of-veterans",
+      "name": "Equal Employment of Veterans",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "genetic-information-non-discrimination-act-of-2008",
+      "name": "Genetic Information Non-Discrimination Act of 2008",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "the-equal-pay-act-of-1963",
+      "name": "The Equal Pay Act of 1963",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "the-family-and-medical-leave-act-of-1993",
+      "name": "The Family and Medical Leave Act of 1993",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "uniformed-services-employment-and-reemployment-rig",
+      "name": "Uniformed Services Employment and Reemployment Rights Act (USERRA)",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "pregnant-workers-fairness-act-pwfa",
+      "name": "Pregnant Workers Fairness Act (PWFA)",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "affirmative-action-equal-employment-opportunity",
+      "name": "Affirmative Action/Equal Employment Opportunity",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "age-discrimination-act-of-1975",
+      "name": "Age Discrimination Act of 1975",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "age-discrimination-employment-act-of-1967",
+      "name": "Age Discrimination Employment Act of 1967",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "equal-employment-of-veterans",
+      "name": "Equal Employment of Veterans",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "equal-pay-act-of-1963",
+      "name": "Equal Pay Act of 1963",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "genetic-information-non-discrimination-act-of-2008",
+      "name": "Genetic Information Non-Discrimination Act of 2008",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "immigration-and-nationality-act",
+      "name": "Immigration and Nationality Act",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "uniformed-services-employment-and-reemployment-rig",
+      "name": "Uniformed Services Employment and Reemployment Rights Act (USERRA)",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "veterans-employment-emphasis-under-federal-contrac",
+      "name": "Veterans’ employment emphasis under Federal contracts",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "cafeteria-plan-regulations",
+      "name": "Cafeteria Plan Regulations",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "consolidated-omnibus-budget-reconciliation-act-cob",
+      "name": "Consolidated Omnibus Budget Reconciliation Act (COBRA)",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "patient-protection-and-affordable-care-act",
+      "name": "Patient Protection and Affordable Care Act",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "uniformed-services-employment-and-reemployment-rig",
+      "name": "Uniformed Services Employment and Reemployment Rights Act (USERRA)",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "chemical-facility-anti-terrorism-standards",
+      "name": "Chemical Facility Anti-Terrorism Standards",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "clean-water-act",
+      "name": "Clean Water Act",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "comprehensive-environmental-response-compensation-",
+      "name": "Comprehensive Environmental Response, Compensation, and Liability Act (CERCLA)",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "federal-insecticide-fungicide-and-rodenticide-act",
+      "name": "Federal Insecticide, Fungicide and Rodenticide Act",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "guarding-and-use-of-hand-portable-powered-tools",
+      "name": "Guarding and Use of Hand & Portable Powered Tools",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "motor-carrier-act-of-1980",
+      "name": "Motor Carrier Act of 1980",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "osha",
+      "name": "OSHA",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "osha-asbestos-in-construction-standard",
+      "name": "OSHA Asbestos in Construction Standard",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "osha-asbestos-in-general-industry-standard",
+      "name": "OSHA Asbestos in General Industry Standard",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "osha-enforcement-guidance-for-personal-protective-",
+      "name": "OSHA Enforcement Guidance for Personal Protective Equipment (PPE) in General Industry",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "osha-lead-in-construction-standard",
+      "name": "OSHA Lead in Construction Standard",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "osha-lead-in-general-industry-standard",
+      "name": "OSHA Lead in General Industry Standard",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "osha-welding-cutting-and-brazing",
+      "name": "OSHA Welding, Cutting, and Brazing",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "osha-bloodborne-pathogens-standard",
+      "name": "OSHA – Bloodborne Pathogens Standard",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "osha-s-emergency-action-plan-standard",
+      "name": "OSHA’s  Emergency Action Plan Standard",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "osha-s-occupational-noise-exposure-standard",
+      "name": "OSHA’s  Occupational Noise Exposure Standard",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "standards-for-the-management-of-used-oil",
+      "name": "Standards For the Management of Used Oil",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "acts-affecting-a-personal-financial-interest",
+      "name": "Acts Affecting a Personal Financial Interest",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "bribery-of-public-officials-and-witnesses",
+      "name": "Bribery of Public Officials and Witnesses",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "compensation-to-members-of-congress-officers-other",
+      "name": "Compensation to Members of Congress, Officers, Others in Matters Affecting the Government",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "ethics-in-government-act-amended-by-ethics-reform-",
+      "name": "Ethics in Government Act (Amended by Ethics Reform Act and Honest Leadership and Open Government Act of 2007)",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "house-and-senate-gift-ban-and-ethics-rules",
+      "name": "House and Senate Gift Ban and Ethics Rules",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "outside-earned-income-and-activities",
+      "name": "Outside Earned Income and Activities",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "restrictions-on-former-officers-employees-and-elec",
+      "name": "Restrictions on Former Officers, Employees, and Elected Officials of the Executive and Legislative",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "salary-of-government-officials-and-employees-payab",
+      "name": "Salary of Government Officials and Employees Payable Only by United States",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "arms-export-control-act-of-1976",
+      "name": "Arms Export Control Act of 1976",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "export-administration-act-of-1979",
+      "name": "Export Administration Act of 1979",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "foreign-assets-control-regulations",
+      "name": "Foreign Assets Control Regulations",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "international-emergency-economic-powers-act",
+      "name": "International Emergency Economic Powers Act",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "trading-with-the-enemy-act-of-1917",
+      "name": "Trading with the Enemy Act of 1917",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-aid-application-verification",
+      "name": "Higher Education Act: Aid Application Verification",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-borrower-defense-to-repayment",
+      "name": "Higher Education Act: Borrower Defense to Repayment",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-cash-management",
+      "name": "Higher Education Act: Cash Management",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-code-of-conduct",
+      "name": "Higher Education Act: Code of Conduct",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-cohort-default-rate",
+      "name": "Higher Education Act: Cohort Default Rate",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-eligibility-and-certification",
+      "name": "Higher Education Act: Eligibility and Certification",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-net-price-calculator",
+      "name": "Higher Education Act: Net Price Calculator",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-preferred-lenders",
+      "name": "Higher Education Act: Preferred Lenders",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-standard-of-conduct",
+      "name": "Higher Education Act: Standard of Conduct",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "student-loan-default-prevention-initiative-act-of-",
+      "name": "Student Loan Default Prevention Initiative Act of 1990",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "controlling-the-assault-of-non-solicited-pornograp",
+      "name": "Controlling the Assault of Non-Solicited Pornography And Marketing Act of 2003 (CAN-SPAM Act)",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-code-of-conduct",
+      "name": "Higher Education Act: Code of Conduct",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-foreign-gift-and-contract-rep",
+      "name": "Higher Education Act: Foreign Gift and Contract Reports",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "internal-revenue-code-substantiation-and-disclosur",
+      "name": "Internal Revenue Code: Substantiation and Disclosure Provisions",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "pension-protection-act",
+      "name": "Pension Protection Act",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "philanthropy-protection-act-of-1995",
+      "name": "Philanthropy Protection Act of 1995",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "internal-revenue-service-governance-information-re",
+      "name": "Internal Revenue Service: Governance Information Required on Form 990",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "unknown",
+      "name": "Unknown Regulation",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "department-of-education-general-administrative-reg",
+      "name": "Department of Education General Administrative Regulations and Other Applicable Grant Regulations",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "false-claims-act",
+      "name": "False Claims Act",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "fraud-enforcement-and-recovery-act-of-2009-fera",
+      "name": "Fraud Enforcement and Recovery Act of 2009 (FERA)",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "health-insurance-portability-and-accountability-ac",
+      "name": "Health Insurance Portability and Accountability Act",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "immigration-and-nationality-act-ina",
+      "name": "Immigration and Nationality Act (INA)",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "communications-assistance-for-law-enforcement-act-",
+      "name": "Communications Assistance for Law Enforcement Act (CALEA)",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "controlling-the-assault-of-non-solicited-pornograp",
+      "name": "Controlling the Assault of Non-Solicited Pornography And Marketing Act of 2003 (CAN-SPAM Act)",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "digital-millennium-copyright-act-dmca",
+      "name": "Digital Millennium Copyright Act (DMCA)",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "electronic-communications-privacy-act-of-1986",
+      "name": "Electronic Communications Privacy Act of 1986",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "fcc-cable-certification",
+      "name": "FCC – Cable Certification",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "fcc-fixed-microwave-services-licensing",
+      "name": "FCC – Fixed Microwave Services, Licensing",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "fcc-wireless-communications-licensing",
+      "name": "FCC – Wireless Communications, Licensing",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "homeland-security-act-of-2002",
+      "name": "Homeland Security Act of 2002",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "junk-fax-prevention-act-of-2005",
+      "name": "Junk Fax Prevention Act of 2005",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "no-electronic-theft-act",
+      "name": "No Electronic Theft Act",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "telemarketing",
+      "name": "Telemarketing",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "american-jobs-creation-act-of-2004",
+      "name": "American Jobs Creation Act of 2004",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "bayh-dole-act-of-1980",
+      "name": "Bayh-Dole Act of 1980",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "cooperative-research-and-technology-enhancement-ac",
+      "name": "Cooperative Research and Technology Enhancement Act (CREATE Act)",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "trademark-revision-act",
+      "name": "Trademark Revision Act",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "u-s-patent-act",
+      "name": "U.S. Patent Act",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "visual-artists-rights-act",
+      "name": "Visual Artists Rights Act",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "house-and-senate-gift-ban-and-ethics-rules",
+      "name": "House and Senate Gift Ban and Ethics Rules",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "political-activities",
+      "name": "Political Activities",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "children-s-online-privacy-protection-act-of-1998-c",
+      "name": "Children’s Online Privacy Protection Act of 1998 (COPPA)",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "electronic-communications-privacy-act",
+      "name": "Electronic Communications Privacy Act",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "fair-and-accurate-credit-transaction-act-facta",
+      "name": "Fair and Accurate Credit Transaction Act (FACTA)",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "federal-information-security-management-act-fisma",
+      "name": "Federal Information Security Management Act (FISMA)",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "freedom-of-information-act",
+      "name": "Freedom of Information Act",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "health-information-technology-for-economic-and-cli",
+      "name": "Health Information Technology for Economic and Clinical Health (HITECH) Act of 2009",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-credit-hour-definition",
+      "name": "Higher Education Act: Credit Hour Definition",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-incentive-compensation-prohib",
+      "name": "Higher Education Act: Incentive Compensation Prohibition",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-misrepresentation",
+      "name": "Higher Education Act: Misrepresentation",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "federal-volunteer-protection-act",
+      "name": "Federal Volunteer Protection Act",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "immigration-and-nationality-act",
+      "name": "Immigration and Nationality Act",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "worker-adjustment-and-retraining-notification-act-",
+      "name": "Worker Adjustment and Retraining Notification Act (WARN)",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "america-competes-act",
+      "name": "America COMPETES Act",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "clinical-trials-financial-disclosures-by-investiga",
+      "name": "Clinical Trials § Financial Disclosures by Investigator",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "export-administration-regulations",
+      "name": "Export Administration Regulations",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "national-science-foundation-research-misconduct-po",
+      "name": "National Science Foundation Research Misconduct Policies",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "native-american-graves-protection-and-repatriation",
+      "name": "Native American Graves Protection and Repatriation Act (NAGPRA)",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "public-health-service-policies-on-research-miscond",
+      "name": "Public Health Service Policies on Research Misconduct",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "small-unmanned-aircraft-systems",
+      "name": "Small Unmanned Aircraft Systems",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "cafeteria-plans-26-u-s-c-125",
+      "name": "Cafeteria Plans 26 U.S.C. § 125",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "charitable-gift-annuity-antitrust-relief-act",
+      "name": "Charitable Gift Annuity Antitrust Relief Act",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "federal-unemployment-tax-act",
+      "name": "Federal Unemployment Tax Act",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "unrelated-business-income-ubit",
+      "name": "Unrelated Business Income (UBIT)",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "civil-service-reform-act-of-1978",
+      "name": "Civil Service Reform Act of 1978",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "national-labor-relations-act",
+      "name": "National Labor Relations Act",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "consumer-credit-protection-act-title-iii-ccpa-garn",
+      "name": "Consumer Credit Protection Act, Title III (CCPA) – Garnishments",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "federal-insurance-contributions-act-fica",
+      "name": "Federal Insurance Contributions Act (FICA)",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "federal-unemployment-tax-act",
+      "name": "Federal Unemployment Tax Act",
+      "score": 36,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-institutional-and-financial-a",
+      "name": "Higher Education Act: Institutional and Financial Assistance Information for Students",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-textbook-information",
+      "name": "Higher Education Act: Textbook Information",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "unrelated-business-income-tax-ubit",
+      "name": "Unrelated Business Income Tax (UBIT)",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-institutional-and-financial-a",
+      "name": "Higher Education Act: Institutional and Financial Assistance Information for Students",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-institutional-and-financial-a",
+      "name": "Higher Education Act: Institutional and Financial Assistance Information for Students",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "campus-sex-crimes-prevention-act-1601-of-the-victi",
+      "name": "Campus Sex Crimes Prevention Act (§ 1601 of the Victims of Trafficking and Violence Protection Act of 2000)",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-institutional-and-financial-a",
+      "name": "Higher Education Act: Institutional and Financial Assistance Information for Students: Disclosure of Fire Safety Standards and Measures",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-institutional-and-financial-a",
+      "name": "Higher Education Act: Institutional and Financial Assistance Information for Students: Missing Person Procedures",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "copeland-anti-kickback-act",
+      "name": "Copeland Anti-Kickback Act",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-institutional-and-financial-a",
+      "name": "Higher Education Act: Institutional and financial assistance information for students",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "employee-retirement-income-security-act-of-1974-er",
+      "name": "Employee Retirement Income Security Act of 1974 (ERISA)",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "the-veterans-readjustment-benefits-act",
+      "name": "The Veterans’ Readjustment Benefits Act",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "clean-air-act",
+      "name": "Clean Air Act",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "energy-policy-act",
+      "name": "Energy Policy Act",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "energy-reorganization-act-of-1974-as-amended",
+      "name": "Energy Reorganization Act of 1974, as amended",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "hazardous-materials-transportation-act",
+      "name": "Hazardous Materials Transportation Act",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "hazardous-and-solid-waste-amendments-of-1984",
+      "name": "Hazardous and Solid Waste Amendments of 1984",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "housing-urban-development-lead-based-paint-poisoni",
+      "name": "Housing & Urban Development Lead Based Paint Poisoning in Certain Residential Structures",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "mandatory-reporting-of-greenhouse-gases",
+      "name": "Mandatory Reporting of Greenhouse Gases",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "national-emission-standards-for-hazardous-air-poll",
+      "name": "National Emission Standards for Hazardous Air Pollutants (NESHAP)",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "oil-pollution-act",
+      "name": "Oil Pollution Act",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "resource-conservation-and-recovery-act",
+      "name": "Resource Conservation and Recovery Act",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "the-public-health-security-and-bioterrorism-prepar",
+      "name": "The Public Health Security and Bioterrorism Preparedness and Response Act",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "contracts-with-third-party-servicers",
+      "name": "Contracts with Third Party Servicers",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-audits",
+      "name": "Higher Education Act: Audits",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-financial-responsibility-requ",
+      "name": "Higher Education Act: Financial Responsibility Requirements",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-penalties-for-drug-violations",
+      "name": "Higher Education Act: Penalties for Drug Violations",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "federal-funding-accountability-and-transparency-ac",
+      "name": "Federal Funding Accountability and Transparency Act of 2006 (FFATA)",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "controlled-substances-act",
+      "name": "Controlled Substances Act",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "hipaa",
+      "name": "HIPAA",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "nsf-grant-term-and-condition-september-21-2018",
+      "name": "NSF grant term and condition, September 21, 2018",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "hazardous-materials-transportation-act",
+      "name": "Hazardous Materials Transportation Act",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "gramm-leach-bliley-act-glba",
+      "name": "Gramm Leach Bliley Act (GLBA)",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "hipaa",
+      "name": "HIPAA",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "deferred-compensation",
+      "name": "Deferred Compensation",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "employee-annuities",
+      "name": "Employee Annuities",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "employee-retirement-income-security-act-of-1974-er",
+      "name": "Employee Retirement Income Security Act of 1974 (ERISA)",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "qualified-pensions",
+      "name": "Qualified Pensions",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "campus-sex-crimes-prevention-act-1601-of-the-victi",
+      "name": "Campus Sex Crimes Prevention Act (§ 1601 of the Victims of Trafficking and Violence Protection Act of 2000)",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "deferred-compensation",
+      "name": "Deferred Compensation",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "employee-annuities",
+      "name": "Employee Annuities",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "foreign-bank-accounts-and-tax-filings",
+      "name": "Foreign Bank Accounts and Tax Filings",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "fringe-benefits",
+      "name": "Fringe Benefits",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "industrial-alcohol-user-permits-and-special-tax",
+      "name": "Industrial Alcohol User Permits and Special Tax",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "qualified-pensions",
+      "name": "Qualified Pensions",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "qualified-tuition-reductions",
+      "name": "Qualified Tuition Reductions",
+      "score": 41,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-recognition-of-accrediting-ag",
+      "name": "Higher Education Act: Recognition of Accrediting Agency or Association",
+      "score": 43,
+      "certainty": "D",
+      "contentScore": 60,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-program-participation-agreeme",
+      "name": "Higher Education Act: Program Participation Agreements",
+      "score": 43,
+      "certainty": "D",
+      "contentScore": 60,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-program-participation-agreeme",
+      "name": "Higher Education Act: Program Participation Agreements",
+      "score": 43,
+      "certainty": "D",
+      "contentScore": 60,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "atomic-energy-act-of-1954",
+      "name": "Atomic Energy Act of 1954",
+      "score": 43,
+      "certainty": "D",
+      "contentScore": 60,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "international-traffic-in-arms-regulations-itar",
+      "name": "International Traffic in Arms Regulations (ITAR)",
+      "score": 43,
+      "certainty": "D",
+      "contentScore": 60,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-program-participation-agreeme",
+      "name": "Higher Education Act: Program Participation Agreements",
+      "score": 43,
+      "certainty": "D",
+      "contentScore": 60,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "federal-sentencing-guidelines",
+      "name": "Federal Sentencing Guidelines",
+      "score": 43,
+      "certainty": "D",
+      "contentScore": 60,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "drug-alcohol-testing-of-transportation-employees",
+      "name": "Drug & Alcohol Testing of Transportation Employees",
+      "score": 43,
+      "certainty": "D",
+      "contentScore": 60,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-disclosure-of-foreign-gifts",
+      "name": "Higher Education Act – Disclosure of Foreign Gifts",
+      "score": 45,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 80,
+      "needsImprovement": true
+    },
+    {
+      "slug": "qualified-tuition-and-student-loan-interest-report",
+      "name": "Qualified Tuition and Student Loan Interest Reporting",
+      "score": 45,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 80,
+      "needsImprovement": true
+    },
+    {
+      "slug": "uniform-administrative-requirements-cost-principle",
+      "name": "Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance, Super Circular, or Omni Circular)",
+      "score": 45,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 80,
+      "needsImprovement": true
+    },
+    {
+      "slug": "equity-in-athletics-disclosure-act-eada",
+      "name": "Equity in Athletics Disclosure Act (EADA)",
+      "score": 45,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 80,
+      "needsImprovement": true
+    },
+    {
+      "slug": "emergency-planning-and-community-right-to-know-act",
+      "name": "Emergency Planning and Community Right to Know Act (EPCRA)",
+      "score": 45,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 80,
+      "needsImprovement": true
+    },
+    {
+      "slug": "byrd-amendment",
+      "name": "Byrd Amendment",
+      "score": 45,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 80,
+      "needsImprovement": true
+    },
+    {
+      "slug": "small-webcasters-settlement-act-of-2002",
+      "name": "Small Webcasters Settlement Act of 2002",
+      "score": 45,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 80,
+      "needsImprovement": true
+    },
+    {
+      "slug": "medicare-medicaid-and-schip-extension-act-of-2007",
+      "name": "Medicare, Medicaid, and SCHIP Extension Act of 2007",
+      "score": 45,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 80,
+      "needsImprovement": true
+    },
+    {
+      "slug": "emergency-planning-and-community-right-act-epcra",
+      "name": "Emergency Planning and Community Right Act (EPCRA)",
+      "score": 45,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 80,
+      "needsImprovement": true
+    },
+    {
+      "slug": "toxic-substances-control-act",
+      "name": "Toxic Substances Control Act",
+      "score": 45,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 80,
+      "needsImprovement": true
+    },
+    {
+      "slug": "qualified-tuition-and-student-loan-interest-report",
+      "name": "Qualified Tuition and Student Loan Interest Reporting",
+      "score": 45,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 80,
+      "needsImprovement": true
+    },
+    {
+      "slug": "byrd-amendment",
+      "name": "Byrd Amendment",
+      "score": 45,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 80,
+      "needsImprovement": true
+    },
+    {
+      "slug": "federal-awardee-performance-and-integrity-informat",
+      "name": "Federal Awardee Performance and Integrity Information System (FAPIIS)",
+      "score": 45,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 80,
+      "needsImprovement": true
+    },
+    {
+      "slug": "student-exchange-and-visitor-information-system-se",
+      "name": "Student Exchange and Visitor Information System (SEVIS)",
+      "score": 45,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 80,
+      "needsImprovement": true
+    },
+    {
+      "slug": "foreign-agents-registration-act-of-1938",
+      "name": "Foreign Agents Registration Act of 1938",
+      "score": 45,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 80,
+      "needsImprovement": true
+    },
+    {
+      "slug": "honest-leadership-and-open-government-act-of-2007",
+      "name": "Honest Leadership and Open Government Act of 2007",
+      "score": 45,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 80,
+      "needsImprovement": true
+    },
+    {
+      "slug": "lobbying-disclosure-act",
+      "name": "Lobbying Disclosure Act",
+      "score": 45,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 80,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-financial-value-transparency-",
+      "name": "Higher Education Act Financial Value Transparency & Gainful Employment",
+      "score": 45,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 80,
+      "needsImprovement": true
+    },
+    {
+      "slug": "animal-welfare-act",
+      "name": "Animal Welfare Act",
+      "score": 45,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 80,
+      "needsImprovement": true
+    },
+    {
+      "slug": "byrd-amendment",
+      "name": "Byrd Amendment",
+      "score": 45,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 80,
+      "needsImprovement": true
+    },
+    {
+      "slug": "qualified-tuition-and-student-loan-interest-report",
+      "name": "Qualified Tuition and Student Loan Interest Reporting",
+      "score": 45,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 80,
+      "needsImprovement": true
+    },
+    {
+      "slug": "reporting-of-payments-of-royalties",
+      "name": "Reporting of Payments of Royalties",
+      "score": 45,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 80,
+      "needsImprovement": true
+    },
+    {
+      "slug": "small-business-job-protection-act",
+      "name": "Small Business Job Protection Act",
+      "score": 45,
+      "certainty": "D",
+      "contentScore": 40,
+      "summaryScore": 0,
+      "reqScore": 80,
+      "needsImprovement": true
+    },
+    {
+      "slug": "fair-credit-reporting-act-fcra",
+      "name": "Fair Credit Reporting Act (FCRA)",
+      "score": 46,
+      "certainty": "D",
+      "contentScore": 70,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "lilly-ledbetter-fair-pay-act-of-2009",
+      "name": "Lilly Ledbetter Fair Pay Act of 2009",
+      "score": 46,
+      "certainty": "D",
+      "contentScore": 70,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "lilly-ledbetter-fair-pay-act-of-2009",
+      "name": "Lilly Ledbetter Fair Pay Act of 2009",
+      "score": 46,
+      "certainty": "D",
+      "contentScore": 70,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "osha-s-occupational-exposure-to-hazardous-chemical",
+      "name": "OSHA’s Occupational Exposure to Hazardous Chemicals in Laboratories Standard",
+      "score": 46,
+      "certainty": "D",
+      "contentScore": 70,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-entrance-and-exit-counseling",
+      "name": "Higher Education Act: Entrance and Exit Counseling",
+      "score": 46,
+      "certainty": "D",
+      "contentScore": 70,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "foreign-corrupt-practices-act-fcpa",
+      "name": "Foreign Corrupt Practices Act (FCPA)",
+      "score": 46,
+      "certainty": "D",
+      "contentScore": 70,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "fair-credit-reporting-act-fcra",
+      "name": "Fair Credit Reporting Act (FCRA)",
+      "score": 46,
+      "certainty": "D",
+      "contentScore": 70,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "drug-free-workplace-act",
+      "name": "Drug Free Workplace Act",
+      "score": 46,
+      "certainty": "D",
+      "contentScore": 70,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "fair-credit-reporting-act-fcra",
+      "name": "Fair Credit Reporting Act (FCRA)",
+      "score": 46,
+      "certainty": "D",
+      "contentScore": 70,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "food-and-drug-administration-fda-amendments-act-of",
+      "name": "Food and Drug Administration (FDA) Amendments Act of 2007",
+      "score": 46,
+      "certainty": "D",
+      "contentScore": 70,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "responsibility-of-applicants-for-promoting-objecti",
+      "name": "Responsibility of Applicants for Promoting Objectivity in Research for which PHS Funding is Sought",
+      "score": 46,
+      "certainty": "D",
+      "contentScore": 70,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "public-disclosure-of-material",
+      "name": "Public Disclosure of Material",
+      "score": 46,
+      "certainty": "D",
+      "contentScore": 70,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "fair-labor-standards-act-flsa",
+      "name": "Fair Labor Standards Act (FLSA)",
+      "score": 46,
+      "certainty": "D",
+      "contentScore": 70,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "nonqualified-deferred-inclusion",
+      "name": "Nonqualified Deferred Inclusion",
+      "score": 48,
+      "certainty": "D",
+      "contentScore": 60,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "nonqualified-deferred-inclusion",
+      "name": "Nonqualified Deferred Inclusion",
+      "score": 48,
+      "certainty": "D",
+      "contentScore": 60,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "copyright-term-extension-act",
+      "name": "Copyright Term Extension Act",
+      "score": 50,
+      "certainty": "D",
+      "contentScore": 80,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "residential-lead-based-paint-hazard-reduction-act-",
+      "name": "Residential Lead-Based Paint Hazard Reduction Act of 1992",
+      "score": 50,
+      "certainty": "D",
+      "contentScore": 80,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-plus-loans",
+      "name": "Higher Education Act: PLUS Loans",
+      "score": 50,
+      "certainty": "D",
+      "contentScore": 80,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-record-retention",
+      "name": "Higher Education Act: Record Retention",
+      "score": 50,
+      "certainty": "D",
+      "contentScore": 80,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-state-authorization",
+      "name": "Higher Education Act: State Authorization",
+      "score": 50,
+      "certainty": "D",
+      "contentScore": 80,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "employee-polygraph-protection-act",
+      "name": "Employee Polygraph Protection Act",
+      "score": 50,
+      "certainty": "D",
+      "contentScore": 80,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "protection-of-human-subjects-regulations-common-ru",
+      "name": "Protection of Human Subjects Regulations (Common Rule)",
+      "score": 50,
+      "certainty": "D",
+      "contentScore": 80,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-federal-supplemental-educatio",
+      "name": "Higher Education Act: Federal Supplemental Educational Opportunity Grant Program",
+      "score": 51,
+      "certainty": "D",
+      "contentScore": 70,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-information-distributed-to-st",
+      "name": "Higher Education Act: Information Distributed to Students",
+      "score": 51,
+      "certainty": "D",
+      "contentScore": 70,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "teacher-preparation-programs",
+      "name": "Teacher Preparation Programs",
+      "score": 55,
+      "certainty": "D",
+      "contentScore": 80,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "student-right-to-know-act",
+      "name": "Student Right to Know Act",
+      "score": 55,
+      "certainty": "D",
+      "contentScore": 80,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "teacher-preparation-programs",
+      "name": "Teacher Preparation Programs",
+      "score": 55,
+      "certainty": "D",
+      "contentScore": 80,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "independent-contractors",
+      "name": "Independent Contractors",
+      "score": 55,
+      "certainty": "D",
+      "contentScore": 80,
+      "summaryScore": 0,
+      "reqScore": 65,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-textbook-informatoin",
+      "name": "Higher Education Act: Textbook Informatoin",
+      "score": 57,
+      "certainty": "D",
+      "contentScore": 100,
+      "summaryScore": 0,
+      "reqScore": 45,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-federal-work-study",
+      "name": "Higher Education Act: Federal Work Study",
+      "score": 59,
+      "certainty": "D",
+      "contentScore": 80,
+      "summaryScore": 0,
+      "reqScore": 80,
+      "needsImprovement": true
+    },
+    {
+      "slug": "higher-education-act-perkins-loans",
+      "name": "Higher Education Act: Perkins Loans",
+      "score": 59,
+      "certainty": "D",
+      "contentScore": 80,
+      "summaryScore": 0,
+      "reqScore": 80,
+      "needsImprovement": true
+    }
+  ]
+}

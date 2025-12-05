@@ -1,0 +1,20 @@
+{
+  "regulationId": "cafeteria-plans-26-u-s-c-125",
+  "enhanced": {
+    "fullText": "Cafeteria Plans under 26 U.S.C. § 125 provide a critical tax-advantaged benefit structure for higher education institutions to offer employee benefits while maintaining federal tax compliance. This regulation, codified in Internal Revenue Code Section 125 and implemented through Treasury Regulation 26 CFR § 1.125-1, establishes the framework for written benefit plans that allow employees to exclude certain employer-provided benefits from gross income through pre-tax salary reductions.\n\nHigher education institutions must establish written cafeteria plans that comply with strict regulatory requirements under 26 U.S.C. § 125(d). Qualified benefits include accident and health insurance under 26 U.S.C. § 106, group-term life insurance under 26 U.S.C. § 79, dependent care assistance programs under 26 U.S.C. § 129, and adoption assistance under 26 U.S.C. § 137. Universities must ensure their plans explicitly exclude non-qualified benefits including qualified scholarships, tuition reduction programs under 26 U.S.C. § 117, educational assistance under 26 U.S.C. § 127, and deferred compensation arrangements.\n\nUnder 26 CFR § 1.125-2, universities must implement non-discrimination testing to ensure plans do not favor highly compensated employees or key employees as defined in 26 U.S.C. § 125(b)(2). Plans failing these tests face severe penalties including immediate inclusion of benefits in gross income for highly compensated participants under 26 U.S.C. § 125(b)(1).\n\nThe regulation requires strict adherence to the use-it-or-lose-it rule under 26 CFR § 1.125-5, with limited exceptions for grace periods up to 2.5 months or $610 carryover amounts for flexible spending accounts in 2024. Universities must establish plan years and ensure benefit timing compliance under 26 U.S.C. § 125(a)(3), where benefits are treated as received in the taxable year when the plan year ends.\n\nEnforcement mechanisms include IRS audits, employee complaints, and DOL investigations under ERISA provisions at 29 U.S.C. § 1001 et seq. Penalties for non-compliance include immediate tax consequences for participants, plan disqualification, and potential excise taxes under 26 U.S.C. § 4980D. Recent updates include Notice 2020-29 extending grace periods during COVID-19 and Rev. Proc. 2023-23 updating contribution limits for health flexible spending accounts to $3,050 annually.",
+    "summary": "26 U.S.C. § 125 governs tax-advantaged cafeteria plans for higher education employee benefits. Universities must maintain written plans excluding tuition benefits while ensuring non-discrimination compliance and strict benefit timing rules.",
+    "requirements": "## Plan Documentation Requirements\n- Establish written cafeteria plan document complying with 26 U.S.C. § 125(d)\n- Exclude qualified scholarships and tuition reduction benefits per 26 U.S.C. § 117\n- Document eligible benefit categories under 26 CFR § 1.125-1(a)\n- Implement annual plan amendments by December 31st\n\n## Non-Discrimination Testing\n- Conduct annual highly compensated employee testing under 26 U.S.C. § 125(b)(2)\n- Perform key employee concentration tests per 26 CFR § 1.125-3\n- Maintain participant demographic data for compliance verification\n- Remediate failed tests within 90 days of plan year end\n\n## Benefit Administration\n- Enforce use-it-or-lose-it rules under 26 CFR § 1.125-5\n- Process elections during open enrollment periods only\n- Implement grace period provisions not exceeding 2.5 months\n- Track annual FSA contribution limits per Rev. Proc. 2023-23",
+    "reportingRequirements": "Universities must file annual Form 5500 for cafeteria plans with 100+ participants by July 31st. Report failed non-discrimination testing on employee W-2 forms by January 31st. Submit quarterly payroll tax returns including cafeteria plan elections."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T17:25:50.817Z"
+  }
+}

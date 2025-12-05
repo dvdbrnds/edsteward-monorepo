@@ -1,0 +1,20 @@
+{
+  "regulationId": "public-health-service-policies-on-research-miscond",
+  "enhanced": {
+    "fullText": "The Public Health Service (PHS) Policies on Research Misconduct, codified at 42 CFR Part 93, establishes comprehensive standards for institutions receiving federal funding for biomedical and behavioral research. Enacted under the authority of 42 U.S.C. § 289b, these regulations require institutions to maintain rigorous procedures for preventing, detecting, and responding to research misconduct allegations.\n\nResearch misconduct is defined under 42 CFR § 93.103 as fabrication, falsification, or plagiarism in proposing, performing, or reviewing research, or in reporting research results. This definition excludes honest error or differences of scientific opinion. Higher education institutions conducting PHS-supported research must establish written policies addressing misconduct allegations within 120 days of receiving federal funds (42 CFR § 93.301).\n\nKey institutional obligations include appointing a Research Integrity Officer (RIO) responsible for assessing allegations and overseeing inquiries and investigations (42 CFR § 93.300(b)). Institutions must conduct preliminary assessments within 30 days, formal inquiries within 60 days of initiation, and investigations within 120 days of commencement (42 CFR § 93.307-93.313). The Office of Research Integrity (ORI) must receive notification of investigations within 30 days of initiation.\n\nCompliance failures result in significant penalties under 42 CFR § 93.400, including suspension or termination of federal funding, debarment from future awards, and required corrective actions. Recent amendments in 2023 strengthened reporting requirements for international collaborations and enhanced whistleblower protections under 42 U.S.C. § 289b-1. Institutions must maintain complete documentation for seven years and ensure confidentiality throughout proceedings while protecting complainants from retaliation per 42 CFR § 93.304.",
+    "summary": "Federal regulations requiring institutions receiving PHS funding to establish comprehensive research misconduct policies, conduct thorough investigations within specified timeframes, and report findings to ORI while protecting whistleblowers and maintaining confidentiality.",
+    "requirements": "## Policy Development and Implementation\n- Establish written research misconduct policies within 120 days of receiving PHS funding per 42 CFR § 93.301\n- Appoint qualified Research Integrity Officer (RIO) to oversee all misconduct proceedings\n- Develop procedures ensuring fair, thorough, and timely resolution of allegations\n\n## Investigation Procedures and Timelines\n- Complete preliminary assessment within 30 days of allegation receipt\n- Conduct formal inquiry within 60 days if warranted by assessment findings\n- Initiate investigation within 30 days of inquiry completion if misconduct appears likely\n- Complete investigations within 120 days unless circumstances require extension\n\n## Documentation and Record Maintenance\n- Maintain complete case files for minimum seven years post-completion\n- Document all proceedings, decisions, and corrective actions taken\n- Ensure confidentiality while preserving due process rights for all parties\n\n## Whistleblower Protection and Compliance\n- Implement anti-retaliation measures protecting complainants and witnesses\n- Provide regular staff training on misconduct identification and reporting procedures",
+    "reportingRequirements": "Notify ORI within 30 days of initiating formal investigations per 42 CFR § 93.311. Submit final investigation reports to ORI within 120 days of investigation initiation. Report annually on institutional research integrity activities and provide immediate notification of significant compliance issues or potential federal funding impacts."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T01:52:55.905Z"
+  }
+}

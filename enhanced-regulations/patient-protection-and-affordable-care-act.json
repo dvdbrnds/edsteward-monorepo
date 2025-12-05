@@ -1,0 +1,20 @@
+{
+  "regulationId": "patient-protection-and-affordable-care-act",
+  "enhanced": {
+    "fullText": "The Patient Protection and Affordable Care Act (ACA) employer mandate, codified at 26 U.S.C. § 4980H, requires applicable large employers (ALEs) to provide affordable, minimum value health insurance coverage to full-time employees or face significant tax penalties. This mandate, which took effect January 1, 2015, applies to employers with 50 or more full-time equivalent employees during the preceding calendar year.\n\nUnder 26 U.S.C. § 4980H(a), employers face a penalty of $2,700 per full-time employee (adjusted annually for inflation) if they fail to offer minimum essential coverage to at least 95% of their full-time employees and their dependents. The penalty under 26 U.S.C. § 4980H(b) applies when coverage is offered but is either unaffordable (exceeds 9.12% of household income for 2023) or fails to provide minimum value (actuarial value of at least 60%).\n\nHigher education institutions face unique challenges under Treasury Regulation 26 CFR § 54.4980H-3, which provides specific guidance for measuring hours of adjunct faculty and student employees. The regulation establishes that adjunct instructors' hours include classroom instruction, preparation time, and grading activities. For academic year employees, institutions may use the monthly measurement method or look-back measurement method under 26 CFR § 54.4980H-3(d).\n\nStudent employees enrolled in at least five credit hours are generally exempt from full-time employee status under 26 CFR § 54.4980H-1(a)(15), but graduate teaching assistants and research assistants may qualify as full-time employees if they exceed the 30-hour weekly threshold.\n\nCompliance requires institutions to track employee hours meticulously, offer qualifying coverage during open enrollment periods, and file annual information returns using Forms 1094-C and 1095-C under 26 U.S.C. § 6056. The IRS enforces compliance through automatic penalty assessments, with appeals available through the Employee Plans Compliance Resolution System.\n\nRecent updates include inflation adjustments to penalty amounts and clarifications on seasonal employee treatment. Institutions must maintain detailed records of coverage offers, employee hours, and affordability calculations for IRS audit purposes.",
+    "summary": "ACA employer mandate requires higher education institutions with 50+ employees to provide affordable health coverage to full-time staff or pay tax penalties up to $2,700 per employee, with special rules for adjunct faculty.",
+    "requirements": "## Coverage Requirements\n- Offer minimum essential coverage to 95% of full-time employees (30+ hours/week average)\n- Ensure coverage meets minimum value standard (60% actuarial value)\n- Maintain affordability threshold below 9.12% of employee household income\n\n## Employee Measurement\n- Track adjunct faculty hours including instruction, preparation, and grading time\n- Apply student employee exemption for those enrolled in 5+ credit hours\n- Use look-back or monthly measurement method for variable hour employees\n\n## Documentation and Reporting\n- File Forms 1094-C and 1095-C annually by January 31\n- Maintain records of coverage offers and employee hour calculations\n- Provide employee statements regarding coverage eligibility\n\n## Penalty Avoidance\n- Monitor full-time equivalent employee count quarterly\n- Implement safe harbor provisions for affordability determinations\n- Establish compliant waiting periods not exceeding 90 days",
+    "reportingRequirements": "Annual filing of Forms 1094-C and 1095-C due January 31 (March 31 if filing electronically). Provide employee coverage statements by January 31. Quarterly monitoring of full-time equivalent employee counts required."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T16:09:20.093Z"
+  }
+}

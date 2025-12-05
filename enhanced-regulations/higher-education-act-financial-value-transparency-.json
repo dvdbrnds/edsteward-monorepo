@@ -1,0 +1,20 @@
+{
+  "regulationId": "higher-education-act-financial-value-transparency-",
+  "enhanced": {
+    "fullText": "The Higher Education Act Financial Value Transparency and Gainful Employment regulations, codified under 20 U.S.C. §�� 1001-1002 and implemented through 34 CFR § 668.6, establish fundamental eligibility requirements for Title IV federal student aid programs. These regulations mandate that educational programs must either lead to a degree from public or nonprofit institutions or prepare students for gainful employment in recognized occupations.\n\nUnder 34 CFR § 668.403, gainful employment programs include all non-degree programs at public and nonprofit institutions, and essentially all programs at proprietary (for-profit) institutions. The Department of Education enforces these standards through debt-to-earnings ratio metrics, as specified in 34 CFR § 668.404, requiring programs to demonstrate that graduates can obtain employment sufficient to repay educational debt.\n\nKey provisions include annual debt-to-earnings calculations comparing median loan payments to median earnings of program completers. Programs failing to meet the 20% discretionary income threshold or 8% annual earnings threshold for two consecutive years, or failing in any three years within a four-year period, lose Title IV eligibility under 34 CFR § 668.405. Institutions must provide mandatory disclosures about program costs, completion rates, job placement rates, and median debt levels to prospective students as required by 34 CFR § 668.412.\n\nEnforcement mechanisms include immediate loss of Title IV eligibility, mandatory teach-out plans under 34 CFR § 600.32, and potential institutional sanctions. The regulation underwent significant revision in 2019, with current standards effective July 1, 2023, incorporating enhanced financial transparency requirements and streamlined metrics calculations. Institutions must maintain detailed records of graduate employment outcomes and earnings data for Department review, with non-compliance resulting in immediate suspension of federal aid disbursements and potential institutional fines up to $27,500 per violation under 20 U.S.C. § 1094(c).",
+    "summary": "Federal regulation requiring Title IV-eligible programs to either award degrees (public/nonprofit) or demonstrate gainful employment outcomes through debt-to-earnings ratios and mandatory financial disclosures.",
+    "requirements": "## Debt-to-Earnings Compliance\n- Calculate annual debt-to-earnings ratios for all covered programs\n- Maintain 20% discretionary income threshold and 8% annual earnings threshold\n- Submit earnings data through Federal Student Aid's Gainful Employment reporting system\n\n## Student Disclosure Obligations\n- Provide mandatory pre-enrollment disclosures of program costs, completion rates, and median debt\n- Display job placement rates and median earnings of graduates prominently\n- Update disclosure documents annually by July 1st\n\n## Data Collection and Reporting\n- Track graduate employment outcomes for minimum 4-year period\n- Maintain verifiable earnings documentation from graduates or third-party sources\n- Submit annual reports to Department by October 1st\n\n## Program Monitoring Requirements\n- Implement early warning systems for at-risk programs\n- Develop teach-out plans for programs approaching failure thresholds\n- Establish internal compliance review procedures with designated responsible officials",
+    "reportingRequirements": "Annual debt-to-earnings calculations due October 1st via Federal Student Aid reporting portal. Student disclosure updates required by July 1st annually. Graduate employment tracking data must be submitted within 180 days of program completion."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T20:03:41.866Z"
+  }
+}
