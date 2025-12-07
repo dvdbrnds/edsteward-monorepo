@@ -1,9 +1,6 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { marked } from "marked";
 import type { Regulation, Deadline, RegulationAction } from "@shared/schema";
 
@@ -95,17 +92,6 @@ type RegulationWithOverride = Regulation & {
   escalationEmail?: string;
 };
 
-// Schema for notification override form
-const notificationOverrideSchema = z.object({
-  email: z.string().email("Please enter a valid email").optional().or(z.literal("")),
-  phone: z.string().optional().or(z.literal("")),
-  notificationSchedule: z.object({
-    initialReminder: z.number().int().min(1).max(365),
-    weeklyReminder: z.number().int().min(1).max(52),
-    dailyReminder: z.number().int().min(1).max(14),
-    finalDayReminders: z.boolean()
-  })
-});
 import Navigation from "@/components/layout/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -146,7 +132,10 @@ import {
   Plus,
   Edit,
   Trash2,
-  Calendar
+  Calendar,
+  ChevronDown,
+  ChevronUp,
+  Scale
 } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { format } from "date-fns";
@@ -187,6 +176,7 @@ function RegulationDetailPage() {
   const [showCreateDeadlineDialog, setShowCreateDeadlineDialog] = useState(false);
   const [showEscalateDialog, setShowEscalateDialog] = useState(false);
   const [editingDeadline, setEditingDeadline] = useState<Deadline | null>(null);
+  const [timelineExpanded, setTimelineExpanded] = useState(false);
   const regulationId = location.split("/")[2];
   const isAdmin = user?.role?.toLowerCase() === "admin";
 
@@ -234,46 +224,6 @@ function RegulationDetailPage() {
   });
 
   // Note: overrideForm and overrideMutation moved to NotificationOverrideControl component
-
-  // Placeholder for backward compatibility
-  const _overrideMutation = useMutation({
-    mutationFn: async (_data: z.infer<typeof notificationOverrideSchema>) => {
-      if (!regulation?.id) {
-        throw new Error('No regulation ID available');
-      }
-      
-      const response = await fetch(
-        `/api/regulations/${regulation.id}/notification-override`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(_data),
-        }
-      );
-      
-      if (!response.ok) {
-        throw new Error("Failed to update notification override");
-      }
-      return response.json();
-    },
-    onSuccess: () => {
-      toast({
-        title: "Override Updated",
-        description: "Notification settings have been updated for this regulation.",
-      });
-      queryClient.invalidateQueries({ queryKey: ["/api/regulations"] });
-      queryClient.invalidateQueries({ queryKey: ["/api/regulations", regulationId] });
-    },
-    onError: (error: Error) => {
-      toast({
-        title: "Update Failed",
-        description: error.message,
-        variant: "destructive",
-      });
-    },
-  });
 
   // Fetch users for owner assignment dropdown (admins only)
   const { data: users = [] } = useQuery<Array<{ id: number; username: string; firstName?: string; lastName?: string; role: string }>>({
@@ -344,7 +294,7 @@ function RegulationDetailPage() {
       }
       return response.json();
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast({
         title: "Owner Updated",
         description: "The regulation has been assigned successfully.",
@@ -545,9 +495,6 @@ function RegulationDetailPage() {
   }
 
   const regulationDeadlines = deadlines.filter(d => d.regulationId === parseInt(regulationId)) || [];
-  const nextDeadline = regulationDeadlines.length > 0
-    ? regulationDeadlines.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0]
-    : null;
 
   if (!regulation) {
     return (
@@ -762,6 +709,44 @@ function RegulationDetailPage() {
                   </span>
                 )}
               </div>
+              {/* Additional metadata row */}
+              <div className="flex flex-wrap items-center gap-4 mt-3 text-sm">
+                {/* Statute */}
+                {regulation?.statute && (
+                  <div className="flex items-center gap-2">
+                    <Scale className="h-4 w-4 text-gray-400" />
+                    <span className="text-gray-500">Statute:</span>
+                    <span className="font-medium text-gray-700">{regulation.statute}</span>
+                  </div>
+                )}
+                {/* Agency */}
+                {regulation?.agency_name && (
+                  <div className="flex items-center gap-2 text-gray-600">
+                    <span className="text-gray-400">|</span>
+                    <span className="text-gray-500">Agency:</span>
+                    <span>{regulation.agency_name}</span>
+                    {regulation?.agency_url && (
+                      <a
+                        href={regulation.agency_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800"
+                      >
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
+                    )}
+                  </div>
+                )}
+              </div>
+              {/* Notification toggle - Admin only */}
+              {isAdmin && (
+                <div className="mt-3">
+                  <NotificationOverrideControl 
+                    regulationId={parseInt(regulationId)} 
+                    regulationName={regulation?.name || regulation?.topic || 'Unknown Regulation'} 
+                  />
+                </div>
+              )}
             </div>
 
             {/* Action buttons */}
@@ -884,14 +869,41 @@ function RegulationDetailPage() {
                   </CardContent>
                 </Card>
 
-                {/* Enhanced Timeline for Admins, Basic Timeline for Users */}
-                {isAdmin ? (
-                  <div data-testid="enhanced-timeline">
-                    <EnhancedRegulationTimeline regulation={regulation} />
-                  </div>
-                ) : (
-                  <RegulationTimeline regulation={regulation} />
-                )}
+                {/* Enhanced Timeline for Admins, Basic Timeline for Users - Collapsed by Default */}
+                <Card>
+                  <CardHeader 
+                    className="cursor-pointer hover:bg-gray-50 transition-colors"
+                    onClick={() => setTimelineExpanded(!timelineExpanded)}
+                  >
+                    <CardTitle className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <History className="h-5 w-5 text-gray-500" />
+                        <span>Version History & Timeline</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Badge variant="secondary" className="text-xs">
+                          {regulation.versionNumber || 1} version{(regulation.versionNumber || 1) > 1 ? 's' : ''}
+                        </Badge>
+                        {timelineExpanded ? (
+                          <ChevronUp className="h-5 w-5 text-gray-400" />
+                        ) : (
+                          <ChevronDown className="h-5 w-5 text-gray-400" />
+                        )}
+                      </div>
+                    </CardTitle>
+                  </CardHeader>
+                  {timelineExpanded && (
+                    <CardContent>
+                      {isAdmin ? (
+                        <div data-testid="enhanced-timeline">
+                          <EnhancedRegulationTimeline regulation={regulation} />
+                        </div>
+                      ) : (
+                        <RegulationTimeline regulation={regulation} />
+                      )}
+                    </CardContent>
+                  )}
+                </Card>
 
                 {/* Submission Guidelines Card */}
                 <Card>
@@ -925,84 +937,35 @@ function RegulationDetailPage() {
                   </CardContent>
                 </Card>
 
-                {/* Additional Details Card */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Additional Details</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4">
-                      {/* Notification Override Control */}
-                      <NotificationOverrideControl 
-                        regulationId={parseInt(regulationId)} 
-                        regulationName={regulation?.name || regulation?.topic || 'Unknown Regulation'} 
-                      />
-
-                      <div>
-                        <h3 className="font-medium text-gray-900">Statute</h3>
-                        <p className="text-gray-700 mt-1">
-                          {regulation?.statute}
-                        </p>
-                      </div>
-
+                {/* Additional Details Card - Simplified */}
+                {(regulation?.originationDate || regulation?.effectiveDate) && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Key Dates</CardTitle>
+                    </CardHeader>
+                    <CardContent>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {regulation?.originationDate && (
                           <div>
-                            <h3 className="font-medium text-gray-900">Origination Date</h3>
-                            <p className="text-gray-700 mt-1">
+                            <h3 className="text-sm font-medium text-gray-500">Origination Date</h3>
+                            <p className="text-gray-900 mt-1">
                               {format(new Date(regulation.originationDate), "PP")}
                             </p>
                           </div>
                         )}
                         {regulation?.effectiveDate && (
                           <div>
-                            <h3 className="font-medium text-gray-900">Effective Date</h3>
-                            <p className="text-gray-700 mt-1">
+                            <h3 className="text-sm font-medium text-gray-500">Effective Date</h3>
+                            <p className="text-gray-900 mt-1">
                               {format(new Date(regulation.effectiveDate), "PP")}
                             </p>
                           </div>
                         )}
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
+                )}
 
-                {/* Agency Information Card */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Agency Information</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2">
-                      {regulation?.agency_name && (
-                        <p className="text-gray-700">
-                          <span className="font-medium">Agency:</span> {regulation.agency_name}
-                        </p>
-                      )}
-                      {regulation?.agency_url && (
-                        <a
-                          href={regulation.agency_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[#00267A] hover:text-[#003166] underline inline-flex items-center gap-2"
-                        >
-                          Visit Agency Website
-                          <ExternalLink className="h-3 w-3" />
-                        </a>
-                      )}
-                      {regulation?.agency_contact && (
-                        <p className="text-gray-700">
-                          <span className="font-medium">Contact:</span> {regulation.agency_contact}
-                        </p>
-                      )}
-                      {regulation?.agency_department && (
-                        <p className="text-gray-700">
-                          <span className="font-medium">Department:</span> {regulation.agency_department}
-                        </p>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
               </div>
 
               <div className="space-y-6">

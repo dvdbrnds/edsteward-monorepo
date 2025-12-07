@@ -1,6 +1,6 @@
 import express from 'express';
 import { getDatabaseStorage } from '../../services/database';
-import { syslog, LogLevel, LogFacility } from '../../services/syslog';
+import { syslog } from '../../services/syslog';
 
 // Simple auth middleware
 const requireAuth = (req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -70,18 +70,13 @@ router.post("/:id/toggle", requireAuth, requireComplianceRole, async (req, res) 
     await tenantStorage.updateRegulation(regulationId, updateData);
 
     // Log the action
-    await syslog({
-      level: LogLevel.INFO,
-      facility: LogFacility.USER,
-      message: `Notification override ${disabled ? 'enabled' : 'disabled'} for regulation ${regulation.name}`,
-      metadata: {
-        regulationId,
-        regulationName: regulation.name,
-        userId: user.id,
-        userEmail: user.email,
-        disabled,
-        reason: reason || 'No reason provided'
-      }
+    await syslog.info(`Notification override ${disabled ? 'enabled' : 'disabled'} for regulation ${regulation.name}`, {
+      regulationId,
+      regulationName: regulation.name,
+      userId: user.id,
+      userEmail: user.email,
+      disabled,
+      reason: reason || 'No reason provided'
     });
 
     res.json({
@@ -98,11 +93,8 @@ router.post("/:id/toggle", requireAuth, requireComplianceRole, async (req, res) 
 
   } catch (error) {
     console.error('Error toggling regulation notification override:', error);
-    await syslog({
-      level: LogLevel.ERROR,
-      facility: LogFacility.SYSTEM,
-      message: 'Failed to toggle regulation notification override',
-      metadata: { error: error instanceof Error ? error.message : 'Unknown error' }
+    await syslog.error('Failed to toggle regulation notification override', { 
+      error: error instanceof Error ? error.message : 'Unknown error' 
     });
     res.status(500).json({ error: 'Failed to toggle notification override' });
   }
@@ -124,24 +116,34 @@ router.get("/:id/status", requireAuth, async (req, res) => {
       return res.status(404).json({ error: 'Regulation not found' });
     }
 
+    // Handle both camelCase and snake_case field names (ORM might return either)
+    const notificationsDisabled = regulation.notificationsDisabled ?? regulation.notifications_disabled ?? false;
+    const notificationsDisabledBy = regulation.notificationsDisabledBy ?? regulation.notifications_disabled_by;
+    const notificationsDisabledAt = regulation.notificationsDisabledAt ?? regulation.notifications_disabled_at;
+    const notificationsDisabledReason = regulation.notificationsDisabledReason ?? regulation.notifications_disabled_reason;
+
     // Get user info for disabled by field
     let disabledByUser = null;
-    if (regulation.notificationsDisabledBy) {
-      disabledByUser = await tenantStorage.getUserById(regulation.notificationsDisabledBy);
+    if (notificationsDisabledBy) {
+      try {
+        disabledByUser = await tenantStorage.getUserById(notificationsDisabledBy);
+      } catch (e) {
+        console.error('Error fetching user for notification status:', e);
+      }
     }
 
     res.json({
       regulationId,
       regulationName: regulation.name,
-      notificationsDisabled: regulation.notificationsDisabled || false,
+      notificationsDisabled: notificationsDisabled,
       notificationsDisabledBy: disabledByUser ? {
         id: disabledByUser.id,
         firstName: disabledByUser.firstName,
         lastName: disabledByUser.lastName,
         email: disabledByUser.email
       } : null,
-      notificationsDisabledAt: regulation.notificationsDisabledAt,
-      notificationsDisabledReason: regulation.notificationsDisabledReason
+      notificationsDisabledAt: notificationsDisabledAt,
+      notificationsDisabledReason: notificationsDisabledReason
     });
 
   } catch (error) {
