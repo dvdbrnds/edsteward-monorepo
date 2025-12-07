@@ -1,10 +1,27 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { marked } from "marked";
 import type { Regulation, Deadline, RegulationAction } from "@shared/schema";
+
+// Configure marked for safe rendering
+marked.setOptions({
+  breaks: true,
+  gfm: true,
+});
+
+// Helper to safely render markdown as HTML
+function renderMarkdown(text: string | null | undefined): string {
+  if (!text) return "";
+  try {
+    return marked.parse(text) as string;
+  } catch {
+    return text;
+  }
+}
 
 // Helper function to calculate compliance status
 function calculateComplianceStatus(actions: RegulationAction[], deadlines: Deadline[]) {
@@ -72,6 +89,10 @@ type RegulationWithOverride = Regulation & {
     dailyReminder: number;
     finalDayReminders: boolean;
   };
+  responsibleOffice?: string;
+  responsibleOfficeEmail?: string;
+  escalationTarget?: string;
+  escalationEmail?: string;
 };
 
 // Schema for notification override form
@@ -138,6 +159,7 @@ import { CommunicationDialog } from "@/components/regulations/communication-dial
 import { SubmissionWizard } from "@/components/regulations/submission-wizard";
 import { EvidenceFiles } from "@/components/regulations/evidence-files";
 import { NotificationOverrideControl } from "@/components/regulations/notification-override-control";
+import { EscalateIssueDialog } from "@/components/regulations/escalate-issue-dialog";
 import { useAuth } from "@/hooks/use-auth";
 
 const CATEGORIES = [
@@ -163,6 +185,7 @@ function RegulationDetailPage() {
   const [showSubmissionWizard, setShowSubmissionWizard] = useState(false);
   const [showFullTextDialog, setShowFullTextDialog] = useState(false);
   const [showCreateDeadlineDialog, setShowCreateDeadlineDialog] = useState(false);
+  const [showEscalateDialog, setShowEscalateDialog] = useState(false);
   const [editingDeadline, setEditingDeadline] = useState<Deadline | null>(null);
   const regulationId = location.split("/")[2];
   const isAdmin = user?.role?.toLowerCase() === "admin";
@@ -761,17 +784,16 @@ function RegulationDetailPage() {
                 <Printer className="h-4 w-4" />
                 Print Report
               </Button>
-              <Button
-                variant="outline"
-                className="flex items-center justify-center gap-2"
-                onClick={() => {
-                  const subject = encodeURIComponent(`Regulation ${regulation?.itemId} - ${regulation?.topic}`);
-                  window.location.href = `mailto:compliance@moravian.edu?subject=${subject}`;
-                }}
-              >
-                <Mail className="h-4 w-4" />
-                Contact Compliance Office
-              </Button>
+              {isAdmin && (
+                <Button
+                  variant="default"
+                  className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white"
+                  onClick={() => setShowEscalateDialog(true)}
+                >
+                  <AlertCircle className="h-4 w-4" />
+                  Escalate Issue
+                </Button>
+              )}
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -812,9 +834,14 @@ function RegulationDetailPage() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <div className="prose prose-sm max-w-none text-gray-700">
-                      {regulation.summary || "No summary available."}
-                    </div>
+                    <div 
+                      className="prose prose-sm max-w-none text-gray-700"
+                      dangerouslySetInnerHTML={{ 
+                        __html: regulation.summary 
+                          ? renderMarkdown(regulation.summary) 
+                          : "No summary available." 
+                      }}
+                    />
                   </CardContent>
                 </Card>
 
@@ -828,7 +855,12 @@ function RegulationDetailPage() {
                       <div className="space-y-4">
                         {regulation.requirements ? (
                           <>
-                            <p className="text-gray-700">{regulation.requirements}</p>
+                            <div 
+                              className="text-gray-700"
+                              dangerouslySetInnerHTML={{ 
+                                __html: renderMarkdown(regulation.requirements) 
+                              }}
+                            />
                             {regulation.requirementsUrl && (
                               <a
                                 href={regulation.requirementsUrl}
@@ -858,12 +890,7 @@ function RegulationDetailPage() {
                     <EnhancedRegulationTimeline regulation={regulation} />
                   </div>
                 ) : (
-                  <div className="border-4 border-yellow-500 p-4 rounded">
-                    <div className="bg-yellow-100 border border-yellow-300 rounded p-4 mb-4 text-lg font-bold">
-                      📋 Regular User - Basic Timeline
-                    </div>
-                    <RegulationTimeline regulation={regulation} />
-                  </div>
+                  <RegulationTimeline regulation={regulation} />
                 )}
 
                 {/* Submission Guidelines Card */}
@@ -878,9 +905,11 @@ function RegulationDetailPage() {
                           __html: regulation.submissionGuidelines
                         }} />
                       ) : (
-                        <p className="text-gray-500 italic">
-                          No submission guidelines available.
-                        </p>
+                        <div className="text-center py-4 px-4 bg-gray-50 rounded-lg border border-dashed border-gray-200">
+                          <p className="text-gray-500 text-sm">
+                            No specific submission guidelines have been defined for this regulation.
+                          </p>
+                        </div>
                       )}
                     </div>
                   </CardContent>
@@ -903,16 +932,6 @@ function RegulationDetailPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
-                      {categoryVisible && (
-                        <div>
-                          <h3 className="font-medium text-gray-900">Admin Tools</h3>
-                          <p className="text-sm text-gray-600 mt-1">
-                            Enhanced version control timeline is shown above for admin users.
-                            Use the timeline to view version history, compare versions, and rollback changes.
-                          </p>
-                        </div>
-                      )}
-                      
                       {/* Notification Override Control */}
                       <NotificationOverrideControl 
                         regulationId={parseInt(regulationId)} 
@@ -1232,8 +1251,15 @@ function RegulationDetailPage() {
                       {regulationDeadlines.map((deadline) => (
                         <div
                           key={deadline.id}
-                          className="p-4 border rounded-lg space-y-3"
+                          className={`p-4 border rounded-lg space-y-3 ${deadline.isDefault ? 'bg-orange-50 border-orange-200' : ''}`}
                         >
+                          {/* Default deadline indicator */}
+                          {deadline.isDefault && (
+                            <div className="flex items-center gap-2 text-xs text-orange-700 bg-orange-100 px-2 py-1 rounded-full w-fit">
+                              <span>🎃</span>
+                              <span>Default Oct 31 Deadline</span>
+                            </div>
+                          )}
                           {/* Main deadline info */}
                           <div className="flex items-start gap-3">
                           <div
@@ -1242,6 +1268,8 @@ function RegulationDetailPage() {
                                 ? "bg-green-50"
                                 : deadline.status === "overdue"
                                 ? "bg-red-50"
+                                : deadline.isDefault
+                                ? "bg-orange-100"
                                 : "bg-yellow-50"
                             }`}
                           >
@@ -1250,19 +1278,24 @@ function RegulationDetailPage() {
                             ) : deadline.status === "overdue" ? (
                               <AlertCircle className="h-5 w-5 text-red-500" />
                             ) : (
-                              <Clock className="h-5 w-5 text-yellow-500" />
+                              <Clock className={`h-5 w-5 ${deadline.isDefault ? 'text-orange-500' : 'text-yellow-500'}`} />
                             )}
                           </div>
                             <div className="flex-1 min-w-0">
                               <p className="font-medium text-gray-900 break-words">
                               Due: {format(new Date(deadline.dueDate), "PP")}
                             </p>
+                            {deadline.description && (
+                              <p className="text-xs text-gray-500 mt-1">{deadline.description}</p>
+                            )}
                             <span
                                 className={`inline-block text-sm font-medium px-2 py-1 rounded-full mt-1 ${
                                 deadline.status === "completed"
                                     ? "bg-green-100 text-green-700"
                                   : deadline.status === "overdue"
                                     ? "bg-red-100 text-red-700"
+                                    : deadline.isDefault
+                                    ? "bg-orange-100 text-orange-700"
                                     : "bg-yellow-100 text-yellow-700"
                               }`}
                             >
@@ -1317,11 +1350,26 @@ function RegulationDetailPage() {
                       ))}
                       
                       {regulationDeadlines.length === 0 && (
-                        <div className="text-center py-8 text-gray-500">
-                          <Calendar className="h-12 w-12 mx-auto mb-4 text-gray-300" />
-                          <p>No deadlines set for this regulation</p>
+                        <div className="text-center py-6 px-4 bg-gradient-to-b from-gray-50 to-white rounded-lg border border-dashed border-gray-200">
+                          <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-blue-50 flex items-center justify-center">
+                            <Calendar className="h-6 w-6 text-blue-400" />
+                          </div>
+                          <p className="font-medium text-gray-700">No deadlines yet</p>
+                          <p className="text-sm text-gray-500 mt-1">
+                            {isAdmin 
+                              ? "Set compliance deadlines to track important dates" 
+                              : "No compliance deadlines have been set for this regulation"}
+                          </p>
                           {isAdmin && (
-                            <p className="text-sm mt-1">Click "Add Deadline" to create one</p>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="mt-3"
+                              onClick={() => setShowCreateDeadlineDialog(true)}
+                            >
+                              <Plus className="h-4 w-4 mr-1" />
+                              Add First Deadline
+                            </Button>
                           )}
                         </div>
                       )}
@@ -1338,38 +1386,6 @@ function RegulationDetailPage() {
                     <EvidenceFiles regulationId={regulationId} />
                   </CardContent>
                 </Card>
-
-                {/* Notes Card */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Notes & Comments</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <NoteSection regulationId={regulationId} />
-                  </CardContent>
-                </Card>
-
-                {/* Action Required Card */}
-                {nextDeadline && nextDeadline.status !== "completed" && (
-                  <Card className="border-[#00267A]">
-                    <CardHeader>
-                      <CardTitle className="text-[#00267A]">
-                        Action Required
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-4">
-                        <p className="text-sm text-gray-600">
-                          Next deadline:{" "}
-                          {format(new Date(nextDeadline.dueDate), "PP")}
-                        </p>
-                        <Button className="w-full">
-                          Complete Compliance Report
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
               </div>
             </div>
           </div>
@@ -1425,11 +1441,14 @@ function RegulationDetailPage() {
                   Complete text of {regulation.name || regulation.topic}
                 </DialogDescription>
               </DialogHeader>
-              <div className="prose prose-sm max-w-none mt-4 text-gray-800 whitespace-pre-wrap">
+              <div className="prose prose-sm max-w-none mt-4 text-gray-800">
                 {regulation.regulationText ? (
-                  <div className="space-y-4">
-                    {regulation.regulationText}
-                  </div>
+                  <div 
+                    className="space-y-4"
+                    dangerouslySetInnerHTML={{ 
+                      __html: renderMarkdown(regulation.regulationText) 
+                    }}
+                  />
                 ) : (
                   <p className="text-gray-500 italic">
                     Full regulation text is not available.
@@ -1478,6 +1497,25 @@ function RegulationDetailPage() {
               )}
             </DialogContent>
           </Dialog>
+
+          {/* Escalate Issue Dialog */}
+          <EscalateIssueDialog
+            open={showEscalateDialog}
+            onOpenChange={setShowEscalateDialog}
+            regulation={{
+              id: regulation.id,
+              name: regulation.name,
+              topic: regulation.topic,
+              responsibleOffice: regulation.responsibleOffice,
+              responsibleOfficeEmail: regulation.responsibleOfficeEmail,
+              escalationTarget: regulation.escalationTarget,
+              escalationEmail: regulation.escalationEmail,
+              ownerId: regulation.ownerId,
+              actions: regulation.actions,
+            }}
+            deadlines={regulationDeadlines}
+            assignedUser={regulation.ownerId ? users.find(u => u.id === regulation.ownerId) : null}
+          />
         </>
       )}
     </div>

@@ -352,7 +352,15 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
       <div className="mt-8">
         <h3 className="text-lg font-medium mb-4">Notes ({notes.length})</h3>
         {notes.length === 0 ? (
-          <p className="text-sm text-gray-500">No notes found for this regulation.</p>
+          <div className="text-center py-6 px-4 bg-gradient-to-b from-gray-50 to-white rounded-lg border border-dashed border-gray-200">
+            <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-purple-50 flex items-center justify-center">
+              <Edit className="h-6 w-6 text-purple-400" />
+            </div>
+            <p className="font-medium text-gray-700">No notes yet</p>
+            <p className="text-sm text-gray-500 mt-1">
+              Add notes above to document compliance activities
+            </p>
+          </div>
         ) : (
           <div className="space-y-4">
             {notes.map((note) => (

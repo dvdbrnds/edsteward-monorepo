@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/hover-card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { FileText, Image as ImageIcon, FileText as PdfIcon, User, Upload, Download } from "lucide-react";
+import { FileText, Image as ImageIcon, FileText as PdfIcon, User, Upload, Download, FolderOpen } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -322,7 +322,15 @@ export function EvidenceFiles({ regulationId }: EvidenceFilesProps) {
                 </HoverCard>
               ))
             ) : (
-              <p className="text-gray-500 italic text-center">No evidence files uploaded yet</p>
+              <div className="text-center py-6 px-4 bg-gradient-to-b from-gray-50 to-white rounded-lg border border-dashed border-gray-200">
+                <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-green-50 flex items-center justify-center">
+                  <FolderOpen className="h-6 w-6 text-green-400" />
+                </div>
+                <p className="font-medium text-gray-700">No evidence files yet</p>
+                <p className="text-sm text-gray-500 mt-1">
+                  Upload documents to support compliance
+                </p>
+              </div>
             )}
           </div>
         </ScrollArea>

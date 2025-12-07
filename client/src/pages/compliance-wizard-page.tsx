@@ -1,5 +1,6 @@
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { marked } from "marked";
 import type { Regulation } from "@shared/schema";
 import Navigation from "@/components/layout/navigation";
 import {
@@ -13,6 +14,22 @@ import {
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { useState } from "react";
+
+// Configure marked for safe rendering
+marked.setOptions({
+  breaks: true,
+  gfm: true,
+});
+
+// Helper to safely render markdown as HTML
+function renderMarkdown(text: string | null | undefined): string {
+  if (!text) return "";
+  try {
+    return marked.parse(text) as string;
+  } catch {
+    return text;
+  }
+}
 
 export default function ComplianceWizardPage() {
   const [location, navigate] = useLocation();
@@ -48,15 +65,10 @@ export default function ComplianceWizardPage() {
         content: (
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Regulation Details</h3>
-            <p className="text-gray-600">{regulation.requirements}</p>
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <h4 className="font-medium text-blue-800">Requirements Checklist:</h4>
-              <ul className="list-disc list-inside text-sm text-blue-700 mt-2">
-                {regulation.requirements?.split('\n').map((req, index) => (
-                  <li key={index}>{req}</li>
-                ))}
-              </ul>
-            </div>
+            <div 
+              className="prose prose-sm max-w-none text-gray-600"
+              dangerouslySetInnerHTML={{ __html: renderMarkdown(regulation.requirements) }}
+            />
             {regulation.regulationUrl && (
               <div className="mt-4">
                 <a

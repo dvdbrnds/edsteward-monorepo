@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useLocation } from "wouter";
+import { marked } from "marked";
 import PublicNavigation from "@/components/layout/public-navigation";
 import {
   Card,
@@ -28,6 +29,22 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { format, differenceInDays } from "date-fns";
 import { type Regulation, type Deadline } from "@shared/schema";
+
+// Configure marked for safe rendering
+marked.setOptions({
+  breaks: true,
+  gfm: true,
+});
+
+// Helper to safely render markdown as HTML
+function renderMarkdown(text: string | null | undefined): string {
+  if (!text) return "";
+  try {
+    return marked.parse(text) as string;
+  } catch {
+    return text;
+  }
+}
 
 // Calculate compliance score utility function
 function calculateComplianceScore(regulation: Regulation | undefined, deadlines: Deadline[] = []): {
@@ -316,9 +333,10 @@ export default function PublicRegulationDetailPage() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {regulation.summary ? (
-                      <div className="prose max-w-none">
-                        <p>{regulation.summary}</p>
-                      </div>
+                      <div 
+                        className="prose max-w-none"
+                        dangerouslySetInnerHTML={{ __html: renderMarkdown(regulation.summary) }}
+                      />
                     ) : (
                       <div className="bg-gray-50 border border-gray-100 rounded-md p-4 text-gray-500 flex items-center">
                         <Info className="h-5 w-5 text-gray-400 mr-2" />
@@ -341,9 +359,10 @@ export default function PublicRegulationDetailPage() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     {regulation.requirements ? (
-                      <div className="prose max-w-none">
-                        <p>{regulation.requirements}</p>
-                      </div>
+                      <div 
+                        className="prose max-w-none"
+                        dangerouslySetInnerHTML={{ __html: renderMarkdown(regulation.requirements) }}
+                      />
                     ) : (
                       <div className="bg-gray-50 border border-gray-100 rounded-md p-4 text-gray-500 flex items-center">
                         <Info className="h-5 w-5 text-gray-400 mr-2" />

@@ -1,0 +1,2132 @@
+[
+  {
+    "id": 128,
+    "name": "Acts Affecting a Personal Financial Interest",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 73,
+    "name": "Affirmative Action/Equal Employment Opportunity",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 1,
+    "name": "Age Discrimination Act of 1975",
+    "office": "Academic Affairs",
+    "email": "academicaffairs@university.edu"
+  },
+  {
+    "id": 27,
+    "name": "Age Discrimination Act of 1975",
+    "office": "Admissions",
+    "email": "admissions@university.edu"
+  },
+  {
+    "id": 74,
+    "name": "Age Discrimination Act of 1975",
+    "office": "Academic Affairs",
+    "email": "academicaffairs@university.edu"
+  },
+  {
+    "id": 75,
+    "name": "Age Discrimination Employment Act of 1967",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 61,
+    "name": "Age Discrimination in Employment Act of 1967",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 241,
+    "name": "America COMPETES Act",
+    "office": "Research Compliance",
+    "email": "researchcompliance@university.edu"
+  },
+  {
+    "id": 206,
+    "name": "American Jobs Creation Act of 2004",
+    "office": "Academic Affairs",
+    "email": "academicaffairs@university.edu"
+  },
+  {
+    "id": 294,
+    "name": "Americans with Disabilities Act (ADA) Amendments Act of 2008",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 291,
+    "name": "Americans with Disabilities Act (ADA) Amendments Act of 2024, Section 001",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 2,
+    "name": "Americans with Disabilities Act of 1990",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 56,
+    "name": "Americans with Disabilities Act of 1990",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 62,
+    "name": "Americans with Disabilities Act of 1990",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 76,
+    "name": "Americans with Disabilities Act of 1990",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 186,
+    "name": "Americans with Disabilities Act of 1990",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 218,
+    "name": "Americans with Disabilities Act of 1990",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 242,
+    "name": "Animal Welfare Act",
+    "office": "Research Compliance",
+    "email": "researchcompliance@university.edu"
+  },
+  {
+    "id": 37,
+    "name": "Anti-Kickback Act of 1986",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 38,
+    "name": "Anti-discrimination laws for federal contractors",
+    "office": "Business Office / Finance",
+    "email": "businessoffice@university.edu"
+  },
+  {
+    "id": 136,
+    "name": "Arms Export Control Act of 1976",
+    "office": "Research Compliance",
+    "email": "researchcompliance@university.edu"
+  },
+  {
+    "id": 95,
+    "name": "Atomic Energy Act of 1954",
+    "office": "Admissions",
+    "email": "admissions@university.edu"
+  },
+  {
+    "id": 10,
+    "name": "Bankruptcy Abuse Prevention & Consumer Protection Act of 2005",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 207,
+    "name": "Bayh-Dole Act of 1980",
+    "office": "Academic Affairs",
+    "email": "academicaffairs@university.edu"
+  },
+  {
+    "id": 129,
+    "name": "Bribery of Public Officials and Witnesses",
+    "office": "Compliance Office",
+    "email": "compliance@university.edu"
+  },
+  {
+    "id": 39,
+    "name": "Byrd Amendment",
+    "office": "Business Office / Finance",
+    "email": "businessoffice@university.edu"
+  },
+  {
+    "id": 177,
+    "name": "Byrd Amendment",
+    "office": "Institutional Research",
+    "email": "institutionalresearch@university.edu"
+  },
+  {
+    "id": 260,
+    "name": "Byrd Amendment",
+    "office": "Business Office / Finance",
+    "email": "businessoffice@university.edu"
+  },
+  {
+    "id": 87,
+    "name": "Cafeteria Plan Regulations",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 261,
+    "name": "Cafeteria Plans 26 U.S.C. § 125",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 257,
+    "name": "Campus Sex Crimes Prevention Act (§ 1601 of the Victims of Trafficking and Violence Protection Act of 2000)",
+    "office": "Title IX Office",
+    "email": "titleix@university.edu"
+  },
+  {
+    "id": 262,
+    "name": "Charitable Gift Annuity Antitrust Relief Act",
+    "office": "Business Office / Finance",
+    "email": "businessoffice@university.edu"
+  },
+  {
+    "id": 96,
+    "name": "Chemical Facility Anti-Terrorism Standards",
+    "office": "Environmental Health & Safety",
+    "email": "environmentalhealth@university.edu"
+  },
+  {
+    "id": 219,
+    "name": "Children’s Online Privacy Protection Act of 1998 (COPPA)",
+    "office": "Information Technology",
+    "email": "informationtechnology@university.edu"
+  },
+  {
+    "id": 277,
+    "name": "Civil Service Reform Act of 1978",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 11,
+    "name": "Clayton Antitrust Act of 1914",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 97,
+    "name": "Clean Air Act",
+    "office": "Environmental Health & Safety",
+    "email": "environmentalhealth@university.edu"
+  },
+  {
+    "id": 98,
+    "name": "Clean Water Act",
+    "office": "Environmental Health & Safety",
+    "email": "environmentalhealth@university.edu"
+  },
+  {
+    "id": 243,
+    "name": "Clinical Trials § Financial Disclosures by Investigator",
+    "office": "Research Compliance",
+    "email": "researchcompliance@university.edu"
+  },
+  {
+    "id": 193,
+    "name": "Communications Assistance for Law Enforcement Act (CALEA)",
+    "office": "Business Office / Finance",
+    "email": "businessoffice@university.edu"
+  },
+  {
+    "id": 130,
+    "name": "Compensation to Members of Congress, Officers, Others in Matters Affecting the Government",
+    "office": "Compliance Office",
+    "email": "compliance@university.edu"
+  },
+  {
+    "id": 99,
+    "name": "Comprehensive Environmental Response, Compensation, and Liability Act (CERCLA)",
+    "office": "Environmental Health & Safety",
+    "email": "environmentalhealth@university.edu"
+  },
+  {
+    "id": 88,
+    "name": "Consolidated Omnibus Budget Reconciliation Act (COBRA)",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 279,
+    "name": "Consumer Credit Protection Act, Title III (CCPA) – Garnishments",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 142,
+    "name": "Contracts with Third Party Servicers",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 183,
+    "name": "Controlled Substances Act",
+    "office": "Environmental Health & Safety",
+    "email": "environmentalhealth@university.edu"
+  },
+  {
+    "id": 168,
+    "name": "Controlling the Assault of Non-Solicited Pornography And Marketing Act of 2003 (CAN-SPAM Act)",
+    "office": "Compliance Office",
+    "email": "compliance@university.edu"
+  },
+  {
+    "id": 194,
+    "name": "Controlling the Assault of Non-Solicited Pornography And Marketing Act of 2003 (CAN-SPAM Act)",
+    "office": "Compliance Office",
+    "email": "compliance@university.edu"
+  },
+  {
+    "id": 208,
+    "name": "Cooperative Research and Technology Enhancement Act (CREATE Act)",
+    "office": "Academic Affairs",
+    "email": "academicaffairs@university.edu"
+  },
+  {
+    "id": 40,
+    "name": "Copeland Anti-Kickback Act",
+    "office": "Business Office / Finance",
+    "email": "businessoffice@university.edu"
+  },
+  {
+    "id": 48,
+    "name": "Copyright Act",
+    "office": "Institutional Research",
+    "email": "institutionalresearch@university.edu"
+  },
+  {
+    "id": 49,
+    "name": "Copyright Term Extension Act",
+    "office": "Business Office / Finance",
+    "email": "businessoffice@university.edu"
+  },
+  {
+    "id": 41,
+    "name": "Davis-Bacon Act",
+    "office": "Business Office / Finance",
+    "email": "businessoffice@university.edu"
+  },
+  {
+    "id": 252,
+    "name": "Deferred Compensation",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 263,
+    "name": "Deferred Compensation",
+    "office": "Business Office / Finance",
+    "email": "businessoffice@university.edu"
+  },
+  {
+    "id": 178,
+    "name": "Department of Education General Administrative Regulations and Other Applicable Grant Regulations",
+    "office": "Title IX Office",
+    "email": "titleix@university.edu"
+  },
+  {
+    "id": 50,
+    "name": "Digital Millennium Copyright Act (DMCA)",
+    "office": "Institutional Research",
+    "email": "institutionalresearch@university.edu"
+  },
+  {
+    "id": 195,
+    "name": "Digital Millennium Copyright Act (DMCA)",
+    "office": "Academic Affairs",
+    "email": "academicaffairs@university.edu"
+  },
+  {
+    "id": 234,
+    "name": "Drug & Alcohol Testing of Transportation Employees",
+    "office": "Registrar",
+    "email": "registrar@university.edu"
+  },
+  {
+    "id": 235,
+    "name": "Drug Free Workplace Act",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 67,
+    "name": "Drug-Free Schools and Communities Act",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 42,
+    "name": "E-Verify Executive Order 13465-Amending Executive Order 12989",
+    "office": "Business Office / Finance",
+    "email": "businessoffice@university.edu"
+  },
+  {
+    "id": 285,
+    "name": "EDU-2024-001 Regulation",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 220,
+    "name": "Electronic Communications Privacy Act",
+    "office": "Information Technology",
+    "email": "informationtechnology@university.edu"
+  },
+  {
+    "id": 196,
+    "name": "Electronic Communications Privacy Act of 1986",
+    "office": "Institutional Research",
+    "email": "institutionalresearch@university.edu"
+  },
+  {
+    "id": 100,
+    "name": "Emergency Planning and Community Right Act (EPCRA)",
+    "office": "Environmental Health & Safety",
+    "email": "environmentalhealth@university.edu"
+  },
+  {
+    "id": 253,
+    "name": "Employee Annuities",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 264,
+    "name": "Employee Annuities",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 236,
+    "name": "Employee Polygraph Protection Act",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 89,
+    "name": "Employee Retirement Income Security Act of 1974 (ERISA)",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 254,
+    "name": "Employee Retirement Income Security Act of 1974 (ERISA)",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 101,
+    "name": "Energy Policy Act",
+    "office": "Environmental Health & Safety",
+    "email": "environmentalhealth@university.edu"
+  },
+  {
+    "id": 102,
+    "name": "Energy Reorganization Act of 1974, as amended",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 63,
+    "name": "Equal Employment Opportunity",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 64,
+    "name": "Equal Employment of Veterans",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 77,
+    "name": "Equal Employment of Veterans",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 33,
+    "name": "Equity in Athletics Disclosure Act (EADA)",
+    "office": "Athletics",
+    "email": "athletics@university.edu"
+  },
+  {
+    "id": 131,
+    "name": "Ethics in Government Act (Amended by Ethics Reform Act and Honest Leadership and Open Government Act of 2007)",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 137,
+    "name": "Export Administration Act of 1979",
+    "office": "International Programs",
+    "email": "international@university.edu"
+  },
+  {
+    "id": 244,
+    "name": "Export Administration Regulations",
+    "office": "Research Compliance",
+    "email": "researchcompliance@university.edu"
+  },
+  {
+    "id": 197,
+    "name": "FCC – Cable Certification",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 198,
+    "name": "FCC – Fixed Microwave Services, Licensing",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 199,
+    "name": "FCC – Wireless Communications, Licensing",
+    "office": "Title IX Office",
+    "email": "titleix@university.edu"
+  },
+  {
+    "id": 286,
+    "name": "FERPA-2024",
+    "office": "Registrar",
+    "email": "registrar@university.edu"
+  },
+  {
+    "id": 12,
+    "name": "Fair Credit Reporting Act (FCRA)",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 221,
+    "name": "Fair Credit Reporting Act (FCRA)",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 237,
+    "name": "Fair Credit Reporting Act (FCRA)",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 57,
+    "name": "Fair Housing Act, Section 6",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 280,
+    "name": "Fair Labor Standards Act (FLSA)",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 222,
+    "name": "Fair and Accurate Credit Transaction Act (FACTA)",
+    "office": "Institutional Research",
+    "email": "institutionalresearch@university.edu"
+  },
+  {
+    "id": 179,
+    "name": "False Claims Act",
+    "office": "Business Office / Finance",
+    "email": "businessoffice@university.edu"
+  },
+  {
+    "id": 295,
+    "name": "Family Education Rights and Privacy Act (FERPA) 2024 Update",
+    "office": "Student Affairs",
+    "email": "studentaffairs@university.edu"
+  },
+  {
+    "id": 223,
+    "name": "Family Educational Rights and Privacy Act (FERPA)",
+    "office": "Registrar",
+    "email": "registrar@university.edu"
+  },
+  {
+    "id": 292,
+    "name": "Family Educational Rights and Privacy Act 2024 Update",
+    "office": "Registrar",
+    "email": "registrar@university.edu"
+  },
+  {
+    "id": 289,
+    "name": "Family Educational Rights and Privacy Act of 2024",
+    "office": "Registrar",
+    "email": "registrar@university.edu"
+  },
+  {
+    "id": 180,
+    "name": "Federal Awardee Performance and Integrity Information System (FAPIIS)",
+    "office": "Business Office / Finance",
+    "email": "businessoffice@university.edu"
+  },
+  {
+    "id": 181,
+    "name": "Federal Funding Accountability and Transparency Act of 2006 (FFATA)",
+    "office": "Institutional Research",
+    "email": "institutionalresearch@university.edu"
+  },
+  {
+    "id": 224,
+    "name": "Federal Information Security Management Act (FISMA)",
+    "office": "Information Technology",
+    "email": "informationtechnology@university.edu"
+  },
+  {
+    "id": 103,
+    "name": "Federal Insecticide, Fungicide and Rodenticide Act",
+    "office": "Environmental Health & Safety",
+    "email": "environmentalhealth@university.edu"
+  },
+  {
+    "id": 13,
+    "name": "Federal Insurance Contributions Act (FICA)",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 281,
+    "name": "Federal Insurance Contributions Act (FICA)",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 174,
+    "name": "Federal Sentencing Guidelines",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 265,
+    "name": "Federal Unemployment Tax Act",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 282,
+    "name": "Federal Unemployment Tax Act",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 14,
+    "name": "Federal Unemployment Tax Act (FUTA)",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 238,
+    "name": "Federal Volunteer Protection Act",
+    "office": "Admissions",
+    "email": "admissions@university.edu"
+  },
+  {
+    "id": 245,
+    "name": "Food and Drug Administration (FDA) Amendments Act of 2007",
+    "office": "Research Compliance",
+    "email": "researchcompliance@university.edu"
+  },
+  {
+    "id": 212,
+    "name": "Foreign Agents Registration Act of 1938",
+    "office": "Institutional Research",
+    "email": "institutionalresearch@university.edu"
+  },
+  {
+    "id": 138,
+    "name": "Foreign Assets Control Regulations",
+    "office": "International Programs",
+    "email": "international@university.edu"
+  },
+  {
+    "id": 266,
+    "name": "Foreign Bank Accounts and Tax Filings",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 213,
+    "name": "Foreign Corrupt Practices Act (FCPA)",
+    "office": "Institutional Research",
+    "email": "institutionalresearch@university.edu"
+  },
+  {
+    "id": 182,
+    "name": "Fraud Enforcement and Recovery Act of 2009 (FERA)",
+    "office": "Institutional Research",
+    "email": "institutionalresearch@university.edu"
+  },
+  {
+    "id": 225,
+    "name": "Freedom of Information Act",
+    "office": "Information Technology",
+    "email": "informationtechnology@university.edu"
+  },
+  {
+    "id": 267,
+    "name": "Fringe Benefits",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 65,
+    "name": "Genetic Information Non-Discrimination Act of 2008",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 79,
+    "name": "Genetic Information Non-Discrimination Act of 2008",
+    "office": "Institutional Research",
+    "email": "institutionalresearch@university.edu"
+  },
+  {
+    "id": 226,
+    "name": "Gramm Leach Bliley Act (GLBA)",
+    "office": "Information Technology",
+    "email": "informationtechnology@university.edu"
+  },
+  {
+    "id": 104,
+    "name": "Guarding and Use of Hand & Portable Powered Tools",
+    "office": "Environmental Health & Safety",
+    "email": "environmentalhealth@university.edu"
+  },
+  {
+    "id": 184,
+    "name": "HIPAA",
+    "office": "Health Services",
+    "email": "healthservices@university.edu"
+  },
+  {
+    "id": 227,
+    "name": "HIPAA",
+    "office": "Information Technology",
+    "email": "informationtechnology@university.edu"
+  },
+  {
+    "id": 105,
+    "name": "Hazardous Materials Transportation Act",
+    "office": "Environmental Health & Safety",
+    "email": "environmentalhealth@university.edu"
+  },
+  {
+    "id": 200,
+    "name": "Hazardous Materials Transportation Act",
+    "office": "Environmental Health & Safety",
+    "email": "environmentalhealth@university.edu"
+  },
+  {
+    "id": 106,
+    "name": "Hazardous and Solid Waste Amendments of 1984",
+    "office": "Environmental Health & Safety",
+    "email": "environmentalhealth@university.edu"
+  },
+  {
+    "id": 228,
+    "name": "Health Information Technology for Economic and Clinical Health (HITECH) Act of 2009",
+    "office": "Information Technology",
+    "email": "informationtechnology@university.edu"
+  },
+  {
+    "id": 189,
+    "name": "Health Insurance Portability and Accountability Act",
+    "office": "Health Services",
+    "email": "healthservices@university.edu"
+  },
+  {
+    "id": 43,
+    "name": "Health Insurance Portability and Accountability Act of 1996 (HIPAA)",
+    "office": "Health Services",
+    "email": "healthservices@university.edu"
+  },
+  {
+    "id": 78,
+    "name": "Higher Education Act - Title IV (Student Financial Aid)",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 229,
+    "name": "Higher Education Act Financial Value Transparency & Gainful Employment",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 15,
+    "name": "Higher Education Act – Disclosure of Foreign Gifts",
+    "office": "Business Office / Finance",
+    "email": "businessoffice@university.edu"
+  },
+  {
+    "id": 143,
+    "name": "Higher Education Act: Aid Application Verification",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 144,
+    "name": "Higher Education Act: Audits",
+    "office": "Business Office / Finance",
+    "email": "businessoffice@university.edu"
+  },
+  {
+    "id": 145,
+    "name": "Higher Education Act: Borrower Defense to Repayment",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 146,
+    "name": "Higher Education Act: Cash Management",
+    "office": "Institutional Research",
+    "email": "institutionalresearch@university.edu"
+  },
+  {
+    "id": 147,
+    "name": "Higher Education Act: Code of Conduct",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 169,
+    "name": "Higher Education Act: Code of Conduct",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 148,
+    "name": "Higher Education Act: Cohort Default Rate",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 230,
+    "name": "Higher Education Act: Credit Hour Definition",
+    "office": "Admissions",
+    "email": "admissions@university.edu"
+  },
+  {
+    "id": 149,
+    "name": "Higher Education Act: Eligibility and Certification",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 150,
+    "name": "Higher Education Act: Entrance and Exit Counseling",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 151,
+    "name": "Higher Education Act: Federal Supplemental Educational Opportunity Grant Program",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 152,
+    "name": "Higher Education Act: Federal Work Study",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 153,
+    "name": "Higher Education Act: Financial Responsibility Requirements",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 44,
+    "name": "Higher Education Act: Foreign Gift and Contract Reports",
+    "office": "Business Office / Finance",
+    "email": "businessoffice@university.edu"
+  },
+  {
+    "id": 170,
+    "name": "Higher Education Act: Foreign Gift and Contract Reports",
+    "office": "Institutional Research",
+    "email": "institutionalresearch@university.edu"
+  },
+  {
+    "id": 231,
+    "name": "Higher Education Act: Incentive Compensation Prohibition",
+    "office": "Academic Affairs",
+    "email": "academicaffairs@university.edu"
+  },
+  {
+    "id": 154,
+    "name": "Higher Education Act: Information Distributed to Students",
+    "office": "Institutional Research",
+    "email": "institutionalresearch@university.edu"
+  },
+  {
+    "id": 3,
+    "name": "Higher Education Act: Institutional and Financial Assistance Information for Students",
+    "office": "Institutional Research",
+    "email": "institutionalresearch@university.edu"
+  },
+  {
+    "id": 25,
+    "name": "Higher Education Act: Institutional and Financial Assistance Information for Students",
+    "office": "Academic Affairs",
+    "email": "academicaffairs@university.edu"
+  },
+  {
+    "id": 28,
+    "name": "Higher Education Act: Institutional and Financial Assistance Information for Students",
+    "office": "Admissions",
+    "email": "admissions@university.edu"
+  },
+  {
+    "id": 51,
+    "name": "Higher Education Act: Institutional and financial assistance information for students",
+    "office": "Institutional Research",
+    "email": "institutionalresearch@university.edu"
+  },
+  {
+    "id": 232,
+    "name": "Higher Education Act: Misrepresentation",
+    "office": "Academic Affairs",
+    "email": "academicaffairs@university.edu"
+  },
+  {
+    "id": 155,
+    "name": "Higher Education Act: Net Price Calculator",
+    "office": "Business Office / Finance",
+    "email": "businessoffice@university.edu"
+  },
+  {
+    "id": 156,
+    "name": "Higher Education Act: PLUS Loans",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 157,
+    "name": "Higher Education Act: Penalties for Drug Violations",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 158,
+    "name": "Higher Education Act: Perkins Loans",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 159,
+    "name": "Higher Education Act: Preferred Lenders",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 52,
+    "name": "Higher Education Act: Program Participation Agreements",
+    "office": "Academic Affairs",
+    "email": "academicaffairs@university.edu"
+  },
+  {
+    "id": 160,
+    "name": "Higher Education Act: Program Participation Agreements",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 29,
+    "name": "Higher Education Act: Readmission Requirements for Servicemembers",
+    "office": "Admissions",
+    "email": "admissions@university.edu"
+  },
+  {
+    "id": 26,
+    "name": "Higher Education Act: Recognition of Accrediting Agency or Association",
+    "office": "Academic Affairs",
+    "email": "academicaffairs@university.edu"
+  },
+  {
+    "id": 161,
+    "name": "Higher Education Act: Record Retention",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 162,
+    "name": "Higher Education Act: Standard of Conduct",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 233,
+    "name": "Higher Education Act: State Authorization",
+    "office": "Academic Affairs",
+    "email": "academicaffairs@university.edu"
+  },
+  {
+    "id": 4,
+    "name": "Higher Education Act: Textbook Information",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 36,
+    "name": "Higher Education Act: Textbook Informatoin",
+    "office": "Institutional Research",
+    "email": "institutionalresearch@university.edu"
+  },
+  {
+    "id": 185,
+    "name": "Higher Education Opportunity Act",
+    "office": "Health Services",
+    "email": "healthservices@university.edu"
+  },
+  {
+    "id": 201,
+    "name": "Higher Education Opportunity Act",
+    "office": "Academic Affairs",
+    "email": "academicaffairs@university.edu"
+  },
+  {
+    "id": 5,
+    "name": "Higher Education Opportunity Act Sections 152 and 153",
+    "office": "Institutional Research",
+    "email": "institutionalresearch@university.edu"
+  },
+  {
+    "id": 202,
+    "name": "Homeland Security Act of 2002",
+    "office": "Institutional Research",
+    "email": "institutionalresearch@university.edu"
+  },
+  {
+    "id": 214,
+    "name": "Honest Leadership and Open Government Act of 2007",
+    "office": "Institutional Research",
+    "email": "institutionalresearch@university.edu"
+  },
+  {
+    "id": 132,
+    "name": "House and Senate Gift Ban and Ethics Rules",
+    "office": "Compliance Office",
+    "email": "compliance@university.edu"
+  },
+  {
+    "id": 215,
+    "name": "House and Senate Gift Ban and Ethics Rules",
+    "office": "Compliance Office",
+    "email": "compliance@university.edu"
+  },
+  {
+    "id": 107,
+    "name": "Housing & Urban Development Lead Based Paint Poisoning in Certain Residential Structures",
+    "office": "Environmental Health & Safety",
+    "email": "environmentalhealth@university.edu"
+  },
+  {
+    "id": 80,
+    "name": "Immigration and Nationality Act",
+    "office": "Title IX Office",
+    "email": "titleix@university.edu"
+  },
+  {
+    "id": 239,
+    "name": "Immigration and Nationality Act",
+    "office": "Admissions",
+    "email": "admissions@university.edu"
+  },
+  {
+    "id": 192,
+    "name": "Immigration and Nationality Act (INA)",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 268,
+    "name": "Independent Contractors",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 269,
+    "name": "Industrial Alcohol User Permits and Special Tax",
+    "office": "Campus Safety / Police",
+    "email": "campussafety@university.edu"
+  },
+  {
+    "id": 171,
+    "name": "Internal Revenue Code: Substantiation and Disclosure Provisions",
+    "office": "Institutional Research",
+    "email": "institutionalresearch@university.edu"
+  },
+  {
+    "id": 175,
+    "name": "Internal Revenue Service: Governance Information Required on Form 990",
+    "office": "Business Office / Finance",
+    "email": "businessoffice@university.edu"
+  },
+  {
+    "id": 139,
+    "name": "International Emergency Economic Powers Act",
+    "office": "International Programs",
+    "email": "international@university.edu"
+  },
+  {
+    "id": 140,
+    "name": "International Traffic in Arms Regulations (ITAR)",
+    "office": "Research Compliance",
+    "email": "researchcompliance@university.edu"
+  },
+  {
+    "id": 9,
+    "name": "Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Act",
+    "office": "Campus Safety / Police",
+    "email": "campussafety@university.edu"
+  },
+  {
+    "id": 355,
+    "name": "Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Act",
+    "office": "Campus Safety / Police",
+    "email": "campussafety@university.edu"
+  },
+  {
+    "id": 203,
+    "name": "Junk Fax Prevention Act of 2005",
+    "office": "Business Office / Finance",
+    "email": "businessoffice@university.edu"
+  },
+  {
+    "id": 53,
+    "name": "Lanham Act",
+    "office": "Academic Affairs",
+    "email": "academicaffairs@university.edu"
+  },
+  {
+    "id": 66,
+    "name": "Lilly Ledbetter Fair Pay Act of 2009",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 81,
+    "name": "Lilly Ledbetter Fair Pay Act of 2009",
+    "office": "Admissions",
+    "email": "admissions@university.edu"
+  },
+  {
+    "id": 216,
+    "name": "Lobbying Disclosure Act",
+    "office": "Institutional Research",
+    "email": "institutionalresearch@university.edu"
+  },
+  {
+    "id": 108,
+    "name": "Mandatory Reporting of Greenhouse Gases",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 90,
+    "name": "Medicare, Medicaid, and SCHIP Extension Act of 2007",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 109,
+    "name": "Motor Carrier Act of 1980",
+    "office": "Environmental Health & Safety",
+    "email": "environmentalhealth@university.edu"
+  },
+  {
+    "id": 190,
+    "name": "NSF grant term and condition, September 21, 2018",
+    "office": "Title IX Office",
+    "email": "titleix@university.edu"
+  },
+  {
+    "id": 110,
+    "name": "National Emission Standards for Hazardous Air Pollutants (NESHAP)",
+    "office": "Environmental Health & Safety",
+    "email": "environmentalhealth@university.edu"
+  },
+  {
+    "id": 278,
+    "name": "National Labor Relations Act",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 246,
+    "name": "National Science Foundation Research Misconduct Policies",
+    "office": "Research Compliance",
+    "email": "researchcompliance@university.edu"
+  },
+  {
+    "id": 247,
+    "name": "Native American Graves Protection and Repatriation Act (NAGPRA)",
+    "office": "Research Compliance",
+    "email": "researchcompliance@university.edu"
+  },
+  {
+    "id": 204,
+    "name": "No Electronic Theft Act",
+    "office": "Academic Affairs",
+    "email": "academicaffairs@university.edu"
+  },
+  {
+    "id": 47,
+    "name": "Non-Retaliation for Disclosure of Compensation Information",
+    "office": "Admissions",
+    "email": "admissions@university.edu"
+  },
+  {
+    "id": 255,
+    "name": "Nonqualified Deferred Inclusion",
+    "office": "Business Office / Finance",
+    "email": "businessoffice@university.edu"
+  },
+  {
+    "id": 270,
+    "name": "Nonqualified Deferred Inclusion",
+    "office": "Title IX Office",
+    "email": "titleix@university.edu"
+  },
+  {
+    "id": 111,
+    "name": "OSHA",
+    "office": "Environmental Health & Safety",
+    "email": "environmentalhealth@university.edu"
+  },
+  {
+    "id": 112,
+    "name": "OSHA Asbestos in Construction Standard",
+    "office": "Environmental Health & Safety",
+    "email": "environmentalhealth@university.edu"
+  },
+  {
+    "id": 113,
+    "name": "OSHA Asbestos in General Industry Standard",
+    "office": "Environmental Health & Safety",
+    "email": "environmentalhealth@university.edu"
+  },
+  {
+    "id": 114,
+    "name": "OSHA Enforcement Guidance for Personal Protective Equipment (PPE) in General Industry",
+    "office": "Environmental Health & Safety",
+    "email": "environmentalhealth@university.edu"
+  },
+  {
+    "id": 115,
+    "name": "OSHA Lead in Construction Standard",
+    "office": "Environmental Health & Safety",
+    "email": "environmentalhealth@university.edu"
+  },
+  {
+    "id": 116,
+    "name": "OSHA Lead in General Industry Standard",
+    "office": "Environmental Health & Safety",
+    "email": "environmentalhealth@university.edu"
+  },
+  {
+    "id": 117,
+    "name": "OSHA Welding, Cutting, and Brazing",
+    "office": "Environmental Health & Safety",
+    "email": "environmentalhealth@university.edu"
+  },
+  {
+    "id": 118,
+    "name": "OSHA – Bloodborne Pathogens Standard",
+    "office": "Environmental Health & Safety",
+    "email": "environmentalhealth@university.edu"
+  },
+  {
+    "id": 119,
+    "name": "OSHA’s  Emergency Action Plan Standard",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 120,
+    "name": "OSHA’s  Occupational Noise Exposure Standard",
+    "office": "Environmental Health & Safety",
+    "email": "environmentalhealth@university.edu"
+  },
+  {
+    "id": 121,
+    "name": "OSHA’s Occupational Exposure to Hazardous Chemicals in Laboratories Standard",
+    "office": "Environmental Health & Safety",
+    "email": "environmentalhealth@university.edu"
+  },
+  {
+    "id": 287,
+    "name": "Occupational Safety and Health Administration Regulation 2024-001",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 122,
+    "name": "Oil Pollution Act",
+    "office": "Environmental Health & Safety",
+    "email": "environmentalhealth@university.edu"
+  },
+  {
+    "id": 133,
+    "name": "Outside Earned Income and Activities",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 91,
+    "name": "Patient Protection and Affordable Care Act",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 58,
+    "name": "Patient Protection and Affordable Care Act (Section 1557)",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 299,
+    "name": "Pennsylvania English Fluency in Higher Education Act",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 300,
+    "name": "Pennsylvania Graduation Rates Reporting Act 88",
+    "office": "Institutional Research",
+    "email": "institutionalresearch@university.edu"
+  },
+  {
+    "id": 303,
+    "name": "Pennsylvania Higher Education - Academic Standards",
+    "office": "Institutional Research",
+    "email": "institutionalresearch@university.edu"
+  },
+  {
+    "id": 304,
+    "name": "Pennsylvania Higher Education - Accreditation Requirements",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 309,
+    "name": "Pennsylvania Higher Education - Assessment and Evaluation",
+    "office": "Registrar",
+    "email": "registrar@university.edu"
+  },
+  {
+    "id": 311,
+    "name": "Pennsylvania Higher Education - Compliance Monitoring",
+    "office": "Legal / General Counsel",
+    "email": "legal@university.edu"
+  },
+  {
+    "id": 316,
+    "name": "Pennsylvania Higher Education - Data Management",
+    "office": "Athletics",
+    "email": "athletics@university.edu"
+  },
+  {
+    "id": 320,
+    "name": "Pennsylvania Higher Education - Emergency Preparedness",
+    "office": "Campus Safety / Police",
+    "email": "campussafety@university.edu"
+  },
+  {
+    "id": 305,
+    "name": "Pennsylvania Higher Education - Faculty Qualifications",
+    "office": "Registrar",
+    "email": "registrar@university.edu"
+  },
+  {
+    "id": 307,
+    "name": "Pennsylvania Higher Education - Financial Aid Administration",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 315,
+    "name": "Pennsylvania Higher Education - Information Security",
+    "office": "Information Technology",
+    "email": "informationtechnology@university.edu"
+  },
+  {
+    "id": 318,
+    "name": "Pennsylvania Higher Education - Infrastructure Requirements",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 308,
+    "name": "Pennsylvania Higher Education - Institutional Research",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 314,
+    "name": "Pennsylvania Higher Education - Privacy Protection",
+    "office": "Registrar",
+    "email": "registrar@university.edu"
+  },
+  {
+    "id": 301,
+    "name": "Pennsylvania Higher Education - Programs & Majors",
+    "office": "Academic Affairs",
+    "email": "academicaffairs@university.edu"
+  },
+  {
+    "id": 310,
+    "name": "Pennsylvania Higher Education - Quality Assurance",
+    "office": "Compliance Office",
+    "email": "compliance@university.edu"
+  },
+  {
+    "id": 313,
+    "name": "Pennsylvania Higher Education - Record Keeping",
+    "office": "Legal / General Counsel",
+    "email": "legal@university.edu"
+  },
+  {
+    "id": 312,
+    "name": "Pennsylvania Higher Education - Reporting Requirements",
+    "office": "Institutional Research",
+    "email": "institutionalresearch@university.edu"
+  },
+  {
+    "id": 319,
+    "name": "Pennsylvania Higher Education - Safety and Security",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 306,
+    "name": "Pennsylvania Higher Education - Student Services",
+    "office": "Title IX Office",
+    "email": "titleix@university.edu"
+  },
+  {
+    "id": 317,
+    "name": "Pennsylvania Higher Education - Technology Standards",
+    "office": "Registrar",
+    "email": "registrar@university.edu"
+  },
+  {
+    "id": 321,
+    "name": "Pennsylvania Higher Education Framework - Regulation 321",
+    "office": "Compliance Office",
+    "email": "compliance@university.edu"
+  },
+  {
+    "id": 322,
+    "name": "Pennsylvania Higher Education Framework - Regulation 322",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 323,
+    "name": "Pennsylvania Higher Education Framework - Regulation 323",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 324,
+    "name": "Pennsylvania Higher Education Framework - Regulation 324",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 325,
+    "name": "Pennsylvania Higher Education Framework - Regulation 325",
+    "office": "Registrar",
+    "email": "registrar@university.edu"
+  },
+  {
+    "id": 326,
+    "name": "Pennsylvania Higher Education Framework - Regulation 326",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 327,
+    "name": "Pennsylvania Higher Education Framework - Regulation 327",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 328,
+    "name": "Pennsylvania Higher Education Framework - Regulation 328",
+    "office": "Compliance Office",
+    "email": "compliance@university.edu"
+  },
+  {
+    "id": 329,
+    "name": "Pennsylvania Higher Education Framework - Regulation 329",
+    "office": "Compliance Office",
+    "email": "compliance@university.edu"
+  },
+  {
+    "id": 330,
+    "name": "Pennsylvania Higher Education Framework - Regulation 330",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 331,
+    "name": "Pennsylvania Higher Education Framework - Regulation 331",
+    "office": "Compliance Office",
+    "email": "compliance@university.edu"
+  },
+  {
+    "id": 332,
+    "name": "Pennsylvania Higher Education Framework - Regulation 332",
+    "office": "Compliance Office",
+    "email": "compliance@university.edu"
+  },
+  {
+    "id": 333,
+    "name": "Pennsylvania Higher Education Framework - Regulation 333",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 334,
+    "name": "Pennsylvania Higher Education Framework - Regulation 334",
+    "office": "Compliance Office",
+    "email": "compliance@university.edu"
+  },
+  {
+    "id": 335,
+    "name": "Pennsylvania Higher Education Framework - Regulation 335",
+    "office": "Compliance Office",
+    "email": "compliance@university.edu"
+  },
+  {
+    "id": 336,
+    "name": "Pennsylvania Higher Education Framework - Regulation 336",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 337,
+    "name": "Pennsylvania Higher Education Framework - Regulation 337",
+    "office": "Compliance Office",
+    "email": "compliance@university.edu"
+  },
+  {
+    "id": 338,
+    "name": "Pennsylvania Higher Education Framework - Regulation 338",
+    "office": "Compliance Office",
+    "email": "compliance@university.edu"
+  },
+  {
+    "id": 339,
+    "name": "Pennsylvania Higher Education Framework - Regulation 339",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 340,
+    "name": "Pennsylvania Higher Education Framework - Regulation 340",
+    "office": "Compliance Office",
+    "email": "compliance@university.edu"
+  },
+  {
+    "id": 341,
+    "name": "Pennsylvania Higher Education Framework - Regulation 341",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 342,
+    "name": "Pennsylvania Higher Education Framework - Regulation 342",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 343,
+    "name": "Pennsylvania Higher Education Framework - Regulation 343",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 344,
+    "name": "Pennsylvania Higher Education Framework - Regulation 344",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 345,
+    "name": "Pennsylvania Higher Education Framework - Regulation 345",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 346,
+    "name": "Pennsylvania Higher Education Framework - Regulation 346",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 347,
+    "name": "Pennsylvania Higher Education Framework - Regulation 347",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 348,
+    "name": "Pennsylvania Higher Education Framework - Regulation 348",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 349,
+    "name": "Pennsylvania Higher Education Framework - Regulation 349",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 350,
+    "name": "Pennsylvania Higher Education Framework - Regulation 350",
+    "office": "Compliance Office",
+    "email": "compliance@university.edu"
+  },
+  {
+    "id": 351,
+    "name": "Pennsylvania Higher Education Framework - Regulation 351",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 352,
+    "name": "Pennsylvania Higher Education Framework - Regulation 352",
+    "office": "Campus Safety / Police",
+    "email": "campussafety@university.edu"
+  },
+  {
+    "id": 353,
+    "name": "Pennsylvania Higher Education Framework - Regulation 353",
+    "office": "Business Office / Finance",
+    "email": "businessoffice@university.edu"
+  },
+  {
+    "id": 354,
+    "name": "Pennsylvania Higher Education Framework - Regulation 354",
+    "office": "Academic Affairs",
+    "email": "academicaffairs@university.edu"
+  },
+  {
+    "id": 298,
+    "name": "Pennsylvania Higher Education Gift Disclosure Act",
+    "office": "Business Office / Finance",
+    "email": "businessoffice@university.edu"
+  },
+  {
+    "id": 297,
+    "name": "Pennsylvania Sexual Violence Education Act",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 302,
+    "name": "Pennsylvania State Board of Higher Education",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 296,
+    "name": "Pennsylvania Uniform Crime Reporting Act",
+    "office": "Campus Safety / Police",
+    "email": "campussafety@university.edu"
+  },
+  {
+    "id": 172,
+    "name": "Pension Protection Act",
+    "office": "Institutional Research",
+    "email": "institutionalresearch@university.edu"
+  },
+  {
+    "id": 173,
+    "name": "Philanthropy Protection Act of 1995",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 217,
+    "name": "Political Activities",
+    "office": "Institutional Research",
+    "email": "institutionalresearch@university.edu"
+  },
+  {
+    "id": 72,
+    "name": "Pregnant Workers Fairness Act (PWFA)",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 248,
+    "name": "Protection of Human Subjects Regulations (Common Rule)",
+    "office": "Research Compliance",
+    "email": "researchcompliance@university.edu"
+  },
+  {
+    "id": 271,
+    "name": "Public Disclosure of Material",
+    "office": "Admissions",
+    "email": "admissions@university.edu"
+  },
+  {
+    "id": 249,
+    "name": "Public Health Service Policies on Research Misconduct",
+    "office": "Research Compliance",
+    "email": "researchcompliance@university.edu"
+  },
+  {
+    "id": 256,
+    "name": "Qualified Pensions",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 272,
+    "name": "Qualified Pensions",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 283,
+    "name": "Qualified Tuition Reductions",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 16,
+    "name": "Qualified Tuition and Student Loan Interest Reporting",
+    "office": "Business Office / Finance",
+    "email": "businessoffice@university.edu"
+  },
+  {
+    "id": 163,
+    "name": "Qualified Tuition and Student Loan Interest Reporting",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 273,
+    "name": "Qualified Tuition and Student Loan Interest Reporting",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 176,
+    "name": "REG1891",
+    "office": "Institutional Research",
+    "email": "institutionalresearch@university.edu"
+  },
+  {
+    "id": 17,
+    "name": "Regulation E: Electronic Fund Transfers",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 288,
+    "name": "Regulation ID EDU-2024-001",
+    "office": "Compliance Office",
+    "email": "compliance@university.edu"
+  },
+  {
+    "id": 284,
+    "name": "Regulation ID OSHA-2024-001",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 274,
+    "name": "Reporting of Payments of Royalties",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 123,
+    "name": "Residential Lead-Based Paint Hazard Reduction Act of 1992",
+    "office": "Environmental Health & Safety",
+    "email": "environmentalhealth@university.edu"
+  },
+  {
+    "id": 124,
+    "name": "Resource Conservation and Recovery Act",
+    "office": "Environmental Health & Safety",
+    "email": "environmentalhealth@university.edu"
+  },
+  {
+    "id": 250,
+    "name": "Responsibility of Applicants for Promoting Objectivity in Research for which PHS Funding is Sought",
+    "office": "Research Compliance",
+    "email": "researchcompliance@university.edu"
+  },
+  {
+    "id": 134,
+    "name": "Restrictions on Former Officers, Employees, and Elected Officials of the Executive and Legislative",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 135,
+    "name": "Salary of Government Officials and Employees Payable Only by United States",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 18,
+    "name": "Sarbanes Oxley Act of 2002 (SOX)",
+    "office": "Business Office / Finance",
+    "email": "businessoffice@university.edu"
+  },
+  {
+    "id": 6,
+    "name": "Section 504 of The Rehabilitation Act of 1973",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 30,
+    "name": "Section 504 of The Rehabilitation Act of 1973",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 34,
+    "name": "Section 504 of The Rehabilitation Act of 1973",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 59,
+    "name": "Section 504 of The Rehabilitation Act of 1973",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 82,
+    "name": "Section 504 of The Rehabilitation Act of 1973",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 187,
+    "name": "Section 504 of The Rehabilitation Act of 1973",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 19,
+    "name": "Sherman Antitrust Act",
+    "office": "Business Office / Finance",
+    "email": "businessoffice@university.edu"
+  },
+  {
+    "id": 45,
+    "name": "Small Business Act and Small Business Investment Act of 1958",
+    "office": "Campus Safety / Police",
+    "email": "campussafety@university.edu"
+  },
+  {
+    "id": 275,
+    "name": "Small Business Job Protection Act",
+    "office": "Business Office / Finance",
+    "email": "businessoffice@university.edu"
+  },
+  {
+    "id": 251,
+    "name": "Small Unmanned Aircraft Systems",
+    "office": "Research Compliance",
+    "email": "researchcompliance@university.edu"
+  },
+  {
+    "id": 54,
+    "name": "Small Webcasters Settlement Act of 2002",
+    "office": "Academic Affairs",
+    "email": "academicaffairs@university.edu"
+  },
+  {
+    "id": 20,
+    "name": "Social Security Act",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 125,
+    "name": "Standards For the Management of Used Oil",
+    "office": "Environmental Health & Safety",
+    "email": "environmentalhealth@university.edu"
+  },
+  {
+    "id": 191,
+    "name": "Student Exchange and Visitor Information System (SEVIS)",
+    "office": "International Programs",
+    "email": "international@university.edu"
+  },
+  {
+    "id": 164,
+    "name": "Student Loan Default Prevention Initiative Act of 1990",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 165,
+    "name": "Student Right to Know Act",
+    "office": "Institutional Research",
+    "email": "institutionalresearch@university.edu"
+  },
+  {
+    "id": 21,
+    "name": "Tax Cuts and Jobs Act of 2017 (endowment excise tax)",
+    "office": "Business Office / Finance",
+    "email": "businessoffice@university.edu"
+  },
+  {
+    "id": 166,
+    "name": "Teacher Preparation Programs",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 55,
+    "name": "Technology Education and Copyright Harmonization Act (TEACH ACT) of 2002",
+    "office": "Academic Affairs",
+    "email": "academicaffairs@university.edu"
+  },
+  {
+    "id": 205,
+    "name": "Telemarketing",
+    "office": "Business Office / Finance",
+    "email": "businessoffice@university.edu"
+  },
+  {
+    "id": 60,
+    "name": "The Family and Medical Leave Act of 1993",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 68,
+    "name": "The Family and Medical Leave Act of 1993",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 126,
+    "name": "The Public Health Security and Bioterrorism Preparedness and Response Act",
+    "office": "Environmental Health & Safety",
+    "email": "environmentalhealth@university.edu"
+  },
+  {
+    "id": 92,
+    "name": "The Veterans’ Readjustment Benefits Act",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 35,
+    "name": "Title IX",
+    "office": "Title IX Office",
+    "email": "titleix@university.edu"
+  },
+  {
+    "id": 7,
+    "name": "Title IX of the Education Amendment of 1972",
+    "office": "Title IX Office",
+    "email": "titleix@university.edu"
+  },
+  {
+    "id": 31,
+    "name": "Title IX of the Education Amendment of 1972",
+    "office": "Title IX Office",
+    "email": "titleix@university.edu"
+  },
+  {
+    "id": 69,
+    "name": "Title IX of the Education Amendment of 1972",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 83,
+    "name": "Title IX of the Education Amendment of 1972",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 93,
+    "name": "Title IX of the Education Amendment of 1972",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 167,
+    "name": "Title IX of the Education Amendment of 1972",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  },
+  {
+    "id": 188,
+    "name": "Title IX of the Education Amendment of 1972",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 258,
+    "name": "Title IX of the Education Amendment of 1972",
+    "office": "Campus Safety / Police",
+    "email": "campussafety@university.edu"
+  },
+  {
+    "id": 293,
+    "name": "Title IX of the Education Amendments of 1972",
+    "office": "Admissions",
+    "email": "admissions@university.edu"
+  },
+  {
+    "id": 290,
+    "name": "Title IX of the Education Amendments of 1972",
+    "office": "Title IX Office",
+    "email": "titleix@university.edu"
+  },
+  {
+    "id": 8,
+    "name": "Title VI of the Civil Rights Act of 1964",
+    "office": "Admissions",
+    "email": "admissions@university.edu"
+  },
+  {
+    "id": 32,
+    "name": "Title VI of the Civil Rights Act of 1964",
+    "office": "Admissions",
+    "email": "admissions@university.edu"
+  },
+  {
+    "id": 70,
+    "name": "Title VII of the Civil Rights Act of 1964",
+    "office": "Disability Services",
+    "email": "disabilityservices@university.edu"
+  },
+  {
+    "id": 84,
+    "name": "Title VII of the Civil Rights Act of 1964",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 259,
+    "name": "Title VII of the Civil Rights Act of 1964",
+    "office": "Title IX Office",
+    "email": "titleix@university.edu"
+  },
+  {
+    "id": 127,
+    "name": "Toxic Substances Control Act",
+    "office": "Environmental Health & Safety",
+    "email": "environmentalhealth@university.edu"
+  },
+  {
+    "id": 46,
+    "name": "Trade Sanctions Reform and Export Enhancement",
+    "office": "Business Office / Finance",
+    "email": "businessoffice@university.edu"
+  },
+  {
+    "id": 209,
+    "name": "Trademark Revision Act",
+    "office": "Academic Affairs",
+    "email": "academicaffairs@university.edu"
+  },
+  {
+    "id": 141,
+    "name": "Trading with the Enemy Act of 1917",
+    "office": "Research Compliance",
+    "email": "researchcompliance@university.edu"
+  },
+  {
+    "id": 22,
+    "name": "Truth in Lending Act",
+    "office": "Institutional Research",
+    "email": "institutionalresearch@university.edu"
+  },
+  {
+    "id": 210,
+    "name": "U.S. Patent Act",
+    "office": "Academic Affairs",
+    "email": "academicaffairs@university.edu"
+  },
+  {
+    "id": 23,
+    "name": "Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance, Super Circular, or Omni Circular)",
+    "office": "Business Office / Finance",
+    "email": "businessoffice@university.edu"
+  },
+  {
+    "id": 71,
+    "name": "Uniformed Services Employment and Reemployment Rights Act (USERRA)",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 85,
+    "name": "Uniformed Services Employment and Reemployment Rights Act (USERRA)",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 94,
+    "name": "Uniformed Services Employment and Reemployment Rights Act (USERRA)",
+    "office": "Title IX Office",
+    "email": "titleix@university.edu"
+  },
+  {
+    "id": 276,
+    "name": "Unrelated Business Income (UBIT)",
+    "office": "Business Office / Finance",
+    "email": "businessoffice@university.edu"
+  },
+  {
+    "id": 24,
+    "name": "Unrelated Business Income Tax (UBIT)",
+    "office": "Business Office / Finance",
+    "email": "businessoffice@university.edu"
+  },
+  {
+    "id": 86,
+    "name": "Veterans’ employment emphasis under Federal contracts",
+    "office": "Human Resources",
+    "email": "humanresources@university.edu"
+  },
+  {
+    "id": 211,
+    "name": "Visual Artists Rights Act",
+    "office": "Academic Affairs",
+    "email": "academicaffairs@university.edu"
+  },
+  {
+    "id": 240,
+    "name": "Worker Adjustment and Retraining Notification Act (WARN)",
+    "office": "Financial Aid Office",
+    "email": "financialaid@university.edu"
+  }
+]

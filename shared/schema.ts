@@ -274,6 +274,12 @@ export const regulations = pgTable("regulations", {
   actions: jsonb("actions").$type<RegulationAction[]>(),
   // Owner/assignment field - compliance officer responsible for this regulation
   ownerId: integer("owner_id").references(() => users.id),
+  // Responsible office (field compliance office)
+  responsibleOffice: text("responsible_office"),
+  responsibleOfficeEmail: text("responsible_office_email"),
+  // Escalation target (supervisor/VP for escalations)
+  escalationTarget: text("escalation_target"),
+  escalationEmail: text("escalation_email"),
 });
 
 // Notifications table
@@ -294,6 +300,8 @@ export const deadlines = pgTable("deadlines", {
   dueDate: date("due_date").notNull(),
   status: text("status").notNull(),
   assignedTo: integer("assigned_to").notNull(),
+  description: text("description"),
+  isDefault: boolean("is_default").default(false),
 });
 
 // Guides table for storing submission guides and documentation
