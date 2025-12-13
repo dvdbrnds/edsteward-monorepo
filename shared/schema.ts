@@ -280,6 +280,11 @@ export const regulations = pgTable("regulations", {
   // Escalation target (supervisor/VP for escalations)
   escalationTarget: text("escalation_target"),
   escalationEmail: text("escalation_email"),
+  // Risk level for email attestation eligibility
+  riskLevel: text("risk_level").default("medium"), // low, medium, high, critical
+  // Email attestation settings
+  emailAttestationEnabled: boolean("email_attestation_enabled").default(false),
+  attestationFrequency: text("attestation_frequency").default("annual"), // quarterly, annual, etc.
 });
 
 // Notifications table
@@ -313,6 +318,41 @@ export const guides = pgTable("guides", {
   lastUpdated: timestamp("last_updated").defaultNow(),
   createdBy: integer("created_by").notNull(),
 });
+
+// Risk levels for regulations (determines email attestation eligibility)
+export const RISK_LEVELS = ["low", "medium", "high", "critical"] as const;
+export type RiskLevel = typeof RISK_LEVELS[number];
+
+// Attestation token types
+export const ATTESTATION_TYPES = ["quarterly", "annual", "incident", "ad_hoc"] as const;
+export type AttestationType = typeof ATTESTATION_TYPES[number];
+
+// Attestation tokens table for one-click email attestations
+export const attestationTokens = pgTable("attestation_tokens", {
+  id: serial("id").primaryKey(),
+  token: text("token").notNull().unique(),
+  regulationId: integer("regulation_id").notNull().references(() => regulations.id),
+  userId: integer("user_id").notNull().references(() => users.id),
+  attestationType: text("attestation_type").notNull().default("quarterly"),
+  // What the user is attesting to (shown on confirmation page)
+  attestationStatement: text("attestation_statement").notNull(),
+  // Period being attested (e.g., "Q4 2025", "Annual 2025")
+  attestationPeriod: text("attestation_period"),
+  // Token lifecycle
+  expiresAt: timestamp("expires_at").notNull(),
+  usedAt: timestamp("used_at"),
+  usedIp: text("used_ip"),
+  usedUserAgent: text("used_user_agent"),
+  // Tracking
+  emailSentAt: timestamp("email_sent_at"),
+  emailSentTo: text("email_sent_to"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  createdBy: integer("created_by").references(() => users.id), // Admin who triggered the attestation request
+});
+
+// Attestation token types
+export type AttestationToken = typeof attestationTokens.$inferSelect;
+export type InsertAttestationToken = typeof attestationTokens.$inferInsert;
 
 // Notes schema is already defined above
 

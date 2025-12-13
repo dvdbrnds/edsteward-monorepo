@@ -28,6 +28,7 @@ import UpdatesListPage from "@/pages/updates-list-page";
 import DifferentialViewPage from "@/pages/differential-view-page";
 import DiffTestPage from "@/pages/diff-test-page";
 import TrusteesDashboard from "@/pages/trustees-dashboard";
+import AttestationPage from "@/pages/attestation-page";
 import { ProtectedRoute } from "./lib/protected-route";
 import { ProtectedRegulationRoute } from "./lib/protected-regulation-route";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
@@ -61,6 +62,9 @@ export default function App() {
               
               {/* Legacy public dashboard route - redirect to new trustees dashboard */}
               <Route path="/trustees-dashboard" component={TrusteesDashboard} />
+              
+              {/* Email Attestation - No authentication required (token is auth) */}
+              <Route path="/attest/:token" component={AttestationPage} />
 
               {/* Protected Routes - Authentication Required */}
               <ProtectedRoute path="/" component={HomePage} />

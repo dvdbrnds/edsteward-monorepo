@@ -154,6 +154,7 @@ import { SubmissionWizard } from "@/components/regulations/submission-wizard";
 import { EvidenceFiles } from "@/components/regulations/evidence-files";
 import { NotificationOverrideControl } from "@/components/regulations/notification-override-control";
 import { EscalateIssueDialog } from "@/components/regulations/escalate-issue-dialog";
+import { SendAttestationDialog } from "@/components/regulations/send-attestation-dialog";
 import { useAuth } from "@/hooks/use-auth";
 
 const CATEGORIES = [
@@ -179,6 +180,7 @@ function RegulationDetailPage() {
   const [showSubmissionWizard, setShowSubmissionWizard] = useState(false);
   const [showCreateDeadlineDialog, setShowCreateDeadlineDialog] = useState(false);
   const [showEscalateDialog, setShowEscalateDialog] = useState(false);
+  const [showAttestationDialog, setShowAttestationDialog] = useState(false);
   const [editingDeadline, setEditingDeadline] = useState<Deadline | null>(null);
   
   // Accordion section states - Summary expanded by default, others collapsed
@@ -782,14 +784,24 @@ function RegulationDetailPage() {
                 Print Report
               </Button>
               {isAdmin && (
-                <Button
-                  variant="default"
-                  className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white"
-                  onClick={() => setShowEscalateDialog(true)}
-                >
-                  <AlertCircle className="h-4 w-4" />
-                  Escalate Issue
-                </Button>
+                <>
+                  <Button
+                    variant="default"
+                    className="flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-700 text-white"
+                    onClick={() => setShowAttestationDialog(true)}
+                  >
+                    <Mail className="h-4 w-4" />
+                    Send Attestation
+                  </Button>
+                  <Button
+                    variant="default"
+                    className="flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 text-white"
+                    onClick={() => setShowEscalateDialog(true)}
+                  >
+                    <AlertCircle className="h-4 w-4" />
+                    Escalate Issue
+                  </Button>
+                </>
               )}
             </div>
 
@@ -1275,6 +1287,18 @@ function RegulationDetailPage() {
             }}
             deadlines={regulationDeadlines}
             assignedUser={regulation.ownerId ? users.find(u => u.id === regulation.ownerId) : null}
+          />
+
+          {/* Send Attestation Request Dialog */}
+          <SendAttestationDialog
+            open={showAttestationDialog}
+            onOpenChange={setShowAttestationDialog}
+            regulationId={regulation.id}
+            regulationName={regulation.name || regulation.topic || 'Unknown Regulation'}
+            riskLevel={(regulation as any).riskLevel || 'medium'}
+            assignedUserId={regulation.ownerId || undefined}
+            responsibleOffice={regulation.responsibleOffice}
+            responsibleOfficeEmail={regulation.responsibleOfficeEmail}
           />
         </>
       )}

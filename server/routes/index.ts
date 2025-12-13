@@ -31,6 +31,7 @@ import auditRouter from './api/audit';
 import awsTenantManagementRouter from './api/aws-tenant-management';
 import { debugRouter } from './api/debug';
 import { emergencyMoravianRouter } from './api/emergency-moravian-fix';
+import attestationRouter from './api/attestation';
 // @ts-ignore
 import migrationRoutes from './database-migration.js';
 
@@ -420,6 +421,7 @@ export function registerRoutes(app: express.Application): Server {
   app.use('/api/users', usersRouter);
   app.use('/api/mfa', mfaRouter); // Multi-Factor Authentication for local accounts
   app.use('/api/audit', auditRouter); // Audit trail for compliance tracking
+  app.use('/api/attestation', attestationRouter); // Email attestation for low-risk regulations
 
   // AWS Tenant Management - Only available on admin.edsteward.ai
   app.use('/api/aws-tenant-management', (req, res, next) => {
