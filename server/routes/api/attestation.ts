@@ -43,15 +43,16 @@ router.post('/send', requireAuth, requireAdmin, async (req: Request, res: Respon
     const { 
       regulationId, 
       userId, 
+      email: manualEmail,
       attestationType = 'quarterly',
       attestationStatement,
       attestationPeriod 
     } = req.body;
 
     // Validate required fields
-    if (!regulationId || !userId || !attestationStatement) {
+    if (!regulationId || (!userId && !manualEmail) || !attestationStatement) {
       return res.status(400).json({ 
-        error: 'Missing required fields: regulationId, userId, attestationStatement' 
+        error: 'Missing required fields: regulationId, (userId or email), attestationStatement' 
       });
     }
 
@@ -61,14 +62,34 @@ router.post('/send', requireAuth, requireAdmin, async (req: Request, res: Respon
       return res.status(404).json({ error: 'Regulation not found' });
     }
 
-    // Get the user
-    const user = await db.select().from(users).where(eq(users.id, userId)).limit(1);
-    if (!user.length) {
-      return res.status(404).json({ error: 'User not found' });
+    let targetUser: { id: number; email: string; firstName?: string | null; lastName?: string | null; username: string } | null = null;
+    let targetEmail: string;
+    let targetUserId: number | null = null;
+
+    if (userId) {
+      // Get user from database
+      const user = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+      if (!user.length) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+      targetUser = user[0];
+      targetEmail = targetUser.email;
+      targetUserId = targetUser.id;
+    } else {
+      // Use manual email - check if user exists with this email
+      targetEmail = manualEmail;
+      const existingUser = await db.select().from(users).where(eq(users.email, manualEmail)).limit(1);
+      if (existingUser.length) {
+        targetUser = existingUser[0];
+        targetUserId = targetUser.id;
+      }
+    }
+
+    if (!targetEmail) {
+      return res.status(400).json({ error: 'No valid email address provided' });
     }
 
     const reg = regulation[0];
-    const targetUser = user[0];
 
     // Check if regulation is eligible for email attestation
     if (reg.riskLevel === 'critical' || reg.riskLevel === 'high') {
@@ -86,7 +107,7 @@ router.post('/send', requireAuth, requireAdmin, async (req: Request, res: Respon
     const [tokenRecord] = await db.insert(attestationTokens).values({
       token,
       regulationId,
-      userId,
+      userId: targetUserId, // Can be null for manual email
       attestationType,
       attestationStatement,
       attestationPeriod,
@@ -99,16 +120,17 @@ router.post('/send', requireAuth, requireAdmin, async (req: Request, res: Respon
 
     // Send email
     const emailSubject = `Action Required: ${reg.name} Compliance Attestation`;
-    const emailBody = generateAttestationEmail(reg, targetUser, attestationStatement, attestationPeriod, attestationUrl);
+    const recipientName = targetUser?.firstName || targetEmail.split('@')[0];
+    const emailBody = generateAttestationEmailForRecipient(reg, recipientName, attestationStatement, attestationPeriod, attestationUrl);
     
-    const emailSent = await emailService.sendEmail(targetUser.email, emailSubject, emailBody);
+    const emailSent = await emailService.sendEmail(targetEmail, emailSubject, emailBody);
 
     if (emailSent) {
       // Update token record with email sent info
       await db.update(attestationTokens)
         .set({ 
           emailSentAt: new Date(),
-          emailSentTo: targetUser.email 
+          emailSentTo: targetEmail 
         })
         .where(eq(attestationTokens.id, tokenRecord.id));
     }
@@ -401,14 +423,14 @@ router.delete('/:tokenId', requireAuth, requireAdmin, async (req: Request, res: 
 /**
  * Generate HTML email content for attestation request
  */
-function generateAttestationEmail(
+function generateAttestationEmailForRecipient(
   regulation: any, 
-  user: any, 
+  recipientName: string, 
   attestationStatement: string,
   attestationPeriod: string | undefined,
   attestationUrl: string
 ): string {
-  const firstName = user.firstName || user.email.split('@')[0];
+  const firstName = recipientName;
   const periodText = attestationPeriod ? ` for ${attestationPeriod}` : '';
   
   return `

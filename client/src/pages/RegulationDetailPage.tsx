@@ -475,7 +475,9 @@ function RegulationDetailPage() {
       updatedAction.completedBy = {
         userId: user.id,
         username: user.username,
-        fullName
+        fullName,
+        email: user.email,
+        completedAt: now.toISOString()
       };
       updatedAction.completedAt = now;
       updatedAction.completedDate = now;
@@ -816,6 +818,12 @@ function RegulationDetailPage() {
                 .filter(d => d.status === 'pending')
                 .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0];
               
+              // Find the attestation action and who completed it (DRI signature)
+              const attestationAction = regulation.actions?.find(a => a.type === 'attestation');
+              const attestedBy = attestationAction?.status === 'completed' && attestationAction?.completedBy 
+                ? attestationAction.completedBy 
+                : null;
+              
               return (
                 <div className={`rounded-xl border-2 p-6 mb-6 ${
                   complianceStatus.color === 'red' ? 'bg-red-50 border-red-300' :
@@ -872,6 +880,70 @@ function RegulationDetailPage() {
                       </Button>
                     )}
                   </div>
+                  
+                  {/* DRI Attestation Signature - Prominent display of who attested */}
+                  {attestedBy ? (
+                    <div className="bg-white/80 rounded-lg p-4 mb-4 border border-green-200 flex items-center gap-4">
+                      <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0">
+                        <FileCheck className="h-6 w-6 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs text-green-700 font-semibold uppercase tracking-wide">Attested by (Directly Responsible Individual)</p>
+                        <p className="text-xl font-bold text-slate-800">
+                          {attestedBy.fullName || attestedBy.username || attestedBy.email || 'Unknown'}
+                        </p>
+                        {attestedBy.email && attestedBy.fullName && (
+                          <p className="text-sm text-gray-600">{attestedBy.email}</p>
+                        )}
+                        {attestedBy.completedAt ? (
+                          <p className="text-sm text-green-700 font-medium mt-1">
+                            Signed: {format(new Date(attestedBy.completedAt), "EEEE, MMMM d, yyyy 'at' h:mm:ss a")}
+                          </p>
+                        ) : attestationAction?.completedAt ? (
+                          <p className="text-sm text-green-700 font-medium mt-1">
+                            Signed: {format(new Date(attestationAction.completedAt), "EEEE, MMMM d, yyyy 'at' h:mm:ss a")}
+                          </p>
+                        ) : (
+                          <button
+                            onClick={() => attestationAction && handleActionStatusChange(attestationAction, 'completed')}
+                            className="text-sm text-amber-600 hover:text-amber-700 underline mt-1"
+                          >
+                            Click to update signature with full details
+                          </button>
+                        )}
+                      </div>
+                      {isAdmin && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="text-xs"
+                          onClick={() => attestationAction && handleActionStatusChange(attestationAction, 'completed')}
+                        >
+                          Re-attest
+                        </Button>
+                      )}
+                    </div>
+                  ) : attestationAction ? (
+                    <div className="bg-amber-50 rounded-lg p-4 mb-4 border border-amber-200 flex items-center gap-4">
+                      <div className="w-12 h-12 bg-amber-500 rounded-full flex items-center justify-center flex-shrink-0">
+                        <FileCheck className="h-6 w-6 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-xs text-amber-700 font-semibold uppercase tracking-wide">Attestation Required</p>
+                        <p className="text-base font-medium text-amber-800">No attestation on file</p>
+                        <p className="text-sm text-amber-600">A DRI must attest to institutional compliance</p>
+                      </div>
+                      <Button
+                        variant="default"
+                        size="sm"
+                        className="bg-amber-600 hover:bg-amber-700"
+                        onClick={() => handleActionStatusChange(attestationAction, 'completed')}
+                      >
+                        <FileCheck className="h-4 w-4 mr-1" />
+                        Attest Now
+                      </Button>
+                    </div>
+                  ) : null}
 
                   {/* Quick Actions Row */}
                   <div className="flex flex-wrap gap-2 mb-4">
@@ -910,7 +982,8 @@ function RegulationDetailPage() {
                             <FileText className="h-4 w-4" />
                           )}
                           {action.type.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
-                          {isAdmin && (
+                          {/* Attestation is always required - no toggle. Other actions can be toggled by admin */}
+                          {isAdmin && action.type !== 'attestation' && (
                             <Switch
                               checked={action.required}
                               onCheckedChange={(required) => {

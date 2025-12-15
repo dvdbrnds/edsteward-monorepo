@@ -1359,6 +1359,9 @@ export function registerRoutes(app: express.Application): Server {
           email: user.email,
           username: user.username,
           role: user.role,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          department: user.department,
           identityProvider: 'local'
         });
       });

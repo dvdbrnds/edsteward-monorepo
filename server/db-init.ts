@@ -2,7 +2,7 @@ import { db } from './config/database';
 import { sql } from 'drizzle-orm';
 import fs from 'fs';
 import path from 'path';
-import { getDatabaseStorage } from './services/database';
+// getDatabaseStorage removed - not needed for basic init
 import { hashPassword } from './auth';  // Import our new scrypt-based function
 
 export async function initializeDatabase() {
@@ -85,7 +85,7 @@ export async function initializeDatabase() {
       // Create your user account
       await db.execute(sql`
         INSERT INTO users (username, password, email, role, "firstName", "lastName", department)
-        VALUES ('dvdbrnds', ${dvdbrndSPassword}, 'dvdbrnds@moravian.edu', 'admin', 'David', 'Bernards', 'IT')
+        VALUES ('dvdbrnds', ${dvdbrndSPassword}, 'dvdbrnds@moravian.edu', 'admin', 'David', 'Brandes', 'IT')
       `);
 
       // Create test user from your exports
@@ -115,14 +115,14 @@ export async function initializeDatabase() {
           try {
             await db.execute(sql.raw(statement));
             successCount++;
-          } catch (error) {
+          } catch (_err) {
             // Continue on errors - some inserts might conflict
           }
         }
 
         console.log(`✅ Loaded ${successCount} records from exports`);
       }
-    } catch (error) {
+    } catch (_err) {
       console.log('⚠️ Could not load export data, continuing with basic setup');
     }
 

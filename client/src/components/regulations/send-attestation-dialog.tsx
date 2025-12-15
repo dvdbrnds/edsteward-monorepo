@@ -33,9 +33,7 @@ import {
   Mail,
   Send,
   AlertTriangle,
-  CheckCircle2,
   Loader2,
-  User,
   Calendar,
   Shield,
   Info,
@@ -53,7 +51,7 @@ interface User {
 
 interface SendAttestationDialogProps {
   open: boolean;
-  onOpenChange: (open: boolean) => void;
+  onOpenChange: (_open: boolean) => void;
   regulationId: number;
   regulationName: string;
   riskLevel?: string;
@@ -89,14 +87,16 @@ export function SendAttestationDialog({
   responsibleOfficeEmail,
 }: SendAttestationDialogProps) {
   const [selectedUserId, setSelectedUserId] = useState<number | null>(assignedUserId || null);
+  const [manualEmail, setManualEmail] = useState('');
+  const [useManualEmail, setUseManualEmail] = useState(false);
   const [attestationType, setAttestationType] = useState('annual');
   const [attestationPeriod, setAttestationPeriod] = useState('Annual 2025');
   const [attestationStatement, setAttestationStatement] = useState('');
   const [showPreview, setShowPreview] = useState(false);
 
   // Fetch users for the dropdown
-  const { data: usersData } = useQuery<{ users: User[] }>({
-    queryKey: ['/api/users'],
+  const { data: usersData } = useQuery<User[]>({
+    queryKey: ['/api/admin/users'],
     enabled: open,
   });
 
@@ -104,7 +104,7 @@ export function SendAttestationDialog({
   useEffect(() => {
     if (open && !attestationStatement) {
       setAttestationStatement(
-        `I confirm that ${responsibleOffice || 'my department'} is in compliance with all requirements of the ${regulationName} regulation.\n\n` +
+        `I, as the Directly Responsible Individual (DRI) for the ${regulationName} regulation, confirm that the institution is in compliance with all requirements.\n\n` +
         `Specifically, I attest that:\n` +
         `• All required policies and procedures are in place\n` +
         `• Staff have received required training\n` +
@@ -114,12 +114,31 @@ export function SendAttestationDialog({
     }
   }, [open, regulationName, responsibleOffice, attestationStatement]);
 
-  // Reset form when dialog opens
+  // Reset form and set default user when dialog opens
   useEffect(() => {
-    if (open) {
-      setSelectedUserId(assignedUserId || null);
+    if (open && usersData) {
+      // Priority: 1) assignedUserId, 2) user matching responsibleOfficeEmail, 3) null
+      if (assignedUserId) {
+        setSelectedUserId(assignedUserId);
+        setUseManualEmail(false);
+      } else if (responsibleOfficeEmail) {
+        const matchingUser = usersData.find(u => 
+          u.email?.toLowerCase() === responsibleOfficeEmail.toLowerCase()
+        );
+        if (matchingUser) {
+          setSelectedUserId(matchingUser.id);
+          setUseManualEmail(false);
+        } else {
+          // No matching user - use manual email with the responsible office email
+          setManualEmail(responsibleOfficeEmail);
+          setUseManualEmail(true);
+          setSelectedUserId(null);
+        }
+      } else {
+        setSelectedUserId(null);
+      }
     }
-  }, [open, assignedUserId]);
+  }, [open, assignedUserId, responsibleOfficeEmail, usersData]);
 
   // Send attestation mutation
   const sendMutation = useMutation({
@@ -130,7 +149,8 @@ export function SendAttestationDialog({
         credentials: 'include',
         body: JSON.stringify({
           regulationId,
-          userId: selectedUserId,
+          userId: useManualEmail ? null : selectedUserId,
+          email: useManualEmail ? manualEmail : undefined,
           attestationType,
           attestationPeriod,
           attestationStatement,
@@ -142,15 +162,18 @@ export function SendAttestationDialog({
       }
       return response.json();
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
+      const recipientEmail = useManualEmail ? manualEmail : selectedUser?.email;
       toast({
         title: 'Attestation Request Sent',
-        description: `Email sent to field officer. Token expires in 14 days.`,
+        description: `Email sent to ${recipientEmail}. Token expires in 14 days.`,
       });
       onOpenChange(false);
       // Reset form
       setAttestationStatement('');
       setShowPreview(false);
+      setManualEmail('');
+      setUseManualEmail(false);
     },
     onError: (error: Error) => {
       toast({
@@ -161,13 +184,22 @@ export function SendAttestationDialog({
     },
   });
 
-  const selectedUser = usersData?.users?.find(u => u.id === selectedUserId);
+  const selectedUser = usersData?.find(u => u.id === selectedUserId);
   const isHighRisk = riskLevel === 'high' || riskLevel === 'critical';
 
-  // Filter to compliance officers and admins
-  const eligibleUsers = usersData?.users?.filter(u => 
-    u.role === 'compliance_officer' || u.role === 'admin' || u.role === 'department_head'
-  ) || [];
+  // Show all users with emails - prioritize compliance officers and admins
+  const eligibleUsers = (usersData || [])
+    .filter(u => u.email) // Must have email
+    .sort((a, b) => {
+      // Sort compliance officers and admins first
+      const priority = (role: string) => {
+        if (role === 'compliance_officer') return 0;
+        if (role === 'admin') return 1;
+        if (role === 'department_head') return 2;
+        return 3;
+      };
+      return priority(a.role) - priority(b.role);
+    });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -221,34 +253,60 @@ export function SendAttestationDialog({
 
           {/* Recipient Selection */}
           <div className="space-y-2">
-            <Label className="flex items-center gap-2">
-              <User className="h-4 w-4" />
-              Send To
-            </Label>
-            <Select
-              value={selectedUserId?.toString() || ''}
-              onValueChange={(value) => setSelectedUserId(parseInt(value))}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select a field officer..." />
-              </SelectTrigger>
-              <SelectContent>
-                {eligibleUsers.map((user) => (
-                  <SelectItem key={user.id} value={user.id.toString()}>
-                    <div className="flex items-center gap-2">
-                      <span>{user.firstName} {user.lastName}</span>
-                      <span className="text-muted-foreground text-xs">({user.email})</span>
-                      <Badge variant="outline" className="text-xs ml-auto">
-                        {user.role}
-                      </Badge>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {selectedUser && (
+            <div className="flex items-center justify-between">
+              <Label className="flex items-center gap-2">
+                <User className="h-4 w-4" />
+                Send To
+              </Label>
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id="manual-email"
+                  checked={useManualEmail}
+                  onCheckedChange={(checked) => {
+                    setUseManualEmail(checked === true);
+                    if (checked) setSelectedUserId(null);
+                  }}
+                />
+                <label htmlFor="manual-email" className="text-xs text-muted-foreground cursor-pointer">
+                  Enter email manually
+                </label>
+              </div>
+            </div>
+            
+            {useManualEmail ? (
+              <Input
+                type="email"
+                placeholder="Enter email address..."
+                value={manualEmail}
+                onChange={(e) => setManualEmail(e.target.value)}
+              />
+            ) : (
+              <Select
+                value={selectedUserId?.toString() || ''}
+                onValueChange={(value) => setSelectedUserId(parseInt(value))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a field officer..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {eligibleUsers.map((user) => (
+                    <SelectItem key={user.id} value={user.id.toString()}>
+                      <div className="flex items-center gap-2">
+                        <span>{user.firstName || user.username} {user.lastName || ''}</span>
+                        <span className="text-muted-foreground text-xs">({user.email})</span>
+                        <Badge variant="outline" className="text-xs ml-auto">
+                          {user.role}
+                        </Badge>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+            
+            {(selectedUser || (useManualEmail && manualEmail)) && (
               <p className="text-sm text-muted-foreground">
-                Email will be sent to: <span className="font-medium">{selectedUser.email}</span>
+                Email will be sent to: <span className="font-medium">{useManualEmail ? manualEmail : selectedUser?.email}</span>
               </p>
             )}
           </div>
@@ -322,18 +380,18 @@ export function SendAttestationDialog({
           </div>
 
           {/* Email Preview */}
-          {showPreview && selectedUser && (
+          {showPreview && (selectedUser || (useManualEmail && manualEmail)) && (
             <div className="bg-white border rounded-lg p-4 space-y-3">
               <div className="flex items-center gap-2 text-sm border-b pb-2">
                 <span className="font-medium">To:</span>
-                <span>{selectedUser.email}</span>
+                <span>{useManualEmail ? manualEmail : selectedUser?.email}</span>
               </div>
               <div className="flex items-center gap-2 text-sm border-b pb-2">
                 <span className="font-medium">Subject:</span>
                 <span>Action Required: {regulationName} Compliance Attestation</span>
               </div>
               <div className="text-sm whitespace-pre-wrap text-slate-700 bg-slate-50 p-3 rounded">
-                Dear {selectedUser.firstName || selectedUser.email.split('@')[0]},
+                Dear {useManualEmail ? manualEmail.split('@')[0] : (selectedUser?.firstName || selectedUser?.email?.split('@')[0])},
 
                 You are receiving this email because you are the designated Directly Responsible Individual (DRI) for the following regulation:
 
@@ -369,7 +427,12 @@ export function SendAttestationDialog({
           </Button>
           <Button
             onClick={() => sendMutation.mutate()}
-            disabled={!selectedUserId || !attestationStatement.trim() || sendMutation.isPending}
+            disabled={
+              (!useManualEmail && !selectedUserId) || 
+              (useManualEmail && !manualEmail.trim()) || 
+              !attestationStatement.trim() || 
+              sendMutation.isPending
+            }
             className="gap-2"
           >
             {sendMutation.isPending ? (
@@ -389,4 +452,5 @@ export function SendAttestationDialog({
     </Dialog>
   );
 }
+
 

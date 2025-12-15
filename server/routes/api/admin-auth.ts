@@ -18,7 +18,7 @@ const adminUsers = [
     id: 'admin-2', 
     email: 'dvdbrnds@gmail.com',
     password: 'admin123', // Simple password for development
-    name: 'David Brands',
+    name: 'David Brandes',
     role: 'super_admin' as const,
     permissions: ['*'],
     createdAt: new Date(),
@@ -93,7 +93,7 @@ function authenticateAdminToken(req: any, res: any, next: any) {
     const decoded = jwt.verify(token, process.env.ADMIN_JWT_SECRET || 'admin-secret-key') as any;
     req.adminUser = decoded;
     next();
-  } catch (error) {
+  } catch (_err) {
     return res.status(403).json({ message: 'Invalid or expired token' });
   }
 }

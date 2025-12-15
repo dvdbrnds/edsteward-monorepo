@@ -28,7 +28,7 @@ async function fixUserPassword() {
 
             await db.execute(sql`
         INSERT INTO users (username, password, email, role, "firstName", "lastName", department)
-        VALUES ('dvdbrnds', ${hashedPassword}, 'dvdbrnds@moravian.edu', 'admin', 'David', 'Bernards', 'IT')
+        VALUES ('dvdbrnds', ${hashedPassword}, 'dvdbrnds@moravian.edu', 'admin', 'David', 'Brandes', 'IT')
       `);
 
             console.log('✅ User dvdbrnds created successfully with scrypt password');

@@ -57,21 +57,18 @@ export interface RegulationAction {
 }
 
 // MCP Validation Levels
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+/* eslint-disable no-unused-vars */
 export enum ValidationLevel {
   // Basic structural validation
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   A = "A",
   // Content-level validation  
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   B = "B", 
   // Business rules validation
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   C = "C",
   // Contextual/cross-reference validation
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   D = "D"
 }
+/* eslint-enable no-unused-vars */
 
 // Export validation levels for external use to satisfy ESLint
 export const VALIDATION_LEVELS = {
@@ -280,11 +277,6 @@ export const regulations = pgTable("regulations", {
   // Escalation target (supervisor/VP for escalations)
   escalationTarget: text("escalation_target"),
   escalationEmail: text("escalation_email"),
-  // Risk level for email attestation eligibility
-  riskLevel: text("risk_level").default("medium"), // low, medium, high, critical
-  // Email attestation settings
-  emailAttestationEnabled: boolean("email_attestation_enabled").default(false),
-  attestationFrequency: text("attestation_frequency").default("annual"), // quarterly, annual, etc.
 });
 
 // Notifications table
@@ -318,41 +310,6 @@ export const guides = pgTable("guides", {
   lastUpdated: timestamp("last_updated").defaultNow(),
   createdBy: integer("created_by").notNull(),
 });
-
-// Risk levels for regulations (determines email attestation eligibility)
-export const RISK_LEVELS = ["low", "medium", "high", "critical"] as const;
-export type RiskLevel = typeof RISK_LEVELS[number];
-
-// Attestation token types
-export const ATTESTATION_TYPES = ["quarterly", "annual", "incident", "ad_hoc"] as const;
-export type AttestationType = typeof ATTESTATION_TYPES[number];
-
-// Attestation tokens table for one-click email attestations
-export const attestationTokens = pgTable("attestation_tokens", {
-  id: serial("id").primaryKey(),
-  token: text("token").notNull().unique(),
-  regulationId: integer("regulation_id").notNull().references(() => regulations.id),
-  userId: integer("user_id").notNull().references(() => users.id),
-  attestationType: text("attestation_type").notNull().default("quarterly"),
-  // What the user is attesting to (shown on confirmation page)
-  attestationStatement: text("attestation_statement").notNull(),
-  // Period being attested (e.g., "Q4 2025", "Annual 2025")
-  attestationPeriod: text("attestation_period"),
-  // Token lifecycle
-  expiresAt: timestamp("expires_at").notNull(),
-  usedAt: timestamp("used_at"),
-  usedIp: text("used_ip"),
-  usedUserAgent: text("used_user_agent"),
-  // Tracking
-  emailSentAt: timestamp("email_sent_at"),
-  emailSentTo: text("email_sent_to"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  createdBy: integer("created_by").references(() => users.id), // Admin who triggered the attestation request
-});
-
-// Attestation token types
-export type AttestationToken = typeof attestationTokens.$inferSelect;
-export type InsertAttestationToken = typeof attestationTokens.$inferInsert;
 
 // Notes schema is already defined above
 
@@ -1000,6 +957,44 @@ export const insertAuditLogSchema = createInsertSchema(auditLogs).extend({
 // Add to the type exports
 export type AuditLog = typeof auditLogs.$inferSelect;
 export type InsertAuditLog = z.infer<typeof insertAuditLogSchema>;
+
+// ===== ATTESTATION TOKENS =====
+// Email-based attestation tokens for one-click compliance attestations
+export const attestationTokens = pgTable("attestation_tokens", {
+  id: serial("id").primaryKey(),
+  token: text("token").notNull().unique(),
+  regulationId: integer("regulation_id").notNull().references(() => regulations.id),
+  userId: integer("user_id").references(() => users.id), // May be null for manual email
+  email: text("email").notNull(), // Target email address
+  attestationType: text("attestation_type").notNull().default('annual'), // quarterly, annual, etc.
+  attestationStatement: text("attestation_statement").notNull(),
+  attestationPeriod: text("attestation_period"), // e.g., "Q4 2025", "FY 2025"
+  
+  // Token lifecycle
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  expiresAt: timestamp("expires_at").notNull(),
+  completedAt: timestamp("completed_at"), // null until used
+  
+  // Completion tracking
+  completedByName: text("completed_by_name"),
+  completedByEmail: text("completed_by_email"),
+  completedByIp: text("completed_by_ip"),
+  
+  // Metadata
+  sentBy: integer("sent_by").references(() => users.id), // Admin who sent the request
+  metadata: jsonb("metadata").$type<Record<string, any>>(),
+}, (table) => {
+  return {
+    tokenIdx: index("attestation_tokens_token_idx").on(table.token),
+    regulationIdIdx: index("attestation_tokens_regulation_id_idx").on(table.regulationId),
+    userIdIdx: index("attestation_tokens_user_id_idx").on(table.userId),
+    expiresAtIdx: index("attestation_tokens_expires_at_idx").on(table.expiresAt),
+  };
+});
+
+export const insertAttestationTokenSchema = createInsertSchema(attestationTokens);
+export type AttestationToken = typeof attestationTokens.$inferSelect;
+export type InsertAttestationToken = z.infer<typeof insertAttestationTokenSchema>;
 
 // ===== SINGLE-TENANT ARCHITECTURE =====
 // Single-tenant configuration is handled via environment variables and config files

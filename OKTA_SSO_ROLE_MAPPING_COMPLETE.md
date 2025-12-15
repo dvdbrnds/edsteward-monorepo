@@ -82,8 +82,8 @@ When users log in via SSO, the server logs show:
   email: 'brandesd@moravian.edu',
   nameID: '00u123abc...',
   firstName: 'David',
-  lastName: 'Brands',
-  displayName: 'David Brands',
+  lastName: 'Brandes',
+  displayName: 'David Brandes',
   groups: ['EdSteward-Admin'],              // ← From Okta
   mappedRoles: ['admin'],                   // ← Mapped role
   primaryRole: 'admin'                      // ← Assigned role

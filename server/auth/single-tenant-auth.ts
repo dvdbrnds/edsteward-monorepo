@@ -28,7 +28,7 @@ export function configureAuth(app: Express): void {
         passwordField: 'password',
       },
        
-      async (username: string, password: string, done: (error: unknown, user?: unknown, info?: unknown) => void) => {
+      async (username: string, password: string, done: (_error: unknown, _user?: unknown, _info?: unknown) => void) => {
         try {
           const storage = getDatabaseStorage();
           const user = await storage.getUserByUsername(username, undefined);
@@ -88,7 +88,7 @@ export function configureAuth(app: Express): void {
         identifierFormat: 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress',
       },
        
-      async (profile: unknown, done: (error: unknown, user?: unknown, info?: unknown) => void) => {
+      async (profile: unknown, done: (_error: unknown, _user?: unknown, _info?: unknown) => void) => {
         try {
           const storage = getDatabaseStorage();
           const samlProfile = profile as Record<string, unknown>;
@@ -143,18 +143,22 @@ export function configureAuth(app: Express): void {
             }, undefined);
             console.log('🔐 New user created with roles:', mappedRoles);
           } else if (user) {
-            // Update existing user's role based on current Okta groups
-            console.log('🔐 Updating existing user role from', user.role, 'to', primaryRole);
+            // Update existing user's data from Okta on each login (Okta is source of truth)
+            console.log('🔐 Updating existing user from Okta. Role:', user.role, '→', primaryRole);
+            console.log('🔐 Name from Okta:', samlProfile.firstName, samlProfile.lastName);
             await storage.updateUser(user.id, {
               role: primaryRole,
               roles: JSON.stringify(mappedRoles),
+              // Always sync name from Okta - Okta is the source of truth
+              firstName: (samlProfile.firstName || samlProfile.displayName || user.firstName || '') as string,
+              lastName: (samlProfile.lastName || user.lastName || '') as string,
               identityProvider: 'saml',
               lastLogin: new Date(),
             }, undefined);
             
-            // Refresh user object with updated role
+            // Refresh user object with updated data
             user = await storage.getUserByEmail(email, undefined);
-            console.log('🔐 User roles updated to:', mappedRoles);
+            console.log('🔐 User synced from Okta:', { roles: mappedRoles, firstName: user?.firstName, lastName: user?.lastName });
           }
 
           if (!user) {
@@ -178,7 +182,7 @@ export function configureAuth(app: Express): void {
   });
 
    
-  passport.deserializeUser(async (id: string, done: (error: unknown, user?: unknown) => void) => {
+  passport.deserializeUser(async (id: string, done: (_error: unknown, _user?: unknown) => void) => {
     try {
       const storage = getDatabaseStorage();
       let user = await storage.getUser(parseInt(id, 10), undefined);

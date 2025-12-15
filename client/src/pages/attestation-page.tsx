@@ -11,7 +11,7 @@
  * 4. A confirm button
  */
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams } from 'wouter';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
@@ -257,16 +257,27 @@ export default function AttestationPage() {
           </CardHeader>
           
           <CardContent className="pt-6 space-y-6">
-            {/* Attestation Details */}
-            <div className="grid grid-cols-2 gap-4 text-sm">
-              <div>
-                <span className="text-muted-foreground">Attesting as:</span>
-                <p className="font-medium">{attestation.user.name}</p>
-                <p className="text-muted-foreground text-xs">{attestation.user.email}</p>
+            {/* DRI Signature Block - Prominent display of who is attesting */}
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-5 border-2 border-blue-200">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+                  <Shield className="h-6 w-6 text-white" />
+                </div>
+                <div>
+                  <p className="text-xs text-blue-600 font-semibold uppercase tracking-wide">Directly Responsible Individual</p>
+                  <p className="text-xl font-bold text-slate-800">{attestation.user.name}</p>
+                  <p className="text-sm text-muted-foreground">{attestation.user.email}</p>
+                </div>
               </div>
-              <div>
-                <span className="text-muted-foreground">Period:</span>
-                <p className="font-medium">{attestation.attestationPeriod || 'Current Period'}</p>
+              <div className="flex items-center gap-4 text-sm pt-2 border-t border-blue-200">
+                <div>
+                  <span className="text-muted-foreground">Period:</span>
+                  <span className="font-medium ml-1">{attestation.attestationPeriod || 'Current Period'}</span>
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Type:</span>
+                  <span className="font-medium ml-1">{attestation.attestationType}</span>
+                </div>
               </div>
             </div>
 
@@ -289,8 +300,8 @@ export default function AttestationPage() {
                 <p>By confirming this attestation, you acknowledge that:</p>
                 <ul className="list-disc list-inside space-y-1 ml-2">
                   <li>You have reviewed the compliance requirements for this regulation</li>
-                  <li>Your area of responsibility is in compliance with all applicable requirements</li>
-                  <li>You are authorized to make this attestation on behalf of your department</li>
+                  <li>The institution is in compliance with all applicable requirements</li>
+                  <li>You are authorized as the DRI to make this attestation on behalf of the institution</li>
                   <li>This attestation will be recorded and may be subject to audit</li>
                   <li>False attestation may result in disciplinary action</li>
                 </ul>
@@ -371,4 +382,5 @@ export default function AttestationPage() {
     </div>
   );
 }
+
 
