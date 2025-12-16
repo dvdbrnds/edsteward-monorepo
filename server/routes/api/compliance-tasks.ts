@@ -6,6 +6,7 @@
  */
 
 import { Router, Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
 import { db } from '../../db';
 import { complianceTasks, taskEvidence, taskActivity, users, regulations } from '@shared/schema';
 import { eq, desc, asc } from 'drizzle-orm';
@@ -13,6 +14,10 @@ import { alias } from 'drizzle-orm/pg-core';
 import { requireAuth, requireAdmin } from '../../middleware/role-based-auth';
 import { emailService } from '../../services/email';
 import { getCleryTasksWithDates, getCleryTaskCount } from '../../templates/clery-act-tasks';
+
+// JWT secret for task tokens (use same as attestation or a dedicated one)
+const TASK_TOKEN_SECRET = process.env.ATTESTATION_JWT_SECRET || process.env.JWT_SECRET || 'edsteward-task-secret-key';
+const TASK_TOKEN_EXPIRY = '14d'; // 14 days
 
 // Alias for the users table to join twice (assignedTo and completedBy)
 const completedByUsers = alias(users, 'completedByUsers');
@@ -760,6 +765,760 @@ router.get('/templates', requireAuth, async (_req: Request, res: Response) => {
   } catch (error) {
     console.error('Error fetching templates:', error);
     res.status(500).json({ error: 'Failed to fetch templates' });
+  }
+});
+
+// ===== EVIDENCE ENDPOINTS =====
+
+/**
+ * GET /api/compliance-tasks/:taskId/evidence
+ * Get all evidence for a specific task
+ */
+router.get('/:taskId/evidence', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const taskId = parseInt(req.params.taskId);
+    
+    if (isNaN(taskId)) {
+      return res.status(400).json({ error: 'Invalid task ID' });
+    }
+
+    // Alias for uploaded by user
+    const uploadedByUsers = alias(users, 'uploadedByUsers');
+
+    const evidenceList = await db
+      .select({
+        id: taskEvidence.id,
+        taskId: taskEvidence.taskId,
+        fileName: taskEvidence.fileName,
+        fileType: taskEvidence.fileType,
+        fileSize: taskEvidence.fileSize,
+        fileUrl: taskEvidence.fileUrl,
+        linkUrl: taskEvidence.linkUrl,
+        linkTitle: taskEvidence.linkTitle,
+        description: taskEvidence.description,
+        uploadedBy: taskEvidence.uploadedBy,
+        createdAt: taskEvidence.createdAt,
+        uploadedByUser: {
+          id: uploadedByUsers.id,
+          username: uploadedByUsers.username,
+          email: uploadedByUsers.email,
+          firstName: uploadedByUsers.firstName,
+          lastName: uploadedByUsers.lastName,
+        },
+      })
+      .from(taskEvidence)
+      .leftJoin(uploadedByUsers, eq(taskEvidence.uploadedBy, uploadedByUsers.id))
+      .where(eq(taskEvidence.taskId, taskId))
+      .orderBy(desc(taskEvidence.createdAt));
+
+    res.json(evidenceList);
+  } catch (error) {
+    console.error('Error fetching task evidence:', error);
+    res.status(500).json({ error: 'Failed to fetch evidence' });
+  }
+});
+
+/**
+ * POST /api/compliance-tasks/:taskId/evidence
+ * Upload evidence for a task (file or link)
+ */
+router.post('/:taskId/evidence', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const taskId = parseInt(req.params.taskId);
+    
+    if (isNaN(taskId)) {
+      return res.status(400).json({ error: 'Invalid task ID' });
+    }
+
+    // Check if task exists
+    const task = await db.select().from(complianceTasks).where(eq(complianceTasks.id, taskId)).limit(1);
+    if (task.length === 0) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    let fileName = '';
+    let fileType = null;
+    let fileSize = null;
+    let fileUrl = null;
+    let linkUrl = null;
+    let linkTitle = null;
+    let description = '';
+
+    // Check content type
+    const contentType = req.headers['content-type'] || '';
+    
+    if (contentType.includes('multipart/form-data')) {
+      // Handle file upload using busboy
+      const busboy = await import('busboy');
+      const bb = busboy.default({ headers: req.headers });
+      
+      const uploadPromise = new Promise<{
+        fileName: string;
+        fileType: string;
+        fileSize: number;
+        fileUrl: string;
+        description: string;
+        linkUrl?: string;
+        linkTitle?: string;
+      }>((resolve, reject) => {
+        let uploadedFileName = '';
+        let uploadedFileType = '';
+        let uploadedFileSize = 0;
+        let uploadedFileUrl = '';
+        let uploadedDescription = '';
+        let uploadedLinkUrl = '';
+        let uploadedLinkTitle = '';
+        const chunks: Buffer[] = [];
+
+        bb.on('field', (name: string, val: string) => {
+          if (name === 'description') uploadedDescription = val;
+          if (name === 'linkUrl') uploadedLinkUrl = val;
+          if (name === 'linkTitle') uploadedLinkTitle = val;
+        });
+
+        bb.on('file', (_name: string, file: import('stream').Readable, info: { filename: string; encoding: string; mimeType: string }) => {
+          uploadedFileName = info.filename;
+          uploadedFileType = info.mimeType;
+
+          file.on('data', (data: Buffer) => {
+            chunks.push(data);
+            uploadedFileSize += data.length;
+          });
+
+          file.on('end', async () => {
+            // Store file locally in uploads directory
+            const fs = await import('fs/promises');
+            const path = await import('path');
+            
+            const uploadsDir = path.join(process.cwd(), 'uploads', 'evidence');
+            await fs.mkdir(uploadsDir, { recursive: true });
+
+            // Generate unique filename
+            const uniqueName = `${Date.now()}-${Math.random().toString(36).substring(7)}-${uploadedFileName}`;
+            const filePath = path.join(uploadsDir, uniqueName);
+            
+            await fs.writeFile(filePath, Buffer.concat(chunks));
+            uploadedFileUrl = `/uploads/evidence/${uniqueName}`;
+          });
+        });
+
+        bb.on('close', () => {
+          resolve({
+            fileName: uploadedFileName || uploadedLinkTitle || 'Link',
+            fileType: uploadedFileType,
+            fileSize: uploadedFileSize,
+            fileUrl: uploadedFileUrl,
+            description: uploadedDescription,
+            linkUrl: uploadedLinkUrl,
+            linkTitle: uploadedLinkTitle,
+          });
+        });
+
+        bb.on('error', reject);
+        req.pipe(bb);
+      });
+
+      const uploadData = await uploadPromise;
+      fileName = uploadData.fileName;
+      fileType = uploadData.fileType || null;
+      fileSize = uploadData.fileSize || null;
+      fileUrl = uploadData.fileUrl || null;
+      linkUrl = uploadData.linkUrl || null;
+      linkTitle = uploadData.linkTitle || null;
+      description = uploadData.description || '';
+
+    } else {
+      // Handle JSON body (for link submissions)
+      const body = req.body;
+      if (body.linkUrl) {
+        linkUrl = body.linkUrl;
+        linkTitle = body.linkTitle || body.linkUrl;
+        fileName = body.linkTitle || 'Link';
+        description = body.description || '';
+      } else {
+        return res.status(400).json({ error: 'No file or link provided' });
+      }
+    }
+
+    // Insert evidence record
+    const [newEvidence] = await db.insert(taskEvidence).values({
+      taskId,
+      fileName,
+      fileType,
+      fileSize,
+      fileUrl,
+      linkUrl,
+      linkTitle,
+      description,
+      uploadedBy: req.user!.id,
+    }).returning();
+
+    // Log activity
+    await db.insert(taskActivity).values({
+      taskId,
+      userId: req.user!.id,
+      activityType: 'evidence_uploaded',
+      content: `Uploaded evidence: ${fileName}`,
+    });
+
+    res.status(201).json(newEvidence);
+  } catch (error) {
+    console.error('Error uploading evidence:', error);
+    res.status(500).json({ error: 'Failed to upload evidence' });
+  }
+});
+
+/**
+ * DELETE /api/compliance-tasks/:taskId/evidence/:evidenceId
+ * Delete evidence from a task
+ */
+router.delete('/:taskId/evidence/:evidenceId', requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const taskId = parseInt(req.params.taskId);
+    const evidenceId = parseInt(req.params.evidenceId);
+    
+    if (isNaN(taskId) || isNaN(evidenceId)) {
+      return res.status(400).json({ error: 'Invalid IDs' });
+    }
+
+    // Get evidence to delete (for file cleanup and logging)
+    const existingEvidence = await db
+      .select()
+      .from(taskEvidence)
+      .where(eq(taskEvidence.id, evidenceId))
+      .limit(1);
+
+    if (existingEvidence.length === 0) {
+      return res.status(404).json({ error: 'Evidence not found' });
+    }
+
+    // Delete file if exists
+    if (existingEvidence[0].fileUrl) {
+      try {
+        const fs = await import('fs/promises');
+        const path = await import('path');
+        const filePath = path.join(process.cwd(), existingEvidence[0].fileUrl);
+        await fs.unlink(filePath);
+      } catch (e) {
+        console.warn('Could not delete file:', e);
+      }
+    }
+
+    // Delete evidence record
+    await db.delete(taskEvidence).where(eq(taskEvidence.id, evidenceId));
+
+    // Log activity
+    await db.insert(taskActivity).values({
+      taskId,
+      userId: req.user!.id,
+      activityType: 'comment',
+      content: `Deleted evidence: ${existingEvidence[0].fileName}`,
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting evidence:', error);
+    res.status(500).json({ error: 'Failed to delete evidence' });
+  }
+});
+
+// ===== ACTIVITY ENDPOINTS =====
+
+/**
+ * GET /api/compliance-tasks/:taskId/activity
+ * Get activity log for a specific task
+ */
+router.get('/:taskId/activity', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const taskId = parseInt(req.params.taskId);
+    
+    if (isNaN(taskId)) {
+      return res.status(400).json({ error: 'Invalid task ID' });
+    }
+
+    // Alias for activity user
+    const activityUsers = alias(users, 'activityUsers');
+
+    const activityList = await db
+      .select({
+        id: taskActivity.id,
+        taskId: taskActivity.taskId,
+        userId: taskActivity.userId,
+        activityType: taskActivity.activityType,
+        content: taskActivity.content,
+        previousValue: taskActivity.previousValue,
+        newValue: taskActivity.newValue,
+        createdAt: taskActivity.createdAt,
+        user: {
+          id: activityUsers.id,
+          username: activityUsers.username,
+          email: activityUsers.email,
+          firstName: activityUsers.firstName,
+          lastName: activityUsers.lastName,
+        },
+      })
+      .from(taskActivity)
+      .leftJoin(activityUsers, eq(taskActivity.userId, activityUsers.id))
+      .where(eq(taskActivity.taskId, taskId))
+      .orderBy(desc(taskActivity.createdAt));
+
+    res.json(activityList);
+  } catch (error) {
+    console.error('Error fetching task activity:', error);
+    res.status(500).json({ error: 'Failed to fetch activity' });
+  }
+});
+
+/**
+ * POST /api/compliance-tasks/:taskId/activity
+ * Add activity (comment) to a task
+ */
+router.post('/:taskId/activity', requireAuth, async (req: Request, res: Response) => {
+  try {
+    const taskId = parseInt(req.params.taskId);
+    
+    if (isNaN(taskId)) {
+      return res.status(400).json({ error: 'Invalid task ID' });
+    }
+
+    const { activityType, content } = req.body;
+
+    if (!activityType || !content) {
+      return res.status(400).json({ error: 'Activity type and content are required' });
+    }
+
+    const [newActivity] = await db.insert(taskActivity).values({
+      taskId,
+      userId: req.user!.id,
+      activityType,
+      content,
+    }).returning();
+
+    res.status(201).json(newActivity);
+  } catch (error) {
+    console.error('Error adding activity:', error);
+    res.status(500).json({ error: 'Failed to add activity' });
+  }
+});
+
+// ===== TASK EMAIL LINK ENDPOINTS =====
+
+interface TaskTokenPayload {
+  taskId: number;
+  userId: number;
+  regulationId: number;
+  type: 'task_access';
+  iat?: number;
+  exp?: number;
+}
+
+/**
+ * POST /api/compliance-tasks/:taskId/generate-link
+ * Generate a secure link for task completion via email
+ */
+router.post('/:taskId/generate-link', requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const taskId = parseInt(req.params.taskId);
+    const { userId } = req.body;
+    
+    if (isNaN(taskId)) {
+      return res.status(400).json({ error: 'Invalid task ID' });
+    }
+
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID is required' });
+    }
+
+    // Get task details
+    const task = await db
+      .select({
+        id: complianceTasks.id,
+        title: complianceTasks.title,
+        regulationId: complianceTasks.regulationId,
+      })
+      .from(complianceTasks)
+      .where(eq(complianceTasks.id, taskId))
+      .limit(1);
+
+    if (task.length === 0) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    // Get user details
+    const user = await db
+      .select({
+        id: users.id,
+        email: users.email,
+        firstName: users.firstName,
+        lastName: users.lastName,
+      })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+
+    if (user.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Generate JWT token
+    const payload: TaskTokenPayload = {
+      taskId,
+      userId,
+      regulationId: task[0].regulationId,
+      type: 'task_access',
+    };
+
+    const token = jwt.sign(payload, TASK_TOKEN_SECRET, { expiresIn: TASK_TOKEN_EXPIRY });
+
+    // Build the task URL
+    const baseUrl = process.env.APP_URL || `http://${req.headers.host}`;
+    const taskUrl = `${baseUrl}/task/${token}`;
+
+    res.json({
+      success: true,
+      taskUrl,
+      token,
+      expiresIn: TASK_TOKEN_EXPIRY,
+      task: task[0],
+      user: user[0],
+    });
+  } catch (error) {
+    console.error('Error generating task link:', error);
+    res.status(500).json({ error: 'Failed to generate task link' });
+  }
+});
+
+/**
+ * POST /api/compliance-tasks/:taskId/send-task-email
+ * Send a task assignment/reminder email with a direct link
+ */
+router.post('/:taskId/send-task-email', requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const taskId = parseInt(req.params.taskId);
+    const { userId, subject, message, emailType = 'assignment' } = req.body;
+    
+    if (isNaN(taskId)) {
+      return res.status(400).json({ error: 'Invalid task ID' });
+    }
+
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID is required' });
+    }
+
+    // Get task details with regulation
+    const taskWithRegulation = await db
+      .select({
+        id: complianceTasks.id,
+        title: complianceTasks.title,
+        description: complianceTasks.description,
+        instructions: complianceTasks.instructions,
+        dueDate: complianceTasks.dueDate,
+        priority: complianceTasks.priority,
+        evidenceRequired: complianceTasks.evidenceRequired,
+        regulationId: complianceTasks.regulationId,
+        regulationName: regulations.name,
+      })
+      .from(complianceTasks)
+      .leftJoin(regulations, eq(complianceTasks.regulationId, regulations.id))
+      .where(eq(complianceTasks.id, taskId))
+      .limit(1);
+
+    if (taskWithRegulation.length === 0) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    const task = taskWithRegulation[0];
+
+    // Get user details
+    const user = await db
+      .select({
+        id: users.id,
+        email: users.email,
+        firstName: users.firstName,
+        lastName: users.lastName,
+        username: users.username,
+      })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+
+    if (user.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const recipient = user[0];
+
+    // Generate JWT token for direct access
+    const payload: TaskTokenPayload = {
+      taskId,
+      userId,
+      regulationId: task.regulationId,
+      type: 'task_access',
+    };
+
+    const token = jwt.sign(payload, TASK_TOKEN_SECRET, { expiresIn: TASK_TOKEN_EXPIRY });
+
+    // Build the task URL
+    const baseUrl = process.env.APP_URL || `http://${req.headers.host}`;
+    const taskUrl = `${baseUrl}/task/${token}`;
+
+    // Build email content
+    const recipientName = recipient.firstName && recipient.lastName 
+      ? `${recipient.firstName} ${recipient.lastName}`
+      : recipient.username;
+
+    const emailSubject = subject || (emailType === 'nudge' 
+      ? `Reminder: ${task.title} - Action Required`
+      : `Task Assignment: ${task.title}`);
+
+    const dueDateText = task.dueDate 
+      ? `Due Date: ${new Date(task.dueDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`
+      : 'No due date specified';
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      </head>
+      <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
+        <div style="background: linear-gradient(135deg, #1e3a5f 0%, #2c5282 100%); padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+          <h1 style="color: white; margin: 0; font-size: 24px;">Compliance Task ${emailType === 'nudge' ? 'Reminder' : 'Assignment'}</h1>
+        </div>
+        
+        <div style="background: #f8f9fa; padding: 30px; border: 1px solid #e9ecef; border-top: none;">
+          <p style="margin-top: 0;">Dear ${recipientName},</p>
+          
+          ${message ? `<p>${message}</p>` : ''}
+          
+          <div style="background: white; border: 1px solid #e9ecef; border-radius: 8px; padding: 20px; margin: 20px 0;">
+            <h2 style="margin-top: 0; color: #1e3a5f; font-size: 18px;">${task.title}</h2>
+            <p style="color: #666; margin-bottom: 10px;"><strong>Regulation:</strong> ${task.regulationName}</p>
+            <p style="color: #666; margin-bottom: 10px;"><strong>${dueDateText}</strong></p>
+            <p style="color: #666; margin-bottom: 10px;"><strong>Priority:</strong> <span style="text-transform: capitalize;">${task.priority}</span></p>
+            ${task.evidenceRequired ? '<p style="color: #b45309; margin-bottom: 10px;">📎 Evidence upload required</p>' : ''}
+            ${task.description ? `<p style="color: #666;">${task.description}</p>` : ''}
+          </div>
+          
+          <div style="text-align: center; margin: 30px 0;">
+            <a href="${taskUrl}" style="display: inline-block; background: #1e3a5f; color: white; padding: 14px 28px; text-decoration: none; border-radius: 6px; font-weight: 600;">
+              View & Complete Task
+            </a>
+          </div>
+          
+          <p style="font-size: 12px; color: #666;">
+            This link will expire in 14 days. If you have questions about this task, please contact your compliance officer.
+          </p>
+        </div>
+        
+        <div style="text-align: center; padding: 20px; color: #666; font-size: 12px;">
+          <p>EdSteward Compliance Management Platform</p>
+        </div>
+      </body>
+      </html>
+    `;
+
+    // Send email
+    await emailService.sendEmail({
+      to: recipient.email,
+      subject: emailSubject,
+      html: htmlContent,
+    });
+
+    // Log activity
+    await db.insert(taskActivity).values({
+      taskId,
+      userId: req.user!.id,
+      activityType: emailType === 'nudge' ? 'nudge' : 'comment',
+      content: `${emailType === 'nudge' ? 'Sent reminder' : 'Sent task assignment'} email to ${recipientName} (${recipient.email})`,
+    });
+
+    res.json({
+      success: true,
+      message: `Email sent to ${recipient.email}`,
+    });
+  } catch (error) {
+    console.error('Error sending task email:', error);
+    res.status(500).json({ error: 'Failed to send email' });
+  }
+});
+
+/**
+ * GET /api/compliance-tasks/token/:token
+ * Verify a task token and return task details (no auth required)
+ */
+router.get('/token/:token', async (req: Request, res: Response) => {
+  try {
+    const { token } = req.params;
+
+    // Verify token
+    let payload: TaskTokenPayload;
+    try {
+      payload = jwt.verify(token, TASK_TOKEN_SECRET) as TaskTokenPayload;
+    } catch (e) {
+      if ((e as Error).name === 'TokenExpiredError') {
+        return res.status(401).json({ error: 'Token has expired', code: 'TOKEN_EXPIRED' });
+      }
+      return res.status(401).json({ error: 'Invalid token', code: 'INVALID_TOKEN' });
+    }
+
+    if (payload.type !== 'task_access') {
+      return res.status(401).json({ error: 'Invalid token type' });
+    }
+
+    // Get task details with regulation
+    const taskResult = await db
+      .select({
+        id: complianceTasks.id,
+        title: complianceTasks.title,
+        description: complianceTasks.description,
+        instructions: complianceTasks.instructions,
+        dueDate: complianceTasks.dueDate,
+        status: complianceTasks.status,
+        priority: complianceTasks.priority,
+        evidenceRequired: complianceTasks.evidenceRequired,
+        evidenceType: complianceTasks.evidenceType,
+        evidenceInstructions: complianceTasks.evidenceInstructions,
+        completedAt: complianceTasks.completedAt,
+        regulationId: complianceTasks.regulationId,
+        regulationName: regulations.name,
+        completedByUser: {
+          id: completedByUsers.id,
+          username: completedByUsers.username,
+          email: completedByUsers.email,
+          firstName: completedByUsers.firstName,
+          lastName: completedByUsers.lastName,
+        },
+      })
+      .from(complianceTasks)
+      .leftJoin(regulations, eq(complianceTasks.regulationId, regulations.id))
+      .leftJoin(completedByUsers, eq(complianceTasks.completedBy, completedByUsers.id))
+      .where(eq(complianceTasks.id, payload.taskId))
+      .limit(1);
+
+    if (taskResult.length === 0) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    // Get user details
+    const userResult = await db
+      .select({
+        id: users.id,
+        username: users.username,
+        email: users.email,
+        firstName: users.firstName,
+        lastName: users.lastName,
+      })
+      .from(users)
+      .where(eq(users.id, payload.userId))
+      .limit(1);
+
+    if (userResult.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.json({
+      task: taskResult[0],
+      user: userResult[0],
+      tokenValid: true,
+    });
+  } catch (error) {
+    console.error('Error verifying task token:', error);
+    res.status(500).json({ error: 'Failed to verify token' });
+  }
+});
+
+/**
+ * POST /api/compliance-tasks/token/:token/complete
+ * Complete a task using a valid token (no auth required)
+ */
+router.post('/token/:token/complete', async (req: Request, res: Response) => {
+  try {
+    const { token } = req.params;
+
+    // Verify token
+    let payload: TaskTokenPayload;
+    try {
+      payload = jwt.verify(token, TASK_TOKEN_SECRET) as TaskTokenPayload;
+    } catch (e) {
+      if ((e as Error).name === 'TokenExpiredError') {
+        return res.status(401).json({ error: 'Token has expired', code: 'TOKEN_EXPIRED' });
+      }
+      return res.status(401).json({ error: 'Invalid token', code: 'INVALID_TOKEN' });
+    }
+
+    if (payload.type !== 'task_access') {
+      return res.status(401).json({ error: 'Invalid token type' });
+    }
+
+    // Get current task status
+    const currentTask = await db
+      .select()
+      .from(complianceTasks)
+      .where(eq(complianceTasks.id, payload.taskId))
+      .limit(1);
+
+    if (currentTask.length === 0) {
+      return res.status(404).json({ error: 'Task not found' });
+    }
+
+    if (currentTask[0].status === 'completed') {
+      return res.status(400).json({ error: 'Task is already completed' });
+    }
+
+    // Get user for activity log
+    const user = await db
+      .select({
+        id: users.id,
+        username: users.username,
+        email: users.email,
+        firstName: users.firstName,
+        lastName: users.lastName,
+      })
+      .from(users)
+      .where(eq(users.id, payload.userId))
+      .limit(1);
+
+    if (user.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Update task status
+    const [updatedTask] = await db
+      .update(complianceTasks)
+      .set({
+        status: 'completed',
+        completedAt: new Date(),
+        completedBy: payload.userId,
+        updatedAt: new Date(),
+      })
+      .where(eq(complianceTasks.id, payload.taskId))
+      .returning();
+
+    // Log activity
+    const userName = user[0].firstName && user[0].lastName
+      ? `${user[0].firstName} ${user[0].lastName}`
+      : user[0].username;
+
+    await db.insert(taskActivity).values({
+      taskId: payload.taskId,
+      userId: payload.userId,
+      activityType: 'status_change',
+      content: `Task completed via email link by ${userName}`,
+      previousValue: currentTask[0].status,
+      newValue: 'completed',
+    });
+
+    res.json({
+      success: true,
+      task: updatedTask,
+      completedBy: user[0],
+      completedAt: updatedTask.completedAt,
+    });
+  } catch (error) {
+    console.error('Error completing task via token:', error);
+    res.status(500).json({ error: 'Failed to complete task' });
   }
 });
 

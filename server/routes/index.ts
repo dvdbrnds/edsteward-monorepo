@@ -1479,6 +1479,9 @@ export function registerRoutes(app: express.Application): Server {
 
   // Serve static files
   app.use('/downloads', express.static(path.join(process.cwd(), 'public/downloads')));
+  
+  // Serve uploaded evidence files
+  app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
   // Serve branding assets
   const assetsPath = path.join(process.cwd(), 'client/public/assets');

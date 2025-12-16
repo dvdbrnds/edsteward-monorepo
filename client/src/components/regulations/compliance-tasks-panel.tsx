@@ -31,7 +31,6 @@ import {
   Calendar,
   Loader2,
   Plus,
-  Sparkles,
   PenLine,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -57,6 +56,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+import { TaskDetailDialog } from './task-detail-dialog';
 
 interface ComplianceTask {
   id: number;
@@ -135,6 +135,7 @@ function TaskItem({
   onStatusChange, 
   onNudge, 
   onEscalate,
+  onTaskClick,
   depth = 0 
 }: { 
   task: ComplianceTask; 
@@ -142,6 +143,7 @@ function TaskItem({
   onStatusChange: (_id: number, _newStatus: string) => void;
   onNudge: (_taskToNudge: ComplianceTask) => void;
   onEscalate: (_taskToEscalate: ComplianceTask) => void;
+  onTaskClick: (_task: ComplianceTask) => void;
   depth?: number;
 }) {
   const [expanded, setExpanded] = useState(depth === 0);
@@ -195,12 +197,17 @@ function TaskItem({
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1">
-              <h4 className={cn(
-                "font-medium text-sm",
-                task.status === 'completed' && "line-through text-gray-500"
-              )}>
-                {task.title}
-              </h4>
+              <button 
+                onClick={() => onTaskClick(task)}
+                className="text-left w-full hover:text-blue-600 transition-colors"
+              >
+                <h4 className={cn(
+                  "font-medium text-sm",
+                  task.status === 'completed' && "line-through text-gray-500"
+                )}>
+                  {task.title}
+                </h4>
+              </button>
               {task.description && (
                 <p className="text-xs text-gray-600 mt-0.5 line-clamp-2">{task.description}</p>
               )}
@@ -316,6 +323,7 @@ function TaskItem({
               onStatusChange={onStatusChange}
               onNudge={onNudge}
               onEscalate={onEscalate}
+              onTaskClick={onTaskClick}
               depth={depth + 1}
             />
           ))}
@@ -327,12 +335,12 @@ function TaskItem({
 
 export function ComplianceTasksPanel({ regulationId, regulationName: _regulationName, isAdmin }: ComplianceTasksPanelProps) {
   const queryClient = useQueryClient();
+  const [selectedTask, setSelectedTask] = useState<ComplianceTask | null>(null);
   const [nudgeTask, setNudgeTask] = useState<ComplianceTask | null>(null);
   const [escalateTask, setEscalateTask] = useState<ComplianceTask | null>(null);
   const [nudgeMessage, setNudgeMessage] = useState('');
   const [escalateEmail, setEscalateEmail] = useState('');
   const [escalateMessage, setEscalateMessage] = useState('');
-  const [showApplyTemplate, setShowApplyTemplate] = useState(false);
 
   // Fetch tasks
   const { data, isLoading, error } = useQuery<TasksResponse>({
@@ -408,31 +416,6 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
     },
   });
 
-  // Apply template mutation
-  const applyTemplateMutation = useMutation({
-    mutationFn: async () => {
-      const response = await fetch(`/api/compliance-tasks/apply-template/clery/${regulationId}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ year: new Date().getFullYear() }),
-      });
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to apply template');
-      }
-      return response.json();
-    },
-    onSuccess: (data) => {
-      toast({ title: 'Template Applied', description: `${data.tasksCreated} tasks created` });
-      setShowApplyTemplate(false);
-      queryClient.invalidateQueries({ queryKey: ['compliance-tasks', regulationId] });
-    },
-    onError: (error: Error) => {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
-    },
-  });
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -466,12 +449,6 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
             </div>
           )}
         </div>
-        {isAdmin && hasNoTasks && (
-          <Button onClick={() => setShowApplyTemplate(true)} className="gap-2">
-            <Sparkles className="h-4 w-4" />
-            Apply Clery Template
-          </Button>
-        )}
         {isAdmin && !hasNoTasks && (
           <Button variant="outline" size="sm" className="gap-2">
             <Plus className="h-4 w-4" />
@@ -486,15 +463,9 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
           <FileText className="h-12 w-12 mx-auto text-gray-400 mb-4" />
           <h4 className="text-lg font-medium text-gray-700">No Compliance Tasks</h4>
           <p className="text-gray-500 mt-1 max-w-md mx-auto">
-            This regulation doesn't have any compliance tasks yet. 
-            {isAdmin && " Apply a template to get started with a pre-built checklist."}
+            This regulation doesn't have any compliance tasks defined yet.
+            Tasks are configured by the system administrator.
           </p>
-          {isAdmin && (
-            <Button onClick={() => setShowApplyTemplate(true)} className="mt-4 gap-2">
-              <Sparkles className="h-4 w-4" />
-              Apply Clery Act Template
-            </Button>
-          )}
         </div>
       ) : (
         /* Task List */
@@ -507,6 +478,7 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
               onStatusChange={(taskId, status) => updateStatusMutation.mutate({ taskId, status })}
               onNudge={setNudgeTask}
               onEscalate={setEscalateTask}
+              onTaskClick={setSelectedTask}
             />
           ))}
         </div>
@@ -604,61 +576,15 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
         </DialogContent>
       </Dialog>
 
-      {/* Apply Template Dialog */}
-      <Dialog open={showApplyTemplate} onOpenChange={setShowApplyTemplate}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Apply Clery Act Template</DialogTitle>
-            <DialogDescription>
-              This will create a comprehensive compliance checklist for the Clery Act with {37} tasks covering:
-            </DialogDescription>
-          </DialogHeader>
-          <div className="space-y-2 text-sm">
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-600" />
-              <span>Annual Security Report (ASR) publication</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-600" />
-              <span>Crime statistics collection and DOE submission</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-600" />
-              <span>Daily crime log maintenance</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-600" />
-              <span>Timely warning procedures</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-600" />
-              <span>Emergency notification testing</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-600" />
-              <span>Fire safety reporting (residential)</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-600" />
-              <span>VAWA compliance requirements</span>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowApplyTemplate(false)}>Cancel</Button>
-            <Button 
-              onClick={() => applyTemplateMutation.mutate()}
-              disabled={applyTemplateMutation.isPending}
-            >
-              {applyTemplateMutation.isPending ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-2" />
-              ) : (
-                <Sparkles className="h-4 w-4 mr-2" />
-              )}
-              Apply Template
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Task Detail Dialog */}
+      <TaskDetailDialog
+        task={selectedTask}
+        open={!!selectedTask}
+        onOpenChange={(open) => !open && setSelectedTask(null)}
+        regulationId={regulationId}
+        isAdmin={isAdmin}
+        onStatusChange={(taskId, status) => updateStatusMutation.mutate({ taskId, status })}
+      />
     </div>
   );
 }
