@@ -30,6 +30,7 @@ import DiffTestPage from "@/pages/diff-test-page";
 import TrusteesDashboard from "@/pages/trustees-dashboard";
 import AttestationPage from "@/pages/attestation-page";
 import TaskPage from "@/pages/task-page";
+import TaskAnalyticsPage from "@/pages/task-analytics-page";
 import { ProtectedRoute } from "./lib/protected-route";
 import { ProtectedRegulationRoute } from "./lib/protected-regulation-route";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
@@ -99,6 +100,7 @@ export default function App() {
                 component={ComplianceWizardPage}
               />
               <ProtectedRoute path="/reports" component={ReportsPage} />
+              <ProtectedRoute path="/task-analytics" component={TaskAnalyticsPage} />
               <ProtectedRoute path="/notifications" component={NotificationsPage} />
               
               {/* User Account Settings */}

@@ -1522,5 +1522,380 @@ router.post('/token/:token/complete', async (req: Request, res: Response) => {
   }
 });
 
+// ===== BULK OPERATIONS =====
+
+/**
+ * POST /api/compliance-tasks/bulk/assign
+ * Assign multiple tasks to a user (admin only)
+ */
+router.post('/bulk/assign', requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const { taskIds, userId, role } = req.body;
+
+    if (!taskIds || !Array.isArray(taskIds) || taskIds.length === 0) {
+      return res.status(400).json({ error: 'Task IDs array required' });
+    }
+
+    if (!userId && !role) {
+      return res.status(400).json({ error: 'Either userId or role required' });
+    }
+
+    // Verify user exists if userId provided
+    if (userId) {
+      const userResult = await db.select().from(users).where(eq(users.id, userId));
+      if (!userResult.length) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+    }
+
+    const updateData: Record<string, unknown> = { updatedAt: new Date() };
+    if (userId) updateData.assignedTo = userId;
+    if (role) updateData.assignedRole = role;
+
+    // Update all tasks
+    const updatedTasks = [];
+    for (const taskId of taskIds) {
+      const result = await db.update(complianceTasks)
+        .set(updateData)
+        .where(eq(complianceTasks.id, taskId))
+        .returning();
+      
+      if (result.length) {
+        updatedTasks.push(result[0]);
+        
+        // Log activity
+        await db.insert(taskActivity).values({
+          taskId,
+          userId: req.user!.id,
+          activityType: 'assignment',
+          content: `Bulk assigned to ${userId ? `user ${userId}` : `role "${role}"`}`,
+        });
+      }
+    }
+
+    res.json({
+      success: true,
+      updatedCount: updatedTasks.length,
+      tasks: updatedTasks,
+    });
+  } catch (error) {
+    console.error('Error bulk assigning tasks:', error);
+    res.status(500).json({ error: 'Failed to bulk assign tasks' });
+  }
+});
+
+/**
+ * POST /api/compliance-tasks/bulk/status
+ * Update status of multiple tasks (admin only)
+ */
+router.post('/bulk/status', requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const { taskIds, status } = req.body;
+
+    if (!taskIds || !Array.isArray(taskIds) || taskIds.length === 0) {
+      return res.status(400).json({ error: 'Task IDs array required' });
+    }
+
+    const validStatuses = ['pending', 'in_progress', 'completed', 'blocked'];
+    if (!status || !validStatuses.includes(status)) {
+      return res.status(400).json({ error: `Status must be one of: ${validStatuses.join(', ')}` });
+    }
+
+    const updateData: Record<string, unknown> = { 
+      status,
+      updatedAt: new Date(),
+    };
+    
+    // If completing, set completion data
+    if (status === 'completed') {
+      updateData.completedAt = new Date();
+      updateData.completedBy = req.user!.id;
+    } else {
+      // If un-completing, clear completion data
+      updateData.completedAt = null;
+      updateData.completedBy = null;
+    }
+
+    const updatedTasks = [];
+    for (const taskId of taskIds) {
+      // Get current status for logging
+      const currentTask = await db.select().from(complianceTasks).where(eq(complianceTasks.id, taskId));
+      
+      const result = await db.update(complianceTasks)
+        .set(updateData)
+        .where(eq(complianceTasks.id, taskId))
+        .returning();
+      
+      if (result.length) {
+        updatedTasks.push(result[0]);
+        
+        // Log activity
+        await db.insert(taskActivity).values({
+          taskId,
+          userId: req.user!.id,
+          activityType: 'status_change',
+          content: `Bulk status change`,
+          previousValue: currentTask[0]?.status,
+          newValue: status,
+        });
+      }
+    }
+
+    res.json({
+      success: true,
+      updatedCount: updatedTasks.length,
+      tasks: updatedTasks,
+    });
+  } catch (error) {
+    console.error('Error bulk updating task status:', error);
+    res.status(500).json({ error: 'Failed to bulk update task status' });
+  }
+});
+
+/**
+ * POST /api/compliance-tasks/bulk/notify
+ * Send notifications for multiple tasks (admin only)
+ */
+router.post('/bulk/notify', requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const { taskIds, notificationType = 'nudge' } = req.body;
+
+    if (!taskIds || !Array.isArray(taskIds) || taskIds.length === 0) {
+      return res.status(400).json({ error: 'Task IDs array required' });
+    }
+
+    const { sendImmediateTaskNotification } = await import('../../services/task-notifications');
+    
+    const results = {
+      sent: 0,
+      failed: 0,
+      errors: [] as string[],
+    };
+
+    for (const taskId of taskIds) {
+      try {
+        const success = await sendImmediateTaskNotification(taskId, notificationType);
+        if (success) {
+          results.sent++;
+        } else {
+          results.failed++;
+        }
+      } catch (error) {
+        results.failed++;
+        results.errors.push(`Task ${taskId}: ${error}`);
+      }
+    }
+
+    res.json({
+      success: true,
+      results,
+    });
+  } catch (error) {
+    console.error('Error bulk sending notifications:', error);
+    res.status(500).json({ error: 'Failed to bulk send notifications' });
+  }
+});
+
+// ===== TASK ANALYTICS =====
+
+/**
+ * GET /api/compliance-tasks/analytics
+ * Get task analytics/statistics (admin only)
+ */
+router.get('/analytics', requireAdmin, async (_req: Request, res: Response) => {
+  try {
+    const today = new Date();
+    
+    // Get all tasks
+    const allTasks = await db.select({
+      id: complianceTasks.id,
+      status: complianceTasks.status,
+      priority: complianceTasks.priority,
+      dueDate: complianceTasks.dueDate,
+      regulationId: complianceTasks.regulationId,
+      assignedRole: complianceTasks.assignedRole,
+      completedAt: complianceTasks.completedAt,
+      parentTaskId: complianceTasks.parentTaskId,
+    })
+    .from(complianceTasks);
+
+    // Get regulation names for grouping
+    const regulationsList = await db.select({
+      id: regulations.id,
+      name: regulations.name,
+    }).from(regulations);
+    
+    const regulationMap = new Map(regulationsList.map(r => [r.id, r.name]));
+
+    // Calculate overview stats
+    const total = allTasks.length;
+    const completed = allTasks.filter(t => t.status === 'completed').length;
+    const pending = allTasks.filter(t => t.status === 'pending').length;
+    const inProgress = allTasks.filter(t => t.status === 'in_progress').length;
+    const blocked = allTasks.filter(t => t.status === 'blocked').length;
+    
+    // Overdue tasks (due date passed, not completed)
+    const overdue = allTasks.filter(t => 
+      t.status !== 'completed' && 
+      t.dueDate && 
+      new Date(t.dueDate) < today
+    ).length;
+
+    // Due soon (next 7 days)
+    const nextWeek = new Date(today);
+    nextWeek.setDate(nextWeek.getDate() + 7);
+    const dueSoon = allTasks.filter(t => 
+      t.status !== 'completed' && 
+      t.dueDate && 
+      new Date(t.dueDate) >= today &&
+      new Date(t.dueDate) <= nextWeek
+    ).length;
+
+    // Parent vs sub-tasks
+    const parentTasks = allTasks.filter(t => !t.parentTaskId).length;
+    const subTasks = allTasks.filter(t => t.parentTaskId).length;
+
+    // By regulation
+    const byRegulation: Record<string, { total: number; completed: number; pending: number; overdue: number }> = {};
+    allTasks.forEach(t => {
+      const regName = regulationMap.get(t.regulationId) || `Regulation ${t.regulationId}`;
+      if (!byRegulation[regName]) {
+        byRegulation[regName] = { total: 0, completed: 0, pending: 0, overdue: 0 };
+      }
+      byRegulation[regName].total++;
+      if (t.status === 'completed') {
+        byRegulation[regName].completed++;
+      } else {
+        byRegulation[regName].pending++;
+        if (t.dueDate && new Date(t.dueDate) < today) {
+          byRegulation[regName].overdue++;
+        }
+      }
+    });
+
+    // By priority
+    const byPriority = {
+      critical: allTasks.filter(t => t.priority === 'critical').length,
+      high: allTasks.filter(t => t.priority === 'high').length,
+      medium: allTasks.filter(t => t.priority === 'medium').length,
+      low: allTasks.filter(t => t.priority === 'low').length,
+    };
+
+    // By assigned role (top 10)
+    const roleCount: Record<string, number> = {};
+    allTasks.forEach(t => {
+      const role = t.assignedRole || 'Unassigned';
+      roleCount[role] = (roleCount[role] || 0) + 1;
+    });
+    const byRole = Object.entries(roleCount)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 10)
+      .map(([role, count]) => ({ role, count }));
+
+    // Completion trend (last 30 days)
+    const thirtyDaysAgo = new Date(today);
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+    
+    const completedTasks = allTasks.filter(t => 
+      t.status === 'completed' && 
+      t.completedAt && 
+      new Date(t.completedAt) >= thirtyDaysAgo
+    );
+
+    // Group by day
+    const completionsByDay: Record<string, number> = {};
+    for (let i = 0; i < 30; i++) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      const key = date.toISOString().split('T')[0];
+      completionsByDay[key] = 0;
+    }
+    
+    completedTasks.forEach(t => {
+      if (t.completedAt) {
+        const key = new Date(t.completedAt).toISOString().split('T')[0];
+        if (completionsByDay[key] !== undefined) {
+          completionsByDay[key]++;
+        }
+      }
+    });
+
+    const completionTrend = Object.entries(completionsByDay)
+      .sort((a, b) => a[0].localeCompare(b[0]))
+      .map(([date, count]) => ({ date, count }));
+
+    res.json({
+      overview: {
+        total,
+        completed,
+        pending,
+        inProgress,
+        blocked,
+        overdue,
+        dueSoon,
+        parentTasks,
+        subTasks,
+        completionRate: total > 0 ? Math.round((completed / total) * 100) : 0,
+      },
+      byRegulation,
+      byPriority,
+      byRole,
+      completionTrend,
+    });
+  } catch (error) {
+    console.error('Error fetching task analytics:', error);
+    res.status(500).json({ error: 'Failed to fetch analytics' });
+  }
+});
+
+// ===== TASK NOTIFICATIONS =====
+
+/**
+ * POST /api/compliance-tasks/notifications/check
+ * Trigger task notification check (admin only)
+ * This would typically be called by a cron job
+ */
+router.post('/notifications/check', requireAdmin, async (_req: Request, res: Response) => {
+  try {
+    const { checkAndSendTaskNotifications } = await import('../../services/task-notifications');
+    const results = await checkAndSendTaskNotifications();
+    
+    res.json({
+      success: true,
+      results,
+    });
+  } catch (error) {
+    console.error('Error checking task notifications:', error);
+    res.status(500).json({ error: 'Failed to check task notifications' });
+  }
+});
+
+/**
+ * POST /api/compliance-tasks/:taskId/notify
+ * Send immediate notification for a specific task (admin only)
+ */
+router.post('/:taskId/notify', requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const taskId = parseInt(req.params.taskId);
+    const { type = 'nudge' } = req.body;
+    
+    if (isNaN(taskId)) {
+      return res.status(400).json({ error: 'Invalid task ID' });
+    }
+
+    const { sendImmediateTaskNotification } = await import('../../services/task-notifications');
+    const success = await sendImmediateTaskNotification(taskId, type);
+    
+    if (success) {
+      res.json({ success: true, message: 'Notification sent' });
+    } else {
+      res.status(400).json({ error: 'Failed to send notification' });
+    }
+  } catch (error) {
+    console.error('Error sending task notification:', error);
+    res.status(500).json({ error: 'Failed to send notification' });
+  }
+});
+
 export default router;
 
