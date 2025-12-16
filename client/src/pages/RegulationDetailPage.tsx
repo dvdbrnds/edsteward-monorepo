@@ -155,6 +155,7 @@ import { EvidenceFiles } from "@/components/regulations/evidence-files";
 import { NotificationOverrideControl } from "@/components/regulations/notification-override-control";
 import { EscalateIssueDialog } from "@/components/regulations/escalate-issue-dialog";
 import { SendAttestationDialog } from "@/components/regulations/send-attestation-dialog";
+import { ComplianceTasksPanel } from "@/components/regulations/compliance-tasks-panel";
 import { useAuth } from "@/hooks/use-auth";
 
 const CATEGORIES = [
@@ -185,6 +186,7 @@ function RegulationDetailPage() {
   
   // Accordion section states - Summary expanded by default, others collapsed
   const [summaryOpen, setSummaryOpen] = useState(true);
+  const [complianceTasksOpen, setComplianceTasksOpen] = useState(false);
   const [requirementsOpen, setRequirementsOpen] = useState(false);
   const [deadlinesOpen, setDeadlinesOpen] = useState(false);
   const [evidenceNotesOpen, setEvidenceNotesOpen] = useState(false);
@@ -1058,6 +1060,29 @@ function RegulationDetailPage() {
                         ? renderMarkdown(regulation.summary) 
                         : "No summary available." 
                     }}
+                  />
+                </CollapsibleContent>
+              </Collapsible>
+
+              {/* COMPLIANCE TASKS - For complex regulations like Clery Act */}
+              <Collapsible open={complianceTasksOpen} onOpenChange={setComplianceTasksOpen}>
+                <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-white rounded-lg border hover:bg-gray-50 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <ListTodo className="h-5 w-5 text-indigo-600" />
+                    <span className="font-semibold text-gray-900">Compliance Tasks</span>
+                    <Badge variant="secondary" className="text-xs bg-indigo-100 text-indigo-700">
+                      Complex Workflow
+                    </Badge>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {complianceTasksOpen ? <ChevronDown className="h-5 w-5 text-gray-400" /> : <ChevronRight className="h-5 w-5 text-gray-400" />}
+                  </div>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="bg-white rounded-b-lg border-x border-b p-4">
+                  <ComplianceTasksPanel
+                    regulationId={regulation.id}
+                    regulationName={regulation.name || regulation.topic || 'Unknown'}
+                    isAdmin={isAdmin}
                   />
                 </CollapsibleContent>
               </Collapsible>

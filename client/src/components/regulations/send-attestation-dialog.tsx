@@ -37,6 +37,7 @@ import {
   Calendar,
   Shield,
   Info,
+  User as UserIcon,
 } from 'lucide-react';
 import { toast } from '@/hooks/use-toast';
 
@@ -255,7 +256,7 @@ export function SendAttestationDialog({
           <div className="space-y-2">
             <div className="flex items-center justify-between">
               <Label className="flex items-center gap-2">
-                <User className="h-4 w-4" />
+                <UserIcon className="h-4 w-4" />
                 Send To
               </Label>
               <div className="flex items-center gap-2">

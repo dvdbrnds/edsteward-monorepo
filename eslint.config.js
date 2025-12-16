@@ -33,6 +33,8 @@ export default [
       'react-hooks': reactHooks,
     },
     rules: {
+      // Disable base rule in favor of @typescript-eslint version
+      'no-unused-vars': 'off',
       // Start with essential rules only - no auto-fixes
       '@typescript-eslint/no-unused-vars': ['error', { 
         argsIgnorePattern: '^_',

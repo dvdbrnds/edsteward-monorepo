@@ -57,7 +57,7 @@ export interface RegulationAction {
 }
 
 // MCP Validation Levels
-/* eslint-disable no-unused-vars */
+ 
 export enum ValidationLevel {
   // Basic structural validation
   A = "A",
@@ -68,7 +68,7 @@ export enum ValidationLevel {
   // Contextual/cross-reference validation
   D = "D"
 }
-/* eslint-enable no-unused-vars */
+ 
 
 // Export validation levels for external use to satisfy ESLint
 export const VALIDATION_LEVELS = {
@@ -995,6 +995,141 @@ export const attestationTokens = pgTable("attestation_tokens", {
 export const insertAttestationTokenSchema = createInsertSchema(attestationTokens);
 export type AttestationToken = typeof attestationTokens.$inferSelect;
 export type InsertAttestationToken = z.infer<typeof insertAttestationTokenSchema>;
+
+// ===== COMPLIANCE TASKS =====
+// Hierarchical task management for complex regulations (e.g., Clery Act)
+// Supports sub-tasks, per-task DRIs, flexible evidence requirements
+
+export const TASK_STATUS = ['pending', 'in_progress', 'completed', 'overdue', 'blocked', 'not_applicable'] as const;
+export const EVIDENCE_TYPE = ['none', 'document', 'link', 'screenshot', 'attestation', 'form'] as const;
+export const TASK_PRIORITY = ['low', 'medium', 'high', 'critical'] as const;
+
+export type TaskStatus = typeof TASK_STATUS[number];
+export type EvidenceType = typeof EVIDENCE_TYPE[number];
+export type TaskPriority = typeof TASK_PRIORITY[number];
+
+export const complianceTasks = pgTable("compliance_tasks", {
+  id: serial("id").primaryKey(),
+  regulationId: integer("regulation_id").notNull().references(() => regulations.id),
+  parentTaskId: integer("parent_task_id"), // Self-reference for sub-tasks (can't use references() for self-ref)
+  
+  // Task details
+  title: text("title").notNull(),
+  description: text("description"),
+  instructions: text("instructions"), // Detailed instructions for completing the task
+  
+  // Assignment
+  assignedTo: integer("assigned_to").references(() => users.id), // DRI for this specific task
+  assignedRole: text("assigned_role"), // Role name if no specific user assigned
+  
+  // Scheduling
+  dueDate: timestamp("due_date"),
+  recurringSchedule: text("recurring_schedule"), // 'annual', 'quarterly', 'monthly', 'daily', or cron expression
+  reminderDays: integer("reminder_days").default(30), // Days before due date to send reminders
+  
+  // Status tracking
+  status: text("status").notNull().default('pending'),
+  priority: text("priority").default('medium'),
+  completedAt: timestamp("completed_at"),
+  completedBy: integer("completed_by").references(() => users.id),
+  
+  // Evidence requirements
+  evidenceRequired: boolean("evidence_required").default(false),
+  evidenceType: text("evidence_type").default('none'), // What kind of evidence is needed
+  evidenceInstructions: text("evidence_instructions"), // Specific guidance on what to upload
+  
+  // Ordering and display
+  sortOrder: integer("sort_order").default(0),
+  isTemplate: boolean("is_template").default(false), // Template tasks for regulation setup
+  
+  // Metadata
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  createdBy: integer("created_by").references(() => users.id),
+  metadata: jsonb("metadata").$type<Record<string, unknown>>(),
+}, (table) => {
+  return {
+    regulationIdIdx: index("compliance_tasks_regulation_id_idx").on(table.regulationId),
+    parentTaskIdIdx: index("compliance_tasks_parent_task_id_idx").on(table.parentTaskId),
+    assignedToIdx: index("compliance_tasks_assigned_to_idx").on(table.assignedTo),
+    statusIdx: index("compliance_tasks_status_idx").on(table.status),
+    dueDateIdx: index("compliance_tasks_due_date_idx").on(table.dueDate),
+  };
+});
+
+export const insertComplianceTaskSchema = createInsertSchema(complianceTasks).extend({
+  title: z.string().min(1, "Title is required"),
+  status: z.enum(TASK_STATUS).default('pending'),
+  evidenceType: z.enum(EVIDENCE_TYPE).default('none'),
+  priority: z.enum(TASK_PRIORITY).default('medium'),
+});
+
+export type ComplianceTask = typeof complianceTasks.$inferSelect;
+export type InsertComplianceTask = z.infer<typeof insertComplianceTaskSchema>;
+
+// ===== TASK EVIDENCE =====
+// Evidence uploads for compliance tasks
+export const taskEvidence = pgTable("task_evidence", {
+  id: serial("id").primaryKey(),
+  taskId: integer("task_id").notNull().references(() => complianceTasks.id),
+  
+  // File details
+  fileName: text("file_name").notNull(),
+  fileType: text("file_type"), // MIME type
+  fileSize: integer("file_size"), // bytes
+  fileUrl: text("file_url"), // S3 or local path
+  
+  // For link-type evidence
+  linkUrl: text("link_url"),
+  linkTitle: text("link_title"),
+  
+  // Metadata
+  description: text("description"),
+  uploadedBy: integer("uploaded_by").notNull().references(() => users.id),
+  uploadedAt: timestamp("uploaded_at").notNull().defaultNow(),
+  
+  // Verification (for audit purposes)
+  verified: boolean("verified").default(false),
+  verifiedBy: integer("verified_by").references(() => users.id),
+  verifiedAt: timestamp("verified_at"),
+}, (table) => {
+  return {
+    taskIdIdx: index("task_evidence_task_id_idx").on(table.taskId),
+  };
+});
+
+export const insertTaskEvidenceSchema = createInsertSchema(taskEvidence);
+export type TaskEvidence = typeof taskEvidence.$inferSelect;
+export type InsertTaskEvidence = z.infer<typeof insertTaskEvidenceSchema>;
+
+// ===== TASK ACTIVITY LOG =====
+// Activity tracking for tasks (comments, status changes, nudges, escalations)
+export const TASK_ACTIVITY_TYPE = ['comment', 'status_change', 'assignment_change', 'evidence_uploaded', 'nudge', 'escalation', 'due_date_change'] as const;
+export type TaskActivityType = typeof TASK_ACTIVITY_TYPE[number];
+
+export const taskActivity = pgTable("task_activity", {
+  id: serial("id").primaryKey(),
+  taskId: integer("task_id").notNull().references(() => complianceTasks.id),
+  userId: integer("user_id").notNull().references(() => users.id),
+  
+  activityType: text("activity_type").notNull(), // comment, status_change, etc.
+  content: text("content"), // Comment text or change description
+  
+  // For status changes
+  previousValue: text("previous_value"),
+  newValue: text("new_value"),
+  
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+}, (table) => {
+  return {
+    taskIdIdx: index("task_activity_task_id_idx").on(table.taskId),
+    createdAtIdx: index("task_activity_created_at_idx").on(table.createdAt),
+  };
+});
+
+export const insertTaskActivitySchema = createInsertSchema(taskActivity);
+export type TaskActivity = typeof taskActivity.$inferSelect;
+export type InsertTaskActivity = z.infer<typeof insertTaskActivitySchema>;
 
 // ===== SINGLE-TENANT ARCHITECTURE =====
 // Single-tenant configuration is handled via environment variables and config files
