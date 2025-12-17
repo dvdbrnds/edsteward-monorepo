@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { marked } from "marked";
@@ -186,7 +186,7 @@ function RegulationDetailPage() {
   
   // Accordion section states - Summary expanded by default, others collapsed
   const [summaryOpen, setSummaryOpen] = useState(true);
-  const [complianceTasksOpen, setComplianceTasksOpen] = useState(false);
+  const [complianceTasksOpen, setComplianceTasksOpen] = useState(true); // Default open, will close if fully compliant
   const [requirementsOpen, setRequirementsOpen] = useState(false);
   const [deadlinesOpen, setDeadlinesOpen] = useState(false);
   const [evidenceNotesOpen, setEvidenceNotesOpen] = useState(false);
@@ -218,6 +218,30 @@ function RegulationDetailPage() {
     },
     enabled: !!regulationId && !!user
   });
+
+  // Fetch compliance tasks to determine if accordion should be open
+  const { data: complianceTasks } = useQuery<Array<{ id: number; status: string }>>({
+    queryKey: ['compliance-tasks', regulationId],
+    queryFn: async () => {
+      const response = await fetch(`/api/compliance-tasks/regulation/${regulationId}`, {
+        credentials: 'include',
+      });
+      if (!response.ok) return [];
+      return response.json();
+    },
+    enabled: !!regulationId && !!user
+  });
+
+  // Auto-collapse compliance tasks accordion if all tasks are complete
+  useEffect(() => {
+    if (complianceTasks && complianceTasks.length > 0) {
+      const allComplete = complianceTasks.every(task => task.status === 'completed');
+      // Only collapse if ALL tasks are complete
+      if (allComplete) {
+        setComplianceTasksOpen(false);
+      }
+    }
+  }, [complianceTasks]);
 
   console.log("Regulation data:", regulation);
   console.log("User role:", user?.role, "isAdmin:", isAdmin);

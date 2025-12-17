@@ -32,6 +32,8 @@ import {
   Loader2,
   Plus,
   PenLine,
+  Upload,
+  Paperclip,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -136,6 +138,7 @@ function TaskItem({
   onNudge, 
   onEscalate,
   onTaskClick,
+  onAddEvidence,
   depth = 0 
 }: { 
   task: ComplianceTask; 
@@ -144,6 +147,7 @@ function TaskItem({
   onNudge: (_taskToNudge: ComplianceTask) => void;
   onEscalate: (_taskToEscalate: ComplianceTask) => void;
   onTaskClick: (_task: ComplianceTask) => void;
+  onAddEvidence: (_task: ComplianceTask) => void;
   depth?: number;
 }) {
   const [expanded, setExpanded] = useState(depth === 0);
@@ -235,15 +239,44 @@ function TaskItem({
               </div>
             )}
 
-            {/* Evidence Indicator */}
+            {/* Evidence Indicator & Add Button */}
             {task.evidenceRequired && (
-              <div className={cn(
-                "flex items-center gap-1",
-                task.evidenceCount > 0 ? "text-green-600" : "text-amber-600"
-              )}>
-                {evidenceIcons[task.evidenceType] || evidenceIcons.document}
-                <span>{task.evidenceCount > 0 ? `${task.evidenceCount} file(s)` : 'Evidence needed'}</span>
+              <div className="flex items-center gap-2">
+                <div className={cn(
+                  "flex items-center gap-1",
+                  task.evidenceCount > 0 ? "text-green-600" : "text-amber-600"
+                )}>
+                  {evidenceIcons[task.evidenceType] || evidenceIcons.document}
+                  <span>{task.evidenceCount > 0 ? `${task.evidenceCount} file(s)` : 'Evidence needed'}</span>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  className="h-6 px-2 text-xs text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onAddEvidence(task);
+                  }}
+                >
+                  <Paperclip className="h-3 w-3 mr-1" />
+                  Add
+                </Button>
               </div>
+            )}
+            {/* Show Add Evidence button even if not required */}
+            {!task.evidenceRequired && (
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="h-6 px-2 text-xs text-gray-500 hover:text-blue-600 hover:bg-blue-50"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAddEvidence(task);
+                }}
+              >
+                <Paperclip className="h-3 w-3 mr-1" />
+                Add Evidence
+              </Button>
             )}
 
             {/* Sub-task count */}
@@ -324,6 +357,7 @@ function TaskItem({
               onNudge={onNudge}
               onEscalate={onEscalate}
               onTaskClick={onTaskClick}
+              onAddEvidence={onAddEvidence}
               depth={depth + 1}
             />
           ))}
@@ -338,9 +372,15 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
   const [selectedTask, setSelectedTask] = useState<ComplianceTask | null>(null);
   const [nudgeTask, setNudgeTask] = useState<ComplianceTask | null>(null);
   const [escalateTask, setEscalateTask] = useState<ComplianceTask | null>(null);
+  const [evidenceTask, setEvidenceTask] = useState<ComplianceTask | null>(null);
   const [nudgeMessage, setNudgeMessage] = useState('');
   const [escalateEmail, setEscalateEmail] = useState('');
   const [escalateMessage, setEscalateMessage] = useState('');
+  const [evidenceFile, setEvidenceFile] = useState<File | null>(null);
+  const [evidenceDescription, setEvidenceDescription] = useState('');
+  const [evidenceLinkUrl, setEvidenceLinkUrl] = useState('');
+  const [evidenceLinkTitle, setEvidenceLinkTitle] = useState('');
+  const [evidenceType, setEvidenceType] = useState<'file' | 'link'>('file');
 
   // Fetch tasks
   const { data, isLoading, error } = useQuery<TasksResponse>({
@@ -416,6 +456,83 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
     },
   });
 
+  // Evidence upload mutation
+  const evidenceMutation = useMutation({
+    mutationFn: async ({ taskId, file, description, linkUrl, linkTitle }: { 
+      taskId: number; 
+      file?: File; 
+      description: string; 
+      linkUrl?: string; 
+      linkTitle?: string 
+    }) => {
+      if (file) {
+        // File upload
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('description', description);
+        
+        const response = await fetch(`/api/compliance-tasks/${taskId}/evidence`, {
+          method: 'POST',
+          credentials: 'include',
+          body: formData,
+        });
+        if (!response.ok) throw new Error('Failed to upload evidence');
+        return response.json();
+      } else if (linkUrl) {
+        // Link submission
+        const response = await fetch(`/api/compliance-tasks/${taskId}/evidence`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ linkUrl, linkTitle, description }),
+        });
+        if (!response.ok) throw new Error('Failed to add evidence link');
+        return response.json();
+      }
+      throw new Error('No file or link provided');
+    },
+    onSuccess: () => {
+      toast({ title: 'Evidence Added', description: 'Evidence has been attached to the task' });
+      queryClient.invalidateQueries({ queryKey: ['compliance-tasks', regulationId] });
+      resetEvidenceForm();
+    },
+    onError: () => {
+      toast({ title: 'Error', description: 'Failed to add evidence', variant: 'destructive' });
+    },
+  });
+
+  // Reset evidence form helper
+  const resetEvidenceForm = () => {
+    setEvidenceTask(null);
+    setEvidenceFile(null);
+    setEvidenceDescription('');
+    setEvidenceLinkUrl('');
+    setEvidenceLinkTitle('');
+    setEvidenceType('file');
+  };
+
+  // Handle evidence submission
+  const handleEvidenceSubmit = () => {
+    if (!evidenceTask) return;
+    
+    if (evidenceType === 'file' && evidenceFile) {
+      evidenceMutation.mutate({
+        taskId: evidenceTask.id,
+        file: evidenceFile,
+        description: evidenceDescription,
+      });
+    } else if (evidenceType === 'link' && evidenceLinkUrl) {
+      evidenceMutation.mutate({
+        taskId: evidenceTask.id,
+        linkUrl: evidenceLinkUrl,
+        linkTitle: evidenceLinkTitle,
+        description: evidenceDescription,
+      });
+    } else {
+      toast({ title: 'Error', description: 'Please provide a file or link', variant: 'destructive' });
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
@@ -479,6 +596,7 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
               onNudge={setNudgeTask}
               onEscalate={setEscalateTask}
               onTaskClick={setSelectedTask}
+              onAddEvidence={setEvidenceTask}
             />
           ))}
         </div>
@@ -571,6 +689,137 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
             >
               {escalateMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <AlertCircle className="h-4 w-4 mr-2" />}
               Escalate
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Evidence Upload Dialog */}
+      <Dialog open={!!evidenceTask} onOpenChange={() => resetEvidenceForm()}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Paperclip className="h-5 w-5 text-blue-600" />
+              Add Evidence
+            </DialogTitle>
+            <DialogDescription>
+              Attach evidence to: <span className="font-medium">{evidenceTask?.title}</span>
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {/* Type Selector - Styled as tabs */}
+            <div className="flex border-b border-gray-200">
+              <button
+                type="button"
+                onClick={() => setEvidenceType('file')}
+                className={cn(
+                  "flex-1 py-2 px-4 text-sm font-medium border-b-2 transition-colors",
+                  evidenceType === 'file' 
+                    ? "border-blue-600 text-blue-600" 
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                )}
+              >
+                <Upload className="h-4 w-4 inline mr-2" />
+                Upload File
+              </button>
+              <button
+                type="button"
+                onClick={() => setEvidenceType('link')}
+                className={cn(
+                  "flex-1 py-2 px-4 text-sm font-medium border-b-2 transition-colors",
+                  evidenceType === 'link' 
+                    ? "border-blue-600 text-blue-600" 
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                )}
+              >
+                <LinkIcon className="h-4 w-4 inline mr-2" />
+                Add Link
+              </button>
+            </div>
+
+            {evidenceType === 'file' ? (
+              <div>
+                {/* Styled Drop Zone */}
+                <label 
+                  htmlFor="evidence-file"
+                  className={cn(
+                    "flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-colors",
+                    evidenceFile 
+                      ? "border-green-400 bg-green-50" 
+                      : "border-gray-300 bg-gray-50 hover:bg-gray-100 hover:border-blue-400"
+                  )}
+                >
+                  {evidenceFile ? (
+                    <div className="flex flex-col items-center text-green-600">
+                      <FileCheck className="h-8 w-8 mb-2" />
+                      <p className="text-sm font-medium">{evidenceFile.name}</p>
+                      <p className="text-xs text-green-500 mt-1">Click to change file</p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center text-gray-500">
+                      <Upload className="h-8 w-8 mb-2" />
+                      <p className="text-sm font-medium">Click to upload</p>
+                      <p className="text-xs text-gray-400">or drag and drop</p>
+                    </div>
+                  )}
+                  <input
+                    id="evidence-file"
+                    type="file"
+                    className="hidden"
+                    onChange={(e) => setEvidenceFile(e.target.files?.[0] || null)}
+                  />
+                </label>
+              </div>
+            ) : (
+              <>
+                <div>
+                  <Label htmlFor="evidence-link-url">URL *</Label>
+                  <Input
+                    id="evidence-link-url"
+                    type="url"
+                    placeholder="https://..."
+                    value={evidenceLinkUrl}
+                    onChange={(e) => setEvidenceLinkUrl(e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="evidence-link-title">Link Title</Label>
+                  <Input
+                    id="evidence-link-title"
+                    placeholder="e.g., Policy Document v2.0"
+                    value={evidenceLinkTitle}
+                    onChange={(e) => setEvidenceLinkTitle(e.target.value)}
+                    className="mt-1"
+                  />
+                </div>
+              </>
+            )}
+
+            <div>
+              <Label htmlFor="evidence-description">Description (optional)</Label>
+              <Textarea
+                id="evidence-description"
+                placeholder="Describe this evidence..."
+                value={evidenceDescription}
+                onChange={(e) => setEvidenceDescription(e.target.value)}
+                className="mt-1"
+                rows={2}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => resetEvidenceForm()}>Cancel</Button>
+            <Button 
+              onClick={handleEvidenceSubmit}
+              disabled={evidenceMutation.isPending || (evidenceType === 'file' ? !evidenceFile : !evidenceLinkUrl)}
+            >
+              {evidenceMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : (
+                <CheckCircle className="h-4 w-4 mr-2" />
+              )}
+              Submit Evidence
             </Button>
           </DialogFooter>
         </DialogContent>
