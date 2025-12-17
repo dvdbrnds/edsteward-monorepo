@@ -53,12 +53,35 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '@/components/ui/hover-card';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { TaskDetailDialog } from './task-detail-dialog';
+
+interface EvidenceItem {
+  id: number;
+  fileName: string;
+  fileType: string | null;
+  fileUrl: string | null;
+  linkUrl: string | null;
+  linkTitle: string | null;
+  description: string | null;
+  uploadedAt: string | null;
+  uploader: {
+    id: number;
+    username: string;
+    email: string;
+    firstName: string | null;
+    lastName: string | null;
+  } | null;
+}
 
 interface ComplianceTask {
   id: number;
@@ -92,6 +115,7 @@ interface ComplianceTask {
     lastName: string | null;
   } | null;
   evidenceCount: number;
+  evidenceItems?: EvidenceItem[];
   subTasks: ComplianceTask[];
 }
 
@@ -310,6 +334,173 @@ function TaskItem({
                     : '(no timestamp)'}
                 </span>
               </div>
+            </div>
+          )}
+
+          {/* Evidence Items with Signatures */}
+          {task.evidenceItems && task.evidenceItems.length > 0 && (
+            <div className={cn(
+              "mt-2 pt-2 border-t -mx-3 px-3 -mb-3 pb-3 rounded-b-lg space-y-2",
+              task.status === 'completed' ? "border-green-200" : "border-blue-200 bg-blue-50/30"
+            )}>
+              <div className="flex items-center gap-1 text-xs font-medium text-blue-800">
+                <Paperclip className="h-3 w-3" />
+                Evidence Attached ({task.evidenceItems.length})
+              </div>
+              {task.evidenceItems.map((evidence) => (
+                <HoverCard key={evidence.id}>
+                  <HoverCardTrigger asChild>
+                    <div className="flex items-start gap-2 text-xs bg-white/60 rounded px-2 py-1.5 border border-blue-100 cursor-pointer hover:bg-white hover:border-blue-200 transition-colors">
+                      {/* File type icon */}
+                      <div className="p-1 bg-gray-100 rounded shrink-0">
+                        {evidence.linkUrl ? (
+                          <LinkIcon className="h-3 w-3 text-blue-600" />
+                        ) : evidence.fileType?.startsWith('image/') ? (
+                          <Image className="h-3 w-3 text-purple-600" />
+                        ) : (
+                          <FileText className="h-3 w-3 text-gray-600" />
+                        )}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2">
+                          {evidence.linkUrl ? (
+                            <span className="text-blue-600 font-medium truncate">
+                              {evidence.linkTitle || evidence.fileName}
+                            </span>
+                          ) : (
+                            <span className="font-medium text-gray-700 truncate">{evidence.fileName}</span>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-1 mt-0.5 text-[10px] text-gray-500">
+                          <PenLine className="h-2.5 w-2.5" />
+                          <span>
+                            {evidence.uploader 
+                              ? (evidence.uploader.firstName && evidence.uploader.lastName
+                                  ? `${evidence.uploader.firstName} ${evidence.uploader.lastName}`
+                                  : evidence.uploader.username)
+                              : 'Unknown'}
+                          </span>
+                          {evidence.uploadedAt && (
+                            <>
+                              <span className="text-gray-400">•</span>
+                              <span>{format(new Date(evidence.uploadedAt), "MMM d, yyyy")}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </HoverCardTrigger>
+                  <HoverCardContent align="start" className="w-80">
+                    <div className="space-y-3">
+                      {/* Header */}
+                      <div className="flex items-start gap-2">
+                        <div className="p-2 bg-gray-100 rounded">
+                          {evidence.linkUrl ? (
+                            <LinkIcon className="h-5 w-5 text-blue-600" />
+                          ) : evidence.fileType?.startsWith('image/') ? (
+                            <Image className="h-5 w-5 text-purple-600" />
+                          ) : (
+                            <FileText className="h-5 w-5 text-gray-600" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="text-sm font-semibold truncate">{evidence.fileName}</h4>
+                          {evidence.fileType && (
+                            <p className="text-xs text-gray-500">{evidence.fileType}</p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* File Preview */}
+                      {evidence.fileUrl && (
+                        evidence.fileType?.startsWith('image/') ? (
+                          <div className="relative w-full h-32 bg-gray-100 rounded-md overflow-hidden">
+                            <img 
+                              src={evidence.fileUrl}
+                              alt={evidence.fileName}
+                              className="object-cover w-full h-full"
+                            />
+                          </div>
+                        ) : evidence.fileType === 'application/pdf' ? (
+                          <div className="relative w-full h-40 bg-gray-100 rounded-md overflow-hidden border">
+                            <iframe
+                              src={`${evidence.fileUrl}#toolbar=0&navpanes=0`}
+                              className="w-full h-full"
+                              title={evidence.fileName}
+                            />
+                            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-gray-900/70 to-transparent p-2">
+                              <p className="text-white text-xs font-medium truncate">PDF Document</p>
+                            </div>
+                          </div>
+                        ) : (
+                          <div className="w-full bg-gray-50 rounded-md p-4 text-center border">
+                            <FileText className="h-10 w-10 mx-auto text-gray-400 mb-2" />
+                            <p className="text-xs text-gray-500">
+                              {evidence.fileType || 'Document'}
+                            </p>
+                          </div>
+                        )
+                      )}
+
+                      {/* Description */}
+                      {evidence.description && (
+                        <p className="text-xs text-gray-600">{evidence.description}</p>
+                      )}
+
+                      {/* Signature Block */}
+                      <div className="bg-gray-50 rounded-md p-2 space-y-1">
+                        <div className="flex items-center gap-1 text-xs">
+                          <PenLine className="h-3 w-3 text-gray-500" />
+                          <span className="font-medium text-gray-700">Uploaded by:</span>
+                        </div>
+                        <div className="text-xs text-gray-600">
+                          <p className="font-medium">
+                            {evidence.uploader 
+                              ? (evidence.uploader.firstName && evidence.uploader.lastName
+                                  ? `${evidence.uploader.firstName} ${evidence.uploader.lastName}`
+                                  : evidence.uploader.username)
+                              : 'Unknown'}
+                          </p>
+                          {evidence.uploader?.email && (
+                            <p className="text-gray-500">{evidence.uploader.email}</p>
+                          )}
+                          {evidence.uploadedAt && (
+                            <p className="text-gray-500">{format(new Date(evidence.uploadedAt), "MMMM d, yyyy 'at' h:mm a")}</p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Action Button */}
+                      {(evidence.linkUrl || evidence.fileUrl) && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="w-full gap-2"
+                          asChild
+                        >
+                          <a 
+                            href={evidence.linkUrl || evidence.fileUrl || '#'}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            {evidence.linkUrl ? (
+                              <>
+                                <LinkIcon className="h-4 w-4" />
+                                Open Link
+                              </>
+                            ) : (
+                              <>
+                                <FileText className="h-4 w-4" />
+                                View File
+                              </>
+                            )}
+                          </a>
+                        </Button>
+                      )}
+                    </div>
+                  </HoverCardContent>
+                </HoverCard>
+              ))}
             </div>
           )}
         </div>

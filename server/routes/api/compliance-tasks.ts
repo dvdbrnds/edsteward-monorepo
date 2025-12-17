@@ -61,27 +61,69 @@ router.get('/regulation/:regulationId', requireAuth, async (req: Request, res: R
     .where(eq(complianceTasks.regulationId, regulationId))
     .orderBy(asc(complianceTasks.sortOrder), asc(complianceTasks.id));
 
-    // Get evidence counts for each task
-    const evidenceCounts = await db.select({
-      taskId: taskEvidence.taskId,
+    // Get evidence with uploader info for each task
+    const evidenceUploader = alias(users, 'evidence_uploader');
+    const evidenceItems = await db.select({
+      evidence: taskEvidence,
+      uploader: {
+        id: evidenceUploader.id,
+        username: evidenceUploader.username,
+        email: evidenceUploader.email,
+        firstName: evidenceUploader.firstName,
+        lastName: evidenceUploader.lastName,
+      }
     })
-    .from(taskEvidence);
+    .from(taskEvidence)
+    .leftJoin(evidenceUploader, eq(taskEvidence.uploadedBy, evidenceUploader.id));
 
-    const evidenceByTask = evidenceCounts.reduce((acc, e) => {
-      acc[e.taskId] = (acc[e.taskId] || 0) + 1;
-      return acc;
-    }, {} as Record<number, number>);
+    // Group evidence by task
+    const evidenceByTask: Record<number, Array<{
+      id: number;
+      fileName: string;
+      fileType: string | null;
+      fileUrl: string | null;
+      linkUrl: string | null;
+      linkTitle: string | null;
+      description: string | null;
+      uploadedAt: Date | null;
+      uploader: {
+        id: number;
+        username: string;
+        email: string;
+        firstName: string | null;
+        lastName: string | null;
+      } | null;
+    }>> = {};
+    
+    evidenceItems.forEach(({ evidence, uploader }) => {
+      if (!evidenceByTask[evidence.taskId]) {
+        evidenceByTask[evidence.taskId] = [];
+      }
+      evidenceByTask[evidence.taskId].push({
+        id: evidence.id,
+        fileName: evidence.fileName,
+        fileType: evidence.fileType,
+        fileUrl: evidence.fileUrl,
+        linkUrl: evidence.linkUrl,
+        linkTitle: evidence.linkTitle,
+        description: evidence.description,
+        uploadedAt: evidence.uploadedAt,
+        uploader: uploader?.id ? uploader : null,
+      });
+    });
 
     // Build hierarchical structure
     const taskMap = new Map<number, any>();
     const rootTasks: any[] = [];
 
     tasks.forEach(({ task, assignedUser, completedByUser }) => {
+      const taskEvidence = evidenceByTask[task.id] || [];
       const taskWithMeta = {
         ...task,
         assignedUser: assignedUser?.id ? assignedUser : null,
         completedByUser: completedByUser?.id ? completedByUser : null,
-        evidenceCount: evidenceByTask[task.id] || 0,
+        evidenceCount: taskEvidence.length,
+        evidenceItems: taskEvidence,
         subTasks: [],
       };
       taskMap.set(task.id, taskWithMeta);
@@ -876,6 +918,8 @@ router.post('/:taskId/evidence', requireAuth, async (req: Request, res: Response
           if (name === 'linkTitle') uploadedLinkTitle = val;
         });
 
+        let fileWritePromise: Promise<void> | null = null;
+
         bb.on('file', (_name: string, file: import('stream').Readable, info: { filename: string; encoding: string; mimeType: string }) => {
           uploadedFileName = info.filename;
           uploadedFileType = info.mimeType;
@@ -885,24 +929,30 @@ router.post('/:taskId/evidence', requireAuth, async (req: Request, res: Response
             uploadedFileSize += data.length;
           });
 
-          file.on('end', async () => {
-            // Store file locally in uploads directory
-            const fs = await import('fs/promises');
-            const path = await import('path');
-            
-            const uploadsDir = path.join(process.cwd(), 'uploads', 'evidence');
-            await fs.mkdir(uploadsDir, { recursive: true });
+          file.on('end', () => {
+            // Create a promise for the file write operation
+            fileWritePromise = (async () => {
+              const fs = await import('fs/promises');
+              const path = await import('path');
+              
+              const uploadsDir = path.join(process.cwd(), 'uploads', 'evidence');
+              await fs.mkdir(uploadsDir, { recursive: true });
 
-            // Generate unique filename
-            const uniqueName = `${Date.now()}-${Math.random().toString(36).substring(7)}-${uploadedFileName}`;
-            const filePath = path.join(uploadsDir, uniqueName);
-            
-            await fs.writeFile(filePath, Buffer.concat(chunks));
-            uploadedFileUrl = `/uploads/evidence/${uniqueName}`;
+              // Generate unique filename
+              const uniqueName = `${Date.now()}-${Math.random().toString(36).substring(7)}-${uploadedFileName}`;
+              const filePath = path.join(uploadsDir, uniqueName);
+              
+              await fs.writeFile(filePath, Buffer.concat(chunks));
+              uploadedFileUrl = `/uploads/evidence/${uniqueName}`;
+            })();
           });
         });
 
-        bb.on('close', () => {
+        bb.on('close', async () => {
+          // Wait for file write to complete before resolving
+          if (fileWritePromise) {
+            await fileWritePromise;
+          }
           resolve({
             fileName: uploadedFileName || uploadedLinkTitle || 'Link',
             fileType: uploadedFileType,
