@@ -8,15 +8,28 @@ import { checkAndSendTaskNotifications } from './task-notifications';
 let schedulerInterval: NodeJS.Timeout | null = null;
 let isRunning = false;
 
-// Configuration
+// Configuration - can be modified at runtime
 const SCHEDULER_CONFIG = {
   // Check every 6 hours by default (in milliseconds)
   intervalMs: 6 * 60 * 60 * 1000,
   // Also check at specific hours (24-hour format)
   preferredHours: [8, 14], // 8 AM and 2 PM
-  // Enable/disable based on environment
+  // Enable/disable based on environment (can be toggled at runtime)
   enabled: process.env.ENABLE_TASK_SCHEDULER !== 'false',
 };
+
+/**
+ * Enable or disable the scheduler at runtime
+ */
+export function setSchedulerEnabled(enabled: boolean): void {
+  SCHEDULER_CONFIG.enabled = enabled;
+  if (enabled && !schedulerInterval) {
+    startTaskScheduler();
+  } else if (!enabled && schedulerInterval) {
+    stopTaskScheduler();
+  }
+  console.log(`[TaskScheduler] Scheduler ${enabled ? 'enabled' : 'disabled'}`);
+}
 
 /**
  * Run the notification check

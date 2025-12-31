@@ -19,6 +19,7 @@ import { format } from "date-fns";
 import { InstitutionSettings } from "@/components/admin/institution-settings";
 import { BrandingSettingsV2 } from "@/components/admin/branding-settings";
 import { BackupManagement } from "@/components/admin/backup-management";
+import { NotificationSchedulerSettings } from "@/components/admin/notification-scheduler-settings";
 import {
   Table,
   TableBody,
@@ -446,9 +447,10 @@ export default function SystemSettingsPage() {
           <h1 className="text-3xl font-bold text-gray-900 mb-8">System Settings</h1>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-7 mb-4">
+            <TabsList className="grid grid-cols-8 mb-4">
               <TabsTrigger value="institution">Institution</TabsTrigger>
               <TabsTrigger value="branding">Branding</TabsTrigger>
+              <TabsTrigger value="notifications">Notifications</TabsTrigger>
               <TabsTrigger value="email">Email</TabsTrigger>
               <TabsTrigger value="sms">SMS</TabsTrigger>
               <TabsTrigger value="users">Users</TabsTrigger>
@@ -478,6 +480,10 @@ export default function SystemSettingsPage() {
                   });
                 }}
               />
+            </TabsContent>
+
+            <TabsContent value="notifications">
+              <NotificationSchedulerSettings />
             </TabsContent>
 
             <TabsContent value="email">

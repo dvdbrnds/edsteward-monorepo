@@ -1965,5 +1965,31 @@ router.get('/notifications/scheduler-status', requireAdmin, async (_req: Request
   }
 });
 
+/**
+ * POST /api/compliance-tasks/notifications/scheduler-toggle
+ * Enable or disable the task notification scheduler (admin only)
+ */
+router.post('/notifications/scheduler-toggle', requireAdmin, async (req: Request, res: Response) => {
+  try {
+    const { enabled } = req.body;
+    if (typeof enabled !== 'boolean') {
+      return res.status(400).json({ error: 'enabled must be a boolean' });
+    }
+    
+    const { setSchedulerEnabled, getSchedulerStatus } = await import('../../services/task-scheduler');
+    setSchedulerEnabled(enabled);
+    const status = getSchedulerStatus();
+    
+    res.json({
+      success: true,
+      message: `Scheduler ${enabled ? 'enabled' : 'disabled'}`,
+      status,
+    });
+  } catch (error) {
+    console.error('Error toggling scheduler:', error);
+    res.status(500).json({ error: 'Failed to toggle scheduler' });
+  }
+});
+
 export default router;
 
