@@ -345,6 +345,9 @@ router.patch('/:taskId', requireAuth, async (req: Request, res: Response) => {
     if (updates.evidenceType !== undefined) updateData.evidenceType = updates.evidenceType;
     if (updates.evidenceInstructions !== undefined) updateData.evidenceInstructions = updates.evidenceInstructions;
     if (updates.sortOrder !== undefined) updateData.sortOrder = updates.sortOrder;
+    // Escalation contact fields
+    if (updates.escalationEmail !== undefined) updateData.escalationEmail = updates.escalationEmail;
+    if (updates.escalationName !== undefined) updateData.escalationName = updates.escalationName;
 
     // Handle status change specially
     if (updates.status !== undefined && updates.status !== currentTask.status) {

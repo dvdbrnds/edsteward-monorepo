@@ -19,6 +19,7 @@ import {
   Settings,
   Shield,
   Bell,
+  BarChart3,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -52,7 +53,7 @@ export default function Navigation() {
   const branding = useLegacyBranding();
   
   // Tenant detection for AWS management visibility
-  const [currentTenant, setCurrentTenant] = useState<string | null>(null);
+  const [_currentTenant, setCurrentTenant] = useState<string | null>(null);
   
   useEffect(() => {
     const hostname = window.location.hostname;
@@ -83,6 +84,7 @@ export default function Navigation() {
 
   const links = [
     { href: "/", label: "Dashboard", icon: LayoutDashboard },
+    { href: "/analytics", label: "Analytics", icon: BarChart3 },
     { href: "/notifications", label: "Notifications", icon: Bell },
     ...(user?.role?.toLowerCase() === "admin" || user?.role?.toLowerCase() === "compliance_officer"
       ? [

@@ -5,13 +5,15 @@ import Navigation from "@/components/layout/navigation";
 import ComplianceOverview from "@/components/dashboard/compliance-overview";
 import UpcomingDeadlines from "@/components/dashboard/upcoming-deadlines";
 import DashboardStats from "@/components/dashboard/dashboard-stats";
+import ExecutiveDashboard from "@/components/dashboard/executive-dashboard";
 import RegulationList from "@/components/regulations/regulation-list";
 import { AppliesToFilter } from "@/components/filters/applies-to-filter";
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Bell, CheckCircle, XCircle, Users, ExternalLink } from "lucide-react";
+import { Bell, CheckCircle, Users, ExternalLink, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import type { Notification } from "@shared/schema";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { Notification as _Notification } from "@shared/schema";
 
 export default function HomePage() {
   const { user } = useAuth();
@@ -53,10 +55,29 @@ export default function HomePage() {
 
       <main className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-[#002147] mb-8">
-            Welcome, {user?.username}
-          </h1>
+          <div className="flex items-center justify-between mb-8">
+            <h1 className="text-3xl font-bold text-[#002147]">
+              Welcome, {user?.username}
+            </h1>
+          </div>
 
+          <Tabs defaultValue="overview" className="space-y-6">
+            <TabsList className="grid w-full max-w-md grid-cols-2">
+              <TabsTrigger value="overview" className="flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                Overview
+              </TabsTrigger>
+              <TabsTrigger value="analytics" className="flex items-center gap-2">
+                <BarChart3 className="h-4 w-4" />
+                Analytics
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="analytics">
+              <ExecutiveDashboard />
+            </TabsContent>
+
+            <TabsContent value="overview">
           {/* Dashboard Statistics */}
           <div className="mb-8">
             <DashboardStats />
@@ -206,6 +227,8 @@ export default function HomePage() {
               appliesToFilter={selectedInstitutionTypes}
             />
           </div>
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
     </div>

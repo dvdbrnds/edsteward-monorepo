@@ -10,7 +10,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { AlertCircle, Download, Loader2, RefreshCw } from "lucide-react";
+import { AlertCircle, Download, Loader2, RefreshCw, Trash2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import Navigation from "@/components/layout/navigation";
 import { apiRequest } from "@/lib/api";
@@ -391,6 +391,27 @@ export default function SystemSettingsPage() {
       toast({
         title: 'Password Reset Successful',
         description: `Temporary password: ${data.temporaryPassword}`
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
+    }
+  });
+
+  const { mutate: deleteUser, isPending: isDeletingUser } = useMutation({
+    mutationFn: async (id: number) => {
+      const response = await fetch(`/api/admin/users/${id}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error || 'Failed to delete user');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({
+        title: 'User Deleted',
+        description: 'User has been removed from the system'
       });
       queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
     },
@@ -793,17 +814,35 @@ export default function SystemSettingsPage() {
                                   />
                                 </TableCell>
                                 <TableCell>
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => resetPassword(user.id)}
-                                    disabled={isResettingPassword}
-                                  >
-                                    {isResettingPassword ? (
-                                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
-                                    ) : null}
-                                    Reset Password
-                                  </Button>
+                                  <div className="flex gap-2">
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => resetPassword(user.id)}
+                                      disabled={isResettingPassword}
+                                    >
+                                      {isResettingPassword ? (
+                                        <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                                      ) : null}
+                                      Reset PW
+                                    </Button>
+                                    <Button
+                                      variant="destructive"
+                                      size="sm"
+                                      onClick={() => {
+                                        if (confirm(`Delete user "${user.username || user.email}"? This cannot be undone.`)) {
+                                          deleteUser(user.id);
+                                        }
+                                      }}
+                                      disabled={isDeletingUser}
+                                    >
+                                      {isDeletingUser ? (
+                                        <Loader2 className="h-4 w-4 animate-spin" />
+                                      ) : (
+                                        <Trash2 className="h-4 w-4" />
+                                      )}
+                                    </Button>
+                                  </div>
                                 </TableCell>
                               </TableRow>
                             ))}

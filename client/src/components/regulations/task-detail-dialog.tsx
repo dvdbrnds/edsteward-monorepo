@@ -109,6 +109,9 @@ interface ComplianceTask {
   sortOrder: number;
   assignedUser?: User | null;
   evidenceCount: number;
+  // Escalation path
+  escalationEmail: string | null;
+  escalationName: string | null;
 }
 
 interface TaskDetailDialogProps {
@@ -448,6 +451,51 @@ export function TaskDetailDialog({
                 <p className="text-sm text-blue-800 whitespace-pre-wrap">{task.instructions}</p>
               </div>
             )}
+
+            {/* Escalation Contact */}
+            <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+              <h4 className="font-medium text-red-900 mb-2 flex items-center gap-2">
+                <AlertCircle className="h-4 w-4" />
+                Escalation Contact
+              </h4>
+              {task.escalationEmail || task.escalationName ? (
+                <div className="text-sm text-red-800">
+                  <p className="font-medium">{task.escalationName || 'Supervisor'}</p>
+                  {task.escalationEmail && (
+                    <p className="text-red-600">{task.escalationEmail}</p>
+                  )}
+                </div>
+              ) : (
+                <p className="text-sm text-red-600 italic">No escalation contact defined</p>
+              )}
+              {isAdmin && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="mt-2 text-xs border-red-300 text-red-700 hover:bg-red-100"
+                  onClick={() => {
+                    const name = prompt('Escalation contact name (e.g., VP of Student Affairs):', task.escalationName || '');
+                    if (name !== null) {
+                      const email = prompt('Escalation contact email:', task.escalationEmail || '');
+                      if (email !== null) {
+                        // Update via API
+                        fetch(`/api/compliance-tasks/${task.id}`, {
+                          method: 'PATCH',
+                          headers: { 'Content-Type': 'application/json' },
+                          credentials: 'include',
+                          body: JSON.stringify({ escalationName: name || null, escalationEmail: email || null })
+                        }).then(() => {
+                          // Invalidate queries to refresh
+                          window.location.reload();
+                        });
+                      }
+                    }
+                  }}
+                >
+                  {task.escalationEmail ? 'Edit' : 'Set'} Escalation Contact
+                </Button>
+              )}
+            </div>
 
             {/* Evidence Requirements */}
             {task.evidenceRequired && (

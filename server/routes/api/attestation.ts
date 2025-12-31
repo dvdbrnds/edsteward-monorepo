@@ -92,7 +92,9 @@ router.post('/send', requireAuth, requireAdmin, async (req: Request, res: Respon
     const reg = regulation[0];
 
     // Check if regulation is eligible for email attestation
-    if (reg.riskLevel === 'critical' || reg.riskLevel === 'high') {
+    // Only block if riskLevel is explicitly set to critical or high
+    const riskLevel = (reg as any).riskLevel;
+    if (riskLevel === 'critical' || riskLevel === 'high') {
       return res.status(400).json({ 
         error: 'High-risk and critical regulations cannot use email attestation. User must log in to attest.' 
       });
@@ -108,11 +110,12 @@ router.post('/send', requireAuth, requireAdmin, async (req: Request, res: Respon
       token,
       regulationId,
       userId: targetUserId, // Can be null for manual email
+      email: targetEmail, // Required target email
       attestationType,
       attestationStatement,
       attestationPeriod,
       expiresAt,
-      createdBy: (req as any).user?.id,
+      sentBy: (req as any).user?.id,
     }).returning();
 
     // Generate attestation URL
@@ -125,15 +128,7 @@ router.post('/send', requireAuth, requireAdmin, async (req: Request, res: Respon
     
     const emailSent = await emailService.sendEmail(targetEmail, emailSubject, emailBody);
 
-    if (emailSent) {
-      // Update token record with email sent info
-      await db.update(attestationTokens)
-        .set({ 
-          emailSentAt: new Date(),
-          emailSentTo: targetEmail 
-        })
-        .where(eq(attestationTokens.id, tokenRecord.id));
-    }
+    // Email already stored in token record, no need to update
 
     res.json({
       success: true,
@@ -172,11 +167,11 @@ router.get('/verify/:token', async (req: Request, res: Response) => {
     }
 
     // Check if already used
-    if (tokenRecord.usedAt) {
+    if (tokenRecord.completedAt) {
       return res.status(400).json({ 
         error: 'This attestation has already been completed',
         code: 'TOKEN_ALREADY_USED',
-        completedAt: tokenRecord.usedAt
+        completedAt: tokenRecord.completedAt
       });
     }
 
@@ -238,7 +233,7 @@ router.post('/confirm/:token', async (req: Request, res: Response) => {
   try {
     const { token } = req.params;
     const clientIp = req.ip || req.headers['x-forwarded-for'] || 'unknown';
-    const userAgent = req.headers['user-agent'] || 'unknown';
+    const _userAgent = req.headers['user-agent'] || 'unknown';
 
     // Find and validate the token
     const [tokenRecord] = await db.select()
@@ -254,11 +249,11 @@ router.post('/confirm/:token', async (req: Request, res: Response) => {
     }
 
     // Check if already used
-    if (tokenRecord.usedAt) {
+    if (tokenRecord.completedAt) {
       return res.status(400).json({ 
         error: 'This attestation has already been completed',
         code: 'TOKEN_ALREADY_USED',
-        completedAt: tokenRecord.usedAt
+        completedAt: tokenRecord.completedAt
       });
     }
 
@@ -290,9 +285,10 @@ router.post('/confirm/:token', async (req: Request, res: Response) => {
     const completedAt = new Date();
     await db.update(attestationTokens)
       .set({
-        usedAt: completedAt,
-        usedIp: String(clientIp),
-        usedUserAgent: String(userAgent).substring(0, 500), // Limit length
+        completedAt: completedAt,
+        completedByIp: String(clientIp),
+        completedByName: user ? `${user.firstName || ''} ${user.lastName || ''}`.trim() : undefined,
+        completedByEmail: user?.email,
       })
       .where(eq(attestationTokens.id, tokenRecord.id));
 
@@ -360,7 +356,7 @@ router.get('/pending', requireAuth, requireAdmin, async (req: Request, res: Resp
       .from(attestationTokens)
       .where(
         and(
-          isNull(attestationTokens.usedAt),
+          isNull(attestationTokens.completedAt),
           gt(attestationTokens.expiresAt, new Date())
         )
       );
@@ -388,7 +384,7 @@ router.get('/history/:regulationId', requireAuth, async (req: Request, res: Resp
       createdAt: attestationTokens.createdAt,
       emailSentAt: attestationTokens.emailSentAt,
       emailSentTo: attestationTokens.emailSentTo,
-      usedAt: attestationTokens.usedAt,
+      completedAt: attestationTokens.completedAt,
       expiresAt: attestationTokens.expiresAt,
     })
       .from(attestationTokens)

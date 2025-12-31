@@ -8,7 +8,7 @@ import {
   requireComplianceOfficer,
   attachUserPermissions
 } from '../../middleware/role-based-auth';
-import { auditRegulationAction, auditEvidence } from '../../middleware/audit-middleware';
+import { auditRegulationAction, auditEvidence as _auditEvidence } from '../../middleware/audit-middleware';
 import multer from 'multer';
 
 // Simple multer configuration for evidence uploads
@@ -185,7 +185,7 @@ router.get("/ids", requireAuth, async (req, res) => {
 });
 
 // Get single regulation by ID
-router.get("/:regulationId", async (req, res) => {
+router.get("/:regulationId", async (req: any, res) => {
   try {
     const startTime = Date.now();
     const regulationId = parseInt(req.params.regulationId);
@@ -203,11 +203,22 @@ router.get("/:regulationId", async (req, res) => {
       return res.status(404).json({ error: "Regulation not found" });
     }
 
+    // Add ownership info if user is authenticated
+    const user = req.user;
+    const ownerId = (regulation as any).ownerId ?? (regulation as any).owner_id;
+    const isOwner = user ? user.id === ownerId : false;
+    
+    // Return regulation with ownership info
+    const regulationWithOwnership = {
+      ...regulation,
+      isOwner, // true if current user is the Primary DRI for this regulation
+      ownerId: ownerId || null,
+    };
 
     const totalTime = Date.now() - startTime;
     syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Fetched regulation ${regulationId} in ${totalTime}ms`);
 
-    res.json(regulation);
+    res.json(regulationWithOwnership);
   } catch (error) {
     syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Failed to fetch regulation ${req.params.regulationId}: ${error instanceof Error ? error.message : String(error)}`);
     res.status(500).json({ 
@@ -351,7 +362,7 @@ router.put("/:regulationId", requireAuth, requireComplianceOfficer, async (req, 
     const updateData = req.body;
     
     // Remove any fields that shouldn't be updated directly
-    const { id, version_number, version_date, ...safeUpdateData } = updateData;
+    const { id: _id, version_number: _version_number, version_date: _version_date, ...safeUpdateData } = updateData;
     
     // Add timestamp for last_updated
     safeUpdateData.last_updated = new Date().toISOString();

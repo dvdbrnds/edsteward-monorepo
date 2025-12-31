@@ -31,6 +31,7 @@ import TrusteesDashboard from "@/pages/trustees-dashboard";
 import AttestationPage from "@/pages/attestation-page";
 import TaskPage from "@/pages/task-page";
 import TaskAnalyticsPage from "@/pages/task-analytics-page";
+import ExecutiveDashboardPage from "@/pages/executive-dashboard-page";
 import { ProtectedRoute } from "./lib/protected-route";
 import { ProtectedRegulationRoute } from "./lib/protected-regulation-route";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
@@ -72,6 +73,9 @@ export default function App() {
               <Route path="/task/:token" component={TaskPage} />
 
               {/* Protected Routes - Authentication Required */}
+              <Route path="/analytics">
+                <ExecutiveDashboardPage />
+              </Route>
               <ProtectedRoute path="/" component={HomePage} />
               {/* Admin Dashboard - DISABLED */}
               {/* {currentTenant === 'admin' && (

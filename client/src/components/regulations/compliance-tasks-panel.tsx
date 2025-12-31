@@ -117,6 +117,9 @@ interface ComplianceTask {
   evidenceCount: number;
   evidenceItems?: EvidenceItem[];
   subTasks: ComplianceTask[];
+  // Escalation path
+  escalationEmail: string | null;
+  escalationName: string | null;
 }
 
 interface TasksResponse {

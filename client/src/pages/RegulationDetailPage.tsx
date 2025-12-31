@@ -90,6 +90,9 @@ type RegulationWithOverride = Regulation & {
   responsibleOfficeEmail?: string;
   escalationTarget?: string;
   escalationEmail?: string;
+  // Primary DRI (owner) info - returned from API
+  isOwner?: boolean; // true if current user is the Primary DRI for this regulation
+  ownerId?: number | null; // ID of the assigned Primary DRI
 };
 
 import Navigation from "@/components/layout/navigation";
@@ -195,6 +198,8 @@ function RegulationDetailPage() {
   
   const regulationId = location.split("/")[2];
   const isAdmin = user?.role?.toLowerCase() === "admin";
+  // isRegulationAdmin = global admin OR Primary DRI for this regulation
+  // This is computed after regulation data loads
 
   const { data: regulation, isLoading } = useQuery<RegulationWithOverride>({
     queryKey: ["/api/regulations", regulationId],
@@ -249,11 +254,18 @@ function RegulationDetailPage() {
   // Check if regulation exists 
   const hasRegulation = regulation != null;
   
+  // isRegulationAdmin: either global admin OR the Primary DRI for this regulation
+  // Primary DRI has admin-like controls but ONLY for their assigned regulation
+  const isOwner = regulation?.isOwner || false;
+  const isRegulationAdmin = isAdmin || isOwner;
+  
+  console.log("Primary DRI check:", { isOwner, isRegulationAdmin, ownerId: regulation?.ownerId });
+  
   // Ensure actions is always available (initialize if missing)
   const actions = regulation?.actions || [];
   
-  // Make admin tools visible if the user is an admin and regulation exists
-  const categoryVisible = isAdmin && hasRegulation;
+  // Make admin tools visible if the user is a regulation admin and regulation exists
+  const categoryVisible = isAdmin && hasRegulation; // Category changes still require global admin
   // Note: notificationOverrideVisible removed - now using NotificationOverrideControl component
   
   console.log("Admin tools visibility check:", { 
@@ -336,7 +348,7 @@ function RegulationDetailPage() {
     },
     onSuccess: () => {
       toast({
-        title: "Owner Updated",
+        title: "Primary DRI Updated",
         description: "The regulation has been assigned successfully.",
       });
       // Force refetch of regulation data
@@ -712,35 +724,38 @@ function RegulationDetailPage() {
                       </Select>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-500">Assigned to:</span>
+                      <span className="text-xs text-gray-500">Primary DRI:</span>
                       <Select
                         key={`owner-${regulation.ownerId || 'none'}`}
                         value={regulation.ownerId?.toString() || "unassigned"}
                         onValueChange={(value) => ownerMutation.mutate(value)}
                       >
-                        <SelectTrigger className="w-[200px] bg-blue-50 border border-blue-200 rounded-md hover:bg-blue-100 transition-colors">
-                          <SelectValue placeholder="Select owner...">
+                        <SelectTrigger className="w-[220px] bg-indigo-50 border border-indigo-200 rounded-md hover:bg-indigo-100 transition-colors">
+                          <SelectValue placeholder="Assign Primary DRI...">
                             {regulation.ownerId 
                               ? users.find(u => u.id === regulation.ownerId)?.username || `User ${regulation.ownerId}`
-                              : "— Unassigned —"}
+                              : "— No Primary DRI —"}
                           </SelectValue>
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="unassigned">
-                            <span className="text-gray-500">— Unassigned —</span>
+                            <span className="text-gray-500">— No Primary DRI —</span>
                           </SelectItem>
                           {users
-                            .filter(u => u.role === 'compliance_officer' || u.role === 'admin')
-                            .map((user) => (
-                              <SelectItem key={user.id} value={user.id.toString()}>
-                                {user.firstName && user.lastName 
-                                  ? `${user.firstName} ${user.lastName}` 
-                                  : user.username}
-                                <span className="text-xs text-gray-400 ml-2">
-                                  ({user.role === 'admin' ? 'Admin' : 'Officer'})
-                                </span>
-                              </SelectItem>
-                            ))}
+                            .filter(u => (u.role === 'compliance_officer' || u.role === 'admin') && (u.firstName || u.lastName || u.username))
+                            .map((u) => {
+                              const displayName = (u.firstName && u.lastName) 
+                                ? `${u.firstName} ${u.lastName}` 
+                                : u.username || u.email || `User ${u.id}`;
+                              return (
+                                <SelectItem key={u.id} value={u.id.toString()}>
+                                  {displayName}
+                                  <span className="text-xs text-gray-400 ml-2">
+                                    ({u.role === 'admin' ? 'Admin' : 'Officer'})
+                                  </span>
+                                </SelectItem>
+                              );
+                            })}
                         </SelectContent>
                       </Select>
                     </div>
@@ -811,7 +826,7 @@ function RegulationDetailPage() {
                 <Printer className="h-4 w-4" />
                 Print Report
               </Button>
-              {isAdmin && (
+              {isRegulationAdmin && (
                 <>
                   <Button
                     variant="default"
@@ -819,7 +834,7 @@ function RegulationDetailPage() {
                     onClick={() => setShowAttestationDialog(true)}
                   >
                     <Mail className="h-4 w-4" />
-                    Send Attestation
+                    Send Attestation Request
                   </Button>
                   <Button
                     variant="default"
@@ -894,7 +909,7 @@ function RegulationDetailPage() {
                         </p>
                       </div>
                     </div>
-                    {isAdmin && (
+                    {isRegulationAdmin && (
                       <Button
                         variant="outline"
                         size="sm"
@@ -938,7 +953,7 @@ function RegulationDetailPage() {
                           </button>
                         )}
                       </div>
-                      {isAdmin && (
+                      {isRegulationAdmin && (
                         <Button
                           variant="outline"
                           size="sm"
@@ -1008,8 +1023,8 @@ function RegulationDetailPage() {
                             <FileText className="h-4 w-4" />
                           )}
                           {action.type.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')}
-                          {/* Attestation is always required - no toggle. Other actions can be toggled by admin */}
-                          {isAdmin && action.type !== 'attestation' && (
+                          {/* Attestation is always required - no toggle. Other actions can be toggled by regulation admin */}
+                          {isRegulationAdmin && action.type !== 'attestation' && (
                             <Switch
                               checked={action.required}
                               onCheckedChange={(required) => {
@@ -1106,7 +1121,7 @@ function RegulationDetailPage() {
                   <ComplianceTasksPanel
                     regulationId={regulation.id}
                     regulationName={regulation.name || regulation.topic || 'Unknown'}
-                    isAdmin={isAdmin}
+                    isAdmin={isRegulationAdmin}
                   />
                 </CollapsibleContent>
               </Collapsible>
@@ -1158,7 +1173,7 @@ function RegulationDetailPage() {
                     </Badge>
                   </div>
                   <div className="flex items-center gap-2">
-                    {isAdmin && (
+                    {isRegulationAdmin && (
                       <Button 
                         variant="ghost" 
                         size="sm"
@@ -1200,7 +1215,7 @@ function RegulationDetailPage() {
                             {deadline.isDefault && <span className="text-xs text-orange-600">🎃 Default Oct 31</span>}
                           </div>
                         </div>
-                        {isAdmin && (
+                        {isRegulationAdmin && (
                           <div className="flex items-center gap-1">
                             {deadline.status !== 'completed' && (
                               <Button size="sm" variant="ghost" onClick={() => updateDeadlineMutation.mutate({ id: deadline.id, status: 'completed' })}>

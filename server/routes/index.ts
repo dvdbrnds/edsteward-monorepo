@@ -33,6 +33,7 @@ import { debugRouter } from './api/debug';
 import { emergencyMoravianRouter } from './api/emergency-moravian-fix';
 import attestationRouter from './api/attestation';
 import complianceTasksRouter from './api/compliance-tasks';
+import dashboardAnalyticsRouter from './api/dashboard-analytics';
 // @ts-ignore
 import migrationRoutes from './database-migration.js';
 
@@ -424,6 +425,7 @@ export function registerRoutes(app: express.Application): Server {
   app.use('/api/audit', auditRouter); // Audit trail for compliance tracking
   app.use('/api/attestation', attestationRouter); // Email attestation for low-risk regulations
   app.use('/api/compliance-tasks', complianceTasksRouter); // Complex regulation task management
+  app.use('/api/dashboard-analytics', dashboardAnalyticsRouter); // Executive dashboard analytics
 
   // AWS Tenant Management - Only available on admin.edsteward.ai
   app.use('/api/aws-tenant-management', (req, res, next) => {
@@ -600,6 +602,49 @@ export function registerRoutes(app: express.Application): Server {
       console.error("Error resetting password:", error);
       res.status(500).json({
         error: "Failed to reset password",
+        details: error instanceof Error ? error.message : String(error)
+      });
+    }
+  });
+
+  // Delete user endpoint
+  app.delete('/api/admin/users/:id', async (req: any, res) => {
+    try {
+      // Check if user is admin
+      if (!req.user || req.user.role?.toLowerCase() !== 'admin') {
+        return res.status(403).json({ error: 'Admin access required' });
+      }
+
+      const userId = parseInt(req.params.id);
+      if (isNaN(userId)) {
+        return res.status(400).json({ error: 'Invalid user ID' });
+      }
+
+      // Prevent deleting yourself
+      if (req.user.id === userId) {
+        return res.status(400).json({ error: 'Cannot delete your own account' });
+      }
+
+      const { users, regulations } = await import('@shared/schema');
+      const { db } = await import('../db');
+      const { eq } = await import('drizzle-orm');
+
+      // Check if user is assigned as owner of any regulations
+      const ownedRegs = await db.select().from(regulations).where(eq(regulations.ownerId, userId));
+      if (ownedRegs.length > 0) {
+        return res.status(400).json({ 
+          error: `Cannot delete user - they are Primary DRI for ${ownedRegs.length} regulation(s). Reassign those first.` 
+        });
+      }
+
+      // Delete the user
+      await db.delete(users).where(eq(users.id, userId));
+
+      res.json({ success: true, message: 'User deleted successfully' });
+    } catch (error) {
+      console.error("Error deleting user:", error);
+      res.status(500).json({
+        error: "Failed to delete user",
         details: error instanceof Error ? error.message : String(error)
       });
     }

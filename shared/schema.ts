@@ -1042,6 +1042,10 @@ export const complianceTasks = pgTable("compliance_tasks", {
   sortOrder: integer("sort_order").default(0),
   isTemplate: boolean("is_template").default(false), // Template tasks for regulation setup
   
+  // Escalation path - who to escalate to if task is overdue/blocked
+  escalationEmail: text("escalation_email"), // Email address for escalation
+  escalationName: text("escalation_name"), // Name/title of escalation contact (e.g., "VP of Student Affairs")
+  
   // Metadata
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
