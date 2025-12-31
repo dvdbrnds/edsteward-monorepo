@@ -227,7 +227,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
       <CardContent className="p-6">
         <div className="flex flex-col sm:flex-row gap-4 mb-6">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search regulations..."
               value={search}
@@ -292,16 +292,16 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
                 return (
                   <TableRow
                     key={regulation.id}
-                    className="cursor-pointer hover:bg-gray-50"
+                    className="cursor-pointer hover:bg-muted"
                     onClick={() => handleRowClick(regulation)}
                   >
                     <TableCell>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-muted-foreground">
                         {regulation.itemId}
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="text-base font-medium text-gray-900">
+                      <div className="text-base font-medium text-foreground">
                         {regulation.name || regulation.statute || 'Untitled Regulation'}
                       </div>
                     </TableCell>
@@ -366,7 +366,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
                           </span>
                         </div>
                       ) : (
-                        <span className="text-gray-500">No deadlines</span>
+                        <span className="text-muted-foreground">No deadlines</span>
                       )}
                     </TableCell>
                     <TableCell>
@@ -375,7 +375,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
                           {format(new Date(regulation.lastUpdated), "PP")}
                         </div>
                       ) : (
-                        <span className="text-gray-500">Not updated</span>
+                        <span className="text-muted-foreground">Not updated</span>
                       )}
                     </TableCell>
                     <TableCell>

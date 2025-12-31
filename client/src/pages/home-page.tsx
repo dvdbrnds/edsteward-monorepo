@@ -50,13 +50,13 @@ export default function HomePage() {
 
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Navigation />
 
       <main className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#002147]">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
               Welcome, {user?.username}
             </h1>
           </div>
@@ -105,14 +105,14 @@ export default function HomePage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-0">
-                <div className="space-y-2 max-h-[515px] overflow-y-auto pr-3 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-400 px-6 pb-4">
+                <div className="space-y-2 max-h-[515px] overflow-y-auto pr-3 scrollbar-thin px-6 pb-4">
                   {notificationsLoading ? (
-                    <p className="text-gray-500 text-center py-4">Loading notifications...</p>
+                    <p className="text-muted-foreground text-center py-4">Loading notifications...</p>
                   ) : notificationHistory?.notifications && notificationHistory.notifications.length > 0 ? (
                     notificationHistory.notifications.map((notification) => (
                       <div
                         key={notification.id}
-                        className={`p-3 border rounded-lg hover:bg-gray-50 transition-colors ${notification.regulation ? 'cursor-pointer hover:border-blue-300' : ''}`}
+                        className={`p-3 border rounded-lg hover:bg-muted transition-colors ${notification.regulation ? 'cursor-pointer hover:border-blue-300' : ''}`}
                         onClick={() => {
                           if (notification.regulation) {
                             window.location.href = `/regulations/${notification.regulation.id}`;
@@ -151,7 +151,7 @@ export default function HomePage() {
                                 </span>
                               )}
                             </div>
-                            <div className="flex items-center gap-2 text-xs text-gray-500">
+                            <div className="flex items-center gap-2 text-xs text-muted-foreground">
                               <span>
                                 {new Date(notification.sentAt || notification.createdAt).toLocaleDateString()}
                               </span>
@@ -169,7 +169,7 @@ export default function HomePage() {
                       </div>
                     ))
                   ) : (
-                    <p className="text-gray-500 text-center py-4">
+                    <p className="text-muted-foreground text-center py-4">
                       No recent notifications
                     </p>
                   )}
@@ -179,7 +179,7 @@ export default function HomePage() {
           </div>
 
           {/* Board of Trustees Dashboard Card */}
-          <Card className="mt-8 mb-6 bg-gradient-to-r from-slate-50 to-blue-50 border-blue-100">
+          <Card className="mt-8 mb-6 bg-gradient-to-r from-muted to-blue-500/10 border-blue-500/20">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Users className="h-5 w-5 text-blue-600" />
@@ -191,7 +191,7 @@ export default function HomePage() {
             </CardHeader>
             <CardContent>
               <div className="flex items-center justify-between">
-                <p className="text-sm text-slate-600 max-w-xl">
+                <p className="text-sm text-muted-foreground max-w-xl">
                   Access the view-only dashboard providing an overview of our regulatory compliance status.
                   This dashboard is designed specifically for the board of trustees to monitor compliance metrics
                   and receive status updates.
@@ -208,7 +208,7 @@ export default function HomePage() {
 
           {/* Regulations List Section */}
           <div className="mt-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+            <h2 className="text-2xl font-bold text-foreground mb-4">
               {selectedCategory ? `${selectedCategory} Regulations` : 'All Regulations'}
             </h2>
 

@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -9,7 +10,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
 import { useBranding } from "@/hooks/use-branding";
 
 // Import logos
@@ -54,10 +54,34 @@ export default function AuthPage() {
     return null;
   }
 
+  // Force light mode CSS variables for auth page
+  const lightModeStyle = {
+    backgroundColor: branding.loginScreenBackgroundColor,
+    '--background': '0 0% 100%',
+    '--foreground': '222.2 84% 4.9%',
+    '--card': '0 0% 100%',
+    '--card-foreground': '222.2 84% 4.9%',
+    '--popover': '0 0% 100%',
+    '--popover-foreground': '222.2 84% 4.9%',
+    '--primary': '222.2 47.4% 11.2%',
+    '--primary-foreground': '210 40% 98%',
+    '--secondary': '210 40% 96.1%',
+    '--secondary-foreground': '222.2 47.4% 11.2%',
+    '--muted': '210 40% 96.1%',
+    '--muted-foreground': '215.4 16.3% 46.9%',
+    '--accent': '210 40% 96.1%',
+    '--accent-foreground': '222.2 47.4% 11.2%',
+    '--destructive': '0 84.2% 60.2%',
+    '--destructive-foreground': '210 40% 98%',
+    '--border': '214.3 31.8% 91.4%',
+    '--input': '214.3 31.8% 91.4%',
+    '--ring': '222.2 84% 4.9%',
+  } as React.CSSProperties;
+
   return (
     <div 
       className="min-h-screen flex"
-      style={{ backgroundColor: branding.loginScreenBackgroundColor }}
+      style={lightModeStyle}
     >
       {/* Form Section */}
       <div className="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-20 xl:px-24">

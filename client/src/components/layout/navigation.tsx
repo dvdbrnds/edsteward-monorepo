@@ -22,6 +22,8 @@ import {
   BarChart3,
   Menu,
   X,
+  Sun,
+  Moon,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -33,6 +35,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useQuery } from "@tanstack/react-query";
 import { useLegacyBranding } from "@/hooks/use-branding";
+import { useTheme } from "@/hooks/use-theme";
 
 // TUF component removed - deprecated system
 
@@ -53,6 +56,7 @@ export default function Navigation() {
   const { user, logoutMutation } = useAuth();
   const [location] = useLocation();
   const branding = useLegacyBranding();
+  const { resolvedTheme, toggleTheme } = useTheme();
   
   // Tenant detection for AWS management visibility
   const [_currentTenant, setCurrentTenant] = useState<string | null>(null);
@@ -191,8 +195,21 @@ export default function Navigation() {
 
           {/* Security Status and User Menu */}
           <div className="flex items-center flex-shrink-0 gap-3">
-            {/* TUF Status removed - deprecated system */}
-{/* <WebSocketStatus /> */}
+            {/* Dark Mode Toggle */}
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={toggleTheme}
+              className="text-gray-300 hover:text-white"
+              title={resolvedTheme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            >
+              {resolvedTheme === 'dark' ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
+            </Button>
+
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button
@@ -214,6 +231,23 @@ export default function Navigation() {
                     <span>Account Settings</span>
                   </DropdownMenuItem>
                 </Link>
+                <DropdownMenuItem
+                  onClick={toggleTheme}
+                  className="flex items-center cursor-pointer"
+                >
+                  {resolvedTheme === 'dark' ? (
+                    <>
+                      <Sun className="mr-2 h-4 w-4" />
+                      <span>Light Mode</span>
+                    </>
+                  ) : (
+                    <>
+                      <Moon className="mr-2 h-4 w-4" />
+                      <span>Dark Mode</span>
+                    </>
+                  )}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={() => logoutMutation.mutate()}
                   disabled={logoutMutation.isPending}

@@ -56,11 +56,11 @@ export default function UpcomingDeadlines({ categoryFilter, limit }: UpcomingDea
         <CardTitle>
           Upcoming Deadlines
           {categoryFilter && (
-            <span className="text-sm font-normal text-gray-500 ml-2">
+            <span className="text-sm font-normal text-muted-foreground ml-2">
               ({categoryFilter})
             </span>
           )}
-          <span className="text-sm font-normal text-gray-500 ml-2">
+          <span className="text-sm font-normal text-muted-foreground ml-2">
             ({sortedDeadlines.length} {sortedDeadlines.length === 1 ? 'deadline' : 'deadlines'})
           </span>
         </CardTitle>
@@ -88,7 +88,7 @@ export default function UpcomingDeadlines({ categoryFilter, limit }: UpcomingDea
                         setLocation(`/regulations/${regulation.id}`);
                       }
                     }}
-                    className="flex items-center justify-between p-3 bg-white border rounded-lg hover:border-[#00267A] hover:shadow-sm transition-all cursor-pointer w-full"
+                    className="flex items-center justify-between p-3 bg-background dark:bg-secondary border rounded-lg hover:border-primary hover:shadow-sm transition-all cursor-pointer w-full"
                   >
                     <div className="flex items-center space-x-3 min-w-0 flex-1">
                       {deadline.status === "completed" ? (
@@ -101,10 +101,10 @@ export default function UpcomingDeadlines({ categoryFilter, limit }: UpcomingDea
                         <Clock className="h-4 w-4 text-blue-500 flex-shrink-0" />
                       )}
                       <div className="min-w-0 flex-1">
-                        <p className="font-medium text-gray-900 hover:text-[#00267A] transition-colors truncate text-sm">
+                        <p className="font-medium text-foreground hover:text-primary transition-colors truncate text-sm">
                           {regulationTitle}
                         </p>
-                        <p className="text-xs text-gray-500 truncate">
+                        <p className="text-xs text-muted-foreground truncate">
                           Due: {deadline.dueDate ? format(new Date(deadline.dueDate), "PP") : "Date not set"}
                           {daysUntilDue > 0 && deadline.status !== "completed" && (
                             <span className="ml-2">
@@ -140,7 +140,7 @@ export default function UpcomingDeadlines({ categoryFilter, limit }: UpcomingDea
               );
             })}
             {sortedDeadlines.length === 0 && (
-              <div className="text-center text-gray-500 py-4">
+              <div className="text-center text-muted-foreground py-4">
                 No deadlines {categoryFilter ? `for ${categoryFilter}` : ''} found
               </div>
             )}
