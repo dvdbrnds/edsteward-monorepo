@@ -35,8 +35,16 @@ import {
   ArrowRight,
   RefreshCw,
   Target,
-  Zap
+  Zap,
+  Download,
+  FileSpreadsheet,
 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 interface DashboardAnalytics {
   overview: {
@@ -267,15 +275,39 @@ export const ExecutiveDashboard: React.FC = () => {
             Last updated: {new Date(data.overview.lastUpdated).toLocaleString()}
           </p>
         </div>
-        <Button 
-          variant="outline" 
-          size="sm" 
-          onClick={() => refetch()}
-          disabled={isFetching}
-        >
-          <RefreshCw className={`h-4 w-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
-          Refresh
-        </Button>
+        <div className="flex items-center gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" size="sm">
+                <Download className="h-4 w-4 mr-2" />
+                Export
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => window.open('/api/reports/export/regulations/csv', '_blank')}>
+                <FileSpreadsheet className="h-4 w-4 mr-2" />
+                Regulations (CSV)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => window.open('/api/reports/export/tasks/csv', '_blank')}>
+                <FileSpreadsheet className="h-4 w-4 mr-2" />
+                Tasks (CSV)
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => window.open('/api/reports/export/deadlines/csv', '_blank')}>
+                <FileSpreadsheet className="h-4 w-4 mr-2" />
+                Deadlines (CSV)
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => refetch()}
+            disabled={isFetching}
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${isFetching ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+        </div>
       </div>
 
       {/* Alert Banner for Critical Issues */}

@@ -20,6 +20,8 @@ import {
   Shield,
   Bell,
   BarChart3,
+  Menu,
+  X,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -54,6 +56,7 @@ export default function Navigation() {
   
   // Tenant detection for AWS management visibility
   const [_currentTenant, setCurrentTenant] = useState<string | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   useEffect(() => {
     const hostname = window.location.hostname;
@@ -174,6 +177,18 @@ export default function Navigation() {
             </div>
           </div>
 
+          {/* Mobile Menu Button */}
+          <div className="flex items-center sm:hidden">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="text-white"
+            >
+              {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+            </Button>
+          </div>
+
           {/* Security Status and User Menu */}
           <div className="flex items-center flex-shrink-0 gap-3">
             {/* TUF Status removed - deprecated system */}
@@ -221,6 +236,33 @@ export default function Navigation() {
           </div>
         </div>
       </div>
+
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <div className="sm:hidden" style={{ backgroundColor: branding.primaryColor }}>
+          <div className="px-2 pt-2 pb-3 space-y-1">
+            {links.map((link) => {
+              const Icon = link.icon;
+              const isActive = location === link.href;
+              return (
+                <Link key={link.href} href={link.href}>
+                  <button
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={`${
+                      isActive
+                        ? "bg-white/10 text-white"
+                        : "text-gray-300 hover:bg-white/5 hover:text-white"
+                    } flex items-center w-full px-3 py-2 rounded-md text-base font-medium`}
+                  >
+                    <Icon className="h-5 w-5 mr-3" />
+                    {link.label}
+                  </button>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </nav>
   );
 }

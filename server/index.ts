@@ -19,6 +19,7 @@ import { institutionConfig, validateConfig } from './config/institution';
 import { configureAuth } from './auth/single-tenant-auth';
 import { testConnection } from './services/database';
 import { registerRoutes } from './routes';
+import { startTaskScheduler } from './services/task-scheduler';
 
 // ES Module compatibility: Get current file path
 const __filename = fileURLToPath(import.meta.url);
@@ -369,6 +370,9 @@ httpServer.listen(PORT, '0.0.0.0', async () => {
   
   // Start database connection monitoring to prevent crashes
   startDatabaseMonitoring();
+  
+  // Start task notification scheduler
+  startTaskScheduler();
 });
 
 // DATABASE MONITORING: Prevent database-related crashes

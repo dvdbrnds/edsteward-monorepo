@@ -61,9 +61,11 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { TaskDetailDialog } from './task-detail-dialog';
+import { BulkTaskOperations } from './bulk-task-operations';
 
 interface EvidenceItem {
   id: number;
@@ -166,7 +168,9 @@ function TaskItem({
   onEscalate,
   onTaskClick,
   onAddEvidence,
-  depth = 0 
+  depth = 0,
+  selectedTaskIds = [],
+  onToggleSelect,
 }: { 
   task: ComplianceTask; 
   isAdmin?: boolean;
@@ -176,6 +180,8 @@ function TaskItem({
   onTaskClick: (_task: ComplianceTask) => void;
   onAddEvidence: (_task: ComplianceTask) => void;
   depth?: number;
+  selectedTaskIds?: number[];
+  onToggleSelect?: (_taskId: number) => void;
 }) {
   const [expanded, setExpanded] = useState(depth === 0);
   const hasSubTasks = task.subTasks && task.subTasks.length > 0;
@@ -194,8 +200,18 @@ function TaskItem({
       <div className={cn(
         "flex items-start gap-3 p-3 rounded-lg mb-2 transition-colors",
         task.status === 'completed' ? 'bg-green-50' : 
-        isOverdue ? 'bg-red-50' : 'bg-white hover:bg-gray-50'
+        isOverdue ? 'bg-red-50' : 'bg-white hover:bg-gray-50',
+        selectedTaskIds.includes(task.id) && 'ring-2 ring-blue-500 ring-inset'
       )}>
+        {/* Selection Checkbox (admin only) */}
+        {isAdmin && onToggleSelect && (
+          <Checkbox
+            checked={selectedTaskIds.includes(task.id)}
+            onCheckedChange={() => onToggleSelect(task.id)}
+            className="mt-1"
+          />
+        )}
+
         {/* Expand/Collapse */}
         {hasSubTasks ? (
           <button 
@@ -553,6 +569,8 @@ function TaskItem({
               onTaskClick={onTaskClick}
               onAddEvidence={onAddEvidence}
               depth={depth + 1}
+              selectedTaskIds={selectedTaskIds}
+              onToggleSelect={onToggleSelect}
             />
           ))}
         </div>
@@ -575,6 +593,7 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
   const [evidenceLinkUrl, setEvidenceLinkUrl] = useState('');
   const [evidenceLinkTitle, setEvidenceLinkTitle] = useState('');
   const [evidenceType, setEvidenceType] = useState<'file' | 'link'>('file');
+  const [selectedTaskIds, setSelectedTaskIds] = useState<number[]>([]);
 
   // Fetch tasks
   const { data, isLoading, error } = useQuery<TasksResponse>({
@@ -779,21 +798,40 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
           </p>
         </div>
       ) : (
-        /* Task List */
-        <div className="space-y-2">
-          {data?.tasks.map(task => (
-            <TaskItem
-              key={task.id}
-              task={task}
-              isAdmin={isAdmin}
-              onStatusChange={(taskId, status) => updateStatusMutation.mutate({ taskId, status })}
-              onNudge={setNudgeTask}
-              onEscalate={setEscalateTask}
-              onTaskClick={setSelectedTask}
-              onAddEvidence={setEvidenceTask}
-            />
-          ))}
-        </div>
+        <>
+          {/* Bulk Operations Bar */}
+          <BulkTaskOperations
+            regulationId={regulationId}
+            tasks={data?.tasks?.flatMap(t => [t, ...t.subTasks]) || []}
+            selectedTaskIds={selectedTaskIds}
+            onSelectionChange={setSelectedTaskIds}
+            isAdmin={isAdmin}
+          />
+          
+          {/* Task List */}
+          <div className="space-y-2">
+            {data?.tasks.map(task => (
+              <TaskItem
+                key={task.id}
+                task={task}
+                isAdmin={isAdmin}
+                onStatusChange={(taskId, status) => updateStatusMutation.mutate({ taskId, status })}
+                onNudge={setNudgeTask}
+                onEscalate={setEscalateTask}
+                onTaskClick={setSelectedTask}
+                onAddEvidence={setEvidenceTask}
+                selectedTaskIds={selectedTaskIds}
+                onToggleSelect={(taskId) => {
+                  setSelectedTaskIds(prev => 
+                    prev.includes(taskId) 
+                      ? prev.filter(id => id !== taskId)
+                      : [...prev, taskId]
+                  );
+                }}
+              />
+            ))}
+          </div>
+        </>
       )}
 
       {/* Nudge Dialog */}

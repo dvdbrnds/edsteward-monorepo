@@ -1950,5 +1950,20 @@ router.post('/:taskId/notify', requireAdmin, async (req: Request, res: Response)
   }
 });
 
+/**
+ * GET /api/compliance-tasks/notifications/scheduler-status
+ * Get the current status of the task notification scheduler (admin only)
+ */
+router.get('/notifications/scheduler-status', requireAdmin, async (_req: Request, res: Response) => {
+  try {
+    const { getSchedulerStatus } = await import('../../services/task-scheduler');
+    const status = getSchedulerStatus();
+    res.json(status);
+  } catch (error) {
+    console.error('Error getting scheduler status:', error);
+    res.status(500).json({ error: 'Failed to get scheduler status' });
+  }
+});
+
 export default router;
 
