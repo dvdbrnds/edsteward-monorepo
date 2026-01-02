@@ -548,4 +548,119 @@ router.patch("/:regulationId/actions/:actionType", requireAuth, requireComplianc
   }
 });
 
+/**
+ * POST /api/regulations/:id/submit-to-agency
+ * Submit compliance evidence to the regulatory agency
+ * This endpoint:
+ * 1. Records the submission with timestamp and user info
+ * 2. Updates the agency_submission action to 'completed'
+ * 3. Logs to audit trail
+ */
+router.post('/:id/submit-to-agency', requireAuth, async (req, res) => {
+  const startTime = Date.now();
+  
+  try {
+    const regulationId = parseInt(req.params.id, 10);
+    const userId = (req.user as any)?.id;
+    const username = (req.user as any)?.username;
+    
+    if (!regulationId || isNaN(regulationId)) {
+      return res.status(400).json({ error: "Invalid regulation ID" });
+    }
+    
+    if (!userId) {
+      return res.status(401).json({ error: "User not authenticated" });
+    }
+    
+    // Get the regulation
+    const tenantStorage = getDatabaseStorage();
+    const regulation = await tenantStorage.getRegulation(regulationId);
+    
+    if (!regulation) {
+      return res.status(404).json({ error: "Regulation not found" });
+    }
+    
+    // Get current actions
+    const actions = Array.isArray(regulation.actions) ? [...regulation.actions] : [];
+    
+    // Find or create agency_submission action
+    const actionIndex = actions.findIndex(a => a.type === 'agency_submission');
+    const submissionDate = new Date();
+    
+    const completedAction = {
+      type: 'agency_submission' as const,
+      enabled: true,
+      required: true,
+      status: 'completed' as const,
+      completedDate: submissionDate.toISOString(),
+      completedBy: {
+        userId,
+        username,
+      },
+      completedAt: submissionDate.toISOString(),
+      notes: `Submitted to ${regulation.agency_name || 'agency'} on ${submissionDate.toLocaleDateString()}`,
+    };
+    
+    if (actionIndex === -1) {
+      actions.push(completedAction);
+    } else {
+      actions[actionIndex] = {
+        ...actions[actionIndex],
+        ...completedAction,
+      };
+    }
+    
+    // Update the regulation
+    await tenantStorage.updateRegulation(regulationId, { actions });
+    
+    // Log to audit trail if AuditService is available
+    try {
+      const { AuditService } = await import('../../services/audit');
+      await AuditService.logAction({
+        userId,
+        userEmail: (req.user as any)?.email || username,
+        action: 'agency_submission_completed',
+        entityType: 'regulation_action',
+        entityId: regulationId.toString(),
+        regulationId,
+        complianceImpact: true,
+        riskLevel: 'low',
+        ipAddress: req.ip || 'unknown',
+        metadata: {
+          agencyName: regulation.agency_name,
+          regulationName: regulation.name,
+          submittedBy: username,
+          submittedAt: submissionDate.toISOString(),
+        }
+      });
+    } catch (auditError) {
+      // Log but don't fail the request if audit logging fails
+      console.warn('Failed to log agency submission to audit trail:', auditError);
+    }
+    
+    const totalTime = Date.now() - startTime;
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Agency submission completed for regulation ${regulationId} by user ${username} in ${totalTime}ms`);
+    
+    res.json({
+      success: true,
+      message: `Successfully submitted to ${regulation.agency_name || 'agency'}`,
+      submission: {
+        regulationId,
+        regulationName: regulation.name,
+        agencyName: regulation.agency_name,
+        submittedBy: username,
+        submittedAt: submissionDate.toISOString(),
+        action: completedAction,
+      }
+    });
+  } catch (error) {
+    console.error('❌ Agency submission error:', error);
+    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Failed to submit to agency: ${error instanceof Error ? error.message : String(error)}`);
+    res.status(500).json({
+      error: "Failed to submit to agency",
+      details: error instanceof Error ? error.message : String(error),
+    });
+  }
+});
+
 export default router; 

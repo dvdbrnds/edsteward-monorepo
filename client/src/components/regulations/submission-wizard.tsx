@@ -208,10 +208,10 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
       // Move to next step instead of closing
       setCurrentStep('submit');
       queryClient.invalidateQueries({ queryKey: ['/api/regulations', regulation.id, 'evidence'] });
-    } catch (error) {
+    } catch (evidenceError) {
       toast({
         title: "Submission Failed",
-        description: "There was an error submitting your evidence. Please try again.",
+        description: evidenceError instanceof Error ? evidenceError.message : "There was an error submitting your evidence. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -223,16 +223,31 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
     try {
       setIsSubmittingToAgency(true);
 
-      // TODO: Implement actual agency submission logic here
-      // For now, just simulate a successful submission
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Submit to the backend API
+      const response = await fetch(`/api/regulations/${regulation.id}/submit-to-agency`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+      });
 
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || 'Failed to submit to agency');
+      }
+
+      const result = await response.json();
       const agencyName = regulation.agency_name || 'Agency';
       
       toast({
         title: "Successfully Submitted to " + agencyName,
-        description: "Your compliance submission has been sent to the agency.",
+        description: result.message || "Your compliance submission has been sent to the agency.",
       });
+
+      // Invalidate queries to refresh regulation data
+      queryClient.invalidateQueries({ queryKey: ['/api/regulations'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/regulations', regulation.id] });
 
       // Clear form and close dialog
       setUploadedFiles([]);
@@ -242,7 +257,7 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
     } catch (error) {
       toast({
         title: "Agency Submission Failed",
-        description: "There was an error submitting to the agency. Please try again.",
+        description: error instanceof Error ? error.message : "There was an error submitting to the agency. Please try again.",
         variant: "destructive",
       });
     } finally {
