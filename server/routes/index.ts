@@ -28,7 +28,7 @@ import usersRouter from './api/users';
 import mfaRouter from './api/mfa';
 import auditRouter from './api/audit';
 
-import awsTenantManagementRouter from './api/aws-tenant-management';
+// Note: aws-tenant-management was removed - belongs in separate admin-console app
 import { debugRouter } from './api/debug';
 import { emergencyMoravianRouter } from './api/emergency-moravian-fix';
 import attestationRouter from './api/attestation';
@@ -429,15 +429,7 @@ export function registerRoutes(app: express.Application): Server {
   app.use('/api/dashboard-analytics', dashboardAnalyticsRouter); // Executive dashboard analytics
   app.use('/api/reports', reportsRouter); // Compliance reports and exports
 
-  // AWS Tenant Management - Only available on admin.edsteward.ai
-  app.use('/api/aws-tenant-management', (req, res, next) => {
-    const hostname = req.get('host') || '';
-    if (hostname.startsWith('admin.')) {
-      awsTenantManagementRouter(req, res, next);
-    } else {
-      res.status(403).json({ error: 'AWS tenant management only available on admin.edsteward.ai' });
-    }
-  });
+  // Note: AWS Tenant Management was removed - belongs in separate admin-console app at admin.edsteward.ai
   
   app.use('/api/database-migration', migrationRoutes);
 
