@@ -13,7 +13,6 @@ import { useToast } from "@/hooks/use-toast";
 import { AlertCircle, Download, Loader2, RefreshCw, Trash2 } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import Navigation from "@/components/layout/navigation";
-import { apiRequest } from "@/lib/api";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { format } from "date-fns";
 import { InstitutionSettings } from "@/components/admin/institution-settings";
@@ -104,35 +103,12 @@ export default function SystemSettingsPage() {
   const [isSendingTest, setIsSendingTest] = useState(false);
   const [page, setPage] = useState(1);
   const [autoRefresh, setAutoRefresh] = useState(false);
-  const [logs, setLogs] = useState<any[]>([]);
   const refreshInterval = 10000; // 10 seconds
-  
-  // Redirect if user is not an admin
-  if (!user || user.role?.toLowerCase() !== "admin") {
-    return (
-      <div className="min-h-screen bg-gray-50">
-        <Navigation />
-        <main className="py-10">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center">
-              <h2 className="text-2xl font-semibold text-gray-900">Access Denied</h2>
-              <p className="mt-2 text-gray-600">You do not have permission to access admin settings.</p>
-              <Button
-                variant="outline"
-                onClick={() => window.history.back()}
-                className="mt-4"
-              >
-                <AlertCircle className="h-4 w-4 mr-2" />
-                Go Back
-              </Button>
-            </div>
-          </div>
-        </main>
-      </div>
-    );
-  }
 
+  // Check if user is admin (used for conditional rendering below)
+  const isAdmin = user?.role?.toLowerCase() === "admin";
 
+  // ALL HOOKS MUST BE CALLED UNCONDITIONALLY (React rules of hooks)
   const form = useForm<FormValues>({
     resolver: zodResolver(insertEmailConfigSchema),
     defaultValues: {
@@ -155,6 +131,7 @@ export default function SystemSettingsPage() {
   });
 
   useEffect(() => {
+    if (!isAdmin) return; // Skip fetch if not admin
     const fetchEmailConfig = async () => {
       try {
         const response = await fetch("/api/admin/email-config");
@@ -170,9 +147,10 @@ export default function SystemSettingsPage() {
     };
 
     fetchEmailConfig();
-  }, [form]);
+  }, [form, isAdmin]);
 
   useEffect(() => {
+    if (!isAdmin) return; // Skip fetch if not admin
     const fetchTwilioConfig = async () => {
       try {
         const response = await fetch("/api/admin/twilio-config");
@@ -188,47 +166,9 @@ export default function SystemSettingsPage() {
     };
 
     fetchTwilioConfig();
-  }, [twilioForm]);
+  }, [twilioForm, isAdmin]);
 
-  const fetchLogs = async () => {
-    try {
-      const params = new URLSearchParams();
-      if (search) params.append('search', search);
-      if (level) params.append('level', level);
-      if (facility) params.append('facility', facility);
-      if (startDate) params.append('startDate', startDate.toISOString());
-      if (endDate) params.append('endDate', endDate.toISOString());
-      params.append('page', page.toString());
-
-      const response = await fetch(`/api/admin/logs?${params.toString()}`);
-      if (response.ok) {
-        const data = await response.json();
-        setLogs(data);
-      }
-    } catch (error) {
-      console.error("Failed to fetch logs:", error);
-    }
-  };
-
-  useEffect(() => {
-    if (activeTab === "logs") {
-      fetchLogs();
-    }
-  }, [activeTab, search, level, facility, startDate, endDate, page]);
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-
-    if (autoRefresh && activeTab === "logs") {
-      interval = setInterval(() => {
-        fetchLogs();
-      }, refreshInterval);
-    }
-
-    return () => {
-      if (interval) clearInterval(interval);
-    };
-  }, [autoRefresh, activeTab, search, level, facility, startDate, endDate, page]);
+  // Log fetching is handled by useQuery below
 
   const onSubmitEmailConfig = async (data: FormValues) => {
     try {
@@ -301,17 +241,16 @@ export default function SystemSettingsPage() {
       }
       return response.json();
     },
-    enabled: user?.role?.toLowerCase() === "admin"
+    enabled: isAdmin
   });
 
   useEffect(() => {
-    if (autoRefresh) {
-      const intervalId = setInterval(() => {
-        refetchLogs();
-      }, refreshInterval);
-      return () => clearInterval(intervalId);
-    }
-  }, [autoRefresh, refetchLogs]);
+    if (!isAdmin || !autoRefresh) return;
+    const intervalId = setInterval(() => {
+      refetchLogs();
+    }, refreshInterval);
+    return () => clearInterval(intervalId);
+  }, [autoRefresh, refetchLogs, isAdmin]);
 
   const downloadCSV = () => {
     if (!logData?.logs) return;
@@ -343,7 +282,7 @@ export default function SystemSettingsPage() {
     document.body.removeChild(link);
   };
 
-  const { mutate: updateUser, isPending: isUpdatingUser } = useMutation({
+  const { mutate: updateUser } = useMutation({
     mutationFn: async (data: {id: number; role: string; department: string}) => {
       const response = await fetch('/api/admin/update-user', {
         method: 'POST',
@@ -434,17 +373,41 @@ export default function SystemSettingsPage() {
       }
       return response.json();
     },
-    enabled: user?.role?.toLowerCase() === 'admin' && activeTab === 'users'
+    enabled: isAdmin && activeTab === 'users'
   });
 
+  // Render access denied if not admin
+  if (!user || !isAdmin) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navigation />
+        <main className="py-10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <h2 className="text-2xl font-semibold text-foreground">Access Denied</h2>
+              <p className="mt-2 text-muted-foreground">You do not have permission to access admin settings.</p>
+              <Button
+                variant="outline"
+                onClick={() => window.history.back()}
+                className="mt-4"
+              >
+                <AlertCircle className="h-4 w-4 mr-2" />
+                Go Back
+              </Button>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Navigation />
 
       <main className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-8">System Settings</h1>
+          <h1 className="text-3xl font-bold text-foreground mb-8">System Settings</h1>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid grid-cols-8 mb-4">
@@ -461,7 +424,7 @@ export default function SystemSettingsPage() {
             <TabsContent value="institution">
               <InstitutionSettings 
                 tenantId="admin"
-                onConfigUpdate={(config) => {
+                onConfigUpdate={() => {
                   toast({
                     title: "Institution Settings Updated",
                     description: "The institution configuration has been saved successfully.",
@@ -472,7 +435,7 @@ export default function SystemSettingsPage() {
 
             <TabsContent value="branding">
               <BrandingSettingsV2 
-                onConfigUpdate={(config) => {
+                onConfigUpdate={() => {
                   toast({
                     title: "Branding Updated",
                     description: "Your branding configuration has been applied successfully. Changes will be visible on the next page load.",
@@ -612,7 +575,7 @@ export default function SystemSettingsPage() {
                   {/* Test Email Section */}
                   <div className="mt-6 pt-6 border-t">
                     <h4 className="font-medium mb-3">Test Email Configuration</h4>
-                    <p className="text-sm text-gray-500 mb-4">
+                    <p className="text-sm text-muted-foreground mb-4">
                       Send a test email to verify your SMTP settings are working correctly.
                     </p>
                     <div className="flex gap-3 items-end">
@@ -662,7 +625,7 @@ export default function SystemSettingsPage() {
                                 variant: "destructive",
                               });
                             }
-                          } catch (error) {
+                          } catch {
                             toast({
                               title: "❌ Error",
                               description: "Failed to send test email. Check server logs for details.",

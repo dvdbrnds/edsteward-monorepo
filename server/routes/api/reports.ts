@@ -7,7 +7,6 @@
 import express, { Request, Response } from 'express';
 import { db } from '../../db';
 import { regulations, deadlines, complianceTasks, users } from '@shared/schema';
-import { eq } from 'drizzle-orm';
 
 const router = express.Router();
 
@@ -255,4 +254,5 @@ router.get('/full-report', async (_req: Request, res: Response) => {
 });
 
 export default router;
+
 
