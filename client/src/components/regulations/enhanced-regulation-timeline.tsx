@@ -18,9 +18,32 @@ import {
   GitCommit,
   Download,
   Zap,
-  Shield
+  Shield,
+  CheckCircle,
+  AlertCircle,
+  Send,
+  Globe,
+  MessageSquare,
+  Activity
 } from "lucide-react";
 import type { Regulation } from "@shared/schema";
+
+// Audit log type for status history
+interface AuditLog {
+  id: number;
+  timestamp: string;
+  userId?: number;
+  action: string;
+  entityType: string;
+  entityId?: string;
+  details?: Record<string, unknown>;
+  outcome: 'success' | 'failure' | 'partial';
+  user?: {
+    username: string;
+    firstName?: string;
+    lastName?: string;
+  };
+}
 
 interface RegulationVersion {
   id: number;
@@ -95,6 +118,24 @@ export const EnhancedRegulationTimeline: React.FC<EnhancedRegulationTimelineProp
       const response = await fetch(`/api/regulations/${regulation.id}/pending-updates`);
       if (!response.ok) throw new Error('Failed to fetch pending updates');
       return response.json();
+    }
+  });
+
+  // Fetch audit logs for status history
+  const { data: auditLogs = [], isLoading: auditLoading } = useQuery<AuditLog[]>({
+    queryKey: ['/api/audit/regulation', regulation.id],
+    queryFn: async () => {
+      const response = await fetch(`/api/audit/regulation/${regulation.id}`, {
+        credentials: 'include'
+      });
+      if (!response.ok) {
+        // Return empty array if audit logs fail (non-critical)
+        console.warn('Failed to fetch audit logs:', response.status);
+        return [];
+      }
+      const result = await response.json();
+      // API returns { success: true, data: [...] }
+      return Array.isArray(result.data) ? result.data : [];
     }
   });
 
@@ -231,7 +272,94 @@ export const EnhancedRegulationTimeline: React.FC<EnhancedRegulationTimelineProp
     );
   };
 
-  if (versionsLoading || updatesLoading) {
+  // Build status history from regulation actions and audit logs
+  const statusHistory = useMemo(() => {
+    const events: Array<{
+      id: string;
+      date: Date;
+      title: string;
+      description: string;
+      type: 'attestation' | 'submission' | 'publish' | 'communication' | 'audit';
+      icon: React.ReactNode;
+      user?: string;
+      outcome: 'success' | 'failure' | 'pending';
+    }> = [];
+
+    // Add events from regulation actions (completed actions)
+    if (regulation.actions) {
+      regulation.actions.forEach((action, index) => {
+        if (action.status === 'completed' && action.completedDate) {
+          const actionIcons = {
+            attestation: <CheckCircle className="h-4 w-4 text-green-500" />,
+            agency_submission: <Send className="h-4 w-4 text-blue-500" />,
+            website_publish: <Globe className="h-4 w-4 text-purple-500" />,
+            community_communication: <MessageSquare className="h-4 w-4 text-orange-500" />,
+          };
+
+          const actionTitles = {
+            attestation: 'Attestation Completed',
+            agency_submission: 'Submitted to Agency',
+            website_publish: 'Published to Website',
+            community_communication: 'Community Communication Sent',
+          };
+
+          events.push({
+            id: `action-${action.type}-${index}`,
+            date: new Date(action.completedDate),
+            title: actionTitles[action.type] || action.type,
+            description: action.notes || `${action.type} action completed`,
+            type: action.type === 'attestation' ? 'attestation' : 
+                  action.type === 'agency_submission' ? 'submission' :
+                  action.type === 'website_publish' ? 'publish' : 'communication',
+            icon: actionIcons[action.type] || <Activity className="h-4 w-4 text-muted-foreground" />,
+            user: action.completedBy ? 
+              `${action.completedBy.fullName || action.completedBy.username}` : undefined,
+            outcome: 'success',
+          });
+        }
+      });
+    }
+
+    // Add events from audit logs (filtered to compliance-related actions)
+    const complianceActions = [
+      'attestation_complete', 'agency_submission', 'website_publish', 
+      'community_communication', 'regulation_update', 'deadline_complete',
+      'action_complete', 'review_complete'
+    ];
+
+    auditLogs.forEach(log => {
+      if (complianceActions.some(a => log.action.toLowerCase().includes(a.replace('_', '')))) {
+        events.push({
+          id: `audit-${log.id}`,
+          date: new Date(log.timestamp),
+          title: formatAuditAction(log.action),
+          description: log.details?.message as string || log.action,
+          type: 'audit',
+          icon: log.outcome === 'success' ? 
+            <CheckCircle className="h-4 w-4 text-green-500" /> :
+            <AlertCircle className="h-4 w-4 text-red-500" />,
+          user: log.user ? `${log.user.firstName || ''} ${log.user.lastName || log.user.username}`.trim() : undefined,
+          outcome: log.outcome,
+        });
+      }
+    });
+
+    // Sort by date (newest first)
+    return events.sort((a, b) => b.date.getTime() - a.date.getTime());
+  }, [regulation.actions, auditLogs]);
+
+  // Helper to format audit action names
+  function formatAuditAction(action: string): string {
+    return action
+      .replace(/_/g, ' ')
+      .replace(/([A-Z])/g, ' $1')
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ')
+      .trim();
+  }
+
+  if (versionsLoading || updatesLoading || auditLoading) {
     return (
       <Card>
         <CardContent className="flex items-center justify-center p-8">
@@ -263,8 +391,9 @@ export const EnhancedRegulationTimeline: React.FC<EnhancedRegulationTimelineProp
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="timeline" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="timeline">Timeline</TabsTrigger>
+            <TabsTrigger value="status">Status History</TabsTrigger>
             <TabsTrigger value="versions">Versions</TabsTrigger>
             <TabsTrigger value="compare">Compare</TabsTrigger>
           </TabsList>
@@ -420,7 +549,7 @@ export const EnhancedRegulationTimeline: React.FC<EnhancedRegulationTimelineProp
                                   </div>
                                 </div>
                               ) : null;
-                            } catch (e) {
+                            } catch {
                               return null;
                             }
                           })()}
@@ -446,6 +575,117 @@ export const EnhancedRegulationTimeline: React.FC<EnhancedRegulationTimelineProp
                   <div className="text-center py-8 text-muted-foreground">
                     <History className="h-12 w-12 mx-auto mb-4 opacity-50" />
                     <p>No timeline events found</p>
+                  </div>
+                )}
+              </div>
+            </ScrollArea>
+          </TabsContent>
+
+          <TabsContent value="status" className="space-y-4">
+            <ScrollArea className="h-[600px] w-full">
+              <div className="space-y-4">
+                {/* Current Action Status Summary */}
+                <Card className="bg-muted/50">
+                  <CardContent className="p-4">
+                    <h4 className="font-medium text-sm mb-3 flex items-center gap-2">
+                      <Activity className="h-4 w-4" />
+                      Current Compliance Status
+                    </h4>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                      {regulation.actions?.map((action) => (
+                        <div 
+                          key={action.type}
+                          className={`p-3 rounded-lg border ${
+                            action.status === 'completed' ? 'bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800' :
+                            action.status === 'in_progress' ? 'bg-yellow-50 border-yellow-200 dark:bg-yellow-950 dark:border-yellow-800' :
+                            'bg-card border-border'
+                          }`}
+                        >
+                          <div className="text-xs text-muted-foreground capitalize">
+                            {action.type.replace('_', ' ')}
+                          </div>
+                          <div className="flex items-center gap-1 mt-1">
+                            {action.status === 'completed' ? (
+                              <CheckCircle className="h-4 w-4 text-green-600" />
+                            ) : action.status === 'in_progress' ? (
+                              <Clock className="h-4 w-4 text-yellow-600" />
+                            ) : (
+                              <AlertCircle className="h-4 w-4 text-muted-foreground" />
+                            )}
+                            <span className={`text-sm font-medium capitalize ${
+                              action.status === 'completed' ? 'text-green-700 dark:text-green-400' :
+                              action.status === 'in_progress' ? 'text-yellow-700 dark:text-yellow-400' :
+                              'text-muted-foreground'
+                            }`}>
+                              {action.status.replace('_', ' ')}
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Status History Timeline */}
+                <h4 className="font-medium text-sm flex items-center gap-2 pt-4">
+                  <History className="h-4 w-4" />
+                  Compliance Activity History
+                </h4>
+                
+                {statusHistory.length > 0 ? (
+                  statusHistory.map((event, index) => (
+                    <div key={event.id} className="flex items-start space-x-4">
+                      {/* Timeline line */}
+                      <div className="flex flex-col items-center">
+                        <div className={`flex items-center justify-center w-10 h-10 rounded-full border-2 shadow-sm ${
+                          event.outcome === 'success' ? 'bg-green-50 border-green-200 dark:bg-green-950 dark:border-green-800' :
+                          event.outcome === 'failure' ? 'bg-red-50 border-red-200 dark:bg-red-950 dark:border-red-800' :
+                          'bg-card border-border'
+                        }`}>
+                          {event.icon}
+                        </div>
+                        {index < statusHistory.length - 1 && (
+                          <div className="w-px h-16 bg-border mt-2"></div>
+                        )}
+                      </div>
+
+                      {/* Event content */}
+                      <div className="flex-1 min-w-0 pb-8">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <h3 className="text-sm font-medium text-foreground">
+                              {event.title}
+                            </h3>
+                            <Badge variant={
+                              event.outcome === 'success' ? 'default' :
+                              event.outcome === 'failure' ? 'destructive' : 'secondary'
+                            }>
+                              {event.outcome}
+                            </Badge>
+                          </div>
+                          <time className="text-xs text-muted-foreground">
+                            {formatDate(event.date)}
+                          </time>
+                        </div>
+                        
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {event.description}
+                        </p>
+
+                        {event.user && (
+                          <div className="flex items-center gap-1 mt-2 text-xs text-muted-foreground">
+                            <User className="h-3 w-3" />
+                            <span>by {event.user}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Activity className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>No compliance activity recorded yet</p>
+                    <p className="text-sm mt-1">Complete actions like attestations or submissions to see history here</p>
                   </div>
                 )}
               </div>
@@ -493,9 +733,10 @@ export const EnhancedRegulationTimeline: React.FC<EnhancedRegulationTimelineProp
           <TabsContent value="compare" className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <h4 className="font-medium mb-2">Version A</h4>
+                <h4 className="font-medium mb-2 text-foreground">Version A</h4>
                 <select 
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border border-border rounded bg-white dark:bg-gray-800 text-foreground"
+                  style={{ colorScheme: 'light dark' }}
                   onChange={(e) => {
                     const version = versions.find(v => v.id === parseInt(e.target.value));
                     setCompareVersions([version || null, compareVersions[1]]);
@@ -510,9 +751,10 @@ export const EnhancedRegulationTimeline: React.FC<EnhancedRegulationTimelineProp
                 </select>
               </div>
               <div>
-                <h4 className="font-medium mb-2">Version B</h4>
+                <h4 className="font-medium mb-2 text-foreground">Version B</h4>
                 <select 
-                  className="w-full p-2 border rounded"
+                  className="w-full p-2 border border-border rounded bg-white dark:bg-gray-800 text-foreground"
+                  style={{ colorScheme: 'light dark' }}
                   onChange={(e) => {
                     const version = versions.find(v => v.id === parseInt(e.target.value));
                     setCompareVersions([compareVersions[0], version || null]);
