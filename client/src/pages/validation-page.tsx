@@ -309,7 +309,7 @@ export default function ValidationPage() {
 
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Navigation />
       
       <main className="py-10">
@@ -330,10 +330,10 @@ export default function ValidationPage() {
           {/* Header */}
           <div className="flex justify-between items-center mb-8">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">
+              <h1 className="text-3xl font-bold text-foreground">
                 Regulation Validation <span className="text-sm font-normal text-red-600 ml-2 px-2 py-1 bg-red-50 rounded-full border border-red-200">Deprecated</span>
               </h1>
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-muted-foreground">
                 This feature has been deprecated and is scheduled for removal.
               </p>
             </div>

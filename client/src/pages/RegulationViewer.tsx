@@ -188,7 +188,7 @@ export function RegulationViewer() {
             {filteredRegulations?.map((regulation) => (
               <TableRow 
                 key={regulation.id}
-                className="cursor-pointer hover:bg-gray-50"
+                className="cursor-pointer hover:bg-background"
                 onClick={() => handleRegulationClick(regulation)}
               >
                 <TableCell>{regulation.id}</TableCell>

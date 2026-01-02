@@ -42,7 +42,7 @@ export default function AdminConsolePage() {
   // Only admin users can access this page
   if (!user || user.role !== 'admin') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <Alert className="max-w-md">
           <AlertTriangle className="h-4 w-4" />
           <AlertDescription>
@@ -169,9 +169,9 @@ export default function AdminConsolePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
+      <div className="bg-card border-b border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-6">
             <div className="flex items-center space-x-3">
@@ -197,7 +197,7 @@ export default function AdminConsolePage() {
               <Badge variant="outline" className="text-xs">
                 System Admin
               </Badge>
-              <span className="text-sm text-gray-500">{user.email}</span>
+              <span className="text-sm text-muted-foreground">{user.email}</span>
               <Button
                 variant="outline"
                 size="sm"
@@ -299,12 +299,12 @@ export default function AdminConsolePage() {
                               {activity.tenant}
                             </Badge>
                             <span className="text-sm">{activity.action}</span>
-                            <span className="text-xs text-gray-500">by {activity.user}</span>
+                            <span className="text-xs text-muted-foreground">by {activity.user}</span>
                           </div>
-                          <span className="text-xs text-gray-400">{activity.timestamp}</span>
+                          <span className="text-xs text-muted-foreground">{activity.timestamp}</span>
                         </div>
                       )) || (
-                        <p className="text-sm text-gray-500 text-center py-4">No recent activity</p>
+                        <p className="text-sm text-muted-foreground text-center py-4">No recent activity</p>
                       )}
                     </div>
                   </CardContent>
@@ -334,8 +334,8 @@ export default function AdminConsolePage() {
                         </div>
                         <div>
                           <h3 className="text-lg font-medium capitalize">{tenant.name}</h3>
-                          <p className="text-sm text-gray-500">ID: {tenant.id}</p>
-                          <p className="text-xs text-gray-400">Last Activity: {tenant.lastActivity}</p>
+                          <p className="text-sm text-muted-foreground">ID: {tenant.id}</p>
+                          <p className="text-xs text-muted-foreground">Last Activity: {tenant.lastActivity}</p>
                         </div>
                       </div>
                                               <div className="flex items-center space-x-6">
@@ -431,7 +431,7 @@ export default function AdminConsolePage() {
                         </div>
                         <div>
                           <h4 className="font-medium capitalize">{tenant.name}</h4>
-                          <p className="text-sm text-gray-500">{tenant.userCount} users</p>
+                          <p className="text-sm text-muted-foreground">{tenant.userCount} users</p>
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
@@ -575,25 +575,25 @@ export default function AdminConsolePage() {
                     <div className="flex items-center space-x-3">
                       <Badge variant="outline" className="text-xs">moravian</Badge>
                       <span className="text-sm">Document AI enabled</span>
-                      <span className="text-xs text-gray-500">by admin</span>
+                      <span className="text-xs text-muted-foreground">by admin</span>
                     </div>
-                    <span className="text-xs text-gray-400">2 hours ago</span>
+                    <span className="text-xs text-muted-foreground">2 hours ago</span>
                   </div>
                   <div className="flex items-center justify-between py-2 border-b border-gray-100">
                     <div className="flex items-center space-x-3">
                       <Badge variant="outline" className="text-xs">staging</Badge>
                       <span className="text-sm">Bulk Operations disabled</span>
-                      <span className="text-xs text-gray-500">by admin</span>
+                      <span className="text-xs text-muted-foreground">by admin</span>
                     </div>
-                    <span className="text-xs text-gray-400">1 day ago</span>
+                    <span className="text-xs text-muted-foreground">1 day ago</span>
                   </div>
                   <div className="flex items-center justify-between py-2">
                     <div className="flex items-center space-x-3">
                       <Badge variant="outline" className="text-xs">admin</Badge>
                       <span className="text-sm">Advanced Dashboard enabled</span>
-                      <span className="text-xs text-gray-500">by admin</span>
+                      <span className="text-xs text-muted-foreground">by admin</span>
                     </div>
-                    <span className="text-xs text-gray-400">3 days ago</span>
+                    <span className="text-xs text-muted-foreground">3 days ago</span>
                   </div>
                 </div>
               </CardContent>

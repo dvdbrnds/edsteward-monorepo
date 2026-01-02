@@ -68,7 +68,7 @@ const LOG_LEVELS = {
   4: { name: "Warning", color: "text-yellow-500" },
   5: { name: "Notice", color: "text-blue-500" },
   6: { name: "Info", color: "text-blue-400" },
-  7: { name: "Debug", color: "text-gray-400" }
+  7: { name: "Debug", color: "text-muted-foreground" }
 };
 
 const insertEmailConfigSchema = z.object({

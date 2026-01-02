@@ -498,7 +498,7 @@ These requirements apply to all educational institutions receiving federal fundi
   
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-background">
         <Navigation />
         <main className="py-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -541,7 +541,7 @@ These requirements apply to all educational institutions receiving federal fundi
   
   if (error || !data) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-background">
         <Navigation />
         <main className="py-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -570,7 +570,7 @@ These requirements apply to all educational institutions receiving federal fundi
   const { update, original, diffData } = data;
   
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Navigation />
       
       <main className="py-10">

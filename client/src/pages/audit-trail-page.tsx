@@ -131,7 +131,7 @@ export default function AuditTrailPage() {
       case 'high': return 'bg-orange-100 text-orange-800';
       case 'medium': return 'bg-yellow-100 text-yellow-800';
       case 'low': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+      default: return 'bg-gray-100 text-foreground';
     }
   };
 
@@ -140,7 +140,7 @@ export default function AuditTrailPage() {
       case 'high': return 'bg-red-100 text-red-800';
       case 'medium': return 'bg-yellow-100 text-yellow-800';
       case 'low': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
+      default: return 'bg-gray-100 text-foreground';
     }
   };
 
@@ -148,8 +148,8 @@ export default function AuditTrailPage() {
     if (!changes) return null;
 
     return Object.entries(changes).map(([field, change]) => (
-      <div key={field} className="mb-2 p-2 bg-gray-50 rounded">
-        <div className="font-medium text-sm text-gray-700">{field}:</div>
+      <div key={field} className="mb-2 p-2 bg-background rounded">
+        <div className="font-medium text-sm text-foreground">{field}:</div>
         <div className="text-sm">
           <span className="text-red-600">- {JSON.stringify(change.old)}</span>
         </div>
@@ -161,13 +161,13 @@ export default function AuditTrailPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Navigation />
       <div className="container mx-auto p-6 space-y-6">
         <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold">Audit Trail</h1>
-          <p className="text-gray-600">Monitor compliance actions and system changes</p>
+          <p className="text-muted-foreground">Monitor compliance actions and system changes</p>
         </div>
         <Button 
           variant="outline" 
@@ -295,7 +295,7 @@ export default function AuditTrailPage() {
             <CardHeader>
               <CardTitle>Audit Logs</CardTitle>
               {auditData && (
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   Showing {auditData.data?.length || 0} of {auditData.pagination?.total || 0} logs
                 </p>
               )}
@@ -318,7 +318,7 @@ export default function AuditTrailPage() {
                   {auditData.data.map((log: AuditLog) => (
                     <div
                       key={log.id}
-                      className="border rounded-lg p-4 hover:bg-gray-50 cursor-pointer"
+                      className="border rounded-lg p-4 hover:bg-background cursor-pointer"
                       onClick={() => setSelectedLog(log)}
                     >
                       <div className="flex items-start justify-between">
@@ -338,7 +338,7 @@ export default function AuditTrailPage() {
                             )}
                           </div>
                           
-                          <div className="text-sm text-gray-600 space-y-1">
+                          <div className="text-sm text-muted-foreground space-y-1">
                             <div className="flex items-center gap-4">
                               <span className="flex items-center gap-1">
                                 <User className="h-3 w-3" />
@@ -377,7 +377,7 @@ export default function AuditTrailPage() {
           <Card>
             <CardHeader>
               <CardTitle>Regulation Audit Trail</CardTitle>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 View all audit logs for a specific regulation
               </p>
             </CardHeader>
@@ -389,7 +389,7 @@ export default function AuditTrailPage() {
                 />
                 <Button>View Audit Trail</Button>
               </div>
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-muted-foreground">
                 Enter a regulation ID to view its complete audit trail
               </div>
             </CardContent>
@@ -402,7 +402,7 @@ export default function AuditTrailPage() {
               <CardTitle>Audit Summary</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-muted-foreground">
                 Audit summary and compliance reports coming soon
               </div>
             </CardContent>
@@ -413,7 +413,7 @@ export default function AuditTrailPage() {
       {/* Audit Log Detail Modal */}
       {selectedLog && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+          <div className="bg-card rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6">
               <div className="flex justify-between items-start mb-4">
                 <h2 className="text-xl font-bold">Audit Log Details</h2>
@@ -465,7 +465,7 @@ export default function AuditTrailPage() {
               {selectedLog.changes && (
                 <div className="mt-6">
                   <h3 className="font-semibold mb-2">Changes Made</h3>
-                  <div className="bg-gray-50 p-4 rounded">
+                  <div className="bg-background p-4 rounded">
                     {formatChanges(selectedLog.changes)}
                   </div>
                 </div>
@@ -474,7 +474,7 @@ export default function AuditTrailPage() {
               {selectedLog.metadata && (
                 <div className="mt-6">
                   <h3 className="font-semibold mb-2">Metadata</h3>
-                  <pre className="bg-gray-50 p-4 rounded text-sm overflow-x-auto">
+                  <pre className="bg-background p-4 rounded text-sm overflow-x-auto">
                     {JSON.stringify(selectedLog.metadata, null, 2)}
                   </pre>
                 </div>

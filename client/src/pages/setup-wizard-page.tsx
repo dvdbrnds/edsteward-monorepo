@@ -202,13 +202,13 @@ export default function SetupWizardPage() {
   const officeProgress = ((officeStep + 1) / REGULATION_CATEGORIES.length) * 100;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+    <div className="min-h-screen bg-background flex items-center justify-center">
       <div className="max-w-2xl w-full px-4">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-[#002147] mb-2">
             Moravian Compliance Portal Setup
           </h1>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             Complete the following steps to set up your compliance portal.
           </p>
         </div>
@@ -225,7 +225,7 @@ export default function SetupWizardPage() {
               <Card
                 key={step.id}
                 className={`${isCurrent ? "ring-2 ring-[#00267A]" : ""} ${
-                  isCompleted ? "bg-gray-50" : ""
+                  isCompleted ? "bg-background" : ""
                 }`}
               >
                 <CardHeader>
@@ -368,7 +368,7 @@ export default function SetupWizardPage() {
                     <div className="space-y-6">
                       <div className="mb-6">
                         <Progress value={officeProgress} className="mb-2" />
-                        <p className="text-sm text-gray-500 text-center">
+                        <p className="text-sm text-muted-foreground text-center">
                           Step {officeStep + 1} of {REGULATION_CATEGORIES.length}
                         </p>
                       </div>
@@ -377,7 +377,7 @@ export default function SetupWizardPage() {
                         <h3 className="text-lg font-medium">
                           Assign Office for {REGULATION_CATEGORIES[officeStep]}
                         </h3>
-                        <p className="text-gray-600">
+                        <p className="text-muted-foreground">
                           Assign a compliance office responsible for{" "}
                           {REGULATION_CATEGORIES[officeStep]} regulations.
                           We recommend using department distribution lists (e.g.,{" "}
@@ -451,7 +451,7 @@ export default function SetupWizardPage() {
                   )}
 
                   {!isCurrent && (
-                    <p className="text-gray-600">{step.description}</p>
+                    <p className="text-muted-foreground">{step.description}</p>
                   )}
                 </CardContent>
               </Card>

@@ -61,7 +61,7 @@ const priorityColors: Record<string, string> = {
   critical: 'bg-red-100 text-red-800 border-red-200',
   high: 'bg-orange-100 text-orange-800 border-orange-200',
   medium: 'bg-blue-100 text-blue-800 border-blue-200',
-  low: 'bg-gray-100 text-gray-800 border-gray-200',
+  low: 'bg-gray-100 text-foreground border-border',
 };
 
 export default function TaskPage() {
@@ -154,7 +154,7 @@ export default function TaskPage() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto" />
-          <p className="mt-4 text-gray-600">Loading task...</p>
+          <p className="mt-4 text-muted-foreground">Loading task...</p>
         </div>
       </div>
     );
@@ -201,8 +201,8 @@ export default function TaskPage() {
       <div className="max-w-2xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">EdSteward Compliance Task</h1>
-          <p className="text-gray-600 mt-1">Assigned to: {userName}</p>
+          <h1 className="text-2xl font-bold text-foreground">EdSteward Compliance Task</h1>
+          <p className="text-muted-foreground mt-1">Assigned to: {userName}</p>
         </div>
 
         {/* Task Card */}
@@ -249,8 +249,8 @@ export default function TaskPage() {
             {/* Description */}
             {task.description && (
               <div>
-                <h3 className="font-medium text-gray-900 mb-2">Description</h3>
-                <p className="text-gray-600">{task.description}</p>
+                <h3 className="font-medium text-foreground mb-2">Description</h3>
+                <p className="text-muted-foreground">{task.description}</p>
               </div>
             )}
 
@@ -264,7 +264,7 @@ export default function TaskPage() {
 
             {/* Due Date */}
             {task.dueDate && (
-              <div className="flex items-center gap-2 text-gray-600">
+              <div className="flex items-center gap-2 text-muted-foreground">
                 <Calendar className="h-4 w-4" />
                 <span>Due: {format(new Date(task.dueDate), 'MMMM d, yyyy')}</span>
                 {isOverdue && !isCompleted && (
@@ -337,7 +337,7 @@ export default function TaskPage() {
                   )}
                 </Button>
                 
-                <p className="text-xs text-gray-500 text-center mt-3">
+                <p className="text-xs text-muted-foreground text-center mt-3">
                   By clicking this button, you confirm that you have completed this compliance task
                   and that all requirements have been fulfilled.
                 </p>
@@ -358,7 +358,7 @@ export default function TaskPage() {
         </Card>
 
         {/* Footer */}
-        <div className="text-center mt-8 text-gray-500 text-sm">
+        <div className="text-center mt-8 text-muted-foreground text-sm">
           <p>EdSteward Compliance Management Platform</p>
         </div>
       </div>

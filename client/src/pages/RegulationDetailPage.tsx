@@ -534,7 +534,7 @@ function RegulationDetailPage() {
 
   if (isLoading || deadlinesLoading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-background">
         <Navigation />
         <main className="py-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -552,13 +552,13 @@ function RegulationDetailPage() {
 
   if (!regulation) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-background">
         <Navigation />
         <main className="py-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
-              <h2 className="text-2xl font-semibold text-gray-900">Regulation Not Found</h2>
-              <p className="mt-2 text-gray-600">The regulation you're looking for doesn't exist or you don't have permission to view it.</p>
+              <h2 className="text-2xl font-semibold text-foreground">Regulation Not Found</h2>
+              <p className="mt-2 text-muted-foreground">The regulation you're looking for doesn't exist or you don't have permission to view it.</p>
               <Button
                 variant="outline"
                 onClick={() => window.history.back()}
@@ -591,7 +591,7 @@ function RegulationDetailPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Navigation />
       <main className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -621,7 +621,7 @@ function RegulationDetailPage() {
                       variant="outline"
                       size="sm"
                       onClick={() => navigate('/regulations/updates')}
-                      className="bg-white hover:bg-yellow-50 border-yellow-300"
+                      className="bg-card hover:bg-yellow-50 border-yellow-300"
                     >
                       <FileText className="h-4 w-4 mr-2" />
                       Review Updates
@@ -662,7 +662,7 @@ function RegulationDetailPage() {
                 {/* Quick preview of recent updates */}
                 <div className="mt-3 space-y-2">
                   {pendingUpdates.slice(0, 2).map((update) => (
-                    <div key={update.id} className="flex items-center justify-between text-sm bg-white bg-opacity-50 rounded px-3 py-2">
+                    <div key={update.id} className="flex items-center justify-between text-sm bg-card bg-opacity-50 rounded px-3 py-2">
                       <div className="flex items-center space-x-2">
                         <Clock className="h-4 w-4 text-yellow-600" />
                         <span className="font-medium text-yellow-800">{update.name}</span>
@@ -696,22 +696,22 @@ function RegulationDetailPage() {
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Dashboard
               </Button>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              <h1 className="text-3xl font-bold text-foreground mb-2">
                 {regulation.name || regulation.topic}
               </h1>
-              <div className="flex items-center space-x-2 text-sm text-gray-500">
+              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                 <span className="px-3 py-1 bg-gray-100 rounded-md font-medium">
                   ID: {regulation.itemId || regulation.item_id || regulation.id || 'N/A'}
                 </span>
                 {categoryVisible ? (
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-500">Category:</span>
+                      <span className="text-xs text-muted-foreground">Category:</span>
                       <Select
                         defaultValue={regulation.category || "Other"}
                         onValueChange={(value) => categoryMutation.mutate(value)}
                       >
-                        <SelectTrigger className="w-[180px] bg-gray-100 border rounded-md hover:bg-gray-50 transition-colors">
+                        <SelectTrigger className="w-[180px] bg-gray-100 border rounded-md hover:bg-background transition-colors">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -724,7 +724,7 @@ function RegulationDetailPage() {
                       </Select>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-500">Primary DRI:</span>
+                      <span className="text-xs text-muted-foreground">Primary DRI:</span>
                       <Select
                         key={`owner-${regulation.ownerId || 'none'}`}
                         value={regulation.ownerId?.toString() || "unassigned"}
@@ -739,7 +739,7 @@ function RegulationDetailPage() {
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="unassigned">
-                            <span className="text-gray-500">— No Primary DRI —</span>
+                            <span className="text-muted-foreground">— No Primary DRI —</span>
                           </SelectItem>
                           {users
                             .filter(u => (u.role === 'compliance_officer' || u.role === 'admin') && (u.firstName || u.lastName || u.username))
@@ -750,7 +750,7 @@ function RegulationDetailPage() {
                               return (
                                 <SelectItem key={u.id} value={u.id.toString()}>
                                   {displayName}
-                                  <span className="text-xs text-gray-400 ml-2">
+                                  <span className="text-xs text-muted-foreground ml-2">
                                     ({u.role === 'admin' ? 'Admin' : 'Officer'})
                                   </span>
                                 </SelectItem>
@@ -771,16 +771,16 @@ function RegulationDetailPage() {
                 {/* Statute */}
                 {regulation?.statute && (
                   <div className="flex items-center gap-2">
-                    <Scale className="h-4 w-4 text-gray-400" />
-                    <span className="text-gray-500">Statute:</span>
-                    <span className="font-medium text-gray-700">{regulation.statute}</span>
+                    <Scale className="h-4 w-4 text-muted-foreground" />
+                    <span className="text-muted-foreground">Statute:</span>
+                    <span className="font-medium text-foreground">{regulation.statute}</span>
                   </div>
                 )}
                 {/* Agency */}
                 {regulation?.agency_name && (
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <span className="text-gray-400">|</span>
-                    <span className="text-gray-500">Agency:</span>
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <span className="text-muted-foreground">|</span>
+                    <span className="text-muted-foreground">Agency:</span>
                     <span>{regulation.agency_name}</span>
                     {regulation?.agency_url && (
                       <a
@@ -903,7 +903,7 @@ function RegulationDetailPage() {
                            complianceStatus.status === 'compliant-with-upcoming' ? 'Compliant' :
                            'Non-Compliant'}
                         </h2>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-muted-foreground">
                           {completedActions.length}/{requiredActions.length} actions complete
                           {nextDeadline && ` • Next deadline ${format(new Date(nextDeadline.dueDate), "MMM d")}`}
                         </p>
@@ -913,7 +913,7 @@ function RegulationDetailPage() {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="bg-white border-red-300 text-red-700 hover:bg-red-50"
+                        className="bg-card border-red-300 text-red-700 hover:bg-red-50"
                         onClick={() => setShowEscalateDialog(true)}
                       >
                         <AlertCircle className="h-4 w-4 mr-1" />
@@ -924,7 +924,7 @@ function RegulationDetailPage() {
                   
                   {/* DRI Attestation Signature - Prominent display of who attested */}
                   {attestedBy ? (
-                    <div className="bg-white/80 rounded-lg p-4 mb-4 border border-green-200 flex items-center gap-4">
+                    <div className="bg-card/80 rounded-lg p-4 mb-4 border border-green-200 flex items-center gap-4">
                       <div className="w-12 h-12 bg-green-600 rounded-full flex items-center justify-center flex-shrink-0">
                         <FileCheck className="h-6 w-6 text-white" />
                       </div>
@@ -934,7 +934,7 @@ function RegulationDetailPage() {
                           {attestedBy.fullName || attestedBy.username || attestedBy.email || 'Unknown'}
                         </p>
                         {attestedBy.email && attestedBy.fullName && (
-                          <p className="text-sm text-gray-600">{attestedBy.email}</p>
+                          <p className="text-sm text-muted-foreground">{attestedBy.email}</p>
                         )}
                         {attestedBy.completedAt ? (
                           <p className="text-sm text-green-700 font-medium mt-1">
@@ -1007,8 +1007,8 @@ function RegulationDetailPage() {
                             isComplete 
                               ? 'bg-green-100 text-green-800 border border-green-300' 
                               : isRequired
-                              ? 'bg-white text-gray-800 border-2 border-red-300 hover:border-red-400'
-                              : 'bg-white/50 text-gray-600 border border-gray-300 hover:bg-white'
+                              ? 'bg-card text-foreground border-2 border-red-300 hover:border-red-400'
+                              : 'bg-card/50 text-muted-foreground border border-border hover:bg-card'
                           }`}
                         >
                           {isComplete ? (
@@ -1044,15 +1044,15 @@ function RegulationDetailPage() {
 
                   {/* Next Deadline Highlight */}
                   {nextDeadline && (
-                    <div className="flex items-center gap-3 p-3 bg-white/60 rounded-lg border border-white">
+                    <div className="flex items-center gap-3 p-3 bg-card/60 rounded-lg border border-white">
                       <Calendar className={`h-5 w-5 ${nextDeadline.isDefault ? 'text-orange-500' : 'text-blue-500'}`} />
                       <div className="flex-1">
-                        <p className="text-sm font-medium text-gray-900">
+                        <p className="text-sm font-medium text-foreground">
                           Next: {format(new Date(nextDeadline.dueDate), "MMMM d, yyyy")}
                           {nextDeadline.isDefault && <span className="ml-2 text-xs text-orange-600">🎃 Default</span>}
                         </p>
                         {nextDeadline.description && (
-                          <p className="text-xs text-gray-500">{nextDeadline.description}</p>
+                          <p className="text-xs text-muted-foreground">{nextDeadline.description}</p>
                         )}
                       </div>
                       <Badge variant="outline" className="text-xs">
@@ -1071,10 +1071,10 @@ function RegulationDetailPage() {
               
               {/* SUMMARY - Expanded by default */}
               <Collapsible open={summaryOpen} onOpenChange={setSummaryOpen}>
-                <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-white rounded-lg border hover:bg-gray-50 transition-colors">
+                <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-lg border hover:bg-background transition-colors">
                   <div className="flex items-center gap-3">
                     <FileText className="h-5 w-5 text-blue-600" />
-                    <span className="font-semibold text-gray-900">Summary</span>
+                    <span className="font-semibold text-foreground">Summary</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Button 
@@ -1088,12 +1088,12 @@ function RegulationDetailPage() {
                     >
                       Full Text
                     </Button>
-                    {summaryOpen ? <ChevronDown className="h-5 w-5 text-gray-400" /> : <ChevronRight className="h-5 w-5 text-gray-400" />}
+                    {summaryOpen ? <ChevronDown className="h-5 w-5 text-muted-foreground" /> : <ChevronRight className="h-5 w-5 text-muted-foreground" />}
                   </div>
                 </CollapsibleTrigger>
-                <CollapsibleContent className="bg-white rounded-b-lg border-x border-b px-4 pb-4">
+                <CollapsibleContent className="bg-card rounded-b-lg border-x border-b px-4 pb-4">
                   <div 
-                    className="prose prose-sm max-w-none text-gray-700 pt-4"
+                    className="prose prose-sm max-w-none text-foreground pt-4"
                     dangerouslySetInnerHTML={{ 
                       __html: regulation.summary 
                         ? renderMarkdown(regulation.summary) 
@@ -1105,19 +1105,19 @@ function RegulationDetailPage() {
 
               {/* COMPLIANCE TASKS - For complex regulations like Clery Act */}
               <Collapsible open={complianceTasksOpen} onOpenChange={setComplianceTasksOpen}>
-                <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-white rounded-lg border hover:bg-gray-50 transition-colors">
+                <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-lg border hover:bg-background transition-colors">
                   <div className="flex items-center gap-3">
                     <ListTodo className="h-5 w-5 text-indigo-600" />
-                    <span className="font-semibold text-gray-900">Compliance Tasks</span>
+                    <span className="font-semibold text-foreground">Compliance Tasks</span>
                     <Badge variant="secondary" className="text-xs bg-indigo-100 text-indigo-700">
                       Complex Workflow
                     </Badge>
                   </div>
                   <div className="flex items-center gap-2">
-                    {complianceTasksOpen ? <ChevronDown className="h-5 w-5 text-gray-400" /> : <ChevronRight className="h-5 w-5 text-gray-400" />}
+                    {complianceTasksOpen ? <ChevronDown className="h-5 w-5 text-muted-foreground" /> : <ChevronRight className="h-5 w-5 text-muted-foreground" />}
                   </div>
                 </CollapsibleTrigger>
-                <CollapsibleContent className="bg-white rounded-b-lg border-x border-b p-4">
+                <CollapsibleContent className="bg-card rounded-b-lg border-x border-b p-4">
                   <ComplianceTasksPanel
                     regulationId={regulation.id}
                     regulationName={regulation.name || regulation.topic || 'Unknown'}
@@ -1128,10 +1128,10 @@ function RegulationDetailPage() {
 
               {/* REQUIREMENTS */}
               <Collapsible open={requirementsOpen} onOpenChange={setRequirementsOpen}>
-                <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-white rounded-lg border hover:bg-gray-50 transition-colors">
+                <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-lg border hover:bg-background transition-colors">
                   <div className="flex items-center gap-3">
                     <ListTodo className="h-5 w-5 text-purple-600" />
-                    <span className="font-semibold text-gray-900">Requirements</span>
+                    <span className="font-semibold text-foreground">Requirements</span>
                   </div>
                   <div className="flex items-center gap-2">
                     {regulation.requirementsUrl && (
@@ -1145,18 +1145,18 @@ function RegulationDetailPage() {
                         <ExternalLink className="h-4 w-4" />
                       </a>
                     )}
-                    {requirementsOpen ? <ChevronDown className="h-5 w-5 text-gray-400" /> : <ChevronRight className="h-5 w-5 text-gray-400" />}
+                    {requirementsOpen ? <ChevronDown className="h-5 w-5 text-muted-foreground" /> : <ChevronRight className="h-5 w-5 text-muted-foreground" />}
                   </div>
                 </CollapsibleTrigger>
-                <CollapsibleContent className="bg-white rounded-b-lg border-x border-b px-4 pb-4">
+                <CollapsibleContent className="bg-card rounded-b-lg border-x border-b px-4 pb-4">
                   <div className="prose max-w-none pt-4">
                     {regulation.requirements ? (
                       <div 
-                        className="text-gray-700"
+                        className="text-foreground"
                         dangerouslySetInnerHTML={{ __html: renderMarkdown(regulation.requirements) }}
                       />
                     ) : (
-                      <p className="text-gray-500 italic">No specific requirements listed.</p>
+                      <p className="text-muted-foreground italic">No specific requirements listed.</p>
                     )}
                   </div>
                 </CollapsibleContent>
@@ -1164,10 +1164,10 @@ function RegulationDetailPage() {
 
               {/* DEADLINES */}
               <Collapsible open={deadlinesOpen} onOpenChange={setDeadlinesOpen}>
-                <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-white rounded-lg border hover:bg-gray-50 transition-colors">
+                <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-lg border hover:bg-background transition-colors">
                   <div className="flex items-center gap-3">
                     <Calendar className="h-5 w-5 text-orange-600" />
-                    <span className="font-semibold text-gray-900">Deadlines</span>
+                    <span className="font-semibold text-foreground">Deadlines</span>
                     <Badge variant="secondary" className="text-xs">
                       {regulationDeadlines.length}
                     </Badge>
@@ -1186,10 +1186,10 @@ function RegulationDetailPage() {
                         <Plus className="h-4 w-4 mr-1" /> Add
                       </Button>
                     )}
-                    {deadlinesOpen ? <ChevronDown className="h-5 w-5 text-gray-400" /> : <ChevronRight className="h-5 w-5 text-gray-400" />}
+                    {deadlinesOpen ? <ChevronDown className="h-5 w-5 text-muted-foreground" /> : <ChevronRight className="h-5 w-5 text-muted-foreground" />}
                   </div>
                 </CollapsibleTrigger>
-                <CollapsibleContent className="bg-white rounded-b-lg border-x border-b px-4 pb-4">
+                <CollapsibleContent className="bg-card rounded-b-lg border-x border-b px-4 pb-4">
                   <div className="space-y-3 pt-4">
                     {regulationDeadlines.map((deadline) => (
                       <div
@@ -1198,7 +1198,7 @@ function RegulationDetailPage() {
                           deadline.isDefault ? 'bg-orange-50 border-orange-200' :
                           deadline.status === 'completed' ? 'bg-green-50 border-green-200' :
                           deadline.status === 'overdue' ? 'bg-red-50 border-red-200' :
-                          'bg-gray-50 border-gray-200'
+                          'bg-background border-border'
                         }`}
                       >
                         <div className="flex items-center gap-3">
@@ -1210,8 +1210,8 @@ function RegulationDetailPage() {
                             <Clock className={`h-5 w-5 ${deadline.isDefault ? 'text-orange-500' : 'text-yellow-500'}`} />
                           )}
                           <div>
-                            <p className="font-medium text-gray-900">{format(new Date(deadline.dueDate), "MMMM d, yyyy")}</p>
-                            {deadline.description && <p className="text-xs text-gray-500">{deadline.description}</p>}
+                            <p className="font-medium text-foreground">{format(new Date(deadline.dueDate), "MMMM d, yyyy")}</p>
+                            {deadline.description && <p className="text-xs text-muted-foreground">{deadline.description}</p>}
                             {deadline.isDefault && <span className="text-xs text-orange-600">🎃 Default Oct 31</span>}
                           </div>
                         </div>
@@ -1233,7 +1233,7 @@ function RegulationDetailPage() {
                       </div>
                     ))}
                     {regulationDeadlines.length === 0 && (
-                      <p className="text-gray-500 text-sm text-center py-4">No deadlines set</p>
+                      <p className="text-muted-foreground text-sm text-center py-4">No deadlines set</p>
                     )}
                   </div>
                 </CollapsibleContent>
@@ -1241,23 +1241,23 @@ function RegulationDetailPage() {
 
               {/* EVIDENCE & NOTES */}
               <Collapsible open={evidenceNotesOpen} onOpenChange={setEvidenceNotesOpen}>
-                <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-white rounded-lg border hover:bg-gray-50 transition-colors">
+                <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-lg border hover:bg-background transition-colors">
                   <div className="flex items-center gap-3">
                     <FolderOpen className="h-5 w-5 text-green-600" />
-                    <span className="font-semibold text-gray-900">Evidence & Notes</span>
+                    <span className="font-semibold text-foreground">Evidence & Notes</span>
                   </div>
-                  {evidenceNotesOpen ? <ChevronDown className="h-5 w-5 text-gray-400" /> : <ChevronRight className="h-5 w-5 text-gray-400" />}
+                  {evidenceNotesOpen ? <ChevronDown className="h-5 w-5 text-muted-foreground" /> : <ChevronRight className="h-5 w-5 text-muted-foreground" />}
                 </CollapsibleTrigger>
-                <CollapsibleContent className="bg-white rounded-b-lg border-x border-b px-4 pb-4">
+                <CollapsibleContent className="bg-card rounded-b-lg border-x border-b px-4 pb-4">
                   <div className="pt-4 space-y-6">
                     <div>
-                      <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                      <h4 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
                         <FolderOpen className="h-4 w-4" /> Evidence Files
                       </h4>
                       <EvidenceFiles regulationId={regulationId} />
                     </div>
                     <div className="border-t pt-4">
-                      <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                      <h4 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
                         <MessageSquare className="h-4 w-4" /> Notes & Comments
                       </h4>
                       <NoteSection regulationId={regulationId} />
@@ -1268,17 +1268,17 @@ function RegulationDetailPage() {
 
               {/* VERSION HISTORY */}
               <Collapsible open={historyOpen} onOpenChange={setHistoryOpen}>
-                <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-white rounded-lg border hover:bg-gray-50 transition-colors">
+                <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-lg border hover:bg-background transition-colors">
                   <div className="flex items-center gap-3">
-                    <History className="h-5 w-5 text-gray-600" />
-                    <span className="font-semibold text-gray-900">Version History</span>
+                    <History className="h-5 w-5 text-muted-foreground" />
+                    <span className="font-semibold text-foreground">Version History</span>
                     <Badge variant="secondary" className="text-xs">
                       v{regulation.versionNumber || 1}
                     </Badge>
                   </div>
-                  {historyOpen ? <ChevronDown className="h-5 w-5 text-gray-400" /> : <ChevronRight className="h-5 w-5 text-gray-400" />}
+                  {historyOpen ? <ChevronDown className="h-5 w-5 text-muted-foreground" /> : <ChevronRight className="h-5 w-5 text-muted-foreground" />}
                 </CollapsibleTrigger>
-                <CollapsibleContent className="bg-white rounded-b-lg border-x border-b px-4 pb-4">
+                <CollapsibleContent className="bg-card rounded-b-lg border-x border-b px-4 pb-4">
                   <div className="pt-4">
                     {isAdmin ? (
                       <EnhancedRegulationTimeline regulation={regulation} />
@@ -1291,19 +1291,19 @@ function RegulationDetailPage() {
 
               {/* FULL REGULATION TEXT */}
               <Collapsible open={fullTextOpen} onOpenChange={setFullTextOpen}>
-                <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-white rounded-lg border hover:bg-gray-50 transition-colors">
+                <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-lg border hover:bg-background transition-colors">
                   <div className="flex items-center gap-3">
-                    <Scale className="h-5 w-5 text-gray-600" />
-                    <span className="font-semibold text-gray-900">Full Regulation Text</span>
+                    <Scale className="h-5 w-5 text-muted-foreground" />
+                    <span className="font-semibold text-foreground">Full Regulation Text</span>
                   </div>
-                  {fullTextOpen ? <ChevronDown className="h-5 w-5 text-gray-400" /> : <ChevronRight className="h-5 w-5 text-gray-400" />}
+                  {fullTextOpen ? <ChevronDown className="h-5 w-5 text-muted-foreground" /> : <ChevronRight className="h-5 w-5 text-muted-foreground" />}
                 </CollapsibleTrigger>
-                <CollapsibleContent className="bg-white rounded-b-lg border-x border-b px-4 pb-4">
-                  <div className="prose prose-sm max-w-none pt-4 text-gray-800">
+                <CollapsibleContent className="bg-card rounded-b-lg border-x border-b px-4 pb-4">
+                  <div className="prose prose-sm max-w-none pt-4 text-foreground">
                     {regulation.regulationText ? (
                       <div dangerouslySetInnerHTML={{ __html: renderMarkdown(regulation.regulationText) }} />
                     ) : (
-                      <p className="text-gray-500 italic">Full regulation text is not available.</p>
+                      <p className="text-muted-foreground italic">Full regulation text is not available.</p>
                     )}
                   </div>
                 </CollapsibleContent>
@@ -1312,14 +1312,14 @@ function RegulationDetailPage() {
               {/* SUBMISSION GUIDELINES - Only show if content exists */}
               {regulation.submissionGuidelines && (
                 <Collapsible>
-                  <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-white rounded-lg border hover:bg-gray-50 transition-colors">
+                  <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-lg border hover:bg-background transition-colors">
                     <div className="flex items-center gap-3">
-                      <FileText className="h-5 w-5 text-gray-600" />
-                      <span className="font-semibold text-gray-900">Submission Guidelines</span>
+                      <FileText className="h-5 w-5 text-muted-foreground" />
+                      <span className="font-semibold text-foreground">Submission Guidelines</span>
                     </div>
-                    <ChevronRight className="h-5 w-5 text-gray-400" />
+                    <ChevronRight className="h-5 w-5 text-muted-foreground" />
                   </CollapsibleTrigger>
-                  <CollapsibleContent className="bg-white rounded-b-lg border-x border-b px-4 pb-4">
+                  <CollapsibleContent className="bg-card rounded-b-lg border-x border-b px-4 pb-4">
                     <div className="prose max-w-none pt-4" dangerouslySetInnerHTML={{ __html: regulation.submissionGuidelines }} />
                   </CollapsibleContent>
                 </Collapsible>

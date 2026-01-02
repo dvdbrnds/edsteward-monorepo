@@ -224,12 +224,12 @@ export default function PublicRegulationDetailPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-background">
         <PublicNavigation />
         <main className="py-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-center space-x-4 pt-20">
-              <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+              <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
               <span>Loading regulation details...</span>
             </div>
           </div>
@@ -240,13 +240,13 @@ export default function PublicRegulationDetailPage() {
 
   if (!regulation) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-background">
         <PublicNavigation />
         <main className="py-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center pt-20">
               <h2 className="text-2xl font-bold">Regulation Not Found</h2>
-              <p className="mt-2 text-gray-500">
+              <p className="mt-2 text-muted-foreground">
                 The regulation you're looking for doesn't exist or you don't have permission to view it.
               </p>
               <Button 
@@ -278,7 +278,7 @@ export default function PublicRegulationDetailPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <PublicNavigation />
       <main className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -293,10 +293,10 @@ export default function PublicRegulationDetailPage() {
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Dashboard
               </Button>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              <h1 className="text-3xl font-bold text-foreground mb-2">
                 {regulation.name || regulation.topic}
               </h1>
-              <div className="flex items-center space-x-2 text-sm text-gray-500">
+              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                 <span className="px-2 py-1 bg-gray-100 rounded">
                   ID: {regulation.itemId}
                 </span>
@@ -311,7 +311,7 @@ export default function PublicRegulationDetailPage() {
                   <Globe className="h-3 w-3 mr-1" />
                   {regulation.jurisdiction}
                 </Badge>
-                <Badge variant="outline" className="bg-gray-50 text-gray-600 border-gray-200">
+                <Badge variant="outline" className="bg-background text-muted-foreground border-border">
                   {regulation.category}
                 </Badge>
               </div>
@@ -324,7 +324,7 @@ export default function PublicRegulationDetailPage() {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center">
-                      <FileText className="h-5 w-5 text-gray-500 mr-2" />
+                      <FileText className="h-5 w-5 text-muted-foreground mr-2" />
                       Executive Summary
                     </CardTitle>
                     <CardDescription>
@@ -338,8 +338,8 @@ export default function PublicRegulationDetailPage() {
                         dangerouslySetInnerHTML={{ __html: renderMarkdown(regulation.summary) }}
                       />
                     ) : (
-                      <div className="bg-gray-50 border border-gray-100 rounded-md p-4 text-gray-500 flex items-center">
-                        <Info className="h-5 w-5 text-gray-400 mr-2" />
+                      <div className="bg-background border border-gray-100 rounded-md p-4 text-muted-foreground flex items-center">
+                        <Info className="h-5 w-5 text-muted-foreground mr-2" />
                         No executive summary available for this regulation.
                       </div>
                     )}
@@ -350,7 +350,7 @@ export default function PublicRegulationDetailPage() {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center">
-                      <BookOpen className="h-5 w-5 text-gray-500 mr-2" />
+                      <BookOpen className="h-5 w-5 text-muted-foreground mr-2" />
                       Requirements
                     </CardTitle>
                     <CardDescription>
@@ -364,8 +364,8 @@ export default function PublicRegulationDetailPage() {
                         dangerouslySetInnerHTML={{ __html: renderMarkdown(regulation.requirements) }}
                       />
                     ) : (
-                      <div className="bg-gray-50 border border-gray-100 rounded-md p-4 text-gray-500 flex items-center">
-                        <Info className="h-5 w-5 text-gray-400 mr-2" />
+                      <div className="bg-background border border-gray-100 rounded-md p-4 text-muted-foreground flex items-center">
+                        <Info className="h-5 w-5 text-muted-foreground mr-2" />
                         No specific requirements listed for this regulation.
                       </div>
                     )}
@@ -392,7 +392,7 @@ export default function PublicRegulationDetailPage() {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center">
-                      <Calendar className="h-5 w-5 text-gray-500 mr-2" />
+                      <Calendar className="h-5 w-5 text-muted-foreground mr-2" />
                       Key Dates
                     </CardTitle>
                     <CardDescription>Important timeline information</CardDescription>
@@ -400,7 +400,7 @@ export default function PublicRegulationDetailPage() {
                   <CardContent>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-1">
-                        <h4 className="text-sm font-medium text-gray-500">Origination Date</h4>
+                        <h4 className="text-sm font-medium text-muted-foreground">Origination Date</h4>
                         <p className="font-medium">
                           {regulation.originationDate
                             ? format(new Date(regulation.originationDate), "MMMM d, yyyy")
@@ -408,7 +408,7 @@ export default function PublicRegulationDetailPage() {
                         </p>
                       </div>
                       <div className="space-y-1">
-                        <h4 className="text-sm font-medium text-gray-500">Effective Date</h4>
+                        <h4 className="text-sm font-medium text-muted-foreground">Effective Date</h4>
                         <p className="font-medium">
                           {regulation.effectiveDate
                             ? format(new Date(regulation.effectiveDate), "MMMM d, yyyy")
@@ -416,7 +416,7 @@ export default function PublicRegulationDetailPage() {
                         </p>
                       </div>
                       <div className="space-y-1">
-                        <h4 className="text-sm font-medium text-gray-500">Last Updated</h4>
+                        <h4 className="text-sm font-medium text-muted-foreground">Last Updated</h4>
                         <p className="font-medium">
                           {regulation.lastUpdated
                             ? format(new Date(regulation.lastUpdated), "MMMM d, yyyy")
@@ -424,7 +424,7 @@ export default function PublicRegulationDetailPage() {
                         </p>
                       </div>
                       <div className="space-y-1">
-                        <h4 className="text-sm font-medium text-gray-500">Next Review Date</h4>
+                        <h4 className="text-sm font-medium text-muted-foreground">Next Review Date</h4>
                         <p className="font-medium">
                           {regulation.nextReviewDate
                             ? format(new Date(regulation.nextReviewDate), "MMMM d, yyyy")
@@ -454,7 +454,7 @@ export default function PublicRegulationDetailPage() {
                   <Card>
                     <CardHeader>
                       <CardTitle className="flex items-center">
-                        <Clock className="h-5 w-5 text-gray-500 mr-2" />
+                        <Clock className="h-5 w-5 text-muted-foreground mr-2" />
                         Deadlines
                       </CardTitle>
                       <CardDescription>
@@ -472,7 +472,7 @@ export default function PublicRegulationDetailPage() {
                               <div className="font-medium">
                                 {deadline.description || "Compliance Deadline"}
                               </div>
-                              <div className="text-sm text-gray-500">
+                              <div className="text-sm text-muted-foreground">
                                 Due: {format(new Date(deadline.dueDate), "MMMM d, yyyy")}
                               </div>
                             </div>
@@ -546,7 +546,7 @@ export default function PublicRegulationDetailPage() {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center">
-                      <Building className="h-5 w-5 text-gray-500 mr-2" />
+                      <Building className="h-5 w-5 text-muted-foreground mr-2" />
                       Agency Information
                     </CardTitle>
                     <CardDescription>Regulatory authority details</CardDescription>
@@ -554,10 +554,10 @@ export default function PublicRegulationDetailPage() {
                   <CardContent className="space-y-4">
                     {regulation.agency_name ? (
                       <div>
-                        <h4 className="text-sm font-medium text-gray-500">Agency</h4>
+                        <h4 className="text-sm font-medium text-muted-foreground">Agency</h4>
                         <p className="font-medium">{regulation.agency_name}</p>
                         {regulation.agency_department && (
-                          <p className="text-sm text-gray-600 mt-1">
+                          <p className="text-sm text-muted-foreground mt-1">
                             {regulation.agency_department}
                           </p>
                         )}
@@ -582,8 +582,8 @@ export default function PublicRegulationDetailPage() {
                         )}
                       </div>
                     ) : (
-                      <div className="bg-gray-50 border border-gray-100 rounded-md p-4 text-gray-500 flex items-center">
-                        <Info className="h-5 w-5 text-gray-400 mr-2" />
+                      <div className="bg-background border border-gray-100 rounded-md p-4 text-muted-foreground flex items-center">
+                        <Info className="h-5 w-5 text-muted-foreground mr-2" />
                         No agency information available.
                       </div>
                     )}
@@ -594,19 +594,19 @@ export default function PublicRegulationDetailPage() {
                 <Card>
                   <CardHeader>
                     <CardTitle className="flex items-center">
-                      <FileCheck className="h-5 w-5 text-gray-500 mr-2" />
+                      <FileCheck className="h-5 w-5 text-muted-foreground mr-2" />
                       Statute Reference
                     </CardTitle>
                     <CardDescription>Legal foundation</CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-2">
                     <div>
-                      <h4 className="text-sm font-medium text-gray-500">Statute</h4>
+                      <h4 className="text-sm font-medium text-muted-foreground">Statute</h4>
                       <p className="font-medium">{regulation.statute}</p>
                     </div>
                     {regulation.statuteIds && (
                       <div>
-                        <h4 className="text-sm font-medium text-gray-500">Statute ID</h4>
+                        <h4 className="text-sm font-medium text-muted-foreground">Statute ID</h4>
                         <p className="font-medium">{regulation.statuteIds}</p>
                       </div>
                     )}

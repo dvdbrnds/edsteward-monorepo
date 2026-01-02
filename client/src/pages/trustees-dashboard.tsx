@@ -85,7 +85,7 @@ function getStatusColor(status: string) {
     case "at-risk":
       return "text-red-600 bg-red-50";
     default:
-      return "text-gray-600 bg-gray-50";
+      return "text-muted-foreground bg-background";
   }
 }
 
@@ -240,10 +240,10 @@ export default function TrusteesDashboard() {
   // Now we can safely use early returns after ALL hooks have been called
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading trustees dashboard...</p>
+          <p className="text-muted-foreground">Loading trustees dashboard...</p>
         </div>
       </div>
     );
@@ -251,11 +251,11 @@ export default function TrusteesDashboard() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Error Loading Dashboard</h2>
-          <p className="text-gray-600 mb-4">{error}</p>
+          <h2 className="text-xl font-semibold text-foreground mb-2">Error Loading Dashboard</h2>
+          <p className="text-muted-foreground mb-4">{error}</p>
           <Button onClick={() => window.location.reload()}>
             Try Again
           </Button>
@@ -265,12 +265,12 @@ export default function TrusteesDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Trustees Dashboard</h1>
-          <p className="text-gray-600 mt-2">
+          <h1 className="text-3xl font-bold text-foreground">Trustees Dashboard</h1>
+          <p className="text-muted-foreground mt-2">
             Regulatory compliance overview for institutional governance
           </p>
         </div>
@@ -281,8 +281,8 @@ export default function TrusteesDashboard() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Total Regulations</p>
-                  <p className="text-3xl font-bold text-gray-900">{stats.total}</p>
+                  <p className="text-sm font-medium text-muted-foreground">Total Regulations</p>
+                  <p className="text-3xl font-bold text-foreground">{stats.total}</p>
                 </div>
                 <FileText className="h-8 w-8 text-blue-600" />
               </div>
@@ -293,7 +293,7 @@ export default function TrusteesDashboard() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Compliant</p>
+                  <p className="text-sm font-medium text-muted-foreground">Compliant</p>
                   <p className="text-3xl font-bold text-green-600">{stats.compliant}</p>
                 </div>
                 <CheckCircle2 className="h-8 w-8 text-green-600" />
@@ -305,7 +305,7 @@ export default function TrusteesDashboard() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">Needs Attention</p>
+                  <p className="text-sm font-medium text-muted-foreground">Needs Attention</p>
                   <p className="text-3xl font-bold text-yellow-600">{stats.needsAttention}</p>
                 </div>
                 <Clock className="h-8 w-8 text-yellow-600" />
@@ -317,7 +317,7 @@ export default function TrusteesDashboard() {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">At Risk</p>
+                  <p className="text-sm font-medium text-muted-foreground">At Risk</p>
                   <p className="text-3xl font-bold text-red-600">{stats.atRisk}</p>
                 </div>
                 <AlertTriangle className="h-8 w-8 text-red-600" />
@@ -338,7 +338,7 @@ export default function TrusteesDashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
               {/* Search */}
               <div className="relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
                   placeholder="Search regulations..."
                   value={searchQuery}
@@ -411,7 +411,7 @@ export default function TrusteesDashboard() {
                 <TableHeader>
                   <TableRow>
                     <TableHead 
-                      className="cursor-pointer hover:bg-gray-50"
+                      className="cursor-pointer hover:bg-background"
                       onClick={() => handleSort('name')}
                     >
                       <div className="flex items-center gap-2">
@@ -420,7 +420,7 @@ export default function TrusteesDashboard() {
                       </div>
                     </TableHead>
                     <TableHead 
-                      className="cursor-pointer hover:bg-gray-50"
+                      className="cursor-pointer hover:bg-background"
                       onClick={() => handleSort('category')}
                     >
                       <div className="flex items-center gap-2">
@@ -429,7 +429,7 @@ export default function TrusteesDashboard() {
                       </div>
                     </TableHead>
                     <TableHead 
-                      className="cursor-pointer hover:bg-gray-50"
+                      className="cursor-pointer hover:bg-background"
                       onClick={() => handleSort('jurisdiction')}
                     >
                       <div className="flex items-center gap-2">
@@ -440,7 +440,7 @@ export default function TrusteesDashboard() {
                     <TableHead>Agency</TableHead>
                     <TableHead>Compliance Status</TableHead>
                     <TableHead 
-                      className="cursor-pointer hover:bg-gray-50"
+                      className="cursor-pointer hover:bg-background"
                       onClick={() => handleSort('lastVerified')}
                     >
                       <div className="flex items-center gap-2">
@@ -449,7 +449,7 @@ export default function TrusteesDashboard() {
                       </div>
                     </TableHead>
                     <TableHead 
-                      className="cursor-pointer hover:bg-gray-50"
+                      className="cursor-pointer hover:bg-background"
                       onClick={() => handleSort('last_updated')}
                     >
                       <div className="flex items-center gap-2">
@@ -465,10 +465,10 @@ export default function TrusteesDashboard() {
                     const complianceStatus = calculateComplianceStatus(regulation);
                     
                     return (
-                      <TableRow key={regulation.id} className="hover:bg-gray-50">
+                      <TableRow key={regulation.id} className="hover:bg-background">
                         <TableCell>
                           <div>
-                            <div className="font-medium text-gray-900">
+                            <div className="font-medium text-foreground">
                               {regulation.name}
                             </div>
                           </div>
@@ -480,12 +480,12 @@ export default function TrusteesDashboard() {
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            <Building className="h-4 w-4 text-gray-400" />
+                            <Building className="h-4 w-4 text-muted-foreground" />
                             {regulation.jurisdiction}
                           </div>
                         </TableCell>
                         <TableCell>
-                          <div className="text-sm text-gray-600">
+                          <div className="text-sm text-muted-foreground">
                             {regulation.agency_name}
                           </div>
                         </TableCell>
@@ -496,7 +496,7 @@ export default function TrusteesDashboard() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <Calendar className="h-4 w-4" />
                             {regulation.lastVerified 
                               ? format(new Date(regulation.lastVerified), 'MMM d, yyyy')
@@ -505,7 +505,7 @@ export default function TrusteesDashboard() {
                           </div>
                         </TableCell>
                         <TableCell>
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
                             <Calendar className="h-4 w-4" />
                             {regulation.last_updated 
                               ? format(new Date(regulation.last_updated), 'MMM d, yyyy')
@@ -533,9 +533,9 @@ export default function TrusteesDashboard() {
 
             {filteredRegulations.length === 0 && (
               <div className="text-center py-12">
-                <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No regulations found</h3>
-                <p className="text-gray-600">
+                <FileText className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-medium text-foreground mb-2">No regulations found</h3>
+                <p className="text-muted-foreground">
                   Try adjusting your filters to see more results.
                 </p>
               </div>

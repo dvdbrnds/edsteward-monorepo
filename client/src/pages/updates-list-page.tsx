@@ -190,7 +190,7 @@ const UpdatesListPage: React.FC = () => {
   if (isLoading) {
     console.log('⏳ Rendering loading state');
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-background">
         <Navigation />
         <div className="container mx-auto px-4 py-8">
           <div className="flex items-center justify-center min-h-[400px]">
@@ -205,12 +205,12 @@ const UpdatesListPage: React.FC = () => {
   if (error) {
     console.log('❌ Rendering error state:', error);
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-background">
         <Navigation />
         <div className="container mx-auto px-4 py-8">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-red-600 mb-4">Error Loading Updates</h1>
-            <p className="text-gray-600">{error.message}</p>
+            <p className="text-muted-foreground">{error.message}</p>
           </div>
         </div>
       </div>
@@ -220,13 +220,13 @@ const UpdatesListPage: React.FC = () => {
   console.log('📋 Rendering updates list with', pendingUpdates.length, 'items');
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Navigation />
       <div className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Regulation Updates</h1>
-            <p className="text-sm text-gray-500 mt-1">
+            <h1 className="text-3xl font-bold text-foreground">Regulation Updates</h1>
+            <p className="text-sm text-muted-foreground mt-1">
               Last updated: {new Date(dataUpdatedAt).toLocaleTimeString()}
             </p>
           </div>
@@ -270,7 +270,7 @@ const UpdatesListPage: React.FC = () => {
 
         {/* Bulk Actions Bar */}
         {pendingUpdates.length > 0 && (
-          <div className="bg-white rounded-lg border p-4 mb-6">
+          <div className="bg-card rounded-lg border p-4 mb-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <div className="flex items-center gap-2">
@@ -336,11 +336,11 @@ const UpdatesListPage: React.FC = () => {
         {pendingUpdates.length === 0 ? (
           <div className="space-y-8">
             <div className="text-center py-12">
-              <div className="text-gray-400 mb-4">
+              <div className="text-muted-foreground mb-4">
                 <FileText className="h-16 w-16 mx-auto" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">No pending updates</h3>
-              <p className="text-gray-500">
+              <h3 className="text-lg font-medium text-foreground mb-2">No pending updates</h3>
+              <p className="text-muted-foreground">
                 All regulation updates have been reviewed and processed.
               </p>
             </div>
@@ -348,11 +348,11 @@ const UpdatesListPage: React.FC = () => {
             {/* Demo Section */}
             <div className="border-t pt-8">
               <div className="text-center mb-6">
-                <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                <h2 className="text-xl font-semibold text-foreground mb-2">
                   <Zap className="h-5 w-5 inline mr-2 text-blue-500" />
                   Differential View Demo
                 </h2>
-                <p className="text-gray-600">
+                <p className="text-muted-foreground">
                   Experience the powerful regulation change tracking and review system
                 </p>
               </div>
@@ -366,7 +366,7 @@ const UpdatesListPage: React.FC = () => {
                     
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <h3 className="text-lg font-semibold text-gray-900">
+                        <h3 className="text-lg font-semibold text-foreground">
                           Title IX Educational Amendments - 2024 Update
                         </h3>
                         <Badge variant="secondary" className="bg-blue-100 text-blue-700">
@@ -374,7 +374,7 @@ const UpdatesListPage: React.FC = () => {
                         </Badge>
                       </div>
                       
-                      <div className="flex items-center gap-4 text-sm text-gray-600 mb-4">
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
                         <span className="flex items-center gap-1">
                           <Calendar className="h-4 w-4" />
                           {new Date().toLocaleDateString()}
@@ -403,7 +403,7 @@ const UpdatesListPage: React.FC = () => {
                         </div>
                       </div>
 
-                      <p className="text-sm text-gray-600 mb-4">
+                      <p className="text-sm text-muted-foreground mb-4">
                         <strong>Summary:</strong> Updated compliance requirements for educational institutions, 
                         including new reporting procedures and enhanced protection measures for students and staff.
                       </p>
@@ -425,7 +425,7 @@ const UpdatesListPage: React.FC = () => {
               </Card>
 
               <div className="text-center mt-6">
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-muted-foreground">
                   This demo showcases the differential view feature with sample regulation changes.
                   <br />
                   In production, this section will display real pending regulation updates.
@@ -448,7 +448,7 @@ const UpdatesListPage: React.FC = () => {
                     
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <h3 className="text-lg font-semibold text-gray-900">
+                        <h3 className="text-lg font-semibold text-foreground">
                           {update.name}
                         </h3>
                         <Badge variant="outline">
@@ -456,7 +456,7 @@ const UpdatesListPage: React.FC = () => {
                         </Badge>
                       </div>
                       
-                      <div className="flex items-center gap-4 text-sm text-gray-500 mb-3">
+                      <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
                         <span className="flex items-center gap-1">
                           <Calendar className="h-4 w-4" />
                           {new Date(update.updateDate).toLocaleDateString()}

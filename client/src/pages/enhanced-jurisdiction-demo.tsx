@@ -126,7 +126,7 @@ export default function EnhancedJurisdictionDemo() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Navigation />
       <main className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -141,8 +141,8 @@ export default function EnhancedJurisdictionDemo() {
               Back to Dashboard
             </Button>
             
-            <h1 className="text-3xl font-bold text-gray-900">Enhanced Jurisdiction System Demo</h1>
-            <p className="mt-2 text-lg text-gray-600">
+            <h1 className="text-3xl font-bold text-foreground">Enhanced Jurisdiction System Demo</h1>
+            <p className="mt-2 text-lg text-muted-foreground">
               Experience the new dual-dimension filtering: Source + Institution Type
             </p>
           </div>
@@ -160,15 +160,15 @@ export default function EnhancedJurisdictionDemo() {
                 <div className="space-y-4">
                   <div>
                     <h4 className="font-medium text-red-600">❌ Old System:</h4>
-                    <p className="text-sm text-gray-600">Single "Jurisdiction" field: Federal OR State</p>
-                    <p className="text-xs text-gray-500">Limited and confusing</p>
+                    <p className="text-sm text-muted-foreground">Single "Jurisdiction" field: Federal OR State</p>
+                    <p className="text-xs text-muted-foreground">Limited and confusing</p>
                   </div>
                   <div>
                     <h4 className="font-medium text-green-600">✅ New System:</h4>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-muted-foreground">
                       <strong>Source:</strong> WHERE it comes from (Federal, State, International, Accreditor, etc.)
                     </p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-muted-foreground">
                       <strong>Applies To:</strong> WHO must comply (Public Universities, Conservatories, etc.)
                     </p>
                   </div>
@@ -187,15 +187,15 @@ export default function EnhancedJurisdictionDemo() {
                 <div className="space-y-3 text-sm">
                   <div className="p-2 bg-blue-50 rounded">
                     <strong>Federal law → Public universities only</strong>
-                    <p className="text-xs text-gray-600">Some federal regulations only apply to public institutions</p>
+                    <p className="text-xs text-muted-foreground">Some federal regulations only apply to public institutions</p>
                   </div>
                   <div className="p-2 bg-green-50 rounded">
                     <strong>Accreditor → Conservatories only</strong>
-                    <p className="text-xs text-gray-600">Music accreditors have specialized requirements</p>
+                    <p className="text-xs text-muted-foreground">Music accreditors have specialized requirements</p>
                   </div>
                   <div className="p-2 bg-purple-50 rounded">
                     <strong>International → Research institutions</strong>
-                    <p className="text-xs text-gray-600">International agreements affecting research collaborations</p>
+                    <p className="text-xs text-muted-foreground">International agreements affecting research collaborations</p>
                   </div>
                 </div>
               </CardContent>
@@ -220,7 +220,7 @@ export default function EnhancedJurisdictionDemo() {
                     }}
                   >
                     <span className="font-medium text-sm">{example.name}</span>
-                    <span className="text-xs text-gray-500 mt-1">{example.description}</span>
+                    <span className="text-xs text-muted-foreground mt-1">{example.description}</span>
                   </Button>
                 ))}
               </div>
@@ -281,10 +281,10 @@ export default function EnhancedJurisdictionDemo() {
                             ))}
                           </div>
                         </TableCell>
-                        <TableCell className="text-sm text-gray-600">
+                        <TableCell className="text-sm text-muted-foreground">
                           {regulation.agency_name}
                         </TableCell>
-                        <TableCell className="text-sm text-gray-600 max-w-xs">
+                        <TableCell className="text-sm text-muted-foreground max-w-xs">
                           {regulation.description}
                         </TableCell>
                       </TableRow>
@@ -294,7 +294,7 @@ export default function EnhancedJurisdictionDemo() {
               </div>
               
               {filteredRegulations.length === 0 && (
-                <div className="text-center py-8 text-gray-500">
+                <div className="text-center py-8 text-muted-foreground">
                   <p>No regulations match the current filters.</p>
                   <Button 
                     variant="outline" 

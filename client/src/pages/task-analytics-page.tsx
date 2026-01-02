@@ -7,11 +7,11 @@ export default function TaskAnalyticsPage() {
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
           <BarChart3 className="h-8 w-8 text-blue-600" />
-          <h1 className="text-3xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold text-foreground">
             Compliance Task Analytics
           </h1>
         </div>
-        <p className="text-gray-600">
+        <p className="text-muted-foreground">
           Monitor task completion rates, identify bottlenecks, and track compliance progress across all regulations.
         </p>
       </div>

@@ -287,7 +287,7 @@ const DiffTestPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Navigation />
       
       <main className="py-10">
@@ -359,7 +359,7 @@ const DiffTestPage = () => {
                        )}
                      </div>
                    ) : originalText && (
-                    <div className="mt-4 p-4 border rounded-md bg-gray-50 max-h-64 overflow-y-auto">
+                    <div className="mt-4 p-4 border rounded-md bg-background max-h-64 overflow-y-auto">
                       <pre className="text-sm">{originalText.substring(0, 500)}...</pre>
                     </div>
                   )}
@@ -390,7 +390,7 @@ const DiffTestPage = () => {
                        )}
                      </div>
                    ) : updatedText && (
-                    <div className="mt-4 p-4 border rounded-md bg-gray-50 max-h-64 overflow-y-auto">
+                    <div className="mt-4 p-4 border rounded-md bg-background max-h-64 overflow-y-auto">
                       <pre className="text-sm">{updatedText.substring(0, 500)}...</pre>
                     </div>
                   )}
@@ -426,7 +426,7 @@ const DiffTestPage = () => {
                 )}
               </CardHeader>
               <CardContent>
-                <div className="p-4 border rounded-md bg-white max-h-[600px] overflow-y-auto">
+                <div className="p-4 border rounded-md bg-card max-h-[600px] overflow-y-auto">
                   {diffResult.map((part, index) => (
                     <span 
                       key={index}

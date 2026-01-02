@@ -183,7 +183,7 @@ export default function AuthPage() {
                     <div className="mt-6 space-y-4">
                       <div className="text-center">
                         <h3 className="text-lg font-semibold">Multi-Factor Authentication</h3>
-                        <p className="text-sm text-gray-600 mt-1">
+                        <p className="text-sm text-muted-foreground mt-1">
                           Enter the 6-digit code from your authenticator app
                         </p>
                       </div>

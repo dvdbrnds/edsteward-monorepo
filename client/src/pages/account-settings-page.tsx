@@ -20,18 +20,18 @@ export default function AccountSettingsPage() {
   if (!user) {
     return (
       <div className="flex items-center justify-center h-64">
-        <p className="text-gray-500">Please log in to access account settings.</p>
+        <p className="text-muted-foreground">Please log in to access account settings.</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Navigation />
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Account Settings</h1>
-        <p className="text-gray-600 mt-2">
+          <h1 className="text-3xl font-bold text-foreground">Account Settings</h1>
+        <p className="text-muted-foreground mt-2">
           Manage your account security and preferences
         </p>
       </div>
@@ -52,12 +52,12 @@ export default function AccountSettingsPage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Username</label>
+                  <label className="text-sm font-medium text-muted-foreground">Username</label>
                   <p className="text-lg font-semibold">{user.username}</p>
                 </div>
                 
                 <div>
-                  <label className="text-sm font-medium text-gray-500 flex items-center gap-1">
+                  <label className="text-sm font-medium text-muted-foreground flex items-center gap-1">
                     <Mail className="h-4 w-4" />
                     Email
                   </label>
@@ -66,14 +66,14 @@ export default function AccountSettingsPage() {
 
                 {user.firstName && (
                   <div>
-                    <label className="text-sm font-medium text-gray-500">First Name</label>
+                    <label className="text-sm font-medium text-muted-foreground">First Name</label>
                     <p className="text-lg">{user.firstName}</p>
                   </div>
                 )}
 
                 {user.lastName && (
                   <div>
-                    <label className="text-sm font-medium text-gray-500">Last Name</label>
+                    <label className="text-sm font-medium text-muted-foreground">Last Name</label>
                     <p className="text-lg">{user.lastName}</p>
                   </div>
                 )}
@@ -81,20 +81,20 @@ export default function AccountSettingsPage() {
 
               <div className="space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Role</label>
+                  <label className="text-sm font-medium text-muted-foreground">Role</label>
                   <div className="flex items-center gap-2">
                     <Badge variant={user.role === 'admin' ? 'default' : 'secondary'}>
                       {user.role}
                     </Badge>
                     {user.role === 'admin' && (
-                      <span className="text-sm text-gray-500">Full system access</span>
+                      <span className="text-sm text-muted-foreground">Full system access</span>
                     )}
                   </div>
                 </div>
 
                 {user.department && (
                   <div>
-                    <label className="text-sm font-medium text-gray-500 flex items-center gap-1">
+                    <label className="text-sm font-medium text-muted-foreground flex items-center gap-1">
                       <Building className="h-4 w-4" />
                       Department
                     </label>
@@ -103,7 +103,7 @@ export default function AccountSettingsPage() {
                 )}
 
                 <div>
-                  <label className="text-sm font-medium text-gray-500">Account Type</label>
+                  <label className="text-sm font-medium text-muted-foreground">Account Type</label>
                   <div className="flex items-center gap-2">
                     {user.identityProvider === 'saml' ? (
                       <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
@@ -114,7 +114,7 @@ export default function AccountSettingsPage() {
                         Emergency Admin
                       </Badge>
                     ) : (
-                      <Badge variant="outline" className="bg-gray-50 text-gray-700 border-gray-200">
+                      <Badge variant="outline" className="bg-background text-foreground border-border">
                         Local Account
                       </Badge>
                     )}
@@ -123,7 +123,7 @@ export default function AccountSettingsPage() {
 
                 {user.lastLogin && (
                   <div>
-                    <label className="text-sm font-medium text-gray-500 flex items-center gap-1">
+                    <label className="text-sm font-medium text-muted-foreground flex items-center gap-1">
                       <Calendar className="h-4 w-4" />
                       Last Login
                     </label>

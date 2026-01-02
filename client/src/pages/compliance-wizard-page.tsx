@@ -42,7 +42,7 @@ export default function ComplianceWizardPage() {
 
   if (isLoading || !regulation) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-background">
         <Navigation />
         <main className="py-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -66,7 +66,7 @@ export default function ComplianceWizardPage() {
           <div className="space-y-4">
             <h3 className="text-lg font-semibold">Regulation Details</h3>
             <div 
-              className="prose prose-sm max-w-none text-gray-600"
+              className="prose prose-sm max-w-none text-muted-foreground"
               dangerouslySetInnerHTML={{ __html: renderMarkdown(regulation.requirements) }}
             />
             {regulation.regulationUrl && (
@@ -103,7 +103,7 @@ export default function ComplianceWizardPage() {
                     <input type="checkbox" className="mt-1" />
                     <div>
                       <p className="font-medium">Course Materials</p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-muted-foreground">
                         Syllabi, course descriptions, and learning objectives
                       </p>
                     </div>
@@ -112,7 +112,7 @@ export default function ComplianceWizardPage() {
                     <input type="checkbox" className="mt-1" />
                     <div>
                       <p className="font-medium">Faculty Credentials</p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-muted-foreground">
                         Current CVs and teaching certifications
                       </p>
                     </div>
@@ -136,7 +136,7 @@ export default function ComplianceWizardPage() {
                     <input type="checkbox" className="mt-1" />
                     <div>
                       <p className="font-medium">Aid Distribution Records</p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-muted-foreground">
                         Documentation of financial aid disbursement and policies
                       </p>
                     </div>
@@ -156,7 +156,7 @@ export default function ComplianceWizardPage() {
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold">Required Documentation</h3>
                 <div className="space-y-4">
-                  <p className="text-gray-600">
+                  <p className="text-muted-foreground">
                     Please gather all relevant documentation as specified in the regulation text.
                   </p>
                 </div>
@@ -178,19 +178,19 @@ export default function ComplianceWizardPage() {
           <div className="space-y-6">
             <div className="space-y-2">
               <h4 className="font-medium">Step 1: Document Preparation</h4>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Format all documents according to {regulation.statute} requirements.
               </p>
             </div>
             <div className="space-y-2">
               <h4 className="font-medium">Step 2: Data Verification</h4>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Verify all data points against source documentation.
               </p>
             </div>
             <div className="space-y-2">
               <h4 className="font-medium">Step 3: Submit Report</h4>
-              <p className="text-gray-600">
+              <p className="text-muted-foreground">
                 Submit through the designated compliance portal.
               </p>
             </div>
@@ -205,10 +205,10 @@ export default function ComplianceWizardPage() {
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Final Review for {regulation.topic}</h3>
           <div className="space-y-4">
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Please review all information before final submission. Ensure:
             </p>
-            <ul className="list-disc list-inside space-y-2 text-gray-600">
+            <ul className="list-disc list-inside space-y-2 text-muted-foreground">
               <li>All required documentation is attached</li>
               <li>Documentation follows {regulation.statute} guidelines</li>
               <li>Supporting evidence properly references {regulation.statuteIds}</li>
@@ -226,7 +226,7 @@ export default function ComplianceWizardPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Navigation />
       <main className="py-10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -239,10 +239,10 @@ export default function ComplianceWizardPage() {
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Regulation
             </Button>
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="text-3xl font-bold text-foreground">
               {regulation.topic} - Compliance Report Generator
             </h1>
-            <p className="mt-2 text-gray-600">
+            <p className="mt-2 text-muted-foreground">
               Follow the steps below to generate a compliance report for {regulation.topic}
             </p>
           </div>
@@ -268,7 +268,7 @@ export default function ComplianceWizardPage() {
                 <span
                   key={index}
                   className={`text-sm ${
-                    index <= step ? "text-[#00267A]" : "text-gray-400"
+                    index <= step ? "text-[#00267A]" : "text-muted-foreground"
                   }`}
                 >
                   Step {index + 1}

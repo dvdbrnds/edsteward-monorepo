@@ -165,7 +165,7 @@ export default function AdminDashboardPage() {
             case 'active': return 'bg-green-100 text-green-800';
             case 'inactive': return 'bg-red-100 text-red-800';
             case 'pending': return 'bg-yellow-100 text-yellow-800';
-            default: return 'bg-gray-100 text-gray-800';
+            default: return 'bg-gray-100 text-foreground';
         }
     };
 
@@ -174,7 +174,7 @@ export default function AdminDashboardPage() {
             case 'starter': return 'bg-blue-100 text-blue-800';
             case 'professional': return 'bg-purple-100 text-purple-800';
             case 'enterprise': return 'bg-orange-100 text-orange-800';
-            default: return 'bg-gray-100 text-gray-800';
+            default: return 'bg-gray-100 text-foreground';
         }
     };
 
@@ -296,7 +296,7 @@ export default function AdminDashboardPage() {
                                 {/* Search and Filter */}
                                 <div className="flex items-center space-x-4 mb-6">
                                     <div className="relative flex-1">
-                                        <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                                        <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                                         <Input
                                             placeholder="Search customers..."
                                             value={searchTerm}

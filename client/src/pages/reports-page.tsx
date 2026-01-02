@@ -329,14 +329,14 @@ export default function ReportsPage() {
 
   const getColumnStyle = (key: keyof Regulation) => {
     if (!sortConfig || sortConfig.key !== key) {
-      return "cursor-pointer hover:bg-gray-50";
+      return "cursor-pointer hover:bg-background";
     }
-    return "cursor-pointer hover:bg-gray-50 font-bold";
+    return "cursor-pointer hover:bg-background font-bold";
   };
 
   if (regulationsLoading || deadlinesLoading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-background">
         <Navigation />
         <main className="py-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -426,7 +426,7 @@ export default function ReportsPage() {
   const sortedRegulations = sortData(filteredRegulations);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Navigation />
 
       <main className="py-10">
@@ -434,7 +434,7 @@ export default function ReportsPage() {
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center">
               <FileText className="h-6 w-6 mr-3 text-[#00267A]" />
-              <h1 className="text-3xl font-bold text-gray-900">
+              <h1 className="text-3xl font-bold text-foreground">
                 Compliance Reports
               </h1>
             </div>
@@ -462,7 +462,7 @@ export default function ReportsPage() {
                 <div className="flex items-center gap-2">
                   Detailed Regulations Report
                   {(categoryFilter || statusFilter) && (
-                    <span className="text-sm font-normal text-gray-500">
+                    <span className="text-sm font-normal text-muted-foreground">
                       {categoryFilter && `Category: ${categoryFilter}`}
                       {categoryFilter && statusFilter && " | "}
                       {statusFilter && `Status: ${statusFilter}`}
@@ -504,13 +504,13 @@ export default function ReportsPage() {
                     return (
                       <TableRow
                         key={regulation.id}
-                        className="cursor-pointer hover:bg-gray-50"
+                        className="cursor-pointer hover:bg-background"
                         onClick={() => setLocation(`/regulations/${regulation.id}`)}
                       >
                         <TableCell>{regulation.itemId}</TableCell>
                         <TableCell>{regulation.name || regulation.statute}</TableCell>
                         <TableCell>
-                          <div className="text-sm text-gray-500 mt-1">
+                          <div className="text-sm text-muted-foreground mt-1">
                             {regulation.topic}
                           </div>
                         </TableCell>
@@ -567,7 +567,7 @@ export default function ReportsPage() {
                               </span>
                             </div>
                           ) : (
-                            <span className="text-gray-500">No deadlines</span>
+                            <span className="text-muted-foreground">No deadlines</span>
                           )}
                         </TableCell>
                         <TableCell>

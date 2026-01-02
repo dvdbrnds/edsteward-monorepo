@@ -213,7 +213,7 @@ function ActionButton({ action, regulationId, isAdmin, onToggle, onStatusChange,
       case 'in_progress':
         return <Clock4 className="h-4 w-4 text-yellow-500" />;
       case 'pending':
-        return <Clock4 className="h-4 w-4 text-gray-400" />;
+        return <Clock4 className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
@@ -225,7 +225,7 @@ function ActionButton({ action, regulationId, isAdmin, onToggle, onStatusChange,
   };
 
   return (
-    <div className={`flex items-center justify-between p-3 border rounded-lg ${!action.enabled ? 'bg-gray-50' : ''}`}>
+    <div className={`flex items-center justify-between p-3 border rounded-lg ${!action.enabled ? 'bg-background' : ''}`}>
       <div className="flex items-center gap-3">
         <div className={`p-2 rounded-full ${action.enabled ? 'bg-blue-50' : 'bg-gray-100'}`}>
           {getIcon()}
@@ -235,7 +235,7 @@ function ActionButton({ action, regulationId, isAdmin, onToggle, onStatusChange,
             {getActionLabel()}
             {action.required && <span className="text-xs text-red-500">*Required</span>}
           </p>
-          <div className="flex items-center gap-2 text-sm text-gray-500">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
             {getStatusIcon()}
             <span>{action.status.charAt(0).toUpperCase() + action.status.slice(1)}</span>
           </div>
@@ -265,7 +265,7 @@ function ActionButton({ action, regulationId, isAdmin, onToggle, onStatusChange,
             {action.enabled ? (
               <ToggleRight className="h-5 w-5 text-green-500" />
             ) : (
-              <ToggleLeft className="h-5 w-5 text-gray-400" />
+              <ToggleLeft className="h-5 w-5 text-muted-foreground" />
             )}
           </Button>
           <Button
@@ -277,7 +277,7 @@ function ActionButton({ action, regulationId, isAdmin, onToggle, onStatusChange,
             {action.required ? (
               <Check className="h-5 w-5 text-red-500" />
             ) : (
-              <Ban className="h-5 w-5 text-gray-400" />
+              <Ban className="h-5 w-5 text-muted-foreground" />
             )}
           </Button>
         </div>
@@ -449,7 +449,7 @@ export default function RegulationDetailPage() {
 
   if (isLoading || deadlinesLoading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-background">
         <Navigation />
         <main className="py-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -471,7 +471,7 @@ export default function RegulationDetailPage() {
   const complianceScore = calculateComplianceScore(regulation, regulationDeadlines);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Navigation />
       <main className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -485,21 +485,21 @@ export default function RegulationDetailPage() {
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Regulations
               </Button>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              <h1 className="text-3xl font-bold text-foreground mb-2">
                 {regulation?.name || regulation?.topic}
               </h1>
-              <div className="flex items-center space-x-2 text-sm text-gray-500">
+              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
                 <span className="px-2 py-1 bg-gray-100 rounded">
                   ID: {regulation?.itemId}
                 </span>
                 {user?.role === "admin" ? (
                   <div className="flex items-center gap-2">
-                    <span className="text-xs text-gray-500">Category:</span>
+                    <span className="text-xs text-muted-foreground">Category:</span>
                     <Select
                       defaultValue={regulation?.category}
                       onValueChange={(value) => categoryMutation.mutate(value)}
                     >
-                      <SelectTrigger className="w-[180px] bg-gray-100 border rounded-md hover:bg-gray-50 transition-colors">
+                      <SelectTrigger className="w-[180px] bg-gray-100 border rounded-md hover:bg-background transition-colors">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -560,23 +560,23 @@ export default function RegulationDetailPage() {
                   <CardContent className="space-y-4">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div>
-                        <h3 className="text-sm font-medium text-gray-500">Statute</h3>
+                        <h3 className="text-sm font-medium text-muted-foreground">Statute</h3>
                         <p className="mt-1">{regulation?.statute || "Not specified"}</p>
                       </div>
                       <div>
-                        <h3 className="text-sm font-medium text-gray-500">Jurisdiction</h3>
+                        <h3 className="text-sm font-medium text-muted-foreground">Jurisdiction</h3>
                         <p className="mt-1 capitalize">{regulation?.jurisdiction || "Not specified"}</p>
                       </div>
                       <div>
-                        <h3 className="text-sm font-medium text-gray-500">Category</h3>
+                        <h3 className="text-sm font-medium text-muted-foreground">Category</h3>
                         <p className="mt-1">{regulation?.category || "Not categorized"}</p>
                       </div>
                       <div>
-                        <h3 className="text-sm font-medium text-gray-500">Agency</h3>
+                        <h3 className="text-sm font-medium text-muted-foreground">Agency</h3>
                         <p className="mt-1">{regulation?.agency_name || "Not specified"}</p>
                       </div>
                       <div>
-                        <h3 className="text-sm font-medium text-gray-500">Last Updated</h3>
+                        <h3 className="text-sm font-medium text-muted-foreground">Last Updated</h3>
                         <p className="mt-1">
                           {regulation?.lastUpdated
                             ? format(new Date(regulation.lastUpdated), "MMMM d, yyyy")
@@ -584,7 +584,7 @@ export default function RegulationDetailPage() {
                         </p>
                       </div>
                       <div>
-                        <h3 className="text-sm font-medium text-gray-500">Effective Date</h3>
+                        <h3 className="text-sm font-medium text-muted-foreground">Effective Date</h3>
                         <p className="mt-1">
                           {regulation?.effectiveDate
                             ? format(new Date(regulation.effectiveDate), "MMMM d, yyyy")
@@ -595,7 +595,7 @@ export default function RegulationDetailPage() {
 
                     {regulation?.summary && (
                       <div>
-                        <h3 className="text-sm font-medium text-gray-500">Summary</h3>
+                        <h3 className="text-sm font-medium text-muted-foreground">Summary</h3>
                         <div 
                           className="mt-1 prose prose-sm max-w-none"
                           dangerouslySetInnerHTML={{ 
@@ -607,7 +607,7 @@ export default function RegulationDetailPage() {
 
                     {regulation?.requirements && (
                       <div>
-                        <h3 className="text-sm font-medium text-gray-500">Requirements</h3>
+                        <h3 className="text-sm font-medium text-muted-foreground">Requirements</h3>
                         <div 
                           className="mt-1 prose prose-sm max-w-none"
                           dangerouslySetInnerHTML={{ 
@@ -657,7 +657,7 @@ export default function RegulationDetailPage() {
                         ))}
                       </div>
                     ) : (
-                      <div className="text-center py-4 text-gray-500">
+                      <div className="text-center py-4 text-muted-foreground">
                         No compliance actions have been defined for this regulation.
                       </div>
                     )}
@@ -759,7 +759,7 @@ export default function RegulationDetailPage() {
                                   {format(new Date(deadline.dueDate), "MMM d, yyyy")}
                                 </span>
                               </div>
-                              <p className="text-sm text-gray-600 mt-1">
+                              <p className="text-sm text-muted-foreground mt-1">
                                 {deadline.description}
                               </p>
                             </div>
@@ -767,14 +767,14 @@ export default function RegulationDetailPage() {
                         })}
 
                         {regulation?.reportingFrequency && (
-                          <div className="text-sm text-gray-600 mt-4">
+                          <div className="text-sm text-muted-foreground mt-4">
                             <span className="font-medium">Reporting Frequency: </span>
                             {regulation.reportingFrequency}
                           </div>
                         )}
                       </div>
                     ) : (
-                      <div className="text-center py-4 text-gray-500">
+                      <div className="text-center py-4 text-muted-foreground">
                         No deadlines have been set for this regulation.
                       </div>
                     )}

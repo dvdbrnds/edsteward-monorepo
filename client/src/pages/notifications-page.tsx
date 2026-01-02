@@ -134,7 +134,7 @@ export default function NotificationsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       <Navigation />
       
       <main className="py-10">
@@ -142,7 +142,7 @@ export default function NotificationsPage() {
           <div className="flex items-center justify-between mb-8">
             <div className="flex items-center">
               <Bell className="h-6 w-6 mr-3 text-blue-500" />
-              <h1 className="text-3xl font-bold text-gray-900">
+              <h1 className="text-3xl font-bold text-foreground">
                 Notifications
               </h1>
             </div>
@@ -254,8 +254,8 @@ export default function NotificationsPage() {
                 </div>
 
                 {/* No Configuration Needed */}
-                <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 text-center">
-                  <p className="text-sm text-gray-600">
+                <div className="bg-background border border-border rounded-lg p-3 text-center">
+                  <p className="text-sm text-muted-foreground">
                     <strong>Automatic System:</strong> Monitors compliance deadlines and sends targeted notifications 
                     based on your role and urgency. Officers can override notifications per regulation as needed.
                   </p>
@@ -264,15 +264,15 @@ export default function NotificationsPage() {
             </Card>
 
           {/* Filter and Stats Bar */}
-          <div className="flex items-center justify-between mb-6 p-4 bg-white rounded-lg border">
+          <div className="flex items-center justify-between mb-6 p-4 bg-card rounded-lg border">
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
-                <Filter className="h-4 w-4 text-gray-500" />
-                <span className="text-sm font-medium text-gray-700">Filter:</span>
+                <Filter className="h-4 w-4 text-muted-foreground" />
+                <span className="text-sm font-medium text-foreground">Filter:</span>
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value as any)}
-                  className="border border-gray-300 rounded-md px-3 py-1 text-sm"
+                  className="border border-border rounded-md px-3 py-1 text-sm"
                 >
                   <option value="all">All Notifications</option>
                   <option value="sent">Sent Only</option>
@@ -282,7 +282,7 @@ export default function NotificationsPage() {
               </div>
             </div>
             
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-muted-foreground">
               {notificationHistory ? (
                 <>Showing {notificationHistory.notifications.length} of {notificationHistory.total} notifications</>
               ) : (
@@ -299,13 +299,13 @@ export default function NotificationsPage() {
               {isLoading ? (
                 <div className="p-8 text-center">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
-                  <p className="text-gray-500">Loading notification history...</p>
+                  <p className="text-muted-foreground">Loading notification history...</p>
                 </div>
               ) : !notificationHistory?.notifications.length ? (
                 <div className="p-8 text-center">
                   <Bell className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500 text-lg mb-2">No notifications found</p>
-                  <p className="text-gray-400 text-sm">
+                  <p className="text-muted-foreground text-lg mb-2">No notifications found</p>
+                  <p className="text-muted-foreground text-sm">
                     {statusFilter === 'all' 
                       ? 'No notifications have been sent yet.' 
                       : `No ${statusFilter} notifications found.`}
@@ -314,12 +314,12 @@ export default function NotificationsPage() {
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
-                    <thead className="bg-gray-50 border-b">
+                    <thead className="bg-background border-b">
                       <tr>
                         <th className="px-6 py-3 text-left">
                           <button
                             onClick={() => handleSort('type')}
-                            className="flex items-center gap-2 text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700"
+                            className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider hover:text-foreground"
                           >
                             Notification
                             {getSortIcon('type')}
@@ -328,7 +328,7 @@ export default function NotificationsPage() {
                         <th className="px-6 py-3 text-left">
                           <button
                             onClick={() => handleSort('status')}
-                            className="flex items-center gap-2 text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700"
+                            className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider hover:text-foreground"
                           >
                             Status
                             {getSortIcon('status')}
@@ -337,7 +337,7 @@ export default function NotificationsPage() {
                         <th className="px-6 py-3 text-left">
                           <button
                             onClick={() => handleSort('priority')}
-                            className="flex items-center gap-2 text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700"
+                            className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider hover:text-foreground"
                           >
                             Priority
                             {getSortIcon('priority')}
@@ -346,7 +346,7 @@ export default function NotificationsPage() {
                         <th className="px-6 py-3 text-left">
                           <button
                             onClick={() => handleSort('createdAt')}
-                            className="flex items-center gap-2 text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700"
+                            className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider hover:text-foreground"
                           >
                             Created
                             {getSortIcon('createdAt')}
@@ -355,22 +355,22 @@ export default function NotificationsPage() {
                         <th className="px-6 py-3 text-left">
                           <button
                             onClick={() => handleSort('sentAt')}
-                            className="flex items-center gap-2 text-xs font-medium text-gray-500 uppercase tracking-wider hover:text-gray-700"
+                            className="flex items-center gap-2 text-xs font-medium text-muted-foreground uppercase tracking-wider hover:text-foreground"
                           >
                             Sent
                             {getSortIcon('sentAt')}
                           </button>
                         </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        <th className="px-6 py-3 text-left text-xs font-medium text-muted-foreground uppercase tracking-wider">
                           Recipient
                         </th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody className="bg-card divide-y divide-gray-200">
                       {notificationHistory.notifications.map((notification) => (
                         <tr 
                           key={notification.id} 
-                          className={`hover:bg-gray-50 ${notification.regulation ? 'cursor-pointer' : ''}`}
+                          className={`hover:bg-background ${notification.regulation ? 'cursor-pointer' : ''}`}
                           onClick={() => {
                             if (notification.regulation) {
                               window.location.href = `/regulations/${notification.regulation.id}`;
@@ -379,10 +379,10 @@ export default function NotificationsPage() {
                         >
                           <td className="px-6 py-4">
                             <div className="max-w-xs">
-                              <p className={`text-sm font-medium truncate ${notification.regulation ? 'text-blue-600' : 'text-gray-900'}`}>
+                              <p className={`text-sm font-medium truncate ${notification.regulation ? 'text-blue-600' : 'text-foreground'}`}>
                                 {getNotificationTitle(notification)}
                               </p>
-                              <p className="text-sm text-gray-500 truncate">
+                              <p className="text-sm text-muted-foreground truncate">
                                 {getNotificationDescription(notification)}
                               </p>
                               {notification.regulation && (
@@ -395,7 +395,7 @@ export default function NotificationsPage() {
                           <td className="px-6 py-4">
                             {getStatusBadge(notification.status)}
                             {notification.retryCount > 0 && (
-                              <p className="text-xs text-gray-500 mt-1">
+                              <p className="text-xs text-muted-foreground mt-1">
                                 Retries: {notification.retryCount}
                               </p>
                             )}
@@ -403,38 +403,38 @@ export default function NotificationsPage() {
                           <td className="px-6 py-4">
                             {getPriorityBadge(notification.priority)}
                           </td>
-                          <td className="px-6 py-4 text-sm text-gray-900">
+                          <td className="px-6 py-4 text-sm text-foreground">
                             {format(new Date(notification.createdAt), 'MMM d, yyyy')}
                             <br />
-                            <span className="text-xs text-gray-500">
+                            <span className="text-xs text-muted-foreground">
                               {format(new Date(notification.createdAt), 'h:mm a')}
                             </span>
                           </td>
-                          <td className="px-6 py-4 text-sm text-gray-900">
+                          <td className="px-6 py-4 text-sm text-foreground">
                             {notification.sentAt ? (
                               <>
                                 {format(new Date(notification.sentAt), 'MMM d, yyyy')}
                                 <br />
-                                <span className="text-xs text-gray-500">
+                                <span className="text-xs text-muted-foreground">
                                   {format(new Date(notification.sentAt), 'h:mm a')}
                                 </span>
                               </>
                             ) : (
-                              <span className="text-gray-400">Not sent</span>
+                              <span className="text-muted-foreground">Not sent</span>
                             )}
                           </td>
-                          <td className="px-6 py-4 text-sm text-gray-900">
+                          <td className="px-6 py-4 text-sm text-foreground">
                             {notification.user ? (
                               <>
                                 <p className="font-medium">
                                   {notification.user.firstName} {notification.user.lastName}
                                 </p>
-                                <p className="text-xs text-gray-500">
+                                <p className="text-xs text-muted-foreground">
                                   {notification.user.email}
                                 </p>
                               </>
                             ) : (
-                              <span className="text-gray-400">System</span>
+                              <span className="text-muted-foreground">System</span>
                             )}
                           </td>
                         </tr>
