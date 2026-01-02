@@ -6,6 +6,7 @@ import ComplianceOverview from "@/components/dashboard/compliance-overview";
 import UpcomingDeadlines from "@/components/dashboard/upcoming-deadlines";
 import DashboardStats from "@/components/dashboard/dashboard-stats";
 import ExecutiveDashboard from "@/components/dashboard/executive-dashboard";
+import MyTasks from "@/components/dashboard/my-tasks";
 import RegulationList from "@/components/regulations/regulation-list";
 import { AppliesToFilter } from "@/components/filters/applies-to-filter";
 import { useState, useEffect } from "react";
@@ -84,18 +85,22 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 mb-8 items-stretch">
-            <div className="lg:col-span-2">
-              <div className="grid grid-cols-1 gap-8 md:grid-cols-2 items-stretch h-full">
-                <ComplianceOverview
-                  onCategorySelect={setSelectedCategory}
-                  selectedCategory={selectedCategory}
-                />
-                <UpcomingDeadlines
-                  categoryFilter={selectedCategory}
-                />
-              </div>
-            </div>
+            {/* My Tasks - Most important for compliance officers */}
+            <MyTasks />
+            
+            {/* Compliance Overview */}
+            <ComplianceOverview
+              onCategorySelect={setSelectedCategory}
+              selectedCategory={selectedCategory}
+            />
+            
+            {/* Upcoming Deadlines */}
+            <UpcomingDeadlines
+              categoryFilter={selectedCategory}
+            />
+          </div>
 
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 mb-8">
             {/* Recent Notifications Card */}
             <Card className="h-[600px]">
               <CardHeader>
