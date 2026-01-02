@@ -1,10 +1,18 @@
 import { useQuery } from "@tanstack/react-query";
 import type { Regulation, Deadline, RegulationAction } from "@shared/schema";
 import { useLocation } from "wouter";
-import { Search, CheckCircle, AlertCircle, Clock, Loader2, ArrowUpDown, Check, Globe, Mail, FileText } from "lucide-react";
+import { Search, CheckCircle, AlertCircle, Clock, Loader2, ArrowUpDown, Check, Globe, Mail, FileText, X, Filter } from "lucide-react";
 import { format } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -30,9 +38,12 @@ type SortConfig = {
 
 
 
+type StatusFilter = 'all' | 'overdue' | 'upcoming' | 'no-deadlines';
+
 export default function RegulationList({ categoryFilter, jurisdictionFilter, appliesToFilter }: RegulationListProps) {
   const [search, setSearch] = useState("");
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'lastUpdated', direction: 'desc' });
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [, navigate] = useLocation();
 
   const { data: regulations = [], isLoading: regulationsLoading, error: regulationsError } = useQuery<Regulation[]>({
@@ -78,6 +89,19 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
     );
   }
 
+  // Helper to get deadline status for a regulation
+  const getRegulationDeadlineStatus = (regulationId: number): 'overdue' | 'upcoming' | 'no-deadlines' => {
+    const regDeadlines = deadlinesData.filter(d => d.regulationId === regulationId);
+    if (regDeadlines.length === 0) return 'no-deadlines';
+    
+    const now = new Date();
+    const hasOverdue = regDeadlines.some(d => 
+      d.status !== 'completed' && new Date(d.dueDate) < now
+    );
+    if (hasOverdue) return 'overdue';
+    return 'upcoming';
+  };
+
   const filteredRegulations = Array.isArray(regulations) ? regulations.filter((reg: Regulation) => {
     if (categoryFilter && reg.category !== categoryFilter) {
       return false;
@@ -90,6 +114,13 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
         reg.applicableInstitutions?.includes(filterType)
       );
       if (!hasMatch) {
+        return false;
+      }
+    }
+    // Status filter
+    if (statusFilter !== 'all') {
+      const deadlineStatus = getRegulationDeadlineStatus(reg.id);
+      if (statusFilter !== deadlineStatus) {
         return false;
       }
     }
@@ -222,18 +253,80 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
     }
   };
 
+  const hasActiveFilters = search || statusFilter !== 'all' || categoryFilter || jurisdictionFilter || (appliesToFilter && appliesToFilter.length > 0);
+  const totalCount = Array.isArray(regulations) ? regulations.length : 0;
+
+  const clearAllFilters = () => {
+    setSearch("");
+    setStatusFilter('all');
+  };
+
   return (
     <Card>
-      <CardContent className="p-6">
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="relative flex-1">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search regulations..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9"
-            />
+      <CardContent className="p-4 sm:p-6">
+        <div className="flex flex-col gap-4 mb-6">
+          {/* Search and filters row */}
+          <div className="flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search by name, ID, category, DRO..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-9 pr-9"
+              />
+              {search && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="absolute right-1 top-1 h-8 w-8 p-0"
+                  onClick={() => setSearch("")}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
+            <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as StatusFilter)}>
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <Filter className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="Filter by status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Statuses</SelectItem>
+                <SelectItem value="overdue">
+                  <span className="flex items-center gap-2">
+                    <AlertCircle className="h-3 w-3 text-red-500" />
+                    Overdue
+                  </span>
+                </SelectItem>
+                <SelectItem value="upcoming">
+                  <span className="flex items-center gap-2">
+                    <Clock className="h-3 w-3 text-yellow-500" />
+                    Upcoming
+                  </span>
+                </SelectItem>
+                <SelectItem value="no-deadlines">
+                  <span className="flex items-center gap-2">
+                    <CheckCircle className="h-3 w-3 text-green-500" />
+                    No Deadlines
+                  </span>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          
+          {/* Results count and clear filters */}
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">
+              Showing {sortedRegulations.length} of {totalCount} regulations
+              {hasActiveFilters && " (filtered)"}
+            </span>
+            {hasActiveFilters && (
+              <Button variant="ghost" size="sm" onClick={clearAllFilters} className="text-muted-foreground hover:text-foreground">
+                <X className="h-3 w-3 mr-1" />
+                Clear filters
+              </Button>
+            )}
           </div>
         </div>
 

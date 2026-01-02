@@ -599,24 +599,24 @@ function RegulationDetailPage() {
             {/* Pending Updates Notification Banner */}
             {pendingUpdates.length > 0 && (
               <div className="p-4 bg-gradient-to-r from-yellow-50 to-orange-50 border-l-4 border-yellow-400 rounded-lg shadow-sm">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <div className="flex-shrink-0">
-                      <AlertCircle className="h-6 w-6 text-yellow-600" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-medium text-yellow-800">
-                        {pendingUpdates.length} Pending Update{pendingUpdates.length > 1 ? 's' : ''} Available
-                      </h3>
-                      <p className="text-sm text-yellow-700 mt-1">
-                        This regulation has updates waiting for review and approval. 
-                        {pendingUpdates.some((update) => update.name?.includes('MCP Engine')) && 
-                          ' Some updates are from the MCP Engine with enhanced Federal Register data.'
-                        }
-                      </p>
-                    </div>
+              <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div className="flex items-center space-x-3">
+                  <div className="flex-shrink-0">
+                    <AlertCircle className="h-6 w-6 text-yellow-600" />
                   </div>
-                  <div className="flex items-center space-x-2">
+                  <div>
+                    <h3 className="text-base sm:text-lg font-medium text-yellow-800">
+                      {pendingUpdates.length} Pending Update{pendingUpdates.length > 1 ? 's' : ''} Available
+                    </h3>
+                    <p className="text-sm text-yellow-700 mt-1">
+                      This regulation has updates waiting for review and approval. 
+                      {pendingUpdates.some((update) => update.name?.includes('MCP Engine')) && 
+                        ' Some updates are from the MCP Engine with enhanced Federal Register data.'
+                      }
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
                     <Button
                       variant="outline"
                       size="sm"
@@ -696,15 +696,15 @@ function RegulationDetailPage() {
                 <ArrowLeft className="h-4 w-4 mr-2" />
                 Back to Dashboard
               </Button>
-              <h1 className="text-3xl font-bold text-foreground mb-2">
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
                 {regulation.name || regulation.topic}
               </h1>
-              <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+              <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
                 <span className="px-3 py-1 bg-gray-100 rounded-md font-medium">
                   ID: {regulation.itemId || regulation.item_id || regulation.id || 'N/A'}
                 </span>
                 {categoryVisible ? (
-                  <div className="flex items-center gap-4">
+                  <div className="flex flex-wrap items-center gap-2 sm:gap-4">
                     <div className="flex items-center gap-2">
                       <span className="text-xs text-muted-foreground">Category:</span>
                       <Select

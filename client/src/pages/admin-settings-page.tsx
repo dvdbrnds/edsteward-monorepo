@@ -407,18 +407,18 @@ export default function SystemSettingsPage() {
 
       <main className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl font-bold text-foreground mb-8">System Settings</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-6 sm:mb-8">System Settings</h1>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-8 mb-4">
-              <TabsTrigger value="institution">Institution</TabsTrigger>
-              <TabsTrigger value="branding">Branding</TabsTrigger>
-              <TabsTrigger value="notifications">Notifications</TabsTrigger>
-              <TabsTrigger value="email">Email</TabsTrigger>
-              <TabsTrigger value="sms">SMS</TabsTrigger>
-              <TabsTrigger value="users">Users</TabsTrigger>
-              <TabsTrigger value="backups">Backups</TabsTrigger>
-              <TabsTrigger value="logs">System Logs</TabsTrigger>
+            <TabsList className="flex flex-wrap gap-1 h-auto mb-4">
+              <TabsTrigger value="institution" className="flex-shrink-0">Institution</TabsTrigger>
+              <TabsTrigger value="branding" className="flex-shrink-0">Branding</TabsTrigger>
+              <TabsTrigger value="notifications" className="flex-shrink-0">Notifications</TabsTrigger>
+              <TabsTrigger value="email" className="flex-shrink-0">Email</TabsTrigger>
+              <TabsTrigger value="sms" className="flex-shrink-0">SMS</TabsTrigger>
+              <TabsTrigger value="users" className="flex-shrink-0">Users</TabsTrigger>
+              <TabsTrigger value="backups" className="flex-shrink-0">Backups</TabsTrigger>
+              <TabsTrigger value="logs" className="flex-shrink-0">Logs</TabsTrigger>
             </TabsList>
 
             <TabsContent value="institution">
@@ -474,7 +474,7 @@ export default function SystemSettingsPage() {
                         )}
                       />
 
-                      <div className="grid grid-cols-2 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <FormField
                           control={form.control}
                           name="port"

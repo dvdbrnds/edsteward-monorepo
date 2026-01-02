@@ -102,7 +102,7 @@ export default function HomePage() {
 
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 mb-8">
             {/* Recent Notifications Card */}
-            <Card className="h-[600px]">
+            <Card className="min-h-[400px] md:h-[600px]">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Bell className="h-5 w-5 text-blue-500" />
@@ -110,7 +110,7 @@ export default function HomePage() {
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-0">
-                <div className="space-y-2 max-h-[515px] overflow-y-auto pr-3 scrollbar-thin px-6 pb-4">
+                <div className="space-y-2 max-h-[300px] md:max-h-[515px] overflow-y-auto pr-3 scrollbar-thin px-6 pb-4">
                   {notificationsLoading ? (
                     <p className="text-muted-foreground text-center py-4">Loading notifications...</p>
                   ) : notificationHistory?.notifications && notificationHistory.notifications.length > 0 ? (
@@ -195,13 +195,13 @@ export default function HomePage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center justify-between">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <p className="text-sm text-muted-foreground max-w-xl">
                   Access the view-only dashboard providing an overview of our regulatory compliance status.
                   This dashboard is designed specifically for the board of trustees to monitor compliance metrics
                   and receive status updates.
                 </p>
-                <Button asChild className="gap-2">
+                <Button asChild className="gap-2 w-full sm:w-auto flex-shrink-0">
                   <Link href="/public-dashboard">
                     <span>Open Trustees Dashboard</span>
                     <ExternalLink className="h-4 w-4" />
