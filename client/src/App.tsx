@@ -1,10 +1,12 @@
 import { Switch, Route, useLocation } from "wouter";
+import { useState } from "react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { AuthProvider } from "@/hooks/use-auth";
 import { PageLayout } from "@/components/layout/page-layout";
-// React imports removed - using single-tenant mode
+import { useKeyboardShortcuts } from "@/hooks/use-keyboard-shortcuts";
+import { KeyboardShortcutsDialog } from "@/components/ui/keyboard-shortcuts-dialog";
 
 import HomePage from "@/pages/home-page";
 import NotFound from "@/pages/not-found";
@@ -37,15 +39,15 @@ import { ErrorBoundary } from "@/components/ui/error-boundary";
 
 // Tenant detection utility removed - using single-tenant mode
 
-export default function App() {
-  const [_location] = useLocation();
+function AppContent() {
+  const [showShortcuts, setShowShortcuts] = useState(false);
+  
+  // Enable keyboard shortcuts globally
+  useKeyboardShortcuts(() => setShowShortcuts(true));
 
   return (
-    <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <AuthProvider>
-          <PageLayout>
-            <Switch>
+    <>
+      <Switch>
               {/* Authentication Route - Exact match only, don't intercept SAML routes */}
               <Route path="/auth" component={AuthPage} />
               <Route path="/setup" component={SetupWizardPage} />
@@ -115,6 +117,25 @@ export default function App() {
               <Route path="/utilities" component={UtilitiesIndexPage} />
               <Route component={NotFound} />
             </Switch>
+      
+      {/* Keyboard Shortcuts Help Dialog */}
+      <KeyboardShortcutsDialog 
+        open={showShortcuts} 
+        onOpenChange={setShowShortcuts} 
+      />
+    </>
+  );
+}
+
+export default function App() {
+  const [_location] = useLocation();
+
+  return (
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <PageLayout>
+            <AppContent />
           </PageLayout>
           <Toaster />
         </AuthProvider>
