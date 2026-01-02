@@ -1,10 +1,17 @@
 /**
  * Keyboard Shortcuts Hook
  * Provides global keyboard shortcuts for power users
+ * Cross-platform: Uses ⌘ (Command) on Mac, Ctrl on Windows/Linux
  */
 
 import { useEffect, useCallback } from 'react';
 import { useLocation } from 'wouter';
+
+// Detect if user is on Mac
+const isMac = typeof navigator !== 'undefined' && /Mac|iPod|iPhone|iPad/.test(navigator.platform);
+
+// Get the modifier key symbol based on platform
+export const getModifierSymbol = () => isMac ? '⌘' : 'Ctrl';
 
 interface ShortcutConfig {
   key: string;
@@ -20,25 +27,32 @@ interface ShortcutConfig {
 export const SHORTCUTS: ShortcutConfig[] = [
   {
     key: 'g',
-    altKey: true,
-    action: () => {}, // Will be set dynamically
+    metaKey: isMac,
+    ctrlKey: !isMac,
+    action: () => {},
     description: 'Go to Dashboard',
   },
   {
     key: 'a',
-    altKey: true,
+    metaKey: isMac,
+    ctrlKey: !isMac,
+    shiftKey: true,
     action: () => {},
     description: 'Go to Analytics',
   },
   {
     key: 'n',
-    altKey: true,
+    metaKey: isMac,
+    ctrlKey: !isMac,
+    shiftKey: true,
     action: () => {},
     description: 'Go to Notifications',
   },
   {
     key: 's',
-    altKey: true,
+    metaKey: isMac,
+    ctrlKey: !isMac,
+    shiftKey: true,
     action: () => {},
     description: 'Go to Settings',
   },
@@ -77,35 +91,61 @@ export function useKeyboardShortcuts(onShowHelp?: () => void) {
       }
     }
 
-    // Navigation shortcuts (Alt + key)
-    if (event.altKey && !event.ctrlKey && !event.metaKey) {
-      switch (event.key.toLowerCase()) {
-        case 'g':
-          event.preventDefault();
-          navigate('/');
-          break;
-        case 'a':
-          event.preventDefault();
-          navigate('/analytics');
-          break;
-        case 'n':
-          event.preventDefault();
-          navigate('/notifications');
-          break;
-        case 's':
-          event.preventDefault();
-          navigate('/admin/settings');
-          break;
-        case 'u':
-          event.preventDefault();
-          navigate('/regulations/updates');
-          break;
-        case 't':
-          event.preventDefault();
-          navigate('/audit-trail');
-          break;
+    // Check for modifier key (Command on Mac, Ctrl on Windows/Linux)
+    const hasModifier = isMac ? event.metaKey : event.ctrlKey;
+    
+    // Navigation shortcuts (Cmd/Ctrl + key)
+    if (hasModifier && !event.altKey) {
+      const key = event.key.toLowerCase();
+      
+      // Cmd/Ctrl + G - Dashboard
+      if (key === 'g' && !event.shiftKey) {
+        event.preventDefault();
+        navigate('/');
+        return;
       }
-      return;
+      
+      // Cmd/Ctrl + Shift + A - Analytics
+      if (key === 'a' && event.shiftKey) {
+        event.preventDefault();
+        navigate('/analytics');
+        return;
+      }
+      
+      // Cmd/Ctrl + Shift + N - Notifications
+      if (key === 'n' && event.shiftKey) {
+        event.preventDefault();
+        navigate('/notifications');
+        return;
+      }
+      
+      // Cmd/Ctrl + Shift + S - Settings (using Shift to avoid browser save)
+      if (key === 's' && event.shiftKey) {
+        event.preventDefault();
+        navigate('/admin/settings');
+        return;
+      }
+      
+      // Cmd/Ctrl + U - Updates
+      if (key === 'u' && !event.shiftKey) {
+        event.preventDefault();
+        navigate('/regulations/updates');
+        return;
+      }
+      
+      // Cmd/Ctrl + Shift + T - Audit Trail (using Shift to avoid browser reopen tab)
+      if (key === 't' && event.shiftKey) {
+        event.preventDefault();
+        navigate('/audit-trail');
+        return;
+      }
+      
+      // Cmd/Ctrl + R - Regulations (using R to avoid conflict)
+      if (key === 'r' && event.shiftKey) {
+        event.preventDefault();
+        navigate('/regulations');
+        return;
+      }
     }
 
     // Search shortcut (just /)
@@ -143,17 +183,18 @@ export function useKeyboardShortcuts(onShowHelp?: () => void) {
   }, [handleKeyDown]);
 }
 
-// Exportable shortcut info for help display
+// Exportable shortcut info for help display - dynamically uses correct modifier
 export const SHORTCUT_GROUPS = [
   {
     name: 'Navigation',
     shortcuts: [
-      { keys: ['Alt', 'G'], description: 'Go to Dashboard' },
-      { keys: ['Alt', 'A'], description: 'Go to Analytics' },
-      { keys: ['Alt', 'N'], description: 'Go to Notifications' },
-      { keys: ['Alt', 'S'], description: 'Go to Settings' },
-      { keys: ['Alt', 'U'], description: 'Go to Updates' },
-      { keys: ['Alt', 'T'], description: 'Go to Audit Trail' },
+      { keys: [getModifierSymbol(), 'G'], description: 'Go to Dashboard' },
+      { keys: [getModifierSymbol(), 'Shift', 'R'], description: 'Go to Regulations' },
+      { keys: [getModifierSymbol(), 'Shift', 'A'], description: 'Go to Analytics' },
+      { keys: [getModifierSymbol(), 'Shift', 'N'], description: 'Go to Notifications' },
+      { keys: [getModifierSymbol(), 'Shift', 'S'], description: 'Go to Settings' },
+      { keys: [getModifierSymbol(), 'U'], description: 'Go to Updates' },
+      { keys: [getModifierSymbol(), 'Shift', 'T'], description: 'Go to Audit Trail' },
     ],
   },
   {
@@ -165,4 +206,3 @@ export const SHORTCUT_GROUPS = [
     ],
   },
 ];
-
