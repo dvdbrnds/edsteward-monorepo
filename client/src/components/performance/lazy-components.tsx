@@ -195,13 +195,7 @@ export const LazyAdminConsolePage = createLazyComponent(
   () => import('../../pages/admin-console-page')
 );
 
-export const LazyAdminFeatureManagementPage = createLazyComponent(
-  () => import('../../pages/admin-feature-management-page')
-);
-
-export const LazyTenantFeatureManager = createLazyComponent(
-  () => import('../admin/tenant-feature-manager')
-);
+// Note: Admin feature management and tenant feature manager removed - belongs in admin-console
 
 // Regulation components
 export const LazyRegulationsPage = createLazyComponent(
