@@ -1,5 +1,4 @@
 import { Switch, Route, useLocation } from "wouter";
-import { useEffect } from "react";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
@@ -39,16 +38,7 @@ import { ErrorBoundary } from "@/components/ui/error-boundary";
 // Tenant detection utility removed - using single-tenant mode
 
 export default function App() {
-  console.log('[App] Initializing single-tenant application');
-  const [location] = useLocation();
-  
-  // Debug current location - this will update when routes change
-  console.log('[App] Current location from wouter:', location);
-  console.log('[App] Current location from window:', window.location.pathname);
-  
-  useEffect(() => {
-    console.log('[App] Route changed to:', location);
-  }, [location]);
+  const [_location] = useLocation();
 
   return (
     <ErrorBoundary>

@@ -47,14 +47,11 @@ export function useBranding(): BrandingConfig {
   const [appliedBranding, setAppliedBranding] = useState<BrandingConfig>(DEFAULT_BRANDING);
 
   // Fetch branding configuration from API
-  const { data: brandingData, isLoading, error } = useQuery({
+  const { data: brandingData } = useQuery({
     queryKey: ["/api/branding"],
     queryFn: async (): Promise<BrandingConfig> => {
       try {
-        console.log('🔍 Fetching branding configuration from public endpoint...');
-        // Use public endpoint for all users - it works for both authenticated and unauthenticated
         const response = await apiRequest("GET", "/api/branding");
-        console.log('🎨 Fetched branding config successfully:', response.branding);
         
         // Map API response to expected format
         const apiData = response.branding;
@@ -72,11 +69,8 @@ export function useBranding(): BrandingConfig {
           loginScreenHeroColor: apiData.heroColor || apiData.loginScreenHeroColor || DEFAULT_BRANDING.loginScreenHeroColor,
         };
         
-        console.log('🔵 Hero color in fetched data:', mappedBranding.loginScreenHeroColor);
         return mappedBranding;
-      } catch (error) {
-        console.warn("⚠️ Failed to fetch branding configuration, using defaults:", error);
-        console.log('🔴 Using default hero color:', DEFAULT_BRANDING.loginScreenHeroColor);
+      } catch {
         return DEFAULT_BRANDING;
       }
     },
@@ -89,10 +83,6 @@ export function useBranding(): BrandingConfig {
   // Apply branding configuration when it changes
   useEffect(() => {
     if (brandingData) {
-      console.log('🎨 Applying branding configuration to CSS custom properties:');
-      console.log('🔵 Hero color being applied:', brandingData.loginScreenHeroColor);
-      console.log('🔵 Full branding config:', brandingData);
-
       const branding = brandingData;
       setAppliedBranding(branding);
 
@@ -107,20 +97,11 @@ export function useBranding(): BrandingConfig {
 
       // Apply CSS custom properties for theming
       applyThemeColors(branding);
-
-      console.log('✅ Applied branding configuration:', branding.institutionName);
     }
   }, [brandingData]);
 
-  // 🔧 FIX: Return fresh data immediately when available, not the potentially stale state
-  const currentBranding = brandingData || appliedBranding;
-  console.log('🔄 useBranding returning:', {
-    hasData: !!brandingData,
-    heroColor: currentBranding.loginScreenHeroColor,
-    isLoading
-  });
-
-  return currentBranding;
+  // Return fresh data immediately when available, not the potentially stale state
+  return brandingData || appliedBranding;
 }
 
 // Legacy hook for backward compatibility
@@ -151,7 +132,6 @@ function updateFavicon(faviconUrl: string) {
       // Add timestamp to force browser to reload favicon
       const timestamp = new Date().getTime();
       favicon.href = `${faviconUrl}?v=${timestamp}`;
-      console.log('🎨 Updated favicon to:', favicon.href);
     } else {
       // Create favicon link if it doesn't exist
       const newFavicon = document.createElement('link');
@@ -161,7 +141,6 @@ function updateFavicon(faviconUrl: string) {
       const timestamp = new Date().getTime();
       newFavicon.href = `${faviconUrl}?v=${timestamp}`;
       document.head.appendChild(newFavicon);
-      console.log('🎨 Created new favicon:', newFavicon.href);
     }
   } catch (error) {
     console.error('Failed to update favicon:', error);
@@ -173,13 +152,11 @@ function updateMetaDescription(institutionName: string) {
   const metaDescription = document.querySelector('meta[name="description"]');
   if (metaDescription) {
     metaDescription.setAttribute('content', `Welcome to ${institutionName}'s Compliance Portal. Manage your security and regulatory obligations effectively.`);
-    console.log('🎨 Updated meta description for:', institutionName);
   } else {
     const newMetaDescription = document.createElement('meta');
     newMetaDescription.name = 'description';
     newMetaDescription.content = `Welcome to ${institutionName}'s Compliance Portal. Manage your security and regulatory obligations effectively.`;
     document.head.appendChild(newMetaDescription);
-    console.log('🎨 Created new meta description for:', institutionName);
   }
 }
 
@@ -216,12 +193,6 @@ function applyThemeColors(branding: BrandingConfig) {
     root.style.setProperty('--login-text-rgb', hexToRgb(branding.loginScreenTextColor));
     root.style.setProperty('--login-hero', branding.loginScreenHeroColor);
     root.style.setProperty('--login-hero-rgb', hexToRgb(branding.loginScreenHeroColor));
-
-    console.log('🎨 Applied theme colors:', {
-      primary: branding.primaryColor,
-      secondary: branding.secondaryColor,
-      accent: branding.accentColor,
-    });
   } catch (error) {
     console.error('Failed to apply theme colors:', error);
   }

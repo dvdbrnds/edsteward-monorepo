@@ -142,10 +142,7 @@ export default function Navigation() {
                           target.src = genericLogo;
                         }
                       }}
-                      onLoad={() => {
-                        console.log('🖼️  NAVIGATION: Logo loaded successfully:', branding.logo);
-                        console.log('🖼️  NAVIGATION: Full branding object:', branding);
-                      }}
+                      onLoad={() => {}}
                     />
 
                     <span className="text-xl font-bold text-white hover:text-gray-200 transition-colors ml-3">

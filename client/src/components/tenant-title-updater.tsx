@@ -11,22 +11,15 @@ export function TenantTitleUpdater() {
         });
         
         const tenantId = response.headers.get('x-tenant-id');
-        const tenantName = response.headers.get('x-tenant-name');
-        
-        console.log('🏷️  Tenant detected:', { tenantId, tenantName });
         
         if (tenantId === 'admin') {
           document.title = 'EdSteward Admin Console';
-          console.log('✅ Title updated to: EdSteward Admin Console');
         } else if (tenantId === 'moravian') {
           document.title = 'Moravian University Compliance Portal';
-          console.log('✅ Title updated to: Moravian University Compliance Portal');
         } else if (tenantId === 'test') {
           document.title = 'Generic Compliance Portal';
-          console.log('✅ Title updated to: Generic Compliance Portal');
         } else {
-          document.title = 'EdSteward Compliance Portal'; // Default
-          console.log('✅ Title updated to default: EdSteward Compliance Portal');
+          document.title = 'EdSteward Compliance Portal';
         }
       } catch (error) {
         console.error('❌ Failed to update title from API:', error);

@@ -33,7 +33,6 @@ interface MFAStatus {
  * @description Complete MFA setup wizard with QR code generation and backup codes
  */
 export default function MFASetup() {
-  console.log('🚨 MFA COMPONENT LOADING!!!');
   const [verificationCode, setVerificationCode] = useState("");
   const [showBackupCodes, setShowBackupCodes] = useState(false);
   const [copiedCodes, setCopiedCodes] = useState(false);
@@ -48,12 +47,6 @@ export default function MFASetup() {
   });
   
   const mfaStatus = mfaStatusResponse?.mfa;
-  
-  // Debug logging - FRONTEND
-  console.log('🔧 FRONTEND MFA Status Response:', mfaStatusResponse);
-  console.log('🔧 FRONTEND MFA Status:', mfaStatus);
-  console.log('🔧 FRONTEND MFA Status Enabled Check:', mfaStatus?.enabled);
-  console.log('🔧 FRONTEND Component will render:', mfaStatus?.enabled ? 'ENABLED UI' : 'SETUP UI');
 
   // Generate MFA setup data
   const { mutate: generateSetup, isPending: isGenerating } = useMutation<MFASetupData>({
