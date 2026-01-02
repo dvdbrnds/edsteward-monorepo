@@ -201,7 +201,7 @@ export default function MFASetup() {
               <CardContent>
                 <div className="grid grid-cols-2 gap-2 font-mono text-sm">
                   {backupCodes.codes.map((code, index) => (
-                    <div key={index} className="bg-white p-2 rounded border">
+                    <div key={index} className="bg-card p-2 rounded border">
                       {code}
                     </div>
                   ))}
@@ -256,7 +256,7 @@ export default function MFASetup() {
                 <h3 className="text-lg font-semibold mb-3">Step 1: Scan QR Code</h3>
                 <div className="flex flex-col md:flex-row gap-6">
                   <div className="flex-shrink-0">
-                    <div className="bg-white p-4 rounded-lg border inline-block">
+                    <div className="bg-card p-4 rounded-lg border inline-block">
                       <img
                         src={setupData.setup.qrCodeUrl}
                         alt="MFA QR Code"
@@ -266,21 +266,21 @@ export default function MFASetup() {
                   </div>
                   <div className="flex-1">
                     <div className="space-y-3">
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-muted-foreground">
                         1. Install Google Authenticator on your phone
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-muted-foreground">
                         2. Tap "+" to add a new account
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-muted-foreground">
                         3. Scan this QR code with your camera
                       </p>
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-muted-foreground">
                         4. Enter the 6-digit code below to verify
                       </p>
                     </div>
-                    <div className="mt-4 p-3 bg-gray-50 rounded">
-                      <p className="text-xs text-gray-500 mb-1">Manual entry key:</p>
+                    <div className="mt-4 p-3 bg-background rounded">
+                      <p className="text-xs text-muted-foreground mb-1">Manual entry key:</p>
                       <code className="text-sm font-mono break-all">{setupData.setup.manualEntryKey}</code>
                     </div>
                   </div>
@@ -330,7 +330,7 @@ export default function MFASetup() {
                   <CardContent>
                     <div className="grid grid-cols-2 gap-2 font-mono text-sm">
                       {setupData.setup.backupCodes.map((code, index) => (
-                        <div key={index} className="bg-white p-2 rounded border">
+                        <div key={index} className="bg-card p-2 rounded border">
                           {code}
                         </div>
                       ))}

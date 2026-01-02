@@ -237,7 +237,7 @@ const FileUploadField: React.FC<{
           className={`border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors ${
             isProcessing 
               ? 'border-blue-400 bg-blue-50' 
-              : 'border-gray-300 hover:border-gray-400'
+              : 'border-border hover:border-gray-400'
           }`}
           onClick={() => {
             console.log('🖱️ Upload area clicked, processing:', isProcessing);
@@ -254,11 +254,11 @@ const FileUploadField: React.FC<{
             </div>
           ) : (
             <>
-              <FileImage className="mx-auto h-12 w-12 text-gray-400" />
-              <p className="mt-2 text-sm text-gray-600">
+              <FileImage className="mx-auto h-12 w-12 text-muted-foreground" />
+              <p className="mt-2 text-sm text-muted-foreground">
                 Click to upload {type} or drag and drop
               </p>
-              <p className="text-xs text-gray-500 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 {type === 'favicon' ? 'ICO, PNG, SVG (up to 5MB)' : 'PNG, JPG, SVG (up to 5MB)'}
               </p>
             </>
@@ -276,11 +276,11 @@ const FileUploadField: React.FC<{
       
       {/* Preview */}
       {previewUrl && (
-        <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+        <div className="flex items-center space-x-3 p-3 bg-background rounded-lg">
           {console.log(`🔍 PREVIEW: Rendering preview container for ${type} with URL:`, previewUrl)}
           <div className="flex-shrink-0">
             {type === 'favicon' ? (
-              <div className="w-8 h-8 border-2 border-gray-300 rounded bg-gray-800 flex items-center justify-center">
+              <div className="w-8 h-8 border-2 border-border rounded bg-gray-800 flex items-center justify-center">
                 <img 
                   src={previewUrl} 
                   alt="Favicon preview" 
@@ -300,7 +300,7 @@ const FileUploadField: React.FC<{
                 />
               </div>
             ) : (
-              <div className="w-16 h-16 border-2 border-gray-300 rounded bg-gray-800 flex items-center justify-center">
+              <div className="w-16 h-16 border-2 border-border rounded bg-gray-800 flex items-center justify-center">
                 <img 
                   src={previewUrl} 
                   alt="Logo preview" 
@@ -325,10 +325,10 @@ const FileUploadField: React.FC<{
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-900 truncate">
+            <p className="text-sm font-medium text-foreground truncate">
               {type === 'favicon' ? 'Favicon' : 'Logo'} Preview
             </p>
-            <p className="text-xs text-gray-500 truncate">
+            <p className="text-xs text-muted-foreground truncate">
               {previewUrl.startsWith('blob:') ? 'Local file' : previewUrl}
             </p>
           </div>
@@ -365,7 +365,7 @@ const ColorPicker: React.FC<{
             type="color"
             value={value}
             onChange={(e) => onChange(e.target.value)}
-            className="w-12 h-10 rounded-md border-2 border-gray-300 cursor-pointer"
+            className="w-12 h-10 rounded-md border-2 border-border cursor-pointer"
           />
           <Palette className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 text-white mix-blend-difference pointer-events-none" />
         </div>
@@ -399,7 +399,7 @@ const BrandingPreview: React.FC<{ config: BrandingFormData }> = ({ config }) => 
         >
           <div className="flex items-center space-x-3">
             {config.logoUrl && (
-              <div className="w-8 h-8 bg-white/20 rounded flex items-center justify-center">
+              <div className="w-8 h-8 bg-card/20 rounded flex items-center justify-center">
                 <img 
                   src={config.logoUrl} 
                   alt="Logo" 

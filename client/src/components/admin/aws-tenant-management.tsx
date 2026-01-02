@@ -295,8 +295,8 @@ export default function AWSTenantsManagement() {
             case 'provisioning': return 'bg-blue-100 text-blue-800';
             case 'failed': return 'bg-red-100 text-red-800';
             case 'stopping': return 'bg-yellow-100 text-yellow-800';
-            case 'stopped': return 'bg-gray-100 text-gray-800';
-            default: return 'bg-gray-100 text-gray-800';
+            case 'stopped': return 'bg-gray-100 text-foreground';
+            default: return 'bg-gray-100 text-foreground';
         }
     };
 
@@ -483,7 +483,7 @@ export default function AWSTenantsManagement() {
             {/* Search and Filter */}
             <div className="flex items-center space-x-4">
                 <div className="relative flex-1 max-w-sm">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input
                         placeholder="Search tenants..."
                         value={searchQuery}
@@ -634,7 +634,7 @@ export default function AWSTenantsManagement() {
                                 {Object.keys(selectedTenant.config.additionalEnvVars).length > 0 && (
                                     <div>
                                         <h4 className="font-medium mb-2">Additional Environment Variables</h4>
-                                        <div className="bg-gray-50 p-3 rounded text-sm">
+                                        <div className="bg-background p-3 rounded text-sm">
                                             {Object.entries(selectedTenant.config.additionalEnvVars).map(([key, value]) => (
                                                 <div key={key}><strong>{key}:</strong> {value}</div>
                                             ))}
@@ -697,11 +697,11 @@ export default function AWSTenantsManagement() {
                                     ) : tenantLogs.length > 0 ? (
                                         tenantLogs.map((log, index) => (
                                             <div key={index} className="mb-1">
-                                                <span className="text-gray-500">{log.timestamp.toLocaleString()}</span> {log.message}
+                                                <span className="text-muted-foreground">{log.timestamp.toLocaleString()}</span> {log.message}
                                             </div>
                                         ))
                                     ) : (
-                                        <div className="text-center text-gray-500">No logs available</div>
+                                        <div className="text-center text-muted-foreground">No logs available</div>
                                     )}
                                 </div>
                             </TabsContent>

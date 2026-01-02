@@ -70,9 +70,9 @@ export default function FeatureDisabledDemo() {
                   </div>
 
                   {/* Standard document upload works */}
-                  <div className="p-4 border border-dashed border-gray-300 rounded-lg text-center">
-                    <FileText className="h-8 w-8 mx-auto text-gray-400 mb-2" />
-                    <p className="text-sm text-gray-600">Drag and drop files here</p>
+                  <div className="p-4 border border-dashed border-border rounded-lg text-center">
+                    <FileText className="h-8 w-8 mx-auto text-muted-foreground mb-2" />
+                    <p className="text-sm text-muted-foreground">Drag and drop files here</p>
                   </div>
 
                   {/* AI Analysis section - disabled */}
@@ -196,7 +196,7 @@ export default function FeatureDisabledDemo() {
                         </div>
                         <div className="flex items-center justify-between">
                           <span className="text-sm">System Alerts</span>
-                          <Badge className="bg-gray-100 text-gray-800">Disabled</Badge>
+                          <Badge className="bg-gray-100 text-foreground">Disabled</Badge>
                         </div>
                       </div>
                       <Button className="w-full">
@@ -232,15 +232,15 @@ export default function FeatureDisabledDemo() {
                   <div className="grid grid-cols-3 gap-4">
                     <div className="text-center">
                       <div className="text-2xl font-bold text-blue-600">87%</div>
-                      <div className="text-xs text-gray-500">Compliance Rate</div>
+                      <div className="text-xs text-muted-foreground">Compliance Rate</div>
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold text-green-600">23</div>
-                      <div className="text-xs text-gray-500">Active Regulations</div>
+                      <div className="text-xs text-muted-foreground">Active Regulations</div>
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold text-orange-600">5</div>
-                      <div className="text-xs text-gray-500">Upcoming Deadlines</div>
+                      <div className="text-xs text-muted-foreground">Upcoming Deadlines</div>
                     </div>
                   </div>
                 </CardContent>
@@ -311,7 +311,7 @@ export default function FeatureDisabledDemo() {
                   />
 
                   {/* Inline style in a sentence */}
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-muted-foreground">
                     You can export data to CSV, but{' '}
                     <FeatureDisabledMessage 
                       featureKey="document_ai" 

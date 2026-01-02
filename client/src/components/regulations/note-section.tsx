@@ -352,12 +352,12 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
       <div className="mt-8">
         <h3 className="text-lg font-medium mb-4">Notes ({notes.length})</h3>
         {notes.length === 0 ? (
-          <div className="text-center py-6 px-4 bg-gradient-to-b from-gray-50 to-white rounded-lg border border-dashed border-gray-200">
+          <div className="text-center py-6 px-4 bg-gradient-to-b from-gray-50 to-white rounded-lg border border-dashed border-border">
             <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-purple-50 flex items-center justify-center">
               <Edit className="h-6 w-6 text-purple-400" />
             </div>
-            <p className="font-medium text-gray-700">No notes yet</p>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="font-medium text-foreground">No notes yet</p>
+            <p className="text-sm text-muted-foreground mt-1">
               Add notes above to document compliance activities
             </p>
           </div>
@@ -416,7 +416,7 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
                       )}
                     </div>
                   </div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-muted-foreground">
                     {note.user && `By ${note.user.firstName} ${note.user.lastName} • `}
                     {note.createdAt && new Date(note.createdAt).toLocaleString()}
                   </div>
@@ -447,7 +447,7 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
                       {viewingNote.category?.charAt(0).toUpperCase() + viewingNote.category?.slice(1) || 'General'}
                     </Badge>
                   </div>
-                  <div className="text-sm text-gray-500 mt-2">
+                  <div className="text-sm text-muted-foreground mt-2">
                     {viewingNote.user && `By ${viewingNote.user.firstName} ${viewingNote.user.lastName} • `}
                     {viewingNote.createdAt && new Date(viewingNote.createdAt).toLocaleString()}
                   </div>
@@ -479,7 +479,7 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
               <div className="flex justify-between items-start">
                 <div>
                   <CardTitle>Note History: {viewingHistory.title}</CardTitle>
-                  <div className="text-sm text-gray-500 mt-2">
+                  <div className="text-sm text-muted-foreground mt-2">
                     {noteHistory.length} modification{noteHistory.length !== 1 ? 's' : ''} found
                   </div>
                 </div>
@@ -497,7 +497,7 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
             </CardHeader>
             <CardContent>
               {noteHistory.length === 0 ? (
-                <p className="text-gray-500">No modification history found for this note.</p>
+                <p className="text-muted-foreground">No modification history found for this note.</p>
               ) : (
                 <div className="space-y-4">
                   {noteHistory.map((historyItem, index) => (
@@ -516,7 +516,7 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
                                 }
                               </span>
                             </div>
-                            <div className="text-xs text-gray-500 mt-1">
+                            <div className="text-xs text-muted-foreground mt-1">
                               {new Date(historyItem.createdAt).toLocaleString()}
                             </div>
                           </div>
@@ -527,7 +527,7 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
                           {/* Title changes */}
                           {historyItem.previousTitle !== historyItem.newTitle && (
                             <div>
-                              <div className="text-sm font-medium text-gray-700">Title:</div>
+                              <div className="text-sm font-medium text-foreground">Title:</div>
                               <div className="text-sm">
                                 <span className="bg-red-100 text-red-800 px-2 py-1 rounded line-through">
                                   {historyItem.previousTitle || '(empty)'}
@@ -543,7 +543,7 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
                           {/* Category changes */}
                           {historyItem.previousCategory !== historyItem.newCategory && (
                             <div>
-                              <div className="text-sm font-medium text-gray-700">Category:</div>
+                              <div className="text-sm font-medium text-foreground">Category:</div>
                               <div className="text-sm">
                                 <span className="bg-red-100 text-red-800 px-2 py-1 rounded line-through">
                                   {historyItem.previousCategory || '(empty)'}
@@ -559,17 +559,17 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
                           {/* Content changes */}
                           {historyItem.previousContent !== historyItem.newContent && (
                             <div>
-                              <div className="text-sm font-medium text-gray-700">Content:</div>
+                              <div className="text-sm font-medium text-foreground">Content:</div>
                               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
                                 <div>
-                                  <div className="text-xs text-gray-500 mb-1">Previous:</div>
+                                  <div className="text-xs text-muted-foreground mb-1">Previous:</div>
                                   <div 
                                     className="text-sm bg-red-50 border border-red-200 p-2 rounded max-h-32 overflow-y-auto"
                                     dangerouslySetInnerHTML={{ __html: historyItem.previousContent || '(empty)' }}
                                   />
                                 </div>
                                 <div>
-                                  <div className="text-xs text-gray-500 mb-1">New:</div>
+                                  <div className="text-xs text-muted-foreground mb-1">New:</div>
                                   <div 
                                     className="text-sm bg-green-50 border border-green-200 p-2 rounded max-h-32 overflow-y-auto"
                                     dangerouslySetInnerHTML={{ __html: historyItem.newContent || '(empty)' }}

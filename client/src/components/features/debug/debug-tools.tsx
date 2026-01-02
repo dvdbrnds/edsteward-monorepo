@@ -167,7 +167,7 @@ export function NoteDebugger() {
         )}
 
         {result && (
-          <div className="p-3 bg-gray-50 border border-gray-200 rounded-md">
+          <div className="p-3 bg-background border border-border rounded-md">
             <h4 className="font-medium text-sm mb-1">Result:</h4>
             <pre className="text-xs overflow-auto max-h-40">
               {typeof result === 'string' ? result : JSON.stringify(result, null, 2)}
@@ -175,7 +175,7 @@ export function NoteDebugger() {
           </div>
         )}
         {schemaInfo && (
-          <div className="p-3 bg-gray-50 border border-gray-200 rounded-md">
+          <div className="p-3 bg-background border border-border rounded-md">
             <h4 className="font-medium text-sm mb-1">Schema Info:</h4>
             <pre className="text-xs overflow-auto max-h-40">
               {typeof schemaInfo === 'string' ? schemaInfo : JSON.stringify(schemaInfo, null, 2)}
@@ -183,7 +183,7 @@ export function NoteDebugger() {
           </div>
         )}
         {reqResponse && (
-          <div className="p-3 bg-gray-50 border border-gray-200 rounded-md">
+          <div className="p-3 bg-background border border-border rounded-md">
             <h4 className="font-medium text-sm mb-1">Request Response:</h4>
             <pre className="text-xs overflow-auto max-h-40">
               {typeof reqResponse === 'string' ? reqResponse : JSON.stringify(reqResponse, null, 2)}

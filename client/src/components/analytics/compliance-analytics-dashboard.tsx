@@ -167,7 +167,7 @@ export const ComplianceAnalyticsDashboard: React.FC = () => {
       case 'medium': return 'bg-yellow-100 text-yellow-800';
       case 'high': return 'bg-red-100 text-red-800';
       case 'critical': return 'bg-red-200 text-red-900';
-      default: return 'bg-gray-100 text-gray-800';
+      default: return 'bg-gray-100 text-foreground';
     }
   };
 
@@ -175,7 +175,7 @@ export const ComplianceAnalyticsDashboard: React.FC = () => {
     switch (trend) {
       case 'up': return <TrendingUp className="h-4 w-4 text-red-500" />;
       case 'down': return <TrendingDown className="h-4 w-4 text-green-500" />;
-      default: return <Activity className="h-4 w-4 text-gray-500" />;
+      default: return <Activity className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
@@ -196,7 +196,7 @@ export const ComplianceAnalyticsDashboard: React.FC = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold">Compliance Analytics</h1>
-          <p className="text-gray-600">
+          <p className="text-muted-foreground">
             Last updated: {metrics.lastCalculated.toLocaleString()}
           </p>
         </div>
@@ -223,7 +223,7 @@ export const ComplianceAnalyticsDashboard: React.FC = () => {
           <CardContent className="p-6">
             <div className="flex items-center">
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-600">Compliance Score</p>
+                <p className="text-sm font-medium text-muted-foreground">Compliance Score</p>
                 <div className="flex items-center mt-2">
                   <span className="text-2xl font-bold">{metrics.complianceScore}%</span>
                   <Badge className={`ml-2 ${getRiskLevelColor(metrics.riskLevel)}`}>
@@ -241,9 +241,9 @@ export const ComplianceAnalyticsDashboard: React.FC = () => {
           <CardContent className="p-6">
             <div className="flex items-center">
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-600">Active Regulations</p>
+                <p className="text-sm font-medium text-muted-foreground">Active Regulations</p>
                 <p className="text-2xl font-bold">{metrics.activeRegulations}</p>
-                <p className="text-xs text-gray-500">of {metrics.totalRegulations} total</p>
+                <p className="text-xs text-muted-foreground">of {metrics.totalRegulations} total</p>
               </div>
               <FileText className="h-8 w-8 text-green-500" />
             </div>
@@ -254,7 +254,7 @@ export const ComplianceAnalyticsDashboard: React.FC = () => {
           <CardContent className="p-6">
             <div className="flex items-center">
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-600">Upcoming Deadlines</p>
+                <p className="text-sm font-medium text-muted-foreground">Upcoming Deadlines</p>
                 <p className="text-2xl font-bold">{metrics.upcomingDeadlines}</p>
                 {metrics.overdueDeadlines > 0 && (
                   <p className="text-xs text-red-500">{metrics.overdueDeadlines} overdue</p>
@@ -269,9 +269,9 @@ export const ComplianceAnalyticsDashboard: React.FC = () => {
           <CardContent className="p-6">
             <div className="flex items-center">
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-600">Active Users</p>
+                <p className="text-sm font-medium text-muted-foreground">Active Users</p>
                 <p className="text-2xl font-bold">{systemUsage.activeUsers}</p>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   Avg. session: {systemUsage.averageSessionDuration}m
                 </p>
               </div>
@@ -430,7 +430,7 @@ export const ComplianceAnalyticsDashboard: React.FC = () => {
                         <h3 className="font-medium">{item.category}</h3>
                         <div className="flex items-center space-x-2">
                           {getTrendIcon(item.trend)}
-                          <span className="text-sm text-gray-600">{item.regulations} regulations</span>
+                          <span className="text-sm text-muted-foreground">{item.regulations} regulations</span>
                         </div>
                       </div>
                       <div className="flex items-center space-x-2">
@@ -451,7 +451,7 @@ export const ComplianceAnalyticsDashboard: React.FC = () => {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Total Logins</p>
+                    <p className="text-sm font-medium text-muted-foreground">Total Logins</p>
                     <p className="text-2xl font-bold">{systemUsage.totalLogins.toLocaleString()}</p>
                   </div>
                   <Activity className="h-8 w-8 text-blue-500" />
@@ -463,7 +463,7 @@ export const ComplianceAnalyticsDashboard: React.FC = () => {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Storage Used</p>
+                    <p className="text-sm font-medium text-muted-foreground">Storage Used</p>
                     <p className="text-2xl font-bold">{systemUsage.storageUsed} GB</p>
                   </div>
                   <BarChart3 className="h-8 w-8 text-green-500" />
@@ -475,9 +475,9 @@ export const ComplianceAnalyticsDashboard: React.FC = () => {
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">API Calls</p>
+                    <p className="text-sm font-medium text-muted-foreground">API Calls</p>
                     <p className="text-2xl font-bold">{systemUsage.apiCallsThisMonth.toLocaleString()}</p>
-                    <p className="text-xs text-gray-500">this month</p>
+                    <p className="text-xs text-muted-foreground">this month</p>
                   </div>
                   <Target className="h-8 w-8 text-purple-500" />
                 </div>

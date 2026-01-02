@@ -91,7 +91,7 @@ export function RegulationChanges({ currentRegulation }: RegulationChangesProps)
           <CardTitle>Change History</CardTitle>
         </CardHeader>
         <CardContent>
-          <p className="text-gray-500 italic">This is the first version of this regulation.</p>
+          <p className="text-muted-foreground italic">This is the first version of this regulation.</p>
         </CardContent>
       </Card>
     );
@@ -133,8 +133,8 @@ export function RegulationChanges({ currentRegulation }: RegulationChangesProps)
 
             return (
               <div key={key} className="space-y-2">
-                <h3 className="font-medium text-gray-900">{label}</h3>
-                <div className="rounded-lg border p-4 bg-gray-50">
+                <h3 className="font-medium text-foreground">{label}</h3>
+                <div className="rounded-lg border p-4 bg-background">
                   <HighlightDifferences oldText={oldValue} newText={newValue} />
                 </div>
               </div>
@@ -142,7 +142,7 @@ export function RegulationChanges({ currentRegulation }: RegulationChangesProps)
           })}
 
           {currentRegulation.versionMetadata?.changes.length === 0 && (
-            <p className="text-gray-500 italic">No significant changes detected between versions.</p>
+            <p className="text-muted-foreground italic">No significant changes detected between versions.</p>
           )}
         </div>
       </CardContent>

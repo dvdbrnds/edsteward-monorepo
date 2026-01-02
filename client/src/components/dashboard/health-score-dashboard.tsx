@@ -168,7 +168,7 @@ export default function HealthScoreDashboard() {
   return (
     <Card className="transition-all duration-300 ease-in-out">
       <div 
-        className="cursor-pointer hover:bg-gray-50/50 transition-colors"
+        className="cursor-pointer hover:bg-background/50 transition-colors"
         onClick={() => setIsExpanded(!isExpanded)}
       >
         <CardHeader>
@@ -176,7 +176,7 @@ export default function HealthScoreDashboard() {
             Overall Compliance Health
             <ChevronDown 
               className={cn(
-                "h-6 w-6 text-gray-400 transition-transform duration-300",
+                "h-6 w-6 text-muted-foreground transition-transform duration-300",
                 isExpanded && "transform rotate-180"
               )} 
             />
@@ -193,15 +193,15 @@ export default function HealthScoreDashboard() {
             </div>
             <div className="grid grid-cols-3 gap-4">
               <div>
-                <p className="text-sm text-gray-500">Total Regulations</p>
+                <p className="text-sm text-muted-foreground">Total Regulations</p>
                 <p className="text-2xl font-bold">{regulations.length}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Categories</p>
+                <p className="text-sm text-muted-foreground">Categories</p>
                 <p className="text-2xl font-bold">{categoryScores.length}</p>
               </div>
               <div>
-                <p className="text-sm text-gray-500">Active Deadlines</p>
+                <p className="text-sm text-muted-foreground">Active Deadlines</p>
                 <p className="text-2xl font-bold">
                   {deadlines.filter(d => d.status !== "completed").length}
                 </p>
@@ -225,14 +225,14 @@ export default function HealthScoreDashboard() {
               <div 
                 key={category.category} 
                 className={cn(
-                  "bg-gray-50 rounded-lg p-4 cursor-pointer transition-colors",
+                  "bg-background rounded-lg p-4 cursor-pointer transition-colors",
                   selectedCategory === category.category && "ring-2 ring-[#00267A] bg-gray-100"
                 )}
                 onClick={() => setSelectedCategory(
                   selectedCategory === category.category ? null : category.category
                 )}
               >
-                <h4 className="font-medium text-gray-900 mb-3">{category.category}</h4>
+                <h4 className="font-medium text-foreground mb-3">{category.category}</h4>
                 <div className="flex items-center gap-4">
                   <div className="w-20 h-20">
                     <CircularProgress

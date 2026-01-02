@@ -17,7 +17,7 @@ export default function PublicNavigation() {
   const branding = useTenantBranding();
 
   return (
-    <header className="bg-white shadow-sm border-b border-gray-200">
+    <header className="bg-card shadow-sm border-b border-border">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
@@ -28,10 +28,10 @@ export default function PublicNavigation() {
                 alt={branding.name}
               />
               <div className="ml-4 flex flex-col">
-                <h1 className="text-lg font-semibold text-gray-900">
+                <h1 className="text-lg font-semibold text-foreground">
                   {branding.name}
                 </h1>
-                <h2 className="text-sm text-gray-600">
+                <h2 className="text-sm text-muted-foreground">
                   {branding.id === 'test' ? 'Public Dashboard' : 'Board of Trustees Dashboard'}
                 </h2>
               </div>
@@ -42,7 +42,7 @@ export default function PublicNavigation() {
                   className={`px-3 py-2 rounded-md text-sm font-medium ${
                     location === "/public-dashboard"
                       ? "bg-gray-100 text-[#00267A]"
-                      : "text-gray-500 hover:text-gray-700 hover:bg-gray-50"
+                      : "text-muted-foreground hover:text-foreground hover:bg-background"
                   }`}
                 >
                   Regulations

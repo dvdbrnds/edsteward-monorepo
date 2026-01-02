@@ -389,24 +389,24 @@ export function EscalateIssueDialog({
 
           {/* Context Info */}
           <div className="grid grid-cols-2 gap-3 text-sm">
-            <div className="bg-gray-50 p-3 rounded-lg">
-              <div className="flex items-center gap-2 text-gray-600 mb-1">
+            <div className="bg-background p-3 rounded-lg">
+              <div className="flex items-center gap-2 text-muted-foreground mb-1">
                 <Building2 className="h-4 w-4" />
                 <span className="font-medium">Field Office:</span>
               </div>
-              <div className="text-gray-900">{fieldOffice}</div>
+              <div className="text-foreground">{fieldOffice}</div>
             </div>
-            <div className="bg-gray-50 p-3 rounded-lg">
-              <div className="flex items-center gap-2 text-gray-600 mb-1">
+            <div className="bg-background p-3 rounded-lg">
+              <div className="flex items-center gap-2 text-muted-foreground mb-1">
                 <User className="h-4 w-4" />
                 <span className="font-medium">Assigned To:</span>
               </div>
-              <div className="text-gray-900">
+              <div className="text-foreground">
                 {assignedUser 
                   ? (assignedUser.firstName && assignedUser.lastName 
                       ? `${assignedUser.firstName} ${assignedUser.lastName}` 
                       : assignedUser.username)
-                  : <span className="text-gray-400 italic">Unassigned</span>
+                  : <span className="text-muted-foreground italic">Unassigned</span>
                 }
               </div>
             </div>
@@ -424,14 +424,14 @@ export function EscalateIssueDialog({
                   <SelectItem key={level.value} value={level.value}>
                     <div className="flex items-center gap-2">
                       <Badge className={level.color}>{level.label}</Badge>
-                      <span className="text-gray-500 text-xs">{level.description}</span>
+                      <span className="text-muted-foreground text-xs">{level.description}</span>
                     </div>
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
             {suggestedUrgency !== 'normal' && (
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 Auto-set to "{suggestedUrgency}" based on detected issues
               </p>
             )}
@@ -464,7 +464,7 @@ export function EscalateIssueDialog({
               >
                 CC the Field Office ({fieldOffice})
               </label>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 Send a copy to {fieldOfficeEmail}
               </p>
             </div>
@@ -482,8 +482,8 @@ export function EscalateIssueDialog({
 
           {showEmailPreview && (
             <div className="bg-gray-100 border rounded-lg p-4 text-xs font-mono whitespace-pre-wrap max-h-64 overflow-y-auto">
-              <div className="font-bold text-gray-700 mb-2">Subject: {emailContent.subject}</div>
-              <div className="text-gray-600">{emailContent.body}</div>
+              <div className="font-bold text-foreground mb-2">Subject: {emailContent.subject}</div>
+              <div className="text-muted-foreground">{emailContent.body}</div>
             </div>
           )}
         </div>

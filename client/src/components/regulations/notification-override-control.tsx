@@ -133,7 +133,7 @@ export function NotificationOverrideControl({ regulationId }: NotificationOverri
 
   if (isLoading) {
     return (
-      <div className="flex items-center gap-2 text-gray-500 text-sm">
+      <div className="flex items-center gap-2 text-muted-foreground text-sm">
         <Loader2 className="h-3 w-3 animate-spin" />
         <span>Loading...</span>
       </div>
@@ -174,7 +174,7 @@ export function NotificationOverrideControl({ regulationId }: NotificationOverri
     <div className="space-y-2">
       {/* Inline notification status */}
       <div className="flex items-center gap-2 text-sm">
-        <span className="text-gray-500">Notifications:</span>
+        <span className="text-muted-foreground">Notifications:</span>
         <Badge 
           variant="outline" 
           className={`${badge.className} flex items-center gap-1 font-medium`}

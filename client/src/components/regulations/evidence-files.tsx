@@ -216,7 +216,7 @@ export function EvidenceFiles({ regulationId }: EvidenceFilesProps) {
                   id="isOfficial"
                   checked={isOfficial}
                   onChange={(e) => setIsOfficial(e.target.checked)}
-                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  className="h-4 w-4 rounded border-border text-blue-600 focus:ring-blue-500"
                 />
                 <Label htmlFor="isOfficial" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                   Mark as official government source document
@@ -322,12 +322,12 @@ export function EvidenceFiles({ regulationId }: EvidenceFilesProps) {
                 </HoverCard>
               ))
             ) : (
-              <div className="text-center py-6 px-4 bg-gradient-to-b from-gray-50 to-white rounded-lg border border-dashed border-gray-200">
+              <div className="text-center py-6 px-4 bg-gradient-to-b from-gray-50 to-white rounded-lg border border-dashed border-border">
                 <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-green-50 flex items-center justify-center">
                   <FolderOpen className="h-6 w-6 text-green-400" />
                 </div>
-                <p className="font-medium text-gray-700">No evidence files yet</p>
-                <p className="text-sm text-gray-500 mt-1">
+                <p className="font-medium text-foreground">No evidence files yet</p>
+                <p className="text-sm text-muted-foreground mt-1">
                   Upload documents to support compliance
                 </p>
               </div>

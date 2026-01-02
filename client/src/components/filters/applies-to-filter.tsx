@@ -149,7 +149,7 @@ export function AppliesToFilter({
           <CardContent className="p-4">
             <div className="flex items-center space-x-2">
               <div className="animate-spin h-4 w-4 border-2 border-current border-t-transparent rounded-full" />
-              <span className="text-sm text-gray-600">Loading filter configuration...</span>
+              <span className="text-sm text-muted-foreground">Loading filter configuration...</span>
             </div>
           </CardContent>
         </Card>
@@ -232,7 +232,7 @@ export function AppliesToFilter({
                     placeholder="Search institution types..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10 bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600"
+                    className="pl-10 bg-card dark:bg-slate-800 border-slate-300 dark:border-slate-600"
                   />
                 </div>
 
@@ -282,7 +282,7 @@ export function AppliesToFilter({
                           "flex items-center space-x-2 p-2 rounded-md border transition-colors cursor-pointer",
                           isSelected 
                             ? "bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800"
-                            : "bg-white border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:hover:bg-slate-750"
+                            : "bg-card border-slate-200 hover:bg-slate-50 dark:bg-slate-800 dark:border-slate-700 dark:hover:bg-slate-750"
                         )}
                         onClick={() => handleTypeChange(type, !isSelected)}
                       >

@@ -50,10 +50,10 @@ export const UpdatesList: FC = () => {
 
   if (data.length === 0) {
     return (
-      <div className="text-center p-12 border rounded-lg bg-gray-50">
-        <FileText className="w-12 h-12 mx-auto mb-3 text-gray-400" />
+      <div className="text-center p-12 border rounded-lg bg-background">
+        <FileText className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
         <h3 className="text-xl font-medium">No pending updates</h3>
-        <p className="text-gray-500 mt-2">There are currently no regulation updates awaiting review.</p>
+        <p className="text-muted-foreground mt-2">There are currently no regulation updates awaiting review.</p>
       </div>
     );
   }

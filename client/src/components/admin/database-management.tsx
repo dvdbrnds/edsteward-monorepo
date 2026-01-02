@@ -252,9 +252,9 @@ export default function DatabaseManagement() {
                 <div className="text-2xl font-bold text-red-600">{dbStats.deadlines}</div>
                 <div className="text-sm text-red-800">Deadlines</div>
               </div>
-              <div className="text-center p-4 bg-gray-50 rounded-lg">
-                <div className="text-2xl font-bold text-gray-600">{dbStats.total_records}</div>
-                <div className="text-sm text-gray-800">Total Records</div>
+              <div className="text-center p-4 bg-background rounded-lg">
+                <div className="text-2xl font-bold text-muted-foreground">{dbStats.total_records}</div>
+                <div className="text-sm text-foreground">Total Records</div>
               </div>
             </div>
           ) : (

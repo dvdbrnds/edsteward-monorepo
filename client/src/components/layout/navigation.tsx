@@ -165,7 +165,7 @@ export default function Navigation() {
                         variant="ghost"
                         className={`${isActive
                           ? "text-white border-b-2 border-white"
-                          : "text-gray-300 hover:text-white hover:border-b-2 hover:border-gray-300"
+                          : "text-gray-300 hover:text-white hover:border-b-2 hover:border-border"
                           } flex items-center space-x-2 rounded-none px-2 h-16 whitespace-nowrap`}
                       >
                         <Icon className="h-4 w-4" />
@@ -281,8 +281,8 @@ export default function Navigation() {
                     onClick={() => setMobileMenuOpen(false)}
                     className={`${
                       isActive
-                        ? "bg-white/10 text-white"
-                        : "text-gray-300 hover:bg-white/5 hover:text-white"
+                        ? "bg-card/10 text-white"
+                        : "text-gray-300 hover:bg-card/5 hover:text-white"
                     } flex items-center w-full px-3 py-2 rounded-md text-base font-medium`}
                   >
                     <Icon className="h-5 w-5 mr-3" />

@@ -71,7 +71,7 @@ export function FeatureDisabledMessage({
   const defaultMessage = customMessage || getUpgradeMessage(feature.category);
 
   const contactSection = showContactInfo && (
-    <div className="mt-3 pt-3 border-t border-gray-200">
+    <div className="mt-3 pt-3 border-t border-border">
       <p className="text-sm text-muted-foreground mb-2">
         Interested in enabling this feature?
       </p>

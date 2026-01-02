@@ -70,7 +70,7 @@ export function FeatureFlagExampleComponent() {
                         ✅ Advanced Dashboard with charts and analytics is available!
                       </div>
                     ) : (
-                      <div className="p-4 bg-gray-50 border border-gray-200 rounded">
+                      <div className="p-4 bg-background border border-border rounded">
                         📊 Basic dashboard is shown (advanced features disabled)
                       </div>
                     )}
@@ -137,7 +137,7 @@ export function FeatureFlagExampleComponent() {
                         </div>
                       </div>
                     ) : (
-                      <div className="p-4 bg-gray-50 border border-gray-200 rounded">
+                      <div className="p-4 bg-background border border-border rounded">
                         📄 Standard document upload only (AI features disabled)
                       </div>
                     )}
@@ -169,7 +169,7 @@ export function FeatureFlagExampleComponent() {
                           <div key={feature.key} className="flex items-center justify-between p-2 border rounded">
                             <div>
                               <div className="font-medium">{feature.name}</div>
-                              <div className="text-sm text-gray-600">{feature.description}</div>
+                              <div className="text-sm text-muted-foreground">{feature.description}</div>
                             </div>
                             <Badge variant={
                               tenantFeatures[feature.key] ?? feature.defaultValue ? "default" : "secondary"
@@ -201,7 +201,7 @@ export function FeatureFlagExampleComponent() {
                         <div key={key} className="flex items-center justify-between p-2 border rounded">
                           <div>
                             <div className="font-medium">{feature.name}</div>
-                            <div className="text-sm text-gray-600">{feature.description}</div>
+                            <div className="text-sm text-muted-foreground">{feature.description}</div>
                             <Badge variant="outline" className="mt-1 text-xs">
                               {feature.category}
                             </Badge>

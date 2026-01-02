@@ -19,7 +19,7 @@ export function WebSocketStatus() {
       case 'error':
         return 'bg-red-500';
       default:
-        return 'bg-gray-500';
+        return 'bg-background0';
     }
   };
 

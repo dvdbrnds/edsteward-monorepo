@@ -40,7 +40,7 @@ const INSTITUTION_TYPE_COLORS: Record<string, string> = {
   'for-profit-institutions': 'bg-red-100 text-red-800 hover:bg-red-200',
   'research-institutes': 'bg-indigo-100 text-indigo-800 hover:bg-indigo-200',
   'professional-schools': 'bg-teal-100 text-teal-800 hover:bg-teal-200',
-  'all-institutions': 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+  'all-institutions': 'bg-gray-100 text-foreground hover:bg-gray-200'
 };
 
 interface AppliesToTagsProps {
@@ -64,7 +64,7 @@ export const AppliesToTags: React.FC<AppliesToTagsProps> = ({
     console.log('[APPLIES-TO-TAGS] No applicable institutions found, showing fallback');
     return showLabel ? (
       <div className={`flex items-center gap-2 ${className}`}>
-        <span className="text-sm font-medium text-gray-600">Applies to:</span>
+        <span className="text-sm font-medium text-muted-foreground">Applies to:</span>
         <Badge variant="secondary" className="text-xs">
           Not specified
         </Badge>
@@ -88,7 +88,7 @@ export const AppliesToTags: React.FC<AppliesToTagsProps> = ({
     return (
       <div className={`flex items-center gap-2 ${className}`}>
         {showLabel && (
-          <span className="text-sm font-medium text-gray-600">Applies to:</span>
+          <span className="text-sm font-medium text-muted-foreground">Applies to:</span>
         )}
         <Badge 
           className={`text-xs font-medium transition-colors ${INSTITUTION_TYPE_COLORS['all-institutions']}`}
@@ -103,14 +103,14 @@ export const AppliesToTags: React.FC<AppliesToTagsProps> = ({
   return (
     <div className={`flex items-center gap-2 flex-wrap ${className}`}>
       {showLabel && (
-        <span className="text-sm font-medium text-gray-600">Applies to:</span>
+        <span className="text-sm font-medium text-muted-foreground">Applies to:</span>
       )}
       <div className="flex flex-wrap gap-1">
         {displayTypes.map((type) => (
           <Badge
             key={type}
             className={`text-xs font-medium transition-colors ${
-              INSTITUTION_TYPE_COLORS[type] || 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+              INSTITUTION_TYPE_COLORS[type] || 'bg-gray-100 text-foreground hover:bg-gray-200'
             }`}
           >
             {INSTITUTION_TYPE_LABELS[type] || type}
@@ -119,7 +119,7 @@ export const AppliesToTags: React.FC<AppliesToTagsProps> = ({
         {remainingCount > 0 && (
           <Badge 
             variant="outline" 
-            className="text-xs font-medium text-gray-600 border-gray-300"
+            className="text-xs font-medium text-muted-foreground border-border"
           >
             +{remainingCount} more
           </Badge>

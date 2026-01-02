@@ -189,11 +189,11 @@ export const DifferentialView: FC<DifferentialViewProps> = ({ updateId }) => {
   const renderSideBySide = () => {
     return (
       <div className="grid grid-cols-2 gap-4">
-        <div className="border rounded-md p-4 bg-gray-50">
+        <div className="border rounded-md p-4 bg-background">
           <h3 className="font-medium mb-2">Original Version</h3>
           <div className="whitespace-pre-wrap">{original.requirements}</div>
         </div>
-        <div className="border rounded-md p-4 bg-gray-50">
+        <div className="border rounded-md p-4 bg-background">
           <h3 className="font-medium mb-2">Updated Version</h3>
           <div className="whitespace-pre-wrap">{update.updatedContent}</div>
         </div>
@@ -207,17 +207,17 @@ export const DifferentialView: FC<DifferentialViewProps> = ({ updateId }) => {
         <div className="border rounded-md p-4 text-center">
           <h3 className="font-medium mb-2">Added Content</h3>
           <div className="text-3xl font-bold text-green-600">{diffData.addedPercentage}%</div>
-          <div className="text-sm text-gray-500">{diffData.addedChars} characters</div>
+          <div className="text-sm text-muted-foreground">{diffData.addedChars} characters</div>
         </div>
         <div className="border rounded-md p-4 text-center">
           <h3 className="font-medium mb-2">Removed Content</h3>
           <div className="text-3xl font-bold text-red-600">{diffData.removedPercentage}%</div>
-          <div className="text-sm text-gray-500">{diffData.removedChars} characters</div>
+          <div className="text-sm text-muted-foreground">{diffData.removedChars} characters</div>
         </div>
         <div className="border rounded-md p-4 text-center">
           <h3 className="font-medium mb-2">Total Changes</h3>
           <div className="text-3xl font-bold text-blue-600">{diffData.changedPercentage}%</div>
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-muted-foreground">
             {original.requirements?.length || 0} → {update.updatedContent.length} chars
           </div>
         </div>
@@ -266,7 +266,7 @@ export const DifferentialView: FC<DifferentialViewProps> = ({ updateId }) => {
       
       <CardContent>
         {viewMode === 'diff' && (
-          <div className="border rounded-md p-4 bg-gray-50 whitespace-pre-wrap">
+          <div className="border rounded-md p-4 bg-background whitespace-pre-wrap">
             {renderDiff(diffData.differences)}
           </div>
         )}
@@ -323,15 +323,15 @@ export const DifferentialView: FC<DifferentialViewProps> = ({ updateId }) => {
               <h3 className="font-medium mb-2">Document Statistics</h3>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-sm text-gray-500">Original document length:</p>
+                  <p className="text-sm text-muted-foreground">Original document length:</p>
                   <p className="font-medium">{diffData.originalLength} characters</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Updated document length:</p>
+                  <p className="text-sm text-muted-foreground">Updated document length:</p>
                   <p className="font-medium">{diffData.updatedLength} characters</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Net change:</p>
+                  <p className="text-sm text-muted-foreground">Net change:</p>
                   <p className="font-medium">
                     {diffData.updatedLength - diffData.originalLength > 0 ? '+' : ''}
                     {diffData.updatedLength - diffData.originalLength} characters
@@ -345,7 +345,7 @@ export const DifferentialView: FC<DifferentialViewProps> = ({ updateId }) => {
         <Separator className="my-6" />
         
         <div className="flex justify-between">
-          <div className="text-sm text-gray-500">
+          <div className="text-sm text-muted-foreground">
             <p>Submitted by: User ID {update.submittedBy}</p>
             <p>Submitted on: {new Date(update.submittedAt).toLocaleString()}</p>
           </div>

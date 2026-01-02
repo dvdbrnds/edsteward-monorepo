@@ -64,7 +64,7 @@ export function TaskAnalyticsDashboard() {
     return (
       <div className="flex items-center justify-center py-12">
         <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
-        <span className="ml-3 text-gray-600">Loading analytics...</span>
+        <span className="ml-3 text-muted-foreground">Loading analytics...</span>
       </div>
     );
   }
@@ -265,7 +265,7 @@ export function TaskAnalyticsDashboard() {
                   <span className="font-medium text-sm truncate max-w-[300px]" title={name}>{name}</span>
                   <div className="flex items-center gap-3 text-sm">
                     <span className="text-green-600">{stats.completed} done</span>
-                    <span className="text-gray-600">{stats.pending} pending</span>
+                    <span className="text-muted-foreground">{stats.pending} pending</span>
                     {stats.overdue > 0 && (
                       <span className="text-red-600">{stats.overdue} overdue</span>
                     )}
@@ -313,7 +313,7 @@ export function TaskAnalyticsDashboard() {
               );
             })}
           </div>
-          <div className="flex justify-between mt-2 text-xs text-gray-500">
+          <div className="flex justify-between mt-2 text-xs text-muted-foreground">
             <span>30 days ago</span>
             <span>Today</span>
           </div>

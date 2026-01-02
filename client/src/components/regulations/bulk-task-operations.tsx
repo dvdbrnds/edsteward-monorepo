@@ -223,7 +223,7 @@ export function BulkTaskOperations({
 
   return (
     <>
-      <div className="flex flex-wrap items-center gap-2 p-3 bg-gray-50 border-b">
+      <div className="flex flex-wrap items-center gap-2 p-3 bg-background border-b">
         {/* Select All */}
         <Button
           variant="ghost"
@@ -296,7 +296,7 @@ export function BulkTaskOperations({
                 <DropdownMenuItem
                   onClick={() => handleBulkAction({ type: 'status', value: 'pending', label: 'Pending' })}
                 >
-                  <Clock className="h-4 w-4 mr-2 text-gray-500" />
+                  <Clock className="h-4 w-4 mr-2 text-muted-foreground" />
                   Pending
                 </DropdownMenuItem>
                 <DropdownMenuItem

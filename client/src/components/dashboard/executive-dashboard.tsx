@@ -165,7 +165,7 @@ const ScoreGauge: React.FC<{ score: number; riskLevel: string }> = ({ score, ris
           <span className="text-4xl font-bold" style={{ color: getScoreColor(score) }}>
             {score}%
           </span>
-          <span className="text-sm text-gray-500">Score</span>
+          <span className="text-sm text-muted-foreground">Score</span>
         </div>
       </div>
       <Badge className={`mt-3 ${getRiskBadge(riskLevel)}`}>
@@ -196,17 +196,17 @@ const StatCard: React.FC<{
       <CardContent className="p-5">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-sm font-medium text-gray-500">{title}</p>
+            <p className="text-sm font-medium text-muted-foreground">{title}</p>
             <div className="flex items-baseline gap-2 mt-1">
-              <p className="text-2xl font-bold text-gray-900">{value}</p>
+              <p className="text-2xl font-bold text-foreground">{value}</p>
               {trend && (
-                <span className={trend === 'up' ? 'text-green-500' : trend === 'down' ? 'text-red-500' : 'text-gray-400'}>
+                <span className={trend === 'up' ? 'text-green-500' : trend === 'down' ? 'text-red-500' : 'text-muted-foreground'}>
                   {trend === 'up' ? <TrendingUp className="h-4 w-4" /> : 
                    trend === 'down' ? <TrendingDown className="h-4 w-4" /> : null}
                 </span>
               )}
             </div>
-            {subtitle && <p className="text-xs text-gray-400 mt-1">{subtitle}</p>}
+            {subtitle && <p className="text-xs text-muted-foreground mt-1">{subtitle}</p>}
           </div>
           <div className={`p-3 rounded-xl ${colorClasses[color]}`}>
             {icon}
@@ -228,7 +228,7 @@ export const ExecutiveDashboard: React.FC = () => {
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-3">
           <RefreshCw className="h-8 w-8 animate-spin text-blue-500" />
-          <p className="text-gray-500">Loading analytics...</p>
+          <p className="text-muted-foreground">Loading analytics...</p>
         </div>
       </div>
     );
@@ -270,8 +270,8 @@ export const ExecutiveDashboard: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Compliance Dashboard</h1>
-          <p className="text-gray-500 mt-1">
+          <h1 className="text-3xl font-bold text-foreground">Compliance Dashboard</h1>
+          <p className="text-muted-foreground mt-1">
             Last updated: {new Date(data.overview.lastUpdated).toLocaleString()}
           </p>
         </div>
@@ -506,7 +506,7 @@ export const ExecutiveDashboard: React.FC = () => {
           </CardHeader>
           <CardContent>
             {data.topIssues.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-muted-foreground">
                 <CheckCircle2 className="h-12 w-12 mx-auto mb-3 text-green-500" />
                 <p className="font-medium">All regulations on track!</p>
               </div>
@@ -514,7 +514,7 @@ export const ExecutiveDashboard: React.FC = () => {
               <div className="space-y-4">
                 {data.topIssues.map((issue) => (
                   <Link key={issue.id} href={`/regulations/${issue.id}`}>
-                    <div className="p-3 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                    <div className="p-3 border rounded-lg hover:bg-background cursor-pointer transition-colors">
                       <div className="flex items-center justify-between mb-2">
                         <span className="font-medium text-sm truncate pr-4" title={issue.name}>
                           {issue.name.length > 40 ? issue.name.slice(0, 40) + '...' : issue.name}
@@ -525,7 +525,7 @@ export const ExecutiveDashboard: React.FC = () => {
                       </div>
                       <div className="flex items-center gap-3">
                         <Progress value={issue.taskCompletion} className="flex-1 h-2" />
-                        <span className="text-sm font-medium text-gray-600 w-16 text-right">
+                        <span className="text-sm font-medium text-muted-foreground w-16 text-right">
                           {issue.completedTasks}/{issue.totalTasks}
                         </span>
                       </div>
@@ -557,7 +557,7 @@ export const ExecutiveDashboard: React.FC = () => {
           </CardHeader>
           <CardContent>
             {data.deadlines.dueThisWeek.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
+              <div className="text-center py-8 text-muted-foreground">
                 <Zap className="h-12 w-12 mx-auto mb-3 text-green-500" />
                 <p className="font-medium">No deadlines this week!</p>
               </div>
@@ -565,13 +565,13 @@ export const ExecutiveDashboard: React.FC = () => {
               <div className="space-y-3">
                 {data.deadlines.dueThisWeek.slice(0, 5).map((deadline) => (
                   <Link key={deadline.id} href={`/regulations/${deadline.regulationId}`}>
-                    <div className="flex items-center gap-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                    <div className="flex items-center gap-3 p-3 border rounded-lg hover:bg-background cursor-pointer transition-colors">
                       <div className="p-2 bg-yellow-100 rounded-lg">
                         <Calendar className="h-4 w-4 text-yellow-600" />
                       </div>
                       <div className="flex-1 min-w-0">
                         <p className="font-medium text-sm truncate">{deadline.title}</p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs text-muted-foreground">
                           Due: {new Date(deadline.dueDate).toLocaleDateString()}
                         </p>
                       </div>

@@ -169,7 +169,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
 
     // Non-required incomplete actions use neutral colors
     if (!action.required) {
-      return 'text-gray-400 opacity-40';
+      return 'text-muted-foreground opacity-40';
     }
 
     // Required incomplete actions use red
@@ -216,7 +216,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
       case 'research-institutes':
         return 'bg-emerald-100 text-emerald-800 border-emerald-200';
       case 'all-institutions':
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return 'bg-gray-100 text-foreground border-border';
       default:
         return 'bg-slate-100 text-slate-800 border-slate-200';
     }
@@ -406,7 +406,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
                         {regulation.applicableInstitutions && regulation.applicableInstitutions.length > 3 && (
                           <Badge 
                             variant="outline" 
-                            className="text-xs bg-gray-50 text-gray-600 border-gray-300"
+                            className="text-xs bg-background text-muted-foreground border-border"
                           >
                             +{regulation.applicableInstitutions.length - 3} more
                           </Badge>

@@ -140,7 +140,7 @@ interface ComplianceTasksPanelProps {
 const statusIcons: Record<string, React.ReactNode> = {
   completed: <CheckCircle className="h-4 w-4 text-green-600" />,
   in_progress: <Clock className="h-4 w-4 text-blue-600" />,
-  pending: <Circle className="h-4 w-4 text-gray-400" />,
+  pending: <Circle className="h-4 w-4 text-muted-foreground" />,
   overdue: <AlertTriangle className="h-4 w-4 text-red-600" />,
   blocked: <AlertCircle className="h-4 w-4 text-amber-600" />,
 };
@@ -149,7 +149,7 @@ const priorityColors: Record<string, string> = {
   critical: 'bg-red-100 text-red-800 border-red-200',
   high: 'bg-orange-100 text-orange-800 border-orange-200',
   medium: 'bg-blue-100 text-blue-800 border-blue-200',
-  low: 'bg-gray-100 text-gray-800 border-gray-200',
+  low: 'bg-gray-100 text-foreground border-border',
 };
 
 const evidenceIcons: Record<string, React.ReactNode> = {
@@ -196,11 +196,11 @@ function TaskItem({
   return (
     <div className={cn("border-l-2", depth > 0 ? "ml-6 pl-4" : "pl-0", 
       task.status === 'completed' ? 'border-green-300' : 
-      isOverdue ? 'border-red-300' : 'border-gray-200')}>
+      isOverdue ? 'border-red-300' : 'border-border')}>
       <div className={cn(
         "flex items-start gap-3 p-3 rounded-lg mb-2 transition-colors",
         task.status === 'completed' ? 'bg-green-50' : 
-        isOverdue ? 'bg-red-50' : 'bg-white hover:bg-gray-50',
+        isOverdue ? 'bg-red-50' : 'bg-card hover:bg-background',
         selectedTaskIds.includes(task.id) && 'ring-2 ring-blue-500 ring-inset'
       )}>
         {/* Selection Checkbox (admin only) */}
@@ -250,13 +250,13 @@ function TaskItem({
               >
                 <h4 className={cn(
                   "font-medium text-sm",
-                  task.status === 'completed' && "line-through text-gray-500"
+                  task.status === 'completed' && "line-through text-muted-foreground"
                 )}>
                   {task.title}
                 </h4>
               </button>
               {task.description && (
-                <p className="text-xs text-gray-600 mt-0.5 line-clamp-2">{task.description}</p>
+                <p className="text-xs text-muted-foreground mt-0.5 line-clamp-2">{task.description}</p>
               )}
             </div>
 
@@ -267,7 +267,7 @@ function TaskItem({
           </div>
 
           {/* Meta info */}
-          <div className="flex flex-wrap items-center gap-3 mt-2 text-xs text-gray-500">
+          <div className="flex flex-wrap items-center gap-3 mt-2 text-xs text-muted-foreground">
             {/* Assignee */}
             <div className="flex items-center gap-1">
               <UserIcon className="h-3 w-3" />
@@ -311,7 +311,7 @@ function TaskItem({
               <Button 
                 variant="ghost" 
                 size="sm" 
-                className="h-6 px-2 text-xs text-gray-500 hover:text-blue-600 hover:bg-blue-50"
+                className="h-6 px-2 text-xs text-muted-foreground hover:text-blue-600 hover:bg-blue-50"
                 onClick={(e) => {
                   e.stopPropagation();
                   onAddEvidence(task);
@@ -369,7 +369,7 @@ function TaskItem({
               {task.evidenceItems.map((evidence) => (
                 <HoverCard key={evidence.id}>
                   <HoverCardTrigger asChild>
-                    <div className="flex items-start gap-2 text-xs bg-white/60 rounded px-2 py-1.5 border border-blue-100 cursor-pointer hover:bg-white hover:border-blue-200 transition-colors">
+                    <div className="flex items-start gap-2 text-xs bg-card/60 rounded px-2 py-1.5 border border-blue-100 cursor-pointer hover:bg-card hover:border-blue-200 transition-colors">
                       {/* File type icon */}
                       <div className="p-1 bg-gray-100 rounded shrink-0">
                         {evidence.linkUrl ? (
@@ -377,7 +377,7 @@ function TaskItem({
                         ) : evidence.fileType?.startsWith('image/') ? (
                           <Image className="h-3 w-3 text-purple-600" />
                         ) : (
-                          <FileText className="h-3 w-3 text-gray-600" />
+                          <FileText className="h-3 w-3 text-muted-foreground" />
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -387,10 +387,10 @@ function TaskItem({
                               {evidence.linkTitle || evidence.fileName}
                             </span>
                           ) : (
-                            <span className="font-medium text-gray-700 truncate">{evidence.fileName}</span>
+                            <span className="font-medium text-foreground truncate">{evidence.fileName}</span>
                           )}
                         </div>
-                        <div className="flex items-center gap-1 mt-0.5 text-[10px] text-gray-500">
+                        <div className="flex items-center gap-1 mt-0.5 text-[10px] text-muted-foreground">
                           <PenLine className="h-2.5 w-2.5" />
                           <span>
                             {evidence.uploader 
@@ -401,7 +401,7 @@ function TaskItem({
                           </span>
                           {evidence.uploadedAt && (
                             <>
-                              <span className="text-gray-400">•</span>
+                              <span className="text-muted-foreground">•</span>
                               <span>{format(new Date(evidence.uploadedAt), "MMM d, yyyy")}</span>
                             </>
                           )}
@@ -419,13 +419,13 @@ function TaskItem({
                           ) : evidence.fileType?.startsWith('image/') ? (
                             <Image className="h-5 w-5 text-purple-600" />
                           ) : (
-                            <FileText className="h-5 w-5 text-gray-600" />
+                            <FileText className="h-5 w-5 text-muted-foreground" />
                           )}
                         </div>
                         <div className="flex-1 min-w-0">
                           <h4 className="text-sm font-semibold truncate">{evidence.fileName}</h4>
                           {evidence.fileType && (
-                            <p className="text-xs text-gray-500">{evidence.fileType}</p>
+                            <p className="text-xs text-muted-foreground">{evidence.fileType}</p>
                           )}
                         </div>
                       </div>
@@ -452,9 +452,9 @@ function TaskItem({
                             </div>
                           </div>
                         ) : (
-                          <div className="w-full bg-gray-50 rounded-md p-4 text-center border">
-                            <FileText className="h-10 w-10 mx-auto text-gray-400 mb-2" />
-                            <p className="text-xs text-gray-500">
+                          <div className="w-full bg-background rounded-md p-4 text-center border">
+                            <FileText className="h-10 w-10 mx-auto text-muted-foreground mb-2" />
+                            <p className="text-xs text-muted-foreground">
                               {evidence.fileType || 'Document'}
                             </p>
                           </div>
@@ -463,16 +463,16 @@ function TaskItem({
 
                       {/* Description */}
                       {evidence.description && (
-                        <p className="text-xs text-gray-600">{evidence.description}</p>
+                        <p className="text-xs text-muted-foreground">{evidence.description}</p>
                       )}
 
                       {/* Signature Block */}
-                      <div className="bg-gray-50 rounded-md p-2 space-y-1">
+                      <div className="bg-background rounded-md p-2 space-y-1">
                         <div className="flex items-center gap-1 text-xs">
-                          <PenLine className="h-3 w-3 text-gray-500" />
-                          <span className="font-medium text-gray-700">Uploaded by:</span>
+                          <PenLine className="h-3 w-3 text-muted-foreground" />
+                          <span className="font-medium text-foreground">Uploaded by:</span>
                         </div>
-                        <div className="text-xs text-gray-600">
+                        <div className="text-xs text-muted-foreground">
                           <p className="font-medium">
                             {evidence.uploader 
                               ? (evidence.uploader.firstName && evidence.uploader.lastName
@@ -481,10 +481,10 @@ function TaskItem({
                               : 'Unknown'}
                           </p>
                           {evidence.uploader?.email && (
-                            <p className="text-gray-500">{evidence.uploader.email}</p>
+                            <p className="text-muted-foreground">{evidence.uploader.email}</p>
                           )}
                           {evidence.uploadedAt && (
-                            <p className="text-gray-500">{format(new Date(evidence.uploadedAt), "MMMM d, yyyy 'at' h:mm a")}</p>
+                            <p className="text-muted-foreground">{format(new Date(evidence.uploadedAt), "MMMM d, yyyy 'at' h:mm a")}</p>
                           )}
                         </div>
                       </div>
@@ -749,7 +749,7 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-8">
-        <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -773,7 +773,7 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
           {!hasNoTasks && (
             <div className="flex items-center gap-3 mt-2">
               <Progress value={data?.progress || 0} className="h-2 flex-1 max-w-xs" />
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-muted-foreground">
                 {data?.completedTasks}/{data?.totalTasks} complete ({data?.progress}%)
               </span>
             </div>
@@ -789,10 +789,10 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
 
       {/* Empty State */}
       {hasNoTasks ? (
-        <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed">
-          <FileText className="h-12 w-12 mx-auto text-gray-400 mb-4" />
-          <h4 className="text-lg font-medium text-gray-700">No Compliance Tasks</h4>
-          <p className="text-gray-500 mt-1 max-w-md mx-auto">
+        <div className="text-center py-12 bg-background rounded-lg border-2 border-dashed">
+          <FileText className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+          <h4 className="text-lg font-medium text-foreground">No Compliance Tasks</h4>
+          <p className="text-muted-foreground mt-1 max-w-md mx-auto">
             This regulation doesn't have any compliance tasks defined yet.
             Tasks are configured by the system administrator.
           </p>
@@ -844,9 +844,9 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="bg-gray-50 p-3 rounded-lg">
+            <div className="bg-background p-3 rounded-lg">
               <p className="font-medium">{nudgeTask?.title}</p>
-              <p className="text-sm text-gray-600 mt-1">{nudgeTask?.description}</p>
+              <p className="text-sm text-muted-foreground mt-1">{nudgeTask?.description}</p>
             </div>
             <div>
               <Label htmlFor="nudge-message">Message (optional)</Label>
@@ -884,7 +884,7 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
           <div className="space-y-4">
             <div className="bg-red-50 p-3 rounded-lg border border-red-200">
               <p className="font-medium">{escalateTask?.title}</p>
-              <p className="text-sm text-gray-600 mt-1">Assigned to: {escalateTask?.assignedUser?.email || escalateTask?.assignedRole}</p>
+              <p className="text-sm text-muted-foreground mt-1">Assigned to: {escalateTask?.assignedUser?.email || escalateTask?.assignedRole}</p>
             </div>
             <div>
               <Label htmlFor="escalate-email">Supervisor Email *</Label>
@@ -940,7 +940,7 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
           </DialogHeader>
           <div className="space-y-4">
             {/* Type Selector - Styled as tabs */}
-            <div className="flex border-b border-gray-200">
+            <div className="flex border-b border-border">
               <button
                 type="button"
                 onClick={() => setEvidenceType('file')}
@@ -948,7 +948,7 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
                   "flex-1 py-2 px-4 text-sm font-medium border-b-2 transition-colors",
                   evidenceType === 'file' 
                     ? "border-blue-600 text-blue-600" 
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
                 )}
               >
                 <Upload className="h-4 w-4 inline mr-2" />
@@ -961,7 +961,7 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
                   "flex-1 py-2 px-4 text-sm font-medium border-b-2 transition-colors",
                   evidenceType === 'link' 
                     ? "border-blue-600 text-blue-600" 
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
                 )}
               >
                 <LinkIcon className="h-4 w-4 inline mr-2" />
@@ -978,7 +978,7 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
                     "flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer transition-colors",
                     evidenceFile 
                       ? "border-green-400 bg-green-50" 
-                      : "border-gray-300 bg-gray-50 hover:bg-gray-100 hover:border-blue-400"
+                      : "border-border bg-background hover:bg-muted hover:border-blue-400"
                   )}
                 >
                   {evidenceFile ? (
@@ -988,10 +988,10 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
                       <p className="text-xs text-green-500 mt-1">Click to change file</p>
                     </div>
                   ) : (
-                    <div className="flex flex-col items-center text-gray-500">
+                    <div className="flex flex-col items-center text-muted-foreground">
                       <Upload className="h-8 w-8 mb-2" />
                       <p className="text-sm font-medium">Click to upload</p>
-                      <p className="text-xs text-gray-400">or drag and drop</p>
+                      <p className="text-xs text-muted-foreground">or drag and drop</p>
                     </div>
                   )}
                   <input

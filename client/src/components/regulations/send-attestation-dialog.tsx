@@ -382,7 +382,7 @@ export function SendAttestationDialog({
 
           {/* Email Preview */}
           {showPreview && (selectedUser || (useManualEmail && manualEmail)) && (
-            <div className="bg-white border rounded-lg p-4 space-y-3">
+            <div className="bg-card border rounded-lg p-4 space-y-3">
               <div className="flex items-center gap-2 text-sm border-b pb-2">
                 <span className="font-medium">To:</span>
                 <span>{useManualEmail ? manualEmail : selectedUser?.email}</span>

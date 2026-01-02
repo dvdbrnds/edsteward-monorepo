@@ -173,7 +173,7 @@ export function WebPublishDialog({ regulation, open, onOpenChange, onComplete }:
               </p>
 
               {/* Preview Section */}
-              <div className="relative rounded-md border bg-white p-4">
+              <div className="relative rounded-md border bg-card p-4">
                 <div className="flex justify-between items-center mb-2">
                   <h3 className="text-sm font-medium">Preview</h3>
                   <Button
@@ -235,7 +235,7 @@ export function WebPublishDialog({ regulation, open, onOpenChange, onComplete }:
               </p>
 
               {/* Preview Section */}
-              <div className="relative rounded-md border bg-white p-4">
+              <div className="relative rounded-md border bg-card p-4">
                 <div className="flex justify-between items-center mb-2">
                   <h3 className="text-sm font-medium">Preview</h3>
                   <Button

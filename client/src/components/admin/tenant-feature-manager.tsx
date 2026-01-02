@@ -420,7 +420,7 @@ export default function TenantFeatureManager() {
         <TabsContent value="tenants" className="space-y-4">
           <div className="flex items-center space-x-4">
             <div className="relative flex-1 max-w-sm">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search tenants..."
                 value={searchQuery}
@@ -462,7 +462,7 @@ export default function TenantFeatureManager() {
                         <div className="text-sm font-medium">
                           {Object.values(tenant.featureFlags).filter(Boolean).length}
                         </div>
-                        <div className="text-xs text-gray-500">Features On</div>
+                        <div className="text-xs text-muted-foreground">Features On</div>
                       </div>
                       <Button
                         variant="outline"
@@ -484,7 +484,7 @@ export default function TenantFeatureManager() {
         <TabsContent value="features" className="space-y-4">
           <div className="flex items-center space-x-4">
             <div className="relative flex-1 max-w-sm">
-              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Select value={selectedCategory} onValueChange={setSelectedCategory}>
                 <SelectTrigger className="pl-10">
                   <SelectValue />
@@ -579,7 +579,7 @@ export default function TenantFeatureManager() {
                     <div className="flex items-center space-x-4">
                       <div className="text-center">
                         <div className="text-2xl font-bold">{rollout.progress}%</div>
-                        <div className="text-xs text-gray-500">Progress</div>
+                        <div className="text-xs text-muted-foreground">Progress</div>
                       </div>
                       <Badge className={getRolloutStatusColor(rollout.status)}>
                         {rollout.status}

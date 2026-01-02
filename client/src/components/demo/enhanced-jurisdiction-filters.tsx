@@ -145,9 +145,9 @@ export default function EnhancedJurisdictionFilters({ onFiltersChange }: Enhance
         )}
 
         {/* Example Search Scenarios */}
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+        <div className="mt-6 p-4 bg-background rounded-lg">
           <h4 className="font-medium mb-2">Example Searches:</h4>
-          <div className="space-y-1 text-sm text-gray-600">
+          <div className="space-y-1 text-sm text-muted-foreground">
             <p>• Federal regulations applying to community colleges</p>
             <p>• Accrediting body requirements for private universities</p>
             <p>• International standards applicable to all institutions</p>
@@ -181,13 +181,13 @@ export function DemoUsage() {
             <div className="mt-2 space-y-1">
               <div className="flex items-center gap-2">
                 <Badge variant="outline">Federal Government</Badge>
-                <span className="text-sm text-gray-500">Source</span>
+                <span className="text-sm text-muted-foreground">Source</span>
               </div>
               <div className="flex items-center gap-2">
                 <Badge variant="secondary">Public Universities</Badge>
                 <Badge variant="secondary">Private Universities</Badge>
                 <Badge variant="secondary">Community Colleges</Badge>
-                <span className="text-sm text-gray-500">Applies to</span>
+                <span className="text-sm text-muted-foreground">Applies to</span>
               </div>
             </div>
           </CardContent>
@@ -199,11 +199,11 @@ export function DemoUsage() {
             <div className="mt-2 space-y-1">
               <div className="flex items-center gap-2">
                 <Badge variant="outline">Accrediting Body</Badge>
-                <span className="text-sm text-gray-500">Source</span>
+                <span className="text-sm text-muted-foreground">Source</span>
               </div>
               <div className="flex items-center gap-2">
                 <Badge variant="secondary">All Institution Types</Badge>
-                <span className="text-sm text-gray-500">Applies to</span>
+                <span className="text-sm text-muted-foreground">Applies to</span>
               </div>
             </div>
           </CardContent>

@@ -90,7 +90,7 @@ export function NotificationSchedulerSettings() {
     return (
       <Card>
         <CardContent className="p-6 flex items-center justify-center">
-          <Loader2 className="h-6 w-6 animate-spin text-gray-400" />
+          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
         </CardContent>
       </Card>
     );
@@ -121,12 +121,12 @@ export function NotificationSchedulerSettings() {
         </CardHeader>
         <CardContent className="space-y-6">
           {/* Enable/Disable Toggle */}
-          <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+          <div className="flex items-center justify-between p-4 bg-background rounded-lg">
             <div className="space-y-1">
               <Label htmlFor="scheduler-toggle" className="text-base font-medium">
                 Automatic Notifications
               </Label>
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 When enabled, the system will automatically send task reminders.
               </p>
             </div>
@@ -145,7 +145,7 @@ export function NotificationSchedulerSettings() {
                 {status?.enabled ? (
                   <CheckCircle className="h-5 w-5 text-green-500" />
                 ) : (
-                  <XCircle className="h-5 w-5 text-gray-400" />
+                  <XCircle className="h-5 w-5 text-muted-foreground" />
                 )}
                 <span className="font-medium">Status</span>
               </div>
@@ -159,7 +159,7 @@ export function NotificationSchedulerSettings() {
                 <Clock className="h-5 w-5 text-blue-500" />
                 <span className="font-medium">Schedule</span>
               </div>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 {status?.preferredHours?.map(h => 
                   `${h > 12 ? h - 12 : h}:00 ${h >= 12 ? 'PM' : 'AM'}`
                 ).join(' & ') || 'Not set'}
@@ -171,7 +171,7 @@ export function NotificationSchedulerSettings() {
                 <RefreshCw className="h-5 w-5 text-purple-500" />
                 <span className="font-medium">Interval</span>
               </div>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-muted-foreground">
                 Every {status?.intervalHours || 6} hours
               </p>
             </div>
@@ -201,7 +201,7 @@ export function NotificationSchedulerSettings() {
               )}
               Run Manual Check Now
             </Button>
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="text-xs text-muted-foreground mt-2">
               Manually trigger a notification check for all tasks.
             </p>
           </div>

@@ -156,7 +156,7 @@ export const EnhancedRegulationTimeline: React.FC<EnhancedRegulationTimelineProp
                      version.source === 'import' ? 'Imported Update' :
                      version.source === 'rollback' ? 'Rolled Back' : 'Manual Update'}`,
         type: 'version',
-        icon: sourceIcons[version.source] || <GitCommit className="h-4 w-4 text-gray-500" />,
+        icon: sourceIcons[version.source] || <GitCommit className="h-4 w-4 text-muted-foreground" />,
         data: version,
         status: 'completed'
       });
@@ -276,7 +276,7 @@ export const EnhancedRegulationTimeline: React.FC<EnhancedRegulationTimelineProp
                   <div key={event.id} className="flex items-start space-x-4">
                     {/* Timeline line */}
                     <div className="flex flex-col items-center">
-                      <div className="flex items-center justify-center w-10 h-10 rounded-full bg-white border-2 border-gray-200 shadow-sm">
+                      <div className="flex items-center justify-center w-10 h-10 rounded-full bg-card border-2 border-border shadow-sm">
                         {event.icon}
                       </div>
                       {index < timelineEvents.length - 1 && (
@@ -288,17 +288,17 @@ export const EnhancedRegulationTimeline: React.FC<EnhancedRegulationTimelineProp
                     <div className="flex-1 min-w-0 pb-8">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
-                          <h3 className="text-sm font-medium text-gray-900">
+                          <h3 className="text-sm font-medium text-foreground">
                             {event.title}
                           </h3>
                           {getStatusBadge(event.status)}
                         </div>
-                        <time className="text-xs text-gray-500">
+                        <time className="text-xs text-muted-foreground">
                           {formatDate(event.date)}
                         </time>
                       </div>
                       
-                      <p className="text-sm text-gray-600 mt-1">
+                      <p className="text-sm text-muted-foreground mt-1">
                         {event.description}
                       </p>
 
@@ -327,7 +327,7 @@ export const EnhancedRegulationTimeline: React.FC<EnhancedRegulationTimelineProp
                                   <div className="space-y-4">
                                     <div>
                                       <h4 className="font-medium">Content:</h4>
-                                      <div className="mt-2 p-4 bg-gray-50 rounded-lg">
+                                      <div className="mt-2 p-4 bg-background rounded-lg">
                                         <pre className="whitespace-pre-wrap text-sm">
                                           {(event.data as RegulationVersion).content}
                                         </pre>
@@ -413,7 +413,7 @@ export const EnhancedRegulationTimeline: React.FC<EnhancedRegulationTimelineProp
                                   <div className="text-xs font-medium text-blue-900 mb-1">Changes in this version:</div>
                                   <div className="flex flex-wrap gap-2">
                                     {changes.map((change, idx) => (
-                                      <span key={idx} className="text-xs bg-white px-2 py-1 rounded border border-blue-300 text-blue-700">
+                                      <span key={idx} className="text-xs bg-card px-2 py-1 rounded border border-blue-300 text-blue-700">
                                         {change}
                                       </span>
                                     ))}
@@ -425,7 +425,7 @@ export const EnhancedRegulationTimeline: React.FC<EnhancedRegulationTimelineProp
                             }
                           })()}
                           
-                          <div className="mt-2 text-xs text-gray-500">
+                          <div className="mt-2 text-xs text-muted-foreground">
                             {event.data.createdByUser && (
                               <span>
                                 by {event.data.createdByUser.firstName} {event.data.createdByUser.lastName} 
@@ -443,7 +443,7 @@ export const EnhancedRegulationTimeline: React.FC<EnhancedRegulationTimelineProp
                 ))}
 
                 {timelineEvents.length === 0 && (
-                  <div className="text-center py-8 text-gray-500">
+                  <div className="text-center py-8 text-muted-foreground">
                     <History className="h-12 w-12 mx-auto mb-4 opacity-50" />
                     <p>No timeline events found</p>
                   </div>
@@ -460,7 +460,7 @@ export const EnhancedRegulationTimeline: React.FC<EnhancedRegulationTimelineProp
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <div className="flex items-center gap-2">
-                          <GitCommit className="h-4 w-4 text-gray-500" />
+                          <GitCommit className="h-4 w-4 text-muted-foreground" />
                           <span className="font-medium">Version {version.versionNumber}</span>
                           {version.id === versions[0]?.id && (
                             <Badge variant="default">Current</Badge>
@@ -469,7 +469,7 @@ export const EnhancedRegulationTimeline: React.FC<EnhancedRegulationTimelineProp
                         <Badge variant="outline">{version.source}</Badge>
                       </div>
                       <div className="flex items-center gap-2">
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-muted-foreground">
                           {formatDate(new Date(version.createdAt))}
                         </span>
                         <Button 
@@ -482,7 +482,7 @@ export const EnhancedRegulationTimeline: React.FC<EnhancedRegulationTimelineProp
                       </div>
                     </div>
                     {version.changesSummary && (
-                      <p className="text-sm text-gray-600 mt-2">{version.changesSummary}</p>
+                      <p className="text-sm text-muted-foreground mt-2">{version.changesSummary}</p>
                     )}
                   </CardContent>
                 </Card>

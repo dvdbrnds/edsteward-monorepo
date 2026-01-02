@@ -68,7 +68,7 @@ export function CommunicationDialog({ regulation, open, onOpenChange, onComplete
 
         <div className="space-y-4">
           {/* Preview Section */}
-          <div className="relative rounded-md border bg-white p-4">
+          <div className="relative rounded-md border bg-card p-4">
             <div className="flex justify-between items-center mb-2">
               <h3 className="text-sm font-medium">Preview</h3>
               <Button

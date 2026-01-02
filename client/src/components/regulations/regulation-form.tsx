@@ -193,7 +193,7 @@ export default function RegulationForm({ onSuccess }: { onSuccess: () => void })
         />
 
         {/* New submission-specific fields */}
-        <div className="bg-gray-50 p-4 rounded-lg space-y-4">
+        <div className="bg-background p-4 rounded-lg space-y-4">
           <h3 className="text-lg font-semibold">Submission Requirements</h3>
 
           <FormField

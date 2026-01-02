@@ -192,7 +192,7 @@ export function InstitutionSettings({ tenantId, currentConfig, onConfigUpdate }:
                       "flex items-start space-x-3 p-4 rounded-lg border transition-colors",
                       isSelected 
                         ? "bg-blue-50 border-blue-200 dark:bg-blue-950 dark:border-blue-800" 
-                        : "bg-gray-50 border-gray-200 dark:bg-gray-900 dark:border-gray-700"
+                        : "bg-background border-border dark:bg-gray-900 dark:border-gray-700"
                     )}
                   >
                     <Checkbox
@@ -208,7 +208,7 @@ export function InstitutionSettings({ tenantId, currentConfig, onConfigUpdate }:
                       >
                         {INSTITUTION_TYPE_LABELS[type]}
                       </Label>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      <p className="text-sm text-muted-foreground dark:text-muted-foreground mt-1">
                         {INSTITUTION_TYPE_DESCRIPTIONS[type]}
                       </p>
                     </div>
@@ -219,7 +219,7 @@ export function InstitutionSettings({ tenantId, currentConfig, onConfigUpdate }:
 
             {config.primaryTypes.length > 0 && (
               <div className="mt-4">
-                <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">Selected Types:</Label>
+                <Label className="text-sm font-medium text-foreground dark:text-gray-300">Selected Types:</Label>
                 <div className="flex flex-wrap gap-2 mt-2">
                   {config.primaryTypes.map((type) => (
                     <Badge key={type} variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
@@ -238,19 +238,19 @@ export function InstitutionSettings({ tenantId, currentConfig, onConfigUpdate }:
             <Label className="text-base font-medium">Filtering Behavior</Label>
             
             <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 rounded-lg border bg-gray-50 dark:bg-gray-900">
+              <div className="flex items-center justify-between p-4 rounded-lg border bg-background dark:bg-gray-900">
                 <div className="flex-1">
                   <div className="flex items-center space-x-2">
                     {config.hideNonApplicable ? (
-                      <EyeOff className="h-4 w-4 text-gray-600" />
+                      <EyeOff className="h-4 w-4 text-muted-foreground" />
                     ) : (
-                      <Eye className="h-4 w-4 text-gray-600" />
+                      <Eye className="h-4 w-4 text-muted-foreground" />
                     )}
                     <Label htmlFor="hide-non-applicable" className="font-medium cursor-pointer">
                       Hide Non-Applicable Regulations by Default
                     </Label>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  <p className="text-sm text-muted-foreground dark:text-muted-foreground mt-1">
                     When enabled, only regulations that apply to your selected institution types will be shown by default.
                     Users can still access all regulations using the filter controls.
                   </p>
@@ -262,12 +262,12 @@ export function InstitutionSettings({ tenantId, currentConfig, onConfigUpdate }:
                 />
               </div>
 
-              <div className="flex items-center justify-between p-4 rounded-lg border bg-gray-50 dark:bg-gray-900">
+              <div className="flex items-center justify-between p-4 rounded-lg border bg-background dark:bg-gray-900">
                 <div className="flex-1">
                   <Label htmlFor="allow-user-toggle" className="font-medium cursor-pointer">
                     Allow Users to Toggle Filtering
                   </Label>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                  <p className="text-sm text-muted-foreground dark:text-muted-foreground mt-1">
                     When enabled, users can toggle between showing only applicable regulations and showing all regulations.
                     When disabled, the filtering behavior is enforced for all users.
                   </p>

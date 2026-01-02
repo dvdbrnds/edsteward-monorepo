@@ -183,7 +183,7 @@ export default function RegulationWizard({ onSuccess }: RegulationWizardProps) {
     <div className="space-y-6">
       <div className="space-y-2">
         <Progress value={progress} className="w-full" />
-        <p className="text-sm text-gray-500 text-center">
+        <p className="text-sm text-muted-foreground text-center">
           Step {step + 1} of {steps.length}
         </p>
       </div>

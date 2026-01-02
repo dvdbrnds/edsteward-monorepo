@@ -153,7 +153,7 @@ export default function CreateNotificationModal({ isOpen, onClose }: CreateNotif
     switch (priority) {
       case 'high': return <AlertTriangle className="h-4 w-4 text-red-500" />;
       case 'normal': return <Info className="h-4 w-4 text-blue-500" />;
-      case 'low': return <CheckCircle className="h-4 w-4 text-gray-500" />;
+      case 'low': return <CheckCircle className="h-4 w-4 text-muted-foreground" />;
       default: return null;
     }
   };
@@ -225,7 +225,7 @@ export default function CreateNotificationModal({ isOpen, onClose }: CreateNotif
                   </SelectItem>
                   <SelectItem value="low">
                     <div className="flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4 text-gray-500" />
+                      <CheckCircle className="h-4 w-4 text-muted-foreground" />
                       Low Priority
                     </div>
                   </SelectItem>
@@ -282,7 +282,7 @@ export default function CreateNotificationModal({ isOpen, onClose }: CreateNotif
                       <FileText className="h-4 w-4 text-blue-500" />
                       <div>
                         <p className="font-medium">{regulation.name}</p>
-                        <p className="text-xs text-gray-500">{regulation.category}</p>
+                        <p className="text-xs text-muted-foreground">{regulation.category}</p>
                       </div>
                     </div>
                   </SelectItem>
@@ -323,17 +323,17 @@ export default function CreateNotificationModal({ isOpen, onClose }: CreateNotif
               {usersLoading ? (
                 <div className="text-center py-4">
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mx-auto mb-2"></div>
-                  <p className="text-gray-500 text-sm">Loading users...</p>
+                  <p className="text-muted-foreground text-sm">Loading users...</p>
                 </div>
               ) : usersError ? (
                 <div className="text-center py-4">
                   <p className="text-red-600 text-sm mb-2">⚠️ Access Denied</p>
-                  <p className="text-gray-500 text-xs">
+                  <p className="text-muted-foreground text-xs">
                     Only administrators can send notifications. Please contact your system administrator.
                   </p>
                 </div>
               ) : users.length === 0 ? (
-                <p className="text-gray-500 text-center py-4">No users available</p>
+                <p className="text-muted-foreground text-center py-4">No users available</p>
               ) : (
                 <div className="space-y-2">
                   {users.map((user) => (
@@ -351,7 +351,7 @@ export default function CreateNotificationModal({ isOpen, onClose }: CreateNotif
                           <p className="font-medium">
                             {user.firstName} {user.lastName}
                           </p>
-                          <p className="text-sm text-gray-500">{user.email}</p>
+                          <p className="text-sm text-muted-foreground">{user.email}</p>
                         </div>
                         {user.role && (
                           <Badge variant="secondary" className="text-xs">
@@ -383,7 +383,7 @@ export default function CreateNotificationModal({ isOpen, onClose }: CreateNotif
           </div>
 
           {/* Preview */}
-          <div className="bg-gray-50 border rounded-lg p-4">
+          <div className="bg-background border rounded-lg p-4">
             <h4 className="font-medium mb-2 flex items-center gap-2">
               Preview
               {getPriorityIcon(formData.priority)}

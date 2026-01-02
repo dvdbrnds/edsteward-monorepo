@@ -126,7 +126,7 @@ interface TaskDetailDialogProps {
 const statusIcons: Record<string, React.ReactNode> = {
   completed: <CheckCircle className="h-5 w-5 text-green-600" />,
   in_progress: <Clock className="h-5 w-5 text-blue-600" />,
-  pending: <Circle className="h-5 w-5 text-gray-400" />,
+  pending: <Circle className="h-5 w-5 text-muted-foreground" />,
   overdue: <AlertTriangle className="h-5 w-5 text-red-600" />,
   blocked: <AlertCircle className="h-5 w-5 text-amber-600" />,
 };
@@ -143,7 +143,7 @@ const priorityColors: Record<string, string> = {
   critical: 'bg-red-100 text-red-800 border-red-200',
   high: 'bg-orange-100 text-orange-800 border-orange-200',
   medium: 'bg-blue-100 text-blue-800 border-blue-200',
-  low: 'bg-gray-100 text-gray-800 border-gray-200',
+  low: 'bg-gray-100 text-foreground border-border',
 };
 
 function formatFileSize(bytes: number | null): string {
@@ -160,7 +160,7 @@ function getActivityIcon(type: string): React.ReactNode {
     case 'evidence_uploaded': return <Paperclip className="h-4 w-4 text-green-500" />;
     case 'nudge': return <Send className="h-4 w-4 text-amber-500" />;
     case 'escalation': return <AlertCircle className="h-4 w-4 text-red-500" />;
-    default: return <History className="h-4 w-4 text-gray-500" />;
+    default: return <History className="h-4 w-4 text-muted-foreground" />;
   }
 }
 
@@ -357,13 +357,13 @@ export function TaskDetailDialog({
           {/* Details Tab */}
           <TabsContent value="details" className="space-y-4 mt-4">
             {/* Status & Actions */}
-            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+            <div className="flex items-center justify-between p-4 bg-background rounded-lg">
               <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-gray-600">Status:</span>
+                <span className="text-sm font-medium text-muted-foreground">Status:</span>
                 <Badge variant="outline" className={cn(
                   displayStatus === 'completed' && 'bg-green-100 text-green-800',
                   displayStatus === 'in_progress' && 'bg-blue-100 text-blue-800',
-                  displayStatus === 'pending' && 'bg-gray-100 text-gray-800',
+                  displayStatus === 'pending' && 'bg-gray-100 text-foreground',
                   displayStatus === 'overdue' && 'bg-red-100 text-red-800',
                 )}>
                   {statusLabels[displayStatus] || displayStatus}
@@ -410,8 +410,8 @@ export function TaskDetailDialog({
             {/* Task Info Grid */}
             <div className="grid grid-cols-2 gap-4">
               {/* Assigned To */}
-              <div className="p-3 bg-gray-50 rounded-lg">
-                <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+              <div className="p-3 bg-background rounded-lg">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
                   <UserIcon className="h-4 w-4" />
                   Assigned To
                 </div>
@@ -423,13 +423,13 @@ export function TaskDetailDialog({
                     : task.assignedRole || 'Unassigned'}
                 </div>
                 {task.assignedUser?.email && (
-                  <div className="text-xs text-gray-500">{task.assignedUser.email}</div>
+                  <div className="text-xs text-muted-foreground">{task.assignedUser.email}</div>
                 )}
               </div>
 
               {/* Due Date */}
-              <div className="p-3 bg-gray-50 rounded-lg">
-                <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+              <div className="p-3 bg-background rounded-lg">
+                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
                   <Calendar className="h-4 w-4" />
                   Due Date
                 </div>
@@ -548,7 +548,7 @@ export function TaskDetailDialog({
                       disabled={isUploading}
                       className="mt-1"
                     />
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                       Max file size: 10MB. Supported: PDF, DOC, DOCX, XLS, XLSX, PNG, JPG, GIF
                     </p>
                   </div>
@@ -623,25 +623,25 @@ export function TaskDetailDialog({
 
             {/* Evidence List */}
             <div className="border rounded-lg">
-              <div className="p-3 border-b bg-gray-50">
+              <div className="p-3 border-b bg-background">
                 <h4 className="font-medium">Uploaded Evidence</h4>
               </div>
               
               {evidenceLoading ? (
                 <div className="p-8 text-center">
-                  <Loader2 className="h-6 w-6 animate-spin mx-auto text-gray-400" />
+                  <Loader2 className="h-6 w-6 animate-spin mx-auto text-muted-foreground" />
                 </div>
               ) : evidence && evidence.length > 0 ? (
                 <div className="divide-y">
                   {evidence.map((item) => (
-                    <div key={item.id} className="p-3 flex items-center gap-3 hover:bg-gray-50">
+                    <div key={item.id} className="p-3 flex items-center gap-3 hover:bg-background">
                       <div className="p-2 bg-gray-100 rounded">
                         {item.linkUrl ? (
                           <LinkIcon className="h-5 w-5 text-blue-600" />
                         ) : item.fileType?.startsWith('image/') ? (
                           <Image className="h-5 w-5 text-purple-600" />
                         ) : (
-                          <FileText className="h-5 w-5 text-gray-600" />
+                          <FileText className="h-5 w-5 text-muted-foreground" />
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
@@ -649,9 +649,9 @@ export function TaskDetailDialog({
                           {item.linkTitle || item.fileName}
                         </div>
                         {item.description && (
-                          <div className="text-xs text-gray-500 truncate">{item.description}</div>
+                          <div className="text-xs text-muted-foreground truncate">{item.description}</div>
                         )}
-                        <div className="text-xs text-gray-400">
+                        <div className="text-xs text-muted-foreground">
                           {item.uploadedByUser && (
                             <span>
                               {item.uploadedByUser.firstName && item.uploadedByUser.lastName
@@ -701,7 +701,7 @@ export function TaskDetailDialog({
                   ))}
                 </div>
               ) : (
-                <div className="p-8 text-center text-gray-500">
+                <div className="p-8 text-center text-muted-foreground">
                   <Paperclip className="h-8 w-8 mx-auto mb-2 text-gray-300" />
                   <p>No evidence uploaded yet</p>
                 </div>
@@ -734,13 +734,13 @@ export function TaskDetailDialog({
 
             {/* Activity List */}
             <div className="border rounded-lg">
-              <div className="p-3 border-b bg-gray-50">
+              <div className="p-3 border-b bg-background">
                 <h4 className="font-medium">Activity Log</h4>
               </div>
               
               {activityLoading ? (
                 <div className="p-8 text-center">
-                  <Loader2 className="h-6 w-6 animate-spin mx-auto text-gray-400" />
+                  <Loader2 className="h-6 w-6 animate-spin mx-auto text-muted-foreground" />
                 </div>
               ) : activity && activity.length > 0 ? (
                 <div className="divide-y">
@@ -768,9 +768,9 @@ export function TaskDetailDialog({
                           {item.activityType === 'escalation' && 'escalated this task'}
                         </div>
                         {item.content && (
-                          <p className="text-sm text-gray-600 mt-1 whitespace-pre-wrap">{item.content}</p>
+                          <p className="text-sm text-muted-foreground mt-1 whitespace-pre-wrap">{item.content}</p>
                         )}
-                        <div className="text-xs text-gray-400 mt-1">
+                        <div className="text-xs text-muted-foreground mt-1">
                           {format(new Date(item.createdAt), "MMM d, yyyy 'at' h:mm a")}
                         </div>
                       </div>
@@ -778,7 +778,7 @@ export function TaskDetailDialog({
                   ))}
                 </div>
               ) : (
-                <div className="p-8 text-center text-gray-500">
+                <div className="p-8 text-center text-muted-foreground">
                   <History className="h-8 w-8 mx-auto mb-2 text-gray-300" />
                   <p>No activity yet</p>
                 </div>

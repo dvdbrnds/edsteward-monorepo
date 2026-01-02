@@ -314,7 +314,7 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
                 <div className="space-y-4">
                   <div className="prose max-w-none">
                     <h3>Review Requirements</h3>
-                    <div className="bg-white p-4 rounded-md border">
+                    <div className="bg-card p-4 rounded-md border">
                       {regulation.requirements?.split('\n').map((req, index) => (
                         <div key={index} className="flex items-start gap-2 mb-2">
                           <div className="h-6 w-6 rounded-full border flex items-center justify-center shrink-0">

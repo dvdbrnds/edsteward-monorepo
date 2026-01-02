@@ -157,7 +157,7 @@ export default function CustomPieChart({
                 key={`legend-${index}`} 
                 className={`
                   flex items-center rounded px-2 py-1 transition-colors
-                  ${activeFilter === entry.name ? 'bg-gray-100 font-medium' : 'hover:bg-gray-50'}
+                  ${activeFilter === entry.name ? 'bg-gray-100 font-medium' : 'hover:bg-background'}
                   cursor-pointer
                 `}
                 onClick={() => onSegmentClick(entry.name)}

@@ -101,7 +101,7 @@ export default function TenantSelector({ onTenantSelect, userEmail }: TenantSele
       case 'active': return 'bg-green-100 text-green-800';
       case 'setup': return 'bg-yellow-100 text-yellow-800';
       case 'maintenance': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      default: return 'bg-gray-100 text-foreground';
     }
   };
 
@@ -163,7 +163,7 @@ export default function TenantSelector({ onTenantSelect, userEmail }: TenantSele
             className={`cursor-pointer transition-all hover:shadow-md ${
               selectedTenant?.id === tenant.id
                 ? 'ring-2 ring-blue-500 border-blue-200'
-                : 'hover:border-gray-300'
+                : 'hover:border-border'
             }`}
             onClick={() => handleTenantSelect(tenant)}
           >

@@ -149,9 +149,9 @@ export default function TenantManagementDashboard() {
     switch (status) {
       case 'active': return 'bg-green-100 text-green-800';
       case 'setup': return 'bg-yellow-100 text-yellow-800';
-      case 'inactive': return 'bg-gray-100 text-gray-800';
+      case 'inactive': return 'bg-gray-100 text-foreground';
       case 'suspended': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      default: return 'bg-gray-100 text-foreground';
     }
   };
 
@@ -160,8 +160,8 @@ export default function TenantManagementDashboard() {
       case 'active': return 'bg-green-100 text-green-800';
       case 'trial': return 'bg-blue-100 text-blue-800';
       case 'overdue': return 'bg-red-100 text-red-800';
-      case 'cancelled': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'cancelled': return 'bg-gray-100 text-foreground';
+      default: return 'bg-gray-100 text-foreground';
     }
   };
 

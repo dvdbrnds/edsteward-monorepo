@@ -61,7 +61,7 @@ export function EnhancedJurisdictionFilter({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Jurisdiction Source Filter - WHERE the regulation comes from */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Regulation Source
             </label>
             <Select value={jurisdictionSourceFilter} onValueChange={setJurisdictionSourceFilter}>
@@ -77,14 +77,14 @@ export function EnhancedJurisdictionFilter({
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               Filter by the source/origin of the regulation
             </p>
           </div>
 
           {/* Institution Type Filter - WHO the regulation applies to */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Applies To
             </label>
             <Select value={institutionTypeFilter} onValueChange={setInstitutionTypeFilter}>
@@ -100,7 +100,7 @@ export function EnhancedJurisdictionFilter({
                 ))}
               </SelectContent>
             </Select>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-muted-foreground mt-1">
               Filter by the type of institutions this regulation affects
             </p>
           </div>
