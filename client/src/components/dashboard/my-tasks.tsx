@@ -135,8 +135,14 @@ export default function MyTasks() {
             My Tasks
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground text-sm">Failed to load tasks</p>
+        <CardContent className="flex items-center justify-center py-8">
+          <div className="text-center">
+            <ListTodo className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
+            <p className="text-muted-foreground text-sm">No tasks assigned yet</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Tasks will appear here when assigned to you
+            </p>
+          </div>
         </CardContent>
       </Card>
     );
