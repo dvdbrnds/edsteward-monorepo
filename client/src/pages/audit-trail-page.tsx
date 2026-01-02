@@ -12,8 +12,9 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Search, Filter, Download, Eye, Clock, User, FileText } from 'lucide-react';
+import { Search, Filter, Download, Eye, Clock, User, FileText, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
+import { useToast } from '@/hooks/use-toast';
 
 interface AuditLog {
   id: number;
@@ -45,11 +46,50 @@ interface AuditQueryParams {
 }
 
 export default function AuditTrailPage() {
+  const { toast } = useToast();
   const [queryParams, setQueryParams] = useState<AuditQueryParams>({
     limit: 50,
     offset: 0
   });
   const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null);
+  const [isExporting, setIsExporting] = useState(false);
+
+  // Export compliance report as CSV
+  const handleExportCSV = async () => {
+    setIsExporting(true);
+    try {
+      const response = await fetch('/api/audit/compliance-report?format=csv', {
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to export report');
+      }
+      
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `compliance-audit-report-${format(new Date(), 'yyyy-MM-dd')}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      toast({
+        title: 'Export Complete',
+        description: 'Compliance audit report has been downloaded.',
+      });
+    } catch (error) {
+      toast({
+        title: 'Export Failed',
+        description: error instanceof Error ? error.message : 'Failed to export report',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   // Fetch audit logs
   const { data: auditData, isLoading, error, refetch } = useQuery({
@@ -129,9 +169,18 @@ export default function AuditTrailPage() {
           <h1 className="text-3xl font-bold">Audit Trail</h1>
           <p className="text-gray-600">Monitor compliance actions and system changes</p>
         </div>
-        <Button variant="outline" className="gap-2">
-          <Download className="h-4 w-4" />
-          Export Report
+        <Button 
+          variant="outline" 
+          className="gap-2"
+          onClick={handleExportCSV}
+          disabled={isExporting}
+        >
+          {isExporting ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Download className="h-4 w-4" />
+          )}
+          {isExporting ? 'Exporting...' : 'Export Report'}
         </Button>
       </div>
 
