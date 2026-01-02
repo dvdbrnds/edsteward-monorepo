@@ -7,6 +7,7 @@ import UpcomingDeadlines from "@/components/dashboard/upcoming-deadlines";
 import DashboardStats from "@/components/dashboard/dashboard-stats";
 import ExecutiveDashboard from "@/components/dashboard/executive-dashboard";
 import MyTasks from "@/components/dashboard/my-tasks";
+import PendingAttestations from "@/components/dashboard/pending-attestations";
 import RegulationList from "@/components/regulations/regulation-list";
 import { AppliesToFilter } from "@/components/filters/applies-to-filter";
 import { useState, useEffect } from "react";
@@ -84,9 +85,12 @@ export default function HomePage() {
             <DashboardStats />
           </div>
 
-          <div className="grid grid-cols-1 gap-8 lg:grid-cols-3 mb-8 items-stretch">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8 items-stretch">
             {/* My Tasks - Most important for compliance officers */}
             <MyTasks />
+            
+            {/* Pending Attestations - Quick action for attestation requests */}
+            <PendingAttestations />
             
             {/* Compliance Overview */}
             <ComplianceOverview
