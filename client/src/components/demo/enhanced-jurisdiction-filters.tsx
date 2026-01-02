@@ -165,7 +165,7 @@ export function DemoUsage() {
     jurisdictionSource: string;
     institutionType: string;
   }) => {
-    console.log("Filters changed:", newFilters);
+    
     // This would trigger a re-fetch of regulations with the new filters
   };
 

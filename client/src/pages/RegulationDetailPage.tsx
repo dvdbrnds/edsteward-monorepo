@@ -248,8 +248,8 @@ function RegulationDetailPage() {
     }
   }, [complianceTasks]);
 
-  console.log("Regulation data:", regulation);
-  console.log("User role:", user?.role, "isAdmin:", isAdmin);
+  
+  
   
   // Check if regulation exists 
   const hasRegulation = regulation != null;
@@ -259,7 +259,7 @@ function RegulationDetailPage() {
   const isOwner = regulation?.isOwner || false;
   const isRegulationAdmin = isAdmin || isOwner;
   
-  console.log("Primary DRI check:", { isOwner, isRegulationAdmin, ownerId: regulation?.ownerId });
+  
   
   // Ensure actions is always available (initialize if missing)
   const actions = regulation?.actions || [];
@@ -268,12 +268,7 @@ function RegulationDetailPage() {
   const categoryVisible = isAdmin && hasRegulation; // Category changes still require global admin
   // Note: notificationOverrideVisible removed - now using NotificationOverrideControl component
   
-  console.log("Admin tools visibility check:", { 
-    hasRegulation, 
-    isAdmin, 
-    categoryVisible,
-    actionsLength: actions.length
-  });
+  
 
   // Note: overrideForm and overrideMutation moved to NotificationOverrideControl component
 
@@ -285,7 +280,7 @@ function RegulationDetailPage() {
 
   const categoryMutation = useMutation({
     mutationFn: async (category: string) => {
-      console.log('Updating category for regulation:', regulation?.id, 'to:', category);
+      
       
       if (!regulation?.id) {
         throw new Error('No regulation ID available');

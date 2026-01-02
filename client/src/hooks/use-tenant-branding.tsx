@@ -60,7 +60,7 @@ export function useTenantBranding(): TenantBranding {
         
         if (tenantId && TENANT_BRANDING[tenantId]) {
           setBranding(TENANT_BRANDING[tenantId]);
-          console.log('🎨 Branding detected for tenant:', tenantId);
+          
         } else {
           // Fallback to hostname detection
           const hostname = window.location.hostname;
@@ -99,7 +99,7 @@ export function useTenantBranding(): TenantBranding {
       // Add timestamp to force browser to reload favicon
       const timestamp = new Date().getTime();
       favicon.href = `${branding.favicon}?v=${timestamp}`;
-      console.log('🎨 Updated favicon to:', favicon.href);
+      
     } else {
       // Create favicon link if it doesn't exist
       const newFavicon = document.createElement('link');
@@ -109,7 +109,7 @@ export function useTenantBranding(): TenantBranding {
       const timestamp = new Date().getTime();
       newFavicon.href = `${branding.favicon}?v=${timestamp}`;
       document.head.appendChild(newFavicon);
-      console.log('🎨 Created new favicon:', newFavicon.href);
+      
     }
     
     // Update CSS custom properties for theming
@@ -117,7 +117,7 @@ export function useTenantBranding(): TenantBranding {
     document.documentElement.style.setProperty('--tenant-secondary', branding.secondaryColor);
     document.documentElement.style.setProperty('--tenant-accent', branding.accentColor);
     
-    console.log('🎨 Applied branding:', branding.name, 'favicon:', branding.favicon);
+    
   }, [branding]);
 
   return branding;

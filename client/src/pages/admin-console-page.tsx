@@ -104,28 +104,28 @@ export default function AdminConsolePage() {
   };
 
   const handleManageTenant = (tenantId: string) => {
-    console.log(`Managing tenant: ${tenantId}`);
+    
     // In a real implementation, this would open a tenant management modal or navigate to a tenant detail page
     alert(`Tenant management for ${tenantId} - Feature coming soon!`);
   };
 
   const handleAddNewTenant = () => {
-    console.log('Adding new tenant');
+    
     alert('Add New Tenant - Feature coming soon!');
   };
 
   const handleAddUser = () => {
-    console.log('Adding new user');
+    
     alert('Add User - Feature coming soon!');
   };
 
   const handleViewUsers = (tenantId: string) => {
-    console.log(`Viewing users for tenant: ${tenantId}`);
+    
     alert(`View users for ${tenantId} - Feature coming soon!`);
   };
 
   const handleQuickAction = (action: string) => {
-    console.log(`Quick action: ${action}`);
+    
     switch (action) {
       case 'manage-users':
         alert('Manage Users - Feature coming soon!');

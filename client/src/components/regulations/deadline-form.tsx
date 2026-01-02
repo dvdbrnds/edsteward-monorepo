@@ -68,7 +68,7 @@ export default function DeadlineForm({ regulationId, onSubmit, initialData, onCa
       assignedTo: data.assignedTo || 1
     };
 
-    console.log('Submitting deadline data from form:', deadlineData);
+    
     onSubmit(deadlineData);
   };
 

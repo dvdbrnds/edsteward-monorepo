@@ -216,7 +216,7 @@ const getCongressUrl = (statute: string): string | null => {
   if (!statute) return null;
 
   try {
-    console.log('Processing statute:', statute);
+    
 
     // Check for common acts first using the lookup table from congress-gov-links.md
     const commonActs: Record<string, string> = {
@@ -262,7 +262,7 @@ const getCongressUrl = (statute: string): string | null => {
       return `https://www.congress.gov/public-laws/${cleanCongress}th-congress/public-law/${cleanLawNumber}`;
     }
 
-    console.log('No matching citation pattern found for statute:', statute);
+    
     return null;
   } catch (error) {
     console.error('Error processing statute citation:', error);

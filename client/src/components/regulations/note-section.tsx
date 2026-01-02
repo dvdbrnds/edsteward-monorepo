@@ -185,7 +185,7 @@ export function NoteSection({ regulationId, initialData }: NoteSectionProps) {
 
       // Log raw response for debugging
       const responseText = await response.text();
-      console.log('Raw server response:', responseText);
+      
 
       let responseData;
       try {

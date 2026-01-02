@@ -374,7 +374,7 @@ These requirements apply to all educational institutions receiving federal fundi
         throw new Error(`Failed to approve update: ${response.status} ${errorData.error || response.statusText}`);
       }
       
-      console.log('✅ Update approved successfully');
+      
       
       // Redirect to success page or list
       setLocation('/regulations/updates');
@@ -414,7 +414,7 @@ These requirements apply to all educational institutions receiving federal fundi
         throw new Error(`Failed to reject update: ${response.status} ${errorData.error || response.statusText}`);
       }
       
-      console.log('✅ Update rejected successfully');
+      
       
       // Redirect to list
       setLocation('/regulations/updates');

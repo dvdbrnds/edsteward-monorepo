@@ -104,7 +104,7 @@ function getStatusIcon(status: string) {
 
 export default function TrusteesDashboard() {
   // DEBUG: Log component render to verify this component is actually being used
-  console.log('🔍 [TRUSTEES-DASHBOARD] Component is rendering - this should appear in browser console');
+  
   
   // Simple state management - no complex hooks
   const [regulations, setRegulations] = useState<Regulation[]>([]);

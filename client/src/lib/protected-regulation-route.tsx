@@ -15,15 +15,11 @@ export function ProtectedRegulationRoute({
   path,
   component: Component,
 }: ProtectedRegulationRouteProps) {
-  console.log('[ProtectedRegulationRoute] Initializing with path:', path);
+  
 
   const { user, isLoading: authLoading } = useAuth();
 
-  console.log('[ProtectedRegulationRoute] Current state:', {
-    path,
-    hasUser: !!user,
-    isAuthLoading: authLoading
-  });
+  
 
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
@@ -32,13 +28,10 @@ export function ProtectedRegulationRoute({
   return (
     <Route path={path}>
       {(params: { id?: string }) => {
-        console.log('[ProtectedRegulationRoute] Route matched with params:', params);
+        
 
         if (authLoading || regulationsLoading) {
-          console.log('[ProtectedRegulationRoute] Loading state:', {
-            authLoading,
-            regulationsLoading
-          });
+          
 
           return (
             <div className="flex items-center justify-center min-h-screen">
@@ -48,7 +41,7 @@ export function ProtectedRegulationRoute({
         }
 
         if (!user) {
-          console.log('[ProtectedRegulationRoute] No user, redirecting to auth');
+          
           return <Redirect to="/auth" />;
         }
 
@@ -64,11 +57,11 @@ export function ProtectedRegulationRoute({
         });
 
         if (!regulation) {
-          console.log('[ProtectedRegulationRoute] Regulation not found, redirecting');
+          
           return <Redirect to="/regulations" />;
         }
 
-        console.log('[ProtectedRegulationRoute] Rendering regulation component');
+        
         return (
           <ErrorBoundary>
             <Component regulation={regulation} />

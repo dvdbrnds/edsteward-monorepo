@@ -46,7 +46,7 @@ export function BugReportButton() {
   const onSubmit = async (data: BugReport) => {
     try {
       setIsSubmitting(true);
-      console.log("Submitting bug report:", { location, comments: data.comments });
+      
 
       // Store the current location and form data
       localStorage.setItem('bugReport_returnTo', location);
@@ -93,7 +93,7 @@ export function BugReportButton() {
       });
 
       const result = await response.json().catch(() => ({ error: "Failed to parse server response" }));
-      console.log("Bug report submission response:", result);
+      
 
       if (!response.ok) {
         const errorMessage = result.error 

@@ -57,11 +57,11 @@ export const AppliesToTags: React.FC<AppliesToTagsProps> = ({
   maxDisplay = 5
 }) => {
   // Debug logging
-  console.log('[APPLIES-TO-TAGS] Component rendering with data:', applicableInstitutions);
+  
 
   // Handle null, undefined, or empty arrays
   if (!applicableInstitutions || applicableInstitutions.length === 0) {
-    console.log('[APPLIES-TO-TAGS] No applicable institutions found, showing fallback');
+    
     return showLabel ? (
       <div className={`flex items-center gap-2 ${className}`}>
         <span className="text-sm font-medium text-muted-foreground">Applies to:</span>
@@ -77,14 +77,14 @@ export const AppliesToTags: React.FC<AppliesToTagsProps> = ({
     INSTITUTION_TYPES.includes(type)
   );
   
-  console.log('[APPLIES-TO-TAGS] Valid types:', validTypes);
+  
   
   const displayTypes = validTypes.slice(0, maxDisplay);
   const remainingCount = validTypes.length - maxDisplay;
   
   // If "all-institutions" is present, show only that
   if (validTypes.includes('all-institutions')) {
-    console.log('[APPLIES-TO-TAGS] Showing all-institutions tag');
+    
     return (
       <div className={`flex items-center gap-2 ${className}`}>
         {showLabel && (
@@ -99,7 +99,7 @@ export const AppliesToTags: React.FC<AppliesToTagsProps> = ({
     );
   }
 
-  console.log('[APPLIES-TO-TAGS] Showing individual institution tags');
+  
   return (
     <div className={`flex items-center gap-2 flex-wrap ${className}`}>
       {showLabel && (

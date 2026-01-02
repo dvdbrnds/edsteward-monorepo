@@ -131,14 +131,14 @@ export function useWebSocket(options: WebSocketHookOptions = {}) {
           // MCP Engine connection confirmation
           const connEvent = message as MCPConnectionEvent;
           setClientId(connEvent.clientId);
-          console.log('Connected to MCP Engine with client ID:', connEvent.clientId);
+          
           break;
         }
         case 'subscription_confirmed': {
           // MCP Engine subscription confirmation
           const subEvent = message as MCPSubscriptionEvent;
           setSubscribedRegulations(subEvent.regulationIds);
-          console.log('Subscribed to regulations:', subEvent.regulationIds);
+          
           break;
         }
         case 'pong':
@@ -153,7 +153,7 @@ export function useWebSocket(options: WebSocketHookOptions = {}) {
           });
           break;
         default:
-          console.log('Unknown WebSocket message type:', message.type);
+          
       }
     } catch (error) {
       console.error('Failed to parse WebSocket message:', error);
@@ -162,7 +162,7 @@ export function useWebSocket(options: WebSocketHookOptions = {}) {
 
   const connect = useCallback(async () => {
     if (!wsUrl) {
-      console.log('WebSocket connection skipped: no URL configured');
+      
       setConnectionState('disconnected');
       return;
     }
@@ -170,7 +170,7 @@ export function useWebSocket(options: WebSocketHookOptions = {}) {
     // For MCP Engine, we don't require authentication
     if (useMCPEngine || !isAuthenticated) {
       if (!useMCPEngine && !isAuthenticated) {
-        console.log('WebSocket connection skipped: not authenticated');
+        
         setConnectionState('disconnected');
         return;
       }
@@ -208,7 +208,7 @@ export function useWebSocket(options: WebSocketHookOptions = {}) {
         startHeartbeat();
         
         if (useMCPEngine) {
-          console.log('Connected to MCP Engine');
+          
           // Subscribe to all regulations (you can make this configurable)
           const subscribeMessage = {
             type: 'subscribe',
@@ -216,7 +216,7 @@ export function useWebSocket(options: WebSocketHookOptions = {}) {
           };
           ws.send(JSON.stringify(subscribeMessage));
         } else {
-          console.log('WebSocket connected to internal server');
+          
         }
       };
 
@@ -227,7 +227,7 @@ export function useWebSocket(options: WebSocketHookOptions = {}) {
         cleanup();
         
         if (!event.wasClean && reconnectCount < reconnectAttempts) {
-          console.log(`WebSocket closed unexpectedly. Reconnecting in ${reconnectDelay}ms...`);
+          
           reconnectTimeoutRef.current = setTimeout(() => {
             setReconnectCount(prev => prev + 1);
             connect();

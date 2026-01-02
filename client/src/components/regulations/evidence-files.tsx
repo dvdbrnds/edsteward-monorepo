@@ -58,14 +58,14 @@ export function EvidenceFiles({ regulationId }: EvidenceFilesProps) {
     queryKey: ['/api/regulations', regulationId, 'evidence'],
     queryFn: async () => {
       try {
-        console.log('Fetching evidence files for regulation:', regulationId);
+        
         const response = await fetch(`/api/regulations/${regulationId}/evidence`);
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.error || 'Failed to fetch evidence files');
         }
         const data = await response.json();
-        console.log('Evidence files data:', data);
+        
         return data as EvidenceFile[];
       } catch (err) {
         console.error('Error fetching evidence files:', err);

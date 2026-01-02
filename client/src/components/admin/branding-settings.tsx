@@ -16,22 +16,17 @@ import { Palette, Upload, Eye, Monitor, Smartphone, Save, AlertCircle, CheckCirc
 
 // Utility function to generate favicon from logo
 const generateFaviconFromLogo = (logoFile: File): Promise<File> => {
-  console.log('🚀 FAVICON: Starting favicon generation from logo:', logoFile.name);
+  
   
   return new Promise((resolve, reject) => {
-    console.log('🚀 FAVICON: Creating Image object...');
+    
     const img = new Image();
     
     img.onload = () => {
-      console.log('🚀 FAVICON: Image loaded successfully:', {
-        width: img.width,
-        height: img.height,
-        naturalWidth: img.naturalWidth,
-        naturalHeight: img.naturalHeight
-      });
+      
       
       try {
-        console.log('🚀 FAVICON: Creating canvas for favicon generation...');
+        
         // Create canvas for favicon generation
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
@@ -42,13 +37,13 @@ const generateFaviconFromLogo = (logoFile: File): Promise<File> => {
           return;
         }
 
-        console.log('🚀 FAVICON: Canvas context created successfully');
+        
 
         // Set favicon size (32x32 is a good standard)
         const size = 32;
         canvas.width = size;
         canvas.height = size;
-        console.log(`🚀 FAVICON: Canvas size set to ${size}x${size}`);
+        
 
         // Fill with transparent background
         ctx.clearRect(0, 0, size, size);
@@ -60,23 +55,17 @@ const generateFaviconFromLogo = (logoFile: File): Promise<File> => {
         const x = (size - scaledWidth) / 2;
         const y = (size - scaledHeight) / 2;
 
-        console.log('🚀 FAVICON: Scaling calculations:', {
-          scale,
-          scaledWidth,
-          scaledHeight,
-          x,
-          y
-        });
+        
 
         // Draw the logo centered and scaled
-        console.log('🚀 FAVICON: Drawing image on canvas...');
+        
         ctx.drawImage(img, x, y, scaledWidth, scaledHeight);
-        console.log('🚀 FAVICON: Image drawn successfully');
+        
 
         // Convert to blob and then to File
-        console.log('🚀 FAVICON: Converting canvas to blob...');
+        
         canvas.toBlob((blob) => {
-          console.log('🚀 FAVICON: Canvas.toBlob callback called, blob:', blob);
+          
           
           if (blob) {
             const faviconFile = new File([blob], 'favicon.png', { type: 'image/png' });
@@ -103,9 +92,9 @@ const generateFaviconFromLogo = (logoFile: File): Promise<File> => {
       reject(new Error('Failed to load logo image'));
     };
     
-    console.log('🚀 FAVICON: Setting image src with object URL...');
+    
     img.src = URL.createObjectURL(logoFile);
-    console.log('🚀 FAVICON: Object URL set:', img.src);
+    
   });
 };
 
@@ -144,20 +133,20 @@ const FileUploadField: React.FC<{
   const [isProcessing, setIsProcessing] = useState(false);
 
   useEffect(() => {
-    console.log(`🔄 FILEUPLOAD: ${type} currentUrl changed from ${previewUrl} to ${currentUrl}`);
+    
     setPreviewUrl(currentUrl || '');
   }, [currentUrl, type]);
 
   // Force update when currentUrl changes - this ensures UI updates immediately
   useEffect(() => {
     if (currentUrl && currentUrl !== previewUrl) {
-      console.log(`🔄 FORCE UPDATE: ${type} forcing preview update to ${currentUrl}`);
+      
       setPreviewUrl(currentUrl);
     }
   }, [currentUrl, type]);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(`🚀 UPLOAD: handleFileChange triggered for ${type}`);
+    
     const file = e.target.files?.[0];
     console.log('🚀 UPLOAD: Selected file:', file ? { 
       name: file.name, 
@@ -166,33 +155,33 @@ const FileUploadField: React.FC<{
     } : 'No file');
     
     if (file) {
-      console.log(`🚀 UPLOAD: Setting processing state to true for ${type}`);
+      
       setIsProcessing(true);
       
       // Create preview URL immediately
-      console.log('🚀 UPLOAD: Creating preview URL...');
+      
       const objectUrl = URL.createObjectURL(file);
-      console.log('🚀 UPLOAD: Preview URL created:', objectUrl);
+      
       setPreviewUrl(objectUrl);
       
       try {
-        console.log(`🚀 UPLOAD: Calling onFileSelect callback for ${type}...`);
-        console.log(`🚀 UPLOAD: onFileSelect function:`, onFileSelect);
+        
+        
         
         // Call the file selection handler
         const result = onFileSelect(file);
-        console.log(`🚀 UPLOAD: onFileSelect returned:`, result);
+        
         
         // Handle both sync and async results
         if (result instanceof Promise) {
-          console.log(`🚀 UPLOAD: Awaiting promise result for ${type}...`);
+          
           await result;
-          console.log(`🚀 UPLOAD: Promise resolved for ${type}`);
+          
         } else {
-          console.log(`🚀 UPLOAD: Synchronous result for ${type}`);
+          
         }
         
-        console.log(`✅ UPLOAD: ${type} file processed successfully:`, file.name);
+        
       } catch (error) {
         console.error(`❌ UPLOAD: Failed to process ${type} file:`, error);
         console.error(`❌ UPLOAD: Error details:`, {
@@ -200,11 +189,11 @@ const FileUploadField: React.FC<{
           stack: error instanceof Error ? error.stack : undefined
         });
       } finally {
-        console.log(`🚀 UPLOAD: Setting processing state to false for ${type}`);
+        
         setIsProcessing(false);
       }
     } else {
-      console.log(`🚀 UPLOAD: No file selected for ${type}`);
+      
     }
   };
 
@@ -240,9 +229,9 @@ const FileUploadField: React.FC<{
               : 'border-border hover:border-gray-400'
           }`}
           onClick={() => {
-            console.log('🖱️ Upload area clicked, processing:', isProcessing);
+            
             if (!isProcessing) {
-              console.log('📁 Triggering file input click');
+              
               fileInputRef.current?.click();
             }
           }}
@@ -294,8 +283,8 @@ const FileUploadField: React.FC<{
                   }}
                   onLoad={(e) => {
                     const img = e.target as HTMLImageElement;
-                    console.log('✅ PREVIEW: Favicon preview loaded successfully:', previewUrl);
-                    console.log('✅ PREVIEW: Favicon dimensions:', img.naturalWidth, 'x', img.naturalHeight);
+                    
+                    
                   }}
                 />
               </div>
@@ -317,8 +306,8 @@ const FileUploadField: React.FC<{
                   }}
                   onLoad={(e) => {
                     const img = e.target as HTMLImageElement;
-                    console.log('✅ PREVIEW: Logo preview loaded successfully:', previewUrl);
-                    console.log('✅ PREVIEW: Image dimensions:', img.naturalWidth, 'x', img.naturalHeight);
+                    
+                    
                   }}
                 />
               </div>
@@ -611,15 +600,15 @@ export function BrandingSettingsV2({ onConfigUpdate }: BrandingSettingsProps) {
       return await apiRequest("POST", "/api/admin/branding", data);
     },
     onSuccess: (response) => {
-      console.log('🎨 Branding save successful, updating cache immediately:', response.branding);
-      console.log('🔄 SAVE SUCCESS: Server returned logoUrl:', response.branding.logoUrl);
+      
+      
       console.log('🔄 SAVE SUCCESS: Current form logoUrl before update:', form.watch('logoUrl'));
       
       // CRITICAL: Update form values with server response FIRST
-      console.log('🔄 SAVE SUCCESS: Updating form with server response...');
+      
       form.setValue('logoUrl', response.branding.logoUrl, { shouldDirty: false });
       form.setValue('faviconUrl', response.branding.faviconUrl, { shouldDirty: false });
-      console.log('🔄 SAVE SUCCESS: Form updated - logoUrl:', response.branding.logoUrl);
+      
       console.log('🔄 SAVE SUCCESS: Form logoUrl after setValue:', form.watch('logoUrl'));
       
       // Then update cache with saved data
@@ -627,11 +616,11 @@ export function BrandingSettingsV2({ onConfigUpdate }: BrandingSettingsProps) {
       queryClient.setQueryData(["/api/admin/branding"], { success: true, branding: response.branding });
       
       // Force refetch to ensure navigation updates
-      console.log('🔄 SAVE SUCCESS: About to refetch branding queries...');
+      
       queryClient.refetchQueries({ queryKey: ["/api/branding"], type: 'active' });
       queryClient.refetchQueries({ queryKey: ["/api/admin/branding"], type: 'active' });
       
-      console.log('🔄 Cache updated and refetch forced for branding data');
+      
       console.log('🔄 SAVE SUCCESS: Final form logoUrl after all operations:', form.watch('logoUrl'));
       
       toast({
@@ -653,7 +642,7 @@ export function BrandingSettingsV2({ onConfigUpdate }: BrandingSettingsProps) {
       });
       
       // On error, don't reset form state - keep the uploaded values
-      console.log('🔄 SAVE ERROR: Keeping form state due to save failure');
+      
     }
   });
 
@@ -668,32 +657,32 @@ export function BrandingSettingsV2({ onConfigUpdate }: BrandingSettingsProps) {
       size: `${(file.size / 1024).toFixed(1)}KB`
     });
     
-    console.log(`🚀 HANDLE: Current pendingFiles state:`, pendingFiles);
+    
     
     // IMMEDIATE UPLOAD: Upload the file immediately instead of waiting for form save
     try {
-      console.log(`🚀 IMMEDIATE: Starting immediate upload for ${type}...`);
+      
       
       const uploadResponse = await uploadMutation.mutateAsync({ [type]: file });
-      console.log(`✅ IMMEDIATE: ${type} uploaded successfully:`, uploadResponse);
+      
       
       // Update form with the new URL immediately
       if (type === 'logo' && uploadResponse.assets.logoUrl) {
         form.setValue('logoUrl', uploadResponse.assets.logoUrl, { shouldDirty: true });
-        console.log(`🔄 IMMEDIATE: Updated form logoUrl to:`, uploadResponse.assets.logoUrl);
+        
       }
       if (type === 'favicon' && uploadResponse.assets.faviconUrl) {
         form.setValue('faviconUrl', uploadResponse.assets.faviconUrl, { shouldDirty: true });
-        console.log(`🔄 IMMEDIATE: Updated form faviconUrl to:`, uploadResponse.assets.faviconUrl);
+        
       }
       
       // Force cache invalidation immediately
-      console.log(`🔄 IMMEDIATE: Invalidating branding cache...`);
+      
       queryClient.invalidateQueries({ queryKey: ["/api/branding"] });
       queryClient.refetchQueries({ queryKey: ["/api/branding"], type: 'active' });
       
       // Also invalidate the public branding endpoint used by navigation
-      console.log(`🔄 IMMEDIATE: Invalidating public branding cache...`);
+      
       queryClient.invalidateQueries({ queryKey: ["/api/branding/public"] });
       queryClient.refetchQueries({ queryKey: ["/api/branding/public"], type: 'active' });
       
@@ -701,16 +690,16 @@ export function BrandingSettingsV2({ onConfigUpdate }: BrandingSettingsProps) {
       setPendingFiles(prev => {
         const newState = { ...prev };
         delete newState[type];
-        console.log(`🚀 IMMEDIATE: Cleared ${type} from pendingFiles:`, newState);
+        
         return newState;
       });
       
       // Force hasChanges to true since we just uploaded a file
-      console.log(`🔄 IMMEDIATE: Setting hasChanges to true after successful upload`);
+      
       setHasChanges(true);
       
       // Mark that files have been uploaded to enable save button persistently
-      console.log(`🔄 IMMEDIATE: Setting hasUploadedFiles to true to enable save button`);
+      
       setHasUploadedFiles(true);
       
     } catch (error) {
@@ -718,14 +707,14 @@ export function BrandingSettingsV2({ onConfigUpdate }: BrandingSettingsProps) {
       // Fall back to pending files approach
       setPendingFiles(prev => {
         const newState = { ...prev, [type]: file };
-        console.log(`🚀 HANDLE: Fallback - New pendingFiles state will be:`, newState);
+        
         return newState;
       });
     }
     
     // Auto-generate favicon from logo if this is a logo upload and no custom favicon exists
     if (type === 'logo') {
-      console.log('🚀 HANDLE: This is a logo upload, checking if we should generate favicon...');
+      
       
       const currentFaviconUrl = form.getValues('faviconUrl');
       const currentPendingFiles = pendingFiles;
@@ -757,10 +746,10 @@ export function BrandingSettingsV2({ onConfigUpdate }: BrandingSettingsProps) {
       
       // Generate favicon if no custom favicon exists and no favicon is pending
       if (isDefaultOrGenerated && !currentPendingFiles.favicon) {
-        console.log('🚀 HANDLE: Conditions met for favicon generation! Starting process...');
+        
         
         try {
-          console.log('🚀 HANDLE: Calling generateFaviconFromLogo...');
+          
           const generatedFavicon = await generateFaviconFromLogo(file);
           
           console.log('✅ HANDLE: Favicon generated successfully:', {
@@ -770,32 +759,32 @@ export function BrandingSettingsV2({ onConfigUpdate }: BrandingSettingsProps) {
           });
           
           // Update pending files with generated favicon
-          console.log('🚀 HANDLE: Updating pendingFiles state to add generated favicon...');
+          
           setPendingFiles(prev => {
             const newState = {
               ...prev,
               favicon: generatedFavicon
             };
-            console.log('🚀 HANDLE: New pendingFiles state after favicon generation:', newState);
+            
             return newState;
           });
           
           // Create a blob URL for the generated favicon to show immediate preview
           const faviconBlobUrl = URL.createObjectURL(generatedFavicon);
-          console.log('🚀 HANDLE: Created favicon blob URL for preview:', faviconBlobUrl);
+          
           
           // Set the blob URL as the current favicon URL to trigger preview update
           form.setValue('faviconUrl', faviconBlobUrl);
-          console.log('🚀 HANDLE: Updated form faviconUrl to trigger preview update');
           
-          console.log('🚀 HANDLE: Showing success toast...');
+          
+          
           toast({
             title: "Favicon Generated",
             description: "A favicon has been automatically generated from your logo.",
             duration: 3000,
           });
           
-          console.log('🚀 HANDLE: Favicon generation process completed successfully!');
+          
         } catch (error) {
           console.error('❌ HANDLE: Failed to generate favicon from logo:', error);
           console.error('❌ HANDLE: Error details:', {
@@ -805,17 +794,13 @@ export function BrandingSettingsV2({ onConfigUpdate }: BrandingSettingsProps) {
           // Don't show error toast, as this is a nice-to-have feature
         }
               } else {
-        console.log('🚀 HANDLE: Conditions NOT met for favicon generation. Reasons:', {
-          isDefaultOrGenerated,
-          hasPendingFavicon: !!currentPendingFiles.favicon,
-          reasoning: !isDefaultOrGenerated ? 'Custom favicon exists' : 'Already has pending favicon'
-        });
+        
       }
     } else {
-      console.log('🚀 HANDLE: This is not a logo upload, skipping favicon generation');
+      
     }
     
-    console.log('🚀 HANDLE: handleFileSelect completed');
+    
   };
 
   if (isLoading) {

@@ -28,8 +28,8 @@ interface RegulationUpdate {
 }
 
 const UpdatesListPage: React.FC = () => {
-  console.log('🚀 UpdatesListPage component is rendering!');
-  console.log('🚀 UpdatesListPage: Current URL:', window.location.pathname);
+  
+  
   
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const queryClient = useQueryClient();
@@ -38,7 +38,7 @@ const UpdatesListPage: React.FC = () => {
     queryKey: ['/api/regulation-updates/pending'],
     queryFn: async () => {
       const timestamp = new Date().toLocaleTimeString();
-      console.log(`🔍 [${timestamp}] Fetching regulation updates from API...`);
+      
       const response = await fetch('/api/regulation-updates/pending', {
         cache: 'no-cache',
         headers: {
@@ -51,11 +51,7 @@ const UpdatesListPage: React.FC = () => {
       }
       const jsonData = await response.json();
       console.log(`📊 [${timestamp}] API response (${jsonData.length} items):`, jsonData);
-      console.log(`📊 [${timestamp}] First update fields:`, jsonData[0] ? {
-        hasSummary: !!jsonData[0].summary,
-        hasRequirements: !!jsonData[0].requirements,
-        hasDeadlines: !!jsonData[0].filingDeadlines
-      } : 'No updates');
+      
       return Array.isArray(jsonData) ? jsonData : [];
     },
     refetchInterval: 30000, // Refetch every 30 seconds (reduced from 3 seconds)
@@ -65,7 +61,7 @@ const UpdatesListPage: React.FC = () => {
     cacheTime: 60000, // Cache data for 1 minute
   });
 
-  console.log('📋 Current state:', { pendingUpdates, isLoading, error });
+  
 
   // Bulk delete mutation
   const bulkDeleteMutation = useMutation({
@@ -87,7 +83,7 @@ const UpdatesListPage: React.FC = () => {
       return response.json();
     },
     onSuccess: (data) => {
-      console.log(`✅ Successfully deleted ${data.deletedCount} updates`);
+      
       setSelectedIds([]);
       queryClient.invalidateQueries({ queryKey: ['/api/regulation-updates/pending'] });
     },
@@ -128,7 +124,7 @@ const UpdatesListPage: React.FC = () => {
       const successCount = results.filter(r => r.success).length;
       const failCount = results.filter(r => !r.success).length;
       
-      console.log(`✅ Bulk accept completed: ${successCount} accepted, ${failCount} failed`);
+      
       
       if (successCount > 0) {
         alert(`Successfully accepted ${successCount} regulation update${successCount > 1 ? 's' : ''}${failCount > 0 ? `. ${failCount} failed.` : '.'}`);
@@ -188,7 +184,7 @@ const UpdatesListPage: React.FC = () => {
   const isSomeSelected = selectedIds.length > 0 && selectedIds.length < pendingUpdates.length;
 
   if (isLoading) {
-    console.log('⏳ Rendering loading state');
+    
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
@@ -203,7 +199,7 @@ const UpdatesListPage: React.FC = () => {
   }
 
   if (error) {
-    console.log('❌ Rendering error state:', error);
+    
     return (
       <div className="min-h-screen bg-background">
         <Navigation />
@@ -217,7 +213,7 @@ const UpdatesListPage: React.FC = () => {
     );
   }
 
-  console.log('📋 Rendering updates list with', pendingUpdates.length, 'items');
+  
 
   return (
     <div className="min-h-screen bg-background">
