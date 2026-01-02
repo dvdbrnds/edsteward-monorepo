@@ -8,6 +8,7 @@ import DashboardStats from "@/components/dashboard/dashboard-stats";
 import ExecutiveDashboard from "@/components/dashboard/executive-dashboard";
 import MyTasks from "@/components/dashboard/my-tasks";
 import PendingAttestations from "@/components/dashboard/pending-attestations";
+import DeadlineCalendar from "@/components/dashboard/deadline-calendar";
 import RegulationList from "@/components/regulations/regulation-list";
 import { AppliesToFilter } from "@/components/filters/applies-to-filter";
 import { useState, useEffect } from "react";
@@ -185,6 +186,9 @@ export default function HomePage() {
                 </div>
               </CardContent>
             </Card>
+            
+            {/* Deadline Calendar */}
+            <DeadlineCalendar />
           </div>
 
           {/* Board of Trustees Dashboard Card */}
