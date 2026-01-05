@@ -270,11 +270,7 @@ export function debugUserRoles(req: Request, res: Response, next: NextFunction):
     const user = req.user;
     const userRoles = parseUserRoles(user);
     const permissions = getCombinedPermissions(userRoles);
-    
-      .filter(([, value]) => value)
-      .map(([key]) => key)
-      .join(', ')
-    );
+    // Permissions loaded for user
   }
   
   next();

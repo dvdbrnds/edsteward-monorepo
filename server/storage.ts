@@ -539,15 +539,6 @@ export class DatabaseStorage implements IStorage {
         versionMetadata: row.version_metadata
       }));
 
-      
-      if (formattedResult.length > 0) {
-          id: formattedResult[0].id,
-          name: formattedResult[0].name,
-          category: formattedResult[0].category
-        });
-      } else {
-      }
-      
       return formattedResult as Regulation[];
     } catch (error) {
       console.error("❌ [DEBUG] Error in getRegulations:", error);
@@ -1185,11 +1176,8 @@ export class DatabaseStorage implements IStorage {
         requestId: `legacy_${Date.now()}`
       });
     } catch (error) {
-      // Fallback to console logging if audit service fails
-        timestamp: new Date().toISOString(),
-        ...entry,
-        error: error instanceof Error ? error.message : String(error)
-      });
+      // Fallback - audit service failed
+      console.error('Audit logging failed:', error instanceof Error ? error.message : String(error));
     }
   }
 

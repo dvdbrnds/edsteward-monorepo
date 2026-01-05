@@ -6,7 +6,7 @@ import { setupWebSocketServer } from '../websocket-server';
 import { log } from '../vite';
 import { setupAuth } from '../auth';
 import { setupRegulationUpdatesApi } from '../regulation-updates-api';
-import { setupDebugRegulationUpdatesApi } from '../debug-regulation-updates';
+// Debug regulation updates API removed - was for development only
 import { setupMCPIntegrationApi } from '../mcp-integration-api';
 import { setupRegulationVersionControlApi } from '../regulation-version-control-api';
 import { initializeDatabase } from '../db-init';
@@ -1496,7 +1496,6 @@ export function registerRoutes(app: express.Application): Server {
 
   // Setup additional APIs
   setupRegulationUpdatesApi(app as any);
-  setupDebugRegulationUpdatesApi(app as any);
   setupMCPIntegrationApi(app as any);
   
   // Setup enhanced version control API

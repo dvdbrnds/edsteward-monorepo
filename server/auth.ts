@@ -206,17 +206,7 @@ export function setupAuth(app: Express) {
           return res.status(500).json({ error: "Session creation failed", details: err.message });
         }
 
-        // Debug session state after login
-          sessionId: req.sessionID,
-          hasSession: !!req.session,
-          sessionKeys: req.session ? Object.keys(req.session) : [],
-          passportUser: req.session?.passport?.user,
-          isAuthenticated: req.isAuthenticated(),
-          tenantId: req.tenantId,
-          subdomain: req.tenant?.subdomain,
-          userTenantId: (user as any).tenantId,
-          setCookieHeader: res.getHeaders()['set-cookie']
-        });
+        // Session logged in successfully
 
         try {
           // Use single-tenant storage for user update

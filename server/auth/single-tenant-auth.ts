@@ -95,16 +95,6 @@ export function configureAuth(app: Express): void {
           const mappedRoles = mapOktaGroupsToRoles(groups);
           const primaryRole = getHighestPriorityRole(mappedRoles);
 
-            email: samlProfile.email,
-            nameID: samlProfile.nameID,
-            firstName: samlProfile.firstName,
-            lastName: samlProfile.lastName,
-            displayName: samlProfile.displayName,
-            groups: groups,
-            mappedRoles: mappedRoles,
-            primaryRole: primaryRole
-          });
-
           if (!email) {
             return done(new Error('No email found in SAML profile'));
           }
