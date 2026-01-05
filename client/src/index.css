@@ -77,6 +77,44 @@
   overflow-y: auto;
 }
 
+/* Prose code block styling - Light mode */
+.prose pre,
+.prose code {
+  background-color: hsl(var(--muted));
+  color: hsl(var(--foreground));
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  overflow-x: hidden;
+}
+
+.prose pre {
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid hsl(var(--border));
+}
+
+.prose code {
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+  font-size: 0.875em;
+}
+
+/* Don't double-style code inside pre */
+.prose pre code {
+  padding: 0;
+  border-radius: 0;
+  background-color: transparent;
+  border: none;
+}
+
+/* Dark mode prose styling */
+.dark .prose pre,
+.dark .prose code {
+  background-color: hsl(var(--muted));
+  color: hsl(var(--foreground));
+}
+
 }
 
 @layer utilities {
