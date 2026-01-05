@@ -217,6 +217,8 @@ function TaskItem({
           <button 
             onClick={() => setExpanded(!expanded)}
             className="mt-1 p-0.5 hover:bg-gray-200 rounded"
+            aria-label={expanded ? "Collapse subtasks" : "Expand subtasks"}
+            aria-expanded={expanded}
           >
             {expanded ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
           </button>
@@ -528,7 +530,7 @@ function TaskItem({
         {isAdmin && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+              <Button variant="ghost" size="sm" className="h-8 w-8 p-0" aria-label="Task actions menu">
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>

@@ -185,6 +185,8 @@ export default function Navigation() {
               size="sm"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="text-white"
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileMenuOpen}
             >
               {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>

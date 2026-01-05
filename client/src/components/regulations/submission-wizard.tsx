@@ -432,6 +432,7 @@ export function SubmissionWizard({ regulation, open, onOpenChange }: SubmissionW
                                 size="sm"
                                 onClick={() => handleFileRemove(index)}
                                 className="shrink-0"
+                                aria-label="Remove file"
                               >
                                 <X className="h-4 w-4" />
                               </Button>

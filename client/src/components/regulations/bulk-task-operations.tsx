@@ -338,6 +338,7 @@ export function BulkTaskOperations({
               variant="ghost"
               size="sm"
               onClick={() => onSelectionChange([])}
+              aria-label="Clear selection"
             >
               <X className="h-4 w-4" />
             </Button>

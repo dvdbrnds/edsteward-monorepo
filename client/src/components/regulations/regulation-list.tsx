@@ -352,6 +352,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-9 pr-9"
+                aria-label="Search regulations"
               />
               {search && (
                 <Button
@@ -359,6 +360,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
                   size="sm"
                   className="absolute right-1 top-1 h-8 w-8 p-0"
                   onClick={() => setSearch("")}
+                  aria-label="Clear search"
                 >
                   <X className="h-4 w-4" />
                 </Button>
