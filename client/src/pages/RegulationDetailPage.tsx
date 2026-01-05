@@ -273,7 +273,7 @@ function RegulationDetailPage() {
   // Note: overrideForm and overrideMutation moved to NotificationOverrideControl component
 
   // Fetch users for owner assignment dropdown (admins only)
-  const { data: users = [] } = useQuery<Array<{ id: number; username: string; firstName?: string; lastName?: string; role: string }>>({
+  const { data: users = [] } = useQuery<Array<{ id: number; username: string; email?: string; firstName?: string; lastName?: string; role: string }>>({
     queryKey: ["/api/users"],
     enabled: isAdmin,
   });
@@ -728,7 +728,15 @@ function RegulationDetailPage() {
                         <SelectTrigger className="w-[220px] bg-indigo-50 border border-indigo-200 rounded-md hover:bg-indigo-100 transition-colors">
                           <SelectValue placeholder="Assign Primary DRI...">
                             {regulation.ownerId 
-                              ? users.find(u => u.id === regulation.ownerId)?.username || `User ${regulation.ownerId}`
+                              ? (() => {
+                                  const owner = users.find(u => u.id === regulation.ownerId);
+                                  if (owner) {
+                                    return (owner.firstName && owner.lastName)
+                                      ? `${owner.firstName} ${owner.lastName}`
+                                      : owner.username || owner.email || `User ${regulation.ownerId}`;
+                                  }
+                                  return `User ${regulation.ownerId}`;
+                                })()
                               : "— No Primary DRI —"}
                           </SelectValue>
                         </SelectTrigger>
