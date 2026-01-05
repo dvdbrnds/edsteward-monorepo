@@ -442,9 +442,46 @@ router.patch("/:regulationId/owner", requireAuth, async (req: any, res) => {
     // Allow null to unassign
     const ownerValue = ownerId === null || ownerId === '' ? null : parseInt(ownerId);
     
+    // Get current regulation to check if owner changed
+    const currentRegulation = await tenantStorage.getRegulation(regulationId);
+    const previousOwnerId = currentRegulation?.ownerId;
+    
     const updatedRegulation = await tenantStorage.updateRegulation(regulationId, { 
       ownerId: ownerValue 
     });
+    
+    // Create notification for the new owner if assigned (and it's a different user)
+    if (ownerValue && ownerValue !== previousOwnerId) {
+      try {
+        const regulationName = updatedRegulation?.name || updatedRegulation?.topic || `Regulation #${regulationId}`;
+        const assignedByName = req.user?.firstName && req.user?.lastName 
+          ? `${req.user.firstName} ${req.user.lastName}` 
+          : req.user?.username || 'An administrator';
+        
+        await tenantStorage.createNotificationQueueItem({
+          regulationId: regulationId,
+          userId: ownerValue,
+          type: 'regulation_assigned',
+          content: {
+            title: 'You have been assigned a regulation',
+            message: `${assignedByName} has assigned you as the Primary DRI for "${regulationName}". Please review the regulation and its compliance requirements.`,
+            regulationId: regulationId,
+            regulationName: regulationName,
+            assignedBy: req.user?.id,
+            assignedByName: assignedByName
+          },
+          status: 'pending',
+          priority: 'high'
+        });
+        
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
+          `Created assignment notification for user ${ownerValue} for regulation ${regulationId}`);
+      } catch (notificationError) {
+        // Don't fail the main operation if notification fails
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, 
+          `Failed to create assignment notification: ${notificationError instanceof Error ? notificationError.message : String(notificationError)}`);
+      }
+    }
     
     syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
       `Updated owner for regulation ${regulationId} to user ${ownerValue || 'unassigned'}`);

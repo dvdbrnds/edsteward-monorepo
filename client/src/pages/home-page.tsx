@@ -10,7 +10,6 @@ import MyTasks from "@/components/dashboard/my-tasks";
 import PendingAttestations from "@/components/dashboard/pending-attestations";
 import DeadlineCalendar from "@/components/dashboard/deadline-calendar";
 import RegulationList from "@/components/regulations/regulation-list";
-import { AppliesToFilter } from "@/components/filters/applies-to-filter";
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Bell, CheckCircle, Users, ExternalLink, BarChart3 } from "lucide-react";
@@ -22,7 +21,6 @@ export default function HomePage() {
   const { user } = useAuth();
   const [, setLocation] = useLocation();
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedInstitutionTypes, setSelectedInstitutionTypes] = useState<string[]>([]);
 
   // Check if we're in admin mode and redirect admin users to admin dashboard
   useEffect(() => {
@@ -225,19 +223,9 @@ export default function HomePage() {
               {selectedCategory ? `${selectedCategory} Regulations` : 'All Regulations'}
             </h2>
 
-            {/* Filters Section */}
-            <div className="mb-6">
-              <AppliesToFilter
-                selectedInstitutionTypes={selectedInstitutionTypes}
-                onInstitutionTypesChange={setSelectedInstitutionTypes}
-                compact={true}
-              />
-            </div>
-
             <RegulationList
               categoryFilter={selectedCategory}
               jurisdictionFilter={null}
-              appliesToFilter={selectedInstitutionTypes}
             />
           </div>
             </TabsContent>
