@@ -46,16 +46,12 @@ declare module 'express-session' {
 }
 
 export function registerRoutes(app: express.Application): Server {
-  console.log('🚀 registerRoutes called - setting up HTTP and WebSocket servers...');
   
   // Create HTTP server
   const httpServer = createServer(app);
-  console.log('✅ HTTP server created');
   
   // Setup WebSocket server for MCP Engine integration
-  console.log('🔌 About to setup WebSocket server...');
   setupWebSocketServer(httpServer);
-  console.log('✅ WebSocket server setup completed');
 
   // =============================================================================
   // NO AUTH REQUIRED ENDPOINTS (health checks only) - BEFORE TENANT MIDDLEWARE
@@ -97,7 +93,6 @@ export function registerRoutes(app: express.Application): Server {
       const shouldFix = req.query.fix === 'staging-tenant';
 
       if (shouldFix) {
-        console.log('🔧 [HEALTH-FIX] Single-tenant mode - no tenant fixes needed');
         return res.json({
           status: 'healthy',
           fixApplied: false,
@@ -325,9 +320,6 @@ export function registerRoutes(app: express.Application): Server {
       }
 
       // Simple password verification for debugging
-      console.log(`Login attempt for: ${email}`);
-      console.log(`User found: ${user ? 'Yes' : 'No'}`);
-      console.log(`Password from DB: ${user.password?.substring(0, 20)}...`);
       
       // For now, verify password directly (we'll improve security later)
       const isValidPassword = user.password === password || 

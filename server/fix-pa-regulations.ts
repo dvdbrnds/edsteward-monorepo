@@ -16,7 +16,6 @@ import fetch from 'node-fetch';
  */
 async function fixPARegulations() {
   try {
-    console.log('==== PA Regulations Fixer ====');
     
     // Get all PA regulations
     const allRegulations = await storage.getRegulations();
@@ -24,10 +23,8 @@ async function fixPARegulations() {
       reg => reg.stateCode === 'PA' && reg.jurisdiction === 'state'
     );
     
-    console.log(`Found ${paRegulations.length} PA regulations to analyze`);
     
     // Fixing regulations with navigation/boilerplate content
-    console.log('\nFixing regulations with navigation/boilerplate content...');
     
     let boilerplateFixed = 0;
     const boilerplatePatterns = [
@@ -49,8 +46,6 @@ async function fixPARegulations() {
       
       if (hasBoilerplate && reg.regulationUrl) {
         try {
-          console.log(`\nFetching content for: ${reg.name}`);
-          console.log(`URL: ${reg.regulationUrl}`);
           
           const response = await fetch(reg.regulationUrl, {
             headers: {
@@ -59,7 +54,6 @@ async function fixPARegulations() {
           });
           
           if (!response.ok) {
-            console.log(`Failed to fetch URL: ${response.status} ${response.statusText}`);
             continue;
           }
           
@@ -107,7 +101,6 @@ async function fixPARegulations() {
           for (const selector of regulationSelectors) {
             const elements = $(selector);
             if (elements.length > 0) {
-              console.log(`Found ${elements.length} regulation elements with selector: ${selector}`);
               
               elements.each((_, el) => {
                 // Get parent container for context
@@ -132,7 +125,6 @@ async function fixPARegulations() {
                 // Get text content
                 const text = element.text().trim();
                 if (text.length > 100) {
-                  console.log(`Found content using selector: ${selector}`);
                   
                   // Skip if content contains known boilerplate text
                   const isBoilerplate = boilerplatePatterns.some(pattern => text.includes(pattern));
@@ -140,7 +132,6 @@ async function fixPARegulations() {
                     extractedContent = text;
                     break;
                   } else {
-                    console.log(`Skipping boilerplate content from selector: ${selector}`);
                   }
                 }
               }
@@ -165,10 +156,8 @@ async function fixPARegulations() {
               })
               .where(eq(regulations.id, reg.id));
             
-            console.log(`Updated content for ${reg.name} (${extractedContent.length} characters)`);
             boilerplateFixed++;
           } else {
-            console.log(`Could not find suitable content for ${reg.name}`);
           }
         } catch (error) {
           console.error(`Error fixing content for ${reg.name}:`, error);
@@ -176,10 +165,8 @@ async function fixPARegulations() {
       }
     }
     
-    console.log(`\nFixed ${boilerplateFixed} regulations with boilerplate content`);
     
     // Add some fallback summary info if no content could be extracted
-    console.log('\nChecking for regulations that need a fallback summary...');
     
     let fallbackAdded = 0;
     for (const reg of paRegulations) {
@@ -195,7 +182,6 @@ async function fixPARegulations() {
             })
             .where(eq(regulations.id, reg.id));
           
-          console.log(`Added fallback summary for ${reg.name}`);
           fallbackAdded++;
         } catch (error) {
           console.error(`Error adding fallback for ${reg.name}:`, error);
@@ -203,8 +189,6 @@ async function fixPARegulations() {
       }
     }
     
-    console.log(`\nAdded fallback summaries for ${fallbackAdded} regulations`);
-    console.log('\n==== Fix Script Complete ====');
     
   } catch (error) {
     console.error('Fix script failed:', error);

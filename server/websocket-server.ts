@@ -2,7 +2,6 @@ import { WebSocketServer } from 'ws';
 import { Server } from 'http';
 
 export function setupWebSocketServer(httpServer: Server) {
-  console.log('🚀 Setting up WebSocket server...');
   
   const wss = new WebSocketServer({ 
     server: httpServer,
@@ -13,7 +12,6 @@ export function setupWebSocketServer(httpServer: Server) {
   const connectedClients = new Set<any>();
   
   wss.on('connection', (ws, req) => {
-    console.log('🔌 WebSocket client connected:', req.socket.remoteAddress);
     connectedClients.add(ws);
     
     // Send connection confirmation
@@ -26,11 +24,9 @@ export function setupWebSocketServer(httpServer: Server) {
     ws.on('message', (data) => {
       try {
         const message = JSON.parse(data.toString());
-        console.log('📡 Received WebSocket message:', message);
         
         if (message.type === 'regulation_updated') {
           // Broadcast to all connected frontend clients for instant refresh
-          console.log(`📢 Broadcasting regulation update: ID ${message.data?.updateId || 'unknown'}`);
           broadcastToClients(message, connectedClients);
         }
       } catch (error) {
@@ -43,7 +39,6 @@ export function setupWebSocketServer(httpServer: Server) {
     });
     
     ws.on('close', () => {
-      console.log('📴 WebSocket client disconnected');
       connectedClients.delete(ws);
     });
     
@@ -69,10 +64,8 @@ export function setupWebSocketServer(httpServer: Server) {
         clients.delete(client);
       }
     });
-    console.log(`✅ Broadcasted to ${broadcastCount} clients`);
   }
   
-  console.log('✅ WebSocket server initialized on /ws path');
   return wss;
 }
 

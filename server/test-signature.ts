@@ -48,8 +48,6 @@ function generateTestSignature(method: string, path: string, apiKey: string): vo
       crypto.createHash('sha256').update('').digest('hex')
     ].join('\n');
 
-    console.log('\nStep 1: Canonical Request:');
-    console.log(canonicalRequest);
 
     // Step 2: Create string to sign
     const scope = `${date}/${region}/${service}/aws4_request`;
@@ -60,8 +58,6 @@ function generateTestSignature(method: string, path: string, apiKey: string): vo
       crypto.createHash('sha256').update(canonicalRequest).digest('hex')
     ].join('\n');
 
-    console.log('\nStep 2: String to Sign:');
-    console.log(stringToSign);
 
     // Step 3: Calculate signature
     const kDate = crypto.createHmac('sha256', `AWS4${cleanApiKey}`).update(date).digest();
@@ -70,24 +66,12 @@ function generateTestSignature(method: string, path: string, apiKey: string): vo
     const kSigning = crypto.createHmac('sha256', kService).update('aws4_request').digest();
     const signature = crypto.createHmac('sha256', kSigning).update(stringToSign).digest('hex');
 
-    console.log('\nStep 3: Signature:');
-    console.log(signature);
 
     // Step 4: Create authorization header
     const authHeader = `AWS4-HMAC-SHA256 Credential=${cleanApiKey}/${scope}, SignedHeaders=${signedHeaders}, Signature=${signature}`;
 
-    console.log('\nStep 4: Authorization Header:');
-    console.log(authHeader);
 
     // Log for curl testing
-    console.log('\nTest with curl:');
-    console.log('curl -v \\');
-    console.log(`  -H "Content-Type: application/json" \\`);
-    console.log(`  -H "Host: api.dol.gov" \\`);
-    console.log(`  -H "x-amz-date: ${timestamp}" \\`);
-    console.log(`  -H "Authorization: ${authHeader}" \\`);
-    console.log('  -H "Accept: application/json" \\');
-    console.log(`  "https://api.dol.gov${path}"`);
 
   } catch (error) {
     console.error('Error generating test signature:', error);
@@ -103,11 +87,5 @@ if (!testApiKey) {
   process.exit(1);
 }
 
-console.log('Testing AWS v4 Signature Generation');
-console.log('===================================');
-console.log('Test Parameters:');
-console.log(`Method: GET`);
-console.log(`Path: ${testPath}`);
-console.log(`API Key: ${testApiKey.substring(0, 8)}...`);
 
 generateTestSignature('GET', testPath, testApiKey);

@@ -5,7 +5,6 @@ import { syslog, LogFacility, LogLevel } from './services/syslog';
 // Initialize logging after db setup
 export function initializeLogging() {
   const currentEnv = process.env.NODE_ENV || 'development';
-  console.log(`Database connected in ${currentEnv} environment`);
 
   if (currentEnv === 'production') {
     syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, 

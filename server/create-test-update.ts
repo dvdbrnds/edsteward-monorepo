@@ -12,7 +12,6 @@ import path from 'path';
  */
 async function createTestUpdate() {
   try {
-    console.log('Creating test regulation update...');
     
     // 1. First, let's find an existing regulation to update
     const result = await db.execute(`
@@ -22,22 +21,18 @@ async function createTestUpdate() {
     `);
     
     if (result.rows.length === 0) {
-      console.log('No Title IX regulation found. Creating with a sample regulation');
       // We need to create a sample regulation first
       const sampleRegId = await createSampleRegulation();
       if (!sampleRegId) {
-        console.log('Failed to create sample regulation');
         return;
       }
       await createUpdateForRegulation(sampleRegId);
     } else {
       // Use existing regulation
       const regulation = result.rows[0];
-      console.log(`Found regulation with ID ${regulation.id}`);
       await createUpdateForRegulation(regulation.id, regulation.requirements);
     }
     
-    console.log('Test update created successfully!');
   } catch (error) {
     console.error('Error creating test update:', error);
   }
@@ -108,7 +103,6 @@ async function createUpdateForRegulation(regulationId: number, originalContent?:
       [regulationId, originalContent, updatedContent]
     );
     
-    console.log(`Created update for regulation ID ${regulationId}`);
   } catch (error) {
     console.error('Error creating update for regulation:', error);
   }
@@ -117,7 +111,6 @@ async function createUpdateForRegulation(regulationId: number, originalContent?:
 // Run the script
 createTestUpdate()
   .then(() => {
-    console.log('Script completed');
     process.exit(0);
   })
   .catch(error => {

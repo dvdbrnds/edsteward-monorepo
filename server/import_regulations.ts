@@ -182,11 +182,9 @@ async function parseDeadline(deadlineText: string): Promise<{ dueDate: Date | nu
 
 async function importRegulations() {
   try {
-    console.log('Starting regulations import...');
 
     // Read the Excel file
     const filePath = path.join(process.cwd(), 'attached_assets', 'compliance-matrix.xlsx');
-    console.log('Reading file from:', filePath);
 
     const workbook = xlsx.read(fs.readFileSync(filePath), { type: 'buffer' });
     const sheetName = workbook.SheetNames[0];
@@ -195,13 +193,10 @@ async function importRegulations() {
     // Convert to JSON
     const data = xlsx.utils.sheet_to_json(worksheet);
 
-    console.log(`Found ${data.length} regulations to import`);
 
     // Clear existing regulations and deadlines
-    console.log('Clearing existing regulations and deadlines...');
     await db.delete(deadlines);
     await db.delete(regulations);
-    console.log('Existing data cleared');
 
     // Insert new regulations
     let successCount = 0;
@@ -214,7 +209,6 @@ async function importRegulations() {
           `REG${String(row['Item ID']).padStart(4, '0')}` : 
           `REG${Math.random().toString(36).substring(2, 8).toUpperCase()}`;
 
-        console.log(`Processing regulation with Item ID: ${itemId}`);
 
         // Get topic and map to category, with special handling for education-related topics
         let topic = String(row['Topic'] || '').trim();
@@ -296,7 +290,6 @@ async function importRegulations() {
           }
         }
 
-        console.log(`Successfully imported regulation: ${regulation.name}`);
         successCount++;
       } catch (err) {
         console.error(`Error importing regulation row:`, err);
@@ -305,7 +298,6 @@ async function importRegulations() {
       }
     }
 
-    console.log(`Import completed with ${successCount} successes and ${errorCount} errors`);
   } catch (error) {
     console.error('Error importing regulations:', error);
     throw error;

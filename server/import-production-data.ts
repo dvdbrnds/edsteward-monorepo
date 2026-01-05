@@ -40,7 +40,6 @@ async function importProductionData() {
 if (require.main === module) {
   importProductionData()
     .then((result) => {
-      console.log("Import completed:", result);
       process.exit(0);
     })
     .catch((error) => {

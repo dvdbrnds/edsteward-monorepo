@@ -77,7 +77,6 @@ export class DatabaseQueryOptimizer {
       
       // Pool event monitoring
       pool.on('connect', (client) => {
-        console.log(`[DB-POOL] New client connected for tenant: ${tenantId}`);
       });
       
       pool.on('error', (err, client) => {
@@ -85,7 +84,6 @@ export class DatabaseQueryOptimizer {
       });
       
       pool.on('acquire', (client) => {
-        console.log(`[DB-POOL] Client acquired for tenant: ${tenantId}`);
       });
       
       this.pools.set(tenantId, pool);
@@ -116,7 +114,6 @@ export class DatabaseQueryOptimizer {
     if (options.cache !== false) {
       const cached = this.getCachedResult<T>(cacheKey);
       if (cached) {
-        console.log(`[DB-CACHE] Cache hit for query: ${query.substring(0, 50)}...`);
         return cached;
       }
     }
@@ -138,7 +135,6 @@ export class DatabaseQueryOptimizer {
         this.setCachedResult(cacheKey, result, ttl);
       }
       
-      console.log(`[DB-QUERY] Executed query in ${duration}ms: ${query.substring(0, 50)}...`);
       return result;
       
     } catch (error) {
@@ -349,7 +345,6 @@ export class DatabaseQueryOptimizer {
     }
     
     if (cleanedCount > 0) {
-      console.log(`[DB-CACHE] Cleaned up ${cleanedCount} expired cache entries`);
     }
   }
   
@@ -383,7 +378,6 @@ export class DatabaseQueryOptimizer {
    */
   public clearCache(): void {
     this.queryCache.clear();
-    console.log('[DB-CACHE] All cache entries cleared');
   }
   
   /**
@@ -393,7 +387,6 @@ export class DatabaseQueryOptimizer {
     const closePromises = Array.from(this.pools.values()).map(pool => pool.end());
     await Promise.all(closePromises);
     this.pools.clear();
-    console.log('[DB-POOL] All connection pools closed');
   }
 }
 

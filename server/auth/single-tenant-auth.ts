@@ -16,9 +16,6 @@ import { mapOktaGroupsToRoles, getHighestPriorityRole } from '../config/role-map
  * Configure authentication strategies
  */
 export function configureAuth(app: Express): void {
-  console.log('🔐 Authentication setup starting...');
-  console.log('🔐 SAML Enabled:', institutionConfig.authentication.samlEnabled);
-  console.log('🔐 Username/Password Enabled:', institutionConfig.authentication.usernamePasswordEnabled);
   
   // Local username/password strategy
   if (institutionConfig.authentication.usernamePasswordEnabled) {
@@ -52,23 +49,15 @@ export function configureAuth(app: Express): void {
 
   // SAML strategy - Skip for development
   if (institutionConfig.authentication.samlEnabled && process.env.NODE_ENV !== 'development') {
-    console.log('🔐 SAML Certificate loaded:', !!institutionConfig.authentication.samlCertificate);
-    console.log('🔐 SAML Certificate length:', institutionConfig.authentication.samlCertificate?.length || 0);
     
     // Use fake certificate to bypass signature validation completely
     const useFakeCert = process.env.SAML_USE_FAKE_CERT === 'true';
-    console.log('🔐 Using fake certificate for signature bypass:', useFakeCert);
     
     const fakeCert = "-----BEGIN CERTIFICATE-----\nMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1234567890\n-----END CERTIFICATE-----";
     
     if (useFakeCert) {
-      console.log('🔐 Using fake certificate to bypass signature validation');
     } else {
       const samlCert = institutionConfig.authentication.samlCertificate;
-      console.log('🔐 About to create SAML strategy with real cert:', !!samlCert);
-      console.log('🔐 Cert value type:', typeof samlCert);
-      console.log('🔐 Cert is truthy:', !!samlCert);
-      console.log('🔐 Cert first 50 chars:', samlCert?.substring(0, 50));
     }
     
     passport.use(new SamlStrategy(
@@ -106,7 +95,6 @@ export function configureAuth(app: Express): void {
           const mappedRoles = mapOktaGroupsToRoles(groups);
           const primaryRole = getHighestPriorityRole(mappedRoles);
 
-          console.log('🔐 SAML Profile received:', {
             email: samlProfile.email,
             nameID: samlProfile.nameID,
             firstName: samlProfile.firstName,
@@ -121,16 +109,11 @@ export function configureAuth(app: Express): void {
             return done(new Error('No email found in SAML profile'));
           }
 
-          console.log('🔐 Looking for user with email:', email);
           // Find or create user
           let user = await storage.getUserByEmail(email, undefined);
-          console.log('🔐 Existing user found:', !!user);
 
-          console.log('🔐 Auto-provisioning enabled:', institutionConfig.authentication.allowSelfRegistration);
-          console.log('🔐 Environment AUTH_ALLOW_SELF_REGISTRATION:', process.env.AUTH_ALLOW_SELF_REGISTRATION);
 
           if (!user && institutionConfig.authentication.allowSelfRegistration) {
-            console.log('🔐 Creating new user via auto-provisioning with role:', primaryRole);
             user = await storage.createUser({
               email: email as string,
               username: email as string,
@@ -141,11 +124,8 @@ export function configureAuth(app: Express): void {
               externalId: samlProfile.nameID as string,
               identityProvider: 'saml',
             }, undefined);
-            console.log('🔐 New user created with roles:', mappedRoles);
           } else if (user) {
             // Update existing user's data from Okta on each login (Okta is source of truth)
-            console.log('🔐 Updating existing user from Okta. Role:', user.role, '→', primaryRole);
-            console.log('🔐 Name from Okta:', samlProfile.firstName, samlProfile.lastName);
             await storage.updateUser(user.id, {
               role: primaryRole,
               roles: JSON.stringify(mappedRoles),
@@ -158,11 +138,9 @@ export function configureAuth(app: Express): void {
             
             // Refresh user object with updated data
             user = await storage.getUserByEmail(email, undefined);
-            console.log('🔐 User synced from Okta:', { roles: mappedRoles, firstName: user?.firstName, lastName: user?.lastName });
           }
 
           if (!user) {
-            console.log('🔐 User creation failed - auto-provisioning may be disabled');
             return done(new Error('User not found and auto-provisioning is disabled'));
           }
 
@@ -232,7 +210,6 @@ function setupAuthRoutes(app: Express): void {
 
       // HECVAT 4.0 Requirement: Local accounts should have MFA enabled
       if (user && user.identityProvider !== 'saml' && !user.mfaEnabled) {
-        console.log(`⚠️ Local account ${user.username} should enable MFA for HECVAT 4.0 compliance`);
         
         return res.json({ 
           success: true, 
@@ -299,15 +276,12 @@ function setupAuthRoutes(app: Express): void {
   }
 
   // SAML routes
-  console.log('🔐 Setting up SAML routes, samlEnabled:', institutionConfig.authentication.samlEnabled);
   if (institutionConfig.authentication.samlEnabled) {
-    console.log('✅ SAML routes being registered!');
     app.get('/auth/saml', passport.authenticate('saml'));
 
     app.post('/auth/saml/callback',
       passport.authenticate('saml', { failureRedirect: '/login?error=saml' }),
       (req: Request, res: Response) => {
-        console.log('🔐 SAML authentication successful, redirecting to home page');
         res.redirect('/');
       }
     );

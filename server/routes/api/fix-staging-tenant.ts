@@ -12,7 +12,6 @@ const router = Router();
  */
 router.post('/fix-staging-tenant', async (req, res) => {
   try {
-    console.log('🔧 [FIX-STAGING-TENANT] Starting database fix...');
     
     // Security check - only allow in development or with special header
     const isDevelopment = process.env.NODE_ENV === 'development';
@@ -26,7 +25,6 @@ router.post('/fix-staging-tenant', async (req, res) => {
     }
 
     // Step 1: Check current state
-    console.log('🔍 [FIX-STAGING-TENANT] Checking current staging records...');
     const currentRecords = await db
       .select()
       .from(tenants)
@@ -38,9 +36,7 @@ router.post('/fix-staging-tenant', async (req, res) => {
         )
       );
 
-    console.log(`📋 [FIX-STAGING-TENANT] Found ${currentRecords.length} staging-related records`);
     currentRecords.forEach(record => {
-      console.log(`   - ID: ${record.id}, Subdomain: ${record.subdomain}, Name: ${record.name}`);
     });
 
     // Step 2: Find the problematic record
@@ -48,11 +44,9 @@ router.post('/fix-staging-tenant', async (req, res) => {
     let fixesApplied = [];
 
     if (stagingSubdomainRecord && stagingSubdomainRecord.id !== 'staging') {
-      console.log(`🔧 [FIX-STAGING-TENANT] Found problematic record: subdomain='staging' but id='${stagingSubdomainRecord.id}'`);
       
       // Delete the incorrect record
       await db.delete(tenants).where(eq(tenants.subdomain, 'staging'));
-      console.log('🗑️ [FIX-STAGING-TENANT] Deleted incorrect staging record');
       fixesApplied.push('Deleted incorrect staging record with wrong ID');
     }
 
@@ -64,7 +58,6 @@ router.post('/fix-staging-tenant', async (req, res) => {
       .limit(1);
 
     if (correctRecord.length === 0) {
-      console.log('➕ [FIX-STAGING-TENANT] Inserting correct staging tenant record...');
       
       await db.insert(tenants).values({
         id: 'staging',
@@ -87,14 +80,11 @@ router.post('/fix-staging-tenant', async (req, res) => {
         }
       });
       
-      console.log('✅ [FIX-STAGING-TENANT] Inserted correct staging tenant record');
       fixesApplied.push('Inserted correct staging tenant record');
     } else {
-      console.log('ℹ️ [FIX-STAGING-TENANT] Correct staging record already exists');
     }
 
     // Step 4: Verify the fix
-    console.log('🔍 [FIX-STAGING-TENANT] Verifying fix...');
     const finalRecords = await db
       .select()
       .from(tenants)
@@ -109,9 +99,7 @@ router.post('/fix-staging-tenant', async (req, res) => {
     const success = !!correctStagingRecord;
 
     if (success) {
-      console.log('🎉 [FIX-STAGING-TENANT] SUCCESS: Staging tenant database record is now correct!');
     } else {
-      console.log('❌ [FIX-STAGING-TENANT] FAILED: Staging tenant record is still incorrect');
     }
 
     // Return results

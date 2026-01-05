@@ -82,7 +82,6 @@ async function deduplicateRegulations() {
 
     // Count initial Clery Act regulations
     const initialCount = await countCleryRegulations();
-    console.log(`Found ${initialCount} Clery Act regulations`);
 
     if (initialCount > 1) {
       // Delete all but the most recent Clery Act regulation
@@ -110,7 +109,6 @@ async function deduplicateRegulations() {
         RETURNING id;
       `);
 
-      console.log(`Deleted ${deleteCount.rows.length} duplicate Clery Act regulations`);
 
       // Update the remaining record with consolidated information
       await db.execute(sql`
@@ -145,7 +143,6 @@ async function deduplicateRegulations() {
 
       // Verify final state
       const finalCount = await countCleryRegulations();
-      console.log(`Final Clery Act regulation count: ${finalCount}`);
 
       if (finalCount !== 1) {
         throw new Error(`Expected 1 Clery Act regulation after deduplication, but found ${finalCount}`);

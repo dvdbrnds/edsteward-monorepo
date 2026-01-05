@@ -219,7 +219,6 @@ function generateDavegulation(index: number): InsertRegulation {
 
 // Create the specified number of Davegulations
 async function createDavegulations(count: number = 10) {
-  console.log(`Starting creation of ${count} Davegulations...`);
   syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Starting creation of ${count} Davegulations`);
   
   try {
@@ -230,7 +229,6 @@ async function createDavegulations(count: number = 10) {
     const existingCount = existingRegs.length;
     
     if (existingCount >= count) {
-      console.log(`Already have ${existingCount} Davegulations in the database. Skipping creation.`);
       syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Already have ${existingCount} Davegulations, skipping creation`);
       return;
     }
@@ -245,7 +243,6 @@ async function createDavegulations(count: number = 10) {
     // Insert all Davegulations into the database
     const result = await db.insert(regulations).values(davegulations).returning();
     
-    console.log(`Successfully created ${result.length} Davegulations`);
     syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Successfully created ${result.length} Davegulations`);
     
     return result;
@@ -262,11 +259,8 @@ async function createDavegulations(count: number = 10) {
 if (process.argv[1] === import.meta.url) {
   createDavegulations()
     .then((result) => {
-      console.log('Davegulations creation completed');
       if (result) {
-        console.log(`Created ${result.length} Davegulations:`);
         result.forEach(reg => {
-          console.log(` - ${reg.name} (ID: ${reg.id})`);
         });
       }
       process.exit(0);

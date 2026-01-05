@@ -9,9 +9,6 @@ const { Pool } = pg;
 
 // Get the current environment
 const currentEnv = process.env.NODE_ENV || 'development';
-console.log('🌍 Environment:', currentEnv);
-console.log('🔗 DATABASE_URL set:', !!process.env.DATABASE_URL);
-console.log('🔗 SESSION_SECRET set:', !!process.env.SESSION_SECRET);
 
 // Environment-specific database URLs
 const dbUrls = {
@@ -42,7 +39,6 @@ try {
   // Extract SSL mode from URL parameters
   const sslMode = urlParams.get('sslmode') || 'prefer';
   
-  console.log('🔧 Detected SSL mode:', sslMode);
   
   // Create base pool configuration
   poolConfig = {
@@ -75,7 +71,6 @@ try {
   
   if (sslMode === 'disable') {
     poolConfig.ssl = false;
-    console.log('✅ SSL disabled');
   } else if (sslMode === 'require' || sslMode === 'prefer' || isRDS) {
     // For RDS or managed PostgreSQL services, we typically need SSL
     // but we don't need to specify certificate files
@@ -87,21 +82,13 @@ try {
     const certPath = '/app/ssl/rds-ca-2019-root.pem';
     if (fs.existsSync(certPath)) {
       poolConfig.ssl.ca = fs.readFileSync(certPath);
-      console.log('✅ Using SSL with certificate file');
     } else {
-      console.log('✅ Using SSL without certificate file (managed service)');
     }
     
     if (isRDS) {
-      console.log('🔒 RDS detected - forcing SSL connection');
     }
   }
   
-  console.log('✅ Database configuration created successfully');
-  console.log('🔗 Host:', poolConfig.host);
-  console.log('🔗 Port:', poolConfig.port);
-  console.log('🔗 Database:', poolConfig.database);
-  console.log('🔒 SSL Mode:', sslMode);
   
 } catch (error) {
   console.error('❌ Failed to parse DATABASE_URL:', error);
@@ -132,9 +119,7 @@ try {
   };
   
   if (isRDSFallback) {
-    console.log('⚠️ Using fallback configuration with SSL enabled for RDS');
   } else {
-    console.log('⚠️ Using fallback configuration with SSL disabled');
   }
 }
 
@@ -154,11 +139,9 @@ let lastHealthCheck = 0;
 const HEALTH_CHECK_INTERVAL = 30000; // 30 seconds
 
 export async function testDatabaseConnection(maxRetries: number = 5): Promise<boolean> {
-  console.log('Testing database connection...');
   
   for (let i = 0; i < maxRetries; i++) {
     try {
-      console.log(`Database connection attempt ${i + 1}/${maxRetries}...`);
       
       // Use a simple query with timeout
       const client = await pool.connect();
@@ -166,38 +149,26 @@ export async function testDatabaseConnection(maxRetries: number = 5): Promise<bo
         // Set a shorter statement timeout for the test query
         await client.query('SET statement_timeout = 15000'); // 15 seconds
         await client.query('SELECT 1');
-        console.log("✅ Database connection successful");
         lastHealthCheck = Date.now();
         return true;
       } finally {
         client.release();
       }
     } catch (error) {
-      console.log(`❌ Database connection attempt ${i + 1} failed:`);
-      console.log('Error type:', typeof error);
-      console.log('Error instanceof Error:', error instanceof Error);
       
       if (error instanceof Error) {
-        console.log('Error message:', error.message);
-        console.log('Error name:', error.name);
         
         // Log specific error types
         if (error.message.includes('ETIMEDOUT')) {
-          console.log('⏰ Connection timed out - network issue');
         } else if (error.message.includes('ECONNREFUSED')) {
-          console.log('🚫 Connection refused - server unavailable');
         } else if (error.message.includes('ENOTFOUND')) {
-          console.log('🔍 Host not found - DNS issue');
         } else if (error.message.includes('timeout')) {
-          console.log('⏰ Operation timed out');
         }
         
         // Only log stack trace for non-timeout errors
         if (!error.message.includes('timeout') && !error.message.includes('ETIMEDOUT')) {
-          console.log('Error stack:', error.stack?.substring(0, 300));
         }
       } else {
-        console.log('Error (non-Error object):', JSON.stringify(error, null, 2));
       }
       
       const errorMsg = error instanceof Error ? error.message : String(error);
@@ -213,7 +184,6 @@ export async function testDatabaseConnection(maxRetries: number = 5): Promise<bo
       const jitter = Math.random() * 1000;
       const waitTime = Math.min(baseWaitTime + jitter, 30000); // Max 30 seconds
       
-      console.log(`⏳ Waiting ${Math.round(waitTime)}ms before retry (exponential backoff)...`);
       await new Promise(resolve => setTimeout(resolve, waitTime));
     }
   }
@@ -245,14 +215,11 @@ let isPoolClosed = false;
 export async function closeDatabaseConnection(): Promise<void> {
   try {
     if (isPoolClosed) {
-      console.log('🔌 Database pool already closed, skipping...');
       return;
     }
     
-    console.log('🔌 Closing database connections...');
     await pool.end();
     isPoolClosed = true;
-    console.log('✅ Database connections closed');
   } catch (error) {
     console.error('❌ Error closing database connections:', error);
   }
@@ -264,7 +231,6 @@ process.on('SIGINT', closeDatabaseConnection);
 
 export async function ensureDatabaseSchema(): Promise<void> {
   try {
-    console.log("🔍 Checking database schema...");
     
     // Check if users table exists (as a test for schema initialization)
     const result = await db.execute(sql`
@@ -276,13 +242,10 @@ export async function ensureDatabaseSchema(): Promise<void> {
     `);
     
     const schemaExists = result.rows[0]?.exists;
-    console.log('Schema exists:', schemaExists);
     
     if (!schemaExists) {
-      console.log("📋 Database schema not found. Creating basic tables...");
       
       // Create just the essential users table for now
-      console.log("👤 Creating users table...");
       await db.execute(sql`
         CREATE TABLE IF NOT EXISTS users (
           id serial PRIMARY KEY,
@@ -302,9 +265,7 @@ export async function ensureDatabaseSchema(): Promise<void> {
         );
       `);
       
-      console.log("✅ Essential database schema created successfully");
     } else {
-      console.log("✅ Database schema already exists");
     }
   } catch (error) {
     console.error("❌ Error checking/creating database schema:", error);

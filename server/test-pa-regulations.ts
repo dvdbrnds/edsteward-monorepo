@@ -10,8 +10,6 @@ async function testPARegulationCollection() {
 
     const regulations = await paRegulationCollector.collectRegulations();
 
-    console.log('\nCollection Results:');
-    console.log(`Total regulations found: ${regulations.length}`);
 
     // Group by source and jurisdiction
     const summary = regulations.reduce((acc, reg) => {
@@ -22,16 +20,11 @@ async function testPARegulationCollection() {
       return acc;
     }, {} as Record<string, number>);
 
-    console.log('\nRegulations by source and jurisdiction:');
     Object.entries(summary).forEach(([source, count]) => {
-      console.log(`${source}: ${count}`);
     });
 
     // Print detailed info for all regulations
-    console.log('\nDetailed Regulation Information:');
     regulations.forEach((reg, index) => {
-      console.log(`\nRegulation ${index + 1}:`);
-      console.log(JSON.stringify({
         name: reg.name,
         jurisdiction: reg.jurisdiction,
         stateCode: reg.stateCode,
@@ -52,8 +45,6 @@ async function testPARegulationCollection() {
       })
     );
 
-    console.log('\nValidation Results:');
-    console.log(`Valid regulations: ${validCount}/${regulations.length}`);
 
     // Log any invalid regulations
     const invalidRegulations = validationResults
@@ -65,8 +56,6 @@ async function testPARegulationCollection() {
       }));
 
     if (invalidRegulations.length > 0) {
-      console.log('\nInvalid Regulations:');
-      console.log(JSON.stringify(invalidRegulations, null, 2));
     }
 
     syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 'PA regulation collection test completed', {

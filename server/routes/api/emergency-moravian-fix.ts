@@ -6,12 +6,10 @@ const router = express.Router();
 // Emergency endpoint to bypass broken multi-tenant service for Moravian tenant
 router.get('/regulations', async (req, res) => {
   try {
-    console.log('🚨 [EMERGENCY] Using direct storage bypass for Moravian regulations');
     
     // Use direct storage instead of broken getTenantStorage()
     const regulations = await storage.getRegulations();
     
-    console.log(`🚨 [EMERGENCY] Found ${regulations.length} regulations via direct storage`);
     
     // Apply same filtering logic as original API
     const {

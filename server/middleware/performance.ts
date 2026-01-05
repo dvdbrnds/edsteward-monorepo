@@ -231,7 +231,6 @@ export function performanceMetricsMiddleware() {
       
       // Store metrics (in production, send to monitoring service)
       if (process.env.NODE_ENV === 'development') {
-        console.log(`[METRICS] ${metrics.method} ${metrics.path} - ${metrics.responseTime}ms`);
       }
       
       // Add performance headers

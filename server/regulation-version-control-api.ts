@@ -28,11 +28,9 @@ export function setupRegulationVersionControlApi(app: Express) {
         return res.status(401).json({ error: 'Authentication required' });
       }
 
-      console.log(`📋 Fetching versions for regulation ${regulationId}`);
 
       const versions = await storage.getRegulationVersions(regulationId);
       
-      console.log(`✅ Found ${versions.length} versions for regulation ${regulationId}`);
       
       res.json(versions);
     } catch (error) {
@@ -55,11 +53,9 @@ export function setupRegulationVersionControlApi(app: Express) {
         return res.status(401).json({ error: 'Authentication required' });
       }
 
-      console.log(`📋 Fetching pending updates for regulation ${regulationId}`);
 
       const pendingUpdates = await storage.getPendingUpdatesForRegulation(regulationId);
       
-      console.log(`✅ Found ${pendingUpdates.length} pending updates for regulation ${regulationId}`);
       
       res.json(pendingUpdates);
     } catch (error) {
@@ -84,7 +80,6 @@ export function setupRegulationVersionControlApi(app: Express) {
         return res.status(401).json({ error: 'Authentication required' });
       }
 
-      console.log(`📋 Comparing versions ${versionAId} and ${versionBId} for regulation ${regulationId}`);
 
       const comparison = await storage.compareRegulationVersions(versionAId, versionBId);
       
@@ -125,7 +120,6 @@ export function setupRegulationVersionControlApi(app: Express) {
         return res.status(403).json({ error: 'Unauthorized to perform rollback' });
       }
 
-      console.log(`🔄 Rolling back regulation ${regulationId} to version ${versionId} by user ${user.username}`);
 
       // Get the target version
       const targetVersion = await storage.getRegulationVersion(versionId);
@@ -147,7 +141,6 @@ export function setupRegulationVersionControlApi(app: Express) {
       await storage.updateRegulationContent(regulationId, targetVersion.content, user.id);
 
       // Log the rollback action
-      console.log(`✅ Successfully rolled back regulation ${regulationId} to version ${targetVersion.versionNumber}, created new version ${rollbackVersion.versionNumber}`);
 
       // Create audit log entry
       await storage.createAuditLogEntry({
@@ -190,11 +183,9 @@ export function setupRegulationVersionControlApi(app: Express) {
         return res.status(401).json({ error: 'Authentication required' });
       }
 
-      console.log(`📋 Fetching timeline for regulation ${regulationId}`);
 
       const timeline = await storage.getRegulationTimeline(regulationId);
       
-      console.log(`✅ Found ${timeline.length} timeline events for regulation ${regulationId}`);
       
       res.json(timeline);
     } catch (error) {
@@ -226,7 +217,6 @@ export function setupRegulationVersionControlApi(app: Express) {
 
       const { reason } = req.body;
 
-      console.log(`📸 Creating snapshot for regulation ${regulationId} by user ${user.username}`);
 
       // Get current regulation content
       const regulation = await storage.getRegulation(regulationId);
@@ -244,7 +234,6 @@ export function setupRegulationVersionControlApi(app: Express) {
         changesSummary: `Manual snapshot${reason ? `: ${reason}` : ''}`
       });
 
-      console.log(`✅ Created snapshot version ${snapshot.versionNumber} for regulation ${regulationId}`);
 
       res.json({
         success: true,
@@ -272,7 +261,6 @@ export function setupRegulationVersionControlApi(app: Express) {
         return res.status(401).json({ error: 'Authentication required' });
       }
 
-      console.log(`📊 Fetching version statistics for regulation ${regulationId}`);
 
       const stats = await storage.getRegulationVersionStats(regulationId);
       
@@ -283,5 +271,4 @@ export function setupRegulationVersionControlApi(app: Express) {
     }
   });
 
-  console.log('📋 Regulation Version Control API routes registered');
 }

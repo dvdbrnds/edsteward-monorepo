@@ -19,7 +19,6 @@ router.get("/", requireAuth, async (req, res) => {
     // Use direct database storage for single-tenant mode
     const tenantStorage = getDatabaseStorage();
     
-    console.log(`[NOTIFICATIONS] Fetching notifications for user ${req.user?.id}`);
     
     const notifications = await tenantStorage.getNotificationsByUser(req.user?.id);
     

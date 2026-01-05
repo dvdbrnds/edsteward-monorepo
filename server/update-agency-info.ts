@@ -9,11 +9,9 @@ import * as cheerio from 'cheerio';
  */
 async function updateAgencyInfo() {
   try {
-    console.log('Starting agency information update...');
     
     // Get all regulations
     const regulations = await storage.getRegulations();
-    console.log(`Found ${regulations.length} regulations to process`);
     
     let updatedCount = 0;
     let skippedCount = 0;
@@ -34,7 +32,6 @@ async function updateAgencyInfo() {
           continue;
         }
         
-        console.log(`Processing regulation ${regulation.itemId}: ${regulation.name}`);
         
         // Extract agency information from the URL
         const updates = await extractAgencyInfoFromUrl(regulation.agency_url);
@@ -43,9 +40,7 @@ async function updateAgencyInfo() {
           // Update the regulation
           await storage.updateRegulation(regulation.id, updates);
           updatedCount++;
-          console.log(`✓ Updated regulation ${regulation.itemId} with agency information`);
         } else {
-          console.log(`No agency information found for ${regulation.itemId}`);
           skippedCount++;
         }
       } catch (error) {
@@ -54,11 +49,6 @@ async function updateAgencyInfo() {
       }
     }
     
-    console.log('\nAgency Information Update Summary:');
-    console.log(`Total regulations processed: ${regulations.length}`);
-    console.log(`Updated: ${updatedCount}`);
-    console.log(`Skipped: ${skippedCount}`);
-    console.log(`Errors: ${errorCount}`);
     
   } catch (error) {
     console.error('Failed to update agency information:', error);

@@ -3,14 +3,11 @@ import express from "express";
 import { storage } from '../storage';
 
 export function applyAuthFix(app: express.Application) {
-  console.log('🔓 Applying authentication bypass for /api/regulations');
   
   // Override /api/regulations to be accessible without auth
   app.get('/api/regulations', async (req, res) => {
     try {
-      console.log('📋 Getting regulations - AUTH BYPASSED');
       const regulations = await storage.getRegulations();
-      console.log(`✅ Found ${regulations.length} regulations`);
       res.json(regulations);
     } catch (error) {
       console.error(`❌ Error getting regulations: ${error}`);
@@ -21,5 +18,4 @@ export function applyAuthFix(app: express.Application) {
     }
   });
   
-  console.log('✅ Authentication fix applied');
 }

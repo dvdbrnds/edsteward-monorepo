@@ -63,7 +63,6 @@ interface ValidationReport {
 // Enhanced validation class
 export class RegulationValidator {
   private validateUrls(regulation: Regulation): ValidationError[] {
-    console.log(`Validating URLs for regulation ${regulation.itemId}`);
     const errors: ValidationError[] = [];
 
     // Array of URL fields to validate
@@ -77,7 +76,6 @@ export class RegulationValidator {
 
     urlFields.forEach(({ field, value }) => {
       if (value) {
-        console.log(`Checking URL for ${field}: ${value}`);
         const result = urlSchema.safeParse(value);
         if (!result.success) {
           errors.push({
@@ -110,7 +108,6 @@ export class RegulationValidator {
   }
 
   private validateDates(regulation: Regulation): ValidationError[] {
-    console.log(`Validating dates for regulation ${regulation.itemId}`);
     const errors: ValidationError[] = [];
 
     // Check origination date
@@ -171,7 +168,6 @@ export class RegulationValidator {
   }
 
   private validateRequiredFields(regulation: Regulation): ValidationError[] {
-    console.log(`Validating required fields for regulation ${regulation.itemId}`);
     const errors: ValidationError[] = [];
 
     const requiredFields = [
@@ -200,7 +196,6 @@ export class RegulationValidator {
   }
 
   private validateContent(regulation: Regulation): ValidationError[] {
-    console.log(`Validating content for regulation ${regulation.itemId}`);
     const errors: ValidationError[] = [];
 
     // Check for either summary or requirements
@@ -372,7 +367,6 @@ export class RegulationValidator {
   }
 
   public validateRegulation(regulation: Regulation): ValidationError[] {
-    console.log(`Starting validation for regulation ${regulation.itemId}`);
     const errors = [
       ...this.validateUrls(regulation),
       ...this.validateDates(regulation),
@@ -386,12 +380,10 @@ export class RegulationValidator {
     // Sort errors by priority
     errors.sort((a, b) => a.priority - b.priority);
 
-    console.log(`Validation complete for regulation ${regulation.itemId}. Found ${errors.length} issues.`);
     return errors;
   }
 
   public async validateAll(regulations: Regulation[]): Promise<ValidationReport> {
-    console.log(`Starting batch validation for ${regulations.length} regulations`);
     const allErrors: ValidationError[] = [];
     let validCount = 0;
 
@@ -412,7 +404,6 @@ export class RegulationValidator {
       timestamp: new Date()
     };
 
-    console.log(`Validation complete. ${validCount} valid regulations out of ${regulations.length}`);
     return report;
   }
 }

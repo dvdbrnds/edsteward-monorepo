@@ -4,7 +4,6 @@ import { sql } from "drizzle-orm";
 
 async function migrateUsersTable() {
   try {
-    console.log("Checking users table structure...");
     
     // Check if firstName column exists (trying both camelCase and snake_case)
     const checkFirstName = await db.execute(sql`
@@ -14,23 +13,18 @@ async function migrateUsersTable() {
     
     // If neither exists, add firstName
     if (checkFirstName.rows.length === 0) {
-      console.log("Adding firstName column...");
       await db.execute(sql`
         ALTER TABLE users 
         ADD COLUMN "firstName" TEXT
       `);
-      console.log("Added firstName column");
     } else {
-      console.log("firstName column already exists as:", checkFirstName.rows[0].column_name);
       
       // If first_name exists but firstName doesn't, rename it
       if (checkFirstName.rows[0].column_name === 'first_name') {
-        console.log("Renaming first_name to firstName...");
         await db.execute(sql`
           ALTER TABLE users 
           RENAME COLUMN "first_name" TO "firstName"
         `);
-        console.log("Renamed first_name to firstName");
       }
     }
     
@@ -41,23 +35,18 @@ async function migrateUsersTable() {
     `);
     
     if (checkLastName.rows.length === 0) {
-      console.log("Adding lastName column...");
       await db.execute(sql`
         ALTER TABLE users 
         ADD COLUMN "lastName" TEXT
       `);
-      console.log("Added lastName column");
     } else {
-      console.log("lastName column already exists as:", checkLastName.rows[0].column_name);
       
       // If last_name exists but lastName doesn't, rename it
       if (checkLastName.rows[0].column_name === 'last_name') {
-        console.log("Renaming last_name to lastName...");
         await db.execute(sql`
           ALTER TABLE users 
           RENAME COLUMN "last_name" TO "lastName"
         `);
-        console.log("Renamed last_name to lastName");
       }
     }
     
@@ -68,14 +57,11 @@ async function migrateUsersTable() {
     `);
     
     if (checkExternalId.rows.length === 0) {
-      console.log("Adding external_id column...");
       await db.execute(sql`
         ALTER TABLE users 
         ADD COLUMN "external_id" TEXT UNIQUE
       `);
-      console.log("Added external_id column");
     } else {
-      console.log("external_id column already exists");
     }
     
     // Check for provider_id column
@@ -85,14 +71,11 @@ async function migrateUsersTable() {
     `);
     
     if (checkProviderId.rows.length === 0) {
-      console.log("Adding provider_id column...");
       await db.execute(sql`
         ALTER TABLE users 
         ADD COLUMN "provider_id" TEXT
       `);
-      console.log("Added provider_id column");
     } else {
-      console.log("provider_id column already exists");
     }
     
     // Check for identity_provider column
@@ -102,14 +85,11 @@ async function migrateUsersTable() {
     `);
     
     if (checkIdentityProvider.rows.length === 0) {
-      console.log("Adding identity_provider column...");
       await db.execute(sql`
         ALTER TABLE users 
         ADD COLUMN "identity_provider" TEXT
       `);
-      console.log("Added identity_provider column");
     } else {
-      console.log("identity_provider column already exists");
     }
     
     // Check for last_login column
@@ -119,14 +99,11 @@ async function migrateUsersTable() {
     `);
     
     if (checkLastLogin.rows.length === 0) {
-      console.log("Adding last_login column...");
       await db.execute(sql`
         ALTER TABLE users 
         ADD COLUMN "last_login" TIMESTAMP
       `);
-      console.log("Added last_login column");
     } else {
-      console.log("last_login column already exists");
     }
     
     // Check for created_at column
@@ -136,14 +113,11 @@ async function migrateUsersTable() {
     `);
     
     if (checkCreatedAt.rows.length === 0) {
-      console.log("Adding created_at column...");
       await db.execute(sql`
         ALTER TABLE users 
         ADD COLUMN "created_at" TIMESTAMP DEFAULT NOW()
       `);
-      console.log("Added created_at column");
     } else {
-      console.log("created_at column already exists");
     }
     
     // Check for updated_at column
@@ -153,17 +127,13 @@ async function migrateUsersTable() {
     `);
     
     if (checkUpdatedAt.rows.length === 0) {
-      console.log("Adding updated_at column...");
       await db.execute(sql`
         ALTER TABLE users 
         ADD COLUMN "updated_at" TIMESTAMP DEFAULT NOW()
       `);
-      console.log("Added updated_at column");
     } else {
-      console.log("updated_at column already exists");
     }
     
-    console.log("Migration completed successfully");
   } catch (error) {
     console.error("Migration failed:", error);
   } finally {

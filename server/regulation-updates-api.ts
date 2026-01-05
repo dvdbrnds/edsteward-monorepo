@@ -13,14 +13,12 @@ function basicAuthMiddleware(req: Request, res: Response, next: Function) {
   // Allow localhost requests to bypass authentication
   const host = req.headers.host || '';
   if (host.includes('localhost') || host.includes('127.0.0.1')) {
-    console.log('🔓 Localhost request - bypassing Basic Auth for MCP Engine');
     return next();
   }
 
   const authHeader = req.headers.authorization;
   
   if (!authHeader || !authHeader.startsWith('Basic ')) {
-    console.log('🔒 Missing or invalid Authorization header for MCP Engine');
     return res.status(401).json({ 
       error: 'Basic Authentication required',
       message: 'MCP Engine integration requires Basic Auth with valid credentials'
@@ -33,10 +31,8 @@ function basicAuthMiddleware(req: Request, res: Response, next: Function) {
 
   // Validate MCP Engine credentials
   if (username === 'dvdbrnds' && password === 'gabadh') {
-    console.log('✅ MCP Engine Basic Auth successful for bulk import');
     next();
   } else {
-    console.log('❌ Invalid MCP Engine credentials:', username);
     return res.status(401).json({ 
       error: 'Invalid credentials',
       message: 'MCP Engine integration requires valid username and password'
@@ -243,12 +239,10 @@ export function setupRegulationUpdatesApi(app: Express) {
       const regulationId = req.body.regulationId || 'unknown';
       const regulationName = req.body.name || 'unnamed';
       
-      console.log(`📋 [${timestamp}] MCP Engine bulk import - Regulation ${regulationId}: ${regulationName}`);
       
       // Log Federal Register enhancement status if present
       if (req.body.federal_register_enhancement) {
         const enhancement = req.body.federal_register_enhancement;
-        console.log(`🔍 Federal Register Enhancement: attempted=${enhancement.attempted}, successful=${enhancement.successful}, contexts=${enhancement.contexts_found || 0}`);
       }
       
       let updateData;
@@ -258,7 +252,6 @@ export function setupRegulationUpdatesApi(app: Express) {
       const tufValidation = tufUpdateSchema.safeParse(req.body);
       
       if (tufValidation.success) {
-        console.log('🔒 Detected TUF-verified format');
         const tufData = tufValidation.data;
         
         if (!tufData.verified) {
@@ -290,7 +283,6 @@ export function setupRegulationUpdatesApi(app: Express) {
         const simpleValidation = insertRegulationUpdateSchema.safeParse(req.body);
         
         if (simpleValidation.success) {
-          console.log('✅ Detected simple format');
           const rawData = simpleValidation.data;
           
           // Validate regulation ID (Master Key Field system: 1-354)
@@ -304,17 +296,12 @@ export function setupRegulationUpdatesApi(app: Express) {
             });
           }
           
-          console.log(`✅ Using Master Key Field ID ${validRegulationId} directly`);
           
           // Extract structured fields from request body
           const summary = req.body.summary || null;
           const requirements = req.body.requirements || null;
           const filingDeadlines = req.body.filingDeadlines || req.body.filing_deadlines || null;
           
-          console.log('📋 Structured fields received:');
-          console.log(`   summary: ${summary ? 'YES (' + summary.length + ' chars)' : 'NO'}`);
-          console.log(`   requirements: ${requirements ? 'YES (' + requirements.length + ' chars)' : 'NO'}`);
-          console.log(`   filingDeadlines: ${filingDeadlines ? 'YES (' + filingDeadlines.length + ' chars)' : 'NO'}`);
           
           updateData = {
             ...rawData,
@@ -328,7 +315,6 @@ export function setupRegulationUpdatesApi(app: Express) {
           const mcpValidation = mcpEngineUpdateSchema.safeParse(req.body);
           
           if (mcpValidation.success) {
-            console.log('✅ Detected MCP Engine complex format');
             const mcpData = mcpValidation.data;
             
             // Validate regulation ID (Master Key Field system: 1-354)
@@ -342,17 +328,11 @@ export function setupRegulationUpdatesApi(app: Express) {
               });
             }
             
-            console.log(`✅ Using Master Key Field ID ${validRegulationId} directly`);
             
             // Check for Federal Register enhancement
             const hasEnhancement = mcpData.federal_register_enhancement?.attempted;
             const enhancementSuccessful = mcpData.federal_register_enhancement?.successful;
             
-            console.log('🔍 Federal Register Enhancement Status:');
-            console.log('   attempted:', hasEnhancement);
-            console.log('   successful:', enhancementSuccessful);
-            console.log('   contexts_found:', mcpData.federal_register_enhancement?.contexts_found || 0);
-            console.log('   total_documents:', mcpData.federal_register_enhancement?.total_documents_referenced || 0);
             
             // Determine content source based on enhancement status
             let regulationText: string;
@@ -365,24 +345,17 @@ export function setupRegulationUpdatesApi(app: Express) {
               // Handle requirements array from Federal Register enhancement
               if (mcpData.requirements && Array.isArray(mcpData.requirements)) {
                 requirementsContent = mcpData.requirements.join('\n• ');
-                console.log('✅ Using enhanced requirements array:', mcpData.requirements.length, 'items');
               } else {
                 requirementsContent = mcpData.content?.requirements?.content || null;
               }
               
-              console.log('✅ Using Federal Register enhanced content');
-              console.log('   source_attribution:', mcpData.source_attribution);
-              console.log('   submission_guidelines available:', !!mcpData.submission_guidelines);
             } else {
               // Fallback to legacy content structure
               regulationText = mcpData.content?.uscText?.text || "Original content from MCP Engine";
               requirementsContent = mcpData.content?.requirements?.content || null;
               
               if (hasEnhancement && !enhancementSuccessful) {
-                console.log('⚠️ Federal Register enhancement failed, using fallback content');
-                console.log('   error:', mcpData.federal_register_enhancement?.error);
               } else {
-                console.log('✅ Using legacy content structure');
               }
             }
             
@@ -390,10 +363,6 @@ export function setupRegulationUpdatesApi(app: Express) {
             const summaryContent = mcpData.summary || mcpData.content?.summary || null;
             const filingDeadlinesContent = mcpData.filingDeadlines || mcpData.filing_deadlines || mcpData.content?.filing_deadlines || null;
             
-            console.log('📋 Extracted structured fields:');
-            console.log(`   summary: ${summaryContent ? 'YES (' + summaryContent.length + ' chars)' : 'NO'}`);
-            console.log(`   requirements: ${requirementsContent ? 'YES (' + requirementsContent.length + ' chars)' : 'NO'}`);
-            console.log(`   filingDeadlines: ${filingDeadlinesContent ? 'YES' : 'NO'}`);
             
             // Convert MCP Engine format to EdSteward format
             updateData = {
@@ -415,12 +384,6 @@ export function setupRegulationUpdatesApi(app: Express) {
               }
             };
             
-            console.log('🔍 Debug updateData object:');
-            console.log('   regulationId:', updateData.regulationId);
-            console.log('   name:', updateData.name);
-            console.log('   updatedContent length:', updateData.updatedContent?.length);
-            console.log('   requirements:', updateData.requirements ? `HAS_CONTENT (${updateData.requirements.length} chars)` : 'NULL');
-            console.log('   enhancement_metadata:', !!updateData.metadata?.federal_register_enhancement);
           } else {
             console.error('❌ Validation failed for all formats');
             console.error('TUF format errors:', tufValidation.error.issues);
@@ -438,7 +401,6 @@ export function setupRegulationUpdatesApi(app: Express) {
       // Create the regulation update with optimized bulk processing
       const newUpdate = await storage.createRegulationUpdate(updateData);
       
-      console.log(`✅ [BULK-IMPORT] Regulation ${regulationId} processed successfully - Update ID: ${newUpdate.id} ${isTUFVerified ? '(TUF-verified)' : ''}`);
       
       // Return exact format expected by MCP Engine for bulk import tracking
       res.status(200).json({
@@ -726,7 +688,6 @@ export function setupRegulationUpdatesApi(app: Express) {
       
       await storage.bulkDeleteRegulationUpdates(validIds);
       
-      console.log(`✅ Bulk deleted ${validIds.length} regulation updates by user ${user.username}`);
       
       res.json({ 
         success: true, 

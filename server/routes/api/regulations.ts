@@ -45,7 +45,6 @@ router.get("/", async (req: any, res) => {
     const isAdmin = user?.role === 'admin';
     const isComplianceOfficer = user?.role === 'compliance_officer';
     
-    console.log(`[REGULATIONS] Fetching regulations for user: ${user?.username || 'anonymous'}, role: ${user?.role || 'none'}`);
     
     // Parse query parameters
     const {
@@ -72,7 +71,6 @@ router.get("/", async (req: any, res) => {
         const ownerId = reg.ownerId ?? reg.owner_id;
         return ownerId === user.id;
       });
-      console.log(`[REGULATIONS] Filtered from ${beforeCount} to ${regulations.length} regulations for compliance officer ${user.username} (id: ${user.id})`);
     }
     
     // Apply filters
@@ -498,11 +496,6 @@ router.patch("/:regulationId/owner", requireAuth, async (req: any, res) => {
 // Update a regulation action - requires compliance officer or admin
 router.patch("/:regulationId/actions/:actionType", requireAuth, requireComplianceOfficer, ...auditRegulationAction(), async (req, res) => {
   try {
-    console.log('🔧 PATCH /actions endpoint hit');
-    console.log('   User authenticated:', req.isAuthenticated());
-    console.log('   User:', req.user?.username);
-    console.log('   Params:', req.params);
-    console.log('   Body:', req.body);
     
     const startTime = Date.now();
     const regulationId = parseInt(req.params.regulationId);

@@ -8,7 +8,6 @@ const router = Router();
 
 // Test endpoint to verify route is working
 router.get('/test', (req, res) => {
-  console.log('Database test endpoint called');
   res.json({ 
     message: 'Database API is working!', 
     timestamp: new Date().toISOString(),
@@ -55,8 +54,6 @@ const pool = new Pool({
 // Get database statistics - simplified for testing
 router.get('/stats', async (req, res) => {
   try {
-    console.log('Database stats endpoint called');
-    console.log('User:', req.user);
     
     // For now, return mock data to test the endpoint
     const stats = {
@@ -187,9 +184,6 @@ router.get('/export', requireAuth, requireAdmin, async (req, res) => {
 
 // Import database
 router.post('/import', upload.single('file'), async (req, res) => {
-  console.log('Import endpoint called');
-  console.log('User:', req.user);
-  console.log('File:', req.file);
 
   if (!req.file) {
     return res.status(400).json({ error: 'No file uploaded' });

@@ -481,5 +481,4 @@ export function setupMCPIntegrationApi(app: express.Application) {
     }
   });
   
-  console.log('MCP Integration API routes registered');
 }

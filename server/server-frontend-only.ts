@@ -7,10 +7,6 @@ import { config } from './config/environment';
 let server: Server | null = null;
 
 export async function startServer(): Promise<Server> {
-  console.log('=== EDSTEWARD FRONTEND-ONLY SERVER v2.0 ===');
-  console.log('NODE_ENV:', process.env.NODE_ENV);
-  console.log('PORT:', config.PORT);
-  console.log('🎯 SERVING FRONTEND ONLY - NO DATABASE DEPENDENCIES');
   
   try {
     // Create minimal Express app
@@ -50,13 +46,11 @@ export async function startServer(): Promise<Server> {
     
     // Serve static files (production build) - fixed path
     const distPath = path.join(__dirname, '..', 'dist', 'public');
-    console.log('Serving static files from:', distPath);
     app.use(express.static(distPath));
     
     // Catch-all handler for SPA routing
     app.get('*', (req, res) => {
       const indexPath = path.join(distPath, 'index.html');
-      console.log('Serving index.html for route:', req.path);
       res.sendFile(indexPath, (err) => {
         if (err) {
           console.error('Error serving index.html:', err);
@@ -66,10 +60,8 @@ export async function startServer(): Promise<Server> {
     });
 
     // Start server
-    console.log('Starting HTTP server on port', config.PORT);
     return new Promise((resolve, reject) => {
       const cleanup = () => {
-        console.log('Cleaning up server...');
         if (server) {
           server.close();
           server = null;
@@ -80,8 +72,6 @@ export async function startServer(): Promise<Server> {
       process.on('SIGINT', cleanup);
 
       server = app.listen(config.PORT, () => {
-        console.log(`🚀 FRONTEND-ONLY SERVER RUNNING ON PORT ${config.PORT}!`);
-        console.log(`Server accessible at http://localhost:${config.PORT}`);
         resolve(server!);
       });
 

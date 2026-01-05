@@ -31,7 +31,6 @@ export const sessionDebugMiddleware = (req: Request, res: Response, next: NextFu
   const originalJson = res.json;
   
   // Log session state before request
-  console.log(`🔍 [${req.method} ${req.path}] Session Debug:`, {
     sessionId: req.sessionID,
     hasSession: !!req.session,
     sessionKeys: req.session ? Object.keys(req.session) : [],
@@ -43,7 +42,6 @@ export const sessionDebugMiddleware = (req: Request, res: Response, next: NextFu
 
   // Intercept response to log Set-Cookie headers
   res.send = function(body) {
-    console.log(`📤 [${req.method} ${req.path}] Response:`, {
       statusCode: res.statusCode,
       setCookieHeaders: res.getHeaders()['set-cookie'],
       sessionAfterResponse: req.session ? {
@@ -56,7 +54,6 @@ export const sessionDebugMiddleware = (req: Request, res: Response, next: NextFu
   };
 
   res.json = function(body) {
-    console.log(`📤 [${req.method} ${req.path}] JSON Response:`, {
       statusCode: res.statusCode,
       setCookieHeaders: res.getHeaders()['set-cookie'],
       sessionAfterResponse: req.session ? {

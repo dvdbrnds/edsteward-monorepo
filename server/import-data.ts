@@ -25,7 +25,6 @@ const COMPLIANCE_SURVEY_FIELDS = {
 };
 
 function normalizeTopic(topic: string): string {
-  console.log("Raw topic:", topic);
   const normalized = topic
     .toLowerCase()
     .replace(/\([^)]*\)/g, '') // Remove content in parentheses
@@ -54,26 +53,21 @@ function normalizeTopic(topic: string): string {
     normalizedText = normalizedText.replace(pattern, full);
   });
 
-  console.log("Normalized topic:", normalizedText);
   return normalizedText;
 }
 
 function areSimilarTopics(topic1: string, topic2: string): boolean {
-  console.log(`\nComparing topics:\n- "${topic1}"\n- "${topic2}"`);
   const normalized1 = normalizeTopic(topic1);
   const normalized2 = normalizeTopic(topic2);
 
-  console.log(`Normalized comparison:\n- "${normalized1}"\n- "${normalized2}"`);
 
   // Check for exact match after normalization
   if (normalized1 === normalized2) {
-    console.log("✓ Found exact match after normalization");
     return true;
   }
 
   // Check if one is contained within the other
   if (normalized1.includes(normalized2) || normalized2.includes(normalized1)) {
-    console.log("✓ Found partial match through inclusion");
     return true;
   }
 
@@ -86,8 +80,6 @@ function areSimilarTopics(topic1: string, topic2: string): boolean {
   const uniqueWords = new Set([...words1, ...words2]);
   const similarity = commonWords.length / uniqueWords.size;
 
-  console.log(`Similarity score: ${similarity}`);
-  console.log(`Common words: ${commonWords.join(', ')}`);
 
   // Check for key phrases that indicate same topic
   const keyPhrases = [
@@ -99,44 +91,33 @@ function areSimilarTopics(topic1: string, topic2: string): boolean {
   );
 
   if (hasCommonKeyPhrase) {
-    console.log("✓ Found match through key phrase");
     return true;
   }
 
   // Check content similarity in summary and requirements
   if (similarity > 0.4) {  // Lowered threshold due to improved normalization
-    console.log("✓ Found match through similarity score");
     return true;
   }
 
-  console.log("✗ No match found");
   return false;
 }
 
 async function findExistingRegulation(topic: string): Promise<Regulation | undefined> {
   const existingRegulations = await storage.getRegulations();
-  console.log(`\nSearching for matches among ${existingRegulations.length} existing regulations`);
-  console.log(`Looking for matches for topic: "${topic}"`);
 
   for (const reg of existingRegulations) {
-    console.log(`\nChecking against existing regulation: ${reg.topic}`);
     if (areSimilarTopics(reg.topic, topic)) {
-      console.log(`✓ Found matching regulation: "${reg.topic}" matches "${topic}"`);
       return reg;
     }
   }
-  console.log("✗ No matching regulation found");
   return undefined;
 }
 
 async function mergeRegulations(existing: Regulation, newData: InsertRegulation): Promise<Partial<InsertRegulation>> {
-  console.log("\nMerging regulations:");
-  console.log("Existing regulation:", {
     topic: existing.topic,
     summary: existing.summary?.substring(0, 100) + "...",
     requirements: existing.requirements?.substring(0, 100) + "..."
   });
-  console.log("New regulation:", {
     topic: newData.topic,
     summary: newData.summary?.substring(0, 100) + "...",
     requirements: newData.requirements?.substring(0, 100) + "..."
@@ -171,7 +152,6 @@ async function mergeRegulations(existing: Regulation, newData: InsertRegulation)
     agency_url: existing.agency_url || null,
   };
 
-  console.log("Merged result:", {
     topic: merged.topic,
     summary: merged.summary?.substring(0, 100) + "..."
   });
@@ -260,25 +240,21 @@ function determineJurisdiction(record: any): "federal" | "state" {
   // Check URL if present
   const url = record[COMPLIANCE_SURVEY_FIELDS.LAW_LINK] || record['Regulation URL'] || record['Agency URL'] || '';
   if (url && (url.includes('.pa.gov') || url.includes('pennsylvania.gov'))) {
-    console.log(`Detected state regulation from URL: ${url}`);
     return "state";
   }
 
   // Check for state indicators in content
   for (const indicator of stateIndicators) {
     if (content.includes(indicator)) {
-      console.log(`Detected state regulation from indicator: ${indicator}`);
       return "state";
     }
   }
 
   // Check if the regulation references PA Code
   if (content.includes('pa code') || content.includes('pennsylvania code')) {
-    console.log('Detected state regulation from PA Code reference');
     return "state";
   }
 
-  console.log('No state indicators found, defaulting to federal');
   return "federal";
 }
 
@@ -325,7 +301,6 @@ async function importRegulations(filePath?: string) {
   if (!filePath) {
     filePath = path.join(__dirname, "..", "attached_assets", "compliance-matrix.xlsx");
   }
-  console.log("Reading file from:", filePath);
 
   try {
     let records: any[];
@@ -336,7 +311,6 @@ async function importRegulations(filePath?: string) {
       const worksheet = workbook.Sheets[sheetName];
       records = xlsx.utils.sheet_to_json(worksheet, { raw: false });
     } else if (filePath.endsWith('.csv')) {
-      console.log("Processing CSV file...");
       const content = fs.readFileSync(filePath, 'utf-8');
       records = parse(content, {
         columns: true,
@@ -361,8 +335,6 @@ async function importRegulations(filePath?: string) {
       return hasContent;
     });
 
-    console.log(`Found ${records.length} valid records to import`);
-    console.log("First record sample:", JSON.stringify(records[0], null, 2));
 
     let newCount = 0;
     let updateCount = 0;
@@ -376,7 +348,6 @@ async function importRegulations(filePath?: string) {
       try {
         const isComplianceSurvey = record[COMPLIANCE_SURVEY_FIELDS.LAW_NAME] !== undefined;
 
-        console.log("\nProcessing record:", {
           format: isComplianceSurvey ? 'compliance survey' : 'standard',
           lawName: isComplianceSurvey ? record[COMPLIANCE_SURVEY_FIELDS.LAW_NAME] : record['Topic'],
           timestamp: record['Timestamp']
@@ -388,7 +359,6 @@ async function importRegulations(filePath?: string) {
           record['Item ID'] || record['id'] || '';
 
         if (!itemId) {
-          console.log("Skipping record - no item ID generated");
           skipCount++;
           continue;
         }
@@ -478,20 +448,16 @@ async function importRegulations(filePath?: string) {
           verification_method: record['Verification Method'] || null
         };
 
-        console.log(`\nProcessing regulation: ${regulation.topic}`);
 
         // Check for existing similar regulation
         const existingRegulation = await findExistingRegulation(regulation.topic);
 
         if (existingRegulation) {
-          console.log(`\nExisting regulation found:`, existingRegulation);
           // Merge the regulations
           const mergedRegulation = await mergeRegulations(existingRegulation, regulation);
-          console.log(`\nMerged regulation:`, mergedRegulation);
 
           await storage.updateRegulation(existingRegulation.id, mergedRegulation);
           mergeCount++;
-          console.log(`✓ Merged regulation: ${regulation.topic} into ${existingRegulation.topic}`);
           continue;
         }
 
@@ -502,7 +468,6 @@ async function importRegulations(filePath?: string) {
 
         // Log all validation results for visibility
         if (warnings.length > 0) {
-          console.log(`Validation warnings for regulation ${regulation.itemId}:`, warnings);
         }
 
         // Only block import on actual errors
@@ -514,12 +479,10 @@ async function importRegulations(filePath?: string) {
 
         await storage.createRegulation(regulation);
         newCount++;
-        console.log(`✓ Imported regulation: ${regulation.itemId} (${regulation.category})`);
 
       } catch (error: any) {
         if (error?.code === '23505') { // Duplicate key error
           skipCount++;
-          console.log(`Skipped duplicate regulation: ${record['Item ID'] || record['id'] || record['Timestamp']}`);
         } else {
           console.error(`Failed to import record:`, error);
           console.error('Record data:', JSON.stringify(record, null, 2));
@@ -527,17 +490,9 @@ async function importRegulations(filePath?: string) {
       }
     }
 
-    console.log('\nImport Summary:');
-    console.log(`New regulations added: ${newCount}`);
-    console.log(`Existing regulations merged: ${mergeCount}`);
-    console.log(`Duplicates skipped: ${skipCount}`);
-    console.log(`Validation errors: ${validationErrors}`);
-    console.log('Import completed');
 
     // Run deduplication after import
-    console.log('\nRunning deduplication process...');
     const deduplicationSummary = await deduplicateRegulations();
-    console.log('Deduplication complete:', deduplicationSummary);
 
     return { 
       newCount, 

@@ -38,7 +38,6 @@ async function migrateToProduction() {
 if (require.main === module) {
   migrateToProduction()
     .then(results => {
-      console.log("Migration completed:", results);
       process.exit(0);
     })
     .catch(error => {

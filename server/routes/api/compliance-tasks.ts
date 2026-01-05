@@ -150,13 +150,8 @@ router.get('/regulation/:regulationId', requireAuth, async (req: Request, res: R
 
     // Debug logging
     const completedTasksDebug = allTasks.filter(t => t.status === 'completed');
-    console.log('=== COMPLIANCE TASKS DEBUG ===');
-    console.log('Total tasks:', allTasks.length);
-    console.log('Completed tasks:', completedTasksDebug.length);
     completedTasksDebug.forEach(t => {
-      console.log(`  Task ${t.id}: status=${t.status}, completedAt=${t.completedAt}, completedByUser=`, t.completedByUser);
     });
-    console.log('==============================');
 
     res.json({
       tasks: rootTasks,

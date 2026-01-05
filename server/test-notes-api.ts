@@ -16,7 +16,6 @@ if (!fs.existsSync(LOG_DIR)) {
 const log = (message: string, data?: any) => {
   const timestamp = new Date().toISOString();
   const logEntry = `[${timestamp}] ${message}${data ? ` - ${JSON.stringify(data, null, 2)}` : ''}\n`;
-  console.log(logEntry);
   fs.appendFileSync(TEST_LOG_FILE, logEntry);
 };
 

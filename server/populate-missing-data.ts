@@ -4,27 +4,21 @@ import { addMonths, addDays, subDays } from "date-fns";
 
 async function populateMissingData() {
   try {
-    console.log("Starting to populate missing data...");
 
     // Get all regulations
     const regulations = await storage.getRegulations();
-    console.log(`Found ${regulations.length} regulations`);
 
     // Get all users
     const users = await storage.getUsers();
-    console.log(`Found ${users.length} users`);
 
     if (regulations.length === 0 || users.length === 0) {
-      console.log("No regulations or users found, skipping data population");
       return;
     }
 
     // Check if deadlines already exist
     const existingDeadlines = await storage.getDeadlines();
-    console.log(`Found ${existingDeadlines.length} existing deadlines`);
 
     if (existingDeadlines.length === 0) {
-      console.log("Creating sample deadlines...");
       
       // Create deadlines for first 20 regulations
       const regulationsToProcess = regulations.slice(0, 20);
@@ -53,21 +47,17 @@ async function populateMissingData() {
 
           await storage.createDeadline(deadline);
           deadlinesCreated++;
-          console.log(`Created deadline for regulation ${regulation.id} (${deadline.dueDate}, ${status})`);
         } catch (error) {
           console.error(`Failed to create deadline for regulation ${regulation.id}:`, error);
         }
       }
 
-      console.log(`Created ${deadlinesCreated} deadlines`);
     }
 
     // Check if notifications exist
     const existingNotifications = await storage.getNotificationsByUser(users[0].id);
-    console.log(`Found ${existingNotifications.length} existing notifications for user ${users[0].id}`);
 
     if (existingNotifications.length === 0) {
-      console.log("Creating sample notifications...");
       
       let notificationsCreated = 0;
 
@@ -100,16 +90,13 @@ async function populateMissingData() {
             notificationsCreated++;
           }
 
-          console.log(`Created notifications for user ${user.username}`);
         } catch (error) {
           console.error(`Failed to create notifications for user ${user.id}:`, error);
         }
       }
 
-      console.log(`Created ${notificationsCreated} notifications`);
     }
 
-    console.log("Data population completed successfully!");
 
   } catch (error) {
     console.error("Failed to populate missing data:", error);
@@ -121,7 +108,6 @@ async function populateMissingData() {
 if (require.main === module) {
   populateMissingData()
     .then(() => {
-      console.log("✅ Data population completed");
       process.exit(0);
     })
     .catch((error) => {

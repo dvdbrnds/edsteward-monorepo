@@ -43,7 +43,6 @@ const _currentDir = getDirname();
  */
 async function inspectPARegulations() {
   try {
-    console.log('==== PA Regulations Inspector ====');
 
     // Dynamically get storage module
     const storage = await getStorage();
@@ -54,11 +53,9 @@ async function inspectPARegulations() {
       reg => reg.stateCode === 'PA' && reg.jurisdiction === 'state'
     );
 
-    console.log(`Found ${paRegulations.length} PA regulations to analyze`);
 
     // Create logs directory with robust path handling
     const logsDir = path.join(process.cwd(), 'logs');
-    console.log(`Creating logs directory at: ${logsDir}`);
     if (!fs.existsSync(logsDir)) {
       fs.mkdirSync(logsDir, { recursive: true });
     }
@@ -157,16 +154,12 @@ async function inspectPARegulations() {
 
     // Write to log file
     fs.writeFileSync(logFilePath, logContent);
-    console.log(`Analysis log written to: ${logFilePath}`);
 
     // Provide summary to console
-    console.log('\nContent Pattern Summary:');
     Object.entries(patternCounts).forEach(([pattern, count]) => {
       const percentage = (count / paRegulations.length) * 100;
-      console.log(`- "${pattern}": ${count} regulations (${percentage.toFixed(2)}%)`);
     });
 
-    console.log('\nInspection complete. Check the log file for detailed analysis.');
 
     // Export detailed report
     const reportPath = path.join(logsDir, 'pa_regulations_report.json');
@@ -204,22 +197,14 @@ async function inspectPARegulations() {
     };
 
     fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
-    console.log(`\nDetailed report saved to: ${reportPath}`);
 
     // Print a few examples of problematic regulations
-    console.log('\nExamples of Empty/Poor Content Regulations:');
     paRegulations
       .filter(reg => !reg.requirements || reg.requirements.length < 100)
       .slice(0, 5)
       .forEach((reg, i) => {
-        console.log(`\nExample ${i + 1}:`);
-        console.log(`Name: ${reg.name}`);
-        console.log(`Agency: ${reg.stateAgency}`);
-        console.log(`URL: ${reg.regulationUrl}`);
-        console.log(`Content: ${reg.requirements || '[EMPTY]'}`);
       });
 
-    console.log('\n==== Inspection Complete ====');
 
   } catch (error) {
     console.error('Inspection failed:', error instanceof Error ? error.message : String(error));

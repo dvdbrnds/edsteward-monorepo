@@ -6,12 +6,10 @@ import path from 'path';
 import { hashPassword } from './auth';  // Import our new scrypt-based function
 
 export async function initializeDatabase() {
-  console.log('🚀 Starting database initialization...');
 
   try {
     // Test database connection first
     await db.execute(sql`SELECT 1`);
-    console.log('✅ Database connection successful');
 
     // Check if users table exists and has data
     const userCheck = await db.execute(sql`
@@ -20,7 +18,6 @@ export async function initializeDatabase() {
     `);
 
     if (userCheck.rows[0]?.count === '0') {
-      console.log('📋 Creating database schema from init_schema.sql...');
 
       // Load complete schema from file
       const schemaPath = path.join(process.cwd(), 'sql_dump/init_schema.sql');
@@ -39,9 +36,7 @@ export async function initializeDatabase() {
           .trim();
 
         await db.execute(sql.raw(cleanSchemaSQL));
-        console.log('✅ Complete database schema created from init_schema.sql');
       } else {
-        console.log('⚠️ init_schema.sql not found, creating minimal schema');
         // Fallback to essential tables only
         await db.execute(sql`
           CREATE TABLE IF NOT EXISTS users (
@@ -69,7 +64,6 @@ export async function initializeDatabase() {
     const userCount = parseInt(existingUsers.rows[0]?.count || '0');
 
     if (userCount === 0) {
-      console.log('👤 Creating essential users...');
 
       // Hash passwords properly
       const adminPassword = await hashPassword('admin123');
@@ -94,14 +88,12 @@ export async function initializeDatabase() {
         VALUES ('nasol', ${userPassword}, 'nasol@moravian.edu', 'user', 'Nick', 'Asol', 'Compliance')
       `);
 
-      console.log('✅ Essential users created');
     }
 
     // Try to load data from exports if available
     try {
       const exportPath = path.join(process.cwd(), 'exports/complete_export.sql');
       if (fs.existsSync(exportPath)) {
-        console.log('📊 Loading data from exports...');
         const exportSQL = fs.readFileSync(exportPath, 'utf8');
 
         // Extract and execute INSERT statements
@@ -120,10 +112,8 @@ export async function initializeDatabase() {
           }
         }
 
-        console.log(`✅ Loaded ${successCount} records from exports`);
       }
     } catch (_err) {
-      console.log('⚠️ Could not load export data, continuing with basic setup');
     }
 
     // Final verification
@@ -131,10 +121,7 @@ export async function initializeDatabase() {
     const finalRegCount = await db.execute(sql`SELECT COUNT(*) as count FROM regulations`);
 
     // Single-tenant mode - database already initialized
-    console.log('✅ Single-tenant database ready');
 
-    console.log('🎉 Database initialization completed!');
-    console.log(`📊 Users: ${finalUserCount.rows[0]?.count}, Regulations: ${finalRegCount.rows[0]?.count}`);
 
     return {
       success: true,

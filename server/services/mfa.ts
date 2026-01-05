@@ -148,7 +148,6 @@ export class MFAService {
       mfaSetupAt: new Date(),
     });
 
-    console.log(`✅ MFA enabled for user ${userId}`);
     return true;
   }
 
@@ -206,7 +205,6 @@ export class MFAService {
             mfaBackupCodes: encryptedBackupCodes,
           });
 
-          console.log(`✅ Backup code used for user ${userId}. ${backupCodes.length} codes remaining.`);
           
           return {
             success: true,
@@ -294,7 +292,6 @@ export class MFAService {
       mfaBackupCodes: encryptedBackupCodes,
     });
 
-    console.log(`✅ Backup codes regenerated for user ${userId}`);
     return newBackupCodes;
   }
 
@@ -311,7 +308,6 @@ export class MFAService {
         mfaSetupAt: null,
       });
 
-      console.log(`✅ MFA disabled for user ${userId}`);
     } catch (error) {
       console.error(`❌ Error disabling MFA for user ${userId}:`, error);
       throw error;

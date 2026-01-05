@@ -11,7 +11,6 @@ router.get('/health', async (req, res) => {
     const shouldFix = req.query.fix === 'staging-tenant';
     
     if (shouldFix) {
-      console.log('🔧 [HEALTH-FIX] Emergency staging tenant fix requested...');
       
       try {
         // Check current staging record
@@ -22,11 +21,9 @@ router.get('/health', async (req, res) => {
           .limit(1);
         
         if (currentRecord.length > 0 && currentRecord[0].id !== 'staging') {
-          console.log(`🔧 [HEALTH-FIX] Found problematic record: id='${currentRecord[0].id}', subdomain='staging'`);
           
           // Delete incorrect record
           await db.delete(tenants).where(eq(tenants.subdomain, 'staging'));
-          console.log('🗑️ [HEALTH-FIX] Deleted incorrect staging record');
           
           // Insert correct record
           await db.insert(tenants).values({
@@ -49,7 +46,6 @@ router.get('/health', async (req, res) => {
               }
             }
           });
-          console.log('✅ [HEALTH-FIX] Inserted correct staging record');
           
           return res.json({
             status: 'healthy',
@@ -58,7 +54,6 @@ router.get('/health', async (req, res) => {
             timestamp: new Date().toISOString()
           });
         } else {
-          console.log('ℹ️ [HEALTH-FIX] Staging record is already correct or not found');
           return res.json({
             status: 'healthy',
             fixApplied: false,

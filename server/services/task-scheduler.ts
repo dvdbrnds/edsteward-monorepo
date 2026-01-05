@@ -28,7 +28,6 @@ export function setSchedulerEnabled(enabled: boolean): void {
   } else if (!enabled && schedulerInterval) {
     stopTaskScheduler();
   }
-  console.log(`[TaskScheduler] Scheduler ${enabled ? 'enabled' : 'disabled'}`);
 }
 
 /**
@@ -36,16 +35,13 @@ export function setSchedulerEnabled(enabled: boolean): void {
  */
 async function runNotificationCheck(): Promise<void> {
   if (isRunning) {
-    console.log('[TaskScheduler] Skipping - previous check still running');
     return;
   }
 
   isRunning = true;
-  console.log(`[TaskScheduler] Starting scheduled notification check at ${new Date().toISOString()}`);
 
   try {
     const results = await checkAndSendTaskNotifications();
-    console.log(`[TaskScheduler] Completed. Checked: ${results.tasksChecked}, Sent: ${results.notificationsSent}, Errors: ${results.errors.length}`);
     
     if (results.errors.length > 0) {
       console.warn('[TaskScheduler] Errors encountered:', results.errors);
@@ -70,22 +66,16 @@ function isPreferredHour(): boolean {
  */
 export function startTaskScheduler(): void {
   if (!SCHEDULER_CONFIG.enabled) {
-    console.log('[TaskScheduler] Disabled via ENABLE_TASK_SCHEDULER=false');
     return;
   }
 
   if (schedulerInterval) {
-    console.log('[TaskScheduler] Already running');
     return;
   }
 
-  console.log('[TaskScheduler] Starting scheduler...');
-  console.log(`[TaskScheduler] Will check every ${SCHEDULER_CONFIG.intervalMs / (60 * 60 * 1000)} hours`);
-  console.log(`[TaskScheduler] Preferred hours: ${SCHEDULER_CONFIG.preferredHours.join(', ')}`);
 
   // Run initial check after a short delay (give server time to fully start)
   setTimeout(() => {
-    console.log('[TaskScheduler] Running initial check...');
     runNotificationCheck();
   }, 30000); // 30 seconds after startup
 
@@ -102,7 +92,6 @@ export function startTaskScheduler(): void {
     runNotificationCheck();
   }, SCHEDULER_CONFIG.intervalMs);
 
-  console.log('[TaskScheduler] Scheduler started successfully');
 }
 
 /**
@@ -112,7 +101,6 @@ export function stopTaskScheduler(): void {
   if (schedulerInterval) {
     clearInterval(schedulerInterval);
     schedulerInterval = null;
-    console.log('[TaskScheduler] Scheduler stopped');
   }
 }
 

@@ -131,7 +131,6 @@ export class SysLogger {
 
     // COMPLETELY SKIP all file operations - do not attempt any filesystem access
     // No directory creation, no file stream setup, nothing
-    console.log(`SysLogger initialized: console=${this.config.logToConsole}, file=${this.config.logToFile}, env=${process.env.NODE_ENV}`);
   }
 
   private setupFileStream(): void {
@@ -220,7 +219,6 @@ export class SysLogger {
         } else if (level === LogLevel.WARNING) {
           console.warn(consoleMessage);
         } else {
-          console.log(consoleMessage);
         }
       }
     } catch (error) {
@@ -233,7 +231,6 @@ export class SysLogger {
   // Auth specific logging methods
   async logAuthEvent(level: LogLevel, message: string, userId?: number, username?: string, metadata?: Record<string, any>): Promise<void> {
     try {
-      console.log('Logging auth event:', { level, message, userId, username, metadata });
 
       // Prepare structured data for database
       const eventData = {

@@ -42,7 +42,6 @@ function extractUserAttributes(profile: SamlProfile, idpType: string): Record<st
   }
   
   // Log groups for debugging
-  console.log(`🔐 SAML Groups extracted for ${profile.email}:`, groups);
   
   const extractedData = {
     email: profile.email || profile[mapping.email] || profile.nameID,
@@ -66,7 +65,6 @@ function extractUserAttributes(profile: SamlProfile, idpType: string): Record<st
     extractedData.roles = mappedRoles;
     extractedData.role = getHighestPriorityRole(mappedRoles);
     
-    console.log(`🔐 Okta groups mapped to roles for ${profile.email}:`, {
       groups: groups,
       mappedRoles: mappedRoles,
       primaryRole: extractedData.role
@@ -92,7 +90,6 @@ function extractUserAttributes(profile: SamlProfile, idpType: string): Record<st
     extractedData.role = getHighestPriorityRole(extractedData.roles);
     extractedData.organization = profile[mapping.organization] || '';
     
-    console.log(`🔐 Educational institution roles mapped for ${profile.email}:`, {
       affiliation: affiliation,
       entitlement: entitlement,
       mappedRoles: extractedData.roles,

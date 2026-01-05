@@ -35,16 +35,13 @@ export function getDatabasePool(): Pool {
       });
       
       // Don't let database errors crash the server
-      console.log('🛡️  Database pool error handled - server will continue running');
       
       // Attempt to recover the connection pool
       setTimeout(() => {
-        console.log('🔄 Attempting to recover database pool...');
         try {
           // Force a connection test to see if we can recover
           testConnection().then(success => {
             if (success) {
-              console.log('✅ Database pool recovery successful');
             } else {
               console.warn('⚠️  Database pool recovery failed, but server continues');
             }
@@ -59,15 +56,12 @@ export function getDatabasePool(): Pool {
     
     // Add connection event handlers
     pool.on('connect', (client) => {
-      console.log('🔗 Database client connected');
     });
     
     pool.on('acquire', (client) => {
-      console.log('📥 Database client acquired from pool');
     });
     
     pool.on('remove', (client) => {
-      console.log('📤 Database client removed from pool');
     });
   }
 

@@ -17,17 +17,10 @@ async function main() {
 
     const result = await populateRegulationData([testRegulationId]);
 
-    console.log("\nRegulation Population Results:");
-    console.log(JSON.stringify(result, null, 2));
 
     if (result.successful > 0) {
       const regulation = result.results.find(r => r.status === 'success');
       if (regulation) {
-        console.log("\nSubmission Requirements Details:");
-        console.log("- Submission Guidelines:", regulation.data.submissionGuidelines);
-        console.log("- Required Forms:", regulation.data.applicableForms);
-        console.log("- Filing Deadlines:", regulation.data.filingDeadlines);
-        console.log("- Sources:", regulation.data.sources);
       }
     }
 

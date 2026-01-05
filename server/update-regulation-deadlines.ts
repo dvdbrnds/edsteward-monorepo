@@ -3,11 +3,9 @@ import type { Regulation } from "@shared/schema";
 
 async function updateRegulationDeadlines() {
   try {
-    console.log("Starting regulation deadline updates...");
 
     // Get all regulations
     const regulations = await storage.getRegulations();
-    console.log(`Found ${regulations.length} regulations to process`);
 
     const deadlinePatterns = [
       {
@@ -50,16 +48,12 @@ async function updateRegulationDeadlines() {
           );
 
           updatedCount++;
-          console.log(`Updated regulation ${regulation.itemId} with ${numDeadlines} deadline(s)`);
         }
       } catch (error) {
         console.error(`Failed to update regulation ${regulation.itemId}:`, error);
       }
     }
 
-    console.log('\nRegulation Update Summary:');
-    console.log(`Total regulations updated: ${updatedCount}`);
-    console.log('Update completed');
 
   } catch (error) {
     console.error('Failed to update regulations:', error);

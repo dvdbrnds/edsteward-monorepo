@@ -318,7 +318,6 @@ router.post('/confirm/:token', async (req: Request, res: Response) => {
       .where(eq(regulations.id, tokenRecord.regulationId));
 
     // Log the attestation
-    console.log(`📝 Email attestation completed: Regulation ${regulation.name} (ID: ${regulation.id}) by ${user?.email} from IP ${clientIp}`);
 
     res.json({
       success: true,

@@ -12,7 +12,6 @@ import * as cheerio from 'cheerio';
  */
 async function debugPACollector() {
   try {
-    console.log('==== PA Regulation Collector Debug ====');
 
     // Define PA education regulation sources
     const sources = [
@@ -44,12 +43,9 @@ async function debugPACollector() {
       fs.mkdirSync(htmlDir, { recursive: true });
     }
 
-    console.log(`\nFetching HTML from ${sources.length} sources...`);
 
     // Process each source
     for (const source of sources) {
-      console.log(`\nProcessing source: ${source.name}`);
-      console.log(`URL: ${source.url}`);
 
       try {
         // Fetch the page HTML
@@ -60,7 +56,6 @@ async function debugPACollector() {
         });
 
         if (!response.ok) {
-          console.log(`Failed to fetch URL: ${response.status} ${response.statusText}`);
           continue;
         }
 
@@ -70,18 +65,14 @@ async function debugPACollector() {
         const filename = source.name.toLowerCase().replace(/\s+/g, '-') + '.html';
         const filepath = path.join(htmlDir, filename);
         fs.writeFileSync(filepath, html);
-        console.log(`Saved HTML to ${filepath}`);
 
         // Parse the HTML
         const $ = cheerio.load(html);
 
         // Output basic page info
-        console.log(`Page title: ${$('title').text().trim()}`);
-        console.log(`Body classes: ${$('body').attr('class')}`);
 
         // Check for SharePoint elements
         const isSharePoint = html.includes('SharePoint') || html.includes('_spPageContextInfo');
-        console.log(`Is SharePoint page: ${isSharePoint ? 'Yes' : 'No'}`);
 
         // Check for main content containers
         const containers = [
@@ -93,14 +84,11 @@ async function debugPACollector() {
           '[data-automation-id="CanvasZone"]'
         ];
 
-        console.log('\nContent Containers:');
         containers.forEach(selector => {
           const count = $(selector).length;
-          console.log(`- ${selector}: ${count} elements`);
         });
 
         // Look for regulation-related links
-        console.log('\nRegulation-related links:');
         const links = $('a').filter((_, el) => {
           const href = $(el).attr('href') || '';
           const text = $(el).text().trim().toLowerCase();
@@ -116,15 +104,12 @@ async function debugPACollector() {
           );
         });
 
-        console.log(`Found ${links.length} regulation-related links`);
         links.each((i, el) => {
           if (i < 10) { // Limit to first 10 for brevity
-            console.log(`  Link: ${$(el).attr('href')}, Text: ${$(el).text().trim().substring(0, 50)}`);
           }
         });
 
         // Test content extraction with common selectors
-        console.log('\nContent Extraction Test:');
         [
           '#main-content', 
           'main', 
@@ -136,8 +121,6 @@ async function debugPACollector() {
           const element = $(selector).first();
           if (element.length > 0) {
             const text = element.text().trim();
-            console.log(`${selector} content length: ${text.length} characters`);
-            console.log(`${selector} content preview: ${text.substring(0, 150)}...`);
           }
         });
 
@@ -146,8 +129,6 @@ async function debugPACollector() {
       }
     }
 
-    console.log('\n\n==== Debug Script Complete ====');
-    console.log(`Check the logs directory at ${htmlDir} for raw HTML files`);
 
   } catch (error) {
     console.error('Debug script failed:', error);

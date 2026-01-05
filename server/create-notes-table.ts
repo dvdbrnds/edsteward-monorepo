@@ -3,7 +3,6 @@ import { db } from "./db";
 
 async function createNotesTable() {
   try {
-    console.log("Creating notes table...");
     
     // Check if the table already exists
     const tableExists = await db.execute(`
@@ -15,7 +14,6 @@ async function createNotesTable() {
     `);
     
     if (tableExists.rows[0].exists) {
-      console.log("Notes table already exists, skipping creation.");
       return;
     }
     
@@ -35,7 +33,6 @@ async function createNotesTable() {
       );
     `);
     
-    console.log("Notes table created successfully.");
   } catch (error) {
     console.error("Error creating notes table:", error);
     throw error;
@@ -45,7 +42,6 @@ async function createNotesTable() {
 // Run the migration
 createNotesTable()
   .then(() => {
-    console.log("Migration completed successfully.");
     process.exit(0);
   })
   .catch((error) => {

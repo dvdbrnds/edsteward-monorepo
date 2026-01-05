@@ -10,11 +10,9 @@ export class DatabaseHealthMonitor {
 
   async startMonitoring(): Promise<void> {
     if (this.isMonitoring) {
-      console.log('🔍 Database health monitoring already running');
       return;
     }
 
-    console.log('🚀 Starting database health monitoring...');
     this.isMonitoring = true;
     
     // Initial health check
@@ -33,7 +31,6 @@ export class DatabaseHealthMonitor {
       return;
     }
 
-    console.log('🛑 Stopping database health monitoring...');
     this.isMonitoring = false;
     
     if (this.healthCheckInterval) {
@@ -50,7 +47,6 @@ export class DatabaseHealthMonitor {
       
       if (isHealthy) {
         if (this.consecutiveFailures > 0) {
-          console.log('✅ Database connection restored');
           syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
             `Database connection restored after ${this.consecutiveFailures} failures`);
         }
@@ -76,7 +72,6 @@ export class DatabaseHealthMonitor {
 
   private async emergencyConnectionReset(): Promise<void> {
     try {
-      console.log('🚨 Database connection issues detected - logging only (not closing pool)');
       
       // Log the issue but don't close the pool - let it recover naturally
       syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, 
@@ -85,7 +80,6 @@ export class DatabaseHealthMonitor {
       // Wait a moment before next check
       await new Promise(resolve => setTimeout(resolve, 5000));
       
-      console.log('🔄 Emergency response completed - pool remains active');
       
       // Reset failure counter to give it a fresh start
       this.consecutiveFailures = 0;

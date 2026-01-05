@@ -208,7 +208,6 @@ export class TenantFinder {
   static async findForRequest(req: Request): Promise<Tenant | null> {
     const detection = this.extractTenantFromRequest(req);
     
-    console.log(`[TENANT-FINDER] Detection result:`, {
       method: detection.method,
       subdomain: detection.subdomain,
       domain: detection.domain,
@@ -219,7 +218,6 @@ export class TenantFinder {
     if (detection.subdomain) {
       const tenant = await this.getTenantBySubdomain(detection.subdomain);
       if (tenant) {
-        console.log(`[TENANT-FINDER] ✓ Found tenant by subdomain: ${tenant.id}`);
         return tenant;
       }
     }
@@ -228,24 +226,20 @@ export class TenantFinder {
     if (detection.domain && detection.domain !== 'edsteward.ai') {
       const tenant = await this.getTenantByDomain(detection.domain);
       if (tenant) {
-        console.log(`[TENANT-FINDER] ✓ Found tenant by domain: ${tenant.id}`);
         return tenant;
       }
     }
 
     // Method 3: Development/localhost (simulate Moravian tenant for testing)
     if (detection.method === 'localhost') {
-      console.log(`[TENANT-FINDER] Development environment - simulating Moravian tenant for testing`);
       return TENANT_REGISTRY['moravian'] || null;
     }
 
     // Method 4: Unknown/root domain (no tenant required)
     if (detection.method === 'unknown') {
-      console.log(`[TENANT-FINDER] Root domain or unknown - no tenant required`);
       return null;
     }
 
-    console.log(`[TENANT-FINDER] ✗ No tenant found for detection:`, detection);
     return null;
   }
 
@@ -257,7 +251,6 @@ export class TenantFinder {
     const host = req.get('host') || req.get('x-forwarded-host') || '';
     const protocol = req.get('x-forwarded-proto') || req.protocol || 'http';
     
-    console.log(`[TENANT-FINDER] Extracting from host: ${host} (protocol: ${protocol})`);
     
     // Method 1: Subdomain detection (tenant.edsteward.ai or tenant.edsteward.local)
     const subdomainMatch = host.match(/^([^.]+)\.edsteward\.(ai|local)(?::\d+)?$/);
@@ -318,7 +311,6 @@ export class TenantFinder {
     // Check cache first
     const cached = tenantCache.get(cacheKey);
     if (cached && Date.now() - cached.cachedAt < CACHE_TTL) {
-      console.log(`[TENANT-FINDER] Cache hit for subdomain: ${subdomain} (source: ${cached.source})`);
       return cached.tenant;
     }
 
@@ -333,7 +325,6 @@ export class TenantFinder {
       if (dbTenant) {
         const mappedTenant = this.mapDatabaseTenant(dbTenant);
         this.setCachedTenant(cacheKey, mappedTenant, 'database');
-        console.log(`[TENANT-FINDER] Database lookup successful for subdomain: ${subdomain}`);
         return mappedTenant;
       }
 
@@ -341,11 +332,9 @@ export class TenantFinder {
       const registryTenant = TENANT_REGISTRY[subdomain];
       if (registryTenant) {
         this.setCachedTenant(cacheKey, registryTenant, 'registry');
-        console.log(`[TENANT-FINDER] Registry fallback successful for subdomain: ${subdomain}`);
         return registryTenant;
       }
 
-      console.log(`[TENANT-FINDER] No tenant found for subdomain: ${subdomain}`);
       return null;
     } catch (error) {
       console.error(`[TENANT-FINDER] Database error for subdomain ${subdomain}:`, error);
@@ -353,7 +342,6 @@ export class TenantFinder {
       // Fallback to registry on database error
       const registryTenant = TENANT_REGISTRY[subdomain];
       if (registryTenant) {
-        console.log(`[TENANT-FINDER] Registry fallback due to DB error for subdomain: ${subdomain}`);
         return registryTenant;
       }
       
@@ -369,7 +357,6 @@ export class TenantFinder {
     
     const cached = tenantCache.get(cacheKey);
     if (cached && Date.now() - cached.cachedAt < CACHE_TTL) {
-      console.log(`[TENANT-FINDER] Cache hit for domain: ${domain}`);
       return cached.tenant;
     }
 
@@ -383,7 +370,6 @@ export class TenantFinder {
       if (dbTenant) {
         const mappedTenant = this.mapDatabaseTenant(dbTenant);
         this.setCachedTenant(cacheKey, mappedTenant, 'database');
-        console.log(`[TENANT-FINDER] Database lookup successful for domain: ${domain}`);
         return mappedTenant;
       }
       
@@ -437,10 +423,8 @@ export class TenantFinder {
           tenantCache.delete(key);
         }
       });
-      console.log(`[TENANT-FINDER] Cleared cache for tenant: ${tenantId}`);
     } else {
       tenantCache.clear();
-      console.log(`[TENANT-FINDER] Cleared all tenant cache`);
     }
   }
 
@@ -457,7 +441,6 @@ export class TenantFinder {
   static registerTenant(tenant: Tenant): void {
     TENANT_REGISTRY[tenant.id] = tenant;
     this.clearCache(tenant.id); // Invalidate cache
-    console.log(`[TENANT-FINDER] Registered new tenant: ${tenant.id} (${tenant.name})`);
   }
 
   /**
@@ -484,7 +467,6 @@ export class TenantFinder {
     Object.assign(tenant, updates);
     TENANT_REGISTRY[tenantId] = tenant;
     this.clearCache(tenantId);
-    console.log(`[TENANT-FINDER] Updated tenant: ${tenantId}`, { updates });
     return true;
   }
 }
@@ -501,7 +483,6 @@ export async function tenantMiddleware(req: Request, res: Response, next: NextFu
     if (tenant) {
       // Validate tenant status
       if (tenant.status !== 'active') {
-        console.log(`[TENANT-MIDDLEWARE] ✗ Access denied - tenant ${tenant.id} status: ${tenant.status}`);
         return res.status(403).json({
           error: 'Tenant access suspended',
           code: 'TENANT_SUSPENDED',
@@ -527,10 +508,8 @@ export async function tenantMiddleware(req: Request, res: Response, next: NextFu
       res.set('x-tenant-name', tenant.name);
 
       const duration = Date.now() - startTime;
-      console.log(`[TENANT-MIDDLEWARE] ✓ Tenant context set: ${tenant.name} (${tenant.id}) in ${duration}ms`);
     } else {
       // No tenant context (valid for public routes)
-      console.log(`[TENANT-MIDDLEWARE] No tenant context required`);
     }
 
     next();
@@ -549,14 +528,12 @@ export async function tenantMiddleware(req: Request, res: Response, next: NextFu
 
 export function requireTenant(req: Request, res: Response, next: NextFunction) {
   if (!req.tenant) {
-    console.log(`[TENANT-MIDDLEWARE] ✗ Tenant context required but not found`);
     return res.status(400).json({
       error: 'Tenant context required',
       code: 'TENANT_REQUIRED',
       suggestion: 'Access this resource via a tenant subdomain (e.g., moravian.edsteward.ai)'
     });
   }
-  console.log(`[TENANT-MIDDLEWARE] ✓ Tenant context verified: ${req.tenant.id}`);
   next();
 }
 

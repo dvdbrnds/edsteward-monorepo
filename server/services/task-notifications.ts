@@ -323,7 +323,6 @@ async function sendTaskNotification(context: TaskNotificationContext): Promise<b
   const recipients = await getTaskNotificationRecipients(context);
   
   if (recipients.length === 0) {
-    console.log(`[TaskNotifications] No recipients for task ${context.task.id}`);
     return false;
   }
 
@@ -340,7 +339,6 @@ async function sendTaskNotification(context: TaskNotificationContext): Promise<b
         html,
         text,
       });
-      console.log(`[TaskNotifications] Sent notification to ${recipient.email} for task ${context.task.id}`);
       success = true;
     } catch (error) {
       console.error(`[TaskNotifications] Failed to send to ${recipient.email}:`, error);
@@ -358,7 +356,6 @@ export async function checkAndSendTaskNotifications(): Promise<{
   notificationsSent: number;
   errors: string[];
 }> {
-  console.log('[TaskNotifications] Starting notification check...');
   
   const results = {
     tasksChecked: 0,
@@ -370,7 +367,6 @@ export async function checkAndSendTaskNotifications(): Promise<{
     const tasks = await getTasksNeedingNotification();
     results.tasksChecked = tasks.length;
     
-    console.log(`[TaskNotifications] Found ${tasks.length} tasks in notification window`);
 
     for (const context of tasks) {
       if (!shouldSendNotification(context.daysUntilDue)) {
@@ -389,7 +385,6 @@ export async function checkAndSendTaskNotifications(): Promise<{
       }
     }
 
-    console.log(`[TaskNotifications] Complete. Sent ${results.notificationsSent} notifications.`);
   } catch (error) {
     const errorMsg = `Notification check failed: ${error}`;
     results.errors.push(errorMsg);

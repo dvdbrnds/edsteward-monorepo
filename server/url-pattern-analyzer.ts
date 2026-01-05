@@ -139,7 +139,6 @@ export class UrlPatternAnalyzer {
         reg.agency_url && reg.agency_url.startsWith('http')
       );
       
-      console.log(`Analyzing ${regulationsWithUrls.length} regulations with URLs`);
       
       const urlPatterns = new Map<string, Set<string>>();
       const domainStats: Record<string, number> = {};

@@ -59,8 +59,6 @@ export const institutionConfig: InstitutionConfig = {
       process.env.AUTH_SAML_CERT || (() => {
         try {
           const certContent = readFileSync(join(__dirname, '../../certs/okta-cert.pem'), 'utf8');
-          console.log('🔐 Full certificate length:', certContent.length);
-          console.log('🔐 Certificate starts with:', certContent.substring(0, 30));
           return certContent.trim();
         } catch (error) {
           console.error('Failed to read SAML certificate file:', error);

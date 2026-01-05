@@ -17,7 +17,6 @@ fs.writeFileSync(LOG_FILE, `=== NOTES DIRECT TEST (${new Date().toISOString()}) 
 
 function log(message: string) {
   const entry = `[${new Date().toISOString()}] ${message}\n`;
-  console.log(entry.trim());
   fs.appendFileSync(LOG_FILE, entry);
 }
 

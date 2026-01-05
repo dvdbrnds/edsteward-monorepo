@@ -5,11 +5,9 @@ import { addMonths } from "date-fns";
 
 async function createDeadlines() {
   try {
-    console.log("Starting deadline generation...");
 
     // Get all regulations
     const regulations = await storage.getRegulations();
-    console.log(`Found ${regulations.length} regulations to process`);
 
     // Create a deadline for each regulation (if it doesn't already have one)
     let deadlinesCreated = 0;
@@ -29,15 +27,11 @@ async function createDeadlines() {
 
         await storage.createDeadline(deadline);
         deadlinesCreated++;
-        console.log(`Created deadline for regulation ${regulation.itemId} (${deadline.dueDate})`);
       } catch (error) {
         console.error(`Failed to create deadline for regulation ${regulation.itemId}:`, error);
       }
     }
 
-    console.log(`\nTotal deadlines created: ${deadlinesCreated}`);
-    console.log(`Total regulations processed: ${regulations.length}`);
-    console.log('Deadline generation completed');
 
   } catch (error) {
     console.error('Failed to generate deadlines:', error);

@@ -73,7 +73,6 @@ async function getNotificationRecipients(daysRemaining: number): Promise<User[]>
 export async function checkAndSendDeadlineNotifications() {
   try {
     const deadlines = await storage.getAllIncompleteDeadlines();
-    console.log(`Checking ${deadlines.length} incomplete deadlines`);
 
     for (const deadline of deadlines) {
       const daysRemaining = differenceInDays(new Date(deadline.dueDate), new Date());
@@ -85,7 +84,6 @@ export async function checkAndSendDeadlineNotifications() {
       const assignedUser = await storage.getUser(deadline.assignedTo);
 
       if (!regulation || !assignedUser) {
-        console.log(`Skipping deadline ${deadline.id}: Missing regulation or user info`);
         continue;
       }
 
@@ -113,7 +111,6 @@ async function sendDeadlineNotification(context: NotificationContext) {
   const recipients = await getNotificationRecipients(daysRemaining);
   
   if (recipients.length === 0) {
-    console.log(`No recipients found for deadline notification (${daysRemaining} days remaining)`);
     return;
   }
 
@@ -182,7 +179,6 @@ async function sendDeadlineNotification(context: NotificationContext) {
 
   // Log notification sent
   const recipientEmails = recipients.map(r => r.email).join(', ');
-  console.log(`✅ Sent ${urgencyLevel} deadline notification for regulation ${regulation.id} (${daysRemaining} days remaining) to: ${recipientEmails}`);
 }
 
 /**
@@ -210,7 +206,6 @@ function getUserRoleDescription(user: User): string {
 function shouldSendNotification(daysRemaining: number, regulation: Regulation): boolean {
   // Check if notifications are disabled for this regulation
   if (regulation.notificationsDisabled) {
-    console.log(`Notifications disabled for regulation ${regulation.name} (ID: ${regulation.id})`);
     return false;
   }
 
@@ -299,7 +294,6 @@ export async function sendDeadlineCreationNotification(deadline: Deadline) {
     const assignedUser = await tenantStorage.getUser(deadline.assignedTo);
     
     if (!regulation || !assignedUser) {
-      console.log(`Cannot send creation notification for deadline ${deadline.id}: Missing regulation or user info`);
       return;
     }
 
@@ -415,7 +409,6 @@ export async function sendDeadlineCreationNotification(deadline: Deadline) {
     
     await Promise.allSettled(notificationPromises.filter(Boolean));
     
-    console.log(`✅ Sent deadline creation notifications to ${recipients.size} recipients for deadline ${deadline.id}`);
     
   } catch (error) {
     console.error(`❌ Error sending deadline creation notification:`, error);
@@ -428,8 +421,6 @@ export async function sendDeadlineCreationNotification(deadline: Deadline) {
  * Useful for testing and validation
  */
 export async function getNotificationTimelineSummary(daysFromNow: number[] = [90, 60, 30, 14, 7, 3, 1, 0]): Promise<void> {
-  console.log('\n📋 COMPLIANCE NOTIFICATION TIMELINE SUMMARY');
-  console.log('=' .repeat(60));
   
   for (const days of daysFromNow) {
     const wouldSend = shouldSendNotification(days, { notificationSchedule: DEFAULT_NOTIFICATION_SCHEDULES } as Regulation);
@@ -437,25 +428,12 @@ export async function getNotificationTimelineSummary(daysFromNow: number[] = [90
     const urgency = getUrgencyLevel(days);
     const timeDesc = formatTimeRemaining(days);
     
-    console.log(`\n📅 ${days} days remaining (${timeDesc}):`);
-    console.log(`   🔔 Send Notification: ${wouldSend ? '✅ YES' : '❌ NO'}`);
-    console.log(`   🚩 Urgency Level: ${urgency}`);
-    console.log(`   👥 Recipients (${recipients.length}):`);
     
     if (recipients.length > 0) {
       recipients.forEach(user => {
-        console.log(`      • ${user.firstName} ${user.lastName} (${user.email}) - ${getUserRoleDescription(user)}`);
       });
     } else {
-      console.log(`      • No recipients found`);
     }
   }
   
-  console.log('\n📋 NOTIFICATION SCHEDULE RULES:');
-  console.log(`   • 90 days: Email to Compliance Officers`);
-  console.log(`   • 60 days: Email to Compliance Officers`);
-  console.log(`   • 30 days: Email to Compliance Officers`);
-  console.log(`   • ≤7 days: Daily emails (9 AM) to ALL stakeholders`);
-  console.log(`   • Final day: 3x daily (9 AM, 1 PM, 5 PM) to ALL stakeholders`);
-  console.log('=' .repeat(60));
 }

@@ -20,12 +20,9 @@ async function main() {
 
     syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Starting regulation data collection");
 
-    console.log("Starting regulation data collection process...");
-    console.log("Using standard regulation set for initial population");
 
     await populateRegulationData(standardRegulations);
 
-    console.log("Initial regulation data collection completed");
     syslog.log(LogFacility.LOCAL0, LogLevel.INFO, "Initial regulation data collection completed");
 
   } catch (error) {

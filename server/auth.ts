@@ -207,7 +207,6 @@ export function setupAuth(app: Express) {
         }
 
         // Debug session state after login
-        console.log('🔍 Context7 Multi-Tenant Session Debug After Login:', {
           sessionId: req.sessionID,
           hasSession: !!req.session,
           sessionKeys: req.session ? Object.keys(req.session) : [],
@@ -239,7 +238,6 @@ export function setupAuth(app: Express) {
             if (saveErr) {
               console.error('❌ Session save error:', saveErr);
             } else {
-              console.log('✅ Session saved successfully with tenant context');
             }
 
             // Return user with tenant context

@@ -5,7 +5,6 @@ import * as cheerio from 'cheerio';
 async function fetchDOLRegulations() {
   try {
     const baseUrl = "https://www.dol.gov/agencies/oasam/regulatory/statutes";
-    console.log(`Fetching regulations from: ${baseUrl}`);
     
     // Get the main statutes page
     const response = await axios.get(baseUrl, {
@@ -15,8 +14,6 @@ async function fetchDOLRegulations() {
       timeout: 15000
     });
     
-    console.log(`Successfully fetched DOL statutes page (${response.status})`);
-    console.log(`Content length: ${response.data.length} bytes`);
     
     const $ = cheerio.load(response.data);
     
@@ -38,7 +35,6 @@ async function fetchDOLRegulations() {
         )
       );
     
-    console.log(`\nFound ${statuteLinks.length} potential statute links:`);
     
     // Print the found statutes
     statuteLinks.forEach((link, index) => {
@@ -46,8 +42,6 @@ async function fetchDOLRegulations() {
         ? link.href 
         : `https://www.dol.gov${link.href.startsWith('/') ? '' : '/'}${link.href}`;
       
-      console.log(`${index + 1}. ${link.text}`);
-      console.log(`   URL: ${fullUrl}`);
     });
     
     return statuteLinks;

@@ -18,7 +18,6 @@ export function log(message: string, source = "express") {
     hour12: true,
   });
 
-  console.log(`${formattedTime} [${source}] ${message}`);
 }
 
 export async function setupVite(app: Express, server: Server) {
@@ -111,7 +110,6 @@ export function serveStatic(app: Express) {
     // This avoids issues with ALB hostname detection
     let pageTitle = 'Loading...';
     
-    console.log(`[TITLE] Using neutral default, client-side will handle subdomain detection`);
     
     // Read the HTML file and inject tenant-specific title
     const htmlPath = path.resolve(distPath, "index.html");

@@ -334,7 +334,6 @@ export class DatabaseStorage implements IStorage {
         ? (existingVersions[0].versionNumber + 1) 
         : 1;
       
-      console.log(`Creating version ${nextVersionNumber} for regulation ${update.regulationId}`);
       
       const changeSummary = `Updated via regulation update #${id}`;
       const versionContent = JSON.stringify({
@@ -440,9 +439,7 @@ export class DatabaseStorage implements IStorage {
 
   async getUserByUsername(username: string, _tenantId?: string): Promise<User | undefined> {
     try {
-      console.log(`Looking up user with username: ${username}`);
       const [user] = await this.db.select().from(users).where(eq(users.username, username));
-      console.log(`User lookup result:`, user ? `Found user with ID ${user.id}` : 'User not found');
       return user;
     } catch (error) {
       console.error(`Error in getUserByUsername for ${username}:`, error);
@@ -452,9 +449,7 @@ export class DatabaseStorage implements IStorage {
 
   async getUserByEmail(email: string, _tenantId?: string): Promise<User | undefined> {
     try {
-      console.log(`Looking up user with email: ${email}`);
       const [user] = await this.db.select().from(users).where(eq(users.email, email));
-      console.log(`User lookup result:`, user ? `Found user with ID ${user.id}` : 'User not found');
       return user;
     } catch (error) {
       console.error(`Error in getUserByEmail for ${email}:`, error);
@@ -464,9 +459,7 @@ export class DatabaseStorage implements IStorage {
 
   async getUserByExternalId(externalId: string, _tenantId?: string): Promise<User | undefined> {
     try {
-      console.log(`Looking up user with external ID: ${externalId}`);
       const [user] = await this.db.select().from(users).where(eq(users.externalId, externalId));
-      console.log(`User lookup result:`, user ? `Found user with ID ${user.id}` : 'User not found');
       return user;
     } catch (error) {
       console.error(`Error in getUserByExternalId for ${externalId}:`, error);
@@ -510,8 +503,6 @@ export class DatabaseStorage implements IStorage {
 
   async getRegulations(): Promise<Regulation[]> {
     try {
-      console.log("🔍 [DEBUG] Fetching regulations from database...");
-      console.log("🔍 [DEBUG] Database connection status:", this.db ? "Connected" : "Not connected");
       
       // Temporary fix: Use raw SQL to bypass Drizzle column mapping issues
       const result = await this.db.execute(sql`
@@ -540,16 +531,13 @@ export class DatabaseStorage implements IStorage {
         versionMetadata: row.version_metadata
       }));
 
-      console.log(`✅ [DEBUG] Successfully fetched ${formattedResult.length} regulations from database`);
       
       if (formattedResult.length > 0) {
-        console.log("📝 [DEBUG] Sample regulation:", {
           id: formattedResult[0].id,
           name: formattedResult[0].name,
           category: formattedResult[0].category
         });
       } else {
-        console.log("⚠️ [DEBUG] No regulations found in query result");
       }
       
       return formattedResult as Regulation[];
@@ -593,7 +581,6 @@ export class DatabaseStorage implements IStorage {
 
   async getRegulationById(regulationId: string): Promise<Regulation | null> {
     try {
-      console.log(`Looking up regulation with ID: ${regulationId}`);
       // First try to find by itemId (which is what the UI uses)
       const results = await this.db.select()
         .from(regulations)
@@ -616,14 +603,11 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createRegulation(regulation: InsertRegulation): Promise<Regulation> {
-    console.log("Creating new regulation:", regulation);
     const [newRegulation] = await this.db.insert(regulations).values(regulation).returning();
-    console.log("Created regulation:", newRegulation);
     return newRegulation as Regulation;
   }
 
   async updateRegulation(id: number, regulation: Partial<InsertRegulation>): Promise<Regulation> {
-    console.log(`Updating regulation ${id} with:`, regulation);
 
     try {
       // If we're updating content/requirements, handle it differently due to potential size
@@ -665,7 +649,6 @@ export class DatabaseStorage implements IStorage {
           .where(eq(regulations.id, id))
           .returning();
 
-        console.log("Updated regulation:", updatedRegulation);
         return updatedRegulation as Regulation;
       }
     } catch (error) {
@@ -675,7 +658,6 @@ export class DatabaseStorage implements IStorage {
   }
 
   async setRegulationApplicability(id: number, isApplicable: boolean): Promise<Regulation> {
-    console.log(`Setting regulation ${id} applicability to: ${isApplicable}`);
     const [updatedRegulation] = await this.db
       .update(regulations)
       .set({
@@ -684,32 +666,26 @@ export class DatabaseStorage implements IStorage {
       })
       .where(eq(regulations.id, id))
       .returning();
-    console.log("Updated regulation:", updatedRegulation);
     return updatedRegulation as Regulation;
   }
 
   async getRegulationsByJurisdiction(jurisdiction: string): Promise<Regulation[]> {
-    console.log(`Fetching regulations with jurisdiction: ${jurisdiction}`);
     const result = await this.db
       .select()
       .from(regulations)
       .where(eq(regulations.jurisdictionSource, jurisdiction));
-    console.log(`Found ${result.length} ${jurisdiction} regulations`);
     return result as Regulation[];
   }
 
   async getRegulationsByJurisdictionSource(jurisdictionSource: string): Promise<Regulation[]> {
-    console.log(`Fetching regulations with jurisdiction source: ${jurisdictionSource}`);
     const result = await this.db
       .select()
       .from(regulations)
       .where(eq(regulations.jurisdictionSource, jurisdictionSource));
-    console.log(`Found ${result.length} ${jurisdictionSource} regulations`);
     return result as Regulation[];
   }
 
   async getRegulationsByInstitutionType(institutionType: string): Promise<Regulation[]> {
-    console.log(`Fetching regulations applicable to institution type: ${institutionType}`);
 
     // Use raw SQL to query JSONB field
     const query = `
@@ -724,13 +700,11 @@ export class DatabaseStorage implements IStorage {
       JSON.stringify(['all-institutions'])
     ]);
 
-    console.log(`Found ${result.rows.length} regulations for ${institutionType}`);
     return result.rows as Regulation[];
   }
 
   async searchRegulations(searchTerm: string): Promise<Regulation[]> {
     try {
-      console.log(`Searching for regulations with term: ${searchTerm}`);
       const results = await this.db.select()
         .from(regulations)
         .where(
@@ -740,7 +714,6 @@ export class DatabaseStorage implements IStorage {
             like(regulations.topic, `%${searchTerm}%`)
           )
         );
-      console.log(`Found ${results.length} matching regulations`);
       return results as Regulation[];
     } catch (error) {
       console.error("Error searching regulations:", error);
@@ -1010,13 +983,11 @@ export class DatabaseStorage implements IStorage {
 
   async createEvidenceFile(file: InsertEvidenceFile): Promise<EvidenceFile> {
     try {
-      console.log("Creating new evidence file:", file);
       const [evidenceFile] = await this.db
         .insert(evidenceFiles)
         .values(file)
         .returning();
 
-      console.log("Created evidence file:", evidenceFile);
       return evidenceFile;
     } catch (error) {
       console.error("Error creating evidence file:", error);
@@ -1026,7 +997,6 @@ export class DatabaseStorage implements IStorage {
 
   async getEvidenceFilesByRegulation(regulationId: number): Promise<EvidenceFile[]> {
     try {
-      console.log(`Fetching evidence files for regulation ${regulationId}`);
       // First, get the evidence files
       const files = await this.db
         .select()
@@ -1054,7 +1024,6 @@ export class DatabaseStorage implements IStorage {
         })
       );
 
-      console.log(`Found ${result.length} evidence files`);
       return result;
     } catch (error) {
       console.error("Error fetching evidence files:", error);
@@ -1129,7 +1098,6 @@ export class DatabaseStorage implements IStorage {
         .values(version)
         .returning();
 
-      console.log(`Created new regulation version ${newVersion.id} for regulation ${version.regulationId}`);
       return newVersion;
     } catch (error) {
       console.error("Error creating regulation version:", error);
@@ -1210,7 +1178,6 @@ export class DatabaseStorage implements IStorage {
       });
     } catch (error) {
       // Fallback to console logging if audit service fails
-      console.log('📋 AUDIT LOG (fallback):', {
         timestamp: new Date().toISOString(),
         ...entry,
         error: error instanceof Error ? error.message : String(error)
@@ -1785,7 +1752,6 @@ export class DatabaseStorage implements IStorage {
       // CRITICAL FIX: Check admin mode FIRST to ensure proper admin branding
       const isAdminMode = process.env.ADMIN_MODE === 'true';
       if (isAdminMode) {
-        console.log(`🎨 Admin mode detected - forcing admin branding`);
         const adminConfig = {
           institutionName: "EdSteward Admin Console",
           title: "EdSteward Admin Console",
@@ -1824,7 +1790,6 @@ export class DatabaseStorage implements IStorage {
       `);
 
       if (result.rows.length > 0) {
-        console.log(`🎨 Using database branding config from ${tableName}: ${result.rows[0].config_data.institutionName}`);
         return result.rows[0].config_data;
       }
 
@@ -1862,7 +1827,6 @@ export class DatabaseStorage implements IStorage {
           loginScreenHeroColor: envBrandingConfig.loginScreenHeroColor || "#3d1a5a",
         };
 
-        console.log(`🎨 Using environment-based branding config (fallback): ${config.institutionName}`);
         return config;
       }
 
@@ -1881,7 +1845,6 @@ export class DatabaseStorage implements IStorage {
         loginScreenHeroColor: "#3d1a5a",
       };
 
-      console.log(`🎨 Using default branding config: ${defaultConfig.institutionName}`);
       return defaultConfig;
     } catch (error) {
       console.error('Error fetching branding configuration:', error);
@@ -1895,7 +1858,6 @@ export class DatabaseStorage implements IStorage {
       // Admin environments should use environment-only branding
       const isAdminMode = process.env.ADMIN_MODE === 'true';
       if (isAdminMode) {
-        console.log(`🎨 Admin mode detected - preventing database branding save to maintain isolation`);
         throw new Error('Admin environments cannot save branding configuration to database. Use environment variables instead.');
       }
 

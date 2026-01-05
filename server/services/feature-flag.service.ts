@@ -117,7 +117,6 @@ export class FeatureFlagService {
       // Clear cache for this tenant
       this.clearTenantCache(tenantId);
 
-      console.log(`[FEATURE-FLAGS] Updated features for tenant ${tenantId}:`, features);
       return true;
     } catch (error) {
       console.error(`[FEATURE-FLAGS] Error updating features for tenant ${tenantId}:`, error);

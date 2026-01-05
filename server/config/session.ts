@@ -4,9 +4,6 @@ import { storage } from '../storage';
 import crypto from 'crypto';
 
 // CONTEXT7 SESSION FIX: Comprehensive session configuration for AWS ALB + PostgreSQL
-console.log('🔧 Context7 Session Fix - Comprehensive AWS ALB + PostgreSQL Configuration');
-console.log('🔧 Environment:', isProduction ? 'PRODUCTION' : 'DEVELOPMENT');
-console.log('🔧 Trust Proxy: 1 (AWS ALB), Cookie Security: Enhanced');
 
 /**
  * Context7 Best Practices for Express Session + AWS ALB:
@@ -60,10 +57,6 @@ export const sessionConfig: session.SessionOptions = {
     
     // Enhanced debugging for Context7 compliance
     if (!isProduction) {
-      console.log(`🔑 Session ID Generated: ${sessionId.substring(0, 8)}...`);
-      console.log(`🔑 X-Forwarded-Proto: ${req.headers['x-forwarded-proto']}`);
-      console.log(`🔑 Request Secure: ${req.secure}`);
-      console.log(`🔑 Session Store: PostgreSQL (ENABLED)`);
     }
     
     return sessionId;

@@ -11,7 +11,6 @@ router.get("/", async (req, res) => {
     // Use direct database storage for single-tenant mode
     const tenantStorage = getDatabaseStorage();
     
-    console.log('[DEADLINES] Fetching deadlines for single-tenant mode');
     
     const deadlines = await tenantStorage.getDeadlines();
     

@@ -33,15 +33,12 @@ router.get('/status', requireAuth, async (req: Request, res: Response) => {
     const userId = req.user!.id;
     const status = await MFAService.getMFAStatus(userId);
     
-    console.log('🔧 DEBUG: MFA Status API called for user', userId);
-    console.log('🔧 DEBUG: MFA Status from service:', status);
     
     const response = {
       success: true,
       mfa: status,
     };
     
-    console.log('🔧 DEBUG: Sending MFA status response:', response);
     
     res.json(response);
   } catch (error) {

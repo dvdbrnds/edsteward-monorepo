@@ -271,8 +271,6 @@ export function debugUserRoles(req: Request, res: Response, next: NextFunction):
     const userRoles = parseUserRoles(user);
     const permissions = getCombinedPermissions(userRoles);
     
-    console.log(`🔐 Debug - User: ${user.username}, Roles: ${userRoles.join(', ')}, Groups: ${user.groups?.join(', ') || 'none'}`);
-    console.log(`🔐 Debug - Permissions:`, Object.entries(permissions)
       .filter(([, value]) => value)
       .map(([key]) => key)
       .join(', ')

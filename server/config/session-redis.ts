@@ -4,9 +4,6 @@ import { createClient } from 'redis';
 import { config, isProduction } from './environment';
 
 // CRITICAL AWS ALB FIX - Enable debugging for Redis session config too
-console.log('🔍 Redis Session Store Debug - AWS ALB Configuration');
-console.log('🔍 Environment:', isProduction ? 'PRODUCTION' : 'DEVELOPMENT');
-console.log('🔍 Trust Proxy: Enabled for AWS ALB');
 
 // Create Redis client
 const redisClient = createClient({
@@ -21,7 +18,6 @@ redisClient.on('error', (err) => {
 });
 
 redisClient.on('connect', () => {
-  console.log('Redis Client Connected');
 });
 
 // Initialize Redis connection

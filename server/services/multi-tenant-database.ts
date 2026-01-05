@@ -55,7 +55,6 @@ export class MultiTenantDatabaseService {
       throw new Error(`No database configuration found for tenant: ${tenantId}`);
     }
 
-    console.log(`[MULTI-TENANT-DB] Creating pool for tenant ${tenantId} with database: ${config.databaseUrl.split('/').pop()?.split('?')[0]}`);
 
     const pool = new Pool({
       connectionString: config.databaseUrl,
@@ -69,7 +68,6 @@ export class MultiTenantDatabaseService {
     });
 
     tenantPools.set(tenantId, pool);
-    console.log(`[MULTI-TENANT-DB] ✓ Created database pool for tenant: ${tenantId}`);
     
     return pool;
   }
@@ -92,7 +90,6 @@ export class MultiTenantDatabaseService {
     (storage as any).pool = pool;
 
     tenantStorages.set(tenantId, storage);
-    console.log(`[MULTI-TENANT-DB] ✓ Created storage instance for tenant: ${tenantId}`);
     
     return storage;
   }
@@ -106,7 +103,6 @@ export class MultiTenantDatabaseService {
       databaseUrl,
       poolConfig: poolConfig || { max: 5, idleTimeoutMillis: 30000, connectionTimeoutMillis: 10000 }
     };
-    console.log(`[MULTI-TENANT-DB] Added configuration for tenant: ${tenantId}`);
   }
 
   /**
@@ -126,7 +122,6 @@ export class MultiTenantDatabaseService {
     // Remove configuration
     delete TENANT_DATABASE_CONFIGS[tenantId];
     
-    console.log(`[MULTI-TENANT-DB] Removed configuration for tenant: ${tenantId}`);
   }
 
   /**
@@ -145,7 +140,6 @@ export class MultiTenantDatabaseService {
       const client = await pool.connect();
       await client.query('SELECT 1');
       client.release();
-      console.log(`[MULTI-TENANT-DB] ✓ Connection test successful for tenant: ${tenantId}`);
       return true;
     } catch (error) {
       console.error(`[MULTI-TENANT-DB] ✗ Connection test failed for tenant ${tenantId}:`, error);
@@ -158,15 +152,12 @@ export class MultiTenantDatabaseService {
    */
   static async initializeAllTenants(): Promise<void> {
     const tenantIds = this.getConfiguredTenants();
-    console.log(`[MULTI-TENANT-DB] Initializing ${tenantIds.length} tenant databases...`);
 
     for (const tenantId of tenantIds) {
       try {
         const isHealthy = await this.testTenantConnection(tenantId);
         if (isHealthy) {
-          console.log(`[MULTI-TENANT-DB] ✓ Tenant ${tenantId} initialized successfully`);
         } else {
-          console.log(`[MULTI-TENANT-DB] ✗ Tenant ${tenantId} connection failed`);
         }
       } catch (error) {
         console.error(`[MULTI-TENANT-DB] ✗ Failed to initialize tenant ${tenantId}:`, error);
@@ -178,12 +169,10 @@ export class MultiTenantDatabaseService {
    * Close all database connections
    */
   static async closeAllConnections(): Promise<void> {
-    console.log('[MULTI-TENANT-DB] Closing all tenant database connections...');
     
     const closePromises = Array.from(tenantPools.entries()).map(async ([tenantId, pool]) => {
       try {
         await pool.end();
-        console.log(`[MULTI-TENANT-DB] ✓ Closed connections for tenant: ${tenantId}`);
       } catch (error) {
         console.error(`[MULTI-TENANT-DB] ✗ Error closing connections for tenant ${tenantId}:`, error);
       }

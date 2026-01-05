@@ -31,7 +31,6 @@ const PORT = process.env.PORT || 3000;
 // Validate configuration on startup
 try {
   validateConfig();
-  console.log('✅ Configuration validated successfully');
 } catch (error) {
   console.error('❌ Configuration validation failed:', error);
   process.exit(1);
@@ -206,7 +205,6 @@ app.get('/mcp-test.html', (req, res) => {
             div.style.color = type === 'error' ? 'red' : type === 'success' ? 'green' : 'black';
             messagesDiv.appendChild(div);
             messagesDiv.scrollTop = messagesDiv.scrollHeight;
-            console.log('[' + timestamp + '] ' + message);
         }
         
         function connect() {
@@ -358,15 +356,8 @@ setupWebSocketServer(httpServer);
 
 // Start server
 httpServer.listen(PORT, '0.0.0.0', async () => {
-  console.log(`🚀 Single-Tenant EdSteward running on port ${PORT}`);
-  console.log(`🏢 Institution: ${institutionConfig.name}`);
-  console.log(`🔐 Authentication: ${institutionConfig.authentication.samlEnabled ? 'SAML + ' : ''}${institutionConfig.authentication.usernamePasswordEnabled ? 'Username/Password' : ''}`);
-  console.log(`🌐 Access: http://localhost:${PORT}`);
-  console.log(`🌍 Network Access: http://0.0.0.0:${PORT} (accessible from external networks)`);
   
   // MCP Engine Integration Status
-  console.log('🔌 MCP Engine Integration:');
-  console.log('   - Port 3003: MCP Engine WebSocket (regulation updates)');
   
   // Start database connection monitoring to prevent crashes
   startDatabaseMonitoring();
@@ -377,7 +368,6 @@ httpServer.listen(PORT, '0.0.0.0', async () => {
 
 // DATABASE MONITORING: Prevent database-related crashes
 function startDatabaseMonitoring() {
-  console.log('🔍 Starting database connection monitoring...');
   
   // Check database health every 30 seconds
   setInterval(async () => {
@@ -390,7 +380,6 @@ function startDatabaseMonitoring() {
     }
   }, 30000); // 30 seconds
   
-  console.log('✅ Database monitoring started (30s intervals)');
   
   // Monitor memory usage to prevent memory leaks
   setInterval(() => {
@@ -406,11 +395,9 @@ function startDatabaseMonitoring() {
     if (memUsageMB.heapUsed > 500) { // Warn if heap usage > 500MB
       console.warn('⚠️  High memory usage detected:', memUsageMB);
     } else {
-      console.log('📊 Memory usage:', memUsageMB);
     }
   }, 300000); // 5 minutes
   
-  console.log('✅ Memory monitoring started (5min intervals)');
 }
 
 // CRASH PREVENTION: Handle uncaught exceptions and unhandled rejections
@@ -422,7 +409,6 @@ process.on('uncaughtException', (error) => {
   
   // Log the error but don't crash the server
   // In production, you might want to restart the server gracefully
-  console.log('⚠️  Server continuing despite uncaught exception...');
   
   // Don't exit the process - keep running
   return false;
@@ -433,7 +419,6 @@ process.on('unhandledRejection', (reason, promise) => {
   console.error('Reason:', reason);
   
   // Log the error but don't crash the server
-  console.log('⚠️  Server continuing despite unhandled rejection...');
   
   // Don't exit the process - keep running
   return false;
@@ -453,40 +438,33 @@ process.on('warning', (warning) => {
 process.exit = ((code?: number) => {
   console.error('🚨 PROCESS.EXIT CALLED - Preventing crash! Code:', code);
   console.error('Stack trace:', new Error().stack);
-  console.log('⚠️  Server will continue running instead of exiting...');
   // Don't actually exit - just log it
   return undefined as never;
 }) as typeof process.exit;
 
 // Graceful shutdown only on explicit signals
 process.on('SIGTERM', () => {
-  console.log('🔄 SIGTERM received - Server will continue running (crash prevention active)');
   // Don't exit - keep running
 });
 
 process.on('SIGINT', () => {
-  console.log('🔄 SIGINT received - Server will continue running (crash prevention active)');
   // Don't exit - keep running
 });
 
 // Add additional error handlers
 process.on('beforeExit', (code) => {
-  console.log('🚨 BEFORE EXIT - Code:', code, '- Preventing exit!');
 });
 
 process.on('exit', (code) => {
-  console.log('🚨 PROCESS EXIT - Code:', code, '- This should not happen with crash prevention!');
 });
 
 // Add domain error handling for synchronous errors
 process.on('multipleResolves', (type, promise, reason) => {
   console.warn('🚨 MULTIPLE RESOLVES detected:', type, promise, reason);
-  console.log('⚠️  Server continuing despite multiple resolves...');
 });
 
 // Catch any remaining synchronous errors
 process.on('disconnect', () => {
-  console.log('🔄 DISCONNECT event - Server will continue running');
 });
 
 // Add setInterval to keep the process alive and detect crashes
@@ -512,16 +490,13 @@ console.error = (...args) => {
       errorString.includes('ETIMEDOUT') ||
       errorString.includes('connection terminated') ||
       errorString.includes('Client has encountered a connection error')) {
-    console.log('🛡️  Database connection error detected - implementing recovery...');
     
     // Attempt to recover database connections
     setTimeout(async () => {
       try {
-        console.log('🔄 Attempting database connection recovery...');
         // Force a database health check
         const { testConnection } = await import('./services/database');
         await testConnection();
-        console.log('✅ Database connection recovery successful');
       } catch (recoveryError) {
         console.warn('⚠️  Database recovery failed, but server will continue:', recoveryError);
       }

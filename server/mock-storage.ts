@@ -423,7 +423,6 @@ export class MockStorage implements IStorage {
   }
 
   async sendEmailNotification(userId: number, subject: string, message: string): Promise<boolean> {
-    console.log(`Mock email to user ${userId}: ${subject}`);
     return true;
   }
 
