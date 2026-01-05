@@ -80,6 +80,9 @@ const sessionPool = new Pool({
 
  
 export interface IStorage {
+  // Database access for raw queries
+  getDb(): ReturnType<typeof getDatabase> | null;
+  
   // User methods - now tenant-aware
   getUser(_id: number, _tenantId?: string): Promise<User | undefined>;
   getUserByUsername(_username: string, _tenantId?: string): Promise<User | undefined>;
@@ -213,6 +216,11 @@ import { emailService } from './services/email';
 export class DatabaseStorage implements IStorage {
   private get db() {
     return getDatabase();
+  }
+  
+  // Public method to get database for raw queries
+  getDb() {
+    return this.db;
   }
   // Regulation Update methods
   async getPendingRegulationUpdates(): Promise<RegulationUpdate[]> {

@@ -222,6 +222,11 @@ export class MockStorage implements IStorage {
     this.sessionStore = new session.MemoryStore();
   }
 
+  // Database access - not available in mock
+  getDb() {
+    return null;
+  }
+
   // User methods
   async getUser(id: number): Promise<User | undefined> {
     return mockUsers.find(u => u.id === id);
