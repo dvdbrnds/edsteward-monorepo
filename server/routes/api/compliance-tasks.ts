@@ -14,6 +14,7 @@ import { alias } from 'drizzle-orm/pg-core';
 import { requireAuth, requireAdmin } from '../../middleware/role-based-auth';
 import { emailService } from '../../services/email';
 import { getCleryTasksWithDates, getCleryTaskCount } from '../../templates/clery-act-tasks';
+import { uploadLimiter, burstLimiter } from '../../middleware/rate-limiter';
 
 // JWT secret for task tokens (use same as attestation or a dedicated one)
 const TASK_TOKEN_SECRET = process.env.ATTESTATION_JWT_SECRET || process.env.JWT_SECRET || 'edsteward-task-secret-key';
@@ -862,7 +863,7 @@ router.get('/:taskId/evidence', requireAuth, async (req: Request, res: Response)
  * POST /api/compliance-tasks/:taskId/evidence
  * Upload evidence for a task (file or link)
  */
-router.post('/:taskId/evidence', requireAuth, async (req: Request, res: Response) => {
+router.post('/:taskId/evidence', uploadLimiter, requireAuth, async (req: Request, res: Response) => {
   try {
     const taskId = parseInt(req.params.taskId);
     

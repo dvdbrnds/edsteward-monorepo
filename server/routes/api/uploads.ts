@@ -5,6 +5,7 @@ import fs from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import { syslog, LogLevel, LogFacility } from '../../services/syslog';
+import { uploadLimiter } from '../../middleware/rate-limiter';
 
 // ES Module compatibility: Get current file path
 const __filename = fileURLToPath(import.meta.url);

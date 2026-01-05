@@ -20,6 +20,7 @@ import { configureAuth } from './auth/single-tenant-auth';
 import { testConnection } from './services/database';
 import { registerRoutes } from './routes';
 import { startTaskScheduler } from './services/task-scheduler';
+import { apiLimiter, authLimiter } from './middleware/rate-limiter';
 
 // ES Module compatibility: Get current file path
 const __filename = fileURLToPath(import.meta.url);
@@ -89,6 +90,14 @@ app.use(passport.session());
 
 // Configure authentication
 configureAuth(app);
+
+// Rate limiting - apply to API routes
+// General API rate limit: 100 requests per 15 minutes
+app.use('/api/', apiLimiter);
+// Stricter rate limit for authentication: 5 attempts per 15 minutes
+app.use('/api/login', authLimiter);
+app.use('/api/authenticate', authLimiter);
+app.use('/auth/saml', authLimiter);
 
 // API routes
 registerRoutes(app);

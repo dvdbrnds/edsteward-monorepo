@@ -10,6 +10,7 @@ import {
 } from '../../middleware/role-based-auth';
 import { auditRegulationAction, auditEvidence as _auditEvidence } from '../../middleware/audit-middleware';
 import multer from 'multer';
+import { uploadLimiter, burstLimiter } from '../../middleware/rate-limiter';
 
 // Simple multer configuration for evidence uploads
 const upload = multer({
@@ -281,7 +282,7 @@ router.get("/:regulationId/evidence", async (req, res) => {
 });
 
 // Upload evidence file for a regulation
-router.post("/:regulationId/evidence", requireAuth, upload.single('file'), async (req, res) => {
+router.post("/:regulationId/evidence", uploadLimiter, requireAuth, upload.single('file'), async (req, res) => {
   try {
     if (!req.user) {
       syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, "Unauthorized evidence upload attempt");
