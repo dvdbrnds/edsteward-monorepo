@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import type { Regulation, Deadline, RegulationAction } from "@shared/schema";
 import { useLocation } from "wouter";
-import { Search, CheckCircle, AlertCircle, Clock, Loader2, ArrowUpDown, Check, Globe, Mail, FileText, X, Filter } from "lucide-react";
+import { Search, CheckCircle, AlertCircle, Clock, Loader2, ArrowUpDown, Check, Globe, Mail, FileText, X, Filter, Eye, EyeOff, Columns, RotateCcw } from "lucide-react";
 import { format } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -21,9 +21,52 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useState } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuCheckboxItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
+
+// Column definitions for visibility control
+type ColumnKey = 'id' | 'name' | 'category' | 'dro' | 'status' | 'nextDeadline' | 'lastUpdated' | 'jurisdiction' | 'appliesTo';
+
+interface ColumnDef {
+  key: ColumnKey;
+  label: string;
+  required?: boolean; // Required columns can't be hidden
+}
+
+const COLUMN_DEFINITIONS: ColumnDef[] = [
+  { key: 'id', label: 'ID' },
+  { key: 'name', label: 'Name', required: true }, // Name should always be visible
+  { key: 'category', label: 'Category' },
+  { key: 'dro', label: 'DRO' },
+  { key: 'status', label: 'Status' },
+  { key: 'nextDeadline', label: 'Next Deadline' },
+  { key: 'lastUpdated', label: 'Last Updated' },
+  { key: 'jurisdiction', label: 'Jurisdiction' },
+  { key: 'appliesTo', label: 'Applies To' },
+];
+
+const STORAGE_KEY = 'edsteward-regulation-columns';
+
+const getDefaultVisibility = (): Record<ColumnKey, boolean> => ({
+  id: true,
+  name: true,
+  category: true,
+  dro: true,
+  status: true,
+  nextDeadline: true,
+  lastUpdated: true,
+  jurisdiction: true,
+  appliesTo: true,
+});
 
 interface RegulationListProps {
   categoryFilter: string | null;
@@ -45,6 +88,41 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'lastUpdated', direction: 'desc' });
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [, navigate] = useLocation();
+  
+  // Column visibility state - load from localStorage
+  const [columnVisibility, setColumnVisibility] = useState<Record<ColumnKey, boolean>>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        return { ...getDefaultVisibility(), ...JSON.parse(saved) };
+      }
+    } catch {
+      // Ignore parse errors
+    }
+    return getDefaultVisibility();
+  });
+
+  // Persist column visibility to localStorage
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(columnVisibility));
+  }, [columnVisibility]);
+
+  const toggleColumn = (key: ColumnKey) => {
+    const column = COLUMN_DEFINITIONS.find(c => c.key === key);
+    if (column?.required) return; // Can't hide required columns
+    
+    setColumnVisibility(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
+  const resetColumns = () => {
+    setColumnVisibility(getDefaultVisibility());
+  };
+
+  const hiddenColumnCount = COLUMN_DEFINITIONS.filter(col => !columnVisibility[col.key]).length;
+  const isColumnVisible = (key: ColumnKey) => columnVisibility[key];
 
   const { data: regulations = [], isLoading: regulationsLoading, error: regulationsError } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
@@ -313,6 +391,59 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
                 </SelectItem>
               </SelectContent>
             </Select>
+            
+            {/* Column visibility dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" size="default" className="w-full sm:w-auto">
+                  <Columns className="h-4 w-4 mr-2" />
+                  Columns
+                  {hiddenColumnCount > 0 && (
+                    <Badge variant="secondary" className="ml-2 h-5 px-1.5 text-xs">
+                      {hiddenColumnCount} hidden
+                    </Badge>
+                  )}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                <DropdownMenuLabel className="flex items-center justify-between">
+                  <span>Toggle Columns</span>
+                  {hiddenColumnCount > 0 && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={resetColumns}
+                      className="h-6 px-2 text-xs"
+                    >
+                      <RotateCcw className="h-3 w-3 mr-1" />
+                      Show All
+                    </Button>
+                  )}
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {COLUMN_DEFINITIONS.map((column) => (
+                  <DropdownMenuCheckboxItem
+                    key={column.key}
+                    checked={columnVisibility[column.key]}
+                    onCheckedChange={() => toggleColumn(column.key)}
+                    disabled={column.required}
+                    className="cursor-pointer"
+                  >
+                    <span className="flex items-center gap-2">
+                      {columnVisibility[column.key] ? (
+                        <Eye className="h-3 w-3 text-muted-foreground" />
+                      ) : (
+                        <EyeOff className="h-3 w-3 text-muted-foreground" />
+                      )}
+                      {column.label}
+                      {column.required && (
+                        <span className="text-xs text-muted-foreground">(required)</span>
+                      )}
+                    </span>
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
           
           {/* Results count and clear filters */}
@@ -334,45 +465,63 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="cursor-pointer" onClick={() => handleSort('itemId')}>
-                  <div className="flex items-center gap-2">
-                    ID
-                    <ArrowUpDown className="h-4 w-4" />
-                  </div>
-                </TableHead>
-                <TableHead className="cursor-pointer" onClick={() => handleSort('name')}>
-                  <div className="flex items-center gap-2">
-                    Name
-                    <ArrowUpDown className="h-4 w-4" />
-                  </div>
-                </TableHead>
-                <TableHead className="cursor-pointer" onClick={() => handleSort('category')}>
-                  <div className="flex items-center gap-2">
-                    Category
-                    <ArrowUpDown className="h-4 w-4" />
-                  </div>
-                </TableHead>
-                <TableHead className="cursor-pointer" onClick={() => handleSort('dro')}>
-                  <div className="flex items-center gap-2">
-                    DRO
-                    <ArrowUpDown className="h-4 w-4" />
-                  </div>
-                </TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Next Deadline</TableHead>
-                <TableHead className="cursor-pointer" onClick={() => handleSort('lastUpdated')}>
-                  <div className="flex items-center gap-2">
-                    Last Updated
-                    <ArrowUpDown className="h-4 w-4" />
-                  </div>
-                </TableHead>
-                <TableHead className="cursor-pointer" onClick={() => handleSort('jurisdictionSource')}>
-                  <div className="flex items-center gap-2">
-                    Jurisdiction
-                    <ArrowUpDown className="h-4 w-4" />
-                  </div>
-                </TableHead>
-                <TableHead>Applies To</TableHead>
+                {isColumnVisible('id') && (
+                  <TableHead className="cursor-pointer" onClick={() => handleSort('itemId')}>
+                    <div className="flex items-center gap-2">
+                      ID
+                      <ArrowUpDown className="h-4 w-4" />
+                    </div>
+                  </TableHead>
+                )}
+                {isColumnVisible('name') && (
+                  <TableHead className="cursor-pointer" onClick={() => handleSort('name')}>
+                    <div className="flex items-center gap-2">
+                      Name
+                      <ArrowUpDown className="h-4 w-4" />
+                    </div>
+                  </TableHead>
+                )}
+                {isColumnVisible('category') && (
+                  <TableHead className="cursor-pointer" onClick={() => handleSort('category')}>
+                    <div className="flex items-center gap-2">
+                      Category
+                      <ArrowUpDown className="h-4 w-4" />
+                    </div>
+                  </TableHead>
+                )}
+                {isColumnVisible('dro') && (
+                  <TableHead className="cursor-pointer" onClick={() => handleSort('dro')}>
+                    <div className="flex items-center gap-2">
+                      DRO
+                      <ArrowUpDown className="h-4 w-4" />
+                    </div>
+                  </TableHead>
+                )}
+                {isColumnVisible('status') && (
+                  <TableHead>Status</TableHead>
+                )}
+                {isColumnVisible('nextDeadline') && (
+                  <TableHead>Next Deadline</TableHead>
+                )}
+                {isColumnVisible('lastUpdated') && (
+                  <TableHead className="cursor-pointer" onClick={() => handleSort('lastUpdated')}>
+                    <div className="flex items-center gap-2">
+                      Last Updated
+                      <ArrowUpDown className="h-4 w-4" />
+                    </div>
+                  </TableHead>
+                )}
+                {isColumnVisible('jurisdiction') && (
+                  <TableHead className="cursor-pointer" onClick={() => handleSort('jurisdictionSource')}>
+                    <div className="flex items-center gap-2">
+                      Jurisdiction
+                      <ArrowUpDown className="h-4 w-4" />
+                    </div>
+                  </TableHead>
+                )}
+                {isColumnVisible('appliesTo') && (
+                  <TableHead>Applies To</TableHead>
+                )}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -388,124 +537,142 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
                     className="cursor-pointer hover:bg-muted"
                     onClick={() => handleRowClick(regulation)}
                   >
-                    <TableCell>
-                      <div className="text-sm text-muted-foreground">
-                        {regulation.itemId}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-base font-medium text-foreground">
-                        {regulation.name || regulation.statute || 'Untitled Regulation'}
-                      </div>
-                    </TableCell>
-                    <TableCell>{regulation.category || 'Uncategorized'}</TableCell>
-                    <TableCell>
-                      <div className="text-sm text-blue-600">
-                        {regulation.dro || getDroEmailByCategory(regulation.category)}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex gap-3">
-                        {(regulation.actions || [
-                          { type: 'attestation', enabled: true, required: true, status: 'pending' },
-                          { type: 'website_publish', enabled: true, required: false, status: 'pending' },
-                          { type: 'community_communication', enabled: true, required: false, status: 'pending' },
-                          { type: 'agency_submission', enabled: true, required: true, status: 'pending' }
-                        ]).map((action: RegulationAction) => (
-                          <div
-                            key={action.type}
-                            className={cn(
-                              "relative flex items-center gap-1 transition-all duration-200",
-                              getActionStatus(action),
-                              action.required ? "scale-110" : "scale-90"
-                            )}
-                            title={`${action.type.replace('_', ' ')} ${action.required ? '(Required)' : '(Optional)'} - ${action.status}`}
-                          >
-                            {getActionIcon(action.type)}
-                            {action.required && (
-                              <div className="absolute -top-1 -right-1 flex items-center justify-center">
-                                <div
-                                  className={cn(
-                                    "h-2 w-2 rounded-full",
-                                    action.status === 'completed'
-                                      ? "bg-emerald-600"
-                                      : "bg-rose-500 animate-pulse"
-                                  )}
-                                />
-                              </div>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      {nextDeadline ? (
-                        <div className="flex items-center gap-2">
-                          {nextDeadline.status === "completed" ? (
-                            <CheckCircle className="h-4 w-4 text-green-500" />
-                          ) : nextDeadline.status === "overdue" ? (
-                            <AlertCircle className="h-4 w-4 text-red-500" />
-                          ) : (
-                            <Clock className="h-4 w-4 text-yellow-500" />
-                          )}
-                          <span className={
-                            nextDeadline.status === "completed"
-                              ? "text-green-600"
-                              : nextDeadline.status === "overdue"
-                              ? "text-red-600"
-                              : "text-yellow-600"
-                          }>
-                            {format(new Date(nextDeadline.dueDate), "PP")}
-                          </span>
+                    {isColumnVisible('id') && (
+                      <TableCell>
+                        <div className="text-sm text-muted-foreground">
+                          {regulation.itemId}
                         </div>
-                      ) : (
-                        <span className="text-muted-foreground">No deadlines</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {regulation.lastUpdated ? (
-                        <div className="text-sm text-blue-700">
-                          {format(new Date(regulation.lastUpdated), "PP")}
+                      </TableCell>
+                    )}
+                    {isColumnVisible('name') && (
+                      <TableCell>
+                        <div className="text-base font-medium text-foreground">
+                          {regulation.name || regulation.statute || 'Untitled Regulation'}
                         </div>
-                      ) : (
-                        <span className="text-muted-foreground">Not updated</span>
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      <div className={`text-sm ${regulation.jurisdictionSource === 'federal' ? 'text-blue-600' : 'text-green-600'}`}>
-                        {regulation.jurisdictionSource === 'federal' ? 'Federal' : 'State'}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap gap-1">
-                        {regulation.applicableInstitutions && Array.isArray(regulation.applicableInstitutions) ? (
-                          regulation.applicableInstitutions.slice(0, 3).map((type: string) => (
-                            <Badge 
-                              key={type} 
-                              variant="outline" 
-                              className={`text-xs ${getInstitutionTypeColor(type)}`}
+                      </TableCell>
+                    )}
+                    {isColumnVisible('category') && (
+                      <TableCell>{regulation.category || 'Uncategorized'}</TableCell>
+                    )}
+                    {isColumnVisible('dro') && (
+                      <TableCell>
+                        <div className="text-sm text-blue-600">
+                          {regulation.dro || getDroEmailByCategory(regulation.category)}
+                        </div>
+                      </TableCell>
+                    )}
+                    {isColumnVisible('status') && (
+                      <TableCell>
+                        <div className="flex gap-3">
+                          {(regulation.actions || [
+                            { type: 'attestation', enabled: true, required: true, status: 'pending' },
+                            { type: 'website_publish', enabled: true, required: false, status: 'pending' },
+                            { type: 'community_communication', enabled: true, required: false, status: 'pending' },
+                            { type: 'agency_submission', enabled: true, required: true, status: 'pending' }
+                          ]).map((action: RegulationAction) => (
+                            <div
+                              key={action.type}
+                              className={cn(
+                                "relative flex items-center gap-1 transition-all duration-200",
+                                getActionStatus(action),
+                                action.required ? "scale-110" : "scale-90"
+                              )}
+                              title={`${action.type.replace('_', ' ')} ${action.required ? '(Required)' : '(Optional)'} - ${action.status}`}
                             >
-                              {type.replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
-                            </Badge>
-                          ))
+                              {getActionIcon(action.type)}
+                              {action.required && (
+                                <div className="absolute -top-1 -right-1 flex items-center justify-center">
+                                  <div
+                                    className={cn(
+                                      "h-2 w-2 rounded-full",
+                                      action.status === 'completed'
+                                        ? "bg-emerald-600"
+                                        : "bg-rose-500 animate-pulse"
+                                    )}
+                                  />
+                                </div>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </TableCell>
+                    )}
+                    {isColumnVisible('nextDeadline') && (
+                      <TableCell>
+                        {nextDeadline ? (
+                          <div className="flex items-center gap-2">
+                            {nextDeadline.status === "completed" ? (
+                              <CheckCircle className="h-4 w-4 text-green-500" />
+                            ) : nextDeadline.status === "overdue" ? (
+                              <AlertCircle className="h-4 w-4 text-red-500" />
+                            ) : (
+                              <Clock className="h-4 w-4 text-yellow-500" />
+                            )}
+                            <span className={
+                              nextDeadline.status === "completed"
+                                ? "text-green-600"
+                                : nextDeadline.status === "overdue"
+                                ? "text-red-600"
+                                : "text-yellow-600"
+                            }>
+                              {format(new Date(nextDeadline.dueDate), "PP")}
+                            </span>
+                          </div>
                         ) : (
-                          <Badge 
-                            variant="outline" 
-                            className={`text-xs ${getInstitutionTypeColor('all-institutions')}`}
-                          >
-                            All Institutions
-                          </Badge>
+                          <span className="text-muted-foreground">No deadlines</span>
                         )}
-                        {regulation.applicableInstitutions && regulation.applicableInstitutions.length > 3 && (
-                          <Badge 
-                            variant="outline" 
-                            className="text-xs bg-background text-muted-foreground border-border"
-                          >
-                            +{regulation.applicableInstitutions.length - 3} more
-                          </Badge>
+                      </TableCell>
+                    )}
+                    {isColumnVisible('lastUpdated') && (
+                      <TableCell>
+                        {regulation.lastUpdated ? (
+                          <div className="text-sm text-blue-700">
+                            {format(new Date(regulation.lastUpdated), "PP")}
+                          </div>
+                        ) : (
+                          <span className="text-muted-foreground">Not updated</span>
                         )}
-                      </div>
-                    </TableCell>
+                      </TableCell>
+                    )}
+                    {isColumnVisible('jurisdiction') && (
+                      <TableCell>
+                        <div className={`text-sm ${regulation.jurisdictionSource === 'federal' ? 'text-blue-600' : 'text-green-600'}`}>
+                          {regulation.jurisdictionSource === 'federal' ? 'Federal' : 'State'}
+                        </div>
+                      </TableCell>
+                    )}
+                    {isColumnVisible('appliesTo') && (
+                      <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {regulation.applicableInstitutions && Array.isArray(regulation.applicableInstitutions) ? (
+                            regulation.applicableInstitutions.slice(0, 3).map((type: string) => (
+                              <Badge 
+                                key={type} 
+                                variant="outline" 
+                                className={`text-xs ${getInstitutionTypeColor(type)}`}
+                              >
+                                {type.replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
+                              </Badge>
+                            ))
+                          ) : (
+                            <Badge 
+                              variant="outline" 
+                              className={`text-xs ${getInstitutionTypeColor('all-institutions')}`}
+                            >
+                              All Institutions
+                            </Badge>
+                          )}
+                          {regulation.applicableInstitutions && regulation.applicableInstitutions.length > 3 && (
+                            <Badge 
+                              variant="outline" 
+                              className="text-xs bg-background text-muted-foreground border-border"
+                            >
+                              +{regulation.applicableInstitutions.length - 3} more
+                            </Badge>
+                          )}
+                        </div>
+                      </TableCell>
+                    )}
                   </TableRow>
                 );
               })}
