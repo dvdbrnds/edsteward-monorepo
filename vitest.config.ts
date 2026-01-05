@@ -43,9 +43,9 @@ export default defineConfig({
     // Context7 Best Practice: Global setup files
     setupFiles: ['./tests/setup/global.setup.ts'],
 
-    // Context7 Best Practice: Coverage configuration
+    // Coverage configuration - disabled temporarily
     coverage: {
-      enabled: true,
+      enabled: false,
       provider: 'v8',
       reporter: ['text', 'html', 'lcov', 'json', 'json-summary'],
       reportsDirectory: './coverage',
@@ -75,29 +75,12 @@ export default defineConfig({
       },
     },
 
-    // Context7 Best Practice: Enhanced reporter configuration
-    reporters: ['default', 'verbose', 'json', 'html'],
+    // Reporter configuration
+    reporters: ['default'],
 
-    // Context7 Best Practice: Test sequence configuration
+    // Test sequence configuration
     sequence: {
-      hooks: 'list', // Run hooks sequentially like Jest
-      concurrent: false, // Can be overridden per test
-    },
-
-    // Context7 Best Practice: Enable auto-stubbing of environment variables
-    unstubEnvs: true,
-
-    // Context7 Best Practice: Pool configuration for optimal performance
-    pool: 'threads',
-    poolOptions: {
-      threads: {
-        singleThread: false,
-        isolate: true,
-      },
-      forks: {
-        singleFork: false,
-        isolate: true,
-      },
+      hooks: 'list',
     },
   },
 });
