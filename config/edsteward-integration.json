@@ -1,0 +1,91 @@
+{
+  "version": "2.0.0",
+  "lastUpdated": "2026-01-06",
+  "source": "EdSteward AI Integration Response",
+  
+  "environments": {
+    "production": {
+      "baseUrl": "https://moravian.edsteward.ai",
+      "endpoint": "/api/regulation-updates",
+      "healthCheck": "/api/regulation-updates/bulk-import/health",
+      "authRequired": true
+    },
+    "staging": {
+      "baseUrl": "https://staging.edsteward.ai",
+      "endpoint": "/api/regulation-updates",
+      "healthCheck": "/api/regulation-updates/bulk-import/health",
+      "authRequired": true
+    },
+    "development": {
+      "baseUrl": "http://localhost:3000",
+      "endpoint": "/api/regulation-updates",
+      "healthCheck": "/api/regulation-updates/bulk-import/health",
+      "authRequired": false
+    }
+  },
+  
+  "authentication": {
+    "method": "basic",
+    "username": "dvdbrnds",
+    "password": "gabadh",
+    "base64": "ZHZkYnJuZHM6Z2FiYWRo",
+    "header": "Authorization",
+    "headerValue": "Basic ZHZkYnJuZHM6Z2FiYWRo"
+  },
+  
+  "rateLimits": {
+    "generalApi": {
+      "limit": 100,
+      "windowMinutes": 15
+    },
+    "delayBetweenRequests": 100,
+    "maxBatchSize": 500
+  },
+  
+  "schema": {
+    "requiredFields": ["regulationId", "name"],
+    "regulationIdRange": {
+      "min": 1,
+      "max": 500
+    },
+    "filingDeadlineFormat": {
+      "type": "array",
+      "itemSchema": {
+        "type": "string",
+        "date": "string",
+        "frequency": "string",
+        "description": "string"
+      }
+    },
+    "requirementsFormat": "newline-separated-with-bullets",
+    "bulletPrefix": "• "
+  },
+  
+  "templateHints": {
+    "clery": ["clery", "campus security", "crime statistics", "1092(f)"],
+    "ferpa": ["ferpa", "student records", "privacy", "1232g"],
+    "title-ix": ["title ix", "title-ix", "sex discrimination", "1681"]
+  },
+  
+  "validStatuses": ["pending", "accepted", "rejected", "deferred"],
+  "validCategories": [
+    "Academic Affairs",
+    "Admissions and Financial Aid",
+    "Athletics and Extracurricular",
+    "Campus Safety and Security",
+    "Faculty and Staff",
+    "Finance and Administration",
+    "Research and Grants",
+    "Student Life and Services",
+    "Other"
+  ],
+  "validJurisdictionSources": [
+    "federal",
+    "state",
+    "international",
+    "private-organization",
+    "accreditor",
+    "industry-association"
+  ]
+}
+

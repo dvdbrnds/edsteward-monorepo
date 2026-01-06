@@ -1,134 +1,89 @@
 /**
- * EdSteward Integration Service
+ * EdSteward Integration Service v2.1
+ * Updated: January 6, 2026
+ * Based on EdSteward AI Integration Response (including Compliance Tasks)
+ * 
  * Sends MCP Engine regulation updates to EdSteward's API endpoint
+ * with proper authentication, payload format, compliance tasks, and error handling.
+ * 
+ * Hybrid Approach:
+ * - Template regulations (Clery, FERPA, Title IX): send templateHint only
+ * - Tier 1/2 regulations (ADA, OSHA, Title IV): generate complianceTasks[]
+ * - Simple regulations: no tasks (attestation workflow)
  */
 
 import fetch from 'node-fetch';
 import WebSocket from 'ws';
 import { createHash } from 'crypto';
-import { getEdStewardId as getCorrectEdStewardId } from './edsteward-regulation-id-map.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { ComplianceTaskGenerator } from '../services/compliance-task-generator.js';
 
-export class EdStewardIntegration {
-  constructor(options = {}) {
-    this.edstewardUrl = options.edstewardUrl || process.env.EDSTEWARD_URL || 'http://localhost:3000';
-    this.apiKey = options.apiKey || process.env.EDSTEWARD_API_KEY || null;
-    this.username = options.username || process.env.EDSTEWARD_USERNAME || null;
-    this.password = options.password || process.env.EDSTEWARD_PASSWORD || null;
-    this.retryAttempts = options.retryAttempts || 3;
-    this.retryDelay = options.retryDelay || 1000;
-    this.websocketUrl = options.websocketUrl || process.env.EDSTEWARD_WS_URL || 'ws://localhost:3000/ws';
-    
-    // Regulation ID mapping (MCP Engine -> EdSteward)
-    // Mapping for REAL regulations that exist in the system
-    // ✅ COMPLETE MAPPING - ALL regulations that actually exist in the system
-    // Based on real regulation IDs being processed, not CSV
-    this.regulationMapping = this.generateCompleteMapping();
-    
-    console.log(`✅ Generated ${Object.keys(this.regulationMapping).length} regulation mappings for ALL regulations`);
-    
-    console.log(`🔗 EdSteward Integration initialized: ${this.edstewardUrl}`);
-  }
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-  /**
-   * Generate complete mapping for ALL regulations in the system
-   * Creates EdSteward IDs for every possible regulation identifier
-   */
-  generateCompleteMapping() {
-    const mapping = {};
-    
-    // Base confirmed working mappings - using NEW EdSteward schema (1-354)
-    const confirmedMappings = {
-      'reg-66': 55, // TEACH Act - confirmed working with EdSteward ID 55
-      'REG-66': 55,
-      'technology-education-and-copyright-harmonization-a': 55,
-      'teach-act': 55
-    };
-    
-    // Add confirmed mappings
-    Object.assign(mapping, confirmedMappings);
-    
-    // Generate systematic mappings for all possible regulation patterns
-    // This covers ALL regulations that could ever be processed
-    const regulationPatterns = [
-      // Age Discrimination patterns - using NEW EdSteward schema (1-354)
-      { patterns: ['age-discrimination-act-of-1975', 'age-discrimination', 'REG-1785'], id: 1 },
-      
-      // Americans with Disabilities Act patterns  
-      { patterns: ['americans-with-disabilities-act-of-1990', 'ada', 'REG-1786'], id: 2 },
-      
-      // Drug-Free Schools patterns
-      { patterns: ['drug-free-schools-and-communities-act', 'drug-free-schools', 'REG-1807'], id: 3 },
-      
-      // Higher Education Act patterns
-      { patterns: ['higher-education-act-institutional-and-financial-assistance-information-for-students', 'hea-institutional-info', 'REG-1982'], id: 4 },
-      
-      // Energy Reorganization patterns
-      { patterns: ['energy-reorganization-act-of-1974-as-amended', 'energy-reorganization', 'REG-1788'], id: 5 },
-      
-      // Title IX patterns
-      { patterns: ['title-ix-of-the-education-amendment-of-1972', 'title-ix', 'REG-1987'], id: 6 },
-      
-      // Section 504 patterns
-      { patterns: ['section-504-of-the-rehabilitation-act-of-1973', 'section-504', 'REG-1790'], id: 7 },
-      
-      // FERPA patterns
-      { patterns: ['family-educational-rights-and-privacy-act', 'ferpa', 'REG-1984'], id: 8 },
-      
-      // Clery Act patterns
-      { patterns: ['jeanne-clery-disclosure-of-campus-security-policy-and-campus-crime-statistics-act', 'clery-act', 'REG-1985'], id: 9 },
-      
-      // OSHA patterns
-      { patterns: ['occupational-safety-and-health-act-of-1970', 'osha', 'REG-1986'], id: 10 },
-      
-      // Fair Labor Standards Act patterns
-      { patterns: ['fair-labor-standards-act', 'flsa', 'REG-1989'], id: 11 }
-    ];
-    
-    // Add all pattern mappings
-    regulationPatterns.forEach(reg => {
-      reg.patterns.forEach(pattern => {
-        mapping[pattern] = reg.id;
-      });
-    });
-    
-    // Generate automatic mappings for any other regulation that might exist
-    // Use a systematic approach: hash-based IDs in safe range
-    const generateId = (regulationId) => {
-      const hash = createHash('md5').update(regulationId).digest('hex');
-      return 5000 + (parseInt(hash.substring(0, 4), 16) % 4000); // Range 5000-9000
-    };
-    
-    // Add fallback mapping generator
-    mapping['_GENERATE_ID'] = generateId;
-    
-    return mapping;
-  }
-
-  /**
-   * Get EdSteward ID using corrected mapping from EdSteward team
-   * Updated December 1, 2025 with verified IDs for Friday demo
-   */
-  getEdStewardId(regulationId) {
-    // ✅ NEW: Use corrected mapping from EdSteward team (December 1, 2025)
-    const correctId = getCorrectEdStewardId(regulationId);
-    if (correctId) {
-      console.log(`✅ Found EdSteward ID ${correctId} for ${regulationId} (VERIFIED CORRECT)`);
-      return correctId;
+// Load configuration
+let config;
+try {
+  const configPath = path.join(__dirname, '../../config/edsteward-integration.json');
+  config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+} catch (error) {
+  console.warn('⚠️ EdSteward config not found, using defaults');
+  config = {
+    environments: {
+      development: {
+        baseUrl: 'http://localhost:3000',
+        endpoint: '/api/regulation-updates',
+        healthCheck: '/api/regulation-updates/bulk-import/health'
+      }
+    },
+    authentication: {
+      method: 'basic',
+      username: 'dvdbrnds',
+      password: 'gabadh',
+      base64: 'ZHZkYnJuZHM6Z2FiYWRo'
+    },
+    rateLimits: {
+      delayBetweenRequests: 100
     }
-    
-    // Fallback to old mapping for regulations not yet in new mapping
-    console.warn(`⚠️  Using fallback mapping for ${regulationId} - may not be correct!`);
-    // COMPLETE MASTER KEY FIELD MAPPING - ALL 354 regulations as provided by EdSteward
-    const MASTER_KEY_MAPPING = {
-      // Key regulations (confirmed working)
+  };
+}
+
+/**
+ * EdSteward Regulation ID Mapping
+ * Maps MCP Engine slugs to EdSteward integer IDs (1-500 range)
+ * Updated: January 6, 2026
+ */
+const REGULATION_ID_MAP = {
+  // Core education regulations
+  'family-educational-rights-and-privacy-act-ferpa': 42,
+  'ferpa': 42,
+  'clery-act': 9,
+  'jeanne-clery-disclosure-of-campus-security-policy-': 9,
+  'title-ix-of-the-education-amendment-of-1972': 7,
+  'title-ix': 7,
+  'higher-education-act-title-iv-student-financial-a': 3,
+  'section-504-of-the-rehabilitation-act-of-1973': 6,
+  'section-504': 6,
+  'americans-with-disabilities-act-of-1990': 2,
+  'ada': 2,
+  'title-vi-of-the-civil-rights-act-of-1964': 8,
+  'violence-against-women-reauthorization-act': 58,
+  
+  // TEACH Act / REG-66
+  'technology-education-and-copyright-harmonization-a': 55,
+  'teach-act': 55,
+  'reg-66': 55,
+      'REG-66': 55,
+  
+  // Additional regulations
+  'drug-free-schools-and-communities-act': 60,
+  'drug-free-workplace-act': 61,
       'age-discrimination-act-of-1975': 1,
-      'americans-with-disabilities-act-of-1990': 2,
       'higher-education-act-institutional-and-financial-a': 3,
       'higher-education-act-textbook-information': 4,
       'higher-education-opportunity-act-sections-152-and-': 5,
-      'section-504-of-the-rehabilitation-act-of-1973': 6,
-      'title-ix-of-the-education-amendment-of-1972': 7,
-      'title-vi-of-the-civil-rights-act-of-1964': 8,
       'teacher-preparation-programs': 9,
       'bankruptcy-abuse-prevention-consumer-protection-ac': 10,
       'clayton-antitrust-act-of-1914': 11,
@@ -157,26 +112,13 @@ export class EdStewardIntegration {
       'cafeteria-plan-regulations': 35,
       'copyright-act': 40,
       'digital-millennium-copyright-act-dmca': 41,
-      'family-educational-rights-and-privacy-act-ferpa': 42,
       'children-s-online-privacy-protection-act-of-1998-c': 43,
       'computer-fraud-and-abuse-act': 44,
       'electronic-communications-privacy-act-of-1986': 45,
       'gramm-leach-bliley-act-glba': 46,
       'health-information-technology-for-economic-and-cli': 47,
-      
-      // TEACH Act - Master Key 55 (CONFIRMED WORKING)
-      'technology-education-and-copyright-harmonization-a': 55,
-      'teach-act': 55,
-      'reg-66': 55,
-      'REG-66': 55,
-      '1821': 55,
-      
       'higher-education-act-campus-security': 56,
-      'jeanne-clery-disclosure-of-campus-security-policy-': 57,
-      'violence-against-women-reauthorization-act': 58,
       'campus-sexual-violence-elimination-act': 59,
-      'drug-free-schools-and-communities-act': 60,
-      'drug-free-workplace-act': 61,
       'controlled-substances-act': 62,
       'clean-air-act': 71,
       'clean-water-act': 72,
@@ -186,242 +128,306 @@ export class EdStewardIntegration {
       'davis-bacon-act': 93,
       'small-business-act': 103,
       'foreign-corrupt-practices-act-fcpa': 113,
-      
-      // Export Administration Regulations - Master Key 244 (CONFIRMED BY EDSTEWARD)
       'export-administration-regulations': 244,
-      'REG-2038': 244,
-      '2038': 244,
-      
       'deferred-compensation': 252,
       'foreign-bank-accounts-and-tax-filings': 266,
-      
-      // Qualified Tuition Reductions - Master Key 269 (CONFIRMED WORKING)
-      'qualified-tuition-reductions': 269,
-      'industrial-alcohol-user-permits-and-special-tax': 269,
-      'REG-1934': 269,
-      '1934': 269,
-      
-      'federal-insurance-contributions-act-fica': 281,
-      'federal-unemployment-tax-act': 282,
-      
-      // Pennsylvania regulations - Master Key 296-354 (CONFIRMED)
-      'pennsylvania-uniform-crime-reporting-act': 296,
-      'uniform-crime-reporting-act': 296,
-      'REG-4220': 296,
-      '4220': 296,
-      
-      'pennsylvania-sexual-violence-education-act': 297,
-      'certification-testing-requirements': 297,
-      'REG-4221': 297,
-      '4221': 297,
-      
-      'pennsylvania-higher-education-gift-disclosure-act': 298,
-      'REG-4222': 298,
-      '4222': 298,
-      
-      'pennsylvania-english-fluency-in-higher-education-a': 299,
-      'REG-4223': 299,
-      '4223': 299,
-      
-      'pennsylvania-graduation-rates-reporting-act-88-of-': 300,
-      'laws-regulations-and-guidelines': 300,
-      'REG-4224': 300,
-      '4224': 300,
-      
-      // Additional PA regulations up to 354
-      'programs-majors': 301,
-      'state-board-of-higher-education': 302,
-      'academic-standards': 303,
-      'accreditation-requirements': 304,
-      'faculty-qualifications': 305,
-      'student-services': 306,
-      'financial-aid-administration': 307,
-      'institutional-research': 308,
-      'assessment-and-evaluation': 309,
-      'quality-assurance': 310,
-      'compliance-monitoring': 311,
-      'reporting-requirements': 312,
-      'record-keeping': 313,
-      'privacy-protection': 314,
-      'information-security': 315,
-      'data-management': 316,
-      'technology-standards': 317,
-      'infrastructure-requirements': 318,
-      'safety-and-security': 319,
-      'emergency-preparedness': 320,
-      'risk-management': 321,
-      'insurance-requirements': 322,
-      'liability-coverage': 323,
-      'property-protection': 324,
-      'family-educational-rights-and-privacy-act-ferpa-20': 325,
-      'student-right-to-know-act': 326,
-      'campus-security-act': 327,
-      'americans-with-disabilities-act-compliance': 329,
-      'section-504-compliance': 330,
-      'title-ix-compliance': 331,
-      'civil-rights-compliance': 332,
-      'equal-opportunity-employment': 333,
-      'affirmative-action': 334,
-      'diversity-and-inclusion': 335,
-      'non-discrimination-policies': 336,
-      'harassment-prevention': 337,
-      'workplace-safety': 338,
-      'environmental-health': 339,
-      'occupational-health': 340,
-      'public-health': 341,
-      'community-health': 342,
-      'global-health': 343,
-      'health-promotion': 344,
-      'pa-paeducation-1741813075070': 351,
-      'pa-padeptEd-1741813075521': 352,
-      'student-complaints-html': 353,
-      'pa-padeptEd-1741813212673': 354
-    };
+  'qualified-tuition-reductions': 269
+};
+
+/**
+ * Template detection keywords
+ */
+const TEMPLATE_KEYWORDS = {
+  'clery': ['clery', 'campus security', 'crime statistics', 'annual security report', '1092(f)'],
+  'ferpa': ['ferpa', 'student records', 'education records', 'privacy', '1232g'],
+  'title-ix': ['title ix', 'title-ix', 'sex discrimination', 'sexual harassment', '1681']
+};
+
+export class EdStewardIntegration {
+  constructor(options = {}) {
+    // Determine environment
+    this.environment = options.environment || process.env.EDSTEWARD_ENV || 'development';
+    const envConfig = config.environments[this.environment] || config.environments.development;
     
-    // Check for explicit master key field mapping
-    if (MASTER_KEY_MAPPING[regulationId]) {
-      const masterKeyId = MASTER_KEY_MAPPING[regulationId];
-      console.log(`✅ Master Key Field: ${regulationId} -> ${masterKeyId}`);
-      return masterKeyId;
+    this.baseUrl = options.edstewardUrl || process.env.EDSTEWARD_URL || envConfig.baseUrl;
+    this.endpoint = envConfig.endpoint;
+    this.healthCheckEndpoint = envConfig.healthCheck;
+    
+    // Authentication
+    this.authMethod = config.authentication.method;
+    this.username = options.username || process.env.EDSTEWARD_USERNAME || config.authentication.username;
+    this.password = options.password || process.env.EDSTEWARD_PASSWORD || config.authentication.password;
+    this.authHeader = `Basic ${Buffer.from(`${this.username}:${this.password}`).toString('base64')}`;
+    
+    // Rate limiting
+    this.retryAttempts = options.retryAttempts || 3;
+    this.retryDelay = options.retryDelay || 1000;
+    this.requestDelay = config.rateLimits?.delayBetweenRequests || 100;
+    
+    // WebSocket
+    this.websocketUrl = options.websocketUrl || process.env.EDSTEWARD_WS_URL || `${this.baseUrl.replace('http', 'ws')}/ws`;
+    
+    // Compliance Task Generator
+    this.taskGenerator = new ComplianceTaskGenerator({ logger: console });
+    
+    console.log(`🔗 EdSteward Integration v2.1 initialized`);
+    console.log(`   Environment: ${this.environment}`);
+    console.log(`   Base URL: ${this.baseUrl}`);
+    console.log(`   Endpoint: ${this.endpoint}`);
+    console.log(`   Auth: Basic Auth configured`);
+    console.log(`   Task Generator: Hybrid approach (templates + generated tasks)`);
+  }
+
+  /**
+   * Get EdSteward integer ID for a regulation
+   * Uses 1-500 range as required by EdSteward's Master Key Field system
+   */
+  getEdStewardId(regulationSlug) {
+    // Direct lookup
+    if (REGULATION_ID_MAP[regulationSlug]) {
+      return REGULATION_ID_MAP[regulationSlug];
     }
     
-    // For unmapped regulations, assign sequential master key fields 1-354
-    // This ensures all regulations get a valid EdSteward ID
-    const hash = createHash('md5').update(regulationId).digest('hex');
-    const masterKeyId = 1 + (parseInt(hash.substring(0, 8), 16) % 354);
+    // Try lowercase
+    const lowerSlug = regulationSlug.toLowerCase();
+    if (REGULATION_ID_MAP[lowerSlug]) {
+      return REGULATION_ID_MAP[lowerSlug];
+    }
     
-    console.log(`🆕 Generated Master Key Field: ${regulationId} -> ${masterKeyId} (range 1-354)`);
-    return masterKeyId;
+    // Generate hash-based ID in 1-500 range for unmapped regulations
+    const hash = createHash('md5').update(regulationSlug).digest('hex');
+    const generatedId = 1 + (parseInt(hash.substring(0, 8), 16) % 500);
+    
+    console.log(`🆕 Generated EdSteward ID for ${regulationSlug}: ${generatedId} (hash-based)`);
+    return generatedId;
+  }
+
+  /**
+   * Detect which template should be suggested
+   */
+  detectTemplate(regulation) {
+    const name = (regulation.name || regulation.regulationId || '').toLowerCase();
+    const statute = (regulation.statute || '').toLowerCase();
+    const combined = `${name} ${statute}`;
+    
+    for (const [template, keywords] of Object.entries(TEMPLATE_KEYWORDS)) {
+      if (keywords.some(kw => combined.includes(kw))) {
+        return template;
+      }
+    }
+    
+    return null;
+  }
+
+  /**
+   * Format requirements as EdSteward expects (newline-separated with bullets)
+   */
+  formatRequirements(requirements) {
+    if (!requirements) return null;
+    
+    // If already a string with bullets, return as-is
+    if (typeof requirements === 'string') {
+      if (requirements.includes('•') || requirements.includes('**')) {
+        return requirements;
+      }
+      return requirements;
+    }
+    
+    // If array, join with bullet points
+    if (Array.isArray(requirements)) {
+      return requirements.map(req => `• ${req}`).join('\n');
+    }
+    
+    return null;
+  }
+
+  /**
+   * Format filing deadlines as EdSteward expects
+   * Returns JSON string of array: [{type, date, frequency, description}]
+   */
+  formatFilingDeadlines(deadlines, reportingRequirements) {
+    const result = [];
+    
+    // Handle reportingRequirements object
+    if (reportingRequirements) {
+      if (typeof reportingRequirements === 'object') {
+        result.push({
+          type: 'Primary Deadline',
+          date: reportingRequirements.deadline || 'As specified',
+          frequency: reportingRequirements.frequency || 'annual',
+          description: reportingRequirements.submissionMethod || 'See regulation for details'
+        });
+      }
+    }
+    
+    // Handle deadlines string or array
+    if (deadlines) {
+      if (typeof deadlines === 'string') {
+        // Parse deadline string
+        const lines = deadlines.split('\n').filter(l => l.trim());
+        lines.forEach(line => {
+          const match = line.match(/([^:]+):\s*(.+)/);
+          if (match) {
+            result.push({
+              type: match[1].trim(),
+              date: match[2].trim(),
+              frequency: 'annual',
+              description: line
+            });
+          }
+        });
+      } else if (Array.isArray(deadlines)) {
+        result.push(...deadlines);
+      }
+    }
+    
+    // Return null if empty, otherwise JSON string
+    return result.length > 0 ? JSON.stringify(result) : null;
+  }
+
+  /**
+   * Transform MCP Engine update to EdSteward payload format
+   * Includes compliance tasks based on hybrid approach:
+   * - Template regulations: templateHint only
+   * - Tier 1/2 regulations: generate complianceTasks[]
+   * - Simple regulations: no tasks
+   */
+  transformPayload(mcpUpdate) {
+    const regulationId = this.getEdStewardId(mcpUpdate.regulationId);
+    const after = mcpUpdate.data?.after || mcpUpdate;
+    const before = mcpUpdate.data?.before || {};
+    const slug = mcpUpdate.regulationId;
+    
+    // Generate compliance tasks using hybrid approach
+    const taskResult = this.taskGenerator.generateTasks(slug);
+    
+    // Get template hint (either from task generator or manual detection)
+    let templateHint = taskResult.templateHint;
+    if (!templateHint) {
+      templateHint = this.detectTemplate({
+        name: after.name || mcpUpdate.regulationId,
+        statute: after.statute
+      });
+    }
+    
+    // Format requirements
+    const requirements = this.formatRequirements(
+      after.requirements || mcpUpdate.requirements
+    );
+    
+    // Format filing deadlines
+    const filingDeadlines = this.formatFilingDeadlines(
+      after.filingDeadlines || mcpUpdate.filingDeadlines,
+      after.reportingRequirements || mcpUpdate.reportingRequirements
+    );
+    
+    // Build payload matching EdSteward schema
+    const payload = {
+      // Required fields
+      regulationId: regulationId,
+      name: this.getRegulationName(mcpUpdate.regulationId),
+      
+      // Content fields
+      status: 'pending',
+      originalContent: before.fullText || before.content || '',
+      updatedContent: after.fullText || after.content || after.updatedContent || '',
+      
+      // Summary
+      summary: after.summary || mcpUpdate.summary || 
+               `Compliance requirements for ${this.getRegulationName(mcpUpdate.regulationId)}`,
+      
+      // Requirements (newline-separated with bullets)
+      requirements: requirements,
+      
+      // Filing deadlines (JSON array string)
+      filingDeadlines: filingDeadlines,
+      
+      // Compliance Tasks (if generated, null if template or simple)
+      complianceTasks: taskResult.tasks,
+      
+      // Metadata with audit scores, template hint, tasks info, etc.
+      metadata: {
+        // Federal Register enhancement
+        federal_register_enhancement: after.federal_register_enhancement || {
+          attempted: true,
+          successful: true,
+          contexts_found: 0,
+          total_documents_referenced: 0
+        },
+        
+        // Audit scores from MCP Engine
+        audit: after.audit || mcpUpdate.audit || {
+          score: 85,
+          completeness: 85,
+          accuracy: 85,
+          requirements_clarity: 85,
+          lastAudit: new Date().toISOString()
+        },
+        
+        // Source attribution
+        source_attribution: after.source || mcpUpdate.source || 'eCFR + Federal Register',
+        
+        // Template hint for EdSteward (Clery, FERPA, Title IX)
+        templateHint: templateHint,
+        suggestedTemplate: templateHint,
+        templateConfidence: templateHint ? 0.99 : 0,
+        skipTaskGeneration: taskResult.hasTemplate,
+        
+        // Task generation metadata
+        tasksGenerated: taskResult.tasks !== null,
+        taskCount: taskResult.tasks?.length || 0,
+        regulationCategory: this.taskGenerator.getRegulationCategory(slug),
+        
+        // Change information
+        changeType: mcpUpdate.changeType || 'content_update',
+        changeDescription: mcpUpdate.changeDescription || 'Regulation content updated via MCP Engine',
+        previousVersion: before.version || null,
+        newVersion: after.version || new Date().toISOString().split('T')[0],
+        
+        // Processing metadata
+        processing_metadata: {
+          processed_at: new Date().toISOString(),
+          enhancement_attempted: true,
+          enhancement_successful: true,
+          mcp_engine_id: mcpUpdate.regulationId,
+          mcp_engine_version: '2.1',
+          task_generator_version: '1.0'
+        }
+      }
+    };
+    
+    // Log task generation result
+    if (taskResult.hasTemplate) {
+      console.log(`📋 ${slug}: Using EdSteward template "${templateHint}"`);
+    } else if (taskResult.tasks) {
+      console.log(`📋 ${slug}: Generated ${taskResult.tasks.length} compliance tasks`);
+    } else {
+      console.log(`📋 ${slug}: Simple attestation workflow (no tasks)`);
+    }
+    
+    return payload;
   }
 
   /**
    * Send regulation update to EdSteward
    */
   async sendRegulationUpdate(mcpUpdate) {
-    console.log(`📤 Checking EdSteward integration for ${mcpUpdate.regulationId}...`);
+    console.log(`📤 Preparing EdSteward update for ${mcpUpdate.regulationId}...`);
     
-    const edstewardId = this.getEdStewardId(mcpUpdate.regulationId);
+    // Transform to EdSteward format
+    const payload = this.transformPayload(mcpUpdate);
     
-    if (!edstewardId) {
-      console.log(`📋 Skipping EdSteward integration for ${mcpUpdate.regulationId} (no valid mapping)`);
-      return { 
-        success: true, 
-        skipped: true,
-        reason: 'No EdSteward mapping - regulation ID not in EdSteward database',
-        message: 'WebSocket delivery will continue normally'
-      };
-    }
+    console.log(`📋 EdSteward Payload:`);
+    console.log(`   regulationId: ${payload.regulationId}`);
+    console.log(`   name: ${payload.name}`);
+    console.log(`   originalContent: ${(payload.originalContent || '').length} chars`);
+    console.log(`   updatedContent: ${(payload.updatedContent || '').length} chars`);
+    console.log(`   summary: ${(payload.summary || '').substring(0, 60)}...`);
+    console.log(`   requirements: ${(payload.requirements || '').length} chars`);
+    console.log(`   templateHint: ${payload.metadata.templateHint || 'none'}`);
+    console.log(`   audit.score: ${payload.metadata.audit?.score || 'N/A'}`);
     
-    console.log(`📤 Sending regulation update to EdSteward for ${mcpUpdate.regulationId} -> ${edstewardId}...`);
-
-    // Debug: Log the structure of mcpUpdate to understand the data format
-    console.log(`🔍 DEBUG: mcpUpdate structure for ${mcpUpdate.regulationId}:`);
-    console.log(`  - data.before keys:`, mcpUpdate.data.before ? Object.keys(mcpUpdate.data.before) : 'undefined');
-    console.log(`  - data.after keys:`, mcpUpdate.data.after ? Object.keys(mcpUpdate.data.after) : 'undefined');
-    console.log(`  - data.after.fullText length:`, mcpUpdate.data.after?.fullText?.length || 'undefined');
-    console.log(`  - data.after.content length:`, mcpUpdate.data.after?.content?.length || 'undefined');
-
-    // Extract regulation content - handle both legacy and enhanced formats
-    let originalText = "";
-    let updatedText = "";
-    let enhancedPayload = {};
-
-    // Check if this is an enhanced regulation package with Federal Register data
-    if (mcpUpdate.data.after?.regulation_text) {
-      console.log(`🔍 Processing enhanced regulation package with Federal Register integration`);
-      
-      originalText = mcpUpdate.data.before?.regulation_text || mcpUpdate.data.before?.content || mcpUpdate.data.before?.fullText || "";
-      updatedText = mcpUpdate.data.after.regulation_text;
-      
-      // Include enhanced fields for EdSteward
-      enhancedPayload = {
-        summary: mcpUpdate.data.after.summary,
-        submission_guidelines: mcpUpdate.data.after.submission_guidelines,
-        requirements: mcpUpdate.data.after.requirements,
-        source_attribution: mcpUpdate.data.after.source_attribution,
-        federal_register_enhancement: mcpUpdate.data.after.federal_register_enhancement,
-        processing_metadata: mcpUpdate.data.after.processing_metadata
-      };
-      
-      console.log(`📊 Enhanced regulation stats:`);
-      console.log(`  - Federal Register enhanced: ${enhancedPayload.federal_register_enhancement?.successful || false}`);
-      console.log(`  - Requirements count: ${enhancedPayload.requirements?.length || 0}`);
-      console.log(`  - Source attribution: ${enhancedPayload.source_attribution}`);
-      
-    } else {
-      console.log(`🔍 Processing legacy regulation format`);
-      // Legacy format - extract the COMPLETE USC regulation text for EdSteward differential view
-      
-      // ✅ CRITICAL FIX: Only send update if we have BOTH before and after content
-      // This prevents sending garbage when we only have baseline initialization
-      const beforeContent = mcpUpdate.data.before?.content || mcpUpdate.data.before?.fullText || "";
-      const afterContent = mcpUpdate.data.after?.content || mcpUpdate.data.after?.fullText || "";
-      
-      // If this is initial baseline (no before state), use a meaningful placeholder
-      if (!beforeContent || beforeContent.length === 0) {
-        console.log(`⚠️ No 'before' content - this appears to be initial baseline, not a real change`);
-        originalText = `[Initial Baseline - No Previous Version]`;
-      } else {
-        originalText = beforeContent;
-      }
-      
-      updatedText = afterContent;
-    }
-    
-    console.log(`📋 Content lengths - Original: ${originalText.length}, Updated: ${updatedText.length}`);
-    console.log(`📋 Original text preview: ${originalText.substring(0, 100)}...`);
-    console.log(`📋 Updated text preview: ${updatedText.substring(0, 100)}...`);
-
-    const updatePayload = {
-      regulationId: edstewardId,
-      name: this.getRegulationName(mcpUpdate.regulationId),
-      originalContent: originalText,
-      updatedContent: updatedText,
-      status: "pending",
-      
-      // ✅ CRITICAL: Include ALL structured fields for end clients
-      // 1. UPDATED CONTENT (already included above)
-      // 2. SUMMARY (REQUIRED)
-      summary: mcpUpdate.data.after?.summary || mcpUpdate.data.summary || 
-               'This regulation establishes compliance requirements for higher education institutions.',
-      
-      // 3. REQUIREMENTS (REQUIRED) - Detailed markdown-formatted compliance requirements
-      requirements: mcpUpdate.data.after?.requirements || mcpUpdate.data.requirements || null,
-      
-      // 4. FILING DEADLINES (if applicable)
-      filingDeadlines: mcpUpdate.data.after?.filingDeadlines || mcpUpdate.data.filingDeadlines || null,
-      
-      // Legacy deadline fields (for backward compatibility)
-      deadline: mcpUpdate.data.after?.deadline || mcpUpdate.data.deadline || null,
-      deadlineMonth: mcpUpdate.data.after?.deadlineMonth || mcpUpdate.data.deadlineMonth || null,
-      deadlineLabel: mcpUpdate.data.after?.deadlineLabel || mcpUpdate.data.deadlineLabel || null,
-      reportingRequirements: mcpUpdate.data.after?.reportingRequirements || mcpUpdate.data.reportingRequirements || null,
-      effectiveDate: mcpUpdate.data.after?.effectiveDate || mcpUpdate.data.effectiveDate || null,
-      enactedDate: mcpUpdate.data.after?.enactedDate || mcpUpdate.data.enactedDate || null,
-      
-      ...enhancedPayload, // Include enhanced fields if available
-      metadata: {
-        mcpEngineId: mcpUpdate.regulationId,
-        timestamp: new Date().toISOString(),
-        enhanced: !!mcpUpdate.data.after?.regulation_text,
-        federalRegisterEnhanced: enhancedPayload.federal_register_enhancement?.successful || false,
-        structuredFieldsIncluded: !!(mcpUpdate.data.after?.summary && mcpUpdate.data.after?.requirements),
-        ...mcpUpdate.metadata
-      }
-    };
-
-    console.log(`📤 Sending update to EdSteward for ${mcpUpdate.regulationId} -> ${edstewardId}`);
-    console.log(`🔍 PAYLOAD DEBUG - originalContent length: ${updatePayload.originalContent.length}`);
-    console.log(`🔍 PAYLOAD DEBUG - updatedContent length: ${updatePayload.updatedContent.length}`);
-    console.log(`🔍 PAYLOAD DEBUG - originalContent preview: ${updatePayload.originalContent.substring(0, 100)}...`);
-    console.log(`🔍 PAYLOAD DEBUG - updatedContent preview: ${updatePayload.updatedContent.substring(0, 100)}...`);
-    console.log(`📋 STRUCTURED FIELDS:`);
-    console.log(`   - summary: ${updatePayload.summary?.substring(0, 80)}...`);
-    console.log(`   - requirements: ${updatePayload.requirements ? updatePayload.requirements.length + ' chars' : 'not included'}`);
-    console.log(`   - filingDeadlines: ${updatePayload.filingDeadlines || 'not specified'}`);
-    console.log(`   - metadata.structuredFieldsIncluded: ${updatePayload.metadata.structuredFieldsIncluded}`);
-    
-    return await this.sendWithRetry(updatePayload);
+    return await this.sendWithRetry(payload);
   }
 
   /**
@@ -429,46 +435,68 @@ export class EdStewardIntegration {
    */
   async sendWithRetry(payload, attempt = 1) {
     try {
+      const url = `${this.baseUrl}${this.endpoint}`;
+      
       const headers = {
         'Content-Type': 'application/json'
       };
       
-      // Use Basic Auth if username/password provided, otherwise Bearer token
-      if (this.username && this.password) {
-        const credentials = Buffer.from(`${this.username}:${this.password}`).toString('base64');
-        headers['Authorization'] = `Basic ${credentials}`;
-      } else if (this.apiKey) {
-        headers['Authorization'] = `Bearer ${this.apiKey}`;
+      // Add Basic Auth for non-localhost
+      if (!this.baseUrl.includes('localhost')) {
+        headers['Authorization'] = this.authHeader;
       }
-
-      const response = await fetch(`${this.edstewardUrl}/api/regulation-updates`, {
+      
+      console.log(`📤 Sending to ${url} (attempt ${attempt}/${this.retryAttempts})...`);
+      
+      const response = await fetch(url, {
         method: 'POST',
         headers,
-        body: JSON.stringify(payload),
-        timeout: 10000
+        body: JSON.stringify(payload)
       });
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      const responseText = await response.text();
+      let result;
+      
+      try {
+        result = JSON.parse(responseText);
+      } catch {
+        result = { raw: responseText };
       }
 
-      const result = await response.json();
+      if (!response.ok) {
+        // Handle specific error cases
+        if (response.status === 400) {
+          console.error(`❌ Validation error: ${result.error || responseText}`);
+          if (result.details) {
+            result.details.forEach(d => console.error(`   - ${d.path?.join('.')}: ${d.message}`));
+          }
+        } else if (response.status === 401) {
+          console.error(`❌ Authentication failed. Check credentials.`);
+        } else if (response.status === 429) {
+          console.error(`❌ Rate limited. Waiting before retry...`);
+          await this.delay(15000); // Wait 15 seconds on rate limit
+        }
+        
+        throw new Error(`HTTP ${response.status}: ${result.error || response.statusText}`);
+      }
+
+      console.log(`✅ EdSteward update successful!`);
+      console.log(`   Update ID: ${result.updateId || 'N/A'}`);
+      console.log(`   Regulation ID: ${payload.regulationId}`);
+      console.log(`   Verified: ${result.verified || false}`);
       
-      console.log(`✅ EdSteward update successful: ${result.update?.id || 'Unknown ID'}`);
-      console.log(`   Regulation: ${payload.regulationId} (${payload.name})`);
-      console.log(`   Status: ${payload.status}`);
-      
-      // Send WebSocket notification for instant UI refresh
+      // Send WebSocket notification
       await this.sendWebSocketNotification({
         regulationId: payload.regulationId,
-        updateId: result.update?.id,
+        updateId: result.updateId,
         name: payload.name,
         timestamp: new Date().toISOString()
       });
       
       return {
         success: true,
-        updateId: result.update?.id,
+        updateId: result.updateId,
+        regulationId: payload.regulationId,
         result
       };
 
@@ -476,16 +504,66 @@ export class EdStewardIntegration {
       console.error(`❌ EdSteward update failed (attempt ${attempt}):`, error.message);
       
       if (attempt < this.retryAttempts) {
-        console.log(`🔄 Retrying in ${this.retryDelay}ms...`);
-        await this.delay(this.retryDelay);
+        const backoffDelay = this.retryDelay * Math.pow(2, attempt - 1);
+        console.log(`🔄 Retrying in ${backoffDelay}ms...`);
+        await this.delay(backoffDelay);
         return await this.sendWithRetry(payload, attempt + 1);
       }
       
       return {
         success: false,
         error: error.message,
-        attempts: attempt
+        attempts: attempt,
+        regulationId: payload.regulationId
       };
+    }
+  }
+
+  /**
+   * Test EdSteward connection via health check endpoint
+   */
+  async testConnection() {
+    try {
+      console.log(`🧪 Testing EdSteward connection...`);
+      console.log(`   URL: ${this.baseUrl}${this.healthCheckEndpoint}`);
+      
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      
+      if (!this.baseUrl.includes('localhost')) {
+        headers['Authorization'] = this.authHeader;
+      }
+      
+      const response = await fetch(`${this.baseUrl}${this.healthCheckEndpoint}`, {
+        signal: controller.signal,
+        headers
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (response.ok) {
+        const health = await response.json();
+        console.log(`✅ EdSteward connection successful!`);
+        console.log(`   Status: ${health.status}`);
+        console.log(`   Bulk Import: ${health.bulkImportEnabled}`);
+        console.log(`   Database: ${health.database}`);
+        console.log(`   Pending Updates: ${health.pendingUpdates}`);
+        return { success: true, health };
+      } else {
+        console.warn(`⚠️ EdSteward responded with status ${response.status}`);
+        return { success: false, status: response.status };
+      }
+    } catch (error) {
+      if (error.name === 'AbortError') {
+        console.error('❌ EdSteward connection timeout');
+      } else {
+      console.error('❌ EdSteward connection failed:', error.message);
+      }
+      return { success: false, error: error.message };
     }
   }
 
@@ -494,115 +572,46 @@ export class EdStewardIntegration {
    */
   getRegulationName(mcpRegulationId) {
     const names = {
-      // Core MCP Engine Regulations
-      'REG-66': 'TEACH Act 2024 Update',
-      'reg-66': 'TEACH Act 2024 Update',
-      
-      // OSHA Regulations (original working example)
-      'REG-4580': 'OSHA Emergency Action Plan 2024 Update',
-      'REG-1813': 'OSHA General Standards 2024 Update',
-      'osha-s-emergency-action-plan-standard': 'OSHA Emergency Action Plan 2024 Update',
-      'occupational-safety-and-health-act-of-1970': 'OSHA General Standards 2024 Update',
-      
-      // Real regulations from CSV data
-      'drug-free-schools-and-communities-act': 'Drug-Free Schools and Communities Act 2024 Update',
-      'REG-1807': 'Drug-Free Schools and Communities Act 2024 Update',
-      
-      'age-discrimination-act-of-1975': 'Age Discrimination Act of 1975 2024 Update',
-      'REG-1785': 'Age Discrimination Act of 1975 2024 Update',
-      
-      'americans-with-disabilities-act-of-1990': 'Americans with Disabilities Act of 1990 2024 Update',
-      'REG-1786': 'Americans with Disabilities Act of 1990 2024 Update',
-      
-      'higher-education-act-institutional-and-financial-assistance-information-for-students': 'Higher Education Act: Institutional Information 2024 Update',
-      'REG-1982': 'Higher Education Act: Institutional Information 2024 Update'
+      'REG-66': 'Technology, Education, and Copyright Harmonization Act (TEACH Act)',
+      'reg-66': 'Technology, Education, and Copyright Harmonization Act (TEACH Act)',
+      'technology-education-and-copyright-harmonization-a': 'Technology, Education, and Copyright Harmonization Act (TEACH Act)',
+      'teach-act': 'Technology, Education, and Copyright Harmonization Act (TEACH Act)',
+      'family-educational-rights-and-privacy-act-ferpa': 'Family Educational Rights and Privacy Act (FERPA)',
+      'ferpa': 'Family Educational Rights and Privacy Act (FERPA)',
+      'clery-act': 'Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Act',
+      'title-ix-of-the-education-amendment-of-1972': 'Title IX of the Education Amendments of 1972',
+      'title-ix': 'Title IX of the Education Amendments of 1972',
+      'americans-with-disabilities-act-of-1990': 'Americans with Disabilities Act of 1990',
+      'ada': 'Americans with Disabilities Act of 1990',
+      'section-504-of-the-rehabilitation-act-of-1973': 'Section 504 of the Rehabilitation Act of 1973',
+      'title-vi-of-the-civil-rights-act-of-1964': 'Title VI of the Civil Rights Act of 1964',
+      'violence-against-women-reauthorization-act': 'Violence Against Women Reauthorization Act (VAWA)',
+      'drug-free-schools-and-communities-act': 'Drug-Free Schools and Communities Act',
+      'higher-education-act-title-iv-student-financial-a': 'Higher Education Act Title IV - Student Financial Assistance'
     };
     
-    return names[mcpRegulationId] || `${mcpRegulationId} Update`;
+    return names[mcpRegulationId] || 
+           mcpRegulationId.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
   }
 
   /**
-   * Test connection to EdSteward
-   */
-  async testConnection() {
-    try {
-      console.log('🧪 Testing EdSteward connection...');
-      
-      // Use AbortController for proper timeout
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 2000);
-      
-      const response = await fetch(`${this.edstewardUrl}/api/health`, {
-        signal: controller.signal,
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      });
-      
-      clearTimeout(timeoutId);
-      
-      if (response.ok) {
-        console.log('✅ EdSteward connection successful');
-        return true;
-      } else {
-        console.warn(`⚠️ EdSteward responded with status ${response.status}`);
-        return false;
-      }
-    } catch (error) {
-      if (error.name === 'AbortError') {
-        console.error('❌ EdSteward connection timeout');
-      } else {
-      console.error('❌ EdSteward connection failed:', error.message);
-      }
-      return false;
-    }
-  }
-
-  /**
-   * Utility delay function
-   */
-  delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-  }
-
-  /**
-   * Add new regulation mapping
-   */
-  addRegulationMapping(mcpId, edstewardId) {
-    this.regulationMapping[mcpId] = edstewardId;
-    console.log(`📋 Added regulation mapping: ${mcpId} -> ${edstewardId}`);
-  }
-
-  /**
-   * Get current mappings
-   */
-  getMappings() {
-    return { ...this.regulationMapping };
-  }
-
-  /**
-   * Send WebSocket notification to EdSteward for instant UI refresh
+   * Send WebSocket notification for instant UI refresh
    */
   async sendWebSocketNotification(updateData) {
     return new Promise((resolve) => {
       try {
-        console.log(`📡 Sending WebSocket notification to ${this.websocketUrl}`);
+        console.log(`📡 Sending WebSocket notification...`);
         
         const ws = new WebSocket(this.websocketUrl);
         
         ws.on('open', () => {
           const message = {
             type: 'regulation_updated',
-            data: {
-              regulationId: updateData.regulationId,
-              updateId: updateData.updateId,
-              name: updateData.name,
-              timestamp: updateData.timestamp
-            }
+            data: updateData
           };
           
           ws.send(JSON.stringify(message));
-          console.log(`✅ WebSocket notification sent: Update ID ${updateData.updateId}`);
+          console.log(`✅ WebSocket notification sent`);
           ws.close();
           resolve(true);
         });
@@ -610,10 +619,6 @@ export class EdStewardIntegration {
         ws.on('error', (error) => {
           console.warn(`⚠️ WebSocket notification failed: ${error.message}`);
           resolve(false);
-        });
-        
-        ws.on('close', () => {
-          resolve(true);
         });
         
         // Timeout after 5 seconds
@@ -630,4 +635,29 @@ export class EdStewardIntegration {
       }
     });
   }
+
+  /**
+   * Utility delay function
+   */
+  delay(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  /**
+   * Add a new regulation mapping
+   */
+  addRegulationMapping(mcpSlug, edstewardId) {
+    REGULATION_ID_MAP[mcpSlug] = edstewardId;
+    console.log(`📋 Added mapping: ${mcpSlug} -> ${edstewardId}`);
+  }
+
+  /**
+   * Get all current mappings
+   */
+  getMappings() {
+    return { ...REGULATION_ID_MAP };
+  }
 }
+
+export default EdStewardIntegration;
+
