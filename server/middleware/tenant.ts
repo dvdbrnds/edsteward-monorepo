@@ -179,6 +179,33 @@ const TENANT_REGISTRY: Record<string, Tenant> = {
     },
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date()
+  },
+  'wossamotta': {
+    id: 'wossamotta',
+    name: 'Wossamotta University',
+    domain: 'wossamotta.edu',
+    subdomain: 'wossamotta',
+    databaseName: 'edsteward_wossamotta',
+    status: 'active',
+    settings: {
+      allowedDomains: ['wossamotta.edu'],
+      defaultRole: 'user',
+      enableAutoProvisioning: true,
+      features: {
+        apiAccess: true,
+        customDomain: false,
+        ssoEnabled: false,
+        maxUsers: 500,
+        maxRegulations: 5000
+      },
+      institutionConfig: {
+        primaryTypes: ['private-universities'],
+        hideNonApplicable: true,
+        allowUsersToToggle: true
+      }
+    },
+    createdAt: new Date('2026-01-06'),
+    updatedAt: new Date()
   }
 };
 

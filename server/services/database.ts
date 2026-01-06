@@ -25,6 +25,7 @@ const TENANT_DATABASE_URLS: Record<string, string> = {
   'dev': process.env.DEV_DATABASE_URL || process.env.DATABASE_URL || '',
   'staging': process.env.STAGING_DATABASE_URL || process.env.DATABASE_URL || '',
   'admin': process.env.ADMIN_DATABASE_URL || process.env.DATABASE_URL || '',
+  'wossamotta': process.env.WOSSAMOTTA_DATABASE_URL || process.env.DATABASE_URL || '',
 };
 
 /**
