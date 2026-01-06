@@ -14,10 +14,11 @@ interface TenantDatabaseConfig {
 }
 
 // Tenant database configurations - each tenant gets its own database
+// IMPORTANT: Each tenant MUST have its own DATABASE_URL for data isolation
 const TENANT_DATABASE_CONFIGS: Record<string, TenantDatabaseConfig> = {
   'admin': {
     tenantId: 'admin',
-    databaseUrl: process.env.ADMIN_DATABASE_URL || config.DATABASE_URL,
+    databaseUrl: process.env.ADMIN_DATABASE_URL || process.env.MORAVIAN_DATABASE_URL || config.DATABASE_URL,
     poolConfig: { max: 10, idleTimeoutMillis: 30000, connectionTimeoutMillis: 10000 }
   },
   'moravian': {
@@ -25,9 +26,14 @@ const TENANT_DATABASE_CONFIGS: Record<string, TenantDatabaseConfig> = {
     databaseUrl: process.env.MORAVIAN_DATABASE_URL || config.DATABASE_URL,
     poolConfig: { max: 5, idleTimeoutMillis: 30000, connectionTimeoutMillis: 10000 }
   },
+  'dev': {
+    tenantId: 'dev',
+    databaseUrl: process.env.DEV_DATABASE_URL || config.DATABASE_URL,
+    poolConfig: { max: 3, idleTimeoutMillis: 30000, connectionTimeoutMillis: 10000 }
+  },
   'test': {
     tenantId: 'test',
-    databaseUrl: process.env.TEST_DATABASE_URL || config.DATABASE_URL,
+    databaseUrl: process.env.TEST_DATABASE_URL || process.env.DEV_DATABASE_URL || config.DATABASE_URL,
     poolConfig: { max: 3, idleTimeoutMillis: 30000, connectionTimeoutMillis: 10000 }
   },
   'staging': {
@@ -156,8 +162,8 @@ export class MultiTenantDatabaseService {
     for (const tenantId of tenantIds) {
       try {
         const isHealthy = await this.testTenantConnection(tenantId);
-        if (isHealthy) {
-        } else {
+        if (!isHealthy) {
+          console.warn(`[MULTI-TENANT-DB] ⚠ Tenant ${tenantId} connection unhealthy`);
         }
       } catch (error) {
         console.error(`[MULTI-TENANT-DB] ✗ Failed to initialize tenant ${tenantId}:`, error);
