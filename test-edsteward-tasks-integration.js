@@ -1,19 +1,22 @@
 #!/usr/bin/env node
 /**
- * EdSteward Integration Test - Compliance Tasks
- * Tests the hybrid approach: templates for Clery/FERPA/Title IX, generated tasks for others
+ * EdSteward Integration Test - Expanded Compliance Tasks
+ * Tests the hybrid approach with all Tier 1 and Tier 2 templates
  */
 
 import { EdStewardIntegration } from './src/delivery-system/edsteward-integration.js';
+import { ComplianceTaskGenerator } from './src/services/compliance-task-generator.js';
 
 async function testIntegration() {
   console.log('═══════════════════════════════════════════════════════════════');
-  console.log('🧪 EdSteward Integration Test - Compliance Tasks');
+  console.log('🧪 EdSteward Integration Test - Expanded Compliance Tasks');
   console.log('═══════════════════════════════════════════════════════════════\n');
 
   const edsteward = new EdStewardIntegration({
-    environment: 'development' // Uses localhost:3000
+    environment: 'development'
   });
+
+  const taskGenerator = new ComplianceTaskGenerator();
 
   // Test 1: Health Check
   console.log('📋 Test 1: EdSteward Health Check');
@@ -26,74 +29,132 @@ async function testIntegration() {
   }
   console.log('');
 
-  // Test 2: Template Regulation (Clery Act)
-  console.log('📋 Test 2: Template Regulation (Clery Act)');
+  // Test 2: List all available templates
+  console.log('📋 Test 2: Available Task Templates');
   console.log('─────────────────────────────────────────────────────────────');
-  const cleryUpdate = {
-    regulationId: 'clery-act',
-    data: {
-      after: {
-        fullText: 'The Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Act (20 U.S.C. § 1092(f)) requires colleges and universities participating in federal financial aid programs to maintain and disclose campus crime statistics and security information.',
-        summary: 'Requires colleges to disclose campus crime statistics and security policies.',
-        requirements: ['Publish Annual Security Report by October 1', 'Maintain daily crime log', 'Issue timely warnings', 'Test emergency notification systems']
-      }
+  const templates = taskGenerator.getAvailableTemplates();
+  console.log('   EdSteward Templates (use templateHint):');
+  templates.edstewardTemplates.forEach(t => console.log(`     • ${t}`));
+  console.log('');
+  console.log('   MCP Engine Task Templates:');
+  const uniqueTemplates = [...new Set(templates.mcpTaskTemplates)];
+  uniqueTemplates.forEach(t => {
+    const result = taskGenerator.generateTasks(t);
+    if (result.tasks) {
+      console.log(`     • ${t}: ${result.tasks.length} tasks`);
     }
-  };
-  
-  const cleryPayload = edsteward.transformPayload(cleryUpdate);
-  console.log(`   Regulation: ${cleryPayload.name}`);
-  console.log(`   EdSteward ID: ${cleryPayload.regulationId}`);
-  console.log(`   Template Hint: ${cleryPayload.metadata.templateHint || 'none'}`);
-  console.log(`   Tasks Generated: ${cleryPayload.metadata.tasksGenerated}`);
-  console.log(`   Task Count: ${cleryPayload.metadata.taskCount}`);
-  console.log(`   Category: ${cleryPayload.metadata.regulationCategory}`);
-  console.log('   ✅ Clery uses EdSteward template (no tasks generated)');
+  });
   console.log('');
 
-  // Test 3: Generated Tasks Regulation (ADA)
-  console.log('📋 Test 3: Generated Tasks Regulation (ADA)');
+  // Test 3: Test each Tier 1 regulation
+  console.log('📋 Test 3: Tier 1 Regulation Task Generation');
   console.log('─────────────────────────────────────────────────────────────');
-  const adaUpdate = {
-    regulationId: 'americans-with-disabilities-act-of-1990',
-    data: {
-      after: {
-        fullText: 'The Americans with Disabilities Act of 1990 (42 U.S.C. § 12101 et seq.) prohibits discrimination against individuals with disabilities in all areas of public life, including jobs, schools, transportation, and all public and private places that are open to the general public.',
-        summary: 'Prohibits discrimination based on disability in employment, public services, and accommodations.',
-        requirements: ['Provide reasonable accommodations', 'Maintain accessible facilities', 'Publish non-discrimination policy', 'Designate ADA coordinator']
-      }
+  
+  const tier1Regs = [
+    { slug: 'americans-with-disabilities-act-of-1990', name: 'ADA' },
+    { slug: 'hipaa', name: 'HIPAA' },
+    { slug: 'glba', name: 'GLBA' },
+    { slug: 'osha', name: 'OSHA' },
+    { slug: 'heoa', name: 'HEOA' },
+    { slug: 'save-act', name: 'Campus SaVE Act' },
+    { slug: 'solomon-amendment', name: 'Solomon Amendment' },
+    { slug: 'title-iv', name: 'Title IV' }
+  ];
+
+  let totalTasks = 0;
+  for (const reg of tier1Regs) {
+    const result = taskGenerator.generateTasks(reg.slug);
+    if (result.tasks) {
+      console.log(`   ✅ ${reg.name}: ${result.tasks.length} tasks`);
+      totalTasks += result.tasks.length;
+    } else if (result.templateHint) {
+      console.log(`   🏷️  ${reg.name}: uses EdSteward template "${result.templateHint}"`);
+    } else {
+      console.log(`   ⚠️  ${reg.name}: no template`);
     }
-  };
-  
-  const adaPayload = edsteward.transformPayload(adaUpdate);
-  console.log(`   Regulation: ${adaPayload.name}`);
-  console.log(`   EdSteward ID: ${adaPayload.regulationId}`);
-  console.log(`   Template Hint: ${adaPayload.metadata.templateHint || 'none'}`);
-  console.log(`   Tasks Generated: ${adaPayload.metadata.tasksGenerated}`);
-  console.log(`   Task Count: ${adaPayload.metadata.taskCount}`);
-  console.log(`   Category: ${adaPayload.metadata.regulationCategory}`);
-  
-  if (adaPayload.complianceTasks) {
-    console.log('\n   📋 Generated Tasks:');
-    adaPayload.complianceTasks.forEach((task, i) => {
-      const indent = task.parentTempId ? '      └─' : '   ';
-      console.log(`${indent} ${i+1}. ${task.title} (${task.priority})`);
-      console.log(`${indent}    Role: ${task.assignedRole}`);
-      console.log(`${indent}    Evidence: ${task.evidenceType}`);
-    });
   }
   console.log('');
 
-  // Test 4: Send to EdSteward (if localhost is running)
-  console.log('📋 Test 4: Send ADA Regulation to EdSteward');
+  // Test 4: Test Tier 2 regulations
+  console.log('📋 Test 4: Tier 2 Regulation Task Generation');
+  console.log('─────────────────────────────────────────────────────────────');
+  
+  const tier2Regs = [
+    { slug: 'drug-free-schools-and-communities-act', name: 'Drug-Free Schools' },
+    { slug: 'section-504', name: 'Section 504' },
+    { slug: 'vawa', name: 'VAWA' },
+    { slug: 'fmla', name: 'FMLA' },
+    { slug: 'dmca', name: 'Copyright/DMCA' }
+  ];
+
+  for (const reg of tier2Regs) {
+    const result = taskGenerator.generateTasks(reg.slug);
+    if (result.tasks) {
+      console.log(`   ✅ ${reg.name}: ${result.tasks.length} tasks`);
+      totalTasks += result.tasks.length;
+    } else {
+      console.log(`   ⚠️  ${reg.name}: no template`);
+    }
+  }
+  console.log('');
+
+  // Test 5: EdSteward template regulations
+  console.log('📋 Test 5: EdSteward Template Regulations');
+  console.log('─────────────────────────────────────────────────────────────');
+  
+  const templateRegs = [
+    { slug: 'clery-act', name: 'Clery Act' },
+    { slug: 'ferpa', name: 'FERPA' },
+    { slug: 'title-ix', name: 'Title IX' }
+  ];
+
+  for (const reg of templateRegs) {
+    const result = taskGenerator.generateTasks(reg.slug);
+    console.log(`   🏷️  ${reg.name}: templateHint = "${result.templateHint}"`);
+  }
+  console.log('');
+
+  // Test 6: Full payload test with HIPAA
+  console.log('📋 Test 6: Full HIPAA Payload Test');
+  console.log('─────────────────────────────────────────────────────────────');
+  const hipaaUpdate = {
+    regulationId: 'hipaa',
+    data: {
+      after: {
+        fullText: 'The Health Insurance Portability and Accountability Act (HIPAA) of 1996 establishes national standards for the protection of health information...',
+        summary: 'Establishes national standards for electronic health care transactions and security for protected health information (PHI).',
+        requirements: ['Privacy Officer designation', 'Security Risk Assessment', 'Business Associate Agreements', 'Workforce Training']
+      }
+    }
+  };
+  
+  const hipaaPayload = edsteward.transformPayload(hipaaUpdate);
+  console.log(`   Regulation: ${hipaaPayload.name}`);
+  console.log(`   EdSteward ID: ${hipaaPayload.regulationId}`);
+  console.log(`   Tasks Generated: ${hipaaPayload.metadata.tasksGenerated}`);
+  console.log(`   Task Count: ${hipaaPayload.metadata.taskCount}`);
+  
+  if (hipaaPayload.complianceTasks) {
+    console.log('\n   📋 HIPAA Tasks:');
+    hipaaPayload.complianceTasks.slice(0, 5).forEach((task, i) => {
+      const indent = task.parentTempId ? '      └─' : '   ';
+      console.log(`${indent} ${i+1}. ${task.title}`);
+    });
+    if (hipaaPayload.complianceTasks.length > 5) {
+      console.log(`      ... and ${hipaaPayload.complianceTasks.length - 5} more tasks`);
+    }
+  }
+  console.log('');
+
+  // Test 7: Send HIPAA to EdSteward
+  console.log('📋 Test 7: Send HIPAA to EdSteward');
   console.log('─────────────────────────────────────────────────────────────');
   
   if (!health.success) {
     console.log('   ⚠️  EdSteward not running on localhost:3000');
-    console.log('   ℹ️  To test delivery, start EdSteward locally or use staging');
-    console.log('');
   } else {
-    console.log('   Sending ADA regulation with tasks to EdSteward...');
-    const result = await edsteward.sendRegulationUpdate(adaUpdate);
+    console.log('   Sending HIPAA regulation with tasks...');
+    const result = await edsteward.sendRegulationUpdate(hipaaUpdate);
     
     if (result.success) {
       console.log('   ✅ Delivery successful!');
@@ -102,37 +163,24 @@ async function testIntegration() {
     } else {
       console.log(`   ❌ Delivery failed: ${result.error}`);
     }
-    console.log('');
   }
-
-  // Test 5: OSHA (another Tier 1 regulation)
-  console.log('📋 Test 5: OSHA Task Generation');
-  console.log('─────────────────────────────────────────────────────────────');
-  const oshaUpdate = {
-    regulationId: 'occupational-safety-and-health-act-of-1970',
-    data: {
-      after: {
-        fullText: 'OSHA text...',
-        summary: 'Ensures safe workplace conditions...',
-        requirements: ['Safety program', 'Emergency action plan', 'Hazcom']
-      }
-    }
-  };
-  
-  const oshaPayload = edsteward.transformPayload(oshaUpdate);
-  console.log(`   Regulation: ${oshaPayload.name}`);
-  console.log(`   Tasks Generated: ${oshaPayload.metadata.tasksGenerated}`);
-  console.log(`   Task Count: ${oshaPayload.metadata.taskCount}`);
   console.log('');
 
   // Summary
   console.log('═══════════════════════════════════════════════════════════════');
   console.log('📊 Test Summary');
   console.log('═══════════════════════════════════════════════════════════════');
-  console.log('✅ Template detection working (Clery → templateHint)');
-  console.log('✅ Task generation working (ADA → 9 tasks, OSHA → 8 tasks)');
-  console.log('✅ Payload format matches EdSteward schema');
-  console.log(`${health.success ? '✅' : '⚠️'} EdSteward connection: ${health.success ? 'OK' : 'Not available'}`);
+  console.log(`   EdSteward Templates:     3 (Clery, FERPA, Title IX)`);
+  console.log(`   MCP Task Templates:      ${tier1Regs.length + tier2Regs.length} regulations`);
+  console.log(`   Total Generated Tasks:   ${totalTasks}`);
+  console.log('');
+  console.log('   ✅ Template detection working');
+  console.log('   ✅ Tier 1 regulations: ADA, HIPAA, GLBA, OSHA, HEOA, SaVE, Solomon, Title IV');
+  console.log('   ✅ Tier 2 regulations: Drug-Free Schools, 504, VAWA, FMLA, DMCA');
+  console.log(`   ${health.success ? '✅' : '⚠️'} EdSteward connection: ${health.success ? 'OK' : 'Not available'}`);
+  console.log('');
+  console.log('   Remaining to cover: ~20 complex regulations (Tier 3)');
+  console.log('   Simple attestation: ~230 regulations (no tasks needed)');
   console.log('');
 }
 

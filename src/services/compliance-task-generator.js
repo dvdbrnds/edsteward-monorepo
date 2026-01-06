@@ -76,11 +76,20 @@ const TIER_1_REGULATIONS = [
 const TIER_2_REGULATIONS = [
   'drug-free-schools-and-communities-act',
   'campus-sexual-violence-elimination-act',
+  'save-act',
   'technology-education-and-copyright-harmonization-a',
   'teach-act',
   'reg-66',
   'section-504-of-the-rehabilitation-act-of-1973',
-  'violence-against-women-reauthorization-act'
+  'violence-against-women-reauthorization-act',
+  'vawa',
+  'family-medical-leave-act',
+  'fmla',
+  'copyright-dmca',
+  'digital-millennium-copyright-act',
+  'solomon-amendment',
+  'higher-education-opportunity-act',
+  'heoa'
 ];
 
 /**
@@ -525,6 +534,792 @@ const DRUG_FREE_SCHOOLS_TASKS = [
 ];
 
 /**
+ * HIPAA Task Template (for institutions with health programs)
+ */
+const HIPAA_TASKS = [
+  {
+    tempId: 'hipaa-privacy-officer',
+    parentTempId: null,
+    title: 'HIPAA Privacy Officer Designation',
+    description: 'Designate a Privacy Officer responsible for HIPAA compliance',
+    assignedRole: ROLES.COMPLIANCE,
+    priority: 'critical',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload Privacy Officer designation letter',
+    sortOrder: 1
+  },
+  {
+    tempId: 'hipaa-security-officer',
+    parentTempId: null,
+    title: 'HIPAA Security Officer Designation',
+    description: 'Designate a Security Officer for electronic PHI',
+    assignedRole: ROLES.COMPLIANCE,
+    priority: 'critical',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload Security Officer designation letter',
+    sortOrder: 2
+  },
+  {
+    tempId: 'hipaa-privacy-policies',
+    parentTempId: null,
+    title: 'Privacy Policies and Procedures',
+    description: 'Develop and maintain written privacy policies and procedures',
+    assignedRole: ROLES.COMPLIANCE,
+    priority: 'critical',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload HIPAA privacy policies',
+    sortOrder: 3
+  },
+  {
+    tempId: 'hipaa-npp',
+    parentTempId: 'hipaa-privacy-policies',
+    title: 'Notice of Privacy Practices',
+    description: 'Publish and distribute Notice of Privacy Practices to patients',
+    assignedRole: ROLES.COMPLIANCE,
+    priority: 'critical',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload current Notice of Privacy Practices',
+    sortOrder: 1
+  },
+  {
+    tempId: 'hipaa-risk-assessment',
+    parentTempId: null,
+    title: 'Security Risk Assessment',
+    description: 'Conduct periodic risk assessment of PHI security',
+    recurringSchedule: 'annual',
+    assignedRole: ROLES.IT_SECURITY,
+    priority: 'critical',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload risk assessment report',
+    sortOrder: 4
+  },
+  {
+    tempId: 'hipaa-safeguards',
+    parentTempId: null,
+    title: 'Administrative, Physical, and Technical Safeguards',
+    description: 'Implement and document required HIPAA safeguards',
+    assignedRole: ROLES.IT_SECURITY,
+    priority: 'critical',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload safeguards documentation',
+    sortOrder: 5
+  },
+  {
+    tempId: 'hipaa-baa',
+    parentTempId: null,
+    title: 'Business Associate Agreements',
+    description: 'Maintain executed BAAs with all business associates handling PHI',
+    assignedRole: ROLES.GENERAL_COUNSEL,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload BAA inventory and sample agreements',
+    sortOrder: 6
+  },
+  {
+    tempId: 'hipaa-training',
+    parentTempId: null,
+    title: 'HIPAA Workforce Training',
+    description: 'Train all workforce members who handle PHI on HIPAA requirements',
+    recurringSchedule: 'annual',
+    assignedRole: ROLES.TRAINING,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload training materials and attendance records',
+    sortOrder: 7
+  },
+  {
+    tempId: 'hipaa-breach-procedures',
+    parentTempId: null,
+    title: 'Breach Notification Procedures',
+    description: 'Establish procedures for breach identification, investigation, and notification',
+    assignedRole: ROLES.COMPLIANCE,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload breach response plan',
+    sortOrder: 8
+  },
+  {
+    tempId: 'hipaa-minimum-necessary',
+    parentTempId: null,
+    title: 'Minimum Necessary Standard',
+    description: 'Implement policies limiting PHI access to minimum necessary',
+    assignedRole: ROLES.COMPLIANCE,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload minimum necessary policies',
+    sortOrder: 9
+  }
+];
+
+/**
+ * GLBA Task Template (Gramm-Leach-Bliley Act)
+ */
+const GLBA_TASKS = [
+  {
+    tempId: 'glba-program',
+    parentTempId: null,
+    title: 'Information Security Program',
+    description: 'Develop comprehensive written information security program',
+    assignedRole: ROLES.IT_SECURITY,
+    priority: 'critical',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload information security program document',
+    sortOrder: 1
+  },
+  {
+    tempId: 'glba-coordinator',
+    parentTempId: 'glba-program',
+    title: 'GLBA Coordinator Designation',
+    description: 'Designate employee(s) to coordinate information security program',
+    assignedRole: ROLES.PRESIDENT,
+    priority: 'critical',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload coordinator designation',
+    sortOrder: 1
+  },
+  {
+    tempId: 'glba-risk-assessment',
+    parentTempId: 'glba-program',
+    title: 'Risk Assessment',
+    description: 'Identify reasonably foreseeable risks to customer information',
+    recurringSchedule: 'annual',
+    assignedRole: ROLES.IT_SECURITY,
+    priority: 'critical',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload risk assessment report',
+    sortOrder: 2
+  },
+  {
+    tempId: 'glba-safeguards',
+    parentTempId: null,
+    title: 'Design and Implement Safeguards',
+    description: 'Design and implement safeguards to control identified risks',
+    assignedRole: ROLES.IT_SECURITY,
+    priority: 'critical',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload safeguards documentation',
+    sortOrder: 2
+  },
+  {
+    tempId: 'glba-vendor-oversight',
+    parentTempId: null,
+    title: 'Service Provider Oversight',
+    description: 'Oversee service providers handling customer information',
+    assignedRole: ROLES.IT_SECURITY,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload vendor security requirements and contracts',
+    sortOrder: 3
+  },
+  {
+    tempId: 'glba-testing',
+    parentTempId: null,
+    title: 'Program Testing and Monitoring',
+    description: 'Regularly test and monitor effectiveness of safeguards',
+    recurringSchedule: 'annual',
+    assignedRole: ROLES.IT_SECURITY,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload testing and monitoring reports',
+    sortOrder: 4
+  },
+  {
+    tempId: 'glba-update',
+    parentTempId: null,
+    title: 'Program Updates',
+    description: 'Evaluate and adjust security program based on testing and changes',
+    recurringSchedule: 'annual',
+    assignedRole: ROLES.IT_SECURITY,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload program review and update documentation',
+    sortOrder: 5
+  },
+  {
+    tempId: 'glba-privacy-notice',
+    parentTempId: null,
+    title: 'Privacy Notice',
+    description: 'Provide initial and annual privacy notices to students',
+    recurringSchedule: 'annual',
+    assignedRole: ROLES.FINANCIAL_AID,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload privacy notice and distribution evidence',
+    sortOrder: 6
+  },
+  {
+    tempId: 'glba-employee-training',
+    parentTempId: null,
+    title: 'Employee Security Training',
+    description: 'Train employees on information security policies and procedures',
+    recurringSchedule: 'annual',
+    assignedRole: ROLES.TRAINING,
+    priority: 'medium',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload training materials and attendance records',
+    sortOrder: 7
+  }
+];
+
+/**
+ * Campus SaVE Act Task Template
+ */
+const SAVE_ACT_TASKS = [
+  {
+    tempId: 'save-policy',
+    parentTempId: null,
+    title: 'Campus Sexual Assault Policy',
+    description: 'Maintain comprehensive policy on sexual assault, dating violence, domestic violence, and stalking',
+    assignedRole: ROLES.TITLE_IX,
+    priority: 'critical',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload campus sexual assault policy',
+    sortOrder: 1
+  },
+  {
+    tempId: 'save-primary-prevention',
+    parentTempId: null,
+    title: 'Primary Prevention and Awareness Programs',
+    description: 'Implement primary prevention and awareness programs for incoming students and new employees',
+    assignedRole: ROLES.STUDENT_AFFAIRS,
+    priority: 'critical',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload program descriptions and completion records',
+    sortOrder: 2
+  },
+  {
+    tempId: 'save-ongoing-prevention',
+    parentTempId: null,
+    title: 'Ongoing Prevention and Awareness Campaigns',
+    description: 'Conduct ongoing prevention and awareness campaigns for students and employees',
+    recurringSchedule: 'annual',
+    assignedRole: ROLES.STUDENT_AFFAIRS,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload campaign materials and participation data',
+    sortOrder: 3
+  },
+  {
+    tempId: 'save-bystander-training',
+    parentTempId: 'save-primary-prevention',
+    title: 'Bystander Intervention Training',
+    description: 'Include bystander intervention strategies in prevention programs',
+    assignedRole: ROLES.STUDENT_AFFAIRS,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload bystander training materials',
+    sortOrder: 1
+  },
+  {
+    tempId: 'save-risk-reduction',
+    parentTempId: 'save-primary-prevention',
+    title: 'Risk Reduction Information',
+    description: 'Provide information on recognizing warning signs and risk reduction',
+    assignedRole: ROLES.STUDENT_AFFAIRS,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload risk reduction materials',
+    sortOrder: 2
+  },
+  {
+    tempId: 'save-reporting-options',
+    parentTempId: null,
+    title: 'Reporting Options',
+    description: 'Provide clear information on reporting options and procedures',
+    assignedRole: ROLES.TITLE_IX,
+    priority: 'critical',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.LINK,
+    evidenceInstructions: 'Provide URL to reporting information',
+    sortOrder: 4
+  },
+  {
+    tempId: 'save-written-notification',
+    parentTempId: null,
+    title: 'Written Notification to Victims',
+    description: 'Provide written notification of rights and options to victims',
+    assignedRole: ROLES.TITLE_IX,
+    priority: 'critical',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload victim notification template',
+    sortOrder: 5
+  },
+  {
+    tempId: 'save-disciplinary-procedures',
+    parentTempId: null,
+    title: 'Disciplinary Procedures',
+    description: 'Maintain prompt, fair, and impartial disciplinary procedures',
+    assignedRole: ROLES.TITLE_IX,
+    priority: 'critical',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload disciplinary procedures document',
+    sortOrder: 6
+  },
+  {
+    tempId: 'save-training-officials',
+    parentTempId: null,
+    title: 'Training for Officials',
+    description: 'Train officials who conduct disciplinary proceedings annually',
+    recurringSchedule: 'annual',
+    assignedRole: ROLES.TRAINING,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload training materials and attendance records',
+    sortOrder: 7
+  }
+];
+
+/**
+ * Solomon Amendment Task Template
+ */
+const SOLOMON_AMENDMENT_TASKS = [
+  {
+    tempId: 'solomon-policy',
+    parentTempId: null,
+    title: 'Military Recruiter Access Policy',
+    description: 'Establish policy allowing military recruiter access equal to other employers',
+    assignedRole: ROLES.GENERAL_COUNSEL,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload military recruiter access policy',
+    sortOrder: 1
+  },
+  {
+    tempId: 'solomon-directory-info',
+    parentTempId: null,
+    title: 'Student Directory Information for Military',
+    description: 'Provide student directory information upon request to military recruiters',
+    assignedRole: ROLES.REGISTRAR,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload procedure for handling military requests',
+    sortOrder: 2
+  },
+  {
+    tempId: 'solomon-career-services',
+    parentTempId: null,
+    title: 'Career Services Access',
+    description: 'Ensure military recruiters have access equal to other employers at career fairs',
+    assignedRole: ROLES.STUDENT_AFFAIRS,
+    priority: 'medium',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.ATTESTATION,
+    evidenceInstructions: 'Attest to equal access for military recruiters',
+    sortOrder: 3
+  },
+  {
+    tempId: 'solomon-rotc-access',
+    parentTempId: null,
+    title: 'ROTC Campus Access',
+    description: 'Provide campus access for ROTC programs',
+    assignedRole: ROLES.PRESIDENT,
+    priority: 'medium',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.ATTESTATION,
+    evidenceInstructions: 'Attest to ROTC access compliance',
+    sortOrder: 4
+  },
+  {
+    tempId: 'solomon-opt-out-notice',
+    parentTempId: 'solomon-directory-info',
+    title: 'Student Opt-Out Notification',
+    description: 'Notify students of right to opt out of directory information release to military',
+    recurringSchedule: 'annual',
+    assignedRole: ROLES.REGISTRAR,
+    priority: 'medium',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload opt-out notification',
+    sortOrder: 1
+  }
+];
+
+/**
+ * HEOA Task Template (Higher Education Opportunity Act)
+ */
+const HEOA_TASKS = [
+  {
+    tempId: 'heoa-consumer-info',
+    parentTempId: null,
+    title: 'Consumer Information Web Page',
+    description: 'Maintain comprehensive consumer information on institutional website',
+    assignedRole: ROLES.REGISTRAR,
+    priority: 'critical',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.LINK,
+    evidenceInstructions: 'Provide URL to consumer information page',
+    sortOrder: 1
+  },
+  {
+    tempId: 'heoa-textbook-info',
+    parentTempId: null,
+    title: 'Textbook Information Disclosure',
+    description: 'Disclose textbook ISBN and pricing information during course registration',
+    assignedRole: ROLES.REGISTRAR,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.LINK,
+    evidenceInstructions: 'Provide URL showing textbook information',
+    sortOrder: 2
+  },
+  {
+    tempId: 'heoa-transfer-credit',
+    parentTempId: null,
+    title: 'Transfer Credit Policy Disclosure',
+    description: 'Publish transfer credit policies on website',
+    assignedRole: ROLES.REGISTRAR,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.LINK,
+    evidenceInstructions: 'Provide URL to transfer credit policy',
+    sortOrder: 3
+  },
+  {
+    tempId: 'heoa-fire-safety',
+    parentTempId: null,
+    title: 'Annual Fire Safety Report',
+    description: 'Publish annual fire safety report for on-campus housing',
+    dueDate: 'October 1',
+    recurringSchedule: 'annual',
+    assignedRole: ROLES.CAMPUS_SAFETY,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload Annual Fire Safety Report',
+    sortOrder: 4
+  },
+  {
+    tempId: 'heoa-peer-to-peer',
+    parentTempId: null,
+    title: 'Peer-to-Peer File Sharing Plan',
+    description: 'Develop plan to combat unauthorized file sharing on campus network',
+    recurringSchedule: 'annual',
+    assignedRole: ROLES.IT_SECURITY,
+    priority: 'medium',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload P2P file sharing plan',
+    sortOrder: 5
+  },
+  {
+    tempId: 'heoa-constitution-day',
+    parentTempId: null,
+    title: 'Constitution Day Program',
+    description: 'Hold educational program on Constitution for students on September 17',
+    dueDate: 'September 17',
+    recurringSchedule: 'annual',
+    assignedRole: ROLES.STUDENT_AFFAIRS,
+    priority: 'medium',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload Constitution Day program materials',
+    sortOrder: 6
+  },
+  {
+    tempId: 'heoa-voter-registration',
+    parentTempId: null,
+    title: 'Voter Registration',
+    description: 'Make voter registration forms available to students',
+    assignedRole: ROLES.STUDENT_AFFAIRS,
+    priority: 'medium',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.ATTESTATION,
+    evidenceInstructions: 'Attest that voter registration forms are available',
+    sortOrder: 7
+  },
+  {
+    tempId: 'heoa-retention-rates',
+    parentTempId: 'heoa-consumer-info',
+    title: 'Retention and Graduation Rate Disclosure',
+    description: 'Publish student retention and graduation rates on consumer info page',
+    assignedRole: ROLES.REGISTRAR,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.LINK,
+    evidenceInstructions: 'Provide URL to retention/graduation data',
+    sortOrder: 1
+  }
+];
+
+/**
+ * VAWA Task Template (Violence Against Women Act)
+ */
+const VAWA_TASKS = [
+  {
+    tempId: 'vawa-definitions',
+    parentTempId: null,
+    title: 'VAWA Definitions in Policy',
+    description: 'Include definitions of dating violence, domestic violence, sexual assault, and stalking in policy',
+    assignedRole: ROLES.TITLE_IX,
+    priority: 'critical',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload policy with VAWA definitions',
+    sortOrder: 1
+  },
+  {
+    tempId: 'vawa-consent-definition',
+    parentTempId: null,
+    title: 'Consent Definition',
+    description: 'Define consent in reference to sexual activity in institutional policy',
+    assignedRole: ROLES.TITLE_IX,
+    priority: 'critical',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload consent definition in policy',
+    sortOrder: 2
+  },
+  {
+    tempId: 'vawa-prompt-proceedings',
+    parentTempId: null,
+    title: 'Prompt and Equitable Proceedings',
+    description: 'Ensure prompt, fair, and impartial investigation and resolution',
+    assignedRole: ROLES.TITLE_IX,
+    priority: 'critical',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload investigation and resolution procedures',
+    sortOrder: 3
+  },
+  {
+    tempId: 'vawa-advisor-rights',
+    parentTempId: null,
+    title: 'Advisor Rights',
+    description: 'Allow parties to have advisor of their choice in proceedings',
+    assignedRole: ROLES.TITLE_IX,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload advisor policy',
+    sortOrder: 4
+  },
+  {
+    tempId: 'vawa-simultaneous-notification',
+    parentTempId: null,
+    title: 'Simultaneous Notification',
+    description: 'Notify both parties simultaneously of proceeding outcomes',
+    assignedRole: ROLES.TITLE_IX,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload notification procedures',
+    sortOrder: 5
+  },
+  {
+    tempId: 'vawa-protective-measures',
+    parentTempId: null,
+    title: 'Protective Measures',
+    description: 'Provide information about protective measures available to victims',
+    assignedRole: ROLES.TITLE_IX,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload protective measures information',
+    sortOrder: 6
+  },
+  {
+    tempId: 'vawa-training',
+    parentTempId: null,
+    title: 'Annual Training for Officials',
+    description: 'Train all officials involved in proceedings on relevant issues',
+    recurringSchedule: 'annual',
+    assignedRole: ROLES.TRAINING,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload training records',
+    sortOrder: 7
+  }
+];
+
+/**
+ * FMLA Task Template (Family Medical Leave Act)
+ */
+const FMLA_TASKS = [
+  {
+    tempId: 'fmla-policy',
+    parentTempId: null,
+    title: 'FMLA Policy',
+    description: 'Maintain written FMLA policy in employee handbook',
+    assignedRole: ROLES.HR,
+    priority: 'critical',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload FMLA policy',
+    sortOrder: 1
+  },
+  {
+    tempId: 'fmla-poster',
+    parentTempId: null,
+    title: 'FMLA Poster Display',
+    description: 'Post FMLA notice in conspicuous location',
+    assignedRole: ROLES.HR,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.SCREENSHOT,
+    evidenceInstructions: 'Upload photo of posted FMLA notice',
+    sortOrder: 2
+  },
+  {
+    tempId: 'fmla-eligibility-notice',
+    parentTempId: null,
+    title: 'Eligibility Notice Process',
+    description: 'Provide eligibility/rights notice within 5 business days of leave request',
+    assignedRole: ROLES.HR,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload eligibility notice template',
+    sortOrder: 3
+  },
+  {
+    tempId: 'fmla-designation-notice',
+    parentTempId: null,
+    title: 'Designation Notice Process',
+    description: 'Notify employee if leave is designated as FMLA leave',
+    assignedRole: ROLES.HR,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload designation notice template',
+    sortOrder: 4
+  },
+  {
+    tempId: 'fmla-records',
+    parentTempId: null,
+    title: 'FMLA Recordkeeping',
+    description: 'Maintain FMLA records for at least 3 years',
+    assignedRole: ROLES.HR,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.ATTESTATION,
+    evidenceInstructions: 'Attest that FMLA records are maintained',
+    sortOrder: 5
+  },
+  {
+    tempId: 'fmla-training',
+    parentTempId: null,
+    title: 'FMLA Training for Supervisors',
+    description: 'Train supervisors on FMLA requirements and employee rights',
+    recurringSchedule: 'annual',
+    assignedRole: ROLES.TRAINING,
+    priority: 'medium',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload training materials',
+    sortOrder: 6
+  }
+];
+
+/**
+ * Copyright/DMCA Task Template
+ */
+const COPYRIGHT_DMCA_TASKS = [
+  {
+    tempId: 'dmca-agent',
+    parentTempId: null,
+    title: 'DMCA Agent Designation',
+    description: 'Designate and register DMCA agent with Copyright Office',
+    assignedRole: ROLES.GENERAL_COUNSEL,
+    priority: 'critical',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload DMCA agent registration',
+    sortOrder: 1
+  },
+  {
+    tempId: 'dmca-policy',
+    parentTempId: null,
+    title: 'Copyright Policy',
+    description: 'Publish copyright infringement policy and procedures',
+    assignedRole: ROLES.GENERAL_COUNSEL,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.LINK,
+    evidenceInstructions: 'Provide URL to copyright policy',
+    sortOrder: 2
+  },
+  {
+    tempId: 'dmca-repeat-infringer',
+    parentTempId: null,
+    title: 'Repeat Infringer Policy',
+    description: 'Implement policy for terminating repeat infringers',
+    assignedRole: ROLES.IT_SECURITY,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload repeat infringer policy',
+    sortOrder: 3
+  },
+  {
+    tempId: 'dmca-notice-procedure',
+    parentTempId: null,
+    title: 'Takedown Notice Procedures',
+    description: 'Establish procedures for handling DMCA takedown notices',
+    assignedRole: ROLES.IT_SECURITY,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload takedown procedures',
+    sortOrder: 4
+  },
+  {
+    tempId: 'dmca-education',
+    parentTempId: null,
+    title: 'Copyright Education',
+    description: 'Educate students and employees about copyright law',
+    recurringSchedule: 'annual',
+    assignedRole: ROLES.TRAINING,
+    priority: 'medium',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload educational materials',
+    sortOrder: 5
+  },
+  {
+    tempId: 'dmca-legal-alternatives',
+    parentTempId: null,
+    title: 'Legal Alternatives Information',
+    description: 'Inform community about legal alternatives to piracy',
+    assignedRole: ROLES.IT_SECURITY,
+    priority: 'medium',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.LINK,
+    evidenceInstructions: 'Provide URL to legal alternatives information',
+    sortOrder: 6
+  }
+];
+
+/**
  * Section 504 Task Template
  */
 const SECTION_504_TASKS = [
@@ -582,14 +1377,34 @@ const SECTION_504_TASKS = [
  * Task templates by regulation slug
  */
 const TASK_TEMPLATES = {
+  // Tier 1 - Critical
   'americans-with-disabilities-act-of-1990': ADA_TASKS,
   'ada': ADA_TASKS,
   'occupational-safety-and-health-act-of-1970': OSHA_TASKS,
   'osha': OSHA_TASKS,
   'higher-education-act-title-iv-student-financial-a': TITLE_IV_TASKS,
+  'title-iv': TITLE_IV_TASKS,
+  'health-insurance-portability-and-accountability-ac': HIPAA_TASKS,
+  'hipaa': HIPAA_TASKS,
+  'gramm-leach-bliley-act-glba': GLBA_TASKS,
+  'glba': GLBA_TASKS,
+  'solomon-amendment': SOLOMON_AMENDMENT_TASKS,
+  'higher-education-opportunity-act': HEOA_TASKS,
+  'heoa': HEOA_TASKS,
+  'campus-sexual-violence-elimination-act': SAVE_ACT_TASKS,
+  'save-act': SAVE_ACT_TASKS,
+  
+  // Tier 2 - High Priority
   'drug-free-schools-and-communities-act': DRUG_FREE_SCHOOLS_TASKS,
   'section-504-of-the-rehabilitation-act-of-1973': SECTION_504_TASKS,
-  'section-504': SECTION_504_TASKS
+  'section-504': SECTION_504_TASKS,
+  'violence-against-women-reauthorization-act': VAWA_TASKS,
+  'vawa': VAWA_TASKS,
+  'family-medical-leave-act': FMLA_TASKS,
+  'fmla': FMLA_TASKS,
+  'copyright-dmca': COPYRIGHT_DMCA_TASKS,
+  'digital-millennium-copyright-act': COPYRIGHT_DMCA_TASKS,
+  'dmca': COPYRIGHT_DMCA_TASKS
 };
 
 /**
