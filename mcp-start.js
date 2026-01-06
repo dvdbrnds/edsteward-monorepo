@@ -204,7 +204,7 @@ async function startRegistryServer() {
 async function startLLMGateway() {
   log.info('Starting LLM Gateway...', 'LLM');
 
-  const llmProcess = spawn('node', ['src/llm-gateway/simple-usc-gateway.js'], {
+  const llmProcess = spawn('node', ['src/llm-gateway/start-llm-gateway-phase4.js'], {
     stdio: ['ignore', 'pipe', 'pipe'],
     cwd: process.cwd()
   });
@@ -462,7 +462,7 @@ async function main() {
       execSync('pkill -f "node.*start-all.js" || true', { stdio: 'ignore' });
       execSync('pkill -f "vite.*3050" || true', { stdio: 'ignore' });
       execSync('pkill -f "registry-server.js" || true', { stdio: 'ignore' });
-      execSync('pkill -f "simple-usc-gateway" || true', { stdio: 'ignore' });
+      execSync('pkill -f "start-llm-gateway-phase4" || true', { stdio: 'ignore' });
       execSync('pkill -f "delivery-server.js" || true', { stdio: 'ignore' });
       execSync('pkill -f "customer-management-api.js" || true', { stdio: 'ignore' });
     } catch (e) {
