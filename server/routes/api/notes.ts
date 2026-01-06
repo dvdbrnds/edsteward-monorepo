@@ -1,6 +1,6 @@
 import express from 'express';
 import { z } from 'zod';
-// import { storage } from '../../storage'; // Unused - using getDatabaseStorage() directly
+// import { storage } from '../../storage'; // Unused - using getDatabaseStorage(req.tenantId) directly
 import { syslog, LogLevel, LogFacility } from '../../services/syslog';
 import { insertNoteSchema } from '@shared/schema';
 import { getDatabaseStorage } from '../../services/database';
@@ -23,7 +23,7 @@ const requireAuth = (req: express.Request, res: express.Response, next: express.
 router.post("/", requireAuth, async (req, res) => {
   try {
     // Use direct database storage for single-tenant mode
-    const tenantStorage = getDatabaseStorage();
+    const tenantStorage = getDatabaseStorage(req.tenantId);
     
     
     // Validate request body
@@ -57,7 +57,7 @@ router.post("/", requireAuth, async (req, res) => {
 router.get("/regulation/:regulationId", async (req, res) => {
   try {
     // Use direct database storage for single-tenant mode
-    const tenantStorage = getDatabaseStorage();
+    const tenantStorage = getDatabaseStorage(req.tenantId);
     
     const regulationId = parseInt(req.params.regulationId);
     
@@ -82,7 +82,7 @@ router.get("/regulation/:regulationId", async (req, res) => {
 router.delete("/:noteId", requireAuth, async (req, res) => {
   try {
     // Use direct database storage for single-tenant mode
-    const tenantStorage = getDatabaseStorage();
+    const tenantStorage = getDatabaseStorage(req.tenantId);
     
     const noteId = parseInt(req.params.noteId);
     
@@ -122,7 +122,7 @@ router.delete("/:noteId", requireAuth, async (req, res) => {
 // Update note endpoint
 router.put("/:noteId", requireAuth, async (req, res) => {
   try {
-    const tenantStorage = getDatabaseStorage();
+    const tenantStorage = getDatabaseStorage(req.tenantId);
     
     const noteId = parseInt(req.params.noteId);
     
@@ -176,7 +176,7 @@ router.put("/:noteId", requireAuth, async (req, res) => {
 // Get note history endpoint
 router.get("/:noteId/history", requireAuth, async (req, res) => {
   try {
-    const tenantStorage = getDatabaseStorage();
+    const tenantStorage = getDatabaseStorage(req.tenantId);
     
     const noteId = parseInt(req.params.noteId);
     

@@ -9,7 +9,7 @@ const router = express.Router();
 router.get("/", async (req, res) => {
   try {
     // Use direct database storage for single-tenant mode
-    const tenantStorage = getDatabaseStorage();
+    const tenantStorage = getDatabaseStorage(req.tenantId);
     
     
     const deadlines = await tenantStorage.getDeadlines();
@@ -34,7 +34,7 @@ router.post("/", async (req, res) => {
     }
 
     // Use direct database storage for single-tenant mode
-    const tenantStorage = getDatabaseStorage();
+    const tenantStorage = getDatabaseStorage(req.tenantId);
     
     const deadline = await tenantStorage.createDeadline(req.body);
     
@@ -71,7 +71,7 @@ router.put("/:id", async (req, res) => {
     }
 
     // Use direct database storage for single-tenant mode
-    const tenantStorage = getDatabaseStorage();
+    const tenantStorage = getDatabaseStorage(req.tenantId);
     
     const updatedDeadline = await tenantStorage.updateDeadline(deadlineId, req.body);
     
@@ -100,7 +100,7 @@ router.delete("/:id", async (req, res) => {
     }
 
     // Use direct database storage for single-tenant mode
-    const tenantStorage = getDatabaseStorage();
+    const tenantStorage = getDatabaseStorage(req.tenantId);
     
     await tenantStorage.deleteDeadline(deadlineId);
     

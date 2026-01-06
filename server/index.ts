@@ -21,6 +21,7 @@ import { testConnection } from './services/database';
 import { registerRoutes } from './routes';
 import { startTaskScheduler } from './services/task-scheduler';
 import { apiLimiter, authLimiter } from './middleware/rate-limiter';
+import { tenantMiddleware } from './middleware/tenant';
 
 // ES Module compatibility: Get current file path
 const __filename = fileURLToPath(import.meta.url);
@@ -91,6 +92,15 @@ app.use(passport.session());
 // Configure authentication
 configureAuth(app);
 
+// Tenant detection middleware - MUST be before routes
+// This sets req.tenant and req.tenantId based on subdomain
+if (process.env.MULTI_TENANT === 'true') {
+  console.log('🏢 Multi-tenant mode ENABLED - tenant routing active');
+  app.use(tenantMiddleware);
+} else {
+  console.log('🏠 Single-tenant mode - using default database');
+}
+
 // Rate limiting - apply to API routes
 // General API rate limit: 100 requests per 15 minutes
 app.use('/api/', apiLimiter);
@@ -112,9 +122,9 @@ app.post('/api/authenticate', async (req, res) => {
       return res.status(400).json({ error: 'Email and password required' });
     }
 
-    // Import database storage
+    // Import database storage (tenant-aware)
     const { getDatabaseStorage } = await import('./services/database');
-    const tenantStorage = getDatabaseStorage();
+    const tenantStorage = getDatabaseStorage((req as any).tenantId);
     
     // Try to get user by email first, then by username
     let user = await tenantStorage.getUserByEmail(loginEmail);
@@ -403,7 +413,6 @@ function startDatabaseMonitoring() {
     // Log memory usage every 5 minutes, warn if high
     if (memUsageMB.heapUsed > 500) { // Warn if heap usage > 500MB
       console.warn('⚠️  High memory usage detected:', memUsageMB);
-    } else {
     }
   }, 300000); // 5 minutes
   
@@ -445,7 +454,7 @@ process.on('warning', (warning) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const _originalExit = process.exit;
 process.exit = ((code?: number) => {
-  console.error('🚨 PROCESS.EXIT CALLED - Preventing crash! Code:', code);
+  console.error('🚨 PROCESS.EXIT CALLED - Preventing crash! Code:', _code);
   console.error('Stack trace:', new Error().stack);
   // Don't actually exit - just log it
   return undefined as never;

@@ -25,7 +25,7 @@ router.get("/me", requireAuth, async (req, res) => {
       lastName: req.user?.lastName,
       department: req.user?.department
     });
-  } catch (error) {
+  } catch (_error) {
     res.status(500).json({ error: "Failed to get user info" });
   }
 });
@@ -65,7 +65,7 @@ router.get("/", requireAuth, async (req, res) => {
       });
     }
 
-    const tenantStorage = getDatabaseStorage();
+    const tenantStorage = getDatabaseStorage(req.tenantId);
     const users = await tenantStorage.getAllUsers();
     
     // Return user data with only necessary fields for notifications
@@ -83,7 +83,7 @@ router.get("/", requireAuth, async (req, res) => {
       `Admin ${req.user.email} retrieved ${userList.length} users for notifications`);
     
     res.json(userList);
-  } catch (error) {
+  } catch (_error) {
     syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 
       `Failed to get users: ${error instanceof Error ? error.message : String(error)}`);
     

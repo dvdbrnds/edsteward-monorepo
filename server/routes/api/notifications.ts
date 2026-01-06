@@ -1,5 +1,5 @@
 import express from 'express';
-// Removed unused storage import - using getDatabaseStorage() directly
+// Removed unused storage import - using getDatabaseStorage(req.tenantId) directly
 import { syslog, LogLevel, LogFacility } from '../../services/syslog';
 import { getDatabaseStorage } from '../../services/database';
 
@@ -17,7 +17,7 @@ const requireAuth = (req: express.Request, res: express.Response, next: express.
 router.get("/", requireAuth, async (req, res) => {
   try {
     // Use direct database storage for single-tenant mode
-    const tenantStorage = getDatabaseStorage();
+    const tenantStorage = getDatabaseStorage(req.tenantId);
     
     
     const notifications = await tenantStorage.getNotificationsByUser(req.user?.id);
@@ -37,7 +37,7 @@ router.get("/", requireAuth, async (req, res) => {
 router.post("/", requireAuth, async (req, res) => {
   try {
     // Use direct database storage for single-tenant mode
-    const tenantStorage = getDatabaseStorage();
+    const tenantStorage = getDatabaseStorage(req.tenantId);
     
     const notification = await tenantStorage.createNotification(req.body);
     
@@ -62,7 +62,7 @@ router.patch("/:id", requireAuth, async (req, res) => {
     }
 
     // Use direct database storage for single-tenant mode
-    const tenantStorage = getDatabaseStorage();
+    const tenantStorage = getDatabaseStorage(req.tenantId);
     
     const notification = await tenantStorage.updateNotification(notificationId, req.body);
     
@@ -87,7 +87,7 @@ router.delete("/:id", requireAuth, async (req, res) => {
     }
 
     // Use direct database storage for single-tenant mode
-    const tenantStorage = getDatabaseStorage();
+    const tenantStorage = getDatabaseStorage(req.tenantId);
     
     await tenantStorage.deleteNotification(notificationId);
     

@@ -51,7 +51,7 @@ router.post("/:id/toggle", requireAuth, requireComplianceRole, async (req, res) 
       return res.status(400).json({ error: 'Invalid regulation ID' });
     }
 
-    const tenantStorage = getDatabaseStorage();
+    const tenantStorage = getDatabaseStorage(req.tenantId);
     
     // Get current regulation
     const regulation = await tenantStorage.getRegulationById(regulationId);
@@ -109,7 +109,7 @@ router.get("/:id/status", requireAuth, async (req, res) => {
       return res.status(400).json({ error: 'Invalid regulation ID' });
     }
 
-    const tenantStorage = getDatabaseStorage();
+    const tenantStorage = getDatabaseStorage(req.tenantId);
     const regulation = await tenantStorage.getRegulationById(regulationId);
     
     if (!regulation) {

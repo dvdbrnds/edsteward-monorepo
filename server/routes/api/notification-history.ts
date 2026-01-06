@@ -15,7 +15,7 @@ const router = express.Router();
 // GET /api/notification-history - Get sent notification history
 router.get("/", requireAuth, async (req, res) => {
   try {
-    const tenantStorage = getDatabaseStorage();
+    const tenantStorage = getDatabaseStorage(req.tenantId);
     
     // Get query parameters for filtering and sorting
     const { 
@@ -44,7 +44,7 @@ router.get("/", requireAuth, async (req, res) => {
           if (typeof notification.content === 'string') {
             try {
               parsedContent = JSON.parse(notification.content);
-            } catch (e) {
+            } catch (_e) {
               // Keep as string if not valid JSON
             }
           }
@@ -136,7 +136,7 @@ router.get("/", requireAuth, async (req, res) => {
 // GET /api/notification-history/stats - Get notification statistics
 router.get("/stats", requireAuth, async (req, res) => {
   try {
-    const tenantStorage = getDatabaseStorage();
+    const tenantStorage = getDatabaseStorage(req.tenantId);
     
     // Get all notifications for stats
     const allNotifications = await tenantStorage.getNotificationQueue();
@@ -174,7 +174,7 @@ router.get("/stats", requireAuth, async (req, res) => {
 // POST /api/notification-history/send - Send a new notification
 router.post("/send", requireAuth, async (req, res) => {
   try {
-    const tenantStorage = getDatabaseStorage();
+    const tenantStorage = getDatabaseStorage(req.tenantId);
     const { 
       type, 
       title, 

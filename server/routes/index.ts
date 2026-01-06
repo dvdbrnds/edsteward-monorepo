@@ -107,13 +107,17 @@ export function registerRoutes(app: express.Application): Server {
       const dbHealthy = await checkConnectionHealth();
       const healthStatus = databaseHealthMonitor.getHealthStatus();
 
-      // Single-tenant mode - simplified tenant info
-      const tenantInfo = { subdomain: null, domain: req.get('host'), method: 'single-tenant' };
+      // Determine tenant detection method
+      const isMultiTenant = process.env.MULTI_TENANT === 'true';
+      const detectionMethod = req.tenant ? 
+        (req.tenantContext?.detectionMethod || 'subdomain') : 
+        (isMultiTenant ? 'not-detected' : 'single-tenant');
 
       const response = {
         status: dbHealthy ? "healthy" : "degraded",
         timestamp: new Date().toISOString(),
         server: "running",
+        multiTenant: isMultiTenant,
         database: {
           connected: dbHealthy,
           monitoring: healthStatus.isMonitoring,
@@ -124,9 +128,9 @@ export function registerRoutes(app: express.Application): Server {
           detected: !!req.tenant,
           tenantId: req.tenantId || null,
           tenantName: req.tenant?.name || null,
-          subdomain: req.tenant?.subdomain || tenantInfo.subdomain || null,
-          domain: req.tenant?.domain || tenantInfo.domain || null,
-          detectionMethod: tenantInfo.method,
+          subdomain: req.tenant?.subdomain || null,
+          domain: req.get('host') || null,
+          detectionMethod: detectionMethod,
           status: req.tenant?.status || null
         }
       };
@@ -162,7 +166,7 @@ export function registerRoutes(app: express.Application): Server {
 
     // Single-tenant mode - storage always available
     try {
-      getDatabaseStorage();
+      getDatabaseStorage(req.tenantId);
       deploymentInfo.singleTenantWorking = true;
     } catch (error) {
       deploymentInfo.singleTenantWorking = false;
@@ -179,7 +183,8 @@ export function registerRoutes(app: express.Application): Server {
   // Public branding endpoint (no auth required) for login page styling
   app.get('/api/branding', async (req, res) => {
     try {
-      const tenantStorage = getDatabaseStorage();
+      // Use tenant-aware storage for proper isolation
+      const tenantStorage = getDatabaseStorage(req.tenantId);
       const brandingConfig = await tenantStorage.getBrandingConfig();
 
       res.json({
@@ -237,7 +242,7 @@ export function registerRoutes(app: express.Application): Server {
       }
 
       // Single-tenant storage - always use main database
-      const tenantStorage = getDatabaseStorage();
+      const tenantStorage = getDatabaseStorage(req.tenantId);
 
       log(`📋 Checking setup status for single-tenant: default`);
 
@@ -312,7 +317,7 @@ export function registerRoutes(app: express.Application): Server {
       }
 
       // Get user from database using proper storage methods
-      const tenantStorage = getDatabaseStorage();
+      const tenantStorage = getDatabaseStorage(req.tenantId);
       const user = await tenantStorage.getUserByEmail(email);
       
       if (!user) {
@@ -514,7 +519,8 @@ export function registerRoutes(app: express.Application): Server {
   // Tenant branding endpoints - Available to all tenants for their own branding
   app.get('/api/admin/branding', async (req, res) => {
     try {
-      const tenantStorage = getDatabaseStorage();
+      // Use tenant-aware storage for proper isolation
+      const tenantStorage = getDatabaseStorage(req.tenantId);
       const brandingConfig = await tenantStorage.getBrandingConfig();
 
       res.json({
@@ -532,7 +538,8 @@ export function registerRoutes(app: express.Application): Server {
 
   app.post('/api/admin/branding', async (req, res) => {
     try {
-      const tenantStorage = getDatabaseStorage();
+      // Use tenant-aware storage for proper isolation
+      const tenantStorage = getDatabaseStorage(req.tenantId);
       const brandingConfig = req.body;
       
       await tenantStorage.saveBrandingConfig(brandingConfig);
@@ -554,7 +561,7 @@ export function registerRoutes(app: express.Application): Server {
   // Tenant user management endpoints - Available to all tenants for their own users
   app.get('/api/admin/users', async (req, res) => {
     try {
-      const tenantStorage = getDatabaseStorage();
+      const tenantStorage = getDatabaseStorage(req.tenantId);
       const users = await tenantStorage.getAllUsers();
 
       res.json(users);
@@ -574,7 +581,7 @@ export function registerRoutes(app: express.Application): Server {
         return res.status(400).json({ error: 'User ID is required' });
       }
 
-      const tenantStorage = getDatabaseStorage();
+      const tenantStorage = getDatabaseStorage(req.tenantId);
       const temporaryPassword = Math.random().toString(36).slice(-8);
       
       await tenantStorage.updateUser(id, { password: temporaryPassword });
@@ -962,7 +969,7 @@ export function registerRoutes(app: express.Application): Server {
         return res.status(400).json({ error: 'Email and password required' });
       }
 
-      const tenantStorage = getDatabaseStorage();
+      const tenantStorage = getDatabaseStorage(req.tenantId);
       const user = await tenantStorage.getUserByEmail(email);
       
       if (!user) {
@@ -1152,7 +1159,7 @@ export function registerRoutes(app: express.Application): Server {
       }
 
       // Get full user from database
-      const tenantStorage = getDatabaseStorage();
+      const tenantStorage = getDatabaseStorage(req.tenantId);
       const user = await tenantStorage.getUserByEmail(mfaUser.email);
       
       if (!user || !user.mfa_enabled) {
@@ -1253,7 +1260,7 @@ export function registerRoutes(app: express.Application): Server {
         return res.status(400).json({ error: 'Username and password required' });
       }
 
-      const tenantStorage = getDatabaseStorage();
+      const tenantStorage = getDatabaseStorage(req.tenantId);
       const user = await tenantStorage.getUserByUsername(username);
       
       if (!user) {
@@ -1414,7 +1421,7 @@ export function registerRoutes(app: express.Application): Server {
         return res.status(400).json({ error: 'Email and password required' });
       }
 
-      const tenantStorage = getDatabaseStorage();
+      const tenantStorage = getDatabaseStorage(req.tenantId);
       const user = await tenantStorage.getUserByEmail(email);
       
       if (!user) {

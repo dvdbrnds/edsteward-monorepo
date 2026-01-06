@@ -1,11 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
-import { db } from '../db';
-import { tenants } from '@shared/schema';
-import { eq } from 'drizzle-orm';
 
 // ===== CONSOLIDATED TENANT ARCHITECTURE =====
 // Following Context7 best practices and Laravel Spatie multitenancy patterns
 // Single responsibility: tenant resolution with proper fallback chain
+// NOTE: Uses in-memory registry - database lookup disabled until tenants table exists
 
 // Extend Express Request to include tenant context
 declare global {
@@ -207,12 +205,6 @@ export class TenantFinder {
    */
   static async findForRequest(req: Request): Promise<Tenant | null> {
     const detection = this.extractTenantFromRequest(req);
-    
-      method: detection.method,
-      subdomain: detection.subdomain,
-      domain: detection.domain,
-      source: detection.source
-    });
 
     // Method 1: Subdomain-based detection (primary)
     if (detection.subdomain) {
@@ -249,7 +241,7 @@ export class TenantFinder {
    */
   static extractTenantFromRequest(req: Request): TenantDetectionResult {
     const host = req.get('host') || req.get('x-forwarded-host') || '';
-    const protocol = req.get('x-forwarded-proto') || req.protocol || 'http';
+    const _protocol = req.get('x-forwarded-proto') || req.protocol || 'http';
     
     
     // Method 1: Subdomain detection (tenant.edsteward.ai or tenant.edsteward.local)
@@ -314,39 +306,14 @@ export class TenantFinder {
       return cached.tenant;
     }
 
-    try {
-      // Try database first
-      const [dbTenant] = await db
-        .select()
-        .from(tenants)
-        .where(eq(tenants.subdomain, subdomain))
-        .limit(1);
-
-      if (dbTenant) {
-        const mappedTenant = this.mapDatabaseTenant(dbTenant);
-        this.setCachedTenant(cacheKey, mappedTenant, 'database');
-        return mappedTenant;
-      }
-
-      // Fallback to registry
-      const registryTenant = TENANT_REGISTRY[subdomain];
-      if (registryTenant) {
-        this.setCachedTenant(cacheKey, registryTenant, 'registry');
-        return registryTenant;
-      }
-
-      return null;
-    } catch (error) {
-      console.error(`[TENANT-FINDER] Database error for subdomain ${subdomain}:`, error);
-      
-      // Fallback to registry on database error
-      const registryTenant = TENANT_REGISTRY[subdomain];
-      if (registryTenant) {
-        return registryTenant;
-      }
-      
-      return null;
+    // Use in-memory registry (database lookup disabled)
+    const registryTenant = TENANT_REGISTRY[subdomain];
+    if (registryTenant) {
+      this.setCachedTenant(cacheKey, registryTenant, 'registry');
+      return registryTenant;
     }
+
+    return null;
   }
 
   /**
@@ -360,38 +327,15 @@ export class TenantFinder {
       return cached.tenant;
     }
 
-    try {
-      const [dbTenant] = await db
-        .select()
-        .from(tenants)
-        .where(eq(tenants.domain, domain))
-        .limit(1);
-
-      if (dbTenant) {
-        const mappedTenant = this.mapDatabaseTenant(dbTenant);
-        this.setCachedTenant(cacheKey, mappedTenant, 'database');
-        return mappedTenant;
+    // Search registry for matching domain
+    for (const tenant of Object.values(TENANT_REGISTRY)) {
+      if (tenant.domain === domain) {
+        this.setCachedTenant(cacheKey, tenant, 'registry');
+        return tenant;
       }
-      
-      return null;
-    } catch (error) {
-      console.error(`[TENANT-FINDER] Database error for domain ${domain}:`, error);
-      return null;
     }
-  }
-
-  /**
-   * Map database tenant to interface
-   */
-  private static mapDatabaseTenant(dbTenant: any): Tenant {
-    return {
-      ...dbTenant,
-      settings: dbTenant.settings || {
-        allowedDomains: [],
-        defaultRole: 'user' as const,
-        enableAutoProvisioning: false
-      }
-    } as Tenant;
+    
+    return null;
   }
 
   /**
@@ -507,14 +451,14 @@ export async function tenantMiddleware(req: Request, res: Response, next: NextFu
       res.set('x-tenant-subdomain', tenant.subdomain);
       res.set('x-tenant-name', tenant.name);
 
-      const duration = Date.now() - startTime;
+      const _duration = Date.now() - startTime;
     } else {
       // No tenant context (valid for public routes)
     }
 
     next();
   } catch (error) {
-    const duration = Date.now() - startTime;
+    const _duration = Date.now() - startTime;
     console.error(`[TENANT-MIDDLEWARE] Error after ${duration}ms:`, error);
     res.status(500).json({
       error: 'Internal server error during tenant identification',

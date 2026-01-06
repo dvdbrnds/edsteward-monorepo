@@ -10,7 +10,7 @@ import {
 } from '../../middleware/role-based-auth';
 import { auditRegulationAction, auditEvidence as _auditEvidence } from '../../middleware/audit-middleware';
 import multer from 'multer';
-import { uploadLimiter, burstLimiter } from '../../middleware/rate-limiter';
+import { uploadLimiter } from '../../middleware/rate-limiter';
 
 // Simple multer configuration for evidence uploads
 const upload = multer({
@@ -39,7 +39,7 @@ router.get("/", async (req: any, res) => {
     }
     
     // Single-tenant mode - use direct database storage
-    const tenantStorage = getDatabaseStorage();
+    const tenantStorage = getDatabaseStorage(req.tenantId);
     
     // Get user info for filtering
     const user = req.user;
@@ -66,7 +66,7 @@ router.get("/", async (req: any, res) => {
     // Filter by ownership for compliance officers (admins see all)
     // Compliance officers only see regulations specifically assigned to them
     if (user && isComplianceOfficer && !isAdmin) {
-      const beforeCount = regulations.length;
+      const _beforeCount = regulations.length;
       // Check for both camelCase and snake_case field names (Drizzle vs raw SQL)
       regulations = regulations.filter((reg: any) => {
         const ownerId = reg.ownerId ?? reg.owner_id;
@@ -157,7 +157,7 @@ router.get("/ids", requireAuth, async (req, res) => {
     const startTime = Date.now();
     
     // Use direct database storage for single-tenant mode
-    const tenantStorage = getDatabaseStorage();
+    const tenantStorage = getDatabaseStorage(req.tenantId);
     
     const regulations = await tenantStorage.getRegulations();
     
@@ -194,7 +194,7 @@ router.get("/:regulationId", async (req: any, res) => {
     }
     
     // Use direct database storage for single-tenant mode
-    const tenantStorage = getDatabaseStorage();
+    const tenantStorage = getDatabaseStorage(req.tenantId);
     
     const regulation = await tenantStorage.getRegulation(regulationId);
     
@@ -236,7 +236,7 @@ router.get("/:regulationId/versions", async (req, res) => {
       return res.status(400).json({ error: "Invalid regulation ID" });
     }
 
-    const tenantStorage = getDatabaseStorage();
+    const tenantStorage = getDatabaseStorage(req.tenantId);
     const versions = await tenantStorage.getRegulationVersions(regulationId);
     
     syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
@@ -264,7 +264,7 @@ router.get("/:regulationId/evidence", async (req, res) => {
     }
     
     // Use direct database storage for single-tenant mode
-    const tenantStorage = getDatabaseStorage();
+    const tenantStorage = getDatabaseStorage(req.tenantId);
     
     const evidenceFiles = await tenantStorage.getEvidenceFilesByRegulation(regulationId);
     
@@ -304,7 +304,7 @@ router.post("/:regulationId/evidence", uploadLimiter, requireAuth, upload.single
     const isOfficial = req.body.isOfficial === 'true';
 
     try {
-      const tenantStorage = getDatabaseStorage();
+      const tenantStorage = getDatabaseStorage(req.tenantId);
       const evidenceFile = await tenantStorage.createEvidenceFile({
         regulationId: regulationId,
         fileName: file.originalname,
@@ -366,7 +366,7 @@ router.put("/:regulationId", requireAuth, requireComplianceOfficer, async (req, 
     // Add timestamp for last_updated
     safeUpdateData.last_updated = new Date().toISOString();
     
-    const tenantStorage = getDatabaseStorage();
+    const tenantStorage = getDatabaseStorage(req.tenantId);
     const updatedRegulation = await tenantStorage.updateRegulation(regulationId, safeUpdateData);
     
     const totalTime = Date.now() - startTime;
@@ -406,7 +406,7 @@ router.patch("/:regulationId/category", requireAuth, async (req: any, res) => {
       return res.status(403).json({ error: "Admin access required" });
     }
     
-    const tenantStorage = getDatabaseStorage();
+    const tenantStorage = getDatabaseStorage(req.tenantId);
     const updatedRegulation = await tenantStorage.updateRegulation(regulationId, { category });
     
     syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
@@ -436,7 +436,7 @@ router.patch("/:regulationId/owner", requireAuth, async (req: any, res) => {
       return res.status(403).json({ error: "Admin access required" });
     }
     
-    const tenantStorage = getDatabaseStorage();
+    const tenantStorage = getDatabaseStorage(req.tenantId);
     
     // Allow null to unassign
     const ownerValue = ownerId === null || ownerId === '' ? null : parseInt(ownerId);
@@ -519,7 +519,7 @@ router.patch("/:regulationId/actions/:actionType", requireAuth, requireComplianc
     }
     
     // Use direct database storage for single-tenant mode
-    const tenantStorage = getDatabaseStorage();
+    const tenantStorage = getDatabaseStorage(req.tenantId);
     
     // Get current regulation
     const regulation = await tenantStorage.getRegulation(regulationId);
@@ -604,7 +604,7 @@ router.post('/:id/submit-to-agency', requireAuth, async (req, res) => {
     }
     
     // Get the regulation
-    const tenantStorage = getDatabaseStorage();
+    const tenantStorage = getDatabaseStorage(req.tenantId);
     const regulation = await tenantStorage.getRegulation(regulationId);
     
     if (!regulation) {

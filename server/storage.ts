@@ -214,8 +214,27 @@ export interface IStorage {
 import { emailService } from './services/email';
 
 export class DatabaseStorage implements IStorage {
+  private _db: ReturnType<typeof getDatabase> | null = null;
+  private _pool: Pool | null = null;
+  sessionStore: session.Store;
+
+  constructor(customDb?: ReturnType<typeof getDatabase>, customPool?: Pool) {
+    this._db = customDb || null;
+    this._pool = customPool || null;
+    this.sessionStore = new PostgresSessionStore({
+      pool: customPool || sessionPool,
+      createTableIfMissing: true,
+    });
+  }
+
   private get db() {
-    return getDatabase();
+    // Use custom database if provided, otherwise fall back to default
+    return this._db || getDatabase();
+  }
+  
+  // Get the pool to use for raw queries - tenant-specific or default
+  private get pool(): Pool {
+    return this._pool || sessionPool;
   }
   
   // Public method to get database for raw queries
@@ -343,7 +362,7 @@ export class DatabaseStorage implements IStorage {
         : 1;
       
       
-      const changeSummary = `Updated via regulation update #${id}`;
+      const _changeSummary = `Updated via regulation update #${id}`;
       const versionContent = JSON.stringify({
         regulation_text: update.updatedContent,
         requirements: update.requirements || null,
@@ -424,15 +443,6 @@ export class DatabaseStorage implements IStorage {
       console.error(`Error bulk deleting regulation updates:`, error);
       throw error;
     }
-  }
-
-  sessionStore: session.Store;
-
-  constructor() {
-    this.sessionStore = new PostgresSessionStore({
-      pool: sessionPool,
-      createTableIfMissing: true,
-    });
   }
 
   async getUser(id: number, _tenantId?: string): Promise<User | undefined> {
@@ -561,7 +571,7 @@ export class DatabaseStorage implements IStorage {
       if (typeof regulation.actions === 'string') {
         try {
           regulation.actions = JSON.parse(regulation.actions);
-        } catch (e) {
+        } catch (_e) {
           regulation.actions = [];
         }
       }
@@ -569,7 +579,7 @@ export class DatabaseStorage implements IStorage {
       if (typeof regulation.sections === 'string') {
         try {
           regulation.sections = JSON.parse(regulation.sections);
-        } catch (e) {
+        } catch (_e) {
           regulation.sections = [];
         }
       }
@@ -1367,7 +1377,7 @@ export class DatabaseStorage implements IStorage {
 
   async getValidationStatus(regulationId: number, versionId?: number): Promise<ValidationStatus[]> {
     try {
-      let query = db
+      let query = this.db
         .select()
         .from(validationStatus)
         .where(eq(validationStatus.regulationId, regulationId));
@@ -1764,13 +1774,11 @@ export class DatabaseStorage implements IStorage {
         return adminConfig;
       }
 
-      // Priority 2: Environment-specific database configuration (check database first in development)
-      // Use environment-specific table names to ensure isolation
-      const environmentPrefix = process.env.ENVIRONMENT_PREFIX || 'default';
-      const tableName = environmentPrefix === 'default' ? 'branding_configurations' : `branding_configurations_${environmentPrefix}`;
+      // Priority 2: Database configuration from tenant-specific or default pool
+      const tableName = 'branding_configurations';
 
       // Create table if it doesn't exist
-      await sessionPool.query(`
+      await this.pool.query(`
         CREATE TABLE IF NOT EXISTS ${tableName} (
           id SERIAL PRIMARY KEY,
           config_data JSONB NOT NULL,
@@ -1779,7 +1787,7 @@ export class DatabaseStorage implements IStorage {
         )
       `);
 
-      const result = await sessionPool.query(`
+      const result = await this.pool.query(`
         SELECT config_data 
         FROM ${tableName} 
         WHERE id = 1
@@ -1857,12 +1865,11 @@ export class DatabaseStorage implements IStorage {
         throw new Error('Admin environments cannot save branding configuration to database. Use environment variables instead.');
       }
 
-      // Use environment-specific table names to ensure isolation
-      const environmentPrefix = process.env.ENVIRONMENT_PREFIX || 'default';
-      const tableName = environmentPrefix === 'default' ? 'branding_configurations' : `branding_configurations_${environmentPrefix}`;
+      // Use tenant-specific or default pool for database queries
+      const tableName = 'branding_configurations';
 
       // Create the table if it doesn't exist
-      await sessionPool.query(`
+      await this.pool.query(`
         CREATE TABLE IF NOT EXISTS ${tableName} (
           id SERIAL PRIMARY KEY,
           config_data JSONB NOT NULL,
@@ -1872,7 +1879,7 @@ export class DatabaseStorage implements IStorage {
       `);
 
       // Use UPSERT (INSERT ... ON CONFLICT) to save configuration
-      const result = await sessionPool.query(`
+      const result = await this.pool.query(`
         INSERT INTO ${tableName} (id, config_data, updated_at)
         VALUES (1, $1, NOW())
         ON CONFLICT (id) 
@@ -1887,29 +1894,6 @@ export class DatabaseStorage implements IStorage {
       console.error("Error saving branding config:", error);
       throw error;
     }
-  }
-
-  // Notification methods
-  async getNotificationsByUser(userId: number): Promise<Notification[]> {
-    return await this.db
-      .select()
-      .from(notifications)
-      .where(eq(notifications.userId, userId));
-  }
-
-  async getAllNotifications(): Promise<Notification[]> {
-    return await this.db
-      .select()
-      .from(notifications)
-      .orderBy(notifications.id);
-  }
-
-  async createNotification(notification: InsertNotification): Promise<Notification> {
-    const [result] = await this.db
-      .insert(notifications)
-      .values(notification)
-      .returning();
-    return result;
   }
 
   async updateNotification(id: number, updates: Partial<Notification>): Promise<Notification> {
