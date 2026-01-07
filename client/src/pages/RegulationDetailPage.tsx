@@ -20,8 +20,8 @@ function renderMarkdown(text: string | null | undefined): string {
   }
 }
 
-// Helper function to calculate compliance status
-function calculateComplianceStatus(actions: RegulationAction[], deadlines: Deadline[]) {
+// Helper function to calculate compliance status (kept for potential future use)
+function _calculateComplianceStatus(actions: RegulationAction[], deadlines: Deadline[]) {
   const requiredActions = actions.filter(action => action.required);
   const completedRequiredActions = requiredActions.filter(action => action.status === 'completed');
   
@@ -261,8 +261,8 @@ function RegulationDetailPage() {
   
   
   
-  // Ensure actions is always available (initialize if missing)
-  const actions = regulation?.actions || [];
+  // Ensure actions is always available (initialize if missing) - kept for attestation logic
+  const _actions = regulation?.actions || [];
   
   // Make admin tools visible if the user is a regulation admin and regulation exists
   const categoryVisible = isAdmin && hasRegulation; // Category changes still require global admin
@@ -855,9 +855,54 @@ function RegulationDetailPage() {
                 HERO SECTION - Compliance Status + Quick Actions
             ═══════════════════════════════════════════════════════════════════ */}
             {(() => {
-              const complianceStatus = calculateComplianceStatus(regulation.actions || [], regulationDeadlines);
-              const requiredActions = regulation.actions?.filter(a => a.required) || [];
-              const completedActions = requiredActions.filter(a => a.status === 'completed');
+              // Calculate task-based compliance (using actual compliance_tasks from database)
+              // Ensure complianceTasks is an array before using array methods
+              const tasksArray = Array.isArray(complianceTasks) ? complianceTasks : [];
+              const totalTasks = tasksArray.length;
+              const completedTasks = tasksArray.filter(t => t.status === 'completed').length;
+              const hasIncompleteTasks = totalTasks > 0 && completedTasks < totalTasks;
+              
+              // Calculate deadline-based compliance
+              const overdueDeadlines = regulationDeadlines.filter(deadline => 
+                deadline.status === 'overdue' || 
+                (deadline.status === 'pending' && new Date(deadline.dueDate) < new Date())
+              );
+              const upcomingDeadlines = regulationDeadlines.filter(deadline => 
+                deadline.status === 'pending' && 
+                new Date(deadline.dueDate) >= new Date() &&
+                new Date(deadline.dueDate) <= new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
+              );
+              
+              // Determine compliance status based on BOTH tasks and deadlines
+              let complianceStatus: { status: string; color: string; message: string };
+              
+              if (overdueDeadlines.length > 0) {
+                complianceStatus = {
+                  status: 'non-compliant',
+                  color: 'red',
+                  message: `${overdueDeadlines.length} overdue deadline${overdueDeadlines.length > 1 ? 's' : ''}`
+                };
+              } else if (hasIncompleteTasks) {
+                // If there are incomplete tasks, show partial compliance (yellow)
+                complianceStatus = {
+                  status: 'partial-compliance',
+                  color: 'yellow',
+                  message: `${totalTasks - completedTasks} task${totalTasks - completedTasks > 1 ? 's' : ''} remaining`
+                };
+              } else if (upcomingDeadlines.length > 0) {
+                complianceStatus = {
+                  status: 'compliant-with-upcoming',
+                  color: 'blue',
+                  message: `${upcomingDeadlines.length} deadline${upcomingDeadlines.length > 1 ? 's' : ''} due within 30 days`
+                };
+              } else {
+                complianceStatus = {
+                  status: 'compliant',
+                  color: 'green',
+                  message: 'All requirements met'
+                };
+              }
+              
               const nextDeadline = regulationDeadlines
                 .filter(d => d.status === 'pending')
                 .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())[0];
@@ -907,7 +952,7 @@ function RegulationDetailPage() {
                            'Non-Compliant'}
                         </h2>
                         <p className="text-sm text-muted-foreground">
-                          {completedActions.length}/{requiredActions.length} actions complete
+                          {completedTasks}/{totalTasks} tasks complete
                           {nextDeadline && ` • Next deadline ${format(new Date(nextDeadline.dueDate), "MMM d")}`}
                         </p>
                       </div>
