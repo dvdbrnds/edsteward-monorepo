@@ -1,5 +1,7 @@
 import express, { type Request, Response } from "express";
 import { storage } from "./storage";
+import { db } from "./db";
+import { regulations, complianceTasks } from "@shared/schema";
 import { syslog, LogLevel, LogFacility } from './services/syslog';
 import { z } from "zod";
 import { ValidationLevel } from "@shared/schema";
@@ -478,6 +480,443 @@ export function setupMCPIntegrationApi(app: express.Application) {
       console.error(`Error fetching validation status for version ${req.params.versionId}:`, error);
       syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Error fetching MCP validation status for version ${req.params.versionId}`, { error: String(error) });
       res.status(500).json({ error: 'Failed to fetch validation status' });
+    }
+  });
+
+  // =====================================================
+  // NEW REGULATION CREATION ENDPOINT FOR MCP ENGINE
+  // =====================================================
+  
+  /**
+   * Schema for compliance task from MCP Engine
+   */
+  const mcpComplianceTaskSchema = z.object({
+    tempId: z.string().optional(),
+    parentTempId: z.string().optional().nullable(),
+    title: z.string(),
+    description: z.string().optional(),
+    instructions: z.string().optional(),
+    assignedRole: z.string().optional(),
+    dueDate: z.string().optional(),
+    recurringSchedule: z.string().optional(),
+    reminderDays: z.number().optional(),
+    priority: z.enum(['low', 'medium', 'high', 'critical']).optional(),
+    evidenceRequired: z.boolean().optional(),
+    evidenceType: z.string().optional(),
+    evidenceInstructions: z.string().optional(),
+    sortOrder: z.number().optional(),
+  });
+
+  /**
+   * Schema for creating a NEW regulation with compliance tasks
+   * This is the correct endpoint for MCP Engine to add regulations that don't exist yet
+   */
+  const createRegulationWithTasksSchema = z.object({
+    // Required fields
+    name: z.string().min(1, "Regulation name is required"),
+    statute: z.string().min(1, "Statute reference is required"),
+    category: z.string().min(1, "Category is required"),
+    topic: z.string().min(1, "Topic is required"),
+    
+    // Optional regulation fields
+    itemId: z.string().optional(), // If not provided, will auto-generate
+    jurisdictionSource: z.string().default("federal"),
+    summary: z.string().optional(),
+    requirements: z.string().optional(),
+    regulationText: z.string().optional(),
+    applicableInstitutions: z.array(z.string()).optional(),
+    dro: z.string().optional(),
+    effectiveDate: z.string().optional(),
+    originationDate: z.string().optional(),
+    agency_name: z.string().optional(),
+    agency_url: z.string().optional(),
+    agency_contact: z.string().optional(),
+    agency_department: z.string().optional(),
+    regulationUrl: z.string().optional(),
+    requirementsUrl: z.string().optional(),
+    submissionGuideUrl: z.string().optional(),
+    formsUrl: z.string().optional(),
+    submissionGuidelines: z.string().optional(),
+    reportingFrequency: z.string().optional(),
+    filingDeadlines: z.array(z.object({
+      type: z.string(),
+      date: z.string(),
+      frequency: z.string(),
+      description: z.string(),
+    })).optional(),
+    
+    // Compliance tasks
+    complianceTasks: z.array(mcpComplianceTaskSchema).optional(),
+    
+    // Metadata
+    metadata: z.object({
+      source: z.string().optional(),
+      mcpVersion: z.string().optional(),
+      createdBy: z.string().optional(),
+      audit: z.any().optional(),
+    }).optional(),
+  });
+
+  /**
+   * Basic Auth middleware for MCP Engine (shared with regulation-updates-api)
+   * Supports: dvdbrnds:gabadh (Base64: ZHZkYnJuZHM6Z2FiYWRo)
+   */
+  function basicAuthMCP(req: Request, res: Response, next: Function) {
+    // Allow localhost requests to bypass authentication
+    const host = req.headers.host || '';
+    if (host.includes('localhost') || host.includes('127.0.0.1')) {
+      return next();
+    }
+
+    const authHeader = req.headers.authorization;
+    
+    if (!authHeader || !authHeader.startsWith('Basic ')) {
+      return res.status(401).json({ 
+        error: 'Basic Authentication required',
+        message: 'MCP Engine integration requires Basic Auth with valid credentials'
+      });
+    }
+
+    const base64Credentials = authHeader.split(' ')[1];
+    const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
+    const [username, password] = credentials.split(':');
+
+    if (username === 'dvdbrnds' && password === 'gabadh') {
+      next();
+    } else {
+      return res.status(401).json({ 
+        error: 'Invalid credentials',
+        message: 'MCP Engine integration requires valid username and password'
+      });
+    }
+  }
+
+  /**
+   * POST /api/mcp/regulations/create
+   * 
+   * Creates a NEW regulation with optional compliance tasks in a single atomic operation.
+   * This is the correct endpoint for MCP Engine to use when adding regulations
+   * that don't already exist in EdSteward.
+   * 
+   * Authentication: Basic Auth (dvdbrnds:gabadh)
+   * 
+   * Example payload:
+   * {
+   *   "name": "General Data Protection Regulation (GDPR)",
+   *   "statute": "EU Regulation 2016/679",
+   *   "category": "Information Technology",
+   *   "topic": "Data Privacy",
+   *   "jurisdictionSource": "international",
+   *   "summary": "The GDPR is a comprehensive data protection law...",
+   *   "requirements": "• Appoint a Data Protection Officer...",
+   *   "complianceTasks": [
+   *     {
+   *       "tempId": "task-1",
+   *       "title": "Appoint Data Protection Officer",
+   *       "description": "Designate a DPO to oversee GDPR compliance",
+   *       "assignedRole": "IT Director",
+   *       "priority": "high",
+   *       "evidenceRequired": true,
+   *       "evidenceType": "document"
+   *     }
+   *   ]
+   * }
+   */
+  app.post('/api/mcp/regulations/create', basicAuthMCP, async (req: Request, res: Response) => {
+    const timestamp = new Date().toISOString();
+    console.log(`\n========================================`);
+    console.log(`📥 [${timestamp}] MCP CREATE NEW REGULATION REQUEST`);
+    console.log(`========================================`);
+    
+    try {
+      // Validate the payload
+      const validation = createRegulationWithTasksSchema.safeParse(req.body);
+      
+      if (!validation.success) {
+        console.error('❌ Validation failed:', validation.error.issues);
+        return res.status(400).json({
+          success: false,
+          error: 'Validation failed',
+          details: validation.error.issues,
+        });
+      }
+      
+      const data = validation.data;
+      console.log(`📋 Creating regulation: ${data.name}`);
+      console.log(`   Category: ${data.category}`);
+      console.log(`   Jurisdiction: ${data.jurisdictionSource}`);
+      console.log(`   Tasks: ${data.complianceTasks?.length || 0}`);
+      
+      // Check if regulation already exists by name
+      const existingRegulations = await storage.searchRegulations(data.name);
+      const exactMatch = existingRegulations.find(
+        r => r.name.toLowerCase() === data.name.toLowerCase()
+      );
+      
+      if (exactMatch) {
+        console.log(`⚠️ Regulation already exists with ID ${exactMatch.id}`);
+        return res.status(409).json({
+          success: false,
+          error: 'Regulation already exists',
+          existingRegulationId: exactMatch.id,
+          existingRegulationName: exactMatch.name,
+          message: `A regulation named "${data.name}" already exists. Use /api/regulation-updates to update it instead.`,
+        });
+      }
+      
+      // Generate itemId if not provided
+      const itemId = data.itemId || `REG-${data.name.replace(/[^a-zA-Z0-9]/g, '-').substring(0, 30).toUpperCase()}-${Date.now()}`;
+      
+      // Create the regulation
+      console.log('💾 Inserting regulation into database...');
+      const [newRegulation] = await db.insert(regulations).values({
+        itemId,
+        name: data.name,
+        topic: data.topic,
+        statute: data.statute,
+        category: data.category,
+        jurisdictionSource: data.jurisdictionSource,
+        summary: data.summary || null,
+        requirements: data.requirements || null,
+        regulationText: data.regulationText || null,
+        applicableInstitutions: data.applicableInstitutions || null,
+        dro: data.dro || '',
+        effectiveDate: data.effectiveDate ? new Date(data.effectiveDate) : null,
+        originationDate: data.originationDate ? new Date(data.originationDate) : null,
+        agency_name: data.agency_name || null,
+        agency_url: data.agency_url || null,
+        agency_contact: data.agency_contact || null,
+        agency_department: data.agency_department || null,
+        regulationUrl: data.regulationUrl || null,
+        requirementsUrl: data.requirementsUrl || null,
+        submissionGuideUrl: data.submissionGuideUrl || null,
+        formsUrl: data.formsUrl || null,
+        submissionGuidelines: data.submissionGuidelines || null,
+        reportingFrequency: data.reportingFrequency || null,
+        filingDeadlines: data.filingDeadlines || null,
+        isApplicable: true,
+        isCurrent: true,
+        versionNumber: 1,
+      }).returning();
+      
+      console.log(`✅ Regulation created with ID: ${newRegulation.id}`);
+      
+      // Create compliance tasks if provided
+      const createdTasks: Array<{ id: number; tempId?: string; title: string }> = [];
+      const taskIdMap = new Map<string, number>(); // Map tempId to actual ID
+      
+      if (data.complianceTasks && data.complianceTasks.length > 0) {
+        console.log(`📝 Creating ${data.complianceTasks.length} compliance tasks...`);
+        
+        // First pass: create root tasks (no parent)
+        const rootTasks = data.complianceTasks.filter(t => !t.parentTempId);
+        for (const task of rootTasks) {
+          const [newTask] = await db.insert(complianceTasks).values({
+            regulationId: newRegulation.id,
+            title: task.title,
+            description: task.description || null,
+            instructions: task.instructions || null,
+            assignedRole: task.assignedRole || null,
+            dueDate: task.dueDate ? new Date(task.dueDate) : null,
+            recurringSchedule: task.recurringSchedule || null,
+            reminderDays: task.reminderDays || 30,
+            priority: task.priority || 'medium',
+            evidenceRequired: task.evidenceRequired || false,
+            evidenceType: task.evidenceType || 'none',
+            evidenceInstructions: task.evidenceInstructions || null,
+            sortOrder: task.sortOrder || 0,
+            status: 'pending',
+            isTemplate: false,
+          }).returning();
+          
+          if (task.tempId) {
+            taskIdMap.set(task.tempId, newTask.id);
+          }
+          createdTasks.push({
+            id: newTask.id,
+            tempId: task.tempId,
+            title: task.title,
+          });
+        }
+        
+        // Second pass: create child tasks (with parent)
+        const childTasks = data.complianceTasks.filter(t => t.parentTempId);
+        for (const task of childTasks) {
+          const parentId = taskIdMap.get(task.parentTempId!);
+          if (!parentId) {
+            console.warn(`⚠️ Could not find parent task with tempId: ${task.parentTempId}`);
+            continue;
+          }
+          
+          const [newTask] = await db.insert(complianceTasks).values({
+            regulationId: newRegulation.id,
+            parentTaskId: parentId,
+            title: task.title,
+            description: task.description || null,
+            instructions: task.instructions || null,
+            assignedRole: task.assignedRole || null,
+            dueDate: task.dueDate ? new Date(task.dueDate) : null,
+            recurringSchedule: task.recurringSchedule || null,
+            reminderDays: task.reminderDays || 30,
+            priority: task.priority || 'medium',
+            evidenceRequired: task.evidenceRequired || false,
+            evidenceType: task.evidenceType || 'none',
+            evidenceInstructions: task.evidenceInstructions || null,
+            sortOrder: task.sortOrder || 0,
+            status: 'pending',
+            isTemplate: false,
+          }).returning();
+          
+          if (task.tempId) {
+            taskIdMap.set(task.tempId, newTask.id);
+          }
+          createdTasks.push({
+            id: newTask.id,
+            tempId: task.tempId,
+            title: task.title,
+          });
+        }
+        
+        console.log(`✅ Created ${createdTasks.length} compliance tasks`);
+      }
+      
+      // Log to syslog
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `New regulation created via MCP: ${data.name}`, {
+        regulationId: newRegulation.id,
+        taskCount: createdTasks.length,
+      });
+      
+      // Success response
+      const response = {
+        success: true,
+        message: `Successfully created regulation "${data.name}" with ${createdTasks.length} compliance tasks`,
+        regulation: {
+          id: newRegulation.id,
+          itemId: newRegulation.itemId,
+          name: newRegulation.name,
+          category: newRegulation.category,
+          jurisdictionSource: newRegulation.jurisdictionSource,
+        },
+        tasks: createdTasks,
+        taskIdMapping: Object.fromEntries(taskIdMap),
+        timestamp,
+      };
+      
+      console.log(`\n✅ SUCCESS: Created regulation ID ${newRegulation.id} with ${createdTasks.length} tasks`);
+      console.log(`========================================\n`);
+      
+      res.status(201).json(response);
+      
+    } catch (error) {
+      console.error('❌ Error creating regulation:', error);
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 'Error creating regulation via MCP', { 
+        error: String(error) 
+      });
+      
+      res.status(500).json({
+        success: false,
+        error: 'Failed to create regulation',
+        details: error instanceof Error ? error.message : String(error),
+        timestamp,
+      });
+    }
+  });
+
+  /**
+   * GET /api/mcp/regulations/lookup
+   * 
+   * Look up a regulation by name or statute to get its EdSteward ID
+   * Useful for MCP Engine to check if a regulation exists before creating it
+   */
+  app.get('/api/mcp/regulations/lookup', basicAuthMCP, async (req: Request, res: Response) => {
+    try {
+      const { name, statute, category } = req.query;
+      
+      if (!name && !statute) {
+        return res.status(400).json({
+          success: false,
+          error: 'Must provide either name or statute query parameter',
+        });
+      }
+      
+      let searchResults: any[] = [];
+      
+      if (name) {
+        searchResults = await storage.searchRegulations(String(name));
+      }
+      
+      // Filter by additional criteria if provided
+      if (statute && searchResults.length > 0) {
+        searchResults = searchResults.filter(r => 
+          r.statute.toLowerCase().includes(String(statute).toLowerCase())
+        );
+      }
+      
+      if (category && searchResults.length > 0) {
+        searchResults = searchResults.filter(r => 
+          r.category.toLowerCase() === String(category).toLowerCase()
+        );
+      }
+      
+      res.json({
+        success: true,
+        count: searchResults.length,
+        regulations: searchResults.map(r => ({
+          id: r.id,
+          itemId: r.itemId,
+          name: r.name,
+          statute: r.statute,
+          category: r.category,
+          jurisdictionSource: r.jurisdictionSource,
+        })),
+      });
+      
+    } catch (error) {
+      console.error('Error looking up regulation:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to lookup regulation',
+        details: error instanceof Error ? error.message : String(error),
+      });
+    }
+  });
+
+  /**
+   * GET /api/mcp/regulations/:id/tasks
+   * 
+   * Get all compliance tasks for a regulation
+   */
+  app.get('/api/mcp/regulations/:id/tasks', basicAuthMCP, async (req: Request, res: Response) => {
+    try {
+      const regulationId = parseInt(req.params.id, 10);
+      
+      if (isNaN(regulationId)) {
+        return res.status(400).json({ error: 'Invalid regulation ID' });
+      }
+      
+      const regulation = await storage.getRegulation(regulationId);
+      
+      if (!regulation) {
+        return res.status(404).json({ error: 'Regulation not found' });
+      }
+      
+      const tasks = await storage.getComplianceTasks?.(regulationId) || [];
+      
+      res.json({
+        success: true,
+        regulationId,
+        regulationName: regulation.name,
+        taskCount: tasks.length,
+        tasks,
+      });
+      
+    } catch (error) {
+      console.error('Error fetching regulation tasks:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch regulation tasks',
+        details: error instanceof Error ? error.message : String(error),
+      });
     }
   });
   
