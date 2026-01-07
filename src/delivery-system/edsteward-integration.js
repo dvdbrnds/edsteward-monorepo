@@ -150,7 +150,9 @@ export class EdStewardIntegration {
     const envConfig = config.environments[this.environment] || config.environments.development;
     
     this.baseUrl = options.edstewardUrl || process.env.EDSTEWARD_URL || envConfig.baseUrl;
-    this.endpoint = envConfig.endpoint;
+    this.endpoint = envConfig.endpoint;  // For updates to existing regulations
+    this.createEndpoint = envConfig.createEndpoint || '/api/mcp/regulations/create';  // For NEW regulations
+    this.lookupEndpoint = envConfig.lookupEndpoint || '/api/mcp/regulations/lookup';  // To check if exists
     this.healthCheckEndpoint = envConfig.healthCheck;
     
     // Authentication
@@ -170,10 +172,11 @@ export class EdStewardIntegration {
     // Compliance Task Generator
     this.taskGenerator = new ComplianceTaskGenerator({ logger: console });
     
-    console.log(`🔗 EdSteward Integration v2.1 initialized`);
+    console.log(`🔗 EdSteward Integration v2.2 initialized`);
     console.log(`   Environment: ${this.environment}`);
     console.log(`   Base URL: ${this.baseUrl}`);
-    console.log(`   Endpoint: ${this.endpoint}`);
+    console.log(`   Update Endpoint: ${this.endpoint}`);
+    console.log(`   Create Endpoint: ${this.createEndpoint}`);
     console.log(`   Auth: Basic Auth configured`);
     console.log(`   Task Generator: Hybrid approach (templates + generated tasks)`);
   }
@@ -428,6 +431,153 @@ export class EdStewardIntegration {
     console.log(`   audit.score: ${payload.metadata.audit?.score || 'N/A'}`);
     
     return await this.sendWithRetry(payload);
+  }
+
+  /**
+   * Check if a regulation exists in EdSteward
+   */
+  async lookupRegulation(name) {
+    try {
+      const url = `${this.baseUrl}${this.lookupEndpoint}?name=${encodeURIComponent(name)}`;
+      console.log(`🔍 Looking up regulation: ${name}`);
+      
+      const headers = { 'Content-Type': 'application/json' };
+      if (!this.baseUrl.includes('localhost')) {
+        headers['Authorization'] = this.authHeader;
+      }
+      
+      const response = await fetch(url, { headers });
+      const result = await response.json();
+      
+      return { 
+        exists: result.count > 0,
+        count: result.count,
+        regulations: result.regulations || []
+      };
+    } catch (error) {
+      console.error(`❌ Lookup failed: ${error.message}`);
+      return { exists: false, count: 0, error: error.message };
+    }
+  }
+
+  /**
+   * Create a NEW regulation in EdSteward
+   * Use this for regulations that don't exist yet (like GDPR)
+   * Uses /api/mcp/regulations/create endpoint
+   */
+  async createRegulation(regulationData) {
+    console.log(`🆕 Creating NEW regulation in EdSteward: ${regulationData.name}`);
+    
+    // Check if it already exists
+    const lookup = await this.lookupRegulation(regulationData.name);
+    if (lookup.exists) {
+      console.log(`⚠️ Regulation "${regulationData.name}" already exists (count: ${lookup.count})`);
+      // Could return error or proceed to update
+    }
+    
+    // Generate compliance tasks if applicable
+    const slug = this.slugify(regulationData.name);
+    const taskResult = this.taskGenerator.generateTasks(slug);
+    
+    // Build payload for create endpoint (NO regulationId)
+    const payload = {
+      name: regulationData.name,
+      statute: regulationData.statute,
+      category: regulationData.category || 'Other',
+      topic: regulationData.topic || regulationData.category,
+      jurisdictionSource: regulationData.jurisdictionSource || 'federal',
+      summary: regulationData.summary,
+      requirements: this.formatRequirements(regulationData.requirements),
+      filingDeadlines: regulationData.filingDeadlines || [],
+      complianceTasks: taskResult.tasks || regulationData.complianceTasks || []
+    };
+    
+    console.log(`📋 Create Payload:`);
+    console.log(`   Name: ${payload.name}`);
+    console.log(`   Category: ${payload.category}`);
+    console.log(`   Jurisdiction: ${payload.jurisdictionSource}`);
+    console.log(`   Tasks: ${payload.complianceTasks?.length || 0}`);
+    
+    return await this.sendCreate(payload);
+  }
+
+  /**
+   * Send create request to EdSteward
+   */
+  async sendCreate(payload, attempt = 1) {
+    try {
+      const url = `${this.baseUrl}${this.createEndpoint}`;
+      
+      const headers = { 'Content-Type': 'application/json' };
+      if (!this.baseUrl.includes('localhost')) {
+        headers['Authorization'] = this.authHeader;
+      }
+      
+      console.log(`📤 Sending to ${url} (attempt ${attempt}/${this.retryAttempts})...`);
+      
+      const response = await fetch(url, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify(payload)
+      });
+
+      const responseText = await response.text();
+      let result;
+      
+      try {
+        result = JSON.parse(responseText);
+      } catch {
+        result = { raw: responseText };
+      }
+
+      if (!response.ok) {
+        if (response.status === 400) {
+          console.error(`❌ Validation error: ${result.error || responseText}`);
+        } else if (response.status === 409) {
+          console.error(`❌ Conflict: Regulation may already exist`);
+        }
+        throw new Error(`HTTP ${response.status}: ${result.error || response.statusText}`);
+      }
+
+      console.log(`✅ Regulation created successfully!`);
+      console.log(`   Regulation ID: ${result.regulation?.id || 'N/A'}`);
+      console.log(`   Item ID: ${result.regulation?.itemId || 'N/A'}`);
+      console.log(`   Tasks Created: ${result.tasks?.length || 0}`);
+      
+      return {
+        success: true,
+        regulationId: result.regulation?.id,
+        itemId: result.regulation?.itemId,
+        tasks: result.tasks,
+        result
+      };
+
+    } catch (error) {
+      console.error(`❌ Create failed (attempt ${attempt}):`, error.message);
+      
+      if (attempt < this.retryAttempts) {
+        const backoffDelay = this.retryDelay * Math.pow(2, attempt - 1);
+        console.log(`🔄 Retrying in ${backoffDelay}ms...`);
+        await this.delay(backoffDelay);
+        return await this.sendCreate(payload, attempt + 1);
+      }
+      
+      return {
+        success: false,
+        error: error.message,
+        attempts: attempt
+      };
+    }
+  }
+
+  /**
+   * Helper to create a slug from name
+   */
+  slugify(name) {
+    return name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-|-$/g, '');
   }
 
   /**
