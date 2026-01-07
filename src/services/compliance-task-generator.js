@@ -1241,6 +1241,359 @@ const FMLA_TASKS = [
 ];
 
 /**
+ * GDPR Task Template (General Data Protection Regulation)
+ * For US Higher Education institutions processing EU resident data
+ */
+const GDPR_TASKS = [
+  // Data Mapping & Inventory
+  {
+    tempId: 'gdpr-data-inventory',
+    parentTempId: null,
+    title: 'Data Mapping and Inventory',
+    description: 'Create comprehensive inventory of all personal data processed, including EU resident data from students, applicants, and employees',
+    instructions: 'Document: data categories, data subjects, purposes, legal basis, retention periods, recipients, and international transfers.',
+    assignedRole: ROLES.IT_SECURITY,
+    priority: 'critical',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload data inventory spreadsheet or ROPA documentation',
+    sortOrder: 1
+  },
+  {
+    tempId: 'gdpr-data-flows',
+    parentTempId: 'gdpr-data-inventory',
+    title: 'Document Data Flows',
+    description: 'Map data flows showing how EU personal data moves through institutional systems',
+    assignedRole: ROLES.IT_SECURITY,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload data flow diagrams',
+    sortOrder: 1
+  },
+  {
+    tempId: 'gdpr-lawful-basis',
+    parentTempId: 'gdpr-data-inventory',
+    title: 'Identify Lawful Basis for Processing',
+    description: 'Document lawful basis for each processing activity (consent, contract, legal obligation, vital interests, public task, legitimate interests)',
+    instructions: 'Student records typically use "public task" or "contract". Recruitment/marketing requires consent.',
+    assignedRole: ROLES.GENERAL_COUNSEL,
+    priority: 'critical',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload lawful basis assessment for each processing activity',
+    sortOrder: 2
+  },
+  {
+    tempId: 'gdpr-processor-contracts',
+    parentTempId: 'gdpr-data-inventory',
+    title: 'Review Data Processor Agreements',
+    description: 'Ensure all vendors processing EU data have GDPR-compliant Data Processing Agreements (DPAs)',
+    assignedRole: ROLES.GENERAL_COUNSEL,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload template DPA and list of compliant vendors',
+    sortOrder: 3
+  },
+
+  // Legal Basis & Consent
+  {
+    tempId: 'gdpr-privacy-notice',
+    parentTempId: null,
+    title: 'GDPR-Compliant Privacy Notice',
+    description: 'Update privacy notices to meet GDPR Article 13/14 requirements for EU data subjects',
+    instructions: 'Must include: identity of controller, DPO contact, purposes, legal basis, recipients, retention, rights, right to complain, automated decision-making.',
+    assignedRole: ROLES.GENERAL_COUNSEL,
+    priority: 'critical',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.LINK,
+    evidenceInstructions: 'Provide URL to GDPR privacy notice',
+    sortOrder: 2
+  },
+  {
+    tempId: 'gdpr-consent-management',
+    parentTempId: null,
+    title: 'Consent Management System',
+    description: 'Implement system to collect, record, and manage consent for EU data subjects',
+    instructions: 'Consent must be freely given, specific, informed, and unambiguous. Must be easy to withdraw.',
+    assignedRole: ROLES.IT_SECURITY,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.SCREENSHOT,
+    evidenceInstructions: 'Upload screenshots of consent collection and management interface',
+    sortOrder: 3
+  },
+  {
+    tempId: 'gdpr-lia',
+    parentTempId: null,
+    title: 'Legitimate Interest Assessments',
+    description: 'Document Legitimate Interest Assessments (LIAs) where legitimate interests is the lawful basis',
+    assignedRole: ROLES.GENERAL_COUNSEL,
+    priority: 'medium',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload completed LIA templates',
+    sortOrder: 4
+  },
+
+  // Data Subject Rights
+  {
+    tempId: 'gdpr-dsar-process',
+    parentTempId: null,
+    title: 'Data Subject Access Request (DSAR) Process',
+    description: 'Establish process to handle DSARs within 30-day deadline',
+    instructions: 'Must verify identity, search all systems, provide data in portable format, respond within 30 days (extendable to 90 for complex requests).',
+    assignedRole: ROLES.REGISTRAR,
+    priority: 'critical',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload DSAR procedure document and response templates',
+    sortOrder: 5
+  },
+  {
+    tempId: 'gdpr-erasure',
+    parentTempId: 'gdpr-dsar-process',
+    title: 'Right to Erasure Procedures',
+    description: 'Implement "right to be forgotten" request handling',
+    instructions: 'Document exceptions (legal obligations, public interest archiving, legal claims).',
+    assignedRole: ROLES.REGISTRAR,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload erasure request procedure',
+    sortOrder: 1
+  },
+  {
+    tempId: 'gdpr-portability',
+    parentTempId: 'gdpr-dsar-process',
+    title: 'Data Portability Procedures',
+    description: 'Enable data subjects to receive their data in machine-readable format',
+    assignedRole: ROLES.IT_SECURITY,
+    priority: 'medium',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload data export procedure and sample output format',
+    sortOrder: 2
+  },
+  {
+    tempId: 'gdpr-rectification',
+    parentTempId: 'gdpr-dsar-process',
+    title: 'Rectification Procedures',
+    description: 'Process for correcting inaccurate personal data upon request',
+    assignedRole: ROLES.REGISTRAR,
+    priority: 'medium',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload rectification request procedure',
+    sortOrder: 3
+  },
+
+  // Security & Breach Response
+  {
+    tempId: 'gdpr-security-measures',
+    parentTempId: null,
+    title: 'Technical and Organizational Security Measures',
+    description: 'Implement appropriate security measures for EU personal data (encryption, access controls, pseudonymization)',
+    assignedRole: ROLES.IT_SECURITY,
+    priority: 'critical',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload security controls documentation',
+    sortOrder: 6
+  },
+  {
+    tempId: 'gdpr-breach-procedure',
+    parentTempId: null,
+    title: '72-Hour Breach Notification Procedure',
+    description: 'Establish procedure to notify supervisory authority within 72 hours of becoming aware of a personal data breach',
+    instructions: 'Must assess risk to data subjects, document all breaches, notify authority if risk exists, notify individuals if high risk.',
+    assignedRole: ROLES.IT_SECURITY,
+    priority: 'critical',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload breach response plan with 72-hour notification procedures',
+    sortOrder: 7
+  },
+  {
+    tempId: 'gdpr-breach-register',
+    parentTempId: 'gdpr-breach-procedure',
+    title: 'Maintain Breach Register',
+    description: 'Document all personal data breaches, including facts, effects, and remedial action',
+    assignedRole: ROLES.IT_SECURITY,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload breach register template',
+    sortOrder: 1
+  },
+
+  // Governance
+  {
+    tempId: 'gdpr-dpo',
+    parentTempId: null,
+    title: 'Data Protection Officer (DPO) Appointment',
+    description: 'Appoint DPO if required (public authority, large-scale processing, special categories)',
+    instructions: 'DPO must be independent, report to highest management, have adequate resources.',
+    assignedRole: ROLES.PRESIDENT,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload DPO appointment letter or determination that DPO not required',
+    sortOrder: 8
+  },
+  {
+    tempId: 'gdpr-dpia',
+    parentTempId: null,
+    title: 'Data Protection Impact Assessments (DPIA)',
+    description: 'Conduct DPIAs for high-risk processing activities',
+    instructions: 'Required for: systematic monitoring, large-scale special categories, new technologies, profiling.',
+    recurringSchedule: 'as-needed',
+    assignedRole: ROLES.IT_SECURITY,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload DPIA template and completed assessments',
+    sortOrder: 9
+  },
+  {
+    tempId: 'gdpr-ropa',
+    parentTempId: null,
+    title: 'Records of Processing Activities (ROPA)',
+    description: 'Maintain Article 30 records of all processing activities',
+    instructions: 'Must include: controller details, purposes, data categories, recipients, transfers, retention, security measures.',
+    assignedRole: ROLES.COMPLIANCE,
+    priority: 'critical',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload ROPA documentation',
+    sortOrder: 10
+  },
+  {
+    tempId: 'gdpr-privacy-by-design',
+    parentTempId: null,
+    title: 'Privacy by Design Implementation',
+    description: 'Integrate data protection into system design and business processes',
+    instructions: 'Consider privacy at project inception, default to privacy-protective settings.',
+    assignedRole: ROLES.IT_SECURITY,
+    priority: 'medium',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload privacy by design checklist for new projects',
+    sortOrder: 11
+  },
+
+  // International Transfers
+  {
+    tempId: 'gdpr-transfer-mechanisms',
+    parentTempId: null,
+    title: 'International Transfer Safeguards',
+    description: 'Implement lawful mechanisms for transferring EU data to US (SCCs, binding corporate rules)',
+    instructions: 'Standard Contractual Clauses (SCCs) are primary mechanism post-Schrems II. Conduct Transfer Impact Assessments.',
+    assignedRole: ROLES.GENERAL_COUNSEL,
+    priority: 'critical',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload executed SCCs and Transfer Impact Assessments',
+    sortOrder: 12
+  },
+  {
+    tempId: 'gdpr-study-abroad',
+    parentTempId: 'gdpr-transfer-mechanisms',
+    title: 'Study Abroad Data Transfer Compliance',
+    description: 'Ensure GDPR compliance for study abroad program data transfers',
+    assignedRole: ROLES.REGISTRAR,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload study abroad data handling procedures',
+    sortOrder: 1
+  },
+
+  // Training
+  {
+    tempId: 'gdpr-training',
+    parentTempId: null,
+    title: 'Annual GDPR Training',
+    description: 'Provide annual GDPR awareness training to all staff who handle EU personal data',
+    recurringSchedule: 'annual',
+    assignedRole: ROLES.TRAINING,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload training materials and completion records',
+    sortOrder: 13
+  },
+  {
+    tempId: 'gdpr-it-training',
+    parentTempId: 'gdpr-training',
+    title: 'Specialized IT GDPR Training',
+    description: 'Provide specialized training to IT staff on technical GDPR requirements',
+    recurringSchedule: 'annual',
+    assignedRole: ROLES.TRAINING,
+    priority: 'medium',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload IT-specific training materials',
+    sortOrder: 1
+  },
+
+  // Higher Education Specific
+  {
+    tempId: 'gdpr-student-records',
+    parentTempId: null,
+    title: 'Student Records GDPR Compliance',
+    description: 'Ensure student records processing complies with GDPR (lawful basis, retention, rights)',
+    instructions: 'Primary lawful basis for academic records is typically "public task" or "contract performance".',
+    assignedRole: ROLES.REGISTRAR,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload student records GDPR compliance assessment',
+    sortOrder: 14
+  },
+  {
+    tempId: 'gdpr-recruitment',
+    parentTempId: null,
+    title: 'International Recruitment Compliance',
+    description: 'Ensure GDPR compliance for international student recruitment activities',
+    instructions: 'Marketing to EU prospects requires explicit consent. Retention periods must be defined.',
+    assignedRole: ROLES.COMPLIANCE,
+    priority: 'high',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload recruitment data handling procedures',
+    sortOrder: 15
+  },
+  {
+    tempId: 'gdpr-alumni',
+    parentTempId: null,
+    title: 'Alumni Data GDPR Compliance',
+    description: 'Review alumni data retention and marketing consent under GDPR',
+    instructions: 'Alumni marketing requires consent. Review retention periods for historical records.',
+    assignedRole: ROLES.COMPLIANCE,
+    priority: 'medium',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload alumni data policy and consent mechanisms',
+    sortOrder: 16
+  },
+  {
+    tempId: 'gdpr-research',
+    parentTempId: null,
+    title: 'Research Data GDPR Compliance',
+    description: 'Ensure research involving EU subjects complies with GDPR special category rules',
+    instructions: 'Research involving health data, genetics, biometrics requires explicit consent or public interest exemption.',
+    assignedRole: ROLES.COMPLIANCE,
+    priority: 'medium',
+    evidenceRequired: true,
+    evidenceType: EVIDENCE_TYPES.DOCUMENT,
+    evidenceInstructions: 'Upload research data handling procedures',
+    sortOrder: 17
+  }
+];
+
+/**
  * Copyright/DMCA Task Template
  */
 const COPYRIGHT_DMCA_TASKS = [
@@ -1404,7 +1757,13 @@ const TASK_TEMPLATES = {
   'fmla': FMLA_TASKS,
   'copyright-dmca': COPYRIGHT_DMCA_TASKS,
   'digital-millennium-copyright-act': COPYRIGHT_DMCA_TASKS,
-  'dmca': COPYRIGHT_DMCA_TASKS
+  'dmca': COPYRIGHT_DMCA_TASKS,
+  
+  // International
+  'general-data-protection-regulation': GDPR_TASKS,
+  'gdpr': GDPR_TASKS,
+  'reg-gdpr-2016-679': GDPR_TASKS,
+  'eu-gdpr': GDPR_TASKS
 };
 
 /**
