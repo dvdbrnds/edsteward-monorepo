@@ -1506,22 +1506,26 @@
                     <span class="step-icon">○</span>
                         <span>University Law Libraries</span>
                     </div>
-                    <div class="step-substeps" style="margin-left: 20px; font-size: 0.85em; color: #666; margin-top: 5px;">
-                        <div class="substep" id="substep-harvard" style="display: flex; align-items: center; gap: 6px; padding: 2px 0;">
-                            <span class="substep-icon" style="font-size: 0.8em; width: 12px;">○</span>
-                            <span>Harvard CAP</span>
+                    <div class="step-substeps" style="margin-left: 24px; font-size: 0.82em; color: #555; margin-top: 4px;">
+                        <div class="substep" id="substep-harvard" style="display: flex; align-items: center; gap: 8px; padding: 3px 0;">
+                            <span class="substep-icon" style="color: #888;">•</span>
+                            <span class="substep-name">Harvard CAP</span>
+                            <span class="substep-confidence" id="conf-harvard" style="color: #22c55e; font-weight: 500;"></span>
                         </div>
-                        <div class="substep" id="substep-courtlistener" style="display: flex; align-items: center; gap: 6px; padding: 2px 0;">
-                            <span class="substep-icon" style="font-size: 0.8em; width: 12px;">○</span>
-                            <span>CourtListener</span>
+                        <div class="substep" id="substep-courtlistener" style="display: flex; align-items: center; gap: 8px; padding: 3px 0;">
+                            <span class="substep-icon" style="color: #888;">•</span>
+                            <span class="substep-name">CourtListener</span>
+                            <span class="substep-confidence" id="conf-courtlistener" style="color: #22c55e; font-weight: 500;"></span>
                         </div>
-                        <div class="substep" id="substep-cornell" style="display: flex; align-items: center; gap: 6px; padding: 2px 0;">
-                            <span class="substep-icon" style="font-size: 0.8em; width: 12px;">○</span>
-                            <span>Cornell LII</span>
+                        <div class="substep" id="substep-cornell" style="display: flex; align-items: center; gap: 8px; padding: 3px 0;">
+                            <span class="substep-icon" style="color: #888;">•</span>
+                            <span class="substep-name">Cornell LII</span>
+                            <span class="substep-confidence" id="conf-cornell" style="color: #22c55e; font-weight: 500;"></span>
                         </div>
-                        <div class="substep" id="substep-justia" style="display: flex; align-items: center; gap: 6px; padding: 2px 0;">
-                            <span class="substep-icon" style="font-size: 0.8em; width: 12px;">○</span>
-                            <span>Justia</span>
+                        <div class="substep" id="substep-justia" style="display: flex; align-items: center; gap: 8px; padding: 3px 0;">
+                            <span class="substep-icon" style="color: #888;">•</span>
+                            <span class="substep-name">Justia</span>
+                            <span class="substep-confidence" id="conf-justia" style="color: #22c55e; font-weight: 500;"></span>
                         </div>
                     </div>
                 </div>
@@ -1660,21 +1664,24 @@
         
         function updateSubstep(id, status, confidence) {
             const substep = document.getElementById('substep-' + id);
+            const confSpan = document.getElementById('conf-' + id);
             if (substep) {
                 const icon = substep.querySelector('.substep-icon');
-                const text = substep.querySelector('span:last-child');
                 if (status === 'completed' && confidence > 0) {
                     icon.textContent = '✓';
                     icon.style.color = '#22c55e';
-                    if (!text.textContent.includes('%')) {
-                        text.textContent += ' (' + confidence + '%)';
+                    if (confSpan) {
+                        confSpan.textContent = '(' + confidence + '%)';
                     }
                 } else if (status === 'running') {
-                    icon.textContent = '◉';
+                    icon.textContent = '→';
                     icon.style.color = '#3b82f6';
-                } else if (status === 'checking') {
-                    icon.textContent = '○';
-                    icon.style.color = '#999';
+                    if (confSpan) {
+                        confSpan.textContent = '';
+                    }
+                } else {
+                    icon.textContent = '•';
+                    icon.style.color = '#888';
                 }
             }
         }
@@ -1885,7 +1892,7 @@
                 addConsoleLog('⚖️ STEP 3: Law library validation (REAL APIs)...', 'step');
                 
                 // Check for real law library data from the comprehensive workflow
-                const lawLibraryData = result.data?.lawLibrarySources || result.data?.workflowDetails?.lawLibrarySources;
+                const lawLibraryData = result.data?.lawLibrarySources || result.data?.realApiResults?.lawLibraries;
                 
                 await new Promise(resolve => setTimeout(resolve, 400));
                 
@@ -1924,7 +1931,7 @@
                 await new Promise(resolve => setTimeout(resolve, 400));
                 
                 // Cornell LII (REAL)
-                const cornellData = result.data?.academicSources?.cornellLII;
+                const cornellData = result.data?.realApiResults?.academic?.cornellLII || result.data?.academicSources?.cornellLII;
                 if (cornellData) {
                     if (cornellData.status === 'fetched' && cornellData.confidence > 0) {
                         addConsoleLog(`   ⚖️ Cornell LII: ${cornellData.confidence}% confidence (REAL API)`, 'success');

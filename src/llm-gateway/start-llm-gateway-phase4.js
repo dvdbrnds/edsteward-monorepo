@@ -564,8 +564,10 @@ class EnhancedLLMGateway {
               realApiResults: {
                 government: govSources,
                 academic: academicSources,
-                legalResearch: crossRefResult.legalResearchSources
+                legalResearch: crossRefResult.legalResearchSources,
+                lawLibraries: crossRefResult.lawLibrarySources
               },
+              lawLibrarySources: crossRefResult.lawLibrarySources,
               summary: `REAL cross-reference v2.0 completed for ${crossRefResult.regulationName || title}. Government: ${govSources.overall.sourcesFetched}/${govSources.overall.sourcesChecked} sources. Academic: ${academicSources.overall.sourcesFetched}/${academicSources.overall.sourcesChecked} sources. Overall confidence: ${crossRefResult.summary.averageConfidence}%. Certainty: ${crossRefResult.summary.certaintyLevel}. NO MOCK DATA.`
             }
           });
