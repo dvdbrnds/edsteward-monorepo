@@ -1658,35 +1658,34 @@
             statusText.textContent = status.toUpperCase();
         }
         
+        function updateSubstep(id, status, confidence) {
+            const substep = document.getElementById('substep-' + id);
+            if (substep) {
+                const icon = substep.querySelector('.substep-icon');
+                const text = substep.querySelector('span:last-child');
+                if (status === 'completed' && confidence > 0) {
+                    icon.textContent = '✓';
+                    icon.style.color = '#22c55e';
+                    if (!text.textContent.includes('%')) {
+                        text.textContent += ' (' + confidence + '%)';
+                    }
+                } else if (status === 'running') {
+                    icon.textContent = '◉';
+                    icon.style.color = '#3b82f6';
+                } else if (status === 'checking') {
+                    icon.textContent = '○';
+                    icon.style.color = '#999';
+                }
+            }
+        }
+        
         function updateStepStatus(stepNum, status) {
             const step = document.getElementById(`step${stepNum}`);
             if (step) {
                 step.className = `step-item ${status}`;
                 if (status === 'running') {
                     step.querySelector('.step-icon').textContent = '●';
-                }
-
-                function updateSubstep(id, status, confidence) {
-                    const substep = document.getElementById('substep-' + id);
-                    if (substep) {
-                        const icon = substep.querySelector('.substep-icon');
-                        const text = substep.querySelector('span:last-child');
-                        if (status === 'completed' && confidence > 0) {
-                            icon.textContent = '✓';
-                            icon.style.color = '#22c55e';
-                            if (!text.textContent.includes('%')) {
-                                text.textContent += ' (' + confidence + '%)';
-                            }
-                        } else if (status === 'running') {
-                            icon.textContent = '◉';
-                            icon.style.color = '#3b82f6';
-                        } else if (status === 'checking') {
-                            icon.textContent = '○';
-                            icon.style.color = '#999';
-                        }
-                    }
-                }
- else if (status === 'completed') {
+                } else if (status === 'completed') {
                     step.querySelector('.step-icon').textContent = '✓';
                 } else if (status === 'error') {
                     step.querySelector('.step-icon').textContent = '✗';
@@ -1895,14 +1894,14 @@
                     const harvard = lawLibraryData.harvardCaselawAccessProject;
                     if (harvard.status === 'fetched' && harvard.confidence > 0) {
                         addConsoleLog(`   📚 Harvard Caselaw Access Project: ${harvard.confidence}% confidence (REAL API)`, 'success');
-                updateSubstep('harvard', 'completed', harvard.confidence);
+                        updateSubstep('harvard', 'completed', harvard.confidence);
                         addConsoleLog(`      └─ ${harvard.data?.totalCases || 0} cases found, ${harvard.data?.coverage || 'US court cases'}`, 'debug');
                     } else {
                         addConsoleLog(`   📚 Harvard CAP: ${harvard.status || 'checking'}...`, 'info');
                     }
                 } else {
                     addConsoleLog('   📚 Harvard Caselaw Access Project: Checking...', 'info');
-                updateSubstep('harvard', 'running', 0);
+                    updateSubstep('harvard', 'running', 0);
                 }
                 
                 await new Promise(resolve => setTimeout(resolve, 400));
@@ -1912,14 +1911,14 @@
                     const cl = lawLibraryData.courtListener;
                     if (cl.status === 'fetched' && cl.confidence > 0) {
                         addConsoleLog(`   🏛️ CourtListener (Free Law Project): ${cl.confidence}% confidence (REAL API)`, 'success');
-                updateSubstep('courtlistener', 'completed', cl.confidence);
+                        updateSubstep('courtlistener', 'completed', cl.confidence);
                         addConsoleLog(`      └─ ${cl.data?.totalOpinions || 0} opinions found`, 'debug');
                     } else {
                         addConsoleLog(`   🏛️ CourtListener: ${cl.status || 'checking'}...`, 'info');
                     }
                 } else {
                     addConsoleLog('   🏛️ CourtListener (Free Law Project): Checking...', 'info');
-                updateSubstep('courtlistener', 'running', 0);
+                    updateSubstep('courtlistener', 'running', 0);
                 }
                 
                 await new Promise(resolve => setTimeout(resolve, 400));
@@ -1929,14 +1928,14 @@
                 if (cornellData) {
                     if (cornellData.status === 'fetched' && cornellData.confidence > 0) {
                         addConsoleLog(`   ⚖️ Cornell LII: ${cornellData.confidence}% confidence (REAL API)`, 'success');
-                updateSubstep('cornell', 'completed', cornellData.confidence);
+                        updateSubstep('cornell', 'completed', cornellData.confidence);
                         addConsoleLog(`      └─ ${cornellData.data?.citation || 'USC citation verified'}`, 'debug');
                     } else {
                         addConsoleLog(`   ⚖️ Cornell LII: ${cornellData.status || 'checking'}...`, 'info');
                     }
                 } else {
                     addConsoleLog('   ⚖️ Cornell Legal Information Institute: Checking...', 'info');
-                updateSubstep('cornell', 'running', 0);
+                    updateSubstep('cornell', 'running', 0);
                 }
                 
                 await new Promise(resolve => setTimeout(resolve, 400));
@@ -1946,13 +1945,13 @@
                     const justia = lawLibraryData.justia;
                     if ((justia.status === 'fetched' || justia.status === 'available') && justia.confidence > 0) {
                         addConsoleLog(`   📖 Justia Legal: ${justia.confidence}% confidence (REAL)`, 'success');
-                updateSubstep('justia', 'completed', justia.confidence);
+                        updateSubstep('justia', 'completed', justia.confidence);
                     } else {
                         addConsoleLog(`   📖 Justia: ${justia.status || 'checking'}...`, 'info');
                     }
                 } else {
                     addConsoleLog('   📖 Justia Legal Resources: Checking...', 'info');
-                updateSubstep('justia', 'running', 0);
+                    updateSubstep('justia', 'running', 0);
                 }
                 
                 await new Promise(resolve => setTimeout(resolve, 300));
