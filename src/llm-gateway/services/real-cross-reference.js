@@ -380,68 +380,93 @@ async function fetchCornellLII(uscTitle, uscSection) {
 
 /**
  * Caselaw Access Project (Harvard Law School)
- * REAL API: https://case.law/api/
- * FREE: 6.5 million US court cases, no API key required for basic access
+ * NOTE: API deprecated in 2024 - now requires registration
+ * Data available at: https://case.law/ (bulk download requires account)
  */
 async function fetchCaselawAccessProject(searchTerm) {
-  console.log(`\n[Harvard CAP] ⚖️ Searching Caselaw Access Project for "${searchTerm}"...`);
+  console.log(`\n[Harvard CAP] ⚖️ Harvard Caselaw Access Project...`);
+  console.log(`   ⚠️ API deprecated - registration required at case.law`);
   
-  const encodedTerm = encodeURIComponent(searchTerm);
-  const url = `https://api.case.law/v1/cases/?search=${encodedTerm}&page_size=5`;
-  const result = await fetchWithTimeout(url);
+  // Check if API key is configured
+  const apiKey = process.env.HARVARD_CAP_API_KEY;
   
-  let cases = [];
-  let totalCount = 0;
-  
-  if (result.success && result.data) {
-    totalCount = result.data.count || 0;
-    cases = (result.data.results || []).slice(0, 5).map(c => ({
-      name: c.name_abbreviation || c.name,
-      citation: c.citations?.[0]?.cite || 'Unknown',
-      court: c.court?.name || 'Unknown Court',
-      decisionDate: c.decision_date,
-      jurisdiction: c.jurisdiction?.name || 'Unknown',
-      url: c.frontend_url
-    }));
-  }
-  
-  // Calculate confidence based on results
-  let confidence = 0;
-  if (result.success && totalCount > 0) {
-    confidence = Math.min(94, 70 + Math.min(totalCount / 10, 24));
+  if (apiKey) {
+    const encodedTerm = encodeURIComponent(searchTerm);
+    const url = `https://api.case.law/v1/cases/?search=${encodedTerm}&page_size=5`;
+    const result = await fetchWithTimeout(url, { 
+      headers: { 'Authorization': `Token ${apiKey}` }
+    });
+    
+    if (result.success && result.data?.count > 0) {
+      return {
+        source: 'Caselaw Access Project (Harvard Law School)',
+        type: 'law_library',
+        institution: 'Harvard Law School',
+        status: 'fetched',
+        confidence: Math.min(94, 70 + Math.min(result.data.count / 10, 24)),
+        url: url,
+        duration: `${result.duration}ms`,
+        timestamp: new Date().toISOString(),
+        isReal: true,
+        data: { totalCases: result.data.count, coverage: '6.5M US cases' },
+        error: null
+      };
+    }
   }
   
   return {
     source: 'Caselaw Access Project (Harvard Law School)',
     type: 'law_library',
     institution: 'Harvard Law School',
-    status: result.success && totalCount > 0 ? 'fetched' : (result.success ? 'no_results' : 'unavailable'),
-    confidence: confidence,
-    url: url,
-    duration: `${result.duration}ms`,
+    status: 'requires_api_key',
+    confidence: 0,
+    url: 'https://case.law/',
+    duration: '0ms',
     timestamp: new Date().toISOString(),
     isReal: true,
-    data: result.success ? {
-      totalCases: totalCount,
-      cases: cases,
-      coverage: '6.5 million US court cases (1658-present)',
-      openAccess: true
-    } : null,
-    error: result.error || null
+    data: null,
+    error: 'API requires registration - set HARVARD_CAP_API_KEY env var',
+    signupUrl: 'https://case.law/user/register/'
   };
 }
 
 /**
  * CourtListener (Free Law Project)
  * REAL API: https://www.courtlistener.com/api/rest/v4/
- * FREE: American court opinions, oral arguments
+ * NOTE: Now requires API key - free registration at courtlistener.com
  */
 async function fetchCourtListener(searchTerm) {
   console.log(`\n[CourtListener] 🏛️ Searching CourtListener for "${searchTerm}"...`);
   
+  const apiKey = process.env.COURTLISTENER_API_KEY;
   const encodedTerm = encodeURIComponent(searchTerm);
   const url = `https://www.courtlistener.com/api/rest/v4/search/?q=${encodedTerm}&type=o&page_size=5`;
-  const result = await fetchWithTimeout(url);
+  
+  const headers = {};
+  if (apiKey) {
+    headers['Authorization'] = `Token ${apiKey}`;
+  }
+  
+  const result = await fetchWithTimeout(url, { headers });
+  
+  // Check if auth error
+  if (!result.success && result.data?.detail?.includes('Authentication')) {
+    console.log('   ⚠️ CourtListener requires API key');
+    return {
+      source: 'CourtListener (Free Law Project)',
+      type: 'law_library',
+      institution: 'Free Law Project',
+      status: 'requires_api_key',
+      confidence: 0,
+      url: url,
+      duration: `${result.duration}ms`,
+      timestamp: new Date().toISOString(),
+      isReal: true,
+      data: null,
+      error: 'API requires authentication - set COURTLISTENER_API_KEY env var',
+      signupUrl: 'https://www.courtlistener.com/sign-in/'
+    };
+  }
   
   let opinions = [];
   let totalCount = 0;
@@ -509,32 +534,31 @@ async function fetchGoogleScholarCases(searchTerm) {
 
 /**
  * Justia (Free Case Law)
- * Note: Basic search without API key
+ * NOTE: No public API - web-only access, blocks programmatic requests
  */
 async function fetchJustia(searchTerm) {
-  console.log(`\n[Justia] ⚖️ Searching Justia for "${searchTerm}"...`);
+  console.log(`\n[Justia] ⚖️ Justia Legal Resources...`);
+  console.log(`   ⚠️ No public API - web search only`);
   
-  // Justia's search is primarily web-based, check if page exists
-  const encodedTerm = encodeURIComponent(searchTerm.toLowerCase().replace(/ /g, '-'));
-  const url = `https://law.justia.com/codes/us/`;
-  const result = await fetchWithTimeout(url);
+  // Justia blocks programmatic access (403), mark as web-only
+  const searchUrl = `https://www.justia.com/search?q=${encodeURIComponent(searchTerm)}`;
   
   return {
     source: 'Justia (Free Legal Information)',
     type: 'law_library',
     institution: 'Justia',
-    status: result.success ? 'available' : 'unavailable',
-    confidence: result.success ? 75 : 0,
-    url: url,
-    duration: `${result.duration}ms`,
+    status: 'web_only',
+    confidence: 0,
+    url: searchUrl,
+    duration: '0ms',
     timestamp: new Date().toISOString(),
     isReal: true,
-    data: result.success ? {
+    data: {
       coverage: 'US Code, CFR, State Laws, Case Law',
-      searchUrl: `https://www.justia.com/search?q=${encodeURIComponent(searchTerm)}`,
+      searchUrl: searchUrl,
       freeAccess: true
-    } : null,
-    error: result.error || null
+    },
+    error: 'No public API - web search only'
   };
 }
 

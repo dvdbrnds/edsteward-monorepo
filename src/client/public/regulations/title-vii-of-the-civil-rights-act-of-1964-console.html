@@ -1662,7 +1662,7 @@
             statusText.textContent = status.toUpperCase();
         }
         
-        function updateSubstep(id, status, confidence) {
+        function updateSubstep(id, status, confidence, errorMsg) {
             const substep = document.getElementById('substep-' + id);
             const confSpan = document.getElementById('conf-' + id);
             if (substep) {
@@ -1685,6 +1685,30 @@
                     icon.style.height = '8px';
                     if (confSpan) {
                         confSpan.textContent = '';
+                    }
+                } else if (status === 'requires_key') {
+                    icon.textContent = '🔑';
+                    icon.style.background = 'transparent';
+                    icon.style.color = '#f59e0b';
+                    icon.style.fontSize = '10px';
+                    icon.style.width = 'auto';
+                    icon.style.height = 'auto';
+                    if (confSpan) {
+                        confSpan.textContent = '(key needed)';
+                        confSpan.style.color = '#f59e0b';
+                        confSpan.style.fontSize = '0.85em';
+                    }
+                } else if (status === 'web_only') {
+                    icon.textContent = '🌐';
+                    icon.style.background = 'transparent';
+                    icon.style.color = '#6b7280';
+                    icon.style.fontSize = '10px';
+                    icon.style.width = 'auto';
+                    icon.style.height = 'auto';
+                    if (confSpan) {
+                        confSpan.textContent = '(web only)';
+                        confSpan.style.color = '#6b7280';
+                        confSpan.style.fontSize = '0.85em';
                     }
                 } else {
                     icon.textContent = '';
@@ -1905,19 +1929,22 @@
                 
                 await new Promise(resolve => setTimeout(resolve, 400));
                 
-                // Harvard Caselaw Access Project (REAL)
+                // Harvard Caselaw Access Project
                 if (lawLibraryData?.harvardCaselawAccessProject) {
                     const harvard = lawLibraryData.harvardCaselawAccessProject;
                     if (harvard.status === 'fetched' && harvard.confidence > 0) {
-                        addConsoleLog(`   📚 Harvard Caselaw Access Project: ${harvard.confidence}% confidence (REAL API)`, 'success');
+                        addConsoleLog(`   📚 Harvard CAP: ${harvard.confidence}% confidence (REAL)`, 'success');
                         updateSubstep('harvard', 'completed', harvard.confidence);
-                        addConsoleLog(`      └─ ${harvard.data?.totalCases || 0} cases found, ${harvard.data?.coverage || 'US court cases'}`, 'debug');
+                    } else if (harvard.status === 'requires_api_key') {
+                        addConsoleLog('   📚 Harvard CAP: API key required (free registration)', 'warning');
+                        updateSubstep('harvard', 'requires_key', 0);
                     } else {
-                        addConsoleLog(`   📚 Harvard CAP: ${harvard.status || 'checking'}...`, 'info');
+                        addConsoleLog(`   📚 Harvard CAP: ${harvard.status || 'unavailable'}`, 'info');
+                        updateSubstep('harvard', 'pending', 0);
                     }
                 } else {
-                    addConsoleLog('   📚 Harvard Caselaw Access Project: Checking...', 'info');
-                    updateSubstep('harvard', 'running', 0);
+                    addConsoleLog('   📚 Harvard CAP: Not configured', 'info');
+                    updateSubstep('harvard', 'pending', 0);
                 }
                 
                 await new Promise(resolve => setTimeout(resolve, 400));
@@ -1956,18 +1983,22 @@
                 
                 await new Promise(resolve => setTimeout(resolve, 400));
                 
-                // Justia (REAL)
+                // Justia (Web Only - No API)
                 if (lawLibraryData?.justia) {
                     const justia = lawLibraryData.justia;
-                    if ((justia.status === 'fetched' || justia.status === 'available') && justia.confidence > 0) {
-                        addConsoleLog(`   📖 Justia Legal: ${justia.confidence}% confidence (REAL)`, 'success');
+                    if (justia.status === 'fetched' && justia.confidence > 0) {
+                        addConsoleLog(`   📖 Justia: ${justia.confidence}% confidence`, 'success');
                         updateSubstep('justia', 'completed', justia.confidence);
+                    } else if (justia.status === 'web_only') {
+                        addConsoleLog('   📖 Justia: Web search only (no API)', 'info');
+                        updateSubstep('justia', 'web_only', 0);
                     } else {
-                        addConsoleLog(`   📖 Justia: ${justia.status || 'checking'}...`, 'info');
+                        addConsoleLog(`   📖 Justia: ${justia.status || 'unavailable'}`, 'info');
+                        updateSubstep('justia', 'pending', 0);
                     }
                 } else {
-                    addConsoleLog('   📖 Justia Legal Resources: Checking...', 'info');
-                    updateSubstep('justia', 'running', 0);
+                    addConsoleLog('   📖 Justia: Not available', 'info');
+                    updateSubstep('justia', 'pending', 0);
                 }
                 
                 await new Promise(resolve => setTimeout(resolve, 300));
