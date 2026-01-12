@@ -1504,25 +1504,25 @@
                     <span class="step-icon">○</span>
                         <span>University Law Libraries</span>
                     </div>
-                    <div class="step-substeps" style="margin-left: 24px; font-size: 0.82em; color: #555; margin-top: 4px;">
-                        <div class="substep" id="substep-harvard" style="display: flex; align-items: center; gap: 8px; padding: 3px 0;">
-                            <span class="substep-icon" style="color: #888;">•</span>
-                            <span class="substep-name">Harvard CAP</span>
+                    <div class="step-substeps" style="margin-left: 28px; font-size: 0.85em; color: #666; margin-top: 6px; line-height: 1.8;">
+                        <div class="substep" id="substep-harvard" style="display: flex; align-items: center; gap: 10px;">
+                            <span class="substep-icon" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0;"></span>
+                            <span class="substep-name" style="flex: 1;">Harvard CAP</span>
                             <span class="substep-confidence" id="conf-harvard" style="color: #22c55e; font-weight: 500;"></span>
                         </div>
-                        <div class="substep" id="substep-courtlistener" style="display: flex; align-items: center; gap: 8px; padding: 3px 0;">
-                            <span class="substep-icon" style="color: #888;">•</span>
-                            <span class="substep-name">CourtListener</span>
+                        <div class="substep" id="substep-courtlistener" style="display: flex; align-items: center; gap: 10px;">
+                            <span class="substep-icon" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0;"></span>
+                            <span class="substep-name" style="flex: 1;">CourtListener</span>
                             <span class="substep-confidence" id="conf-courtlistener" style="color: #22c55e; font-weight: 500;"></span>
                         </div>
-                        <div class="substep" id="substep-cornell" style="display: flex; align-items: center; gap: 8px; padding: 3px 0;">
-                            <span class="substep-icon" style="color: #888;">•</span>
-                            <span class="substep-name">Cornell LII</span>
+                        <div class="substep" id="substep-cornell" style="display: flex; align-items: center; gap: 10px;">
+                            <span class="substep-icon" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0;"></span>
+                            <span class="substep-name" style="flex: 1;">Cornell LII</span>
                             <span class="substep-confidence" id="conf-cornell" style="color: #22c55e; font-weight: 500;"></span>
                         </div>
-                        <div class="substep" id="substep-justia" style="display: flex; align-items: center; gap: 8px; padding: 3px 0;">
-                            <span class="substep-icon" style="color: #888;">•</span>
-                            <span class="substep-name">Justia</span>
+                        <div class="substep" id="substep-justia" style="display: flex; align-items: center; gap: 10px;">
+                            <span class="substep-icon" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0;"></span>
+                            <span class="substep-name" style="flex: 1;">Justia</span>
                             <span class="substep-confidence" id="conf-justia" style="color: #22c55e; font-weight: 500;"></span>
                         </div>
                     </div>
@@ -1672,19 +1672,28 @@
                 const icon = substep.querySelector('.substep-icon');
                 if (status === 'completed' && confidence > 0) {
                     icon.textContent = '✓';
+                    icon.style.background = 'transparent';
                     icon.style.color = '#22c55e';
+                    icon.style.fontSize = '14px';
+                    icon.style.fontWeight = 'bold';
+                    icon.style.width = 'auto';
+                    icon.style.height = 'auto';
                     if (confSpan) {
                         confSpan.textContent = '(' + confidence + '%)';
                     }
                 } else if (status === 'running') {
-                    icon.textContent = '→';
-                    icon.style.color = '#3b82f6';
+                    icon.textContent = '';
+                    icon.style.background = '#3b82f6';
+                    icon.style.width = '8px';
+                    icon.style.height = '8px';
                     if (confSpan) {
                         confSpan.textContent = '';
                     }
                 } else {
-                    icon.textContent = '•';
-                    icon.style.color = '#888';
+                    icon.textContent = '';
+                    icon.style.background = '#ccc';
+                    icon.style.width = '8px';
+                    icon.style.height = '8px';
                 }
             }
         }
