@@ -16,7 +16,7 @@
         "description": "Individuals have the right to have their personal data erased"
       }
     ],
-    "updatedAt": "2026-01-07T13:24:17.624Z"
+    "updatedAt": "2026-01-12T19:17:28.403Z"
   },
   {
     "regulationId": "hipaa-1996",
@@ -35,7 +35,7 @@
         "description": "Sets standards for securing patient data"
       }
     ],
-    "updatedAt": "2026-01-07T13:24:17.624Z"
+    "updatedAt": "2026-01-12T19:17:28.404Z"
   },
   {
     "regulationId": "ccpa-2018",
@@ -54,7 +54,7 @@
         "description": "Consumers have the right to request deletion of personal information"
       }
     ],
-    "updatedAt": "2026-01-07T13:24:17.624Z"
+    "updatedAt": "2026-01-12T19:17:28.404Z"
   },
   {
     "regulationId": "reg-66",
