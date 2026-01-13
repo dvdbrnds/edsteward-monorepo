@@ -257,6 +257,51 @@ class DeliveryServer {
       }
     });
 
+    // Send regulation to EdSteward - DEMO BUTTON ENDPOINT
+    this.app.post('/api/send-to-edsteward', async (req, res) => {
+      const { regulationId, regulationSlug, name, edstewardId } = req.body;
+      
+      console.log('📤 [DEMO] Sending regulation to EdSteward:', regulationSlug || regulationId);
+      
+      const payload = {
+        regulationId: edstewardId || 9,
+        name: name || 'Clery Act',
+        originalContent: '',
+        updatedContent: `[UPDATED ${new Date().toLocaleDateString()}] MCP Engine detected regulation changes - Update from real-time monitoring system.`,
+        status: 'pending',
+        summary: 'Regulation update delivered by MCP Engine real-time monitoring',
+        metadata: {
+          source: 'MCP_ENGINE_CONSOLE_DEMO',
+          timestamp: new Date().toISOString(),
+          mcpEngineId: regulationSlug || regulationId
+        }
+      };
+      
+      try {
+        const response = await fetch('https://moravian.edsteward.ai/api/regulation-updates', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Basic ' + Buffer.from('dvdbrnds:gabadh').toString('base64')
+          },
+          body: JSON.stringify(payload)
+        });
+        
+        const result = await response.json();
+        
+        if (response.ok) {
+          console.log('✅ [DEMO] Successfully sent to EdSteward');
+          res.json({ success: true, edstewardId: edstewardId || 9, result });
+        } else {
+          console.log('❌ [DEMO] EdSteward error:', result);
+          res.status(response.status).json({ success: false, error: result });
+        }
+      } catch (error) {
+        console.error('❌ [DEMO] Error sending to EdSteward:', error.message);
+        res.status(500).json({ success: false, error: error.message });
+      }
+    });
+
     // Simulate regulation change (for testing)
     this.app.post('/api/simulate-change/:regulationId', async (req, res) => {
       const { regulationId } = req.params;

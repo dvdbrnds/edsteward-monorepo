@@ -1438,6 +1438,9 @@
                 <button id="pushUpdateButton" onclick="pushRegulationUpdate()" class="run-button" style="background: #059669; margin-left: 12px; font-size: 12px;">
                     📤 PUSH UPDATE TO CLIENTS
                 </button>
+                <button id="sendToEdstewardBtn" onclick="sendToEdSteward()" class="run-button" style="background: #2563eb; margin-left: 12px; font-size: 12px;">
+                    📤 SEND TO EDSTEWARD
+                </button>
                 
             </div>
             
@@ -2325,6 +2328,64 @@
                 button.disabled = false;
             }
         }
+
+        // Send regulation update to EdSteward via delivery system proxy
+        async function sendToEdSteward() {
+            const button = document.getElementById('sendToEdstewardBtn');
+            if (!button) return;
+            
+            const originalText = button.textContent;
+            button.textContent = '📤 SENDING...';
+            button.style.background = '#f59e0b';
+            button.disabled = true;
+            
+            try {
+                addConsoleLog('📤 Sending Clery Act update to EdSteward...', 'info');
+                
+                // Use delivery system proxy to avoid CORS
+                const response = await fetch('http://localhost:3051/api/send-to-edsteward', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        regulationId: 9,
+                        regulationSlug: 'clery-act',
+                        name: 'Jeanne Clery Disclosure of Campus Security Policy',
+                        edstewardId: 9
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    addConsoleLog('✅ Successfully sent to EdSteward!', 'success');
+                    addConsoleLog('📋 Regulation ID: 9 (Clery Act) | Status: Pending CCO Review', 'info');
+                    button.textContent = '✅ SENT!';
+                    button.style.background = '#059669';
+                    setTimeout(() => {
+                        button.textContent = originalText;
+                        button.style.background = '#2563eb';
+                        button.disabled = false;
+                    }, 3000);
+                } else {
+                    addConsoleLog('❌ EdSteward error: ' + (result.error || 'Unknown error'), 'error');
+                    button.textContent = '❌ FAILED';
+                    button.style.background = '#dc2626';
+                    setTimeout(() => {
+                        button.textContent = originalText;
+                        button.style.background = '#2563eb';
+                        button.disabled = false;
+                    }, 3000);
+                }
+            } catch (error) {
+                addConsoleLog('❌ Error: ' + error.message, 'error');
+                button.textContent = originalText;
+                button.style.background = '#2563eb';
+                button.disabled = false;
+            }
+        }
+
         
         // Initialize diagnostics and regulation status
         setTimeout(() => {
