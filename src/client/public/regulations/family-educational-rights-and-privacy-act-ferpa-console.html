@@ -1505,11 +1505,6 @@
                         <span>University Law Libraries</span>
                     </div>
                     <div class="step-substeps" style="margin-left: 28px; font-size: 0.85em; color: #666; margin-top: 6px; line-height: 1.8;">
-                        <div class="substep" id="substep-harvard" style="display: flex; align-items: center; gap: 10px;">
-                            <span class="substep-icon" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0;"></span>
-                            <span class="substep-name" style="flex: 1;">Harvard CAP</span>
-                            <span class="substep-confidence" id="conf-harvard" style="color: #22c55e; font-weight: 500;"></span>
-                        </div>
                         <div class="substep" id="substep-courtlistener" style="display: flex; align-items: center; gap: 10px;">
                             <span class="substep-icon" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0;"></span>
                             <span class="substep-name" style="flex: 1;">CourtListener</span>
@@ -1929,26 +1924,6 @@
                 
                 // Check for real law library data from the comprehensive workflow
                 const lawLibraryData = result.data?.lawLibrarySources || result.data?.realApiResults?.lawLibraries;
-                
-                await new Promise(resolve => setTimeout(resolve, 400));
-                
-                // Harvard Caselaw Access Project
-                if (lawLibraryData?.harvardCaselawAccessProject) {
-                    const harvard = lawLibraryData.harvardCaselawAccessProject;
-                    if (harvard.status === 'fetched' && harvard.confidence > 0) {
-                        addConsoleLog(`   📚 Harvard CAP: ${harvard.confidence}% confidence (REAL)`, 'success');
-                        updateSubstep('harvard', 'completed', harvard.confidence);
-                    } else if (harvard.status === 'requires_api_key') {
-                        addConsoleLog('   📚 Harvard CAP: API key required (free registration)', 'warning');
-                        updateSubstep('harvard', 'requires_key', 0);
-                    } else {
-                        addConsoleLog(`   📚 Harvard CAP: ${harvard.status || 'unavailable'}`, 'info');
-                        updateSubstep('harvard', 'pending', 0);
-                    }
-                } else {
-                    addConsoleLog('   📚 Harvard CAP: Not configured', 'info');
-                    updateSubstep('harvard', 'pending', 0);
-                }
                 
                 await new Promise(resolve => setTimeout(resolve, 400));
                 

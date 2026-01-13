@@ -378,57 +378,9 @@ async function fetchCornellLII(uscTitle, uscSection) {
 // LAW LIBRARY API INTEGRATIONS - ALL REAL
 // ============================================================================
 
-/**
- * Caselaw Access Project (Harvard Law School)
- * NOTE: API deprecated in 2024 - now requires registration
- * Data available at: https://case.law/ (bulk download requires account)
- */
-async function fetchCaselawAccessProject(searchTerm) {
-  console.log(`\n[Harvard CAP] ⚖️ Harvard Caselaw Access Project...`);
-  console.log(`   ⚠️ API deprecated - registration required at case.law`);
-  
-  // Check if API key is configured
-  const apiKey = process.env.HARVARD_CAP_API_KEY;
-  
-  if (apiKey) {
-    const encodedTerm = encodeURIComponent(searchTerm);
-    const url = `https://api.case.law/v1/cases/?search=${encodedTerm}&page_size=5`;
-    const result = await fetchWithTimeout(url, { 
-      headers: { 'Authorization': `Token ${apiKey}` }
-    });
-    
-    if (result.success && result.data?.count > 0) {
-      return {
-        source: 'Caselaw Access Project (Harvard Law School)',
-        type: 'law_library',
-        institution: 'Harvard Law School',
-        status: 'fetched',
-        confidence: Math.min(94, 70 + Math.min(result.data.count / 10, 24)),
-        url: url,
-        duration: `${result.duration}ms`,
-        timestamp: new Date().toISOString(),
-        isReal: true,
-        data: { totalCases: result.data.count, coverage: '6.5M US cases' },
-        error: null
-      };
-    }
-  }
-  
-  return {
-    source: 'Caselaw Access Project (Harvard Law School)',
-    type: 'law_library',
-    institution: 'Harvard Law School',
-    status: 'requires_api_key',
-    confidence: 0,
-    url: 'https://case.law/',
-    duration: '0ms',
-    timestamp: new Date().toISOString(),
-    isReal: true,
-    data: null,
-    error: 'API requires registration - set HARVARD_CAP_API_KEY env var',
-    signupUrl: 'https://case.law/user/register/'
-  };
-}
+// NOTE: Harvard CAP (Caselaw Access Project) has been DEPRECATED
+// CourtListener now provides equivalent functionality with better coverage
+// See: fetchCourtListener() below
 
 /**
  * CourtListener (Free Law Project)
@@ -935,8 +887,7 @@ export async function performRealCrossReference(regulationSlug) {
     openAlexResult,
     semanticScholarResult,
     lexisNexisResult,
-    // NEW: Real Law Library APIs
-    harvardCapResult,
+    // Law Library APIs (CourtListener replaced Harvard CAP)
     courtListenerResult,
     justiaResult
   ] = await Promise.all([
@@ -950,8 +901,7 @@ export async function performRealCrossReference(regulationSlug) {
     fetchOpenAlex(citation.searchTerms[0]),
     fetchSemanticScholar(citation.searchTerms[0]),
     fetchLexisNexis(citation.searchTerms[0]),
-    // NEW: Real Law Library APIs
-    fetchCaselawAccessProject(citation.searchTerms[0]),
+    // Law Library APIs (CourtListener replaced Harvard CAP)
     fetchCourtListener(citation.searchTerms[0]),
     fetchJustia(citation.searchTerms[0])
   ]);
@@ -961,7 +911,7 @@ export async function performRealCrossReference(regulationSlug) {
   // Organize results by category
   const governmentSources = [ecfrResult, federalRegResult, congressResult, govInfoResult, locResult];
   const academicSources = [cornellResult, coreResult, openAlexResult, semanticScholarResult];
-  const lawLibrarySources = [harvardCapResult, courtListenerResult, justiaResult];
+  const lawLibrarySources = [courtListenerResult, justiaResult]; // CourtListener replaced Harvard CAP
   const legalResearchSources = [lexisNexisResult];
   
   const allSources = [...governmentSources, ...academicSources, ...lawLibrarySources, ...legalResearchSources];
@@ -1056,9 +1006,8 @@ export async function performRealCrossReference(regulationSlug) {
         sourcesChecked: lawLibrarySources.length,
         sourcesFetched: lawLibrarySuccess.length,
         averageConfidence: lawLibraryConfidence,
-        note: 'Real law library APIs - Harvard CAP, CourtListener, Justia'
+        note: 'Real law library APIs - CourtListener, Justia (Harvard CAP deprecated)'
       },
-      harvardCaselawAccessProject: harvardCapResult,
       courtListener: courtListenerResult,
       justia: justiaResult
     },
