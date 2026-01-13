@@ -485,6 +485,212 @@ async function fetchGoogleScholarCases(searchTerm) {
 }
 
 /**
+ * RECAP Archive (Free PACER Documents via CourtListener)
+ * REAL API: Uses search endpoint with type=r for RECAP documents
+ * FREE: 200M+ PACER documents that normally cost $0.10/page
+ */
+async function fetchRECAP(searchTerm) {
+  console.log(`\n[RECAP] 📄 Searching RECAP Archive for "${searchTerm}"...`);
+  
+  const apiKey = process.env.COURTLISTENER_API_KEY;
+  const encodedTerm = encodeURIComponent(searchTerm);
+  // Use search endpoint with type=r for RECAP documents
+  const url = `https://www.courtlistener.com/api/rest/v4/search/?q=${encodedTerm}&type=r&page_size=5`;
+  
+  const headers = {};
+  if (apiKey) {
+    headers['Authorization'] = `Token ${apiKey}`;
+  }
+  
+  const result = await fetchWithTimeout(url, { headers });
+  
+  if (!apiKey || (result.status === 401 || result.status === 403)) {
+    return {
+      source: 'RECAP Archive (Free PACER)',
+      type: 'law_library',
+      institution: 'Free Law Project',
+      status: 'requires_api_key',
+      confidence: 0,
+      url: url,
+      duration: `${result.duration}ms`,
+      timestamp: new Date().toISOString(),
+      isReal: true,
+      data: null,
+      error: 'Uses CourtListener API key - set COURTLISTENER_API_KEY'
+    };
+  }
+  
+  let documents = [];
+  let totalCount = 0;
+  
+  if (result.success && result.data) {
+    totalCount = result.data.count || 0;
+    documents = (result.data.results || []).slice(0, 5).map(d => ({
+      caseName: d.caseName || d.case_name,
+      docketNumber: d.docketNumber || d.docket_number,
+      court: d.court,
+      dateFiled: d.dateFiled || d.date_filed,
+      description: d.short_description || d.description
+    }));
+  }
+  
+  let confidence = 0;
+  if (result.success && totalCount > 0) {
+    confidence = Math.min(88, 60 + Math.min(totalCount / 100, 28));
+  }
+  
+  return {
+    source: 'RECAP Archive (Free PACER)',
+    type: 'law_library',
+    institution: 'Free Law Project',
+    status: result.success && totalCount > 0 ? 'fetched' : (result.success ? 'no_results' : 'unavailable'),
+    confidence: confidence,
+    url: url,
+    duration: `${result.duration}ms`,
+    timestamp: new Date().toISOString(),
+    isReal: true,
+    data: result.success ? {
+      totalDocuments: totalCount,
+      documents: documents,
+      coverage: '200M+ PACER documents (free)',
+      savings: 'Normally $0.10/page'
+    } : null,
+    error: result.error || null
+  };
+}
+
+/**
+ * Regulations.gov API
+ * REAL API: Federal regulatory dockets and comments
+ * FREE: Requires API key from api.data.gov
+ */
+async function fetchRegulationsGov(searchTerm) {
+  console.log(`\n[Regulations.gov] 📋 Searching federal dockets for "${searchTerm}"...`);
+  
+  const apiKey = process.env.REGULATIONS_GOV_API_KEY;
+  
+  if (!apiKey) {
+    return {
+      source: 'Regulations.gov (Federal Dockets)',
+      type: 'government',
+      institution: 'US Government',
+      status: 'requires_api_key',
+      confidence: 0,
+      url: 'https://api.regulations.gov/',
+      duration: '0ms',
+      timestamp: new Date().toISOString(),
+      isReal: true,
+      data: null,
+      error: 'Requires free API key - register at api.data.gov',
+      signupUrl: 'https://api.data.gov/signup/'
+    };
+  }
+  
+  const encodedTerm = encodeURIComponent(searchTerm);
+  const url = `https://api.regulations.gov/v4/documents?filter[searchTerm]=${encodedTerm}&page[size]=5&api_key=${apiKey}`;
+  
+  const result = await fetchWithTimeout(url);
+  
+  let documents = [];
+  let totalCount = 0;
+  
+  if (result.success && result.data?.data) {
+    totalCount = result.data.meta?.totalElements || result.data.data.length;
+    documents = result.data.data.slice(0, 5).map(d => ({
+      title: d.attributes?.title,
+      documentType: d.attributes?.documentType,
+      postedDate: d.attributes?.postedDate,
+      agencyId: d.attributes?.agencyId,
+      docketId: d.attributes?.docketId
+    }));
+  }
+  
+  let confidence = 0;
+  if (result.success && totalCount > 0) {
+    confidence = Math.min(90, 65 + Math.min(totalCount / 5, 25));
+  }
+  
+  return {
+    source: 'Regulations.gov (Federal Dockets)',
+    type: 'government',
+    institution: 'US Government',
+    status: result.success && totalCount > 0 ? 'fetched' : (result.success ? 'no_results' : 'unavailable'),
+    confidence: confidence,
+    url: url.replace(apiKey, 'API_KEY'),
+    duration: `${result.duration}ms`,
+    timestamp: new Date().toISOString(),
+    isReal: true,
+    data: result.success ? {
+      totalDocuments: totalCount,
+      documents: documents,
+      coverage: 'Federal regulatory dockets and comments'
+    } : null,
+    error: result.error || null
+  };
+}
+
+/**
+ * USAspending.gov API
+ * REAL API: Federal contracts and grants
+ * FREE: No authentication required
+ */
+async function fetchUSAspending(searchTerm) {
+  console.log(`\n[USAspending] 💰 Searching federal spending for "${searchTerm}"...`);
+  
+  const encodedTerm = encodeURIComponent(searchTerm);
+  const url = `https://api.usaspending.gov/api/v2/search/spending_by_award/?limit=5`;
+  
+  // USAspending requires POST with filters
+  const result = await fetchWithTimeout(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      filters: {
+        keywords: [searchTerm]
+      },
+      limit: 5
+    })
+  });
+  
+  let awards = [];
+  let totalCount = 0;
+  
+  if (result.success && result.data?.results) {
+    totalCount = result.data.page_metadata?.total || result.data.results.length;
+    awards = result.data.results.slice(0, 5).map(a => ({
+      recipientName: a.recipient_name,
+      awardAmount: a.Award_Amount || a.total_obligation,
+      awardType: a.award_type,
+      agency: a.awarding_agency,
+      description: a.description
+    }));
+  }
+  
+  let confidence = 0;
+  if (result.success && totalCount > 0) {
+    confidence = Math.min(85, 55 + Math.min(totalCount / 10, 30));
+  }
+  
+  return {
+    source: 'USAspending.gov (Federal Spending)',
+    type: 'government',
+    institution: 'US Government',
+    status: result.success && totalCount > 0 ? 'fetched' : (result.success ? 'no_results' : 'unavailable'),
+    confidence: confidence,
+    url: 'https://api.usaspending.gov/api/v2/search/',
+    duration: `${result.duration}ms`,
+    timestamp: new Date().toISOString(),
+    isReal: true,
+    data: result.success ? {
+      totalAwards: totalCount,
+      awards: awards,
+      coverage: 'Federal contracts and grants'
+    } : null,
+    error: result.error || null
+  };
+}
+
+/**
  * Justia (Free Case Law)
  * NOTE: No public API - web-only access, blocks programmatic requests
  */
@@ -887,9 +1093,13 @@ export async function performRealCrossReference(regulationSlug) {
     openAlexResult,
     semanticScholarResult,
     lexisNexisResult,
-    // Law Library APIs (CourtListener replaced Harvard CAP)
+    // Law Library APIs
     courtListenerResult,
-    justiaResult
+    recapResult,
+    justiaResult,
+    // Additional Government APIs
+    regulationsGovResult,
+    usaSpendingResult
   ] = await Promise.all([
     fetchECFR(citation.cfr.title, citation.cfr.part),
     fetchFederalRegister(citation.searchTerms[0]),
@@ -901,17 +1111,21 @@ export async function performRealCrossReference(regulationSlug) {
     fetchOpenAlex(citation.searchTerms[0]),
     fetchSemanticScholar(citation.searchTerms[0]),
     fetchLexisNexis(citation.searchTerms[0]),
-    // Law Library APIs (CourtListener replaced Harvard CAP)
+    // Law Library APIs
     fetchCourtListener(citation.searchTerms[0]),
-    fetchJustia(citation.searchTerms[0])
+    fetchRECAP(citation.searchTerms[0]),
+    fetchJustia(citation.searchTerms[0]),
+    // Additional Government APIs
+    fetchRegulationsGov(citation.searchTerms[0]),
+    fetchUSAspending(citation.searchTerms[0])
   ]);
   
   const duration = Date.now() - startTime;
   
   // Organize results by category
-  const governmentSources = [ecfrResult, federalRegResult, congressResult, govInfoResult, locResult];
+  const governmentSources = [ecfrResult, federalRegResult, congressResult, govInfoResult, locResult, regulationsGovResult, usaSpendingResult];
   const academicSources = [cornellResult, coreResult, openAlexResult, semanticScholarResult];
-  const lawLibrarySources = [courtListenerResult, justiaResult]; // CourtListener replaced Harvard CAP
+  const lawLibrarySources = [courtListenerResult, recapResult, justiaResult];
   const legalResearchSources = [lexisNexisResult];
   
   const allSources = [...governmentSources, ...academicSources, ...lawLibrarySources, ...legalResearchSources];
@@ -984,7 +1198,9 @@ export async function performRealCrossReference(regulationSlug) {
       federalRegister: federalRegResult,
       congressGov: congressResult,
       govInfo: govInfoResult,
-      libraryOfCongress: locResult
+      libraryOfCongress: locResult,
+      regulationsGov: regulationsGovResult,
+      usaSpending: usaSpendingResult
     },
     
     // Academic sources (all real)
@@ -1000,15 +1216,16 @@ export async function performRealCrossReference(regulationSlug) {
       semanticScholar: semanticScholarResult
     },
     
-    // Law Library sources (REAL APIs - replacing fake Stanford/Harvard/Yale/Columbia)
+    // Law Library sources (REAL APIs)
     lawLibrarySources: {
       overall: {
         sourcesChecked: lawLibrarySources.length,
         sourcesFetched: lawLibrarySuccess.length,
         averageConfidence: lawLibraryConfidence,
-        note: 'Real law library APIs - CourtListener, Justia (Harvard CAP deprecated)'
+        note: 'Real law library APIs - CourtListener, RECAP, Justia'
       },
       courtListener: courtListenerResult,
+      recap: recapResult,
       justia: justiaResult
     },
     
