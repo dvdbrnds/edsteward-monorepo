@@ -1510,6 +1510,11 @@
                             <span class="substep-name" style="flex: 1;">CourtListener</span>
                             <span class="substep-confidence" id="conf-courtlistener" style="color: #22c55e; font-weight: 500;"></span>
                         </div>
+                        <div class="substep" id="substep-recap" style="display: flex; align-items: center; gap: 10px;">
+                            <span class="substep-icon" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0;"></span>
+                            <span class="substep-name" style="flex: 1;">RECAP Archive</span>
+                            <span class="substep-confidence" id="conf-recap" style="color: #22c55e; font-weight: 500;"></span>
+                        </div>
                         <div class="substep" id="substep-cornell" style="display: flex; align-items: center; gap: 10px;">
                             <span class="substep-icon" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0;"></span>
                             <span class="substep-name" style="flex: 1;">Cornell LII</span>
@@ -1943,6 +1948,22 @@
                 }
                 
                 await new Promise(resolve => setTimeout(resolve, 400));
+                // RECAP Archive (FREE PACER via CourtListener)
+                if (lawLibraryData?.recap) {
+                    const recap = lawLibraryData.recap;
+                    if (recap.status === 'fetched' && recap.confidence > 0) {
+                        addConsoleLog(`   📄 RECAP Archive: ${recap.confidence}% confidence (FREE PACER)`, 'success');
+                        updateSubstep('recap', 'completed', recap.confidence);
+                        addConsoleLog(`      └─ ${recap.data?.totalDocuments || 0} PACER documents found`, 'debug');
+                    } else {
+                        addConsoleLog(`   📄 RECAP Archive: ${recap.status || 'checking'}...`, 'info');
+                        updateSubstep('recap', 'running', 0);
+                    }
+                } else {
+                    addConsoleLog('   📄 RECAP Archive: Checking...', 'info');
+                    updateSubstep('recap', 'running', 0);
+                }
+
                 
                 // Cornell LII (REAL)
                 const cornellData = result.data?.realApiResults?.academic?.cornellLII || result.data?.academicSources?.cornellLII;
