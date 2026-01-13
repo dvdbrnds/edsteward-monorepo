@@ -1255,17 +1255,17 @@
                                         <div class="endpoint-list">
                                             <div class="endpoint-item">
                                                 <span class="method get">GET</span>
-                                                <span class="url">/api/v1/regulations/teach-act</span>
+                                                <span class="url">/api/v1/regulations/higher-education-act-federal-supplemental-educatio</span>
                                                 <span class="description">Current regulation data</span>
                                             </div>
                                             <div class="endpoint-item">
                                                 <span class="method get">GET</span>
-                                                <span class="url">/api/v1/regulations/teach-act/version</span>
+                                                <span class="url">/api/v1/regulations/higher-education-act-federal-supplemental-educatio/version</span>
                                                 <span class="description">Version information</span>
                                             </div>
                                             <div class="endpoint-item">
                                                 <span class="method get">GET</span>
-                                                <span class="url">/api/v1/regulations/teach-act/changes</span>
+                                                <span class="url">/api/v1/regulations/higher-education-act-federal-supplemental-educatio/changes</span>
                                                 <span class="description">Recent changes diff</span>
                                             </div>
                                             <div class="endpoint-item">
@@ -1281,7 +1281,7 @@
                                         <div class="auth-info">
                                             <div class="auth-method">
                                                 <strong>API Key:</strong> 
-                                                <code>X-API-Key: teach_act_[customer_id]_[hash]</code>
+                                                <code>X-API-Key: higher_education_act_federal_supplemental_educatio_[customer_id]_[hash]</code>
                                             </div>
                                             <div class="auth-method">
                                                 <strong>Rate Limit:</strong> 
@@ -2667,7 +2667,7 @@
                     metrics.style.fontSize = '12px';
                     metrics.style.color = '#6e7681';
                     metrics.style.marginTop = '4px';
-                    metrics.textContent = `TEACH refs: ${university.metrics.teachReferences}, Copyright terms: ${university.metrics.copyrightTerms}, Keyword density: ${university.metrics.keywordDensity}%`;
+                    metrics.textContent = `Regulation refs: ${university.metrics.regulationReferences}, Compliance terms: ${university.metrics.complianceTerms}, Keyword density: ${university.metrics.keywordDensity}%`;
                     listItem.appendChild(metrics);
                 }
                 
@@ -3221,7 +3221,7 @@
             try {
                 console.log('📡 Fetching enhanced Regulation data for EdSteward preview...');
                 
-                const response = await fetch('http://localhost:3002/api/llm/cfr/enhanced/teach-act?federal_register=true');
+                const response = await fetch('http://localhost:3002/api/llm/cfr/enhanced/higher-education-act-federal-supplemental-educatio?federal_register=true');
                 const data = await response.json();
                 
                 if (!data.success) {
@@ -3413,7 +3413,7 @@
                 console.log('📡 Fetching complete Federal Register document list via LLM Gateway...');
                 
                 // Use our LLM Gateway endpoint to get all documents with debug info
-                const response = await fetch('http://localhost:3002/api/llm/cfr/enhanced/teach-act?federal_register=true&debug=true&show_all_documents=true');
+                const response = await fetch('http://localhost:3002/api/llm/cfr/enhanced/higher-education-act-federal-supplemental-educatio?federal_register=true&debug=true&show_all_documents=true');
                 const data = await response.json();
                 
                 console.log('📋 Full API response:', data);
