@@ -3,7 +3,7 @@
  * Supports both SAML and username/password without tenant complexity
  */
 
-import { Express, Request, Response } from 'express';
+import { Express, Request, Response, NextFunction } from 'express';
 import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import { Strategy as SamlStrategy } from '@node-saml/passport-saml';
@@ -60,6 +60,12 @@ export function configureAuth(app: Express): void {
       const samlCert = institutionConfig.authentication.samlCertificate;
     }
     
+    // Check if we should disable signature validation (for debugging)
+    const disableSignatureValidation = process.env.SAML_DISABLE_SIGNATURE_VALIDATION === 'true';
+    if (disableSignatureValidation) {
+      console.log('⚠️ SAML signature validation is DISABLED');
+    }
+
     passport.use(new SamlStrategy(
       {
         entryPoint: institutionConfig.authentication.samlSsoUrl!,
@@ -68,9 +74,9 @@ export function configureAuth(app: Express): void {
         // Use fake certificate when flag is set, otherwise use real certificate
         idpCert: useFakeCert ? fakeCert : institutionConfig.authentication.samlCertificate?.trim(),
         signatureAlgorithm: 'sha256',
-        // Enable proper signature validation with OKTA certificate
-        wantAssertionsSigned: true,
-        wantAuthnResponseSigned: true,
+        // Signature validation can be disabled for debugging
+        wantAssertionsSigned: !disableSignatureValidation,
+        wantAuthnResponseSigned: !disableSignatureValidation,
         validateInResponseTo: 'never', // Disable InResponseTo validation
         disableRequestedAuthnContext: true,
         // Request groups attribute in SAML assertion
@@ -269,12 +275,28 @@ function setupAuthRoutes(app: Express): void {
   if (institutionConfig.authentication.samlEnabled) {
     app.get('/auth/saml', passport.authenticate('saml'));
 
-    app.post('/auth/saml/callback',
-      passport.authenticate('saml', { failureRedirect: '/login?error=saml' }),
-      (req: Request, res: Response) => {
-        res.redirect('/');
-      }
-    );
+    app.post('/auth/saml/callback', (req: Request, res: Response, next: NextFunction) => {
+      console.log('🔐 SAML callback received');
+      passport.authenticate('saml', (err: Error | null, user: Express.User | false, info: { message?: string } | undefined) => {
+        if (err) {
+          console.error('🔐 SAML authentication error:', err.message);
+          console.error('🔐 SAML error stack:', err.stack);
+          return res.status(500).json({ error: 'SAML authentication failed', details: err.message });
+        }
+        if (!user) {
+          console.error('🔐 SAML no user returned, info:', info);
+          return res.redirect('/login?error=saml_no_user');
+        }
+        req.logIn(user, (loginErr) => {
+          if (loginErr) {
+            console.error('🔐 SAML login error:', loginErr.message);
+            return res.status(500).json({ error: 'Login failed', details: loginErr.message });
+          }
+          console.log('🔐 SAML login successful for user:', (user as { email?: string }).email);
+          return res.redirect('/');
+        });
+      })(req, res, next);
+    });
 
     app.get('/auth/saml/metadata', (req: Request, res: Response) => {
       res.type('application/xml');

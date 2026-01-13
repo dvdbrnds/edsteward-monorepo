@@ -225,17 +225,26 @@ function RegulationDetailPage() {
   });
 
   // Fetch compliance tasks to determine if accordion should be open
-  const { data: complianceTasks } = useQuery<Array<{ id: number; status: string }>>({
+  // API returns {tasks, totalTasks, completedTasks, progress}
+  const { data: complianceTasksData } = useQuery<{
+    tasks: Array<{ id: number; status: string }>;
+    totalTasks: number;
+    completedTasks: number;
+    progress: number;
+  }>({
     queryKey: ['compliance-tasks', regulationId],
     queryFn: async () => {
       const response = await fetch(`/api/compliance-tasks/regulation/${regulationId}`, {
         credentials: 'include',
       });
-      if (!response.ok) return [];
+      if (!response.ok) return { tasks: [], totalTasks: 0, completedTasks: 0, progress: 0 };
       return response.json();
     },
     enabled: !!regulationId && !!user
   });
+  
+  // Extract tasks array for backward compatibility
+  const complianceTasks = complianceTasksData?.tasks || [];
 
   // Auto-collapse compliance tasks accordion if all tasks are complete
   useEffect(() => {
@@ -855,11 +864,9 @@ function RegulationDetailPage() {
                 HERO SECTION - Compliance Status + Quick Actions
             ═══════════════════════════════════════════════════════════════════ */}
             {(() => {
-              // Calculate task-based compliance (using actual compliance_tasks from database)
-              // Ensure complianceTasks is an array before using array methods
-              const tasksArray = Array.isArray(complianceTasks) ? complianceTasks : [];
-              const totalTasks = tasksArray.length;
-              const completedTasks = tasksArray.filter(t => t.status === 'completed').length;
+              // Use pre-calculated values from the API for accuracy
+              const totalTasks = complianceTasksData?.totalTasks || 0;
+              const completedTasks = complianceTasksData?.completedTasks || 0;
               const hasIncompleteTasks = totalTasks > 0 && completedTasks < totalTasks;
               
               // Calculate deadline-based compliance

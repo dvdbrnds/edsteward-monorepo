@@ -554,7 +554,8 @@ export function setupRegulationUpdatesApi(app: Express) {
       res.json({ success: true });
     } catch (error) {
       console.error('Error accepting regulation update:', error);
-      res.status(500).json({ error: 'Failed to accept regulation update' });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      res.status(500).json({ error: 'Failed to accept regulation update', details: errorMessage });
     }
   });
   

@@ -328,10 +328,20 @@ export class DatabaseStorage implements IStorage {
         updateValues.push(update.summary);
       }
 
-      // Update filing_deadlines field if provided
+      // Update filing_deadlines field if provided (must be valid JSON for JSONB column)
       if (update.filingDeadlines) {
-        updateFields.push(`filing_deadlines = $${paramIndex++}`);
-        updateValues.push(update.filingDeadlines);
+        try {
+          // Try to parse as JSON first
+          const parsedDeadlines = typeof update.filingDeadlines === 'string' 
+            ? JSON.parse(update.filingDeadlines)
+            : update.filingDeadlines;
+          updateFields.push(`filing_deadlines = $${paramIndex++}`);
+          updateValues.push(JSON.stringify(parsedDeadlines));
+        } catch {
+          // If not valid JSON, wrap the text in a JSON object
+          updateFields.push(`filing_deadlines = $${paramIndex++}`);
+          updateValues.push(JSON.stringify({ description: update.filingDeadlines }));
+        }
       }
 
       // Always update last_updated timestamp

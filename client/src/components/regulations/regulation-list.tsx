@@ -268,12 +268,9 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
   const getActionStatus = (action: RegulationAction) => {
     if (!action.enabled) return 'opacity-30';
 
-    // All completed actions use cool green color
+    // All completed actions use bright green - no dimming!
     if (action.status === 'completed') {
-      return cn(
-        'text-emerald-600',
-        !action.required && 'opacity-75' // Slightly dim non-required completed actions
-      );
+      return 'text-emerald-600';
     }
 
     // Non-required incomplete actions use neutral colors
@@ -576,13 +573,13 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
                               key={action.type}
                               className={cn(
                                 "relative flex items-center gap-1 transition-all duration-200",
-                                getActionStatus(action),
-                                action.required ? "scale-110" : "scale-90"
+                                getActionStatus(action)
                               )}
                               title={`${action.type.replace('_', ' ')} ${action.required ? '(Required)' : '(Optional)'} - ${action.status}`}
                             >
                               {getActionIcon(action.type)}
-                              {action.required && (
+                              {/* Show green dot for completed OR red dot for required incomplete */}
+                              {(action.status === 'completed' || action.required) && (
                                 <div className="absolute -top-1 -right-1 flex items-center justify-center">
                                   <div
                                     className={cn(
