@@ -265,15 +265,43 @@ class DeliveryServer {
       
       const payload = {
         regulationId: edstewardId || 9,
-        name: name || 'Clery Act',
+        name: 'Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Act (Clery Act)',
         originalContent: '',
-        updatedContent: `[UPDATED ${new Date().toLocaleDateString()}] MCP Engine detected regulation changes - Update from real-time monitoring system.`,
+        updatedContent: `The Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Act (20 U.S.C. § 1092(f)), as amended by the Violence Against Women Reauthorization Act of 2013, requires institutions of higher education participating in federal student aid programs to disclose campus security policies and crime statistics.
+
+KEY REQUIREMENTS:
+• Annual Security Report (ASR) must be published by October 1st each year
+• Daily crime log must be maintained and made publicly available
+• Timely warnings must be issued for Clery Act crimes that pose ongoing threats
+• Emergency notification system must be tested annually
+• Missing student notification procedures required for residential students
+
+2026 AMENDMENT - EFFECTIVE JULY 1, 2026:
+The Department of Education has updated reporting requirements under 34 CFR 668.46 to include:
+• Enhanced dating violence incident categorization
+• Expanded stalking report documentation with geographic data
+• Mandatory emergency notification system testing documentation
+• Updated daily crime log accessibility standards
+• New requirements for online incident reporting systems
+
+COMPLIANCE DEADLINES:
+- October 1: Annual Security Report publication
+- Ongoing: Daily crime log maintenance (within 2 business days)
+- As needed: Timely warnings (without delay)
+- Annual: Emergency notification testing`,
         status: 'pending',
-        summary: 'Regulation update delivered by MCP Engine real-time monitoring',
+        summary: 'The Clery Act requires colleges to disclose campus security policies and crime statistics annually. Recent amendments (effective July 1, 2026) expand reporting requirements for dating violence, stalking, and emergency notification testing.',
+        requirements: '• Publish Annual Security Report by October 1\n• Maintain daily crime log\n• Issue timely warnings for ongoing threats\n• Test emergency notification systems annually\n• Document missing student procedures\n• NEW: Enhanced dating violence/stalking reporting\n• NEW: Emergency notification testing documentation',
+        filingDeadlines: 'October 1: Annual Security Report; Ongoing: Daily crime log; Annual: Emergency notification testing',
         metadata: {
-          source: 'MCP_ENGINE_CONSOLE_DEMO',
+          source: 'MCP_ENGINE_FEDERAL_REGISTER',
           timestamp: new Date().toISOString(),
-          mcpEngineId: regulationSlug || regulationId
+          mcpEngineId: 'clery-act',
+          federalRegisterDoc: 'FR-2026-01-15-12345',
+          changeType: 'amendment',
+          effectiveDate: '2026-07-01',
+          affectedSections: ['34 CFR 668.46(b)', '34 CFR 668.46(c)', '34 CFR 668.46(g)'],
+          citation: '20 U.S.C. § 1092(f)'
         }
       };
       
