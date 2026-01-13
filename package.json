@@ -30,7 +30,8 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "lint": "eslint src/**/*.js",
     "demo:clery": "node scripts/demo-trigger-clery.js",
-    "demo:ferpa": "node scripts/demo-trigger-ferpa.js"
+    "demo:ferpa": "node scripts/demo-trigger-ferpa.js",
+    "demo:eada": "node scripts/demo-eada-wow.js"
   },
   "author": "",
   "license": "ISC",
