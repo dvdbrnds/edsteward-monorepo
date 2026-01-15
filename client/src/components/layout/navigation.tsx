@@ -36,6 +36,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { useLegacyBranding } from "@/hooks/use-branding";
 import { useTheme } from "@/hooks/use-theme";
+import { FULL_VERSION } from "@/lib/version";
 
 // TUF component removed - deprecated system
 
@@ -147,6 +148,9 @@ export default function Navigation() {
 
                     <span className="text-xl font-bold text-white hover:text-gray-200 transition-colors ml-3">
                       Compliance Portal
+                    </span>
+                    <span className="ml-2 px-2 py-0.5 text-xs font-semibold bg-amber-500 text-white rounded-full">
+                      {FULL_VERSION}
                     </span>
                   </button>
                 </Link>
