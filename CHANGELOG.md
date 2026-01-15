@@ -1,65 +1,273 @@
 # Changelog
 
-## [1.2.0] - 2025-04-16
+All notable changes to EdSteward are documented in this file.
 
-### Added
-- "isOfficial" flag for evidence files to identify official government source documents
-- Official badges for government regulation files in both list and detail views
-- Enhanced file upload form with checkbox for marking official government documents
-- Dedicated endpoint for regulation file downloads with proper content-type handling
-- Improved file server for both user-uploaded and system regulation files
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.2.0] - 2026-01-15
 
 ### Fixed
-- File download content-type handling for various document formats
-- File path resolution for documents from different storage locations
-- Evidence file metadata display and attribution
+- Regulation update accept now properly handles JSONB filing_deadlines field
+- Attestation checkmarks display bright green for ALL completed actions (not dimmed)
+- Green dot indicator shows for all completed actions regardless of required status
+- Compliance tasks data structure in RegulationDetailPage
 
-### Improved
-- Evidence files now display uploader's full name instead of username
-- Enhanced user interface for file identification and downloading
-- Better handling of file downloads with correct headers and disposition
-- Official government documents are now clearly distinguished in the interface
+### Changed
+- Removed scale-90 from non-required actions that made them look faded
+- Added detailed error messages to accept endpoint for better debugging
 
-## [1.1.0] - 2025-03-13
+## [1.1.0] - 2026-01-06
 
 ### Added
-- New endpoint for creating deadlines via POST /api/deadlines
-- Dedicated endpoint for updating regulation categories via PATCH /api/regulations/:regulationId/category
-- Enhanced error logging throughout the application
-- Improved form validation for deadline creation
-- Web publishing dialog with support for both Drupal and Universal HTML formats
-- Community communication statement generator for compliance announcements
-- Streamlined compliance action workflow with single-button actions
-- Automatic formatting for regulation publication content
-- One-click compliance communication generation
-- Responsive dialog interface for copying generated content
+- True multi-tenant database architecture with customer isolation
+- Wossamotta University demo tenant
+- MCP endpoint for creating new regulations with compliance tasks
+- Rate limiting for API endpoints
+- FERPA and Title IX task seed scripts
+
+### Changed
+- Database-per-tenant architecture for security compliance
+- MCP Engine integration for bulk regulation imports
+
+## [1.0.0] - 2026-01-02
+
+### Added
+- Dark mode support with toggle in navigation
+- Executive analytics dashboard with compliance metrics
+- Task scheduler with GUI toggle in admin settings
+- Bulk operations for compliance tasks
+- Mobile responsive menu
+- Deadline calendar view on dashboard
+- Quick attestation button from dashboard
+- Keyboard shortcuts for power users (⌘/Ctrl)
+- Email digest options in account settings
+- Audit trail CSV export
+- "My Tasks" focused view for compliance officers
+
+### Changed
+- Updated 47 components with dark mode compatible classes
+- Updated 26 pages with dark mode compatible styling
+- Improved mobile responsiveness
+
+## [0.9.0] - 2025-12-13
+
+### Added
+- One-click email attestation for low-risk regulations
+- Task detail view with evidence upload
+- Task email links for notifications
+- Compliance tasks workflow for complex regulations (Clery Act)
+- FERPA/Title IX templates
+- Task notifications and analytics
+- Hover preview for evidence files with signature display
+
+### Changed
+- Major UX redesign: Hero section + accordion layout for regulation detail page
+- Enhanced attestation UX
+- OKTA sync improvements
+
+## [0.8.0] - 2025-12-04
+
+### Added
+- Database backup system for on-prem deployments
+- Regulation ownership - compliance officers see only assigned regulations
+- Escalation feature for overdue items
+- Colored status badges
 
 ### Fixed
-- JSON parsing errors in category update functionality
-- Deadline creation form validation and submission
-- Proper error handling and user feedback for API responses
-- Validation of regulation IDs before making API calls
-- HTML content overflow in dialog boxes
-- Action button layout and responsiveness
-- Pre-formatted text wrapping in dialogs
-- Copy-to-clipboard functionality in modals
+- Branding logo upload cache issue with cache-busting timestamps
+- MCP Engine Integration: UI rich data display, validation range, storage mapping
+- Auth and owner filtering
+- Actions display issues
+- Audit logs SQL syntax error
 
-### Improved
-- Enhanced error messages for better debugging
-- Added detailed logging for API endpoints
-- Better handling of edge cases in form submissions
-- More robust error handling in mutation functions
-- Simplified compliance action interface
-- Dialog content formatting and readability
-- User experience for compliance action workflows
-- Content generation templates and formatting
+## [0.7.0] - 2025-11-17
+
+### Added
+- Comprehensive frontend system assessment (82% production ready)
+- Pre-deployment evidence upload fixes
+- Enhanced timeline and UX improvements
+
+### Verified
+- Okta SSO role mapping working - compliance officer test successful
+- Complete Okta SSO role mapping implementation
+
+### Fixed
+- Action updates
+- Notifications page dropdown formatting
+
+## [0.6.0] - 2025-10-24
+
+### Added
+- Comprehensive audit trail system for compliance tracking
+- Compliance status card on regulation detail page
+- Note creation with validation
+- Evidence file upload functionality
+
+### Fixed
+- Audit trail schema and role-based auth errors
+- Select component empty value error
+- Clery Act full text display
+- MFA disable functionality for HECVAT 4.0 compliance
+
+## [0.5.0] - 2025-09-29
+
+### Added
+- MFA Frontend UI Components
+- MFA login challenge system
+- HECVAT 4.0: MFA + Emergency Access Implementation
+
+### Fixed
+- MFA API calls - correct apiRequest signature
+- Okta Role Assignment with diagnostic tools
 
 ### Security
-- Added authentication checks for deadline creation and category updates
-- Improved input validation for all API endpoints
+- Implement Okta Group-to-Role Mapping with Comprehensive RBAC
 
-### Technical Debt
-- Refactored mutation functions to handle errors more gracefully
-- Added proper TypeScript types for all API responses
-- Improved consistency in API error responses
-- Standardized dialog component implementations
+## [0.4.0] - 2025-09-23
+
+### Added
+- Comprehensive Regulation Version Control System
+- Accept All Button for Bulk Regulation Updates Processing
+- Enhanced version control prominent for admin users
+
+### Changed
+- Configure EdSteward for MCP Engine Bulk Import
+
+### Fixed
+- Async import syntax error in routes
+
+## [0.3.0] - 2025-09-10
+
+### Added
+- SAML/SSO Authentication (Okta integration)
+- Federal Register Enhanced Integration
+- Support for 10x richer regulation packages with metadata storage
+
+### Fixed
+- Proper ECS deployment process
+- SAML endpoint configuration
+- Server SAML route updates
+
+### Changed
+- Backward compatibility for regulation metadata
+
+## [0.2.4] - 2025-02-27
+
+### Added
+- JSDoc documentation to UI components
+- Admin user management endpoints
+- Adjustable notification settings for admin users
+- Automated deadline reminders (90 days, weekly, daily)
+- Bug report button on all pages
+- Validation page with category statistics
+- API endpoint for regulation validation
+
+### Changed
+- Enhanced admin section indicators with visual cues
+- Purple border for admin-only panels
+
+## [0.2.3] - 2025-02-27
+
+### Added
+- Reset password functionality
+- Admin user account management
+
+### Fixed
+- Changelog version number click behavior
+- z.string() import in admin settings
+
+## [0.2.2] - 2025-02-24
+
+### Added
+- Pennsylvania state regulations integration
+- Completed status field to deadlines
+
+### Fixed
+- Deadline status calculation in pie chart
+- PA Code jurisdiction handling
+- Database query for regulation fetching
+
+## [0.2.1] - 2025-02-21
+
+### Added
+- ETL service with CSV processing
+- Data export functionality
+- Email notification system with NodeMailer
+
+### Fixed
+- Pie chart colors to match legend
+- Port configuration and fallback logic
+
+## [0.2.0] - 2025-02-20
+
+### Added
+- ETL service for data import/export
+- Email notifications with NodeMailer
+- Deadline notification checker
+
+### Fixed
+- Server port handling
+- Express import issues
+
+## [0.1.3] - 2025-02-18
+
+### Fixed
+- Regulation links click handling
+- Navigation to regulation detail page
+
+## [0.1.2] - 2025-02-14
+
+### Added
+- Error boundaries throughout application
+- Version tag in navigation bar (Alpha v0.1.0)
+- Changelog dialog
+- Comment schema documentation
+
+### Fixed
+- Routing to regulation detail pages
+- Invalid Regulation ID handling
+
+## [0.1.1] - 2025-02-13
+
+### Added
+- Interactive pie charts for filtering
+- Regulation sorting functionality
+- Deadline status color indicators
+- Requirements URL links (ECFR)
+- Navigation improvements
+
+### Changed
+- Chart legends with dark grey text
+- Pie chart colors to Moravian brand scheme
+
+## [0.1.0] - 2025-02-12
+
+### Added
+- Initial release
+- User authentication (login/registration)
+- Regulations management dashboard
+- Moravian University branding
+- Compliance overview with pie charts
+- Regulation categories (Academic Programs, Accounting, Athletics, etc.)
+- Navigation bar with university logo
+- Basic CRUD operations for regulations
+
+---
+
+## Version History Summary
+
+| Version | Date | Milestone |
+|---------|------|-----------|
+| 1.2.0 | 2026-01-15 | Demo prep fixes, attestation display |
+| 1.1.0 | 2026-01-06 | Multi-tenant architecture |
+| 1.0.0 | 2026-01-02 | Dark mode, scheduler, mobile |
+| 0.9.0 | 2025-12-13 | Email attestation, compliance tasks |
+| 0.8.0 | 2025-12-04 | Database backups, ownership |
+| 0.7.0 | 2025-11-17 | Pre-deployment, Okta SSO verified |
+| 0.6.0 | 2025-10-24 | Audit trail system |
+| 0.5.0 | 2025-09-29 | MFA implementation |
+| 0.4.0 | 2025-09-23 | Version control system |
+| 0.3.0 | 2025-09-10 | SAML/SSO authentication |
+| 0.2.x | 2025-02-20 | ETL, notifications, admin |
+| 0.1.0 | 2025-02-12 | Initial release |
