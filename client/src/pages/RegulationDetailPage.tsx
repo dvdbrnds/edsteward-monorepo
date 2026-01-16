@@ -106,6 +106,16 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { 
   Select,
   SelectContent,
@@ -186,6 +196,13 @@ function RegulationDetailPage() {
   const [showEscalateDialog, setShowEscalateDialog] = useState(false);
   const [showAttestationDialog, setShowAttestationDialog] = useState(false);
   const [editingDeadline, setEditingDeadline] = useState<Deadline | null>(null);
+  
+  // DRI reassignment confirmation state
+  const [pendingDriChange, setPendingDriChange] = useState<{
+    newOwnerId: string;
+    newOwnerName: string;
+    currentOwnerName: string;
+  } | null>(null);
   
   // Accordion section states - Summary expanded by default, others collapsed
   const [summaryOpen, setSummaryOpen] = useState(true);
@@ -732,7 +749,34 @@ function RegulationDetailPage() {
                       <Select
                         key={`owner-${regulation.ownerId || 'none'}`}
                         value={regulation.ownerId?.toString() || "unassigned"}
-                        onValueChange={(value) => ownerMutation.mutate(value)}
+                        onValueChange={(value) => {
+                          // Get current owner name
+                          const currentOwner = regulation.ownerId 
+                            ? users.find(u => u.id === regulation.ownerId)
+                            : null;
+                          const currentOwnerName = currentOwner
+                            ? (currentOwner.firstName && currentOwner.lastName)
+                              ? `${currentOwner.firstName} ${currentOwner.lastName}`
+                              : currentOwner.username || currentOwner.email || 'Unknown'
+                            : 'No one';
+                          
+                          // Get new owner name
+                          const newOwner = value === 'unassigned' 
+                            ? null 
+                            : users.find(u => u.id.toString() === value);
+                          const newOwnerName = newOwner
+                            ? (newOwner.firstName && newOwner.lastName)
+                              ? `${newOwner.firstName} ${newOwner.lastName}`
+                              : newOwner.username || newOwner.email || 'Unknown'
+                            : 'No one (unassigned)';
+                          
+                          // Show confirmation dialog
+                          setPendingDriChange({
+                            newOwnerId: value,
+                            newOwnerName,
+                            currentOwnerName,
+                          });
+                        }}
                       >
                         <SelectTrigger className="w-[220px] bg-indigo-50 border border-indigo-200 rounded-md hover:bg-indigo-100 transition-colors">
                           <SelectValue placeholder="Assign Primary DRI...">
@@ -1492,6 +1536,46 @@ function RegulationDetailPage() {
             responsibleOffice={regulation.responsibleOffice}
             responsibleOfficeEmail={regulation.responsibleOfficeEmail}
           />
+
+          {/* DRI Reassignment Confirmation Dialog */}
+          <AlertDialog open={!!pendingDriChange} onOpenChange={(open) => !open && setPendingDriChange(null)}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Confirm DRI Reassignment</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to reassign the Primary DRI for this regulation?
+                  <div className="mt-4 p-3 bg-muted rounded-lg space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Current DRI:</span>
+                      <span className="font-medium">{pendingDriChange?.currentOwnerName}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">New DRI:</span>
+                      <span className="font-medium text-primary">{pendingDriChange?.newOwnerName}</span>
+                    </div>
+                  </div>
+                  <p className="mt-4 text-sm text-muted-foreground">
+                    The new DRI will receive full administrative control over this regulation.
+                  </p>
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setPendingDriChange(null)}>
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => {
+                    if (pendingDriChange) {
+                      ownerMutation.mutate(pendingDriChange.newOwnerId);
+                      setPendingDriChange(null);
+                    }
+                  }}
+                >
+                  Confirm Reassignment
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </>
       )}
     </div>

@@ -32,6 +32,8 @@ import {
   MessageSquare,
   History,
   Paperclip,
+  File,
+  X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -181,6 +183,8 @@ export function TaskDetailDialog({
   const [description, setDescription] = useState('');
   const [isUploading, setIsUploading] = useState(false);
   const [comment, setComment] = useState('');
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [pendingFile, setPendingFile] = useState<File | null>(null);
 
   // Fetch evidence for task
   const { data: evidence, isLoading: evidenceLoading } = useQuery<TaskEvidence[]>({
@@ -540,17 +544,77 @@ export function TaskDetailDialog({
                 <div className="space-y-3">
                   <div>
                     <Label htmlFor="file">File</Label>
-                    <Input
+                    <input
                       ref={fileInputRef}
                       id="file"
                       type="file"
-                      onChange={handleFileUpload}
+                      className="hidden"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          setPendingFile(file);
+                        }
+                      }}
                       disabled={isUploading}
-                      className="mt-1"
                     />
-                    <p className="text-xs text-muted-foreground mt-1">
-                      Max file size: 10MB. Supported: PDF, DOC, DOCX, XLS, XLSX, PNG, JPG, GIF
-                    </p>
+                    <div
+                      onClick={() => !isUploading && fileInputRef.current?.click()}
+                      onDragOver={(e) => { e.preventDefault(); if (!isUploading) setIsDragOver(true); }}
+                      onDragLeave={() => setIsDragOver(false)}
+                      onDrop={(e) => {
+                        e.preventDefault();
+                        setIsDragOver(false);
+                        if (!isUploading && e.dataTransfer.files.length > 0) {
+                          setPendingFile(e.dataTransfer.files[0]);
+                        }
+                      }}
+                      className={cn(
+                        "mt-2 border-2 border-dashed rounded-lg p-4 text-center cursor-pointer transition-colors",
+                        isUploading && "opacity-50 cursor-not-allowed",
+                        isDragOver 
+                          ? "border-primary bg-primary/5" 
+                          : "border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/50",
+                        pendingFile && "border-green-500 bg-green-50"
+                      )}
+                    >
+                      {pendingFile ? (
+                        <div className="flex items-center justify-center gap-3">
+                          <File className="h-6 w-6 text-green-600" />
+                          <div className="text-left">
+                            <p className="font-medium text-foreground text-sm">{pendingFile.name}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {(pendingFile.size / 1024 / 1024).toFixed(2)} MB
+                            </p>
+                          </div>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            className="ml-2"
+                            disabled={isUploading}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setPendingFile(null);
+                              if (fileInputRef.current) fileInputRef.current.value = '';
+                            }}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col items-center gap-1">
+                          <Upload className="h-8 w-8 text-muted-foreground" />
+                          <div>
+                            <p className="font-medium text-foreground text-sm">
+                              Click to browse or drag & drop
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              PDF, DOC, XLS, or images up to 10MB
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <div>
                     <Label htmlFor="file-description">Description (optional)</Label>
@@ -563,6 +627,30 @@ export function TaskDetailDialog({
                       className="mt-1"
                     />
                   </div>
+                  {pendingFile && (
+                    <Button
+                      onClick={() => {
+                        // Trigger upload with the pending file
+                        const event = { target: { files: [pendingFile] } } as unknown as React.ChangeEvent<HTMLInputElement>;
+                        handleFileUpload(event);
+                        setPendingFile(null);
+                      }}
+                      disabled={isUploading}
+                      className="w-full"
+                    >
+                      {isUploading ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="mr-2 h-4 w-4" />
+                          Upload File
+                        </>
+                      )}
+                    </Button>
+                  )}
                 </div>
               ) : (
                 <div className="space-y-3">

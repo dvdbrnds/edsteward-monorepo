@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import {
   Card,
@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/hover-card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { FileText, FileText as PdfIcon, User, Upload, Download, FolderOpen, Trash2 } from "lucide-react";
+import { FileText, FileText as PdfIcon, User, Upload, Download, FolderOpen, Trash2, File, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -25,8 +25,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 
 interface EvidenceFilesProps {
   regulationId: number;
@@ -48,6 +48,8 @@ interface EvidenceFile {
 
 export function EvidenceFiles({ regulationId, isAdmin = false }: EvidenceFilesProps) {
   const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isDragOver, setIsDragOver] = useState(false);
   const queryClient = useQueryClient();
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -234,11 +236,70 @@ export function EvidenceFiles({ regulationId, isAdmin = false }: EvidenceFilesPr
             <div className="space-y-4">
               <div>
                 <Label htmlFor="file">File</Label>
-                <Input
+                <input
+                  ref={fileInputRef}
                   id="file"
                   type="file"
+                  className="hidden"
                   onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
                 />
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  onDragOver={(e) => { e.preventDefault(); setIsDragOver(true); }}
+                  onDragLeave={() => setIsDragOver(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setIsDragOver(false);
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                      setSelectedFile(files[0]);
+                    }
+                  }}
+                  className={cn(
+                    "mt-2 border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-colors",
+                    isDragOver 
+                      ? "border-primary bg-primary/5" 
+                      : "border-muted-foreground/25 hover:border-primary/50 hover:bg-muted/50",
+                    selectedFile && "border-green-500 bg-green-50"
+                  )}
+                >
+                  {selectedFile ? (
+                    <div className="flex items-center justify-center gap-3">
+                      <File className="h-8 w-8 text-green-600" />
+                      <div className="text-left">
+                        <p className="font-medium text-foreground">{selectedFile.name}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                        </p>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="ml-2"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedFile(null);
+                          if (fileInputRef.current) fileInputRef.current.value = '';
+                        }}
+                      >
+                        <X className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col items-center gap-2">
+                      <Upload className="h-10 w-10 text-muted-foreground" />
+                      <div>
+                        <p className="font-medium text-foreground">
+                          Click to browse or drag & drop
+                        </p>
+                        <p className="text-sm text-muted-foreground">
+                          PDF, Word, Excel, or images up to 10MB
+                        </p>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
               <div>
                 <Label htmlFor="description">Description</Label>
