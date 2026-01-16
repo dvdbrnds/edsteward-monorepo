@@ -1,6 +1,6 @@
 # EdSteward Product & Engineering Roadmap
 
-> **Last Updated:** January 16, 2026  
+> **Last Updated:** January 16, 2026 (evening)  
 > **Version:** 0.9.2-beta  
 > **Status:** Beta (Moravian University pilot)
 
@@ -84,13 +84,19 @@ higher education institutions.
 
 ### Phase 7: Production Hardening (Q1 2026)
 
+#### 🔴 Critical Tasks
+
+- [ ] **Institution type configuration rebuild** - Refactor how institution
+      types are configured per tenant
+- [ ] Move secrets to AWS Secrets Manager
+- [ ] Deploy admin console to admin.edsteward.ai
+
 #### Security & Compliance
 
 - [x] Content Security Policy (CSP) enabled
 - [x] Remove hardcoded credentials
 - [x] Consolidate database connection pools
 - [x] Clean up dead authentication code
-- [ ] Move secrets to AWS Secrets Manager
 - [ ] Enable AWS CloudTrail
 - [ ] SOC 2 Type II preparation
 

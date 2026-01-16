@@ -34,6 +34,7 @@ import {
   PenLine,
   Upload,
   Paperclip,
+  Trash2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -168,6 +169,7 @@ function TaskItem({
   onEscalate,
   onTaskClick,
   onAddEvidence,
+  onDeleteEvidence,
   depth = 0,
   selectedTaskIds = [],
   onToggleSelect,
@@ -179,6 +181,7 @@ function TaskItem({
   onEscalate: (_taskToEscalate: ComplianceTask) => void;
   onTaskClick: (_task: ComplianceTask) => void;
   onAddEvidence: (_task: ComplianceTask) => void;
+  onDeleteEvidence: (_taskId: number, _evidenceId: number, _fileName: string) => void;
   depth?: number;
   selectedTaskIds?: number[];
   onToggleSelect?: (_taskId: number) => void;
@@ -491,33 +494,46 @@ function TaskItem({
                         </div>
                       </div>
 
-                      {/* Action Button */}
-                      {(evidence.linkUrl || evidence.fileUrl) && (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="w-full gap-2"
-                          asChild
-                        >
-                          <a 
-                            href={evidence.linkUrl || evidence.fileUrl || '#'}
-                            target="_blank"
-                            rel="noopener noreferrer"
+                      {/* Action Buttons */}
+                      <div className="flex gap-2">
+                        {(evidence.linkUrl || evidence.fileUrl) && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="flex-1 gap-2"
+                            asChild
                           >
-                            {evidence.linkUrl ? (
-                              <>
-                                <LinkIcon className="h-4 w-4" />
-                                Open Link
-                              </>
-                            ) : (
-                              <>
-                                <FileText className="h-4 w-4" />
-                                View File
-                              </>
-                            )}
-                          </a>
-                        </Button>
-                      )}
+                            <a 
+                              href={evidence.linkUrl || evidence.fileUrl || '#'}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                            >
+                              {evidence.linkUrl ? (
+                                <>
+                                  <LinkIcon className="h-4 w-4" />
+                                  Open Link
+                                </>
+                              ) : (
+                                <>
+                                  <FileText className="h-4 w-4" />
+                                  View File
+                                </>
+                              )}
+                            </a>
+                          </Button>
+                        )}
+                        {isAdmin && (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="gap-2 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200"
+                            onClick={() => onDeleteEvidence(task.id, evidence.id, evidence.fileName)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Delete
+                          </Button>
+                        )}
+                      </div>
                     </div>
                   </HoverCardContent>
                 </HoverCard>
@@ -570,6 +586,7 @@ function TaskItem({
               onEscalate={onEscalate}
               onTaskClick={onTaskClick}
               onAddEvidence={onAddEvidence}
+              onDeleteEvidence={onDeleteEvidence}
               depth={depth + 1}
               selectedTaskIds={selectedTaskIds}
               onToggleSelect={onToggleSelect}
@@ -596,6 +613,18 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
   const [evidenceLinkTitle, setEvidenceLinkTitle] = useState('');
   const [evidenceType, setEvidenceType] = useState<'file' | 'link'>('file');
   const [selectedTaskIds, setSelectedTaskIds] = useState<number[]>([]);
+  
+  // Add Task Dialog state
+  const [showAddTask, setShowAddTask] = useState(false);
+  const [newTaskTitle, setNewTaskTitle] = useState('');
+  const [newTaskDescription, setNewTaskDescription] = useState('');
+  const [newTaskInstructions, setNewTaskInstructions] = useState('');
+  const [newTaskPriority, setNewTaskPriority] = useState<'low' | 'medium' | 'high' | 'critical'>('medium');
+  const [newTaskDueDate, setNewTaskDueDate] = useState('');
+  const [newTaskAssignedRole, setNewTaskAssignedRole] = useState('');
+  const [newTaskEvidenceRequired, setNewTaskEvidenceRequired] = useState(false);
+  const [newTaskEvidenceType, setNewTaskEvidenceType] = useState<'none' | 'document' | 'link' | 'screenshot' | 'attestation'>('none');
+  const [newTaskEvidenceInstructions, setNewTaskEvidenceInstructions] = useState('');
 
   // Fetch tasks
   const { data, isLoading, error } = useQuery<TasksResponse>({
@@ -671,6 +700,42 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
     },
   });
 
+  // Create task mutation
+  const createTaskMutation = useMutation({
+    mutationFn: async (taskData: {
+      regulationId: number;
+      title: string;
+      description?: string;
+      instructions?: string;
+      priority: string;
+      dueDate?: string;
+      assignedRole?: string;
+      evidenceRequired: boolean;
+      evidenceType?: string;
+      evidenceInstructions?: string;
+    }) => {
+      const response = await fetch('/api/compliance-tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(taskData),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to create task');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({ title: 'Task Created', description: 'New compliance task has been added' });
+      queryClient.invalidateQueries({ queryKey: ['compliance-tasks', regulationId] });
+      resetAddTaskForm();
+    },
+    onError: (error: Error) => {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    },
+  });
+
   // Evidence upload mutation
   const evidenceMutation = useMutation({
     mutationFn: async ({ taskId, file, description, linkUrl, linkTitle }: { 
@@ -716,6 +781,35 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
     },
   });
 
+  // Delete evidence mutation
+  const deleteEvidenceMutation = useMutation({
+    mutationFn: async ({ taskId, evidenceId }: { taskId: number; evidenceId: number }) => {
+      const response = await fetch(`/api/compliance-tasks/${taskId}/evidence/${evidenceId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to delete evidence');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({ title: 'Evidence Deleted', description: 'Evidence has been removed from the task' });
+      queryClient.invalidateQueries({ queryKey: ['compliance-tasks', regulationId] });
+    },
+    onError: (error: Error) => {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    },
+  });
+
+  // Handle evidence deletion with confirmation
+  const handleDeleteEvidence = (taskId: number, evidenceId: number, fileName: string) => {
+    if (confirm(`Are you sure you want to delete "${fileName}"? This cannot be undone.`)) {
+      deleteEvidenceMutation.mutate({ taskId, evidenceId });
+    }
+  };
+
   // Reset evidence form helper
   const resetEvidenceForm = () => {
     setEvidenceTask(null);
@@ -724,6 +818,41 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
     setEvidenceLinkUrl('');
     setEvidenceLinkTitle('');
     setEvidenceType('file');
+  };
+
+  // Reset add task form helper
+  const resetAddTaskForm = () => {
+    setShowAddTask(false);
+    setNewTaskTitle('');
+    setNewTaskDescription('');
+    setNewTaskInstructions('');
+    setNewTaskPriority('medium');
+    setNewTaskDueDate('');
+    setNewTaskAssignedRole('');
+    setNewTaskEvidenceRequired(false);
+    setNewTaskEvidenceType('none');
+    setNewTaskEvidenceInstructions('');
+  };
+
+  // Handle add task submission
+  const handleAddTaskSubmit = () => {
+    if (!newTaskTitle.trim()) {
+      toast({ title: 'Error', description: 'Task title is required', variant: 'destructive' });
+      return;
+    }
+    
+    createTaskMutation.mutate({
+      regulationId,
+      title: newTaskTitle.trim(),
+      description: newTaskDescription.trim() || undefined,
+      instructions: newTaskInstructions.trim() || undefined,
+      priority: newTaskPriority,
+      dueDate: newTaskDueDate || undefined,
+      assignedRole: newTaskAssignedRole.trim() || undefined,
+      evidenceRequired: newTaskEvidenceRequired,
+      evidenceType: newTaskEvidenceRequired ? newTaskEvidenceType : 'none',
+      evidenceInstructions: newTaskEvidenceRequired ? newTaskEvidenceInstructions.trim() || undefined : undefined,
+    });
   };
 
   // Handle evidence submission
@@ -781,8 +910,13 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
             </div>
           )}
         </div>
-        {isAdmin && !hasNoTasks && (
-          <Button variant="outline" size="sm" className="gap-2">
+        {isAdmin && (
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="gap-2"
+            onClick={() => setShowAddTask(true)}
+          >
             <Plus className="h-4 w-4" />
             Add Task
           </Button>
@@ -822,6 +956,7 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
                 onEscalate={setEscalateTask}
                 onTaskClick={setSelectedTask}
                 onAddEvidence={setEvidenceTask}
+                onDeleteEvidence={handleDeleteEvidence}
                 selectedTaskIds={selectedTaskIds}
                 onToggleSelect={(taskId) => {
                   setSelectedTaskIds(prev => 
@@ -1068,6 +1203,163 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
         isAdmin={isAdmin}
         onStatusChange={(taskId, status) => updateStatusMutation.mutate({ taskId, status })}
       />
+
+      {/* Add Task Dialog */}
+      <Dialog open={showAddTask} onOpenChange={() => resetAddTaskForm()}>
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Plus className="h-5 w-5 text-blue-600" />
+              Add Compliance Task
+            </DialogTitle>
+            <DialogDescription>
+              Create a new task for this regulation. Tasks can be assigned to specific roles and include evidence requirements.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            {/* Task Title */}
+            <div>
+              <Label htmlFor="task-title">Task Title *</Label>
+              <Input
+                id="task-title"
+                placeholder="e.g., Submit Annual Safety Report"
+                value={newTaskTitle}
+                onChange={(e) => setNewTaskTitle(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+
+            {/* Task Description */}
+            <div>
+              <Label htmlFor="task-description">Description</Label>
+              <Textarea
+                id="task-description"
+                placeholder="Describe what needs to be done..."
+                value={newTaskDescription}
+                onChange={(e) => setNewTaskDescription(e.target.value)}
+                className="mt-1"
+                rows={2}
+              />
+            </div>
+
+            {/* Task Instructions */}
+            <div>
+              <Label htmlFor="task-instructions">Instructions</Label>
+              <Textarea
+                id="task-instructions"
+                placeholder="Step-by-step instructions for completing this task..."
+                value={newTaskInstructions}
+                onChange={(e) => setNewTaskInstructions(e.target.value)}
+                className="mt-1"
+                rows={3}
+              />
+            </div>
+
+            {/* Priority & Due Date Row */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="task-priority">Priority</Label>
+                <select
+                  id="task-priority"
+                  value={newTaskPriority}
+                  onChange={(e) => setNewTaskPriority(e.target.value as 'low' | 'medium' | 'high' | 'critical')}
+                  className="mt-1 w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
+                >
+                  <option value="low">Low</option>
+                  <option value="medium">Medium</option>
+                  <option value="high">High</option>
+                  <option value="critical">Critical</option>
+                </select>
+              </div>
+              <div>
+                <Label htmlFor="task-due-date">Due Date</Label>
+                <Input
+                  id="task-due-date"
+                  type="date"
+                  value={newTaskDueDate}
+                  onChange={(e) => setNewTaskDueDate(e.target.value)}
+                  className="mt-1"
+                />
+              </div>
+            </div>
+
+            {/* Assigned Role */}
+            <div>
+              <Label htmlFor="task-role">Assigned Role</Label>
+              <Input
+                id="task-role"
+                placeholder="e.g., Campus Safety Director, Compliance Officer"
+                value={newTaskAssignedRole}
+                onChange={(e) => setNewTaskAssignedRole(e.target.value)}
+                className="mt-1"
+              />
+              <p className="text-xs text-muted-foreground mt-1">
+                Enter the role responsible for this task
+              </p>
+            </div>
+
+            {/* Evidence Required */}
+            <div className="border rounded-lg p-4 bg-background">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  id="evidence-required"
+                  checked={newTaskEvidenceRequired}
+                  onCheckedChange={(checked) => setNewTaskEvidenceRequired(checked === true)}
+                />
+                <Label htmlFor="evidence-required" className="cursor-pointer">
+                  Evidence required for completion
+                </Label>
+              </div>
+
+              {newTaskEvidenceRequired && (
+                <div className="mt-4 space-y-3 pl-6 border-l-2 border-blue-200">
+                  <div>
+                    <Label htmlFor="evidence-type">Evidence Type</Label>
+                    <select
+                      id="evidence-type"
+                      value={newTaskEvidenceType}
+                      onChange={(e) => setNewTaskEvidenceType(e.target.value as 'document' | 'link' | 'screenshot' | 'attestation')}
+                      className="mt-1 w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
+                    >
+                      <option value="document">Document Upload</option>
+                      <option value="link">External Link</option>
+                      <option value="screenshot">Screenshot</option>
+                      <option value="attestation">Signed Attestation</option>
+                    </select>
+                  </div>
+                  <div>
+                    <Label htmlFor="evidence-instructions">Evidence Instructions</Label>
+                    <Textarea
+                      id="evidence-instructions"
+                      placeholder="Describe what evidence needs to be provided..."
+                      value={newTaskEvidenceInstructions}
+                      onChange={(e) => setNewTaskEvidenceInstructions(e.target.value)}
+                      className="mt-1"
+                      rows={2}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+          <DialogFooter className="mt-4">
+            <Button variant="outline" onClick={() => resetAddTaskForm()}>
+              Cancel
+            </Button>
+            <Button 
+              onClick={handleAddTaskSubmit}
+              disabled={!newTaskTitle.trim() || createTaskMutation.isPending}
+            >
+              {createTaskMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : (
+                <Plus className="h-4 w-4 mr-2" />
+              )}
+              Create Task
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

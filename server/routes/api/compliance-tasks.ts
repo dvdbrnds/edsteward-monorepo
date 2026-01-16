@@ -14,7 +14,7 @@ import { alias } from 'drizzle-orm/pg-core';
 import { requireAuth, requireAdmin } from '../../middleware/role-based-auth';
 import { emailService } from '../../services/email';
 import { getCleryTasksWithDates, getCleryTaskCount } from '../../templates/clery-act-tasks';
-import { uploadLimiter, burstLimiter } from '../../middleware/rate-limiter';
+import { uploadLimiter } from '../../middleware/rate-limiter';
 
 // JWT secret for task tokens (use same as attestation or a dedicated one)
 const TASK_TOKEN_SECRET = process.env.ATTESTATION_JWT_SECRET || process.env.JWT_SECRET || 'edsteward-task-secret-key';
@@ -148,11 +148,6 @@ router.get('/regulation/:regulationId', requireAuth, async (req: Request, res: R
     const progress = allTasks.length > 0 
       ? Math.round((completedTasks.length / allTasks.length) * 100) 
       : 0;
-
-    // Debug logging
-    const completedTasksDebug = allTasks.filter(t => t.status === 'completed');
-    completedTasksDebug.forEach(t => {
-    });
 
     res.json({
       tasks: rootTasks,
@@ -838,7 +833,7 @@ router.get('/:taskId/evidence', requireAuth, async (req: Request, res: Response)
         linkTitle: taskEvidence.linkTitle,
         description: taskEvidence.description,
         uploadedBy: taskEvidence.uploadedBy,
-        createdAt: taskEvidence.createdAt,
+        uploadedAt: taskEvidence.uploadedAt,
         uploadedByUser: {
           id: uploadedByUsers.id,
           username: uploadedByUsers.username,
@@ -850,7 +845,7 @@ router.get('/:taskId/evidence', requireAuth, async (req: Request, res: Response)
       .from(taskEvidence)
       .leftJoin(uploadedByUsers, eq(taskEvidence.uploadedBy, uploadedByUsers.id))
       .where(eq(taskEvidence.taskId, taskId))
-      .orderBy(desc(taskEvidence.createdAt));
+      .orderBy(desc(taskEvidence.uploadedAt));
 
     res.json(evidenceList);
   } catch (error) {

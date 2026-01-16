@@ -74,7 +74,7 @@ interface TaskEvidence {
   description: string | null;
   uploadedBy: number;
   uploadedByUser?: User;
-  createdAt: string;
+  uploadedAt: string;
 }
 
 interface TaskActivity {
@@ -660,7 +660,7 @@ export function TaskDetailDialog({
                               {' • '}
                             </span>
                           )}
-                          {format(new Date(item.createdAt), 'MMM d, yyyy')}
+                          {format(new Date(item.uploadedAt), 'MMM d, yyyy')}
                           {item.fileSize && ` • ${formatFileSize(item.fileSize)}`}
                         </div>
                       </div>

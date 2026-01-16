@@ -1309,7 +1309,7 @@ function RegulationDetailPage() {
                       <h4 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">
                         <FolderOpen className="h-4 w-4" /> Evidence Files
                       </h4>
-                      <EvidenceFiles regulationId={regulationId} />
+                      <EvidenceFiles regulationId={regulationId} isAdmin={isRegulationAdmin} />
                     </div>
                     <div className="border-t pt-4">
                       <h4 className="text-sm font-medium text-foreground mb-3 flex items-center gap-2">

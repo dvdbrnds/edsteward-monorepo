@@ -1,11 +1,16 @@
 import express from 'express';
+import fs from 'fs';
 import { storage } from '../../storage';
 import { getDatabaseStorage } from '../../services/database';
+import { db } from '../../db';
+import { evidenceFiles } from '@shared/schema';
+import { eq, and } from 'drizzle-orm';
 import { syslog, LogLevel, LogFacility } from '../../services/syslog';
 import type { Regulation } from '@shared/schema';
 import { 
   requireAuth, 
   requireComplianceOfficer,
+  requireAdmin,
   attachUserPermissions
 } from '../../middleware/role-based-auth';
 import { auditRegulationAction, auditEvidence as _auditEvidence } from '../../middleware/audit-middleware';
@@ -343,6 +348,67 @@ router.post("/:regulationId/evidence", uploadLimiter, requireAuth, upload.single
 
     return res.status(500).json({
       error: "Failed to upload evidence file",
+      details: error instanceof Error ? error.message : String(error)
+    });
+  }
+});
+
+// Delete evidence file for a regulation - admin only
+router.delete("/:regulationId/evidence/:evidenceId", requireAuth, requireAdmin, async (req, res) => {
+  try {
+    const regulationId = parseInt(req.params.regulationId);
+    const evidenceId = parseInt(req.params.evidenceId);
+
+    if (isNaN(regulationId) || isNaN(evidenceId)) {
+      return res.status(400).json({ error: "Invalid regulation ID or evidence ID" });
+    }
+
+    // Get the evidence file first to get the storage path
+    const [existingEvidence] = await db
+      .select()
+      .from(evidenceFiles)
+      .where(and(
+        eq(evidenceFiles.id, evidenceId),
+        eq(evidenceFiles.regulationId, regulationId)
+      ))
+      .limit(1);
+
+    if (!existingEvidence) {
+      return res.status(404).json({ error: "Evidence file not found" });
+    }
+
+    // Delete the file from disk if it exists
+    if (existingEvidence.storagePath) {
+      try {
+        fs.unlinkSync(existingEvidence.storagePath);
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
+          `Deleted evidence file from disk: ${existingEvidence.storagePath}`);
+      } catch (fileError) {
+        // Log but don't fail if file doesn't exist
+        syslog.log(LogFacility.LOCAL0, LogLevel.WARNING, 
+          `Could not delete evidence file from disk: ${existingEvidence.storagePath}`, 
+          { error: fileError instanceof Error ? fileError.message : String(fileError) });
+      }
+    }
+
+    // Delete from database
+    await db
+      .delete(evidenceFiles)
+      .where(eq(evidenceFiles.id, evidenceId));
+
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
+      `User ${req.user?.username} deleted evidence file ${evidenceId} for regulation ${regulationId}`);
+
+    res.json({ 
+      message: "Evidence file deleted successfully",
+      deletedId: evidenceId
+    });
+  } catch (error) {
+    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, "Failed to delete evidence file", {
+      error: error instanceof Error ? error.message : String(error)
+    });
+    res.status(500).json({ 
+      error: "Failed to delete evidence file",
       details: error instanceof Error ? error.message : String(error)
     });
   }

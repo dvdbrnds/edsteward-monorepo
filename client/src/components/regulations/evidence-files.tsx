@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/hover-card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { FileText, Image as ImageIcon, FileText as PdfIcon, User, Upload, Download, FolderOpen } from "lucide-react";
+import { FileText, FileText as PdfIcon, User, Upload, Download, FolderOpen, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import {
   Dialog,
@@ -30,6 +30,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 interface EvidenceFilesProps {
   regulationId: number;
+  isAdmin?: boolean;
 }
 
 interface EvidenceFile {
@@ -45,7 +46,7 @@ interface EvidenceFile {
   isOfficial?: boolean;
 }
 
-export function EvidenceFiles({ regulationId }: EvidenceFilesProps) {
+export function EvidenceFiles({ regulationId, isAdmin = false }: EvidenceFilesProps) {
   const { toast } = useToast();
   const queryClient = useQueryClient();
   const [isUploadDialogOpen, setIsUploadDialogOpen] = useState(false);
@@ -53,6 +54,7 @@ export function EvidenceFiles({ regulationId }: EvidenceFilesProps) {
   const [description, setDescription] = useState("");
   const [isOfficial, setIsOfficial] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   const { data: evidenceFiles, error, isLoading } = useQuery({
     queryKey: ['/api/regulations', regulationId, 'evidence'],
@@ -110,6 +112,43 @@ export function EvidenceFiles({ regulationId }: EvidenceFilesProps) {
       });
     },
   });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (evidenceId: number) => {
+      const response = await fetch(`/api/regulations/${regulationId}/evidence/${evidenceId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to delete file');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/regulations', regulationId, 'evidence'] });
+      toast({
+        title: "Success",
+        description: "Evidence file deleted successfully",
+      });
+      setDeletingId(null);
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Error",
+        description: error.message,
+        variant: "destructive",
+      });
+      setDeletingId(null);
+    },
+  });
+
+  const handleDelete = (file: EvidenceFile) => {
+    if (confirm(`Are you sure you want to delete "${file.fileName}"? This cannot be undone.`)) {
+      setDeletingId(file.id);
+      deleteMutation.mutate(file.id);
+    }
+  };
 
   const handleFileUpload = async () => {
     if (!selectedFile) {
@@ -279,6 +318,21 @@ export function EvidenceFiles({ regulationId }: EvidenceFilesProps) {
                             <Download className="h-4 w-4" />
                           </a>
                         </Button>
+                        {isAdmin && (
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            className="p-1 h-auto text-red-600 hover:text-red-700 hover:bg-red-50"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDelete(file);
+                            }}
+                            disabled={deletingId === file.id}
+                            title="Delete file"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </HoverCardTrigger>
