@@ -4,9 +4,13 @@ import { calculateTextChangeDiff } from './services/diff-calculator';
 import { z } from 'zod';
 import { insertRegulationUpdateSchema } from '@shared/schema';
 
+// MCP Engine credentials from environment
+const MCP_ENGINE_USERNAME = process.env.MCP_ENGINE_USERNAME || 'mcp-engine';
+const MCP_ENGINE_PASSWORD = process.env.MCP_ENGINE_PASSWORD;
+
 /**
  * Basic Authentication middleware for MCP Engine integration
- * Supports the credentials: dvdbrnds:gabadh (Base64: ZHZkYnJuZHM6Z2FiYWRo)
+ * Credentials configured via MCP_ENGINE_USERNAME and MCP_ENGINE_PASSWORD env vars
  * ALLOWS BYPASS for localhost requests (for local MCP Engine testing)
  */
 function basicAuthMiddleware(req: Request, res: Response, next: Function) {
@@ -14,6 +18,15 @@ function basicAuthMiddleware(req: Request, res: Response, next: Function) {
   const host = req.headers.host || '';
   if (host.includes('localhost') || host.includes('127.0.0.1')) {
     return next();
+  }
+
+  // Check if MCP credentials are configured
+  if (!MCP_ENGINE_PASSWORD) {
+    console.error('MCP_ENGINE_PASSWORD not configured - MCP Engine requests will fail');
+    return res.status(500).json({
+      error: 'MCP Engine not configured',
+      message: 'Server missing MCP_ENGINE_PASSWORD environment variable'
+    });
   }
 
   const authHeader = req.headers.authorization;
@@ -29,8 +42,8 @@ function basicAuthMiddleware(req: Request, res: Response, next: Function) {
   const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
   const [username, password] = credentials.split(':');
 
-  // Validate MCP Engine credentials
-  if (username === 'dvdbrnds' && password === 'gabadh') {
+  // Validate MCP Engine credentials from environment
+  if (username === MCP_ENGINE_USERNAME && password === MCP_ENGINE_PASSWORD) {
     next();
   } else {
     return res.status(401).json({ 
