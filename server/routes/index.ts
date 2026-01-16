@@ -307,57 +307,8 @@ export function registerRoutes(app: express.Application): Server {
     });
   });
 
-  // Login endpoint
-  app.post('/api/auth/login', async (req, res) => {
-    try {
-      const { email, password } = req.body;
-      
-      if (!email || !password) {
-        return res.status(400).json({ error: 'Email and password required' });
-      }
-
-      // Get user from database using proper storage methods
-      const tenantStorage = getDatabaseStorage(req.tenantId);
-      const user = await tenantStorage.getUserByEmail(email);
-      
-      if (!user) {
-        return res.status(401).json({ error: 'Invalid credentials' });
-      }
-
-      // Simple password verification for debugging
-      
-      // For now, verify password directly (we'll improve security later)
-      const isValidPassword = user.password === password || 
-                             user.password === 'gabadh' || 
-                             user.password === 'password123';
-
-      if (!isValidPassword) {
-        return res.status(401).json({ error: 'Invalid credentials' });
-      }
-
-      // Set up session
-      req.login(user, (err) => {
-        if (err) {
-          console.error('Login session error:', err);
-          return res.status(500).json({ error: 'Login failed' });
-        }
-
-        res.json({
-          success: true,
-          user: {
-            id: user.id,
-            email: user.email,
-            username: user.username,
-            role: user.role
-          }
-        });
-      });
-
-    } catch (error) {
-      console.error('Login error:', error);
-      res.status(500).json({ error: 'Internal server error' });
-    }
-  });
+  // Login endpoint - REMOVED duplicate with plaintext password comparison
+  // The proper scrypt-based login is defined later in this file
 
   // Logout endpoint
   app.post('/api/auth/logout', async (req, res) => {
@@ -1412,7 +1363,7 @@ export function registerRoutes(app: express.Application): Server {
     }
   });
 
-  // Alternative auth login endpoint 
+  // Primary login endpoint - uses scrypt password verification
   app.post('/api/auth/login', async (req, res) => {
     try {
       const { email, password } = req.body;
@@ -1468,14 +1419,7 @@ export function registerRoutes(app: express.Application): Server {
     }
   });
 
-  app.post('/api/auth/logout', (req, res) => {
-    req.logout((err) => {
-      if (err) {
-        return res.status(500).json({ error: 'Logout failed' });
-      }
-      res.json({ success: true });
-    });
-  });
+  // Duplicate logout removed - using the logged version earlier in file
 
   app.get('/api/user', (req, res) => {
     if (!req.isAuthenticated()) {
