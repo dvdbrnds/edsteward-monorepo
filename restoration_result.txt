@@ -1,3 +1,0 @@
-Starting database restoration process...
-
-Step 1: Testing AWS RDS Connection

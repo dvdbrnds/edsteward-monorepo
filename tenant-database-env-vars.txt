@@ -1,7 +1,0 @@
-# Tenant Database Environment Variables
-# Add these to your deployment environment
-
-ADMIN_DATABASE_URL="postgresql://postgres:EdSteward2024!Secure@edsteward-public-db.cwv4g6g0yzmg.us-east-1.rds.amazonaws.com:5432/edsteward_admin?sslmode=require"
-MORAVIAN_DATABASE_URL="postgresql://postgres:EdSteward2024!Secure@edsteward-public-db.cwv4g6g0yzmg.us-east-1.rds.amazonaws.com:5432/edsteward_moravian?sslmode=require"
-STAGING_DATABASE_URL="postgresql://postgres:EdSteward2024!Secure@edsteward-public-db.cwv4g6g0yzmg.us-east-1.rds.amazonaws.com:5432/edsteward_staging?sslmode=require"
-TEST_DATABASE_URL="postgresql://postgres:EdSteward2024!Secure@edsteward-public-db.cwv4g6g0yzmg.us-east-1.rds.amazonaws.com:5432/edsteward_test?sslmode=require"
