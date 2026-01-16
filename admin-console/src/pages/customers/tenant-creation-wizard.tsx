@@ -1,673 +1,357 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Card, CardHeader, CardTitle, CardContent, CardDescription, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AlertCircle, CheckCircle, Clock, Cloud, Database, Globe, Shield, Zap } from 'lucide-react';
+import { AlertCircle, CheckCircle, Database, ArrowLeft, Loader2 } from 'lucide-react';
 
-interface TenantConfig {
-  // Customer Information
-  customerName: string;
-  organizationDomain: string;
-  customerSubdomain: string;
-  contactEmail: string;
-  organizationUrl: string;
-  
-  // AWS Infrastructure
-  awsRegion: string;
-  awsAccountId: string;
-  clusterName: string;
-  serviceName: string;
-  ecrRepository: string;
-  
-  // Database Configuration
-  databaseType: string;
-  databaseUrl: string;
-  
-  // Branding
-  primaryColor: string;
-  logoUrl: string;
-  faviconUrl: string;
-  
-  // Features
-  maxUsers: number;
-  maxRegulations: number;
-  samlEnabled: boolean;
-  ssoProvider: string;
-}
+// API base URL - use localhost in development, production URL otherwise
+const API_BASE = import.meta.env.DEV ? 'http://localhost:4000' : '';
 
-interface DeploymentStep {
-  id: string;
+interface TenantFormData {
   name: string;
-  description: string;
-  status: 'pending' | 'running' | 'completed' | 'failed';
-  duration?: number;
-  details?: string;
+  subdomain: string;
+  contact_email: string;
+  database_url: string;
+  plan: 'starter' | 'professional' | 'enterprise';
 }
 
 const TenantCreationWizard: React.FC = () => {
-  const [currentStep, setCurrentStep] = useState(1);
+  const navigate = useNavigate();
+  const [step, setStep] = useState<'form' | 'testing' | 'success' | 'error'>('form');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [createdTenant, setCreatedTenant] = useState<any>(null);
 
-  // Set development admin token if not already set
-  React.useEffect(() => {
-    if (!localStorage.getItem('admin_token')) {
-      localStorage.setItem('admin_token', 'admin-token-12345');
-      console.log('Development admin token set');
-    }
-  }, []);
-  const [tenantConfig, setTenantConfig] = useState<TenantConfig>({
-    customerName: '',
-    organizationDomain: '',
-    customerSubdomain: '',
-    contactEmail: '',
-    organizationUrl: '',
-    awsRegion: 'us-east-1',
-    awsAccountId: '259661441422',
-    clusterName: '',
-    serviceName: '',
-    ecrRepository: '',
-    databaseType: 'neon',
-    databaseUrl: '',
-    primaryColor: '#3b82f6',
-    logoUrl: '',
-    faviconUrl: '',
-    maxUsers: 1000,
-    maxRegulations: 5000,
-    samlEnabled: false,
-    ssoProvider: ''
+  const [formData, setFormData] = useState<TenantFormData>({
+    name: '',
+    subdomain: '',
+    contact_email: '',
+    database_url: '',
+    plan: 'starter'
   });
 
-  const [deploymentStatus, setDeploymentStatus] = useState<'idle' | 'deploying' | 'completed' | 'failed'>('idle');
-  const [deploymentError, setDeploymentError] = useState<string | null>(null);
-  const [deploymentSteps, setDeploymentSteps] = useState<DeploymentStep[]>([
-    { id: 'vpc', name: 'Create VPC', description: 'Setting up isolated network infrastructure', status: 'pending' },
-    { id: 'ecs', name: 'Create ECS Cluster', description: 'Deploying container orchestration', status: 'pending' },
-    { id: 'rds', name: 'Setup Database', description: 'Configuring PostgreSQL instance', status: 'pending' },
-    { id: 'alb', name: 'Configure Load Balancer', description: 'Setting up traffic routing and SSL', status: 'pending' },
-    { id: 'ecr', name: 'Create Container Registry', description: 'Setting up Docker image repository', status: 'pending' },
-    { id: 'task', name: 'Deploy Application', description: 'Launching EdSteward containers', status: 'pending' },
-    { id: 'dns', name: 'Configure DNS', description: 'Setting up domain routing', status: 'pending' },
-    { id: 'monitoring', name: 'Setup Monitoring', description: 'Configuring health checks and logs', status: 'pending' }
-  ]);
+  // Auto-generate subdomain from name
+  const handleNameChange = (name: string) => {
+    const subdomain = name.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    setFormData(prev => ({ ...prev, name, subdomain }));
+  };
 
-  const [websocket, setWebsocket] = useState<WebSocket | null>(null);
+  const handleChange = (field: keyof TenantFormData, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
 
-  // Auto-generate derived values
-  useEffect(() => {
-    if (tenantConfig.customerName) {
-      const subdomain = tenantConfig.customerName.toLowerCase().replace(/[^a-z0-9]/g, '-');
-      const clusterName = `edsteward-${subdomain}-cluster`;
-      const serviceName = `edsteward-${subdomain}-service`;
-      const ecrRepository = `edsteward-${subdomain}`;
-      
-      setTenantConfig(prev => ({
-        ...prev,
-        customerSubdomain: subdomain,
-        clusterName,
-        serviceName,
-        ecrRepository
-      }));
+  const validateForm = (): string | null => {
+    if (!formData.name.trim()) return 'Organization name is required';
+    if (!formData.subdomain.trim()) return 'Subdomain is required';
+    if (!/^[a-z0-9-]+$/.test(formData.subdomain)) return 'Subdomain must be lowercase letters, numbers, and hyphens only';
+    if (!formData.contact_email.trim()) return 'Contact email is required';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.contact_email)) return 'Invalid email format';
+    if (!formData.database_url.trim()) return 'Database URL is required';
+    if (!formData.database_url.startsWith('postgresql://') && !formData.database_url.startsWith('postgres://')) {
+      return 'Database URL must start with postgresql:// or postgres://';
     }
-  }, [tenantConfig.customerName]);
-
-  const handleInputChange = (field: keyof TenantConfig, value: string | number | boolean) => {
-    setTenantConfig(prev => ({ ...prev, [field]: value }));
+    return null;
   };
 
-  const validateStep = (step: number): boolean => {
-    switch (step) {
-      case 1:
-        return !!(tenantConfig.customerName && tenantConfig.organizationDomain && tenantConfig.contactEmail);
-      case 2:
-        return !!(tenantConfig.awsRegion && tenantConfig.awsAccountId);
-      case 3:
-        return !!(tenantConfig.databaseType && tenantConfig.databaseUrl);
-      case 4:
-        return true; // Branding is optional
-      default:
-        return true;
-    }
+  const testDatabaseConnection = async (): Promise<boolean> => {
+    // For now, just return true - the backend will test on creation
+    // In the future, we could add a /api/test-database endpoint
+    return true;
   };
 
-  const nextStep = () => {
-    if (validateStep(currentStep)) {
-      setCurrentStep(prev => Math.min(prev + 1, 5));
-    }
-  };
-
-  const prevStep = () => {
-    setCurrentStep(prev => Math.max(prev - 1, 1));
-  };
-
-  const startDeployment = async () => {
-    setDeploymentStatus('deploying');
-    setDeploymentError(null);
-    console.log('Deploy button clicked!');
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
     
+    const validationError = validateForm();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    setIsSubmitting(true);
+    setError(null);
+    setStep('testing');
+
     try {
-      // Connect to WebSocket for real-time updates
-      console.log('Connecting to WebSocket at ws://localhost:4000/ws/deployment...');
-      const ws = new WebSocket(`ws://localhost:4000/ws/deployment`);
-      setWebsocket(ws);
+      // Test database connection first
+      const dbValid = await testDatabaseConnection();
+      if (!dbValid) {
+        throw new Error('Could not connect to the provided database URL');
+      }
 
-      ws.onopen = () => {
-        console.log('WebSocket connection established successfully');
-      };
-
-      ws.onerror = (error) => {
-        console.error('WebSocket connection error:', error);
-      };
-
-      ws.onclose = (event) => {
-        console.log('WebSocket connection closed:', event.code, event.reason);
-      };
-
-      ws.onmessage = (event) => {
-        const update = JSON.parse(event.data);
-        console.log('WebSocket update received:', update);
-        
-        if (update.type === 'step_update') {
-          setDeploymentSteps(prev => 
-            prev.map(step => 
-              step.id === update.stepId 
-                ? { ...step, status: update.status, details: update.details }
-                : step
-            )
-          );
-        } else if (update.type === 'deployment_complete') {
-          setDeploymentStatus('completed');
-          setDeploymentSteps(prev => 
-            prev.map(step => ({ ...step, status: 'completed' }))
-          );
-        } else if (update.type === 'deployment_failed') {
-          setDeploymentStatus('failed');
-          console.error('Deployment failed:', update.error);
-        }
-      };
-
-      // Start deployment via API
-      console.log('Starting deployment with config:', tenantConfig);
-      
-      const response = await fetch('http://localhost:4000/api/tenants/provision', {
+      // Create tenant
+      const token = localStorage.getItem('admin_token');
+      const response = await fetch(`${API_BASE}/api/customers`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('admin_token') || 'admin-token-12345'}`
+          'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(tenantConfig)
+        body: JSON.stringify(formData)
       });
 
-      console.log('API response status:', response.status);
-
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error('API error response:', errorText);
-        throw new Error(`Deployment failed to start: ${response.status} ${errorText}`);
+        const data = await response.json();
+        throw new Error(data.error || `Failed to create tenant: ${response.status}`);
       }
 
-      const result = await response.json();
-      console.log('Deployment started successfully:', result);
+      const tenant = await response.json();
+      setCreatedTenant(tenant);
+      setStep('success');
 
-    } catch (error) {
-      console.error('Deployment error:', error);
-      setDeploymentStatus('failed');
-      setDeploymentError(error instanceof Error ? error.message : String(error));
+    } catch (err) {
+      console.error('Tenant creation error:', err);
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
+      setStep('error');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const renderForm = () => (
+    <form onSubmit={handleSubmit}>
+      <CardContent className="space-y-6">
+        {/* Organization Info */}
+        <div className="space-y-4">
+          <h3 className="font-semibold text-lg flex items-center gap-2">
+            <span className="w-6 h-6 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-sm">1</span>
+            Organization Information
+          </h3>
+          
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Organization Name *</Label>
+              <Input
+                id="name"
+                value={formData.name}
+                onChange={(e) => handleNameChange(e.target.value)}
+                placeholder="Acme University"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="contact_email">Contact Email *</Label>
+              <Input
+                id="contact_email"
+                type="email"
+                value={formData.contact_email}
+                onChange={(e) => handleChange('contact_email', e.target.value)}
+                placeholder="admin@acme.edu"
+              />
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="subdomain">EdSteward URL</Label>
+            <div className="flex items-center gap-2">
+              <span className="text-muted-foreground">https://</span>
+              <Input
+                id="subdomain"
+                value={formData.subdomain}
+                onChange={(e) => handleChange('subdomain', e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ''))}
+                placeholder="acme"
+                className="max-w-[200px]"
+              />
+              <span className="text-muted-foreground">.edsteward.ai</span>
+            </div>
+            <p className="text-xs text-muted-foreground">This will be their login URL</p>
+          </div>
+        </div>
+
+        {/* Database */}
+        <div className="space-y-4">
+          <h3 className="font-semibold text-lg flex items-center gap-2">
+            <span className="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-sm">2</span>
+            Database Connection
+          </h3>
+          
+          <div className="bg-blue-50 p-4 rounded-lg text-sm">
+            <p className="font-medium text-blue-900">Create a new Neon database for this tenant:</p>
+            <ol className="mt-2 list-decimal list-inside text-blue-800 space-y-1">
+              <li>Go to <a href="https://console.neon.tech" target="_blank" rel="noopener noreferrer" className="underline">console.neon.tech</a></li>
+              <li>Create a new project named <strong>edsteward-{formData.subdomain || 'tenant'}</strong></li>
+              <li>Copy the connection string and paste below</li>
+            </ol>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="database_url">Database Connection URL *</Label>
+            <Textarea
+              id="database_url"
+              value={formData.database_url}
+              onChange={(e) => handleChange('database_url', e.target.value)}
+              placeholder="postgresql://user:password@ep-xxx.us-east-1.aws.neon.tech/neondb?sslmode=require"
+              className="font-mono text-sm"
+              rows={2}
+            />
+            <p className="text-xs text-muted-foreground">Neon PostgreSQL connection string</p>
+          </div>
+        </div>
+
+        {/* Plan */}
+        <div className="space-y-4">
+          <h3 className="font-semibold text-lg flex items-center gap-2">
+            <span className="w-6 h-6 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-sm">3</span>
+            Subscription Plan
+          </h3>
+          
+          <div className="grid grid-cols-3 gap-4">
+            {(['starter', 'professional', 'enterprise'] as const).map((plan) => (
+              <button
+                key={plan}
+                type="button"
+                onClick={() => handleChange('plan', plan)}
+                className={`p-4 rounded-lg border-2 text-left transition-colors ${
+                  formData.plan === plan 
+                    ? 'border-blue-500 bg-blue-50' 
+                    : 'border-gray-200 hover:border-gray-300'
+                }`}
+              >
+                <div className="font-semibold capitalize">{plan}</div>
+                <div className="text-xs text-muted-foreground mt-1">
+                  {plan === 'starter' && '10 users, 100 regulations'}
+                  {plan === 'professional' && '50 users, 500 regulations'}
+                  {plan === 'enterprise' && 'Unlimited'}
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+            <AlertCircle className="h-5 w-5 text-red-500 flex-shrink-0 mt-0.5" />
+            <div>
+              <p className="font-medium text-red-800">Error</p>
+              <p className="text-sm text-red-600">{error}</p>
+            </div>
+          </div>
+        )}
+      </CardContent>
+
+      <CardFooter className="flex justify-between">
+        <Button type="button" variant="outline" onClick={() => navigate('/customers')}>
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Cancel
+        </Button>
+        <Button type="submit" disabled={isSubmitting}>
+          {isSubmitting ? (
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Creating...
+            </>
+          ) : (
+            <>
+              <Database className="h-4 w-4 mr-2" />
+              Create Tenant
+            </>
+          )}
+        </Button>
+      </CardFooter>
+    </form>
+  );
+
+  const renderTesting = () => (
+    <CardContent className="py-12 text-center">
+      <Loader2 className="h-12 w-12 mx-auto mb-4 animate-spin text-blue-500" />
+      <h3 className="text-lg font-semibold">Setting Up Tenant...</h3>
+      <p className="text-muted-foreground mt-2">Testing database connection and creating tenant record</p>
+    </CardContent>
+  );
+
+  const renderSuccess = () => (
+    <CardContent className="py-12 text-center">
+      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-green-100 flex items-center justify-center">
+        <CheckCircle className="h-8 w-8 text-green-600" />
+      </div>
+      <h3 className="text-xl font-semibold text-green-800">Tenant Created Successfully!</h3>
+      <p className="text-muted-foreground mt-2 mb-6">
+        <strong>{createdTenant?.name}</strong> is ready to use at:
+      </p>
+      <a 
+        href={`https://${createdTenant?.subdomain}.edsteward.ai`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+      >
+        https://{createdTenant?.subdomain}.edsteward.ai
+      </a>
       
-      // Close WebSocket if it exists
-      if (websocket && websocket.readyState === WebSocket.OPEN) {
-        websocket.close();
-      }
-    }
-  };
+      <div className="mt-8 p-4 bg-yellow-50 rounded-lg text-left max-w-md mx-auto">
+        <h4 className="font-semibold text-yellow-800">Next Steps:</h4>
+        <ol className="mt-2 list-decimal list-inside text-sm text-yellow-700 space-y-1">
+          <li>Run database migrations on the new database</li>
+          <li>Create the first admin user</li>
+          <li>Configure DNS for {createdTenant?.subdomain}.edsteward.ai</li>
+          <li>Set up SSO if needed</li>
+        </ol>
+      </div>
 
-  const getStepIcon = (status: string) => {
-    switch (status) {
-      case 'completed': return <CheckCircle className="h-5 w-5 text-green-500" />;
-      case 'running': return <Clock className="h-5 w-5 text-blue-500 animate-spin" />;
-      case 'failed': return <AlertCircle className="h-5 w-5 text-red-500" />;
-      default: return <div className="h-5 w-5 rounded-full border-2 border-gray-300" />;
-    }
-  };
+      <div className="mt-6 flex justify-center gap-4">
+        <Button variant="outline" onClick={() => navigate('/customers')}>
+          Back to Customers
+        </Button>
+        <Button onClick={() => {
+          setStep('form');
+          setFormData({
+            name: '',
+            subdomain: '',
+            contact_email: '',
+            database_url: '',
+            plan: 'starter'
+          });
+          setCreatedTenant(null);
+        }}>
+          Create Another
+        </Button>
+      </div>
+    </CardContent>
+  );
 
-  const renderStepContent = () => {
-    switch (currentStep) {
-      case 1:
-        return (
-          <div className="space-y-6">
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <h4 className="font-semibold flex items-center gap-2">
-                <Globe className="h-5 w-5" />
-                Customer Deployment Information
-              </h4>
-              <p className="text-sm text-gray-600 mt-1">
-                Each customer gets their own subdomain: <strong>{tenantConfig.customerSubdomain || 'customer'}.edsteward.ai</strong>
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="customerName">Customer/Organization Name *</Label>
-                <Input
-                  id="customerName"
-                  value={tenantConfig.customerName}
-                  onChange={(e) => handleInputChange('customerName', e.target.value)}
-                  placeholder="Acme University"
-                />
-              </div>
-              <div>
-                <Label htmlFor="organizationDomain">Organization Domain *</Label>
-                <Input
-                  id="organizationDomain"
-                  value={tenantConfig.organizationDomain}
-                  onChange={(e) => handleInputChange('organizationDomain', e.target.value)}
-                  placeholder="acme.edu"
-                />
-                <p className="text-xs text-gray-500 mt-1">Their actual domain (for reference only)</p>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="customerSubdomain">EdSteward Deployment URL</Label>
-                <div className="flex items-center space-x-2">
-                  <Input
-                    id="customerSubdomain"
-                    value={tenantConfig.customerSubdomain}
-                    readOnly
-                    className="bg-gray-100"
-                  />
-                  <span className="text-sm text-gray-500">.edsteward.ai</span>
-                </div>
-                <p className="text-xs text-gray-500 mt-1">Auto-generated from customer name</p>
-              </div>
-              <div>
-                <Label htmlFor="contactEmail">Contact Email *</Label>
-                <Input
-                  id="contactEmail"
-                  type="email"
-                  value={tenantConfig.contactEmail}
-                  onChange={(e) => handleInputChange('contactEmail', e.target.value)}
-                  placeholder="admin@acme.edu"
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="organizationUrl">Organization Website URL</Label>
-              <Input
-                id="organizationUrl"
-                value={tenantConfig.organizationUrl}
-                onChange={(e) => handleInputChange('organizationUrl', e.target.value)}
-                placeholder="https://www.acme.edu"
-              />
-              <p className="text-xs text-gray-500 mt-1">Link to their main website (for reference)</p>
-            </div>
-          </div>
-        );
-
-      case 2:
-        return (
-          <div className="space-y-6">
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <h4 className="font-semibold flex items-center gap-2">
-                <Cloud className="h-5 w-5" />
-                Complete AWS Isolation
-              </h4>
-              <p className="text-sm text-gray-600 mt-1">
-                Each customer gets their own VPC, ECS cluster, RDS instance, and Load Balancer for complete isolation.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="awsRegion">AWS Region *</Label>
-                <Select value={tenantConfig.awsRegion} onValueChange={(value) => handleInputChange('awsRegion', value)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="us-east-1">US East (N. Virginia)</SelectItem>
-                    <SelectItem value="us-east-2">US East (Ohio)</SelectItem>
-                    <SelectItem value="us-west-1">US West (N. California)</SelectItem>
-                    <SelectItem value="us-west-2">US West (Oregon)</SelectItem>
-                    <SelectItem value="eu-west-1">Europe (Ireland)</SelectItem>
-                    <SelectItem value="eu-central-1">Europe (Frankfurt)</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="awsAccountId">AWS Account ID *</Label>
-                <Input
-                  id="awsAccountId"
-                  value={tenantConfig.awsAccountId}
-                  onChange={(e) => handleInputChange('awsAccountId', e.target.value)}
-                  placeholder="123456789012"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="clusterName">ECS Cluster Name</Label>
-                <Input
-                  id="clusterName"
-                  value={tenantConfig.clusterName}
-                  readOnly
-                  className="bg-gray-100"
-                />
-              </div>
-              <div>
-                <Label htmlFor="serviceName">ECS Service Name</Label>
-                <Input
-                  id="serviceName"
-                  value={tenantConfig.serviceName}
-                  readOnly
-                  className="bg-gray-100"
-                />
-              </div>
-            </div>
-
-            <div>
-              <Label htmlFor="ecrRepository">ECR Repository</Label>
-              <Input
-                id="ecrRepository"
-                value={tenantConfig.ecrRepository}
-                readOnly
-                className="bg-gray-100"
-              />
-            </div>
-          </div>
-        );
-
-      case 3:
-        return (
-          <div className="space-y-6">
-            <div className="bg-green-50 p-4 rounded-lg">
-              <h4 className="font-semibold flex items-center gap-2">
-                <Database className="h-5 w-5" />
-                Database Configuration
-              </h4>
-              <p className="text-sm text-gray-600 mt-1">
-                Each customer gets their own dedicated PostgreSQL database instance.
-              </p>
-            </div>
-
-            <div>
-              <Label htmlFor="databaseType">Database Type</Label>
-              <Select value={tenantConfig.databaseType} onValueChange={(value) => handleInputChange('databaseType', value)}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="neon">Neon PostgreSQL (Recommended)</SelectItem>
-                  <SelectItem value="rds">AWS RDS PostgreSQL</SelectItem>
-                  <SelectItem value="custom">Custom PostgreSQL</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div>
-              <Label htmlFor="databaseUrl">Database Connection URL *</Label>
-              <Textarea
-                id="databaseUrl"
-                value={tenantConfig.databaseUrl}
-                onChange={(e) => handleInputChange('databaseUrl', e.target.value)}
-                placeholder="postgresql://user:password@host:5432/database?sslmode=require"
-                className="font-mono text-sm"
-              />
-            </div>
-          </div>
-        );
-
-      case 4:
-        return (
-          <div className="space-y-6">
-            <div className="bg-purple-50 p-4 rounded-lg">
-              <h4 className="font-semibold flex items-center gap-2">
-                <Globe className="h-5 w-5" />
-                Branding & Configuration
-              </h4>
-              <p className="text-sm text-gray-600 mt-1">
-                Customize the appearance and limits for this customer.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="primaryColor">Primary Color</Label>
-                <div className="flex gap-2">
-                  <Input
-                    id="primaryColor"
-                    type="color"
-                    value={tenantConfig.primaryColor}
-                    onChange={(e) => handleInputChange('primaryColor', e.target.value)}
-                    className="w-16 h-10"
-                  />
-                  <Input
-                    value={tenantConfig.primaryColor}
-                    onChange={(e) => handleInputChange('primaryColor', e.target.value)}
-                    placeholder="#3b82f6"
-                  />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="logoUrl">Logo URL</Label>
-                <Input
-                  id="logoUrl"
-                  value={tenantConfig.logoUrl}
-                  onChange={(e) => handleInputChange('logoUrl', e.target.value)}
-                  placeholder="https://example.com/logo.png"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="maxUsers">Max Users</Label>
-                <Input
-                  id="maxUsers"
-                  type="number"
-                  value={tenantConfig.maxUsers}
-                  onChange={(e) => handleInputChange('maxUsers', parseInt(e.target.value))}
-                />
-              </div>
-              <div>
-                <Label htmlFor="maxRegulations">Max Regulations</Label>
-                <Input
-                  id="maxRegulations"
-                  type="number"
-                  value={tenantConfig.maxRegulations}
-                  onChange={(e) => handleInputChange('maxRegulations', parseInt(e.target.value))}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="samlEnabled"
-                  checked={tenantConfig.samlEnabled}
-                  onChange={(e) => handleInputChange('samlEnabled', e.target.checked)}
-                />
-                <Label htmlFor="samlEnabled">Enable SAML Authentication</Label>
-              </div>
-
-              {tenantConfig.samlEnabled && (
-                <div>
-                  <Label htmlFor="ssoProvider">SSO Provider</Label>
-                  <Select value={tenantConfig.ssoProvider} onValueChange={(value) => handleInputChange('ssoProvider', value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select SSO provider" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="azure">Azure AD / Entra ID</SelectItem>
-                      <SelectItem value="okta">Okta</SelectItem>
-                      <SelectItem value="google">Google Workspace</SelectItem>
-                      <SelectItem value="generic">Generic SAML</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-            </div>
-          </div>
-        );
-
-      case 5:
-        return (
-          <div className="space-y-6">
-            <div className="bg-blue-50 p-4 rounded-lg">
-              <h4 className="font-semibold flex items-center gap-2">
-                <Zap className="h-5 w-5" />
-                Deployment Progress
-              </h4>
-              <p className="text-sm text-gray-600 mt-1">
-                Real-time monitoring of AWS infrastructure provisioning and application deployment.
-              </p>
-            </div>
-
-            <div className="space-y-4">
-              {deploymentSteps.map((step, index) => (
-                <div key={step.id} className="flex items-center space-x-4 p-4 border rounded-lg">
-                  <div className="flex-shrink-0">
-                    {getStepIcon(step.status)}
-                  </div>
-                  <div className="flex-grow">
-                    <div className="flex items-center justify-between">
-                      <h4 className="font-medium">{step.name}</h4>
-                      <Badge variant={
-                        step.status === 'completed' ? 'default' :
-                        step.status === 'running' ? 'secondary' :
-                        step.status === 'failed' ? 'destructive' : 'outline'
-                      }>
-                        {step.status}
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-gray-600">{step.description}</p>
-                    {step.details && (
-                      <p className="text-xs text-gray-500 mt-1">{step.details}</p>
-                    )}
-                    {step.duration && (
-                      <p className="text-xs text-gray-500 mt-1">Duration: {step.duration}s</p>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {deploymentStatus === 'idle' && (
-              <Button onClick={startDeployment} className="w-full" size="lg">
-                <Shield className="h-5 w-5 mr-2" />
-                Deploy Isolated AWS Infrastructure
-              </Button>
-            )}
-
-            {deploymentStatus === 'deploying' && (
-              <div className="text-center">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
-                <p className="text-sm text-gray-600">Deploying infrastructure...</p>
-              </div>
-            )}
-
-            {deploymentStatus === 'completed' && (
-              <div className="text-center p-4 bg-green-50 rounded-lg">
-                <CheckCircle className="h-8 w-8 text-green-500 mx-auto mb-2" />
-                <h4 className="font-semibold text-green-700">Deployment Completed!</h4>
-                <p className="text-sm text-green-600">
-                  Customer deployment is ready at: <strong>https://{tenantConfig.customerSubdomain}.edsteward.ai</strong>
-                </p>
-                <p className="text-xs text-green-500 mt-1">
-                  Complete AWS isolation with dedicated VPC, ECS cluster, and database
-                </p>
-              </div>
-            )}
-
-            {deploymentStatus === 'failed' && (
-              <div className="text-center p-4 bg-red-50 rounded-lg">
-                <AlertCircle className="h-8 w-8 text-red-500 mx-auto mb-2" />
-                <h4 className="font-semibold text-red-700">Deployment Failed</h4>
-                <p className="text-sm text-red-600">
-                  {deploymentError || 'Please check the logs and try again.'}
-                </p>
-                <Button 
-                  onClick={() => {
-                    setDeploymentStatus('idle');
-                    setDeploymentError(null);
-                    setDeploymentSteps(prev => prev.map(step => ({ ...step, status: 'pending' })));
-                  }}
-                  variant="outline"
-                  className="mt-2"
-                >
-                  Try Again
-                </Button>
-              </div>
-            )}
-          </div>
-        );
-
-      default:
-        return null;
-    }
-  };
+  const renderError = () => (
+    <CardContent className="py-12 text-center">
+      <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-red-100 flex items-center justify-center">
+        <AlertCircle className="h-8 w-8 text-red-600" />
+      </div>
+      <h3 className="text-xl font-semibold text-red-800">Creation Failed</h3>
+      <p className="text-muted-foreground mt-2 mb-4">{error}</p>
+      
+      <div className="flex justify-center gap-4">
+        <Button variant="outline" onClick={() => navigate('/customers')}>
+          Back to Customers
+        </Button>
+        <Button onClick={() => {
+          setStep('form');
+          setError(null);
+        }}>
+          Try Again
+        </Button>
+      </div>
+    </CardContent>
+  );
 
   return (
-    <div className="max-w-4xl mx-auto p-6">
+    <div className="max-w-2xl mx-auto p-6">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Cloud className="h-6 w-6" />
-            Create New Tenant - Enhanced ECS Isolation
+            <Database className="h-6 w-6" />
+            Add New Tenant
           </CardTitle>
-          <div className="flex items-center space-x-2">
-            <Progress value={(currentStep / 5) * 100} className="flex-grow" />
-            <span className="text-sm text-gray-500">Step {currentStep} of 5</span>
-          </div>
+          <CardDescription>
+            Create a new EdSteward tenant with their own isolated database
+          </CardDescription>
         </CardHeader>
-        
-        <CardContent>
-          <Tabs value={currentStep.toString()} className="w-full">
-            <TabsList className="grid w-full grid-cols-5">
-              <TabsTrigger value="1">Organization</TabsTrigger>
-              <TabsTrigger value="2">AWS</TabsTrigger>
-              <TabsTrigger value="3">Database</TabsTrigger>
-              <TabsTrigger value="4">Branding</TabsTrigger>
-              <TabsTrigger value="5">Deploy</TabsTrigger>
-            </TabsList>
 
-            {[1, 2, 3, 4, 5].map(step => (
-              <TabsContent key={step} value={step.toString()}>
-                {renderStepContent()}
-              </TabsContent>
-            ))}
-          </Tabs>
-
-          <div className="flex justify-between mt-6">
-            <Button
-              variant="outline"
-              onClick={prevStep}
-              disabled={currentStep === 1}
-            >
-              Previous
-            </Button>
-            
-            {currentStep < 5 ? (
-              <Button
-                onClick={nextStep}
-                disabled={!validateStep(currentStep)}
-              >
-                Next
-              </Button>
-            ) : null}
-          </div>
-        </CardContent>
+        {step === 'form' && renderForm()}
+        {step === 'testing' && renderTesting()}
+        {step === 'success' && renderSuccess()}
+        {step === 'error' && renderError()}
       </Card>
     </div>
   );
 };
 
-export default TenantCreationWizard; 
+export default TenantCreationWizard;

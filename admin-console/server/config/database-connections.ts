@@ -1,6 +1,8 @@
 /**
- * Customer Database Connection Manager
- * Handles connections to different customer tenant databases
+ * Admin Console Database Manager
+ * Handles connections to the admin database and tenant databases
+ * 
+ * REBUILT: Tenants are now stored in the database, not hardcoded
  */
 
 import dotenv from 'dotenv';
@@ -8,343 +10,435 @@ import { Pool } from 'pg';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
-// Get current directory and load environment variables from correct path
+// Load environment variables
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-dotenv.config({ path: join(__dirname, '..', '.env') });
+// When compiled, we're in dist/config, so go up two levels to server/
+dotenv.config({ path: join(__dirname, '..', '..', '.env') });
 
-// Customer tenant database configurations
-export interface CustomerTenantConfig {
+// Tenant interface - matches database schema
+export interface Tenant {
   id: string;
   name: string;
   subdomain: string;
-  status: 'active' | 'inactive' | 'maintenance';
-  databaseUrl: string;
-  healthCheckUrl?: string;
+  status: 'active' | 'inactive' | 'pending' | 'suspended';
+  database_url: string;
+  contact_email: string;
+  contact_name?: string;
+  organization_url?: string;
+  plan: 'starter' | 'professional' | 'enterprise';
+  max_users: number;
+  max_regulations: number;
+  deployment_type: 'cloud' | 'on-premises';
+  aws_region?: string;
+  health_check_url?: string;
+  sso_enabled: boolean;
+  sso_provider?: string;
+  primary_color: string;
+  logo_url?: string;
+  created_at: Date;
+  updated_at: Date;
+  last_health_check?: Date;
+  cached_user_count: number;
+  cached_regulation_count: number;
+  cached_last_activity?: Date;
 }
 
-// Define customer tenant configurations
-export const customerTenants: CustomerTenantConfig[] = [
-  {
-    id: 'moravian',
-    name: 'Moravian University',
-    subdomain: 'moravian',
-    status: 'active',
-    databaseUrl: process.env.DATABASE_URL || '',
-    healthCheckUrl: 'https://moravian.edsteward.ai/api/health'
-  },
-  {
-    id: 'test',
-    name: 'Test University',
-    subdomain: 'test',
-    status: 'active',
-    databaseUrl: process.env.DATABASE_URL || '',
-    healthCheckUrl: 'http://localhost:3000/api/health'
-  },
-  {
-    id: 'beta',
-    name: 'Beta University', 
-    subdomain: 'beta',
-    status: 'active',
-    databaseUrl: process.env.DATABASE_URL || '',
-    healthCheckUrl: 'http://localhost:3000/api/health'
-  }
-];
+// Admin database connection (where tenants table lives)
+const adminPool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.DATABASE_URL?.includes('neon.tech') ? { rejectUnauthorized: false } : false,
+  max: 10,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 5000
+});
 
-// Database connection pools for each tenant
-const connectionPools = new Map<string, Pool>();
+// Tenant database connection pools (cached)
+const tenantPools = new Map<string, Pool>();
 
 /**
- * Get database connection pool for a specific tenant
+ * Initialize admin database - create tables if needed
  */
-export function getTenantDatabasePool(tenantId: string): Pool {
-  if (connectionPools.has(tenantId)) {
-    return connectionPools.get(tenantId)!;
-  }
+export async function initializeAdminDatabase(): Promise<void> {
+  const client = await adminPool.connect();
+  try {
+    // Create tenants table
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS tenants (
+        id VARCHAR(50) PRIMARY KEY,
+        name VARCHAR(255) NOT NULL,
+        subdomain VARCHAR(100) UNIQUE NOT NULL,
+        status VARCHAR(20) DEFAULT 'pending',
+        database_url TEXT NOT NULL,
+        contact_email VARCHAR(255) NOT NULL,
+        contact_name VARCHAR(255),
+        organization_url VARCHAR(500),
+        plan VARCHAR(50) DEFAULT 'starter',
+        max_users INTEGER DEFAULT 10,
+        max_regulations INTEGER DEFAULT 100,
+        deployment_type VARCHAR(20) DEFAULT 'cloud',
+        aws_region VARCHAR(50),
+        health_check_url VARCHAR(500),
+        sso_enabled BOOLEAN DEFAULT FALSE,
+        sso_provider VARCHAR(50),
+        sso_entity_id VARCHAR(500),
+        sso_sso_url VARCHAR(500),
+        sso_certificate TEXT,
+        primary_color VARCHAR(20) DEFAULT '#1e40af',
+        logo_url VARCHAR(500),
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        last_health_check TIMESTAMP WITH TIME ZONE,
+        cached_user_count INTEGER DEFAULT 0,
+        cached_regulation_count INTEGER DEFAULT 0,
+        cached_last_activity TIMESTAMP WITH TIME ZONE
+      )
+    `);
 
-  const tenant = customerTenants.find(t => t.id === tenantId);
-  if (!tenant) {
-    throw new Error(`Tenant not found: ${tenantId}`);
-  }
+    // Insert Moravian if not exists (the only real tenant currently)
+    const moravianExists = await client.query(
+      'SELECT id FROM tenants WHERE id = $1',
+      ['moravian']
+    );
+    
+    if (moravianExists.rows.length === 0 && process.env.DATABASE_URL) {
+      await client.query(`
+        INSERT INTO tenants (id, name, subdomain, status, database_url, contact_email, plan, deployment_type, health_check_url)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      `, [
+        'moravian',
+        'Moravian University',
+        'moravian',
+        'active',
+        process.env.DATABASE_URL,
+        'admin@moravian.edu',
+        'enterprise',
+        'cloud',
+        'https://moravian.edsteward.ai/api/health'
+      ]);
+      console.log('✅ Inserted Moravian University as initial tenant');
+    }
 
-  console.log(`Creating connection pool for tenant ${tenantId}:`);
-  console.log(`Database URL: ${tenant.databaseUrl ? '[SET]' : '[NOT SET]'}`);
-  console.log(`URL includes neon.tech: ${tenant.databaseUrl.includes('neon.tech')}`);
+    console.log('✅ Admin database initialized');
+  } finally {
+    client.release();
+  }
+}
+
+/**
+ * Get all tenants from database
+ */
+export async function getAllTenants(): Promise<Tenant[]> {
+  const result = await adminPool.query('SELECT * FROM tenants ORDER BY created_at DESC');
+  return result.rows;
+}
+
+/**
+ * Get a single tenant by ID
+ */
+export async function getTenantById(tenantId: string): Promise<Tenant | null> {
+  const result = await adminPool.query('SELECT * FROM tenants WHERE id = $1', [tenantId]);
+  return result.rows[0] || null;
+}
+
+/**
+ * Get a tenant by subdomain
+ */
+export async function getTenantBySubdomain(subdomain: string): Promise<Tenant | null> {
+  const result = await adminPool.query('SELECT * FROM tenants WHERE subdomain = $1', [subdomain]);
+  return result.rows[0] || null;
+}
+
+/**
+ * Create a new tenant
+ */
+export async function createTenant(tenant: Partial<Tenant>): Promise<Tenant> {
+  const id = tenant.id || tenant.subdomain?.toLowerCase().replace(/[^a-z0-9]/g, '-');
   
+  const result = await adminPool.query(`
+    INSERT INTO tenants (
+      id, name, subdomain, status, database_url, contact_email, contact_name,
+      organization_url, plan, max_users, max_regulations, deployment_type,
+      aws_region, health_check_url, sso_enabled, primary_color, logo_url
+    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+    RETURNING *
+  `, [
+    id,
+    tenant.name,
+    tenant.subdomain,
+    tenant.status || 'pending',
+    tenant.database_url,
+    tenant.contact_email,
+    tenant.contact_name || null,
+    tenant.organization_url || null,
+    tenant.plan || 'starter',
+    tenant.max_users || 10,
+    tenant.max_regulations || 100,
+    tenant.deployment_type || 'cloud',
+    tenant.aws_region || null,
+    tenant.health_check_url || `https://${tenant.subdomain}.edsteward.ai/api/health`,
+    tenant.sso_enabled || false,
+    tenant.primary_color || '#1e40af',
+    tenant.logo_url || null
+  ]);
+
+  return result.rows[0];
+}
+
+/**
+ * Update a tenant
+ */
+export async function updateTenant(tenantId: string, updates: Partial<Tenant>): Promise<Tenant | null> {
+  const fields: string[] = [];
+  const values: any[] = [];
+  let paramIndex = 1;
+
+  // Build dynamic update query
+  const updateableFields = [
+    'name', 'status', 'database_url', 'contact_email', 'contact_name',
+    'organization_url', 'plan', 'max_users', 'max_regulations', 'deployment_type',
+    'aws_region', 'health_check_url', 'sso_enabled', 'sso_provider', 'primary_color', 'logo_url'
+  ];
+
+  for (const field of updateableFields) {
+    if (updates[field as keyof Tenant] !== undefined) {
+      fields.push(`${field} = $${paramIndex}`);
+      values.push(updates[field as keyof Tenant]);
+      paramIndex++;
+    }
+  }
+
+  if (fields.length === 0) return getTenantById(tenantId);
+
+  fields.push(`updated_at = CURRENT_TIMESTAMP`);
+  values.push(tenantId);
+
+  const result = await adminPool.query(
+    `UPDATE tenants SET ${fields.join(', ')} WHERE id = $${paramIndex} RETURNING *`,
+    values
+  );
+
+  return result.rows[0] || null;
+}
+
+/**
+ * Delete a tenant
+ */
+export async function deleteTenant(tenantId: string): Promise<boolean> {
+  const result = await adminPool.query('DELETE FROM tenants WHERE id = $1', [tenantId]);
+  
+  // Clean up connection pool
+  if (tenantPools.has(tenantId)) {
+    await tenantPools.get(tenantId)?.end();
+    tenantPools.delete(tenantId);
+  }
+  
+  return (result.rowCount || 0) > 0;
+}
+
+/**
+ * Get database pool for a specific tenant
+ */
+export function getTenantDatabasePool(tenant: Tenant): Pool {
+  if (tenantPools.has(tenant.id)) {
+    return tenantPools.get(tenant.id)!;
+  }
+
   const pool = new Pool({
-    connectionString: tenant.databaseUrl,
-    ssl: tenant.databaseUrl.includes('neon.tech') ? { rejectUnauthorized: false } : false,
-    max: 5, // Limit connections per tenant
+    connectionString: tenant.database_url,
+    ssl: tenant.database_url.includes('neon.tech') ? { rejectUnauthorized: false } : false,
+    max: 5,
     idleTimeoutMillis: 30000,
     connectionTimeoutMillis: 5000
   });
 
-  connectionPools.set(tenantId, pool);
+  tenantPools.set(tenant.id, pool);
   return pool;
 }
 
 /**
- * Execute query on a specific tenant database
+ * Query a tenant's database
  */
-export async function queryTenantDatabase(tenantId: string, query: string, params: any[] = []) {
-  const pool = getTenantDatabasePool(tenantId);
-  
-  try {
-    const result = await pool.query(query, params);
-    return result;
-  } catch (error) {
-    console.error(`Database query error for tenant ${tenantId}:`, error);
-    throw error;
-  }
+export async function queryTenantDatabase(tenant: Tenant, query: string, params: any[] = []): Promise<any> {
+  const pool = getTenantDatabasePool(tenant);
+  return pool.query(query, params);
 }
 
 /**
- * Get comprehensive tenant statistics including real user activity tracking
+ * Get real-time stats for a tenant by querying their database
  */
-export async function getTenantStats(tenantId: string) {
+export async function getTenantStats(tenant: Tenant): Promise<{
+  userCount: number;
+  regulationCount: number;
+  lastActivity: string | null;
+  error?: string;
+}> {
   try {
-    const [usersResult, regulationsResult, lastActivityResult] = await Promise.all([
-      queryTenantDatabase(tenantId, 'SELECT COUNT(*) as count FROM users'),
-      queryTenantDatabase(tenantId, 'SELECT COUNT(*) as count FROM regulations'),
-      getRealLastActivity(tenantId)
+    const pool = getTenantDatabasePool(tenant);
+    
+    const [usersResult, regulationsResult, activityResult] = await Promise.all([
+      pool.query('SELECT COUNT(*) as count FROM users'),
+      pool.query('SELECT COUNT(*) as count FROM regulations'),
+      pool.query(`
+        SELECT GREATEST(
+          (SELECT MAX(last_login) FROM users WHERE last_login IS NOT NULL),
+          (SELECT MAX(created_at) FROM users)
+        ) as last_activity
+      `)
     ]);
 
-    return {
+    const stats = {
       userCount: parseInt(usersResult.rows[0]?.count || '0'),
       regulationCount: parseInt(regulationsResult.rows[0]?.count || '0'),
-      lastActivity: lastActivityResult
+      lastActivity: activityResult.rows[0]?.last_activity?.toISOString() || null
     };
+
+    // Update cached stats in admin database
+    await adminPool.query(`
+      UPDATE tenants 
+      SET cached_user_count = $1, 
+          cached_regulation_count = $2, 
+          cached_last_activity = $3,
+          updated_at = CURRENT_TIMESTAMP
+      WHERE id = $4
+    `, [stats.userCount, stats.regulationCount, stats.lastActivity, tenant.id]);
+
+    return stats;
   } catch (error) {
-    console.error(`Error getting stats for tenant ${tenantId}:`, error);
+    console.error(`Error getting stats for tenant ${tenant.id}:`, error);
     return {
-      userCount: 0,
-      regulationCount: 0,
-      lastActivity: null,
+      userCount: tenant.cached_user_count || 0,
+      regulationCount: tenant.cached_regulation_count || 0,
+      lastActivity: tenant.cached_last_activity?.toISOString() || null,
       error: error instanceof Error ? error.message : 'Unknown error'
     };
   }
 }
 
 /**
- * Get real user activity from multiple sources to find the most recent activity
+ * Check database health for a tenant
  */
-async function getRealLastActivity(tenantId: string): Promise<string | null> {
+export async function checkTenantDatabaseHealth(tenant: Tenant): Promise<{
+  status: 'healthy' | 'unhealthy';
+  connected: boolean;
+  responseTimeMs: number;
+  error?: string;
+}> {
+  const startTime = Date.now();
   try {
-    // Check multiple activity sources and find the most recent timestamp
-    const activityQueries = [
-      // Last login (most reliable activity indicator)
-      queryTenantDatabase(tenantId, `
-        SELECT last_login as activity_time, 'user_login' as activity_type
-        FROM users 
-        WHERE last_login IS NOT NULL 
-        ORDER BY last_login DESC 
-        LIMIT 1
-      `),
-      
-      // System logs for user activities (login, regulation views, etc.)
-      queryTenantDatabase(tenantId, `
-        SELECT timestamp as activity_time, 'system_log' as activity_type
-        FROM system_logs 
-        WHERE structured_data->>'userId' IS NOT NULL
-        ORDER BY timestamp DESC 
-        LIMIT 1
-      `),
-      
-      // Recent user sessions
-      queryTenantDatabase(tenantId, `
-        SELECT expire as activity_time, 'active_session' as activity_type
-        FROM session 
-        WHERE expire > NOW()
-        ORDER BY expire DESC 
-        LIMIT 1
-      `),
-      
-      // Recent notes created/updated
-      queryTenantDatabase(tenantId, `
-        SELECT GREATEST(created_at, updated_at) as activity_time, 'note_activity' as activity_type
-        FROM notes 
-        ORDER BY GREATEST(created_at, updated_at) DESC 
-        LIMIT 1
-      `),
-      
-      // Recent comments
-      queryTenantDatabase(tenantId, `
-        SELECT created_at as activity_time, 'comment_activity' as activity_type
-        FROM comments 
-        ORDER BY created_at DESC 
-        LIMIT 1
-      `),
-      
-      // Recent evidence file uploads
-      queryTenantDatabase(tenantId, `
-        SELECT uploaded_at as activity_time, 'file_upload' as activity_type
-        FROM evidence_files 
-        ORDER BY uploaded_at DESC 
-        LIMIT 1
-      `)
-    ];
-
-    // Execute all queries in parallel
-    const results = await Promise.allSettled(activityQueries);
+    const pool = getTenantDatabasePool(tenant);
+    await pool.query('SELECT 1');
     
-    // Collect all valid timestamps
-    const allActivities: Array<{timestamp: Date, type: string}> = [];
-    
-    results.forEach((result, index) => {
-      if (result.status === 'fulfilled' && result.value.rows.length > 0) {
-        const row = result.value.rows[0];
-        if (row.activity_time) {
-          allActivities.push({
-            timestamp: new Date(row.activity_time),
-            type: row.activity_type
-          });
-        }
-      }
-    });
-
-    // Find the most recent activity
-    if (allActivities.length === 0) {
-      // Fallback to most recent user creation if no activity found
-      const fallbackResult = await queryTenantDatabase(tenantId, `
-        SELECT created_at as activity_time
-        FROM users 
-        ORDER BY created_at DESC 
-        LIMIT 1
-      `);
-      
-      return fallbackResult.rows[0]?.activity_time || null;
-    }
-
-    // Sort by timestamp and return the most recent
-    allActivities.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
-    const mostRecentActivity = allActivities[0];
-    
-    console.log(`[${tenantId}] Most recent activity: ${mostRecentActivity.type} at ${mostRecentActivity.timestamp.toISOString()}`);
-    
-    return mostRecentActivity.timestamp.toISOString();
-    
-  } catch (error) {
-    console.error(`Error getting real last activity for tenant ${tenantId}:`, error);
-    
-    // Fallback to simple user creation query if complex activity tracking fails
-    try {
-      const fallbackResult = await queryTenantDatabase(tenantId, `
-        SELECT created_at FROM users ORDER BY created_at DESC LIMIT 1
-      `);
-      return fallbackResult.rows[0]?.created_at || null;
-    } catch (fallbackError) {
-      console.error(`Fallback activity query also failed for tenant ${tenantId}:`, fallbackError);
-      return null;
-    }
-  }
-}
-
-/**
- * Check health of a tenant's database connection
- */
-export async function checkTenantHealth(tenantId: string) {
-  try {
-    const result = await queryTenantDatabase(tenantId, 'SELECT 1 as health');
     return {
       status: 'healthy',
-      database: true,
-      responseTime: Date.now()
+      connected: true,
+      responseTimeMs: Date.now() - startTime
     };
   } catch (error) {
     return {
-      status: 'unhealthy', 
-      database: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
-      responseTime: Date.now()
+      status: 'unhealthy',
+      connected: false,
+      responseTimeMs: Date.now() - startTime,
+      error: error instanceof Error ? error.message : 'Unknown error'
     };
   }
 }
 
 /**
- * Check application health by calling the health endpoint
+ * Check application health by calling health endpoint
  */
-export async function checkApplicationHealth(healthCheckUrl: string) {
+export async function checkTenantApplicationHealth(tenant: Tenant): Promise<{
+  status: 'healthy' | 'unhealthy' | 'unknown';
+  responding: boolean;
+  responseTimeMs: number;
+  serverStatus?: string;
+  error?: string;
+}> {
+  if (!tenant.health_check_url) {
+    return { status: 'unknown', responding: false, responseTimeMs: 0 };
+  }
+
+  const startTime = Date.now();
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
     
-    const response = await fetch(healthCheckUrl, {
+    const response = await fetch(tenant.health_check_url, {
       signal: controller.signal,
-      headers: {
-        'User-Agent': 'EdSteward-Admin-Console/1.0'
-      }
+      headers: { 'User-Agent': 'EdSteward-Admin/2.0' }
     });
     
     clearTimeout(timeoutId);
     
     if (response.ok) {
-      const healthData = await response.json();
+      const data = await response.json();
       return {
         status: 'healthy',
-        applicationHealth: true,
-        serverStatus: healthData.server || 'unknown',
-        databaseStatus: healthData.database || {},
-        tenantInfo: healthData.tenant || {},
-        responseTime: Date.now(),
-        fullHealthData: healthData
+        responding: true,
+        responseTimeMs: Date.now() - startTime,
+        serverStatus: data.server || 'running'
       };
     } else {
       return {
         status: 'unhealthy',
-        applicationHealth: false,
-        error: `HTTP ${response.status}: ${response.statusText}`,
-        responseTime: Date.now()
+        responding: false,
+        responseTimeMs: Date.now() - startTime,
+        error: `HTTP ${response.status}`
       };
     }
   } catch (error) {
     return {
       status: 'unhealthy',
-      applicationHealth: false,
-      error: error instanceof Error ? error.message : 'Unknown error',
-      responseTime: Date.now()
+      responding: false,
+      responseTimeMs: Date.now() - startTime,
+      error: error instanceof Error ? error.message : 'Unknown error'
     };
   }
 }
 
 /**
- * Comprehensive health check combining database and application health
+ * Comprehensive health check for a tenant
  */
-export async function checkComprehensiveHealth(tenantId: string, healthCheckUrl?: string) {
-  const dbHealth = await checkTenantHealth(tenantId);
-  
-  let appHealth = null;
-  if (healthCheckUrl) {
-    appHealth = await checkApplicationHealth(healthCheckUrl);
+export async function checkTenantHealth(tenant: Tenant): Promise<{
+  overall: 'healthy' | 'degraded' | 'unhealthy';
+  database: Awaited<ReturnType<typeof checkTenantDatabaseHealth>>;
+  application: Awaited<ReturnType<typeof checkTenantApplicationHealth>>;
+}> {
+  const [database, application] = await Promise.all([
+    checkTenantDatabaseHealth(tenant),
+    checkTenantApplicationHealth(tenant)
+  ]);
+
+  let overall: 'healthy' | 'degraded' | 'unhealthy';
+  if (database.status === 'healthy' && application.status === 'healthy') {
+    overall = 'healthy';
+  } else if (database.status === 'unhealthy') {
+    overall = 'unhealthy';
+  } else {
+    overall = 'degraded';
   }
-  
-  // Determine overall status
-  const dbHealthy = dbHealth.status === 'healthy';
-  const appHealthy = !appHealth || appHealth.status === 'healthy';
-  const overallHealthy = dbHealthy && appHealthy;
-  
-  return {
-    status: overallHealthy ? 'healthy' : 'unhealthy',
-    database: dbHealth,
-    application: appHealth,
-    overall: {
-      healthy: overallHealthy,
-      databaseConnected: dbHealthy,
-      applicationResponding: appHealthy,
-      hasErrors: !!(dbHealth.error || appHealth?.error)
-    }
-  };
+
+  // Update last health check timestamp
+  await adminPool.query(
+    'UPDATE tenants SET last_health_check = CURRENT_TIMESTAMP WHERE id = $1',
+    [tenant.id]
+  );
+
+  return { overall, database, application };
 }
 
 /**
- * Get users from a specific tenant
+ * Get users from a tenant's database
  */
-export async function getTenantUsers(tenantId: string, limit: number = 50) {
+export async function getTenantUsers(tenant: Tenant, limit: number = 50): Promise<any[]> {
   try {
-    const result = await queryTenantDatabase(
-      tenantId,
-      'SELECT id, email, username, "firstName", "lastName", role, department, created_at, last_login FROM users ORDER BY created_at DESC LIMIT $1',
-      [limit]
-    );
+    const pool = getTenantDatabasePool(tenant);
+    const result = await pool.query(`
+      SELECT id, email, username, "firstName", "lastName", role, department, created_at, last_login 
+      FROM users 
+      ORDER BY created_at DESC 
+      LIMIT $1
+    `, [limit]);
     
     return result.rows.map(user => ({
       id: user.id,
@@ -355,25 +449,35 @@ export async function getTenantUsers(tenantId: string, limit: number = 50) {
       department: user.department,
       createdAt: user.created_at,
       lastLogin: user.last_login,
-      tenantId
+      tenantId: tenant.id,
+      tenantName: tenant.name
     }));
   } catch (error) {
-    console.error(`Error getting users for tenant ${tenantId}:`, error);
+    console.error(`Error getting users for tenant ${tenant.id}:`, error);
     return [];
   }
 }
 
 /**
- * Cleanup database connections
+ * Close all database connections
  */
-export async function closeTenantConnections() {
-  for (const [tenantId, pool] of connectionPools) {
+export async function closeAllConnections(): Promise<void> {
+  // Close tenant pools
+  for (const [tenantId, pool] of tenantPools) {
     try {
       await pool.end();
-      console.log(`Closed database connection for tenant: ${tenantId}`);
+      console.log(`Closed connection pool for tenant: ${tenantId}`);
     } catch (error) {
-      console.error(`Error closing connection for tenant ${tenantId}:`, error);
+      console.error(`Error closing pool for tenant ${tenantId}:`, error);
     }
   }
-  connectionPools.clear();
-} 
+  tenantPools.clear();
+
+  // Close admin pool
+  await adminPool.end();
+  console.log('Closed admin database connection');
+}
+
+// Legacy exports for backward compatibility
+export const customerTenants: Tenant[] = []; // Will be populated from database
+export const closeTenantConnections = closeAllConnections;

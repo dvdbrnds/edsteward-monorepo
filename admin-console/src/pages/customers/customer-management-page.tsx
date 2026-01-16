@@ -1,22 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { apiGet } from '@/lib/api';
 
 interface Customer {
   id: string;
   name: string;
   subdomain: string;
-  status: 'active' | 'inactive' | 'unhealthy';
+  status: 'active' | 'inactive' | 'pending' | 'unhealthy';
+  plan: string;
+  deploymentType: string;
+  contactEmail: string;
   userCount: number;
   regulationCount: number;
-  lastActivity: string;
-  databaseHealth: boolean;
-  applicationHealth: boolean | null;
-  serverStatus: string | null;
+  lastActivity: string | null;
   healthCheckUrl?: string;
-  healthDetails?: {
-    database: any;
-    application: any;
-    overall: any;
+  createdAt: string;
+  health: {
+    overall: 'healthy' | 'degraded' | 'unhealthy';
+    database: { status: string; connected: boolean; error?: string };
+    application: { status: string; responding: boolean; error?: string };
   };
   error?: string;
 }
@@ -32,28 +34,12 @@ export function CustomerManagementPage() {
 
   const fetchCustomers = async () => {
     try {
-      const token = localStorage.getItem('admin_token');
-      console.log('🔑 Fetching customers with token:', token ? `${token.substring(0, 20)}...` : 'No token');
-      
-      const response = await fetch('http://localhost:4000/api/customers', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log('✅ Real customer data received:', data);
-        setCustomers(data);
-        setError(null);
-      } else {
-        const errorText = await response.text();
-        console.error('❌ Failed to fetch customers:', response.status, errorText);
-        setError(`Failed to fetch customers: ${response.status} ${response.statusText}`);
-      }
+      const data = await apiGet<Customer[]>('/api/customers');
+      setCustomers(data);
+      setError(null);
     } catch (err) {
-      console.error('❌ Error fetching customers:', err);
-      setError('Failed to connect to admin API');
+      console.error('Error fetching customers:', err);
+      setError(err instanceof Error ? err.message : 'Failed to connect to admin API');
     } finally {
       setIsLoading(false);
     }
@@ -62,13 +48,25 @@ export function CustomerManagementPage() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'active': return 'bg-green-100 text-green-800';
+      case 'pending': return 'bg-yellow-100 text-yellow-800';
       case 'inactive': return 'bg-gray-100 text-gray-800';
+      case 'unhealthy': return 'bg-red-100 text-red-800';
+      case 'suspended': return 'bg-orange-100 text-orange-800';
+      default: return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getHealthColor = (health: string) => {
+    switch (health) {
+      case 'healthy': return 'bg-green-100 text-green-800';
+      case 'degraded': return 'bg-yellow-100 text-yellow-800';
       case 'unhealthy': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
 
-  const formatLastActivity = (timestamp: string) => {
+  const formatLastActivity = (timestamp: string | null) => {
+    if (!timestamp) return 'Never';
     const date = new Date(timestamp);
     const now = new Date();
     const diffHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
@@ -166,36 +164,14 @@ export function CustomerManagementPage() {
                           >
                             {customer.status}
                           </span>
-                          {customer.databaseHealth && (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                              💾 DB Healthy
-                            </span>
-                          )}
-                          {!customer.databaseHealth && (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                              💾 DB Error
-                            </span>
-                          )}
-                          {customer.applicationHealth === true && (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                              🌐 App Healthy
-                            </span>
-                          )}
-                          {customer.applicationHealth === false && (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
-                              🌐 App Error
-                            </span>
-                          )}
-                          {customer.applicationHealth === null && (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                              🌐 App N/A
-                            </span>
-                          )}
-                          {customer.serverStatus && (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                              🖥️ {customer.serverStatus}
-                            </span>
-                          )}
+                          <span
+                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getHealthColor(customer.health.overall)}`}
+                          >
+                            {customer.health.overall === 'healthy' ? '✓' : customer.health.overall === 'degraded' ? '⚠' : '✗'} {customer.health.overall}
+                          </span>
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                            {customer.plan}
+                          </span>
                         </div>
                         <div className="mt-2 flex items-center text-sm text-gray-500 space-x-6">
                           <span>🌐 {customer.subdomain}.edsteward.ai</span>
@@ -208,47 +184,31 @@ export function CustomerManagementPage() {
                             Error: {customer.error}
                           </div>
                         )}
-                        {customer.healthDetails && (
-                          <details className="mt-2">
-                            <summary className="text-sm text-blue-600 cursor-pointer hover:text-blue-800">
-                              View Health Details
-                            </summary>
-                            <div className="mt-2 p-3 bg-gray-50 rounded text-xs">
-                              <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                  <h4 className="font-semibold text-gray-900 mb-1">Database Health</h4>
-                                  <p>Status: {customer.healthDetails.database.status}</p>
-                                  <p>Connected: {customer.healthDetails.database.database ? 'Yes' : 'No'}</p>
-                                  {customer.healthDetails.database.error && (
-                                    <p className="text-red-600">Error: {customer.healthDetails.database.error}</p>
-                                  )}
-                                </div>
-                                <div>
-                                  <h4 className="font-semibold text-gray-900 mb-1">Application Health</h4>
-                                  {customer.healthDetails.application ? (
-                                    <>
-                                      <p>Status: {customer.healthDetails.application.status}</p>
-                                      <p>Server: {customer.healthDetails.application.serverStatus}</p>
-                                      <p>App Response: {customer.healthDetails.application.applicationHealth ? 'Yes' : 'No'}</p>
-                                      {customer.healthDetails.application.error && (
-                                        <p className="text-red-600">Error: {customer.healthDetails.application.error}</p>
-                                      )}
-                                    </>
-                                  ) : (
-                                    <p className="text-gray-500">No health check URL configured</p>
-                                  )}
-                                </div>
+                        <details className="mt-2">
+                          <summary className="text-sm text-blue-600 cursor-pointer hover:text-blue-800">
+                            View Health Details
+                          </summary>
+                          <div className="mt-2 p-3 bg-gray-50 rounded text-xs">
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <h4 className="font-semibold text-gray-900 mb-1">Database</h4>
+                                <p>Status: {customer.health.database.status}</p>
+                                <p>Connected: {customer.health.database.connected ? 'Yes' : 'No'}</p>
+                                {customer.health.database.error && (
+                                  <p className="text-red-600">Error: {customer.health.database.error}</p>
+                                )}
                               </div>
-                              <div className="mt-3 pt-3 border-t border-gray-200">
-                                <h4 className="font-semibold text-gray-900 mb-1">Overall Status</h4>
-                                <p>Healthy: {customer.healthDetails.overall.healthy ? 'Yes' : 'No'}</p>
-                                <p>Database Connected: {customer.healthDetails.overall.databaseConnected ? 'Yes' : 'No'}</p>
-                                <p>Application Responding: {customer.healthDetails.overall.applicationResponding ? 'Yes' : 'No'}</p>
-                                <p>Has Errors: {customer.healthDetails.overall.hasErrors ? 'Yes' : 'No'}</p>
+                              <div>
+                                <h4 className="font-semibold text-gray-900 mb-1">Application</h4>
+                                <p>Status: {customer.health.application.status}</p>
+                                <p>Responding: {customer.health.application.responding ? 'Yes' : 'No'}</p>
+                                {customer.health.application.error && (
+                                  <p className="text-red-600">Error: {customer.health.application.error}</p>
+                                )}
                               </div>
                             </div>
-                          </details>
-                        )}
+                          </div>
+                        </details>
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">

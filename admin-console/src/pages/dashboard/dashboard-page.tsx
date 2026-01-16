@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
+import { apiGet } from '@/lib/api';
 
 interface SystemStats {
   totalCustomers: number;
+  activeCustomers: number;
   totalUsers: number;
   totalRegulations: number;
   systemHealth: 'healthy' | 'warning' | 'critical';
@@ -12,6 +14,7 @@ interface SystemStats {
 export function DashboardPage() {
   const [stats, setStats] = useState<SystemStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [_error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchSystemStats();
@@ -19,51 +22,24 @@ export function DashboardPage() {
 
   const fetchSystemStats = async () => {
     try {
-      const token = localStorage.getItem('admin_token');
-      console.log('🔑 Admin token:', token ? `${token.substring(0, 20)}...` : 'No token found');
+      const data = await apiGet<any>('/api/dashboard/stats');
       
-      const response = await fetch('http://localhost:4000/api/dashboard/stats', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+      setStats({
+        totalCustomers: data.totalCustomers,
+        activeCustomers: data.activeCustomers,
+        totalUsers: data.activeUsers,
+        totalRegulations: data.totalRegulations,
+        systemHealth: data.systemStatus as 'healthy' | 'warning' | 'critical',
+        databaseStatus: 'connected',
+        lastUpdated: new Date().toISOString(),
       });
-      
-      console.log('📊 Dashboard API response status:', response.status);
-      
-      if (response.ok) {
-        const data = await response.json();
-        console.log('✅ Real dashboard data received:', data);
-        
-        // Transform backend data to frontend format
-        setStats({
-          totalCustomers: data.totalCustomers,
-          totalUsers: data.activeUsers,
-          totalRegulations: data.totalRegulations,
-          systemHealth: data.systemStatus as 'healthy' | 'warning' | 'critical',
-          databaseStatus: 'connected' as const,
-          lastUpdated: new Date().toISOString(),
-        });
-      } else {
-        console.error('❌ Dashboard API failed:', response.status, response.statusText);
-        const errorText = await response.text();
-        console.error('Error details:', errorText);
-        
-        // Show real API error instead of falling back to mock data
-        setStats({
-          totalCustomers: 0,
-          totalUsers: 0,
-          totalRegulations: 0,
-          systemHealth: 'critical',
-          databaseStatus: 'disconnected',
-          lastUpdated: new Date().toISOString(),
-        });
-      }
-    } catch (error) {
-      console.error('❌ Failed to fetch system stats:', error);
-      
-      // Show connection error instead of mock data
+      setError(null);
+    } catch (err) {
+      console.error('Dashboard fetch error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load dashboard');
       setStats({
         totalCustomers: 0,
+        activeCustomers: 0,
         totalUsers: 0,
         totalRegulations: 0,
         systemHealth: 'critical',
