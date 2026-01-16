@@ -2,7 +2,7 @@ import passport from 'passport';
 import { MultiSamlStrategy } from '@node-saml/passport-saml';
 import { Express, Request, Response, NextFunction } from 'express';
 import { storage } from '../storage';
-import { getTenantStorage } from '../services/multi-tenant-database';
+import { getTenantStorage } from '../services/database';
 import { attributeMappings } from '../config/saml';
 import { syslog, LogLevel } from '../services/syslog';
 import { mapOktaGroupsToRoles, getHighestPriorityRole } from '../config/role-mapping';

@@ -56,27 +56,18 @@ import type {
 
 // Import RegulationUpdate type from schema
 import { regulationUpdates, type RegulationUpdate, type InsertRegulationUpdate } from "@shared/schema";
-import { getDatabase } from "./services/database";
+import { getDatabase, getDatabasePool } from "./services/database";
 import { eq, desc, or, like, sql } from "drizzle-orm";
 import { getDatabaseStorage } from "./services/database";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { pool } from "./db";
 import { Pool } from "pg";
-import { config } from "./config/environment";
 
 const PostgresSessionStore = connectPg(session);
 
-// Create a separate pool for session store to avoid conflicts
-const sessionPool = new Pool({
-  connectionString: config.DATABASE_URL,
-  ssl: config.DATABASE_URL.includes('neondb') ? { rejectUnauthorized: false } : false,
-  max: 5, // Smaller pool for sessions
-  idleTimeoutMillis: 0, // Never timeout idle connections
-  connectionTimeoutMillis: 10000,
-  // Prevent the pool from being closed accidentally
-  allowExitOnIdle: false,
-});
+// Use the shared pool from services/database - NO MORE SEPARATE POOLS!
+// This consolidates all database connections through a single pool.
 
  
 export interface IStorage {
@@ -222,7 +213,7 @@ export class DatabaseStorage implements IStorage {
     this._db = customDb || null;
     this._pool = customPool || null;
     this.sessionStore = new PostgresSessionStore({
-      pool: customPool || sessionPool,
+      pool: customPool || getDatabasePool(),
       createTableIfMissing: true,
     });
   }
@@ -234,7 +225,7 @@ export class DatabaseStorage implements IStorage {
   
   // Get the pool to use for raw queries - tenant-specific or default
   private get pool(): Pool {
-    return this._pool || sessionPool;
+    return this._pool || getDatabasePool();
   }
   
   // Public method to get database for raw queries
@@ -1127,7 +1118,7 @@ export class DatabaseStorage implements IStorage {
   // Enhanced Version Control Methods for API
   async getPendingUpdatesForRegulation(regulationId: number): Promise<any[]> {
     try {
-      const result = await sessionPool.query(`
+      const result = await this.pool.query(`
         SELECT 
           ru.id,
           ru.regulation_id as "regulationId",
@@ -1163,7 +1154,7 @@ export class DatabaseStorage implements IStorage {
 
   async updateRegulationContent(regulationId: number, content: string, _userId: number): Promise<void> {
     try {
-      await sessionPool.query(`
+      await this.pool.query(`
         UPDATE regulations 
         SET summary = $1, last_updated = NOW()
         WHERE id = $2

@@ -1,10 +1,13 @@
 import { Router } from 'express';
-import { Pool } from 'pg';
 import multer from 'multer';
 import fs from 'fs/promises';
 import _path from 'path';
+import { getDatabasePool } from '../../services/database';
 
 const router = Router();
+
+// Use the shared database pool - NO MORE SEPARATE POOLS!
+const pool = getDatabasePool();
 
 // Test endpoint to verify route is working
 router.get('/test', (req, res) => {
@@ -43,12 +46,6 @@ const upload = multer({
       cb(new Error('Only SQL files are allowed'));
     }
   },
-});
-
-// Database connection
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
 });
 
 // Get database statistics - simplified for testing

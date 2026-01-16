@@ -22,6 +22,10 @@ import { registerRoutes } from './routes';
 import { startTaskScheduler } from './services/task-scheduler';
 import { apiLimiter, authLimiter } from './middleware/rate-limiter';
 import { tenantMiddleware } from './middleware/tenant';
+import { setupVite, serveStatic, log } from './vite';
+
+// Check if we're in development mode
+const isDev = process.env.NODE_ENV !== 'production';
 
 // ES Module compatibility: Get current file path
 const __filename = fileURLToPath(import.meta.url);
@@ -176,8 +180,11 @@ app.post('/api/authenticate', async (req, res) => {
   }
 });
 
-// Serve static files
-app.use(express.static(path.join(__dirname, '../dist/public')));
+// Static files - only used in production mode
+// In dev mode, Vite middleware handles this
+if (!isDev) {
+  app.use(express.static(path.join(__dirname, '../dist/public')));
+}
 
 // Serve MCP client script
 app.get('/mcp-client.js', (req, res) => {
@@ -344,21 +351,24 @@ app.get('/api/health', async (req, res) => {
   });
 });
 
-// Serve React app for all other routes
-app.get('*', (req, res) => {
-  const htmlPath = path.join(__dirname, '../dist/public/index.html');
-  
-  // Read the HTML file and inject MCP client script
-  let html = fs.readFileSync(htmlPath, 'utf8');
-  
-  // Inject MCP client script after title-setter script
-  html = html.replace(
-    '<script src="/title-setter.js"></script>',
-    '<script src="/title-setter.js"></script>\n    \n    <!-- MCP Engine Integration - Real-time regulation updates -->\n    <script src="/mcp-client.js"></script>'
-  );
-  
-  res.send(html);
-});
+// Serve React app for all other routes - PRODUCTION ONLY
+// In dev mode, Vite middleware handles this
+if (!isDev) {
+  app.get('*', (req, res) => {
+    const htmlPath = path.join(__dirname, '../dist/public/index.html');
+    
+    // Read the HTML file and inject MCP client script
+    let html = fs.readFileSync(htmlPath, 'utf8');
+    
+    // Inject MCP client script after title-setter script
+    html = html.replace(
+      '<script src="/title-setter.js"></script>',
+      '<script src="/title-setter.js"></script>\n    \n    <!-- MCP Engine Integration - Real-time regulation updates -->\n    <script src="/mcp-client.js"></script>'
+    );
+    
+    res.send(html);
+  });
+}
 
 // Error handling
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -373,10 +383,31 @@ const httpServer = createServer(app);
 // Setup WebSocket server for MCP Engine integration
 setupWebSocketServer(httpServer);
 
+// Setup Vite dev server or static serving
+async function setupFrontend() {
+  if (isDev) {
+    log("Setting up Vite development server with HMR...");
+    try {
+      await setupVite(app, httpServer);
+      log("✅ Vite dev server ready - changes will hot reload!");
+    } catch (error) {
+      console.error("Error setting up Vite:", error);
+      log("⚠️ Falling back to static serving");
+      serveStatic(app);
+    }
+  } else {
+    log("Production mode - serving static files from dist/public");
+    serveStatic(app);
+  }
+}
+
 // Start server
 httpServer.listen(PORT, '0.0.0.0', async () => {
   
-  // MCP Engine Integration Status
+  // Setup frontend serving (Vite dev server or static)
+  await setupFrontend();
+  
+  log(`🚀 Server running on port ${PORT} (${isDev ? 'development' : 'production'} mode)`);
   
   // Start database connection monitoring to prevent crashes
   startDatabaseMonitoring();

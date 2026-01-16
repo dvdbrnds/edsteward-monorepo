@@ -1,20 +1,32 @@
 /**
- * Multi-Tenant Database Service
- * Provides tenant-aware database connections with automatic routing
+ * Database Service - Consolidated Database Access
+ * 
+ * This is the PRIMARY database service. All database access should go through here.
+ * Uses the pool from config/database.ts - DO NOT create additional pools!
  */
 
 import { Pool } from 'pg';
 import { drizzle } from 'drizzle-orm/node-postgres';
-import { config } from '../config/environment';
+import { 
+  pool as sharedPool, 
+  db as sharedDb,
+  testDatabaseConnection,
+  checkConnectionHealth,
+  closeDatabaseConnection
+} from '../config/database';
 import { DatabaseStorage } from '../storage';
 import * as schema from '@shared/schema';
 
-// Default (single-tenant) pool and storage
-let pool: Pool | null = null;
-let db: ReturnType<typeof drizzle> | null = null;
+// Re-export the shared pool and db for backwards compatibility
+export { sharedPool as pool, sharedDb as db };
+
+// Re-export health check functions
+export { testDatabaseConnection, checkConnectionHealth };
+
+// Default storage instance (singleton)
 let storage: DatabaseStorage | null = null;
 
-// Tenant-specific pools and storage instances
+// Tenant-specific pools and storage instances (only created when multi-tenant is enabled)
 const tenantPools = new Map<string, Pool>();
 const tenantStorages = new Map<string, DatabaseStorage>();
 
@@ -29,69 +41,18 @@ const TENANT_DATABASE_URLS: Record<string, string> = {
 };
 
 /**
- * Get database connection pool
+ * Get the shared database connection pool
+ * DO NOT create new pools - use this function!
  */
 export function getDatabasePool(): Pool {
-  if (!pool) {
-    pool = new Pool({
-      connectionString: config.DATABASE_URL,
-      max: 20,
-      idleTimeoutMillis: 30000,
-      connectionTimeoutMillis: 10000,
-    });
-
-    pool.on('error', (err) => {
-      console.error('🚨 Database pool error detected:', err);
-      console.error('Error details:', {
-        message: err.message,
-        code: (err as any).code,
-        errno: (err as any).errno,
-        syscall: (err as any).syscall
-      });
-      
-      // Don't let database errors crash the server
-      
-      // Attempt to recover the connection pool
-      setTimeout(() => {
-        try {
-          // Force a connection test to see if we can recover
-          testConnection().then(success => {
-            if (!success) {
-              console.warn('⚠️  Database pool recovery failed, but server continues');
-            }
-          }).catch(recoveryError => {
-            console.warn('⚠️  Database pool recovery error:', recoveryError);
-          });
-        } catch (syncError) {
-          console.warn('⚠️  Database pool recovery sync error:', syncError);
-        }
-      }, 5000);
-    });
-    
-    // Add connection event handlers
-    pool.on('connect', (_client) => {
-    });
-    
-    pool.on('acquire', (_client) => {
-    });
-    
-    pool.on('remove', (_client) => {
-    });
-  }
-
-  return pool;
+  return sharedPool;
 }
 
 /**
- * Get Drizzle database instance
+ * Get the shared Drizzle database instance
  */
 export function getDatabase() {
-  if (!db) {
-    const pool = getDatabasePool();
-    db = drizzle(pool, { schema });
-  }
-
-  return db;
+  return sharedDb;
 }
 
 /**
@@ -124,7 +85,7 @@ export function getDatabaseStorage(tenantId?: string): DatabaseStorage {
 
   console.log(`[MULTI-TENANT] Creating storage for tenant '${tenantId}'`);
 
-  // Create tenant-specific pool
+  // Create tenant-specific pool (only for tenants with different databases)
   const tenantPool = new Pool({
     connectionString: databaseUrl,
     max: 10,
@@ -166,16 +127,14 @@ export function getStorageForRequest(req: { tenantId?: string }): DatabaseStorag
 }
 
 /**
- * Close database connections
+ * Close all database connections (main + tenant pools)
  */
 export async function closeDatabaseConnections(): Promise<void> {
-  // Close default pool
-  if (pool) {
-    await pool.end();
-    pool = null;
-    db = null;
-    storage = null;
-  }
+  // Close main pool via config/database
+  await closeDatabaseConnection();
+  
+  // Reset storage singleton
+  storage = null;
   
   // Close all tenant pools
   for (const [tenantId, tenantPool] of tenantPools.entries()) {
@@ -191,8 +150,7 @@ export async function closeDatabaseConnections(): Promise<void> {
  */
 export async function testConnection(): Promise<boolean> {
   try {
-    const pool = getDatabasePool();
-    const client = await pool.connect();
+    const client = await sharedPool.connect();
     await client.query('SELECT NOW()');
     client.release();
     return true;
