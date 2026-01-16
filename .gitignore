@@ -3,6 +3,31 @@ dist
 .DS_Store
 server/public
 vite.config.ts.*
+
+# Environment files - NEVER commit secrets
+.env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+.env.development
+!.env.example
+*/.env
+**/.env
+
+# AWS Task Definitions (may contain secrets)
+*-task-def.json
+*-task-definition.json
+task-definition*.json
+task-def*.json
+
+# Temporary deployment files
+service-status.json
+deployment-status.json
+failed-task.json
+temp-*.json
+
+# Archives
 *.tar.gz
 
 # Terraform
