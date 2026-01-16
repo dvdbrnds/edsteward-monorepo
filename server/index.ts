@@ -42,9 +42,44 @@ try {
   process.exit(1);
 }
 
-// Security middleware - CSP temporarily disabled for iOS simulator testing
+// Security middleware with proper CSP configuration
 app.use(helmet({
-  contentSecurityPolicy: false, // Temporarily disable CSP
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: [
+        "'self'",
+        "'unsafe-inline'", // Required for Vite dev server and some UI libraries
+        "'unsafe-eval'",   // Required for Vite dev server HMR in development
+      ],
+      styleSrc: [
+        "'self'",
+        "'unsafe-inline'", // Required for Tailwind and styled-components
+      ],
+      imgSrc: [
+        "'self'",
+        "data:",           // For inline images and icons
+        "blob:",           // For generated images
+        "https://www.okta.com", // Okta logo
+        "https://*.okta.com",
+      ],
+      fontSrc: ["'self'", "data:"],
+      connectSrc: [
+        "'self'",
+        "ws://localhost:*",    // WebSocket dev
+        "wss://localhost:*",   // WebSocket dev secure
+        "ws://*.edsteward.ai", // WebSocket production
+        "wss://*.edsteward.ai", // WebSocket production secure
+        "https://*.okta.com",  // Okta SSO
+        "https://*.neon.tech", // Neon database (if direct connections needed)
+      ],
+      frameSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      upgradeInsecureRequests: process.env.NODE_ENV === 'production' ? [] : null,
+    },
+  },
+  // Other helmet protections (all enabled by default)
+  crossOriginEmbedderPolicy: false, // Disable for compatibility with external images
 }));
 
 // CORS configuration - support both development and production domains
