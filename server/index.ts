@@ -20,8 +20,9 @@ import { configureAuth } from './auth/single-tenant-auth';
 import { testConnection } from './services/database';
 import { registerRoutes } from './routes';
 import { startTaskScheduler } from './services/task-scheduler';
-import { apiLimiter, authLimiter } from './middleware/rate-limiter';
+import { apiLimiter, authLimiter, tenantQuotaLimiter } from './middleware/rate-limiter';
 import { tenantMiddleware } from './middleware/tenant';
+import { tenantRequestLogger, getAllTenantMetrics, getTopEndpoints } from './middleware/tenant-logger';
 import { setupVite, serveStatic, log } from './vite';
 
 // Check if we're in development mode
@@ -140,11 +141,17 @@ if (process.env.MULTI_TENANT === 'true') {
   console.log('🏠 Single-tenant mode - using default database');
 }
 
+// Tenant-aware request logging (after tenant detection)
+app.use(tenantRequestLogger);
+
 // Rate limiting - apply to API routes
-// General API rate limit: 100 requests per 15 minutes
+// Tenant-wide quota: 10,000 requests per hour per tenant
+app.use('/api/', tenantQuotaLimiter);
+// Per-IP within tenant: 200 requests per 15 minutes
 app.use('/api/', apiLimiter);
-// Stricter rate limit for authentication: 5 attempts per 15 minutes
+// Stricter rate limit for authentication: 10 attempts per 15 minutes per tenant+IP
 app.use('/api/login', authLimiter);
+app.use('/api/auth/login', authLimiter);
 app.use('/api/authenticate', authLimiter);
 app.use('/auth/saml', authLimiter);
 
@@ -383,6 +390,57 @@ app.get('/api/health', async (req, res) => {
     database: dbStatus ? 'connected' : 'disconnected',
     timestamp: new Date().toISOString(),
     institution: institutionConfig.name,
+  });
+});
+
+// Tenant metrics endpoint (admin only)
+app.get('/api/admin/tenant-metrics', (req, res) => {
+  // Only allow in development or for authenticated admins
+  const user = (req as any).user;
+  if (process.env.NODE_ENV !== 'development' && (!user || user.role !== 'admin')) {
+    return res.status(403).json({ error: 'Admin access required' });
+  }
+  
+  const metrics = getAllTenantMetrics();
+  const tenantId = req.query.tenant as string;
+  
+  if (tenantId) {
+    // Return metrics for specific tenant
+    const tenantData = metrics[tenantId];
+    if (!tenantData) {
+      return res.status(404).json({ error: 'Tenant not found' });
+    }
+    return res.json({
+      tenant: tenantId,
+      metrics: {
+        requests: tenantData.requests,
+        errors: tenantData.errors,
+        avgResponseTime: tenantData.avgResponseTime,
+        lastRequest: tenantData.lastRequest,
+        errorRate: tenantData.requests > 0 
+          ? ((tenantData.errors / tenantData.requests) * 100).toFixed(2) + '%'
+          : '0%',
+      },
+      topEndpoints: getTopEndpoints(tenantId, 10),
+    });
+  }
+  
+  // Return summary for all tenants
+  const summary = Object.entries(metrics).map(([tenant, data]) => ({
+    tenant,
+    requests: data.requests,
+    errors: data.errors,
+    avgResponseTime: data.avgResponseTime,
+    lastRequest: data.lastRequest,
+    errorRate: data.requests > 0 
+      ? ((data.errors / data.requests) * 100).toFixed(2) + '%'
+      : '0%',
+  }));
+  
+  res.json({
+    tenants: summary,
+    totalRequests: summary.reduce((sum, t) => sum + t.requests, 0),
+    totalErrors: summary.reduce((sum, t) => sum + t.errors, 0),
   });
 });
 
