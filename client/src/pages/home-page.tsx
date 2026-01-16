@@ -11,12 +11,30 @@ import PendingAttestations from "@/components/dashboard/pending-attestations";
 import DeadlineCalendar from "@/components/dashboard/deadline-calendar";
 import RegulationList from "@/components/regulations/regulation-list";
 import { WidgetSettings, WidgetWrapper } from "@/components/dashboard/widget-settings";
+import { DraggableWidget } from "@/components/dashboard/draggable-widget";
 import { DashboardWidgetsProvider, useDashboardWidgets, type WidgetId } from "@/hooks/use-dashboard-widgets";
 import { useState, useEffect, ReactNode } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Bell, CheckCircle, Users, ExternalLink, BarChart3 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  rectSortingStrategy,
+} from '@dnd-kit/sortable';
 import type { Notification as _Notification } from "@shared/schema";
 
 // Widget size definitions
@@ -34,12 +52,13 @@ const WIDGET_SIZES: Record<WidgetId, WidgetSize> = {
   regulationList: 'full',
 };
 
-// Component that renders widgets in order
-function OrderedDashboardWidgets({ selectedCategory, setSelectedCategory }: {
+// Component that renders widgets with drag-and-drop
+function DraggableDashboardWidgets({ selectedCategory, setSelectedCategory }: {
   selectedCategory: string | null;
   setSelectedCategory: (category: string | null) => void;
 }) {
-  const { widgetOrder, isWidgetVisible } = useDashboardWidgets();
+  const { widgetOrder, isWidgetVisible, reorderWidgets } = useDashboardWidgets();
+  const [activeId, setActiveId] = useState<WidgetId | null>(null);
   
   const { data: notificationHistory, isLoading: notificationsLoading } = useQuery<{
     notifications: Array<{
@@ -58,54 +77,66 @@ function OrderedDashboardWidgets({ selectedCategory, setSelectedCategory }: {
     queryKey: ["/api/notification-history", { status: 'sent', limit: 10 }],
   });
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
+
+  const handleDragStart = (event: DragStartEvent) => {
+    setActiveId(event.active.id as WidgetId);
+  };
+
+  const handleDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    setActiveId(null);
+
+    if (over && active.id !== over.id) {
+      const oldIndex = widgetOrder.indexOf(active.id as WidgetId);
+      const newIndex = widgetOrder.indexOf(over.id as WidgetId);
+      const newOrder = arrayMove(widgetOrder, oldIndex, newIndex);
+      reorderWidgets(newOrder);
+    }
+  };
+
+  // Get visible widgets in order
+  const visibleWidgets = widgetOrder.filter(id => isWidgetVisible(id));
+
   // Widget components mapped by ID
-  const renderWidget = (widgetId: WidgetId): ReactNode => {
-    switch (widgetId) {
-      case 'stats':
-        return (
-          <WidgetWrapper widgetId="stats">
-            <div className="mb-8">
-              <DashboardStats />
-            </div>
-          </WidgetWrapper>
-        );
+  const renderWidget = (widgetId: WidgetId, isDragOverlay = false): ReactNode => {
+    const content = (() => {
+      switch (widgetId) {
+        case 'stats':
+          return <DashboardStats />;
 
-      case 'myTasks':
-        return (
-          <WidgetWrapper widgetId="myTasks">
-            <MyTasks />
-          </WidgetWrapper>
-        );
+        case 'myTasks':
+          return <MyTasks />;
 
-      case 'pendingAttestations':
-        return (
-          <WidgetWrapper widgetId="pendingAttestations">
-            <PendingAttestations />
-          </WidgetWrapper>
-        );
+        case 'pendingAttestations':
+          return <PendingAttestations />;
 
-      case 'complianceOverview':
-        return (
-          <WidgetWrapper widgetId="complianceOverview">
+        case 'complianceOverview':
+          return (
             <ComplianceOverview
               onCategorySelect={setSelectedCategory}
               selectedCategory={selectedCategory}
             />
-          </WidgetWrapper>
-        );
+          );
 
-      case 'upcomingDeadlines':
-        return (
-          <WidgetWrapper widgetId="upcomingDeadlines">
+        case 'upcomingDeadlines':
+          return (
             <UpcomingDeadlines
               categoryFilter={selectedCategory}
             />
-          </WidgetWrapper>
-        );
+          );
 
-      case 'notifications':
-        return (
-          <WidgetWrapper widgetId="notifications">
+        case 'notifications':
+          return (
             <Card className="h-full min-h-[400px]">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -185,19 +216,13 @@ function OrderedDashboardWidgets({ selectedCategory, setSelectedCategory }: {
                 </div>
               </CardContent>
             </Card>
-          </WidgetWrapper>
-        );
+          );
 
-      case 'deadlineCalendar':
-        return (
-          <WidgetWrapper widgetId="deadlineCalendar">
-            <DeadlineCalendar />
-          </WidgetWrapper>
-        );
+        case 'deadlineCalendar':
+          return <DeadlineCalendar />;
 
-      case 'trusteesCard':
-        return (
-          <WidgetWrapper widgetId="trusteesCard">
+        case 'trusteesCard':
+          return (
             <Card className="bg-gradient-to-r from-muted to-blue-500/10 border-blue-500/20">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
@@ -212,8 +237,6 @@ function OrderedDashboardWidgets({ selectedCategory, setSelectedCategory }: {
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                   <p className="text-sm text-muted-foreground max-w-xl">
                     Access the view-only dashboard providing an overview of our regulatory compliance status.
-                    This dashboard is designed specifically for the board of trustees to monitor compliance metrics
-                    and receive status updates.
                   </p>
                   <Button asChild className="gap-2 w-full sm:w-auto flex-shrink-0">
                     <Link href="/public-dashboard">
@@ -224,12 +247,10 @@ function OrderedDashboardWidgets({ selectedCategory, setSelectedCategory }: {
                 </div>
               </CardContent>
             </Card>
-          </WidgetWrapper>
-        );
+          );
 
-      case 'regulationList':
-        return (
-          <WidgetWrapper widgetId="regulationList">
+        case 'regulationList':
+          return (
             <div>
               <h2 className="text-2xl font-bold text-foreground mb-4">
                 {selectedCategory ? `${selectedCategory} Regulations` : 'All Regulations'}
@@ -239,21 +260,25 @@ function OrderedDashboardWidgets({ selectedCategory, setSelectedCategory }: {
                 jurisdictionFilter={null}
               />
             </div>
-          </WidgetWrapper>
-        );
+          );
 
-      default:
-        return null;
+        default:
+          return null;
+      }
+    })();
+
+    if (isDragOverlay) {
+      return content;
     }
+
+    return content;
   };
 
   // Group widgets by size for layout
   const groupedWidgets: { widgets: WidgetId[]; size: WidgetSize }[] = [];
   let currentGroup: { widgets: WidgetId[]; size: WidgetSize } | null = null;
 
-  widgetOrder.forEach((widgetId) => {
-    if (!isWidgetVisible(widgetId)) return;
-    
+  visibleWidgets.forEach((widgetId) => {
     const size = WIDGET_SIZES[widgetId];
     
     // Full-width widgets always get their own row
@@ -291,40 +316,58 @@ function OrderedDashboardWidgets({ selectedCategory, setSelectedCategory }: {
   }
 
   return (
-    <div className="space-y-6">
-      {groupedWidgets.map((group, groupIndex) => {
-        if (group.size === 'full') {
-          return (
-            <div key={`group-${groupIndex}`}>
-              {renderWidget(group.widgets[0])}
-            </div>
-          );
-        }
-        
-        if (group.size === 'half') {
-          return (
-            <div key={`group-${groupIndex}`} className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-              {group.widgets.map(widgetId => (
-                <div key={widgetId}>
-                  {renderWidget(widgetId)}
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
+      <SortableContext items={visibleWidgets} strategy={rectSortingStrategy}>
+        <div className="space-y-6">
+          {groupedWidgets.map((group, groupIndex) => {
+            if (group.size === 'full') {
+              return (
+                <DraggableWidget key={group.widgets[0]} id={group.widgets[0]}>
+                  {renderWidget(group.widgets[0])}
+                </DraggableWidget>
+              );
+            }
+            
+            if (group.size === 'half') {
+              return (
+                <div key={`group-${groupIndex}`} className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                  {group.widgets.map(widgetId => (
+                    <DraggableWidget key={widgetId} id={widgetId}>
+                      {renderWidget(widgetId)}
+                    </DraggableWidget>
+                  ))}
                 </div>
-              ))}
-            </div>
-          );
-        }
-        
-        // Quarter size
-        return (
-          <div key={`group-${groupIndex}`} className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4 items-stretch">
-            {group.widgets.map(widgetId => (
-              <div key={widgetId}>
-                {renderWidget(widgetId)}
+              );
+            }
+            
+            // Quarter size
+            return (
+              <div key={`group-${groupIndex}`} className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4 items-stretch">
+                {group.widgets.map(widgetId => (
+                  <DraggableWidget key={widgetId} id={widgetId}>
+                    {renderWidget(widgetId)}
+                  </DraggableWidget>
+                ))}
               </div>
-            ))}
+            );
+          })}
+        </div>
+      </SortableContext>
+      
+      {/* Drag overlay for visual feedback */}
+      <DragOverlay>
+        {activeId ? (
+          <div className="opacity-80 shadow-2xl rounded-lg">
+            {renderWidget(activeId, true)}
           </div>
-        );
-      })}
-    </div>
+        ) : null}
+      </DragOverlay>
+    </DndContext>
   );
 }
 
@@ -350,9 +393,14 @@ export default function HomePage() {
       <main className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
-              Welcome, {user?.username}
-            </h1>
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
+                Welcome, {user?.username}
+              </h1>
+              <p className="text-sm text-muted-foreground mt-1">
+                Drag widgets to rearrange your dashboard
+              </p>
+            </div>
             <WidgetSettings />
           </div>
 
@@ -373,7 +421,7 @@ export default function HomePage() {
             </TabsContent>
 
             <TabsContent value="overview">
-              <OrderedDashboardWidgets 
+              <DraggableDashboardWidgets 
                 selectedCategory={selectedCategory}
                 setSelectedCategory={setSelectedCategory}
               />
