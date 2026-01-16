@@ -76,73 +76,91 @@
 
 ---
 
-## PART 3: Dashboard - Overview Tab (20 min)
+## PART 3: Dashboard - Overview Tab (25 min)
 
 ### 3.1 Page Header
 - [ ] **Welcome message** - "Welcome, [username]"
-- [ ] **Widget Settings** (gear icon) - Click → Settings panel opens
+- [ ] **Subtitle** - "Drag widgets to rearrange your dashboard" visible
+- [ ] **Widgets Button** (top right) - Click → Dropdown opens
 
-### 3.2 Widget Settings Panel
-- [ ] **"Dashboard Widgets"** title visible
-- [ ] **Stats toggle** - Click on/off, verify widget shows/hides
+### 3.2 Widget Drag-and-Drop Reordering
+- [ ] **Hover over any widget** - Drag handle (⠿) appears on left side
+- [ ] **Drag handle visible** - 6-dot grip icon appears on hover
+- [ ] **Drag a widget** - Grab handle, drag to new position
+- [ ] **Visual feedback** - Widget gets shadow and slight scale during drag
+- [ ] **Drop widget** - Release in new position
+- [ ] **Order persists** - Refresh page, verify new order is saved
+- [ ] **Drag Stats widget** - Move it below My Tasks
+- [ ] **Drag it back** - Return Stats to original position
+- [ ] **Try dragging multiple widgets** - Reorder several widgets
+- [ ] **Verify layout adapts** - Full/half/quarter width widgets group correctly
+
+### 3.3 Widgets Dropdown (Visibility & Reset)
+- [ ] Click **"Widgets"** button (top right)
+- [ ] **Show All** button - Click if widgets are hidden
+- [ ] **Reset** button - Click → Order resets to default
+- [ ] **Stats toggle** - Click off, verify widget hides
+- [ ] **Stats toggle** - Click on, verify widget shows
 - [ ] **My Tasks toggle** - Click on/off, verify widget shows/hides
 - [ ] **Pending Attestations toggle** - Click on/off, verify widget shows/hides
 - [ ] **Compliance Overview toggle** - Click on/off, verify widget shows/hides
 - [ ] **Upcoming Deadlines toggle** - Click on/off, verify widget shows/hides
 - [ ] **Notifications toggle** - Click on/off, verify widget shows/hides
 - [ ] **Deadline Calendar toggle** - Click on/off, verify widget shows/hides
+- [ ] **Trustees Card toggle** - Click on/off, verify widget shows/hides
+- [ ] **Regulations List** - Cannot be hidden (core functionality)
 - [ ] Turn all widgets back ON
-- [ ] Close settings panel
+- [ ] Close dropdown
 
-### 3.3 Dashboard Tabs
+### 3.5 Dashboard Tabs
 - [ ] **Overview tab** - Click → Shows widgets
 - [ ] **Analytics tab** - Click → Shows executive dashboard
 - [ ] Switch back to **Overview tab**
 
-### 3.4 Dashboard Stats Widget
+### 3.6 Dashboard Stats Widget
 - [ ] **Total Regulations** card - Shows number
 - [ ] **Compliant** card - Shows number with percentage
 - [ ] **Pending** card - Shows number
 - [ ] **Overdue** card - Shows number (red if > 0)
 
-### 3.5 My Tasks Widget
+### 3.7 My Tasks Widget
 - [ ] **"My Tasks"** header visible
 - [ ] **View All** button - Click → Opens task list
 - [ ] Task items show name, status, due date
 - [ ] Click on a task → Opens task detail or navigates
 
-### 3.6 Pending Attestations Widget
+### 3.8 Pending Attestations Widget
 - [ ] **"Pending Attestations"** header visible
 - [ ] List of pending attestation requests
 - [ ] **Quick Attest** button on each item
 - [ ] Click **Quick Attest** → Attestation dialog opens
 - [ ] Cancel/close the dialog
 
-### 3.7 Compliance Overview Widget
+### 3.9 Compliance Overview Widget
 - [ ] **Pie chart** displays
 - [ ] **Legend** shows categories
 - [ ] Hover over pie slice → Tooltip shows details
 - [ ] Click pie slice → Filters regulation list below
 
-### 3.8 Upcoming Deadlines Widget
+### 3.10 Upcoming Deadlines Widget
 - [ ] **List of deadlines** displays
 - [ ] **Date** shown for each
 - [ ] **Color coding** - Red (overdue), Yellow (soon), Green (OK)
 - [ ] Click deadline → Navigates to regulation
 
-### 3.9 Recent Notifications Widget
+### 3.11 Recent Notifications Widget
 - [ ] **Bell icon** in header
 - [ ] List of recent notifications
 - [ ] Click notification → Navigates to regulation
 - [ ] **Status icons** (green checkmark for sent)
 
-### 3.10 Deadline Calendar Widget (if enabled)
+### 3.12 Deadline Calendar Widget (if enabled)
 - [ ] **Calendar view** displays
 - [ ] **Month/week navigation** arrows
 - [ ] **Deadlines marked** on calendar
 - [ ] Click date with deadline → Shows details
 
-### 3.11 All Regulations Table
+### 3.13 All Regulations Table
 - [ ] **Table displays** with columns
 - [ ] **Column headers**: Name, Category, Status, Actions, etc.
 - [ ] **Column visibility** (gear icon) - Click → Show column toggles
