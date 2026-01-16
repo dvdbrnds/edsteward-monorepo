@@ -85,17 +85,25 @@ export const DASHBOARD_WIDGETS: Widget[] = [
   },
 ];
 
+// Default order of widgets
+const DEFAULT_WIDGET_ORDER: WidgetId[] = DASHBOARD_WIDGETS.map(w => w.id);
+
 const STORAGE_KEY = 'edsteward-dashboard-widgets';
+const ORDER_STORAGE_KEY = 'edsteward-dashboard-widget-order';
 
 interface DashboardWidgetsContextType {
   widgets: Widget[];
   hiddenWidgets: Set<WidgetId>;
   hiddenCount: number;
+  widgetOrder: WidgetId[];
   isWidgetVisible: (widgetId: WidgetId) => boolean;
   toggleWidget: (widgetId: WidgetId) => void;
   showAllWidgets: () => void;
   hideWidget: (widgetId: WidgetId) => void;
   showWidget: (widgetId: WidgetId) => void;
+  reorderWidgets: (newOrder: WidgetId[]) => void;
+  resetOrder: () => void;
+  getOrderedWidgets: () => Widget[];
   isLoaded: boolean;
 }
 
@@ -103,16 +111,34 @@ const DashboardWidgetsContext = createContext<DashboardWidgetsContextType | null
 
 export function DashboardWidgetsProvider({ children }: { children: ReactNode }) {
   const [hiddenWidgets, setHiddenWidgets] = useState<Set<WidgetId>>(new Set());
+  const [widgetOrder, setWidgetOrder] = useState<WidgetId[]>(DEFAULT_WIDGET_ORDER);
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Load preferences from localStorage on mount
   useEffect(() => {
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored);
+      // Load hidden widgets
+      const storedHidden = localStorage.getItem(STORAGE_KEY);
+      if (storedHidden) {
+        const parsed = JSON.parse(storedHidden);
         if (Array.isArray(parsed)) {
           setHiddenWidgets(new Set(parsed as WidgetId[]));
+        }
+      }
+      
+      // Load widget order
+      const storedOrder = localStorage.getItem(ORDER_STORAGE_KEY);
+      if (storedOrder) {
+        const parsed = JSON.parse(storedOrder);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // Validate and merge with any new widgets that might have been added
+          const validOrder = parsed.filter((id: string) => 
+            DASHBOARD_WIDGETS.some(w => w.id === id)
+          ) as WidgetId[];
+          
+          // Add any new widgets that weren't in the saved order
+          const missingWidgets = DEFAULT_WIDGET_ORDER.filter(id => !validOrder.includes(id));
+          setWidgetOrder([...validOrder, ...missingWidgets]);
         }
       }
     } catch {
@@ -121,7 +147,7 @@ export function DashboardWidgetsProvider({ children }: { children: ReactNode }) 
     setIsLoaded(true);
   }, []);
 
-  // Save to localStorage whenever hiddenWidgets changes
+  // Save hidden widgets to localStorage
   useEffect(() => {
     if (isLoaded) {
       try {
@@ -131,6 +157,17 @@ export function DashboardWidgetsProvider({ children }: { children: ReactNode }) 
       }
     }
   }, [hiddenWidgets, isLoaded]);
+
+  // Save widget order to localStorage
+  useEffect(() => {
+    if (isLoaded) {
+      try {
+        localStorage.setItem(ORDER_STORAGE_KEY, JSON.stringify(widgetOrder));
+      } catch {
+        // Ignore storage errors
+      }
+    }
+  }, [widgetOrder, isLoaded]);
 
   const isWidgetVisible = useCallback((widgetId: WidgetId): boolean => {
     const widget = DASHBOARD_WIDGETS.find(w => w.id === widgetId);
@@ -172,6 +209,20 @@ export function DashboardWidgetsProvider({ children }: { children: ReactNode }) 
     });
   }, []);
 
+  const reorderWidgets = useCallback((newOrder: WidgetId[]) => {
+    setWidgetOrder(newOrder);
+  }, []);
+
+  const resetOrder = useCallback(() => {
+    setWidgetOrder(DEFAULT_WIDGET_ORDER);
+  }, []);
+
+  const getOrderedWidgets = useCallback((): Widget[] => {
+    return widgetOrder
+      .map(id => DASHBOARD_WIDGETS.find(w => w.id === id))
+      .filter((w): w is Widget => w !== undefined);
+  }, [widgetOrder]);
+
   const hiddenCount = hiddenWidgets.size;
 
   return (
@@ -179,11 +230,15 @@ export function DashboardWidgetsProvider({ children }: { children: ReactNode }) 
       widgets: DASHBOARD_WIDGETS,
       hiddenWidgets,
       hiddenCount,
+      widgetOrder,
       isWidgetVisible,
       toggleWidget,
       showAllWidgets,
       hideWidget,
       showWidget,
+      reorderWidgets,
+      resetOrder,
+      getOrderedWidgets,
       isLoaded,
     }}>
       {children}
@@ -198,4 +253,3 @@ export function useDashboardWidgets() {
   }
   return context;
 }
-
