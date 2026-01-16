@@ -93,7 +93,14 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 export function useTheme() {
   const context = useContext(ThemeContext);
   if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider');
+    // Provide a fallback when context is not available (e.g., during HMR)
+    console.warn('useTheme called outside ThemeProvider, using fallback');
+    return {
+      theme: 'system' as const,
+      resolvedTheme: 'light' as const,
+      setTheme: () => {},
+      toggleTheme: () => {},
+    };
   }
   return context;
 }
