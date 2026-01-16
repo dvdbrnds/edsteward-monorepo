@@ -13,8 +13,22 @@ export async function apiRequest(
   });
 
   if (!response.ok) {
-    const error = await response.text();
-    throw new Error(error);
+    const errorText = await response.text();
+    let errorMessage = errorText;
+    
+    // Try to parse as JSON to extract the error message
+    try {
+      const errorJson = JSON.parse(errorText);
+      if (errorJson.error) {
+        errorMessage = errorJson.error;
+      } else if (errorJson.message) {
+        errorMessage = errorJson.message;
+      }
+    } catch {
+      // Not JSON, use raw text
+    }
+    
+    throw new Error(errorMessage);
   }
 
   // Handle no content responses

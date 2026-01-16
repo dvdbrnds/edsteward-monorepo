@@ -939,7 +939,7 @@ export function registerRoutes(app: express.Application): Server {
             }
           }
         );
-        return res.status(401).json({ error: 'Invalid credentials' });
+        return res.status(401).json({ error: 'No account found with that username. Please check your username and try again.' });
       }
 
       // Use dynamic imports for Node.js crypto
@@ -965,7 +965,7 @@ export function registerRoutes(app: express.Application): Server {
             }
           }
         );
-        return res.status(401).json({ error: 'Invalid credentials' });
+        return res.status(401).json({ error: 'Account configuration error. Please contact your administrator.' });
       }
       
       const derivedKey = await scryptAsync(password, Buffer.from(salt, 'hex'), 32) as Buffer;
@@ -989,7 +989,7 @@ export function registerRoutes(app: express.Application): Server {
             }
           }
         );
-        return res.status(401).json({ error: 'Invalid credentials' });
+        return res.status(401).json({ error: 'Incorrect password. Please check your password and try again.' });
       }
 
       // Check if MFA is enabled for this user
@@ -1229,7 +1229,7 @@ export function registerRoutes(app: express.Application): Server {
             }
           }
         );
-        return res.status(401).json({ error: 'Invalid credentials' });
+        return res.status(401).json({ error: 'No account found with that username. Please check your username and try again.' });
       }
 
       // Verify password
@@ -1239,7 +1239,7 @@ export function registerRoutes(app: express.Application): Server {
       
       const [salt, hash] = user.password.split(':');
       if (!salt || !hash) {
-        return res.status(401).json({ error: 'Invalid credentials' });
+        return res.status(401).json({ error: 'Account configuration error. Please contact your administrator.' });
       }
       
       const derivedKey = await scryptAsync(password, Buffer.from(salt, 'hex'), 32) as Buffer;
@@ -1261,7 +1261,7 @@ export function registerRoutes(app: express.Application): Server {
             }
           }
         );
-        return res.status(401).json({ error: 'Invalid credentials' });
+        return res.status(401).json({ error: 'Incorrect password. Please check your password and try again.' });
       }
 
       // Check if MFA is enabled
@@ -1376,7 +1376,7 @@ export function registerRoutes(app: express.Application): Server {
       const user = await tenantStorage.getUserByEmail(email);
       
       if (!user) {
-        return res.status(401).json({ error: 'Invalid credentials' });
+        return res.status(401).json({ error: 'No account found with that email address. Please check your email and try again.' });
       }
 
       // Use dynamic imports for Node.js crypto
@@ -1386,7 +1386,7 @@ export function registerRoutes(app: express.Application): Server {
       
       const [salt, hash] = user.password.split(':');
       if (!salt || !hash) {
-        return res.status(401).json({ error: 'Invalid credentials' });
+        return res.status(401).json({ error: 'Account configuration error. Please contact your administrator.' });
       }
       
       const derivedKey = await scryptAsync(password, Buffer.from(salt, 'hex'), 32) as Buffer;
@@ -1394,7 +1394,7 @@ export function registerRoutes(app: express.Application): Server {
       const isValidPassword = crypto.timingSafeEqual(derivedKey, storedKey);
 
       if (!isValidPassword) {
-        return res.status(401).json({ error: 'Invalid credentials' });
+        return res.status(401).json({ error: 'Incorrect password. Please check your password and try again.' });
       }
 
       req.login(user, (err) => {

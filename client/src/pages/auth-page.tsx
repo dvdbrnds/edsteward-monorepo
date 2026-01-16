@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Loader2 } from "lucide-react";
 import { useBranding } from "@/hooks/use-branding";
 
@@ -16,7 +15,7 @@ import { useBranding } from "@/hooks/use-branding";
 import moravianLogo from "../assets/Moravian-Monogram-MoravianBlue.png";
 
 export default function AuthPage() {
-  const { user, loginMutation, registerMutation } = useAuth();
+  const { user, loginMutation } = useAuth();
   const [, setLocation] = useLocation();
   const branding = useBranding();
   const [mfaRequired, setMfaRequired] = useState(false);
@@ -28,19 +27,6 @@ export default function AuthPage() {
     defaultValues: {
       username: "",
       password: ""
-    }
-  });
-
-  const registerForm = useForm({
-    resolver: zodResolver(insertUserSchema),
-    defaultValues: {
-      username: "",
-      password: "",
-      email: "",
-      firstName: "",
-      lastName: "",
-      role: "user" as const,
-      department: ""
     }
   });
 
@@ -112,275 +98,153 @@ export default function AuthPage() {
             <span className="text-xl font-normal opacity-90">Compliance Portal</span>
           </h1>
 
-          <Tabs defaultValue="login" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="login">Login</TabsTrigger>
-              <TabsTrigger value="register">Register</TabsTrigger>
-            </TabsList>
-
-            <TabsContent value="login">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Login to your account</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Form {...loginForm}>
-                    <form onSubmit={loginForm.handleSubmit((data) => {
-                      setLoginCredentials(data);
-                      loginMutation.mutate(data, {
-                        onSuccess: (response: any) => {
-                          if (response.mfaRequired) {
-                            setMfaRequired(true);
-                          }
-                        }
-                      });
-                    })} className="space-y-4">
-                      <FormField
-                        control={loginForm.control}
-                        name="username"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Username</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={loginForm.control}
-                        name="password"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Password</FormLabel>
-                            <FormControl>
-                              <Input type="password" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      {!mfaRequired && (
-                        <Button 
-                          type="submit" 
-                          className="w-full hover:opacity-90 transition-opacity" 
-                          style={{ 
-                            backgroundColor: branding.loginScreenAccentColor, 
-                            borderColor: branding.loginScreenAccentColor 
-                          }}
-                          disabled={loginMutation.isPending}
-                        >
-                          {loginMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                          Login
-                        </Button>
-                      )}
-                    </form>
-                  </Form>
-
-                  {/* MFA Code Input */}
-                  {mfaRequired && (
-                    <div className="mt-6 space-y-4">
-                      <div className="text-center">
-                        <h3 className="text-lg font-semibold">Multi-Factor Authentication</h3>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          Enter the 6-digit code from your authenticator app
-                        </p>
-                      </div>
-                      <div className="space-y-4">
-                        <Input
-                          type="text"
-                          placeholder="000000"
-                          value={mfaCode}
-                          onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                          className="text-center text-lg tracking-widest"
-                          maxLength={6}
-                        />
-                        <div className="flex space-x-2">
-                          <Button
-                            variant="outline"
-                            onClick={() => {
-                              setMfaRequired(false);
-                              setMfaCode("");
-                              setLoginCredentials(null);
-                            }}
-                            className="flex-1"
-                          >
-                            Back
-                          </Button>
-                          <Button
-                            onClick={() => {
-                              if (loginCredentials && mfaCode.length === 6) {
-                                loginMutation.mutate({
-                                  ...loginCredentials,
-                                  mfaCode
-                                });
-                              }
-                            }}
-                            disabled={mfaCode.length !== 6 || loginMutation.isPending}
-                            className="flex-1"
-                            style={{ 
-                              backgroundColor: branding.loginScreenAccentColor, 
-                              borderColor: branding.loginScreenAccentColor 
-                            }}
-                          >
-                            {loginMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                            Verify
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
+          <Card>
+            <CardHeader>
+              <CardTitle>Sign in to your account</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Form {...loginForm}>
+                <form onSubmit={loginForm.handleSubmit((data) => {
+                  setLoginCredentials(data);
+                  loginMutation.mutate(data, {
+                    onSuccess: (response: any) => {
+                      if (response.mfaRequired) {
+                        setMfaRequired(true);
+                      }
+                    }
+                  });
+                })} className="space-y-4">
+                  <FormField
+                    control={loginForm.control}
+                    name="username"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Username</FormLabel>
+                        <FormControl>
+                          <Input {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={loginForm.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Password</FormLabel>
+                        <FormControl>
+                          <Input type="password" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  {!mfaRequired && (
+                    <Button 
+                      type="submit" 
+                      className="w-full hover:opacity-90 transition-opacity" 
+                      style={{ 
+                        backgroundColor: branding.loginScreenAccentColor, 
+                        borderColor: branding.loginScreenAccentColor 
+                      }}
+                      disabled={loginMutation.isPending}
+                    >
+                      {loginMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      Sign In
+                    </Button>
                   )}
-                  
-                  {/* SAML SSO Login - show for institutions that have SAML configured */}
-                  {branding.institutionName.toLowerCase().includes('moravian') && (
-                    <div className="mt-6">
-                      <div className="relative">
-                        <div className="absolute inset-0 flex items-center">
-                          <span className="w-full border-t" />
-                        </div>
-                        <div className="relative flex justify-center text-xs uppercase">
-                          <span className="bg-background px-2 text-muted-foreground">
-                            Or continue with
-                          </span>
-                        </div>
-                      </div>
-                      <div className="mt-6">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          className="w-full"
-                          onClick={() => {
-                            window.location.href = 'https://moravian.edsteward.ai/auth/saml';
-                          }}
-                        >
-                          <img 
-                            src="https://www.okta.com/sites/default/files/Okta_Logo_BrightBlue_Medium.png" 
-                            alt="Okta" 
-                            className="mr-2 h-4 w-4"
-                          />
-                          Sign in with Moravian University SSO
-                        </Button>
-                      </div>
-                    </div>
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
+                </form>
+              </Form>
 
-            <TabsContent value="register">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Create new account</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <Form {...registerForm}>
-                    <form onSubmit={registerForm.handleSubmit((data) => registerMutation.mutate(data))} className="space-y-4">
-                      <FormField
-                        control={registerForm.control}
-                        name="firstName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>First Name</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={registerForm.control}
-                        name="lastName"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Last Name</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={registerForm.control}
-                        name="username"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Username</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={registerForm.control}
-                        name="email"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Email</FormLabel>
-                            <FormControl>
-                              <Input type="email" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={registerForm.control}
-                        name="password"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Password</FormLabel>
-                            <FormControl>
-                              <Input type="password" {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={registerForm.control}
-                        name="role"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Role</FormLabel>
-                            <FormControl>
-                              <select {...field} className="w-full p-2 border rounded">
-                                <option value="user">User</option>
-                                <option value="compliance_officer">Compliance Officer</option>
-                                <option value="admin">Admin</option>
-                              </select>
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={registerForm.control}
-                        name="department"
-                        render={({ field }) => (
-                          <FormItem>
-                            <FormLabel>Department</FormLabel>
-                            <FormControl>
-                              <Input {...field} />
-                            </FormControl>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <Button type="submit" className="w-full bg-[#002147] hover:bg-[#003166]" disabled={registerMutation.isPending}>
-                        {registerMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        Register
+              {/* MFA Code Input */}
+              {mfaRequired && (
+                <div className="mt-6 space-y-4">
+                  <div className="text-center">
+                    <h3 className="text-lg font-semibold">Multi-Factor Authentication</h3>
+                    <p className="text-sm text-muted-foreground mt-1">
+                      Enter the 6-digit code from your authenticator app
+                    </p>
+                  </div>
+                  <div className="space-y-4">
+                    <Input
+                      type="text"
+                      placeholder="000000"
+                      value={mfaCode}
+                      onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                      className="text-center text-lg tracking-widest"
+                      maxLength={6}
+                    />
+                    <div className="flex space-x-2">
+                      <Button
+                        variant="outline"
+                        onClick={() => {
+                          setMfaRequired(false);
+                          setMfaCode("");
+                          setLoginCredentials(null);
+                        }}
+                        className="flex-1"
+                      >
+                        Back
                       </Button>
-                    </form>
-                  </Form>
-                </CardContent>
-              </Card>
-            </TabsContent>
-          </Tabs>
+                      <Button
+                        onClick={() => {
+                          if (loginCredentials && mfaCode.length === 6) {
+                            loginMutation.mutate({
+                              ...loginCredentials,
+                              mfaCode
+                            });
+                          }
+                        }}
+                        disabled={mfaCode.length !== 6 || loginMutation.isPending}
+                        className="flex-1"
+                        style={{ 
+                          backgroundColor: branding.loginScreenAccentColor, 
+                          borderColor: branding.loginScreenAccentColor 
+                        }}
+                      >
+                        {loginMutation.isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        Verify
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              {/* SAML SSO Login - show for institutions that have SAML configured */}
+              {branding.institutionName.toLowerCase().includes('moravian') && (
+                <div className="mt-6">
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-background px-2 text-muted-foreground">
+                        Or continue with
+                      </span>
+                    </div>
+                  </div>
+                  <div className="mt-6">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => {
+                        window.location.href = 'https://moravian.edsteward.ai/auth/saml';
+                      }}
+                    >
+                      <img 
+                        src="https://www.okta.com/sites/default/files/Okta_Logo_BrightBlue_Medium.png" 
+                        alt="Okta" 
+                        className="mr-2 h-4 w-4"
+                      />
+                      Sign in with Moravian University SSO
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
 

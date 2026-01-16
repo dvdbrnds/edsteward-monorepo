@@ -179,7 +179,7 @@ app.post('/api/authenticate', async (req, res) => {
     }
     
     if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: 'No account found with that username or email. Please check your credentials and try again.' });
     }
 
     // Verify scrypt password
@@ -189,7 +189,7 @@ app.post('/api/authenticate', async (req, res) => {
     
     const [salt, hash] = user.password.split(':');
     if (!salt || !hash) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: 'Account configuration error. Please contact your administrator.' });
     }
     
     const derivedKey = await scryptAsync(password, Buffer.from(salt, 'hex'), 32) as Buffer;
@@ -197,7 +197,7 @@ app.post('/api/authenticate', async (req, res) => {
     const isValidPassword = crypto.timingSafeEqual(derivedKey, storedKey);
 
     if (!isValidPassword) {
-      return res.status(401).json({ error: 'Invalid credentials' });
+      return res.status(401).json({ error: 'Incorrect password. Please check your password and try again.' });
     }
 
     req.login(user, (err) => {
@@ -464,7 +464,7 @@ if (!isDev) {
 }
 
 // Error handling
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+ 
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
   console.error('Server error:', err);
   res.status(500).json({ error: 'Internal server error' });
@@ -575,9 +575,9 @@ process.on('warning', (warning) => {
 });
 
 // Override process.exit to prevent accidental crashes
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const _originalExit = process.exit;
-process.exit = ((code?: number) => {
+ 
+const _originalExit = process.exit;
+process.exit = ((_code?: number) => {
   console.error('🚨 PROCESS.EXIT CALLED - Preventing crash! Code:', _code);
   console.error('Stack trace:', new Error().stack);
   // Don't actually exit - just log it
@@ -594,10 +594,12 @@ process.on('SIGINT', () => {
 });
 
 // Add additional error handlers
-process.on('beforeExit', (code) => {
+process.on('beforeExit', (_code) => {
+  // Event logged for debugging
 });
 
-process.on('exit', (code) => {
+process.on('exit', (_code) => {
+  // Event logged for debugging
 });
 
 // Add domain error handling for synchronous errors
@@ -610,7 +612,7 @@ process.on('disconnect', () => {
 });
 
 // Add setInterval to keep the process alive and detect crashes
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+   
   const _keepAliveInterval = setInterval(() => {
   // This ensures the event loop stays active
   // and prevents the process from exiting unexpectedly

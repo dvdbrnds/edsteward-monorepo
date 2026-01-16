@@ -60,13 +60,26 @@ export async function apiRequest(
     try {
       const errorText = await response.text();
       if (errorText) {
-        errorMessage = errorText;
+        // Try to parse as JSON to extract the error message
+        try {
+          const errorJson = JSON.parse(errorText);
+          if (errorJson.error) {
+            errorMessage = errorJson.error;
+          } else if (errorJson.message) {
+            errorMessage = errorJson.message;
+          } else {
+            errorMessage = errorText;
+          }
+        } catch {
+          // Not JSON, use raw text
+          errorMessage = errorText;
+        }
       }
-    } catch (e) {
-      // Ignore JSON parsing errors for error responses
+    } catch {
+      // Ignore response parsing errors
     }
     
-    const error = new Error(errorMessage) as any;
+    const error = new Error(errorMessage) as Error & { status?: number; retryAfter?: number };
     error.status = response.status;
     
     if (response.status === 429) {

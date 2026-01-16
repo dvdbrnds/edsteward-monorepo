@@ -74,9 +74,15 @@ export function setupAuth(app: Express) {
         const tenantStorage = getSingleTenantStorage();
         const user = await tenantStorage.getUserByUsername(username);
 
-        if (!user || !(await verifyPassword(password, user.password))) {
-          await syslog.logAuthEvent(LogLevel.WARNING, "Failed login attempt", undefined, username, {});
-          return done(null, false);
+        if (!user) {
+          await syslog.logAuthEvent(LogLevel.WARNING, "Failed login attempt - user not found", undefined, username, {});
+          return done(null, false, { message: 'User not found' });
+        }
+
+        const isValidPassword = await verifyPassword(password, user.password);
+        if (!isValidPassword) {
+          await syslog.logAuthEvent(LogLevel.WARNING, "Failed login attempt - wrong password", undefined, username, {});
+          return done(null, false, { message: 'Invalid password' });
         }
 
         await syslog.logAuthEvent(LogLevel.INFO, "Login successful", user.id, username, {});
@@ -177,7 +183,7 @@ export function setupAuth(app: Express) {
       return res.status(400).json({ error: "Content-Type must be application/json" });
     }
 
-    passport.authenticate("local", async (err: Error | null, user: SelectUser | false) => {
+    passport.authenticate("local", async (err: Error | null, user: SelectUser | false, info: { message?: string } | undefined) => {
       if (err) {
         await syslog.logAuthEvent(LogLevel.ERROR, "Login error", undefined, req.body.username, {
           tenantId: req.tenantId,
@@ -191,7 +197,13 @@ export function setupAuth(app: Express) {
           tenantId: req.tenantId,
           subdomain: req.tenant?.subdomain
         });
-        return res.status(401).json({ error: "Invalid credentials" });
+        // Provide specific error message based on what went wrong
+        const errorMessage = info?.message === 'User not found' 
+          ? 'No account found with that username. Please check your username and try again.'
+          : info?.message === 'Invalid password'
+          ? 'Incorrect password. Please check your password and try again.'
+          : 'Invalid credentials. Please check your username and password.';
+        return res.status(401).json({ error: errorMessage });
       }
 
       // Context7 Multi-Tenant Fix: Attach tenant context to user before login
@@ -227,8 +239,8 @@ export function setupAuth(app: Express) {
           req.session.save((saveErr) => {
             if (saveErr) {
               console.error('❌ Session save error:', saveErr);
-            } else {
             }
+            // Session saved successfully (or error logged above)
 
             // Return user with tenant context
             const userWithTenant = {
