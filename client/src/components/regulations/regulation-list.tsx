@@ -56,6 +56,43 @@ const COLUMN_DEFINITIONS: ColumnDef[] = [
 
 const STORAGE_KEY = 'edsteward-regulation-columns';
 
+// Column header component with inline hide button
+interface ColumnHeaderProps {
+  columnKey: ColumnKey;
+  label: string;
+  sortable?: boolean;
+  sortKey?: string;
+  onSort?: (key: string) => void;
+  onHide: (key: ColumnKey) => void;
+  canHide?: boolean;
+}
+
+function ColumnHeader({ columnKey, label, sortable, sortKey, onSort, onHide, canHide = true }: ColumnHeaderProps) {
+  return (
+    <div className="flex items-center gap-1 group">
+      <div 
+        className={cn("flex items-center gap-2 flex-1", sortable && "cursor-pointer")}
+        onClick={() => sortable && sortKey && onSort?.(sortKey)}
+      >
+        {label}
+        {sortable && <ArrowUpDown className="h-4 w-4" />}
+      </div>
+      {canHide && (
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            onHide(columnKey);
+          }}
+          className="opacity-0 group-hover:opacity-100 p-0.5 hover:bg-muted rounded transition-opacity"
+          title={`Hide ${label} column`}
+        >
+          <X className="h-3 w-3 text-muted-foreground hover:text-foreground" />
+        </button>
+      )}
+    </div>
+  );
+}
+
 const getDefaultVisibility = (): Record<ColumnKey, boolean> => ({
   id: true,
   name: true,
@@ -415,7 +452,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
                       className="h-6 px-2 text-xs"
                     >
                       <RotateCcw className="h-3 w-3 mr-1" />
-                      Show All
+                      Restore All
                     </Button>
                   )}
                 </DropdownMenuLabel>
@@ -465,61 +502,104 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
             <TableHeader>
               <TableRow>
                 {isColumnVisible('id') && (
-                  <TableHead className="cursor-pointer" onClick={() => handleSort('itemId')}>
-                    <div className="flex items-center gap-2">
-                      ID
-                      <ArrowUpDown className="h-4 w-4" />
-                    </div>
+                  <TableHead>
+                    <ColumnHeader 
+                      columnKey="id" 
+                      label="ID" 
+                      sortable 
+                      sortKey="itemId" 
+                      onSort={handleSort}
+                      onHide={toggleColumn}
+                    />
                   </TableHead>
                 )}
                 {isColumnVisible('name') && (
-                  <TableHead className="cursor-pointer" onClick={() => handleSort('name')}>
-                    <div className="flex items-center gap-2">
-                      Name
-                      <ArrowUpDown className="h-4 w-4" />
-                    </div>
+                  <TableHead>
+                    <ColumnHeader 
+                      columnKey="name" 
+                      label="Name" 
+                      sortable 
+                      sortKey="name" 
+                      onSort={handleSort}
+                      onHide={toggleColumn}
+                      canHide={false}
+                    />
                   </TableHead>
                 )}
                 {isColumnVisible('category') && (
-                  <TableHead className="cursor-pointer" onClick={() => handleSort('category')}>
-                    <div className="flex items-center gap-2">
-                      Category
-                      <ArrowUpDown className="h-4 w-4" />
-                    </div>
+                  <TableHead>
+                    <ColumnHeader 
+                      columnKey="category" 
+                      label="Category" 
+                      sortable 
+                      sortKey="category" 
+                      onSort={handleSort}
+                      onHide={toggleColumn}
+                    />
                   </TableHead>
                 )}
                 {isColumnVisible('dro') && (
-                  <TableHead className="cursor-pointer" onClick={() => handleSort('dro')}>
-                    <div className="flex items-center gap-2">
-                      DRO
-                      <ArrowUpDown className="h-4 w-4" />
-                    </div>
+                  <TableHead>
+                    <ColumnHeader 
+                      columnKey="dro" 
+                      label="DRO" 
+                      sortable 
+                      sortKey="dro" 
+                      onSort={handleSort}
+                      onHide={toggleColumn}
+                    />
                   </TableHead>
                 )}
                 {isColumnVisible('status') && (
-                  <TableHead>Status</TableHead>
+                  <TableHead>
+                    <ColumnHeader 
+                      columnKey="status" 
+                      label="Status" 
+                      onHide={toggleColumn}
+                    />
+                  </TableHead>
                 )}
                 {isColumnVisible('nextDeadline') && (
-                  <TableHead>Next Deadline</TableHead>
+                  <TableHead>
+                    <ColumnHeader 
+                      columnKey="nextDeadline" 
+                      label="Next Deadline" 
+                      onHide={toggleColumn}
+                    />
+                  </TableHead>
                 )}
                 {isColumnVisible('lastUpdated') && (
-                  <TableHead className="cursor-pointer" onClick={() => handleSort('lastUpdated')}>
-                    <div className="flex items-center gap-2">
-                      Last Updated
-                      <ArrowUpDown className="h-4 w-4" />
-                    </div>
+                  <TableHead>
+                    <ColumnHeader 
+                      columnKey="lastUpdated" 
+                      label="Last Updated" 
+                      sortable 
+                      sortKey="lastUpdated" 
+                      onSort={handleSort}
+                      onHide={toggleColumn}
+                    />
                   </TableHead>
                 )}
                 {isColumnVisible('jurisdiction') && (
-                  <TableHead className="cursor-pointer" onClick={() => handleSort('jurisdictionSource')}>
-                    <div className="flex items-center gap-2">
-                      Jurisdiction
-                      <ArrowUpDown className="h-4 w-4" />
-                    </div>
+                  <TableHead>
+                    <ColumnHeader 
+                      columnKey="jurisdiction" 
+                      label="Jurisdiction" 
+                      sortable 
+                      sortKey="jurisdictionSource" 
+                      onSort={handleSort}
+                      onHide={toggleColumn}
+                    />
                   </TableHead>
                 )}
                 {isColumnVisible('appliesTo') && (
-                  <TableHead>Applies To</TableHead>
+                  <TableHead>
+                    <ColumnHeader 
+                      columnKey="appliesTo" 
+                      label="Applies To" 
+                      onHide={toggleColumn}
+                    />
+                  </TableHead>
                 )}
               </TableRow>
             </TableHeader>

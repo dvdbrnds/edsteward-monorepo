@@ -10,7 +10,7 @@ import MyTasks from "@/components/dashboard/my-tasks";
 import PendingAttestations from "@/components/dashboard/pending-attestations";
 import DeadlineCalendar from "@/components/dashboard/deadline-calendar";
 import RegulationList from "@/components/regulations/regulation-list";
-import { WidgetSettings, WidgetWrapper } from "@/components/dashboard/widget-settings";
+import { WidgetSettings } from "@/components/dashboard/widget-settings";
 import { DraggableWidget } from "@/components/dashboard/draggable-widget";
 import { DashboardWidgetsProvider, useDashboardWidgets, type WidgetId } from "@/hooks/use-dashboard-widgets";
 import { useState, useEffect, ReactNode } from "react";
@@ -395,7 +395,7 @@ export default function HomePage() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-8 gap-4">
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-foreground">
-                Welcome, {user?.username}
+                Welcome, {(user as { firstName?: string })?.firstName || user?.username}
               </h1>
               <p className="text-sm text-muted-foreground mt-1">
                 Drag widgets to rearrange your dashboard

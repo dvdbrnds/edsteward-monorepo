@@ -4,7 +4,7 @@
  */
 
 import { useState } from 'react';
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,15 +14,20 @@ import {
   Loader2,
   AlertTriangle,
   CheckCircle2,
-  Send
+  Send,
+  // CheckCheck - used by Quick Attest button (currently disabled)
 } from "lucide-react";
 import { Link } from "wouter";
 import type { Regulation } from "@shared/schema";
 import { SendAttestationDialog } from "@/components/regulations/send-attestation-dialog";
 import { useAuth } from "@/hooks/use-auth";
+import { useToast } from "@/hooks/use-toast";
+import { apiRequest } from "@/lib/queryClient";
 
 export default function PendingAttestations() {
   const { user } = useAuth();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   const isAdmin = user?.role === 'admin' || user?.role === 'compliance_officer';
   
   const [attestationDialog, setAttestationDialog] = useState<{
@@ -32,6 +37,44 @@ export default function PendingAttestations() {
 
   const { data: regulations, isLoading } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"],
+  });
+
+  // Quick attest mutation - marks attestation as complete directly (currently disabled)
+   
+  const _quickAttestMutation = useMutation({
+    mutationFn: async (regulationId: number) => {
+      const now = new Date().toISOString();
+      const userWithDetails = user as { firstName?: string; lastName?: string; email?: string };
+      const fullName = `${userWithDetails?.firstName || ''} ${userWithDetails?.lastName || ''}`.trim() || user?.username;
+      
+      return await apiRequest("PATCH", `/api/regulations/${regulationId}/actions/attestation`, {
+        status: 'completed',
+        completedDate: now,
+        completedAt: now,
+        completedBy: {
+          userId: user?.id,
+          username: user?.username,
+          email: userWithDetails?.email || user?.username,
+          fullName,
+          completedAt: now, // Include timestamp in completedBy for signature display
+        },
+        notes: `Quick attested by ${fullName} on ${new Date().toLocaleString()}`
+      });
+    },
+    onSuccess: () => {
+      toast({
+        title: "Attestation Complete",
+        description: "The regulation has been attested successfully.",
+      });
+      queryClient.invalidateQueries({ queryKey: ["/api/regulations"] });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Attestation Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
   });
 
   if (isLoading) {
@@ -113,19 +156,43 @@ export default function PendingAttestations() {
                         </div>
                       </div>
                       {isAdmin && (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="flex-shrink-0 text-orange-600 hover:text-orange-700 hover:bg-orange-100"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            e.stopPropagation();
-                            setAttestationDialog({ open: true, regulation });
-                          }}
-                        >
-                          <Send className="h-4 w-4 mr-1" />
-                          Request
-                        </Button>
+                        <div className="flex gap-1 flex-shrink-0">
+                          {/* Quick Attest button - disabled for now, may re-enable later
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-green-600 hover:text-green-700 hover:bg-green-100"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              _quickAttestMutation.mutate(regulation.id);
+                            }}
+                            disabled={_quickAttestMutation.isPending}
+                          >
+                            {_quickAttestMutation.isPending ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <>
+                                <CheckCheck className="h-4 w-4 mr-1" />
+                                Attest
+                              </>
+                            )}
+                          </Button>
+                          */}
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="text-orange-600 hover:text-orange-700 hover:bg-orange-100"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              setAttestationDialog({ open: true, regulation });
+                            }}
+                          >
+                            <Send className="h-4 w-4 mr-1" />
+                            Request
+                          </Button>
+                        </div>
                       )}
                     </div>
                   </div>
