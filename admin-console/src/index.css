@@ -15,6 +15,23 @@
     html {
         scroll-behavior: smooth;
     }
+
+    /* Ensure inputs are always light mode */
+    input, textarea, select {
+        background-color: white !important;
+        color: rgb(17 24 39) !important;
+        color-scheme: light;
+    }
+
+    /* Override browser autofill styling */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus,
+    input:-webkit-autofill:active {
+        -webkit-box-shadow: 0 0 0 30px white inset !important;
+        -webkit-text-fill-color: rgb(17 24 39) !important;
+        background-color: white !important;
+    }
 }
 
 @layer components {

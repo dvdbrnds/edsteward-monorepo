@@ -1,19 +1,22 @@
-import { useState, useEffect, useContext, createContext, ReactNode } from 'react';
+import { useState, useEffect, useContext, createContext, ReactNode, useRef, useCallback } from 'react';
 import { AdminUser, LoginCredentials, AuthContextType } from '@/types/auth';
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// API base URL
+const API_BASE = import.meta.env.DEV ? 'http://localhost:4000' : '';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AdminUser | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const hasCheckedAuth = useRef(false);
 
-  useEffect(() => {
-    // Check for existing session on mount
-    checkAuthStatus();
-  }, []);
+  const checkAuthStatus = useCallback(async () => {
+    // Prevent multiple auth checks (StrictMode calls useEffect twice)
+    if (hasCheckedAuth.current) return;
+    hasCheckedAuth.current = true;
 
-  const checkAuthStatus = async () => {
     try {
       const token = localStorage.getItem('admin_token');
       if (!token) {
@@ -21,7 +24,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      const response = await fetch('http://localhost:4000/api/auth/me', {
+      const response = await fetch(`${API_BASE}/api/auth/me`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -39,14 +42,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    checkAuthStatus();
+  }, [checkAuthStatus]);
 
   const login = async (credentials: LoginCredentials) => {
     try {
       setIsLoading(true);
       setError(null);
 
-      const response = await fetch('http://localhost:4000/api/auth/login', {
+      const response = await fetch(`${API_BASE}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -54,27 +61,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         body: JSON.stringify(credentials),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Login failed');
+        throw new Error(data.error || data.message || 'Login failed');
       }
 
-      const { user: adminUser, token } = await response.json();
-      localStorage.setItem('admin_token', token);
-      setUser(adminUser);
+      // Backend returns { token, user: { id, email, name, role } }
+      localStorage.setItem('admin_token', data.token);
+      setUser(data.user);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
+      const errorMessage = err instanceof Error ? err.message : 'Login failed';
+      setError(errorMessage);
       throw err;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('admin_token');
-    setUser(null);
-    setError(null);
-  };
+  const logout = useCallback(async () => {
+    try {
+      const token = localStorage.getItem('admin_token');
+      if (token) {
+        await fetch(`${API_BASE}/api/auth/logout`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+      }
+    } catch (err) {
+      console.error('Logout error:', err);
+    } finally {
+      localStorage.removeItem('admin_token');
+      setUser(null);
+      setError(null);
+    }
+  }, []);
 
   const value: AuthContextType = {
     user,

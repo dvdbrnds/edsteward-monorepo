@@ -8,6 +8,7 @@ import { registerRoutes } from './routes/index';
 import { setupVite, serveStatic, log } from './vite';
 import { checkAndSendDeadlineNotifications } from './services/deadline-notifications';
 import { databaseHealthMonitor } from './services/database-health';
+import { initializeTenantRegistry, closeTenantRegistry } from './services/tenant-registry';
 
 const exec = promisify(execCallback);
 
@@ -43,6 +44,16 @@ export async function startServer(): Promise<Server> {
       } catch (error) {
         console.error("❌ Database auto-initialization failed:", error);
       }
+    }
+
+    // Initialize dynamic tenant registry (loads from admin database)
+    log("Initializing tenant registry...");
+    try {
+      await initializeTenantRegistry();
+      log("Tenant registry initialized successfully");
+    } catch (error) {
+      console.error("Failed to initialize tenant registry:", error);
+      log("Tenant registry initialization failed, using fallback tenants");
     }
 
     // Create Express app with all middleware
@@ -84,6 +95,8 @@ export async function startServer(): Promise<Server> {
             server.close();
             server = null;
           }
+          // Close tenant registry connection
+          await closeTenantRegistry();
         } catch (error) {
           console.error('Cleanup error:', error);
         }

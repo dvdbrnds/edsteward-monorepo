@@ -16,6 +16,7 @@ import {
 } from '../config/database';
 import { DatabaseStorage } from '../storage';
 import * as schema from '@shared/schema';
+import { getTenantDatabaseUrl, getAllTenantDatabaseUrls, isRegistryInitialized } from './tenant-registry';
 
 // Re-export the shared pool and db for backwards compatibility
 export { sharedPool as pool, sharedDb as db };
@@ -30,15 +31,32 @@ let storage: DatabaseStorage | null = null;
 const tenantPools = new Map<string, Pool>();
 const tenantStorages = new Map<string, DatabaseStorage>();
 
-// Tenant database URL mapping
-const TENANT_DATABASE_URLS: Record<string, string> = {
+// Fallback tenant database URL mapping (used when dynamic registry unavailable)
+const FALLBACK_TENANT_DATABASE_URLS: Record<string, string> = {
   'moravian': process.env.MORAVIAN_DATABASE_URL || process.env.DATABASE_URL || '',
   'test': process.env.TEST_DATABASE_URL || process.env.DEV_DATABASE_URL || process.env.DATABASE_URL || '',
   'dev': process.env.DEV_DATABASE_URL || process.env.DATABASE_URL || '',
   'staging': process.env.STAGING_DATABASE_URL || process.env.DATABASE_URL || '',
   'admin': process.env.ADMIN_DATABASE_URL || process.env.DATABASE_URL || '',
   'wossamotta': process.env.WOSSAMOTTA_DATABASE_URL || process.env.DATABASE_URL || '',
+  'template': process.env.TEMPLATE_DATABASE_URL || process.env.DATABASE_URL || '',
 };
+
+/**
+ * Get database URL for a tenant - tries dynamic registry first, then fallback
+ */
+async function resolveTenantDatabaseUrl(tenantId: string): Promise<string | null> {
+  // Try dynamic registry first
+  if (isRegistryInitialized()) {
+    const dynamicUrl = await getTenantDatabaseUrl(tenantId);
+    if (dynamicUrl) {
+      return dynamicUrl;
+    }
+  }
+  
+  // Fallback to hardcoded URLs
+  return FALLBACK_TENANT_DATABASE_URLS[tenantId] || null;
+}
 
 /**
  * Get the shared database connection pool
@@ -56,7 +74,7 @@ export function getDatabase() {
 }
 
 /**
- * Get database storage instance - tenant-aware
+ * Get database storage instance - tenant-aware (sync version for backwards compatibility)
  * @param tenantId - Optional tenant identifier for multi-tenant routing
  */
 export function getDatabaseStorage(tenantId?: string): DatabaseStorage {
@@ -73,8 +91,20 @@ export function getDatabaseStorage(tenantId?: string): DatabaseStorage {
     return tenantStorages.get(tenantId)!;
   }
 
-  // Get the tenant-specific database URL
-  const databaseUrl = TENANT_DATABASE_URLS[tenantId];
+  // Try to get from dynamic registry synchronously (if already cached)
+  let databaseUrl: string | null = null;
+  
+  // Check dynamic registry URLs (synchronous access to cached values)
+  if (isRegistryInitialized()) {
+    const allUrls = getAllTenantDatabaseUrls();
+    databaseUrl = allUrls[tenantId] || null;
+  }
+  
+  // Fallback to hardcoded URLs
+  if (!databaseUrl) {
+    databaseUrl = FALLBACK_TENANT_DATABASE_URLS[tenantId] || null;
+  }
+  
   if (!databaseUrl) {
     console.warn(`[MULTI-TENANT] No database URL for tenant '${tenantId}', using default`);
     if (!storage) {

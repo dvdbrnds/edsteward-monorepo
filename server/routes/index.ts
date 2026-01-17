@@ -841,6 +841,81 @@ export function registerRoutes(app: express.Application): Server {
     }
   });
 
+  // ===== TENANT REGISTRY ENDPOINTS =====
+  // These endpoints allow the admin console to manage the dynamic tenant registry
+  
+  // Get tenant registry status
+  app.get('/api/admin/tenant-registry/status', async (req, res) => {
+    try {
+      const { getRegistryStats, getAllCachedTenants } = await import('../services/tenant-registry');
+      const stats = getRegistryStats();
+      const tenants = getAllCachedTenants();
+      
+      res.json({
+        success: true,
+        stats,
+        tenantCount: tenants.length,
+        tenants: tenants.map(t => ({
+          id: t.id,
+          name: t.name,
+          subdomain: t.subdomain,
+          status: t.status,
+        })),
+      });
+    } catch (error) {
+      console.error("Error getting tenant registry status:", error);
+      res.status(500).json({
+        success: false,
+        error: "Failed to get tenant registry status",
+      });
+    }
+  });
+
+  // Refresh tenant registry (called after new tenant is created)
+  app.post('/api/admin/tenant-registry/refresh', async (req, res) => {
+    try {
+      const { refreshAllTenants, getRegistryStats } = await import('../services/tenant-registry');
+      
+      await refreshAllTenants();
+      const stats = getRegistryStats();
+      
+      console.log('[TENANT-REGISTRY] Manual refresh triggered via API');
+      
+      res.json({
+        success: true,
+        message: 'Tenant registry refreshed successfully',
+        stats,
+      });
+    } catch (error) {
+      console.error("Error refreshing tenant registry:", error);
+      res.status(500).json({
+        success: false,
+        error: "Failed to refresh tenant registry",
+      });
+    }
+  });
+
+  // Invalidate specific tenant cache (for updates)
+  app.post('/api/admin/tenant-registry/invalidate/:tenantId', async (req, res) => {
+    try {
+      const { invalidateTenantCache } = await import('../services/tenant-registry');
+      const { tenantId } = req.params;
+      
+      invalidateTenantCache(tenantId);
+      
+      res.json({
+        success: true,
+        message: `Cache invalidated for tenant: ${tenantId}`,
+      });
+    } catch (error) {
+      console.error("Error invalidating tenant cache:", error);
+      res.status(500).json({
+        success: false,
+        error: "Failed to invalidate tenant cache",
+      });
+    }
+  });
+
   // ALIAS: Institution endpoint (for compatibility with frontend)
   app.get('/api/institution', (req, res) => {
     // Read environment variables dynamically for true customer isolation

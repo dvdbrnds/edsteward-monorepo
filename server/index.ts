@@ -24,6 +24,7 @@ import { apiLimiter, authLimiter, tenantQuotaLimiter } from './middleware/rate-l
 import { tenantMiddleware } from './middleware/tenant';
 import { tenantRequestLogger, getAllTenantMetrics, getTopEndpoints } from './middleware/tenant-logger';
 import { setupVite, serveStatic, log } from './vite';
+import { initializeTenantRegistry, refreshAllTenants, getRegistryStats, closeTenantRegistry } from './services/tenant-registry';
 
 // Check if we're in development mode
 const isDev = process.env.NODE_ENV !== 'production';
@@ -137,6 +138,18 @@ configureAuth(app);
 if (process.env.MULTI_TENANT === 'true') {
   console.log('🏢 Multi-tenant mode ENABLED - tenant routing active');
   app.use(tenantMiddleware);
+  
+  // Initialize dynamic tenant registry (reads from admin database)
+  (async () => {
+    try {
+      console.log('[TENANT-REGISTRY] Initializing dynamic tenant registry...');
+      await initializeTenantRegistry();
+      console.log('[TENANT-REGISTRY] ✅ Registry initialized successfully');
+    } catch (error) {
+      console.error('[TENANT-REGISTRY] ❌ Failed to initialize:', error);
+      console.log('[TENANT-REGISTRY] Using fallback hardcoded tenants');
+    }
+  })();
 } else {
   console.log('🏠 Single-tenant mode - using default database');
 }
@@ -391,6 +404,37 @@ app.get('/api/health', async (req, res) => {
     timestamp: new Date().toISOString(),
     institution: institutionConfig.name,
   });
+});
+
+// Tenant Registry API - Dynamic tenant management
+app.get('/api/admin/tenant-registry/status', (req, res) => {
+  const stats = getRegistryStats();
+  res.json({
+    success: true,
+    stats,
+    tenantCount: stats.cachedTenants,
+    tenants: [] // Simplified - full tenant list available via other endpoints
+  });
+});
+
+app.post('/api/admin/tenant-registry/refresh', async (req, res) => {
+  try {
+    console.log('[TENANT-REGISTRY] Manual refresh triggered via API');
+    await refreshAllTenants();
+    const stats = getRegistryStats();
+    res.json({
+      success: true,
+      message: 'Tenant registry refreshed successfully',
+      stats
+    });
+  } catch (error) {
+    console.error('[TENANT-REGISTRY] Refresh failed:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to refresh tenant registry',
+      message: error instanceof Error ? error.message : String(error)
+    });
+  }
 });
 
 // Tenant metrics endpoint (admin only)

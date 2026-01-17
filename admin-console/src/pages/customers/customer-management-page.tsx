@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { apiGet } from '@/lib/api';
+import { TenantDeletionDialog } from '@/components/tenant-deletion-dialog';
 
 interface Customer {
   id: string;
@@ -27,6 +28,7 @@ export function CustomerManagementPage() {
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [deletingTenant, setDeletingTenant] = useState<{ id: string; name: string } | null>(null);
 
   useEffect(() => {
     fetchCustomers();
@@ -230,6 +232,13 @@ export function CustomerManagementPage() {
                       >
                         Visit Site
                       </a>
+                      <button
+                        onClick={() => setDeletingTenant({ id: customer.id, name: customer.name })}
+                        className="inline-flex items-center px-3 py-2 border border-red-300 shadow-sm text-sm leading-4 font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                        title="Delete tenant"
+                      >
+                        🗑️
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -237,6 +246,20 @@ export function CustomerManagementPage() {
             ))}
           </ul>
         </div>
+      )}
+
+      {/* Tenant Deletion Dialog */}
+      {deletingTenant && (
+        <TenantDeletionDialog
+          tenantId={deletingTenant.id}
+          tenantName={deletingTenant.name}
+          isOpen={true}
+          onClose={() => setDeletingTenant(null)}
+          onDeleted={() => {
+            setDeletingTenant(null);
+            fetchCustomers(); // Refresh the list
+          }}
+        />
       )}
     </div>
   );

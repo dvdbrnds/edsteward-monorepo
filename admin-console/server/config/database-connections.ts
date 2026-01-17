@@ -10,11 +10,13 @@ import { Pool } from 'pg';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
-// Load environment variables
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-// When compiled, we're in dist/config, so go up two levels to server/
-dotenv.config({ path: join(__dirname, '..', '..', '.env') });
+// Load environment variables - only if DATABASE_URL is not already set (allows ECS env vars to take precedence)
+if (!process.env.DATABASE_URL) {
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
+  // When compiled, we're in dist/config, so go up two levels to server/
+  dotenv.config({ path: join(__dirname, '..', '..', '.env') });
+}
 
 // Tenant interface - matches database schema
 export interface Tenant {
@@ -55,6 +57,13 @@ const adminPool = new Pool({
 
 // Tenant database connection pools (cached)
 const tenantPools = new Map<string, Pool>();
+
+/**
+ * Get the admin database pool (for tenant provisioning)
+ */
+export function getAdminPool(): Pool {
+  return adminPool;
+}
 
 /**
  * Initialize admin database - create tables if needed

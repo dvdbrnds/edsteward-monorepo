@@ -1,10 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
-import { getTenantConfig, getAllCachedTenants, isRegistryInitialized } from '../services/tenant-registry';
+import { db } from '../db';
+import { tenants } from '@shared/schema';
+import { eq } from 'drizzle-orm';
 
 // ===== CONSOLIDATED TENANT ARCHITECTURE =====
 // Following Context7 best practices and Laravel Spatie multitenancy patterns
 // Single responsibility: tenant resolution with proper fallback chain
-// NOW USES DYNAMIC REGISTRY - tenants loaded from admin database
 
 // Extend Express Request to include tenant context
 declare global {
@@ -180,60 +181,6 @@ const TENANT_REGISTRY: Record<string, Tenant> = {
     },
     createdAt: new Date('2024-01-01'),
     updatedAt: new Date()
-  },
-  'wossamotta': {
-    id: 'wossamotta',
-    name: 'Wossamotta University',
-    domain: 'wossamotta.edu',
-    subdomain: 'wossamotta',
-    databaseName: 'edsteward_wossamotta',
-    status: 'active',
-    settings: {
-      allowedDomains: ['wossamotta.edu'],
-      defaultRole: 'user',
-      enableAutoProvisioning: true,
-      features: {
-        apiAccess: true,
-        customDomain: false,
-        ssoEnabled: false,
-        maxUsers: 500,
-        maxRegulations: 5000
-      },
-      institutionConfig: {
-        primaryTypes: ['private-universities'],
-        hideNonApplicable: true,
-        allowUsersToToggle: true
-      }
-    },
-    createdAt: new Date('2026-01-06'),
-    updatedAt: new Date()
-  },
-  'template': {
-    id: 'template',
-    name: 'EdSteward Template',
-    domain: 'template.edsteward.ai',
-    subdomain: 'template',
-    databaseName: 'edsteward_template',
-    status: 'active',
-    settings: {
-      allowedDomains: ['edsteward.ai'],
-      defaultRole: 'admin',
-      enableAutoProvisioning: false,
-      features: {
-        apiAccess: true,
-        customDomain: false,
-        ssoEnabled: false,
-        maxUsers: 999,
-        maxRegulations: 9999
-      },
-      institutionConfig: {
-        primaryTypes: ['public-universities', 'private-universities'],
-        hideNonApplicable: false,
-        allowUsersToToggle: true
-      }
-    },
-    createdAt: new Date('2026-01-17'),
-    updatedAt: new Date()
   }
 };
 
@@ -261,10 +208,18 @@ export class TenantFinder {
   static async findForRequest(req: Request): Promise<Tenant | null> {
     const detection = this.extractTenantFromRequest(req);
 
+    console.log(`[TENANT-FINDER] Detection result:`, {
+      method: detection.method,
+      subdomain: detection.subdomain,
+      domain: detection.domain,
+      source: detection.source
+    });
+
     // Method 1: Subdomain-based detection (primary)
     if (detection.subdomain) {
       const tenant = await this.getTenantBySubdomain(detection.subdomain);
       if (tenant) {
+        console.log(`[TENANT-FINDER] ✓ Found tenant by subdomain: ${tenant.id}`);
         return tenant;
       }
     }
@@ -273,20 +228,33 @@ export class TenantFinder {
     if (detection.domain && detection.domain !== 'edsteward.ai') {
       const tenant = await this.getTenantByDomain(detection.domain);
       if (tenant) {
+        console.log(`[TENANT-FINDER] ✓ Found tenant by domain: ${tenant.id}`);
         return tenant;
       }
     }
 
     // Method 3: Development/localhost (simulate Moravian tenant for testing)
     if (detection.method === 'localhost') {
+      console.log(`[TENANT-FINDER] Development environment - simulating Moravian tenant for testing`);
       return TENANT_REGISTRY['moravian'] || null;
     }
 
-    // Method 4: Unknown/root domain (no tenant required)
+    // Method 4: Unknown/root domain or ALB health checks
     if (detection.method === 'unknown') {
+      // For ALB health checks in production, provide a default tenant to avoid health check failures
+      const userAgent = req.get('user-agent') || '';
+      if (userAgent.includes('ELB-HealthChecker') ||
+        userAgent.includes('Wget') ||
+        detection.source.match(/^\d+\.\d+\.\d+\.\d+/)) {
+        console.log(`[TENANT-FINDER] ALB health check - providing default tenant for health checks`);
+        return TENANT_REGISTRY['moravian'] || null; // Default to Moravian for production health checks
+      }
+
+      console.log(`[TENANT-FINDER] Root domain or unknown - no tenant required`);
       return null;
     }
 
+    console.log(`[TENANT-FINDER] ✗ No tenant found for detection:`, detection);
     return null;
   }
 
@@ -296,9 +264,24 @@ export class TenantFinder {
    */
   static extractTenantFromRequest(req: Request): TenantDetectionResult {
     const host = req.get('host') || req.get('x-forwarded-host') || '';
-    const _protocol = req.get('x-forwarded-proto') || req.protocol || 'http';
-    
-    
+    const protocol = req.get('x-forwarded-proto') || req.protocol || 'http';
+    const userAgent = req.get('user-agent') || '';
+
+    console.log(`[TENANT-FINDER] Extracting from host: ${host} (protocol: ${protocol})`);
+
+    // Method 0: ALB Health Checks and Load Balancer IPs (skip tenant detection)
+    if (host.match(/^\d+\.\d+\.\d+\.\d+/) || // IP address
+      userAgent.includes('ELB-HealthChecker') || // ALB health checker
+      userAgent.includes('Wget') || // Common health check tool
+      host.includes('52.2.50.62') || // Specific ALB IP
+      host.includes('amazonaws.com')) { // AWS internal domains
+      console.log(`[TENANT-FINDER] ALB/Health check detected - skipping tenant detection`);
+      return {
+        method: 'unknown',
+        source: host
+      };
+    }
+
     // Method 1: Subdomain detection (tenant.edsteward.ai or tenant.edsteward.local)
     const subdomainMatch = host.match(/^([^.]+)\.edsteward\.(ai|local)(?::\d+)?$/);
     if (subdomainMatch && subdomainMatch[1] !== 'www' && subdomainMatch[1] !== 'api') {
@@ -311,11 +294,12 @@ export class TenantFinder {
     }
 
     // Method 2: Custom domain (customer-domain.com)
-    if (host && 
-        !host.includes('edsteward.ai') && 
-        !host.includes('localhost') && 
-        !host.includes('127.0.0.1') &&
-        !host.includes('0.0.0.0')) {
+    if (host &&
+      !host.includes('edsteward.ai') &&
+      !host.includes('localhost') &&
+      !host.includes('127.0.0.1') &&
+      !host.includes('0.0.0.0') &&
+      !host.match(/^\d+\.\d+\.\d+\.\d+/)) { // Exclude IP addresses
       return {
         domain: host.split(':')[0],
         method: 'domain',
@@ -333,16 +317,16 @@ export class TenantFinder {
       };
     }
 
-    // Method 4: Localhost development
+    // Method 4: Localhost development (simulate Moravian tenant for testing)
     if (host.includes('localhost') || host.includes('127.0.0.1') || host.includes('0.0.0.0')) {
-      return { 
+      return {
         method: 'localhost',
         source: host
       };
     }
 
     // Method 5: Root domain or unknown
-    return { 
+    return {
       method: 'unknown',
       source: host
     };
@@ -354,30 +338,51 @@ export class TenantFinder {
    */
   static async getTenantBySubdomain(subdomain: string): Promise<Tenant | null> {
     const cacheKey = `subdomain:${subdomain}`;
-    
-    // Check local cache first
+
+    // Check cache first
     const cached = tenantCache.get(cacheKey);
     if (cached && Date.now() - cached.cachedAt < CACHE_TTL) {
+      console.log(`[TENANT-FINDER] Cache hit for subdomain: ${subdomain} (source: ${cached.source})`);
       return cached.tenant;
     }
 
-    // Try dynamic registry (loads from admin database)
-    if (isRegistryInitialized()) {
-      const dynamicTenant = await getTenantConfig(subdomain);
-      if (dynamicTenant) {
-        this.setCachedTenant(cacheKey, dynamicTenant, 'database');
-        return dynamicTenant;
+    try {
+      // Try database first
+      const [dbTenant] = await db
+        .select()
+        .from(tenants)
+        .where(eq(tenants.subdomain, subdomain))
+        .limit(1);
+
+      if (dbTenant) {
+        const mappedTenant = this.mapDatabaseTenant(dbTenant);
+        this.setCachedTenant(cacheKey, mappedTenant, 'database');
+        console.log(`[TENANT-FINDER] Database lookup successful for subdomain: ${subdomain}`);
+        return mappedTenant;
       }
-    }
 
-    // Fallback to hardcoded registry (for backwards compatibility)
-    const registryTenant = TENANT_REGISTRY[subdomain];
-    if (registryTenant) {
-      this.setCachedTenant(cacheKey, registryTenant, 'registry');
-      return registryTenant;
-    }
+      // Fallback to registry
+      const registryTenant = TENANT_REGISTRY[subdomain];
+      if (registryTenant) {
+        this.setCachedTenant(cacheKey, registryTenant, 'registry');
+        console.log(`[TENANT-FINDER] Registry fallback successful for subdomain: ${subdomain}`);
+        return registryTenant;
+      }
 
-    return null;
+      console.log(`[TENANT-FINDER] No tenant found for subdomain: ${subdomain}`);
+      return null;
+    } catch (error) {
+      console.error(`[TENANT-FINDER] Database error for subdomain ${subdomain}:`, error);
+
+      // Fallback to registry on database error
+      const registryTenant = TENANT_REGISTRY[subdomain];
+      if (registryTenant) {
+        console.log(`[TENANT-FINDER] Registry fallback due to DB error for subdomain: ${subdomain}`);
+        return registryTenant;
+      }
+
+      return null;
+    }
   }
 
   /**
@@ -385,32 +390,46 @@ export class TenantFinder {
    */
   static async getTenantByDomain(domain: string): Promise<Tenant | null> {
     const cacheKey = `domain:${domain}`;
-    
+
     const cached = tenantCache.get(cacheKey);
     if (cached && Date.now() - cached.cachedAt < CACHE_TTL) {
+      console.log(`[TENANT-FINDER] Cache hit for domain: ${domain}`);
       return cached.tenant;
     }
 
-    // Search dynamic registry first
-    if (isRegistryInitialized()) {
-      const allTenants = getAllCachedTenants();
-      for (const tenant of allTenants) {
-        if (tenant.domain === domain) {
-          this.setCachedTenant(cacheKey, tenant, 'database');
-          return tenant;
-        }
-      }
-    }
+    try {
+      const [dbTenant] = await db
+        .select()
+        .from(tenants)
+        .where(eq(tenants.domain, domain))
+        .limit(1);
 
-    // Fallback to hardcoded registry
-    for (const tenant of Object.values(TENANT_REGISTRY)) {
-      if (tenant.domain === domain) {
-        this.setCachedTenant(cacheKey, tenant, 'registry');
-        return tenant;
+      if (dbTenant) {
+        const mappedTenant = this.mapDatabaseTenant(dbTenant);
+        this.setCachedTenant(cacheKey, mappedTenant, 'database');
+        console.log(`[TENANT-FINDER] Database lookup successful for domain: ${domain}`);
+        return mappedTenant;
       }
+
+      return null;
+    } catch (error) {
+      console.error(`[TENANT-FINDER] Database error for domain ${domain}:`, error);
+      return null;
     }
-    
-    return null;
+  }
+
+  /**
+   * Map database tenant to interface
+   */
+  private static mapDatabaseTenant(dbTenant: any): Tenant {
+    return {
+      ...dbTenant,
+      settings: dbTenant.settings || {
+        allowedDomains: [],
+        defaultRole: 'user' as const,
+        enableAutoProvisioning: false
+      }
+    } as Tenant;
   }
 
   /**
@@ -442,8 +461,10 @@ export class TenantFinder {
           tenantCache.delete(key);
         }
       });
+      console.log(`[TENANT-FINDER] Cleared cache for tenant: ${tenantId}`);
     } else {
       tenantCache.clear();
+      console.log(`[TENANT-FINDER] Cleared all tenant cache`);
     }
   }
 
@@ -460,29 +481,14 @@ export class TenantFinder {
   static registerTenant(tenant: Tenant): void {
     TENANT_REGISTRY[tenant.id] = tenant;
     this.clearCache(tenant.id); // Invalidate cache
+    console.log(`[TENANT-FINDER] Registered new tenant: ${tenant.id} (${tenant.name})`);
   }
 
   /**
-   * Get all tenants (combines dynamic and hardcoded)
+   * Get all tenants
    */
   static getAllTenants(): Tenant[] {
-    const tenants = new Map<string, Tenant>();
-    
-    // Add dynamic tenants first (higher priority)
-    if (isRegistryInitialized()) {
-      for (const tenant of getAllCachedTenants()) {
-        tenants.set(tenant.id, tenant);
-      }
-    }
-    
-    // Add hardcoded tenants as fallback (won't overwrite dynamic)
-    for (const tenant of Object.values(TENANT_REGISTRY)) {
-      if (!tenants.has(tenant.id)) {
-        tenants.set(tenant.id, tenant);
-      }
-    }
-    
-    return Array.from(tenants.values());
+    return Object.values(TENANT_REGISTRY);
   }
 
   /**
@@ -502,6 +508,7 @@ export class TenantFinder {
     Object.assign(tenant, updates);
     TENANT_REGISTRY[tenantId] = tenant;
     this.clearCache(tenantId);
+    console.log(`[TENANT-FINDER] Updated tenant: ${tenantId}`, { updates });
     return true;
   }
 }
@@ -511,13 +518,14 @@ export class TenantFinder {
 
 export async function tenantMiddleware(req: Request, res: Response, next: NextFunction) {
   const startTime = Date.now();
-  
+
   try {
     const tenant = await TenantFinder.findForRequest(req);
 
     if (tenant) {
       // Validate tenant status
       if (tenant.status !== 'active') {
+        console.log(`[TENANT-MIDDLEWARE] ✗ Access denied - tenant ${tenant.id} status: ${tenant.status}`);
         return res.status(403).json({
           error: 'Tenant access suspended',
           code: 'TENANT_SUSPENDED',
@@ -542,14 +550,16 @@ export async function tenantMiddleware(req: Request, res: Response, next: NextFu
       res.set('x-tenant-subdomain', tenant.subdomain);
       res.set('x-tenant-name', tenant.name);
 
-      const _duration = Date.now() - startTime;
+      const duration = Date.now() - startTime;
+      console.log(`[TENANT-MIDDLEWARE] ✓ Tenant context set: ${tenant.name} (${tenant.id}) in ${duration}ms`);
     } else {
       // No tenant context (valid for public routes)
+      console.log(`[TENANT-MIDDLEWARE] No tenant context required`);
     }
 
     next();
   } catch (error) {
-    const _duration = Date.now() - startTime;
+    const duration = Date.now() - startTime;
     console.error(`[TENANT-MIDDLEWARE] Error after ${duration}ms:`, error);
     res.status(500).json({
       error: 'Internal server error during tenant identification',
@@ -563,27 +573,29 @@ export async function tenantMiddleware(req: Request, res: Response, next: NextFu
 
 export function requireTenant(req: Request, res: Response, next: NextFunction) {
   if (!req.tenant) {
+    console.log(`[TENANT-MIDDLEWARE] ✗ Tenant context required but not found`);
     return res.status(400).json({
       error: 'Tenant context required',
       code: 'TENANT_REQUIRED',
       suggestion: 'Access this resource via a tenant subdomain (e.g., moravian.edsteward.ai)'
     });
   }
+  console.log(`[TENANT-MIDDLEWARE] ✓ Tenant context verified: ${req.tenant.id}`);
   next();
 }
 
 export function extractTenantFromSAML(samlProfile: any): string | null {
   const orgDomain = samlProfile['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/organization'] ||
-                   samlProfile['urn:oid:2.5.4.10'] ||
-                   samlProfile.organization;
+    samlProfile['urn:oid:2.5.4.10'] ||
+    samlProfile.organization;
 
   const emailDomain = samlProfile.email ? samlProfile.email.split('@')[1] : null;
-  
+
   // Map email domain to tenant subdomain
   if (emailDomain === 'moravian.edu') return 'moravian';
   if (emailDomain === 'edsteward.ai') return 'admin';
   if (orgDomain) return orgDomain.toLowerCase().replace(/[^a-z0-9-]/g, '-');
-  
+
   return null;
 }
 

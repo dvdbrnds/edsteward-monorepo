@@ -1,0 +1,85 @@
+# EdSteward Admin Console - Production Build
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+COPY server/package*.json ./server/
+
+# Install dependencies
+RUN npm ci --only=production=false
+RUN cd server && npm ci
+
+# Copy source
+COPY . .
+
+# Build frontend (Vite) - skip tsc check for Docker build
+RUN npx vite build
+
+# Build backend (TypeScript)
+RUN cd server && npm run build
+
+# Production stage with nginx for frontend
+FROM node:20-alpine AS runner
+
+# Install nginx
+RUN apk add --no-cache nginx
+
+WORKDIR /app
+
+# Copy built frontend to nginx
+COPY --from=builder /app/dist /usr/share/nginx/html
+
+# Copy backend
+COPY --from=builder /app/server/dist ./server/dist
+COPY --from=builder /app/server/package*.json ./server/
+RUN cd server && npm ci --only=production
+
+# Nginx config - serve frontend and proxy API to backend
+RUN cat > /etc/nginx/http.d/default.conf << 'NGINXCONF'
+server {
+    listen 80;
+    server_name _;
+    
+    root /usr/share/nginx/html;
+    index index.html;
+    
+    # Frontend routes - serve static files and SPA fallback
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+    
+    # API proxy to backend
+    location /api/ {
+        proxy_pass http://127.0.0.1:4000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection 'upgrade';
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_cache_bypass $http_upgrade;
+    }
+}
+NGINXCONF
+
+# Create startup script
+RUN echo '#!/bin/sh' > /app/start.sh && \
+    echo 'echo "Starting EdSteward Admin Console..."' >> /app/start.sh && \
+    echo 'cd /app/server && node dist/index.js &' >> /app/start.sh && \
+    echo 'sleep 2' >> /app/start.sh && \
+    echo 'nginx -g "daemon off;"' >> /app/start.sh && \
+    chmod +x /app/start.sh
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD wget --quiet --tries=1 --spider http://localhost/api/health || exit 1
+
+EXPOSE 80
+
+ENV NODE_ENV=production
+ENV ADMIN_PORT=4000
+
+CMD ["/app/start.sh"]

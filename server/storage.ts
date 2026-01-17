@@ -1795,7 +1795,44 @@ export class DatabaseStorage implements IStorage {
       `);
 
       if (result.rows.length > 0) {
-        return result.rows[0].config_data;
+        const dbConfig = result.rows[0].config_data;
+        const primaryColor = dbConfig.primaryColor || '#3d1a5a';
+        
+        // Helper to darken a color for hero/secondary colors
+        const darkenColor = (hex: string, percent: number): string => {
+          const num = parseInt(hex.replace('#', ''), 16);
+          const r = Math.max(0, Math.floor((num >> 16) * (1 - percent)));
+          const g = Math.max(0, Math.floor(((num >> 8) & 0x00FF) * (1 - percent)));
+          const b = Math.max(0, Math.floor((num & 0x0000FF) * (1 - percent)));
+          return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
+        };
+        
+        // Helper to lighten a color for accent colors
+        const lightenColor = (hex: string, percent: number): string => {
+          const num = parseInt(hex.replace('#', ''), 16);
+          const r = Math.min(255, Math.floor((num >> 16) + (255 - (num >> 16)) * percent));
+          const g = Math.min(255, Math.floor(((num >> 8) & 0x00FF) + (255 - ((num >> 8) & 0x00FF)) * percent));
+          const b = Math.min(255, Math.floor((num & 0x0000FF) + (255 - (num & 0x0000FF)) * percent));
+          return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
+        };
+        
+        // Build complete config with derived colors from primaryColor
+        const completeConfig = {
+          institutionName: dbConfig.institutionName || dbConfig.tenantId || "EdSteward Institution",
+          title: dbConfig.title || `${dbConfig.institutionName || dbConfig.tenantId || 'EdSteward'} Compliance Portal`,
+          logoUrl: dbConfig.logoUrl || "/assets/generic-logo.svg",
+          faviconUrl: dbConfig.faviconUrl || "/favicon.ico",
+          primaryColor: primaryColor,
+          secondaryColor: dbConfig.secondaryColor || darkenColor(primaryColor, 0.2),
+          accentColor: dbConfig.accentColor || lightenColor(primaryColor, 0.3),
+          loginScreenBackgroundColor: dbConfig.loginScreenBackgroundColor || "#f8fafc",
+          loginScreenAccentColor: dbConfig.loginScreenAccentColor || primaryColor,
+          loginScreenTextColor: dbConfig.loginScreenTextColor || "#1f2937",
+          loginScreenHeroColor: dbConfig.loginScreenHeroColor || darkenColor(primaryColor, 0.3),
+          tenantId: dbConfig.tenantId,
+        };
+        
+        return completeConfig;
       }
 
       // Priority 3: Environment variables (for container isolation - fallback only)

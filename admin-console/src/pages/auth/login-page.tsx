@@ -43,7 +43,7 @@ export function LoginPage() {
         </div>
       )}
 
-      <div className="rounded-md shadow-sm -space-y-px">
+      <div className="rounded-lg shadow-sm overflow-hidden border border-gray-300">
         <div>
           <label htmlFor="email" className="sr-only">
             Email address
@@ -56,7 +56,7 @@ export function LoginPage() {
             required
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="relative block w-full appearance-none rounded-t-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+            className="block w-full bg-white px-4 py-3 text-gray-900 placeholder-gray-400 border-b border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset sm:text-sm"
             placeholder="Admin email address"
           />
         </div>
@@ -72,7 +72,7 @@ export function LoginPage() {
             required
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="relative block w-full appearance-none rounded-b-md border border-gray-300 px-3 py-2 text-gray-900 placeholder-gray-500 focus:z-10 focus:border-blue-500 focus:outline-none focus:ring-blue-500 sm:text-sm"
+            className="block w-full bg-white px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-inset sm:text-sm"
             placeholder="Password"
           />
         </div>
@@ -82,7 +82,7 @@ export function LoginPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          className="group relative flex w-full justify-center rounded-md border border-transparent bg-blue-600 py-2 px-4 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="group relative flex w-full justify-center rounded-lg border border-transparent bg-blue-600 py-3 px-4 text-sm font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
         >
           {isSubmitting ? (
             <span className="flex items-center">
