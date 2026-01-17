@@ -7,7 +7,7 @@
 
 import { Router, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { db } from '../../db';
+import { getDbForRequest } from '../../services/database';
 import { complianceTasks, taskEvidence, taskActivity, users, regulations } from '@shared/schema';
 import { eq, desc, asc } from 'drizzle-orm';
 import { alias } from 'drizzle-orm/pg-core';
@@ -32,6 +32,9 @@ const router = Router();
  */
 router.get('/regulation/:regulationId', requireAuth, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
+    
     const regulationId = parseInt(req.params.regulationId);
     
     if (isNaN(regulationId)) {
@@ -168,6 +171,8 @@ router.get('/regulation/:regulationId', requireAuth, async (req: Request, res: R
  */
 router.get('/:taskId', requireAuth, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
     const taskId = parseInt(req.params.taskId);
     
     const [task] = await db.select({
@@ -245,6 +250,8 @@ router.get('/:taskId', requireAuth, async (req: Request, res: Response) => {
  */
 router.post('/', requireAuth, requireAdmin, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
     const {
       regulationId,
       parentTaskId,
@@ -310,6 +317,8 @@ router.post('/', requireAuth, requireAdmin, async (req: Request, res: Response) 
  */
 router.patch('/:taskId', requireAuth, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
     const taskId = parseInt(req.params.taskId);
     const updates = req.body;
 
@@ -395,6 +404,8 @@ router.patch('/:taskId', requireAuth, async (req: Request, res: Response) => {
  */
 router.delete('/:taskId', requireAuth, requireAdmin, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
     const taskId = parseInt(req.params.taskId);
 
     await db.delete(complianceTasks).where(eq(complianceTasks.id, taskId));
@@ -413,6 +424,8 @@ router.delete('/:taskId', requireAuth, requireAdmin, async (req: Request, res: R
  */
 router.post('/:taskId/comment', requireAuth, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
     const taskId = parseInt(req.params.taskId);
     const { content } = req.body;
 
@@ -441,6 +454,8 @@ router.post('/:taskId/comment', requireAuth, async (req: Request, res: Response)
  */
 router.post('/:taskId/nudge', requireAuth, requireAdmin, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
     const taskId = parseInt(req.params.taskId);
     const { message } = req.body;
 
@@ -507,6 +522,8 @@ router.post('/:taskId/nudge', requireAuth, requireAdmin, async (req: Request, re
  */
 router.post('/:taskId/escalate', requireAuth, requireAdmin, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
     const taskId = parseInt(req.params.taskId);
     const { escalationEmail, message, ccDri } = req.body;
 
@@ -581,6 +598,8 @@ router.post('/:taskId/escalate', requireAuth, requireAdmin, async (req: Request,
  */
 router.post('/bulk', requireAuth, requireAdmin, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
     const { regulationId, tasks } = req.body;
 
     if (!regulationId || !tasks || !Array.isArray(tasks)) {
@@ -657,6 +676,8 @@ router.post('/bulk', requireAuth, requireAdmin, async (req: Request, res: Respon
  */
 router.get('/my-tasks', requireAuth, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
     const userId = req.user!.id;
 
     const tasks = await db.select({
@@ -686,6 +707,8 @@ router.get('/my-tasks', requireAuth, async (req: Request, res: Response) => {
  */
 router.post('/apply-template/clery/:regulationId', requireAuth, requireAdmin, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
     const regulationId = parseInt(req.params.regulationId);
     const { year } = req.body;
     
@@ -812,6 +835,8 @@ router.get('/templates', requireAuth, async (_req: Request, res: Response) => {
  */
 router.get('/:taskId/evidence', requireAuth, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
     const taskId = parseInt(req.params.taskId);
     
     if (isNaN(taskId)) {
@@ -860,6 +885,8 @@ router.get('/:taskId/evidence', requireAuth, async (req: Request, res: Response)
  */
 router.post('/:taskId/evidence', uploadLimiter, requireAuth, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
     const taskId = parseInt(req.params.taskId);
     
     if (isNaN(taskId)) {
@@ -1018,6 +1045,8 @@ router.post('/:taskId/evidence', uploadLimiter, requireAuth, async (req: Request
  */
 router.delete('/:taskId/evidence/:evidenceId', requireAdmin, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
     const taskId = parseInt(req.params.taskId);
     const evidenceId = parseInt(req.params.evidenceId);
     
@@ -1074,6 +1103,8 @@ router.delete('/:taskId/evidence/:evidenceId', requireAdmin, async (req: Request
  */
 router.get('/:taskId/activity', requireAuth, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
     const taskId = parseInt(req.params.taskId);
     
     if (isNaN(taskId)) {
@@ -1119,6 +1150,8 @@ router.get('/:taskId/activity', requireAuth, async (req: Request, res: Response)
  */
 router.post('/:taskId/activity', requireAuth, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
     const taskId = parseInt(req.params.taskId);
     
     if (isNaN(taskId)) {
@@ -1162,6 +1195,8 @@ interface TaskTokenPayload {
  */
 router.post('/:taskId/generate-link', requireAdmin, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
     const taskId = parseInt(req.params.taskId);
     const { userId } = req.body;
     
@@ -1238,6 +1273,8 @@ router.post('/:taskId/generate-link', requireAdmin, async (req: Request, res: Re
  */
 router.post('/:taskId/send-task-email', requireAdmin, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
     const taskId = parseInt(req.params.taskId);
     const { userId, subject, message, emailType = 'assignment' } = req.body;
     
@@ -1394,6 +1431,8 @@ router.post('/:taskId/send-task-email', requireAdmin, async (req: Request, res: 
  */
 router.get('/token/:token', async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
     const { token } = req.params;
 
     // Verify token
@@ -1479,6 +1518,8 @@ router.get('/token/:token', async (req: Request, res: Response) => {
  */
 router.post('/token/:token/complete', async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
     const { token } = req.params;
 
     // Verify token
@@ -1574,6 +1615,8 @@ router.post('/token/:token/complete', async (req: Request, res: Response) => {
  */
 router.post('/bulk/assign', requireAdmin, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
     const { taskIds, userId, role } = req.body;
 
     if (!taskIds || !Array.isArray(taskIds) || taskIds.length === 0) {
@@ -1634,6 +1677,8 @@ router.post('/bulk/assign', requireAdmin, async (req: Request, res: Response) =>
  */
 router.post('/bulk/status', requireAdmin, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
     const { taskIds, status } = req.body;
 
     if (!taskIds || !Array.isArray(taskIds) || taskIds.length === 0) {
@@ -1702,6 +1747,8 @@ router.post('/bulk/status', requireAdmin, async (req: Request, res: Response) =>
  */
 router.post('/bulk/notify', requireAdmin, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
     const { taskIds, notificationType = 'nudge' } = req.body;
 
     if (!taskIds || !Array.isArray(taskIds) || taskIds.length === 0) {
@@ -1746,8 +1793,11 @@ router.post('/bulk/notify', requireAdmin, async (req: Request, res: Response) =>
  * GET /api/compliance-tasks/analytics
  * Get task analytics/statistics (admin only)
  */
-router.get('/analytics', requireAdmin, async (_req: Request, res: Response) => {
+router.get('/analytics', requireAdmin, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
+    
     const today = new Date();
     
     // Get all tasks
@@ -1920,6 +1970,8 @@ router.post('/notifications/check', requireAdmin, async (_req: Request, res: Res
  */
 router.post('/:taskId/notify', requireAdmin, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
     const taskId = parseInt(req.params.taskId);
     const { type = 'nudge' } = req.body;
     
@@ -1962,6 +2014,8 @@ router.get('/notifications/scheduler-status', requireAdmin, async (_req: Request
  */
 router.post('/notifications/scheduler-toggle', requireAdmin, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
     const { enabled } = req.body;
     if (typeof enabled !== 'boolean') {
       return res.status(400).json({ error: 'enabled must be a boolean' });

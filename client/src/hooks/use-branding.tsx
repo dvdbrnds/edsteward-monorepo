@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { apiRequest } from '@/lib/api';
-import moravianLogo from "@/assets/Moravian-Monogram-MoravianBlue.png";
+
+// Generic EdSteward logo for default branding
+const edstewardLogo = '/assets/es-white-on-purple-logo.png';
 
 export interface BrandingConfig {
   institutionName: string;
@@ -17,19 +19,19 @@ export interface BrandingConfig {
   loginScreenHeroColor: string;
 }
 
-// Default fallback branding configuration
+// Default fallback branding configuration - GENERIC, not tenant-specific!
 const DEFAULT_BRANDING: BrandingConfig = {
-  institutionName: 'Moravian University',
-  title: 'Moravian University Compliance Portal',
-  logoUrl: moravianLogo,
+  institutionName: 'Compliance Portal',
+  title: 'Compliance Portal',
+  logoUrl: edstewardLogo,
   faviconUrl: '/favicon.ico',
-  primaryColor: '#1e3a8a',
-  secondaryColor: '#1e40af',
-  accentColor: '#3b82f6',
+  primaryColor: '#3d1a5a', // EdSteward purple
+  secondaryColor: '#2d1345',
+  accentColor: '#6b3fa0',
   loginScreenBackgroundColor: '#f8fafc',
-  loginScreenAccentColor: '#1e3a8a',
+  loginScreenAccentColor: '#3d1a5a',
   loginScreenTextColor: '#1f2937',
-  loginScreenHeroColor: '#002147',
+  loginScreenHeroColor: '#2d1345',
 };
 
 // Legacy interface for backward compatibility

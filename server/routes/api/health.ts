@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { db } from '../../db';
+import { getDbForRequest } from '../../services/database';
 import { tenants } from '@shared/schema';
 import { eq } from 'drizzle-orm';
 
@@ -7,6 +7,8 @@ const router = Router();
 
 router.get('/health', async (req, res) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
     // Check if this is a fix request
     const shouldFix = req.query.fix === 'staging-tenant';
     

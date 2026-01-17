@@ -11,8 +11,8 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Loader2 } from "lucide-react";
 import { useBranding } from "@/hooks/use-branding";
 
-// Import logos
-import moravianLogo from "../assets/Moravian-Monogram-MoravianBlue.png";
+// Generic fallback logo
+const genericLogo = '/assets/es-white-on-purple-logo.png';
 
 export default function AuthPage() {
   const { user, loginMutation } = useAuth();
@@ -75,19 +75,15 @@ export default function AuthPage() {
           {/* Logo centered above the title */}
           <div className="flex items-center justify-center mb-8">
             <img 
-              src={branding.logoUrl || moravianLogo}
+              src={branding.logoUrl || genericLogo}
               alt={`${branding.institutionName} Logo`}
               className="h-20 w-auto"
               onError={(e) => {
                 const target = e.target as HTMLImageElement;
-                console.warn('Auth page logo failed to load:', branding.logoUrl, 'Falling back to moravian logo');
-                // Only fallback if we haven't already fallen back
-                if (target.src !== moravianLogo) {
-                  target.src = moravianLogo;
+                // Fallback to generic EdSteward logo
+                if (target.src !== genericLogo) {
+                  target.src = genericLogo;
                 }
-              }}
-              onLoad={() => {
-                console.log('Auth page logo loaded successfully:', branding.logoUrl);
               }}
             />
           </div>

@@ -51,9 +51,11 @@ export async function verifyPassword(supplied: string, stored: string): Promise<
   }
 }
 
-// Single-tenant storage for user operations
-function getSingleTenantStorage() {
-  return getDatabaseStorage();
+// Tenant-aware storage helper
+function getTenantStorage(req: any) {
+  // Get tenantId from request (set by tenant middleware) or default
+  const tenantId = req?.tenantId || 'default';
+  return getDatabaseStorage(tenantId);
 }
 
 export function setupAuth(app: Express) {
@@ -70,22 +72,30 @@ export function setupAuth(app: Express) {
   passport.use(
     new LocalStrategy({ passReqToCallback: true }, async (req: any, username: string, password: string, done) => {
       try {
-        // Use single-tenant storage for user lookup
-        const tenantStorage = getSingleTenantStorage();
+        // MULTI-TENANT FIX: Get tenantId from request (set by tenant middleware)
+        const tenantId = req.tenantId || 'default';
+        console.log(`[AUTH] Login attempt for user '${username}' in tenant '${tenantId}'`);
+        
+        // Use tenant-aware storage for user lookup
+        const tenantStorage = getDatabaseStorage(tenantId);
         const user = await tenantStorage.getUserByUsername(username);
 
         if (!user) {
-          await syslog.logAuthEvent(LogLevel.WARNING, "Failed login attempt - user not found", undefined, username, {});
+          await syslog.logAuthEvent(LogLevel.WARNING, "Failed login attempt - user not found", undefined, username, { tenantId });
           return done(null, false, { message: 'User not found' });
         }
 
         const isValidPassword = await verifyPassword(password, user.password);
         if (!isValidPassword) {
-          await syslog.logAuthEvent(LogLevel.WARNING, "Failed login attempt - wrong password", undefined, username, {});
+          await syslog.logAuthEvent(LogLevel.WARNING, "Failed login attempt - wrong password", undefined, username, { tenantId });
           return done(null, false, { message: 'Invalid password' });
         }
 
-        await syslog.logAuthEvent(LogLevel.INFO, "Login successful", user.id, username, {});
+        // CRITICAL: Attach tenantId to user for session serialization
+        // This ensures the session is tied to the tenant where login occurred
+        (user as any)._tenantId = tenantId;
+
+        await syslog.logAuthEvent(LogLevel.INFO, "Login successful", user.id, username, { tenantId });
         return done(null, user);
       } catch (error) {
         await syslog.logAuthEvent(LogLevel.ERROR, "Login error", undefined, username, {
@@ -97,25 +107,47 @@ export function setupAuth(app: Express) {
   );
 
   passport.serializeUser((user: any, done) => {
-    // Single-tenant: Store only user ID in session
-    done(null, user.id);
+    // MULTI-TENANT FIX: Store user ID and tenant ID together to prevent cross-tenant session hijacking
+    // The tenantId is attached to user during login in the LocalStrategy
+    const sessionData = {
+      userId: user.id,
+      tenantId: user._tenantId || 'default', // Tenant ID set during login
+    };
+    done(null, sessionData);
   });
 
-  passport.deserializeUser(async (userId: number, done) => {
+  passport.deserializeUser(async (sessionData: any, done) => {
     try {
+      // Handle both old format (just userId) and new format (object with userId and tenantId)
+      let userId: number;
+      let sessionTenantId: string;
+      
+      if (typeof sessionData === 'object' && sessionData.userId) {
+        userId = sessionData.userId;
+        sessionTenantId = sessionData.tenantId || 'default';
+      } else {
+        // Legacy format - just user ID
+        userId = sessionData as number;
+        sessionTenantId = 'default';
+      }
+      
       if (!userId || isNaN(userId)) {
         console.error(`Invalid user ID during deserialization: ${userId}`);
         return done(null, false);
       }
 
-      // Use single-tenant storage for user lookup
-      const tenantStorage = getSingleTenantStorage();
+      // CRITICAL: Use tenant-aware storage for user lookup
+      // Pass the session's tenantId to get the correct database
+      const tenantStorage = getDatabaseStorage(sessionTenantId);
       const user = await tenantStorage.getUser(userId);
 
       if (!user) {
-        console.error(`User ${userId} not found during deserialization`);
+        console.error(`User ${userId} not found in tenant ${sessionTenantId} during deserialization`);
         return done(null, false);
       }
+
+      // Attach tenant info to user for downstream use
+      (user as any)._sessionTenantId = sessionTenantId;
 
       done(null, user);
     } catch (error) {
@@ -126,8 +158,8 @@ export function setupAuth(app: Express) {
 
   app.post("/api/register", async (req, res, next) => {
     try {
-      // Use single-tenant storage for user operations
-      const tenantStorage = getSingleTenantStorage();
+      // Use tenant-aware storage for user operations
+      const tenantStorage = getTenantStorage(req);
 
       const existingUser = await tenantStorage.getUserByUsername(req.body.username);
       if (existingUser) {
@@ -155,8 +187,9 @@ export function setupAuth(app: Express) {
         subdomain: req.tenant?.subdomain
       });
 
-      // Context7 Multi-Tenant Fix: Attach tenant context to user before login
+      // MULTI-TENANT FIX: Attach tenant context to user before login (for session serialization)
       (user as any).tenantId = req.tenantId || 'admin';
+      (user as any)._tenantId = req.tenantId || 'default'; // Used by serializeUser
 
       req.login(user, (err) => {
         if (err) return next(err);
@@ -206,8 +239,9 @@ export function setupAuth(app: Express) {
         return res.status(401).json({ error: errorMessage });
       }
 
-      // Context7 Multi-Tenant Fix: Attach tenant context to user before login
+      // MULTI-TENANT FIX: Attach tenant context to user before login (for session serialization)
       (user as any).tenantId = req.tenantId || 'admin';
+      (user as any)._tenantId = req.tenantId || 'default'; // Used by serializeUser
 
       req.login(user, async (err) => {
         if (err) {
@@ -221,8 +255,8 @@ export function setupAuth(app: Express) {
         // Session logged in successfully
 
         try {
-          // Use single-tenant storage for user update
-          const tenantStorage = getSingleTenantStorage();
+          // Use tenant-aware storage for user update
+          const tenantStorage = getTenantStorage(req);
           await tenantStorage.updateUser(user.id, { lastLogin: new Date() });
 
           await syslog.logAuthEvent(LogLevel.INFO, "User logged in successfully", user.id, user.username, {

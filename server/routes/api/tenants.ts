@@ -2,7 +2,7 @@ import { Router } from 'express';
 import { tenantMiddleware, requireTenant, TenantFinder, TenantManager, ConsolidatedTenantRequest as TenantRequest, Tenant, LegacyTenantConfig as TenantConfig, tenantToLegacyConfig } from '../../middleware/tenant';
 import { createTenantDatabase, runTenantMigrations } from '../../services/tenantDatabase.js';
 import { eq } from 'drizzle-orm';
-import { db } from '../../db';
+import { getDbForRequest } from '../../services/database';
 import { tenants } from '@shared/schema';
 
 const router = Router();
@@ -101,6 +101,8 @@ router.get('/:tenantId', (req: TenantRequest, res) => {
  */
 router.post('/', requireAdmin, async (req: TenantRequest, res) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const _db = getDbForRequest(req);
     const { tenantId, name, domain, samlConfig, settings } = req.body;
 
     // Validate required fields
@@ -196,6 +198,8 @@ router.put('/:tenantId', requireAdmin, (req: TenantRequest, res) => {
  */
 router.post('/:tenantId/migrate', requireAdmin, async (req: TenantRequest, res) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const _db = getDbForRequest(req);
     const { tenantId } = req.params;
     
     const tenantConfig = TenantManager.getTenant(tenantId);
@@ -285,6 +289,8 @@ router.post('/select', (req: TenantRequest, res) => {
  */
 router.put('/:tenantId/institution-config', async (req: TenantRequest, res) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const _db = getDbForRequest(req);
     const { tenantId } = req.params;
     const { primaryTypes, hideNonApplicable, allowUsersToToggle } = req.body;
     

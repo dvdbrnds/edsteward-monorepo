@@ -1,7 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { FeatureFlagService } from '../../services/feature-flag.service';
 import { FEATURE_FLAGS, FEATURE_CATEGORIES } from '@shared/feature-flags';
-import { db } from '../../db';
+import { getDbForRequest } from '../../services/database';
 import { tenants } from '@shared/schema';
 import { eq } from 'drizzle-orm';
 
@@ -20,6 +20,8 @@ const requireAdmin = (req: any, res: any, next: any) => {
  */
 router.get('/overview', requireAdmin, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const _db = getDbForRequest(req);
     // Get all tenants
     const allTenants = await db.select().from(tenants);
     
@@ -113,6 +115,8 @@ router.get('/features', requireAdmin, (req: Request, res: Response) => {
  */
 router.put('/tenant/:tenantId/features', requireAdmin, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const _db = getDbForRequest(req);
     const { tenantId } = req.params;
     const { features } = req.body;
 
@@ -170,6 +174,8 @@ router.put('/tenant/:tenantId/features', requireAdmin, async (req: Request, res:
  */
 router.put('/feature/:featureKey/bulk', requireAdmin, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const _db = getDbForRequest(req);
     const { featureKey } = req.params;
     const { enabled, tenantIds } = req.body;
 
@@ -249,6 +255,8 @@ router.put('/feature/:featureKey/bulk', requireAdmin, async (req: Request, res: 
  */
 router.get('/analytics', requireAdmin, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const _db = getDbForRequest(req);
     const allTenants = await db.select().from(tenants);
     const analytics = {
       featureAdoption: {} as Record<string, {
@@ -349,6 +357,8 @@ router.get('/analytics', requireAdmin, async (req: Request, res: Response) => {
  */
 router.post('/rollout', requireAdmin, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const _db = getDbForRequest(req);
     const { featureKey, tenantIds, enabled = true, rolloutName } = req.body;
 
     if (!FEATURE_FLAGS[featureKey]) {
@@ -429,6 +439,8 @@ router.post('/rollout', requireAdmin, async (req: Request, res: Response) => {
  */
 router.get('/tenant/:tenantId/health', requireAdmin, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const _db = getDbForRequest(req);
     const { tenantId } = req.params;
 
     // Get tenant info

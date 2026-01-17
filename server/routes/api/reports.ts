@@ -5,14 +5,17 @@
  */
 
 import express, { Request, Response } from 'express';
-import { db } from '../../db';
+import { getDbForRequest } from '../../services/database';
 import { regulations, deadlines, complianceTasks, users } from '@shared/schema';
 
 const router = express.Router();
 
 // Get compliance report data
-router.get('/compliance-summary', async (_req: Request, res: Response) => {
+router.get('/compliance-summary', async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
+    
     // Fetch all data
     const allRegulations = await db.select().from(regulations);
     const allDeadlines = await db.select().from(deadlines);
@@ -109,8 +112,11 @@ router.get('/compliance-summary', async (_req: Request, res: Response) => {
 });
 
 // Export regulations as CSV
-router.get('/export/regulations/csv', async (_req: Request, res: Response) => {
+router.get('/export/regulations/csv', async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
+    
     const allRegulations = await db.select().from(regulations);
 
     // CSV header
@@ -139,8 +145,11 @@ router.get('/export/regulations/csv', async (_req: Request, res: Response) => {
 });
 
 // Export tasks as CSV
-router.get('/export/tasks/csv', async (_req: Request, res: Response) => {
+router.get('/export/tasks/csv', async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
+    
     const allTasks = await db.select().from(complianceTasks);
 
     // CSV header
@@ -170,8 +179,11 @@ router.get('/export/tasks/csv', async (_req: Request, res: Response) => {
 });
 
 // Export deadlines as CSV
-router.get('/export/deadlines/csv', async (_req: Request, res: Response) => {
+router.get('/export/deadlines/csv', async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
+    
     const allDeadlines = await db.select().from(deadlines);
 
     // CSV header
@@ -199,8 +211,11 @@ router.get('/export/deadlines/csv', async (_req: Request, res: Response) => {
 });
 
 // Full compliance report data for PDF generation
-router.get('/full-report', async (_req: Request, res: Response) => {
+router.get('/full-report', async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
+    
     const allRegulations = await db.select().from(regulations);
     const allDeadlines = await db.select().from(deadlines);
     const allTasks = await db.select().from(complianceTasks);
@@ -254,5 +269,3 @@ router.get('/full-report', async (_req: Request, res: Response) => {
 });
 
 export default router;
-
-

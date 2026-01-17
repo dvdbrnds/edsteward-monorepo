@@ -11,41 +11,33 @@ export interface TenantBranding {
   accentColor: string;
 }
 
+// Generic defaults - actual branding comes from API via useBranding hook
 const TENANT_BRANDING: Record<string, TenantBranding> = {
   admin: {
     id: 'admin',
     name: 'EdSteward Admin',
     title: 'EdSteward Admin Console',
-    logo: '/src/assets/Screenshot_2025-02-12_at_9.15.57_AM-removebg-preview.png',
-    favicon: '/admin-favicon.ico',
-    primaryColor: '#2563EB', // Blue
-    secondaryColor: '#1E40AF',
-    accentColor: '#3B82F6'
+    logo: '/assets/es-white-on-purple-logo.png',
+    favicon: '/favicon.ico',
+    primaryColor: '#3d1a5a', // EdSteward purple
+    secondaryColor: '#2d1345',
+    accentColor: '#6b3fa0'
   },
-  moravian: {
-    id: 'moravian',
-    name: 'Moravian University',
-    title: 'Moravian University Compliance Portal',
-    logo: '/src/assets/Moravian-Monogram-MoravianBlue.png',
-    favicon: '/moravian-favicon.ico',
-    primaryColor: '#002147', // Moravian Blue (darker)
-    secondaryColor: '#003166',
-    accentColor: '#1E3A8A'
-  },
-  test: {
-    id: 'test',
-    name: 'Generic Organization',
-    title: 'Generic Compliance Portal',
-    logo: '/src/assets/generic-logo.svg',
-    favicon: '/generic-favicon.ico',
-    primaryColor: '#6B7280', // Gray
-    secondaryColor: '#374151',
-    accentColor: '#9CA3AF'
+  // Default/generic branding for all tenants - API overrides this
+  default: {
+    id: 'default',
+    name: 'Compliance Portal',
+    title: 'Compliance Portal',
+    logo: '/assets/es-white-on-purple-logo.png',
+    favicon: '/favicon.ico',
+    primaryColor: '#3d1a5a', // EdSteward purple
+    secondaryColor: '#2d1345',
+    accentColor: '#6b3fa0'
   }
 };
 
 export function useTenantBranding(): TenantBranding {
-  const [branding, setBranding] = useState<TenantBranding>(TENANT_BRANDING.test);
+  const [branding, setBranding] = useState<TenantBranding>(TENANT_BRANDING.default);
 
   useEffect(() => {
     const detectTenant = async () => {
@@ -62,23 +54,19 @@ export function useTenantBranding(): TenantBranding {
           setBranding(TENANT_BRANDING[tenantId]);
           
         } else {
-          // Fallback to hostname detection
+          // Fallback to hostname detection - use generic defaults
           const hostname = window.location.hostname;
           
           if (hostname.startsWith('admin.')) {
             setBranding(TENANT_BRANDING.admin);
-          } else if (hostname.startsWith('moravian.')) {
-            setBranding(TENANT_BRANDING.moravian);
-          } else if (hostname.startsWith('test.')) {
-            setBranding(TENANT_BRANDING.test);
           } else {
-            setBranding(TENANT_BRANDING.test); // Default to generic
+            // All other tenants use generic default - API provides actual branding
+            setBranding(TENANT_BRANDING.default);
           }
         }
-      } catch (error) {
-        console.error('❌ Failed to detect tenant branding:', error);
-        // Default to generic branding
-        setBranding(TENANT_BRANDING.test);
+      } catch {
+        // Default to generic branding on error
+        setBranding(TENANT_BRANDING.default);
       }
     };
 

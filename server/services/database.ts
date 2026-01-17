@@ -156,6 +156,76 @@ export function getStorageForRequest(req: { tenantId?: string }): DatabaseStorag
   return getDatabaseStorage(req.tenantId);
 }
 
+// Cache for tenant-specific drizzle instances
+const tenantDbs = new Map<string, ReturnType<typeof drizzle>>();
+
+/**
+ * Get a tenant-specific Drizzle database instance
+ * CRITICAL: Use this instead of the global 'db' in all route handlers for tenant isolation!
+ * 
+ * @param tenantId - The tenant identifier from req.tenantId
+ * @returns A Drizzle database instance connected to the tenant's database
+ */
+export function getTenantDb(tenantId?: string): ReturnType<typeof drizzle> {
+  // If no tenant ID or multi-tenant is disabled, use shared db
+  if (!tenantId || process.env.MULTI_TENANT !== 'true') {
+    return sharedDb;
+  }
+
+  // Check cache first
+  if (tenantDbs.has(tenantId)) {
+    return tenantDbs.get(tenantId)!;
+  }
+
+  // Get tenant-specific database URL
+  let databaseUrl: string | null = null;
+  
+  if (isRegistryInitialized()) {
+    const allUrls = getAllTenantDatabaseUrls();
+    databaseUrl = allUrls[tenantId] || null;
+  }
+  
+  if (!databaseUrl) {
+    databaseUrl = FALLBACK_TENANT_DATABASE_URLS[tenantId] || null;
+  }
+  
+  if (!databaseUrl) {
+    console.warn(`[TENANT-DB] No database URL for tenant '${tenantId}', using shared db`);
+    return sharedDb;
+  }
+
+  console.log(`[TENANT-DB] Creating drizzle instance for tenant '${tenantId}'`);
+
+  // Get or create tenant pool
+  let tenantPool = tenantPools.get(tenantId);
+  if (!tenantPool) {
+    tenantPool = new Pool({
+      connectionString: databaseUrl,
+      max: 10,
+      idleTimeoutMillis: 30000,
+      connectionTimeoutMillis: 10000,
+    });
+    tenantPool.on('error', (err) => {
+      console.error(`[TENANT-DB] Pool error for tenant '${tenantId}':`, err.message);
+    });
+    tenantPools.set(tenantId, tenantPool);
+  }
+
+  // Create drizzle instance for this tenant
+  const tenantDb = drizzle(tenantPool, { schema });
+  tenantDbs.set(tenantId, tenantDb);
+  
+  return tenantDb;
+}
+
+/**
+ * Get tenant-specific db from Express request
+ * Use this in route handlers: const db = getDbForRequest(req);
+ */
+export function getDbForRequest(req: { tenantId?: string }): ReturnType<typeof drizzle> {
+  return getTenantDb(req.tenantId);
+}
+
 /**
  * Close all database connections (main + tenant pools)
  */

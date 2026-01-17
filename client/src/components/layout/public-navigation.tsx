@@ -4,13 +4,10 @@
  */
 
 import { Link, useLocation } from "wouter";
-import { Button } from "@/components/ui/button";
-import { FileText } from "lucide-react";
 import { useTenantBranding } from "@/hooks/use-tenant-branding";
 
-// Import logos
-import moravianLogo from "@/assets/Screenshot_2025-02-12_at_9.15.57_AM-removebg-preview.png";
-import genericLogo from "@/assets/generic-logo.svg";
+// Generic logo - tenant-specific logos come from branding.logo
+const genericLogo = '/assets/es-white-on-purple-logo.png';
 
 export default function PublicNavigation() {
   const [location] = useLocation();
@@ -24,7 +21,7 @@ export default function PublicNavigation() {
             <div className="flex-shrink-0 flex items-center">
               <img
                 className="block h-10 w-auto"
-                src={branding.id === 'moravian' ? moravianLogo : branding.id === 'test' ? genericLogo : moravianLogo}
+                src={branding.logo || genericLogo}
                 alt={branding.name}
               />
               <div className="ml-4 flex flex-col">
@@ -50,19 +47,7 @@ export default function PublicNavigation() {
               </Link>
             </nav>
           </div>
-          <div className="flex items-center">
-            <Button variant="outline" size="sm" asChild>
-              <a 
-                href="https://www.moravian.edu/board-of-trustees" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="inline-flex items-center"
-              >
-                <FileText className="h-4 w-4 mr-2" />
-                Board Portal
-              </a>
-            </Button>
-          </div>
+          {/* Board Portal link removed - tenant-specific links should come from config */}
         </div>
       </div>
     </header>

@@ -22,6 +22,7 @@ import { registerRoutes } from './routes';
 import { startTaskScheduler } from './services/task-scheduler';
 import { apiLimiter, authLimiter, tenantQuotaLimiter } from './middleware/rate-limiter';
 import { tenantMiddleware } from './middleware/tenant';
+import { tenantSessionVerificationMiddleware } from './middleware/session';
 import { tenantRequestLogger, getAllTenantMetrics, getTopEndpoints } from './middleware/tenant-logger';
 import { setupVite, serveStatic, log } from './vite';
 import { initializeTenantRegistry, refreshAllTenants, getRegistryStats, closeTenantRegistry } from './services/tenant-registry';
@@ -130,14 +131,15 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Configure authentication
-configureAuth(app);
-
-// Tenant detection middleware - MUST be before routes
+// CRITICAL: Tenant detection middleware MUST run BEFORE authentication routes
 // This sets req.tenant and req.tenantId based on subdomain
 if (process.env.MULTI_TENANT === 'true') {
   console.log('🏢 Multi-tenant mode ENABLED - tenant routing active');
   app.use(tenantMiddleware);
+  
+  // CRITICAL SECURITY: Verify session tenant matches request tenant
+  // Prevents cross-tenant session hijacking via shared cookies
+  app.use(tenantSessionVerificationMiddleware);
   
   // Initialize dynamic tenant registry (reads from admin database)
   (async () => {
@@ -153,6 +155,9 @@ if (process.env.MULTI_TENANT === 'true') {
 } else {
   console.log('🏠 Single-tenant mode - using default database');
 }
+
+// Configure authentication AFTER tenant middleware so login routes have tenant context
+configureAuth(app);
 
 // Tenant-aware request logging (after tenant detection)
 app.use(tenantRequestLogger);
@@ -212,6 +217,11 @@ app.post('/api/authenticate', async (req, res) => {
     if (!isValidPassword) {
       return res.status(401).json({ error: 'Incorrect password. Please check your password and try again.' });
     }
+
+    // CRITICAL: Attach tenantId to user for session serialization
+    const tenantId = (req as any).tenantId || 'default';
+    (user as any)._tenantId = tenantId;
+    console.log(`[AUTH] /api/authenticate successful for '${user.username}' in tenant '${tenantId}'`);
 
     req.login(user, (err) => {
       if (err) {

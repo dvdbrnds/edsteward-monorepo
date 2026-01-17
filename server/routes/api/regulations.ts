@@ -1,8 +1,7 @@
 import express from 'express';
 import fs from 'fs';
 import { storage } from '../../storage';
-import { getDatabaseStorage } from '../../services/database';
-import { db } from '../../db';
+import { getDatabaseStorage, getDbForRequest } from '../../services/database';
 import { evidenceFiles } from '@shared/schema';
 import { eq, and } from 'drizzle-orm';
 import { syslog, LogLevel, LogFacility } from '../../services/syslog';
@@ -356,6 +355,9 @@ router.post("/:regulationId/evidence", uploadLimiter, requireAuth, upload.single
 // Delete evidence file for a regulation - admin only
 router.delete("/:regulationId/evidence/:evidenceId", requireAuth, requireAdmin, async (req, res) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
+    
     const regulationId = parseInt(req.params.regulationId);
     const evidenceId = parseInt(req.params.evidenceId);
 

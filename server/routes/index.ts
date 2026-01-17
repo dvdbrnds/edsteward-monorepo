@@ -1085,6 +1085,11 @@ export function registerRoutes(app: express.Application): Server {
         });
       }
 
+      // CRITICAL: Attach tenantId to user for session serialization
+      const tenantId = req.tenantId || 'default';
+      (user as any)._tenantId = tenantId;
+      console.log(`[AUTH] routes/index.ts login successful for '${user.username}' in tenant '${tenantId}'`);
+
       req.login(user, async (err) => {
         if (err) {
           // Log login session error
@@ -1219,6 +1224,9 @@ export function registerRoutes(app: express.Application): Server {
       // MFA verification successful, complete login
       delete req.session.mfaUser;
       
+      // CRITICAL: Attach tenantId to user for session serialization
+      (user as any)._tenantId = req.tenantId || 'default';
+
       req.login(user, async (err) => {
         if (err) {
           await syslog.log(
@@ -1382,6 +1390,9 @@ export function registerRoutes(app: express.Application): Server {
       }
 
       // Login successful (either no MFA or MFA verified)
+      // CRITICAL: Attach tenantId to user for session serialization
+      (user as any)._tenantId = req.tenantId || 'default';
+
       req.login(user, async (err) => {
         if (err) {
           await syslog.log(
@@ -1471,6 +1482,9 @@ export function registerRoutes(app: express.Application): Server {
       if (!isValidPassword) {
         return res.status(401).json({ error: 'Incorrect password. Please check your password and try again.' });
       }
+
+      // CRITICAL: Attach tenantId to user for session serialization
+      (user as any)._tenantId = req.tenantId || 'default';
 
       req.login(user, (err) => {
         if (err) {

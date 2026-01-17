@@ -1,13 +1,51 @@
 import { Request, Response, NextFunction } from 'express';
 
-// Type declaration for passport session
+// Type declaration for passport session - updated for multi-tenant support
 declare module 'express-session' {
   interface SessionData {
     passport?: {
-      user?: number;
+      user?: number | { userId: number; tenantId: string };
     };
+    tenantId?: string;
   }
 }
+
+/**
+ * CRITICAL SECURITY MIDDLEWARE: Verifies session tenant matches request tenant
+ * Prevents cross-tenant session hijacking when cookies are shared across subdomains
+ */
+export const tenantSessionVerificationMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  // Only check if user is authenticated and we're in multi-tenant mode
+  if (!req.isAuthenticated?.() || process.env.MULTI_TENANT !== 'true') {
+    return next();
+  }
+
+  const requestTenantId = (req as any).tenantId;
+  const sessionUser = req.user as any;
+  const sessionTenantId = sessionUser?._sessionTenantId;
+
+  // If session has tenant info and it doesn't match request tenant, invalidate session
+  if (sessionTenantId && requestTenantId && sessionTenantId !== requestTenantId) {
+    console.warn(`[SECURITY] Session tenant mismatch! Session: ${sessionTenantId}, Request: ${requestTenantId}. Logging out user.`);
+    
+    req.logout((err) => {
+      if (err) {
+        console.error('[SECURITY] Error logging out mismatched tenant session:', err);
+      }
+      req.session?.destroy((destroyErr) => {
+        if (destroyErr) {
+          console.error('[SECURITY] Error destroying mismatched tenant session:', destroyErr);
+        }
+        // Clear user from request
+        (req as any).user = null;
+        next();
+      });
+    });
+    return;
+  }
+
+  next();
+};
 
 // Session cleanup middleware - clears invalid sessions
 export const sessionCleanupMiddleware = (req: Request, res: Response, next: NextFunction) => {
@@ -25,45 +63,16 @@ export const sessionCleanupMiddleware = (req: Request, res: Response, next: Next
   }
 };
 
-// Add comprehensive session debugging middleware
+// Session debugging middleware - minimal logging to avoid performance issues
 export const sessionDebugMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  const originalSend = res.send;
-  const originalJson = res.json;
-  
-  // Log session state before request
-    sessionId: req.sessionID,
-    hasSession: !!req.session,
-    sessionKeys: req.session ? Object.keys(req.session) : [],
-    userId: (req.session as any)?.userId,
-    passport: req.session?.passport,
-    cookieHeader: req.headers.cookie,
-    userAgent: req.headers['user-agent']?.substring(0, 50)
-  });
-
-  // Intercept response to log Set-Cookie headers
-  res.send = function(body) {
-      statusCode: res.statusCode,
-      setCookieHeaders: res.getHeaders()['set-cookie'],
-      sessionAfterResponse: req.session ? {
-        id: req.sessionID,
-        userId: (req.session as any).userId,
-        keys: Object.keys(req.session)
-      } : null
+  // Only log session debug info for API auth endpoints and only in development
+  if (process.env.NODE_ENV === 'development' && req.path.includes('/auth')) {
+    console.log('[SESSION DEBUG]', {
+      path: req.path,
+      sessionId: req.sessionID?.substring(0, 8),
+      hasUser: !!req.user,
+      tenantId: (req as any).tenantId,
     });
-    return originalSend.call(this, body);
-  };
-
-  res.json = function(body) {
-      statusCode: res.statusCode,
-      setCookieHeaders: res.getHeaders()['set-cookie'],
-      sessionAfterResponse: req.session ? {
-        id: req.sessionID,
-        userId: (req.session as any).userId,
-        keys: Object.keys(req.session)
-      } : null
-    });
-    return originalJson.call(this, body);
-  };
-
+  }
   next();
 }; 

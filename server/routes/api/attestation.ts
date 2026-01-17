@@ -7,7 +7,7 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { db } from '../../db';
+import { getDbForRequest } from '../../services/database';
 import { attestationTokens, regulations, users } from '@shared/schema';
 import { eq, and, isNull, gt } from 'drizzle-orm';
 import crypto from 'crypto';
@@ -40,6 +40,8 @@ function getBaseUrl(): string {
  */
 router.post('/send', requireAuth, requireAdmin, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
     const { 
       regulationId, 
       userId, 
@@ -151,6 +153,8 @@ router.post('/send', requireAuth, requireAdmin, async (req: Request, res: Respon
  */
 router.get('/verify/:token', async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
     const { token } = req.params;
 
     // Find the token
@@ -231,6 +235,8 @@ router.get('/verify/:token', async (req: Request, res: Response) => {
  */
 router.post('/confirm/:token', async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
     const { token } = req.params;
     const clientIp = req.ip || req.headers['x-forwarded-for'] || 'unknown';
     const _userAgent = req.headers['user-agent'] || 'unknown';
@@ -341,6 +347,8 @@ router.post('/confirm/:token', async (req: Request, res: Response) => {
  */
 router.get('/pending', requireAuth, requireAdmin, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
     const pendingTokens = await db.select({
       id: attestationTokens.id,
       regulationId: attestationTokens.regulationId,
@@ -373,6 +381,8 @@ router.get('/pending', requireAuth, requireAdmin, async (req: Request, res: Resp
  */
 router.get('/history/:regulationId', requireAuth, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
     const regulationId = parseInt(req.params.regulationId);
     
     const history = await db.select({
@@ -403,6 +413,8 @@ router.get('/history/:regulationId', requireAuth, async (req: Request, res: Resp
  */
 router.delete('/:tokenId', requireAuth, requireAdmin, async (req: Request, res: Response) => {
   try {
+    // TENANT ISOLATION: Get tenant-specific database
+    const db = getDbForRequest(req);
     const tokenId = parseInt(req.params.tokenId);
     
     await db.delete(attestationTokens)

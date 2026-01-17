@@ -17,30 +17,43 @@ import { mapOktaGroupsToRoles, getHighestPriorityRole } from '../config/role-map
  */
 export function configureAuth(app: Express): void {
   
-  // Local username/password strategy
+  // Local username/password strategy - MULTI-TENANT AWARE
   if (institutionConfig.authentication.usernamePasswordEnabled) {
     passport.use(new LocalStrategy(
       {
         usernameField: 'username',
         passwordField: 'password',
+        passReqToCallback: true, // CRITICAL: Need request for tenant context
       },
        
-      async (username: string, password: string, done: (_error: unknown, _user?: unknown, _info?: unknown) => void) => {
+      async (req: Request, username: string, password: string, done: (_error: unknown, _user?: unknown, _info?: unknown) => void) => {
         try {
-          const storage = getDatabaseStorage();
+          // MULTI-TENANT FIX: Get tenant from request (set by tenant middleware)
+          const tenantId = (req as any).tenantId || 'default';
+          console.log(`[AUTH] Login attempt for '${username}' in tenant '${tenantId}'`);
+          
+          // Use tenant-specific storage
+          const storage = getDatabaseStorage(tenantId);
           const user = await storage.getUserByUsername(username, undefined);
 
           if (!user) {
+            console.log(`[AUTH] User '${username}' not found in tenant '${tenantId}'`);
             return done(null, false, { message: 'User not found' });
           }
 
           const isValidPassword = await verifyPassword(password, user.password);
           if (!isValidPassword) {
+            console.log(`[AUTH] Invalid password for '${username}' in tenant '${tenantId}'`);
             return done(null, false, { message: 'Invalid password' });
           }
 
+          // CRITICAL: Attach tenantId to user for session serialization
+          (user as any)._tenantId = tenantId;
+          console.log(`[AUTH] Login successful for '${username}' in tenant '${tenantId}'`);
+
           return done(null, user);
         } catch (error) {
+          console.error('[AUTH] Login error:', error);
           return done(error, false);
         }
       }
@@ -149,17 +162,48 @@ export function configureAuth(app: Express): void {
     ));
   }
 
-  // Passport serialization
+  // Passport serialization - MULTI-TENANT AWARE
   passport.serializeUser((user: unknown, done) => {
     const userObj = user as Record<string, unknown>;
-    done(null, userObj.id);
+    // CRITICAL: Store both userId and tenantId to prevent cross-tenant session hijacking
+    const sessionData = {
+      userId: userObj.id,
+      tenantId: userObj._tenantId || 'default',
+    };
+    console.log(`[AUTH] Serializing user ${userObj.id} for tenant ${sessionData.tenantId}`);
+    done(null, sessionData);
   });
 
    
-  passport.deserializeUser(async (id: string, done: (_error: unknown, _user?: unknown) => void) => {
+  passport.deserializeUser(async (sessionData: unknown, done: (_error: unknown, _user?: unknown) => void) => {
     try {
-      const storage = getDatabaseStorage();
-      let user = await storage.getUser(parseInt(id, 10), undefined);
+      // Handle both old format (just ID string/number) and new format (object with userId and tenantId)
+      let userId: number;
+      let tenantId: string;
+      
+      if (typeof sessionData === 'object' && sessionData !== null && 'userId' in sessionData) {
+        const data = sessionData as { userId: number; tenantId: string };
+        userId = data.userId;
+        tenantId = data.tenantId || 'default';
+      } else {
+        // Legacy format - just user ID (string or number)
+        userId = typeof sessionData === 'string' ? parseInt(sessionData, 10) : sessionData as number;
+        tenantId = 'default'; // Legacy sessions don't have tenant info
+      }
+      
+      console.log(`[AUTH] Deserializing user ${userId} from tenant ${tenantId}`);
+      
+      // CRITICAL: Use tenant-specific storage for user lookup
+      const storage = getDatabaseStorage(tenantId);
+      let user = await storage.getUser(userId, undefined);
+
+      if (!user) {
+        console.log(`[AUTH] User ${userId} not found in tenant ${tenantId} during deserialization`);
+        return done(null, false);
+      }
+
+      // Attach tenant info to user for downstream verification
+      (user as any)._sessionTenantId = tenantId;
 
       // Ensure dvdbrnds is always admin
       if (user && user.username === 'dvdbrnds' && user.role !== 'admin') {
@@ -168,6 +212,7 @@ export function configureAuth(app: Express): void {
 
       done(null, user);
     } catch (error) {
+      console.error('[AUTH] Deserialization error:', error);
       done(error);
     }
   });

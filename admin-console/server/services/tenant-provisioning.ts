@@ -340,7 +340,44 @@ export async function copyDataFromTemplate(targetDatabaseUrl: string): Promise<{
       await targetPool.query(`SELECT setval('compliance_tasks_id_seq', (SELECT COALESCE(MAX(id), 0) + 1 FROM compliance_tasks), false)`);
     }
 
-    console.log('✅ Data copied successfully');
+    // CRITICAL: Clean up ALL tenant-specific data - new tenants should start completely fresh!
+    // Reset ALL actions to clean defaults - no inherited required flags or completion data
+    console.log('  🧹 Resetting all actions to clean defaults for fresh tenant...');
+    await targetPool.query(`
+      UPDATE regulations 
+      SET actions = '[
+        {"type": "attestation", "status": "pending", "enabled": true, "required": false},
+        {"type": "website_publish", "status": "pending", "enabled": true, "required": false},
+        {"type": "community_communication", "status": "pending", "enabled": true, "required": false},
+        {"type": "agency_submission", "status": "pending", "enabled": true, "required": false}
+      ]'::jsonb
+      WHERE actions IS NOT NULL
+    `);
+    
+    // Clear any compliance task status/assignments
+    await targetPool.query(`
+      UPDATE compliance_tasks 
+      SET status = 'pending',
+          "completedAt" = NULL,
+          "completedBy" = NULL,
+          "assignedTo" = NULL
+      WHERE status != 'pending' OR "completedAt" IS NOT NULL
+    `);
+
+    // Clear ALL tenant-specific operational data - new tenants start completely fresh
+    console.log('  🧹 Clearing pending updates, notifications, and other operational data...');
+    await targetPool.query(`DELETE FROM regulation_updates`);
+    await targetPool.query(`DELETE FROM version_conflicts`);
+    await targetPool.query(`DELETE FROM notification_queue`);
+    await targetPool.query(`DELETE FROM notifications`);
+    await targetPool.query(`DELETE FROM attestation_tokens`);
+    await targetPool.query(`DELETE FROM task_evidence`);
+    await targetPool.query(`DELETE FROM task_activity`);
+    await targetPool.query(`DELETE FROM evidence_files`);
+    await targetPool.query(`DELETE FROM notes`);
+    await targetPool.query(`DELETE FROM deadlines`);
+
+    console.log('✅ Data copied and cleaned successfully');
 
     return {
       regulationsCount: regsResult.rows.length,
@@ -430,7 +467,7 @@ export async function configureBranding(
       primaryColor: primaryColor,
       secondaryColor: darkenColor(primaryColor, 0.2),
       accentColor: lightenColor(primaryColor, 0.3),
-      logoUrl: branding?.logoUrl || '/assets/institution-logo.svg',
+      logoUrl: branding?.logoUrl || '/assets/es-white-on-purple-logo.png', // Generic EdSteward logo as default
       faviconUrl: '/favicon.ico',
       loginScreenBackgroundColor: '#f8fafc',
       loginScreenAccentColor: primaryColor,

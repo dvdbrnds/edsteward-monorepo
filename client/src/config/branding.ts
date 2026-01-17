@@ -1,12 +1,12 @@
-// Single-tenant branding configuration for Moravian University
-import moravianLogo from "@/assets/Moravian-Monogram-MoravianBlue.png";
+// Generic branding configuration - tenant-specific branding is loaded from API
+const edstewardLogo = '/assets/es-white-on-purple-logo.png';
 
 export const BRANDING = {
-  name: 'Moravian University',
-  title: 'Moravian University Compliance Portal',
-  logo: moravianLogo,
+  name: 'Compliance Portal',
+  title: 'Compliance Portal',
+  logo: edstewardLogo,
   favicon: '/favicon.ico',
-  primaryColor: '#1e3a8a',
-  secondaryColor: '#1e40af',
-  accentColor: '#3b82f6',
+  primaryColor: '#3d1a5a', // EdSteward purple
+  secondaryColor: '#2d1345',
+  accentColor: '#6b3fa0',
 } as const; 
