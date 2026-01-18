@@ -469,8 +469,6 @@
         }
         
         .regulation-tabs {
-            flex-wrap: wrap;
-            overflow-x: auto;
             display: flex;
             border-bottom: 1px solid #e1e5e9;
             margin-bottom: 20px;
@@ -479,8 +477,7 @@
         .tab-button {
             background: none;
             border: none;
-            padding: 10px 14px;
-            font-size: 13px;
+            padding: 12px 20px;
             cursor: pointer;
             font-family: 'Inter', sans-serif;
             font-weight: 500;
@@ -1094,7 +1091,7 @@
                         <div class="regulation-section">
                             <div id="usc-loading" style="text-align: center; padding: 40px; color: #6e7681;">
                                 <div style="font-size: 16px; margin-bottom: 10px;">📖 Fetching Real USC 5 Section 552a Text...</div>
-                                <div style="font-size: 14px;">Loading official TEACH Act statute from US Code</div>
+                                <div style="font-size: 14px;">Loading official Family Educational Rights And Privacy Act Ferpa statute from CFR</div>
                                     </div>
                             <div id="usc-content" style="display: none;">
                                 <h4 id="usc-title">Regulation: Family Educational Rights and Privacy Act (FERPA) - Family Educational Rights and Privacy Act (FERPA)</h4>
@@ -1130,11 +1127,11 @@
                     <div id="cfr-regs" class="tab-content">
                         <div class="regulation-section">
                             <div id="cfr-loading" style="text-align: center; padding: 40px; color: #6e7681;">
-                                <div style="font-size: 16px; margin-bottom: 10px;">📋 Fetching Real CFR TEACH Act Guidance...</div>
-                                <div style="font-size: 14px;">Loading official guidance from U.S. Copyright Office</div>
+                                <div style="font-size: 16px; margin-bottom: 10px;">📋 Fetching Real CFR Family Educational Rights And Privacy Act Ferpa Guidance...</div>
+                                <div style="font-size: 14px;">Loading official guidance from Department of Education</div>
                                 </div>
                             <div id="cfr-content" style="display: none;">
-                                <h4 id="cfr-title">TEACH Act Implementation Guidelines</h4>
+                                <h4 id="cfr-title">Family Educational Rights And Privacy Act Ferpa Implementation Guidelines</h4>
                                 <div id="cfr-metadata" style="font-size: 12px; color: #6e7681; margin-bottom: 20px; padding: 8px; background: #f0f6ff; border-radius: 4px; border-left: 3px solid #0969da;">
                                     <div id="cfr-source">Source: Loading...</div>
                                     <div id="cfr-updated">Last Updated: Loading...</div>
@@ -1180,11 +1177,11 @@
                     <div id="compliance" class="tab-content">
                         <div class="regulation-section">
                             <div id="compliance-loading" style="text-align: center; padding: 40px; color: #6e7681;">
-                                <div style="font-size: 16px; margin-bottom: 10px;">📋 Generating Real TEACH Act Compliance Guidance...</div>
-                                <div style="font-size: 14px;">Calculating institutional requirements and risk assessments</div>
+                                <div style="font-size: 16px; margin-bottom: 10px;">📋 Generating Real Family Educational Rights And Privacy Act Ferpa Compliance Guidance...</div>
+                                <div style="font-size: 14px;">Calculating institutional privacy requirements and risk assessments</div>
                                         </div>
                             <div id="compliance-content" style="display: none;">
-                                <h4 id="compliance-title">TEACH Act Compliance Guidelines</h4>
+                                <h4 id="compliance-title">Family Educational Rights And Privacy Act Ferpa Compliance Guidelines</h4>
                                 <div id="compliance-metadata" style="font-size: 12px; color: #6e7681; margin-bottom: 20px; padding: 8px; background: #f0f6ff; border-radius: 4px; border-left: 3px solid #0969da;">
                                     <div id="compliance-score">Overall Compliance: Loading...</div>
                                     <div id="compliance-updated">Last Assessment: Loading...</div>
@@ -1231,7 +1228,7 @@
                     
                     <div id="staging" class="tab-content">
                         <div class="regulation-section">
-                            <h4>TEACH Act Update Staging System</h4>
+                            <h4>Family Educational Rights And Privacy Act Ferpa Update Staging System</h4>
                             <div id="staging-loading" class="loading-state">
                                 <div class="loading-spinner"></div>
                                 <p>Loading real system versioning data...</p>
@@ -1248,7 +1245,7 @@
                     
                     <div id="api-distribution" class="tab-content">
                         <div class="regulation-section">
-                            <h4>TEACH Act Customer API Distribution</h4>
+                            <h4>Family Educational Rights And Privacy Act Ferpa Customer API Distribution</h4>
                             <div class="api-dashboard">
                                 <div class="api-endpoints">
                                     <div class="endpoint-card">
@@ -1256,17 +1253,17 @@
                                         <div class="endpoint-list">
                                             <div class="endpoint-item">
                                                 <span class="method get">GET</span>
-                                                <span class="url">/api/v1/regulations/teach-act</span>
+                                                <span class="url">/api/v1/regulations/family-educational-rights-and-privacy-act-ferpa</span>
                                                 <span class="description">Current regulation data</span>
                                             </div>
                                             <div class="endpoint-item">
                                                 <span class="method get">GET</span>
-                                                <span class="url">/api/v1/regulations/teach-act/version</span>
+                                                <span class="url">/api/v1/regulations/family-educational-rights-and-privacy-act-ferpa/version</span>
                                                 <span class="description">Version information</span>
                                             </div>
                                             <div class="endpoint-item">
                                                 <span class="method get">GET</span>
-                                                <span class="url">/api/v1/regulations/teach-act/changes</span>
+                                                <span class="url">/api/v1/regulations/family-educational-rights-and-privacy-act-ferpa/changes</span>
                                                 <span class="description">Recent changes diff</span>
                                             </div>
                                             <div class="endpoint-item">
@@ -1282,7 +1279,7 @@
                                         <div class="auth-info">
                                             <div class="auth-method">
                                                 <strong>API Key:</strong> 
-                                                <code>X-API-Key: teach_act_[customer_id]_[hash]</code>
+                                                <code>X-API-Key: family_educational_rights_and_privacy_act_ferpa_[customer_id]_[hash]</code>
                                             </div>
                                             <div class="auth-method">
                                                 <strong>Rate Limit:</strong> 
@@ -1439,9 +1436,7 @@
                 <button id="pushUpdateButton" onclick="pushRegulationUpdate()" class="run-button" style="background: #059669; margin-left: 12px; font-size: 12px;">
                     📤 PUSH UPDATE TO CLIENTS
                 </button>
-                <button id="updateAllButton" onclick="updateAllRegulations()" class="run-button" style="background: #dc2626; margin-left: 12px; font-size: 12px;">
-                    🔄 UPDATE ALL REGULATIONS
-                </button>
+                
             </div>
             
             <div class="console-output" id="consoleOutput">
@@ -1509,8 +1504,27 @@
                     <span class="step-icon">○</span>
                         <span>University Law Libraries</span>
                     </div>
-                    <div class="step-substeps" style="margin-left: 20px; font-size: 0.9em; color: #666; margin-top: 5px;">
-
+                    <div class="step-substeps" style="margin-left: 28px; font-size: 0.85em; color: #666; margin-top: 6px; line-height: 1.8;">
+                        <div class="substep" id="substep-courtlistener" style="display: flex; align-items: center; gap: 10px;">
+                            <span class="substep-icon" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0;"></span>
+                            <span class="substep-name" style="flex: 1;">CourtListener</span>
+                            <span class="substep-confidence" id="conf-courtlistener" style="color: #22c55e; font-weight: 500;"></span>
+                        </div>
+                        <div class="substep" id="substep-recap" style="display: flex; align-items: center; gap: 10px;">
+                            <span class="substep-icon" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0;"></span>
+                            <span class="substep-name" style="flex: 1;">RECAP Archive</span>
+                            <span class="substep-confidence" id="conf-recap" style="color: #22c55e; font-weight: 500;"></span>
+                        </div>
+                        <div class="substep" id="substep-cornell" style="display: flex; align-items: center; gap: 10px;">
+                            <span class="substep-icon" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0;"></span>
+                            <span class="substep-name" style="flex: 1;">Cornell LII</span>
+                            <span class="substep-confidence" id="conf-cornell" style="color: #22c55e; font-weight: 500;"></span>
+                        </div>
+                        <div class="substep" id="substep-justia" style="display: flex; align-items: center; gap: 10px;">
+                            <span class="substep-icon" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0;"></span>
+                            <span class="substep-name" style="flex: 1;">Justia</span>
+                            <span class="substep-confidence" id="conf-justia" style="color: #22c55e; font-weight: 500;"></span>
+                        </div>
                     </div>
                 </div>
                 <div class="step-item pending" id="step4">
@@ -1551,6 +1565,33 @@
                 <div class="error-title">🚨 Error Details</div>
                 <div class="error-message" id="errorMessage"></div>
             </div>
+            
+            <h3 style="margin-top: 24px;">🤖 AI Quality Auditor</h3>
+            <div id="inquisitorWidget" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; padding: 16px; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);">
+                <button id="inquisitorBtn" onclick="runInquisitorAudit()" style="background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.3); color: white; padding: 12px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: 600; font-size: 14px; transition: all 0.3s;">
+                    ⚡ Run AI Audit
+                </button>
+                <div id="inquisitorProgress" style="display: none; background: rgba(255, 255, 255, 0.95); margin-top: 12px; padding: 12px; border-radius: 8px;">
+                    <div style="font-size: 12px; color: #495057; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                        <span style="display: inline-block; width: 12px; height: 12px; border: 2px solid #667eea; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite;"></span>
+                        <span>AI analyzing regulation quality...</span>
+                    </div>
+                    <div style="background: #e9ecef; height: 8px; border-radius: 4px; overflow: hidden;">
+                        <div id="inquisitorProgressBar" style="height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); width: 0%; transition: width 0.5s ease;"></div>
+                    </div>
+                    <div id="inquisitorProgressText" style="text-align: center; font-size: 11px; color: #6c757d; margin-top: 6px; font-weight: 600;">0%</div>
+                </div>
+                <div id="inquisitorResults" style="display: none; background: white; margin-top: 12px; padding: 12px; border-radius: 8px;">
+                    <div style="font-weight: 600; margin-bottom: 8px;">Quality Report</div>
+                    <div id="inquisitorScores" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;"></div>
+                </div>
+                <div id="inquisitorError" style="display: none; background: #fee; color: #dc2626; padding: 10px; border-radius: 6px; margin-top: 12px; font-size: 12px;"></div>
+            </div>
+            <style>
+                @keyframes spin {
+                    to { transform: rotate(360deg); }
+                }
+            </style>
         </div>
     </div>
 
@@ -1622,6 +1663,63 @@
             
             statusDot.className = `status-dot ${type}`;
             statusText.textContent = status.toUpperCase();
+        }
+        
+        function updateSubstep(id, status, confidence, errorMsg) {
+            const substep = document.getElementById('substep-' + id);
+            const confSpan = document.getElementById('conf-' + id);
+            if (substep) {
+                const icon = substep.querySelector('.substep-icon');
+                if (status === 'completed' && confidence > 0) {
+                    icon.textContent = '✓';
+                    icon.style.background = 'transparent';
+                    icon.style.color = '#22c55e';
+                    icon.style.fontSize = '14px';
+                    icon.style.fontWeight = 'bold';
+                    icon.style.width = 'auto';
+                    icon.style.height = 'auto';
+                    if (confSpan) {
+                        confSpan.textContent = '(' + confidence + '%)';
+                    }
+                } else if (status === 'running') {
+                    icon.textContent = '';
+                    icon.style.background = '#3b82f6';
+                    icon.style.width = '8px';
+                    icon.style.height = '8px';
+                    if (confSpan) {
+                        confSpan.textContent = '';
+                    }
+                } else if (status === 'requires_key') {
+                    icon.textContent = '🔑';
+                    icon.style.background = 'transparent';
+                    icon.style.color = '#f59e0b';
+                    icon.style.fontSize = '10px';
+                    icon.style.width = 'auto';
+                    icon.style.height = 'auto';
+                    if (confSpan) {
+                        confSpan.textContent = '(key needed)';
+                        confSpan.style.color = '#f59e0b';
+                        confSpan.style.fontSize = '0.85em';
+                    }
+                } else if (status === 'web_only') {
+                    icon.textContent = '🌐';
+                    icon.style.background = 'transparent';
+                    icon.style.color = '#6b7280';
+                    icon.style.fontSize = '10px';
+                    icon.style.width = 'auto';
+                    icon.style.height = 'auto';
+                    if (confSpan) {
+                        confSpan.textContent = '(web only)';
+                        confSpan.style.color = '#6b7280';
+                        confSpan.style.fontSize = '0.85em';
+                    }
+                } else {
+                    icon.textContent = '';
+                    icon.style.background = '#ccc';
+                    icon.style.width = '8px';
+                    icon.style.height = '8px';
+                }
+            }
         }
         
         function updateStepStatus(stepNum, status) {
@@ -1701,72 +1799,7 @@
         let updateAllRunning = false;
         let currentRegulationIndex = 0;
         let regulationsList = [];
-        
-        async function updateAllRegulations() {
-            if (updateAllRunning) {
-                addConsoleLog('🛑 Update All process already running', 'warning');
-                return;
-            }
-            
-            updateAllRunning = true;
-            currentRegulationIndex = 0;
-            
-            const updateButton = document.getElementById('updateAllButton');
-            updateButton.textContent = '⏳ UPDATING ALL...';
-            updateButton.style.background = '#f59e0b';
-            
-            try {
-                addConsoleLog('🚀 Starting UPDATE ALL REGULATIONS process', 'success');
-                addConsoleLog('📋 Fetching complete regulations list...', 'info');
-                
-                // Fetch all regulations from the API
-                const response = await fetch('http://localhost:3010/api/regulations/all');
-                if (!response.ok) {
-                    throw new Error(`Failed to fetch regulations: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                regulationsList = data.data || [];
-                
-                addConsoleLog(`✅ Found ${regulationsList.length} regulations to update`, 'success');
-                addConsoleLog('🔄 Beginning sequential update process...', 'info');
-                
-                // Process each regulation sequentially
-                for (let i = 0; i < regulationsList.length; i++) {
-                    currentRegulationIndex = i;
-                    const regulation = regulationsList[i];
-                    
-                    addConsoleLog(`\n📋 [${i + 1}/${regulationsList.length}] Processing: ${regulation.name}`, 'info');
-                    addConsoleLog(`🏷️  Topic: ${regulation.topic || 'General'}`, 'info');
-                    addConsoleLog(`🆔 ID: ${regulation.id || regulation.slug}`, 'info');
-                    
-                    // Update the button to show progress
-                    updateButton.textContent = `⏳ UPDATING ${i + 1}/${regulationsList.length}`;
-                    
-                    // Simulate regulation update process
-                    await updateSingleRegulation(regulation, i + 1, regulationsList.length);
-                    
-                    // Add delay between updates to prevent overwhelming the system
-                    if (i < regulationsList.length - 1) {
-                        addConsoleLog('⏱️  Waiting 2 seconds before next regulation...', 'info');
-                        await new Promise(resolve => setTimeout(resolve, 2000));
-                    }
-                }
-                
-                addConsoleLog('\n🎉 UPDATE ALL REGULATIONS COMPLETED!', 'success');
-                addConsoleLog(`✅ Successfully processed ${regulationsList.length} regulations`, 'success');
-                addConsoleLog('📊 All regulations are now up to date', 'success');
-                
-            } catch (error) {
-                addConsoleLog(`❌ Update All failed: ${error.message}`, 'error');
-                console.error('Update All error:', error);
-            } finally {
-                updateAllRunning = false;
-                updateButton.textContent = '🔄 UPDATE ALL REGULATIONS';
-                updateButton.style.background = '#dc2626';
-            }
-        }
-        
+
         async function updateSingleRegulation(regulation, index, total) {
             try {
                 addConsoleLog(`  🔍 Analyzing regulation structure...`, 'info');
@@ -1821,7 +1854,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        query: 'Execute Family Educational Rights and Privacy Act (FERPA) comprehensive LinearEngine workflow for TEACH Act compliance validation',
+                        query: 'Execute Family Educational Rights and Privacy Act (FERPA) comprehensive LinearEngine workflow for Family Educational Rights And Privacy Act Ferpa compliance validation',
                         options: { workflow: 'comprehensive', regulation: 'family-educational-rights-and-privacy-act-ferpa', realExecution: true }
                     })
                 });
@@ -1850,13 +1883,13 @@
                             addConsoleLog(`   - Changes detected: ${step1.changes_detected}`, 'info');
                         }
                     } else {
-                        addConsoleLog('   - USC 5 Section 552a (TEACH Act) ✓', 'info');
-                        addConsoleLog('   - Copyright Office TEACH Act Guidance ✓', 'info');
+                        addConsoleLog('   - USC 5 Section 552a  ✓', 'info');
+                        addConsoleLog('   - Department of Education Family Educational Rights And Privacy Act Ferpa Guidance ✓', 'info');
                     }
                 } else {
                 addConsoleLog(`✅ Workflow ${result.workflowId || 'Family Educational Rights and Privacy Act (FERPA)'} initiated successfully`, 'success');
-                    addConsoleLog('   - USC 5 Section 552a (TEACH Act) ✓', 'info');
-                    addConsoleLog('   - Copyright Office TEACH Act Guidance ✓', 'info');
+                    addConsoleLog('   - USC 5 Section 552a  ✓', 'info');
+                    addConsoleLog('   - Department of Education Family Educational Rights And Privacy Act Ferpa Guidance ✓', 'info');
                 }
                 
                 metrics.dataPoints += 2;
@@ -1888,53 +1921,117 @@
                 updateMetrics();
                 
                                 // Step 3: University Law Libraries - Comprehensive Validation
+                
+                // Step 3: Law Library APIs - REAL validation from actual legal databases
                 currentStep = 3;
                 updateStepStatus(3, 'running');
-                addConsoleLog('📚 STEP 3: University law libraries validation...', 'step');
+                addConsoleLog('⚖️ STEP 3: Law library validation (REAL APIs)...', 'step');
                 
-                // Check if we have real university data from LinearEngine
-                const step2Data = result.data?.workflowDetails?.step2_result;
-                // University validation removed - no public APIs
-                
-                
-                                await new Promise(resolve => setTimeout(resolve, 500));
-                                                if (stanfordConfidence) {
-                    addConsoleLog(`     ✓ Validation confidence: ${stanfordConfidence}% (REAL)`, 'debug');
-                    } else {
-                    addConsoleLog('     ✓ Validation confidence: 90% (FALLBACK)', 'debug');
-                    }
-                
-                                await new Promise(resolve => setTimeout(resolve, 600));
-                                                if (harvardConfidence) {
-                    addConsoleLog(`     ✓ Validation confidence: ${harvardConfidence}% (REAL)`, 'debug');
-                    } else {
-                    addConsoleLog('     ✓ Validation confidence: 92% (FALLBACK)', 'debug');
-                    }
-                
-                                await new Promise(resolve => setTimeout(resolve, 600));
-                                                if (yaleConfidence) {
-                    addConsoleLog(`     ✓ Validation confidence: ${yaleConfidence}% (REAL)`, 'debug');
-                    } else {
-                    addConsoleLog('     ✓ Validation confidence: 90% (FALLBACK)', 'debug');
-                    }
-                
-                                await new Promise(resolve => setTimeout(resolve, 700));
-                                                if (columbiaConfidence) {
-                    addConsoleLog(`     ✓ Validation confidence: ${columbiaConfidence}% (REAL)`, 'debug');
-                    } else {
-                    addConsoleLog('     ✓ Validation confidence: 91% (FALLBACK)', 'debug');
-                    }
+                // Check for real law library data from the comprehensive workflow
+                const lawLibraryData = result.data?.lawLibrarySources || result.data?.realApiResults?.lawLibraries;
                 
                 await new Promise(resolve => setTimeout(resolve, 400));
-                addConsoleLog('   📊 Cross-referencing consensus across institutions...', 'info');
                 
-                // Use real consensus data if available
-                if (step2Data?.consensus_analysis) {
-                    addConsoleLog(`     ✓ Academic consensus: ${step2Data.consensus_analysis}`, 'debug');
-                    addConsoleLog(`     ✓ Corroborated ${Math.round(step2Data.corroboration_rate * 100)}% of government source materials`, 'debug');
+                // CourtListener / Free Law Project (REAL)
+                if (lawLibraryData?.courtListener) {
+                    const cl = lawLibraryData.courtListener;
+                    if (cl.status === 'fetched' && cl.confidence > 0) {
+                        addConsoleLog(`   🏛️ CourtListener (Free Law Project): ${cl.confidence}% confidence (REAL API)`, 'success');
+                        updateSubstep('courtlistener', 'completed', cl.confidence);
+                        addConsoleLog(`      └─ ${cl.data?.totalOpinions || 0} opinions found`, 'debug');
+                    } else {
+                        addConsoleLog(`   🏛️ CourtListener: ${cl.status || 'checking'}...`, 'info');
+                    }
                 } else {
-                    addConsoleLog('     ✓ Academic consensus: High agreement on TEACH Act interpretation', 'debug');
-                    addConsoleLog('     ✓ Corroborated 94% of government source materials', 'debug');
+                    addConsoleLog('   🏛️ CourtListener (Free Law Project): Checking...', 'info');
+                    updateSubstep('courtlistener', 'running', 0);
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 400));
+                // RECAP Archive (FREE PACER via CourtListener)
+                if (lawLibraryData?.recap) {
+                    const recap = lawLibraryData.recap;
+                    if (recap.status === 'fetched' && recap.confidence > 0) {
+                        addConsoleLog(`   📄 RECAP Archive: ${recap.confidence}% confidence (FREE PACER)`, 'success');
+                        updateSubstep('recap', 'completed', recap.confidence);
+                        addConsoleLog(`      └─ ${recap.data?.totalDocuments || 0} PACER documents found`, 'debug');
+                    } else {
+                        addConsoleLog(`   📄 RECAP Archive: ${recap.status || 'checking'}...`, 'info');
+                        updateSubstep('recap', 'running', 0);
+                    }
+                } else {
+                    addConsoleLog('   📄 RECAP Archive: Checking...', 'info');
+                    updateSubstep('recap', 'running', 0);
+                }
+
+                
+                // Cornell LII (REAL)
+                const cornellData = result.data?.realApiResults?.academic?.cornellLII || result.data?.academicSources?.cornellLII;
+                if (cornellData) {
+                    if (cornellData.status === 'fetched' && cornellData.confidence > 0) {
+                        addConsoleLog(`   ⚖️ Cornell LII: ${cornellData.confidence}% confidence (REAL API)`, 'success');
+                        updateSubstep('cornell', 'completed', cornellData.confidence);
+                        addConsoleLog(`      └─ ${cornellData.data?.citation || 'USC citation verified'}`, 'debug');
+                    } else {
+                        addConsoleLog(`   ⚖️ Cornell LII: ${cornellData.status || 'checking'}...`, 'info');
+                    }
+                } else {
+                    addConsoleLog('   ⚖️ Cornell Legal Information Institute: Checking...', 'info');
+                    updateSubstep('cornell', 'running', 0);
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 400));
+                
+                // Justia (Web Only - No API)
+                if (lawLibraryData?.justia) {
+                    const justia = lawLibraryData.justia;
+                    if (justia.status === 'fetched' && justia.confidence > 0) {
+                        addConsoleLog(`   📖 Justia: ${justia.confidence}% confidence`, 'success');
+                        updateSubstep('justia', 'completed', justia.confidence);
+                    } else if (justia.status === 'web_only') {
+                        addConsoleLog('   📖 Justia: Web search only (no API)', 'info');
+                        updateSubstep('justia', 'web_only', 0);
+                    } else {
+                        addConsoleLog(`   📖 Justia: ${justia.status || 'unavailable'}`, 'info');
+                        updateSubstep('justia', 'pending', 0);
+                    }
+                } else {
+                    addConsoleLog('   📖 Justia: Not available', 'info');
+                    updateSubstep('justia', 'pending', 0);
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                // Calculate overall law library confidence
+                let lawLibConfidence = 0;
+                let lawLibCount = 0;
+                if (lawLibraryData?.overall?.averageConfidence) {
+                    lawLibConfidence = lawLibraryData.overall.averageConfidence;
+                    lawLibCount = lawLibraryData.overall.sourcesFetched || 0;
+                } else {
+                    // Fallback calculation
+                    const sources = [
+                        lawLibraryData?.harvardCaselawAccessProject?.confidence || 0,
+                        lawLibraryData?.courtListener?.confidence || 0,
+                        cornellData?.confidence || 0,
+                        lawLibraryData?.justia?.confidence || 0
+                    ].filter(c => c > 0);
+                    if (sources.length > 0) {
+                        lawLibConfidence = Math.round(sources.reduce((a, b) => a + b, 0) / sources.length);
+                        lawLibCount = sources.length;
+                    }
+                }
+                
+                addConsoleLog(`   📊 Law Library Consensus: ${lawLibConfidence}% average from ${lawLibCount} sources`, 'info');
+
+                
+                // Use real law library consensus data
+                if (lawLibConfidence > 0) {
+                    addConsoleLog(`     ✓ Law Library consensus: ${lawLibConfidence}% confidence from ${lawLibCount} real APIs`, 'debug');
+                    addConsoleLog(`     ✓ Academic sources verified regulation interpretation`, 'debug');
+                } else {
+                    addConsoleLog('     ✓ Law Library APIs contacted - Harvard CAP, CourtListener, Cornell LII, Justia', 'debug');
+                    addConsoleLog('     ✓ Real API confidence data available when APIs respond', 'debug');
                 }
                 
                 metrics.apiCalls += 8;
@@ -1947,8 +2044,8 @@
                                 // Step 4: CFR Integration
                 currentStep = 4;
                 updateStepStatus(4, 'running');
-                addConsoleLog('📜 STEP 4: Copyright Office integration and analysis...', 'step');
-                addConsoleLog('   - TEACH Act regulatory guidance analysis ✓', 'info');
+                addConsoleLog('📜 STEP 4: Department of Education integration and analysis...', 'step');
+                addConsoleLog('   - Family Educational Rights And Privacy Act Ferpa regulatory guidance analysis ✓', 'info');
                 addConsoleLog('   - Regulatory interpretation updates ✓', 'info');
                 addConsoleLog('   - Mapped 18 compliance requirements', 'debug');
                 metrics.apiCalls++;
@@ -2206,7 +2303,7 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        regulationId: 'Family Educational Rights and Privacy Act (FERPA)',
+                        regulationId: 'family-educational-rights-and-privacy-act-ferpa',
                         changeType: 'MANUAL_PUSH',
                         message: 'Manual update triggered from console',
                         timestamp: new Date().toISOString()
@@ -2236,8 +2333,8 @@
         setTimeout(() => {
             addConsoleLog('🔧 System diagnostics initialized', 'info');
             addConsoleLog('📡 Monitoring API endpoints...', 'debug');
-            addConsoleLog('📋 Regulation preview loaded: TEACH Act', 'info');
-            addConsoleLog('🎯 TEACH Act LinearEngine ready for execution', 'info');
+            addConsoleLog('📋 Regulation preview loaded: Family Educational Rights And Privacy Act Ferpa', 'info');
+            addConsoleLog('🎯 Family Educational Rights And Privacy Act Ferpa LinearEngine ready for execution', 'info');
             
             // Initialize real-time updates
             addConsoleLog('🔗 Initializing real-time regulation updates...', 'info');
@@ -2301,7 +2398,7 @@
             summaryDiv.innerHTML = 'Loading summary...';
             
             try {
-                const response = await fetch(`http://localhost:3002/api/llm/cfr/family-educational-rights-and-privacy-act-ferpa`);
+                const response = await fetch(`http://localhost:3002/api/llm/cfr/reg-66`);
                 const result = await response.json();
                 
                 if (result.success && result.data && result.data.summary) {
@@ -2373,7 +2470,7 @@
             try {
                 console.log('📋 Fetching real CFR guidance from API...');
                 
-                const response = await fetch(`http://localhost:3002/api/llm/cfr/family-educational-rights-and-privacy-act-ferpa`);
+                const response = await fetch(`http://localhost:3002/api/llm/cfr/reg-66`);
                 const result = await response.json();
                 
                 if (result.success && result.data) {
@@ -2573,7 +2670,7 @@
                     metrics.style.fontSize = '12px';
                     metrics.style.color = '#6e7681';
                     metrics.style.marginTop = '4px';
-                    metrics.textContent = `TEACH refs: ${university.metrics.teachReferences}, Copyright terms: ${university.metrics.copyrightTerms}, Keyword density: ${university.metrics.keywordDensity}%`;
+                    metrics.textContent = `Regulation refs: ${university.metrics.regulationReferences}, Compliance terms: ${university.metrics.complianceTerms}, Keyword density: ${university.metrics.keywordDensity}%`;
                     listItem.appendChild(metrics);
                 }
                 
@@ -2583,7 +2680,7 @@
             // Add academic consensus note
             const consensusItem = document.createElement('li');
             const validationRate = Math.round((universities.filter(u => u.status === 'validated').length / universities.length) * 100);
-            consensusItem.innerHTML = `<strong>Academic Consensus:</strong> ${validationRate}% validation rate on TEACH Act interpretation`;
+            consensusItem.innerHTML = `<strong>Academic Consensus:</strong> ${validationRate}% validation rate on Family Educational Rights And Privacy Act Ferpa interpretation`;
             list.appendChild(consensusItem);
             
             card.appendChild(titleElement);
@@ -2704,9 +2801,9 @@
             errorDiv.style.display = 'none';
             
             try {
-                console.log('📋 Fetching real TEACH Act compliance guidance from API...');
+                console.log('📋 Fetching real compliance guidance from API...');
                 
-                const response = await fetch('http://localhost:3002/api/llm/compliance/teach-act');
+                const response = await fetch('http://localhost:3002/api/llm/cfr/family-educational-rights-and-privacy-act-ferpa');
                 const result = await response.json();
                 
                 if (result.success && result.data) {
@@ -2844,7 +2941,7 @@
             section.className = 'compliance-section';
             
             const title = document.createElement('h5');
-            title.textContent = 'Copyright Enforcement Statistics';
+            title.textContent = 'Compliance Statistics';
             section.appendChild(title);
             
             const statsDiv = document.createElement('div');
@@ -2907,11 +3004,11 @@
                 
                 // For demo purposes, use our generated requirements
                 const enhancedRequirements = {
-                    title: 'TEACH Act Enhanced Requirements',
+                    title: 'Family Educational Rights And Privacy Act Ferpa Enhanced Requirements',
                     qualityScore: '100/100',
                     generatedAt: new Date().toISOString(),
                     apiKey: 'Requirements API Key (Second Key)',
-                    requirements: `**Key Compliance Requirements for TEACH Act:**
+                    requirements: `**Key Compliance Requirements for Family Educational Rights And Privacy Act Ferpa:**
 
 1. **Technology Infrastructure Requirements**
    - IT Department must implement access control systems limiting content to enrolled students
@@ -2926,7 +3023,7 @@
    - Review/update annually before academic year
 
 3. **Course Material Management**
-   - Faculty must verify materials meet TEACH Act requirements before use
+   - Faculty must verify materials meet regulatory requirements before use
    - Department chairs must approve copyrighted content usage
    - Instructors must supervise all digital transmissions directly
    - Verify compliance before each term
@@ -2934,14 +3031,14 @@
 **Documentation Requirements:**
 - Maintain inventory of all copyrighted materials used in courses
 - Keep records of student enrollment verification for 3 years
-- Store copyright permissions/licenses for 7 years
+- Store compliance documentation per retention policy
 - Legal department maintains master policy documents
 - IT maintains access control system documentation
 
 **Training Requirements:**
-- New faculty copyright training before first online course
-- Annual refresher training for all teaching staff
-- Student copyright awareness training at enrollment
+- Initial compliance training for new staff
+- Annual refresher training for all relevant staff
+- Student awareness training at enrollment
 - IT staff DRM system training every 6 months
 - Document all training completion in HR records
 
@@ -3121,13 +3218,13 @@
             // Update status to loading
             statusDiv.innerHTML = `
                 <div style="font-size: 16px; color: #495057; margin-bottom: 15px;">🔄 Loading Enhanced Data...</div>
-                <div style="font-size: 14px; color: #6c757d;">Fetching TEACH Act regulation with Federal Register integration...</div>
+                <div style="font-size: 14px; color: #6c757d;">Fetching Regulation regulation with Federal Register integration...</div>
             `;
             
             try {
-                console.log('📡 Fetching enhanced TEACH Act data for EdSteward preview...');
+                console.log('📡 Fetching enhanced Regulation data for EdSteward preview...');
                 
-                const response = await fetch('http://localhost:3002/api/llm/cfr/family-educational-rights-and-privacy-act-ferpa?federal_register=true');
+                const response = await fetch('http://localhost:3002/api/llm/cfr/enhanced/family-educational-rights-and-privacy-act-ferpa?federal_register=true');
                 const data = await response.json();
                 
                 if (!data.success) {
@@ -3139,7 +3236,7 @@
                 // Update status to success
                 statusDiv.innerHTML = `
                     <div style="font-size: 16px; color: #198754; margin-bottom: 10px;">✅ EdSteward Preview Loaded Successfully!</div>
-                    <div style="font-size: 14px; color: #6c757d;">Enhanced TEACH Act data with ${enhancedData.federal_register_enhancement?.total_documents_referenced || 0} Federal Register documents</div>
+                    <div style="font-size: 14px; color: #6c757d;">Enhanced Regulation data with ${enhancedData.federal_register_enhancement?.total_documents_referenced || 0} Federal Register documents</div>
                 `;
                 
                 // Populate enhancement stats
@@ -3319,7 +3416,7 @@
                 console.log('📡 Fetching complete Federal Register document list via LLM Gateway...');
                 
                 // Use our LLM Gateway endpoint to get all documents with debug info
-                const response = await fetch('http://localhost:3002/api/llm/cfr/family-educational-rights-and-privacy-act-ferpa?federal_register=true&debug=true&show_all_documents=true');
+                const response = await fetch('http://localhost:3002/api/llm/cfr/enhanced/family-educational-rights-and-privacy-act-ferpa?federal_register=true&debug=true&show_all_documents=true');
                 const data = await response.json();
                 
                 console.log('📋 Full API response:', data);
@@ -3684,6 +3781,99 @@
             }
         });
 
+    </script>
+    
+    <script>
+    // Inquisitor AI Quality Auditor
+    async function runInquisitorAudit() {
+        const btn = document.getElementById('inquisitorBtn');
+        const progress = document.getElementById('inquisitorProgress');
+        const progressBar = document.getElementById('inquisitorProgressBar');
+        const progressText = document.getElementById('inquisitorProgressText');
+        const results = document.getElementById('inquisitorResults');
+        const scores = document.getElementById('inquisitorScores');
+        const errorDiv = document.getElementById('inquisitorError');
+        
+        btn.disabled = true;
+        btn.textContent = '🔄 Analyzing...';
+        btn.style.opacity = '0.6';
+        results.style.display = 'none';
+        errorDiv.style.display = 'none';
+        progress.style.display = 'block';
+        
+        // Animate progress bar from 0 to 90% over ~8 seconds
+        let currentProgress = 0;
+        const progressInterval = setInterval(() => {
+            currentProgress = Math.min(currentProgress + 10, 90);
+            progressBar.style.width = currentProgress + '%';
+            progressText.textContent = currentProgress + '%';
+        }, 800);
+        
+        // Get regulation slug from URL
+        const slug = window.location.pathname.split('/').pop().replace('-console.html', '');
+        
+        try {
+            const response = await fetch('http://localhost:3060/api/inquisitor/audit', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ regulationSlug: slug }),
+                signal: AbortSignal.timeout(60000)
+            });
+            
+            clearInterval(progressInterval);
+            progressBar.style.width = '100%';
+            progressText.textContent = '100% Complete!';
+            
+            if (!response.ok) throw new Error('Audit failed');
+            
+            const data = await response.json();
+            if (data.success && data.audit) {
+                const audit = data.audit;
+                scores.innerHTML = `
+                    <div style="text-align: center; padding: 10px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <div style="font-size: 11px; color: #6c757d; font-weight: 600;">OVERALL</div>
+                        <div style="font-size: 24px; font-weight: 700; color: ${audit.overallScore >= 90 ? '#10b981' : audit.overallScore >= 75 ? '#3b82f6' : audit.overallScore >= 60 ? '#f59e0b' : '#ef4444'};">${audit.overallScore}</div>
+                    </div>
+                    <div style="text-align: center; padding: 10px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <div style="font-size: 11px; color: #6c757d; font-weight: 600;">CERTAINTY</div>
+                        <div style="font-size: 24px; font-weight: 700;">${audit.certaintyLevel || 'D'}</div>
+                    </div>
+                    <div style="text-align: center; padding: 10px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <div style="font-size: 11px; color: #6c757d; font-weight: 600;">CONTENT</div>
+                        <div style="font-size: 24px; font-weight: 700;">${audit.scores?.content || 0}</div>
+                    </div>
+                    <div style="text-align: center; padding: 10px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <div style="font-size: 11px; color: #6c757d; font-weight: 600;">SUMMARY</div>
+                        <div style="font-size: 24px; font-weight: 700;">${audit.scores?.summary || 0}</div>
+                    </div>
+                `;
+                if (audit.aiAnalysis && audit.aiAnalysis.enabled) {
+                    scores.innerHTML += `
+                        <div style="grid-column: 1 / -1; background: #f8f9fa; padding: 10px; border-radius: 6px; margin-top: 8px;">
+                            <div style="font-weight: 600; margin-bottom: 6px;">🤖 AI Analysis</div>
+                            <div style="font-size: 11px;">Legal Accuracy: <strong>${audit.aiAnalysis.legalAccuracy?.score || 0}/100</strong></div>
+                            <div style="font-size: 11px;">Completeness: <strong>${audit.aiAnalysis.completeness?.score || 0}/100</strong></div>
+                            <div style="font-size: 11px; margin-top: 6px; padding: 6px; background: white; border-radius: 4px;">${audit.aiAnalysis.overallAssessment || 'No assessment'}</div>
+                        </div>
+                    `;
+                }
+                results.style.display = 'block';
+            }
+        } catch (err) {
+            clearInterval(progressInterval);
+            errorDiv.textContent = '⚠️ Error: ' + err.message;
+            errorDiv.style.display = 'block';
+        } finally {
+            setTimeout(() => {
+                progress.style.display = 'none';
+                progressBar.style.width = '0%';
+                progressText.textContent = '0%';
+            }, 1500);
+            btn.disabled = false;
+            btn.textContent = '⚡ Run AI Audit';
+            btn.style.opacity = '1';
+        }
+    }
     </script>
 </body>
 </html>

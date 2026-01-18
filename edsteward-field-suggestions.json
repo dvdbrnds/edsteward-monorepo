@@ -1,0 +1,3251 @@
+{
+  "generated": "2026-01-18T21:08:51.855Z",
+  "total_suggestions": 295,
+  "suggestions": [
+    {
+      "regulationId": "age-discrimination-act-of-1975",
+      "name": "Age Discrimination Act of 1975",
+      "current": {
+        "category": "Academic Programs"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "americans-with-disabilities-act-of-1990",
+      "name": "Americans with Disabilities Act of 1990",
+      "current": {
+        "category": "Academic Programs"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-institutional-and-financial-a",
+      "name": "Higher Education Act: Institutional and Financial Assistance Information for Stu",
+      "current": {
+        "category": "Academic Programs"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-textbook-information",
+      "name": "Higher Education Act: Textbook Information",
+      "current": {
+        "category": "Academic Programs"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "higher-education-opportunity-act-sections-152-and-",
+      "name": "Higher Education Opportunity Act Sections 152 and 153",
+      "current": {
+        "category": "Academic Programs"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "section-504-of-the-rehabilitation-act-of-1973",
+      "name": "Section 504 of The Rehabilitation Act of 1973",
+      "current": {
+        "category": "Academic Programs"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "title-ix-of-the-education-amendment-of-1972",
+      "name": "Title IX of the Education Amendment of 1972",
+      "current": {
+        "category": "Academic Programs"
+      },
+      "suggested": {
+        "statute": "20 U.S.C. §§ 1681-1688; 34 CFR Part 106",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "title-vi-of-the-civil-rights-act-of-1964",
+      "name": "Title VI of the Civil Rights Act of 1964",
+      "current": {
+        "category": "Academic Programs"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "teacher-preparation-programs",
+      "name": "Teacher Preparation Programs",
+      "current": {
+        "category": "Academic Programs,Financial Aid"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "bankruptcy-abuse-prevention-consumer-protection-ac",
+      "name": "Bankruptcy Abuse Prevention & Consumer Protection Act of 2005",
+      "current": {
+        "category": "Accounting"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "clayton-antitrust-act-of-1914",
+      "name": "Clayton Antitrust Act of 1914",
+      "current": {
+        "category": "Accounting"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "fair-credit-reporting-act-fcra",
+      "name": "Fair Credit Reporting Act (FCRA)",
+      "current": {
+        "category": "Accounting"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "federal-insurance-contributions-act-fica",
+      "name": "Federal Insurance Contributions Act (FICA)",
+      "current": {
+        "category": "Accounting"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "federal-unemployment-tax-act-futa",
+      "name": "Federal Unemployment Tax Act (FUTA)",
+      "current": {
+        "category": "Accounting"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-disclosure-of-foreign-gifts",
+      "name": "Higher Education Act – Disclosure of Foreign Gifts",
+      "current": {
+        "category": "Accounting"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "qualified-tuition-and-student-loan-interest-report",
+      "name": "Qualified Tuition and Student Loan Interest Reporting",
+      "current": {
+        "category": "Accounting"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "regulation-e-electronic-fund-transfers",
+      "name": "Regulation E: Electronic Fund Transfers",
+      "current": {
+        "category": "Accounting"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "sarbanes-oxley-act-of-2002-sox",
+      "name": "Sarbanes Oxley Act of 2002 (SOX)",
+      "current": {
+        "category": "Accounting"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "sherman-antitrust-act",
+      "name": "Sherman Antitrust Act",
+      "current": {
+        "category": "Accounting"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "social-security-act",
+      "name": "Social Security Act",
+      "current": {
+        "category": "Accounting"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "tax-cuts-and-jobs-act-of-2017-endowment-excise-tax",
+      "name": "Tax Cuts and Jobs Act of 2017 (endowment excise tax)",
+      "current": {
+        "category": "Accounting"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "truth-in-lending-act",
+      "name": "Truth in Lending Act",
+      "current": {
+        "category": "Accounting"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "uniform-administrative-requirements-cost-principle",
+      "name": "Uniform Administrative Requirements, Cost Principles, and Audit Requirements for",
+      "current": {
+        "category": "Accounting"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "unrelated-business-income-tax-ubit",
+      "name": "Unrelated Business Income Tax (UBIT)",
+      "current": {
+        "category": "Accounting"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-institutional-and-financial-a",
+      "name": "Higher Education Act: Institutional and Financial Assistance Information for Stu",
+      "current": {
+        "category": "Accreditation"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Accreditation & Quality"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-recognition-of-accrediting-ag",
+      "name": "Higher Education Act: Recognition of Accrediting Agency or Association",
+      "current": {
+        "category": "Accreditation"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Accreditation & Quality"
+      }
+    },
+    {
+      "regulationId": "age-discrimination-act-of-1975",
+      "name": "Age Discrimination Act of 1975",
+      "current": {
+        "category": "Admissions"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-institutional-and-financial-a",
+      "name": "Higher Education Act: Institutional and Financial Assistance Information for Stu",
+      "current": {
+        "category": "Admissions"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-readmission-requirements-for-",
+      "name": "Higher Education Act: Readmission Requirements for Servicemembers",
+      "current": {
+        "category": "Admissions"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "section-504-of-the-rehabilitation-act-of-1973",
+      "name": "Section 504 of The Rehabilitation Act of 1973",
+      "current": {
+        "category": "Admissions"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "title-ix-of-the-education-amendment-of-1972",
+      "name": "Title IX of the Education Amendment of 1972",
+      "current": {
+        "category": "Admissions"
+      },
+      "suggested": {
+        "statute": "20 U.S.C. §§ 1681-1688; 34 CFR Part 106",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "title-vi-of-the-civil-rights-act-of-1964",
+      "name": "Title VI of the Civil Rights Act of 1964",
+      "current": {
+        "category": "Admissions"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "equity-in-athletics-disclosure-act-eada",
+      "name": "Equity in Athletics Disclosure Act (EADA)",
+      "current": {
+        "category": "Athletics"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Athletics Compliance"
+      }
+    },
+    {
+      "regulationId": "section-504-of-the-rehabilitation-act-of-1973",
+      "name": "Section 504 of The Rehabilitation Act of 1973",
+      "current": {
+        "category": "Athletics"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Athletics Compliance"
+      }
+    },
+    {
+      "regulationId": "title-ix",
+      "name": "Title IX",
+      "current": {
+        "category": "Athletics"
+      },
+      "suggested": {
+        "statute": "20 U.S.C. §§ 1681-1688; 34 CFR Part 106",
+        "topic": "Athletics Compliance"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-textbook-informatoin",
+      "name": "Higher Education Act: Textbook Informatoin",
+      "current": {
+        "category": "Auxiliary Services"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "americans-with-disabilities-act",
+      "name": "Americans with Disabilities Act",
+      "current": {
+        "category": "Campus Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Safety & Security"
+      }
+    },
+    {
+      "regulationId": "campus-sex-crimes-prevention-act-1601-of-the-victi",
+      "name": "Campus Sex Crimes Prevention Act (§ 1601 of the Victims of Trafficking and Viole",
+      "current": {
+        "category": "Campus Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Safety & Security"
+      }
+    },
+    {
+      "regulationId": "drug-free-schools-and-communities-act",
+      "name": "Drug Free Schools and Communities Act",
+      "current": {
+        "category": "Campus Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Safety & Security"
+      }
+    },
+    {
+      "regulationId": "emergency-planning-and-community-right-to-know-act",
+      "name": "Emergency Planning and Community Right to Know Act (EPCRA)",
+      "current": {
+        "category": "Campus Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Safety & Security"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-drug-and-alcohol-abuse-preven",
+      "name": "Higher Education Act: Drug and Alcohol Abuse Prevention",
+      "current": {
+        "category": "Campus Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Safety & Security"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-institutional-and-financial-a",
+      "name": "Higher Education Act: Institutional and Financial Assistance Information for Stu",
+      "current": {
+        "category": "Campus Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Safety & Security"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-institutional-and-financial-a",
+      "name": "Higher Education Act: Institutional and Financial Assistance Information for Stu",
+      "current": {
+        "category": "Campus Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Safety & Security"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-program-participation-agreeme",
+      "name": "Higher Education Act: Program Participation Agreements",
+      "current": {
+        "category": "Campus Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Safety & Security"
+      }
+    },
+    {
+      "regulationId": "jeanne-clery-disclosure-of-campus-security-policy-",
+      "name": "Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Ac",
+      "current": {
+        "category": "Campus Safety"
+      },
+      "suggested": {
+        "statute": "20 U.S.C. § 1092(f); 34 CFR § 668.46",
+        "topic": "Safety & Security"
+      }
+    },
+    {
+      "regulationId": "occupational-safety-and-health-act-of-1970",
+      "name": "Occupational Safety and Health Act of 1970",
+      "current": {
+        "category": "Campus Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Safety & Security"
+      }
+    },
+    {
+      "regulationId": "title-vi-of-the-civil-rights-act-of-1964-42-u-s-c-",
+      "name": "Title VI of the Civil Rights Act of 1964  42 U.S.C. §§ 2000d-2000d-7",
+      "current": {
+        "category": "Campus Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Safety & Security"
+      }
+    },
+    {
+      "regulationId": "anti-kickback-act-of-1986",
+      "name": "Anti-Kickback Act of 1986",
+      "current": {
+        "category": "Contracts & Procurement"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "anti-discrimination-laws-for-federal-contractors",
+      "name": "Anti-discrimination laws for federal contractors",
+      "current": {
+        "category": "Contracts & Procurement"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "byrd-amendment",
+      "name": "Byrd Amendment",
+      "current": {
+        "category": "Contracts & Procurement"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "copeland-anti-kickback-act",
+      "name": "Copeland Anti-Kickback Act",
+      "current": {
+        "category": "Contracts & Procurement"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "davis-bacon-act",
+      "name": "Davis-Bacon Act",
+      "current": {
+        "category": "Contracts & Procurement"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "e-verify-executive-order-13465-amending-executive-",
+      "name": "E-Verify Executive Order 13465-Amending Executive Order 12989",
+      "current": {
+        "category": "Contracts & Procurement"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "health-insurance-portability-and-accountability-ac",
+      "name": "Health Insurance Portability and Accountability Act of 1996 (HIPAA)",
+      "current": {
+        "category": "Contracts & Procurement"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-foreign-gift-and-contract-rep",
+      "name": "Higher Education Act: Foreign Gift and Contract Reports",
+      "current": {
+        "category": "Contracts & Procurement"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "small-business-act-and-small-business-investment-a",
+      "name": "Small Business Act and Small Business Investment Act of 1958",
+      "current": {
+        "category": "Contracts & Procurement"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "trade-sanctions-reform-and-export-enhancement",
+      "name": "Trade Sanctions Reform and Export Enhancement",
+      "current": {
+        "category": "Contracts & Procurement"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "non-retaliation-for-disclosure-of-compensation-inf",
+      "name": "Non-Retaliation for Disclosure of Compensation Information",
+      "current": {
+        "category": "Contracts & Procurement,Recruitment Hiring & Termination"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "copyright-act",
+      "name": "Copyright Act",
+      "current": {
+        "category": "Copyright & Trademark"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "copyright-term-extension-act",
+      "name": "Copyright Term Extension Act",
+      "current": {
+        "category": "Copyright & Trademark"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "digital-millennium-copyright-act-dmca",
+      "name": "Digital Millennium Copyright Act (DMCA)",
+      "current": {
+        "category": "Copyright & Trademark"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-institutional-and-financial-a",
+      "name": "Higher Education Act: Institutional and financial assistance information for stu",
+      "current": {
+        "category": "Copyright & Trademark"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-program-participation-agreeme",
+      "name": "Higher Education Act: Program Participation Agreements",
+      "current": {
+        "category": "Copyright & Trademark"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "lanham-act",
+      "name": "Lanham Act",
+      "current": {
+        "category": "Copyright & Trademark"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "small-webcasters-settlement-act-of-2002",
+      "name": "Small Webcasters Settlement Act of 2002",
+      "current": {
+        "category": "Copyright & Trademark"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "technology-education-and-copyright-harmonization-a",
+      "name": "Technology Education and Copyright Harmonization Act (TEACH ACT) of 2002",
+      "current": {
+        "category": "Copyright & Trademark"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "americans-with-disabilities-act-of-1990",
+      "name": "Americans with Disabilities Act of 1990",
+      "current": {
+        "category": "Disabilities"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "fair-housing-act-section-6",
+      "name": "Fair Housing Act, Section 6",
+      "current": {
+        "category": "Disabilities"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "patient-protection-and-affordable-care-act-section",
+      "name": "Patient Protection and Affordable Care Act (Section 1557)",
+      "current": {
+        "category": "Disabilities"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "section-504-of-the-rehabilitation-act-of-1973",
+      "name": "Section 504 of The Rehabilitation Act of 1973",
+      "current": {
+        "category": "Disabilities"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "the-family-and-medical-leave-act-of-1993",
+      "name": "The Family and Medical Leave Act of 1993",
+      "current": {
+        "category": "Disabilities"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "age-discrimination-in-employment-act-of-1967",
+      "name": "Age Discrimination in Employment Act of 1967",
+      "current": {
+        "category": "Discrimination"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "americans-with-disabilities-act-of-1990",
+      "name": "Americans with Disabilities Act of 1990",
+      "current": {
+        "category": "Discrimination"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "equal-employment-opportunity",
+      "name": "Equal Employment Opportunity",
+      "current": {
+        "category": "Discrimination"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "equal-employment-of-veterans",
+      "name": "Equal Employment of Veterans",
+      "current": {
+        "category": "Discrimination"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "genetic-information-non-discrimination-act-of-2008",
+      "name": "Genetic Information Non-Discrimination Act of 2008",
+      "current": {
+        "category": "Discrimination"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "lilly-ledbetter-fair-pay-act-of-2009",
+      "name": "Lilly Ledbetter Fair Pay Act of 2009",
+      "current": {
+        "category": "Discrimination"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "the-equal-pay-act-of-1963",
+      "name": "The Equal Pay Act of 1963",
+      "current": {
+        "category": "Discrimination"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "the-family-and-medical-leave-act-of-1993",
+      "name": "The Family and Medical Leave Act of 1993",
+      "current": {
+        "category": "Discrimination"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "title-ix-of-the-education-amendment-of-1972",
+      "name": "Title IX of the Education Amendment of 1972",
+      "current": {
+        "category": "Discrimination"
+      },
+      "suggested": {
+        "statute": "20 U.S.C. §§ 1681-1688; 34 CFR Part 106",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "title-vii-of-the-civil-rights-act-of-1964",
+      "name": "Title VII of the Civil Rights Act of 1964",
+      "current": {
+        "category": "Discrimination"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "uniformed-services-employment-and-reemployment-rig",
+      "name": "Uniformed Services Employment and Reemployment Rights Act (USERRA)",
+      "current": {
+        "category": "Discrimination"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "pregnant-workers-fairness-act-pwfa",
+      "name": "Pregnant Workers Fairness Act (PWFA)",
+      "current": {
+        "category": "Discrimination,Human Resources"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "affirmative-action-equal-employment-opportunity",
+      "name": "Affirmative Action/Equal Employment Opportunity",
+      "current": {
+        "category": "Diversity/Affirmative Action"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "age-discrimination-act-of-1975",
+      "name": "Age Discrimination Act of 1975",
+      "current": {
+        "category": "Diversity/Affirmative Action"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "age-discrimination-employment-act-of-1967",
+      "name": "Age Discrimination Employment Act of 1967",
+      "current": {
+        "category": "Diversity/Affirmative Action"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "americans-with-disabilities-act-of-1990",
+      "name": "Americans with Disabilities Act of 1990",
+      "current": {
+        "category": "Diversity/Affirmative Action"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "equal-employment-of-veterans",
+      "name": "Equal Employment of Veterans",
+      "current": {
+        "category": "Diversity/Affirmative Action"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "equal-pay-act-of-1963",
+      "name": "Equal Pay Act of 1963",
+      "current": {
+        "category": "Diversity/Affirmative Action"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "genetic-information-non-discrimination-act-of-2008",
+      "name": "Genetic Information Non-Discrimination Act of 2008",
+      "current": {
+        "category": "Diversity/Affirmative Action"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "immigration-and-nationality-act",
+      "name": "Immigration and Nationality Act",
+      "current": {
+        "category": "Diversity/Affirmative Action"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "lilly-ledbetter-fair-pay-act-of-2009",
+      "name": "Lilly Ledbetter Fair Pay Act of 2009",
+      "current": {
+        "category": "Diversity/Affirmative Action"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "section-504-of-the-rehabilitation-act-of-1973",
+      "name": "Section 504 of The Rehabilitation Act of 1973",
+      "current": {
+        "category": "Diversity/Affirmative Action"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "title-ix-of-the-education-amendment-of-1972",
+      "name": "Title IX of the Education Amendment of 1972",
+      "current": {
+        "category": "Diversity/Affirmative Action"
+      },
+      "suggested": {
+        "statute": "20 U.S.C. §§ 1681-1688; 34 CFR Part 106",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "title-vii-of-the-civil-rights-act-of-1964",
+      "name": "Title VII of the Civil Rights Act of 1964",
+      "current": {
+        "category": "Diversity/Affirmative Action"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "uniformed-services-employment-and-reemployment-rig",
+      "name": "Uniformed Services Employment and Reemployment Rights Act (USERRA)",
+      "current": {
+        "category": "Diversity/Affirmative Action"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "veterans-employment-emphasis-under-federal-contrac",
+      "name": "Veterans’ employment emphasis under Federal contracts",
+      "current": {
+        "category": "Diversity/Affirmative Action"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "cafeteria-plan-regulations",
+      "name": "Cafeteria Plan Regulations",
+      "current": {
+        "category": "Employee Benefits"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "consolidated-omnibus-budget-reconciliation-act-cob",
+      "name": "Consolidated Omnibus Budget Reconciliation Act (COBRA)",
+      "current": {
+        "category": "Employee Benefits"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "employee-retirement-income-security-act-of-1974-er",
+      "name": "Employee Retirement Income Security Act of 1974 (ERISA)",
+      "current": {
+        "category": "Employee Benefits"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "medicare-medicaid-and-schip-extension-act-of-2007",
+      "name": "Medicare, Medicaid, and SCHIP Extension Act of 2007",
+      "current": {
+        "category": "Employee Benefits"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "patient-protection-and-affordable-care-act",
+      "name": "Patient Protection and Affordable Care Act",
+      "current": {
+        "category": "Employee Benefits"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "the-veterans-readjustment-benefits-act",
+      "name": "The Veterans’ Readjustment Benefits Act",
+      "current": {
+        "category": "Employee Benefits"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "title-ix-of-the-education-amendment-of-1972",
+      "name": "Title IX of the Education Amendment of 1972",
+      "current": {
+        "category": "Employee Benefits"
+      },
+      "suggested": {
+        "statute": "20 U.S.C. §§ 1681-1688; 34 CFR Part 106",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "uniformed-services-employment-and-reemployment-rig",
+      "name": "Uniformed Services Employment and Reemployment Rights Act (USERRA)",
+      "current": {
+        "category": "Employee Benefits"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "atomic-energy-act-of-1954",
+      "name": "Atomic Energy Act of 1954",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "chemical-facility-anti-terrorism-standards",
+      "name": "Chemical Facility Anti-Terrorism Standards",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "clean-air-act",
+      "name": "Clean Air Act",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "clean-water-act",
+      "name": "Clean Water Act",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "comprehensive-environmental-response-compensation-",
+      "name": "Comprehensive Environmental Response, Compensation, and Liability Act (CERCLA)",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "emergency-planning-and-community-right-act-epcra",
+      "name": "Emergency Planning and Community Right Act (EPCRA)",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "energy-policy-act",
+      "name": "Energy Policy Act",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "energy-reorganization-act-of-1974-as-amended",
+      "name": "Energy Reorganization Act of 1974, as amended",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "federal-insecticide-fungicide-and-rodenticide-act",
+      "name": "Federal Insecticide, Fungicide and Rodenticide Act",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "guarding-and-use-of-hand-portable-powered-tools",
+      "name": "Guarding and Use of Hand & Portable Powered Tools",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "hazardous-materials-transportation-act",
+      "name": "Hazardous Materials Transportation Act",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "hazardous-and-solid-waste-amendments-of-1984",
+      "name": "Hazardous and Solid Waste Amendments of 1984",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "housing-urban-development-lead-based-paint-poisoni",
+      "name": "Housing & Urban Development Lead Based Paint Poisoning in Certain Residential St",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "mandatory-reporting-of-greenhouse-gases",
+      "name": "Mandatory Reporting of Greenhouse Gases",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "motor-carrier-act-of-1980",
+      "name": "Motor Carrier Act of 1980",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "national-emission-standards-for-hazardous-air-poll",
+      "name": "National Emission Standards for Hazardous Air Pollutants (NESHAP)",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "osha",
+      "name": "OSHA",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "osha-asbestos-in-construction-standard",
+      "name": "OSHA Asbestos in Construction Standard",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "osha-asbestos-in-general-industry-standard",
+      "name": "OSHA Asbestos in General Industry Standard",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "osha-enforcement-guidance-for-personal-protective-",
+      "name": "OSHA Enforcement Guidance for Personal Protective Equipment (PPE) in General Ind",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "osha-lead-in-construction-standard",
+      "name": "OSHA Lead in Construction Standard",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "osha-lead-in-general-industry-standard",
+      "name": "OSHA Lead in General Industry Standard",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "osha-welding-cutting-and-brazing",
+      "name": "OSHA Welding, Cutting, and Brazing",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "osha-bloodborne-pathogens-standard",
+      "name": "OSHA – Bloodborne Pathogens Standard",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "osha-s-emergency-action-plan-standard",
+      "name": "OSHA’s  Emergency Action Plan Standard",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "osha-s-occupational-noise-exposure-standard",
+      "name": "OSHA’s  Occupational Noise Exposure Standard",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "osha-s-occupational-exposure-to-hazardous-chemical",
+      "name": "OSHA’s Occupational Exposure to Hazardous Chemicals in Laboratories Standard",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "oil-pollution-act",
+      "name": "Oil Pollution Act",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "residential-lead-based-paint-hazard-reduction-act-",
+      "name": "Residential Lead-Based Paint Hazard Reduction Act of 1992",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "resource-conservation-and-recovery-act",
+      "name": "Resource Conservation and Recovery Act",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "standards-for-the-management-of-used-oil",
+      "name": "Standards For the Management of Used Oil",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "the-public-health-security-and-bioterrorism-prepar",
+      "name": "The Public Health Security and Bioterrorism Preparedness and Response Act",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "toxic-substances-control-act",
+      "name": "Toxic Substances Control Act",
+      "current": {
+        "category": "Environmental Health and Safety"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "acts-affecting-a-personal-financial-interest",
+      "name": "Acts Affecting a Personal Financial Interest",
+      "current": {
+        "category": "Ethics"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "bribery-of-public-officials-and-witnesses",
+      "name": "Bribery of Public Officials and Witnesses",
+      "current": {
+        "category": "Ethics"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "compensation-to-members-of-congress-officers-other",
+      "name": "Compensation to Members of Congress, Officers, Others in Matters Affecting the G",
+      "current": {
+        "category": "Ethics"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "ethics-in-government-act-amended-by-ethics-reform-",
+      "name": "Ethics in Government Act (Amended by Ethics Reform Act and Honest Leadership and",
+      "current": {
+        "category": "Ethics"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "house-and-senate-gift-ban-and-ethics-rules",
+      "name": "House and Senate Gift Ban and Ethics Rules",
+      "current": {
+        "category": "Ethics"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "outside-earned-income-and-activities",
+      "name": "Outside Earned Income and Activities",
+      "current": {
+        "category": "Ethics"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "restrictions-on-former-officers-employees-and-elec",
+      "name": "Restrictions on Former Officers, Employees, and Elected Officials of the Executi",
+      "current": {
+        "category": "Ethics"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "salary-of-government-officials-and-employees-payab",
+      "name": "Salary of Government Officials and Employees Payable Only by United States",
+      "current": {
+        "category": "Ethics"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "arms-export-control-act-of-1976",
+      "name": "Arms Export Control Act of 1976",
+      "current": {
+        "category": "Export Controls"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "export-administration-act-of-1979",
+      "name": "Export Administration Act of 1979",
+      "current": {
+        "category": "Export Controls"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "foreign-assets-control-regulations",
+      "name": "Foreign Assets Control Regulations",
+      "current": {
+        "category": "Export Controls"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "international-emergency-economic-powers-act",
+      "name": "International Emergency Economic Powers Act",
+      "current": {
+        "category": "Export Controls"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "international-traffic-in-arms-regulations-itar",
+      "name": "International Traffic in Arms Regulations (ITAR)",
+      "current": {
+        "category": "Export Controls"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "trading-with-the-enemy-act-of-1917",
+      "name": "Trading with the Enemy Act of 1917",
+      "current": {
+        "category": "Export Controls"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "contracts-with-third-party-servicers",
+      "name": "Contracts with Third Party Servicers",
+      "current": {
+        "category": "Financial Aid"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Student Financial Services"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-aid-application-verification",
+      "name": "Higher Education Act: Aid Application Verification",
+      "current": {
+        "category": "Financial Aid"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Student Financial Services"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-audits",
+      "name": "Higher Education Act: Audits",
+      "current": {
+        "category": "Financial Aid"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Student Financial Services"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-borrower-defense-to-repayment",
+      "name": "Higher Education Act: Borrower Defense to Repayment",
+      "current": {
+        "category": "Financial Aid"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Student Financial Services"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-cash-management",
+      "name": "Higher Education Act: Cash Management",
+      "current": {
+        "category": "Financial Aid"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Student Financial Services"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-code-of-conduct",
+      "name": "Higher Education Act: Code of Conduct",
+      "current": {
+        "category": "Financial Aid"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Student Financial Services"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-cohort-default-rate",
+      "name": "Higher Education Act: Cohort Default Rate",
+      "current": {
+        "category": "Financial Aid"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Student Financial Services"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-eligibility-and-certification",
+      "name": "Higher Education Act: Eligibility and Certification",
+      "current": {
+        "category": "Financial Aid"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Student Financial Services"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-entrance-and-exit-counseling",
+      "name": "Higher Education Act: Entrance and Exit Counseling",
+      "current": {
+        "category": "Financial Aid"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Student Financial Services"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-federal-supplemental-educatio",
+      "name": "Higher Education Act: Federal Supplemental Educational Opportunity Grant Program",
+      "current": {
+        "category": "Financial Aid"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Student Financial Services"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-federal-work-study",
+      "name": "Higher Education Act: Federal Work Study",
+      "current": {
+        "category": "Financial Aid"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Student Financial Services"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-financial-responsibility-requ",
+      "name": "Higher Education Act: Financial Responsibility Requirements",
+      "current": {
+        "category": "Financial Aid"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Student Financial Services"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-information-distributed-to-st",
+      "name": "Higher Education Act: Information Distributed to Students",
+      "current": {
+        "category": "Financial Aid"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Student Financial Services"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-net-price-calculator",
+      "name": "Higher Education Act: Net Price Calculator",
+      "current": {
+        "category": "Financial Aid"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Student Financial Services"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-plus-loans",
+      "name": "Higher Education Act: PLUS Loans",
+      "current": {
+        "category": "Financial Aid"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Student Financial Services"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-penalties-for-drug-violations",
+      "name": "Higher Education Act: Penalties for Drug Violations",
+      "current": {
+        "category": "Financial Aid"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Student Financial Services"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-perkins-loans",
+      "name": "Higher Education Act: Perkins Loans",
+      "current": {
+        "category": "Financial Aid"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Student Financial Services"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-preferred-lenders",
+      "name": "Higher Education Act: Preferred Lenders",
+      "current": {
+        "category": "Financial Aid"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Student Financial Services"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-program-participation-agreeme",
+      "name": "Higher Education Act: Program Participation Agreements",
+      "current": {
+        "category": "Financial Aid"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Student Financial Services"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-record-retention",
+      "name": "Higher Education Act: Record Retention",
+      "current": {
+        "category": "Financial Aid"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Student Financial Services"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-standard-of-conduct",
+      "name": "Higher Education Act: Standard of Conduct",
+      "current": {
+        "category": "Financial Aid"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Student Financial Services"
+      }
+    },
+    {
+      "regulationId": "qualified-tuition-and-student-loan-interest-report",
+      "name": "Qualified Tuition and Student Loan Interest Reporting",
+      "current": {
+        "category": "Financial Aid"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Student Financial Services"
+      }
+    },
+    {
+      "regulationId": "student-loan-default-prevention-initiative-act-of-",
+      "name": "Student Loan Default Prevention Initiative Act of 1990",
+      "current": {
+        "category": "Financial Aid"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Student Financial Services"
+      }
+    },
+    {
+      "regulationId": "student-right-to-know-act",
+      "name": "Student Right to Know Act",
+      "current": {
+        "category": "Financial Aid"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Student Financial Services"
+      }
+    },
+    {
+      "regulationId": "teacher-preparation-programs",
+      "name": "Teacher Preparation Programs",
+      "current": {
+        "category": "Financial Aid"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Student Financial Services"
+      }
+    },
+    {
+      "regulationId": "title-ix-of-the-education-amendment-of-1972",
+      "name": "Title IX of the Education Amendment of 1972",
+      "current": {
+        "category": "Financial Aid"
+      },
+      "suggested": {
+        "statute": "20 U.S.C. §§ 1681-1688; 34 CFR Part 106",
+        "topic": "Student Financial Services"
+      }
+    },
+    {
+      "regulationId": "controlling-the-assault-of-non-solicited-pornograp",
+      "name": "Controlling the Assault of Non-Solicited Pornography And Marketing Act of 2003 (",
+      "current": {
+        "category": "Fundraising & Development"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-code-of-conduct",
+      "name": "Higher Education Act: Code of Conduct",
+      "current": {
+        "category": "Fundraising & Development"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-foreign-gift-and-contract-rep",
+      "name": "Higher Education Act: Foreign Gift and Contract Reports",
+      "current": {
+        "category": "Fundraising & Development"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "internal-revenue-code-substantiation-and-disclosur",
+      "name": "Internal Revenue Code: Substantiation and Disclosure Provisions",
+      "current": {
+        "category": "Fundraising & Development"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "pension-protection-act",
+      "name": "Pension Protection Act",
+      "current": {
+        "category": "Fundraising & Development"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "philanthropy-protection-act-of-1995",
+      "name": "Philanthropy Protection Act of 1995",
+      "current": {
+        "category": "Fundraising & Development"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "federal-sentencing-guidelines",
+      "name": "Federal Sentencing Guidelines",
+      "current": {
+        "category": "Governance"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "internal-revenue-service-governance-information-re",
+      "name": "Internal Revenue Service: Governance Information Required on Form 990",
+      "current": {
+        "category": "Governance"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "unknown",
+      "name": "Unknown Regulation",
+      "current": {
+        "category": "Grants Management"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "byrd-amendment",
+      "name": "Byrd Amendment",
+      "current": {
+        "category": "Grants Management"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "department-of-education-general-administrative-reg",
+      "name": "Department of Education General Administrative Regulations and Other Applicable ",
+      "current": {
+        "category": "Grants Management"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "false-claims-act",
+      "name": "False Claims Act",
+      "current": {
+        "category": "Grants Management"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "federal-awardee-performance-and-integrity-informat",
+      "name": "Federal Awardee Performance and Integrity Information System (FAPIIS)",
+      "current": {
+        "category": "Grants Management"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "federal-funding-accountability-and-transparency-ac",
+      "name": "Federal Funding Accountability and Transparency Act of 2006 (FFATA)",
+      "current": {
+        "category": "Grants Management"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "fraud-enforcement-and-recovery-act-of-2009-fera",
+      "name": "Fraud Enforcement and Recovery Act of 2009 (FERA)",
+      "current": {
+        "category": "Grants Management"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "controlled-substances-act",
+      "name": "Controlled Substances Act",
+      "current": {
+        "category": "Health Care and Insurance"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "hipaa",
+      "name": "HIPAA",
+      "current": {
+        "category": "Health Care and Insurance"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "higher-education-opportunity-act",
+      "name": "Higher Education Opportunity Act",
+      "current": {
+        "category": "Health Care and Insurance"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "americans-with-disabilities-act-of-1990",
+      "name": "Americans with Disabilities Act of 1990",
+      "current": {
+        "category": "Housing"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "section-504-of-the-rehabilitation-act-of-1973",
+      "name": "Section 504 of The Rehabilitation Act of 1973",
+      "current": {
+        "category": "Housing"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "title-ix-of-the-education-amendment-of-1972",
+      "name": "Title IX of the Education Amendment of 1972",
+      "current": {
+        "category": "Housing"
+      },
+      "suggested": {
+        "statute": "20 U.S.C. §§ 1681-1688; 34 CFR Part 106",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "health-insurance-portability-and-accountability-ac",
+      "name": "Health Insurance Portability and Accountability Act",
+      "current": {
+        "category": "Human Resources"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "nsf-grant-term-and-condition-september-21-2018",
+      "name": "NSF grant term and condition, September 21, 2018",
+      "current": {
+        "category": "Human Resources"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "student-exchange-and-visitor-information-system-se",
+      "name": "Student Exchange and Visitor Information System (SEVIS)",
+      "current": {
+        "category": "Immigration"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "immigration-and-nationality-act-ina",
+      "name": "Immigration and Nationality Act (INA)",
+      "current": {
+        "category": "Immigration,Recruitment Hiring & Termination"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "communications-assistance-for-law-enforcement-act-",
+      "name": "Communications Assistance for Law Enforcement Act (CALEA)",
+      "current": {
+        "category": "Information Technology"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Information Technology & IP"
+      }
+    },
+    {
+      "regulationId": "controlling-the-assault-of-non-solicited-pornograp",
+      "name": "Controlling the Assault of Non-Solicited Pornography And Marketing Act of 2003 (",
+      "current": {
+        "category": "Information Technology"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Information Technology & IP"
+      }
+    },
+    {
+      "regulationId": "digital-millennium-copyright-act-dmca",
+      "name": "Digital Millennium Copyright Act (DMCA)",
+      "current": {
+        "category": "Information Technology"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Information Technology & IP"
+      }
+    },
+    {
+      "regulationId": "electronic-communications-privacy-act-of-1986",
+      "name": "Electronic Communications Privacy Act of 1986",
+      "current": {
+        "category": "Information Technology"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Information Technology & IP"
+      }
+    },
+    {
+      "regulationId": "fcc-cable-certification",
+      "name": "FCC – Cable Certification",
+      "current": {
+        "category": "Information Technology"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Information Technology & IP"
+      }
+    },
+    {
+      "regulationId": "fcc-fixed-microwave-services-licensing",
+      "name": "FCC – Fixed Microwave Services, Licensing",
+      "current": {
+        "category": "Information Technology"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Information Technology & IP"
+      }
+    },
+    {
+      "regulationId": "fcc-wireless-communications-licensing",
+      "name": "FCC – Wireless Communications, Licensing",
+      "current": {
+        "category": "Information Technology"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Information Technology & IP"
+      }
+    },
+    {
+      "regulationId": "hazardous-materials-transportation-act",
+      "name": "Hazardous Materials Transportation Act",
+      "current": {
+        "category": "Information Technology"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Information Technology & IP"
+      }
+    },
+    {
+      "regulationId": "higher-education-opportunity-act",
+      "name": "Higher Education Opportunity Act",
+      "current": {
+        "category": "Information Technology"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Information Technology & IP"
+      }
+    },
+    {
+      "regulationId": "homeland-security-act-of-2002",
+      "name": "Homeland Security Act of 2002",
+      "current": {
+        "category": "Information Technology"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Information Technology & IP"
+      }
+    },
+    {
+      "regulationId": "junk-fax-prevention-act-of-2005",
+      "name": "Junk Fax Prevention Act of 2005",
+      "current": {
+        "category": "Information Technology"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Information Technology & IP"
+      }
+    },
+    {
+      "regulationId": "no-electronic-theft-act",
+      "name": "No Electronic Theft Act",
+      "current": {
+        "category": "Information Technology"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Information Technology & IP"
+      }
+    },
+    {
+      "regulationId": "telemarketing",
+      "name": "Telemarketing",
+      "current": {
+        "category": "Information Technology"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "Information Technology & IP"
+      }
+    },
+    {
+      "regulationId": "american-jobs-creation-act-of-2004",
+      "name": "American Jobs Creation Act of 2004",
+      "current": {
+        "category": "Intellectual Property and Technology Transfer"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "bayh-dole-act-of-1980",
+      "name": "Bayh-Dole Act of 1980",
+      "current": {
+        "category": "Intellectual Property and Technology Transfer"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "cooperative-research-and-technology-enhancement-ac",
+      "name": "Cooperative Research and Technology Enhancement Act (CREATE Act)",
+      "current": {
+        "category": "Intellectual Property and Technology Transfer"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "trademark-revision-act",
+      "name": "Trademark Revision Act",
+      "current": {
+        "category": "Intellectual Property and Technology Transfer"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "u-s-patent-act",
+      "name": "U.S. Patent Act",
+      "current": {
+        "category": "Intellectual Property and Technology Transfer"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "visual-artists-rights-act",
+      "name": "Visual Artists Rights Act",
+      "current": {
+        "category": "Intellectual Property and Technology Transfer"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "foreign-agents-registration-act-of-1938",
+      "name": "Foreign Agents Registration Act of 1938",
+      "current": {
+        "category": "International Activities and Programs"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "foreign-corrupt-practices-act-fcpa",
+      "name": "Foreign Corrupt Practices Act (FCPA)",
+      "current": {
+        "category": "International Activities and Programs"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "honest-leadership-and-open-government-act-of-2007",
+      "name": "Honest Leadership and Open Government Act of 2007",
+      "current": {
+        "category": "Lobbying and Political Activities"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "house-and-senate-gift-ban-and-ethics-rules",
+      "name": "House and Senate Gift Ban and Ethics Rules",
+      "current": {
+        "category": "Lobbying and Political Activities"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "lobbying-disclosure-act",
+      "name": "Lobbying Disclosure Act",
+      "current": {
+        "category": "Lobbying and Political Activities"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "political-activities",
+      "name": "Political Activities",
+      "current": {
+        "category": "Lobbying and Political Activities"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "americans-with-disabilities-act-of-1990",
+      "name": "Americans with Disabilities Act of 1990",
+      "current": {
+        "category": "Privacy & Information Security"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "children-s-online-privacy-protection-act-of-1998-c",
+      "name": "Children’s Online Privacy Protection Act of 1998 (COPPA)",
+      "current": {
+        "category": "Privacy & Information Security"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "electronic-communications-privacy-act",
+      "name": "Electronic Communications Privacy Act",
+      "current": {
+        "category": "Privacy & Information Security"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "fair-credit-reporting-act-fcra",
+      "name": "Fair Credit Reporting Act (FCRA)",
+      "current": {
+        "category": "Privacy & Information Security"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "fair-and-accurate-credit-transaction-act-facta",
+      "name": "Fair and Accurate Credit Transaction Act (FACTA)",
+      "current": {
+        "category": "Privacy & Information Security"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "family-educational-rights-and-privacy-act-ferpa",
+      "name": "Family Educational Rights and Privacy Act (FERPA)",
+      "current": {
+        "category": "Privacy & Information Security"
+      },
+      "suggested": {
+        "statute": "20 U.S.C. § 1232g; 34 CFR Part 99",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "federal-information-security-management-act-fisma",
+      "name": "Federal Information Security Management Act (FISMA)",
+      "current": {
+        "category": "Privacy & Information Security"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "freedom-of-information-act",
+      "name": "Freedom of Information Act",
+      "current": {
+        "category": "Privacy & Information Security"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "gramm-leach-bliley-act-glba",
+      "name": "Gramm Leach Bliley Act (GLBA)",
+      "current": {
+        "category": "Privacy & Information Security"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "hipaa",
+      "name": "HIPAA",
+      "current": {
+        "category": "Privacy & Information Security"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "health-information-technology-for-economic-and-cli",
+      "name": "Health Information Technology for Economic and Clinical Health (HITECH) Act of 2",
+      "current": {
+        "category": "Privacy & Information Security"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-financial-value-transparency-",
+      "name": "Higher Education Act Financial Value Transparency & Gainful Employment",
+      "current": {
+        "category": "Program Integrity Rules"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-credit-hour-definition",
+      "name": "Higher Education Act: Credit Hour Definition",
+      "current": {
+        "category": "Program Integrity Rules"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-incentive-compensation-prohib",
+      "name": "Higher Education Act: Incentive Compensation Prohibition",
+      "current": {
+        "category": "Program Integrity Rules"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-misrepresentation",
+      "name": "Higher Education Act: Misrepresentation",
+      "current": {
+        "category": "Program Integrity Rules"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "higher-education-act-state-authorization",
+      "name": "Higher Education Act: State Authorization",
+      "current": {
+        "category": "Program Integrity Rules"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "drug-alcohol-testing-of-transportation-employees",
+      "name": "Drug & Alcohol Testing of Transportation Employees",
+      "current": {
+        "category": "Recruitment Hiring & Termination"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "drug-free-workplace-act",
+      "name": "Drug Free Workplace Act",
+      "current": {
+        "category": "Recruitment Hiring & Termination"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "employee-polygraph-protection-act",
+      "name": "Employee Polygraph Protection Act",
+      "current": {
+        "category": "Recruitment Hiring & Termination"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "fair-credit-reporting-act-fcra",
+      "name": "Fair Credit Reporting Act (FCRA)",
+      "current": {
+        "category": "Recruitment Hiring & Termination"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "federal-volunteer-protection-act",
+      "name": "Federal Volunteer Protection Act",
+      "current": {
+        "category": "Recruitment Hiring & Termination"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "immigration-and-nationality-act",
+      "name": "Immigration and Nationality Act",
+      "current": {
+        "category": "Recruitment Hiring & Termination"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "worker-adjustment-and-retraining-notification-act-",
+      "name": "Worker Adjustment and Retraining Notification Act (WARN)",
+      "current": {
+        "category": "Recruitment Hiring & Termination"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "america-competes-act",
+      "name": "America COMPETES Act",
+      "current": {
+        "category": "Research"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "animal-welfare-act",
+      "name": "Animal Welfare Act",
+      "current": {
+        "category": "Research"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "clinical-trials-financial-disclosures-by-investiga",
+      "name": "Clinical Trials § Financial Disclosures by Investigator",
+      "current": {
+        "category": "Research"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "export-administration-regulations",
+      "name": "Export Administration Regulations",
+      "current": {
+        "category": "Research"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "food-and-drug-administration-fda-amendments-act-of",
+      "name": "Food and Drug Administration (FDA) Amendments Act of 2007",
+      "current": {
+        "category": "Research"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "national-science-foundation-research-misconduct-po",
+      "name": "National Science Foundation Research Misconduct Policies",
+      "current": {
+        "category": "Research"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "native-american-graves-protection-and-repatriation",
+      "name": "Native American Graves Protection and Repatriation Act (NAGPRA)",
+      "current": {
+        "category": "Research"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "protection-of-human-subjects-regulations-common-ru",
+      "name": "Protection of Human Subjects Regulations (Common Rule)",
+      "current": {
+        "category": "Research"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "public-health-service-policies-on-research-miscond",
+      "name": "Public Health Service Policies on Research Misconduct",
+      "current": {
+        "category": "Research"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "responsibility-of-applicants-for-promoting-objecti",
+      "name": "Responsibility of Applicants for Promoting Objectivity in Research for which PHS",
+      "current": {
+        "category": "Research"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "small-unmanned-aircraft-systems",
+      "name": "Small Unmanned Aircraft Systems",
+      "current": {
+        "category": "Research"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "deferred-compensation",
+      "name": "Deferred Compensation",
+      "current": {
+        "category": "Retirement"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "employee-annuities",
+      "name": "Employee Annuities",
+      "current": {
+        "category": "Retirement"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "employee-retirement-income-security-act-of-1974-er",
+      "name": "Employee Retirement Income Security Act of 1974 (ERISA)",
+      "current": {
+        "category": "Retirement"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "nonqualified-deferred-inclusion",
+      "name": "Nonqualified Deferred Inclusion",
+      "current": {
+        "category": "Retirement"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "qualified-pensions",
+      "name": "Qualified Pensions",
+      "current": {
+        "category": "Retirement"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "campus-sex-crimes-prevention-act-1601-of-the-victi",
+      "name": "Campus Sex Crimes Prevention Act (§ 1601 of the Victims of Trafficking and Viole",
+      "current": {
+        "category": "Sexual Misconduct"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "jeanne-clery-disclosure-of-campus-security-policy-",
+      "name": "Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Ac",
+      "current": {
+        "category": "Sexual Misconduct"
+      },
+      "suggested": {
+        "statute": "20 U.S.C. § 1092(f); 34 CFR § 668.46",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "title-ix-of-the-education-amendment-of-1972",
+      "name": "Title IX of the Education Amendment of 1972",
+      "current": {
+        "category": "Sexual Misconduct"
+      },
+      "suggested": {
+        "statute": "20 U.S.C. §§ 1681-1688; 34 CFR Part 106",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "title-vii-of-the-civil-rights-act-of-1964",
+      "name": "Title VII of the Civil Rights Act of 1964",
+      "current": {
+        "category": "Sexual Misconduct"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "byrd-amendment",
+      "name": "Byrd Amendment",
+      "current": {
+        "category": "Tax"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "cafeteria-plans-26-u-s-c-125",
+      "name": "Cafeteria Plans 26 U.S.C. § 125",
+      "current": {
+        "category": "Tax"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "charitable-gift-annuity-antitrust-relief-act",
+      "name": "Charitable Gift Annuity Antitrust Relief Act",
+      "current": {
+        "category": "Tax"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "deferred-compensation",
+      "name": "Deferred Compensation",
+      "current": {
+        "category": "Tax"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "employee-annuities",
+      "name": "Employee Annuities",
+      "current": {
+        "category": "Tax"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "federal-unemployment-tax-act",
+      "name": "Federal Unemployment Tax Act",
+      "current": {
+        "category": "Tax"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "foreign-bank-accounts-and-tax-filings",
+      "name": "Foreign Bank Accounts and Tax Filings",
+      "current": {
+        "category": "Tax"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "fringe-benefits",
+      "name": "Fringe Benefits",
+      "current": {
+        "category": "Tax"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "independent-contractors",
+      "name": "Independent Contractors",
+      "current": {
+        "category": "Tax"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "industrial-alcohol-user-permits-and-special-tax",
+      "name": "Industrial Alcohol User Permits and Special Tax",
+      "current": {
+        "category": "Tax"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "nonqualified-deferred-inclusion",
+      "name": "Nonqualified Deferred Inclusion",
+      "current": {
+        "category": "Tax"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "public-disclosure-of-material",
+      "name": "Public Disclosure of Material",
+      "current": {
+        "category": "Tax"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "qualified-pensions",
+      "name": "Qualified Pensions",
+      "current": {
+        "category": "Tax"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "qualified-tuition-and-student-loan-interest-report",
+      "name": "Qualified Tuition and Student Loan Interest Reporting",
+      "current": {
+        "category": "Tax"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "reporting-of-payments-of-royalties",
+      "name": "Reporting of Payments of Royalties",
+      "current": {
+        "category": "Tax"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "small-business-job-protection-act",
+      "name": "Small Business Job Protection Act",
+      "current": {
+        "category": "Tax"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "unrelated-business-income-ubit",
+      "name": "Unrelated Business Income (UBIT)",
+      "current": {
+        "category": "Tax"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "civil-service-reform-act-of-1978",
+      "name": "Civil Service Reform Act of 1978",
+      "current": {
+        "category": "Unions"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "national-labor-relations-act",
+      "name": "National Labor Relations Act",
+      "current": {
+        "category": "Unions"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "consumer-credit-protection-act-title-iii-ccpa-garn",
+      "name": "Consumer Credit Protection Act, Title III (CCPA) – Garnishments",
+      "current": {
+        "category": "Wages"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "fair-labor-standards-act-flsa",
+      "name": "Fair Labor Standards Act (FLSA)",
+      "current": {
+        "category": "Wages"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "federal-insurance-contributions-act-fica",
+      "name": "Federal Insurance Contributions Act (FICA)",
+      "current": {
+        "category": "Wages"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "federal-unemployment-tax-act",
+      "name": "Federal Unemployment Tax Act",
+      "current": {
+        "category": "Wages"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    },
+    {
+      "regulationId": "qualified-tuition-reductions",
+      "name": "Qualified Tuition Reductions",
+      "current": {
+        "category": "Wages"
+      },
+      "suggested": {
+        "statute": "NEEDS_RESEARCH",
+        "topic": "General Compliance"
+      }
+    }
+  ]
+}

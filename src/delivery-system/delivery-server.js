@@ -10,11 +10,27 @@ import { createServer } from 'http';
 import cors from 'cors';
 import fetch from 'node-fetch';
 import dotenv from 'dotenv';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import { RegulationDeliveryEngine, REGULATION_EVENTS } from './regulation-delivery-engine.js';
 import { EdStewardIntegration } from './edsteward-integration.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 // Load environment variables
 dotenv.config();
+
+// Load customer configuration
+let customerConfig = { customers: [], defaults: {} };
+try {
+  const configPath = path.join(__dirname, '../../config/customers.json');
+  customerConfig = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+  console.log(`✅ Loaded ${customerConfig.customers.length} customers from config`);
+} catch (error) {
+  console.warn('⚠️ Customer config not found, using defaults');
+}
 
 class DeliveryServer {
   constructor(options = {}) {
@@ -23,6 +39,8 @@ class DeliveryServer {
     this.server = createServer(this.app);
     this.deliveryEngine = null;
     this.edstewardIntegration = null;
+    this.customers = customerConfig.customers;
+    this.customerDefaults = customerConfig.defaults;
     
     this.setupMiddleware();
     this.setupRoutes();
@@ -64,7 +82,8 @@ class DeliveryServer {
             status: status ? 'healthy' : 'initializing',
             timestamp: new Date().toISOString(),
             details: status,
-            uptime: process.uptime()
+            uptime: process.uptime(),
+            customers: this.customers.length
           });
         }
       } catch (error) {
@@ -78,6 +97,181 @@ class DeliveryServer {
         }
       }
     });
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // CUSTOMER MANAGEMENT ENDPOINTS
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    // List all available customers for dropdown
+    this.app.get('/api/customers', (req, res) => {
+      const customers = this.customers.map(c => ({
+        id: c.id,
+        name: c.name,
+        shortName: c.shortName,
+        type: c.type,
+        enabled: c.enabled,
+        url: c.url
+      }));
+      
+      res.json({
+        customers,
+        defaults: this.customerDefaults,
+        timestamp: new Date().toISOString()
+      });
+    });
+
+    // Get customer status (online/offline check)
+    this.app.get('/api/customers/:customerId/status', async (req, res) => {
+      const { customerId } = req.params;
+      const customer = this.customers.find(c => c.id === customerId);
+      
+      if (!customer) {
+        return res.status(404).json({ error: 'Customer not found', customerId });
+      }
+
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 5000);
+        
+        const healthUrl = `${customer.url}/health`;
+        const response = await fetch(healthUrl, { 
+          signal: controller.signal,
+          headers: { 'Content-Type': 'application/json' }
+        });
+        
+        clearTimeout(timeoutId);
+        
+        res.json({
+          customerId,
+          name: customer.name,
+          status: response.ok ? 'online' : 'error',
+          statusCode: response.status,
+          url: customer.url,
+          timestamp: new Date().toISOString()
+        });
+      } catch (error) {
+        res.json({
+          customerId,
+          name: customer.name,
+          status: 'offline',
+          error: error.message,
+          url: customer.url,
+          timestamp: new Date().toISOString()
+        });
+      }
+    });
+
+    // Push regulation update to specific customer(s)
+    this.app.post('/api/customers/push', async (req, res) => {
+      const { regulationId, customerIds, pushToAll = false } = req.body;
+      
+      if (!regulationId) {
+        return res.status(400).json({ error: 'regulationId is required' });
+      }
+
+      // Determine which customers to push to
+      let targetCustomers = [];
+      if (pushToAll) {
+        targetCustomers = this.customers.filter(c => c.enabled);
+      } else if (customerIds && customerIds.length > 0) {
+        targetCustomers = this.customers.filter(c => customerIds.includes(c.id) && c.enabled);
+      } else {
+        // Default customer
+        const defaultCustomer = this.customers.find(c => c.id === this.customerDefaults.defaultCustomer);
+        if (defaultCustomer) targetCustomers = [defaultCustomer];
+      }
+
+      if (targetCustomers.length === 0) {
+        return res.status(400).json({ error: 'No valid customers specified' });
+      }
+
+      // Fetch regulation content
+      let regulationContent = {};
+      if (this.deliveryEngine) {
+        try {
+          regulationContent = await this.deliveryEngine.cdc.fetchRegulationState(regulationId);
+        } catch (error) {
+          console.error(`Failed to fetch regulation state: ${error.message}`);
+        }
+      }
+
+      // Push to each customer
+      const results = [];
+      for (const customer of targetCustomers) {
+        try {
+          console.log(`📤 Pushing ${regulationId} to ${customer.name}...`);
+          
+          const payload = {
+            regulationId: customer.type === 'development' ? regulationId : (this.edstewardIntegration?.getEdStewardId(regulationId) || regulationId),
+            name: regulationContent.name || regulationId,
+            originalContent: regulationContent.content || '',
+            updatedContent: regulationContent.fullText || regulationContent.content || '',
+            summary: regulationContent.summary || 'Regulation update from MCP Engine',
+            requirements: regulationContent.requirements || '',
+            metadata: {
+              source: 'MCP Engine v5.3.0',
+              pushedAt: new Date().toISOString(),
+              changeType: 'MANUAL_PUSH'
+            }
+          };
+
+          const headers = { 'Content-Type': 'application/json' };
+          if (customer.auth?.method === 'basic') {
+            const authString = Buffer.from(`${customer.auth.username}:${customer.auth.password}`).toString('base64');
+            headers['Authorization'] = `Basic ${authString}`;
+          }
+
+          const response = await fetch(`${customer.url}${customer.apiEndpoint}`, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify(payload)
+          });
+
+          let responseData;
+          try {
+            responseData = await response.json();
+          } catch {
+            const rawText = await response.text();
+            responseData = { raw: rawText };
+          }
+
+          results.push({
+            customerId: customer.id,
+            customerName: customer.name,
+            success: response.ok,
+            statusCode: response.status,
+            response: responseData,
+            timestamp: new Date().toISOString()
+          });
+
+          console.log(`   ${response.ok ? '✅' : '❌'} ${customer.name}: ${response.status}`);
+        } catch (error) {
+          results.push({
+            customerId: customer.id,
+            customerName: customer.name,
+            success: false,
+            error: error.message,
+            timestamp: new Date().toISOString()
+          });
+          console.error(`   ❌ ${customer.name}: ${error.message}`);
+        }
+      }
+
+      const successCount = results.filter(r => r.success).length;
+      res.json({
+        success: successCount > 0,
+        regulationId,
+        totalCustomers: targetCustomers.length,
+        successCount,
+        failedCount: targetCustomers.length - successCount,
+        results,
+        timestamp: new Date().toISOString()
+      });
+    });
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // EXISTING ENDPOINTS
+    // ═══════════════════════════════════════════════════════════════════════════
 
     // Trigger manual regulation check and EdSteward delivery
     this.app.post('/api/trigger-check/:regulationId', async (req, res) => {
@@ -473,6 +667,30 @@ COMPLIANCE DEADLINES:
         const status = this.deliveryEngine.getStatus();
         const realVersion = regulationContent.version || 'unknown';
         
+        // ✅ NEW: Also send to EdSteward directly for moravian.edsteward.ai
+        let edstewardResult = null;
+        if (this.edstewardIntegration) {
+          try {
+            console.log(`📤 Sending update to EdSteward for ${regulationId}...`);
+            edstewardResult = await this.edstewardIntegration.sendRegulationUpdate({
+              regulationId,
+              name: regulationContent.name || regulationId,
+              data: {
+                content: regulationContent.fullText || regulationContent.content,
+                summary: regulationContent.summary,
+                requirements: regulationContent.requirements,
+                filingDeadlines: regulationContent.filingDeadlines
+              },
+              changeType: changeType,
+              timestamp: new Date().toISOString()
+            });
+            console.log(`✅ EdSteward delivery result:`, edstewardResult.success ? 'SUCCESS' : 'FAILED');
+          } catch (edstewardError) {
+            console.error(`⚠️ EdSteward delivery failed (non-blocking):`, edstewardError.message);
+            edstewardResult = { success: false, error: edstewardError.message };
+          }
+        }
+        
         // ✅ CRITICAL: Return COMPLETE regulation data for validation
         res.json({
           success: true,
@@ -483,7 +701,9 @@ COMPLIANCE DEADLINES:
           clientsNotified: status?.regulations?.[regulationId]?.connectedClients || 0,
           timestamp: new Date().toISOString(),
           // ✅ NEW: Include complete regulation data for validation and inspection
-          regulationData: updateData.data.after
+          regulationData: updateData.data.after,
+          // ✅ NEW: Include EdSteward delivery result
+          edstewardDelivery: edstewardResult
         });
         
       } catch (error) {

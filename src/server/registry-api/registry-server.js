@@ -65,22 +65,128 @@ const writeRegulations = (regulations) => {
   }
 };
 
-// Initialize console generator and load all regulations from CSV
+// Initialize console generator and load all regulations from CSV + enhanced files
 const consoleGenerator = new ConsoleGenerator();
 let allRegulations = [];
 
-// Load all regulations from CSV asynchronously
+// State regulation statute citations mapping
+const STATE_STATUTE_CITATIONS = {
+  'pennsylvania-uniform-crime-reporting-act': { statute: '18 Pa.C.S. § 9101 et seq.', topic: 'Campus Safety' },
+  'pennsylvania-sexual-violence-education-act': { statute: '24 P.S. § 20-2001 et seq. (Act 16 of 2014)', topic: 'Sexual Misconduct' },
+  'pennsylvania-sexual-violence-education-act-article-': { statute: '24 P.S. § 20-2001 et seq. (Act 16 of 2014)', topic: 'Sexual Misconduct' },
+  'pennsylvania-higher-education-gift-disclosure-act': { statute: '22 Pa. Code § 31.41 (Act 188 of 1982)', topic: 'Ethics' },
+  'pennsylvania-english-fluency-in-higher-education-a': { statute: '24 P.S. § 6803 (Act 36 of 1990)', topic: 'Academic Programs' },
+  'pennsylvania-graduation-rates-reporting-act': { statute: '24 P.S. § 2510-301 (Act 88 of 1986)', topic: 'Academic Programs' },
+  'pennsylvania-graduation-rates-reporting-act-88-of-': { statute: '24 P.S. § 2510-301 (Act 88 of 1986)', topic: 'Academic Programs' },
+  'pennsylvania-higher-education-standards': { statute: '22 Pa. Code § 31.1 et seq.', topic: 'Academic Programs' },
+  'pennsylvania-institutional-accreditation': { statute: '22 Pa. Code § 31.21', topic: 'Accreditation' },
+  'pennsylvania-student-consumer-protection': { statute: '24 P.S. § 6601 et seq.', topic: 'Student Services' },
+  'new-jersey-campus-sex-assault-victim-bill-of-rights': { statute: 'N.J.S.A. 18A:61E-1 et seq.', topic: 'Sexual Misconduct' },
+  'new-jersey-hazing-prevention': { statute: 'N.J.S.A. 2C:40-3 et seq.', topic: 'Campus Safety' },
+  'new-jersey-licensure-accreditation-standards': { statute: 'N.J.A.C. 9A:1-1 et seq.', topic: 'Accreditation' },
+  'new-jersey-tuition-aid-grant-program': { statute: 'N.J.A.C. 9A:9-2', topic: 'Financial Aid' },
+  'new-jersey-uniform-crime-reporting': { statute: 'N.J.S.A. 52:17B-5', topic: 'Campus Safety' },
+  'new-jersey-veterans-benefits-compliance': { statute: 'N.J.S.A. 18A:62-6', topic: 'Financial Aid' }
+};
+
+// Load state regulations from enhanced-regulations folder
+const loadStateRegulations = () => {
+  const stateRegulations = [];
+  const enhancedDir = path.join(__dirname, '../../../enhanced-regulations');
+  
+  if (!fs.existsSync(enhancedDir)) {
+    console.warn('Enhanced regulations directory not found');
+    return stateRegulations;
+  }
+  
+  // PA regulations
+  const paFiles = fs.readdirSync(enhancedDir)
+    .filter(f => f.startsWith('pennsylvania-') && f.endsWith('.json'));
+  
+  for (const file of paFiles) {
+    try {
+      const data = JSON.parse(fs.readFileSync(path.join(enhancedDir, file), 'utf8'));
+      const regId = data.regulationId || file.replace('.json', '');
+      const citation = STATE_STATUTE_CITATIONS[regId] || {};
+      
+      stateRegulations.push({
+        'Item ID': `PA-${stateRegulations.length + 4220}`,
+        'Topic': citation.topic || data.topic || 'State Compliance',
+        'Statute Name': data.name || regId.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+        'Statute 1': citation.statute || data.statute || '',
+        'Statutory Summary': data.enhanced?.summary || data.summary || '',
+        'Reporting Requirements': data.enhanced?.reportingRequirements || 'See regulation for details',
+        'Deadlines': data.enhanced?.deadlines || 'Not Applicable',
+        'Last Updated': new Date().toISOString().split('T')[0],
+        '_jurisdictionSource': 'state',
+        '_stateCode': 'PA',
+        '_regulationSlug': regId
+      });
+    } catch (err) {
+      console.error(`Error loading PA regulation ${file}:`, err.message);
+    }
+  }
+  
+  // NJ regulations
+  const njFiles = fs.readdirSync(enhancedDir)
+    .filter(f => f.startsWith('new-jersey-') && f.endsWith('.json'));
+  
+  for (const file of njFiles) {
+    try {
+      const data = JSON.parse(fs.readFileSync(path.join(enhancedDir, file), 'utf8'));
+      const regId = data.regulationId || file.replace('.json', '');
+      const citation = STATE_STATUTE_CITATIONS[regId] || {};
+      
+      stateRegulations.push({
+        'Item ID': `NJ-${stateRegulations.length + 4240}`,
+        'Topic': citation.topic || data.topic || 'State Compliance',
+        'Statute Name': data.name || regId.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+        'Statute 1': citation.statute || data.statute || '',
+        'Statutory Summary': data.enhanced?.summary || data.summary || '',
+        'Reporting Requirements': data.enhanced?.reportingRequirements || 'See regulation for details',
+        'Deadlines': data.enhanced?.deadlines || 'Not Applicable',
+        'Last Updated': new Date().toISOString().split('T')[0],
+        '_jurisdictionSource': 'state',
+        '_stateCode': 'NJ',
+        '_regulationSlug': regId
+      });
+    } catch (err) {
+      console.error(`Error loading NJ regulation ${file}:`, err.message);
+    }
+  }
+  
+  console.log(`Loaded ${stateRegulations.length} state regulations (PA: ${paFiles.length}, NJ: ${njFiles.length})`);
+  return stateRegulations;
+};
+
+// Load all regulations from CSV + state enhanced files asynchronously
 const loadAllRegulations = async () => {
   try {
+    // Load federal regulations from CSV
     const csvPath = path.join(__dirname, '../../../compmat.csv');
     if (fs.existsSync(csvPath)) {
       const csvContent = fs.readFileSync(csvPath, 'utf8');
       const records = parse(csvContent, {
         columns: true,
-        skip_empty_lines: true
+        skip_empty_lines: true,
+        relax_column_count: true  // Handle inconsistent column counts
       });
-      allRegulations = records;
-      console.log(`Loaded ${allRegulations.length} regulations from CSV`);
+      
+      // Mark CSV regulations as federal
+      const csvRegulations = records.map(r => ({
+        ...r,
+        '_jurisdictionSource': 'federal',
+        '_stateCode': null
+      }));
+      
+      console.log(`Loaded ${csvRegulations.length} federal regulations from CSV`);
+      
+      // Load state regulations from enhanced folder
+      const stateRegulations = loadStateRegulations();
+      
+      // Combine all regulations
+      allRegulations = [...csvRegulations, ...stateRegulations];
+      console.log(`TOTAL: ${allRegulations.length} regulations (${csvRegulations.length} federal + ${stateRegulations.length} state)`);
     } else {
       console.warn('CSV file not found at:', csvPath);
     }
@@ -117,10 +223,49 @@ app.get('/regulation-update-client.js', (req, res) => {
 
 // Health check endpoint
 app.get('/health', (req, res) => {
+  const federalCount = allRegulations.filter(r => r._jurisdictionSource === 'federal').length;
+  const stateCount = allRegulations.filter(r => r._jurisdictionSource === 'state').length;
+  const paCount = allRegulations.filter(r => r._stateCode === 'PA').length;
+  const njCount = allRegulations.filter(r => r._stateCode === 'NJ').length;
+  
   res.json({
     status: 'ok',
     time: new Date().toISOString(),
-    regulations: readRegulations().length
+    regulations: {
+      total: allRegulations.length,
+      federal: federalCount,
+      state: stateCount,
+      byState: {
+        PA: paCount,
+        NJ: njCount
+      }
+    }
+  });
+});
+
+// Summary endpoint - get regulation counts by jurisdiction
+app.get('/api/regulations/summary', ensureRegulationsLoaded, (req, res) => {
+  const federalCount = allRegulations.filter(r => r._jurisdictionSource === 'federal').length;
+  const stateCount = allRegulations.filter(r => r._jurisdictionSource === 'state').length;
+  const paCount = allRegulations.filter(r => r._stateCode === 'PA').length;
+  const njCount = allRegulations.filter(r => r._stateCode === 'NJ').length;
+  
+  res.json({
+    timestamp: new Date().toISOString(),
+    total: allRegulations.length,
+    byJurisdiction: {
+      federal: federalCount,
+      state: stateCount
+    },
+    byState: {
+      PA: paCount,
+      NJ: njCount
+    },
+    edstewardReady: {
+      total: allRegulations.length,
+      withStatute: allRegulations.filter(r => r['Statute 1'] && r['Statute 1'].trim() !== '').length,
+      withTopic: allRegulations.filter(r => r.Topic && r.Topic.trim() !== '').length
+    }
   });
 });
 
@@ -163,24 +308,38 @@ function extractDeadlineInfo(reg) {
   };
 }
 
-// Get all regulations - Enhanced with deadline data from CSV
+// Get all regulations - Enhanced with deadline data from CSV + State regulations
 app.get('/api/regulations', ensureRegulationsLoaded, (req, res) => {
   try {
-    // Transform CSV data to API format with COMPLETE deadline information
-    // ✅ CRITICAL FIX: Removed .slice(0, 50) to serve ALL 295 regulations for Friday demo
-    const apiRegulations = allRegulations.map((reg, index) => {
-      // ✅ CRITICAL: Extract deadline with July 1 default fallback
+    // Support jurisdiction filtering via query param
+    const { jurisdiction, state } = req.query;
+    
+    // Filter regulations if jurisdiction specified
+    let filteredRegulations = allRegulations;
+    if (jurisdiction) {
+      filteredRegulations = allRegulations.filter(r => r._jurisdictionSource === jurisdiction);
+    }
+    if (state) {
+      filteredRegulations = filteredRegulations.filter(r => r._stateCode === state.toUpperCase());
+    }
+    
+    // Transform data to API format with COMPLETE deadline information
+    const apiRegulations = filteredRegulations.map((reg, index) => {
+      // Extract deadline with July 1 default fallback
       const deadlineInfo = extractDeadlineInfo(reg);
       
+      // For state regs, use the slug directly if available
+      const regulationId = reg._regulationSlug || consoleGenerator.getRegulationSlug(reg) || `reg-${index}`;
+      
       return {
-        regulationId: consoleGenerator.getRegulationSlug(reg) || `reg-${index}`,
+        regulationId: regulationId,
         name: reg['Statute Name'] || 'Unknown Regulation',
         description: reg['Statutory Summary'] || 'No description available',
         version: '1.0',
         enactedDate: reg['Last Updated'] || new Date().toISOString(),
         publicLaw: reg['Statute 1'] || 'Unknown',
         
-        // ✅ CRITICAL: Include deadline and compliance data (with July 1 default)
+        // ✅ Include deadline and compliance data (with July 1 default)
         deadline: deadlineInfo.deadline,
         deadlineMonth: deadlineInfo.deadlineMonth,
         deadlineLabel: deadlineInfo.deadlineLabel,
@@ -190,6 +349,10 @@ app.get('/api/regulations', ensureRegulationsLoaded, (req, res) => {
         topic: reg.Topic || 'Uncategorized',
         statutes: [reg['Statute 1'], reg['Statute 2'], reg['Statute 3'], reg['Statute 4']].filter(Boolean),
         regulations: [reg['Regulation 1'], reg['Regulation 2'], reg['Regulation 3'], reg['Regulation 4'], reg['Regulation 5']].filter(Boolean),
+        
+        // ✅ CRITICAL: Include jurisdiction information for EdSteward
+        jurisdictionSource: reg._jurisdictionSource || 'federal',
+        stateCode: reg._stateCode || null,
         
         keyProvisions: [
           {

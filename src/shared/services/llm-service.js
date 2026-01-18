@@ -1,6 +1,6 @@
 /**
  * LLM Service
- * Handles interactions with Language Learning Models
+ * Handles interactions with Language Learning Models (Anthropic Claude)
  */
 import { LLMServiceInterface } from '../interfaces/service.js';
 import { setupLogger } from '../../utils/logger.js';
@@ -10,12 +10,15 @@ export class LLMService extends LLMServiceInterface {
   constructor(dependencies = {}) {
     super(dependencies);
     this.logger = setupLogger('llm-service');
-    this.openaiApiKey = process.env.OPENAI_API_KEY;
-    this.model = process.env.OPENAI_MODEL || 'gpt-3.5-turbo';
-    this.mockMode = !this.openaiApiKey;
+    // Support both ANTHROPIC_API_KEY and OPENAI_API_KEY (for backward compatibility)
+    this.anthropicApiKey = process.env.ANTHROPIC_API_KEY || process.env.OPENAI_API_KEY;
+    this.model = process.env.ANTHROPIC_MODEL || process.env.OPENAI_MODEL || 'claude-sonnet-4-20250514';
+    this.mockMode = !this.anthropicApiKey || !this.anthropicApiKey.startsWith('sk-ant-');
     
     if (this.mockMode) {
-      this.logger.warn('No OpenAI API key found, using mock responses');
+      this.logger.warn('No valid Anthropic API key found, using mock responses');
+    } else {
+      this.logger.info(`Using Anthropic Claude model: ${this.model}`);
     }
   }
 
@@ -28,7 +31,7 @@ export class LLMService extends LLMServiceInterface {
         return this._generateMockResponse(prompt, options);
       }
       
-      return await this._callOpenAI(prompt, options);
+      return await this._callAnthropic(prompt, options);
     } catch (error) {
       this.handleError(error, 'query', { promptLength: prompt.length, options });
     }
@@ -91,9 +94,10 @@ export class LLMService extends LLMServiceInterface {
     return {
       status: isAvailable ? 'healthy' : 'unhealthy',
       details: {
+        provider: 'Anthropic Claude',
         mockMode: this.mockMode,
         model: this.model,
-        hasApiKey: !!this.openaiApiKey,
+        hasApiKey: !!this.anthropicApiKey,
         available: isAvailable
       }
     };
@@ -101,50 +105,47 @@ export class LLMService extends LLMServiceInterface {
 
   // Private methods
 
-  async _callOpenAI(prompt, options = {}) {
+  async _callAnthropic(prompt, options = {}) {
     try {
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${this.openaiApiKey}`,
+          'x-api-key': this.anthropicApiKey,
+          'anthropic-version': '2023-06-01',
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
           model: options.model || this.model,
+          max_tokens: options.maxTokens || 2000,
+          system: 'You are an expert compliance assistant for educational institutions.',
           messages: [
-            {
-              role: 'system',
-              content: 'You are an expert compliance assistant for educational institutions.'
-            },
             {
               role: 'user',
               content: prompt
             }
           ],
-          temperature: options.temperature || 0.7,
-          max_tokens: options.maxTokens || 2000,
-          top_p: options.topP || 1,
-          frequency_penalty: options.frequencyPenalty || 0,
-          presence_penalty: options.presencePenalty || 0
+          temperature: options.temperature || 0.7
         })
       });
 
       if (!response.ok) {
-        throw new ExternalServiceError('OpenAI', `HTTP ${response.status}: ${response.statusText}`);
+        const errorText = await response.text();
+        throw new ExternalServiceError('Anthropic', `HTTP ${response.status}: ${response.statusText} - ${errorText}`);
       }
 
       const data = await response.json();
       
-      if (!data.choices || data.choices.length === 0) {
-        throw new ExternalServiceError('OpenAI', 'No response choices returned');
+      if (!data.content || data.content.length === 0) {
+        throw new ExternalServiceError('Anthropic', 'No response content returned');
       }
 
-      return data.choices[0].message.content;
+      // Anthropic returns content as array of blocks
+      return data.content.map(block => block.text).join('\n');
     } catch (error) {
       if (error instanceof ExternalServiceError) {
         throw error;
       }
-      throw new ExternalServiceError('OpenAI', error.message);
+      throw new ExternalServiceError('Anthropic', error.message);
     }
   }
 

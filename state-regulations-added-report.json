@@ -1,0 +1,281 @@
+{
+  "timestamp": "2026-01-18T21:23:59.452Z",
+  "stateRegulationsProcessed": [
+    {
+      "regulationId": "pennsylvania-english-fluency-in-higher-education-a",
+      "name": "Pennsylvania English Fluency in Higher Education Act",
+      "source": "enhanced",
+      "state": "PA",
+      "jurisdictionSource": "state",
+      "statute": "24 P.S. § 6803 (Act 36 of 1990)",
+      "topic": "Academic Programs",
+      "topicId": 50,
+      "summary": "Pennsylvania statute requiring higher education institutions to ensure English language proficiency of all instructional faculty through assessment, testing, and student complaint procedures, with state funding penalties for non-compliance.",
+      "requirements": "## Core Assessment Requirements\n- Conduct English proficiency testing for all new instructional faculty before classroom assignment\n- Maintain TOEFL iBT speaking scores ≥26 or IELTS speaking band scores ≥8.0 for non-native speakers\n- Implement institutional assessment protocols approved by Pennsylvania Department of Education\n- Complete assessments within 30 days of hiring or appointment\n\n## Student Complaint Procedures\n- Establish formal complaint mechanisms for students to report instructor communication issues\n- Investigate all formal complaints within 30-day timeframe\n- Provide written responses to complainants with specific remedial actions\n- Maintain appeal processes allowing Department of Education review\n\n## Faculty Remediation Programs\n- Provide English language improvement resources for faculty not meeting standards\n- Complete remedial instruction within 12-month period\n- Document all remediation efforts and outcomes\n- Implement employment actions for faculty failing to achieve proficiency\n\n## Record Maintenance\n- Retain all proficiency test results and assessment documentation\n- Maintain complaint records and institutional responses for five-year period\n- Document all remedial actions and faculty improvement plans",
+      "reportingRequirements": "Annual compliance reports due September 30 to Pennsylvania Department of Education documenting faculty assessments, student complaints, and remedial actions. Immediate notification required for formal student complaints filed with external agencies.",
+      "auditScore": 96
+    },
+    {
+      "regulationId": "pennsylvania-graduation-rates-reporting-act",
+      "name": "Pennsylvania Graduation Rates Reporting Act",
+      "source": "enhanced",
+      "state": "PA",
+      "jurisdictionSource": "state",
+      "statute": "24 P.S. § 2510-301 (Act 88 of 1986)",
+      "topic": "Academic Programs",
+      "topicId": 50,
+      "summary": "This regulation implements Pennsylvania's Graduation Rates Reporting Act, requiring all public educational institutions to submit comprehensive annual reports on graduation and retention rates. Reports must include demographic breakdowns, program-specific data, and employment outcomes. Institutions must use standardized cohort methodology and submit reports by March 15 annually. The Department of Education will compile statewide summaries and make data publicly available. Non-compliance may result in withheld state funding and required improvement plans.",
+      "requirements": [
+        "Submit annual graduation rate reports with demographic disaggregation by gender, race, ethnicity, first-generation status, and financial aid status",
+        "Provide program-specific graduation rates for all degree and certificate programs offered by the institution",
+        "Report retention rates, transfer-out rates, and employment outcomes data for graduates within specified timeframes",
+        "Use standardized cohort methodology consistent with federal IPEDS reporting standards for data calculation",
+        "Maintain comprehensive student tracking systems and supporting documentation for all reported graduation rate data"
+      ],
+      "reportingRequirements": {
+        "timeline": "Annual reports due March 15 covering previous academic year; preliminary data may be submitted February 1; employment outcomes data due September 15; corrections must be submitted within 30 days of discovery"
+      },
+      "auditScore": 95
+    },
+    {
+      "regulationId": "pennsylvania-higher-education-gift-disclosure-act",
+      "name": "Pennsylvania Higher Education Gift Disclosure Act",
+      "source": "enhanced",
+      "state": "PA",
+      "jurisdictionSource": "state",
+      "statute": "22 Pa. Code § 31.41 (Act 188 of 1982)",
+      "topic": "Ethics",
+      "topicId": 69,
+      "summary": "Pennsylvania Act requiring higher education institutions to disclose gifts exceeding $50,000 individually or $100,000 aggregate annually, with enhanced reporting for foreign contributions above $25,000, enforced through state audits and funding penalties.",
+      "requirements": "## Disclosure Thresholds\n- Report individual gifts of $50,000 or more from any single source\n- Disclose aggregate contributions of $100,000+ per donor within fiscal year\n- Enhanced reporting for foreign gifts exceeding $25,000 under 24 P.S. § 2510-A(d)\n\n## Record Maintenance\n- Maintain comprehensive donor identification records\n- Document gift value, purpose, and attached conditions\n- Preserve supporting documentation for minimum seven years\n\n## Public Reporting\n- Submit annual disclosure reports to PA Department of Education\n- Publish gift information on institutional website within 90 days of fiscal year-end\n- Include gifts-in-kind, endowments, and naming rights agreements per 22 Pa. Code § 31.41\n\n## Compliance Infrastructure\n- Designate qualified gift disclosure officer\n- Implement staff training programs on disclosure obligations\n- Establish donor notification procedures regarding transparency requirements",
+      "reportingRequirements": "Annual gift disclosure reports due within 90 days of fiscal year-end to Pennsylvania Department of Education via online portal. Foreign gift reports required within 60 days of receipt for contributions exceeding $25,000. Public website disclosure mandatory concurrent with state filing.",
+      "auditScore": 93
+    },
+    {
+      "regulationId": "pennsylvania-higher-education-standards",
+      "name": "Pennsylvania Higher Education Standards",
+      "source": "enhanced",
+      "state": "PA",
+      "jurisdictionSource": "state",
+      "statute": "22 Pa. Code § 31.1 et seq.",
+      "topic": "Academic Programs",
+      "topicId": 50,
+      "summary": "22 Pa. Code Ch. 31 establishes comprehensive academic and operational standards for Pennsylvania higher education institutions. The regulation covers academic program quality, institutional governance, faculty qualifications, student services, facilities, and distance learning requirements. Institutions must maintain appropriate accreditation, demonstrate financial stability, provide adequate student support services, and ensure faculty meet terminal degree requirements. Compliance is monitored through annual reporting, periodic reviews, and site visits by the Pennsylvania Department of Education. Non-compliance may result in probationary status, operational restrictions, or loss of authorization. The regulation promotes educational quality, student protection, and institutional accountability across all degree-granting institutions operating in Pennsylvania.",
+      "requirements": "• Maintain regional accreditation and specialized program accreditation where applicable\n• Ensure 75% of credit hours are taught by appropriately qualified full-time faculty with terminal degrees\n• Conduct comprehensive program reviews every five years with documented learning outcomes assessment\n• Submit annual compliance reports including financial audits, student data, and program effectiveness metrics\n• Maintain adequate financial reserves and demonstrate fiscal stability through multi-year financial planning\n• Provide comprehensive student support services including academic advising, career counseling, and disability services\n• Implement robust student complaint processes with annual reporting to the Department of Education\n• Participate in statewide transfer articulation agreements and maintain transparent credit transfer policies\n• Ensure physical facilities and technology infrastructure meet current educational and accessibility standards\n• Maintain FERPA-compliant student records management with appropriate security measures",
+      "reportingRequirements": "Annual Institutional Report: Due September 30th each year, including enrollment data, financial statements, faculty qualifications, and student outcomes. Program Review Reports: Due within 60 days of completion for each five-year program review cycle. Financial Audit Reports: Independently audited financial statements due December 31st annually. Student Complaint Summary: Annual report of student complaints and resolutions due October 15th. Faculty Credentials Report: Updated faculty qualification documentation due with annual report. Compliance Certification: Annual certification of regulatory compliance signed by chief executive officer due with institutional report. Distance Learning Report: Annual report on online program quality and student services due November 30th. Transfer Articulation Report: Documentation of transfer agreements and credit acceptance rates due January 31st annually.",
+      "auditScore": 95
+    },
+    {
+      "regulationId": "pennsylvania-institutional-accreditation",
+      "name": "Pennsylvania Institutional Accreditation Requirements",
+      "source": "enhanced",
+      "state": "PA",
+      "jurisdictionSource": "state",
+      "statute": "22 Pa. Code § 31.21",
+      "topic": "Accreditation",
+      "topicId": 50,
+      "summary": "Pennsylvania's Institutional Accreditation Requirements (22 Pa. Code Ch. 36) mandate that all degree-granting institutions obtain Department of Education authorization and maintain recognized accreditation. Key requirements include demonstrated financial stability through audited statements and surety bonds, qualified faculty with appropriate credentials, adequate physical facilities and learning resources, comprehensive student services, and transparent consumer disclosures. The Department conducts ongoing oversight through annual reporting, site visits, and complaint investigations. Non-compliance may result in warnings, probation, fines, or revocation of operating authority. Authorization renewal occurs every five years with comprehensive institutional review. Institutions must notify the Department of material changes and maintain detailed compliance documentation.",
+      "requirements": [
+        "• Obtain and maintain regional or national accreditation from a U.S. Department of Education recognized accrediting agency",
+        "• Submit annual audited financial statements prepared by certified public accountants and maintain required surety bonds or escrow accounts",
+        "• Employ faculty with appropriate academic credentials (master's degree minimum for undergraduate instruction, doctoral for graduate programs)",
+        "• Maintain adequate physical facilities, library resources, and technological infrastructure to support educational programs",
+        "• Provide comprehensive student services including academic advising, financial aid administration, and accurate transcript maintenance",
+        "• Submit annual institutional reports including enrollment data, financial information, and program outcomes by specified deadlines",
+        "• Notify the Department within 30 days of any material changes to ownership, governance, financial status, or program offerings",
+        "• Maintain transparent consumer disclosures regarding program costs, graduation rates, and employment outcomes",
+        "• Develop and maintain teach-out plans and student record preservation procedures in case of institutional closure",
+        "• Renew institutional authorization every five years through comprehensive application process submitted 12 months before expiration"
+      ],
+      "reportingRequirements": "Annual institutional reports must be submitted by March 31st each year, including enrollment statistics, financial data, faculty qualifications, and student outcome metrics. Audited financial statements are due within 120 days of fiscal year end. Material change notifications must be filed within 30 days of occurrence. Authorization renewal applications must be submitted 12 months before current authorization expires (typically every 5 years). Quarterly financial reports may be required for institutions under financial monitoring. Immediate notification (within 48 hours) is required for any events threatening institutional operations, including loss of accreditation, significant financial difficulties, or closure decisions. Site visit scheduling and documentation must be provided within 10 business days of Department request.",
+      "auditScore": 95
+    },
+    {
+      "regulationId": "pennsylvania-sexual-violence-education-act",
+      "name": "Pennsylvania Sexual Violence Education Act (Act 16 of 2014)",
+      "source": "enhanced",
+      "state": "PA",
+      "jurisdictionSource": "state",
+      "statute": "24 P.S. § 20-2001 et seq. (Act 16 of 2014)",
+      "topic": "Sexual Misconduct",
+      "topicId": 41,
+      "summary": "The Pennsylvania Sexual Violence Education Act requires all public school districts to implement age-appropriate sexual violence prevention education programs from grades K-12. Districts must use qualified instructors, trauma-informed approaches, and evidence-based curricula while maintaining parent notification requirements. Programs must address consent, healthy relationships, bystander intervention, and available resources. Schools must establish clear reporting protocols, collaborate with community partners, and maintain supportive environments that encourage disclosure of incidents.",
+      "requirements": [
+        "Implement developmentally appropriate sexual violence prevention education for grades K-12 using state-approved, evidence-based curricula delivered by specially trained instructors",
+        "Establish clear parent/guardian notification procedures with advance notice of program content, material review opportunities, and opt-out provisions with alternative activities",
+        "Provide annual training for all school personnel on recognizing signs of sexual violence, responding to disclosures, and fulfilling mandatory reporting obligations",
+        "Collaborate with local sexual assault service providers, law enforcement, and community partners to enhance program effectiveness and student resource access",
+        "Maintain trauma-informed, inclusive programs that address the needs of all students regardless of gender identity, sexual orientation, race, ethnicity, or disability status"
+      ],
+      "reportingRequirements": {
+        "timeline": "Annual reporting to Pennsylvania Department of Education by June 30th each year, including program implementation data, student participation rates, staff training completion, community partnerships established, and outcome measures. Incident reports must be filed within 24 hours of disclosure with appropriate authorities and documented according to district protocols."
+      },
+      "auditScore": 95
+    },
+    {
+      "regulationId": "pennsylvania-student-consumer-protection",
+      "name": "Pennsylvania Student Consumer Protection",
+      "source": "enhanced",
+      "state": "PA",
+      "jurisdictionSource": "state",
+      "statute": "24 P.S. § 6601 et seq.",
+      "topic": "Student Services",
+      "topicId": 63,
+      "summary": "Pennsylvania Student Consumer Protection Standards under 22 Pa. Code Chapter 40 establish comprehensive transparency and accountability requirements for higher education institutions. The regulation mandates accurate disclosure of program information, costs, and outcomes while prohibiting deceptive marketing practices. Institutions must maintain clear complaint resolution procedures, designate compliance officers, and provide detailed financial information including refund policies. Special provisions address online education, career programs, and institutional closure procedures. Enforcement includes monitoring, investigations, and progressive sanctions. Annual reporting and documentation requirements ensure ongoing compliance. These standards protect student consumers while maintaining educational quality and institutional integrity throughout Pennsylvania's higher education system.",
+      "requirements": "• Designate a qualified compliance officer with direct access to senior leadership and authority to oversee consumer protection compliance\n• Maintain current, accurate catalogs and websites with complete program information, requirements, graduation criteria, and time-to-completion estimates\n• Provide detailed cost breakdowns including tuition, mandatory fees, living expenses, and program-specific costs with functioning net price calculators\n• Establish clear, accessible student complaint resolution procedures with multiple review levels, reasonable timelines, and proper documentation\n• Ensure all marketing materials and recruitment practices contain truthful, accurate information about programs, outcomes, and institutional achievements\n• Implement comprehensive record-keeping systems maintaining student communications, financial transactions, and academic progress documentation for required retention periods\n• Provide equivalent support services and clear technology requirements for online and distance education students\n• Develop and maintain institutional closure and teach-out plans with appropriate notification procedures\n• Submit required annual compliance reports, student outcome data, and financial stability indicators to the Pennsylvania Department of Education",
+      "reportingRequirements": "Annual compliance reports must be submitted to the Pennsylvania Department of Education by September 30th each year, including student enrollment data, completion rates, employment outcomes, and complaint resolution statistics. Student outcome data for career programs must be reported by December 31st annually, including licensure examination pass rates and employment placement rates. Financial stability indicators and audited financial statements must be submitted within 120 days of fiscal year end. Significant changes to programs, policies, or financial status must be reported within 30 days. Institutional closure notifications must be provided 180 days in advance with teach-out plans submitted 120 days prior to closure. Student complaint data must be maintained continuously and provided upon request during compliance reviews or investigations.",
+      "auditScore": 95
+    },
+    {
+      "regulationId": "pennsylvania-uniform-crime-reporting-act",
+      "name": "Pennsylvania Uniform Crime Reporting Act",
+      "source": "enhanced",
+      "state": "PA",
+      "jurisdictionSource": "state",
+      "statute": "18 Pa.C.S. § 9101 et seq.",
+      "topic": "Campus Safety",
+      "topicId": 11,
+      "summary": "Pennsylvania's Uniform Crime Reporting Act requires higher education institutions with sworn police departments to submit monthly crime statistics to state authorities within ten days of month-end, encompassing detailed incident data.",
+      "requirements": "## Crime Data Reporting\n- Submit monthly UCR reports within 10 days of month conclusion per 18 Pa.C.S. § 9103\n- Report all Part I offenses occurring within institutional jurisdiction\n- Include arrest data for Part II offenses including drug, weapon, and liquor violations\n- Utilize NIBRS format for detailed incident reporting as of January 2021\n\n## Institutional Coverage\n- Applies to institutions operating certified police departments under 22 Pa. Code § 1-3\n- Campus security without arrest powers exempt from PUCRA requirements\n- Coordinate reporting with federal Clery Act obligations\n\n## Data Quality Standards\n- Provide geographic location details for each reported incident\n- Include victim demographics and offense circumstances\n- Document bias incidents and hate crime classifications per Act 16 of 2020\n- Maintain accuracy standards subject to Pennsylvania State Police audit",
+      "reportingRequirements": "Monthly UCR reports due within 10 days of each month's end to Pennsylvania State Police Bureau of Records. NIBRS-format incident reports required for all qualifying offenses. Enhanced sexual offense and hate crime reporting required under Act 16 of 2020 amendments.",
+      "auditScore": 96
+    },
+    {
+      "regulationId": "new-jersey-campus-sex-assault-victim-bill-of-rights",
+      "name": "New Jersey Campus Sexual Assault Victim's Bill of Rights",
+      "source": "enhanced",
+      "state": "NJ",
+      "jurisdictionSource": "state",
+      "statute": "N.J.S.A. 18A:61E-1 et seq.",
+      "topic": "Sexual Misconduct",
+      "topicId": 41,
+      "summary": "New Jersey's Campus Sexual Assault Victim Bill of Rights mandates comprehensive protections for sexual assault victims at higher education institutions. The law requires colleges and universities to provide fair investigation procedures, support services including free counseling and medical care, trained personnel, confidentiality protections, and academic accommodations. Institutions must maintain clear policies, coordinate with law enforcement while respecting victim choice in reporting, and ensure disciplinary proceedings meet strict fairness standards within established timeframes.",
+      "requirements": [
+        "Establish written policies for sexual assault prevention, response procedures, and available victim resources with annual distribution to all campus community members",
+        "Provide specialized training for all personnel involved in receiving reports, conducting investigations, or providing support services using trauma-informed approaches",
+        "Offer comprehensive support services including free on-campus and off-campus counseling, medical services, and academic accommodations for victims",
+        "Implement fair and impartial disciplinary proceedings with representation rights, evidence presentation opportunities, and written outcome notifications for all parties",
+        "Maintain coordination agreements with local law enforcement agencies while preserving victim autonomy in choosing whether to pursue criminal reporting"
+      ],
+      "reportingRequirements": {
+        "timeline": "Initial response within 24 hours of report, formal investigation initiation within 7 days, resolution within 60 days unless circumstances require documented extension, with regular progress updates provided to all parties throughout the process"
+      },
+      "auditScore": 95
+    },
+    {
+      "regulationId": "new-jersey-hazing-prevention",
+      "name": "New Jersey Anti-Hazing Act",
+      "source": "enhanced",
+      "state": "NJ",
+      "jurisdictionSource": "state",
+      "statute": "N.J.S.A. 2C:40-3 et seq.",
+      "topic": "Campus Safety",
+      "topicId": 11,
+      "summary": "The New Jersey Anti-Hazing Law criminalizes hazing activities in educational institutions and student organizations, defining hazing as intentional actions causing mental or physical discomfort, embarrassment, or harassment. The law establishes criminal penalties ranging from disorderly persons offenses to third-degree crimes depending on severity. Educational institutions must implement anti-hazing policies, provide prevention education, investigate incidents, and maintain reporting procedures. The statute includes whistleblower protections, extends to off-campus activities, and explicitly states that consent is not a defense for hazing activities.",
+      "requirements": [
+        "Establish and annually distribute comprehensive anti-hazing policies to all students, faculty, staff, and organization members that clearly define prohibited hazing activities and associated consequences",
+        "Provide mandatory educational programming on hazing prevention, including information about physical, psychological, and legal consequences of hazing activities for all relevant stakeholders",
+        "Implement anonymous reporting mechanisms and whistleblower protections for individuals who report suspected hazing activities in good faith",
+        "Conduct immediate and thorough investigations of all hazing reports and implement appropriate disciplinary measures while cooperating with law enforcement when criminal activity is suspected",
+        "Maintain detailed documentation of hazing incidents, investigations, disciplinary actions, and prevention measures implemented, with potential annual reporting to state education authorities"
+      ],
+      "reportingRequirements": {
+        "timeline": "Immediate reporting to institutional authorities upon knowledge of hazing activities; law enforcement notification within 24 hours for incidents involving serious bodily injury or criminal activity; parental notification for minor students within 48 hours; comprehensive incident documentation within 5 business days; annual policy distribution and prevention program implementation at the beginning of each academic year"
+      },
+      "auditScore": 95
+    },
+    {
+      "regulationId": "new-jersey-licensure-accreditation-standards",
+      "name": "New Jersey Licensure & Accreditation Standards",
+      "source": "enhanced",
+      "state": "NJ",
+      "jurisdictionSource": "state",
+      "statute": "N.J.A.C. 9A:1-1 et seq.",
+      "topic": "Accreditation",
+      "topicId": 50,
+      "summary": "N.J.A.C. 9A:1-1 establishes accreditation standards for New Jersey post-secondary institutions, requiring recognized accrediting agency approval, institutional stability, qualified faculty, adequate facilities, and financial viability. Institutions undergo comprehensive review cycles every ten years with interim monitoring. Standards address academic quality, student services, faculty requirements, financial accountability, and continuous improvement. Compliance monitoring includes annual reporting, site visits, and progressive sanctions for non-compliance, with appeals processes available.",
+      "requirements": [
+        "Obtain and maintain accreditation from U.S. Department of Education or CHEA-recognized accrediting agencies, with specialized accreditation for professional programs where applicable",
+        "Demonstrate minimum two years operational stability with 60% faculty holding terminal degrees, adequate facilities, libraries, laboratories, and positive financial margins with sufficient reserves",
+        "Maintain full-time faculty comprising at least 25% of instructional staff, with comprehensive evaluation systems, academic freedom policies, and professional development requirements",
+        "Provide comprehensive student support services including academic advising, career counseling, disability services, complaint procedures, and FERPA-compliant records management",
+        "Submit annual audited financial statements demonstrating fiscal responsibility, maintain transparent tuition and fee structures, appropriate insurance coverage, and established refund policies"
+      ],
+      "reportingRequirements": {
+        "timeline": "Annual financial audits and compliance reports due September 30; comprehensive accreditation self-evaluations every 10 years with interim monitoring reports at 5-year intervals; immediate notification required for significant institutional changes including new programs, ownership transfers, or major policy modifications; quarterly enrollment and outcome data submissions; and immediate reporting of any adverse accreditation actions or financial emergencies within 30 days of occurrence."
+      },
+      "auditScore": 95
+    },
+    {
+      "regulationId": "new-jersey-tuition-aid-grant-program",
+      "name": "New Jersey Tuition Aid Grant (TAG) Program",
+      "source": "enhanced",
+      "state": "NJ",
+      "jurisdictionSource": "state",
+      "statute": "N.J.A.C. 9A:9-2",
+      "topic": "Financial Aid",
+      "topicId": 52,
+      "summary": "N.J.A.C. 9A:9-2 governs New Jersey's Tuition Aid Grant Program compliance, requiring participating institutions to verify student eligibility, maintain detailed records, accurately calculate and disburse awards, and submit regular compliance reports. The regulation establishes residency requirements, academic progress standards, refund procedures, and documentation retention requirements. Institutions must undergo periodic audits and face penalties for non-compliance including program suspension.",
+      "requirements": [
+        "Verify New Jersey residency for at least 12 consecutive months and maintain documentation of student eligibility including FAFSA completion and satisfactory academic progress",
+        "Calculate TAG awards accurately based on enrollment status, financial need, and established state formulas with proper proration for part-time students",
+        "Maintain comprehensive records for all TAG recipients for minimum five years including enrollment certifications, disbursement records, and academic transcripts",
+        "Process refunds within 45 days of student withdrawal using federal Return to Title IV methodology and report overpayments to HESAA",
+        "Submit to periodic compliance audits by HESAA and provide access to student records, financial aid files, and system data upon request"
+      ],
+      "reportingRequirements": {
+        "timeline": "Annual enrollment and disbursement reports due October 31st following each award year, with quarterly enrollment updates due within 30 days of each term census date, overpayment notifications within 45 days of determination, and immediate reporting of significant compliance issues or program violations to HESAA"
+      },
+      "auditScore": 95
+    },
+    {
+      "regulationId": "new-jersey-uniform-crime-reporting",
+      "name": "New Jersey Uniform Crime Reporting Act",
+      "source": "enhanced",
+      "state": "NJ",
+      "jurisdictionSource": "state",
+      "statute": "N.J.S.A. 52:17B-5",
+      "topic": "Campus Safety",
+      "topicId": 11,
+      "summary": "N.J.S.A. 52:17B-5.1 requires New Jersey higher education institutions to report criminal incidents to state police using Uniform Crime Reporting standards. Institutions must designate trained officials to collect and submit crime data monthly, maintain public incident logs, and coordinate with local law enforcement. Reporting covers violent crimes, property crimes, drug offenses, and disciplinary violations occurring on campus and adjacent properties. Emergency incidents require 24-hour notification, with comprehensive annual reports due by March 1st.",
+      "requirements": [
+        "Designate a qualified campus safety official responsible for collecting, compiling, and submitting crime data with appropriate UCR training and certification",
+        "Establish formal procedures for collecting crime data from campus security, local police, and other relevant campus officials",
+        "Maintain comprehensive incident logs accessible to the public during business hours with appropriate privacy protections",
+        "Coordinate with local law enforcement agencies to ensure accurate reporting and prevent double-counting of incidents",
+        "Implement regular training programs for campus security personnel and staff who may receive reports of criminal activity"
+      ],
+      "reportingRequirements": {
+        "monthly": "Submit crime data reports by the 10th day of each month covering previous month's incidents",
+        "annual": "Submit comprehensive annual reports by March 1st covering previous calendar year",
+        "emergency": "Report serious crimes posing immediate threats within 24 hours of discovery",
+        "ongoing": "Maintain daily incident logs with continuous public access during normal business hours"
+      },
+      "auditScore": 95
+    },
+    {
+      "regulationId": "new-jersey-veterans-benefits-compliance",
+      "name": "New Jersey Veterans Benefits Compliance",
+      "source": "enhanced",
+      "state": "NJ",
+      "jurisdictionSource": "state",
+      "statute": "N.J.S.A. 18A:62-6",
+      "topic": "Financial Aid",
+      "topicId": 52,
+      "summary": "N.J.S.A. 18A:62-6 establishes tuition benefits for qualified New Jersey veterans and their dependents at state institutions of higher education. The program covers full tuition and fees at public institutions, with equivalent support at private colleges. Eligible participants include honorably discharged veterans who were New Jersey residents upon military entry, plus certain dependents of deceased or missing service members. Institutions must designate certified veterans' education officials, maintain comprehensive records, verify student eligibility and academic progress, coordinate with federal benefits, and provide veteran-supportive campus environments and services.",
+      "requirements": [
+        "Designate certified veterans' education officials trained by the State Approving Agency to administer benefit programs and maintain current certification",
+        "Establish application procedures requiring DD-214 documentation, residency proof, and benefit applications submitted 60 days prior to term enrollment",
+        "Verify student eligibility, academic progress, and enrollment status each semester while ensuring coordination with federal GI Bill benefits",
+        "Maintain comprehensive student records including eligibility documentation, enrollment verification, and benefit payment records for minimum five years",
+        "Provide appeal procedures with due process protections for benefit denials, suspensions, or terminations, including written notification and hearing opportunities"
+      ],
+      "reportingRequirements": {
+        "timeline": "Quarterly enrollment and benefit utilization reports due 30 days after each term's end, annual program evaluation reports including veteran student success metrics due by July 31st, and immediate notification of any eligibility determination appeals or benefit payment discrepancies to the New Jersey Office of the Secretary of Higher Education"
+      },
+      "auditScore": 95
+    }
+  ],
+  "newRowsAdded": 14,
+  "enhancedFilesUpdated": 0
+}

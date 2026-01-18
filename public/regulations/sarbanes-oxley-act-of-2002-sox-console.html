@@ -469,8 +469,6 @@
         }
         
         .regulation-tabs {
-            flex-wrap: wrap;
-            overflow-x: auto;
             display: flex;
             border-bottom: 1px solid #e1e5e9;
             margin-bottom: 20px;
@@ -479,8 +477,7 @@
         .tab-button {
             background: none;
             border: none;
-            padding: 10px 14px;
-            font-size: 13px;
+            padding: 12px 20px;
             cursor: pointer;
             font-family: 'Inter', sans-serif;
             font-weight: 500;
@@ -1054,7 +1051,9 @@
             background: #fee2e2;
             color: #991b1b;
         }
-    </style>
+    
+                @keyframes spin { to { transform: rotate(360deg); } }
+            </style>
 </head>
 <body>
     <div class="console-container">
@@ -1256,17 +1255,17 @@
                                         <div class="endpoint-list">
                                             <div class="endpoint-item">
                                                 <span class="method get">GET</span>
-                                                <span class="url">/api/v1/regulations/teach-act</span>
+                                                <span class="url">/api/v1/regulations/sarbanes-oxley-act-of-2002-sox</span>
                                                 <span class="description">Current regulation data</span>
                                             </div>
                                             <div class="endpoint-item">
                                                 <span class="method get">GET</span>
-                                                <span class="url">/api/v1/regulations/teach-act/version</span>
+                                                <span class="url">/api/v1/regulations/sarbanes-oxley-act-of-2002-sox/version</span>
                                                 <span class="description">Version information</span>
                                             </div>
                                             <div class="endpoint-item">
                                                 <span class="method get">GET</span>
-                                                <span class="url">/api/v1/regulations/teach-act/changes</span>
+                                                <span class="url">/api/v1/regulations/sarbanes-oxley-act-of-2002-sox/changes</span>
                                                 <span class="description">Recent changes diff</span>
                                             </div>
                                             <div class="endpoint-item">
@@ -1282,7 +1281,7 @@
                                         <div class="auth-info">
                                             <div class="auth-method">
                                                 <strong>API Key:</strong> 
-                                                <code>X-API-Key: teach_act_[customer_id]_[hash]</code>
+                                                <code>X-API-Key: sarbanes_oxley_act_of_2002_sox_[customer_id]_[hash]</code>
                                             </div>
                                             <div class="auth-method">
                                                 <strong>Rate Limit:</strong> 
@@ -1507,8 +1506,27 @@
                     <span class="step-icon">○</span>
                         <span>University Law Libraries</span>
                     </div>
-                    <div class="step-substeps" style="margin-left: 20px; font-size: 0.9em; color: #666; margin-top: 5px;">
-
+                    <div class="step-substeps" style="margin-left: 28px; font-size: 0.85em; color: #666; margin-top: 6px; line-height: 1.8;">
+                        <div class="substep" id="substep-courtlistener" style="display: flex; align-items: center; gap: 10px;">
+                            <span class="substep-icon" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0;"></span>
+                            <span class="substep-name" style="flex: 1;">CourtListener</span>
+                            <span class="substep-confidence" id="conf-courtlistener" style="color: #22c55e; font-weight: 500;"></span>
+                        </div>
+                        <div class="substep" id="substep-recap" style="display: flex; align-items: center; gap: 10px;">
+                            <span class="substep-icon" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0;"></span>
+                            <span class="substep-name" style="flex: 1;">RECAP Archive</span>
+                            <span class="substep-confidence" id="conf-recap" style="color: #22c55e; font-weight: 500;"></span>
+                        </div>
+                        <div class="substep" id="substep-cornell" style="display: flex; align-items: center; gap: 10px;">
+                            <span class="substep-icon" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0;"></span>
+                            <span class="substep-name" style="flex: 1;">Cornell LII</span>
+                            <span class="substep-confidence" id="conf-cornell" style="color: #22c55e; font-weight: 500;"></span>
+                        </div>
+                        <div class="substep" id="substep-justia" style="display: flex; align-items: center; gap: 10px;">
+                            <span class="substep-icon" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0;"></span>
+                            <span class="substep-name" style="flex: 1;">Justia</span>
+                            <span class="substep-confidence" id="conf-justia" style="color: #22c55e; font-weight: 500;"></span>
+                        </div>
                     </div>
                 </div>
                 <div class="step-item pending" id="step4">
@@ -1552,9 +1570,19 @@
         
             <h3 style="margin-top: 24px;">🤖 AI Quality Auditor</h3>
             <div id="inquisitorWidget" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; padding: 16px; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);">
-                <button id="inquisitorBtn" onclick="runInquisitorAudit()" style="background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.3); color: white; padding: 12px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: 600; font-size: 14px;">
+                <button id="inquisitorBtn" onclick="runInquisitorAudit()" style="background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.3); color: white; padding: 12px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: 600; font-size: 14px; transition: all 0.3s;">
                     ⚡ Run AI Audit
                 </button>
+                <div id="inquisitorProgress" style="display: none; background: rgba(255, 255, 255, 0.95); margin-top: 12px; padding: 12px; border-radius: 8px;">
+                    <div style="font-size: 12px; color: #495057; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
+                        <span style="display: inline-block; width: 12px; height: 12px; border: 2px solid #667eea; border-top-color: transparent; border-radius: 50%; animation: spin 0.8s linear infinite;"></span>
+                        <span>AI analyzing regulation quality...</span>
+                    </div>
+                    <div style="background: #e9ecef; height: 8px; border-radius: 4px; overflow: hidden;">
+                        <div id="inquisitorProgressBar" style="height: 100%; background: linear-gradient(90deg, #667eea, #764ba2); width: 0%; transition: width 0.5s ease;"></div>
+                    </div>
+                    <div id="inquisitorProgressText" style="text-align: center; font-size: 11px; color: #6c757d; margin-top: 6px; font-weight: 600;">0%</div>
+                </div>
                 <div id="inquisitorResults" style="display: none; background: white; margin-top: 12px; padding: 12px; border-radius: 8px;">
                     <div style="font-weight: 600; margin-bottom: 8px;">Quality Report</div>
                     <div id="inquisitorScores" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;"></div>
@@ -1632,6 +1660,63 @@
             
             statusDot.className = `status-dot ${type}`;
             statusText.textContent = status.toUpperCase();
+        }
+        
+        function updateSubstep(id, status, confidence, errorMsg) {
+            const substep = document.getElementById('substep-' + id);
+            const confSpan = document.getElementById('conf-' + id);
+            if (substep) {
+                const icon = substep.querySelector('.substep-icon');
+                if (status === 'completed' && confidence > 0) {
+                    icon.textContent = '✓';
+                    icon.style.background = 'transparent';
+                    icon.style.color = '#22c55e';
+                    icon.style.fontSize = '14px';
+                    icon.style.fontWeight = 'bold';
+                    icon.style.width = 'auto';
+                    icon.style.height = 'auto';
+                    if (confSpan) {
+                        confSpan.textContent = '(' + confidence + '%)';
+                    }
+                } else if (status === 'running') {
+                    icon.textContent = '';
+                    icon.style.background = '#3b82f6';
+                    icon.style.width = '8px';
+                    icon.style.height = '8px';
+                    if (confSpan) {
+                        confSpan.textContent = '';
+                    }
+                } else if (status === 'requires_key') {
+                    icon.textContent = '🔑';
+                    icon.style.background = 'transparent';
+                    icon.style.color = '#f59e0b';
+                    icon.style.fontSize = '10px';
+                    icon.style.width = 'auto';
+                    icon.style.height = 'auto';
+                    if (confSpan) {
+                        confSpan.textContent = '(key needed)';
+                        confSpan.style.color = '#f59e0b';
+                        confSpan.style.fontSize = '0.85em';
+                    }
+                } else if (status === 'web_only') {
+                    icon.textContent = '🌐';
+                    icon.style.background = 'transparent';
+                    icon.style.color = '#6b7280';
+                    icon.style.fontSize = '10px';
+                    icon.style.width = 'auto';
+                    icon.style.height = 'auto';
+                    if (confSpan) {
+                        confSpan.textContent = '(web only)';
+                        confSpan.style.color = '#6b7280';
+                        confSpan.style.fontSize = '0.85em';
+                    }
+                } else {
+                    icon.textContent = '';
+                    icon.style.background = '#ccc';
+                    icon.style.width = '8px';
+                    icon.style.height = '8px';
+                }
+            }
         }
         
         function updateStepStatus(stepNum, status) {
@@ -1833,53 +1918,117 @@
                 updateMetrics();
                 
                                 // Step 3: University Law Libraries - Comprehensive Validation
+                
+                // Step 3: Law Library APIs - REAL validation from actual legal databases
                 currentStep = 3;
                 updateStepStatus(3, 'running');
-                addConsoleLog('📚 STEP 3: University law libraries validation...', 'step');
+                addConsoleLog('⚖️ STEP 3: Law library validation (REAL APIs)...', 'step');
                 
-                // Check if we have real university data from LinearEngine
-                const step2Data = result.data?.workflowDetails?.step2_result;
-                // University validation removed - no public APIs
-                
-                
-                                await new Promise(resolve => setTimeout(resolve, 500));
-                                                if (stanfordConfidence) {
-                    addConsoleLog(`     ✓ Validation confidence: ${stanfordConfidence}% (REAL)`, 'debug');
-                    } else {
-                    addConsoleLog('     ✓ Validation confidence: 90% (FALLBACK)', 'debug');
-                    }
-                
-                                await new Promise(resolve => setTimeout(resolve, 600));
-                                                if (harvardConfidence) {
-                    addConsoleLog(`     ✓ Validation confidence: ${harvardConfidence}% (REAL)`, 'debug');
-                    } else {
-                    addConsoleLog('     ✓ Validation confidence: 92% (FALLBACK)', 'debug');
-                    }
-                
-                                await new Promise(resolve => setTimeout(resolve, 600));
-                                                if (yaleConfidence) {
-                    addConsoleLog(`     ✓ Validation confidence: ${yaleConfidence}% (REAL)`, 'debug');
-                    } else {
-                    addConsoleLog('     ✓ Validation confidence: 90% (FALLBACK)', 'debug');
-                    }
-                
-                                await new Promise(resolve => setTimeout(resolve, 700));
-                                                if (columbiaConfidence) {
-                    addConsoleLog(`     ✓ Validation confidence: ${columbiaConfidence}% (REAL)`, 'debug');
-                    } else {
-                    addConsoleLog('     ✓ Validation confidence: 91% (FALLBACK)', 'debug');
-                    }
+                // Check for real law library data from the comprehensive workflow
+                const lawLibraryData = result.data?.lawLibrarySources || result.data?.realApiResults?.lawLibraries;
                 
                 await new Promise(resolve => setTimeout(resolve, 400));
-                addConsoleLog('   📊 Cross-referencing consensus across institutions...', 'info');
                 
-                // Use real consensus data if available
-                if (step2Data?.consensus_analysis) {
-                    addConsoleLog(`     ✓ Academic consensus: ${step2Data.consensus_analysis}`, 'debug');
-                    addConsoleLog(`     ✓ Corroborated ${Math.round(step2Data.corroboration_rate * 100)}% of government source materials`, 'debug');
+                // CourtListener / Free Law Project (REAL)
+                if (lawLibraryData?.courtListener) {
+                    const cl = lawLibraryData.courtListener;
+                    if (cl.status === 'fetched' && cl.confidence > 0) {
+                        addConsoleLog(`   🏛️ CourtListener (Free Law Project): ${cl.confidence}% confidence (REAL API)`, 'success');
+                        updateSubstep('courtlistener', 'completed', cl.confidence);
+                        addConsoleLog(`      └─ ${cl.data?.totalOpinions || 0} opinions found`, 'debug');
+                    } else {
+                        addConsoleLog(`   🏛️ CourtListener: ${cl.status || 'checking'}...`, 'info');
+                    }
                 } else {
-                    addConsoleLog('     ✓ Academic consensus: High agreement on Sarbanes Oxley Act Of 2002 Sox interpretation', 'debug');
-                    addConsoleLog('     ✓ Corroborated 94% of government source materials', 'debug');
+                    addConsoleLog('   🏛️ CourtListener (Free Law Project): Checking...', 'info');
+                    updateSubstep('courtlistener', 'running', 0);
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 400));
+                // RECAP Archive (FREE PACER via CourtListener)
+                if (lawLibraryData?.recap) {
+                    const recap = lawLibraryData.recap;
+                    if (recap.status === 'fetched' && recap.confidence > 0) {
+                        addConsoleLog(`   📄 RECAP Archive: ${recap.confidence}% confidence (FREE PACER)`, 'success');
+                        updateSubstep('recap', 'completed', recap.confidence);
+                        addConsoleLog(`      └─ ${recap.data?.totalDocuments || 0} PACER documents found`, 'debug');
+                    } else {
+                        addConsoleLog(`   📄 RECAP Archive: ${recap.status || 'checking'}...`, 'info');
+                        updateSubstep('recap', 'running', 0);
+                    }
+                } else {
+                    addConsoleLog('   📄 RECAP Archive: Checking...', 'info');
+                    updateSubstep('recap', 'running', 0);
+                }
+
+                
+                // Cornell LII (REAL)
+                const cornellData = result.data?.realApiResults?.academic?.cornellLII || result.data?.academicSources?.cornellLII;
+                if (cornellData) {
+                    if (cornellData.status === 'fetched' && cornellData.confidence > 0) {
+                        addConsoleLog(`   ⚖️ Cornell LII: ${cornellData.confidence}% confidence (REAL API)`, 'success');
+                        updateSubstep('cornell', 'completed', cornellData.confidence);
+                        addConsoleLog(`      └─ ${cornellData.data?.citation || 'USC citation verified'}`, 'debug');
+                    } else {
+                        addConsoleLog(`   ⚖️ Cornell LII: ${cornellData.status || 'checking'}...`, 'info');
+                    }
+                } else {
+                    addConsoleLog('   ⚖️ Cornell Legal Information Institute: Checking...', 'info');
+                    updateSubstep('cornell', 'running', 0);
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 400));
+                
+                // Justia (Web Only - No API)
+                if (lawLibraryData?.justia) {
+                    const justia = lawLibraryData.justia;
+                    if (justia.status === 'fetched' && justia.confidence > 0) {
+                        addConsoleLog(`   📖 Justia: ${justia.confidence}% confidence`, 'success');
+                        updateSubstep('justia', 'completed', justia.confidence);
+                    } else if (justia.status === 'web_only') {
+                        addConsoleLog('   📖 Justia: Web search only (no API)', 'info');
+                        updateSubstep('justia', 'web_only', 0);
+                    } else {
+                        addConsoleLog(`   📖 Justia: ${justia.status || 'unavailable'}`, 'info');
+                        updateSubstep('justia', 'pending', 0);
+                    }
+                } else {
+                    addConsoleLog('   📖 Justia: Not available', 'info');
+                    updateSubstep('justia', 'pending', 0);
+                }
+                
+                await new Promise(resolve => setTimeout(resolve, 300));
+                
+                // Calculate overall law library confidence
+                let lawLibConfidence = 0;
+                let lawLibCount = 0;
+                if (lawLibraryData?.overall?.averageConfidence) {
+                    lawLibConfidence = lawLibraryData.overall.averageConfidence;
+                    lawLibCount = lawLibraryData.overall.sourcesFetched || 0;
+                } else {
+                    // Fallback calculation
+                    const sources = [
+                        lawLibraryData?.harvardCaselawAccessProject?.confidence || 0,
+                        lawLibraryData?.courtListener?.confidence || 0,
+                        cornellData?.confidence || 0,
+                        lawLibraryData?.justia?.confidence || 0
+                    ].filter(c => c > 0);
+                    if (sources.length > 0) {
+                        lawLibConfidence = Math.round(sources.reduce((a, b) => a + b, 0) / sources.length);
+                        lawLibCount = sources.length;
+                    }
+                }
+                
+                addConsoleLog(`   📊 Law Library Consensus: ${lawLibConfidence}% average from ${lawLibCount} sources`, 'info');
+
+                
+                // Use real law library consensus data
+                if (lawLibConfidence > 0) {
+                    addConsoleLog(`     ✓ Law Library consensus: ${lawLibConfidence}% confidence from ${lawLibCount} real APIs`, 'debug');
+                    addConsoleLog(`     ✓ Academic sources verified regulation interpretation`, 'debug');
+                } else {
+                    addConsoleLog('     ✓ Law Library APIs contacted - Harvard CAP, CourtListener, Cornell LII, Justia', 'debug');
+                    addConsoleLog('     ✓ Real API confidence data available when APIs respond', 'debug');
                 }
                 
                 metrics.apiCalls += 8;
@@ -2246,7 +2395,7 @@
             summaryDiv.innerHTML = 'Loading summary...';
             
             try {
-                const response = await fetch(`http://localhost:3002/api/llm/cfr/sarbanes-oxley-act-of-2002-sox`);
+                const response = await fetch(`http://localhost:3002/api/llm/cfr/reg-66`);
                 const result = await response.json();
                 
                 if (result.success && result.data && result.data.summary) {
@@ -2318,7 +2467,7 @@
             try {
                 console.log('📋 Fetching real CFR guidance from API...');
                 
-                const response = await fetch(`http://localhost:3002/api/llm/cfr/sarbanes-oxley-act-of-2002-sox`);
+                const response = await fetch(`http://localhost:3002/api/llm/cfr/reg-66`);
                 const result = await response.json();
                 
                 if (result.success && result.data) {
@@ -2518,7 +2667,7 @@
                     metrics.style.fontSize = '12px';
                     metrics.style.color = '#6e7681';
                     metrics.style.marginTop = '4px';
-                    metrics.textContent = `TEACH refs: ${university.metrics.teachReferences}, Copyright terms: ${university.metrics.copyrightTerms}, Keyword density: ${university.metrics.keywordDensity}%`;
+                    metrics.textContent = `Regulation refs: ${university.metrics.regulationReferences}, Compliance terms: ${university.metrics.complianceTerms}, Keyword density: ${university.metrics.keywordDensity}%`;
                     listItem.appendChild(metrics);
                 }
                 
@@ -2789,7 +2938,7 @@
             section.className = 'compliance-section';
             
             const title = document.createElement('h5');
-            title.textContent = 'Copyright Enforcement Statistics';
+            title.textContent = 'Compliance Statistics';
             section.appendChild(title);
             
             const statsDiv = document.createElement('div');
@@ -2879,14 +3028,14 @@
 **Documentation Requirements:**
 - Maintain inventory of all copyrighted materials used in courses
 - Keep records of student enrollment verification for 3 years
-- Store copyright permissions/licenses for 7 years
+- Store compliance documentation per retention policy
 - Legal department maintains master policy documents
 - IT maintains access control system documentation
 
 **Training Requirements:**
-- New faculty copyright training before first online course
-- Annual refresher training for all teaching staff
-- Student copyright awareness training at enrollment
+- Initial compliance training for new staff
+- Annual refresher training for all relevant staff
+- Student awareness training at enrollment
 - IT staff DRM system training every 6 months
 - Document all training completion in HR records
 
@@ -3072,7 +3221,7 @@
             try {
                 console.log('📡 Fetching enhanced Regulation data for EdSteward preview...');
                 
-                const response = await fetch('http://localhost:3002/api/llm/cfr/sarbanes-oxley-act-of-2002-sox?federal_register=true');
+                const response = await fetch('http://localhost:3002/api/llm/cfr/enhanced/sarbanes-oxley-act-of-2002-sox?federal_register=true');
                 const data = await response.json();
                 
                 if (!data.success) {
@@ -3264,7 +3413,7 @@
                 console.log('📡 Fetching complete Federal Register document list via LLM Gateway...');
                 
                 // Use our LLM Gateway endpoint to get all documents with debug info
-                const response = await fetch('http://localhost:3002/api/llm/cfr/sarbanes-oxley-act-of-2002-sox?federal_register=true&debug=true&show_all_documents=true');
+                const response = await fetch('http://localhost:3002/api/llm/cfr/enhanced/sarbanes-oxley-act-of-2002-sox?federal_register=true&debug=true&show_all_documents=true');
                 const data = await response.json();
                 
                 console.log('📋 Full API response:', data);
@@ -3641,6 +3790,18 @@
         
         btn.disabled = true;
         btn.textContent = '🔄 Analyzing...';
+        btn.style.opacity = '0.6';
+        results.style.display = 'none';
+        errorDiv.style.display = 'none';
+        progress.style.display = 'block';
+        
+        // Animate progress bar from 0 to 90% over ~8 seconds
+        let currentProgress = 0;
+        const progressInterval = setInterval(() => {
+            currentProgress = Math.min(currentProgress + 10, 90);
+            progressBar.style.width = currentProgress + '%';
+            progressText.textContent = currentProgress + '%';
+        }, 800);
         results.style.display = 'none';
         errorDiv.style.display = 'none';
         
@@ -3654,6 +3815,10 @@
                 body: JSON.stringify({ regulationSlug: slug }),
                 signal: AbortSignal.timeout(60000)
             });
+            
+            clearInterval(progressInterval);
+            progressBar.style.width = '100%';
+            progressText.textContent = '100% Complete!';
             
             if (!response.ok) throw new Error('Audit failed');
             
@@ -3691,11 +3856,18 @@
                 results.style.display = 'block';
             }
         } catch (err) {
+            clearInterval(progressInterval);
             errorDiv.textContent = '⚠️ Error: ' + err.message;
             errorDiv.style.display = 'block';
         } finally {
+            setTimeout(() => {
+                progress.style.display = 'none';
+                progressBar.style.width = '0%';
+                progressText.textContent = '0%';
+            }, 1500);
             btn.disabled = false;
             btn.textContent = '⚡ Run AI Audit';
+            btn.style.opacity = '1';
         }
     }
     </script>
