@@ -10,6 +10,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Send, X, AlertTriangle, Info, CheckCircle, Users, FileText } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
+import { apiRequest } from '@/lib/queryClient';
 
 interface User {
   id: number;
@@ -62,20 +63,7 @@ export default function CreateNotificationModal({ isOpen, onClose }: CreateNotif
 
   const createNotificationMutation = useMutation({
     mutationFn: async (data: typeof formData) => {
-      const response = await fetch('/api/notification-history/send', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-      
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || 'Failed to send notification');
-      }
-      
-      return response.json();
+      return apiRequest('POST', '/api/notification-history/send', data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/notification-history'] });

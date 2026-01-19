@@ -272,7 +272,7 @@ export default function NotificationsPage() {
                 <select
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value as any)}
-                  className="border border-border rounded-md px-3 py-1 text-sm"
+                  className="border border-border rounded-md px-3 py-1 text-sm bg-background text-foreground"
                 >
                   <option value="all">All Notifications</option>
                   <option value="sent">Sent Only</option>

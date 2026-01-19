@@ -45,7 +45,7 @@ export class EmailService {
     }
   }
 
-  async sendEmail(to: string, subject: string, text: string) {
+  async sendEmail(to: string, subject: string, content: string, options?: { html?: boolean }) {
     try {
       if (!this.transporter) {
         const initialized = await this.initializeTransporter();
@@ -59,12 +59,24 @@ export class EmailService {
         throw new Error('Email configuration not found');
       }
 
-      const info = await this.transporter!.sendMail({
+      // Determine if content is HTML (auto-detect or use option)
+      const isHtml = options?.html ?? content.trim().startsWith('<');
+      
+      const mailOptions: nodemailer.SendMailOptions = {
         from: config.fromEmail,
         to,
         subject,
-        text,
-      });
+      };
+
+      if (isHtml) {
+        mailOptions.html = content;
+        // Create plain text fallback by stripping HTML
+        mailOptions.text = content.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+      } else {
+        mailOptions.text = content;
+      }
+
+      const info = await this.transporter!.sendMail(mailOptions);
 
       log(`Email sent: ${info.messageId}`);
       return true;
