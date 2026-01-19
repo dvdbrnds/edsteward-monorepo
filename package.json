@@ -21,6 +21,7 @@
     "db:setup-local": "chmod +x scripts/setup-local-db.sh && ./scripts/setup-local-db.sh",
     "db:test": "node test-rds-connection.js",
     "db:test-connection": "node test-rds-connection.js",
+    "verify:alignment": "node scripts/verify-mcp-alignment.cjs",
     "build:single-tenant": "npm run build",
     "start:single-tenant": "npx tsx server/index.ts",
     "docker:build:single-tenant": "docker build -f Dockerfile.single-tenant -t edsteward-single-tenant:latest .",

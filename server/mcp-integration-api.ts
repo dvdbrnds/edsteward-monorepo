@@ -1273,5 +1273,85 @@ export function setupMCPIntegrationApi(app: express.Application) {
       });
     }
   });
+
+  // =====================================================
+  // ALIGNMENT STATUS ENDPOINTS (for MCP Engine verification)
+  // =====================================================
+
+  /**
+   * GET /api/mcp/alignment-status
+   * 
+   * Returns comprehensive alignment status for MCP Engine verification
+   * Shows regulation counts by jurisdiction, L.O.V.V. level, and related data
+   */
+  app.get('/api/mcp/alignment-status', basicAuthMCP, async (req: Request, res: Response) => {
+    try {
+      const result = await db.execute(sql`
+        SELECT 
+          (SELECT COUNT(*) FROM regulations) as total_regulations,
+          (SELECT COUNT(*) FROM regulations WHERE lovv_level IS NOT NULL) as mcp_validated,
+          (SELECT COUNT(*) FROM regulations WHERE jurisdiction_source = 'federal') as federal,
+          (SELECT COUNT(*) FROM regulations WHERE state_code = 'PA') as pennsylvania,
+          (SELECT COUNT(*) FROM regulations WHERE state_code = 'NJ') as new_jersey,
+          (SELECT COUNT(*) FROM regulation_topics) as topic_mappings,
+          (SELECT COUNT(*) FROM compliance_tasks) as compliance_tasks,
+          (SELECT MAX(last_updated) FROM regulations) as last_sync
+      `);
+      
+      const stats = result.rows[0] as any;
+      
+      res.json({
+        status: 'ok',
+        alignment: {
+          totalRegulations: parseInt(stats.total_regulations),
+          mcpValidated: parseInt(stats.mcp_validated),
+          federal: parseInt(stats.federal),
+          pennsylvania: parseInt(stats.pennsylvania),
+          newJersey: parseInt(stats.new_jersey),
+          topicMappings: parseInt(stats.topic_mappings),
+          complianceTasks: parseInt(stats.compliance_tasks),
+          lastSync: stats.last_sync,
+        },
+        timestamp: new Date().toISOString()
+      });
+      
+    } catch (error) {
+      console.error('Error fetching alignment status:', error);
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 'Error fetching alignment status', { error: String(error) });
+      res.status(500).json({ error: 'Failed to fetch alignment status' });
+    }
+  });
+
+  /**
+   * GET /api/mcp/regulation-hashes
+   * 
+   * Returns item_id and version_hash for all regulations
+   * Used by MCP Engine to detect which regulations need updates (diff checking)
+   */
+  app.get('/api/mcp/regulation-hashes', basicAuthMCP, async (req: Request, res: Response) => {
+    try {
+      const result = await db.execute(sql`
+        SELECT item_id, version_hash, lovv_level, last_updated
+        FROM regulations
+        WHERE item_id IS NOT NULL
+        ORDER BY item_id
+      `);
+      
+      res.json({
+        count: result.rows.length,
+        regulations: result.rows.map((r: any) => ({
+          itemId: r.item_id,
+          versionHash: r.version_hash,
+          lovvLevel: r.lovv_level,
+          lastUpdated: r.last_updated,
+        }))
+      });
+      
+    } catch (error) {
+      console.error('Error fetching regulation hashes:', error);
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 'Error fetching regulation hashes', { error: String(error) });
+      res.status(500).json({ error: 'Failed to fetch regulation hashes' });
+    }
+  });
   
 }

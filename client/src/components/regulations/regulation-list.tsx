@@ -507,7 +507,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
                       columnKey="id" 
                       label="ID" 
                       sortable 
-                      sortKey="itemId" 
+                      sortKey="id" 
                       onSort={handleSort}
                       onHide={toggleColumn}
                     />
@@ -618,8 +618,8 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
                   >
                     {isColumnVisible('id') && (
                       <TableCell>
-                        <div className="text-sm text-muted-foreground">
-                          {regulation.itemId}
+                        <div className="text-sm text-muted-foreground font-mono">
+                          {regulation.id}
                         </div>
                       </TableCell>
                     )}
