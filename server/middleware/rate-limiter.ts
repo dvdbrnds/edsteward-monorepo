@@ -49,18 +49,35 @@ interface TenantRateLimitOptions {
   tenantWide?: boolean; // If true, limit applies to entire tenant, not per-IP
 }
 
+// Check if we're in development mode
+const isDevelopment = process.env.NODE_ENV !== 'production';
+
 function createTenantAwareLimiter(options: TenantRateLimitOptions) {
   const { windowMs, max, message, skipSuccessfulRequests = false, tenantWide = false } = options;
   
   return rateLimit({
     windowMs,
-    max,
+    // In development, use 10x the limit
+    max: isDevelopment ? max * 10 : max,
     keyGenerator: tenantWide ? getTenantOnlyKey : getTenantAwareKey,
     skipSuccessfulRequests,
     standardHeaders: true,
     legacyHeaders: false,
     // Disable the keyGenerator IPv6 validation - we're combining tenant+IP which is intentional
     validate: { keyGenerator: false },
+    // Skip rate limiting entirely for localhost in development
+    skip: (req: Request) => {
+      // Always skip in development for localhost
+      if (isDevelopment) {
+        const host = req.get('host') || '';
+        const ip = req.ip || '';
+        if (host.includes('localhost') || host.includes('127.0.0.1') || 
+            ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1') {
+          return true;
+        }
+      }
+      return false;
+    },
     handler: (req: Request, res: Response) => {
       const tenantId = req.tenantId || 'unknown';
       const resetTime = req.rateLimit?.resetTime?.getTime() || Date.now() + windowMs;
@@ -94,11 +111,12 @@ export const apiLimiter = createTenantAwareLimiter({
 });
 
 /**
- * Authentication rate limiter - 10 attempts per 15 minutes per tenant+IP
+ * Authentication rate limiter - 50 attempts per 15 minutes per tenant+IP
+ * (increased from 10 for development flexibility)
  */
 export const authLimiter = createTenantAwareLimiter({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 10,
+  max: 50,
   message: 'Too many login attempts. Please try again in 15 minutes.',
   skipSuccessfulRequests: true,
 });

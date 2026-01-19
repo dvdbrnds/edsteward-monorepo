@@ -1,10 +1,12 @@
 import express, { type Request, Response } from "express";
 import { storage } from "./storage";
 import { db } from "./db";
+import { sql, eq } from "drizzle-orm";
 import { regulations, complianceTasks } from "@shared/schema";
 import { syslog, LogLevel, LogFacility } from './services/syslog';
 import { z } from "zod";
 import { ValidationLevel } from "@shared/schema";
+import { normalizeCategory } from './services/category-normalizer';
 
 /**
  * Sets up the MCP integration API routes
@@ -545,8 +547,27 @@ export function setupMCPIntegrationApi(app: express.Application) {
       description: z.string(),
     })).optional(),
     
+    // MCP Engine specific fields
+    lovvLevel: z.enum(['A', 'B', 'C', 'D']).optional(), // L.O.V.V. validation level
+    lastValidated: z.string().optional(), // ISO timestamp of last validation
+    version: z.number().optional(), // Version number
+    versionHash: z.string().optional(), // SHA-256 hash for change detection
+    stateCode: z.string().max(2).optional(), // Two-letter state code (PA, NJ)
+    sourceUrl: z.string().optional(), // Original source URL
+    
     // Compliance tasks
     complianceTasks: z.array(mcpComplianceTaskSchema).optional(),
+    
+    // Topic mappings (for multi-topic regulations)
+    topics: z.array(z.object({
+      topic: z.string().optional(),
+      name: z.string().optional(),
+      topicId: z.number().optional(),
+      topic_id: z.number().optional(),
+      department: z.string().optional(),
+      responsibleRole: z.string().optional(),
+      responsible_role: z.string().optional(),
+    })).optional(),
     
     // Metadata
     metadata: z.object({
@@ -667,7 +688,38 @@ export function setupMCPIntegrationApi(app: express.Application) {
       // Generate itemId if not provided
       const itemId = data.itemId || `REG-${data.name.replace(/[^a-zA-Z0-9]/g, '-').substring(0, 30).toUpperCase()}-${Date.now()}`;
       
-      // Create the regulation
+      // Build default actions based on regulation characteristics
+      const hasDeadlines = data.filingDeadlines && data.filingDeadlines.length > 0;
+      const firstDeadline = hasDeadlines ? data.filingDeadlines[0] : null;
+      const defaultActions = [
+        {
+          type: 'attestation' as const,
+          enabled: true,
+          required: true,
+          status: 'pending' as const,
+        },
+        {
+          type: 'website_publish' as const,
+          enabled: false,
+          required: false,
+          status: 'pending' as const,
+        },
+        {
+          type: 'community_communication' as const,
+          enabled: false,
+          required: false,
+          status: 'pending' as const,
+        },
+        {
+          type: 'agency_submission' as const,
+          enabled: hasDeadlines,
+          required: hasDeadlines,
+          status: 'pending' as const,
+          dueDate: firstDeadline?.date || undefined,
+        },
+      ];
+      
+      // Create the regulation with all MCP Engine fields
       console.log('💾 Inserting regulation into database...');
       const [newRegulation] = await db.insert(regulations).values({
         itemId,
@@ -696,7 +748,15 @@ export function setupMCPIntegrationApi(app: express.Application) {
         filingDeadlines: data.filingDeadlines || null,
         isApplicable: true,
         isCurrent: true,
-        versionNumber: 1,
+        versionNumber: (data as any).version || 1,
+        // MCP Engine specific fields
+        lovvLevel: (data as any).lovvLevel || null,
+        lastValidated: (data as any).lastValidated ? new Date((data as any).lastValidated) : null,
+        versionHash: (data as any).versionHash || null,
+        stateCode: (data as any).stateCode || null,
+        sourceUrl: (data as any).sourceUrl || null,
+        // Default actions for compliance workflow
+        actions: defaultActions,
       }).returning();
       
       console.log(`✅ Regulation created with ID: ${newRegulation.id}`);
@@ -780,6 +840,36 @@ export function setupMCPIntegrationApi(app: express.Application) {
         console.log(`✅ Created ${createdTasks.length} compliance tasks`);
       }
       
+      // Handle topic mappings if provided
+      if ((data as any).topics && Array.isArray((data as any).topics) && (data as any).topics.length > 0) {
+        console.log(`🏷️ Processing ${(data as any).topics.length} topic mappings...`);
+        
+        // Clear existing topic mappings for this regulation
+        await db.execute(
+          sql`DELETE FROM regulation_topics WHERE regulation_id = ${newRegulation.id}`
+        );
+        
+        for (const topic of (data as any).topics) {
+          await db.execute(sql`
+            INSERT INTO regulation_topics (
+              regulation_id, topic, topic_id, department, responsible_role
+            ) VALUES (
+              ${newRegulation.id},
+              ${topic.topic || topic.name},
+              ${topic.topicId || topic.topic_id || null},
+              ${topic.department || null},
+              ${topic.responsibleRole || topic.responsible_role || null}
+            )
+            ON CONFLICT (regulation_id, topic) DO UPDATE SET
+              topic_id = EXCLUDED.topic_id,
+              department = EXCLUDED.department,
+              responsible_role = EXCLUDED.responsible_role
+          `);
+        }
+        
+        console.log(`✅ Created ${(data as any).topics.length} topic mappings`);
+      }
+      
       // Log to syslog
       syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `New regulation created via MCP: ${data.name}`, {
         regulationId: newRegulation.id,
@@ -816,6 +906,270 @@ export function setupMCPIntegrationApi(app: express.Application) {
       res.status(500).json({
         success: false,
         error: 'Failed to create regulation',
+        details: error instanceof Error ? error.message : String(error),
+        timestamp,
+      });
+    }
+  });
+
+  /**
+   * POST /api/mcp/regulations/sync
+   * 
+   * UPSERT endpoint - Creates a new regulation OR updates existing one
+   * Matches by regulationId (item_id in EdSteward)
+   * 
+   * This is the recommended endpoint for MCP Engine to sync regulations
+   */
+  app.post('/api/mcp/regulations/sync', basicAuthMCP, async (req: Request, res: Response) => {
+    const timestamp = new Date().toISOString();
+    
+    console.log(`\n========================================`);
+    console.log(`📥 MCP SYNC REQUEST at ${timestamp}`);
+    console.log(`========================================`);
+    
+    try {
+      const data = req.body;
+      
+      // Validate required fields
+      if (!data.name || !data.statute || !data.category || !data.topic) {
+        return res.status(400).json({
+          success: false,
+          error: 'Missing required fields: name, statute, category, topic',
+          timestamp,
+        });
+      }
+      
+      // Use regulationId from payload, or generate one
+      const itemId = data.regulationId || data.itemId || 
+        `REG-${data.name.replace(/[^a-zA-Z0-9]/g, '-').substring(0, 30).toUpperCase()}-${Date.now()}`;
+      
+      console.log(`🔍 Looking for existing regulation with item_id: ${itemId}`);
+      
+      // Normalize category (smart mapping to canonical categories)
+      const categoryResult = await normalizeCategory(data.category, { 
+        source: data.jurisdictionSource || 'mcp-engine',
+        autoCreate: true 
+      });
+      
+      if (categoryResult.isNewMapping) {
+        console.log(`🏷️ Auto-mapped category: "${data.category}" → "${categoryResult.canonicalName}" (${(categoryResult.confidence * 100).toFixed(0)}% confidence)`);
+      }
+      
+      // Check if regulation exists by item_id
+      const existingReg = await db.select()
+        .from(regulations)
+        .where(eq(regulations.itemId, itemId))
+        .limit(1);
+      
+      const isUpdate = existingReg.length > 0;
+      let regulationId: number;
+      let regulationRecord: any;
+      
+      // Build default actions
+      const hasDeadlines = data.filingDeadlines && data.filingDeadlines.length > 0;
+      const firstDeadline = hasDeadlines ? data.filingDeadlines[0] : null;
+      const defaultActions = [
+        { type: 'attestation' as const, enabled: true, required: true, status: 'pending' as const },
+        { type: 'website_publish' as const, enabled: false, required: false, status: 'pending' as const },
+        { type: 'community_communication' as const, enabled: false, required: false, status: 'pending' as const },
+        { type: 'agency_submission' as const, enabled: hasDeadlines, required: hasDeadlines, status: 'pending' as const, dueDate: firstDeadline?.date },
+      ];
+      
+      if (isUpdate) {
+        // UPDATE existing regulation
+        console.log(`📝 Updating existing regulation ID: ${existingReg[0].id}`);
+        
+        const [updated] = await db.update(regulations)
+          .set({
+            name: data.name,
+            topic: data.topic,
+            statute: data.statute,
+            category: categoryResult.canonicalName || data.category, // Use canonical if available
+            originalCategory: categoryResult.originalCategory, // Preserve original
+            canonicalCategoryId: categoryResult.canonicalId, // Link to canonical
+            jurisdictionSource: data.jurisdictionSource || 'federal',
+            summary: data.summary || null,
+            requirements: data.requirements || null,
+            regulationText: data.regulationText || null,
+            applicableInstitutions: data.applicableInstitutions || null,
+            dro: data.dro || existingReg[0].dro || '',
+            effectiveDate: data.effectiveDate ? new Date(data.effectiveDate) : existingReg[0].effectiveDate,
+            agency_name: data.agency_name || data.agencyName || existingReg[0].agency_name,
+            agency_url: data.agency_url || data.agencyUrl || existingReg[0].agency_url,
+            regulationUrl: data.regulationUrl || existingReg[0].regulationUrl,
+            filingDeadlines: data.filingDeadlines || existingReg[0].filingDeadlines,
+            lovvLevel: data.lovvLevel || existingReg[0].lovvLevel,
+            lastValidated: data.lastValidated ? new Date(data.lastValidated) : new Date(),
+            versionHash: data.versionHash || null,
+            stateCode: data.stateCode || existingReg[0].stateCode,
+            sourceUrl: data.sourceUrl || existingReg[0].sourceUrl,
+            lastUpdated: new Date(),
+            // Keep existing actions if not provided, otherwise use defaults
+            actions: existingReg[0].actions || defaultActions,
+          })
+          .where(eq(regulations.id, existingReg[0].id))
+          .returning();
+        
+        regulationId = updated.id;
+        regulationRecord = updated;
+        
+      } else {
+        // CREATE new regulation
+        console.log(`✨ Creating new regulation with item_id: ${itemId}`);
+        
+        const [created] = await db.insert(regulations).values({
+          itemId,
+          name: data.name,
+          topic: data.topic,
+          statute: data.statute,
+          category: categoryResult.canonicalName || data.category, // Use canonical if available
+          originalCategory: categoryResult.originalCategory, // Preserve original
+          canonicalCategoryId: categoryResult.canonicalId, // Link to canonical
+          jurisdictionSource: data.jurisdictionSource || 'federal',
+          summary: data.summary || null,
+          requirements: data.requirements || null,
+          regulationText: data.regulationText || null,
+          applicableInstitutions: data.applicableInstitutions || null,
+          dro: data.dro || '',
+          effectiveDate: data.effectiveDate ? new Date(data.effectiveDate) : null,
+          originationDate: data.originationDate ? new Date(data.originationDate) : null,
+          agency_name: data.agency_name || data.agencyName || null,
+          agency_url: data.agency_url || data.agencyUrl || null,
+          regulationUrl: data.regulationUrl || null,
+          filingDeadlines: data.filingDeadlines || null,
+          isApplicable: true,
+          isCurrent: true,
+          versionNumber: data.version || 1,
+          lovvLevel: data.lovvLevel || null,
+          lastValidated: data.lastValidated ? new Date(data.lastValidated) : null,
+          versionHash: data.versionHash || null,
+          stateCode: data.stateCode || null,
+          sourceUrl: data.sourceUrl || null,
+          actions: defaultActions,
+        }).returning();
+        
+        regulationId = created.id;
+        regulationRecord = created;
+      }
+      
+      // Handle compliance tasks - replace existing if provided
+      const createdTasks: Array<{ id: number; tempId?: string; title: string }> = [];
+      const taskIdMap = new Map<string, number>();
+      
+      if (data.complianceTasks && data.complianceTasks.length > 0) {
+        console.log(`📝 Processing ${data.complianceTasks.length} compliance tasks...`);
+        
+        // Delete existing tasks for this regulation (full replacement)
+        await db.delete(complianceTasks).where(eq(complianceTasks.regulationId, regulationId));
+        
+        // First pass: create root tasks (no parent)
+        const rootTasks = data.complianceTasks.filter((t: any) => !t.parentTempId);
+        for (const task of rootTasks) {
+          const [newTask] = await db.insert(complianceTasks).values({
+            regulationId,
+            title: task.title,
+            description: task.description || null,
+            instructions: task.instructions || null,
+            assignedRole: task.assignedRole || null,
+            dueDate: task.dueDate ? new Date(task.dueDate) : null,
+            recurringSchedule: task.recurringSchedule || null,
+            reminderDays: task.reminderDays || 30,
+            priority: task.priority || 'medium',
+            evidenceRequired: task.evidenceRequired || false,
+            evidenceType: task.evidenceType || 'none',
+            evidenceInstructions: task.evidenceInstructions || null,
+            sortOrder: task.sortOrder || 0,
+            status: 'pending',
+            isTemplate: false,
+          }).returning();
+          
+          if (task.tempId) taskIdMap.set(task.tempId, newTask.id);
+          createdTasks.push({ id: newTask.id, tempId: task.tempId, title: task.title });
+        }
+        
+        // Second pass: create child tasks (with parent)
+        const childTasks = data.complianceTasks.filter((t: any) => t.parentTempId);
+        for (const task of childTasks) {
+          const parentId = taskIdMap.get(task.parentTempId!);
+          if (!parentId) continue;
+          
+          const [newTask] = await db.insert(complianceTasks).values({
+            regulationId,
+            parentTaskId: parentId,
+            title: task.title,
+            description: task.description || null,
+            assignedRole: task.assignedRole || null,
+            dueDate: task.dueDate ? new Date(task.dueDate) : null,
+            priority: task.priority || 'medium',
+            evidenceRequired: task.evidenceRequired || false,
+            evidenceType: task.evidenceType || 'none',
+            sortOrder: task.sortOrder || 0,
+            status: 'pending',
+            isTemplate: false,
+          }).returning();
+          
+          if (task.tempId) taskIdMap.set(task.tempId, newTask.id);
+          createdTasks.push({ id: newTask.id, tempId: task.tempId, title: task.title });
+        }
+        
+        console.log(`✅ ${isUpdate ? 'Replaced' : 'Created'} ${createdTasks.length} compliance tasks`);
+      }
+      
+      // Handle topic mappings if provided
+      if (data.topics && Array.isArray(data.topics) && data.topics.length > 0) {
+        console.log(`🏷️ Processing ${data.topics.length} topic mappings...`);
+        
+        await db.execute(sql`DELETE FROM regulation_topics WHERE regulation_id = ${regulationId}`);
+        
+        for (const topic of data.topics) {
+          await db.execute(sql`
+            INSERT INTO regulation_topics (regulation_id, topic, topic_id, department, responsible_role)
+            VALUES (${regulationId}, ${topic.topic || topic.name}, ${topic.topicId || topic.topic_id || null}, 
+                    ${topic.department || null}, ${topic.responsibleRole || topic.responsible_role || null})
+            ON CONFLICT (regulation_id, topic) DO UPDATE SET
+              topic_id = EXCLUDED.topic_id, department = EXCLUDED.department, responsible_role = EXCLUDED.responsible_role
+          `);
+        }
+        
+        console.log(`✅ Synced ${data.topics.length} topic mappings`);
+      }
+      
+      // Log to syslog
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Regulation ${isUpdate ? 'updated' : 'created'} via MCP sync: ${data.name}`, {
+        regulationId,
+        itemId,
+        isUpdate,
+        taskCount: createdTasks.length,
+      });
+      
+      const response = {
+        success: true,
+        action: isUpdate ? 'updated' : 'created',
+        message: `Successfully ${isUpdate ? 'updated' : 'created'} regulation "${data.name}" with ${createdTasks.length} compliance tasks`,
+        regulation: {
+          id: regulationId,
+          itemId: regulationRecord.itemId,
+          name: regulationRecord.name,
+          category: regulationRecord.category,
+          jurisdictionSource: regulationRecord.jurisdictionSource,
+        },
+        tasks: createdTasks,
+        taskIdMapping: Object.fromEntries(taskIdMap),
+        timestamp,
+      };
+      
+      console.log(`\n✅ SUCCESS: ${isUpdate ? 'Updated' : 'Created'} regulation ID ${regulationId}`);
+      console.log(`========================================\n`);
+      
+      res.status(isUpdate ? 200 : 201).json(response);
+      
+    } catch (error) {
+      console.error('❌ Error syncing regulation:', error);
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 'Error syncing regulation via MCP', { error: String(error) });
+      
+      res.status(500).json({
+        success: false,
+        error: 'Failed to sync regulation',
         details: error instanceof Error ? error.message : String(error),
         timestamp,
       });

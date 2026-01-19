@@ -277,6 +277,39 @@ export const regulations = pgTable("regulations", {
   // Escalation target (supervisor/VP for escalations)
   escalationTarget: text("escalation_target"),
   escalationEmail: text("escalation_email"),
+  // MCP Engine integration fields
+  lovvLevel: text("lovv_level"), // L.O.V.V. validation level: A, B, C, D
+  lastValidated: timestamp("last_validated", { withTimezone: true }),
+  versionHash: text("version_hash"), // SHA-256 hash of content for change detection
+  stateCode: text("state_code"), // Two-letter state code for state regulations (PA, NJ, etc.)
+  sourceUrl: text("source_url"), // Original source URL for the regulation
+  // Category normalization fields
+  originalCategory: text("original_category"), // Preserves the original category from source
+  canonicalCategoryId: integer("canonical_category_id"), // FK to canonical_categories
+});
+
+// Canonical Categories - the 15 master categories
+export const canonicalCategories = pgTable("canonical_categories", {
+  id: serial("id").primaryKey(),
+  name: text("name").notNull().unique(),
+  description: text("description"),
+  icon: text("icon"),
+  color: text("color"),
+  sortOrder: integer("sort_order").default(0),
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Category Mappings - maps incoming categories to canonical
+export const categoryMappings = pgTable("category_mappings", {
+  id: serial("id").primaryKey(),
+  incomingCategory: text("incoming_category").notNull().unique(),
+  canonicalCategoryId: integer("canonical_category_id").references(() => canonicalCategories.id),
+  source: text("source"), // Where this mapping came from (e.g., 'PA-DOE', 'federal', 'manual')
+  confidence: text("confidence").default("1.00"), // Confidence score for auto-mappings
+  isVerified: boolean("is_verified").default(false),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
 // Notifications table
@@ -345,8 +378,13 @@ export const insertRegulationSchema = createInsertSchema(regulations).extend({
   dro: z.string().email("DRO must be a valid email address").optional(),
   jurisdictionSource: z.enum(JURISDICTION_SOURCES),
   applicableInstitutions: z.array(z.enum(INSTITUTION_TYPES)).optional().nullable(),
-  stateCode: z.string().optional(),
+  stateCode: z.string().max(2).optional(),
   stateAgency: z.string().optional(),
+  // MCP Engine integration fields
+  lovvLevel: z.enum(['A', 'B', 'C', 'D']).optional().nullable(),
+  lastValidated: z.date().optional().nullable(),
+  versionHash: z.string().max(64).optional().nullable(),
+  sourceUrl: z.string().url().optional().nullable(),
   originationDate: z.date().optional().nullable(),
   effectiveDate: z.date().optional().nullable(),
   nextReviewDate: z.date().optional().nullable(),
