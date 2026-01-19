@@ -46,7 +46,25 @@ const RegulationRepository = {
            'responsibleRole', rt.responsible_role
          ) ORDER BY rt.topic)
          FROM regulation_topics rt 
-         WHERE rt.regulation_id = r.id) as topics
+         WHERE rt.regulation_id = r.id) as topics,
+        (SELECT json_build_object(
+           'riskScore', ra.risk_score,
+           'riskLevel', ra.risk_level,
+           'riskFactors', json_build_object(
+             'financialPenalty', ra.financial_penalty,
+             'federalFunding', ra.federal_funding,
+             'accreditationImpact', ra.accreditation_impact,
+             'reputationalLegal', ra.reputational_legal,
+             'operationalDisruption', ra.operational_disruption
+           ),
+           'enforcementTrend', ra.enforcement_trend,
+           'recentEnforcementActions', ra.recent_enforcement_actions,
+           'assessmentDate', ra.assessment_date,
+           'assessmentVersion', ra.assessment_version,
+           'isPreliminary', ra.is_preliminary
+         )
+         FROM risk_assessments ra 
+         WHERE ra.regulation_id = r.id) as risk_assessment
       FROM regulations r
       WHERE r.is_current = TRUE
     `;
@@ -99,7 +117,8 @@ const RegulationRepository = {
       ...r,
       deadlines: r.deadlines || [],
       tasks: r.tasks || [],
-      topics: r.topics || []
+      topics: r.topics || [],
+      risk_assessment: r.risk_assessment || null
     }));
   },
   
@@ -129,7 +148,25 @@ const RegulationRepository = {
            'responsibleRole', rt.responsible_role
          ) ORDER BY rt.topic)
          FROM regulation_topics rt 
-         WHERE rt.regulation_id = r.id) as topics
+         WHERE rt.regulation_id = r.id) as topics,
+        (SELECT json_build_object(
+           'riskScore', ra.risk_score,
+           'riskLevel', ra.risk_level,
+           'riskFactors', json_build_object(
+             'financialPenalty', ra.financial_penalty,
+             'federalFunding', ra.federal_funding,
+             'accreditationImpact', ra.accreditation_impact,
+             'reputationalLegal', ra.reputational_legal,
+             'operationalDisruption', ra.operational_disruption
+           ),
+           'enforcementTrend', ra.enforcement_trend,
+           'recentEnforcementActions', ra.recent_enforcement_actions,
+           'assessmentDate', ra.assessment_date,
+           'assessmentVersion', ra.assessment_version,
+           'isPreliminary', ra.is_preliminary
+         )
+         FROM risk_assessments ra 
+         WHERE ra.regulation_id = r.id) as risk_assessment
       FROM regulations r
       WHERE r.item_id = $1
     `;
@@ -152,7 +189,8 @@ const RegulationRepository = {
       deadlines: reg.deadlines || [],
       tasks: reg.tasks || [],
       version_history: reg.version_history || [],
-      topics: reg.topics || []
+      topics: reg.topics || [],
+      risk_assessment: reg.risk_assessment || null
     };
   },
   

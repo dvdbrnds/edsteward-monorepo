@@ -168,6 +168,7 @@ router.get('/api/regulations', async (req, res) => {
       filingDeadlines: (r.deadlines || []).map(transformDeadline),
       complianceTasks: (r.tasks || []).map(transformTask),
       topics: r.topics || [],  // Already in camelCase from repository
+      riskAssessment: r.risk_assessment || null,  // Institutional Risk Score
       
       keyProvisions: [
         {
@@ -415,6 +416,7 @@ router.get('/api/regulations/:id', async (req, res) => {
       filingDeadlines: (regulation.deadlines || []).map(transformDeadline),
       complianceTasks: (regulation.tasks || []).map(transformTask),
       topics: regulation.topics || [],  // Already in camelCase from repository
+      riskAssessment: regulation.risk_assessment || null,  // Institutional Risk Score
       versionHistory: regulation.version_history || [],
       
       // Metadata

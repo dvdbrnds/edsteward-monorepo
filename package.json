@@ -37,7 +37,8 @@
     "enrich:deadlines": "node scripts/import-deadlines.cjs",
     "enrich:tasks": "node scripts/import-tasks.cjs",
     "enrich:topics": "node scripts/import-topic-mappings.cjs",
-    "enrich:all": "npm run enrich:statutes && npm run enrich:deadlines && npm run enrich:tasks && npm run enrich:topics",
+    "enrich:risk": "node scripts/calculate-risk-scores.cjs",
+    "enrich:all": "npm run enrich:statutes && npm run enrich:deadlines && npm run enrich:tasks && npm run enrich:topics && npm run enrich:risk",
     "align": "node scripts/execute-alignment.cjs",
     "align:edsteward": "node scripts/execute-alignment.cjs"
   },

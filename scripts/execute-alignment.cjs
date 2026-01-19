@@ -93,7 +93,26 @@ async function getAllRegulations() {
         'sortOrder', t.sort_order
       ) ORDER BY t.sort_order, t.id)
       FROM regulation_tasks t 
-      WHERE t.regulation_id = r.id) as tasks
+      WHERE t.regulation_id = r.id) as tasks,
+      (SELECT json_build_object(
+        'riskScore', ra.risk_score,
+        'riskLevel', ra.risk_level,
+        'riskFactors', json_build_object(
+          'financialPenalty', ra.financial_penalty,
+          'federalFunding', ra.federal_funding,
+          'accreditationImpact', ra.accreditation_impact,
+          'reputationalLegal', ra.reputational_legal,
+          'operationalDisruption', ra.operational_disruption
+        ),
+        'enforcementTrend', ra.enforcement_trend,
+        'recentEnforcementActions', ra.recent_enforcement_actions,
+        'assessmentDate', ra.assessment_date,
+        'assessmentVersion', ra.assessment_version,
+        'isPreliminary', ra.is_preliminary,
+        'dataSources', ra.data_sources
+      )
+      FROM risk_assessments ra 
+      WHERE ra.regulation_id = r.id) as risk_assessment
     FROM regulations r
     WHERE r.is_current = TRUE
     ORDER BY r.name
@@ -140,6 +159,9 @@ function transformForEdSteward(reg) {
     
     // Topic mappings (department responsibility - many-to-many)
     topics: reg.topics || [],
+    
+    // Institutional Risk Assessment
+    riskAssessment: reg.risk_assessment || null,
     
     // Deadlines
     filingDeadlines: (reg.deadlines || []).map(d => ({
