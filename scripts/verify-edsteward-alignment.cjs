@@ -112,14 +112,24 @@ async function verifyAlignment() {
   }
   
   console.log('\n📊 EDSTEWARD (Consumer):');
-  console.log(`   Regulations: ${edStats.total_regulations}`);
-  console.log(`   - Federal: ${edStats.federal}`);
-  console.log(`   - PA: ${edStats.pennsylvania}`);
-  console.log(`   - NJ: ${edStats.new_jersey}`);
-  console.log(`   MCP Validated: ${edStats.mcp_validated}`);
-  console.log(`   Topic Mappings: ${edStats.topic_mappings}`);
-  console.log(`   Tasks: ${edStats.compliance_tasks}`);
-  console.log(`   Last Sync: ${edStats.last_sync}`);
+  // Handle both camelCase (EdSteward) and snake_case field names
+  const edTotal = edStats.totalRegulations || edStats.total_regulations || 0;
+  const edFederal = edStats.federal || 0;
+  const edPA = edStats.pennsylvania || 0;
+  const edNJ = edStats.newJersey || edStats.new_jersey || 0;
+  const edValidated = edStats.mcpValidated || edStats.mcp_validated || 0;
+  const edTopics = edStats.topicMappings || edStats.topic_mappings || 0;
+  const edTasks = edStats.complianceTasks || edStats.compliance_tasks || 0;
+  const edLastSync = edStats.lastSync || edStats.last_sync || 'Unknown';
+  
+  console.log(`   Regulations: ${edTotal}`);
+  console.log(`   - Federal: ${edFederal}`);
+  console.log(`   - PA: ${edPA}`);
+  console.log(`   - NJ: ${edNJ}`);
+  console.log(`   MCP Validated: ${edValidated}`);
+  console.log(`   Topic Mappings: ${edTopics}`);
+  console.log(`   Tasks: ${edTasks}`);
+  console.log(`   Last Sync: ${edLastSync}`);
   
   // Compare
   console.log('\n📋 ALIGNMENT CHECK:');
@@ -127,42 +137,42 @@ async function verifyAlignment() {
   let issues = [];
   
   // Total regulations
-  if (parseInt(mcpStats.total) === parseInt(edStats.total_regulations)) {
+  if (parseInt(mcpStats.total) === parseInt(edTotal)) {
     console.log(`   ✅ Total regulations match: ${mcpStats.total}`);
   } else {
-    console.log(`   ❌ MISMATCH - Total: MCP=${mcpStats.total}, EdSteward=${edStats.total_regulations}`);
-    issues.push(`Total: MCP=${mcpStats.total}, EdSteward=${edStats.total_regulations}`);
+    console.log(`   ❌ MISMATCH - Total: MCP=${mcpStats.total}, EdSteward=${edTotal}`);
+    issues.push(`Total: MCP=${mcpStats.total}, EdSteward=${edTotal}`);
   }
   
   // Federal
-  if (parseInt(mcpStats.federal) === parseInt(edStats.federal)) {
+  if (parseInt(mcpStats.federal) === parseInt(edFederal)) {
     console.log(`   ✅ Federal regulations match: ${mcpStats.federal}`);
   } else {
-    console.log(`   ❌ MISMATCH - Federal: MCP=${mcpStats.federal}, EdSteward=${edStats.federal}`);
-    issues.push(`Federal: MCP=${mcpStats.federal}, EdSteward=${edStats.federal}`);
+    console.log(`   ❌ MISMATCH - Federal: MCP=${mcpStats.federal}, EdSteward=${edFederal}`);
+    issues.push(`Federal: MCP=${mcpStats.federal}, EdSteward=${edFederal}`);
   }
   
   // PA
-  if (parseInt(mcpStats.pa) === parseInt(edStats.pennsylvania)) {
+  if (parseInt(mcpStats.pa) === parseInt(edPA)) {
     console.log(`   ✅ PA regulations match: ${mcpStats.pa}`);
   } else {
-    console.log(`   ❌ MISMATCH - PA: MCP=${mcpStats.pa}, EdSteward=${edStats.pennsylvania}`);
-    issues.push(`PA: MCP=${mcpStats.pa}, EdSteward=${edStats.pennsylvania}`);
+    console.log(`   ❌ MISMATCH - PA: MCP=${mcpStats.pa}, EdSteward=${edPA}`);
+    issues.push(`PA: MCP=${mcpStats.pa}, EdSteward=${edPA}`);
   }
   
   // NJ
-  if (parseInt(mcpStats.nj) === parseInt(edStats.new_jersey)) {
+  if (parseInt(mcpStats.nj) === parseInt(edNJ)) {
     console.log(`   ✅ NJ regulations match: ${mcpStats.nj}`);
   } else {
-    console.log(`   ❌ MISMATCH - NJ: MCP=${mcpStats.nj}, EdSteward=${edStats.new_jersey}`);
-    issues.push(`NJ: MCP=${mcpStats.nj}, EdSteward=${edStats.new_jersey}`);
+    console.log(`   ❌ MISMATCH - NJ: MCP=${mcpStats.nj}, EdSteward=${edNJ}`);
+    issues.push(`NJ: MCP=${mcpStats.nj}, EdSteward=${edNJ}`);
   }
   
   // Topics
-  if (parseInt(mcpStats.topics) === parseInt(edStats.topic_mappings)) {
+  if (parseInt(mcpStats.topics) === parseInt(edTopics)) {
     console.log(`   ✅ Topic mappings match: ${mcpStats.topics}`);
   } else {
-    console.log(`   ⚠️  Topic mappings differ: MCP=${mcpStats.topics}, EdSteward=${edStats.topic_mappings}`);
+    console.log(`   ⚠️  Topic mappings differ: MCP=${mcpStats.topics}, EdSteward=${edTopics}`);
   }
   
   // Hash comparison (if available)
@@ -171,7 +181,11 @@ async function verifyAlignment() {
   const edHashes = await getEdStewardHashes();
   
   if (edHashes) {
-    const edHashMap = new Map(edHashes.map(r => [r.item_id, r.version_hash]));
+    // Handle both camelCase (EdSteward) and snake_case field names
+    const edHashMap = new Map(edHashes.map(r => [
+      r.itemId || r.item_id, 
+      r.versionHash || r.version_hash
+    ]));
     
     let hashMatches = 0;
     let hashMismatches = [];
