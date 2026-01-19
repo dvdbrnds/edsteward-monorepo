@@ -1,22 +1,3 @@
-/**
- * @deprecated This CSV-based Registry API is DEPRECATED as of January 18, 2026.
- * 
- * USE INSTEAD: node start-registry-postgres.js
- * 
- * PostgreSQL is now the authoritative source of truth for all regulation data.
- * This file is kept for backward compatibility only.
- * 
- * To run the PostgreSQL version:
- *   npm run start:registry        (PostgreSQL - default)
- *   npm run start:registry:csv    (this file - deprecated)
- * 
- * Migration was completed with 248 unique regulations (234 federal + 14 state).
- */
-
-console.warn('⚠️  WARNING: CSV-based Registry API is DEPRECATED');
-console.warn('⚠️  Use "npm run start:registry" for PostgreSQL version');
-console.warn('⚠️  This file will be removed in a future release\n');
-
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';

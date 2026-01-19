@@ -149,12 +149,13 @@ async function waitForHealth(url, serviceName, maxRetries = CONFIG.healthCheck.m
 }
 
 /**
- * Start Registry API Server
+ * Start Registry API Server (PostgreSQL)
  */
 async function startRegistryServer() {
-  log.info('Starting Registry API Server...', 'REGISTRY');
+  log.info('Starting Registry API Server (PostgreSQL)...', 'REGISTRY');
   
-  const registryProcess = spawn('node', ['src/server/registry-api/registry-server.js'], {
+  // Use PostgreSQL-backed registry server (deprecated CSV version)
+  const registryProcess = spawn('node', ['start-registry-postgres.js'], {
     stdio: ['ignore', 'pipe', 'pipe'],
     cwd: process.cwd()
   });
