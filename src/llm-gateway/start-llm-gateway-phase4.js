@@ -846,20 +846,21 @@ class EnhancedLLMGateway {
         
         // Find regulation by ID match
         let regulation = null;
+        const slugLower = slug.toLowerCase();
+        const findRegulation = (r) => {
+          const regId = r.regulationId ? String(r.regulationId).toLowerCase() : '';
+          const id = r.id ? String(r.id).toLowerCase() : '';
+          return regId === slugLower || 
+                 id === slugLower ||
+                 regId.includes(slugLower) ||
+                 slugLower.includes(regId) ||
+                 (regId && slugLower.includes(id));
+        };
+        
         if (Array.isArray(registryData)) {
-          regulation = registryData.find(r => 
-            r.regulationId === slug || 
-            r.id === slug ||
-            (r.regulationId && r.regulationId.toLowerCase().includes(slug.toLowerCase())) ||
-            (r.id && slug.toLowerCase().includes(r.id.toLowerCase()))
-          );
+          regulation = registryData.find(findRegulation);
         } else if (registryData.success && Array.isArray(registryData.regulations)) {
-          regulation = registryData.regulations.find(r => 
-            r.regulationId === slug || 
-            r.id === slug ||
-            (r.regulationId && r.regulationId.toLowerCase().includes(slug.toLowerCase())) ||
-            (r.id && slug.toLowerCase().includes(r.id.toLowerCase()))
-          );
+          regulation = registryData.regulations.find(findRegulation);
         }
         
         if (regulation) {
