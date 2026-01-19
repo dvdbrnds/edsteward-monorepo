@@ -12,6 +12,60 @@ import { healthCheck, getStats } from '../../../services/database.js';
 const router = express.Router();
 
 /**
+ * Transform deadline object from snake_case to camelCase for EdSteward
+ */
+function transformDeadline(d) {
+  if (!d) return null;
+  return {
+    id: d.id,
+    regulationId: d.regulation_id,
+    deadlineId: d.deadline_id,
+    name: d.name,
+    description: d.description,
+    deadlineType: d.deadline_type,
+    dueDate: d.due_date,
+    frequency: d.frequency,
+    recurringMonth: d.recurring_month,
+    recurringDay: d.recurring_day,
+    advanceNoticeDays: d.advance_notice_days,
+    penaltyForMissing: d.penalty_for_missing,
+    reportingTo: d.reporting_to,
+    createdAt: d.created_at,
+    updatedAt: d.updated_at
+  };
+}
+
+/**
+ * Transform task object from snake_case to camelCase for EdSteward
+ */
+function transformTask(t) {
+  if (!t) return null;
+  return {
+    id: t.id,
+    regulationId: t.regulation_id,
+    deadlineId: t.deadline_id,
+    parentTaskId: t.parent_task_id,
+    taskId: t.task_id,
+    title: t.title,
+    description: t.description,
+    instructions: t.instructions,
+    category: t.category,
+    topic: t.topic,  // Department/topic this task belongs to
+    priority: t.priority,
+    assignedRole: t.assigned_role,
+    estimatedEffort: t.estimated_effort,
+    evidenceRequired: t.evidence_required,
+    evidenceType: t.evidence_type,
+    evidenceInstructions: t.evidence_instructions,
+    deliverable: t.deliverable,
+    deliverableTemplateUrl: t.deliverable_template_url,
+    sortOrder: t.sort_order,
+    createdAt: t.created_at,
+    updatedAt: t.updated_at
+  };
+}
+
+/**
  * GET /health - Database-aware health check
  */
 router.get('/health', async (req, res) => {
@@ -110,9 +164,10 @@ router.get('/api/regulations', async (req, res) => {
       agencyName: r.agency_name,
       agencyUrl: r.agency_url,
       
-      // Nested data
-      filingDeadlines: r.deadlines || [],
-      complianceTasks: r.tasks || [],
+      // Nested data (transformed to camelCase for EdSteward)
+      filingDeadlines: (r.deadlines || []).map(transformDeadline),
+      complianceTasks: (r.tasks || []).map(transformTask),
+      topics: r.topics || [],  // Already in camelCase from repository
       
       keyProvisions: [
         {
@@ -356,9 +411,10 @@ router.get('/api/regulations/:id', async (req, res) => {
       agencyName: regulation.agency_name,
       agencyUrl: regulation.agency_url,
       
-      // Nested data
-      filingDeadlines: regulation.deadlines || [],
-      complianceTasks: regulation.tasks || [],
+      // Nested data (transformed to camelCase for EdSteward)
+      filingDeadlines: (regulation.deadlines || []).map(transformDeadline),
+      complianceTasks: (regulation.tasks || []).map(transformTask),
+      topics: regulation.topics || [],  // Already in camelCase from repository
       versionHistory: regulation.version_history || [],
       
       // Metadata

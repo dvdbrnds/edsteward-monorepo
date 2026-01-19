@@ -38,7 +38,15 @@ const RegulationRepository = {
          WHERE d.regulation_id = r.id) as deadlines,
         (SELECT json_agg(t.* ORDER BY t.sort_order, t.id) 
          FROM regulation_tasks t 
-         WHERE t.regulation_id = r.id) as tasks
+         WHERE t.regulation_id = r.id) as tasks,
+        (SELECT json_agg(json_build_object(
+           'topic', rt.topic,
+           'topicId', rt.topic_id,
+           'department', rt.department,
+           'responsibleRole', rt.responsible_role
+         ) ORDER BY rt.topic)
+         FROM regulation_topics rt 
+         WHERE rt.regulation_id = r.id) as topics
       FROM regulations r
       WHERE r.is_current = TRUE
     `;
@@ -90,7 +98,8 @@ const RegulationRepository = {
     return result.rows.map(r => ({
       ...r,
       deadlines: r.deadlines || [],
-      tasks: r.tasks || []
+      tasks: r.tasks || [],
+      topics: r.topics || []
     }));
   },
   
@@ -112,7 +121,15 @@ const RegulationRepository = {
          WHERE t.regulation_id = r.id) as tasks,
         (SELECT json_agg(v.* ORDER BY v.version DESC) 
          FROM regulation_versions v 
-         WHERE v.regulation_id = r.id) as version_history
+         WHERE v.regulation_id = r.id) as version_history,
+        (SELECT json_agg(json_build_object(
+           'topic', rt.topic,
+           'topicId', rt.topic_id,
+           'department', rt.department,
+           'responsibleRole', rt.responsible_role
+         ) ORDER BY rt.topic)
+         FROM regulation_topics rt 
+         WHERE rt.regulation_id = r.id) as topics
       FROM regulations r
       WHERE r.item_id = $1
     `;
@@ -134,7 +151,8 @@ const RegulationRepository = {
       ...reg,
       deadlines: reg.deadlines || [],
       tasks: reg.tasks || [],
-      version_history: reg.version_history || []
+      version_history: reg.version_history || [],
+      topics: reg.topics || []
     };
   },
   

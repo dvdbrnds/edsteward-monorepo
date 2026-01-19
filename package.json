@@ -32,7 +32,14 @@
     "lint": "eslint src/**/*.js",
     "demo:clery": "node scripts/demo-trigger-clery.js",
     "demo:ferpa": "node scripts/demo-trigger-ferpa.js",
-    "demo:eada": "node scripts/demo-eada-wow.js"
+    "demo:eada": "node scripts/demo-eada-wow.js",
+    "enrich:statutes": "node scripts/enrich-statutes.cjs",
+    "enrich:deadlines": "node scripts/import-deadlines.cjs",
+    "enrich:tasks": "node scripts/import-tasks.cjs",
+    "enrich:topics": "node scripts/import-topic-mappings.cjs",
+    "enrich:all": "npm run enrich:statutes && npm run enrich:deadlines && npm run enrich:tasks && npm run enrich:topics",
+    "align": "node scripts/execute-alignment.cjs",
+    "align:edsteward": "node scripts/execute-alignment.cjs"
   },
   "author": "",
   "license": "ISC",
