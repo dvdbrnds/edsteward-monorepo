@@ -137,16 +137,20 @@
             display: none; /* Hidden - replaced by toolbar */
         }
         
-        /* Modern Action Toolbar */
+        /* Modern Action Toolbar - Sticky at top */
         .action-toolbar {
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 12px 16px;
-            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
-            border: 1px solid #e2e8f0;
-            border-radius: 10px 10px 0 0;
-            margin-top: 20px;
+            padding: 10px 16px;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            border-bottom: 1px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            margin: 0 -24px;
+            padding-left: 24px;
+            padding-right: 24px;
         }
         
         .toolbar-primary {
@@ -1179,6 +1183,32 @@
                 </div>
             </div>
             
+            <!-- Action Toolbar - Sticky at top -->
+            <div class="action-toolbar">
+                <div class="toolbar-primary">
+                    <button id="runButton" class="btn-execute" onclick="runLinearEngine()">
+                        <span class="icon">▶</span>
+                        <span>Execute Workflow</span>
+                    </button>
+                    <div id="workflowStatus" class="status-chip ready">
+                        <span class="pulse"></span>
+                        <span>Ready</span>
+                    </div>
+                </div>
+                <div class="toolbar-secondary">
+                    <button id="autoWorkflowToggle" class="btn-icon" onclick="toggleAutoWorkflow()" title="Auto-Workflow">
+                        🤖
+                    </button>
+                    <div class="toolbar-divider"></div>
+                    <button id="pushUpdateButton" class="btn-icon" onclick="pushRegulationUpdate()" title="Push to Clients">
+                        📤
+                    </button>
+                    <button id="sendToEdstewardBtn" class="btn-icon" onclick="sendToEdSteward()" title="Send to EdSteward">
+                        🏛️
+                    </button>
+                </div>
+            </div>
+            
             <div class="regulation-preview">
                 <div class="regulation-header">
                     <h3>Complete Regulation Text & Analysis</h3>
@@ -1540,34 +1570,8 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Modern Action Toolbar -->
-            <div class="action-toolbar">
-                <div class="toolbar-primary">
-                    <button id="runButton" class="btn-execute" onclick="runLinearEngine()">
-                        <span class="icon">▶</span>
-                        <span>Execute Workflow</span>
-                    </button>
-                    <div id="workflowStatus" class="status-chip ready">
-                        <span class="pulse"></span>
-                        <span>Ready</span>
-                    </div>
-                </div>
-                <div class="toolbar-secondary">
-                    <button id="autoWorkflowToggle" class="btn-icon" onclick="toggleAutoWorkflow()" title="Auto-Workflow">
-                        🤖
-                    </button>
-                    <div class="toolbar-divider"></div>
-                    <button id="pushUpdateButton" class="btn-icon" onclick="pushRegulationUpdate()" title="Push to Clients">
-                        📤
-                    </button>
-                    <button id="sendToEdstewardBtn" class="btn-icon" onclick="sendToEdSteward()" title="Send to EdSteward">
-                        🏛️
-                    </button>
-                </div>
-            </div>
             
-            <div class="console-output" id="consoleOutput" style="border-radius: 0 0 10px 10px; margin-top: 0; border-top: none;">
+            <div class="console-output" id="consoleOutput">
                 <div class="log-entry">
                     <span class="log-timestamp">[SYSTEM]</span>
                     <span class="log-level-success">Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Act (Clery Act) and Violence Against Women Act (VAWA) Console Initialized</span>
