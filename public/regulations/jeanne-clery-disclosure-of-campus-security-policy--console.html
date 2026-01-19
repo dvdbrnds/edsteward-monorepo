@@ -134,41 +134,154 @@
         .log-level-debug { color: #6c757d; }
         
         .control-panel {
-            background: #f8f9fa;
-            border: 2px solid #dee2e6;
-            border-radius: 6px;
-            padding: 15px;
-            margin: 15px 0;
+            display: none; /* Hidden - replaced by toolbar */
         }
         
-        .run-button {
-            background: linear-gradient(135deg, #2563eb, #3b82f6);
+        /* Modern Action Toolbar */
+        .action-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 10px 10px 0 0;
+            margin-top: 20px;
+        }
+        
+        .toolbar-primary {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+        
+        .toolbar-secondary {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .btn-execute {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
             color: white;
             border: none;
-            padding: 14px 24px;
+            padding: 10px 20px;
             border-radius: 8px;
             cursor: pointer;
             font-family: 'Inter', sans-serif;
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 600;
-            width: 100%;
             transition: all 0.2s ease;
-            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
-            letter-spacing: 0.025em;
+            box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3);
         }
         
-        .run-button:hover:not(:disabled) {
-            background: linear-gradient(135deg, #1d4ed8, #2563eb);
+        .btn-execute:hover:not(:disabled) {
+            background: linear-gradient(135deg, #047857 0%, #059669 100%);
             transform: translateY(-1px);
-            box-shadow: 0 4px 16px rgba(37, 99, 235, 0.35);
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.4);
         }
         
-        .run-button:disabled {
-            background: #e9ecef;
-            color: #6c757d;
+        .btn-execute:disabled {
+            background: #94a3b8;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
+        }
+        
+        .btn-execute .icon {
+            font-size: 14px;
+        }
+        
+        .btn-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 36px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.15s ease;
+            position: relative;
+        }
+        
+        .btn-icon:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            transform: translateY(-1px);
+        }
+        
+        .btn-icon.active {
+            background: #dbeafe;
+            border-color: #3b82f6;
+            color: #2563eb;
+        }
+        
+        .btn-icon[title]:hover::after {
+            content: attr(title);
+            position: absolute;
+            bottom: -32px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            white-space: nowrap;
+            z-index: 1000;
+        }
+        
+        .toolbar-divider {
+            width: 1px;
+            height: 24px;
+            background: #e2e8f0;
+            margin: 0 4px;
+        }
+        
+        .status-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #f1f5f9;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #64748b;
+        }
+        
+        .status-chip.ready {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .status-chip.running {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+        
+        .status-chip .pulse {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: currentColor;
+        }
+        
+        .status-chip.running .pulse {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        
+        /* Legacy button support (hidden) */
+        .run-button {
+            display: none;
         }
         
         .diagnostics-panel {
@@ -1428,23 +1541,33 @@
                 </div>
             </div>
 
-            <div class="control-panel">
-                <button id="runButton" class="run-button" onclick="runLinearEngine()">
-                    ▶ EXECUTE COMPREHENSIVE WORKFLOW
-                </button>
-                <button id="autoWorkflowToggle" onclick="toggleAutoWorkflow()" class="run-button" style="background: #6b7280; margin-left: 12px; font-size: 12px;">
-                    🤖 AUTO-WORKFLOW: OFF
-                </button>
-                <button id="pushUpdateButton" onclick="pushRegulationUpdate()" class="run-button" style="background: #059669; margin-left: 12px; font-size: 12px;">
-                    📤 PUSH UPDATE TO CLIENTS
-                </button>
-                <button id="sendToEdstewardBtn" onclick="sendToEdSteward()" class="run-button" style="background: #2563eb; margin-left: 12px; font-size: 12px;">
-                    📤 SEND TO EDSTEWARD
-                </button>
-                
+            <!-- Modern Action Toolbar -->
+            <div class="action-toolbar">
+                <div class="toolbar-primary">
+                    <button id="runButton" class="btn-execute" onclick="runLinearEngine()">
+                        <span class="icon">▶</span>
+                        <span>Execute Workflow</span>
+                    </button>
+                    <div id="workflowStatus" class="status-chip ready">
+                        <span class="pulse"></span>
+                        <span>Ready</span>
+                    </div>
+                </div>
+                <div class="toolbar-secondary">
+                    <button id="autoWorkflowToggle" class="btn-icon" onclick="toggleAutoWorkflow()" title="Auto-Workflow">
+                        🤖
+                    </button>
+                    <div class="toolbar-divider"></div>
+                    <button id="pushUpdateButton" class="btn-icon" onclick="pushRegulationUpdate()" title="Push to Clients">
+                        📤
+                    </button>
+                    <button id="sendToEdstewardBtn" class="btn-icon" onclick="sendToEdSteward()" title="Send to EdSteward">
+                        🏛️
+                    </button>
+                </div>
             </div>
             
-            <div class="console-output" id="consoleOutput">
+            <div class="console-output" id="consoleOutput" style="border-radius: 0 0 10px 10px; margin-top: 0; border-top: none;">
                 <div class="log-entry">
                     <span class="log-timestamp">[SYSTEM]</span>
                     <span class="log-level-success">Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Act (Clery Act) and Violence Against Women Act (VAWA) Console Initialized</span>
@@ -1826,8 +1949,13 @@
             metrics = { apiCalls: 0, dataPoints: 0, validationRate: 0 };
             
             const button = document.getElementById('runButton');
+            const statusChip = document.getElementById('workflowStatus');
             button.disabled = true;
-            button.textContent = '🔄 EXECUTING WORKFLOW...';
+            button.innerHTML = '<span class="icon">⏳</span><span>Running...</span>';
+            if (statusChip) {
+                statusChip.className = 'status-chip running';
+                statusChip.innerHTML = '<span class="pulse"></span><span>Running</span>';
+            }
             
             updateStatus('RUNNING', 'running');
             updateProgress(0);
@@ -2086,7 +2214,12 @@
                 isRunning = false;
                 clearInterval(runtimeInterval);
                 button.disabled = false;
-                button.textContent = '🚀 EXECUTE COMPREHENSIVE WORKFLOW';
+                button.innerHTML = '<span class="icon">▶</span><span>Execute Workflow</span>';
+                const statusChip = document.getElementById('workflowStatus');
+                if (statusChip) {
+                    statusChip.className = 'status-chip ready';
+                    statusChip.innerHTML = '<span class="pulse"></span><span>Ready</span>';
+                }
             }
         }
         
@@ -2275,8 +2408,8 @@
             autoWorkflowEnabled = !autoWorkflowEnabled;
             const button = document.getElementById('autoWorkflowToggle');
             if (button) {
-                button.textContent = autoWorkflowEnabled ? '🤖 AUTO-WORKFLOW: ON' : '🤖 AUTO-WORKFLOW: OFF';
-                button.style.background = autoWorkflowEnabled ? '#10b981' : '#6b7280';
+                button.classList.toggle('active', autoWorkflowEnabled);
+                button.title = autoWorkflowEnabled ? 'Auto-Workflow: ON' : 'Auto-Workflow: OFF';
             }
             
             addConsoleLog(`🤖 Auto-workflow ${autoWorkflowEnabled ? 'enabled' : 'disabled'}`, 'info');
@@ -2287,11 +2420,10 @@
             if (!button) return;
             
             // Disable button during operation
-            const originalText = button.textContent;
-            const originalBackground = button.style.background;
-            button.textContent = '📤 PUSHING...';
-            button.style.background = '#f59e0b';
+            const originalContent = button.innerHTML;
+            button.innerHTML = '⏳';
             button.disabled = true;
+            button.style.opacity = '0.6';
             
             try {
                 addConsoleLog('📤 Initiating manual regulation update push...', 'info');
@@ -2323,9 +2455,9 @@
                 console.error('Push update error:', error);
             } finally {
                 // Re-enable button
-                button.textContent = originalText;
-                button.style.background = originalBackground;
+                button.innerHTML = originalContent;
                 button.disabled = false;
+                button.style.opacity = '1';
             }
         }
 
@@ -2334,10 +2466,10 @@
             const button = document.getElementById('sendToEdstewardBtn');
             if (!button) return;
             
-            const originalText = button.textContent;
-            button.textContent = '📤 SENDING...';
-            button.style.background = '#f59e0b';
+            const originalContent = button.innerHTML;
+            button.innerHTML = '⏳';
             button.disabled = true;
+            button.style.opacity = '0.6';
             
             try {
                 addConsoleLog('📤 Sending Clery Act update to EdSteward...', 'info');
@@ -2361,27 +2493,25 @@
                 if (response.ok && result.success) {
                     addConsoleLog('✅ Successfully sent to EdSteward!', 'success');
                     addConsoleLog('📋 Regulation ID: 9 (Clery Act) | Status: Pending CCO Review', 'info');
-                    button.textContent = '✅ SENT!';
-                    button.style.background = '#059669';
+                    button.innerHTML = '✅';
+                    button.style.opacity = '1';
                     setTimeout(() => {
-                        button.textContent = originalText;
-                        button.style.background = '#2563eb';
+                        button.innerHTML = originalContent;
                         button.disabled = false;
-                    }, 3000);
+                    }, 2000);
                 } else {
                     addConsoleLog('❌ EdSteward error: ' + (result.error || 'Unknown error'), 'error');
-                    button.textContent = '❌ FAILED';
-                    button.style.background = '#dc2626';
+                    button.innerHTML = '❌';
+                    button.style.opacity = '1';
                     setTimeout(() => {
-                        button.textContent = originalText;
-                        button.style.background = '#2563eb';
+                        button.innerHTML = originalContent;
                         button.disabled = false;
-                    }, 3000);
+                    }, 2000);
                 }
             } catch (error) {
                 addConsoleLog('❌ Error: ' + error.message, 'error');
-                button.textContent = originalText;
-                button.style.background = '#2563eb';
+                button.innerHTML = originalContent;
+                button.style.opacity = '1';
                 button.disabled = false;
             }
         }
