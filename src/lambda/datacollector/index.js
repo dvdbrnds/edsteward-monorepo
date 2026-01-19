@@ -123,7 +123,7 @@ async function collectDataFromUrl(url, selectors) {
  * Stores the collected data in S3
  */
 async function storeDataInS3(regulationId, data) {
-  const baselineId = `${regulationId.toLowerCase()}-${uuidv4()}`;
+  const baselineId = `${String(regulationId || '').toLowerCase()}-${uuidv4()}`;
   const key = `${regulationId}/${baselineId}.json`;
   
   await s3.putObject({

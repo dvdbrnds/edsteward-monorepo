@@ -1019,7 +1019,7 @@ function getCitationInfo(slug) {
     const matches = keyParts.filter(part => 
       slugParts.some(sp => sp.includes(part) || part.includes(sp))
     );
-    if (matches.length >= 2 || lowerSlug.includes(value.name.toLowerCase())) {
+    if (matches.length >= 2 || lowerSlug.includes(String(value.name || '').toLowerCase())) {
       return value;
     }
   }

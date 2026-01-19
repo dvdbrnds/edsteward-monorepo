@@ -661,9 +661,10 @@ export class ValidationClient {
     
     // Basic validation - check if regulation exists in our system
     const knownRegulations = ['REG-66', 'GDPR-2018', 'HIPAA', 'CCPA'];
+    const regIdStr = String(regulationId || '').toLowerCase();
     const isKnownRegulation = knownRegulations.some(reg => 
-      regulationId.toLowerCase().includes(reg.toLowerCase()) || 
-      reg.toLowerCase().includes(regulationId.toLowerCase())
+      regIdStr.includes(reg.toLowerCase()) || 
+      reg.toLowerCase().includes(regIdStr)
     );
     
     const evidence = createEvidence({

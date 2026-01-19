@@ -58,8 +58,9 @@ router.get('/regulations', (req, res) => {
 
 // Get regulations by category
 router.get('/regulations/category/:category', (req, res) => {
+  const categoryLower = String(req.params.category || '').toLowerCase();
   const categoryRegulations = regulations.filter(
-    reg => reg.category.toLowerCase() === req.params.category.toLowerCase()
+    reg => String(reg.category || '').toLowerCase() === categoryLower
   );
   
   res.json({
@@ -154,7 +155,7 @@ router.post('/detect-changes', (req, res) => {
   // Filter by specified categories if provided
   if (categories && Array.isArray(categories) && categories.length > 0) {
     regsToCheck = regulations.filter(reg => 
-      categories.some(cat => reg.category.toLowerCase() === cat.toLowerCase())
+      categories.some(cat => String(reg.category || '').toLowerCase() === String(cat || '').toLowerCase())
     );
   }
   

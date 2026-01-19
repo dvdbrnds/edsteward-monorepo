@@ -236,9 +236,9 @@ const EnhancedRegulationManager = () => {
     
     const search = searchTerm.toLowerCase();
     return (
-      (reg.regulationId && reg.regulationId.toLowerCase().includes(search)) ||
-      (reg.name && reg.name.toLowerCase().includes(search)) ||
-      (reg.description && reg.description.toLowerCase().includes(search))
+      (reg.regulationId && String(reg.regulationId).toLowerCase().includes(search)) ||
+      (reg.name && String(reg.name).toLowerCase().includes(search)) ||
+      (reg.description && String(reg.description).toLowerCase().includes(search))
     );
   });
   

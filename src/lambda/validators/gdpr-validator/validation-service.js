@@ -185,7 +185,7 @@ async function getBaselineFromS3(regulationId) {
  */
 function getDefaultAuthoritativeSource(regulationId) {
   // Handle known regulations with default sources
-  const lowerRegId = regulationId.toLowerCase();
+  const lowerRegId = String(regulationId || '').toLowerCase();
   
   if (lowerRegId.includes('gdpr')) {
     return {
