@@ -41,6 +41,8 @@
     "enrich:all": "npm run enrich:statutes && npm run enrich:deadlines && npm run enrich:tasks && npm run enrich:topics && npm run enrich:risk",
     "align": "node scripts/execute-alignment.cjs",
     "align:edsteward": "node scripts/execute-alignment.cjs",
+    "verify:alignment": "node scripts/verify-edsteward-alignment.cjs",
+    "auto-align": "node scripts/auto-align.cjs",
     "monitor": "node scripts/health-monitor.cjs"
   },
   "author": "",

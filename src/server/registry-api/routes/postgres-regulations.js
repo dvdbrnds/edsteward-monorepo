@@ -7,7 +7,7 @@
 
 import express from 'express';
 import RegulationRepository from '../../../repositories/regulationRepository.js';
-import { healthCheck, getStats } from '../../../services/database.js';
+import { healthCheck, getStats, pool } from '../../../services/database.js';
 
 const router = express.Router();
 
@@ -630,6 +630,65 @@ router.put('/api/transmissions/:id', async (req, res) => {
   } catch (err) {
     console.error('[REGISTRY] Error updating transmission:', err);
     res.status(400).json({ error: err.message });
+  }
+});
+
+/**
+ * GET /api/alignment-status - Get alignment status for verification
+ * Used by EdSteward and verification scripts to check MCP Engine data state
+ */
+router.get('/api/alignment-status', async (req, res) => {
+  try {
+    const stats = await pool.query(`
+      SELECT 
+        (SELECT COUNT(*) FROM regulations WHERE is_current = TRUE) as total_regulations,
+        (SELECT COUNT(*) FROM regulations WHERE jurisdiction_source = 'federal' AND is_current = TRUE) as federal,
+        (SELECT COUNT(*) FROM regulations WHERE state_code = 'PA' AND is_current = TRUE) as pennsylvania,
+        (SELECT COUNT(*) FROM regulations WHERE state_code = 'NJ' AND is_current = TRUE) as new_jersey,
+        (SELECT COUNT(*) FROM regulations WHERE lovv_level IS NOT NULL AND is_current = TRUE) as mcp_validated,
+        (SELECT COUNT(*) FROM regulation_topics) as topic_mappings,
+        (SELECT COUNT(*) FROM regulation_deadlines) as deadlines,
+        (SELECT COUNT(*) FROM regulation_tasks) as compliance_tasks,
+        (SELECT COUNT(*) FROM risk_assessments) as risk_assessments,
+        (SELECT MAX(updated_at) FROM regulations) as last_updated
+    `);
+    
+    res.json({
+      status: 'ok',
+      source: 'mcp_engine',
+      alignment: {
+        ...stats.rows[0],
+        last_sync: stats.rows[0].last_updated
+      },
+      timestamp: new Date().toISOString()
+    });
+  } catch (err) {
+    console.error('[REGISTRY] Error fetching alignment status:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * GET /api/regulation-hashes - Get all regulation hashes for drift detection
+ * Used by verification scripts to compare MCP Engine state with EdSteward
+ */
+router.get('/api/regulation-hashes', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT item_id, version_hash, lovv_level, updated_at, version
+      FROM regulations
+      WHERE is_current = TRUE AND item_id IS NOT NULL
+      ORDER BY item_id
+    `);
+    
+    res.json({
+      count: result.rows.length,
+      regulations: result.rows,
+      generatedAt: new Date().toISOString()
+    });
+  } catch (err) {
+    console.error('[REGISTRY] Error fetching regulation hashes:', err);
+    res.status(500).json({ error: err.message });
   }
 });
 
