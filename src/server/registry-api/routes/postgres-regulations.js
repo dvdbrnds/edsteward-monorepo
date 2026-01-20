@@ -16,6 +16,22 @@ const router = express.Router();
  */
 function transformDeadline(d) {
   if (!d) return null;
+  
+  // Build a date string for Inquisitor compatibility
+  // For ongoing/event-triggered, use a descriptive date
+  let dateValue = d.due_date;
+  if (!dateValue && d.frequency) {
+    // Map frequency to descriptive date for non-specific deadlines
+    const frequencyDates = {
+      'ongoing': 'ongoing - as needed',
+      'event-triggered': 'event-triggered - upon occurrence',
+      'annual': 'annual - specific date varies by institution',
+      'quarterly': 'quarterly - specific date varies by institution',
+      'monthly': 'monthly - specific date varies by institution'
+    };
+    dateValue = frequencyDates[d.frequency] || d.frequency;
+  }
+  
   return {
     id: d.id,
     regulationId: d.regulation_id,
@@ -31,7 +47,10 @@ function transformDeadline(d) {
     penaltyForMissing: d.penalty_for_missing,
     reportingTo: d.reporting_to,
     createdAt: d.created_at,
-    updatedAt: d.updated_at
+    updatedAt: d.updated_at,
+    // Inquisitor compatibility fields
+    type: d.deadline_type || d.name || d.frequency || 'regulatory',
+    date: dateValue || 'see regulation for specific dates'
   };
 }
 
@@ -551,6 +570,283 @@ router.put('/api/regulations/:id', async (req, res) => {
   } catch (err) {
     console.error('[REGISTRY] Error updating regulation:', err);
     res.status(400).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/regulations/workflow-update - Save workflow results to database
+ * 
+ * This endpoint is called by the LLM Gateway after a comprehensive workflow
+ * completes. It saves:
+ * - Updated regulation text and summary
+ * - Compliance tasks and deadlines
+ * - Source validation metadata
+ * - Creates a new version record
+ * - Logs to audit trail
+ */
+router.post('/api/regulations/workflow-update', async (req, res) => {
+  try {
+    const {
+      item_id,
+      name,
+      statute,
+      summary,
+      regulation_text,
+      content_hash,
+      lovv_level,
+      tasks,
+      deadlines,
+      source_validation,
+      risk_assessment,
+      workflow_id,
+      last_workflow_run,
+      // New AI-generated fields
+      summary_metadata,
+      key_requirements,
+      compliance_actions,
+      ai_risk_level,
+      primary_stakeholders,
+      enforcement_agency,
+      // Rich source data - SAVE EVERYTHING!
+      ecfr_data,
+      federal_register_data,
+      legal_database_data,
+      academic_sources_data,
+      penalties,
+      citations,
+      differential_data,
+      // Full backup
+      full_compliance_package
+    } = req.body;
+    
+    if (!item_id) {
+      return res.status(400).json({ error: 'item_id is required' });
+    }
+    
+    console.log(`[REGISTRY] 💾 COMPREHENSIVE Workflow update for: ${item_id}`);
+    console.log(`[REGISTRY]    - Workflow ID: ${workflow_id}`);
+    console.log(`[REGISTRY]    - Tasks: ${tasks?.length || 0}`);
+    console.log(`[REGISTRY]    - Deadlines: ${deadlines?.length || 0}`);
+    console.log(`[REGISTRY]    - Key Requirements: ${key_requirements?.length || 0}`);
+    console.log(`[REGISTRY]    - Compliance Actions: ${compliance_actions?.length || 0}`);
+    console.log(`[REGISTRY]    - Has AI Summary: ${summary?.length > 50 ? 'YES' : 'NO'}`);
+    console.log(`[REGISTRY]    - Has Source Data: ${source_validation ? 'YES' : 'NO'}`);
+    
+    // Check if regulation exists
+    const existing = await RegulationRepository.findById(item_id);
+    
+    // Clean summary - strip JSON code fences if present
+    let cleanSummary = summary;
+    if (cleanSummary && typeof cleanSummary === 'string') {
+      cleanSummary = cleanSummary.trim();
+      // Remove ```json or ``` wrapper
+      if (cleanSummary.startsWith('```json')) {
+        cleanSummary = cleanSummary.slice(7);
+      } else if (cleanSummary.startsWith('```')) {
+        cleanSummary = cleanSummary.slice(3);
+      }
+      if (cleanSummary.endsWith('```')) {
+        cleanSummary = cleanSummary.slice(0, -3);
+      }
+      cleanSummary = cleanSummary.trim();
+      
+      // If summary is JSON object with a "summary" field, extract it
+      if (cleanSummary.startsWith('{') && cleanSummary.includes('"summary"')) {
+        try {
+          const parsed = JSON.parse(cleanSummary);
+          if (parsed.summary && typeof parsed.summary === 'string') {
+            cleanSummary = parsed.summary;
+          }
+        } catch (e) {
+          // Keep the original if parsing fails
+        }
+      }
+    }
+    
+    console.log(`[REGISTRY]    - Clean summary length: ${cleanSummary?.length || 0} chars`);
+    
+    // Convert keyRequirements array to requirements text string
+    let requirementsText = existing?.requirements || '';
+    if (Array.isArray(key_requirements) && key_requirements.length > 0) {
+      requirementsText = '## Key Compliance Requirements\n\n' + 
+        key_requirements.map((r, i) => `${i + 1}. ${r}`).join('\n');
+      console.log(`[REGISTRY]    - Built requirements from ${key_requirements.length} key requirements`);
+    } else if (Array.isArray(compliance_actions) && compliance_actions.length > 0) {
+      requirementsText = '## Required Compliance Actions\n\n' + 
+        compliance_actions.map((a, i) => `${i + 1}. ${a}`).join('\n');
+      console.log(`[REGISTRY]    - Built requirements from ${compliance_actions.length} compliance actions`);
+    }
+    console.log(`[REGISTRY]    - Requirements length: ${requirementsText?.length || 0} chars`);
+    
+    // Build COMPREHENSIVE update payload - SAVE EVERYTHING!
+    const updatePayload = {
+      item_id: item_id,
+      name: name || existing?.name,
+      statute: statute || existing?.statute,
+      summary: cleanSummary,
+      requirements: requirementsText,  // NEW: Populated from keyRequirements
+      regulation_text: regulation_text,
+      content_hash: content_hash,
+      lovv_level: lovv_level || existing?.lovv_level || 'D',
+      source_validation: JSON.stringify(source_validation || {}),
+      last_workflow_run: last_workflow_run || new Date().toISOString(),
+      workflow_id: workflow_id
+    };
+    
+    // Upsert the regulation
+    const result = await RegulationRepository.upsert(updatePayload, 'workflow-engine');
+    
+    // Now save all the rich data directly to the database
+    // This is THE AUTHORITATIVE SOURCE - save EVERYTHING!
+    const regId = result.id || (await RegulationRepository.findById(item_id))?.id;
+    if (regId) {
+      try {
+        await pool.query(`
+          UPDATE regulations SET
+            summary_metadata = $1,
+            key_requirements = $2,
+            compliance_actions = $3,
+            ai_risk_level = $4,
+            primary_stakeholders = $5,
+            enforcement_agency = $6,
+            ecfr_data = $7,
+            federal_register_data = $8,
+            legal_database_data = $9,
+            academic_sources_data = $10,
+            penalties = $11,
+            citations = $12,
+            differential_data = $13,
+            full_compliance_package = $14
+          WHERE id = $15
+        `, [
+          summary_metadata ? JSON.stringify(summary_metadata) : null,
+          key_requirements ? JSON.stringify(key_requirements) : null,
+          compliance_actions ? JSON.stringify(compliance_actions) : null,
+          ai_risk_level || null,
+          primary_stakeholders ? JSON.stringify(primary_stakeholders) : null,
+          enforcement_agency || null,
+          ecfr_data ? JSON.stringify(ecfr_data) : null,
+          federal_register_data ? JSON.stringify(federal_register_data) : null,
+          legal_database_data ? JSON.stringify(legal_database_data) : null,
+          academic_sources_data ? JSON.stringify(academic_sources_data) : null,
+          penalties ? JSON.stringify(penalties) : null,
+          citations ? JSON.stringify(citations) : null,
+          differential_data ? JSON.stringify(differential_data) : null,
+          full_compliance_package ? JSON.stringify(full_compliance_package) : null,
+          regId
+        ]);
+        console.log(`[REGISTRY]    ✅ Rich data saved to database`);
+      } catch (richDataError) {
+        console.error(`[REGISTRY]    ⚠️ Rich data save failed: ${richDataError.message}`);
+      }
+    }
+    
+    console.log(`[REGISTRY] ✅ Regulation saved: ${result.itemId} (version: ${result.version})`);
+    
+    // Update tasks if provided
+    let actualTasksSaved = 0;
+    if (tasks && tasks.length > 0) {
+      try {
+        // Get the regulation ID
+        const reg = await RegulationRepository.findById(item_id);
+        console.log(`[REGISTRY]    - Found regulation: ${reg ? 'yes (id=' + reg.id + ')' : 'no'}`);
+        
+        if (reg) {
+          // Delete existing tasks
+          const deleteResult = await pool.query('DELETE FROM regulation_tasks WHERE regulation_id = $1', [reg.id]);
+          console.log(`[REGISTRY]    - Deleted ${deleteResult.rowCount} existing tasks`);
+          
+          // Insert new tasks
+          for (const task of tasks) {
+            try {
+              await pool.query(`
+                INSERT INTO regulation_tasks (
+                  regulation_id, task_id, parent_task_id, title, description,
+                  category, priority, assigned_role,
+                  evidence_required, evidence_type, sort_order
+                ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+              `, [
+                reg.id,
+                task.tempId || task.taskId || null,
+                null, // Parent will be linked in second pass
+                task.title,
+                task.description || null,
+                task.category || null,
+                task.priority || 'medium',
+                task.assignedRole || null,
+                task.evidenceRequired || false,
+                task.evidenceType || null,
+                task.sortOrder || 0
+              ]);
+              actualTasksSaved++;
+            } catch (insertError) {
+              console.error(`[REGISTRY]    ❌ Failed to insert task "${task.title}": ${insertError.message}`);
+            }
+          }
+          
+          console.log(`[REGISTRY]    ✅ Saved ${actualTasksSaved}/${tasks.length} tasks`);
+        } else {
+          console.error(`[REGISTRY]    ❌ Regulation not found: ${item_id}`);
+        }
+      } catch (taskError) {
+        console.error(`[REGISTRY]    ⚠️ Task save error: ${taskError.message}`);
+        console.error(taskError.stack);
+      }
+    }
+    
+    // Update deadlines if provided
+    let actualDeadlinesSaved = 0;
+    if (deadlines && deadlines.length > 0) {
+      try {
+        const reg = await RegulationRepository.findById(item_id);
+        if (reg) {
+          // Delete existing deadlines
+          await pool.query('DELETE FROM regulation_deadlines WHERE regulation_id = $1', [reg.id]);
+          
+          // Insert new deadlines
+          for (const deadline of deadlines) {
+            try {
+              const deadlineName = deadline.name || deadline.type || 'Filing Deadline';
+              await pool.query(`
+                INSERT INTO regulation_deadlines (
+                  regulation_id, name, deadline_type, due_date, description, frequency
+                ) VALUES ($1, $2, $3, $4, $5, $6)
+              `, [
+                reg.id,
+                deadlineName,
+                deadline.type || deadline.deadlineType || null,
+                deadline.date || deadline.dueDate || null,
+                deadline.description || null,
+                deadline.frequency || null
+              ]);
+              actualDeadlinesSaved++;
+            } catch (dlErr) {
+              console.error(`[REGISTRY]    ❌ Failed to insert deadline "${deadline.type}": ${dlErr.message}`);
+            }
+          }
+          
+          console.log(`[REGISTRY]    ✅ Saved ${actualDeadlinesSaved}/${deadlines.length} deadlines`);
+        }
+      } catch (deadlineError) {
+        console.error(`[REGISTRY]    ⚠️ Deadline save error: ${deadlineError.message}`);
+      }
+    }
+    
+    res.json({
+      success: true,
+      message: 'Workflow results saved to database',
+      itemId: result.itemId,
+      version: result.version,
+      tasksUpdated: actualTasksSaved,
+      tasksRequested: tasks?.length || 0,
+      deadlinesUpdated: actualDeadlinesSaved,
+      deadlinesRequested: deadlines?.length || 0,
+      workflowId: workflow_id
+    });
+    
+  } catch (err) {
+    console.error('[REGISTRY] Error saving workflow update:', err);
+    res.status(500).json({ error: err.message });
   }
 });
 

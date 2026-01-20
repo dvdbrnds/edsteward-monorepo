@@ -219,7 +219,8 @@ const RegulationRepository = {
           source_url, agency_name, agency_url,
           effective_date, lovv_level, last_validated, validation_method,
           deadline, deadline_month, deadline_label,
-          version_hash, created_by, updated_by
+          version_hash, created_by, updated_by,
+          content_hash, source_validation, last_workflow_run, workflow_id
         ) VALUES (
           $1, $2, $3, $4, $5, $6,
           $7, $8,
@@ -227,30 +228,36 @@ const RegulationRepository = {
           $13, $14, $15,
           $16, $17, NOW(), $18,
           $19, $20, $21,
-          $22, $23, $23
+          $22, $23, $23,
+          $24, $25, $26, $27
         )
         ON CONFLICT (item_id) DO UPDATE SET
-          name = EXCLUDED.name,
-          statute = EXCLUDED.statute,
-          public_law = EXCLUDED.public_law,
-          category = EXCLUDED.category,
-          topic = EXCLUDED.topic,
-          summary = EXCLUDED.summary,
-          requirements = EXCLUDED.requirements,
-          regulation_text = EXCLUDED.regulation_text,
-          reporting_requirements = EXCLUDED.reporting_requirements,
-          source_url = EXCLUDED.source_url,
-          agency_name = EXCLUDED.agency_name,
-          agency_url = EXCLUDED.agency_url,
-          effective_date = EXCLUDED.effective_date,
-          lovv_level = EXCLUDED.lovv_level,
+          name = COALESCE(EXCLUDED.name, regulations.name),
+          statute = COALESCE(EXCLUDED.statute, regulations.statute),
+          public_law = COALESCE(EXCLUDED.public_law, regulations.public_law),
+          category = COALESCE(EXCLUDED.category, regulations.category),
+          topic = COALESCE(EXCLUDED.topic, regulations.topic),
+          summary = COALESCE(EXCLUDED.summary, regulations.summary),
+          requirements = COALESCE(EXCLUDED.requirements, regulations.requirements),
+          regulation_text = COALESCE(EXCLUDED.regulation_text, regulations.regulation_text),
+          reporting_requirements = COALESCE(EXCLUDED.reporting_requirements, regulations.reporting_requirements),
+          source_url = COALESCE(EXCLUDED.source_url, regulations.source_url),
+          agency_name = COALESCE(EXCLUDED.agency_name, regulations.agency_name),
+          agency_url = COALESCE(EXCLUDED.agency_url, regulations.agency_url),
+          effective_date = COALESCE(EXCLUDED.effective_date, regulations.effective_date),
+          lovv_level = COALESCE(EXCLUDED.lovv_level, regulations.lovv_level),
           last_validated = NOW(),
-          validation_method = EXCLUDED.validation_method,
-          deadline = EXCLUDED.deadline,
-          deadline_month = EXCLUDED.deadline_month,
-          deadline_label = EXCLUDED.deadline_label,
+          validation_method = COALESCE(EXCLUDED.validation_method, regulations.validation_method),
+          deadline = COALESCE(EXCLUDED.deadline, regulations.deadline),
+          deadline_month = COALESCE(EXCLUDED.deadline_month, regulations.deadline_month),
+          deadline_label = COALESCE(EXCLUDED.deadline_label, regulations.deadline_label),
           version_hash = EXCLUDED.version_hash,
-          updated_by = EXCLUDED.updated_by
+          updated_by = EXCLUDED.updated_by,
+          content_hash = COALESCE(EXCLUDED.content_hash, regulations.content_hash),
+          source_validation = COALESCE(EXCLUDED.source_validation, regulations.source_validation),
+          last_workflow_run = COALESCE(EXCLUDED.last_workflow_run, regulations.last_workflow_run),
+          workflow_id = COALESCE(EXCLUDED.workflow_id, regulations.workflow_id),
+          version = regulations.version + 1
         RETURNING id, item_id, version, (xmax = 0) as was_inserted
       `, [
         itemId,
@@ -275,7 +282,11 @@ const RegulationRepository = {
         regulation.deadlineMonth || regulation.deadline_month,
         regulation.deadlineLabel || regulation.deadline_label,
         versionHash,
-        performedBy
+        performedBy,
+        regulation.contentHash || regulation.content_hash,
+        regulation.sourceValidation || regulation.source_validation,
+        regulation.lastWorkflowRun || regulation.last_workflow_run,
+        regulation.workflowId || regulation.workflow_id
       ]);
       
       const regId = result.rows[0].id;

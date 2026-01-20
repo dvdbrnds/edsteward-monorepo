@@ -64,16 +64,41 @@ export class ConsistentSummaryService {
       const prompt = this.buildConsistentPrompt(regulationSlug, regulationTitle, regulationText, previousSummary);
       
       // Generate summary with strict consistency settings
-      const response = await callLLM(prompt, this.consistencySettings);
+      let response = await callLLM(prompt, this.consistencySettings);
+      
+      // Strip JSON code fences if present
+      if (response && typeof response === 'string') {
+        response = response.trim();
+        // Remove ```json or ``` wrapper
+        if (response.startsWith('```json')) {
+          response = response.slice(7);
+        } else if (response.startsWith('```')) {
+          response = response.slice(3);
+        }
+        if (response.endsWith('```')) {
+          response = response.slice(0, -3);
+        }
+        response = response.trim();
+      }
       
       // Try to parse JSON response, fallback to simple summary if needed
       let parsedResponse;
       try {
         parsedResponse = JSON.parse(response);
+        
+        // Ensure summary is plain text, not JSON
+        if (parsedResponse.summary && typeof parsedResponse.summary === 'string') {
+          // If summary still has JSON prefix, extract just the text
+          if (parsedResponse.summary.startsWith('```')) {
+            parsedResponse.summary = parsedResponse.summary.replace(/^```json?\n?|\n?```$/g, '').trim();
+          }
+        }
       } catch (e) {
         // Fallback: create simple response structure
+        // If response looks like it has a summary key embedded, try to extract it
+        const summaryMatch = response.match(/"summary":\s*"([^"]+)"/);
         parsedResponse = {
-          summary: response.trim(),
+          summary: summaryMatch ? summaryMatch[1] : response.trim(),
           keyRequirements: [],
           complianceActions: [],
           riskLevel: 'medium',

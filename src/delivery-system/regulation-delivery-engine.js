@@ -415,25 +415,25 @@ class RegulationCDCService extends Emittery {
     // Endpoint mapping for regulations
     if (regulationId.includes('REG-66') || regulationId.includes('reg-66') || regulationId.includes('teach')) {
       // TEACH Act uses enhanced CFR endpoint with Federal Register integration
-      uscEndpoint = 'http://localhost:3002/api/llm/usc/17/110';
-      cfrEndpoint = 'http://localhost:3002/api/llm/cfr/enhanced/teach-act?federal_register=true';
-      complianceEndpoint = 'http://localhost:3002/api/llm/compliance/teach-act';
+      uscEndpoint = 'http://localhost:3004/api/llm/usc/17/110';
+      cfrEndpoint = 'http://localhost:3004/api/llm/cfr/enhanced/teach-act?federal_register=true';
+      complianceEndpoint = 'http://localhost:3004/api/llm/compliance/teach-act';
     } else if (regulationId.includes('osha') || regulationId.includes('emergency-action-plan') || regulationId.includes('safety')) {
-      uscEndpoint = 'http://localhost:3002/api/llm/usc/29/651';
-      cfrEndpoint = `http://localhost:3002/api/llm/cfr/${regulationId}`;
-      complianceEndpoint = `http://localhost:3002/api/llm/compliance/${regulationId}`;
+      uscEndpoint = 'http://localhost:3004/api/llm/usc/29/651';
+      cfrEndpoint = `http://localhost:3004/api/llm/cfr/${regulationId}`;
+      complianceEndpoint = `http://localhost:3004/api/llm/compliance/${regulationId}`;
     } else if (regulationId.includes('age-discrimination')) {
-      uscEndpoint = 'http://localhost:3002/api/llm/usc/42/6101';
-      cfrEndpoint = `http://localhost:3002/api/llm/cfr/age-discrimination`;
-      complianceEndpoint = `http://localhost:3002/api/llm/compliance/age-discrimination`;
+      uscEndpoint = 'http://localhost:3004/api/llm/usc/42/6101';
+      cfrEndpoint = `http://localhost:3004/api/llm/cfr/age-discrimination`;
+      complianceEndpoint = `http://localhost:3004/api/llm/compliance/age-discrimination`;
     } else if (regulationId.includes('americans-with-disabilities') || regulationId.includes('ada')) {
-      uscEndpoint = 'http://localhost:3002/api/llm/usc/42/12101';
-      cfrEndpoint = `http://localhost:3002/api/llm/cfr/ada`;
-      complianceEndpoint = `http://localhost:3002/api/llm/compliance/ada`;
+      uscEndpoint = 'http://localhost:3004/api/llm/usc/42/12101';
+      cfrEndpoint = `http://localhost:3004/api/llm/cfr/ada`;
+      complianceEndpoint = `http://localhost:3004/api/llm/compliance/ada`;
     } else {
       uscEndpoint = null;
-      cfrEndpoint = `http://localhost:3002/api/llm/cfr/${regulationId}`;
-      complianceEndpoint = `http://localhost:3002/api/llm/compliance/${regulationId}`;
+      cfrEndpoint = `http://localhost:3004/api/llm/cfr/${regulationId}`;
+      complianceEndpoint = `http://localhost:3004/api/llm/compliance/${regulationId}`;
     }
     
     // Build fetch promises

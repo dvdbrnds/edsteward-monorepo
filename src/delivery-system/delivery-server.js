@@ -34,7 +34,7 @@ try {
 
 class DeliveryServer {
   constructor(options = {}) {
-    this.port = options.port || 3051;
+    this.port = options.port || 3003;  // EdSteward expects MCP WebSocket on 3003
     this.app = express();
     this.server = createServer(this.app);
     this.deliveryEngine = null;
@@ -247,15 +247,40 @@ class DeliveryServer {
               })))
             : '[]';
 
-          // Build requirements text from tasks or keyProvisions
+          // Build requirements text - prioritize AI-extracted keyRequirements
           let requirementsText = '';
-          if (Array.isArray(regulationContent.complianceTasks) && regulationContent.complianceTasks.length > 0) {
-            requirementsText = regulationContent.complianceTasks.map(t => `• ${t.title}: ${t.description || ''}`).join('\n');
-          } else if (Array.isArray(regulationContent.keyProvisions)) {
-            requirementsText = regulationContent.keyProvisions.map(p => `• ${p.title}: ${p.description || ''}`).join('\n');
-          } else if (typeof regulationContent.requirements === 'string') {
+          
+          // PRIORITY 1: Use keyRequirements from AI extraction (structured compliance requirements)
+          if (Array.isArray(regulationContent.keyRequirements) && regulationContent.keyRequirements.length > 0) {
+            requirementsText = '## Key Compliance Requirements\n\n' + 
+              regulationContent.keyRequirements.map((r, i) => `${i + 1}. ${r}`).join('\n');
+          }
+          // PRIORITY 2: Use existing requirements text field
+          else if (typeof regulationContent.requirements === 'string' && regulationContent.requirements.length > 50) {
             requirementsText = regulationContent.requirements;
           }
+          // PRIORITY 3: Build from compliance tasks
+          else if (Array.isArray(regulationContent.complianceTasks) && regulationContent.complianceTasks.length > 0) {
+            requirementsText = '## Compliance Tasks\n\n' + 
+              regulationContent.complianceTasks.map(t => `• ${t.title}: ${t.description || ''}`).join('\n');
+          }
+          // PRIORITY 4: Use keyProvisions as fallback
+          else if (Array.isArray(regulationContent.keyProvisions)) {
+            requirementsText = regulationContent.keyProvisions.map(p => `• ${p.title}: ${p.description || ''}`).join('\n');
+          }
+          
+          console.log(`   📋 Requirements: ${requirementsText.length} chars (source: ${
+            Array.isArray(regulationContent.keyRequirements) && regulationContent.keyRequirements.length > 0 ? 'keyRequirements' :
+            regulationContent.requirements?.length > 50 ? 'requirements field' :
+            regulationContent.complianceTasks?.length > 0 ? 'tasks' : 'none'
+          })`);
+          
+          // Extract risk score data
+          const riskAssessment = regulationContent.riskAssessment || regulationContent.risk_assessment || null;
+          const riskScore = riskAssessment?.riskScore || riskAssessment?.risk_score || null;
+          const riskLevel = riskAssessment?.riskLevel || riskAssessment?.risk_level || null;
+          
+          console.log(`   📊 Risk Score: ${riskScore || 'N/A'} (${riskLevel || 'N/A'})`)
 
           // Build content text (ensure it's a string, not array)
           let contentText = '';
@@ -355,12 +380,25 @@ class DeliveryServer {
             status: 'pending',  // CRITICAL: Creates pending update for CCO review
             
             // Additional context
-            summary: regulationContent.description || `MCP Engine update for ${regulationContent.name}`,
+            summary: regulationContent.summary || regulationContent.description || `MCP Engine update for ${regulationContent.name}`,
             requirements: requirementsText || '',
             filingDeadlines: JSON.stringify(filingDeadlinesArray),
             
             // Full hierarchical task list (parent-child relationships preserved)
-            complianceTasks: hierarchicalTasks
+            complianceTasks: hierarchicalTasks,
+            
+            // INSTITUTIONAL RISK SCORE (1-100)
+            riskScore: riskScore,
+            riskLevel: riskLevel,
+            riskAssessment: riskAssessment ? {
+              score: riskScore,
+              level: riskLevel,
+              factors: riskAssessment.riskFactors || riskAssessment.risk_factors || null,
+              assessmentDate: riskAssessment.assessmentDate || riskAssessment.assessment_date || new Date().toISOString()
+            } : null,
+            
+            // LOVV Validation Level
+            lovvLevel: regulationContent.lovvLevel || regulationContent.lovv_level || null
           };
           
           console.log(`   📋 Sending ${hierarchicalTasks.length} tasks (hierarchy preserved)`);
@@ -1069,39 +1107,39 @@ COMPLIANCE DEADLINES:
       // Endpoint mapping for REAL regulations that exist in the system
       if (regulationId.includes('osha') || regulationId.includes('emergency-action-plan') || regulationId.includes('safety') || regulationId.includes('REG-4580') || regulationId.includes('REG-1813')) {
         // OSHA regulations use BOTH USC (predominant) and CFR endpoints
-        uscEndpoint = 'http://localhost:3002/api/llm/usc/29/651'; // Occupational Safety and Health Act
-        cfrEndpoint = `http://localhost:3002/api/llm/cfr/${regulationId}`;
-        complianceEndpoint = `http://localhost:3002/api/llm/compliance/${regulationId}`;
+        uscEndpoint = 'http://localhost:3004/api/llm/usc/29/651'; // Occupational Safety and Health Act
+        cfrEndpoint = `http://localhost:3004/api/llm/cfr/${regulationId}`;
+        complianceEndpoint = `http://localhost:3004/api/llm/compliance/${regulationId}`;
       } else if (regulationId.includes('REG-66') || regulationId.includes('reg-66') || regulationId.includes('teach') || regulationId.includes('technology-education-and-copyright-harmonization')) {
         // TEACH Act uses enhanced CFR endpoint with Federal Register integration
-        uscEndpoint = 'http://localhost:3002/api/llm/usc/17/110';
-        cfrEndpoint = 'http://localhost:3002/api/llm/cfr/enhanced/teach-act?federal_register=true';
-        complianceEndpoint = 'http://localhost:3002/api/llm/compliance/teach-act';
+        uscEndpoint = 'http://localhost:3004/api/llm/usc/17/110';
+        cfrEndpoint = 'http://localhost:3004/api/llm/cfr/enhanced/teach-act?federal_register=true';
+        complianceEndpoint = 'http://localhost:3004/api/llm/compliance/teach-act';
       } else if (regulationId.includes('drug-free-schools') || regulationId.includes('REG-1807')) {
         // Drug-Free Schools and Communities Act (Item ID 1807)
-        uscEndpoint = 'http://localhost:3002/api/llm/usc/20/1011i'; // Drug-Free Schools USC
-        cfrEndpoint = `http://localhost:3002/api/llm/cfr/drug-free-schools`;
-        complianceEndpoint = `http://localhost:3002/api/llm/compliance/drug-free-schools`;
+        uscEndpoint = 'http://localhost:3004/api/llm/usc/20/1011i'; // Drug-Free Schools USC
+        cfrEndpoint = `http://localhost:3004/api/llm/cfr/drug-free-schools`;
+        complianceEndpoint = `http://localhost:3004/api/llm/compliance/drug-free-schools`;
       } else if (regulationId.includes('age-discrimination') || regulationId.includes('REG-1785')) {
         // Age Discrimination Act of 1975 (Item ID 1785)
-        uscEndpoint = 'http://localhost:3002/api/llm/usc/42/6101'; // Age Discrimination USC
-        cfrEndpoint = `http://localhost:3002/api/llm/cfr/age-discrimination`;
-        complianceEndpoint = `http://localhost:3002/api/llm/compliance/age-discrimination`;
+        uscEndpoint = 'http://localhost:3004/api/llm/usc/42/6101'; // Age Discrimination USC
+        cfrEndpoint = `http://localhost:3004/api/llm/cfr/age-discrimination`;
+        complianceEndpoint = `http://localhost:3004/api/llm/compliance/age-discrimination`;
       } else if (regulationId.includes('americans-with-disabilities') || regulationId.includes('REG-1786')) {
         // Americans with Disabilities Act of 1990 (Item ID 1786)
-        uscEndpoint = 'http://localhost:3002/api/llm/usc/42/12101'; // ADA USC
-        cfrEndpoint = `http://localhost:3002/api/llm/cfr/ada`;
-        complianceEndpoint = `http://localhost:3002/api/llm/compliance/ada`;
+        uscEndpoint = 'http://localhost:3004/api/llm/usc/42/12101'; // ADA USC
+        cfrEndpoint = `http://localhost:3004/api/llm/cfr/ada`;
+        complianceEndpoint = `http://localhost:3004/api/llm/compliance/ada`;
       } else if (regulationId.includes('higher-education-act-institutional') || regulationId.includes('REG-1982')) {
         // Higher Education Act: Institutional Information (Item ID 1982)
-        uscEndpoint = 'http://localhost:3002/api/llm/usc/20/1092'; // HEA USC
-        cfrEndpoint = `http://localhost:3002/api/llm/cfr/hea-institutional`;
-        complianceEndpoint = `http://localhost:3002/api/llm/compliance/hea-institutional`;
+        uscEndpoint = 'http://localhost:3004/api/llm/usc/20/1092'; // HEA USC
+        cfrEndpoint = `http://localhost:3004/api/llm/cfr/hea-institutional`;
+        complianceEndpoint = `http://localhost:3004/api/llm/compliance/hea-institutional`;
       } else {
         // Generic fallback for unknown regulations
         uscEndpoint = null;
-        cfrEndpoint = `http://localhost:3002/api/llm/cfr/${regulationId}`;
-        complianceEndpoint = `http://localhost:3002/api/llm/compliance/${regulationId}`;
+        cfrEndpoint = `http://localhost:3004/api/llm/cfr/${regulationId}`;
+        complianceEndpoint = `http://localhost:3004/api/llm/compliance/${regulationId}`;
       }
       
       console.log(`🔍 Using endpoints - USC: ${uscEndpoint}, CFR: ${cfrEndpoint}, Compliance: ${complianceEndpoint}`);
@@ -1132,7 +1170,7 @@ COMPLIANCE DEADLINES:
       const [uscResponse, cfrResponse, complianceResponse, versioningResponse] = await Promise.all([
         ...fetchPromises,
         // Versioning Data
-        fetch('http://localhost:3002/api/llm/versioning/system-info', {
+        fetch('http://localhost:3004/api/llm/versioning/system-info', {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' }
         })
@@ -1147,7 +1185,7 @@ COMPLIANCE DEADLINES:
       ]);
 
       // Also run the LinearEngine workflow for comprehensive analysis
-      const workflowResponse = await fetch('http://localhost:3002/api/llm/query', {
+      const workflowResponse = await fetch('http://localhost:3004/api/llm/query', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -1323,7 +1361,7 @@ if (isMainModule) {
   console.log('🔧 [STARTUP] Node version:', process.version);
   
   const server = new DeliveryServer({
-    port: process.env.DELIVERY_PORT || 3051
+    port: process.env.DELIVERY_PORT || 3003  // EdSteward expects MCP WebSocket on 3003
   });
   
   console.log('🔧 [STARTUP] Server instance created, calling start()...');

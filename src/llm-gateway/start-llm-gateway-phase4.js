@@ -62,7 +62,7 @@ function parseRequirementsToArray(reqText) {
 class EnhancedLLMGateway {
   constructor() {
     this.app = express();
-    this.port = process.env.LLM_GATEWAY_PORT || 3002;
+    this.port = process.env.LLM_GATEWAY_PORT || 3004;  // Moved from 3002 to avoid EdSteward Admin Console conflict
     this.container = new ServiceContainer();
     this.isInitialized = false;
   }
@@ -690,6 +690,7 @@ class EnhancedLLMGateway {
     });
 
     // CFR endpoint - Generic handler for regulation data by slug
+    // SOURCE OF TRUTH: PostgreSQL (via Registry API) -> then fall back to static files
     router.get('/cfr/:slug', async (req, res) => {
       try {
         const timer = metricsCollector.createTimer('cfr_fetch');
@@ -697,7 +698,103 @@ class EnhancedLLMGateway {
         
         logger.info(`[cfr-endpoint] Fetching regulation data for ${slug}`);
         
-        // FIRST: Check for AI-enhanced data in enhanced-regulations folder
+        // ====================================================================
+        // FIRST: Check PostgreSQL via Registry API (SOURCE OF TRUTH)
+        // This is where workflow results are saved
+        // ====================================================================
+        try {
+          logger.info(`[cfr-endpoint] Checking PostgreSQL for ${slug}...`);
+          const registryResponse = await fetch(`http://localhost:3010/api/regulations/${encodeURIComponent(slug)}`);
+          
+          if (registryResponse.ok) {
+            const registryData = await registryResponse.json();
+            
+            // Check if we got valid data with content
+            const hasContent = registryData?.regulationText || registryData?.summary || 
+                              registryData?.regulation_text || registryData?.content;
+            
+            if (hasContent) {
+              logger.info(`[cfr-endpoint] ✅ Found in PostgreSQL (version: ${registryData.version || 1})`);
+              timer.end();
+              
+              // Format title from slug if not provided
+              const title = registryData.name || slug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+              const fullText = registryData.regulationText || registryData.regulation_text || registryData.content || '';
+              const summary = registryData.summary || '';
+              const requirements = registryData.requirements || registryData.reportingRequirements || '';
+              
+              // Create sections array for console compatibility
+              const sections = [];
+              if (fullText) {
+                const paragraphs = fullText.split('\n\n').filter(p => p.trim());
+                sections.push({
+                  section: '§ Overview',
+                  title: 'Regulation Overview',
+                  content: paragraphs.slice(0, 2).join('\n\n')
+                });
+                if (paragraphs.length > 2) {
+                  sections.push({
+                    section: '§ Details',
+                    title: 'Detailed Provisions',
+                    content: paragraphs.slice(2).join('\n\n')
+                  });
+                }
+              }
+              if (requirements) {
+                sections.push({
+                  section: '§ Requirements',
+                  title: 'Compliance Requirements',
+                  content: requirements
+                });
+              }
+              
+              return res.json({
+                success: true,
+                source: 'PostgreSQL',
+                data: {
+                  id: registryData.regulationId || registryData.item_id || slug,
+                  name: title,
+                  title: title,
+                  source: 'MCP Engine PostgreSQL Database',
+                  lastUpdated: registryData.updatedAt || registryData.updated_at || new Date().toISOString(),
+                  version: registryData.version || 1,
+                  fullText: fullText,
+                  content: fullText,
+                  summary: summary,
+                  requirements: requirements,
+                  requirementsArray: parseRequirementsToArray(requirements),
+                  reportingRequirements: registryData.reportingRequirements || registryData.reporting_requirements || '',
+                  regulation_text: fullText,
+                  sections: sections,
+                  // Risk assessment
+                  riskAssessment: registryData.riskAssessment,
+                  // Tasks and deadlines
+                  complianceTasks: registryData.complianceTasks || [],
+                  filingDeadlines: registryData.filingDeadlines || [],
+                  // Metadata
+                  metadata: {
+                    dataSource: 'PostgreSQL',
+                    version: registryData.version || 1,
+                    contentHash: registryData.contentHash || registryData.content_hash,
+                    lastWorkflowRun: registryData.lastWorkflowRun || registryData.last_workflow_run,
+                    workflowId: registryData.workflowId || registryData.workflow_id,
+                    lovvLevel: registryData.lovvLevel || registryData.lovv_level,
+                    isReal: true,
+                    source: 'PostgreSQL'
+                  }
+                }
+              });
+            }
+          }
+        } catch (pgError) {
+          logger.warn(`[cfr-endpoint] PostgreSQL fetch failed: ${pgError.message}`);
+        }
+        
+        logger.info(`[cfr-endpoint] Not found in PostgreSQL, checking enhanced-regulations folder...`);
+        
+        // ====================================================================
+        // FALLBACK: Check for AI-enhanced data in enhanced-regulations folder
+        // ====================================================================
         const __filename = fileURLToPath(import.meta.url);
         const __dirname = path.dirname(__filename);
         const enhancedDir = path.join(__dirname, '../../enhanced-regulations');
@@ -1212,14 +1309,55 @@ The Family Educational Rights and Privacy Act (FERPA) is a federal law that prot
     // ========================================================================
     // COMPREHENSIVE WORKFLOW ENGINE ENDPOINT
     // THE CORE PURPOSE OF MCP ENGINE - Execute full workflow with real data
+    // 
+    // FLOW:
+    // 1. FETCH existing regulation data from PostgreSQL (for differential)
+    // 2. RUN comprehensive workflow with real government sources
+    // 3. SAVE results back to PostgreSQL (creates version, audit trail)
     // ========================================================================
     router.post('/workflow/execute', async (req, res) => {
       try {
-        const { regulation, slug, existingData, quick } = req.body;
+        const { regulation, slug, quick, saveToDatabase = true } = req.body;
         const regulationSlug = slug || regulation || 'unknown-regulation';
         
         logger.info(`[WORKFLOW] 🚀 Executing ${quick ? 'QUICK' : 'COMPREHENSIVE'} workflow for ${regulationSlug}`);
         
+        // ====================================================================
+        // STEP 1: FETCH EXISTING DATA FROM POSTGRESQL (for differential analysis)
+        // ====================================================================
+        let existingData = null;
+        try {
+          logger.info(`[WORKFLOW] 📥 Fetching existing data from PostgreSQL...`);
+          const registryResponse = await fetch(`http://localhost:3010/api/regulations/${encodeURIComponent(regulationSlug)}`);
+          if (registryResponse.ok) {
+            const registryResult = await registryResponse.json();
+            // Registry API returns data directly OR in a success/data wrapper
+            if (registryResult.success && registryResult.data) {
+              existingData = registryResult.data;
+            } else if (registryResult.regulationId || registryResult.name || registryResult.id) {
+              // Direct response format - the result IS the data
+              existingData = registryResult;
+            }
+            
+            if (existingData) {
+              logger.info(`[WORKFLOW] ✅ Found existing regulation in database:`);
+              logger.info(`[WORKFLOW]    - Name: ${existingData.name}`);
+              logger.info(`[WORKFLOW]    - Version: ${existingData.version || 1}`);
+              logger.info(`[WORKFLOW]    - Content Hash: ${existingData.contentHash || existingData.content_hash || 'N/A'}`);
+              logger.info(`[WORKFLOW]    - Last Workflow: ${existingData.lastWorkflowRun || existingData.last_workflow_run || 'never'}`);
+            }
+          }
+        } catch (fetchError) {
+          logger.warn(`[WORKFLOW] ⚠️ Could not fetch existing data: ${fetchError.message}`);
+        }
+        
+        if (!existingData) {
+          logger.info(`[WORKFLOW] ℹ️ No existing data found - this will be initial load`);
+        }
+        
+        // ====================================================================
+        // STEP 2: RUN COMPREHENSIVE WORKFLOW
+        // ====================================================================
         let result;
         if (quick) {
           result = await executeQuickWorkflow(regulationSlug, existingData);
@@ -1229,9 +1367,109 @@ The Family Educational Rights and Privacy Act (FERPA) is a federal law that prot
         
         logger.info(`[WORKFLOW] ✅ Workflow ${result.workflowId} completed in ${result.duration}`);
         
+        // ====================================================================
+        // STEP 3: SAVE RESULTS TO POSTGRESQL (creates version, audit trail)
+        // ====================================================================
+        let saveResult = null;
+        if (saveToDatabase && result.compliancePackage) {
+          try {
+            logger.info(`[WORKFLOW] 💾 Saving workflow results to PostgreSQL...`);
+            
+            // Build the payload for the Registry API
+            const tasksToSave = result.compliancePackage.complianceTasks || [];
+            const deadlinesToSave = result.compliancePackage.filingDeadlines || [];
+            
+            logger.info(`[WORKFLOW] 📊 Payload stats: ${tasksToSave.length} tasks, ${deadlinesToSave.length} deadlines`);
+            
+            // Build COMPREHENSIVE save payload - THE AUTHORITATIVE SOURCE saves EVERYTHING!
+            const pkg = result.compliancePackage;
+            const savePayload = {
+              item_id: regulationSlug,
+              name: pkg.name,
+              statute: pkg.statute,
+              summary: pkg.summary,
+              regulation_text: pkg.regulationText,
+              content_hash: pkg.contentHash,
+              lovv_level: pkg.validation?.lovvLevel || 'D',
+              
+              // Tasks and deadlines
+              tasks: tasksToSave,
+              deadlines: deadlinesToSave,
+              
+              // AI-generated summary data
+              summary_metadata: pkg.summaryMetadata,
+              key_requirements: pkg.keyRequirements,
+              compliance_actions: pkg.complianceActions,
+              ai_risk_level: pkg.aiRiskLevel,
+              primary_stakeholders: pkg.primaryStakeholders,
+              enforcement_agency: pkg.enforcementAgency,
+              
+              // Source validation metadata
+              source_validation: pkg.sourceValidation,
+              
+              // Rich government source data
+              ecfr_data: result.steps?.governmentSources?.data?.ecfr || null,
+              federal_register_data: result.steps?.governmentSources?.data?.federalRegister || null,
+              
+              // Legal database cross-reference data
+              legal_database_data: result.steps?.legalValidation?.data?.lawLibrarySources || null,
+              academic_sources_data: result.steps?.legalValidation?.data?.academicSources || null,
+              
+              // Penalties and citations
+              penalties: pkg.penalties,
+              citations: {
+                usc: pkg.statute,
+                cfr: pkg.cfrCitation,
+                fullCitations: pkg.sourceValidation?.legalDatabases || null
+              },
+              
+              // Differential analysis data
+              differential_data: result.steps?.differentialAnalysis?.data || null,
+              
+              // Risk assessment
+              risk_assessment: pkg.riskAssessment,
+              
+              // Full compliance package backup (JSON of everything)
+              full_compliance_package: pkg,
+              
+              // Workflow metadata
+              workflow_id: result.workflowId,
+              last_workflow_run: new Date().toISOString()
+            };
+            
+            logger.info(`[WORKFLOW] 📦 Comprehensive payload: summary=${(pkg.summary || '').length} chars, keyReqs=${(pkg.keyRequirements || []).length}, hasEcfr=${!!savePayload.ecfr_data}`);
+            
+            const saveResponse = await fetch('http://localhost:3010/api/regulations/workflow-update', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(savePayload)
+            });
+            
+            if (saveResponse.ok) {
+              saveResult = await saveResponse.json();
+              logger.info(`[WORKFLOW] ✅ Saved to database (version: ${saveResult.version || 'new'})`);
+            } else {
+              const errorText = await saveResponse.text();
+              logger.warn(`[WORKFLOW] ⚠️ Database save failed: ${errorText}`);
+            }
+          } catch (saveError) {
+            logger.error(`[WORKFLOW] ❌ Database save error: ${saveError.message}`);
+          }
+        }
+        
         res.json({
           success: true,
-          ...result
+          ...result,
+          databaseSave: saveResult ? {
+            success: true,
+            version: saveResult.version,
+            tasksUpdated: saveResult.tasksUpdated || 0,
+            deadlinesUpdated: saveResult.deadlinesUpdated || 0,
+            message: 'Workflow results saved to PostgreSQL'
+          } : {
+            success: false,
+            message: saveToDatabase ? 'Save failed' : 'Save disabled'
+          }
         });
         
       } catch (error) {

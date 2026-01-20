@@ -25,7 +25,7 @@ import Anthropic from '@anthropic-ai/sdk';
 
 const app = express();
 const PORT = process.env.INQUISITOR_PORT || 3061;
-const LLM_GATEWAY_URL = process.env.LLM_GATEWAY_URL || 'http://localhost:3002';
+const LLM_GATEWAY_URL = process.env.LLM_GATEWAY_URL || 'http://localhost:3004';
 
 // AI Configuration for Patent Compliance
 const AI_ENABLED = process.env.INQUISITOR_AI_ENABLED !== 'false'; // Default to true for patent
@@ -283,17 +283,157 @@ async function performAudit(regulationData, identifier) {
     };
   }
 
-  // Calculate overall score (weighted average)
-  report.overallScore = Math.round(
-    (report.scores.content * 0.35) +
-    (report.scores.summary * 0.25) +
-    (report.scores.requirements * 0.25) +
-    (report.scores.deadlines * 0.15)
-  );
-
+  // ══════════════════════════════════════════════════════════════════
+  // ENHANCED METRICS & SCORE BREAKDOWN
+  // ══════════════════════════════════════════════════════════════════
+  
+  // Define weights (can be adjusted for different compliance priorities)
+  const weights = {
+    content: 0.35,      // 35% - Most important: actual regulation text
+    summary: 0.25,      // 25% - Executive summary quality
+    requirements: 0.25, // 25% - Compliance requirements clarity
+    deadlines: 0.15     // 15% - Filing deadline completeness
+  };
+  
+  // Calculate weighted contributions
+  const contributions = {
+    content: Math.round(report.scores.content * weights.content),
+    summary: Math.round(report.scores.summary * weights.summary),
+    requirements: Math.round(report.scores.requirements * weights.requirements),
+    deadlines: Math.round(report.scores.deadlines * weights.deadlines)
+  };
+  
+  // Calculate overall score
+  report.overallScore = contributions.content + contributions.summary + 
+                        contributions.requirements + contributions.deadlines;
+  
+  // Extract metrics from regulation data
+  const content = regulationData.fullText || regulationData.content || 
+                  regulationData.regulationText || regulationData.regulation_text || '';
+  const summary = regulationData.summary || '';
+  const requirements = regulationData.requirements || '';
+  const tasks = regulationData.complianceTasks || regulationData.tasks || [];
+  const deadlines = regulationData.filingDeadlines || regulationData.deadlines || [];
+  
+  // Detailed metrics
+  report.metrics = {
+    content: {
+      characterCount: content.length,
+      wordCount: content.split(/\s+/).filter(w => w).length,
+      hasUSCCitation: /\d+\s+U\.?S\.?C\.?\s+§?\s*\d+/i.test(content),
+      hasCFRCitation: /CFR|Code of Federal Regulations/i.test(content),
+      citationCount: (content.match(/\d+\s+U\.?S\.?C\.|CFR\s+(Part\s+)?\d+/gi) || []).length,
+      paragraphCount: content.split(/\n\n+/).filter(p => p.trim()).length
+    },
+    summary: {
+      characterCount: summary.length,
+      wordCount: summary.split(/\s+/).filter(w => w).length,
+      hasActionableLanguage: /must|shall|required|need to|should/i.test(summary),
+      startsWithInstitution: /^your (institution|organization|school)/i.test(summary.trim())
+    },
+    requirements: {
+      characterCount: requirements.length,
+      wordCount: requirements.split(/\s+/).filter(w => w).length,
+      bulletCount: (requirements.match(/^[\s]*[-•*]/gm) || []).length,
+      sectionCount: (requirements.match(/^#{1,3}\s/gm) || []).length
+    },
+    tasks: {
+      totalCount: Array.isArray(tasks) ? tasks.length : 0,
+      criticalCount: Array.isArray(tasks) ? tasks.filter(t => t.priority === 'critical').length : 0,
+      highCount: Array.isArray(tasks) ? tasks.filter(t => t.priority === 'high').length : 0,
+      withEvidence: Array.isArray(tasks) ? tasks.filter(t => t.evidenceRequired).length : 0,
+      withAssignee: Array.isArray(tasks) ? tasks.filter(t => t.assignedRole).length : 0
+    },
+    deadlines: {
+      totalCount: Array.isArray(deadlines) ? deadlines.length : 0,
+      withDates: Array.isArray(deadlines) ? deadlines.filter(d => d.date || d.dueDate).length : 0,
+      recurring: Array.isArray(deadlines) ? deadlines.filter(d => 
+        d.frequency && d.frequency !== 'one-time'
+      ).length : 0
+    }
+  };
+  
+  // Score breakdown with impact analysis
+  report.scoreBreakdown = {
+    weights: weights,
+    rawScores: { ...report.scores },
+    contributions: contributions,
+    maxPossible: 100,
+    achieved: report.overallScore,
+    
+    // What's helping the score
+    positiveFactors: [],
+    
+    // What's hurting the score
+    negativeFactors: []
+  };
+  
+  // Analyze positive factors
+  if (report.scores.content >= 90) {
+    report.scoreBreakdown.positiveFactors.push({
+      category: 'content',
+      impact: '+' + contributions.content,
+      reason: 'Excellent content quality with legal citations'
+    });
+  }
+  if (report.scores.summary === 100) {
+    report.scoreBreakdown.positiveFactors.push({
+      category: 'summary',
+      impact: '+' + contributions.summary,
+      reason: 'Summary is comprehensive and well-structured'
+    });
+  }
+  if (report.scores.deadlines >= 90) {
+    report.scoreBreakdown.positiveFactors.push({
+      category: 'deadlines',
+      impact: '+' + contributions.deadlines,
+      reason: 'Deadlines are complete with proper structure'
+    });
+  }
+  if (report.metrics.tasks.totalCount >= 10) {
+    report.scoreBreakdown.positiveFactors.push({
+      category: 'tasks',
+      impact: 'bonus',
+      reason: `${report.metrics.tasks.totalCount} compliance tasks defined`
+    });
+  }
+  
+  // Analyze negative factors (what's costing points)
+  if (report.scores.content < 100) {
+    const lostPoints = Math.round((100 - report.scores.content) * weights.content);
+    report.scoreBreakdown.negativeFactors.push({
+      category: 'content',
+      impact: '-' + lostPoints,
+      reason: report.issues.find(i => i.field === 'content')?.message || 
+              'Content could be improved',
+      fix: 'Add USC/CFR legal citations to regulation text'
+    });
+  }
+  if (report.scores.requirements < 100) {
+    const lostPoints = Math.round((100 - report.scores.requirements) * weights.requirements);
+    report.scoreBreakdown.negativeFactors.push({
+      category: 'requirements',
+      impact: '-' + lostPoints,
+      reason: report.warnings.find(w => w.field === 'requirements')?.message ||
+              'Requirements section needs improvement',
+      fix: 'Add structured requirements with headers and bullet points (min 300 chars)'
+    });
+  }
+  if (report.scores.summary < 100) {
+    const lostPoints = Math.round((100 - report.scores.summary) * weights.summary);
+    report.scoreBreakdown.negativeFactors.push({
+      category: 'summary',
+      impact: '-' + lostPoints,
+      reason: report.issues.find(i => i.field === 'summary')?.message ||
+              'Summary needs improvement',
+      fix: 'Ensure summary is 90-1000 chars with actionable language'
+    });
+  }
+  
   // Determine certainty level based on issues
   const criticalIssues = report.issues.filter(i => i.severity === 'critical').length;
   const highIssues = report.issues.filter(i => i.severity === 'high').length;
+  const mediumIssues = report.issues.filter(i => i.severity === 'medium').length;
   
   if (criticalIssues > 0) {
     report.certaintyLevel = 'D';
@@ -304,9 +444,29 @@ async function performAudit(regulationData, identifier) {
   } else {
     report.certaintyLevel = 'A';
   }
+  
+  // Issue summary
+  report.issueSummary = {
+    critical: criticalIssues,
+    high: highIssues,
+    medium: mediumIssues,
+    warnings: report.warnings.length,
+    total: report.issues.length
+  };
 
   // Generate pass/fail
   report.passed = report.overallScore >= 70 && criticalIssues === 0;
+  
+  // Action items (prioritized list of what to fix)
+  report.actionItems = report.scoreBreakdown.negativeFactors
+    .filter(f => f.fix)
+    .sort((a, b) => parseInt(b.impact) - parseInt(a.impact))
+    .map((f, i) => ({
+      priority: i + 1,
+      category: f.category,
+      pointsToGain: Math.abs(parseInt(f.impact)),
+      action: f.fix
+    }));
 
   return report;
 }

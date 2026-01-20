@@ -19,6 +19,10 @@ import { extractComplianceRequirements, getKnownRegulationTasks } from './regula
 import { detectChanges, generateHash } from './differential-analysis.js';
 import { FederalRegisterAPIClient } from '../federal-register-api-client.js';
 import { fetchCFRPart } from '../ecfr-api-client.js';
+import ConsistentSummaryService from '../../services/consistent-summary-service.js';
+
+// Initialize the AI summary service
+const summaryService = new ConsistentSummaryService();
 
 // CFR citation mappings for common regulations
 const CFR_MAPPINGS = {
@@ -228,6 +232,39 @@ export async function executeComprehensiveWorkflow(regulationSlug, existingData 
     console.log(`      - Confidence: ${extractionResult.analysis.confidence}%`);
     
     // ========================================================================
+    // STEP 4.5: GENERATE AI-POWERED SUMMARY
+    // The authoritative MCP Engine deserves authoritative summaries!
+    // ========================================================================
+    console.log(`\n📝 STEP 4.5: GENERATING AI-POWERED SUMMARY...`);
+    
+    let generatedSummary = null;
+    try {
+      const regulationTitle = crossRefResult.fullName || crossRefResult.regulationName || regulationSlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+      const regulationTextForSummary = ecfrData?.fullText || combinedText || '';
+      
+      if (regulationTextForSummary.length > 100) {
+        // Use AI to generate consistent, high-quality summary
+        generatedSummary = await summaryService.generateConsistentSummary(
+          regulationSlug,
+          regulationTitle,
+          regulationTextForSummary,
+          existingData?.summaryMetadata || null
+        );
+        
+        console.log(`   ✅ AI summary generated successfully`);
+        console.log(`      - Summary length: ${generatedSummary.summary?.length || 0} chars`);
+        console.log(`      - Key requirements: ${generatedSummary.keyRequirements?.length || 0}`);
+        console.log(`      - Compliance actions: ${generatedSummary.complianceActions?.length || 0}`);
+        console.log(`      - Risk level: ${generatedSummary.riskLevel || 'unknown'}`);
+      } else {
+        console.log(`   ⚠️ Insufficient text for AI summary generation`);
+      }
+    } catch (summaryError) {
+      console.error(`   ❌ AI summary generation failed: ${summaryError.message}`);
+      // Continue without AI summary - we'll use fallback
+    }
+    
+    // ========================================================================
     // STEP 5: ASSEMBLE COMPLETE COMPLIANCE PACKAGE
     // ========================================================================
     console.log(`\n📦 STEP 5: ASSEMBLING COMPLIANCE PACKAGE...`);
@@ -249,8 +286,16 @@ export async function executeComprehensiveWorkflow(regulationSlug, existingData 
       regulationText: ecfrData?.fullText || existingData?.regulationText || '',
       contentHash: generateHash(ecfrData?.fullText || existingData?.regulationText || ''),
       
-      // Plain English summary
-      summary: existingData?.summary || `Compliance requirements for ${crossRefResult.regulationName || regulationSlug}`,
+      // AI-GENERATED SUMMARY (The authoritative MCP Engine deserves authoritative summaries!)
+      summary: generatedSummary?.summary || existingData?.summary || `Compliance requirements for ${crossRefResult.regulationName || regulationSlug}`,
+      summaryMetadata: generatedSummary?.metadata || null,
+      
+      // Structured compliance data from AI summary
+      keyRequirements: generatedSummary?.keyRequirements || [],
+      complianceActions: generatedSummary?.complianceActions || [],
+      aiRiskLevel: generatedSummary?.riskLevel || null,
+      primaryStakeholders: generatedSummary?.primaryStakeholders || [],
+      enforcementAgency: generatedSummary?.enforcementAgency || null,
       
       // Source validation
       sourceValidation: {

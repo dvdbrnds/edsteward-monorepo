@@ -22,7 +22,7 @@ const SERVICES = [
   {
     name: 'LLM Gateway',
     port: 3002,
-    healthUrl: 'http://localhost:3002/api/llm/health',
+    healthUrl: 'http://localhost:3004/api/llm/health',
     startCmd: 'node src/llm-gateway/start-llm-gateway-phase4.js',
     critical: true
   },

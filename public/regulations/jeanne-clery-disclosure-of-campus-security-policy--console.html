@@ -1521,7 +1521,7 @@
                 </div>
                 <div class="log-entry">
                     <span class="log-timestamp">[CONFIG]</span>
-                    <span class="log-level-info">📡 API Endpoint: http://localhost:3002/api/llm/query</span>
+                    <span class="log-level-info">📡 API Endpoint: http://localhost:3004/api/llm/query</span>
                 </div>
                 <div class="log-entry">
                     <span class="log-timestamp">[STATUS]</span>
@@ -1736,9 +1736,9 @@
             </div>
         
             <h3 style="margin-top: 24px;">🤖 AI Quality Auditor</h3>
-            <div id="inquisitorWidget" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 12px; padding: 16px; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);">
-                <button id="inquisitorBtn" onclick="runInquisitorAudit()" style="background: rgba(255, 255, 255, 0.2); border: 1px solid rgba(255, 255, 255, 0.3); color: white; padding: 12px; border-radius: 6px; cursor: pointer; width: 100%; font-weight: 600; font-size: 14px; transition: all 0.3s;">
-                    ⚡ Run AI Audit
+            <div id="inquisitorWidget" style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 12px; padding: 16px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);">
+                <button id="inquisitorBtn" onclick="runInquisitorAudit()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 14px 20px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: 700; font-size: 14px; transition: all 0.3s; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);">
+                    ⚡ Run AI Quality Audit
                 </button>
                 <div id="inquisitorProgress" style="display: none; background: rgba(255, 255, 255, 0.95); margin-top: 12px; padding: 12px; border-radius: 8px;">
                     <div style="font-size: 12px; color: #495057; margin-bottom: 8px; display: flex; align-items: center; gap: 8px;">
@@ -1750,10 +1750,7 @@
                     </div>
                     <div id="inquisitorProgressText" style="text-align: center; font-size: 11px; color: #6c757d; margin-top: 6px; font-weight: 600;">0%</div>
                 </div>
-                <div id="inquisitorResults" style="display: none; background: white; margin-top: 12px; padding: 12px; border-radius: 8px;">
-                    <div style="font-weight: 600; margin-bottom: 8px;">Quality Report</div>
-                    <div id="inquisitorScores" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;"></div>
-                </div>
+                <div id="inquisitorResults" style="display: none; margin-top: 12px;"></div>
                 <div id="inquisitorError" style="display: none; background: #fee; color: #dc2626; padding: 10px; border-radius: 6px; margin-top: 12px; font-size: 12px;"></div>
             </div>
         </div>
@@ -2010,7 +2007,7 @@
         
         async function checkSystemHealth() {
             try {
-                const response = await fetch('http://localhost:3002/api/llm/health');
+                const response = await fetch('http://localhost:3004/api/llm/health');
                 if (response.ok) {
                     document.getElementById('apiStatus').textContent = 'ONLINE';
                     document.getElementById('apiStatus').className = 'diagnostic-status ok';
@@ -2086,7 +2083,7 @@
                 // Call the NEW comprehensive workflow endpoint
                 addConsoleLog('🔗 Connecting to Comprehensive Workflow Engine...', 'info');
                 
-                const response = await fetch('http://localhost:3002/api/llm/workflow/execute', {
+                const response = await fetch('http://localhost:3004/api/llm/workflow/execute', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
@@ -3453,7 +3450,7 @@
             summaryDiv.innerHTML = 'Loading summary...';
             
             try {
-                const response = await fetch(`http://localhost:3002/api/llm/cfr/reg-66`);
+                const response = await fetch(`http://localhost:3004/api/llm/cfr/reg-66`);
                 const result = await response.json();
                 
                 if (result.success && result.data && result.data.summary) {
@@ -3525,7 +3522,7 @@
             try {
                 console.log('📋 Fetching real CFR guidance from API...');
                 
-                const response = await fetch(`http://localhost:3002/api/llm/cfr/reg-66`);
+                const response = await fetch(`http://localhost:3004/api/llm/cfr/reg-66`);
                 const result = await response.json();
                 
                 if (result.success && result.data) {
@@ -3627,7 +3624,7 @@
             try {
                 console.log('📊 Fetching real university validation confidence scores from API...');
                 
-                const response = await fetch('http://localhost:3002/api/llm/analysis/validation-scores');
+                const response = await fetch('http://localhost:3004/api/llm/analysis/validation-scores');
                 const result = await response.json();
                 
                 if (result.success && result.data) {
@@ -3757,7 +3754,7 @@
             try {
                 console.log('📖 Fetching real Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Act (Clery Act) and Violence Against Women Act (VAWA) CFR Implementation text from API...');
                 
-                const response = await fetch('http://localhost:3002/api/llm/cfr/jeanne-clery-disclosure-of-campus-security-policy-');
+                const response = await fetch('http://localhost:3004/api/llm/cfr/jeanne-clery-disclosure-of-campus-security-policy-');
                 const result = await response.json();
                 
                 if (result.success && result.data) {
@@ -3865,7 +3862,7 @@
             try {
                 console.log('📋 Fetching real compliance guidance from API...');
                 
-                const response = await fetch('http://localhost:3002/api/llm/cfr/jeanne-clery-disclosure-of-campus-security-policy-');
+                const response = await fetch('http://localhost:3004/api/llm/cfr/jeanne-clery-disclosure-of-campus-security-policy-');
                 const result = await response.json();
                 
                 if (result.success && result.data) {
@@ -4166,7 +4163,7 @@
             
             try {
                 console.log('🔄 Loading real versioning data...');
-                const response = await fetch('http://localhost:3002/api/llm/versioning/system-info');
+                const response = await fetch('http://localhost:3004/api/llm/versioning/system-info');
                 const result = await response.json();
                 
                 if (result.success && result.data) {
@@ -4286,7 +4283,7 @@
             try {
                 console.log('📡 Fetching enhanced Regulation data for EdSteward preview...');
                 
-                const response = await fetch('http://localhost:3002/api/llm/cfr/enhanced/jeanne-clery-disclosure-of-campus-security-policy-?federal_register=true');
+                const response = await fetch('http://localhost:3004/api/llm/cfr/enhanced/jeanne-clery-disclosure-of-campus-security-policy-?federal_register=true');
                 const data = await response.json();
                 
                 if (!data.success) {
@@ -4478,7 +4475,7 @@
                 console.log('📡 Fetching complete Federal Register document list via LLM Gateway...');
                 
                 // Use our LLM Gateway endpoint to get all documents with debug info
-                const response = await fetch('http://localhost:3002/api/llm/cfr/enhanced/jeanne-clery-disclosure-of-campus-security-policy-?federal_register=true&debug=true&show_all_documents=true');
+                const response = await fetch('http://localhost:3004/api/llm/cfr/enhanced/jeanne-clery-disclosure-of-campus-security-policy-?federal_register=true&debug=true&show_all_documents=true');
                 const data = await response.json();
                 
                 console.log('📋 Full API response:', data);
@@ -4846,11 +4843,10 @@
     </script>
 
     <script>
-    // Inquisitor AI Quality Auditor
+    // Enhanced Inquisitor AI Quality Auditor
     async function runInquisitorAudit() {
         const btn = document.getElementById('inquisitorBtn');
         const results = document.getElementById('inquisitorResults');
-        const scores = document.getElementById('inquisitorScores');
         const errorDiv = document.getElementById('inquisitorError');
         const progress = document.getElementById('inquisitorProgress');
         const progressBar = document.getElementById('inquisitorProgressBar');
@@ -4858,20 +4854,18 @@
         
         btn.disabled = true;
         btn.textContent = '🔄 Analyzing...';
-        btn.style.opacity = '0.6';
+        btn.style.opacity = '0.7';
         results.style.display = 'none';
         if (errorDiv) errorDiv.style.display = 'none';
         if (progress) progress.style.display = 'block';
         
-        // Animate progress bar from 0 to 90% over ~8 seconds
         let currentProgress = 0;
         const progressInterval = setInterval(() => {
-            currentProgress = Math.min(currentProgress + 10, 90);
+            currentProgress = Math.min(currentProgress + 8, 90);
             if (progressBar) progressBar.style.width = currentProgress + '%';
             if (progressText) progressText.textContent = currentProgress + '%';
-        }, 800);
+        }, 600);
         
-        // Get regulation slug from URL
         const slug = window.location.pathname.split('/').pop().replace('-console.html', '');
         
         try {
@@ -4891,34 +4885,145 @@
             const data = await response.json();
             if (data.success && data.audit) {
                 const audit = data.audit;
-                scores.innerHTML = `
-                    <div style="text-align: center; padding: 10px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                        <div style="font-size: 11px; color: #6c757d; font-weight: 600;">OVERALL</div>
-                        <div style="font-size: 24px; font-weight: 700; color: ${audit.overallScore >= 90 ? '#10b981' : audit.overallScore >= 75 ? '#3b82f6' : audit.overallScore >= 60 ? '#f59e0b' : '#ef4444'};">${audit.overallScore}</div>
+                const sb = audit.scoreBreakdown || {};
+                const metrics = audit.metrics || {};
+                const negFactors = sb.negativeFactors || [];
+                const posFactors = sb.positiveFactors || [];
+                const actions = audit.actionItems || [];
+                const issues = audit.issueSummary || {};
+                
+                // Score color helper
+                const scoreColor = (score) => score >= 90 ? '#10b981' : score >= 75 ? '#3b82f6' : score >= 60 ? '#f59e0b' : '#ef4444';
+                const gradeColor = (grade) => ({A:'#10b981', B:'#3b82f6', C:'#f59e0b', D:'#ef4444'}[grade] || '#6b7280');
+                
+                // Build score bar
+                const buildBar = (score, max=100) => {
+                    const pct = Math.min((score/max)*100, 100);
+                    return `<div style="background:#1e293b;height:8px;border-radius:4px;flex:1;overflow:hidden;">
+                        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#667eea,#764ba2);"></div>
+                    </div>`;
+                };
+                
+                results.innerHTML = `
+                    <!-- HEADER SCORE -->
+                    <div style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border-radius:10px;padding:20px;text-align:center;margin-bottom:12px;">
+                        <div style="display:flex;justify-content:center;align-items:center;gap:30px;">
+                            <div>
+                                <div style="font-size:11px;color:rgba(255,255,255,0.8);font-weight:600;margin-bottom:4px;">OVERALL SCORE</div>
+                                <div style="font-size:48px;font-weight:800;color:white;line-height:1;">${audit.overallScore}</div>
+                            </div>
+                            <div style="width:1px;height:60px;background:rgba(255,255,255,0.3);"></div>
+                            <div>
+                                <div style="font-size:11px;color:rgba(255,255,255,0.8);font-weight:600;margin-bottom:4px;">CERTAINTY</div>
+                                <div style="font-size:48px;font-weight:800;color:white;line-height:1;">${audit.certaintyLevel || 'D'}</div>
+                            </div>
+                            <div style="background:${audit.passed ? '#10b981' : '#ef4444'};color:white;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;">
+                                ${audit.passed ? '✓ PASSED' : '✗ FAILED'}
+                            </div>
+                        </div>
                     </div>
-                    <div style="text-align: center; padding: 10px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                        <div style="font-size: 11px; color: #6c757d; font-weight: 600;">CERTAINTY</div>
-                        <div style="font-size: 24px; font-weight: 700;">${audit.certaintyLevel || 'D'}</div>
+                    
+                    <!-- SCORE BREAKDOWN -->
+                    <div style="background:white;border-radius:10px;padding:14px;margin-bottom:12px;">
+                        <div style="font-weight:700;font-size:13px;margin-bottom:12px;color:#1e293b;">📊 Score Breakdown</div>
+                        ${['content', 'summary', 'requirements', 'deadlines'].map(cat => {
+                            const raw = sb.rawScores?.[cat] || 0;
+                            const weight = Math.round((sb.weights?.[cat] || 0) * 100);
+                            const contrib = sb.contributions?.[cat] || 0;
+                            return `
+                                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                                    <div style="width:80px;font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;">${cat}</div>
+                                    ${buildBar(raw)}
+                                    <div style="width:60px;font-size:11px;text-align:right;"><strong>${raw}</strong>/100</div>
+                                    <div style="width:50px;font-size:10px;color:#94a3b8;">×${weight}%</div>
+                                    <div style="width:40px;font-size:11px;font-weight:700;color:${scoreColor(contrib*2)};">+${contrib}</div>
+                                </div>
+                            `;
+                        }).join('')}
                     </div>
-                    <div style="text-align: center; padding: 10px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                        <div style="font-size: 11px; color: #6c757d; font-weight: 600;">CONTENT</div>
-                        <div style="font-size: 24px; font-weight: 700;">${audit.scores?.content || 0}</div>
+                    
+                    <!-- METRICS -->
+                    <div style="background:white;border-radius:10px;padding:14px;margin-bottom:12px;">
+                        <div style="font-weight:700;font-size:13px;margin-bottom:10px;color:#1e293b;">📈 Detailed Metrics</div>
+                        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;font-size:11px;">
+                            <div style="background:#f8fafc;padding:10px;border-radius:6px;">
+                                <div style="color:#64748b;margin-bottom:4px;">Content</div>
+                                <div><strong>${(metrics.content?.wordCount || 0).toLocaleString()}</strong> words</div>
+                                <div><strong>${metrics.content?.citationCount || 0}</strong> citations</div>
+                                <div>USC: ${metrics.content?.hasUSCCitation ? '✓' : '✗'} | CFR: ${metrics.content?.hasCFRCitation ? '✓' : '✗'}</div>
+                            </div>
+                            <div style="background:#f8fafc;padding:10px;border-radius:6px;">
+                                <div style="color:#64748b;margin-bottom:4px;">Summary</div>
+                                <div><strong>${metrics.summary?.wordCount || 0}</strong> words</div>
+                                <div>Actionable: ${metrics.summary?.hasActionableLanguage ? '✓ Yes' : '✗ No'}</div>
+                            </div>
+                            <div style="background:#f8fafc;padding:10px;border-radius:6px;">
+                                <div style="color:#64748b;margin-bottom:4px;">Tasks</div>
+                                <div><strong>${metrics.tasks?.totalCount || 0}</strong> total</div>
+                                <div><strong>${metrics.tasks?.criticalCount || 0}</strong> critical</div>
+                                <div><strong>${metrics.tasks?.withEvidence || 0}</strong> need evidence</div>
+                            </div>
+                            <div style="background:#f8fafc;padding:10px;border-radius:6px;">
+                                <div style="color:#64748b;margin-bottom:4px;">Deadlines</div>
+                                <div><strong>${metrics.deadlines?.totalCount || 0}</strong> total</div>
+                                <div><strong>${metrics.deadlines?.recurring || 0}</strong> recurring</div>
+                            </div>
+                        </div>
                     </div>
-                    <div style="text-align: center; padding: 10px; background: white; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                        <div style="font-size: 11px; color: #6c757d; font-weight: 600;">SUMMARY</div>
-                        <div style="font-size: 24px; font-weight: 700;">${audit.scores?.summary || 0}</div>
+                    
+                    <!-- NEGATIVE FACTORS -->
+                    ${negFactors.length > 0 ? `
+                    <div style="background:#fef2f2;border-radius:10px;padding:14px;margin-bottom:12px;border:1px solid #fecaca;">
+                        <div style="font-weight:700;font-size:13px;margin-bottom:10px;color:#dc2626;">📉 Score Impact (Costing Points)</div>
+                        ${negFactors.slice(0,5).map(f => `
+                            <div style="display:flex;align-items:center;gap:8px;font-size:11px;margin-bottom:6px;padding:6px;background:white;border-radius:4px;">
+                                <div style="background:#fef2f2;color:#dc2626;padding:2px 6px;border-radius:4px;font-weight:700;font-size:10px;min-width:35px;text-align:center;">${f.impact}</div>
+                                <div style="color:#64748b;min-width:70px;">${f.category}</div>
+                                <div style="color:#374151;">${f.reason}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    ` : ''}
+                    
+                    <!-- POSITIVE FACTORS -->
+                    ${posFactors.length > 0 ? `
+                    <div style="background:#f0fdf4;border-radius:10px;padding:14px;margin-bottom:12px;border:1px solid #bbf7d0;">
+                        <div style="font-weight:700;font-size:13px;margin-bottom:10px;color:#16a34a;">📈 Score Boosters (Helping)</div>
+                        ${posFactors.slice(0,5).map(f => `
+                            <div style="display:flex;align-items:center;gap:8px;font-size:11px;margin-bottom:6px;padding:6px;background:white;border-radius:4px;">
+                                <div style="background:#dcfce7;color:#16a34a;padding:2px 6px;border-radius:4px;font-weight:700;font-size:10px;min-width:35px;text-align:center;">${f.impact}</div>
+                                <div style="color:#64748b;min-width:70px;">${f.category}</div>
+                                <div style="color:#374151;">${f.reason}</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    ` : ''}
+                    
+                    <!-- ACTION ITEMS -->
+                    ${actions.length > 0 ? `
+                    <div style="background:#fff7ed;border-radius:10px;padding:14px;margin-bottom:12px;border:1px solid #fed7aa;">
+                        <div style="font-weight:700;font-size:13px;margin-bottom:10px;color:#ea580c;">🎯 Actions to Improve Score</div>
+                        ${actions.slice(0,4).map((a,i) => `
+                            <div style="display:flex;align-items:flex-start;gap:8px;font-size:11px;margin-bottom:6px;padding:8px;background:white;border-radius:4px;">
+                                <div style="background:#ffedd5;color:#ea580c;padding:2px 8px;border-radius:4px;font-weight:700;font-size:10px;">#${i+1}</div>
+                                <div style="flex:1;">
+                                    <div style="color:#374151;">${a.action}</div>
+                                    <div style="color:#94a3b8;font-size:10px;margin-top:2px;">[${a.category}]</div>
+                                </div>
+                                <div style="background:#dcfce7;color:#16a34a;padding:2px 8px;border-radius:4px;font-weight:700;font-size:10px;">+${a.pointsToGain} pts</div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    ` : ''}
+                    
+                    <!-- ISSUE SUMMARY -->
+                    <div style="background:#f8fafc;border-radius:8px;padding:10px;display:flex;justify-content:center;gap:20px;font-size:11px;">
+                        <span><strong style="color:#dc2626;">${issues.critical || 0}</strong> critical</span>
+                        <span><strong style="color:#f59e0b;">${issues.high || 0}</strong> high</span>
+                        <span><strong style="color:#3b82f6;">${issues.medium || 0}</strong> medium</span>
+                        <span><strong style="color:#64748b;">${issues.warnings || 0}</strong> warnings</span>
                     </div>
                 `;
-                if (audit.aiAnalysis && audit.aiAnalysis.enabled) {
-                    scores.innerHTML += `
-                        <div style="grid-column: 1 / -1; background: #f8f9fa; padding: 10px; border-radius: 6px; margin-top: 8px;">
-                            <div style="font-weight: 600; margin-bottom: 6px;">🤖 AI Analysis</div>
-                            <div style="font-size: 11px;">Legal Accuracy: <strong>${audit.aiAnalysis.legalAccuracy?.score || 0}/100</strong></div>
-                            <div style="font-size: 11px;">Completeness: <strong>${audit.aiAnalysis.completeness?.score || 0}/100</strong></div>
-                            <div style="font-size: 11px; margin-top: 6px; padding: 6px; background: white; border-radius: 4px;">${audit.aiAnalysis.overallAssessment || 'No assessment'}</div>
-                        </div>
-                    `;
-                }
                 results.style.display = 'block';
             }
         } catch (err) {
@@ -4935,7 +5040,7 @@
                 if (progressText) progressText.textContent = '0%';
             }, 1500);
             btn.disabled = false;
-            btn.textContent = '⚡ Run AI Audit';
+            btn.textContent = '⚡ Run AI Quality Audit';
             btn.style.opacity = '1';
         }
     }
