@@ -1561,6 +1561,20 @@
             </div>
             
             <h3>Validation Steps</h3>
+            <!-- Legend explaining symbols and percentages -->
+            <div style="font-size: 0.7em; color: #6b7280; margin-bottom: 10px; padding: 8px; background: #f8fafc; border-radius: 6px; border: 1px solid #e2e8f0;">
+                <div style="font-weight: 600; margin-bottom: 4px; color: #374151;">Legend:</div>
+                <div style="display: grid; grid-template-columns: auto 1fr; gap: 3px 8px;">
+                    <span>✓</span><span>Success (% = data quality)</span>
+                    <span>✗</span><span style="color: #ef4444;">Failed (click for error)</span>
+                    <span>🔑</span><span style="color: #f59e0b;">API key needed in .env</span>
+                    <span>🌐</span><span style="color: #6b7280;">Web scraping only (no API)</span>
+                    <span>◐</span><span style="color: #f59e0b;">Partial data received</span>
+                </div>
+                <div style="margin-top: 6px; padding-top: 6px; border-top: 1px solid #e2e8f0; font-size: 0.95em;">
+                    <strong>%</strong> = Confidence score (100% = complete authoritative data)
+                </div>
+            </div>
             <div class="step-indicator" id="stepIndicator">
                 <!-- STEP 1: Government Sources -->
                 <div class="step-item pending" id="step1">
@@ -1820,60 +1834,105 @@
             statusText.textContent = status.toUpperCase();
         }
         
-        function updateSubstep(id, status, confidence, errorMsg) {
+        // Enhanced updateSubstep with error details and granular feedback
+        // Confidence % = API response quality score (100% = full data, lower = partial/issues)
+        function updateSubstep(id, status, confidence, errorMsg, details) {
             const substep = document.getElementById('substep-' + id);
             const confSpan = document.getElementById('conf-' + id);
-            if (substep) {
-                const icon = substep.querySelector('.substep-icon');
-                if (status === 'completed' && confidence > 0) {
-                    icon.textContent = '✓';
-                    icon.style.background = 'transparent';
-                    icon.style.color = '#22c55e';
-                    icon.style.fontSize = '14px';
-                    icon.style.fontWeight = 'bold';
-                    icon.style.width = 'auto';
-                    icon.style.height = 'auto';
-                    if (confSpan) {
-                        confSpan.textContent = '(' + confidence + '%)';
-                    }
-                } else if (status === 'running') {
-                    icon.textContent = '';
-                    icon.style.background = '#3b82f6';
-                    icon.style.width = '8px';
-                    icon.style.height = '8px';
-                    if (confSpan) {
-                        confSpan.textContent = '';
-                    }
-                } else if (status === 'requires_key') {
-                    icon.textContent = '🔑';
-                    icon.style.background = 'transparent';
-                    icon.style.color = '#f59e0b';
-                    icon.style.fontSize = '10px';
-                    icon.style.width = 'auto';
-                    icon.style.height = 'auto';
-                    if (confSpan) {
-                        confSpan.textContent = '(key needed)';
-                        confSpan.style.color = '#f59e0b';
-                        confSpan.style.fontSize = '0.85em';
-                    }
-                } else if (status === 'web_only') {
-                    icon.textContent = '🌐';
-                    icon.style.background = 'transparent';
-                    icon.style.color = '#6b7280';
-                    icon.style.fontSize = '10px';
-                    icon.style.width = 'auto';
-                    icon.style.height = 'auto';
-                    if (confSpan) {
-                        confSpan.textContent = '(web only)';
-                        confSpan.style.color = '#6b7280';
-                        confSpan.style.fontSize = '0.85em';
-                    }
-                } else {
-                    icon.textContent = '';
-                    icon.style.background = '#ccc';
-                    icon.style.width = '8px';
-                    icon.style.height = '8px';
+            if (!substep) return;
+            
+            const icon = substep.querySelector('.substep-icon');
+            
+            // Remove any existing error detail div
+            const existingDetail = substep.querySelector('.substep-detail');
+            if (existingDetail) existingDetail.remove();
+            
+            // Create detail div for error messages / extra info
+            const createDetailDiv = (text, color) => {
+                const detail = document.createElement('div');
+                detail.className = 'substep-detail';
+                detail.style.cssText = `
+                    font-size: 0.75em;
+                    color: ${color};
+                    margin-left: 18px;
+                    margin-top: 2px;
+                    padding: 2px 6px;
+                    background: ${color}15;
+                    border-radius: 3px;
+                    max-width: 180px;
+                    word-wrap: break-word;
+                `;
+                detail.textContent = text;
+                substep.appendChild(detail);
+            };
+            
+            if (status === 'completed' && confidence > 0) {
+                icon.textContent = '✓';
+                icon.style.cssText = 'background: transparent; color: #22c55e; font-size: 14px; font-weight: bold; width: auto; height: auto; display: inline-block;';
+                if (confSpan) {
+                    confSpan.textContent = '(' + confidence + '%)';
+                    confSpan.style.color = '#22c55e';
                 }
+                // Show details if provided (e.g., "15 docs found")
+                if (details) {
+                    createDetailDiv('✓ ' + details, '#22c55e');
+                }
+            } else if (status === 'running') {
+                icon.textContent = '◌';
+                icon.style.cssText = 'background: transparent; color: #3b82f6; font-size: 12px; width: auto; height: auto; animation: pulse 1s infinite;';
+                if (confSpan) confSpan.textContent = '';
+            } else if (status === 'requires_key') {
+                icon.textContent = '🔑';
+                icon.style.cssText = 'background: transparent; color: #f59e0b; font-size: 10px; width: auto; height: auto;';
+                if (confSpan) {
+                    confSpan.textContent = '(key needed)';
+                    confSpan.style.color = '#f59e0b';
+                }
+                createDetailDiv('Add API key to .env file', '#f59e0b');
+            } else if (status === 'web_only') {
+                icon.textContent = '🌐';
+                icon.style.cssText = 'background: transparent; color: #6b7280; font-size: 10px; width: auto; height: auto;';
+                if (confSpan) {
+                    confSpan.textContent = '(web only)';
+                    confSpan.style.color = '#6b7280';
+                }
+                createDetailDiv('No API available - web scraping only', '#6b7280');
+            } else if (status === 'failed') {
+                icon.textContent = '✗';
+                icon.style.cssText = 'background: transparent; color: #ef4444; font-size: 14px; font-weight: bold; width: auto; height: auto;';
+                if (confSpan) {
+                    confSpan.textContent = '(failed)';
+                    confSpan.style.color = '#ef4444';
+                }
+                // Show error message if provided
+                if (errorMsg) {
+                    createDetailDiv('⚠ ' + errorMsg, '#ef4444');
+                } else {
+                    createDetailDiv('⚠ API request failed', '#ef4444');
+                }
+            } else if (status === 'timeout') {
+                icon.textContent = '⏱';
+                icon.style.cssText = 'background: transparent; color: #f59e0b; font-size: 12px; width: auto; height: auto;';
+                if (confSpan) {
+                    confSpan.textContent = '(timeout)';
+                    confSpan.style.color = '#f59e0b';
+                }
+                createDetailDiv('⚠ Request timed out (15s)', '#f59e0b');
+            } else if (status === 'partial') {
+                icon.textContent = '◐';
+                icon.style.cssText = 'background: transparent; color: #f59e0b; font-size: 14px; width: auto; height: auto;';
+                if (confSpan) {
+                    confSpan.textContent = '(' + confidence + '%)';
+                    confSpan.style.color = '#f59e0b';
+                }
+                if (errorMsg) {
+                    createDetailDiv('⚠ ' + errorMsg, '#f59e0b');
+                }
+            } else {
+                // Pending/not started
+                icon.textContent = '';
+                icon.style.cssText = 'background: #ccc; width: 8px; height: 8px; border-radius: 50%; display: inline-block;';
+                if (confSpan) confSpan.textContent = '';
             }
         }
         
@@ -2054,10 +2113,16 @@
                     addConsoleLog(`      └─ URL: ${ecfr.url || 'https://www.ecfr.gov/current/title-34/part-668'}`, 'debug');
                     addConsoleLog(`      └─ Status: ${ecfr.status || 'checked'} | Confidence: ${ecfr.confidence || 0}%`, 'debug');
                     if (ecfr.duration) addConsoleLog(`      └─ Response time: ${ecfr.duration}`, 'debug');
-                    // Update substep UI
-                    const ecfrSubstepStatus = ecfr.status === 'fetched' ? 'completed' : (ecfr.status === 'requires_api_key' ? 'requires_key' : 'failed');
-                    updateSubstep('ecfr', ecfrSubstepStatus, ecfr.confidence || 0);
+                    if (ecfr.error) addConsoleLog(`      └─ ⚠ Error: ${ecfr.error}`, 'debug');
+                    // Update substep UI with error details
+                    const ecfrSubstepStatus = ecfr.status === 'fetched' ? 'completed' : 
+                                             (ecfr.status === 'partial' ? 'partial' :
+                                             (ecfr.status === 'requires_api_key' ? 'requires_key' : 'failed'));
+                    const ecfrDetails = ecfr.data?.format ? `Format: ${ecfr.data.format}` : null;
+                    updateSubstep('ecfr', ecfrSubstepStatus, ecfr.confidence || 0, ecfr.error, ecfrDetails);
                     metrics.apiCalls++;
+                } else {
+                    updateSubstep('ecfr', 'failed', 0, 'No response from API');
                 }
                 
                 // Federal Register
@@ -2073,10 +2138,14 @@
                         });
                     }
                     addConsoleLog(`      └─ Status: ${fedReg.status} | Confidence: ${fedReg.confidence || 0}%`, 'debug');
-                    // Update substep UI
-                    updateSubstep('fedreg', fedReg.status === 'fetched' ? 'completed' : 'failed', fedReg.confidence || 0, docCount > 0 ? `${docCount} docs` : null);
+                    if (fedReg.error) addConsoleLog(`      └─ ⚠ Error: ${fedReg.error}`, 'debug');
+                    // Update substep UI with doc count details
+                    const fedRegStatus = fedReg.status === 'fetched' ? 'completed' : (fedReg.status === 'no_results' ? 'partial' : 'failed');
+                    updateSubstep('fedreg', fedRegStatus, fedReg.confidence || 0, fedReg.error, docCount > 0 ? `${docCount} documents found` : null);
                     metrics.apiCalls++;
                     metrics.dataPoints += docCount;
+                } else {
+                    updateSubstep('fedreg', 'failed', 0, 'No response from API');
                 }
                 
                 // Congress.gov
@@ -2086,10 +2155,13 @@
                     addConsoleLog(`   ${status} Congress.gov (api.congress.gov)`, congress.status === 'fetched' ? 'success' : 'info');
                     addConsoleLog(`      └─ Status: ${congress.status} | Confidence: ${congress.confidence || 0}%`, 'debug');
                     if (congress.error) addConsoleLog(`      └─ Note: ${congress.error}`, 'debug');
-                    // Update substep UI
+                    // Update substep UI with error details
                     const congressStatus = congress.status === 'fetched' ? 'completed' : (congress.status === 'requires_api_key' ? 'requires_key' : 'failed');
-                    updateSubstep('congress', congressStatus, congress.confidence || 0);
+                    const congressDetails = congress.data?.bills ? `${congress.data.bills.length} bills` : null;
+                    updateSubstep('congress', congressStatus, congress.confidence || 0, congress.error, congressDetails);
                     metrics.apiCalls++;
+                } else {
+                    updateSubstep('congress', 'failed', 0, 'No response from API');
                 }
                 
                 // GovInfo (GPO)
@@ -2098,9 +2170,13 @@
                     const status = govInfo.status === 'fetched' ? '✅' : '❌';
                     addConsoleLog(`   ${status} GovInfo (govinfo.gov) - Government Publishing Office`, govInfo.status === 'fetched' ? 'success' : 'info');
                     addConsoleLog(`      └─ Status: ${govInfo.status} | Confidence: ${govInfo.confidence || 0}%`, 'debug');
-                    // Update substep UI
-                    updateSubstep('govinfo', govInfo.status === 'fetched' ? 'completed' : 'failed', govInfo.confidence || 0);
+                    if (govInfo.error) addConsoleLog(`      └─ ⚠ Error: ${govInfo.error}`, 'debug');
+                    // Update substep UI with error details
+                    const govInfoStatus = govInfo.status === 'fetched' ? 'completed' : 'failed';
+                    updateSubstep('govinfo', govInfoStatus, govInfo.confidence || 0, govInfo.error);
                     metrics.apiCalls++;
+                } else {
+                    updateSubstep('govinfo', 'failed', 0, 'No response from API');
                 }
                 
                 // Library of Congress
@@ -2109,9 +2185,13 @@
                     const status = loc.status === 'fetched' ? '✅' : '❌';
                     addConsoleLog(`   ${status} Library of Congress (loc.gov)`, loc.status === 'fetched' ? 'success' : 'info');
                     addConsoleLog(`      └─ Status: ${loc.status} | Confidence: ${loc.confidence || 0}%`, 'debug');
-                    // Update substep UI
-                    updateSubstep('loc', loc.status === 'fetched' ? 'completed' : 'failed', loc.confidence || 0);
+                    if (loc.error) addConsoleLog(`      └─ ⚠ Error: ${loc.error}`, 'debug');
+                    // Update substep UI with error details
+                    const locStatus = loc.status === 'fetched' ? 'completed' : 'failed';
+                    updateSubstep('loc', locStatus, loc.confidence || 0, loc.error);
                     metrics.apiCalls++;
+                } else {
+                    updateSubstep('loc', 'failed', 0, 'No response from API');
                 }
                 
                 // Regulations.gov
@@ -2120,10 +2200,14 @@
                     const status = regsGov.status === 'fetched' ? '✅' : (regsGov.status === 'requires_api_key' ? '🔑' : '❌');
                     addConsoleLog(`   ${status} Regulations.gov (api.regulations.gov) - Federal Dockets`, regsGov.status === 'fetched' ? 'success' : 'info');
                     addConsoleLog(`      └─ Status: ${regsGov.status}`, 'debug');
-                    // Update substep UI
+                    if (regsGov.error) addConsoleLog(`      └─ ⚠ Error: ${regsGov.error}`, 'debug');
+                    // Update substep UI with error details
                     const regsStatus = regsGov.status === 'fetched' ? 'completed' : (regsGov.status === 'requires_api_key' ? 'requires_key' : 'failed');
-                    updateSubstep('regsgov', regsStatus, regsGov.confidence || 0);
+                    const regsDetails = regsGov.data?.docketCount ? `${regsGov.data.docketCount} dockets` : null;
+                    updateSubstep('regsgov', regsStatus, regsGov.confidence || 0, regsGov.error, regsDetails);
                     metrics.apiCalls++;
+                } else {
+                    updateSubstep('regsgov', 'failed', 0, 'No response from API');
                 }
                 
                 // Summary for Step 1
