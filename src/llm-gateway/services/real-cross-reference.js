@@ -128,19 +128,13 @@ function fetchWithTimeout(url, options = {}, timeout = 15000) {
 async function fetchECFR(cfrTitle, cfrPart) {
   console.log(`\n[eCFR] 🏛️ Fetching CFR Title ${cfrTitle} Part ${cfrPart}...`);
   
-  // Get current date for API calls
-  const today = new Date().toISOString().split('T')[0];
-  
-  // Try multiple eCFR endpoints - updated for 2025/2026 API format
+  // eCFR API - use the search endpoint which is most reliable
+  // The search endpoint returns section metadata and excerpts
   const endpoints = [
-    // Structure endpoint (most reliable)
-    `https://www.ecfr.gov/api/versioner/v1/structure/${today}/title-${cfrTitle}.json`,
-    // Full text endpoint
-    `https://www.ecfr.gov/api/versioner/v1/full/${today}/title-${cfrTitle}.xml`,
-    // Ancestors (hierarchy) endpoint
-    `https://www.ecfr.gov/api/versioner/v1/ancestry/${today}/title-${cfrTitle}/part-${cfrPart}.json`,
-    // Search endpoint
-    `https://www.ecfr.gov/api/search/v1/results?query=part+${cfrPart}&per_page=5&cfr_title=${cfrTitle}`
+    // Search endpoint (most reliable, returns actual content)
+    `https://www.ecfr.gov/api/search/v1/results?query=part+${cfrPart}&per_page=20`,
+    // Structure endpoint (metadata only)
+    `https://www.ecfr.gov/api/versioner/v1/structure/current/title-${cfrTitle}.json`
   ];
   
   let result = null;

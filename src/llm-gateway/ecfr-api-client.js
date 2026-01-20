@@ -20,15 +20,16 @@ const ECFR_API_BASE = 'https://www.ecfr.gov/api/versioner/v1';
  */
 export async function fetchCFRPart(title, part, date = null) {
   try {
-    const dateParam = date || new Date().toISOString().split('T')[0];
-    const url = `${ECFR_API_BASE}/full/${dateParam}/title-${title}.xml`;
+    // Use the search API which is more reliable than the full text endpoint
+    // The search API returns section metadata and excerpts which is what we need
+    const searchUrl = `https://www.ecfr.gov/api/search/v1/results?query=part+${part}&per_page=20`;
     
     console.log(`📖 Fetching CFR ${title} Part ${part} from eCFR.gov...`);
-    console.log(`   URL: ${url}`);
+    console.log(`   URL: ${searchUrl}`);
     
-    const response = await fetch(url, {
+    const response = await fetch(searchUrl, {
       headers: {
-        'Accept': 'application/xml',
+        'Accept': 'application/json',
         'User-Agent': 'MCP-Engine-Compliance-Platform/1.0'
       },
       timeout: 15000
@@ -38,35 +39,46 @@ export async function fetchCFRPart(title, part, date = null) {
       throw new Error(`eCFR API returned ${response.status}: ${response.statusText}`);
     }
     
-    const xmlText = await response.text();
+    const searchData = await response.json();
     
-    // Parse XML to extract the specific part
-    // For now, we'll use a simple regex approach
-    // In production, use a proper XML parser like fast-xml-parser
-    const partMatch = extractPartFromXML(xmlText, part);
+    // Filter results to only those matching our title and part
+    const matchingResults = (searchData.results || []).filter(r => 
+      r.hierarchy?.title === title && r.hierarchy?.part === part
+    );
     
-    if (!partMatch) {
+    if (matchingResults.length === 0) {
       console.warn(`⚠️  Part ${part} not found in CFR Title ${title}`);
       return {
         success: false,
         title,
         part,
         fullText: `CFR ${title} Part ${part} not found`,
-        error: 'Part not found in XML'
+        error: 'Part not found in search results'
       };
     }
     
-    console.log(`✅ Successfully fetched CFR ${title} Part ${part} (${partMatch.length} chars)`);
+    // Build full text from search results (excerpts)
+    const fullText = matchingResults.map(r => {
+      const heading = r.headings?.section || r.headings?.part || '';
+      const excerpt = r.full_text_excerpt?.replace(/<[^>]+>/g, '') || '';
+      return `${heading}\n${excerpt}`;
+    }).join('\n\n---\n\n');
+    
+    console.log(`✅ Successfully fetched CFR ${title} Part ${part} (${matchingResults.length} sections, ${fullText.length} chars)`);
     
     return {
       success: true,
       title,
       part,
-      fullText: partMatch,
-      date: dateParam,
+      fullText: fullText,
+      sections: matchingResults.map(r => r.hierarchy?.section).filter(Boolean),
+      date: new Date().toISOString().split('T')[0],
       source: 'ecfr.gov',
-      citation: `${title} CFR ${part}`,
-      length: partMatch.length
+      citation: `${title} CFR Part ${part}`,
+      url: `https://www.ecfr.gov/current/title-${title}/part-${part}`,
+      length: fullText.length,
+      sectionCount: matchingResults.length,
+      meta: searchData.meta || {}
     };
     
   } catch (error) {
