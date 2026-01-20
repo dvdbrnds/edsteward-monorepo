@@ -1736,7 +1736,7 @@
             </div>
         
             <h3 style="margin-top: 24px;">🤖 AI Quality Auditor</h3>
-            <div id="inquisitorWidget" style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 12px; padding: 16px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);">
+            <div id="inquisitorWidget" style="background: linear-gradient(135deg, #1e293b 0%, #334155 100%); border-radius: 12px; padding: 16px; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); overflow: hidden; max-width: 100%; box-sizing: border-box;">
                 <button id="inquisitorBtn" onclick="runInquisitorAudit()" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; color: white; padding: 14px 20px; border-radius: 8px; cursor: pointer; width: 100%; font-weight: 700; font-size: 14px; transition: all 0.3s; box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);">
                     ⚡ Run AI Quality Audit
                 </button>
@@ -1750,7 +1750,7 @@
                     </div>
                     <div id="inquisitorProgressText" style="text-align: center; font-size: 11px; color: #6c757d; margin-top: 6px; font-weight: 600;">0%</div>
                 </div>
-                <div id="inquisitorResults" style="display: none; margin-top: 12px;"></div>
+                <div id="inquisitorResults" style="display: none; margin-top: 12px; overflow: hidden; max-width: 100%; box-sizing: border-box;"></div>
                 <div id="inquisitorError" style="display: none; background: #fee; color: #dc2626; padding: 10px; border-radius: 6px; margin-top: 12px; font-size: 12px;"></div>
             </div>
         </div>
@@ -4906,80 +4906,73 @@
                 
                 results.innerHTML = `
                     <!-- HEADER SCORE -->
-                    <div style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border-radius:10px;padding:20px;text-align:center;margin-bottom:12px;">
-                        <div style="display:flex;justify-content:center;align-items:center;gap:30px;">
-                            <div>
-                                <div style="font-size:11px;color:rgba(255,255,255,0.8);font-weight:600;margin-bottom:4px;">OVERALL SCORE</div>
-                                <div style="font-size:48px;font-weight:800;color:white;line-height:1;">${audit.overallScore}</div>
+                    <div style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);border-radius:10px;padding:16px;text-align:center;margin-bottom:12px;">
+                        <div style="display:flex;flex-wrap:wrap;justify-content:center;align-items:center;gap:12px;">
+                            <div style="min-width:60px;">
+                                <div style="font-size:10px;color:rgba(255,255,255,0.8);font-weight:600;margin-bottom:2px;">SCORE</div>
+                                <div style="font-size:36px;font-weight:800;color:white;line-height:1;">${audit.overallScore}</div>
                             </div>
-                            <div style="width:1px;height:60px;background:rgba(255,255,255,0.3);"></div>
-                            <div>
-                                <div style="font-size:11px;color:rgba(255,255,255,0.8);font-weight:600;margin-bottom:4px;">CERTAINTY</div>
-                                <div style="font-size:48px;font-weight:800;color:white;line-height:1;">${audit.certaintyLevel || 'D'}</div>
+                            <div style="width:1px;height:40px;background:rgba(255,255,255,0.3);"></div>
+                            <div style="min-width:40px;">
+                                <div style="font-size:10px;color:rgba(255,255,255,0.8);font-weight:600;margin-bottom:2px;">GRADE</div>
+                                <div style="font-size:36px;font-weight:800;color:white;line-height:1;">${audit.certaintyLevel || 'D'}</div>
                             </div>
-                            <div style="background:${audit.passed ? '#10b981' : '#ef4444'};color:white;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:700;">
+                            <div style="background:${audit.passed ? '#10b981' : '#ef4444'};color:white;padding:4px 10px;border-radius:16px;font-size:11px;font-weight:700;white-space:nowrap;">
                                 ${audit.passed ? '✓ PASSED' : '✗ FAILED'}
                             </div>
                         </div>
                     </div>
                     
                     <!-- SCORE BREAKDOWN -->
-                    <div style="background:white;border-radius:10px;padding:14px;margin-bottom:12px;">
-                        <div style="font-weight:700;font-size:13px;margin-bottom:12px;color:#1e293b;">📊 Score Breakdown</div>
+                    <div style="background:white;border-radius:10px;padding:12px;margin-bottom:12px;">
+                        <div style="font-weight:700;font-size:12px;margin-bottom:10px;color:#1e293b;">📊 Score Breakdown</div>
                         ${['content', 'summary', 'requirements', 'deadlines'].map(cat => {
                             const raw = sb.rawScores?.[cat] || 0;
                             const weight = Math.round((sb.weights?.[cat] || 0) * 100);
                             const contrib = sb.contributions?.[cat] || 0;
                             return `
-                                <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
-                                    <div style="width:80px;font-size:11px;font-weight:600;color:#64748b;text-transform:uppercase;">${cat}</div>
+                                <div style="margin-bottom:8px;">
+                                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+                                        <span style="font-size:10px;font-weight:600;color:#64748b;text-transform:uppercase;">${cat}</span>
+                                        <span style="font-size:10px;"><strong>${raw}</strong>/100 <span style="color:#94a3b8;">×${weight}%</span> <span style="font-weight:700;color:${scoreColor(contrib*2)};">+${contrib}</span></span>
+                                    </div>
                                     ${buildBar(raw)}
-                                    <div style="width:60px;font-size:11px;text-align:right;"><strong>${raw}</strong>/100</div>
-                                    <div style="width:50px;font-size:10px;color:#94a3b8;">×${weight}%</div>
-                                    <div style="width:40px;font-size:11px;font-weight:700;color:${scoreColor(contrib*2)};">+${contrib}</div>
                                 </div>
                             `;
                         }).join('')}
                     </div>
                     
                     <!-- METRICS -->
-                    <div style="background:white;border-radius:10px;padding:14px;margin-bottom:12px;">
-                        <div style="font-weight:700;font-size:13px;margin-bottom:10px;color:#1e293b;">📈 Detailed Metrics</div>
-                        <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;font-size:11px;">
-                            <div style="background:#f8fafc;padding:10px;border-radius:6px;">
-                                <div style="color:#64748b;margin-bottom:4px;">Content</div>
-                                <div><strong>${(metrics.content?.wordCount || 0).toLocaleString()}</strong> words</div>
-                                <div><strong>${metrics.content?.citationCount || 0}</strong> citations</div>
-                                <div>USC: ${metrics.content?.hasUSCCitation ? '✓' : '✗'} | CFR: ${metrics.content?.hasCFRCitation ? '✓' : '✗'}</div>
+                    <div style="background:white;border-radius:10px;padding:12px;margin-bottom:12px;">
+                        <div style="font-weight:700;font-size:12px;margin-bottom:8px;color:#1e293b;">📈 Detailed Metrics</div>
+                        <div style="display:grid;grid-template-columns:1fr;gap:6px;font-size:10px;">
+                            <div style="background:#f8fafc;padding:8px;border-radius:6px;display:flex;justify-content:space-between;align-items:center;">
+                                <span style="color:#64748b;font-weight:600;">Content</span>
+                                <span><strong>${(metrics.content?.wordCount || 0).toLocaleString()}</strong> words · <strong>${metrics.content?.citationCount || 0}</strong> cites · USC ${metrics.content?.hasUSCCitation ? '✓' : '✗'} · CFR ${metrics.content?.hasCFRCitation ? '✓' : '✗'}</span>
                             </div>
-                            <div style="background:#f8fafc;padding:10px;border-radius:6px;">
-                                <div style="color:#64748b;margin-bottom:4px;">Summary</div>
-                                <div><strong>${metrics.summary?.wordCount || 0}</strong> words</div>
-                                <div>Actionable: ${metrics.summary?.hasActionableLanguage ? '✓ Yes' : '✗ No'}</div>
+                            <div style="background:#f8fafc;padding:8px;border-radius:6px;display:flex;justify-content:space-between;align-items:center;">
+                                <span style="color:#64748b;font-weight:600;">Summary</span>
+                                <span><strong>${metrics.summary?.wordCount || 0}</strong> words · Actionable: ${metrics.summary?.hasActionableLanguage ? '✓' : '✗'}</span>
                             </div>
-                            <div style="background:#f8fafc;padding:10px;border-radius:6px;">
-                                <div style="color:#64748b;margin-bottom:4px;">Tasks</div>
-                                <div><strong>${metrics.tasks?.totalCount || 0}</strong> total</div>
-                                <div><strong>${metrics.tasks?.criticalCount || 0}</strong> critical</div>
-                                <div><strong>${metrics.tasks?.withEvidence || 0}</strong> need evidence</div>
+                            <div style="background:#f8fafc;padding:8px;border-radius:6px;display:flex;justify-content:space-between;align-items:center;">
+                                <span style="color:#64748b;font-weight:600;">Tasks</span>
+                                <span><strong>${metrics.tasks?.totalCount || 0}</strong> total · <strong>${metrics.tasks?.criticalCount || 0}</strong> critical · <strong>${metrics.tasks?.withEvidence || 0}</strong> evidence</span>
                             </div>
-                            <div style="background:#f8fafc;padding:10px;border-radius:6px;">
-                                <div style="color:#64748b;margin-bottom:4px;">Deadlines</div>
-                                <div><strong>${metrics.deadlines?.totalCount || 0}</strong> total</div>
-                                <div><strong>${metrics.deadlines?.recurring || 0}</strong> recurring</div>
+                            <div style="background:#f8fafc;padding:8px;border-radius:6px;display:flex;justify-content:space-between;align-items:center;">
+                                <span style="color:#64748b;font-weight:600;">Deadlines</span>
+                                <span><strong>${metrics.deadlines?.totalCount || 0}</strong> total · <strong>${metrics.deadlines?.recurring || 0}</strong> recurring</span>
                             </div>
                         </div>
                     </div>
                     
                     <!-- NEGATIVE FACTORS -->
                     ${negFactors.length > 0 ? `
-                    <div style="background:#fef2f2;border-radius:10px;padding:14px;margin-bottom:12px;border:1px solid #fecaca;">
-                        <div style="font-weight:700;font-size:13px;margin-bottom:10px;color:#dc2626;">📉 Score Impact (Costing Points)</div>
-                        ${negFactors.slice(0,5).map(f => `
-                            <div style="display:flex;align-items:center;gap:8px;font-size:11px;margin-bottom:6px;padding:6px;background:white;border-radius:4px;">
-                                <div style="background:#fef2f2;color:#dc2626;padding:2px 6px;border-radius:4px;font-weight:700;font-size:10px;min-width:35px;text-align:center;">${f.impact}</div>
-                                <div style="color:#64748b;min-width:70px;">${f.category}</div>
-                                <div style="color:#374151;">${f.reason}</div>
+                    <div style="background:#fef2f2;border-radius:10px;padding:10px;margin-bottom:10px;border:1px solid #fecaca;">
+                        <div style="font-weight:700;font-size:11px;margin-bottom:8px;color:#dc2626;">📉 Score Impact</div>
+                        ${negFactors.slice(0,4).map(f => `
+                            <div style="font-size:10px;margin-bottom:4px;padding:4px 6px;background:white;border-radius:4px;display:flex;justify-content:space-between;align-items:center;">
+                                <span style="color:#374151;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${f.reason}</span>
+                                <span style="background:#fef2f2;color:#dc2626;padding:2px 6px;border-radius:4px;font-weight:700;margin-left:4px;flex-shrink:0;">${f.impact}</span>
                             </div>
                         `).join('')}
                     </div>
@@ -4987,13 +4980,12 @@
                     
                     <!-- POSITIVE FACTORS -->
                     ${posFactors.length > 0 ? `
-                    <div style="background:#f0fdf4;border-radius:10px;padding:14px;margin-bottom:12px;border:1px solid #bbf7d0;">
-                        <div style="font-weight:700;font-size:13px;margin-bottom:10px;color:#16a34a;">📈 Score Boosters (Helping)</div>
-                        ${posFactors.slice(0,5).map(f => `
-                            <div style="display:flex;align-items:center;gap:8px;font-size:11px;margin-bottom:6px;padding:6px;background:white;border-radius:4px;">
-                                <div style="background:#dcfce7;color:#16a34a;padding:2px 6px;border-radius:4px;font-weight:700;font-size:10px;min-width:35px;text-align:center;">${f.impact}</div>
-                                <div style="color:#64748b;min-width:70px;">${f.category}</div>
-                                <div style="color:#374151;">${f.reason}</div>
+                    <div style="background:#f0fdf4;border-radius:10px;padding:10px;margin-bottom:10px;border:1px solid #bbf7d0;">
+                        <div style="font-weight:700;font-size:11px;margin-bottom:8px;color:#16a34a;">📈 Score Boosters</div>
+                        ${posFactors.slice(0,4).map(f => `
+                            <div style="font-size:10px;margin-bottom:4px;padding:4px 6px;background:white;border-radius:4px;display:flex;justify-content:space-between;align-items:center;">
+                                <span style="color:#374151;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${f.reason}</span>
+                                <span style="background:#dcfce7;color:#16a34a;padding:2px 6px;border-radius:4px;font-weight:700;margin-left:4px;flex-shrink:0;">${f.impact}</span>
                             </div>
                         `).join('')}
                     </div>
@@ -5001,16 +4993,15 @@
                     
                     <!-- ACTION ITEMS -->
                     ${actions.length > 0 ? `
-                    <div style="background:#fff7ed;border-radius:10px;padding:14px;margin-bottom:12px;border:1px solid #fed7aa;">
-                        <div style="font-weight:700;font-size:13px;margin-bottom:10px;color:#ea580c;">🎯 Actions to Improve Score</div>
-                        ${actions.slice(0,4).map((a,i) => `
-                            <div style="display:flex;align-items:flex-start;gap:8px;font-size:11px;margin-bottom:6px;padding:8px;background:white;border-radius:4px;">
-                                <div style="background:#ffedd5;color:#ea580c;padding:2px 8px;border-radius:4px;font-weight:700;font-size:10px;">#${i+1}</div>
-                                <div style="flex:1;">
-                                    <div style="color:#374151;">${a.action}</div>
-                                    <div style="color:#94a3b8;font-size:10px;margin-top:2px;">[${a.category}]</div>
+                    <div style="background:#fff7ed;border-radius:10px;padding:10px;margin-bottom:10px;border:1px solid #fed7aa;">
+                        <div style="font-weight:700;font-size:11px;margin-bottom:8px;color:#ea580c;">🎯 Actions to Improve</div>
+                        ${actions.slice(0,3).map((a,i) => `
+                            <div style="font-size:10px;margin-bottom:4px;padding:6px;background:white;border-radius:4px;">
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+                                    <span style="font-weight:600;color:#ea580c;">#${i+1} ${a.category}</span>
+                                    <span style="background:#dcfce7;color:#16a34a;padding:1px 6px;border-radius:4px;font-weight:700;">+${a.pointsToGain}</span>
                                 </div>
-                                <div style="background:#dcfce7;color:#16a34a;padding:2px 8px;border-radius:4px;font-weight:700;font-size:10px;">+${a.pointsToGain} pts</div>
+                                <div style="color:#374151;overflow:hidden;text-overflow:ellipsis;">${a.action}</div>
                             </div>
                         `).join('')}
                     </div>
