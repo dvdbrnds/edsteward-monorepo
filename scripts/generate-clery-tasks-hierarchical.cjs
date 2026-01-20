@@ -5,6 +5,8 @@
  * - 10 parent sections
  * - 32 subtasks
  * - Total: 42 tasks
+ * 
+ * PROPERLY SETS parent_task_id FOR HIERARCHY
  */
 
 const { Pool } = require('pg');
@@ -603,18 +605,18 @@ async function generateCleryTasks() {
   );
   console.log(`Deleted ${deleteResult.rowCount} existing tasks\n`);
 
-  // Insert hierarchical tasks
+  // Map to store tempId -> database id
+  const tempIdToDbId = {};
+  
+  // First pass: Insert all section (parent) tasks
+  console.log('Pass 1: Inserting parent sections...');
   let sections = 0;
-  let subtasks = 0;
   
   for (let i = 0; i < cleryTasks.length; i++) {
     const task = cleryTasks[i];
-    const isSection = !task.parentTempId;
+    if (task.parentTempId) continue; // Skip subtasks in first pass
     
-    if (isSection) sections++;
-    else subtasks++;
-
-    await pool.query(`
+    const result = await pool.query(`
       INSERT INTO regulation_tasks (
         regulation_id,
         title,
@@ -624,8 +626,10 @@ async function generateCleryTasks() {
         assigned_role,
         evidence_required,
         evidence_type,
-        sort_order
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+        sort_order,
+        parent_task_id
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NULL)
+      RETURNING id
     `, [
       cleryRegId,
       task.title,
@@ -637,30 +641,90 @@ async function generateCleryTasks() {
       task.evidenceType || 'document',
       i
     ]);
+    
+    tempIdToDbId[task.tempId] = result.rows[0].id;
+    sections++;
+    console.log(`  ✅ ${task.tempId} -> DB ID ${result.rows[0].id}: ${task.title.substring(0, 50)}...`);
+  }
+  
+  console.log(`\nPass 2: Inserting subtasks with parent references...`);
+  let subtasks = 0;
+  
+  // Second pass: Insert subtasks with parent_task_id
+  for (let i = 0; i < cleryTasks.length; i++) {
+    const task = cleryTasks[i];
+    if (!task.parentTempId) continue; // Skip sections in second pass
+    
+    const parentDbId = tempIdToDbId[task.parentTempId];
+    if (!parentDbId) {
+      console.error(`  ❌ ERROR: Parent ${task.parentTempId} not found for ${task.tempId}`);
+      continue;
+    }
+    
+    const result = await pool.query(`
+      INSERT INTO regulation_tasks (
+        regulation_id,
+        title,
+        description,
+        category,
+        priority,
+        assigned_role,
+        evidence_required,
+        evidence_type,
+        sort_order,
+        parent_task_id
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      RETURNING id
+    `, [
+      cleryRegId,
+      task.title,
+      task.description,
+      task.category,
+      task.priority,
+      task.assignedRole,
+      task.evidenceRequired || false,
+      task.evidenceType || 'document',
+      i,
+      parentDbId
+    ]);
+    
+    tempIdToDbId[task.tempId] = result.rows[0].id;
+    subtasks++;
   }
 
-  console.log(`✅ Inserted ${sections} sections + ${subtasks} subtasks = ${sections + subtasks} total tasks`);
+  console.log(`\n✅ Inserted ${sections} sections + ${subtasks} subtasks = ${sections + subtasks} total tasks`);
 
-  // Verify
-  const verifyResult = await pool.query(
-    'SELECT COUNT(*) as count FROM regulation_tasks WHERE regulation_id = $1',
-    [cleryRegId]
-  );
+  // Verify hierarchy
+  const hierarchyResult = await pool.query(`
+    SELECT 
+      (SELECT COUNT(*) FROM regulation_tasks WHERE regulation_id = $1 AND parent_task_id IS NULL) as sections,
+      (SELECT COUNT(*) FROM regulation_tasks WHERE regulation_id = $1 AND parent_task_id IS NOT NULL) as subtasks,
+      (SELECT COUNT(*) FROM regulation_tasks WHERE regulation_id = $1) as total
+  `, [cleryRegId]);
   
-  console.log(`\nDatabase verification: ${verifyResult.rows[0].count} tasks`);
+  console.log('\n='.repeat(70));
+  console.log('VERIFICATION');
+  console.log('='.repeat(70));
+  console.log(`Sections (parent_task_id IS NULL): ${hierarchyResult.rows[0].sections}`);
+  console.log(`Subtasks (parent_task_id IS NOT NULL): ${hierarchyResult.rows[0].subtasks}`);
+  console.log(`Total: ${hierarchyResult.rows[0].total}`);
 
-  // Show by category
-  const categoryResult = await pool.query(`
-    SELECT category, COUNT(*) as count
-    FROM regulation_tasks
-    WHERE regulation_id = $1
-    GROUP BY category
-    ORDER BY count DESC
+  // Show hierarchy
+  const treeResult = await pool.query(`
+    SELECT 
+      p.id as parent_id,
+      p.title as parent_title,
+      COUNT(c.id) as child_count
+    FROM regulation_tasks p
+    LEFT JOIN regulation_tasks c ON c.parent_task_id = p.id
+    WHERE p.regulation_id = $1 AND p.parent_task_id IS NULL
+    GROUP BY p.id, p.title
+    ORDER BY p.sort_order
   `, [cleryRegId]);
 
-  console.log('\nTasks by Category:');
-  categoryResult.rows.forEach(row => {
-    console.log(`  ${row.category}: ${row.count}`);
+  console.log('\nHierarchy:');
+  treeResult.rows.forEach(row => {
+    console.log(`  ${row.parent_title.substring(0, 50)}... (${row.child_count} subtasks)`);
   });
 
   await pool.end();

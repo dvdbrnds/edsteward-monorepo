@@ -18,6 +18,9 @@ import { authManager } from '../shared/security/AuthenticationManager.js';
 import { metricsCollector } from '../shared/monitoring/MetricsCollector.js';
 import { logger } from '../utils/logger.js';
 import { performRealCrossReference } from './services/real-cross-reference.js';
+import { executeComprehensiveWorkflow, executeQuickWorkflow } from './services/comprehensive-workflow-engine.js';
+import { extractComplianceRequirements } from './services/regulation-task-extractor.js';
+import { detectChanges } from './services/differential-analysis.js';
 
 // Helper to parse requirements text to array for EdSteward Preview
 function parseRequirementsToArray(reqText) {
@@ -1198,6 +1201,87 @@ The Family Educational Rights and Privacy Act (FERPA) is a federal law that prot
         });
       } catch (error) {
         logger.error('[workflow] Comprehensive workflow failed:', error);
+        res.status(500).json({ success: false, error: error.message });
+      }
+    });
+
+    // ========================================================================
+    // COMPREHENSIVE WORKFLOW ENGINE ENDPOINT
+    // THE CORE PURPOSE OF MCP ENGINE - Execute full workflow with real data
+    // ========================================================================
+    router.post('/workflow/execute', async (req, res) => {
+      try {
+        const { regulation, slug, existingData, quick } = req.body;
+        const regulationSlug = slug || regulation || 'unknown-regulation';
+        
+        logger.info(`[WORKFLOW] 🚀 Executing ${quick ? 'QUICK' : 'COMPREHENSIVE'} workflow for ${regulationSlug}`);
+        
+        let result;
+        if (quick) {
+          result = await executeQuickWorkflow(regulationSlug, existingData);
+        } else {
+          result = await executeComprehensiveWorkflow(regulationSlug, existingData);
+        }
+        
+        logger.info(`[WORKFLOW] ✅ Workflow ${result.workflowId} completed in ${result.duration}`);
+        
+        res.json({
+          success: true,
+          ...result
+        });
+        
+      } catch (error) {
+        logger.error(`[WORKFLOW] ❌ Error: ${error.message}`);
+        res.status(500).json({ 
+          success: false, 
+          error: error.message,
+          stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+        });
+      }
+    });
+
+    // Task extraction endpoint - Extract compliance tasks from regulation text
+    router.post('/workflow/extract-tasks', async (req, res) => {
+      try {
+        const { regulation, slug, text, metadata } = req.body;
+        const regulationSlug = slug || regulation || 'unknown-regulation';
+        const regulationText = text || '';
+        
+        logger.info(`[WORKFLOW] 📋 Extracting tasks for ${regulationSlug}`);
+        
+        const result = await extractComplianceRequirements(regulationSlug, regulationText, metadata || {});
+        
+        logger.info(`[WORKFLOW] ✅ Extracted ${result.tasks.length} tasks`);
+        
+        res.json({
+          success: true,
+          ...result
+        });
+        
+      } catch (error) {
+        logger.error(`[WORKFLOW] ❌ Task extraction error: ${error.message}`);
+        res.status(500).json({ success: false, error: error.message });
+      }
+    });
+
+    // Differential analysis endpoint - Compare two versions of regulation data
+    router.post('/workflow/differential', async (req, res) => {
+      try {
+        const { existing, incoming, regulation } = req.body;
+        
+        logger.info(`[WORKFLOW] 🔍 Running differential analysis for ${regulation || 'unknown'}`);
+        
+        const result = detectChanges(existing || {}, incoming || {});
+        
+        logger.info(`[WORKFLOW] ✅ Differential complete: ${result.hasChanges ? 'CHANGES DETECTED' : 'NO CHANGES'}`);
+        
+        res.json({
+          success: true,
+          ...result
+        });
+        
+      } catch (error) {
+        logger.error(`[WORKFLOW] ❌ Differential error: ${error.message}`);
         res.status(500).json({ success: false, error: error.message });
       }
     });

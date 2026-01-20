@@ -276,18 +276,94 @@ class DeliveryServer {
             ? regulationContent.statutes.join('; ')
             : (regulationContent.statute || '');
 
+          // Build hierarchical compliance tasks with tempId and parentTempId
+          // This preserves the parent-child relationships for EdSteward
+          const hierarchicalTasks = [];
+          if (Array.isArray(regulationContent.complianceTasks)) {
+            // Group tasks by parent relationship using database parent_task_id
+            const taskMap = new Map();
+            const parentTasks = [];
+            const childTasks = [];
+            
+            // First pass: identify parents vs children
+            for (const task of regulationContent.complianceTasks) {
+              const tempId = `task-${task.id || task.sortOrder || hierarchicalTasks.length}`;
+              taskMap.set(task.id, tempId);
+              
+              if (task.parentTaskId || task.parent_task_id) {
+                childTasks.push({ ...task, tempId });
+              } else {
+                parentTasks.push({ ...task, tempId });
+              }
+            }
+            
+            // Add parent tasks first
+            for (const task of parentTasks) {
+              hierarchicalTasks.push({
+                tempId: task.tempId,
+                title: task.title,
+                description: task.description || '',
+                category: task.category || '',
+                priority: task.priority || 'medium',
+                assignedRole: task.assignedRole || task.assigned_role || '',
+                evidenceRequired: task.evidenceRequired || task.evidence_required || false,
+                evidenceType: task.evidenceType || task.evidence_type || 'document',
+                sortOrder: task.sortOrder || task.sort_order || 0
+              });
+            }
+            
+            // Add child tasks with parentTempId reference
+            for (const task of childTasks) {
+              const parentDbId = task.parentTaskId || task.parent_task_id;
+              const parentTempId = taskMap.get(parentDbId);
+              
+              hierarchicalTasks.push({
+                tempId: task.tempId,
+                parentTempId: parentTempId,  // CRITICAL: links to parent task
+                title: task.title,
+                description: task.description || '',
+                category: task.category || '',
+                priority: task.priority || 'medium',
+                assignedRole: task.assignedRole || task.assigned_role || '',
+                evidenceRequired: task.evidenceRequired || task.evidence_required || false,
+                evidenceType: task.evidenceType || task.evidence_type || 'document',
+                sortOrder: task.sortOrder || task.sort_order || 0
+              });
+            }
+          }
+
+          // Build the PENDING UPDATE payload for /api/regulation-updates
+          // This goes to CCO review queue - NOT direct database write
+          const filingDeadlinesArray = Array.isArray(regulationContent.filingDeadlines)
+            ? regulationContent.filingDeadlines.map(d => ({
+                deadline: d.dueDate || d.date || null,
+                description: d.name || d.description || d.type || 'Filing deadline'
+              }))
+            : [];
+
           const payload = {
-            regKey: regKey,  // Universal key field (REG-001 to REG-251)
-            itemId: itemId,  // EdSteward looks up regulation by itemId
-            regulationId: regulationContent.id || 0,  // Fallback, EdSteward will use regKey/itemId for lookup
-            name: `${regulationContent.name || regulationId} - MCP Engine Update`,
-            originalContent: `[Previous version of ${regulationContent.name || regulationId}]\n\nStatute: ${statutesText}\n\n${contentText.substring(0, 500)}...`,
-            updatedContent: `${contentText}\n\n---\nStatute: ${statutesText}\nCategory: ${regulationContent.category || 'N/A'}\nJurisdiction: ${regulationContent.jurisdictionSource || 'federal'}`,
-            status: 'pending',  // Creates pending update for CCO review
-            summary: `MCP Engine update for ${regulationContent.name || regulationId}. ${(regulationContent.description || '').substring(0, 200)}`,
-            requirements: requirementsText || 'See regulation text for compliance requirements.',
-            filingDeadlines: deadlinesJson
+            // PRIMARY IDENTIFIER - Universal REG-XXX key (REG-001 to REG-251)
+            regKey: regKey,
+            
+            // Backup identifiers (EdSteward will use regKey first)
+            itemId: itemId,
+            
+            // Required fields for /api/regulation-updates
+            name: regulationContent.name || regulationId,
+            originalContent: contentText.substring(0, 5000) || 'Current regulation content',
+            updatedContent: contentText.substring(0, 5000) || 'Updated regulation content',
+            status: 'pending',  // CRITICAL: Creates pending update for CCO review
+            
+            // Additional context
+            summary: regulationContent.description || `MCP Engine update for ${regulationContent.name}`,
+            requirements: requirementsText || '',
+            filingDeadlines: JSON.stringify(filingDeadlinesArray),
+            
+            // Full hierarchical task list (parent-child relationships preserved)
+            complianceTasks: hierarchicalTasks
           };
+          
+          console.log(`   📋 Sending ${hierarchicalTasks.length} tasks (hierarchy preserved)`);
 
           const headers = { 'Content-Type': 'application/json' };
           if (customer.auth?.method === 'basic') {

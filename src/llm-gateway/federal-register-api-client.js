@@ -116,6 +116,69 @@ export class FederalRegisterAPIClient {
   }
 
   /**
+   * General keyword search of Federal Register documents
+   */
+  async searchDocuments(searchTerm, options = {}) {
+    const cacheKey = `search_${searchTerm.replace(/\s+/g, '_').substring(0, 50)}`;
+    
+    // Check cache first
+    if (this.cache.has(cacheKey)) {
+      const cached = this.cache.get(cacheKey);
+      if (Date.now() - cached.timestamp < this.cacheDuration) {
+        console.log(`📋 Using cached Federal Register search for "${searchTerm}"`);
+        return cached.data;
+      }
+    }
+
+    try {
+      // Build search URL
+      const searchParams = new URLSearchParams({
+        'conditions[term]': searchTerm,
+        'per_page': (options.perPage || options.limit || 10).toString(),
+        'page': (options.page || 1).toString(),
+        'order': options.order || 'relevance'
+      });
+
+      const searchUrl = `${this.baseUrl}/articles.json?${searchParams.toString()}`;
+      const response = await this.httpGet(searchUrl);
+
+      if (response.status !== 200) {
+        console.error(`Federal Register search returned status ${response.status}`);
+        return { count: 0, results: [], error: `HTTP ${response.status}` };
+      }
+
+      const searchResults = {
+        query: searchTerm,
+        count: response.data.count || 0,
+        results: (response.data.results || []).map(doc => ({
+          document_number: doc.document_number,
+          title: doc.title,
+          type: doc.type,
+          abstract: doc.abstract,
+          publication_date: doc.publication_date,
+          agency_names: doc.agency_names,
+          html_url: doc.html_url,
+          pdf_url: doc.pdf_url
+        })),
+        searchUrl: searchUrl
+      };
+
+      // Cache the results
+      this.cache.set(cacheKey, {
+        data: searchResults,
+        timestamp: Date.now()
+      });
+
+      console.log(`✅ Found ${searchResults.count} Federal Register documents for "${searchTerm}"`);
+      return searchResults;
+
+    } catch (error) {
+      console.error(`❌ Federal Register search failed for "${searchTerm}":`, error.message);
+      return { count: 0, results: [], error: error.message };
+    }
+  }
+
+  /**
    * Search Federal Register for documents related to CFR citation
    */
   async searchByCFRCitation(cfrCitation, options = {}) {
