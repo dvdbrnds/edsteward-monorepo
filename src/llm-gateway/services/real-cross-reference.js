@@ -629,7 +629,8 @@ async function fetchRegulationsGov(searchTerm) {
   }
   
   const encodedTerm = encodeURIComponent(searchTerm);
-  const url = `https://api.regulations.gov/v4/documents?filter[searchTerm]=${encodedTerm}&page[size]=5&api_key=${apiKey}`;
+  // Regulations.gov requires URL-encoded brackets and minimum page size of 5
+  const url = `https://api.regulations.gov/v4/documents?filter%5BsearchTerm%5D=${encodedTerm}&page%5Bsize%5D=5&api_key=${apiKey}`;
   
   const result = await fetchWithTimeout(url);
   
@@ -998,6 +999,13 @@ const REGULATION_CITATIONS = {
     usc: { title: 20, section: 1092 },
     cfr: { title: 34, part: 668 },
     searchTerms: ['Clery Act', 'campus security', 'crime statistics disclosure', 'campus safety']
+  },
+  'jeanne-clery-disclosure-of-campus-security-policy-': {
+    name: 'Clery Act',
+    fullName: 'Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Act',
+    usc: { title: 20, section: 1092 },
+    cfr: { title: 34, part: 668 },
+    searchTerms: ['Clery Act', 'campus security', 'crime statistics disclosure', 'campus safety', 'VAWA']
   },
   'teach-act': {
     name: 'TEACH Act',
