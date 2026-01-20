@@ -75,9 +75,11 @@ function fetchWithTimeout(url, options = {}, timeout = 15000) {
       res.on('data', chunk => data += chunk);
       res.on('end', () => {
         const duration = Date.now() - startTime;
-        const isJson = res.headers['content-type']?.includes('application/json');
+        const contentType = res.headers['content-type'] || '';
+        // Check for JSON content type (includes application/json and application/vnd.api+json)
+        const isJson = contentType.includes('application/json') || contentType.includes('application/vnd.api+json');
         
-        console.log(`[RealAPI] ✓ Response: ${res.statusCode} (${duration}ms, ${data.length} bytes)`);
+        console.log(`[RealAPI] ✓ Response: ${res.statusCode} (${duration}ms, ${data.length} bytes, ${contentType.split(';')[0]})`);
         
         try {
           resolve({
