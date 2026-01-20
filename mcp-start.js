@@ -29,7 +29,8 @@ const CONFIG = {
     llmGateway: 3002,
     frontend: 3050,
     delivery: 3051,
-    customerManagement: 3060
+    customerManagement: 3060,
+    inquisitor: 3061
   },
   healthCheck: {
     maxRetries: 15,
@@ -351,6 +352,52 @@ async function startCustomerManagement() {
 }
 
 /**
+ * Start Inquisitor AI Auditor
+ */
+async function startInquisitor() {
+  log.info('Starting Inquisitor AI Auditor...', 'INQUISITOR');
+
+  const inquisitorProcess = spawn('node', ['src/inquisitor-mcp/inquisitor-server.js'], {
+    stdio: ['ignore', 'pipe', 'pipe'],
+    cwd: process.cwd()
+  });
+
+  inquisitorProcess.stdout.on('data', (data) => {
+    const output = data.toString().trim();
+    if (output) {
+      log.info(output, 'INQUISITOR');
+    }
+  });
+
+  inquisitorProcess.stderr.on('data', (data) => {
+    const output = data.toString().trim();
+    if (output) {
+      log.error(output, 'INQUISITOR');
+    }
+  });
+
+  inquisitorProcess.on('close', (code) => {
+    if (!isShuttingDown) {
+      log.error(`Inquisitor exited with code ${code}`, 'INQUISITOR');
+      if (canRestart('inquisitor')) {
+        setTimeout(() => {
+          if (!isShuttingDown) {
+            startInquisitor();
+          }
+        }, 2000);
+      } else {
+        log.error('Inquisitor restart limit reached, system will continue without it', 'INQUISITOR');
+      }
+    }
+  });
+
+  processes.set('inquisitor', inquisitorProcess);
+  log.info(`Inquisitor PID: ${inquisitorProcess.pid}`, 'INQUISITOR');
+
+  return inquisitorProcess;
+}
+
+/**
  * Start Frontend Development Server
  */
 async function startFrontend() {
@@ -498,6 +545,9 @@ async function main() {
 
     // Start Customer Management API (customer data & delivery)
     await startCustomerManagement();
+
+    // Start Inquisitor AI Auditor
+    await startInquisitor();
 
     // Start Frontend (user interface)
     await startFrontend();

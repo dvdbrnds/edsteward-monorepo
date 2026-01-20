@@ -24,7 +24,7 @@ import fetch from 'node-fetch';
 import Anthropic from '@anthropic-ai/sdk';
 
 const app = express();
-const PORT = process.env.INQUISITOR_PORT || 3060;
+const PORT = process.env.INQUISITOR_PORT || 3061;
 const LLM_GATEWAY_URL = process.env.LLM_GATEWAY_URL || 'http://localhost:3002';
 
 // AI Configuration for Patent Compliance

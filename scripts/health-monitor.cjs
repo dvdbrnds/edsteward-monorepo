@@ -10,7 +10,7 @@
 const { spawn, exec } = require('child_process');
 const http = require('http');
 
-// Service definitions
+// Service definitions - ALL required services for MCP Engine
 const SERVICES = [
   {
     name: 'Registry API',
@@ -27,10 +27,17 @@ const SERVICES = [
     critical: true
   },
   {
+    name: 'Inquisitor (AI Auditor)',
+    port: 3061,
+    healthUrl: 'http://localhost:3061/health',
+    startCmd: 'node src/inquisitor-mcp/inquisitor-server.js',
+    critical: true
+  },
+  {
     name: 'Delivery Server',
     port: 3051,
     healthUrl: 'http://localhost:3051/health',
-    startCmd: 'node src/delivery/start-delivery-server.js',
+    startCmd: 'node src/delivery-system/delivery-server.js',
     critical: false
   },
   {

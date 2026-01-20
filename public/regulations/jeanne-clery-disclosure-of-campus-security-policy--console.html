@@ -1668,11 +1668,6 @@
                             <span class="substep-name" style="flex: 1;">Cornell LII</span>
                             <span class="substep-confidence" id="conf-cornell" style="color: #22c55e; font-weight: 500;"></span>
                         </div>
-                        <div class="substep" id="substep-justia" style="display: flex; align-items: center; gap: 10px;">
-                            <span class="substep-icon" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0;"></span>
-                            <span class="substep-name" style="flex: 1;">Justia</span>
-                            <span class="substep-confidence" id="conf-justia" style="color: #22c55e; font-weight: 500;"></span>
-                        </div>
                         <div class="substep" id="substep-openalex" style="display: flex; align-items: center; gap: 10px;">
                             <span class="substep-icon" style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: #ccc; flex-shrink: 0;"></span>
                             <span class="substep-name" style="flex: 1;">OpenAlex</span>
@@ -2327,18 +2322,7 @@
                     metrics.apiCalls++;
                 }
                 
-                // Justia (Cloudflare protected - manual verification with link)
-                const justia = lawLib?.justia;
-                if (justia) {
-                    const isAvailable = justia.status === 'available' || justia.status === 'fetched';
-                    const status = isAvailable ? '✅' : (justia.status === 'web_only' ? '🌐' : '❌');
-                    addConsoleLog(`   ${status} Justia (justia.com) - Legal Information`, isAvailable ? 'success' : 'info');
-                    if (justia.url) {
-                        addConsoleLog(`      └─ Manual lookup: ${justia.url}`, 'debug');
-                    }
-                    // Mark as success if available, include link for manual verification
-                    updateSubstep('justia', isAvailable ? 'success' : 'pending', justia.confidence || 0, null, justia.url);
-                }
+                // Justia removed - no public API, Cloudflare protected, provides no value to automated validation
                 
                 // Academic Sources
                 const academic = crossRef?.academicSources;
@@ -4890,7 +4874,7 @@
         const slug = window.location.pathname.split('/').pop().replace('-console.html', '');
         
         try {
-            const response = await fetch('http://localhost:3060/api/inquisitor/audit', {
+            const response = await fetch('http://localhost:3061/api/inquisitor/audit', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ regulationSlug: slug }),

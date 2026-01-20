@@ -4874,7 +4874,7 @@
         const slug = window.location.pathname.split('/').pop().replace('-console.html', '');
         
         try {
-            const response = await fetch('http://localhost:3060/api/inquisitor/audit', {
+            const response = await fetch('http://localhost:3061/api/inquisitor/audit', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ regulationSlug: slug }),
