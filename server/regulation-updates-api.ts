@@ -3,6 +3,7 @@ import { storage } from './storage';
 import { calculateTextChangeDiff } from './services/diff-calculator';
 import { z } from 'zod';
 import { insertRegulationUpdateSchema } from '@shared/schema';
+import { pool } from './db';
 
 // MCP Engine credentials from environment
 const MCP_ENGINE_USERNAME = process.env.MCP_ENGINE_USERNAME || 'mcp-engine';
@@ -79,9 +80,12 @@ const deferUpdateSchema = z.object({
 
 /**
  * Schema for MCP Engine complex payload with Federal Register enhancement
+ * Now accepts either regulationId (number) or itemId (string) for flexibility
  */
 const mcpEngineUpdateSchema = z.object({
-  regulationId: z.number(),
+  // Accept numeric ID or string itemId
+  regulationId: z.union([z.number(), z.string()]).optional(),
+  itemId: z.string().optional(),
   name: z.string(),
   status: z.enum(["pending", "accepted", "rejected", "deferred"]).default("pending"),
   effectiveDate: z.string().optional(),
@@ -188,20 +192,77 @@ const tufUpdateSchema = z.object({
 });
 
 /**
- * Maps MCP Engine sequential IDs (1-354) to actual EdSteward regulation IDs (4459-4852)
- * @param mcpId Sequential ID from MCP Engine (1-354)
- * @returns Actual EdSteward regulation ID or null if invalid
+ * Validates that a regulation ID exists in the database
+ * @param regulationId The numeric regulation ID to validate
+ * @returns The regulation ID if valid, null if not found
  */
-function validateRegulationId(regulationId: number): number | null {
-  // EdSteward now uses Master Key Field system: sequential IDs
-  // Allow IDs 1-500 to accommodate all regulations including Clery Act (355)
-  // No mapping needed - use regulation IDs directly
-  if (regulationId < 1 || regulationId > 500) {
+async function validateRegulationId(regulationId: number): Promise<number | null> {
+  if (!regulationId || regulationId < 1) {
     return null;
   }
   
-  // Return the regulation ID as-is (no conversion needed)
-  return regulationId;
+  try {
+    const result = await pool.query(
+      'SELECT id FROM regulations WHERE id = $1',
+      [regulationId]
+    );
+    
+    if (result.rows.length > 0) {
+      return regulationId;
+    }
+    return null;
+  } catch (error) {
+    console.error(`Error validating regulation ID ${regulationId}:`, error);
+    return null;
+  }
+}
+
+/**
+ * Looks up a regulation by its item_id (string slug)
+ * @param itemId The string item_id (e.g., "jeanne-clery-disclosure-of-campus-security-policy-")
+ * @returns The numeric regulation ID if found, null if not found
+ */
+async function lookupRegulationByItemId(itemId: string): Promise<number | null> {
+  if (!itemId || typeof itemId !== 'string') {
+    return null;
+  }
+  
+  try {
+    const result = await pool.query(
+      'SELECT id FROM regulations WHERE item_id = $1',
+      [itemId]
+    );
+    
+    if (result.rows.length > 0) {
+      return result.rows[0].id;
+    }
+    return null;
+  } catch (error) {
+    console.error(`Error looking up regulation by item_id "${itemId}":`, error);
+    return null;
+  }
+}
+
+/**
+ * Resolves a regulation identifier to a numeric ID
+ * Accepts either:
+ * - A numeric regulationId (database primary key)
+ * - A string itemId (MCP Engine slug like "ferpa")
+ * @returns The numeric regulation ID if found, null if not found
+ */
+async function resolveRegulationId(identifier: number | string): Promise<number | null> {
+  if (typeof identifier === 'number') {
+    return await validateRegulationId(identifier);
+  } else if (typeof identifier === 'string') {
+    // First try to parse as a number (in case it's "519" instead of 519)
+    const asNumber = parseInt(identifier, 10);
+    if (!isNaN(asNumber)) {
+      return await validateRegulationId(asNumber);
+    }
+    // Otherwise treat as item_id
+    return await lookupRegulationByItemId(identifier);
+  }
+  return null;
 }
 
 /**
@@ -249,14 +310,7 @@ export function setupRegulationUpdatesApi(app: Express) {
     try {
       // Enhanced logging for MCP Engine bulk import
       const timestamp = new Date().toISOString();
-      const regulationId = req.body.regulationId || 'unknown';
-      const regulationName = req.body.name || 'unnamed';
-      
-      
-      // Log Federal Register enhancement status if present
-      if (req.body.federal_register_enhancement) {
-        const enhancement = req.body.federal_register_enhancement;
-      }
+      const regulationId = req.body.regulationId || req.body.itemId || 'unknown';
       
       let updateData;
       let isTUFVerified = false;
@@ -298,14 +352,16 @@ export function setupRegulationUpdatesApi(app: Express) {
         if (simpleValidation.success) {
           const rawData = simpleValidation.data;
           
-          // Validate regulation ID (Master Key Field system: 1-354)
-          const validRegulationId = validateRegulationId(rawData.regulationId);
+          // Resolve regulation ID - accepts numeric ID or looks up by itemId
+          const identifier = req.body.itemId || rawData.regulationId;
+          const validRegulationId = await resolveRegulationId(identifier);
           
           if (validRegulationId === null) {
-            console.error(`❌ Invalid regulation ID: ${rawData.regulationId}. Must be between 1-500.`);
+            console.error(`❌ Regulation not found: ${identifier}`);
             return res.status(400).json({ 
               success: false,
-              error: `Invalid regulation ID: ${rawData.regulationId}. Use IDs 1-500 for Master Key Field system.` 
+              error: `Regulation not found: ${identifier}. Provide a valid numeric ID or itemId string.`,
+              hint: 'Use GET /api/mcp/regulation-hashes to find valid regulation IDs'
             });
           }
           
@@ -330,14 +386,23 @@ export function setupRegulationUpdatesApi(app: Express) {
           if (mcpValidation.success) {
             const mcpData = mcpValidation.data;
             
-            // Validate regulation ID (Master Key Field system: 1-354)
-            const validRegulationId = validateRegulationId(mcpData.regulationId);
-            
-            if (validRegulationId === null) {
-              console.error(`❌ Invalid regulation ID: ${mcpData.regulationId}. Must be between 1-500.`);
+            // Resolve regulation ID - accepts numeric ID, string ID, or itemId
+            const identifier = mcpData.itemId || mcpData.regulationId;
+            if (!identifier) {
               return res.status(400).json({ 
                 success: false,
-                error: `Invalid regulation ID: ${mcpData.regulationId}. Use IDs 1-500 for Master Key Field system.` 
+                error: 'Missing regulation identifier. Provide regulationId (number) or itemId (string).'
+              });
+            }
+            
+            const validRegulationId = await resolveRegulationId(identifier);
+            
+            if (validRegulationId === null) {
+              console.error(`❌ Regulation not found: ${identifier}`);
+              return res.status(400).json({ 
+                success: false,
+                error: `Regulation not found: ${identifier}. Provide a valid numeric ID or itemId string.`,
+                hint: 'Use GET /api/mcp/regulation-hashes to find valid regulation IDs'
               });
             }
             
@@ -366,10 +431,6 @@ export function setupRegulationUpdatesApi(app: Express) {
               // Fallback to legacy content structure
               regulationText = mcpData.content?.uscText?.text || "Original content from MCP Engine";
               requirementsContent = mcpData.content?.requirements?.content || null;
-              
-              if (hasEnhancement && !enhancementSuccessful) {
-              } else {
-              }
             }
             
             // Extract summary and filing deadlines from MCP data

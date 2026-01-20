@@ -63,8 +63,8 @@ function createTenantAwareLimiter(options: TenantRateLimitOptions) {
     skipSuccessfulRequests,
     standardHeaders: true,
     legacyHeaders: false,
-    // Disable the keyGenerator IPv6 validation - we're combining tenant+IP which is intentional
-    validate: { keyGenerator: false },
+    // Disable validation entirely - we use a custom tenant+IP key generator which is intentional
+    validate: false,
     // Skip rate limiting entirely for localhost in development
     skip: (req: Request) => {
       // Always skip in development for localhost
