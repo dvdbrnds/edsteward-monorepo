@@ -832,6 +832,21 @@ router.post('/api/regulations/workflow-update', async (req, res) => {
       }
     }
     
+    // Invalidate LLM Gateway cache so fresh data is served
+    try {
+      const cacheResponse = await fetch('http://localhost:3004/api/llm/cache/clear', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ tags: [item_id] })
+      });
+      if (cacheResponse.ok) {
+        console.log(`[REGISTRY]    🔄 LLM Gateway cache invalidated for ${item_id}`);
+      }
+    } catch (cacheErr) {
+      // Non-fatal - cache will eventually expire
+      console.log(`[REGISTRY]    ⚠️ Could not invalidate cache: ${cacheErr.message}`);
+    }
+    
     res.json({
       success: true,
       message: 'Workflow results saved to database',
@@ -841,7 +856,8 @@ router.post('/api/regulations/workflow-update', async (req, res) => {
       tasksRequested: tasks?.length || 0,
       deadlinesUpdated: actualDeadlinesSaved,
       deadlinesRequested: deadlines?.length || 0,
-      workflowId: workflow_id
+      workflowId: workflow_id,
+      cacheInvalidated: true
     });
     
   } catch (err) {
