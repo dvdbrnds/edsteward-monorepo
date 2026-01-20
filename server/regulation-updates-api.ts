@@ -80,13 +80,18 @@ const deferUpdateSchema = z.object({
 
 /**
  * Schema for MCP Engine complex payload with Federal Register enhancement
- * Now accepts either regulationId (number) or itemId (string) for flexibility
+ * Now accepts regKey (REG-001), regulationId (number), or itemId (string) for flexibility
  */
 const mcpEngineUpdateSchema = z.object({
+  // Universal regulation key (REG-001 to REG-251) - PREFERRED
+  regKey: z.string().optional(),
   // Accept numeric ID or string itemId
   regulationId: z.union([z.number(), z.string()]).optional(),
   itemId: z.string().optional(),
   name: z.string(),
+  // Risk metadata from MCP Engine
+  riskScore: z.number().optional(),
+  riskLevel: z.enum(['CRITICAL', 'SEVERE', 'HIGH', 'MODERATE', 'LOW']).optional(),
   status: z.enum(["pending", "accepted", "rejected", "deferred"]).default("pending"),
   effectiveDate: z.string().optional(),
   
@@ -244,17 +249,61 @@ async function lookupRegulationByItemId(itemId: string): Promise<number | null> 
 }
 
 /**
- * Resolves a regulation identifier to a numeric ID
- * Accepts either:
- * - A numeric regulationId (database primary key)
- * - A string itemId (MCP Engine slug like "ferpa")
+ * Looks up a regulation by its universal reg_key (REG-001 to REG-251)
+ * @param regKey The universal regulation key (e.g., "REG-001")
  * @returns The numeric regulation ID if found, null if not found
  */
-async function resolveRegulationId(identifier: number | string): Promise<number | null> {
+async function lookupRegulationByRegKey(regKey: string): Promise<number | null> {
+  if (!regKey || typeof regKey !== 'string') {
+    return null;
+  }
+  
+  // Normalize the reg_key format (accept REG-001, REG-1, reg-001, etc.)
+  const normalizedKey = regKey.toUpperCase().replace(/REG-0*(\d+)/, 'REG-$1').replace(/REG-(\d)$/, 'REG-00$1').replace(/REG-(\d\d)$/, 'REG-0$1');
+  
+  try {
+    const result = await pool.query(
+      'SELECT id FROM regulations WHERE reg_key = $1',
+      [normalizedKey]
+    );
+    
+    if (result.rows.length > 0) {
+      return result.rows[0].id;
+    }
+    return null;
+  } catch (error) {
+    console.error(`Error looking up regulation by reg_key "${regKey}":`, error);
+    return null;
+  }
+}
+
+/**
+ * Resolves a regulation identifier to a numeric ID
+ * Priority order: regKey > itemId > numeric regulationId
+ * Accepts:
+ * - regKey: Universal key like "REG-001" (highest priority)
+ * - itemId: MCP Engine slug like "ferpa"
+ * - regulationId: Numeric database primary key
+ * @returns The numeric regulation ID if found, null if not found
+ */
+async function resolveRegulationId(identifier: number | string, regKey?: string): Promise<number | null> {
+  // Priority 1: Try regKey lookup (REG-001 format)
+  if (regKey && typeof regKey === 'string' && regKey.toUpperCase().startsWith('REG-')) {
+    const regKeyResult = await lookupRegulationByRegKey(regKey);
+    if (regKeyResult) return regKeyResult;
+  }
+  
+  // Priority 2: Check if identifier itself is a reg_key
+  if (typeof identifier === 'string' && identifier.toUpperCase().startsWith('REG-')) {
+    const regKeyResult = await lookupRegulationByRegKey(identifier);
+    if (regKeyResult) return regKeyResult;
+  }
+  
+  // Priority 3: Numeric ID
   if (typeof identifier === 'number') {
     return await validateRegulationId(identifier);
   } else if (typeof identifier === 'string') {
-    // First try to parse as a number (in case it's "519" instead of 519)
+    // Try to parse as a number (in case it's "519" instead of 519)
     const asNumber = parseInt(identifier, 10);
     if (!isNaN(asNumber)) {
       return await validateRegulationId(asNumber);
@@ -352,15 +401,17 @@ export function setupRegulationUpdatesApi(app: Express) {
         if (simpleValidation.success) {
           const rawData = simpleValidation.data;
           
-          // Resolve regulation ID - accepts numeric ID or looks up by itemId
+          // Resolve regulation ID - priority: regKey > itemId > regulationId
+          const regKey = req.body.regKey;
           const identifier = req.body.itemId || rawData.regulationId;
-          const validRegulationId = await resolveRegulationId(identifier);
+          const validRegulationId = await resolveRegulationId(identifier, regKey);
           
           if (validRegulationId === null) {
-            console.error(`❌ Regulation not found: ${identifier}`);
+            const lookupUsed = regKey || identifier;
+            console.error(`❌ Regulation not found: ${lookupUsed}`);
             return res.status(400).json({ 
               success: false,
-              error: `Regulation not found: ${identifier}. Provide a valid numeric ID or itemId string.`,
+              error: `Regulation not found: ${lookupUsed}. Provide a valid regKey (REG-001), itemId, or numeric ID.`,
               hint: 'Use GET /api/mcp/regulation-hashes to find valid regulation IDs'
             });
           }
@@ -386,22 +437,25 @@ export function setupRegulationUpdatesApi(app: Express) {
           if (mcpValidation.success) {
             const mcpData = mcpValidation.data;
             
-            // Resolve regulation ID - accepts numeric ID, string ID, or itemId
+            // Resolve regulation ID - priority: regKey > itemId > regulationId
+            const regKey = mcpData.regKey;
             const identifier = mcpData.itemId || mcpData.regulationId;
-            if (!identifier) {
+            
+            if (!regKey && !identifier) {
               return res.status(400).json({ 
                 success: false,
-                error: 'Missing regulation identifier. Provide regulationId (number) or itemId (string).'
+                error: 'Missing regulation identifier. Provide regKey (REG-001), itemId, or regulationId.'
               });
             }
             
-            const validRegulationId = await resolveRegulationId(identifier);
+            const validRegulationId = await resolveRegulationId(identifier || '', regKey);
             
             if (validRegulationId === null) {
-              console.error(`❌ Regulation not found: ${identifier}`);
+              const lookupUsed = regKey || identifier;
+              console.error(`❌ Regulation not found: ${lookupUsed}`);
               return res.status(400).json({ 
                 success: false,
-                error: `Regulation not found: ${identifier}. Provide a valid numeric ID or itemId string.`,
+                error: `Regulation not found: ${lookupUsed}. Provide a valid regKey (REG-001), itemId, or numeric ID.`,
                 hint: 'Use GET /api/mcp/regulation-hashes to find valid regulation IDs'
               });
             }

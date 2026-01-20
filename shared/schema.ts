@@ -286,6 +286,10 @@ export const regulations = pgTable("regulations", {
   // Category normalization fields
   originalCategory: text("original_category"), // Preserves the original category from source
   canonicalCategoryId: integer("canonical_category_id"), // FK to canonical_categories
+  // Universal Regulation Key (MCP Engine alignment)
+  regKey: text("reg_key").unique(), // Universal key REG-001 to REG-251, ordered by risk score
+  riskScore: integer("risk_score"), // Institutional risk score 1-100
+  riskLevel: text("risk_level"), // CRITICAL, SEVERE, HIGH, MODERATE, LOW
 });
 
 // Canonical Categories - the 15 master categories

@@ -939,11 +939,18 @@ export function setupMCPIntegrationApi(app: express.Application) {
         });
       }
       
+      // Extract universal reg_key and risk data from payload
+      const regKey = data.regKey; // Universal key like REG-001
+      const riskScore = data.riskScore; // 1-100 score
+      const riskLevel = data.riskLevel; // CRITICAL, SEVERE, HIGH, MODERATE, LOW
+      
       // Use regulationId from payload, or generate one
       const itemId = data.regulationId || data.itemId || 
         `REG-${data.name.replace(/[^a-zA-Z0-9]/g, '-').substring(0, 30).toUpperCase()}-${Date.now()}`;
       
-      console.log(`🔍 Looking for existing regulation with item_id: ${itemId}`);
+      console.log(`🔍 Looking for existing regulation...`);
+      if (regKey) console.log(`   reg_key: ${regKey}`);
+      console.log(`   item_id: ${itemId}`);
       
       // Normalize category (smart mapping to canonical categories)
       const categoryResult = await normalizeCategory(data.category, { 
@@ -955,11 +962,22 @@ export function setupMCPIntegrationApi(app: express.Application) {
         console.log(`🏷️ Auto-mapped category: "${data.category}" → "${categoryResult.canonicalName}" (${(categoryResult.confidence * 100).toFixed(0)}% confidence)`);
       }
       
-      // Check if regulation exists by item_id
-      const existingReg = await db.select()
-        .from(regulations)
-        .where(eq(regulations.itemId, itemId))
-        .limit(1);
+      // Check if regulation exists - try reg_key first, then item_id
+      let existingReg;
+      if (regKey) {
+        existingReg = await db.select()
+          .from(regulations)
+          .where(eq(regulations.regKey, regKey))
+          .limit(1);
+      }
+      
+      // If not found by reg_key, try item_id
+      if (!existingReg || existingReg.length === 0) {
+        existingReg = await db.select()
+          .from(regulations)
+          .where(eq(regulations.itemId, itemId))
+          .limit(1);
+      }
       
       const isUpdate = existingReg.length > 0;
       let regulationId: number;
@@ -1003,6 +1021,10 @@ export function setupMCPIntegrationApi(app: express.Application) {
             versionHash: data.versionHash || null,
             stateCode: data.stateCode || existingReg[0].stateCode,
             sourceUrl: data.sourceUrl || existingReg[0].sourceUrl,
+            // Universal reg_key and risk metadata from MCP Engine
+            regKey: regKey || existingReg[0].regKey,
+            riskScore: riskScore || existingReg[0].riskScore,
+            riskLevel: riskLevel || existingReg[0].riskLevel,
             lastUpdated: new Date(),
             // Keep existing actions if not provided, otherwise use defaults
             actions: existingReg[0].actions || defaultActions,
@@ -1045,6 +1067,10 @@ export function setupMCPIntegrationApi(app: express.Application) {
           versionHash: data.versionHash || null,
           stateCode: data.stateCode || null,
           sourceUrl: data.sourceUrl || null,
+          // Universal reg_key and risk metadata from MCP Engine
+          regKey: regKey || null,
+          riskScore: riskScore || null,
+          riskLevel: riskLevel || null,
           actions: defaultActions,
         }).returning();
         
@@ -1148,10 +1174,13 @@ export function setupMCPIntegrationApi(app: express.Application) {
         message: `Successfully ${isUpdate ? 'updated' : 'created'} regulation "${data.name}" with ${createdTasks.length} compliance tasks`,
         regulation: {
           id: regulationId,
+          regKey: regulationRecord.regKey,
           itemId: regulationRecord.itemId,
           name: regulationRecord.name,
           category: regulationRecord.category,
           jurisdictionSource: regulationRecord.jurisdictionSource,
+          riskScore: regulationRecord.riskScore,
+          riskLevel: regulationRecord.riskLevel,
         },
         tasks: createdTasks,
         taskIdMapping: Object.fromEntries(taskIdMap),
