@@ -1848,7 +1848,7 @@
             if (existingDetail) existingDetail.remove();
             
             // Create detail div for error messages / extra info
-            const createDetailDiv = (text, color) => {
+            const createDetailDiv = (text, color, isLink = false, url = null) => {
                 const detail = document.createElement('div');
                 detail.className = 'substep-detail';
                 detail.style.cssText = `
@@ -1859,10 +1859,19 @@
                     padding: 2px 6px;
                     background: ${color}15;
                     border-radius: 3px;
-                    max-width: 180px;
+                    max-width: 200px;
                     word-wrap: break-word;
                 `;
-                detail.textContent = text;
+                if (isLink && url) {
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.target = '_blank';
+                    link.textContent = text;
+                    link.style.cssText = `color: ${color}; text-decoration: underline; cursor: pointer;`;
+                    detail.appendChild(link);
+                } else {
+                    detail.textContent = text;
+                }
                 substep.appendChild(detail);
             };
             
@@ -1875,6 +1884,20 @@
                 }
                 // Show details if provided (e.g., "15 docs found")
                 if (details) {
+                    createDetailDiv('✓ ' + details, '#22c55e');
+                }
+            } else if (status === 'success') {
+                // Success with optional manual verification link
+                icon.textContent = '✓';
+                icon.style.cssText = 'background: transparent; color: #22c55e; font-size: 14px; font-weight: bold; width: auto; height: auto; display: inline-block;';
+                if (confSpan) {
+                    confSpan.textContent = confidence > 0 ? '(' + confidence + '%)' : '';
+                    confSpan.style.color = '#22c55e';
+                }
+                // If details is a URL, show a clickable link
+                if (details && details.startsWith('http')) {
+                    createDetailDiv('🔗 Manual lookup', '#22c55e', true, details);
+                } else if (details) {
                     createDetailDiv('✓ ' + details, '#22c55e');
                 }
             } else if (status === 'running') {
@@ -2304,13 +2327,17 @@
                     metrics.apiCalls++;
                 }
                 
-                // Justia
+                // Justia (Cloudflare protected - manual verification with link)
                 const justia = lawLib?.justia;
                 if (justia) {
-                    const status = justia.status === 'web_only' ? '🌐' : (justia.status === 'fetched' ? '✅' : '❌');
-                    addConsoleLog(`   ${status} Justia (justia.com) - Legal Information`, justia.status === 'fetched' ? 'success' : 'info');
-                    addConsoleLog(`      └─ Status: ${justia.status} (${justia.status === 'web_only' ? 'No public API' : ''})`, 'debug');
-                    updateSubstep('justia', justia.status === 'web_only' ? 'web_only' : 'pending', 0);
+                    const isAvailable = justia.status === 'available' || justia.status === 'fetched';
+                    const status = isAvailable ? '✅' : (justia.status === 'web_only' ? '🌐' : '❌');
+                    addConsoleLog(`   ${status} Justia (justia.com) - Legal Information`, isAvailable ? 'success' : 'info');
+                    if (justia.url) {
+                        addConsoleLog(`      └─ Manual lookup: ${justia.url}`, 'debug');
+                    }
+                    // Mark as success if available, include link for manual verification
+                    updateSubstep('justia', isAvailable ? 'success' : 'pending', justia.confidence || 0, null, justia.url);
                 }
                 
                 // Academic Sources
