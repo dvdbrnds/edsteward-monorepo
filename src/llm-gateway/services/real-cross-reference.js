@@ -118,32 +118,47 @@ function fetchWithTimeout(url, options = {}, timeout = 15000) {
  * eCFR - Electronic Code of Federal Regulations
  * REAL API: https://www.ecfr.gov/api/versioner/v1
  * Docs: https://www.ecfr.gov/developer/documentation
+ * 
+ * NOTE: eCFR API format updated 2025 - use the current date format
  */
 async function fetchECFR(cfrTitle, cfrPart) {
   console.log(`\n[eCFR] 🏛️ Fetching CFR Title ${cfrTitle} Part ${cfrPart}...`);
   
-  // Try multiple eCFR endpoints - API has changed over time
+  // Get current date for API calls
+  const today = new Date().toISOString().split('T')[0];
+  
+  // Try multiple eCFR endpoints - updated for 2025/2026 API format
   const endpoints = [
-    `https://www.ecfr.gov/api/versioner/v1/full/${cfrTitle}/${cfrPart}.json`,
-    `https://www.ecfr.gov/api/versioner/v1/structure/${cfrTitle}/${cfrPart}.json`,
-    `https://www.ecfr.gov/api/versioner/v1/titles/${cfrTitle}.json`
+    // Structure endpoint (most reliable)
+    `https://www.ecfr.gov/api/versioner/v1/structure/${today}/title-${cfrTitle}.json`,
+    // Full text endpoint
+    `https://www.ecfr.gov/api/versioner/v1/full/${today}/title-${cfrTitle}.xml`,
+    // Ancestors (hierarchy) endpoint
+    `https://www.ecfr.gov/api/versioner/v1/ancestry/${today}/title-${cfrTitle}/part-${cfrPart}.json`,
+    // Search endpoint
+    `https://www.ecfr.gov/api/search/v1/results?query=part+${cfrPart}&per_page=5&cfr_title=${cfrTitle}`
   ];
   
   let result = null;
+  let workingUrl = null;
+  
   for (const url of endpoints) {
+    console.log(`[eCFR]    Trying: ${url.substring(0, 80)}...`);
     result = await fetchWithTimeout(url);
     if (result.success && result.status === 200) {
-      console.log(`[eCFR] ✓ Found working endpoint: ${url}`);
+      console.log(`[eCFR] ✓ Found working endpoint!`);
+      workingUrl = url;
       break;
     }
   }
   
-  // If JSON endpoints fail, try the HTML page as fallback
+  // If JSON endpoints fail, try the HTML page as fallback (always works)
   if (!result?.success || result.status !== 200) {
     const htmlUrl = `https://www.ecfr.gov/current/title-${cfrTitle}/part-${cfrPart}`;
+    console.log(`[eCFR]    Trying HTML fallback: ${htmlUrl}`);
     result = await fetchWithTimeout(htmlUrl);
     if (result.success && result.data?.length > 1000) {
-      console.log(`[eCFR] ✓ HTML page available at ${htmlUrl}`);
+      console.log(`[eCFR] ✓ HTML page available (${Math.round(result.data.length/1024)}KB)`);
       return {
         source: 'eCFR (ecfr.gov)',
         type: 'government',
@@ -157,28 +172,31 @@ async function fetchECFR(cfrTitle, cfrPart) {
           title: cfrTitle,
           part: cfrPart,
           hasContent: true,
-          format: 'html'
+          format: 'html',
+          contentLength: result.data.length
         },
         error: null
       };
     }
   }
   
+  const isSuccess = result?.success && result.status === 200;
+  
   return {
     source: 'eCFR (ecfr.gov)',
     type: 'government',
-    status: result?.success && result.status === 200 ? 'fetched' : 'unavailable',
-    confidence: result?.success && result.status === 200 ? calculateConfidence(result) : 0,
-    url: result?.url || endpoints[0],
+    status: isSuccess ? 'fetched' : 'unavailable',
+    confidence: isSuccess ? calculateConfidence(result) : 0,
+    url: workingUrl || endpoints[0],
     duration: `${result?.duration || 0}ms`,
     timestamp: new Date().toISOString(),
     isReal: true,
-    data: result?.success ? {
+    data: isSuccess ? {
       title: cfrTitle,
       part: cfrPart,
       hasContent: result.data && (typeof result.data === 'object' ? Object.keys(result.data).length > 0 : result.data.length > 100)
     } : null,
-    error: result?.error || `eCFR API unavailable for Title ${cfrTitle} Part ${cfrPart}`
+    error: isSuccess ? null : `eCFR API unavailable for Title ${cfrTitle} Part ${cfrPart} - ${result?.error || 'unknown error'}`
   };
 }
 
