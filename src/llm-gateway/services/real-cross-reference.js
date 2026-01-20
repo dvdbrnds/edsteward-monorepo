@@ -729,41 +729,8 @@ async function fetchUSAspending(searchTerm) {
   };
 }
 
-/**
- * Justia (Free Case Law)
- * NOTE: No public API - Cloudflare protected, blocks programmatic requests
- * Still valuable to show as available with direct link for manual verification
- */
-async function fetchJustia(searchTerm) {
-  console.log(`\n[Justia] ⚖️ Justia Legal Resources...`);
-  console.log(`   ℹ️ Web-only access (Cloudflare protected)`);
-  
-  const startTime = Date.now();
-  const searchUrl = `https://www.justia.com/search?q=${encodeURIComponent(searchTerm)}`;
-  
-  // Justia is a legitimate, well-known legal resource
-  // Mark as "available" since the service exists and is free to use
-  // Users can click the link to verify manually
-  return {
-    source: 'Justia (Free Legal Information)',
-    type: 'law_library',
-    institution: 'Justia',
-    status: 'available',  // Changed from web_only to available
-    confidence: 70,       // Give partial confidence since service is known-good
-    url: searchUrl,
-    duration: `${Date.now() - startTime}ms`,
-    timestamp: new Date().toISOString(),
-    isReal: true,
-    data: {
-      coverage: 'US Code, CFR, State Laws, Case Law',
-      searchUrl: searchUrl,
-      freeAccess: true,
-      accessMethod: 'manual_verification',
-      note: 'Click link to verify in browser'
-    },
-    error: null  // Not an error, just requires manual verification
-  };
-}
+// Justia REMOVED - No public API, Cloudflare protected, provides no value to automated validation
+// If Justia ever provides a public API, it can be re-added here
 
 // ============================================================================
 // ACADEMIC API INTEGRATIONS - ALL REAL, FREE
@@ -1148,7 +1115,6 @@ export async function performRealCrossReference(regulationSlug) {
     // Law Library APIs
     courtListenerResult,
     recapResult,
-    justiaResult,
     // Additional Government APIs
     regulationsGovResult,
     usaSpendingResult
@@ -1166,7 +1132,6 @@ export async function performRealCrossReference(regulationSlug) {
     // Law Library APIs
     fetchCourtListener(citation.searchTerms[0]),
     fetchRECAP(citation.searchTerms[0]),
-    fetchJustia(citation.searchTerms[0]),
     // Additional Government APIs
     fetchRegulationsGov(citation.searchTerms[0]),
     fetchUSAspending(citation.searchTerms[0])
@@ -1177,7 +1142,7 @@ export async function performRealCrossReference(regulationSlug) {
   // Organize results by category
   const governmentSources = [ecfrResult, federalRegResult, congressResult, govInfoResult, locResult, regulationsGovResult, usaSpendingResult];
   const academicSources = [cornellResult, coreResult, openAlexResult, semanticScholarResult];
-  const lawLibrarySources = [courtListenerResult, recapResult, justiaResult];
+  const lawLibrarySources = [courtListenerResult, recapResult];
   const legalResearchSources = [lexisNexisResult];
   
   const allSources = [...governmentSources, ...academicSources, ...lawLibrarySources, ...legalResearchSources];
@@ -1274,11 +1239,10 @@ export async function performRealCrossReference(regulationSlug) {
         sourcesChecked: lawLibrarySources.length,
         sourcesFetched: lawLibrarySuccess.length,
         averageConfidence: lawLibraryConfidence,
-        note: 'Real law library APIs - CourtListener, RECAP, Justia'
+        note: 'Real law library APIs - CourtListener, RECAP'
       },
       courtListener: courtListenerResult,
-      recap: recapResult,
-      justia: justiaResult
+      recap: recapResult
     },
     
     // Legal research sources (pending credentials)
