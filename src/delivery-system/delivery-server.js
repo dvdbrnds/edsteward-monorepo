@@ -185,9 +185,41 @@ class DeliveryServer {
         return res.status(400).json({ error: 'No valid customers specified' });
       }
 
-      // Fetch regulation content
+      // Fetch regulation content from Registry API (full data)
       let regulationContent = {};
-      if (this.deliveryEngine) {
+      try {
+        // First try to get all regulations and find by ID
+        const registryResponse = await fetch('http://localhost:3010/api/regulations');
+        if (registryResponse.ok) {
+          const regulations = await registryResponse.json();
+          if (regulations && regulations.length > 0) {
+            // Find by exact regulationId/item_id match
+            regulationContent = regulations.find(r => 
+              r.regulationId === regulationId || 
+              r.item_id === regulationId ||
+              r.regulationId?.startsWith(regulationId) ||
+              regulationId?.startsWith(r.regulationId)
+            );
+            
+            // If not found by ID, try searching by name
+            if (!regulationContent) {
+              const searchTerm = regulationId.replace(/-/g, ' ').substring(0, 30);
+              regulationContent = regulations.find(r => 
+                r.name?.toLowerCase().includes(searchTerm.toLowerCase())
+              );
+            }
+            
+            if (regulationContent) {
+              console.log(`✅ Fetched regulation from Registry: ${regulationContent.name}`);
+            }
+          }
+        }
+      } catch (error) {
+        console.error(`Failed to fetch from Registry API: ${error.message}`);
+      }
+      
+      // Fallback to CDC if Registry didn't return data
+      if (!regulationContent.name && this.deliveryEngine) {
         try {
           regulationContent = await this.deliveryEngine.cdc.fetchRegulationState(regulationId);
         } catch (error) {
@@ -201,18 +233,60 @@ class DeliveryServer {
         try {
           console.log(`📤 Pushing ${regulationId} to ${customer.name}...`);
           
+          // Use regKey as the universal identifier (REG-001 to REG-251)
+          const regKey = regulationContent.regKey || regulationContent.reg_key;
+          const itemId = regulationContent.regulationId || regulationContent.item_id || regulationId;
+          console.log(`   📋 Using regKey: ${regKey || 'N/A'}, itemId: ${itemId}`);
+
+          // Build EdSteward /api/regulation-updates payload (PENDING UPDATE format)
+          // This creates a pending update for CCO review, NOT a direct sync
+          const deadlinesJson = Array.isArray(regulationContent.filingDeadlines)
+            ? JSON.stringify(regulationContent.filingDeadlines.map(d => ({
+                deadline: d.dueDate || d.date || null,
+                description: d.name || d.description || d.type || 'Filing deadline'
+              })))
+            : '[]';
+
+          // Build requirements text from tasks or keyProvisions
+          let requirementsText = '';
+          if (Array.isArray(regulationContent.complianceTasks) && regulationContent.complianceTasks.length > 0) {
+            requirementsText = regulationContent.complianceTasks.map(t => `• ${t.title}: ${t.description || ''}`).join('\n');
+          } else if (Array.isArray(regulationContent.keyProvisions)) {
+            requirementsText = regulationContent.keyProvisions.map(p => `• ${p.title}: ${p.description || ''}`).join('\n');
+          } else if (typeof regulationContent.requirements === 'string') {
+            requirementsText = regulationContent.requirements;
+          }
+
+          // Build content text (ensure it's a string, not array)
+          let contentText = '';
+          if (typeof regulationContent.description === 'string') {
+            contentText = regulationContent.description;
+          } else if (typeof regulationContent.fullText === 'string') {
+            contentText = regulationContent.fullText;
+          } else if (typeof regulationContent.content === 'string') {
+            contentText = regulationContent.content;
+          } else if (Array.isArray(regulationContent.regulations)) {
+            contentText = regulationContent.regulations.join('\n\n');
+          } else if (typeof regulationContent.regulations === 'string') {
+            contentText = regulationContent.regulations;
+          }
+
+          // Build statutes string
+          const statutesText = Array.isArray(regulationContent.statutes) 
+            ? regulationContent.statutes.join('; ')
+            : (regulationContent.statute || '');
+
           const payload = {
-            regulationId: customer.type === 'development' ? regulationId : (this.edstewardIntegration?.getEdStewardId(regulationId) || regulationId),
-            name: regulationContent.name || regulationId,
-            originalContent: regulationContent.content || '',
-            updatedContent: regulationContent.fullText || regulationContent.content || '',
-            summary: regulationContent.summary || 'Regulation update from MCP Engine',
-            requirements: regulationContent.requirements || '',
-            metadata: {
-              source: 'MCP Engine v5.3.0',
-              pushedAt: new Date().toISOString(),
-              changeType: 'MANUAL_PUSH'
-            }
+            regKey: regKey,  // Universal key field (REG-001 to REG-251)
+            itemId: itemId,  // EdSteward looks up regulation by itemId
+            regulationId: regulationContent.id || 0,  // Fallback, EdSteward will use regKey/itemId for lookup
+            name: `${regulationContent.name || regulationId} - MCP Engine Update`,
+            originalContent: `[Previous version of ${regulationContent.name || regulationId}]\n\nStatute: ${statutesText}\n\n${contentText.substring(0, 500)}...`,
+            updatedContent: `${contentText}\n\n---\nStatute: ${statutesText}\nCategory: ${regulationContent.category || 'N/A'}\nJurisdiction: ${regulationContent.jurisdictionSource || 'federal'}`,
+            status: 'pending',  // Creates pending update for CCO review
+            summary: `MCP Engine update for ${regulationContent.name || regulationId}. ${(regulationContent.description || '').substring(0, 200)}`,
+            requirements: requirementsText || 'See regulation text for compliance requirements.',
+            filingDeadlines: deadlinesJson
           };
 
           const headers = { 'Content-Type': 'application/json' };
@@ -393,6 +467,100 @@ class DeliveryServer {
           subscription_confirmed: 'Subscription successful'
         }
       });
+    });
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // CONNECTED CLIENTS MANAGEMENT
+    // ═══════════════════════════════════════════════════════════════════════════
+
+    // List all connected WebSocket clients
+    this.app.get('/api/clients', (req, res) => {
+      if (!this.deliveryEngine || !this.deliveryEngine.pushService) {
+        return res.status(503).json({ 
+          error: 'Delivery engine not ready',
+          clients: [],
+          timestamp: new Date().toISOString()
+        });
+      }
+
+      const clients = this.deliveryEngine.pushService.getConnectedClients();
+      const stats = this.deliveryEngine.pushService.getConnectionStats();
+
+      res.json({
+        clients,
+        totalConnected: clients.length,
+        subscriptionStats: stats.subscriptions,
+        timestamp: new Date().toISOString()
+      });
+    });
+
+    // Push update to specific WebSocket client(s)
+    this.app.post('/api/clients/push', async (req, res) => {
+      const { clientIds, regulationId, message, pushToAll = false } = req.body;
+
+      if (!this.deliveryEngine || !this.deliveryEngine.pushService) {
+        return res.status(503).json({ error: 'Delivery engine not ready' });
+      }
+
+      if (!regulationId) {
+        return res.status(400).json({ error: 'regulationId is required' });
+      }
+
+      // Build notification payload
+      let regulationContent = {};
+      try {
+        regulationContent = await this.deliveryEngine.cdc.fetchRegulationState(regulationId);
+      } catch (error) {
+        console.error(`Failed to fetch regulation state: ${error.message}`);
+      }
+
+      const notification = {
+        type: 'regulation_updated',
+        regulationId,
+        timestamp: new Date().toISOString(),
+        message: message || 'Manual update from MCP Engine console',
+        data: {
+          name: regulationContent.name || regulationId,
+          summary: regulationContent.summary || '',
+          changeType: 'TARGETED_PUSH',
+          version: regulationContent.version || 'unknown'
+        }
+      };
+
+      try {
+        let results;
+        if (pushToAll) {
+          // Push to all subscribed clients
+          await this.deliveryEngine.pushService.pushRegulationUpdate(regulationId, notification.data);
+          const connectedClients = this.deliveryEngine.pushService.getConnectedClients();
+          results = {
+            success: connectedClients.map(c => c.id),
+            failed: []
+          };
+        } else if (clientIds && clientIds.length > 0) {
+          // Push to specific clients
+          results = await this.deliveryEngine.pushService.pushToSpecificClients(clientIds, notification);
+        } else {
+          return res.status(400).json({ error: 'Either clientIds array or pushToAll=true is required' });
+        }
+
+        res.json({
+          success: true,
+          regulationId,
+          notification,
+          delivered: results.success.length,
+          failed: results.failed.length,
+          results,
+          timestamp: new Date().toISOString()
+        });
+      } catch (error) {
+        res.status(500).json({
+          success: false,
+          error: error.message,
+          regulationId,
+          timestamp: new Date().toISOString()
+        });
+      }
     });
 
     // EdSteward integration endpoints

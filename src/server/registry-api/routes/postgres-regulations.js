@@ -127,6 +127,7 @@ router.get('/api/regulations', async (req, res) => {
     
     // Transform to API format for backward compatibility
     const transformed = regulations.map(r => ({
+      regKey: r.reg_key,  // Universal key field (REG-001 to REG-251)
       regulationId: r.item_id,
       id: r.id,
       name: r.name,
@@ -294,6 +295,7 @@ router.get('/api/regulations/search', async (req, res) => {
     const results = await RegulationRepository.search(q, parseInt(limit));
     
     const transformed = results.map(r => ({
+      regKey: r.reg_key,  // Universal key field
       id: r.id,
       regulationId: r.item_id,
       name: r.name,
@@ -334,6 +336,7 @@ router.get('/api/regulations/all', async (req, res) => {
     const regulations = await RegulationRepository.findAll();
     
     const transformed = regulations.map(r => ({
+      regKey: r.reg_key,  // Universal key field
       id: r.id,
       regulationId: r.item_id,
       name: r.name,
@@ -373,6 +376,7 @@ router.get('/api/regulations/:id', async (req, res) => {
     
     // Transform to API format
     res.json({
+      regKey: regulation.reg_key,  // Universal key field (REG-001 to REG-251)
       regulationId: regulation.item_id,
       id: regulation.id,
       name: regulation.name,
@@ -444,6 +448,7 @@ router.get('/api/regulations/:id/audit', async (req, res) => {
     const auditLog = await RegulationRepository.getAuditLog(regulation.id);
     
     res.json({
+      regKey: regulation.reg_key,  // Universal key field
       regulationId: regulation.item_id,
       name: regulation.name,
       auditLog: auditLog,

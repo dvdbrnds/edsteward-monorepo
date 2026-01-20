@@ -907,6 +907,45 @@ class RegulationPushService extends Emittery {
   }
 
   /**
+   * Get detailed info about all connected clients
+   */
+  getConnectedClients() {
+    const clients = [];
+    for (const [clientId, client] of this.clients) {
+      clients.push({
+        id: clientId,
+        connectedAt: client.connectedAt,
+        lastActivity: client.lastActivity || client.connectedAt,
+        subscriptions: Array.from(client.subscriptions || []),
+        isConnected: client.ws.readyState === 1 // WebSocket.OPEN
+      });
+    }
+    return clients;
+  }
+
+  /**
+   * Push update to specific client(s) by ID
+   */
+  async pushToSpecificClients(clientIds, notification) {
+    const results = {
+      success: [],
+      failed: []
+    };
+
+    for (const clientId of clientIds) {
+      try {
+        await this.sendToClient(clientId, notification);
+        results.success.push(clientId);
+      } catch (error) {
+        results.failed.push({ clientId, error: error.message });
+      }
+    }
+
+    console.log(`📨 Targeted push: ${results.success.length} success, ${results.failed.length} failed`);
+    return results;
+  }
+
+  /**
    * Add client subscription for regulation updates
    */
   addSubscription(regulationId, clientId) {

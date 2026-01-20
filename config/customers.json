@@ -9,8 +9,8 @@
       "type": "development",
       "auth": {
         "method": "basic",
-        "username": "dvdbrnds",
-        "password": "gabadh"
+        "username": "mcp-engine",
+        "password": "mcp-engine-secret"
       },
       "enabled": true,
       "subscriptions": ["all"]
@@ -24,8 +24,8 @@
       "type": "production",
       "auth": {
         "method": "basic",
-        "username": "dvdbrnds",
-        "password": "gabadh"
+        "username": "mcp-engine",
+        "password": "mcp-engine-secret"
       },
       "enabled": true,
       "subscriptions": ["all"]

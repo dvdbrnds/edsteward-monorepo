@@ -250,6 +250,95 @@
             margin: 0 4px;
         }
         
+        /* Delivery Controls */
+        .delivery-controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-right: 8px;
+        }
+        
+        .delivery-select {
+            padding: 6px 28px 6px 10px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            background: white;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 500;
+            color: #334155;
+            cursor: pointer;
+            min-width: 160px;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23475569' d='M3 4.5L6 7.5L9 4.5'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 8px center;
+        }
+        
+        .delivery-select:hover {
+            border-color: #cbd5e1;
+        }
+        
+        .delivery-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+        }
+        
+        .delivery-select optgroup {
+            font-weight: 600;
+            color: #64748b;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .delivery-select option {
+            font-weight: 400;
+            color: #334155;
+            padding: 6px;
+        }
+        
+        .delivery-select option.customer-option {
+            color: #0369a1;
+        }
+        
+        .delivery-select option.client-option {
+            color: #7c3aed;
+        }
+        
+        .delivery-select option.offline {
+            color: #94a3b8;
+        }
+        
+        .btn-icon-sm {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.15s ease;
+        }
+        
+        .btn-icon-sm:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+        
+        .btn-icon-sm.loading {
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
         .status-chip {
             display: inline-flex;
             align-items: center;
@@ -1200,7 +1289,24 @@
                         🤖
                     </button>
                     <div class="toolbar-divider"></div>
-                    <button id="pushUpdateButton" class="btn-icon" onclick="pushRegulationUpdate()" title="Push to Clients">
+                    
+                    <!-- Client/Customer Selector -->
+                    <div class="delivery-controls">
+                        <select id="deliveryTarget" class="delivery-select" onchange="updateDeliveryTarget()">
+                            <option value="all-clients">📡 All Clients</option>
+                            <optgroup label="─── Customers ───" id="customerOptions">
+                                <!-- Loaded dynamically -->
+                            </optgroup>
+                            <optgroup label="─── WebSocket Clients ───" id="clientOptions">
+                                <!-- Loaded dynamically -->
+                            </optgroup>
+                        </select>
+                        <button id="refreshTargets" class="btn-icon-sm" onclick="refreshDeliveryTargets()" title="Refresh Targets">
+                            🔄
+                        </button>
+                    </div>
+                    
+                    <button id="pushUpdateButton" class="btn-icon" onclick="pushToSelectedTarget()" title="Push to Selected Target">
                         📤
                     </button>
                     <button id="sendToEdstewardBtn" class="btn-icon" onclick="sendToEdSteward()" title="Send to EdSteward">
@@ -2419,6 +2525,210 @@
             addConsoleLog(`🤖 Auto-workflow ${autoWorkflowEnabled ? 'enabled' : 'disabled'}`, 'info');
         }
 
+        // ════════════════════════════════════════════════════════════════════════
+        // TARGETED DELIVERY SYSTEM
+        // ════════════════════════════════════════════════════════════════════════
+        
+        let deliveryTargets = {
+            customers: [],
+            clients: []
+        };
+
+        // Load customers and connected WebSocket clients
+        async function refreshDeliveryTargets() {
+            const refreshBtn = document.getElementById('refreshTargets');
+            if (refreshBtn) {
+                refreshBtn.classList.add('loading');
+            }
+            
+            addConsoleLog('🔄 Refreshing delivery targets...', 'debug');
+            
+            try {
+                // Fetch customers
+                const customersResponse = await fetch('http://localhost:3051/api/customers');
+                if (customersResponse.ok) {
+                    const customersData = await customersResponse.json();
+                    deliveryTargets.customers = customersData.customers || [];
+                }
+
+                // Fetch connected WebSocket clients
+                const clientsResponse = await fetch('http://localhost:3051/api/clients');
+                if (clientsResponse.ok) {
+                    const clientsData = await clientsResponse.json();
+                    deliveryTargets.clients = clientsData.clients || [];
+                }
+
+                updateDeliveryDropdown();
+                addConsoleLog(`✅ Found ${deliveryTargets.customers.length} customers, ${deliveryTargets.clients.length} connected clients`, 'success');
+            } catch (error) {
+                addConsoleLog(`❌ Failed to refresh targets: ${error.message}`, 'error');
+            } finally {
+                if (refreshBtn) {
+                    refreshBtn.classList.remove('loading');
+                }
+            }
+        }
+
+        function updateDeliveryDropdown() {
+            const customerOptions = document.getElementById('customerOptions');
+            const clientOptions = document.getElementById('clientOptions');
+            
+            if (customerOptions) {
+                customerOptions.innerHTML = '';
+                deliveryTargets.customers.forEach(customer => {
+                    const option = document.createElement('option');
+                    option.value = `customer:${customer.id}`;
+                    option.textContent = `🏛️ ${customer.shortName || customer.name}`;
+                    option.className = customer.enabled ? 'customer-option' : 'customer-option offline';
+                    if (!customer.enabled) {
+                        option.textContent += ' (disabled)';
+                    }
+                    customerOptions.appendChild(option);
+                });
+            }
+            
+            if (clientOptions) {
+                clientOptions.innerHTML = '';
+                if (deliveryTargets.clients.length === 0) {
+                    const option = document.createElement('option');
+                    option.value = '';
+                    option.textContent = '(No clients connected)';
+                    option.disabled = true;
+                    clientOptions.appendChild(option);
+                } else {
+                    deliveryTargets.clients.forEach(client => {
+                        const option = document.createElement('option');
+                        option.value = `client:${client.id}`;
+                        const subs = client.subscriptions.slice(0, 2).join(', ');
+                        const truncatedSubs = subs.length > 20 ? subs.substring(0, 20) + '...' : subs;
+                        option.textContent = `🔌 ${client.id} (${truncatedSubs || 'no subs'})`;
+                        option.className = client.isConnected ? 'client-option' : 'client-option offline';
+                        clientOptions.appendChild(option);
+                    });
+                }
+            }
+        }
+
+        function updateDeliveryTarget() {
+            const select = document.getElementById('deliveryTarget');
+            if (!select) return;
+            
+            const value = select.value;
+            if (value.startsWith('customer:')) {
+                const customerId = value.replace('customer:', '');
+                const customer = deliveryTargets.customers.find(c => c.id === customerId);
+                if (customer) {
+                    addConsoleLog(`📍 Target set to customer: ${customer.name}`, 'info');
+                }
+            } else if (value.startsWith('client:')) {
+                const clientId = value.replace('client:', '');
+                addConsoleLog(`📍 Target set to WebSocket client: ${clientId}`, 'info');
+            } else {
+                addConsoleLog('📍 Target set to: All Clients', 'info');
+            }
+        }
+
+        // Push to selected target (customer or WebSocket client)
+        async function pushToSelectedTarget() {
+            const button = document.getElementById('pushUpdateButton');
+            const select = document.getElementById('deliveryTarget');
+            if (!button || !select) return;
+            
+            const originalContent = button.innerHTML;
+            button.innerHTML = '⏳';
+            button.disabled = true;
+            button.style.opacity = '0.6';
+            
+            const targetValue = select.value;
+            const regulationId = 'jeanne-clery-disclosure-of-campus-security-policy-and-campus-crime-statistics-act-clery-act-and-violence-against-women-act-vawa';
+            
+            try {
+                if (targetValue === 'all-clients') {
+                    // Push to all WebSocket clients
+                    addConsoleLog('📤 Pushing to ALL connected clients...', 'info');
+                    
+                    const response = await fetch('http://localhost:3051/api/clients/push', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            regulationId,
+                            pushToAll: true,
+                            message: 'Manual broadcast from console'
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    if (response.ok && result.success) {
+                        addConsoleLog(`✅ Broadcast sent to ${result.delivered} clients`, 'success');
+                    } else {
+                        addConsoleLog(`❌ Broadcast failed: ${result.error || 'Unknown error'}`, 'error');
+                    }
+                    
+                } else if (targetValue.startsWith('customer:')) {
+                    // Push to specific customer
+                    const customerId = targetValue.replace('customer:', '');
+                    const customer = deliveryTargets.customers.find(c => c.id === customerId);
+                    
+                    addConsoleLog(`📤 Pushing to customer: ${customer?.name || customerId}...`, 'info');
+                    
+                    const response = await fetch('http://localhost:3051/api/customers/push', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            regulationId,
+                            customerIds: [customerId]
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    if (response.ok && result.success) {
+                        addConsoleLog(`✅ Successfully pushed to ${customer?.name || customerId}`, 'success');
+                        if (result.results && result.results[0]) {
+                            addConsoleLog(`📋 Response: ${result.results[0].statusCode} - ${JSON.stringify(result.results[0].response).substring(0, 100)}`, 'info');
+                        }
+                    } else {
+                        addConsoleLog(`❌ Push failed: ${result.error || result.results?.[0]?.error || 'Unknown error'}`, 'error');
+                    }
+                    
+                } else if (targetValue.startsWith('client:')) {
+                    // Push to specific WebSocket client
+                    const clientId = targetValue.replace('client:', '');
+                    
+                    addConsoleLog(`📤 Pushing to WebSocket client: ${clientId}...`, 'info');
+                    
+                    const response = await fetch('http://localhost:3051/api/clients/push', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            regulationId,
+                            clientIds: [clientId],
+                            message: 'Targeted update from console'
+                        })
+                    });
+                    
+                    const result = await response.json();
+                    if (response.ok && result.success) {
+                        addConsoleLog(`✅ Update sent to client ${clientId}`, 'success');
+                    } else {
+                        addConsoleLog(`❌ Push failed: ${result.error || 'Unknown error'}`, 'error');
+                    }
+                }
+            } catch (error) {
+                addConsoleLog(`❌ Error: ${error.message}`, 'error');
+                console.error('Push error:', error);
+            } finally {
+                button.innerHTML = originalContent;
+                button.disabled = false;
+                button.style.opacity = '1';
+            }
+        }
+
+        // Initialize delivery targets on page load
+        setTimeout(() => {
+            refreshDeliveryTargets();
+        }, 1000);
+
+        // Legacy function - kept for backward compatibility
         async function pushRegulationUpdate() {
             const button = document.getElementById('pushUpdateButton');
             if (!button) return;
