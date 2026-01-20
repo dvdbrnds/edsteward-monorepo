@@ -18,6 +18,10 @@
  *   - LexisNexis (credentials pending)
  */
 
+// Ensure environment variables are loaded
+import dotenv from 'dotenv';
+dotenv.config();
+
 import https from 'https';
 import http from 'http';
 
@@ -290,37 +294,57 @@ async function fetchCongressGov(searchTerm) {
 /**
  * GovInfo API (Government Publishing Office)
  * REAL API: https://api.govinfo.gov/docs/
- * Note: Some endpoints require API key from https://api.data.gov/
+ * Requires API key from https://api.data.gov/
  */
 async function fetchGovInfo(searchTerm) {
   console.log(`\n[GovInfo] 📚 Searching GovInfo for "${searchTerm}"...`);
   
-  // GovInfo collections endpoint (doesn't require API key)
-  const collectionsUrl = `${APIS.govinfo}/collections`;
-  let result = await fetchWithTimeout(collectionsUrl);
+  const apiKey = process.env.GOVINFO_API_KEY;
   
-  // If we can reach the API, try to search
-  if (result.success) {
-    // Try the published documents endpoint
-    const encodedTerm = encodeURIComponent(searchTerm);
-    const searchUrl = `${APIS.govinfo}/published?collection=FR&docClass=RULE&pageSize=5`;
-    const searchResult = await fetchWithTimeout(searchUrl);
-    if (searchResult.success) {
-      result = searchResult;
-    }
+  if (!apiKey) {
+    console.log(`[GovInfo] ⚠ No API key set - register at api.data.gov`);
+    return {
+      source: 'GovInfo (govinfo.gov)',
+      type: 'government',
+      status: 'requires_api_key',
+      confidence: 0,
+      url: 'https://api.govinfo.gov/',
+      duration: '0ms',
+      timestamp: new Date().toISOString(),
+      isReal: true,
+      data: null,
+      error: 'Requires API key - register at api.data.gov',
+      signupUrl: 'https://api.data.gov/signup/'
+    };
   }
+  
+  // GovInfo search endpoint with API key
+  const encodedTerm = encodeURIComponent(searchTerm);
+  const searchUrl = `${APIS.govinfo}/search?query=${encodedTerm}&pageSize=10&api_key=${apiKey}`;
+  
+  console.log(`[GovInfo]    Trying: ${searchUrl.replace(apiKey, '[KEY]')}`);
+  let result = await fetchWithTimeout(searchUrl);
+  
+  // If search fails, try the collections endpoint as fallback
+  if (!result.success || result.status !== 200) {
+    const collectionsUrl = `${APIS.govinfo}/collections?api_key=${apiKey}`;
+    console.log(`[GovInfo]    Fallback: ${collectionsUrl.replace(apiKey, '[KEY]')}`);
+    result = await fetchWithTimeout(collectionsUrl);
+  }
+  
+  const isSuccess = result.success && result.status === 200;
   
   return {
     source: 'GovInfo (govinfo.gov)',
     type: 'government',
-    status: result.success && result.status === 200 ? 'fetched' : 'unavailable',
-    confidence: result.success && result.status === 200 ? 85 : 0,
-    url: result.url,
+    status: isSuccess ? 'fetched' : 'unavailable',
+    confidence: isSuccess ? 85 : 0,
+    url: result.url?.replace(apiKey, '[API_KEY]') || 'https://api.govinfo.gov/',
     duration: `${result.duration}ms`,
     timestamp: new Date().toISOString(),
     isReal: true,
-    data: result.success ? result.data : null,
-    error: result.error || (result.status !== 200 ? `HTTP ${result.status}` : null)
+    data: isSuccess ? result.data : null,
+    error: isSuccess ? null : (result.error || `HTTP ${result.status}`)
   };
 }
 
