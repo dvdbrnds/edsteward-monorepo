@@ -3,6 +3,10 @@
  * Production-ready gateway with advanced caching, security, monitoring, and regulation management
  */
 
+// Load environment variables FIRST
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
 import fs from 'fs';
