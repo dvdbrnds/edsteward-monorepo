@@ -8,6 +8,7 @@
 import express from 'express';
 import RegulationRepository from '../../../repositories/regulationRepository.js';
 import { healthCheck, getStats, pool } from '../../../services/database.js';
+import { validateSourceData } from '../../../services/source-data-validator.js';
 
 const router = express.Router();
 
@@ -646,6 +647,51 @@ router.post('/api/regulations/workflow-update', async (req, res) => {
       console.log(`[REGISTRY] 🔒 DATA PROTECTION ACTIVE for ${item_id}`);
       console.log(`[REGISTRY]    - Locked fields: ${Array.from(lockedFields).join(', ')}`);
       console.log(`[REGISTRY]    - Reason: ${existing?.locked_reason || 'Manual curation'}`);
+    }
+    
+    // ═══════════════════════════════════════════════════════════════════════════
+    // SOURCE DATA VALIDATION: The Moat
+    // Verify that fetched data actually matches the regulation we're updating
+    // ═══════════════════════════════════════════════════════════════════════════
+    const validationResult = validateSourceData(item_id, {
+      fullText: regulation_text,
+      regulation_text,
+      content: regulation_text,
+      name: name,
+      title: name
+    }, existing);
+    
+    console.log(`[REGISTRY] 🛡️ SOURCE VALIDATION: ${validationResult.recommendation} (${validationResult.confidence}% confidence)`);
+    
+    if (validationResult.recommendation === 'REJECT') {
+      console.log(`[REGISTRY] ❌ SOURCE DATA REJECTED - Wrong data detected!`);
+      validationResult.errors.forEach(e => console.log(`   ❌ ${e.message}`));
+      
+      // Log to audit trail
+      await pool.query(`
+        INSERT INTO audit_log (regulation_id, action, performed_by, details, timestamp)
+        VALUES ($1, 'WORKFLOW_REJECTED', 'source-validator', $2, NOW())
+      `, [
+        existing?.id || item_id,
+        JSON.stringify({
+          reason: 'Source data validation failed',
+          confidence: validationResult.confidence,
+          errors: validationResult.errors,
+          warnings: validationResult.warnings
+        })
+      ]);
+      
+      return res.status(400).json({
+        error: 'Source data validation failed',
+        validation: validationResult,
+        message: 'The fetched data appears to be for a different regulation. Update rejected.'
+      });
+    }
+    
+    if (validationResult.recommendation === 'REVIEW') {
+      console.log(`[REGISTRY] ⚠️ SOURCE DATA NEEDS REVIEW - Low confidence`);
+      validationResult.warnings.forEach(w => console.log(`   ⚠️ ${w.message}`));
+      // Allow update but log warning
     }
     
     // Clean summary - strip JSON code fences if present
