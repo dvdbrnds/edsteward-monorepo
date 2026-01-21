@@ -635,6 +635,19 @@ router.post('/api/regulations/workflow-update', async (req, res) => {
     // Check if regulation exists
     const existing = await RegulationRepository.findById(item_id);
     
+    // ═══════════════════════════════════════════════════════════════════════════
+    // DATA PROTECTION: Check if regulation has manually-curated locked fields
+    // This prevents workflow from overwriting carefully edited content
+    // ═══════════════════════════════════════════════════════════════════════════
+    const lockedFields = new Set(existing?.locked_fields || []);
+    const isDataLocked = existing?.data_locked === true;
+    
+    if (isDataLocked && lockedFields.size > 0) {
+      console.log(`[REGISTRY] 🔒 DATA PROTECTION ACTIVE for ${item_id}`);
+      console.log(`[REGISTRY]    - Locked fields: ${Array.from(lockedFields).join(', ')}`);
+      console.log(`[REGISTRY]    - Reason: ${existing?.locked_reason || 'Manual curation'}`);
+    }
+    
     // Clean summary - strip JSON code fences if present
     let cleanSummary = summary;
     if (cleanSummary && typeof cleanSummary === 'string') {
@@ -679,19 +692,35 @@ router.post('/api/regulations/workflow-update', async (req, res) => {
     console.log(`[REGISTRY]    - Requirements length: ${requirementsText?.length || 0} chars`);
     
     // Build COMPREHENSIVE update payload - SAVE EVERYTHING!
+    // BUT respect locked fields that have been manually curated
     const updatePayload = {
       item_id: item_id,
       name: name || existing?.name,
       statute: statute || existing?.statute,
-      summary: cleanSummary,
-      requirements: requirementsText,  // NEW: Populated from keyRequirements
-      regulation_text: regulation_text,
+      // Respect lock on summary
+      summary: (isDataLocked && lockedFields.has('summary')) 
+        ? existing?.summary 
+        : cleanSummary,
+      // Respect lock on requirements
+      requirements: (isDataLocked && lockedFields.has('requirements')) 
+        ? existing?.requirements 
+        : requirementsText,
+      // Respect lock on regulation_text - THE MOST IMPORTANT ONE
+      regulation_text: (isDataLocked && lockedFields.has('regulation_text')) 
+        ? existing?.regulation_text 
+        : regulation_text,
       content_hash: content_hash,
       lovv_level: lovv_level || existing?.lovv_level || 'D',
       source_validation: JSON.stringify(source_validation || {}),
       last_workflow_run: last_workflow_run || new Date().toISOString(),
       workflow_id: workflow_id
     };
+    
+    // Log what fields were protected
+    if (isDataLocked) {
+      const protectedCount = ['summary', 'requirements', 'regulation_text'].filter(f => lockedFields.has(f)).length;
+      console.log(`[REGISTRY] 🛡️  Protected ${protectedCount} locked fields from overwrite`);
+    }
     
     // Upsert the regulation
     const result = await RegulationRepository.upsert(updatePayload, 'workflow-engine');
