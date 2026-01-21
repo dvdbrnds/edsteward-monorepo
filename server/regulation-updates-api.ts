@@ -83,11 +83,14 @@ const deferUpdateSchema = z.object({
  * Now accepts regKey (REG-001), regulationId (number), or itemId (string) for flexibility
  */
 const mcpEngineUpdateSchema = z.object({
-  // Universal regulation key (REG-001 to REG-251) - PREFERRED
+  // PRIMARY IDENTIFIER: Universal regulation key (REG-001 to REG-251)
+  // MCP Engine should use this as the main identifier for all updates
   regKey: z.string().optional(),
-  // Accept numeric ID or string itemId
-  regulationId: z.union([z.number(), z.string()]).optional(),
-  itemId: z.string().optional(),
+  
+  // FALLBACK IDENTIFIERS (used if regKey not provided)
+  itemId: z.string().optional(),           // Slug-based ID (e.g., "clery-act-vawa")
+  regulationId: z.union([z.number(), z.string()]).optional(), // Legacy numeric ID
+  
   name: z.string(),
   // Risk metadata from MCP Engine
   riskScore: z.number().optional(),
@@ -619,16 +622,85 @@ export function setupRegulationUpdatesApi(app: Express) {
         return res.status(404).json({ error: 'Original regulation not found' });
       }
       
+      // Determine content for diff comparison
+      // Use regulation_text or requirements from original regulation
+      const originalContent = regulation.regulationText || regulation.requirements || '';
+      const updatedContent = update.updatedContent || '';
+      
       // Calculate detailed diff
-      const diffData = calculateTextChangeDiff(
-        regulation.requirements || '',
-        update.updatedContent
-      );
+      const diffData = calculateTextChangeDiff(originalContent, updatedContent);
+      
+      // Enhance the update object with all structured fields for transparency
+      const enhancedUpdate = {
+        ...update,
+        // Ensure these fields are explicitly included even if null
+        summary: update.summary || null,
+        requirements: update.requirements || null,
+        filingDeadlines: update.filingDeadlines || null,
+        metadata: update.metadata || null,
+        originalContent: update.originalContent || null,
+        updatedContent: update.updatedContent || null,
+        // Add useful context
+        regulationName: regulation.name,
+        regKey: regulation.regKey || null,
+      };
+      
+      // Enhance the original regulation object with key fields
+      // Note: The raw SQL query returns snake_case column names
+      const regData = regulation as any; // Access both camelCase and snake_case
+      const enhancedOriginal = {
+        id: regulation.id,
+        name: regulation.name,
+        // Handle both snake_case from raw SQL and camelCase from Drizzle
+        item_id: regData.item_id || regulation.itemId || null,
+        reg_key: regData.reg_key || regulation.regKey || null,
+        category: regulation.category,
+        topic: regulation.topic,
+        jurisdictionSource: regData.jurisdiction_source || regulation.jurisdictionSource,
+        statute: regulation.statute,
+        summary: regulation.summary || null,
+        requirements: regulation.requirements || null,
+        regulation_text: regData.regulation_text || regulation.regulationText || null,
+        // Filing and deadlines
+        filingDeadlines: regData.filing_deadlines || regulation.filingDeadlines || null,
+        reportingFrequency: regData.reporting_frequency || regulation.reportingFrequency || null,
+        // Risk info
+        riskScore: regData.risk_score || regulation.riskScore || null,
+        riskLevel: regData.risk_level || regulation.riskLevel || null,
+        // Agency info
+        agency_name: regData.agency_name || regulation.agencyName || null,
+        agency_url: regData.agency_url || regulation.agencyUrl || null,
+        // URLs
+        regulationUrl: regData.regulation_url || regulation.regulationUrl || null,
+        requirementsUrl: regData.requirements_url || regulation.requirementsUrl || null,
+        // Dates
+        effectiveDate: regData.effective_date || regulation.effectiveDate || null,
+        lastUpdated: regData.last_updated || regulation.lastUpdated || null,
+        // For backward compatibility
+        content: originalContent,
+      };
+      
+      // Fetch compliance tasks for this regulation (including parent-child hierarchy)
+      let tasks: any[] = [];
+      try {
+        const tasksResult = await pool.query(
+          `SELECT id, parent_task_id, title, description, status, priority, assigned_role, due_date, 
+                  recurring_schedule, evidence_required, evidence_type, evidence_instructions, instructions, sort_order
+           FROM compliance_tasks 
+           WHERE regulation_id = $1 
+           ORDER BY sort_order ASC`,
+          [update.regulationId]
+        );
+        tasks = tasksResult.rows;
+      } catch (taskError) {
+        console.error('Error fetching compliance tasks:', taskError);
+      }
       
       res.json({
-        update,
-        original: regulation,
-        diffData
+        update: enhancedUpdate,
+        original: enhancedOriginal,
+        diffData,
+        tasks
       });
     } catch (error) {
       console.error('Error getting regulation update:', error);

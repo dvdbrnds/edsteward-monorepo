@@ -558,6 +558,11 @@ export function setupMCPIntegrationApi(app: express.Application) {
     // Compliance tasks
     complianceTasks: z.array(mcpComplianceTaskSchema).optional(),
     
+    // Task sync behavior flag
+    // When true: adds new tasks without deleting existing ones (MERGE mode)
+    // When false/undefined: replaces all existing tasks (REPLACE mode - default)
+    preserveExistingTasks: z.boolean().optional(),
+    
     // Topic mappings (for multi-topic regulations)
     topics: z.array(z.object({
       topic: z.string().optional(),
@@ -1078,18 +1083,36 @@ export function setupMCPIntegrationApi(app: express.Application) {
         regulationRecord = created;
       }
       
-      // Handle compliance tasks - replace existing if provided
+      // Handle compliance tasks
+      // REPLACE mode (default): deletes all existing tasks and inserts new ones
+      // MERGE mode (preserveExistingTasks=true): adds new tasks without deleting existing
       const createdTasks: Array<{ id: number; tempId?: string; title: string }> = [];
       const taskIdMap = new Map<string, number>();
+      const preserveTasks = data.preserveExistingTasks === true;
       
       if (data.complianceTasks && data.complianceTasks.length > 0) {
-        console.log(`📝 Processing ${data.complianceTasks.length} compliance tasks...`);
+        const mode = preserveTasks ? 'MERGE' : 'REPLACE';
+        console.log(`📝 Processing ${data.complianceTasks.length} compliance tasks (${mode} mode)...`);
         
-        // Delete existing tasks for this regulation (full replacement)
-        await db.delete(complianceTasks).where(eq(complianceTasks.regulationId, regulationId));
+        // Debug: Log hierarchy analysis
+        const rootTasks = data.complianceTasks.filter((t: any) => !t.parentTempId);
+        const childTasks = data.complianceTasks.filter((t: any) => t.parentTempId);
+        console.log(`   📊 Hierarchy: ${rootTasks.length} parents, ${childTasks.length} children`);
+        
+        if (childTasks.length > 0) {
+          console.log(`   🔗 Sample child: tempId=${childTasks[0].tempId}, parentTempId=${childTasks[0].parentTempId}`);
+        }
+        
+        if (!preserveTasks) {
+          // REPLACE mode: Delete existing tasks for this regulation
+          await db.delete(complianceTasks).where(eq(complianceTasks.regulationId, regulationId));
+          console.log(`   🗑️  Deleted existing tasks for regulation ${regulationId}`);
+        } else {
+          console.log(`   🔒 Preserving existing tasks (MERGE mode)`);
+        }
         
         // First pass: create root tasks (no parent)
-        const rootTasks = data.complianceTasks.filter((t: any) => !t.parentTempId);
+        console.log(`   ▶️ Pass 1: Creating ${rootTasks.length} root tasks...`);
         for (const task of rootTasks) {
           const [newTask] = await db.insert(complianceTasks).values({
             regulationId,
@@ -1114,10 +1137,18 @@ export function setupMCPIntegrationApi(app: express.Application) {
         }
         
         // Second pass: create child tasks (with parent)
-        const childTasks = data.complianceTasks.filter((t: any) => t.parentTempId);
+        console.log(`   ▶️ Pass 2: Creating ${childTasks.length} child tasks...`);
+        console.log(`   🗺️ TaskIdMap has ${taskIdMap.size} entries`);
+        
+        let childrenCreated = 0;
+        let childrenSkipped = 0;
         for (const task of childTasks) {
           const parentId = taskIdMap.get(task.parentTempId!);
-          if (!parentId) continue;
+          if (!parentId) {
+            console.warn(`   ⚠️ Parent not found for child "${task.title}" (parentTempId: ${task.parentTempId})`);
+            childrenSkipped++;
+            continue;
+          }
           
           const [newTask] = await db.insert(complianceTasks).values({
             regulationId,
@@ -1136,9 +1167,12 @@ export function setupMCPIntegrationApi(app: express.Application) {
           
           if (task.tempId) taskIdMap.set(task.tempId, newTask.id);
           createdTasks.push({ id: newTask.id, tempId: task.tempId, title: task.title });
+          childrenCreated++;
         }
         
-        console.log(`✅ ${isUpdate ? 'Replaced' : 'Created'} ${createdTasks.length} compliance tasks`);
+        const taskAction = preserveTasks ? 'Added' : (isUpdate ? 'Replaced with' : 'Created');
+        console.log(`✅ ${taskAction} ${createdTasks.length} compliance tasks`);
+        console.log(`   📈 Hierarchy result: ${rootTasks.length} parents + ${childrenCreated} children created, ${childrenSkipped} children skipped`);
       }
       
       // Handle topic mappings if provided
@@ -1168,10 +1202,11 @@ export function setupMCPIntegrationApi(app: express.Application) {
         taskCount: createdTasks.length,
       });
       
+      const taskSyncMode = preserveTasks ? 'merge' : 'replace';
       const response = {
         success: true,
         action: isUpdate ? 'updated' : 'created',
-        message: `Successfully ${isUpdate ? 'updated' : 'created'} regulation "${data.name}" with ${createdTasks.length} compliance tasks`,
+        message: `Successfully ${isUpdate ? 'updated' : 'created'} regulation "${data.name}" with ${createdTasks.length} compliance tasks (${taskSyncMode} mode)`,
         regulation: {
           id: regulationId,
           regKey: regulationRecord.regKey,
@@ -1183,6 +1218,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
           riskLevel: regulationRecord.riskLevel,
         },
         tasks: createdTasks,
+        taskSyncMode, // 'replace' (default) or 'merge' (preserveExistingTasks=true)
         taskIdMapping: Object.fromEntries(taskIdMap),
         timestamp,
       };

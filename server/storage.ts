@@ -298,10 +298,16 @@ export class DatabaseStorage implements IStorage {
       }
 
       // 2. Update the regulation with the new content
-      // Handle regulation_text, requirements, summary, and deadlines
+      // Handle name, regulation_text, requirements, summary, and deadlines
       const updateFields = [];
       const updateValues = [];
       let paramIndex = 1;
+
+      // Update regulation name if provided in the update
+      if (update.name) {
+        updateFields.push(`name = $${paramIndex++}`);
+        updateValues.push(update.name);
+      }
 
       // Always update regulation_text with the full text
       updateFields.push(`regulation_text = $${paramIndex++}`);
@@ -572,7 +578,7 @@ export class DatabaseStorage implements IStorage {
       if (typeof regulation.actions === 'string') {
         try {
           regulation.actions = JSON.parse(regulation.actions);
-        } catch (_e) {
+        } catch {
           regulation.actions = [];
         }
       }
@@ -580,7 +586,7 @@ export class DatabaseStorage implements IStorage {
       if (typeof regulation.sections === 'string') {
         try {
           regulation.sections = JSON.parse(regulation.sections);
-        } catch (_e) {
+        } catch {
           regulation.sections = [];
         }
       }

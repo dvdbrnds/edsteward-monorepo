@@ -2,7 +2,7 @@ import express, { type Express } from "express";
 import fs from "fs";
 import path, { dirname } from "path";
 import { fileURLToPath } from "url";
-import { createServer as createViteServer, createLogger } from "vite";
+import { createServer as createViteServer, createLogger, type ViteDevServer } from "vite";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 import { type Server } from "http";
@@ -10,8 +10,12 @@ import { nanoid } from "nanoid";
 
 const viteLogger = createLogger();
 
-export function log(message: string, source = "express") {
-  const formattedTime = new Date().toLocaleTimeString("en-US", {
+// Track Vite instance for potential restart
+let viteInstance: ViteDevServer | null = null;
+let isRestarting = false;
+
+export function log(message: string, _source = "express") {
+  const _formattedTime = new Date().toLocaleTimeString("en-US", {
     hour: "numeric",
     minute: "2-digit",
     second: "2-digit",
@@ -20,7 +24,7 @@ export function log(message: string, source = "express") {
 
 }
 
-export async function setupVite(app: Express, server: Server) {
+async function createViteInstance(app: Express, server: Server): Promise<ViteDevServer> {
   const viteConfig = (await import("../vite.config.ts")).default;
   const serverOptions = {
     middlewareMode: true,
@@ -35,12 +39,49 @@ export async function setupVite(app: Express, server: Server) {
       ...viteLogger,
       error: (msg, options) => {
         viteLogger.error(msg, options);
-        process.exit(1);
+        // Don't exit - log warning and attempt recovery
+        console.error('⚠️ [VITE] Error occurred - service may need restart:', msg);
+        // Schedule a restart attempt if not already restarting
+        if (!isRestarting && viteInstance) {
+          scheduleViteRestart(app, server);
+        }
       },
     },
     server: serverOptions,
     appType: "custom",
   });
+  
+  return vite;
+}
+
+async function scheduleViteRestart(app: Express, server: Server) {
+  if (isRestarting) return;
+  isRestarting = true;
+  
+  console.log('🔄 [VITE] Scheduling restart in 2 seconds...');
+  
+  setTimeout(async () => {
+    try {
+      if (viteInstance) {
+        console.log('🔄 [VITE] Closing old instance...');
+        await viteInstance.close().catch(() => {});
+      }
+      
+      console.log('🔄 [VITE] Creating new instance...');
+      viteInstance = await createViteInstance(app, server);
+      console.log('✅ [VITE] Restart successful!');
+    } catch (error) {
+      console.error('❌ [VITE] Restart failed:', error);
+      console.error('💡 [VITE] Manual server restart may be required');
+    } finally {
+      isRestarting = false;
+    }
+  }, 2000);
+}
+
+export async function setupVite(app: Express, server: Server) {
+  const vite = await createViteInstance(app, server);
+  viteInstance = vite;
 
   app.use(vite.middlewares);
   app.use("*", async (req, res, next) => {

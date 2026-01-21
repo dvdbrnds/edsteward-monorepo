@@ -652,7 +652,11 @@ export const regulationUpdates = pgTable("regulation_updates", {
 });
 
 // Schema for inserting regulation updates
+// Note: regulationId is made optional here because API accepts regKey/itemId and resolves internally
 export const insertRegulationUpdateSchema = createInsertSchema(regulationUpdates).extend({
+  regulationId: z.number().optional(), // API resolves from regKey/itemId
+  regKey: z.string().optional(), // Universal key (REG-001) - PREFERRED identifier
+  itemId: z.string().optional(), // Slug-based ID fallback
   status: z.enum(["pending", "accepted", "rejected", "deferred"]).default("pending"),
   signature: z.string().optional(),
   rejectionReason: z.string().optional(),
