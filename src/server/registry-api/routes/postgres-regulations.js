@@ -150,10 +150,16 @@ router.get('/api/regulations', async (req, res) => {
     // Transform to API format for backward compatibility
     const transformed = regulations.map(r => ({
       regKey: r.reg_key,  // Universal key field (REG-001 to REG-251)
+      reg_key: r.reg_key,  // Also include snake_case for UI compatibility
       regulationId: r.item_id,
       id: r.id,
       name: r.name,
       description: r.summary || 'No description available',
+      summary: r.summary,  // Include raw summary
+      requirements: r.requirements,  // Include requirements text
+      regulation_text: r.regulation_text,  // Include full regulation text
+      regulationText: r.regulation_text,  // camelCase version
+      cfr: r.cfr,  // CFR citation
       version: r.version?.toString() || '1.0',
       enactedDate: r.effective_date || r.created_at,
       publicLaw: r.public_law || r.statute || 'Unknown',
@@ -179,6 +185,7 @@ router.get('/api/regulations', async (req, res) => {
       
       // Validation
       lovvLevel: r.lovv_level,
+      lovv_level: r.lovv_level,  // snake_case for UI
       lastValidated: r.last_validated,
       versionHash: r.version_hash,
       
@@ -190,8 +197,11 @@ router.get('/api/regulations', async (req, res) => {
       // Nested data (transformed to camelCase for EdSteward)
       filingDeadlines: (r.deadlines || []).map(transformDeadline),
       complianceTasks: (r.tasks || []).map(transformTask),
+      tasks: r.tasks || [],  // Raw tasks for UI
+      deadlines: r.deadlines || [],  // Raw deadlines for UI
       topics: r.topics || [],  // Already in camelCase from repository
       riskAssessment: r.risk_assessment || null,  // Institutional Risk Score
+      risk_assessment: r.risk_assessment || null,  // snake_case for UI
       
       keyProvisions: [
         {
