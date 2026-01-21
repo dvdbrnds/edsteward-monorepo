@@ -12,19 +12,34 @@ import fetch from 'node-fetch';
 const ECFR_API_BASE = 'https://www.ecfr.gov/api/versioner/v1';
 
 /**
- * Fetch full text for a CFR part
+ * Fetch full text for a CFR part (or specific section)
  * @param {string} title - CFR title (e.g., "34")
  * @param {string} part - CFR part (e.g., "99")
- * @param {string} date - ISO date (default: current)
+ * @param {object} options - Additional options: section, searchTerms, name
  * @returns {Promise<object>} - Full CFR text and metadata
  */
-export async function fetchCFRPart(title, part, date = null) {
+export async function fetchCFRPart(title, part, options = {}) {
   try {
-    // Use the search API which is more reliable than the full text endpoint
-    // The search API returns section metadata and excerpts which is what we need
-    const searchUrl = `https://www.ecfr.gov/api/search/v1/results?query=part+${part}&per_page=20`;
+    const { section, searchTerms, name } = options;
     
-    console.log(`📖 Fetching CFR ${title} Part ${part} from eCFR.gov...`);
+    // Build a more specific search query
+    // If we have a specific section (e.g., 668.46 for Clery), use that
+    let searchQuery;
+    if (section) {
+      // Specific section - much more targeted!
+      searchQuery = `"${title} CFR ${part}.${section}"`;
+      console.log(`📖 Fetching SPECIFIC section: ${title} CFR ${part}.${section} (${name || 'regulation'})...`);
+    } else if (searchTerms && searchTerms.length > 0) {
+      // Use search terms for better targeting
+      searchQuery = `title ${title} part ${part} ${searchTerms[0]}`;
+      console.log(`📖 Fetching CFR ${title} Part ${part} with term "${searchTerms[0]}"...`);
+    } else {
+      // Fallback to generic (less reliable)
+      searchQuery = `title ${title} part ${part}`;
+      console.log(`📖 Fetching CFR ${title} Part ${part} (generic - may be imprecise)...`);
+    }
+    
+    const searchUrl = `https://www.ecfr.gov/api/search/v1/results?query=${encodeURIComponent(searchQuery)}&per_page=20`;
     console.log(`   URL: ${searchUrl}`);
     
     const response = await fetch(searchUrl, {
@@ -64,18 +79,27 @@ export async function fetchCFRPart(title, part, date = null) {
       return `${heading}\n${excerpt}`;
     }).join('\n\n---\n\n');
     
-    console.log(`✅ Successfully fetched CFR ${title} Part ${part} (${matchingResults.length} sections, ${fullText.length} chars)`);
+    const citationStr = section 
+      ? `${title} CFR ${part}.${section}` 
+      : `${title} CFR Part ${part}`;
+    const urlStr = section
+      ? `https://www.ecfr.gov/current/title-${title}/part-${part}/section-${part}.${section}`
+      : `https://www.ecfr.gov/current/title-${title}/part-${part}`;
+    
+    console.log(`✅ Successfully fetched ${citationStr} (${matchingResults.length} sections, ${fullText.length} chars)`);
     
     return {
       success: true,
       title,
       part,
+      section: section || null,
+      regulationName: name || null,
       fullText: fullText,
       sections: matchingResults.map(r => r.hierarchy?.section).filter(Boolean),
       date: new Date().toISOString().split('T')[0],
       source: 'ecfr.gov',
-      citation: `${title} CFR Part ${part}`,
-      url: `https://www.ecfr.gov/current/title-${title}/part-${part}`,
+      citation: citationStr,
+      url: urlStr,
       length: fullText.length,
       sectionCount: matchingResults.length,
       meta: searchData.meta || {}

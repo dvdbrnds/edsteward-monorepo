@@ -25,19 +25,82 @@ import ConsistentSummaryService from '../../services/consistent-summary-service.
 const summaryService = new ConsistentSummaryService();
 
 // CFR citation mappings for common regulations
+// IMPORTANT: Include specific sections AND search terms to avoid fetching wrong data
 const CFR_MAPPINGS = {
-  'jeanne-clery-disclosure-of-campus-security-policy-': { title: '34', part: '668' },
-  'clery': { title: '34', part: '668' },
-  'ferpa': { title: '34', part: '99' },
-  'family-educational-rights-and-privacy-act-ferpa': { title: '34', part: '99' },
-  'title-ix': { title: '34', part: '106' },
-  'title-ix-of-the-education-amendment-of-1972': { title: '34', part: '106' },
-  'americans-with-disabilities-act': { title: '28', part: '35' },
-  'ada': { title: '28', part: '35' },
-  'section-504': { title: '34', part: '104' },
-  'hipaa': { title: '45', part: '164' },
-  'teach-act': { title: '37', part: '201' },
-  'osha': { title: '29', part: '1910' }
+  'jeanne-clery-disclosure-of-campus-security-policy-': { 
+    title: '34', 
+    part: '668', 
+    section: '46',  // Clery Act is specifically 34 CFR 668.46!
+    searchTerms: ['campus security policy', 'crime statistics', 'timely warning', 'clery'],
+    name: 'Clery Act'
+  },
+  'clery': { 
+    title: '34', 
+    part: '668', 
+    section: '46',
+    searchTerms: ['campus security policy', 'crime statistics', 'timely warning'],
+    name: 'Clery Act'
+  },
+  'ferpa': { 
+    title: '34', 
+    part: '99',
+    searchTerms: ['educational records', 'student privacy', 'directory information'],
+    name: 'FERPA'
+  },
+  'family-educational-rights-and-privacy-act-ferpa': { 
+    title: '34', 
+    part: '99',
+    searchTerms: ['educational records', 'student privacy'],
+    name: 'FERPA'
+  },
+  'title-ix': { 
+    title: '34', 
+    part: '106',
+    searchTerms: ['sex discrimination', 'sexual harassment', 'athletics'],
+    name: 'Title IX'
+  },
+  'title-ix-of-the-education-amendment-of-1972': { 
+    title: '34', 
+    part: '106',
+    searchTerms: ['sex discrimination', 'sexual harassment'],
+    name: 'Title IX'
+  },
+  'americans-with-disabilities-act': { 
+    title: '28', 
+    part: '35',
+    searchTerms: ['disability', 'reasonable accommodation', 'accessibility'],
+    name: 'ADA'
+  },
+  'ada': { 
+    title: '28', 
+    part: '35',
+    searchTerms: ['disability', 'reasonable accommodation'],
+    name: 'ADA'
+  },
+  'section-504': { 
+    title: '34', 
+    part: '104',
+    searchTerms: ['disability', 'discrimination', 'handicapped'],
+    name: 'Section 504'
+  },
+  'hipaa': { 
+    title: '45', 
+    part: '164',
+    searchTerms: ['protected health information', 'privacy', 'security'],
+    name: 'HIPAA'
+  },
+  'teach-act': { 
+    title: '37', 
+    part: '201',
+    searchTerms: ['distance education', 'copyright', 'digital transmission'],
+    name: 'TEACH Act'
+  },
+  'osha': { 
+    title: '29', 
+    part: '1910',
+    searchTerms: ['workplace safety', 'occupational', 'hazard'],
+    name: 'OSHA'
+  }
 };
 
 /**
@@ -121,8 +184,17 @@ export async function executeComprehensiveWorkflow(regulationSlug, existingData 
     // Fetch from eCFR
     let ecfrData = null;
     if (cfrMapping) {
-      console.log(`   Fetching CFR ${cfrMapping.title} Part ${cfrMapping.part}...`);
-      ecfrData = await fetchCFRPart(cfrMapping.title, cfrMapping.part);
+      const citation = cfrMapping.section 
+        ? `${cfrMapping.title} CFR ${cfrMapping.part}.${cfrMapping.section}`
+        : `${cfrMapping.title} CFR ${cfrMapping.part}`;
+      console.log(`   Fetching ${citation} (${cfrMapping.name || regulationSlug})...`);
+      
+      // Pass section and search terms for more precise fetching
+      ecfrData = await fetchCFRPart(cfrMapping.title, cfrMapping.part, {
+        section: cfrMapping.section,
+        searchTerms: cfrMapping.searchTerms,
+        name: cfrMapping.name
+      });
     }
     
     // Fetch from Federal Register
