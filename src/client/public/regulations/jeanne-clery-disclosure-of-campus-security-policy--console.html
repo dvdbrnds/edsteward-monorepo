@@ -1345,7 +1345,7 @@
                                 
                                 <!-- SECTION 1: Identity & Legal Foundation -->
                                 <div style="margin-bottom: 24px; background: linear-gradient(135deg, #1e3a5f 0%, #2d4a6f 100%); border-radius: 12px; padding: 20px; color: white;">
-                                    <h4 style="margin: 0 0 16px 0; font-size: 18px;">🏛️ Legal Foundation</h4>
+                                    <h4 style="margin: 0 0 16px 0; font-size: 18px; color: white;">🏛️ Legal Foundation</h4>
                                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
                                         <div>
                                             <div style="font-size: 11px; text-transform: uppercase; opacity: 0.7; margin-bottom: 4px;">REG-KEY</div>
@@ -3311,11 +3311,35 @@
                     }
                 }
                 
-                // Risk Factors
+                // Risk Factors - show full details including rationale
                 const factors = riskAssessment.riskFactors || {};
+                const maxScores = { financialPenalty: 30, federalFunding: 25, accreditationImpact: 20, reputationalLegal: 15, operationalDisruption: 10 };
+                const factorColors = { financialPenalty: '#dc2626', federalFunding: '#ea580c', accreditationImpact: '#ca8a04', reputationalLegal: '#7c3aed', operationalDisruption: '#0891b2' };
                 const factorsHTML = Object.entries(factors).map(([key, val]) => {
                     const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
-                    return `<div style="display: flex; justify-content: space-between;"><span>${label}:</span><strong>${val || '--'}</strong></div>`;
+                    const score = typeof val === 'object' ? (val.score || 0) : (val || 0);
+                    const max = maxScores[key] || 10;
+                    const color = factorColors[key] || '#64748b';
+                    const rationale = typeof val === 'object' && val.rationale ? val.rationale : 'No details available';
+                    const extras = [];
+                    if (val.maxPenaltyReference) extras.push(`<span style="background:#fef2f2;padding:2px 6px;border-radius:4px;font-size:10px;">💰 ${val.maxPenaltyReference}</span>`);
+                    if (val.fundingTypesAtRisk) extras.push(`<span style="background:#fff7ed;padding:2px 6px;border-radius:4px;font-size:10px;">⚠️ ${val.fundingTypesAtRisk.join(', ')}</span>`);
+                    if (val.precedentCases) extras.push(`<span style="background:#faf5ff;padding:2px 6px;border-radius:4px;font-size:10px;">📋 ${val.precedentCases.slice(0,2).join(', ')}</span>`);
+                    if (val.affectedOperations) extras.push(`<span style="background:#ecfeff;padding:2px 6px;border-radius:4px;font-size:10px;">🏢 ${val.affectedOperations.slice(0,3).join(', ')}</span>`);
+                    const pct = Math.round((score / max) * 100);
+                    return `<div style="background:white;border-radius:8px;padding:12px;margin-bottom:10px;border-left:4px solid ${color};box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                            <span style="font-weight:600;color:#1e293b;">${label}</span>
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden;">
+                                    <div style="width:${pct}%;height:100%;background:${color};"></div>
+                                </div>
+                                <strong style="color:${color};font-size:14px;">${score}/${max}</strong>
+                            </div>
+                        </div>
+                        <div style="font-size:12px;color:#475569;line-height:1.5;margin-bottom:6px;">${rationale}</div>
+                        ${extras.length ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;">${extras.join('')}</div>` : ''}
+                    </div>`;
                 }).join('');
                 const riskFactorsEl = document.getElementById('data-risk-factors');
                 if (riskFactorsEl) riskFactorsEl.innerHTML = factorsHTML || '<div>No risk factors data</div>';
@@ -3613,48 +3637,93 @@
             }
         }
         
-        // TAB 5: Load Customer Payload
+        // TAB 5: Load Customer Payload - Shows EXACT payload EdSteward receives
         async function loadCustomerPayload() {
             try {
                 const reg = await fetchRegulationData();
                 if (!reg) throw new Error('No regulation data');
                 
-                // Build the exact EdSteward payload
+                // Get the actual risk assessment from API data
+                const riskAssessment = reg.riskAssessment || reg.risk_assessment || {};
+                const riskFactors = riskAssessment.riskFactors || riskAssessment.risk_factors || {};
+                
+                // Build the EXACT EdSteward payload (matches delivery-server.js)
                 const payload = {
-                    regKey: reg.regKey || 'REG-001',
+                    // Core Identity
+                    regKey: reg.reg_key || reg.regKey || 'REG-001',
                     regulationId: reg.regulationId || reg.id,
                     name: reg.name,
                     statute: reg.statute,
+                    cfr: reg.cfr,
                     category: reg.category,
                     topic: reg.topic,
-                    jurisdictionSource: reg.jurisdictionSource || 'federal',
+                    jurisdictionSource: reg.jurisdictionSource || reg.jurisdiction_source || 'federal',
+                    
+                    // Content
                     summary: reg.summary,
                     requirements: reg.requirements,
-                    lovvLevel: reg.lovvLevel || 'B',
+                    regulationText: reg.regulationText || reg.regulation_text,
+                    
+                    // Validation
+                    lovvLevel: reg.lovvLevel || reg.lovv_level || 'A',
+                    
+                    // COMPLETE RISK ASSESSMENT (what EdSteward receives)
+                    riskScore: riskAssessment.riskScore || riskAssessment.risk_score,
+                    riskLevel: riskAssessment.riskLevel || riskAssessment.risk_level,
                     riskAssessment: {
-                        riskScore: 96,
-                        riskLevel: 'CRITICAL',
-                        riskFactors: {
-                            financialPenalty: { score: 30, rationale: '$14M fine precedent (Liberty University)' },
-                            federalFunding: { score: 25, rationale: 'Complete Title IV loss possible' },
-                            accreditationImpact: { score: 18, rationale: 'Direct accreditation implications' },
-                            reputationalLegal: { score: 15, rationale: 'National media coverage, class actions' },
-                            operationalDisruption: { score: 8, rationale: 'Major compliance restructuring' }
-                        }
+                        score: riskAssessment.riskScore || riskAssessment.risk_score,
+                        level: riskAssessment.riskLevel || riskAssessment.risk_level,
+                        
+                        // FULL FACTOR BREAKDOWN with rationale
+                        factors: riskFactors,
+                        
+                        // Quick reference scores
+                        factorScores: {
+                            financialPenalty: riskFactors.financialPenalty?.score || riskFactors.financialPenalty,
+                            federalFunding: riskFactors.federalFunding?.score || riskFactors.federalFunding,
+                            accreditationImpact: riskFactors.accreditationImpact?.score || riskFactors.accreditationImpact,
+                            reputationalLegal: riskFactors.reputationalLegal?.score || riskFactors.reputationalLegal,
+                            operationalDisruption: riskFactors.operationalDisruption?.score || riskFactors.operationalDisruption
+                        },
+                        
+                        // Enforcement context
+                        enforcementTrend: riskAssessment.enforcementTrend || riskAssessment.enforcement_trend,
+                        recentEnforcementActions: riskAssessment.recentEnforcementActions || riskAssessment.recent_enforcement_actions || [],
+                        
+                        // Metadata
+                        assessmentDate: riskAssessment.assessmentDate || riskAssessment.assessment_date,
+                        assessmentVersion: riskAssessment.assessmentVersion || '1.0',
+                        isPreliminary: riskAssessment.isPreliminary || false
                     },
+                    
+                    // Topics/Departments
                     topics: reg.topics || [],
-                    filingDeadlines: reg.filingDeadlines || [],
+                    
+                    // Deadlines with full details
+                    filingDeadlines: (reg.filingDeadlines || []).map(d => ({
+                        type: d.type || d.name,
+                        date: d.date || d.dueDate,
+                        description: d.description,
+                        frequency: d.frequency,
+                        responsibleRole: d.responsibleRole || d.responsible_role
+                    })),
+                    
+                    // Tasks with hierarchy
                     complianceTasks: (reg.complianceTasks || []).map((t, idx) => ({
-                        tempId: `task-${idx}`,
+                        tempId: `task-${t.id || idx}`,
                         parentTempId: t.parentTaskId ? `task-${t.parentTaskId}` : null,
                         title: t.title,
                         description: t.description,
-                        assignedRole: t.assignedRole,
+                        assignedRole: t.assignedRole || t.assigned_role,
                         priority: t.priority || 'medium',
-                        evidenceRequired: t.evidenceRequired || false
+                        evidenceRequired: t.evidenceRequired || t.evidence_required || false,
+                        sortOrder: t.sortOrder || t.sort_order
                     })),
+                    
+                    // Metadata
                     lastValidated: new Date().toISOString(),
-                    version: reg.version || 1
+                    version: reg.version || 1,
+                    source: 'MCP Engine'
                 };
                 
                 const jsonStr = JSON.stringify(payload, null, 2);

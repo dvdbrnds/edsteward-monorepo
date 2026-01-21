@@ -387,14 +387,33 @@ class DeliveryServer {
             // Full hierarchical task list (parent-child relationships preserved)
             complianceTasks: hierarchicalTasks,
             
-            // INSTITUTIONAL RISK SCORE (1-100)
+            // INSTITUTIONAL RISK SCORE (1-100) - COMPLETE BREAKDOWN
             riskScore: riskScore,
             riskLevel: riskLevel,
             riskAssessment: riskAssessment ? {
               score: riskScore,
               level: riskLevel,
+              
+              // Full risk factor breakdown with rationale for each score
               factors: riskAssessment.riskFactors || riskAssessment.risk_factors || null,
-              assessmentDate: riskAssessment.assessmentDate || riskAssessment.assessment_date || new Date().toISOString()
+              
+              // Factor summary for quick reference (score only)
+              factorScores: {
+                financialPenalty: riskAssessment.riskFactors?.financialPenalty?.score || riskAssessment.riskFactors?.financialPenalty || null,
+                federalFunding: riskAssessment.riskFactors?.federalFunding?.score || riskAssessment.riskFactors?.federalFunding || null,
+                accreditationImpact: riskAssessment.riskFactors?.accreditationImpact?.score || riskAssessment.riskFactors?.accreditationImpact || null,
+                reputationalLegal: riskAssessment.riskFactors?.reputationalLegal?.score || riskAssessment.riskFactors?.reputationalLegal || null,
+                operationalDisruption: riskAssessment.riskFactors?.operationalDisruption?.score || riskAssessment.riskFactors?.operationalDisruption || null
+              },
+              
+              // Enforcement context
+              enforcementTrend: riskAssessment.enforcementTrend || riskAssessment.enforcement_trend || null,
+              recentEnforcementActions: riskAssessment.recentEnforcementActions || riskAssessment.recent_enforcement_actions || [],
+              
+              // Assessment metadata
+              assessmentDate: riskAssessment.assessmentDate || riskAssessment.assessment_date || new Date().toISOString(),
+              assessmentVersion: riskAssessment.assessmentVersion || riskAssessment.assessment_version || '1.0',
+              isPreliminary: riskAssessment.isPreliminary || riskAssessment.is_preliminary || false
             } : null,
             
             // LOVV Validation Level
@@ -1343,18 +1362,20 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 // Start the server if this file is run directly
-// More robust check that works with different path formats
-const isMainModule = process.argv[1] && (
+// Check for PM2 environment OR direct execution
+const isPM2 = process.env.PM2_HOME || process.env.pm_id !== undefined;
+const isDirectRun = process.argv[1] && (
   process.argv[1].endsWith('delivery-server.js') || 
   process.argv[1].includes('delivery-server.js')
 );
+const shouldStart = isPM2 || isDirectRun;
 
 console.log('🔧 [DEBUG] Module check:');
-console.log('  import.meta.url:', import.meta.url);
-console.log('  process.argv[1]:', process.argv[1]);
-console.log('  isMainModule:', isMainModule);
+console.log('  isPM2:', isPM2);
+console.log('  isDirectRun:', isDirectRun);
+console.log('  shouldStart:', shouldStart);
 
-if (isMainModule) {
+if (shouldStart) {
   console.log('🚀 [STARTUP] Delivery server starting...');
   console.log('🔧 [STARTUP] Process arguments:', process.argv);
   console.log('🔧 [STARTUP] Working directory:', process.cwd());
