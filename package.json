@@ -43,7 +43,8 @@
     "align:edsteward": "node scripts/execute-alignment.cjs",
     "verify:alignment": "node scripts/verify-edsteward-alignment.cjs",
     "auto-align": "node scripts/auto-align.cjs",
-    "monitor": "node scripts/health-monitor.cjs"
+    "monitor": "node scripts/health-monitor.cjs",
+    "standardize": "node scripts/standardize-regulation.cjs"
   },
   "author": "",
   "license": "ISC",

@@ -1448,7 +1448,7 @@
                 </div>
                 <div class="log-entry">
                     <span class="log-timestamp">[CONFIG]</span>
-                    <span class="log-level-info">📡 API Endpoint: http://localhost:3002/api/llm/query</span>
+                    <span class="log-level-info">📡 API Endpoint: http://localhost:3004/api/llm/query</span>
                 </div>
                 <div class="log-entry">
                     <span class="log-timestamp">[STATUS]</span>
@@ -1775,7 +1775,7 @@
         
         async function checkSystemHealth() {
             try {
-                const response = await fetch('http://localhost:3002/api/llm/health');
+                const response = await fetch('http://localhost:3004/api/llm/health');
                 if (response.ok) {
                     document.getElementById('apiStatus').textContent = 'ONLINE';
                     document.getElementById('apiStatus').className = 'diagnostic-status ok';
@@ -1847,7 +1847,7 @@
                 addConsoleLog('📖 STEP 1: Fetching original government sources...', 'step');
                 
                 // Call the real LinearEngine workflow via the LLM Gateway
-                const response = await fetch('http://localhost:3002/api/llm/query', {
+                const response = await fetch('http://localhost:3004/api/llm/query', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
@@ -2121,7 +2121,7 @@
             }
             
             regulationClient = new REG66UpdateClient({
-                wsUrl: 'ws://localhost:3051/regulation-updates',
+                wsUrl: 'ws://localhost:3003/regulation-updates',
                 autoReconnect: true
             });
             
@@ -2294,7 +2294,7 @@
                 addConsoleLog('📤 Initiating manual regulation update push...', 'info');
                 
                 // Call the delivery system API to trigger a manual update
-                const response = await fetch('http://localhost:3051/api/trigger-update', {
+                const response = await fetch('http://localhost:3003/api/trigger-update', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -2395,7 +2395,7 @@
             summaryDiv.innerHTML = 'Loading summary...';
             
             try {
-                const response = await fetch(`http://localhost:3002/api/llm/cfr/reg-66`);
+                const response = await fetch(`http://localhost:3004/api/llm/cfr/reg-66`);
                 const result = await response.json();
                 
                 if (result.success && result.data && result.data.summary) {
@@ -2467,7 +2467,7 @@
             try {
                 console.log('📋 Fetching real CFR guidance from API...');
                 
-                const response = await fetch(`http://localhost:3002/api/llm/cfr/reg-66`);
+                const response = await fetch(`http://localhost:3004/api/llm/cfr/reg-66`);
                 const result = await response.json();
                 
                 if (result.success && result.data) {
@@ -2569,7 +2569,7 @@
             try {
                 console.log('📊 Fetching real university validation confidence scores from API...');
                 
-                const response = await fetch('http://localhost:3002/api/llm/analysis/validation-scores');
+                const response = await fetch('http://localhost:3004/api/llm/analysis/validation-scores');
                 const result = await response.json();
                 
                 if (result.success && result.data) {
@@ -2699,7 +2699,7 @@
             try {
                 console.log('📖 Fetching real Uniformed Services Employment and Reemployment Rights Act (USERRA) CFR Implementation text from API...');
                 
-                const response = await fetch('http://localhost:3002/api/llm/cfr/uniformed-services-employment-and-reemployment-rig');
+                const response = await fetch('http://localhost:3004/api/llm/cfr/uniformed-services-employment-and-reemployment-rig');
                 const result = await response.json();
                 
                 if (result.success && result.data) {
@@ -2800,7 +2800,7 @@
             try {
                 console.log('📋 Fetching real compliance guidance from API...');
                 
-                const response = await fetch('http://localhost:3002/api/llm/cfr/uniformed-services-employment-and-reemployment-rig');
+                const response = await fetch('http://localhost:3004/api/llm/cfr/uniformed-services-employment-and-reemployment-rig');
                 const result = await response.json();
                 
                 if (result.success && result.data) {
@@ -3101,7 +3101,7 @@
             
             try {
                 console.log('🔄 Loading real versioning data...');
-                const response = await fetch('http://localhost:3002/api/llm/versioning/system-info');
+                const response = await fetch('http://localhost:3004/api/llm/versioning/system-info');
                 const result = await response.json();
                 
                 if (result.success && result.data) {
@@ -3221,7 +3221,7 @@
             try {
                 console.log('📡 Fetching enhanced Regulation data for EdSteward preview...');
                 
-                const response = await fetch('http://localhost:3002/api/llm/cfr/enhanced/uniformed-services-employment-and-reemployment-rig?federal_register=true');
+                const response = await fetch('http://localhost:3004/api/llm/cfr/enhanced/uniformed-services-employment-and-reemployment-rig?federal_register=true');
                 const data = await response.json();
                 
                 if (!data.success) {
@@ -3413,7 +3413,7 @@
                 console.log('📡 Fetching complete Federal Register document list via LLM Gateway...');
                 
                 // Use our LLM Gateway endpoint to get all documents with debug info
-                const response = await fetch('http://localhost:3002/api/llm/cfr/enhanced/uniformed-services-employment-and-reemployment-rig?federal_register=true&debug=true&show_all_documents=true');
+                const response = await fetch('http://localhost:3004/api/llm/cfr/enhanced/uniformed-services-employment-and-reemployment-rig?federal_register=true&debug=true&show_all_documents=true');
                 const data = await response.json();
                 
                 console.log('📋 Full API response:', data);
@@ -3633,7 +3633,7 @@
             try {
                 addConsoleLog('🔌 Connecting to real-time regulation update service...', 'info');
                 
-                regulationWebSocket = new WebSocket('ws://localhost:3051/regulation-updates');
+                regulationWebSocket = new WebSocket('ws://localhost:3003/regulation-updates');
                 
                 regulationWebSocket.onopen = function() {
                     addConsoleLog('✅ Connected to real-time update service', 'success');
@@ -3809,7 +3809,7 @@
         const slug = window.location.pathname.split('/').pop().replace('-console.html', '');
         
         try {
-            const response = await fetch('http://localhost:3060/api/inquisitor/audit', {
+            const response = await fetch('http://localhost:3004/api/inquisitor/audit', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ regulationSlug: slug }),
