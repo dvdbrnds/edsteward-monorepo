@@ -8,7 +8,9 @@
 import express from 'express';
 import RegulationRepository from '../../../repositories/regulationRepository.js';
 import { healthCheck, getStats, pool } from '../../../services/database.js';
-import { validateSourceData } from '../../../services/source-data-validator.js';
+// v2.0 validator uses CFR citations, URLs, DB metadata, and semantic similarity
+// instead of fragile keyword matching
+import { validateSourceData } from '../../../services/source-data-validator-v2.js';
 
 const router = express.Router();
 
@@ -653,7 +655,7 @@ router.post('/api/regulations/workflow-update', async (req, res) => {
     // SOURCE DATA VALIDATION: The Moat
     // Verify that fetched data actually matches the regulation we're updating
     // ═══════════════════════════════════════════════════════════════════════════
-    const validationResult = validateSourceData(item_id, {
+    const validationResult = await validateSourceData(item_id, {
       fullText: regulation_text,
       regulation_text,
       content: regulation_text,
