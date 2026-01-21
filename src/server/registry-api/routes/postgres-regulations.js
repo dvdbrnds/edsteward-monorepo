@@ -669,15 +669,16 @@ router.post('/api/regulations/workflow-update', async (req, res) => {
       
       // Log to audit trail
       await pool.query(`
-        INSERT INTO audit_log (regulation_id, action, performed_by, details, timestamp)
-        VALUES ($1, 'WORKFLOW_REJECTED', 'source-validator', $2, NOW())
+        INSERT INTO regulation_audit_log (regulation_id, entity_type, action, performed_by, new_values, performed_at)
+        VALUES ($1, 'regulation', 'WORKFLOW_REJECTED', 'source-validator', $2, NOW())
       `, [
-        existing?.id || item_id,
+        existing?.id,
         JSON.stringify({
           reason: 'Source data validation failed',
           confidence: validationResult.confidence,
           errors: validationResult.errors,
-          warnings: validationResult.warnings
+          warnings: validationResult.warnings,
+          attempted_item_id: item_id
         })
       ]);
       
