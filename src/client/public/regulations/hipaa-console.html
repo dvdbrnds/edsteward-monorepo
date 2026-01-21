@@ -1326,7 +1326,7 @@
                 </div>
                 
                 <div class="regulation-tabs">
-                    <button class="tab-button active" onclick="showTab('regulation-text')">📄 Regulation Text</button>
+                    <button class="tab-button active" onclick="showTab('regulation-text')">📊 Complete Data</button>
                     <button class="tab-button" onclick="showTab('summary-scope')">📋 Summary & Scope</button>
                     <button class="tab-button" onclick="showTab('tasks-deadlines')">📅 Tasks & Deadlines</button>
                     <button class="tab-button" onclick="showTab('risk-assessment')">⚠️ Risk Assessment</button>
@@ -1334,29 +1334,115 @@
                 </div>
                 
                 <div class="regulation-content">
-                    <!-- TAB 1: Regulation Text -->
+                    <!-- TAB 1: Complete Data View (All Rich Data) -->
                     <div id="regulation-text" class="tab-content active">
                         <div class="regulation-section">
                             <div id="reg-text-loading" style="text-align: center; padding: 40px; color: #6e7681;">
-                                <div style="font-size: 16px; margin-bottom: 10px;">📖 Fetching Official Regulation Text from eCFR.gov...</div>
-                                <div style="font-size: 14px;">Loading 34 CFR 668.46 - HIPAA Implementation</div>
-                                    </div>
+                                <div style="font-size: 16px; margin-bottom: 10px;">📊 Loading Complete Regulation Data...</div>
+                                <div style="font-size: 14px;">Fetching all rich data from MCP Engine</div>
+                            </div>
                             <div id="reg-text-content" style="display: none;">
-                                <div id="reg-text-metadata" style="font-size: 12px; color: #6e7681; margin-bottom: 20px; padding: 12px; background: #f0f6ff; border-radius: 6px; border-left: 4px solid #0969da;">
-                                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
-                                        <div><strong>Citation:</strong> <span id="reg-citation">Loading...</span></div>
-                                        <div><strong>Source:</strong> <span id="reg-source">Loading...</span></div>
-                                        <div><strong>Last Verified:</strong> <span id="reg-verified">Loading...</span></div>
-                                    </div>
+                                
+                                <!-- SECTION 1: Identity & Legal Foundation -->
+                                <div style="margin-bottom: 24px; background: linear-gradient(135deg, #1e3a5f 0%, #2d4a6f 100%); border-radius: 12px; padding: 20px; color: white;">
+                                    <h4 style="margin: 0 0 16px 0; font-size: 18px;">🏛️ Legal Foundation</h4>
+                                    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
+                                        <div>
+                                            <div style="font-size: 11px; text-transform: uppercase; opacity: 0.7; margin-bottom: 4px;">REG-KEY</div>
+                                            <div id="data-reg-key" style="font-size: 18px; font-weight: 600;">--</div>
                                         </div>
-                                <div class="legal-text" id="reg-text-body" style="max-height: 400px; overflow-y: auto; padding: 16px; background: #fafbfc; border-radius: 8px; border: 1px solid #e1e5e9; line-height: 1.8; font-size: 14px;">
-                                    <!-- Regulation text loaded here -->
+                                        <div>
+                                            <div style="font-size: 11px; text-transform: uppercase; opacity: 0.7; margin-bottom: 4px;">USC Citation</div>
+                                            <div id="data-usc" style="font-size: 16px;">--</div>
+                                        </div>
+                                        <div>
+                                            <div style="font-size: 11px; text-transform: uppercase; opacity: 0.7; margin-bottom: 4px;">CFR Citation</div>
+                                            <div id="data-cfr" style="font-size: 16px;">--</div>
+                                        </div>
+                                        <div>
+                                            <div style="font-size: 11px; text-transform: uppercase; opacity: 0.7; margin-bottom: 4px;">L.O.V.V. Level</div>
+                                            <div id="data-lovv" style="font-size: 16px;">--</div>
+                                        </div>
                                     </div>
+                                </div>
+                                
+                                <!-- SECTION 2: Risk Assessment Quick View -->
+                                <div style="margin-bottom: 24px; display: grid; grid-template-columns: 1fr 2fr; gap: 16px;">
+                                    <div id="data-risk-score-box" style="background: #fef2f2; border: 2px solid #ef4444; border-radius: 12px; padding: 20px; text-align: center;">
+                                        <div style="font-size: 11px; text-transform: uppercase; color: #991b1b; margin-bottom: 8px;">Risk Score</div>
+                                        <div id="data-risk-score" style="font-size: 48px; font-weight: 700; color: #dc2626;">--</div>
+                                        <div id="data-risk-level" style="font-size: 14px; font-weight: 600; color: #991b1b;">--</div>
+                                    </div>
+                                    <div style="background: #f8fafc; border-radius: 12px; padding: 20px; border: 1px solid #e2e8f0;">
+                                        <div style="font-size: 13px; font-weight: 600; color: #1e293b; margin-bottom: 12px;">📊 Risk Factors</div>
+                                        <div id="data-risk-factors" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px;"></div>
+                                    </div>
+                                </div>
+                                
+                                <!-- SECTION 3: Summary -->
+                                <div style="margin-bottom: 24px; background: #f0f9ff; border-radius: 12px; padding: 20px; border-left: 4px solid #0ea5e9;">
+                                    <h4 style="margin: 0 0 12px 0; font-size: 14px; color: #0c4a6e;">📋 Summary</h4>
+                                    <div id="data-summary" style="font-size: 14px; line-height: 1.7; color: #1e3a5f;">--</div>
+                                </div>
+                                
+                                <!-- SECTION 4: Key Requirements -->
+                                <div style="margin-bottom: 24px; background: #fffbeb; border-radius: 12px; padding: 20px; border-left: 4px solid #f59e0b;">
+                                    <h4 style="margin: 0 0 12px 0; font-size: 14px; color: #92400e;">⚡ Key Requirements</h4>
+                                    <div id="data-requirements" style="font-size: 13px; line-height: 1.8; color: #78350f;"></div>
+                                </div>
+                                
+                                <!-- SECTION 5: Tasks & Deadlines Summary -->
+                                <div style="margin-bottom: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                                    <div style="background: #f0fdf4; border-radius: 12px; padding: 20px; border: 1px solid #86efac;">
+                                        <h4 style="margin: 0 0 12px 0; font-size: 14px; color: #166534;">✅ Tasks (<span id="data-task-count">0</span>)</h4>
+                                        <div id="data-tasks-preview" style="font-size: 12px; max-height: 150px; overflow-y: auto;"></div>
+                                    </div>
+                                    <div style="background: #fdf4ff; border-radius: 12px; padding: 20px; border: 1px solid #e879f9;">
+                                        <h4 style="margin: 0 0 12px 0; font-size: 14px; color: #86198f;">📅 Deadlines (<span id="data-deadline-count">0</span>)</h4>
+                                        <div id="data-deadlines-preview" style="font-size: 12px; max-height: 150px; overflow-y: auto;"></div>
+                                    </div>
+                                </div>
+                                
+                                <!-- SECTION 6: Full Regulation Text (Collapsible) -->
+                                <div style="margin-bottom: 24px; background: #fafbfc; border-radius: 12px; border: 1px solid #e1e5e9;">
+                                    <div onclick="toggleRegText()" style="padding: 16px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e1e5e9;">
+                                        <h4 style="margin: 0; font-size: 14px; color: #1e293b;">📖 Full Regulation Text</h4>
+                                        <span id="reg-text-toggle" style="font-size: 12px; color: #6e7681;">▼ Show</span>
+                                    </div>
+                                    <div id="reg-text-body" style="display: none; max-height: 400px; overflow-y: auto; padding: 20px; line-height: 1.8; font-size: 13px; white-space: pre-wrap;"></div>
+                                </div>
+                                
+                                <!-- SECTION 7: EdSteward Payload Preview -->
+                                <div style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); border-radius: 12px; padding: 20px; color: white;">
+                                    <h4 style="margin: 0 0 12px 0; font-size: 14px;">📤 What EdSteward Receives</h4>
+                                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; font-size: 12px;">
+                                        <div style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 8px; text-align: center;">
+                                            <div style="opacity: 0.8;">REG-KEY</div>
+                                            <div id="payload-regkey" style="font-weight: 600; font-size: 14px;">--</div>
+                                        </div>
+                                        <div style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 8px; text-align: center;">
+                                            <div style="opacity: 0.8;">Risk Score</div>
+                                            <div id="payload-risk" style="font-weight: 600; font-size: 14px;">--</div>
+                                        </div>
+                                        <div style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 8px; text-align: center;">
+                                            <div style="opacity: 0.8;">Tasks</div>
+                                            <div id="payload-tasks" style="font-weight: 600; font-size: 14px;">--</div>
+                                        </div>
+                                        <div style="background: rgba(255,255,255,0.1); padding: 12px; border-radius: 8px; text-align: center;">
+                                            <div style="opacity: 0.8;">Deadlines</div>
+                                            <div id="payload-deadlines" style="font-weight: 600; font-size: 14px;">--</div>
+                                        </div>
+                                    </div>
+                                    <div style="margin-top: 12px; font-size: 11px; opacity: 0.8;">
+                                        Also includes: name, summary, requirements, statute, cfr, filingDeadlines JSON, complianceTasks JSON
+                                    </div>
+                                </div>
+                                
                             </div>
                             <div id="reg-text-error" style="display: none; text-align: center; padding: 40px; color: #d73a49;">
-                                <div style="font-size: 16px; margin-bottom: 10px;">❌ Unable to Load Regulation Text</div>
+                                <div style="font-size: 16px; margin-bottom: 10px;">❌ Unable to Load Data</div>
                                 <div id="reg-text-error-msg" style="font-size: 14px;">Network error</div>
-                                <button onclick="loadRegulationText()" style="margin-top: 15px; padding: 8px 16px; background: #0969da; color: white; border: none; border-radius: 4px; cursor: pointer;">🔄 Retry</button>
+                                <button onclick="loadCompleteData()" style="margin-top: 15px; padding: 8px 16px; background: #0969da; color: white; border: none; border-radius: 4px; cursor: pointer;">🔄 Retry</button>
                             </div>
                         </div>
                     </div>
@@ -3139,8 +3225,21 @@
             return null;
         }
         
-        // TAB 1: Load Regulation Text
-        async function loadRegulationText() {
+        // Toggle regulation text visibility
+        function toggleRegText() {
+            const body = document.getElementById('reg-text-body');
+            const toggle = document.getElementById('reg-text-toggle');
+            if (body.style.display === 'none') {
+                body.style.display = 'block';
+                toggle.textContent = '▲ Hide';
+            } else {
+                body.style.display = 'none';
+                toggle.textContent = '▼ Show';
+            }
+        }
+        
+        // TAB 1: Load Complete Data (All Rich Data)
+        async function loadCompleteData() {
             const loadingDiv = document.getElementById('reg-text-loading');
             const contentDiv = document.getElementById('reg-text-content');
             const errorDiv = document.getElementById('reg-text-error');
@@ -3154,24 +3253,105 @@
                 const reg = await fetchRegulationData();
                 if (!reg) throw new Error('No regulation data');
                 
-                document.getElementById('reg-citation').textContent = reg.statute || '34 CFR 668.46';
-                document.getElementById('reg-source').textContent = 'MCP Registry (PostgreSQL)';
-                document.getElementById('reg-verified').textContent = new Date().toLocaleDateString();
+                console.log('📊 Complete regulation data:', reg);
                 
-                const textBody = document.getElementById('reg-text-body');
-                const fullText = reg.description || reg.regulationText || reg.summary || 'Regulation text not available';
-                textBody.innerHTML = fullText.split('\\n\\n').map(p => 
-                    `<p style="margin-bottom: 16px;">${p}</p>`
-                ).join('');
+                // SECTION 1: Legal Foundation
+                document.getElementById('data-reg-key').textContent = reg.reg_key || reg.regKey || '--';
+                document.getElementById('data-usc').textContent = reg.statute || '--';
+                document.getElementById('data-cfr').textContent = reg.cfr || '--';
+                document.getElementById('data-lovv').textContent = reg.lovv_level || reg.lovvLevel || 'A';
+                
+                // SECTION 2: Risk Assessment
+                const riskAssessment = reg.risk_assessment || reg.riskAssessment || {};
+                const riskScore = riskAssessment.riskScore || reg.riskScore || '--';
+                const riskLevel = riskAssessment.riskLevel || reg.riskLevel || '--';
+                
+                document.getElementById('data-risk-score').textContent = riskScore;
+                document.getElementById('data-risk-level').textContent = riskLevel;
+                
+                // Color the risk box based on level
+                const riskBox = document.getElementById('data-risk-score-box');
+                if (riskLevel === 'CRITICAL') {
+                    riskBox.style.background = '#fef2f2';
+                    riskBox.style.borderColor = '#ef4444';
+                } else if (riskLevel === 'SEVERE') {
+                    riskBox.style.background = '#fff7ed';
+                    riskBox.style.borderColor = '#f97316';
+                } else if (riskLevel === 'HIGH') {
+                    riskBox.style.background = '#fefce8';
+                    riskBox.style.borderColor = '#eab308';
+                } else {
+                    riskBox.style.background = '#f0fdf4';
+                    riskBox.style.borderColor = '#22c55e';
+                }
+                
+                // Risk Factors
+                const factors = riskAssessment.riskFactors || {};
+                const factorsHTML = Object.entries(factors).map(([key, val]) => {
+                    const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
+                    return `<div style="display: flex; justify-content: space-between;"><span>${label}:</span><strong>${val || '--'}</strong></div>`;
+                }).join('');
+                document.getElementById('data-risk-factors').innerHTML = factorsHTML || '<div>No risk factors data</div>';
+                
+                // SECTION 3: Summary
+                document.getElementById('data-summary').innerHTML = reg.summary || '<em>No summary available</em>';
+                
+                // SECTION 4: Key Requirements
+                const reqText = reg.requirements || reg.keyRequirements || '';
+                if (typeof reqText === 'string' && reqText.length > 0) {
+                    document.getElementById('data-requirements').innerHTML = reqText.replace(/\\n/g, '<br>').replace(/## /g, '<strong>').replace(/\\n/g, '</strong><br>');
+                } else if (Array.isArray(reqText)) {
+                    document.getElementById('data-requirements').innerHTML = reqText.map(r => `• ${r.requirement || r}`).join('<br>');
+                } else {
+                    document.getElementById('data-requirements').innerHTML = '<em>No requirements defined</em>';
+                }
+                
+                // SECTION 5: Tasks & Deadlines
+                const tasks = reg.tasks || [];
+                const deadlines = reg.deadlines || [];
+                
+                document.getElementById('data-task-count').textContent = tasks.length;
+                document.getElementById('data-deadline-count').textContent = deadlines.length;
+                
+                // Tasks preview (first 5)
+                const tasksPreviewHTML = tasks.slice(0, 5).map(t => 
+                    `<div style="padding: 6px 0; border-bottom: 1px solid #dcfce7;"><strong>${t.priority || 'TASK'}:</strong> ${t.title || t.name || t.description}</div>`
+                ).join('') + (tasks.length > 5 ? `<div style="padding: 6px 0; color: #166534;"><em>...and ${tasks.length - 5} more tasks</em></div>` : '');
+                document.getElementById('data-tasks-preview').innerHTML = tasksPreviewHTML || '<em>No tasks</em>';
+                
+                // Deadlines preview
+                const deadlinesPreviewHTML = deadlines.slice(0, 5).map(d => 
+                    `<div style="padding: 6px 0; border-bottom: 1px solid #f5d0fe;"><strong>${d.type || d.name || 'DEADLINE'}:</strong> ${d.date || d.dueDate || 'Ongoing'}</div>`
+                ).join('') + (deadlines.length > 5 ? `<div style="padding: 6px 0; color: #86198f;"><em>...and ${deadlines.length - 5} more</em></div>` : '');
+                document.getElementById('data-deadlines-preview').innerHTML = deadlinesPreviewHTML || '<em>No deadlines</em>';
+                
+                // SECTION 6: Full Regulation Text
+                const fullText = reg.regulation_text || reg.regulationText || reg.description || 'Regulation text not available';
+                document.getElementById('reg-text-body').textContent = fullText;
+                
+                // SECTION 7: EdSteward Payload Preview
+                document.getElementById('payload-regkey').textContent = reg.reg_key || reg.regKey || '--';
+                document.getElementById('payload-risk').textContent = riskScore;
+                document.getElementById('payload-tasks').textContent = tasks.length;
+                document.getElementById('payload-deadlines').textContent = deadlines.length;
                 
                 loadingDiv.style.display = 'none';
                 contentDiv.style.display = 'block';
+                
+                addConsoleLog(`📊 Complete data loaded: ${reg.name}`, 'success');
+                addConsoleLog(`   REG-KEY: ${reg.reg_key || '--'} | Risk: ${riskScore} | Tasks: ${tasks.length} | Deadlines: ${deadlines.length}`, 'info');
+                
             } catch (err) {
-                console.error('Failed to load regulation text:', err);
+                console.error('Failed to load complete data:', err);
                 loadingDiv.style.display = 'none';
                 errorDiv.style.display = 'block';
                 document.getElementById('reg-text-error-msg').textContent = err.message;
             }
+        }
+        
+        // Alias for backward compatibility
+        async function loadRegulationText() {
+            return loadCompleteData();
         }
         
         // TAB 2: Load Summary & Scope
