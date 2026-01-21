@@ -18,7 +18,14 @@ const REGULATION_SIGNATURES = {
   'jeanne-clery-disclosure-of-campus-security-policy-': {
     name: 'Clery Act',
     requiredKeywords: ['campus security', 'crime statistics', 'annual security report', 'timely warning'],
-    forbiddenKeywords: ['governmental auditing', 'Student Assistance General Provisions'],
+    forbiddenKeywords: [
+      'governmental auditing',              // Wrong Part 668 section
+      'Student Assistance General Provisions', // Wrong Part 668 section
+      'sex discrimination',                 // Title IX-specific
+      'sexual harassment grievance',        // Title IX-specific
+      'educational records',                // FERPA-specific
+      'directory information'               // FERPA-specific
+    ],
     expectedCitations: ['20 U.S.C. § 1092', '34 CFR 668', '34 CFR Part 668'],
     minContentLength: 500,
     topics: ['campus safety', 'crime reporting', 'security policy', 'disclosure']
@@ -26,7 +33,13 @@ const REGULATION_SIGNATURES = {
   'family-educational-rights-and-privacy-act-ferpa': {
     name: 'FERPA',
     requiredKeywords: ['educational records', 'student privacy', 'directory information', 'consent'],
-    forbiddenKeywords: [],
+    forbiddenKeywords: [
+      'campus security policy',      // Clery-specific
+      'crime statistics',            // Clery-specific
+      'sex discrimination',          // Title IX-specific
+      'sexual harassment',           // Title IX-specific
+      'athletics equity'             // Title IX-specific
+    ],
     expectedCitations: ['20 U.S.C. § 1232g', '34 CFR Part 99'],
     minContentLength: 500,
     topics: ['student records', 'privacy rights', 'educational agency']
@@ -34,7 +47,14 @@ const REGULATION_SIGNATURES = {
   'title-ix-of-the-education-amendment-of-1972': {
     name: 'Title IX',
     requiredKeywords: ['sex discrimination', 'educational program', 'sexual harassment', 'athletics'],
-    forbiddenKeywords: [],
+    forbiddenKeywords: [
+      'campus security policy',      // Clery-specific
+      'crime statistics',            // Clery-specific
+      'timely warning',              // Clery-specific
+      'annual security report',      // Clery-specific
+      'educational records',         // FERPA-specific
+      'directory information'        // FERPA-specific
+    ],
     expectedCitations: ['20 U.S.C. § 1681', '34 CFR Part 106'],
     minContentLength: 500,
     topics: ['gender equity', 'discrimination', 'educational institution']
