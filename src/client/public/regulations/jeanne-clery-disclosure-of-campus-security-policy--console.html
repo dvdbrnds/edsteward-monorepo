@@ -2049,6 +2049,22 @@
         async function runLinearEngine() {
             if (isRunning) return;
             
+            // ⚠️ CONFIRMATION REQUIRED - Workflow can overwrite curated data
+            const confirmed = confirm(
+                '⚠️ EXECUTE COMPREHENSIVE WORKFLOW?\n\n' +
+                'This will:\n' +
+                '• Fetch data from government sources (eCFR, Federal Register)\n' +
+                '• Run AI analysis on regulation text\n' +
+                '• Update the database with new data\n\n' +
+                '🔒 Protected fields (regulation_text, requirements) on locked regulations will NOT be overwritten.\n\n' +
+                'Click OK to proceed or Cancel to abort.'
+            );
+            
+            if (!confirmed) {
+                console.log('Workflow execution cancelled by user');
+                return;
+            }
+            
             isRunning = true;
             startTime = Date.now();
             currentStep = 0;
@@ -2565,7 +2581,7 @@
             }
             
             regulationClient = new REG66UpdateClient({
-                wsUrl: 'ws://localhost:3051/regulation-updates',
+                wsUrl: 'ws://localhost:3003/regulation-updates',
                 autoReconnect: true
             });
             
@@ -2743,14 +2759,14 @@
             
             try {
                 // Fetch customers
-                const customersResponse = await fetch('http://localhost:3051/api/customers');
+                const customersResponse = await fetch('http://localhost:3003/api/customers');
                 if (customersResponse.ok) {
                     const customersData = await customersResponse.json();
                     deliveryTargets.customers = customersData.customers || [];
                 }
 
                 // Fetch connected WebSocket clients
-                const clientsResponse = await fetch('http://localhost:3051/api/clients');
+                const clientsResponse = await fetch('http://localhost:3003/api/clients');
                 if (clientsResponse.ok) {
                     const clientsData = await clientsResponse.json();
                     deliveryTargets.clients = clientsData.clients || [];
@@ -2845,7 +2861,7 @@
                     // Push to all WebSocket clients
                     addConsoleLog('📤 Pushing to ALL connected clients...', 'info');
                     
-                    const response = await fetch('http://localhost:3051/api/clients/push', {
+                    const response = await fetch('http://localhost:3003/api/clients/push', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -2869,7 +2885,7 @@
                     
                     addConsoleLog(`📤 Pushing to customer: ${customer?.name || customerId}...`, 'info');
                     
-                    const response = await fetch('http://localhost:3051/api/customers/push', {
+                    const response = await fetch('http://localhost:3003/api/customers/push', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -2894,7 +2910,7 @@
                     
                     addConsoleLog(`📤 Pushing to WebSocket client: ${clientId}...`, 'info');
                     
-                    const response = await fetch('http://localhost:3051/api/clients/push', {
+                    const response = await fetch('http://localhost:3003/api/clients/push', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -2941,7 +2957,7 @@
                 addConsoleLog('📤 Initiating manual regulation update push...', 'info');
                 
                 // Call the delivery system API to trigger a manual update
-                const response = await fetch('http://localhost:3051/api/trigger-update', {
+                const response = await fetch('http://localhost:3003/api/trigger-update', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -2987,7 +3003,7 @@
                 addConsoleLog('📤 Sending Clery Act update to EdSteward...', 'info');
                 
                 // Use delivery system proxy to avoid CORS
-                const response = await fetch('http://localhost:3051/api/send-to-edsteward', {
+                const response = await fetch('http://localhost:3003/api/send-to-edsteward', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -4695,7 +4711,7 @@
             try {
                 addConsoleLog('🔌 Connecting to real-time regulation update service...', 'info');
                 
-                regulationWebSocket = new WebSocket('ws://localhost:3051/regulation-updates');
+                regulationWebSocket = new WebSocket('ws://localhost:3003/regulation-updates');
                 
                 regulationWebSocket.onopen = function() {
                     addConsoleLog('✅ Connected to real-time update service', 'success');
