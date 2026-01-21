@@ -7,25 +7,36 @@ This protocol ensures each regulation in the MCP Engine meets quality standards 
 
 ## Phase 1: Infrastructure Setup (Before Content)
 
-### 1.1 Console HTML File
-Each regulation needs a dedicated console with all our improvements.
+> **✅ AUTOMATED**: Phase 1 is now fully automated. All 284 consoles have been synced with Clery template improvements. New regulations just need validator/CFR signatures.
 
-**Template Location:** `src/client/public/regulations/`
+### 1.1 Console HTML File ✅ DONE FOR ALL
 
-**Required Features:**
-- [ ] Inquisitor AI Audit integration
-- [ ] Workflow execution with confirmation dialog
-- [ ] Delivery system integration (port 3003)
-- [ ] LLM Gateway integration (port 3004)
-- [ ] Registry API integration (port 3010)
-- [ ] Fixed UI/UX layout (no drift, contained cards)
+All consoles are automatically synced from the Clery template (gold standard).
 
-**Action:** Copy from Clery template and update regulation-specific values.
+**To sync improvements to all consoles:**
+```bash
+npm run sync-consoles
+```
+
+**Features included automatically:**
+- ✅ Inquisitor AI Audit integration with score breakdown
+- ✅ Workflow execution with confirmation dialog
+- ✅ Delivery system integration (port 3003)
+- ✅ LLM Gateway integration (port 3004)
+- ✅ Registry API integration (port 3010)
+- ✅ Fixed UI/UX layout (overflow hidden, contained cards)
+- ✅ CSS fixes for no drift
 
 ### 1.2 Source Data Validator Signature
-Add regulation to `src/services/source-data-validator.js`
 
-**Required Fields:**
+**Check if signature exists:**
+```bash
+npm run standardize REG-XXX
+```
+
+The script will show if a signature exists or generate one to add.
+
+**Add to `src/services/source-data-validator.js`:**
 ```javascript
 'regulation-slug': {
   name: 'Regulation Short Name',
@@ -38,9 +49,13 @@ Add regulation to `src/services/source-data-validator.js`
 ```
 
 ### 1.3 CFR Mapping (Workflow Engine)
-Add/verify in `src/llm-gateway/services/comprehensive-workflow-engine.js`
 
-**Required Fields:**
+**Check if mapping exists:**
+```bash
+npm run standardize REG-XXX
+```
+
+**Add to `src/llm-gateway/services/comprehensive-workflow-engine.js`:**
 ```javascript
 'regulation-slug': { 
   title: 'XX',           // CFR Title number
@@ -155,33 +170,38 @@ Copy this for each regulation:
 ```
 ## REG-XXX: [Name]
 
-### Phase 1: Infrastructure
-- [ ] Console HTML created/updated
-- [ ] Source validator signature added
-- [ ] CFR mapping verified
+### Phase 1: Infrastructure (Mostly Automated)
+- [x] Console HTML synced (npm run sync-consoles)
+- [ ] Source validator signature verified/added
+- [ ] CFR mapping verified/added
 
-### Phase 2: Content
-- [ ] Regulation text with citations
-- [ ] Requirements formatted
-- [ ] Summary written
-- [ ] Tasks created
-- [ ] Deadlines set
+### Phase 2: Content Curation
+- [ ] Regulation text with legal citations (800+ chars)
+- [ ] Requirements formatted with ## headers (300+ chars)
+- [ ] Summary is business-focused
+- [ ] Tasks created with hierarchy
+- [ ] Deadlines set with proper structure
 
 ### Phase 3: QA
-- [ ] Inquisitor score: __/100
-- [ ] Validator test passed
-- [ ] Fields locked
+- [ ] Inquisitor audit: __/100 (target: 90+)
+- [ ] Source validator test passed (bad data rejected)
+- [ ] Fields locked in database
 
 ### Phase 4: Complete
-- [ ] Committed to git
-- [ ] Recorded to Byterover
+- [ ] Committed to git with descriptive message
+- [ ] Code b (Byterover memory recorded)
 ```
 
 ---
 
-## Automation Scripts (Future)
+## Automation Scripts ✅ AVAILABLE
 
-TODO: Create scripts to automate parts of this process:
-- `npm run standardize:new <slug>` - Creates console from template
-- `npm run standardize:validate <slug>` - Runs all QA checks
-- `npm run standardize:lock <slug>` - Locks curated fields
+| Command | Purpose |
+|---------|---------|
+| `npm run sync-consoles` | Sync ALL consoles with Clery template improvements |
+| `npm run standardize REG-XXX` | Check infrastructure status, generate validator/CFR signatures |
+| `npm run monitor` | Health monitor for all services |
+
+### Future Automation (TODO)
+- `npm run standardize:validate <slug>` - Runs all QA checks automatically
+- `npm run standardize:lock <slug>` - Locks curated fields via CLI
