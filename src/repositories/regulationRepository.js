@@ -168,15 +168,21 @@ const RegulationRepository = {
          FROM risk_assessments ra 
          WHERE ra.regulation_id = r.id) as risk_assessment
       FROM regulations r
-      WHERE r.item_id = $1
+      WHERE r.item_id = $1 AND r.is_current = TRUE
     `;
     
     let result = await query(sql, [id]);
     
     // If not found, try as numeric ID
     if (result.rows.length === 0 && !isNaN(parseInt(id))) {
-      sql = sql.replace('r.item_id = $1', 'r.id = $1');
+      sql = sql.replace('r.item_id = $1 AND r.is_current = TRUE', 'r.id = $1 AND r.is_current = TRUE');
       result = await query(sql, [parseInt(id)]);
+    }
+    
+    // If still not found with is_current filter, try without (for historical lookups)
+    if (result.rows.length === 0) {
+      sql = sql.replace('AND r.is_current = TRUE', '');
+      result = await query(sql, [id]);
     }
     
     if (result.rows.length === 0) {
