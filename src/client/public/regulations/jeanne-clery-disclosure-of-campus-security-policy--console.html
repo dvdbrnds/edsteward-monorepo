@@ -704,8 +704,6 @@
         }
         
         .regulation-content {
-            max-height: 500px;
-            overflow-y: auto;
             border: 1px solid #e1e5e9;
             border-radius: 8px;
             background: #ffffff;
@@ -1330,6 +1328,7 @@
                     <button class="tab-button" onclick="showTab('summary-scope')">📋 Summary & Scope</button>
                     <button class="tab-button" onclick="showTab('tasks-deadlines')">📅 Tasks & Deadlines</button>
                     <button class="tab-button" onclick="showTab('risk-assessment')">⚠️ Risk Assessment</button>
+                    <button class="tab-button" onclick="showTab('system-log')">🖥️ System Log</button>
                     <button class="tab-button" onclick="showTab('customer-payload')" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; font-weight: 600;">📤 Customer Payload</button>
                 </div>
                 
@@ -1391,27 +1390,37 @@
                                     <div id="data-requirements" style="font-size: 13px; line-height: 1.8; color: #78350f;"></div>
                                 </div>
                                 
-                                <!-- SECTION 5: Tasks & Deadlines Summary -->
-                                <div style="margin-bottom: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                                    <div style="background: #f0fdf4; border-radius: 12px; padding: 20px; border: 1px solid #86efac;">
-                                        <h4 style="margin: 0 0 12px 0; font-size: 14px; color: #166534;">✅ Tasks (<span id="data-task-count">0</span>)</h4>
-                                        <div id="data-tasks-preview" style="font-size: 12px; max-height: 150px; overflow-y: auto;"></div>
+                                <!-- SECTION 5: Tasks (Expandable) -->
+                                <div style="margin-bottom: 16px; background: #f0fdf4; border-radius: 12px; border: 1px solid #86efac; overflow: hidden;">
+                                    <div onclick="toggleTasksSection()" style="padding: 16px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #166534 0%, #15803d 100%); color: white;">
+                                        <h4 style="margin: 0; font-size: 14px; color: white;">✅ Compliance Tasks (<span id="data-task-count">0</span>)</h4>
+                                        <span id="tasks-toggle" style="font-size: 12px; color: white;">▼ Expand</span>
                                     </div>
-                                    <div style="background: #fdf4ff; border-radius: 12px; padding: 20px; border: 1px solid #e879f9;">
-                                        <h4 style="margin: 0 0 12px 0; font-size: 14px; color: #86198f;">📅 Deadlines (<span id="data-deadline-count">0</span>)</h4>
-                                        <div id="data-deadlines-preview" style="font-size: 12px; max-height: 150px; overflow-y: auto;"></div>
+                                    <div id="data-tasks-expanded" style="display: none; padding: 16px; max-height: 400px; overflow-y: auto; background: #f8fdf8;">
+                                        <div id="data-tasks-list" style="font-size: 13px; color: #1e293b;"></div>
                                     </div>
-                                    </div>
+                                </div>
                                 
-                                <!-- SECTION 6: Full Regulation Text (Collapsible) -->
+                                <!-- SECTION 6: Deadlines (Expandable) -->
+                                <div style="margin-bottom: 24px; background: #fdf4ff; border-radius: 12px; border: 1px solid #e879f9; overflow: hidden;">
+                                    <div onclick="toggleDeadlinesSection()" style="padding: 16px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #86198f 0%, #a21caf 100%); color: white;">
+                                        <h4 style="margin: 0; font-size: 14px; color: white;">📅 Filing Deadlines (<span id="data-deadline-count">0</span>)</h4>
+                                        <span id="deadlines-toggle" style="font-size: 12px; color: white;">▼ Expand</span>
+                                    </div>
+                                    <div id="data-deadlines-expanded" style="display: none; padding: 16px; max-height: 300px; overflow-y: auto; background: #fefaff;">
+                                        <div id="data-deadlines-list" style="font-size: 13px; color: #1e293b;"></div>
+                                    </div>
+                                </div>
+                    
+                                <!-- SECTION 7: Full Regulation Text (Collapsible) -->
                                 <div style="margin-bottom: 24px; background: #fafbfc; border-radius: 12px; border: 1px solid #e1e5e9;">
                                     <div onclick="toggleRegText()" style="padding: 16px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e1e5e9;">
                                         <h4 style="margin: 0; font-size: 14px; color: #1e293b;">📖 Full Regulation Text</h4>
                                         <span id="reg-text-toggle" style="font-size: 12px; color: #6e7681;">▼ Show</span>
-                                    </div>
-                                    <div id="reg-text-body" style="display: none; max-height: 400px; overflow-y: auto; padding: 20px; line-height: 1.8; font-size: 13px; white-space: pre-wrap;"></div>
                                 </div>
-                                
+                                    <div id="reg-text-body" style="display: none; max-height: 400px; overflow-y: auto; padding: 20px; line-height: 1.8; font-size: 13px; white-space: pre-wrap;"></div>
+                    </div>
+                    
                                 <!-- SECTION 7: EdSteward Payload Preview -->
                                 <div style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); border-radius: 12px; padding: 20px; color: white;">
                                     <h4 style="margin: 0 0 12px 0; font-size: 14px;">📤 What EdSteward Receives</h4>
@@ -1432,18 +1441,18 @@
                                             <div style="opacity: 0.8;">Deadlines</div>
                                             <div id="payload-deadlines" style="font-weight: 600; font-size: 14px;">--</div>
                                         </div>
-                                    </div>
+                            </div>
                                     <div style="margin-top: 12px; font-size: 11px; opacity: 0.8;">
                                         Also includes: name, summary, requirements, statute, cfr, filingDeadlines JSON, complianceTasks JSON
-                                    </div>
-                                </div>
-                                
+                        </div>
+                    </div>
+                    
                             </div>
                             <div id="reg-text-error" style="display: none; text-align: center; padding: 40px; color: #d73a49;">
                                 <div style="font-size: 16px; margin-bottom: 10px;">❌ Unable to Load Data</div>
                                 <div id="reg-text-error-msg" style="font-size: 14px;">Network error</div>
                                 <button onclick="loadCompleteData()" style="margin-top: 15px; padding: 8px 16px; background: #0969da; color: white; border: none; border-radius: 4px; cursor: pointer;">🔄 Retry</button>
-                            </div>
+                                </div>
                         </div>
                     </div>
                     
@@ -1452,20 +1461,20 @@
                         <div class="regulation-section">
                             <div id="summary-loading" style="text-align: center; padding: 40px; color: #6e7681;">
                                 <div style="font-size: 16px;">📋 Loading Summary & Scope...</div>
-                            </div>
+                                        </div>
                             <div id="summary-content" style="display: none;">
                                 <!-- Summary Box -->
                                 <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 1px solid #0ea5e9; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
                                     <h5 style="margin: 0 0 12px 0; color: #0c4a6e;">📋 Plain Language Summary</h5>
                                     <div id="summary-text" style="font-size: 15px; line-height: 1.7; color: #1e3a5f;"></div>
-                                </div>
+                                    </div>
                     
                                 <!-- Scope Grid -->
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                                     <div style="background: #f8fafc; border-radius: 8px; padding: 20px; border: 1px solid #e2e8f0;">
                                         <h5 style="margin: 0 0 16px 0; color: #1e293b;">🎯 Who Must Comply</h5>
                                         <ul id="scope-who" style="margin: 0; padding-left: 20px; line-height: 1.8;"></ul>
-                                </div>
+                            </div>
                                     <div style="background: #f8fafc; border-radius: 8px; padding: 20px; border: 1px solid #e2e8f0;">
                                         <h5 style="margin: 0 0 16px 0; color: #1e293b;">🏢 Departments Responsible</h5>
                                         <div id="scope-departments" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
@@ -1476,11 +1485,11 @@
                                 <div style="margin-top: 24px; background: #fffbeb; border-radius: 8px; padding: 20px; border: 1px solid #fcd34d;">
                                     <h5 style="margin: 0 0 16px 0; color: #92400e;">⚡ Key Requirements</h5>
                                     <div id="key-requirements" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;"></div>
+                                            </div>
+                                            </div>
                                         </div>
-                            </div>
-                        </div>
-                    </div>
-                    
+                                    </div>
+                                    
                     <!-- TAB 3: Tasks & Deadlines -->
                     <div id="tasks-deadlines" class="tab-content" style="display: none;">
                         <div class="regulation-section">
@@ -1492,20 +1501,20 @@
                                 <div style="margin-bottom: 24px;">
                                     <h5 style="margin: 0 0 16px 0; color: #1e293b; font-size: 16px;">📅 Filing Deadlines</h5>
                                     <div id="deadlines-list" style="display: grid; gap: 12px;"></div>
-                                    </div>
-                                    
+                                </div>
+                                
                                 <!-- Tasks Section -->
                                 <div>
                                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                                         <h5 style="margin: 0; color: #1e293b; font-size: 16px;">✅ Compliance Tasks</h5>
                                         <span id="task-count" style="background: #dbeafe; color: #1d4ed8; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;"></span>
-                                            </div>
-                                    <div id="tasks-list" style="display: flex; flex-direction: column; gap: 12px; max-height: 350px; overflow-y: auto;"></div>
-                                            </div>
                                         </div>
-                                    </div>
+                                    <div id="tasks-list" style="display: flex; flex-direction: column; gap: 12px; max-height: 350px; overflow-y: auto;"></div>
                                 </div>
-                                
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- TAB 4: Risk Assessment -->
                     <div id="risk-assessment" class="tab-content" style="display: none;">
                         <div class="regulation-section">
@@ -1571,7 +1580,23 @@
                                     </div>
                                 </div>
                                 
-                    <!-- TAB 5: Customer Payload -->
+                    <!-- TAB 5: System Log -->
+                    <div id="system-log" class="tab-content" style="display: none;">
+                        <div class="regulation-section">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                                <h4 style="margin: 0;">🖥️ System Activity Log</h4>
+                                <div style="display: flex; gap: 8px;">
+                                    <button onclick="clearConsoleLog()" style="padding: 6px 12px; background: #6b7280; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">🗑️ Clear</button>
+                                    <button onclick="copyConsoleLog()" style="padding: 6px 12px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">📋 Copy</button>
+                                </div>
+                            </div>
+                            <div id="system-log-content" style="background: #1e293b; border-radius: 8px; padding: 16px; max-height: 500px; overflow-y: auto; font-family: 'SF Mono', Monaco, monospace; font-size: 12px; line-height: 1.6;">
+                                <!-- Log entries will be mirrored here -->
+                            </div>
+                        </div>
+                    </div>
+                                
+                    <!-- TAB 6: Customer Payload -->
                     <div id="customer-payload" class="tab-content" style="display: none;">
                         <div class="regulation-section">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -1600,7 +1625,7 @@
                 </div>
             </div>
 
-            <div class="console-output" id="consoleOutput">
+            <div class="console-output" id="consoleOutput" style="display: none;">
                 <div class="log-entry">
                     <span class="log-timestamp">[SYSTEM]</span>
                     <span class="log-level-success">Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Act (Clery Act) and Violence Against Women Act (VAWA) Console Initialized</span>
@@ -1870,38 +1895,61 @@
         }
         
         function addConsoleLog(message, level = 'info') {
-            const console = document.getElementById('consoleOutput');
-            const entry = document.createElement('div');
-            entry.className = 'log-entry';
+            const consoleOutput = document.getElementById('consoleOutput');
+            const systemLogContent = document.getElementById('system-log-content');
             
             const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
             
-            // Clean message of emojis and make professional
-            const cleanMessage = message.replace(/[\u{1F600}-\u{1F6FF}]/gu, '')
-                                       .replace(/[\u{2600}-\u{27BF}]/gu, '')
-                                       .replace(/[\u{1F300}-\u{1F5FF}]/gu, '')
-                                       .replace(/[\u{1F900}-\u{1F9FF}]/gu, '')
-                                       .replace(/[\u{1F680}-\u{1F6C5}]/gu, '')
-                                       .replace(/🚀/g, '')
-                                       .replace(/📋/g, '')
-                                       .replace(/📖/g, '')
-                                       .replace(/🔍/g, '')
-                                       .replace(/🏛️/g, '')
-                                       .replace(/📚/g, '')
-                                       .replace(/📜/g, '')
-                                       .replace(/⚖️/g, '')
-                                       .replace(/✅/g, '')
-                                       .replace(/📊/g, '')
-                                       .replace(/🎯/g, '')
-                                       .trim();
+            // Level colors for system log tab
+            const levelColors = {
+                info: '#60a5fa',
+                success: '#4ade80',
+                warning: '#fbbf24',
+                error: '#f87171',
+                debug: '#a78bfa'
+            };
+            const color = levelColors[level] || '#94a3b8';
             
+            // Entry for old console (hidden but still works)
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
             entry.innerHTML = `
                 <span class="log-timestamp">[${timestamp}]</span>
-                <span class="log-level-${level}">${cleanMessage}</span>
+                <span class="log-level-${level}">${message}</span>
             `;
+            if (consoleOutput) {
+                consoleOutput.appendChild(entry);
+                consoleOutput.scrollTop = consoleOutput.scrollHeight;
+            }
             
-            console.appendChild(entry);
-            console.scrollTop = console.scrollHeight;
+            // Entry for new system log tab (with colors, keeps emojis)
+            if (systemLogContent) {
+                const logEntry = document.createElement('div');
+                logEntry.style.cssText = `padding: 8px 12px; margin-bottom: 4px; background: rgba(255,255,255,0.05); border-radius: 4px; border-left: 3px solid ${color};`;
+                logEntry.innerHTML = `
+                    <span style="color: #64748b; margin-right: 12px;">[${timestamp}]</span>
+                    <span style="color: ${color};">${message}</span>
+                `;
+                systemLogContent.appendChild(logEntry);
+                systemLogContent.scrollTop = systemLogContent.scrollHeight;
+            }
+        }
+        
+        function clearConsoleLog() {
+            const systemLogContent = document.getElementById('system-log-content');
+            if (systemLogContent) {
+                systemLogContent.innerHTML = '<div style="color: #64748b; text-align: center; padding: 20px;">Log cleared</div>';
+            }
+        }
+        
+        function copyConsoleLog() {
+            const systemLogContent = document.getElementById('system-log-content');
+            if (systemLogContent) {
+                const text = systemLogContent.innerText;
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Log copied to clipboard!');
+                });
+            }
         }
         
         function updateStatus(status, type) {
@@ -3238,6 +3286,32 @@
             }
         }
         
+        // Toggle tasks section
+        function toggleTasksSection() {
+            const expanded = document.getElementById('data-tasks-expanded');
+            const toggle = document.getElementById('tasks-toggle');
+            if (expanded.style.display === 'none') {
+                expanded.style.display = 'block';
+                toggle.textContent = '▲ Collapse';
+            } else {
+                expanded.style.display = 'none';
+                toggle.textContent = '▼ Expand';
+            }
+        }
+        
+        // Toggle deadlines section
+        function toggleDeadlinesSection() {
+            const expanded = document.getElementById('data-deadlines-expanded');
+            const toggle = document.getElementById('deadlines-toggle');
+            if (expanded.style.display === 'none') {
+                expanded.style.display = 'block';
+                toggle.textContent = '▲ Collapse';
+            } else {
+                expanded.style.display = 'none';
+                toggle.textContent = '▼ Expand';
+            }
+        }
+        
         // TAB 1: Load Complete Data (All Rich Data)
         async function loadCompleteData() {
             console.log('🔄 loadCompleteData() called');
@@ -3367,21 +3441,58 @@
                 
                 console.log('📊 Setting tasks and deadlines...');
                 
-                // SECTION 5: Tasks & Deadlines
-                const tasks = reg.tasks || [];
-                const deadlines = reg.deadlines || [];
+                // SECTION 5 & 6: Tasks & Deadlines (Expandable)
+                const tasks = reg.complianceTasks || reg.tasks || [];
+                const deadlines = reg.filingDeadlines || reg.deadlines || [];
                 
                 const taskCountEl = document.getElementById('data-task-count');
                 const deadlineCountEl = document.getElementById('data-deadline-count');
                 if (taskCountEl) taskCountEl.textContent = tasks.length;
                 if (deadlineCountEl) deadlineCountEl.textContent = deadlines.length;
                 
-                // Tasks preview (first 5)
-                const tasksPreviewHTML = tasks.slice(0, 5).map(t => 
-                    `<div style="padding: 6px 0; border-bottom: 1px solid #dcfce7;"><strong>${t.priority || 'TASK'}:</strong> ${t.title || t.name || t.description}</div>`
-                ).join('') + (tasks.length > 5 ? `<div style="padding: 6px 0; color: #166534;"><em>...and ${tasks.length - 5} more tasks</em></div>` : '');
-                const tasksPreviewEl = document.getElementById('data-tasks-preview');
-                if (tasksPreviewEl) tasksPreviewEl.innerHTML = tasksPreviewHTML || '<em>No tasks</em>';
+                // Full tasks list with details
+                const priorityColors = { CRITICAL: '#dc2626', HIGH: '#ea580c', MEDIUM: '#ca8a04', LOW: '#22c55e' };
+                const tasksListHTML = tasks.map((t, idx) => {
+                    const priority = (t.priority || 'MEDIUM').toUpperCase();
+                    const color = priorityColors[priority] || '#64748b';
+                    const isParent = !t.parent_task_id && !t.parentTaskId;
+                    const indent = isParent ? '0' : '24px';
+                    return `<div style="padding: 12px; margin-bottom: 8px; margin-left: ${indent}; background: white; border-radius: 8px; border-left: 4px solid ${color}; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                            <strong style="color: #1e293b; font-size: 13px;">${t.title || t.name || 'Task ' + (idx+1)}</strong>
+                            <span style="background: ${color}; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600;">${priority}</span>
+                        </div>
+                        ${t.description ? `<div style="color: #475569; font-size: 12px; margin-bottom: 6px;">${t.description}</div>` : ''}
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap; font-size: 11px; color: #64748b;">
+                            ${t.assigned_role || t.assignedRole ? `<span>👤 ${t.assigned_role || t.assignedRole}</span>` : ''}
+                            ${t.evidence_required || t.evidenceRequired ? '<span>📋 Evidence Required</span>' : ''}
+                            ${t.frequency ? `<span>🔄 ${t.frequency}</span>` : ''}
+                        </div>
+                    </div>`;
+                }).join('');
+                const tasksListEl = document.getElementById('data-tasks-list');
+                if (tasksListEl) tasksListEl.innerHTML = tasksListHTML || '<em style="color: #6b7280;">No tasks defined</em>';
+                
+                // Full deadlines list with details
+                const deadlinesListHTML = deadlines.map((d, idx) => {
+                    const dateStr = d.date || d.dueDate || d.deadline || 'Ongoing';
+                    const isRecurring = d.frequency && d.frequency !== 'one-time';
+                    return `<div style="padding: 12px; margin-bottom: 8px; background: white; border-radius: 8px; border-left: 4px solid #a21caf; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                            <strong style="color: #1e293b; font-size: 13px;">${d.type || d.name || 'Deadline ' + (idx+1)}</strong>
+                            <span style="background: ${isRecurring ? '#7c3aed' : '#0891b2'}; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600;">
+                                ${isRecurring ? '🔄 ' + d.frequency : '📅 ' + dateStr}
+                            </span>
+                        </div>
+                        ${d.description ? `<div style="color: #475569; font-size: 12px; margin-bottom: 6px;">${d.description}</div>` : ''}
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap; font-size: 11px; color: #64748b;">
+                            ${d.responsible_role || d.responsibleRole ? `<span>👤 ${d.responsible_role || d.responsibleRole}</span>` : ''}
+                            ${d.penalty ? `<span>⚠️ Penalty: ${d.penalty}</span>` : ''}
+                        </div>
+                    </div>`;
+                }).join('');
+                const deadlinesListEl = document.getElementById('data-deadlines-list');
+                if (deadlinesListEl) deadlinesListEl.innerHTML = deadlinesListHTML || '<em style="color: #6b7280;">No deadlines defined</em>';
                 
                 // Deadlines preview
                 const deadlinesPreviewHTML = deadlines.slice(0, 5).map(d => 
