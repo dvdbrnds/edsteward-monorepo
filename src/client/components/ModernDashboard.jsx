@@ -228,12 +228,14 @@ const EmptyStateContainer = styled.div`
 const ModernDashboard = () => {
   const navigate = useNavigate();
   
-  // State management
+  // State management - System Health Stats
   const [stats, setStats] = useState({
-    totalServers: 0,
-    runningServers: 0,
-    stoppedServers: 0,
-    errorServers: 0
+    databaseStatus: 'checking',
+    certifiedGold: 0,
+    certifiedDraft: 0,
+    totalRegulations: 0,
+    totalTasks: 0,
+    totalDeadlines: 0
   });
   const [regulationStats, setRegulationStats] = useState({
     total: 0,
@@ -248,55 +250,6 @@ const ModernDashboard = () => {
   });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [updateAllRunning, setUpdateAllRunning] = useState(false);
-
-  // Update All Regulations functionality
-  const handleUpdateAllRegulations = async () => {
-    if (updateAllRunning) return;
-    
-    setUpdateAllRunning(true);
-    
-    try {
-      console.log('🚀 Starting UPDATE ALL REGULATIONS process');
-      
-      // Fetch all regulations from the API
-      const response = await fetch('http://localhost:3010/api/regulations/all');
-      if (!response.ok) {
-        throw new Error(`Failed to fetch regulations: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      const regulationsList = data.data || [];
-      
-      console.log(`✅ Found ${regulationsList.length} regulations to update`);
-      
-      // Process each regulation sequentially
-      for (let i = 0; i < regulationsList.length; i++) {
-        const regulation = regulationsList[i];
-        
-        console.log(`📋 [${i + 1}/${regulationsList.length}] Processing: ${regulation.name}`);
-        
-        // Simulate regulation update process
-        await new Promise(resolve => setTimeout(resolve, 100)); // Quick processing for dashboard
-        
-        // Add small delay between updates
-        if (i < regulationsList.length - 1) {
-          await new Promise(resolve => setTimeout(resolve, 50));
-        }
-      }
-      
-      console.log('🎉 UPDATE ALL REGULATIONS COMPLETED!');
-      console.log(`✅ Successfully processed ${regulationsList.length} regulations`);
-      
-      // Refresh stats after update
-      await loadDashboardData();
-      
-    } catch (error) {
-      console.error(`❌ Update All failed: ${error.message}`);
-    } finally {
-      setUpdateAllRunning(false);
-    }
-  };
   
   // Load dashboard data
   useEffect(() => {
@@ -307,20 +260,27 @@ const ModernDashboard = () => {
     try {
       setLoading(true);
       
-      // Load server statistics
-      const response = await mcpApiClient.getServers();
-      if (response && response.data) {
-        const servers = response.data;
-        
-        // Calculate statistics
-        const newStats = {
-          totalServers: servers.length,
-          runningServers: servers.filter(s => s.status?.toLowerCase() === 'running').length,
-          stoppedServers: servers.filter(s => s.status?.toLowerCase() === 'stopped').length,
-          errorServers: servers.filter(s => s.status?.toLowerCase() === 'error').length
-        };
-        
-        setStats(newStats);
+      // Load system health from the health endpoint
+      try {
+        const healthResponse = await fetch('http://localhost:3010/health');
+        if (healthResponse.ok) {
+          const healthData = await healthResponse.json();
+          
+          // Calculate system health statistics - use REAL certified console count
+          const newStats = {
+            databaseStatus: healthData.database?.status || 'unknown',
+            certifiedGold: healthData.certifiedConsoles?.gold || 0,
+            certifiedDraft: healthData.certifiedConsoles?.draft || 0,
+            totalRegulations: healthData.regulations?.total || 0,
+            totalTasks: healthData.tasks || 0,
+            totalDeadlines: healthData.deadlines || 0
+          };
+          
+          setStats(newStats);
+        }
+      } catch (healthError) {
+        console.error('Error loading system health:', healthError);
+        setStats(prev => ({ ...prev, databaseStatus: 'error' }));
       }
 
       // Load regulation statistics
@@ -347,48 +307,7 @@ const ModernDashboard = () => {
     setRefreshing(false);
   };
   
-  const handleCreateServer = () => {
-    navigate('/create-server');
-  };
   
-  const handleSettings = () => {
-    navigate('/settings');
-  };
-  
-  const quickActions = [
-    {
-      title: 'Create New Server',
-      description: 'Set up a new MCP validation server',
-      icon: <PlusOutlined />,
-      color: '#e3f2fd',
-      iconColor: '#1976d2',
-      onClick: handleCreateServer
-    },
-    {
-      title: 'Customer Delivery',
-      description: 'Push regulations to specific customers',
-      icon: <SendOutlined />,
-      color: '#fef3c7',
-      iconColor: '#d97706',
-      onClick: () => navigate('/customer-delivery')
-    },
-    {
-      title: 'Server Management',
-      description: 'View and manage existing servers',
-      icon: <SettingOutlined />,
-      color: '#f3e5f5',
-      iconColor: '#7b1fa2',
-      onClick: () => navigate('/servers')
-    },
-    {
-      title: 'System Health',
-      description: 'Monitor system performance',
-      icon: <ReloadOutlined />,
-      color: '#e8f5e8',
-      iconColor: '#2e7d32',
-      onClick: () => navigate('/health')
-    }
-  ];
   
   if (loading) {
     return (
@@ -402,159 +321,88 @@ const ModernDashboard = () => {
   
   return (
     <DashboardContainer>
-      <DashboardHeader>
-        <HeaderContent>
-          <HeaderInfo>
-            <DashboardTitle>MCP Engine Dashboard</DashboardTitle>
-            <DashboardSubtitle>
-              Monitor and manage your Model Context Protocol validation servers
-            </DashboardSubtitle>
-          </HeaderInfo>
-          <HeaderActions>
-            <ActionButton 
-              className="secondary"
-              icon={<ReloadOutlined />}
-              onClick={handleRefresh}
-              loading={refreshing}
-            >
-              Refresh
-            </ActionButton>
-            <ActionButton 
-              className="primary"
-              icon={<PlusOutlined />}
-              onClick={handleCreateServer}
-            >
-              New Server
-            </ActionButton>
-          </HeaderActions>
-        </HeaderContent>
-      </DashboardHeader>
       
-      <StatsContainer>
-        <StatCard>
-          <StatValue color="#1976d2">{stats.totalServers}</StatValue>
-          <StatLabel>Total Servers</StatLabel>
-          <StatChange positive={true}>All systems operational</StatChange>
-        </StatCard>
-        
-        <StatCard>
-          <StatValue color="#198754">{stats.runningServers}</StatValue>
-          <StatLabel>Running Servers</StatLabel>
-          <StatChange positive={stats.runningServers > 0}>
-            {stats.runningServers > 0 ? 'Active and healthy' : 'No active servers'}
-          </StatChange>
-        </StatCard>
-        
-        <StatCard>
-          <StatValue color="#6c757d">{stats.stoppedServers}</StatValue>
-          <StatLabel>Stopped Servers</StatLabel>
-          <StatChange positive={false}>
-            {stats.stoppedServers > 0 ? 'Requires attention' : 'All servers running'}
-          </StatChange>
-        </StatCard>
-        
-        <StatCard>
-          <StatValue color="#dc3545">{stats.errorServers}</StatValue>
-          <StatLabel>Error Servers</StatLabel>
-          <StatChange positive={stats.errorServers === 0}>
-            {stats.errorServers === 0 ? 'No errors detected' : 'Immediate attention needed'}
-          </StatChange>
-        </StatCard>
-      </StatsContainer>
-
-      {/* Regulation Statistics Section */}
-      <div style={{ margin: '24px 0' }}>
-        <h3 style={{ 
-          color: '#1f2937', 
-          fontSize: '18px', 
-          fontWeight: '600', 
-          marginBottom: '16px',
+      {/* Compact Stats Bar */}
+      <div style={{ 
+        display: 'flex', 
+        gap: '12px', 
+        marginBottom: '20px',
+        flexWrap: 'wrap'
+      }}>
+        <div style={{ 
+          background: stats.databaseStatus === 'healthy' ? '#dcfce7' : '#fee2e2',
+          border: `1px solid ${stats.databaseStatus === 'healthy' ? '#86efac' : '#fca5a5'}`,
+          borderRadius: '8px',
+          padding: '12px 20px',
           display: 'flex',
           alignItems: 'center',
-          gap: '8px'
+          gap: '10px'
         }}>
-          📋 Regulation Coverage
-        </h3>
-        <StatsContainer>
-          <StatCard>
-            <StatValue color="#7c3aed">{regulationStats.total}</StatValue>
-            <StatLabel>Total Regulations</StatLabel>
-            <StatChange positive={true}>
-              Complete compliance coverage
-            </StatChange>
-          </StatCard>
-          
-          <StatCard>
-            <StatValue color="#2563eb">{regulationStats.federal}</StatValue>
-            <StatLabel>Federal Regulations</StatLabel>
-            <StatChange positive={true}>
-              CFR + Federal Register
-            </StatChange>
-          </StatCard>
-          
-          <StatCard>
-            <StatValue color="#059669">{regulationStats.state}</StatValue>
-            <StatLabel>State Regulations</StatLabel>
-            <StatChange positive={regulationStats.state > 0}>
-              {regulationStats.breakdown?.states?.Pennsylvania ? `Pennsylvania: ${regulationStats.breakdown.states.Pennsylvania}` : 'Pennsylvania coverage'}
-            </StatChange>
-          </StatCard>
-          
-          <StatCard>
-            <StatValue color="#d97706">{regulationStats.thirdParty}</StatValue>
-            <StatLabel>Third-Party Agencies</StatLabel>
-            <StatChange positive={false}>
-              {regulationStats.thirdParty > 0 ? 'Active integrations' : 'Coming soon'}
-            </StatChange>
-          </StatCard>
-        </StatsContainer>
+          <span style={{ fontSize: '20px' }}>{stats.databaseStatus === 'healthy' ? '✓' : '✗'}</span>
+          <div>
+            <div style={{ fontWeight: '600', color: stats.databaseStatus === 'healthy' ? '#166534' : '#991b1b', fontSize: '14px' }}>Database</div>
+            <div style={{ fontSize: '11px', color: stats.databaseStatus === 'healthy' ? '#15803d' : '#b91c1c' }}>
+              {stats.databaseStatus === 'healthy' ? 'Online' : 'Offline'}
+            </div>
+          </div>
+        </div>
+        
+        <div style={{ 
+          background: '#f3e8ff',
+          border: '1px solid #d8b4fe',
+          borderRadius: '8px',
+          padding: '12px 20px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px'
+        }}>
+          <span style={{ fontSize: '24px', fontWeight: '700', color: '#7c3aed' }}>{stats.certifiedGold}</span>
+          <div>
+            <div style={{ fontWeight: '600', color: '#6b21a8', fontSize: '14px' }}>Gold Consoles</div>
+            <div style={{ fontSize: '11px', color: '#7e22ce' }}>Workflow certified</div>
+          </div>
+        </div>
+        
+        <div style={{ 
+          background: '#dbeafe',
+          border: '1px solid #93c5fd',
+          borderRadius: '8px',
+          padding: '12px 20px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px'
+        }}>
+          <span style={{ fontSize: '24px', fontWeight: '700', color: '#2563eb' }}>{stats.totalRegulations}</span>
+          <div>
+            <div style={{ fontWeight: '600', color: '#1e40af', fontSize: '14px' }}>Regulations</div>
+            <div style={{ fontSize: '11px', color: '#1d4ed8' }}>{regulationStats.federal} federal · {regulationStats.state} state</div>
+          </div>
+        </div>
+        
+        <div style={{ 
+          background: '#fef3c7',
+          border: '1px solid #fcd34d',
+          borderRadius: '8px',
+          padding: '12px 20px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px'
+        }}>
+          <span style={{ fontSize: '24px', fontWeight: '700', color: '#d97706' }}>{stats.totalTasks.toLocaleString()}</span>
+          <div>
+            <div style={{ fontWeight: '600', color: '#92400e', fontSize: '14px' }}>Tasks</div>
+            <div style={{ fontSize: '11px', color: '#b45309' }}>{stats.totalDeadlines} deadlines</div>
+          </div>
+        </div>
       </div>
       
-      <QuickActions>
-        {quickActions.map((action, index) => (
-          <QuickActionCard key={index} onClick={action.onClick}>
-            <QuickActionIcon color={action.color} iconColor={action.iconColor}>
-              {action.icon}
-            </QuickActionIcon>
-            <QuickActionTitle>{action.title}</QuickActionTitle>
-            <QuickActionDescription>{action.description}</QuickActionDescription>
-          </QuickActionCard>
-        ))}
-      </QuickActions>
       
-      <MainContent>
-        <Tabs defaultActiveKey="search" size="large">
-          <TabPane tab="🔍 Regulation Search" key="search">
-            <ContentSection>
-              <SectionHeader>
-                <SectionTitle>Regulation Search</SectionTitle>
-                <Button 
-                  type="primary" 
-                  danger
-                  size="large"
-                  onClick={handleUpdateAllRegulations}
-                  loading={updateAllRunning}
-                  style={{ 
-                    background: updateAllRunning ? '#f59e0b' : '#dc2626',
-                    borderColor: updateAllRunning ? '#f59e0b' : '#dc2626',
-                    fontWeight: '600'
-                  }}
-                >
-                  {updateAllRunning ? '⏳ UPDATING ALL...' : '🔄 UPDATE ALL REGULATIONS'}
-                </Button>
-              </SectionHeader>
-              
-              <SimpleRegulationSearch 
-                placeholder="Search regulations by name, topic, keywords, or requirements..."
-                onRegulationSelect={(regulation) => {
-                  console.log('Selected regulation:', regulation);
-                  // Could navigate to regulation details or open a modal
-                }}
-              />
-            </ContentSection>
-          </TabPane>
-        </Tabs>
-      </MainContent>
+      <SimpleRegulationSearch 
+        placeholder="Search regulations..."
+        onRegulationSelect={(regulation) => {
+          console.log('Selected regulation:', regulation);
+        }}
+      />
     </DashboardContainer>
   );
 };

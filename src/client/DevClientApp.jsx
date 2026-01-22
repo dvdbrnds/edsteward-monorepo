@@ -113,15 +113,30 @@ const Header = styled.header`
   justify-content: space-between;
   height: 64px;
   padding: 0 24px;
-  background-color: ${props => props.theme.colors.primary};
-  color: ${props => props.theme.colors.textOnPrimary};
+  background: linear-gradient(135deg, #1a3a5c, #2563a8);
+  color: white;
   box-shadow: ${props => props.theme.shadows.medium};
+`;
+
+const LogoContainer = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+`;
+
+const Logo = styled.img`
+  height: 44px;
+  width: auto;
+  border-radius: 4px;
+  background: white;
+  padding: 3px;
 `;
 
 const AppTitle = styled.h1`
   margin: 0;
-  font-size: 20px;
-  font-weight: 500;
+  font-size: 18px;
+  font-weight: 600;
+  color: white;
 `;
 
 const Nav = styled.nav`
@@ -167,7 +182,10 @@ const DevClientApp = () => {
       }}>
         <AppContainer>
           <Header>
-            <AppTitle>MCP Engine Dashboard</AppTitle>
+            <LogoContainer>
+              <Logo src="/public/mcp-engine-logo.png" alt="MCP Engine" />
+              <AppTitle>MCP Engine</AppTitle>
+            </LogoContainer>
             <Nav>
               <NavLink to="/">Dashboard</NavLink>
               <NavLink to="/editor">MCP Editor</NavLink>

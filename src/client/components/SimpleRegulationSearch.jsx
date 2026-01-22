@@ -8,11 +8,7 @@ import api from '../api/api';
 const { Text } = Typography;
 
 const SearchContainer = styled.div`
-  background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  padding: 20px;
-  margin-bottom: 20px;
+  padding: 0;
 `;
 
 const SearchInput = styled(Input)`
@@ -52,9 +48,9 @@ const ResultsContainer = styled.div`
 
 const StatsText = styled(Text)`
   display: block;
-  margin-bottom: 12px;
-  font-size: 0.9rem;
-  color: #6c757d;
+  margin: 12px 0;
+  font-size: 0.8rem;
+  color: #9ca3af;
 `;
 
 /**
@@ -83,8 +79,15 @@ const SimpleRegulationSearch = ({ onRegulationSelect, placeholder = "Search regu
         
         if (data && data.data) {
           console.log(`✅ Loaded ${data.data.length} regulations`);
-          setAllRegulations(data.data);
-          setFilteredRegulations(data.data); // Show all initially
+          // Sort by reg_key (REG-001, REG-002, etc.)
+          const sortByRegKey = (a, b) => {
+            const aNum = parseInt((a.reg_key || a.regKey || 'REG-999').replace(/\D/g, '')) || 999;
+            const bNum = parseInt((b.reg_key || b.regKey || 'REG-999').replace(/\D/g, '')) || 999;
+            return aNum - bNum;
+          };
+          const sortedData = [...data.data].sort(sortByRegKey);
+          setAllRegulations(sortedData);
+          setFilteredRegulations(sortedData); // Show all initially
       } else {
           throw new Error('No regulation data returned');
       }
@@ -113,11 +116,21 @@ const SimpleRegulationSearch = ({ onRegulationSelect, placeholder = "Search regu
     const filtered = allRegulations.filter(regulation => 
       regulation.name?.toLowerCase().includes(query) ||
       regulation.topic?.toLowerCase().includes(query) ||
-      regulation.slug?.toLowerCase().includes(query)
+      regulation.slug?.toLowerCase().includes(query) ||
+      regulation.reg_key?.toLowerCase().includes(query) ||
+      regulation.regKey?.toLowerCase().includes(query)
     );
 
-    console.log(`🔍 Filtered ${filtered.length} regulations for "${searchQuery}"`);
-    setFilteredRegulations(filtered);
+    // Sort filtered results by reg_key
+    const sortByRegKey = (a, b) => {
+      const aNum = parseInt((a.reg_key || a.regKey || 'REG-999').replace(/\D/g, '')) || 999;
+      const bNum = parseInt((b.reg_key || b.regKey || 'REG-999').replace(/\D/g, '')) || 999;
+      return aNum - bNum;
+    };
+    const sortedFiltered = [...filtered].sort(sortByRegKey);
+
+    console.log(`🔍 Filtered ${sortedFiltered.length} regulations for "${searchQuery}"`);
+    setFilteredRegulations(sortedFiltered);
   }, [searchQuery, allRegulations]);
 
   const handleSearch = (query) => {
@@ -168,31 +181,107 @@ const SimpleRegulationSearch = ({ onRegulationSelect, placeholder = "Search regu
         <>
           <StatsText>
             {searchQuery ? 
-              `Showing ${filteredRegulations.length} of ${allRegulations.length} regulations matching "${searchQuery}"` :
-              `Showing all ${allRegulations.length} regulations`
+              `${filteredRegulations.length} results` :
+              `${allRegulations.length} regulations`
             }
           </StatsText>
           
           <ResultsContainer>
-            {filteredRegulations.map((regulation, index) => (
-            <ResultItem 
-                key={regulation.id || index}
-              onClick={() => handleRegulationClick(regulation)}
-            >
-              <ResultTitle>{regulation.name || 'Unnamed Regulation'}</ResultTitle>
-                <ResultId>{regulation.id}</ResultId>
-                {regulation.topic && (
-                <Tag color="blue" style={{ marginTop: '8px' }}>
-                  {regulation.topic}
-                </Tag>
-              )}
-                {regulation.lastUpdated && (
-                  <Tag color="default" style={{ marginTop: '8px' }}>
-                    Updated: {new Date(regulation.lastUpdated).toLocaleDateString()}
-                  </Tag>
-                )}
-            </ResultItem>
-          ))}
+            {filteredRegulations.map((regulation, index) => {
+              const regKey = regulation.reg_key || regulation.regKey || '--';
+              const lovvLevel = regulation.lovv_level || regulation.lovvLevel;
+              const taskCount = regulation.complianceTasks?.length || regulation.tasks?.length || 0;
+              const jurisdictionSource = regulation.jurisdiction_source || regulation.jurisdictionSource || 'federal';
+              const stateCode = regulation.state_code || regulation.stateCode;
+              const applicabilityScope = regulation.applicability_scope || regulation.applicabilityScope;
+              const version = regulation.version || 1;
+              const lastUpdated = regulation.updated_at || regulation.updatedAt || regulation.lastUpdated;
+              const isGold = lovvLevel === 'A';
+              const isState = jurisdictionSource === 'state';
+              
+              // Build jurisdiction label
+              let jurisdictionLabel = 'Federal';
+              if (isState && stateCode) {
+                jurisdictionLabel = stateCode;
+                if (applicabilityScope === 'student_residency') {
+                  jurisdictionLabel += ' (Student Residency)';
+                } else if (applicabilityScope === 'both') {
+                  jurisdictionLabel += ' (Institution + Residency)';
+                }
+              }
+              
+              return (
+                <ResultItem 
+                  key={regulation.id || index}
+                  onClick={() => handleRegulationClick(regulation)}
+                  style={{ 
+                    borderLeft: isGold ? '4px solid #d97706' : '4px solid #e1e5e9',
+                    background: isGold ? '#fffbeb' : '#ffffff'
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+                        <span style={{ 
+                          fontFamily: 'Monaco, Menlo, monospace', 
+                          fontSize: '13px', 
+                          fontWeight: '700',
+                          color: '#7c3aed',
+                          background: '#f3e8ff',
+                          padding: '2px 8px',
+                          borderRadius: '4px'
+                        }}>
+                          {regKey}
+                        </span>
+                        {isGold && (
+                          <span style={{ 
+                            fontSize: '11px', 
+                            fontWeight: '700',
+                            color: '#92400e',
+                            background: 'linear-gradient(135deg, #fcd34d, #f59e0b)',
+                            padding: '2px 8px',
+                            borderRadius: '4px',
+                            boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
+                          }}>
+                            ★ GOLD
+                          </span>
+                        )}
+                        {lovvLevel && !isGold && (
+                          <span style={{ 
+                            fontSize: '11px', 
+                            color: '#6b7280',
+                            background: '#f3f4f6',
+                            padding: '2px 6px',
+                            borderRadius: '4px'
+                          }}>
+                            Level {lovvLevel}
+                          </span>
+                        )}
+                        <span style={{ 
+                          fontSize: '11px', 
+                          color: '#6b7280',
+                          background: '#f3f4f6',
+                          padding: '2px 6px',
+                          borderRadius: '4px'
+                        }}>
+                          v{version}
+                        </span>
+                      </div>
+                      <ResultTitle style={{ marginBottom: '4px' }}>{regulation.name || 'Unnamed Regulation'}</ResultTitle>
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', fontSize: '12px', color: '#6b7280' }}>
+                        <span style={{ 
+                          color: isState ? '#0369a1' : '#6b7280',
+                          fontWeight: isState ? '600' : '400'
+                        }}>{jurisdictionLabel}</span>
+                        {regulation.topic && <span>• {regulation.topic}</span>}
+                        {taskCount > 0 && <span>• {taskCount} tasks</span>}
+                        {lastUpdated && <span>• Updated {new Date(lastUpdated).toLocaleDateString()}</span>}
+                      </div>
+                    </div>
+                  </div>
+                </ResultItem>
+              );
+            })}
           </ResultsContainer>
 
           {!loading && filteredRegulations.length === 0 && searchQuery && (

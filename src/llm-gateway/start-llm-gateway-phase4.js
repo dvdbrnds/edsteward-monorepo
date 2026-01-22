@@ -25,6 +25,7 @@ import { performRealCrossReference } from './services/real-cross-reference.js';
 import { executeComprehensiveWorkflow, executeQuickWorkflow } from './services/comprehensive-workflow-engine.js';
 import { extractComplianceRequirements } from './services/regulation-task-extractor.js';
 import { detectChanges } from './services/differential-analysis.js';
+import ConsoleVersionRegistry from '../services/console-version-registry.js';
 
 // Helper to parse requirements text to array for EdSteward Preview
 function parseRequirementsToArray(reqText) {
@@ -1604,8 +1605,135 @@ The Family Educational Rights and Privacy Act (FERPA) is a federal law that prot
       }
     });
 
+    // ============================================================
+    // CONSOLE VERSION CONTROL ROUTES
+    // ============================================================
+    
+    // Get all active gold standards
+    router.get('/console-versions', async (req, res) => {
+      try {
+        const allActive = await ConsoleVersionRegistry.getAllActive();
+        res.json({
+          success: true,
+          goldStandards: allActive,
+          count: allActive.length
+        });
+      } catch (error) {
+        logger.error('[console-versions] Error getting all active:', error);
+        res.status(500).json({ success: false, error: error.message });
+      }
+    });
+    
+    // Get version info for a specific regulation
+    router.get('/console-versions/:regKey', async (req, res) => {
+      try {
+        const { regKey } = req.params;
+        const active = await ConsoleVersionRegistry.getActive(regKey);
+        const versions = await ConsoleVersionRegistry.listVersions(regKey);
+        
+        res.json({
+          success: true,
+          regKey,
+          active: active || null,
+          versions: versions,
+          hasGoldStandard: active !== null && active.status === 'gold'
+        });
+      } catch (error) {
+        logger.error(`[console-versions] Error getting versions for ${req.params.regKey}:`, error);
+        res.status(500).json({ success: false, error: error.message });
+      }
+    });
+    
+    // Certify current console as new gold version
+    router.post('/console-versions/:regKey/certify', async (req, res) => {
+      try {
+        const { regKey } = req.params;
+        const { workflowResults, certifiedBy, notes } = req.body;
+        
+        const result = await ConsoleVersionRegistry.certifyGold(
+          regKey,
+          workflowResults || {},
+          certifiedBy || 'console-ui',
+          notes || ''
+        );
+        
+        res.json({
+          success: true,
+          message: `${regKey} ${result.version} certified as GOLD`,
+          result
+        });
+      } catch (error) {
+        logger.error(`[console-versions] Error certifying ${req.params.regKey}:`, error);
+        res.status(500).json({ success: false, error: error.message });
+      }
+    });
+    
+    // Rollback to a previous gold version
+    router.post('/console-versions/:regKey/rollback', async (req, res) => {
+      try {
+        const { regKey } = req.params;
+        const { targetVersion, performedBy, reason } = req.body;
+        
+        if (!targetVersion) {
+          return res.status(400).json({ success: false, error: 'targetVersion is required' });
+        }
+        
+        const result = await ConsoleVersionRegistry.rollback(
+          regKey,
+          targetVersion,
+          performedBy || 'console-ui',
+          reason || ''
+        );
+        
+        res.json({
+          success: true,
+          message: `${regKey} rolled back to ${targetVersion}`,
+          result
+        });
+      } catch (error) {
+        logger.error(`[console-versions] Error rolling back ${req.params.regKey}:`, error);
+        res.status(500).json({ success: false, error: error.message });
+      }
+    });
+    
+    // Verify integrity of a version
+    router.get('/console-versions/:regKey/verify', async (req, res) => {
+      try {
+        const { regKey } = req.params;
+        const { version } = req.query;
+        
+        let targetVersion = version;
+        if (!targetVersion) {
+          const active = await ConsoleVersionRegistry.getActive(regKey);
+          if (!active) {
+            return res.json({ success: false, error: 'No active version to verify' });
+          }
+          targetVersion = active.version;
+        }
+        
+        const result = await ConsoleVersionRegistry.verifyIntegrity(regKey, targetVersion);
+        res.json({ success: true, verification: result });
+      } catch (error) {
+        logger.error(`[console-versions] Error verifying ${req.params.regKey}:`, error);
+        res.status(500).json({ success: false, error: error.message });
+      }
+    });
+    
+    // Get audit history
+    router.get('/console-versions/:regKey/audit', async (req, res) => {
+      try {
+        const { regKey } = req.params;
+        const limit = parseInt(req.query.limit) || 50;
+        const history = await ConsoleVersionRegistry.getAuditHistory(regKey, limit);
+        res.json({ success: true, regKey, auditHistory: history });
+      } catch (error) {
+        logger.error(`[console-versions] Error getting audit history:`, error);
+        res.status(500).json({ success: false, error: error.message });
+      }
+    });
+
     this.app.use('/api/llm', router);
-    logger.info('[enhanced-llm-gateway] Enhanced routes configured');
+    logger.info('[enhanced-llm-gateway] Enhanced routes configured (including Console Version Control)');
   }
 
   /**

@@ -2189,7 +2189,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        regulation: 'occupational-health',
+                        regulation: REGULATION_SLUG,
                         quick: false  // Full comprehensive workflow
                     })
                 });
@@ -2940,7 +2940,7 @@
             button.style.opacity = '0.6';
             
             const targetValue = select.value;
-            const regulationId = 'occupational-healthand-campus-crime-statistics-act-clery-act-and-violence-against-women-act-vawa';
+            const regulationId = REGULATION_SLUG;
             
             try {
                 if (targetValue === 'all-clients') {
@@ -3049,7 +3049,7 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        regulationId: 'occupational-healthand-campus-crime-statistics-act-clery-act-and-violence-against-women-act-vawa',
+                        regulationId: REGULATION_SLUG,
                         changeType: 'MANUAL_PUSH',
                         message: 'Manual update triggered from console',
                         timestamp: new Date().toISOString()
@@ -3086,7 +3086,7 @@
             button.style.opacity = '0.6';
             
             try {
-                addConsoleLog('📤 Sending Clery Act update to EdSteward...', 'info');
+                addConsoleLog(`📤 Sending ${REGULATION_NAME} update to EdSteward...`, 'info');
                 
                 // Use delivery system proxy to avoid CORS
                 const response = await fetch('http://localhost:3003/api/send-to-edsteward', {
@@ -3095,10 +3095,9 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        regulationId: 9,
-                        regulationSlug: 'clery-act',
-                        name: 'Jeanne Clery Disclosure of Campus Security Policy',
-                        edstewardId: 9
+                        regulationSlug: REGULATION_SLUG,
+                        regKey: REG_KEY,
+                        name: REGULATION_NAME
                     })
                 });
                 
@@ -3106,7 +3105,7 @@
                 
                 if (response.ok && result.success) {
                     addConsoleLog('✅ Successfully sent to EdSteward!', 'success');
-                    addConsoleLog('📋 Regulation ID: 9 (Clery Act) | Status: Pending CCO Review', 'info');
+                    addConsoleLog(`📋 ${REG_KEY} (${REGULATION_NAME}) | Status: Pending CCO Review', 'info');
                     button.innerHTML = '✅';
                     button.style.opacity = '1';
                     setTimeout(() => {
@@ -3213,10 +3212,11 @@
         async function fetchRegulationData() {
             if (cachedRegulationData) return cachedRegulationData;
             try {
-                const response = await fetch(`http://localhost:3010/api/regulations?search=clery`);
+                // Use the REGULATION_SLUG to fetch the correct regulation
+                const response = await fetch(`http://localhost:3010/api/regulations/${REGULATION_SLUG}`);
                 const data = await response.json();
-                if (Array.isArray(data) && data.length > 0) {
-                    cachedRegulationData = data[0];
+                if (data && !data.error) {
+                    cachedRegulationData = data;
                     return cachedRegulationData;
                 }
             } catch (err) {
@@ -3440,46 +3440,60 @@
                     deadlinesList.innerHTML = '<div style="color: #6b7280; padding: 16px;">No deadlines available</div>';
                 }
                 
-                // Tasks
+                                // Tasks - Category Grouped Display (Gold Standard)
                 const tasksList = document.getElementById('tasks-list');
                 const tasks = reg.complianceTasks || [];
                 document.getElementById('task-count').textContent = `${tasks.length} tasks`;
                 
+                const priorityColors = {
+                    'CRITICAL': '#dc2626',
+                    'HIGH': '#f59e0b', 
+                    'MEDIUM': '#3b82f6',
+                    'LOW': '#10b981'
+                };
+                
                 if (tasks.length > 0) {
-                    // Group by parent
-                    const parentTasks = tasks.filter(t => !t.parentTaskId);
-                    const childTasks = tasks.filter(t => t.parentTaskId);
+                    // Group tasks by category
+                    const taskCategories = {};
+                    tasks.forEach(t => {
+                        const cat = t.category || 'Uncategorized';
+                        if (!taskCategories[cat]) taskCategories[cat] = [];
+                        taskCategories[cat].push(t);
+                    });
                     
+                    const sortedCats = Object.keys(taskCategories).sort();
                     let tasksHTML = '';
-                    parentTasks.forEach((parent, idx) => {
-                        const children = childTasks.filter(c => c.parentTaskId === parent.id);
-                        const priorityColor = parent.priority === 'critical' ? '#dc2626' : 
-                                             parent.priority === 'high' ? '#f59e0b' : '#3b82f6';
-                        
+                    
+                    sortedCats.forEach(category => {
+                        const catTasks = taskCategories[category];
+                        const catTitle = category.charAt(0).toUpperCase() + category.slice(1);
                         tasksHTML += `
-                            <div style="background: #f8fafc; border-radius: 8px; padding: 16px; border: 1px solid #e2e8f0;">
-                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                                    <div style="font-weight: 600; color: #1e293b;">${idx + 1}. ${parent.title}</div>
-                                    <span style="background: ${priorityColor}; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; text-transform: uppercase;">${parent.priority || 'medium'}</span>
+                            <div style="margin-bottom: 16px;">
+                                <div style="background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 10px 14px; border-radius: 8px 8px 0 0; font-weight: 600; font-size: 13px; display: flex; justify-content: space-between; align-items: center;">
+                                    <span>${catTitle}</span>
+                                    <span style="background: rgba(255,255,255,0.2); padding: 2px 10px; border-radius: 12px; font-size: 11px;">${catTasks.length}</span>
                                 </div>
-                                <div style="font-size: 13px; color: #64748b; margin-bottom: 8px;">${parent.description || ''}</div>
-                                ${parent.assignedRole ? `<div style="font-size: 12px; color: #3b82f6;">👤 ${parent.assignedRole}</div>` : ''}
-                                ${children.length > 0 ? `
-                                    <div style="margin-top: 12px; padding-left: 16px; border-left: 2px solid #e2e8f0;">
-                                        ${children.map(c => `
-                                            <div style="padding: 8px 0; font-size: 13px; color: #475569;">
-                                                • ${c.title}
-                                                ${c.assignedRole ? `<span style="color: #94a3b8;"> (${c.assignedRole})</span>` : ''}
-                                            </div>
-                                        `).join('')}
-                                    </div>
-                                ` : ''}
-                            </div>
+                                <div style="border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 8px 8px; padding: 8px;">
                         `;
+                        
+                        catTasks.forEach((t, idx) => {
+                            const priority = (t.priority || 'MEDIUM').toUpperCase();
+                            const color = priorityColors[priority] || '#64748b';
+                            tasksHTML += `<div style="padding: 10px 12px; margin-bottom: 6px; background: white; border-radius: 6px; border-left: 4px solid ${color}; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+                                    <strong style="color: #1e293b; font-size: 12px;">${t.title || t.name || 'Task ' + (idx+1)}</strong>
+                                    <span style="background: ${color}; color: white; padding: 1px 6px; border-radius: 4px; font-size: 9px; font-weight: 600;">${priority}</span>
+                                </div>
+                                ${t.description ? `<div style="color: #475569; font-size: 11px; margin-bottom: 4px;">${t.description}</div>` : ''}
+                                ${t.assignedRole ? `<div style="font-size: 10px; color: #3b82f6;">👤 ${t.assignedRole}</div>` : ''}
+                            </div>`;
+                        });
+                        
+                        tasksHTML += '</div></div>';
                     });
                     tasksList.innerHTML = tasksHTML;
                 } else {
-                    tasksList.innerHTML = '<div style="color: #6b7280; padding: 16px;">No tasks available</div>';
+                    tasksList.innerHTML = '<div style="color: #6b7280; padding: 16px;">No compliance tasks available</div>';
                 }
                 
                 loadingDiv.style.display = 'none';

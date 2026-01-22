@@ -95,10 +95,27 @@ router.get('/health', async (req, res) => {
     const dbHealth = await healthCheck();
     const stats = await RegulationRepository.getStats();
     
+    // Get certified console counts from console_versions table
+    let certifiedConsoles = { gold: 0, draft: 0, review: 0 };
+    try {
+      const cvResult = await pool.query(`
+        SELECT status, COUNT(*) as count 
+        FROM console_versions 
+        WHERE is_active = TRUE OR status = 'gold'
+        GROUP BY status
+      `);
+      cvResult.rows.forEach(row => {
+        certifiedConsoles[row.status] = parseInt(row.count);
+      });
+    } catch (cvErr) {
+      console.log('[REGISTRY] Console versions table not available:', cvErr.message);
+    }
+    
     res.json({
       status: dbHealth.status === 'healthy' ? 'ok' : 'degraded',
       time: new Date().toISOString(),
       database: dbHealth,
+      certifiedConsoles: certifiedConsoles,
       regulations: {
         total: parseInt(stats.total),
         federal: parseInt(stats.federal),
@@ -181,7 +198,11 @@ router.get('/api/regulations', async (req, res) => {
       
       // Jurisdiction
       jurisdictionSource: r.jurisdiction_source || 'federal',
+      jurisdiction_source: r.jurisdiction_source || 'federal',
       stateCode: r.state_code || null,
+      state_code: r.state_code || null,
+      applicabilityScope: r.applicability_scope || 'institution_location',
+      applicability_scope: r.applicability_scope || 'institution_location',
       
       // Validation
       lovvLevel: r.lovv_level,
@@ -336,7 +357,11 @@ router.get('/api/regulations/search', async (req, res) => {
       slug: r.item_id,
       consoleUrl: `/console/${r.item_id}`,
       jurisdictionSource: r.jurisdiction_source,
+      jurisdiction_source: r.jurisdiction_source,
       stateCode: r.state_code,
+      state_code: r.state_code,
+      applicabilityScope: r.applicability_scope || 'institution_location',
+      applicability_scope: r.applicability_scope || 'institution_location',
       description: r.summary || `${r.topic} regulation`,
       lastUpdated: r.updated_at
     }));
@@ -369,6 +394,7 @@ router.get('/api/regulations/all', async (req, res) => {
     
     const transformed = regulations.map(r => ({
       regKey: r.reg_key,  // Universal key field
+      reg_key: r.reg_key,
       id: r.id,
       regulationId: r.item_id,
       name: r.name,
@@ -377,10 +403,16 @@ router.get('/api/regulations/all', async (req, res) => {
       slug: r.item_id,
       consoleUrl: `/console/${r.item_id}`,
       jurisdictionSource: r.jurisdiction_source,
+      jurisdiction_source: r.jurisdiction_source,
       stateCode: r.state_code,
+      state_code: r.state_code,
+      applicabilityScope: r.applicability_scope || 'institution_location',
+      applicability_scope: r.applicability_scope || 'institution_location',
       lastUpdated: r.updated_at,
+      updated_at: r.updated_at,
       version: r.version,
-      lovvLevel: r.lovv_level
+      lovvLevel: r.lovv_level,
+      lovv_level: r.lovv_level
     }));
     
     res.json({

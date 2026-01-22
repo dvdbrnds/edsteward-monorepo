@@ -1,0 +1,13 @@
+{
+  "regKey": "REG-001",
+  "version": "v1.0",
+  "status": "gold",
+  "certifiedBy": "mcp-admin",
+  "certifiedAt": "2026-01-22T14:05:29.564Z",
+  "contentHash": "ad6a34bd428160cd474a2ab057881c6beb46e7b8b944ab09e494c63672cee03a",
+  "contentSize": 289856,
+  "workflowScore": 100,
+  "taskCount": 0,
+  "deadlineCount": 0,
+  "notes": "Initial gold standard - 39 compliance tasks, full Clery Act coverage"
+}

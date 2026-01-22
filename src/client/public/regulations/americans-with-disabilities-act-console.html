@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Americans with Disabilities Act (Americans with Disabilities) and Violence Against Women Act (VAWA) - Advanced LinearEngine Console</title>
+    <title>Americans with Disabilities Act - MCP Engine Console</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         
@@ -49,9 +49,9 @@
         }
         
         .header {
-            background: linear-gradient(135deg, #1a365d, #2d5282);
+            background: linear-gradient(135deg, #1a3a5c, #2563a8);
             color: white;
-            padding: 20px 24px;
+            padding: 16px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -381,6 +381,202 @@
             margin-bottom: 20px;
         }
         
+        /* Version Control Panel Styles */
+        .version-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3);
+            flex-shrink: 0;
+        }
+        
+        .version-badge.draft {
+            background: linear-gradient(135deg, #6b7280 0%, #9ca3af 100%);
+            box-shadow: 0 2px 8px rgba(107, 114, 128, 0.3);
+        }
+        
+        .version-badge .version-icon { font-size: 14px; }
+        .version-badge .version-number { opacity: 0.9; }
+        
+        .version-control-panel {
+            background: linear-gradient(180deg, #f0fdf4 0%, #dcfce7 100%);
+            border: 1px solid #86efac;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .version-control-panel.no-gold {
+            background: linear-gradient(180deg, #fefce8 0%, #fef9c3 100%);
+            border-color: #fde047;
+        }
+        
+        .version-control-panel h3 {
+            margin: 0 0 12px 0;
+            font-size: 14px;
+            color: #166534;
+        }
+        
+        .version-control-panel.no-gold h3 {
+            color: #854d0e;
+        }
+        
+        .version-status { margin-bottom: 12px; }
+        
+        .version-current {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #bbf7d0;
+        }
+        
+        .version-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .version-value {
+            font-size: 14px;
+            font-weight: 600;
+            color: #166534;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .version-info {
+            margin-top: 10px;
+            padding: 10px 12px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #bbf7d0;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        
+        .version-detail {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+        
+        .detail-label {
+            font-size: 10px;
+            color: #6b7280;
+            text-transform: uppercase;
+        }
+        
+        .detail-value {
+            font-size: 13px;
+            font-weight: 500;
+            color: #1f2937;
+        }
+        
+        .version-actions {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .version-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .version-btn.certify {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: white;
+        }
+        
+        .version-btn.certify:hover:not(:disabled) {
+            background: linear-gradient(135deg, #047857 0%, #059669 100%);
+            transform: translateY(-1px);
+        }
+        
+        .version-btn.verify {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .version-btn.verify:hover:not(:disabled) {
+            background: #2563eb;
+        }
+        
+        .version-btn.rollback {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .version-btn.rollback:hover:not(:disabled) {
+            background: #d97706;
+        }
+        
+        .version-btn:disabled {
+            background: #d1d5db;
+            color: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .version-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 12px;
+            margin-bottom: 8px;
+            background: white;
+        }
+        
+        .version-message {
+            margin-top: 10px;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .version-message.success {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+        
+        .version-message.error {
+            background: #fef2f2;
+            color: #991b1b;
+            border: 1px solid #fecaca;
+        }
+        
+        .version-message.warning {
+            background: #fefce8;
+            color: #854d0e;
+            border: 1px solid #fde047;
+        }
+        
         .diagnostic-item {
             display: flex;
             justify-content: space-between;
@@ -704,8 +900,6 @@
         }
         
         .regulation-content {
-            max-height: 500px;
-            overflow-y: auto;
             border: 1px solid #e1e5e9;
             border-radius: 8px;
             background: #ffffff;
@@ -1265,10 +1459,23 @@
     <div class="console-container">
         <div class="main-console">
             <div class="header">
-                <h1>Americans with Disabilities Act (Americans with Disabilities) and Violence Against Women Act (VAWA) - Advanced LinearEngine Console</h1>
+                <div style="display: flex; align-items: center; gap: 16px; flex: 1;">
+                    <!-- MCP Engine Logo -->
+                    <img src="/public/mcp-engine-logo.png" alt="MCP Engine" style="height: 48px; width: auto; border-radius: 4px; background: white; padding: 4px;">
+                    <div style="display: flex; flex-direction: column; gap: 2px;">
+                        <h1 class="console-header" style="margin: 0; font-size: 1.1em; font-weight: 600; line-height: 1.3;">Loading...</h1>
+                        <span style="font-size: 11px; opacity: 0.8; font-weight: 400;">MCP Engine Compliance Console</span>
+                    </div>
+                    <!-- Version Badge -->
+                    <div id="versionBadge" class="version-badge" style="display: none; margin-left: auto;">
+                        <span class="version-icon">🔒</span>
+                        <span class="version-text">GOLD</span>
+                        <span class="version-number" id="versionNumber">v1.0</span>
+                    </div>
+                </div>
                 <div class="status-indicator">
                     <div id="statusDot" class="status-dot idle"></div>
-                    <span id="statusText">IDLE</span>
+                    <span id="statusText">CONNECTED</span>
                 </div>
             </div>
             
@@ -1319,7 +1526,7 @@
                 <div class="regulation-header">
                     <h3>Complete Regulation Text & Analysis</h3>
                     <div class="regulation-meta">
-                        <span class="regulation-cite">Regulation: Americans with Disabilities Act (Americans with Disabilities) and Violence Against Women Act (VAWA)</span>
+                        <span class="regulation-cite">Regulation: Americans with Disabilities Act (Americans with Disabilities Act) and Violence Against Women Act (VAWA)</span>
                         <span class="regulation-status">Active</span>
                         <span class="regulation-template">Sexual Misconduct</span>
                     </div>
@@ -1330,6 +1537,7 @@
                     <button class="tab-button" onclick="showTab('summary-scope')">📋 Summary & Scope</button>
                     <button class="tab-button" onclick="showTab('tasks-deadlines')">📅 Tasks & Deadlines</button>
                     <button class="tab-button" onclick="showTab('risk-assessment')">⚠️ Risk Assessment</button>
+                    <button class="tab-button" onclick="showTab('system-log')">🖥️ System Log</button>
                     <button class="tab-button" onclick="showTab('customer-payload')" style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; font-weight: 600;">📤 Customer Payload</button>
                 </div>
                 
@@ -1340,17 +1548,17 @@
                             <div id="reg-text-loading" style="text-align: center; padding: 40px; color: #6e7681;">
                                 <div style="font-size: 16px; margin-bottom: 10px;">📊 Loading Complete Regulation Data...</div>
                                 <div style="font-size: 14px;">Fetching all rich data from MCP Engine</div>
-                            </div>
+                                    </div>
                             <div id="reg-text-content" style="display: none;">
                                 
                                 <!-- SECTION 1: Identity & Legal Foundation -->
                                 <div style="margin-bottom: 24px; background: linear-gradient(135deg, #1e3a5f 0%, #2d4a6f 100%); border-radius: 12px; padding: 20px; color: white;">
-                                    <h4 style="margin: 0 0 16px 0; font-size: 18px;">🏛️ Legal Foundation</h4>
+                                    <h4 style="margin: 0 0 16px 0; font-size: 18px; color: white;">🏛️ Legal Foundation</h4>
                                     <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;">
                                         <div>
                                             <div style="font-size: 11px; text-transform: uppercase; opacity: 0.7; margin-bottom: 4px;">REG-KEY</div>
                                             <div id="data-reg-key" style="font-size: 18px; font-weight: 600;">--</div>
-                                        </div>
+                                    </div>
                                         <div>
                                             <div style="font-size: 11px; text-transform: uppercase; opacity: 0.7; margin-bottom: 4px;">USC Citation</div>
                                             <div id="data-usc" style="font-size: 16px;">--</div>
@@ -1358,60 +1566,70 @@
                                         <div>
                                             <div style="font-size: 11px; text-transform: uppercase; opacity: 0.7; margin-bottom: 4px;">CFR Citation</div>
                                             <div id="data-cfr" style="font-size: 16px;">--</div>
-                                        </div>
+                                    </div>
                                         <div>
                                             <div style="font-size: 11px; text-transform: uppercase; opacity: 0.7; margin-bottom: 4px;">L.O.V.V. Level</div>
                                             <div id="data-lovv" style="font-size: 16px;">--</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                
+                            </div>
+                        </div>
+                    </div>
+                    
                                 <!-- SECTION 2: Risk Assessment Quick View -->
                                 <div style="margin-bottom: 24px; display: grid; grid-template-columns: 1fr 2fr; gap: 16px;">
                                     <div id="data-risk-score-box" style="background: #fef2f2; border: 2px solid #ef4444; border-radius: 12px; padding: 20px; text-align: center;">
                                         <div style="font-size: 11px; text-transform: uppercase; color: #991b1b; margin-bottom: 8px;">Risk Score</div>
                                         <div id="data-risk-score" style="font-size: 48px; font-weight: 700; color: #dc2626;">--</div>
                                         <div id="data-risk-level" style="font-size: 14px; font-weight: 600; color: #991b1b;">--</div>
-                                    </div>
+                            </div>
                                     <div style="background: #f8fafc; border-radius: 12px; padding: 20px; border: 1px solid #e2e8f0;">
                                         <div style="font-size: 13px; font-weight: 600; color: #1e293b; margin-bottom: 12px;">📊 Risk Factors</div>
                                         <div id="data-risk-factors" style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px;"></div>
-                                    </div>
-                                </div>
+                            </div>
+                        </div>
                                 
                                 <!-- SECTION 3: Summary -->
                                 <div style="margin-bottom: 24px; background: #f0f9ff; border-radius: 12px; padding: 20px; border-left: 4px solid #0ea5e9;">
                                     <h4 style="margin: 0 0 12px 0; font-size: 14px; color: #0c4a6e;">📋 Summary</h4>
                                     <div id="data-summary" style="font-size: 14px; line-height: 1.7; color: #1e3a5f;">--</div>
-                                </div>
-                                
+                    </div>
+                    
                                 <!-- SECTION 4: Key Requirements -->
                                 <div style="margin-bottom: 24px; background: #fffbeb; border-radius: 12px; padding: 20px; border-left: 4px solid #f59e0b;">
                                     <h4 style="margin: 0 0 12px 0; font-size: 14px; color: #92400e;">⚡ Key Requirements</h4>
                                     <div id="data-requirements" style="font-size: 13px; line-height: 1.8; color: #78350f;"></div>
                                 </div>
                                 
-                                <!-- SECTION 5: Tasks & Deadlines Summary -->
-                                <div style="margin-bottom: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
-                                    <div style="background: #f0fdf4; border-radius: 12px; padding: 20px; border: 1px solid #86efac;">
-                                        <h4 style="margin: 0 0 12px 0; font-size: 14px; color: #166534;">✅ Tasks (<span id="data-task-count">0</span>)</h4>
-                                        <div id="data-tasks-preview" style="font-size: 12px; max-height: 150px; overflow-y: auto;"></div>
+                                <!-- SECTION 5: Tasks (Expandable) -->
+                                <div style="margin-bottom: 16px; background: #f0fdf4; border-radius: 12px; border: 1px solid #86efac; overflow: hidden;">
+                                    <div onclick="toggleTasksSection()" style="padding: 16px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #166534 0%, #15803d 100%); color: white;">
+                                        <h4 style="margin: 0; font-size: 14px; color: white;">✅ Compliance Tasks (<span id="data-task-count">0</span>)</h4>
+                                        <span id="tasks-toggle" style="font-size: 12px; color: white;">▼ Expand</span>
                                     </div>
-                                    <div style="background: #fdf4ff; border-radius: 12px; padding: 20px; border: 1px solid #e879f9;">
-                                        <h4 style="margin: 0 0 12px 0; font-size: 14px; color: #86198f;">📅 Deadlines (<span id="data-deadline-count">0</span>)</h4>
-                                        <div id="data-deadlines-preview" style="font-size: 12px; max-height: 150px; overflow-y: auto;"></div>
+                                    <div id="data-tasks-expanded" style="display: none; padding: 16px; max-height: 400px; overflow-y: auto; background: #f8fdf8;">
+                                        <div id="data-tasks-list" style="font-size: 13px; color: #1e293b;"></div>
                                     </div>
                                 </div>
                                 
-                                <!-- SECTION 6: Full Regulation Text (Collapsible) -->
+                                <!-- SECTION 6: Deadlines (Expandable) -->
+                                <div style="margin-bottom: 24px; background: #fdf4ff; border-radius: 12px; border: 1px solid #e879f9; overflow: hidden;">
+                                    <div onclick="toggleDeadlinesSection()" style="padding: 16px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; background: linear-gradient(135deg, #86198f 0%, #a21caf 100%); color: white;">
+                                        <h4 style="margin: 0; font-size: 14px; color: white;">📅 Filing Deadlines (<span id="data-deadline-count">0</span>)</h4>
+                                        <span id="deadlines-toggle" style="font-size: 12px; color: white;">▼ Expand</span>
+                                    </div>
+                                    <div id="data-deadlines-expanded" style="display: none; padding: 16px; max-height: 300px; overflow-y: auto; background: #fefaff;">
+                                        <div id="data-deadlines-list" style="font-size: 13px; color: #1e293b;"></div>
+                                    </div>
+                                </div>
+                    
+                                <!-- SECTION 7: Full Regulation Text (Collapsible) -->
                                 <div style="margin-bottom: 24px; background: #fafbfc; border-radius: 12px; border: 1px solid #e1e5e9;">
                                     <div onclick="toggleRegText()" style="padding: 16px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e1e5e9;">
                                         <h4 style="margin: 0; font-size: 14px; color: #1e293b;">📖 Full Regulation Text</h4>
                                         <span id="reg-text-toggle" style="font-size: 12px; color: #6e7681;">▼ Show</span>
-                                    </div>
-                                    <div id="reg-text-body" style="display: none; max-height: 400px; overflow-y: auto; padding: 20px; line-height: 1.8; font-size: 13px; white-space: pre-wrap;"></div>
                                 </div>
-                                
+                                    <div id="reg-text-body" style="display: none; max-height: 400px; overflow-y: auto; padding: 20px; line-height: 1.8; font-size: 13px; white-space: pre-wrap;"></div>
+                    </div>
+                    
                                 <!-- SECTION 7: EdSteward Payload Preview -->
                                 <div style="background: linear-gradient(135deg, #059669 0%, #10b981 100%); border-radius: 12px; padding: 20px; color: white;">
                                     <h4 style="margin: 0 0 12px 0; font-size: 14px;">📤 What EdSteward Receives</h4>
@@ -1432,40 +1650,40 @@
                                             <div style="opacity: 0.8;">Deadlines</div>
                                             <div id="payload-deadlines" style="font-weight: 600; font-size: 14px;">--</div>
                                         </div>
-                                    </div>
+                            </div>
                                     <div style="margin-top: 12px; font-size: 11px; opacity: 0.8;">
                                         Also includes: name, summary, requirements, statute, cfr, filingDeadlines JSON, complianceTasks JSON
-                                    </div>
-                                </div>
-                                
+                        </div>
+                    </div>
+                    
                             </div>
                             <div id="reg-text-error" style="display: none; text-align: center; padding: 40px; color: #d73a49;">
                                 <div style="font-size: 16px; margin-bottom: 10px;">❌ Unable to Load Data</div>
                                 <div id="reg-text-error-msg" style="font-size: 14px;">Network error</div>
                                 <button onclick="loadCompleteData()" style="margin-top: 15px; padding: 8px 16px; background: #0969da; color: white; border: none; border-radius: 4px; cursor: pointer;">🔄 Retry</button>
-                            </div>
+                                </div>
                         </div>
                     </div>
                     
                     <!-- TAB 2: Summary & Scope -->
-                    <div id="summary-scope" class="tab-content">
+                    <div id="summary-scope" class="tab-content" style="display: none;">
                         <div class="regulation-section">
                             <div id="summary-loading" style="text-align: center; padding: 40px; color: #6e7681;">
                                 <div style="font-size: 16px;">📋 Loading Summary & Scope...</div>
-                            </div>
+                                        </div>
                             <div id="summary-content" style="display: none;">
                                 <!-- Summary Box -->
                                 <div style="background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border: 1px solid #0ea5e9; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
                                     <h5 style="margin: 0 0 12px 0; color: #0c4a6e;">📋 Plain Language Summary</h5>
                                     <div id="summary-text" style="font-size: 15px; line-height: 1.7; color: #1e3a5f;"></div>
-                    </div>
+                                    </div>
                     
                                 <!-- Scope Grid -->
                                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
                                     <div style="background: #f8fafc; border-radius: 8px; padding: 20px; border: 1px solid #e2e8f0;">
                                         <h5 style="margin: 0 0 16px 0; color: #1e293b;">🎯 Who Must Comply</h5>
                                         <ul id="scope-who" style="margin: 0; padding-left: 20px; line-height: 1.8;"></ul>
-                                </div>
+                            </div>
                                     <div style="background: #f8fafc; border-radius: 8px; padding: 20px; border: 1px solid #e2e8f0;">
                                         <h5 style="margin: 0 0 16px 0; color: #1e293b;">🏢 Departments Responsible</h5>
                                         <div id="scope-departments" style="display: flex; flex-wrap: wrap; gap: 8px;"></div>
@@ -1476,30 +1694,30 @@
                                 <div style="margin-top: 24px; background: #fffbeb; border-radius: 8px; padding: 20px; border: 1px solid #fcd34d;">
                                     <h5 style="margin: 0 0 16px 0; color: #92400e;">⚡ Key Requirements</h5>
                                     <div id="key-requirements" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
+                                            </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
                     <!-- TAB 3: Tasks & Deadlines -->
-                    <div id="tasks-deadlines" class="tab-content">
+                    <div id="tasks-deadlines" class="tab-content" style="display: none;">
                         <div class="regulation-section">
                             <div id="tasks-loading" style="text-align: center; padding: 40px; color: #6e7681;">
                                 <div style="font-size: 16px;">📅 Loading Tasks & Deadlines...</div>
-                                        </div>
+                                            </div>
                             <div id="tasks-content" style="display: none;">
                                 <!-- Deadlines Section -->
                                 <div style="margin-bottom: 24px;">
                                     <h5 style="margin: 0 0 16px 0; color: #1e293b; font-size: 16px;">📅 Filing Deadlines</h5>
                                     <div id="deadlines-list" style="display: grid; gap: 12px;"></div>
-                    </div>
-                    
+                                </div>
+                                
                                 <!-- Tasks Section -->
                                 <div>
                                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                                         <h5 style="margin: 0; color: #1e293b; font-size: 16px;">✅ Compliance Tasks</h5>
                                         <span id="task-count" style="background: #dbeafe; color: #1d4ed8; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600;"></span>
-                            </div>
+                                        </div>
                                     <div id="tasks-list" style="display: flex; flex-direction: column; gap: 12px; max-height: 350px; overflow-y: auto;"></div>
                                 </div>
                             </div>
@@ -1507,41 +1725,41 @@
                     </div>
                     
                     <!-- TAB 4: Risk Assessment -->
-                    <div id="risk-assessment" class="tab-content">
+                    <div id="risk-assessment" class="tab-content" style="display: none;">
                         <div class="regulation-section">
                             <div id="risk-loading" style="text-align: center; padding: 40px; color: #6e7681;">
                                 <div style="font-size: 16px;">⚠️ Loading Risk Assessment...</div>
-                                        </div>
+                            </div>
                             <div id="risk-content" style="display: none;">
                                 <!-- IRS Score Banner -->
                                 <div id="irs-banner" style="background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); color: white; border-radius: 12px; padding: 24px; margin-bottom: 24px; text-align: center;">
                                     <div style="font-size: 14px; opacity: 0.9; margin-bottom: 8px;">INSTITUTIONAL RISK SCORE</div>
                                     <div id="irs-score" style="font-size: 48px; font-weight: 700; margin-bottom: 8px;">96</div>
                                     <div id="irs-level" style="font-size: 18px; font-weight: 600; background: rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 20px; display: inline-block;">CRITICAL</div>
-                    </div>
-                    
+                                    </div>
+                                    
                                 <!-- 5 Risk Factors -->
                                 <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 24px;">
                                     <div class="risk-factor" style="background: #fef2f2; border-radius: 8px; padding: 16px; text-align: center; border: 1px solid #fecaca;">
                                         <div style="font-size: 24px; font-weight: 700; color: #dc2626;" id="rf-financial">30</div>
                                         <div style="font-size: 11px; color: #991b1b; margin-top: 4px;">Financial Penalty</div>
                                         <div style="font-size: 10px; color: #9ca3af;">/30 max</div>
-                                            </div>
+                                        </div>
                                     <div class="risk-factor" style="background: #fef2f2; border-radius: 8px; padding: 16px; text-align: center; border: 1px solid #fecaca;">
                                         <div style="font-size: 24px; font-weight: 700; color: #dc2626;" id="rf-funding">25</div>
                                         <div style="font-size: 11px; color: #991b1b; margin-top: 4px;">Federal Funding</div>
                                         <div style="font-size: 10px; color: #9ca3af;">/25 max</div>
-                                            </div>
+                                    </div>
                                     <div class="risk-factor" style="background: #fef2f2; border-radius: 8px; padding: 16px; text-align: center; border: 1px solid #fecaca;">
                                         <div style="font-size: 24px; font-weight: 700; color: #dc2626;" id="rf-accreditation">18</div>
                                         <div style="font-size: 11px; color: #991b1b; margin-top: 4px;">Accreditation</div>
                                         <div style="font-size: 10px; color: #9ca3af;">/20 max</div>
-                                            </div>
+                                </div>
                                     <div class="risk-factor" style="background: #fef2f2; border-radius: 8px; padding: 16px; text-align: center; border: 1px solid #fecaca;">
                                         <div style="font-size: 24px; font-weight: 700; color: #dc2626;" id="rf-reputation">15</div>
                                         <div style="font-size: 11px; color: #991b1b; margin-top: 4px;">Reputation/Legal</div>
                                         <div style="font-size: 10px; color: #9ca3af;">/15 max</div>
-                                            </div>
+                                        </div>
                                     <div class="risk-factor" style="background: #fef2f2; border-radius: 8px; padding: 16px; text-align: center; border: 1px solid #fecaca;">
                                         <div style="font-size: 24px; font-weight: 700; color: #dc2626;" id="rf-operations">8</div>
                                         <div style="font-size: 11px; color: #991b1b; margin-top: 4px;">Operations</div>
@@ -1556,23 +1774,39 @@
                                         <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                                             <span>L.O.V.V. Level:</span>
                                             <span id="lovv-level" style="font-weight: 600; color: #166534;">B</span>
-                                            </div>
+                                        </div>
                                         <div style="display: flex; justify-content: space-between;">
                                             <span>Last Validated:</span>
                                             <span id="last-validated" style="font-weight: 600;">Loading...</span>
+                                    </div>
                                             </div>
-                                        </div>
                                     <div style="background: #fff7ed; border-radius: 8px; padding: 20px; border: 1px solid #fdba74;">
                                         <h6 style="margin: 0 0 12px 0; color: #9a3412;">⚖️ Enforcement History</h6>
                                         <div id="enforcement-history" style="font-size: 13px; line-height: 1.6;"></div>
+                                            </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+                                
+                    <!-- TAB 5: System Log -->
+                    <div id="system-log" class="tab-content" style="display: none;">
+                        <div class="regulation-section">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                                <h4 style="margin: 0;">🖥️ System Activity Log</h4>
+                                <div style="display: flex; gap: 8px;">
+                                    <button onclick="clearConsoleLog()" style="padding: 6px 12px; background: #6b7280; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">🗑️ Clear</button>
+                                    <button onclick="copyConsoleLog()" style="padding: 6px 12px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px;">📋 Copy</button>
+                                </div>
+                            </div>
+                            <div id="system-log-content" style="background: #1e293b; border-radius: 8px; padding: 16px; max-height: 500px; overflow-y: auto; font-family: 'SF Mono', Monaco, monospace; font-size: 12px; line-height: 1.6;">
+                                <!-- Log entries will be mirrored here -->
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- TAB 5: Customer Payload -->
-                    <div id="customer-payload" class="tab-content">
+                                
+                    <!-- TAB 6: Customer Payload -->
+                    <div id="customer-payload" class="tab-content" style="display: none;">
                         <div class="regulation-section">
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                                 <h4 style="margin: 0;">📤 EdSteward Customer Payload</h4>
@@ -1580,30 +1814,30 @@
                                     <button onclick="validatePayload()" style="padding: 8px 16px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">✓ Validate</button>
                                     <button onclick="copyPayload()" style="padding: 8px 16px; background: #6b7280; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 500;">📋 Copy JSON</button>
                                     <button onclick="sendPayloadToEdSteward()" style="padding: 8px 16px; background: linear-gradient(135deg, #059669, #10b981); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600;">📤 Send to EdSteward</button>
-                                        </div>
+                                    </div>
                                     </div>
                                     
                             <div id="payload-status" style="padding: 12px 16px; background: #f0fdf4; border: 1px solid #86efac; border-radius: 6px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
                                 <span style="font-size: 18px;">✅</span>
                                 <span style="color: #166534; font-weight: 500;">Payload Ready - All required fields present</span>
-                                </div>
-                                
+                                    </div>
+                                    
                             <div style="background: #1e293b; border-radius: 8px; overflow: hidden;">
                                 <div style="background: #334155; padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;">
                                     <span style="color: #94a3b8; font-size: 12px; font-weight: 600;">EDSTEWARD PAYLOAD JSON</span>
                                     <span id="payload-size" style="color: #94a3b8; font-size: 11px;"></span>
                                         </div>
                                 <pre id="payload-json" style="margin: 0; padding: 20px; color: #e2e8f0; font-family: 'SF Mono', Monaco, monospace; font-size: 12px; line-height: 1.6; max-height: 400px; overflow-y: auto; white-space: pre-wrap;"></pre>
-                                    </div>
-                                        </div>
-                                    </div>
-                                        </div>
-                                    </div>
-                                    
-            <div class="console-output" id="consoleOutput">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="console-output" id="consoleOutput" style="display: none;">
                 <div class="log-entry">
                     <span class="log-timestamp">[SYSTEM]</span>
-                    <span class="log-level-success">Americans with Disabilities Act (Americans with Disabilities) and Violence Against Women Act (VAWA) Console Initialized</span>
+                    <span class="log-level-success">Americans with Disabilities Act (Americans with Disabilities Act) and Violence Against Women Act (VAWA) Console Initialized</span>
                 </div>
                 <div class="log-entry">
                     <span class="log-timestamp">[CONFIG]</span>
@@ -1617,6 +1851,61 @@
         </div>
         
         <div class="sidebar">
+            <!-- VERSION CONTROL PANEL -->
+            <div class="version-control-panel" id="versionControlPanel">
+                <h3 style="display: flex; align-items: center; gap: 8px;">
+                    <span>🔐</span> Version Control
+                </h3>
+                <div class="version-status" id="versionStatus">
+                    <div class="version-current">
+                        <div class="version-label">Current Version</div>
+                        <div class="version-value" id="currentVersionDisplay">
+                            <span id="versionStatusIcon">⏳</span>
+                            <span id="versionStatusText">Loading...</span>
+                        </div>
+                    </div>
+                    <div class="version-info" id="versionInfo" style="display: none;">
+                        <div class="version-detail">
+                            <span class="detail-label">Score:</span>
+                            <span class="detail-value" id="versionScore">--</span>
+                        </div>
+                        <div class="version-detail">
+                            <span class="detail-label">Tasks:</span>
+                            <span class="detail-value" id="versionTasks">--</span>
+                        </div>
+                        <div class="version-detail">
+                            <span class="detail-label">Certified:</span>
+                            <span class="detail-value" id="versionCertified">--</span>
+                        </div>
+                        <div class="version-detail">
+                            <span class="detail-label">By:</span>
+                            <span class="detail-value" id="versionCertifiedBy">--</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="version-actions">
+                    <button id="certifyBtn" class="version-btn certify" onclick="certifyAsGold()" title="Certify current state as new gold version">
+                        <span>🏆</span> Certify as Gold
+                    </button>
+                    <button id="verifyBtn" class="version-btn verify" onclick="verifyIntegrity()" title="Verify console integrity">
+                        <span>✓</span> Verify
+                    </button>
+                </div>
+                
+                <div class="version-history" id="versionHistory" style="display: none;">
+                    <div class="version-label" style="margin-top: 12px;">Version History</div>
+                    <select id="versionSelect" class="version-select" onchange="onVersionSelect()">
+                        <option value="">Select version...</option>
+                    </select>
+                    <button id="rollbackBtn" class="version-btn rollback" onclick="rollbackVersion()" disabled title="Rollback to selected version">
+                        <span>↩️</span> Rollback
+                    </button>
+                </div>
+                
+                <div id="versionMessage" class="version-message" style="display: none;"></div>
+            </div>
+            
             <h3>System Diagnostics</h3>
             <div class="diagnostics-panel" id="diagnosticsPanel">
                 <div class="diagnostic-item">
@@ -1870,38 +2159,61 @@
         }
         
         function addConsoleLog(message, level = 'info') {
-            const console = document.getElementById('consoleOutput');
-            const entry = document.createElement('div');
-            entry.className = 'log-entry';
+            const consoleOutput = document.getElementById('consoleOutput');
+            const systemLogContent = document.getElementById('system-log-content');
             
             const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
             
-            // Clean message of emojis and make professional
-            const cleanMessage = message.replace(/[\u{1F600}-\u{1F6FF}]/gu, '')
-                                       .replace(/[\u{2600}-\u{27BF}]/gu, '')
-                                       .replace(/[\u{1F300}-\u{1F5FF}]/gu, '')
-                                       .replace(/[\u{1F900}-\u{1F9FF}]/gu, '')
-                                       .replace(/[\u{1F680}-\u{1F6C5}]/gu, '')
-                                       .replace(/🚀/g, '')
-                                       .replace(/📋/g, '')
-                                       .replace(/📖/g, '')
-                                       .replace(/🔍/g, '')
-                                       .replace(/🏛️/g, '')
-                                       .replace(/📚/g, '')
-                                       .replace(/📜/g, '')
-                                       .replace(/⚖️/g, '')
-                                       .replace(/✅/g, '')
-                                       .replace(/📊/g, '')
-                                       .replace(/🎯/g, '')
-                                       .trim();
+            // Level colors for system log tab
+            const levelColors = {
+                info: '#60a5fa',
+                success: '#4ade80',
+                warning: '#fbbf24',
+                error: '#f87171',
+                debug: '#a78bfa'
+            };
+            const color = levelColors[level] || '#94a3b8';
             
+            // Entry for old console (hidden but still works)
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
             entry.innerHTML = `
                 <span class="log-timestamp">[${timestamp}]</span>
-                <span class="log-level-${level}">${cleanMessage}</span>
+                <span class="log-level-${level}">${message}</span>
             `;
+            if (consoleOutput) {
+                consoleOutput.appendChild(entry);
+                consoleOutput.scrollTop = consoleOutput.scrollHeight;
+            }
             
-            console.appendChild(entry);
-            console.scrollTop = console.scrollHeight;
+            // Entry for new system log tab (with colors, keeps emojis)
+            if (systemLogContent) {
+                const logEntry = document.createElement('div');
+                logEntry.style.cssText = `padding: 8px 12px; margin-bottom: 4px; background: rgba(255,255,255,0.05); border-radius: 4px; border-left: 3px solid ${color};`;
+                logEntry.innerHTML = `
+                    <span style="color: #64748b; margin-right: 12px;">[${timestamp}]</span>
+                    <span style="color: ${color};">${message}</span>
+                `;
+                systemLogContent.appendChild(logEntry);
+                systemLogContent.scrollTop = systemLogContent.scrollHeight;
+            }
+        }
+        
+        function clearConsoleLog() {
+            const systemLogContent = document.getElementById('system-log-content');
+            if (systemLogContent) {
+                systemLogContent.innerHTML = '<div style="color: #64748b; text-align: center; padding: 20px;">Log cleared</div>';
+            }
+        }
+        
+        function copyConsoleLog() {
+            const systemLogContent = document.getElementById('system-log-content');
+            if (systemLogContent) {
+                const text = systemLogContent.innerText;
+                navigator.clipboard.writeText(text).then(() => {
+                    alert('Log copied to clipboard!');
+                });
+            }
         }
         
         function updateStatus(status, type) {
@@ -2178,7 +2490,7 @@
             try {
                 addConsoleLog('🚀 MCP ENGINE COMPREHENSIVE WORKFLOW', 'step');
                 addConsoleLog('═══════════════════════════════════════════════════════════════════', 'info');
-                addConsoleLog('📋 Regulation: Americans with Disabilities (REG-015)', 'info');
+                addConsoleLog('📋 Regulation: Americans with Disabilities Act (REG-015)', 'info');
                 addConsoleLog('⚠️  NO MOCK DATA - All API calls are REAL government sources', 'info');
                 addConsoleLog('', 'info');
                 
@@ -2189,7 +2501,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
-                        regulation: 'americans-with-disabilities-act',
+                        regulation: REGULATION_SLUG,
                         quick: false  // Full comprehensive workflow
                     })
                 });
@@ -2572,7 +2884,7 @@
                 addConsoleLog('───────────────────────────────────────────────────────────────────', 'info');
                 
                 addConsoleLog(`   📦 Package ID: ${result.workflowId}`, 'info');
-                addConsoleLog(`   📦 Regulation: ${pkg?.regKey || 'REG-015'} - Americans with Disabilities`, 'info');
+                addConsoleLog(`   📦 Regulation: ${pkg?.regKey || 'REG-015'} - Americans with Disabilities Act`, 'info');
                 addConsoleLog(`   📦 Status: ${result.status?.toUpperCase() || 'READY'}`, 'success');
                 addConsoleLog('', 'info');
                 
@@ -2597,8 +2909,25 @@
                 addConsoleLog('', 'info');
                 
                 // ═══════════════════════════════════════════════════════════════
-                // WORKFLOW COMPLETE
+                // WORKFLOW COMPLETE - Store results for version certification
                 // ═══════════════════════════════════════════════════════════════
+                
+                // Store workflow results globally for version certification
+                window.lastWorkflowResults = {
+                    workflowId: result.workflowId,
+                    timestamp: new Date().toISOString(),
+                    scores: {
+                        overall: metrics.validationRate,
+                        certaintyLevel: metrics.validationRate >= 90 ? 'A' : 
+                                       metrics.validationRate >= 75 ? 'B' : 
+                                       metrics.validationRate >= 60 ? 'C' : 'D'
+                    },
+                    metrics: { ...metrics },
+                    taskCount: result.compliancePackage?.tasks?.length || 0,
+                    deadlineCount: result.compliancePackage?.deadlines?.length || 0,
+                    runtime: document.getElementById('runtime').textContent
+                };
+                
                 addConsoleLog('═══════════════════════════════════════════════════════════════════', 'success');
                 addConsoleLog('✅ COMPREHENSIVE WORKFLOW COMPLETED', 'success');
                 addConsoleLog('═══════════════════════════════════════════════════════════════════', 'success');
@@ -2609,6 +2938,7 @@
                 addConsoleLog('', 'info');
                 addConsoleLog('📨 Package ready for delivery to EdSteward clients', 'info');
                 addConsoleLog('   Use "Push to Clients" to send update for CCO review', 'info');
+                addConsoleLog('🔐 Workflow results saved - Click "Certify as Gold" to create new version', 'info');
                 
                 updateStatus('COMPLETED', 'success');
                 
@@ -2690,7 +3020,7 @@
                 const changeType = data.data?.changeType || data.data?.after?.summary?.changeType || 'update';
                 const impact = data.data?.after?.summary?.impact || 'medium';
                 
-                addConsoleLog(`📋 REAL-TIME UPDATE: Americans with Disabilities Act (Americans with Disabilities) and Violence Against Women Act (VAWA) regulation updated (v${version})`, 'update');
+                addConsoleLog(`📋 REAL-TIME UPDATE: Americans with Disabilities Act (Americans with Disabilities Act) and Violence Against Women Act (VAWA) regulation updated (v${version})`, 'update');
                 addConsoleLog(`   - Change type: ${changeType}`, 'info');
                 addConsoleLog(`   - Impact level: ${impact}`, 'debug');
                 addConsoleLog(`   - Timestamp: ${new Date(data.timestamp).toLocaleString()}`, 'debug');
@@ -2766,7 +3096,7 @@
                     animation: slideIn 0.3s ease-out;
                 ">
                     <div style="font-weight: bold; margin-bottom: 8px;">
-                        📋 Americans with Disabilities Act (Americans with Disabilities) and Violence Against Women Act (VAWA) REGULATION UPDATED
+                        📋 Americans with Disabilities Act (Americans with Disabilities Act) and Violence Against Women Act (VAWA) REGULATION UPDATED
                     </div>
                     <div style="font-size: 13px; opacity: 0.9;">
                         Version: ${updateData.data?.after?.version || updateData.version || 'unknown'}<br>
@@ -2940,7 +3270,7 @@
             button.style.opacity = '0.6';
             
             const targetValue = select.value;
-            const regulationId = 'americans-with-disabilities-actand-campus-crime-statistics-act-clery-act-and-violence-against-women-act-vawa';
+            const regulationId = REGULATION_SLUG;
             
             try {
                 if (targetValue === 'all-clients') {
@@ -3049,7 +3379,7 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        regulationId: 'americans-with-disabilities-actand-campus-crime-statistics-act-clery-act-and-violence-against-women-act-vawa',
+                        regulationId: REGULATION_SLUG,
                         changeType: 'MANUAL_PUSH',
                         message: 'Manual update triggered from console',
                         timestamp: new Date().toISOString()
@@ -3086,7 +3416,7 @@
             button.style.opacity = '0.6';
             
             try {
-                addConsoleLog('📤 Sending Americans with Disabilities update to EdSteward...', 'info');
+                addConsoleLog(`📤 Sending ${REGULATION_NAME} update to EdSteward...`, 'info');
                 
                 // Use delivery system proxy to avoid CORS
                 const response = await fetch('http://localhost:3003/api/send-to-edsteward', {
@@ -3095,10 +3425,9 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        regulationId: 9,
-                        regulationSlug: 'clery-act',
-                        name: 'Jeanne Clery Disclosure of Campus Security Policy',
-                        edstewardId: 9
+                        regulationSlug: REGULATION_SLUG,
+                        regKey: REG_KEY,
+                        name: REGULATION_NAME
                     })
                 });
                 
@@ -3106,7 +3435,7 @@
                 
                 if (response.ok && result.success) {
                     addConsoleLog('✅ Successfully sent to EdSteward!', 'success');
-                    addConsoleLog('📋 Regulation ID: 9 (Americans with Disabilities) | Status: Pending CCO Review', 'info');
+                    addConsoleLog(`📋 ${REG_KEY} (${REGULATION_NAME}) | Status: Pending CCO Review', 'info');
                     button.innerHTML = '✅';
                     button.style.opacity = '1';
                     setTimeout(() => {
@@ -3135,8 +3464,8 @@
         setTimeout(() => {
             addConsoleLog('🔧 System diagnostics initialized', 'info');
             addConsoleLog('📡 Monitoring API endpoints...', 'debug');
-            addConsoleLog('📋 Regulation preview loaded: Jeanne Clery Disclosure Of Campus Security Policy ', 'info');
-            addConsoleLog('🎯 Jeanne Clery Disclosure Of Campus Security Policy  LinearEngine ready for execution', 'info');
+            addConsoleLog('📋 Regulation preview loaded: Jeanne americans Disclosure Of Campus Security Policy ', 'info');
+            addConsoleLog('🎯 Jeanne americans Disclosure Of Campus Security Policy  LinearEngine ready for execution', 'info');
             
             // Initialize real-time updates
             addConsoleLog('🔗 Initializing real-time regulation updates...', 'info');
@@ -3168,6 +3497,7 @@
             const tabContents = document.querySelectorAll('.tab-content');
             tabContents.forEach(content => {
                 content.classList.remove('active');
+                content.style.display = 'none';  // Also set inline style
             });
             
             // Remove active class from all tab buttons
@@ -3180,6 +3510,7 @@
             const selectedTab = document.getElementById(tabId);
             if (selectedTab) {
                 selectedTab.classList.add('active');
+                selectedTab.style.display = 'block';  // Override inline style
             }
             
             // Add active class to clicked button
@@ -3207,16 +3538,302 @@
         // ============================================
         
         const REGULATION_SLUG = 'americans-with-disabilities-act';
+        const REG_KEY = 'REG-015';  // Canonical regulation key for version control
         let cachedRegulationData = null;
+        let currentVersionData = null;
+        let REGULATION_NAME = 'Loading...';  // Will be set dynamically
+        
+        // ============================================
+        // DYNAMIC PAGE INITIALIZATION
+        // ============================================
+        
+        /**
+         * Initialize page with regulation data - updates all dynamic elements
+         */
+        async function initializeRegulationPage() {
+            try {
+                const reg = await fetchRegulationData();
+                if (reg && reg.name) {
+                    REGULATION_NAME = reg.name;
+                    
+                    // Update page title
+                    document.title = `${REGULATION_NAME} - MCP Engine Console`;
+                    
+                    // Update header title (h1 with class console-header)
+                    const headerTitle = document.querySelector('h1.console-header');
+                    if (headerTitle) headerTitle.textContent = REGULATION_NAME;
+                    
+                    // Update any regulation-cite elements
+                    document.querySelectorAll('.regulation-cite').forEach(el => {
+                        el.textContent = `Regulation: ${REGULATION_NAME}`;
+                    });
+                    
+                    // Update console logs
+                    addConsoleLog(`📋 ${REGULATION_NAME} Console Initialized`, 'success');
+                    addConsoleLog(`🎯 ${REG_KEY} LinearEngine ready`, 'info');
+                }
+            } catch (err) {
+                console.error('Failed to initialize regulation page:', err);
+            }
+        }
+        
+        // ============================================
+        // VERSION CONTROL FUNCTIONS
+        // ============================================
+        
+        /**
+         * Load version control status on page load
+         */
+        async function loadVersionStatus() {
+            try {
+                const response = await fetch(`http://localhost:3004/api/llm/console-versions/${REG_KEY}`);
+                const data = await response.json();
+                
+                if (data.success) {
+                    currentVersionData = data;
+                    updateVersionUI(data);
+                } else {
+                    showVersionMessage('error', data.error || 'Failed to load version info');
+                }
+            } catch (err) {
+                console.error('Version status load error:', err);
+                updateVersionUI({ active: null, versions: [], hasGoldStandard: false });
+            }
+        }
+        
+        /**
+         * Update the version control UI based on current status
+         */
+        function updateVersionUI(data) {
+            const badge = document.getElementById('versionBadge');
+            const panel = document.getElementById('versionControlPanel');
+            const statusIcon = document.getElementById('versionStatusIcon');
+            const statusText = document.getElementById('versionStatusText');
+            const versionInfo = document.getElementById('versionInfo');
+            const versionHistory = document.getElementById('versionHistory');
+            const versionSelect = document.getElementById('versionSelect');
+            const certifyBtn = document.getElementById('certifyBtn');
+            
+            if (data.hasGoldStandard && data.active) {
+                // Gold standard exists
+                badge.style.display = 'inline-flex';
+                badge.classList.remove('draft');
+                document.getElementById('versionNumber').textContent = data.active.version;
+                
+                panel.classList.remove('no-gold');
+                statusIcon.textContent = '🔒';
+                statusText.textContent = `${data.active.version} GOLD`;
+                
+                // Show version info
+                versionInfo.style.display = 'grid';
+                document.getElementById('versionScore').textContent = data.active.workflowScore ? `${data.active.workflowScore}/100` : '--';
+                document.getElementById('versionTasks').textContent = data.active.taskCount || '--';
+                document.getElementById('versionCertified').textContent = data.active.certifiedAt ? 
+                    new Date(data.active.certifiedAt).toLocaleDateString() : '--';
+                document.getElementById('versionCertifiedBy').textContent = data.active.certifiedBy || '--';
+                
+                certifyBtn.innerHTML = '<span>🏆</span> New Version';
+            } else {
+                // No gold standard
+                badge.style.display = 'inline-flex';
+                badge.classList.add('draft');
+                badge.querySelector('.version-icon').textContent = '📝';
+                badge.querySelector('.version-text').textContent = 'DRAFT';
+                document.getElementById('versionNumber').textContent = '';
+                
+                panel.classList.add('no-gold');
+                statusIcon.textContent = '⚠️';
+                statusText.textContent = 'Not Certified';
+                versionInfo.style.display = 'none';
+                
+                certifyBtn.innerHTML = '<span>🏆</span> Certify as Gold';
+            }
+            
+            // Populate version history dropdown
+            if (data.versions && data.versions.length > 0) {
+                versionHistory.style.display = 'block';
+                versionSelect.innerHTML = '<option value="">Select version...</option>';
+                
+                data.versions.forEach(v => {
+                    const option = document.createElement('option');
+                    option.value = v.version;
+                    option.textContent = `${v.version} - ${v.status.toUpperCase()}${v.isActive ? ' (Active)' : ''} - Score: ${v.workflowScore || 'N/A'}`;
+                    if (v.isActive) option.disabled = true;
+                    versionSelect.appendChild(option);
+                });
+            } else {
+                versionHistory.style.display = 'none';
+            }
+        }
+        
+        /**
+         * Certify current console as new gold version
+         */
+        async function certifyAsGold() {
+            const certifyBtn = document.getElementById('certifyBtn');
+            const originalText = certifyBtn.innerHTML;
+            
+            // Get workflow results if available
+            const workflowResults = window.lastWorkflowResults || {
+                scores: { overall: 100, certaintyLevel: 'A' }
+            };
+            
+            const notes = prompt('Enter certification notes (optional):') || '';
+            
+            try {
+                certifyBtn.innerHTML = '<span>⏳</span> Certifying...';
+                certifyBtn.disabled = true;
+                
+                const response = await fetch(`http://localhost:3004/api/llm/console-versions/${REG_KEY}/certify`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        workflowResults,
+                        certifiedBy: 'console-user',
+                        notes
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showVersionMessage('success', `✅ ${data.message}`);
+                    addConsoleLog(`🏆 ${data.message}`, 'success');
+                    await loadVersionStatus();  // Refresh UI
+                } else {
+                    showVersionMessage('error', data.error);
+                    addConsoleLog(`❌ Certification failed: ${data.error}`, 'error');
+                }
+            } catch (err) {
+                showVersionMessage('error', `Certification failed: ${err.message}`);
+                addConsoleLog(`❌ Certification error: ${err.message}`, 'error');
+            } finally {
+                certifyBtn.innerHTML = originalText;
+                certifyBtn.disabled = false;
+            }
+        }
+        
+        /**
+         * Verify integrity of current gold version
+         */
+        async function verifyIntegrity() {
+            const verifyBtn = document.getElementById('verifyBtn');
+            const originalText = verifyBtn.innerHTML;
+            
+            try {
+                verifyBtn.innerHTML = '<span>⏳</span> Verifying...';
+                verifyBtn.disabled = true;
+                
+                const response = await fetch(`http://localhost:3004/api/llm/console-versions/${REG_KEY}/verify`);
+                const data = await response.json();
+                
+                if (data.success && data.verification) {
+                    if (data.verification.isValid) {
+                        showVersionMessage('success', `✅ ${data.verification.message}`);
+                        addConsoleLog(`✅ Integrity verified for ${REG_KEY} ${data.verification.version}`, 'success');
+                    } else {
+                        showVersionMessage('error', `❌ ${data.verification.message || data.verification.error}`);
+                        addConsoleLog(`❌ INTEGRITY VIOLATION: ${data.verification.message || data.verification.error}`, 'error');
+                    }
+                } else {
+                    showVersionMessage('error', data.error || 'Verification failed');
+                }
+            } catch (err) {
+                showVersionMessage('error', `Verification failed: ${err.message}`);
+            } finally {
+                verifyBtn.innerHTML = originalText;
+                verifyBtn.disabled = false;
+            }
+        }
+        
+        /**
+         * Handle version selection for rollback
+         */
+        function onVersionSelect() {
+            const select = document.getElementById('versionSelect');
+            const rollbackBtn = document.getElementById('rollbackBtn');
+            rollbackBtn.disabled = !select.value;
+        }
+        
+        /**
+         * Rollback to selected version
+         */
+        async function rollbackVersion() {
+            const select = document.getElementById('versionSelect');
+            const targetVersion = select.value;
+            
+            if (!targetVersion) return;
+            
+            const reason = prompt(`Reason for rolling back to ${targetVersion}:`);
+            if (reason === null) return;  // User cancelled
+            
+            const rollbackBtn = document.getElementById('rollbackBtn');
+            const originalText = rollbackBtn.innerHTML;
+            
+            try {
+                rollbackBtn.innerHTML = '<span>⏳</span> Rolling back...';
+                rollbackBtn.disabled = true;
+                
+                const response = await fetch(`http://localhost:3004/api/llm/console-versions/${REG_KEY}/rollback`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        targetVersion,
+                        performedBy: 'console-user',
+                        reason
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showVersionMessage('success', `✅ ${data.message}`);
+                    addConsoleLog(`↩️ ${data.message}`, 'success');
+                    
+                    // Refresh the page to load the rolled-back console
+                    setTimeout(() => {
+                        showVersionMessage('warning', '🔄 Refreshing page to load restored version...');
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    showVersionMessage('error', data.error);
+                    addConsoleLog(`❌ Rollback failed: ${data.error}`, 'error');
+                }
+            } catch (err) {
+                showVersionMessage('error', `Rollback failed: ${err.message}`);
+                addConsoleLog(`❌ Rollback error: ${err.message}`, 'error');
+            } finally {
+                rollbackBtn.innerHTML = originalText;
+                rollbackBtn.disabled = false;
+            }
+        }
+        
+        /**
+         * Show version control message
+         */
+        function showVersionMessage(type, message) {
+            const msgDiv = document.getElementById('versionMessage');
+            msgDiv.className = `version-message ${type}`;
+            msgDiv.textContent = message;
+            msgDiv.style.display = 'block';
+            
+            // Auto-hide after 5 seconds (except errors)
+            if (type !== 'error') {
+                setTimeout(() => {
+                    msgDiv.style.display = 'none';
+                }, 5000);
+            }
+        }
         
         // Fetch regulation data from Registry API
         async function fetchRegulationData() {
             if (cachedRegulationData) return cachedRegulationData;
             try {
-                const response = await fetch(`http://localhost:3010/api/regulations?search=clery`);
+                // Use the REGULATION_SLUG to fetch the correct regulation
+                const response = await fetch(`http://localhost:3010/api/regulations/${REGULATION_SLUG}`);
                 const data = await response.json();
-                if (Array.isArray(data) && data.length > 0) {
-                    cachedRegulationData = data[0];
+                if (data && !data.error) {
+                    cachedRegulationData = data;
                     return cachedRegulationData;
                 }
             } catch (err) {
@@ -3238,28 +3855,76 @@
             }
         }
         
+        // Toggle tasks section
+        function toggleTasksSection() {
+            const expanded = document.getElementById('data-tasks-expanded');
+            const toggle = document.getElementById('tasks-toggle');
+            if (expanded.style.display === 'none') {
+                expanded.style.display = 'block';
+                toggle.textContent = '▲ Collapse';
+            } else {
+                expanded.style.display = 'none';
+                toggle.textContent = '▼ Expand';
+            }
+        }
+        
+        // Toggle deadlines section
+        function toggleDeadlinesSection() {
+            const expanded = document.getElementById('data-deadlines-expanded');
+            const toggle = document.getElementById('deadlines-toggle');
+            if (expanded.style.display === 'none') {
+                expanded.style.display = 'block';
+                toggle.textContent = '▲ Collapse';
+            } else {
+                expanded.style.display = 'none';
+                toggle.textContent = '▼ Expand';
+            }
+        }
+        
         // TAB 1: Load Complete Data (All Rich Data)
         async function loadCompleteData() {
+            console.log('🔄 loadCompleteData() called');
             const loadingDiv = document.getElementById('reg-text-loading');
             const contentDiv = document.getElementById('reg-text-content');
             const errorDiv = document.getElementById('reg-text-error');
             
-            if (!loadingDiv) return;
+            console.log('DOM elements:', { loadingDiv: !!loadingDiv, contentDiv: !!contentDiv, errorDiv: !!errorDiv });
+            
+            if (!loadingDiv) {
+                console.error('❌ loadingDiv not found!');
+                return;
+            }
             loadingDiv.style.display = 'block';
-            contentDiv.style.display = 'none';
-            errorDiv.style.display = 'none';
+            if (contentDiv) contentDiv.style.cssText = 'display: none;';
+            if (errorDiv) errorDiv.style.cssText = 'display: none !important;';
             
             try {
                 const reg = await fetchRegulationData();
+                console.log('📊 fetchRegulationData returned:', reg ? 'object' : 'null');
                 if (!reg) throw new Error('No regulation data');
                 
-                console.log('📊 Complete regulation data:', reg);
+                console.log('📊 Complete regulation data:', {
+                    reg_key: reg.reg_key,
+                    regKey: reg.regKey,
+                    summary: reg.summary ? reg.summary.length + ' chars' : 'null',
+                    requirements: reg.requirements ? reg.requirements.length + ' chars' : 'null',
+                    tasks: reg.tasks?.length || 0,
+                    deadlines: reg.deadlines?.length || 0,
+                    cfr: reg.cfr
+                });
                 
                 // SECTION 1: Legal Foundation
-                document.getElementById('data-reg-key').textContent = reg.reg_key || reg.regKey || '--';
-                document.getElementById('data-usc').textContent = reg.statute || '--';
-                document.getElementById('data-cfr').textContent = reg.cfr || '--';
-                document.getElementById('data-lovv').textContent = reg.lovv_level || reg.lovvLevel || 'A';
+                const regKeyEl = document.getElementById('data-reg-key');
+                const uscEl = document.getElementById('data-usc');
+                const cfrEl = document.getElementById('data-cfr');
+                const lovvEl = document.getElementById('data-lovv');
+                
+                console.log('Section 1 elements:', { regKeyEl: !!regKeyEl, uscEl: !!uscEl, cfrEl: !!cfrEl, lovvEl: !!lovvEl });
+                
+                if (regKeyEl) regKeyEl.textContent = reg.reg_key || reg.regKey || '--';
+                if (uscEl) uscEl.textContent = reg.statute || '--';
+                if (cfrEl) cfrEl.textContent = reg.cfr || '--';
+                if (lovvEl) lovvEl.textContent = reg.lovv_level || reg.lovvLevel || 'A';
                 
                 // SECTION 2: Risk Assessment
                 const riskAssessment = reg.risk_assessment || reg.riskAssessment || {};
@@ -3269,83 +3934,214 @@
                 document.getElementById('data-risk-score').textContent = riskScore;
                 document.getElementById('data-risk-level').textContent = riskLevel;
                 
+                console.log('📊 Setting risk section...');
+                
                 // Color the risk box based on level
                 const riskBox = document.getElementById('data-risk-score-box');
-                if (riskLevel === 'CRITICAL') {
-                    riskBox.style.background = '#fef2f2';
-                    riskBox.style.borderColor = '#ef4444';
-                } else if (riskLevel === 'SEVERE') {
-                    riskBox.style.background = '#fff7ed';
-                    riskBox.style.borderColor = '#f97316';
-                } else if (riskLevel === 'HIGH') {
-                    riskBox.style.background = '#fefce8';
-                    riskBox.style.borderColor = '#eab308';
-                } else {
-                    riskBox.style.background = '#f0fdf4';
-                    riskBox.style.borderColor = '#22c55e';
+                if (riskBox) {
+                    if (riskLevel === 'CRITICAL') {
+                        riskBox.style.background = '#fef2f2';
+                        riskBox.style.borderColor = '#ef4444';
+                    } else if (riskLevel === 'SEVERE') {
+                        riskBox.style.background = '#fff7ed';
+                        riskBox.style.borderColor = '#f97316';
+                    } else if (riskLevel === 'HIGH') {
+                        riskBox.style.background = '#fefce8';
+                        riskBox.style.borderColor = '#eab308';
+                    } else {
+                        riskBox.style.background = '#f0fdf4';
+                        riskBox.style.borderColor = '#22c55e';
+                    }
                 }
                 
-                // Risk Factors
+                // Risk Factors - show full details including rationale
                 const factors = riskAssessment.riskFactors || {};
+                const maxScores = { financialPenalty: 30, federalFunding: 25, accreditationImpact: 20, reputationalLegal: 15, operationalDisruption: 10 };
+                const factorColors = { financialPenalty: '#dc2626', federalFunding: '#ea580c', accreditationImpact: '#ca8a04', reputationalLegal: '#7c3aed', operationalDisruption: '#0891b2' };
                 const factorsHTML = Object.entries(factors).map(([key, val]) => {
                     const label = key.replace(/([A-Z])/g, ' $1').replace(/^./, s => s.toUpperCase());
-                    return `<div style="display: flex; justify-content: space-between;"><span>${label}:</span><strong>${val || '--'}</strong></div>`;
+                    const score = typeof val === 'object' ? (val.score || 0) : (val || 0);
+                    const max = maxScores[key] || 10;
+                    const color = factorColors[key] || '#64748b';
+                    const rationale = typeof val === 'object' && val.rationale ? val.rationale : 'No details available';
+                    const extras = [];
+                    if (val.maxPenaltyReference) extras.push(`<span style="background:#fef2f2;padding:2px 6px;border-radius:4px;font-size:10px;">💰 ${val.maxPenaltyReference}</span>`);
+                    if (val.fundingTypesAtRisk) extras.push(`<span style="background:#fff7ed;padding:2px 6px;border-radius:4px;font-size:10px;">⚠️ ${val.fundingTypesAtRisk.join(', ')}</span>`);
+                    if (val.precedentCases) extras.push(`<span style="background:#faf5ff;padding:2px 6px;border-radius:4px;font-size:10px;">📋 ${val.precedentCases.slice(0,2).join(', ')}</span>`);
+                    if (val.affectedOperations) extras.push(`<span style="background:#ecfeff;padding:2px 6px;border-radius:4px;font-size:10px;">🏢 ${val.affectedOperations.slice(0,3).join(', ')}</span>`);
+                    const pct = Math.round((score / max) * 100);
+                    return `<div style="background:white;border-radius:8px;padding:12px;margin-bottom:10px;border-left:4px solid ${color};box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+                        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+                            <span style="font-weight:600;color:#1e293b;">${label}</span>
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <div style="width:60px;height:6px;background:#e5e7eb;border-radius:3px;overflow:hidden;">
+                                    <div style="width:${pct}%;height:100%;background:${color};"></div>
+                                </div>
+                                <strong style="color:${color};font-size:14px;">${score}/${max}</strong>
+                            </div>
+                        </div>
+                        <div style="font-size:12px;color:#475569;line-height:1.5;margin-bottom:6px;">${rationale}</div>
+                        ${extras.length ? `<div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;">${extras.join('')}</div>` : ''}
+                    </div>`;
                 }).join('');
-                document.getElementById('data-risk-factors').innerHTML = factorsHTML || '<div>No risk factors data</div>';
+                const riskFactorsEl = document.getElementById('data-risk-factors');
+                if (riskFactorsEl) riskFactorsEl.innerHTML = factorsHTML || '<div>No risk factors data</div>';
+                
+                console.log('📊 Setting summary...');
                 
                 // SECTION 3: Summary
-                document.getElementById('data-summary').innerHTML = reg.summary || '<em>No summary available</em>';
+                const summaryEl = document.getElementById('data-summary');
+                if (summaryEl) summaryEl.innerHTML = reg.summary || '<em>No summary available</em>';
+                
+                console.log('📊 Setting requirements...');
                 
                 // SECTION 4: Key Requirements
                 const reqText = reg.requirements || reg.keyRequirements || '';
-                if (typeof reqText === 'string' && reqText.length > 0) {
-                    document.getElementById('data-requirements').innerHTML = reqText.replace(/\\n/g, '<br>').replace(/## /g, '<strong>').replace(/\\n/g, '</strong><br>');
-                } else if (Array.isArray(reqText)) {
-                    document.getElementById('data-requirements').innerHTML = reqText.map(r => `• ${r.requirement || r}`).join('<br>');
-                } else {
-                    document.getElementById('data-requirements').innerHTML = '<em>No requirements defined</em>';
+                const reqEl = document.getElementById('data-requirements');
+                if (reqEl) {
+                    if (typeof reqText === 'string' && reqText.length > 0) {
+                        reqEl.innerHTML = reqText.replace(/\n/g, '<br>').replace(/## /g, '<strong>');
+                    } else if (Array.isArray(reqText)) {
+                        reqEl.innerHTML = reqText.map(r => `• ${r.requirement || r}`).join('<br>');
+                    } else {
+                        reqEl.innerHTML = '<em>No requirements defined</em>';
+                    }
                 }
                 
-                // SECTION 5: Tasks & Deadlines
-                const tasks = reg.tasks || [];
-                const deadlines = reg.deadlines || [];
+                console.log('📊 Setting tasks and deadlines...');
                 
-                document.getElementById('data-task-count').textContent = tasks.length;
-                document.getElementById('data-deadline-count').textContent = deadlines.length;
+                // SECTION 5 & 6: Tasks & Deadlines (Expandable)
+                const tasks = reg.complianceTasks || reg.tasks || [];
+                const deadlines = reg.filingDeadlines || reg.deadlines || [];
                 
-                // Tasks preview (first 5)
-                const tasksPreviewHTML = tasks.slice(0, 5).map(t => 
-                    `<div style="padding: 6px 0; border-bottom: 1px solid #dcfce7;"><strong>${t.priority || 'TASK'}:</strong> ${t.title || t.name || t.description}</div>`
-                ).join('') + (tasks.length > 5 ? `<div style="padding: 6px 0; color: #166534;"><em>...and ${tasks.length - 5} more tasks</em></div>` : '');
-                document.getElementById('data-tasks-preview').innerHTML = tasksPreviewHTML || '<em>No tasks</em>';
+                const taskCountEl = document.getElementById('data-task-count');
+                const deadlineCountEl = document.getElementById('data-deadline-count');
+                if (taskCountEl) taskCountEl.textContent = tasks.length;
+                if (deadlineCountEl) deadlineCountEl.textContent = deadlines.length;
+                
+                // Full tasks list with details - grouped by category
+                const priorityColors = { CRITICAL: '#dc2626', HIGH: '#ea580c', MEDIUM: '#ca8a04', LOW: '#22c55e' };
+                
+                // Group tasks by category
+                const taskCategories = {};
+                tasks.forEach(t => {
+                    const cat = t.category || 'Uncategorized';
+                    if (!taskCategories[cat]) taskCategories[cat] = [];
+                    taskCategories[cat].push(t);
+                });
+                
+                const sortedCats = Object.keys(taskCategories).sort();
+                let tasksListHTML = '';
+                
+                sortedCats.forEach(category => {
+                    const catTasks = taskCategories[category];
+                    tasksListHTML += `
+                        <div style="margin-bottom: 16px;">
+                            <div style="background: linear-gradient(135deg, #166534, #15803d); color: white; padding: 10px 14px; border-radius: 8px 8px 0 0; font-weight: 600; font-size: 13px; display: flex; justify-content: space-between; align-items: center;">
+                                <span>${category}</span>
+                                <span style="background: rgba(255,255,255,0.2); padding: 2px 10px; border-radius: 12px; font-size: 11px;">${catTasks.length}</span>
+                            </div>
+                            <div style="border: 1px solid #d1fae5; border-top: none; border-radius: 0 0 8px 8px; padding: 8px;">
+                    `;
+                    
+                    catTasks.forEach((t, idx) => {
+                        const priority = (t.priority || 'MEDIUM').toUpperCase();
+                        const color = priorityColors[priority] || '#64748b';
+                        tasksListHTML += `<div style="padding: 10px 12px; margin-bottom: 6px; background: white; border-radius: 6px; border-left: 4px solid ${color}; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 4px;">
+                                <strong style="color: #1e293b; font-size: 12px;">${t.title || t.name || 'Task ' + (idx+1)}</strong>
+                                <span style="background: ${color}; color: white; padding: 1px 6px; border-radius: 4px; font-size: 9px; font-weight: 600;">${priority}</span>
+                            </div>
+                            ${t.description ? `<div style="color: #475569; font-size: 11px; margin-bottom: 4px;">${t.description}</div>` : ''}
+                            <div style="display: flex; gap: 10px; flex-wrap: wrap; font-size: 10px; color: #64748b;">
+                                ${t.assigned_role || t.assignedRole ? `<span>👤 ${t.assigned_role || t.assignedRole}</span>` : ''}
+                                ${t.evidence_required || t.evidenceRequired ? '<span>📋 Evidence Required</span>' : ''}
+                                ${t.frequency ? `<span>🔄 ${t.frequency}</span>` : ''}
+                            </div>
+                        </div>`;
+                    });
+                    
+                    tasksListHTML += `
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                const tasksListEl = document.getElementById('data-tasks-list');
+                if (tasksListEl) tasksListEl.innerHTML = tasksListHTML || '<em style="color: #6b7280;">No tasks defined</em>';
+                
+                // Full deadlines list with details
+                const deadlinesListHTML = deadlines.map((d, idx) => {
+                    const dateStr = d.date || d.dueDate || d.deadline || 'Ongoing';
+                    const isRecurring = d.frequency && d.frequency !== 'one-time';
+                    return `<div style="padding: 12px; margin-bottom: 8px; background: white; border-radius: 8px; border-left: 4px solid #a21caf; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                            <strong style="color: #1e293b; font-size: 13px;">${d.type || d.name || 'Deadline ' + (idx+1)}</strong>
+                            <span style="background: ${isRecurring ? '#7c3aed' : '#0891b2'}; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600;">
+                                ${isRecurring ? '🔄 ' + d.frequency : '📅 ' + dateStr}
+                            </span>
+                        </div>
+                        ${d.description ? `<div style="color: #475569; font-size: 12px; margin-bottom: 6px;">${d.description}</div>` : ''}
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap; font-size: 11px; color: #64748b;">
+                            ${d.responsible_role || d.responsibleRole ? `<span>👤 ${d.responsible_role || d.responsibleRole}</span>` : ''}
+                            ${d.penalty ? `<span>⚠️ Penalty: ${d.penalty}</span>` : ''}
+                        </div>
+                    </div>`;
+                }).join('');
+                const deadlinesListEl = document.getElementById('data-deadlines-list');
+                if (deadlinesListEl) deadlinesListEl.innerHTML = deadlinesListHTML || '<em style="color: #6b7280;">No deadlines defined</em>';
                 
                 // Deadlines preview
                 const deadlinesPreviewHTML = deadlines.slice(0, 5).map(d => 
                     `<div style="padding: 6px 0; border-bottom: 1px solid #f5d0fe;"><strong>${d.type || d.name || 'DEADLINE'}:</strong> ${d.date || d.dueDate || 'Ongoing'}</div>`
                 ).join('') + (deadlines.length > 5 ? `<div style="padding: 6px 0; color: #86198f;"><em>...and ${deadlines.length - 5} more</em></div>` : '');
-                document.getElementById('data-deadlines-preview').innerHTML = deadlinesPreviewHTML || '<em>No deadlines</em>';
+                const deadlinesPreviewEl = document.getElementById('data-deadlines-preview');
+                if (deadlinesPreviewEl) deadlinesPreviewEl.innerHTML = deadlinesPreviewHTML || '<em>No deadlines</em>';
+                
+                console.log('📊 Setting full text...');
                 
                 // SECTION 6: Full Regulation Text
                 const fullText = reg.regulation_text || reg.regulationText || reg.description || 'Regulation text not available';
-                document.getElementById('reg-text-body').textContent = fullText;
+                const regTextBody = document.getElementById('reg-text-body');
+                if (regTextBody) regTextBody.textContent = fullText;
+                
+                console.log('📊 Setting payload preview...');
                 
                 // SECTION 7: EdSteward Payload Preview
-                document.getElementById('payload-regkey').textContent = reg.reg_key || reg.regKey || '--';
-                document.getElementById('payload-risk').textContent = riskScore;
-                document.getElementById('payload-tasks').textContent = tasks.length;
-                document.getElementById('payload-deadlines').textContent = deadlines.length;
+                const payloadRegkey = document.getElementById('payload-regkey');
+                const payloadRisk = document.getElementById('payload-risk');
+                const payloadTasks = document.getElementById('payload-tasks');
+                const payloadDeadlines = document.getElementById('payload-deadlines');
                 
-                loadingDiv.style.display = 'none';
-                contentDiv.style.display = 'block';
+                if (payloadRegkey) payloadRegkey.textContent = reg.reg_key || reg.regKey || '--';
+                if (payloadRisk) payloadRisk.textContent = riskScore;
+                if (payloadTasks) payloadTasks.textContent = tasks.length;
+                if (payloadDeadlines) payloadDeadlines.textContent = deadlines.length;
                 
-                addConsoleLog(`📊 Complete data loaded: ${reg.name}`, 'success');
-                addConsoleLog(`   REG-KEY: ${reg.reg_key || '--'} | Risk: ${riskScore} | Tasks: ${tasks.length} | Deadlines: ${deadlines.length}`, 'info');
+                console.log('✅ All sections populated');
+                
+                // Hide loading, show content
+                if (loadingDiv) loadingDiv.style.display = 'none';
+                if (contentDiv) {
+                    contentDiv.style.display = 'block';
+                    console.log('✅ Content div shown');
+                }
+                if (errorDiv) {
+                    errorDiv.style.cssText = 'display: none !important;';
+                    console.log('✅ Error div hidden with !important');
+                }
+                
+                console.log('✅ Complete data loaded successfully!');
                 
             } catch (err) {
-                console.error('Failed to load complete data:', err);
-                loadingDiv.style.display = 'none';
-                errorDiv.style.display = 'block';
-                document.getElementById('reg-text-error-msg').textContent = err.message;
+                console.error('❌ Failed to load complete data:', err);
+                console.error('Error details:', err.message, err.stack);
+                if (loadingDiv) loadingDiv.style.display = 'none';
+                if (errorDiv) {
+                    errorDiv.style.display = 'block';
+                    const errMsgEl = document.getElementById('reg-text-error-msg');
+                    if (errMsgEl) errMsgEl.textContent = err.message || 'Unknown error';
+                }
             }
         }
         
@@ -3354,7 +4150,7 @@
             return loadCompleteData();
         }
         
-        // TAB 2: Load Summary & Scope
+        // TAB 2: Load Summary & Scope (DYNAMIC - pulls all content from API)
         async function loadSummaryScope() {
             const loadingDiv = document.getElementById('summary-loading');
             const contentDiv = document.getElementById('summary-content');
@@ -3367,36 +4163,56 @@
                 const reg = await fetchRegulationData();
                 if (!reg) throw new Error('No regulation data');
                 
-                // Summary
+                // Summary - from API
                 document.getElementById('summary-text').innerHTML = reg.summary || 'Summary not available';
                 
-                // Who must comply
+                // Who must comply - parse from scope or generate from jurisdiction
                 const scopeWho = document.getElementById('scope-who');
-                scopeWho.innerHTML = `
-                    <li>All Title IV participating institutions</li>
-                    <li>Institutions receiving federal financial aid</li>
-                    <li>Public and private colleges/universities</li>
-                    <li>Vocational schools with federal funding</li>
-                `;
+                const jurisdiction = reg.jurisdictionSource || reg.jurisdiction_source || 'federal';
+                const stateCode = reg.stateCode || reg.state_code;
                 
-                // Departments
+                let scopeItems = [];
+                if (jurisdiction === 'federal') {
+                    scopeItems = [
+                        'All Title IV participating institutions',
+                        'Institutions receiving federal financial aid',
+                        'Public and private colleges/universities',
+                        'Vocational schools with federal funding'
+                    ];
+                } else if (jurisdiction === 'state' && stateCode) {
+                    scopeItems = [
+                        `Higher education institutions in ${stateCode}`,
+                        `${stateCode} licensed institutions`,
+                        `Public and private colleges in ${stateCode}`
+                    ];
+                }
+                scopeWho.innerHTML = scopeItems.map(item => `<li>${item}</li>`).join('');
+                
+                // Departments/Topics - from API
                 const depts = document.getElementById('scope-departments');
-                const topics = reg.topics || [{ topic: reg.topic || 'Campus Safety' }];
+                const topics = reg.topics || [{ topic: reg.topic || reg.category || 'Compliance' }];
                 depts.innerHTML = topics.map(t => 
                     `<span style="background: #dbeafe; color: #1e40af; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;">${t.topic || t}</span>`
                 ).join('');
                 
-                // Key requirements
+                // Key requirements - parse from requirements field or generate from tasks
                 const keyReqs = document.getElementById('key-requirements');
-                const requirements = [
-                    { icon: '📊', text: 'Annual Security Report (ASR)' },
-                    { icon: '📋', text: 'Crime statistics disclosure' },
-                    { icon: '⚠️', text: 'Timely warning notifications' },
-                    { icon: '🚨', text: 'Emergency response procedures' },
-                    { icon: '📝', text: 'Crime log maintenance' },
-                    { icon: '🔒', text: 'Missing student policies' }
-                ];
-                keyReqs.innerHTML = requirements.map(r => 
+                const tasks = reg.complianceTasks || [];
+                const categories = [...new Set(tasks.map(t => t.category || 'general'))];
+                
+                const icons = {
+                    'policy': '📋', 'documentation': '📁', 'training': '🎓', 
+                    'notification': '📢', 'reporting': '📊', 'response': '🚨',
+                    'technical': '💻', 'governance': '⚖️', 'assessment': '📝',
+                    'services': '🤝', 'curriculum': '📚', 'general': '✅'
+                };
+                
+                const reqItems = categories.slice(0, 6).map(cat => ({
+                    icon: icons[cat] || '✅',
+                    text: cat.charAt(0).toUpperCase() + cat.slice(1) + ' Requirements'
+                }));
+                
+                keyReqs.innerHTML = reqItems.map(r => 
                     `<div style="background: white; padding: 10px 14px; border-radius: 6px; border: 1px solid #fcd34d; display: flex; align-items: center; gap: 10px;">
                         <span>${r.icon}</span><span style="font-size: 13px;">${r.text}</span>
                     </div>`
@@ -3446,34 +4262,63 @@
                 document.getElementById('task-count').textContent = `${tasks.length} tasks`;
                 
                 if (tasks.length > 0) {
-                    // Group by parent
-                    const parentTasks = tasks.filter(t => !t.parentTaskId);
-                    const childTasks = tasks.filter(t => t.parentTaskId);
+                    // Group by category first, then by parent/child within each category
+                    const categories = {};
+                    tasks.forEach(t => {
+                        const cat = t.category || 'Uncategorized';
+                        if (!categories[cat]) categories[cat] = [];
+                        categories[cat].push(t);
+                    });
+                    
+                    // Sort categories alphabetically
+                    const sortedCategories = Object.keys(categories).sort();
                     
                     let tasksHTML = '';
-                    parentTasks.forEach((parent, idx) => {
-                        const children = childTasks.filter(c => c.parentTaskId === parent.id);
-                        const priorityColor = parent.priority === 'critical' ? '#dc2626' : 
-                                             parent.priority === 'high' ? '#f59e0b' : '#3b82f6';
+                    sortedCategories.forEach(category => {
+                        const categoryTasks = categories[category];
+                        const parentTasks = categoryTasks.filter(t => !t.parentTaskId && !t.parent_task_id);
+                        const childTasks = categoryTasks.filter(t => t.parentTaskId || t.parent_task_id);
+                        
+                        // Category header
+                        tasksHTML += `
+                            <div style="margin-bottom: 24px;">
+                                <div style="background: linear-gradient(135deg, #1e40af, #3b82f6); color: white; padding: 12px 16px; border-radius: 8px 8px 0 0; font-weight: 600; display: flex; justify-content: space-between; align-items: center;">
+                                    <span>${category}</span>
+                                    <span style="background: rgba(255,255,255,0.2); padding: 2px 10px; border-radius: 12px; font-size: 12px;">${categoryTasks.length} tasks</span>
+                                </div>
+                                <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 8px 8px; padding: 12px;">
+                        `;
+                        
+                        // Tasks within this category
+                        parentTasks.forEach((parent, idx) => {
+                            const children = childTasks.filter(c => (c.parentTaskId || c.parent_task_id) === parent.id);
+                            const priorityColor = parent.priority === 'critical' ? '#dc2626' : 
+                                                 parent.priority === 'high' ? '#f59e0b' : '#3b82f6';
+                            
+                            tasksHTML += `
+                                <div style="background: white; border-radius: 6px; padding: 14px; margin-bottom: 8px; border: 1px solid #e2e8f0;">
+                                    <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px;">
+                                        <div style="font-weight: 600; color: #1e293b; font-size: 14px;">${parent.title}</div>
+                                        <span style="background: ${priorityColor}; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; text-transform: uppercase; flex-shrink: 0; margin-left: 8px;">${parent.priority || 'medium'}</span>
+                                    </div>
+                                    ${parent.description ? `<div style="font-size: 12px; color: #64748b; margin-bottom: 6px;">${parent.description}</div>` : ''}
+                                    ${parent.assignedRole ? `<div style="font-size: 11px; color: #3b82f6;">👤 ${parent.assignedRole}</div>` : ''}
+                                    ${children.length > 0 ? `
+                                        <div style="margin-top: 10px; padding-left: 14px; border-left: 2px solid #e2e8f0;">
+                                            ${children.map(c => `
+                                                <div style="padding: 6px 0; font-size: 12px; color: #475569;">
+                                                    • ${c.title}
+                                                    ${c.assignedRole ? `<span style="color: #94a3b8;"> (${c.assignedRole})</span>` : ''}
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            `;
+                        });
                         
                         tasksHTML += `
-                            <div style="background: #f8fafc; border-radius: 8px; padding: 16px; border: 1px solid #e2e8f0;">
-                                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 8px;">
-                                    <div style="font-weight: 600; color: #1e293b;">${idx + 1}. ${parent.title}</div>
-                                    <span style="background: ${priorityColor}; color: white; padding: 2px 8px; border-radius: 4px; font-size: 10px; font-weight: 600; text-transform: uppercase;">${parent.priority || 'medium'}</span>
                                 </div>
-                                <div style="font-size: 13px; color: #64748b; margin-bottom: 8px;">${parent.description || ''}</div>
-                                ${parent.assignedRole ? `<div style="font-size: 12px; color: #3b82f6;">👤 ${parent.assignedRole}</div>` : ''}
-                                ${children.length > 0 ? `
-                                    <div style="margin-top: 12px; padding-left: 16px; border-left: 2px solid #e2e8f0;">
-                                        ${children.map(c => `
-                                            <div style="padding: 8px 0; font-size: 13px; color: #475569;">
-                                                • ${c.title}
-                                                ${c.assignedRole ? `<span style="color: #94a3b8;"> (${c.assignedRole})</span>` : ''}
-                                            </div>
-                                        `).join('')}
-                                    </div>
-                                ` : ''}
                             </div>
                         `;
                     });
@@ -3503,7 +4348,7 @@
                 const reg = await fetchRegulationData();
                 if (!reg) throw new Error('No regulation data');
                 
-                // IRS Score (Clery is 96 - CRITICAL)
+                // IRS Score (americans is 96 - CRITICAL)
                 const risk = reg.riskAssessment || { riskScore: 96, riskLevel: 'CRITICAL' };
                 const score = risk.riskScore || risk.risk_score || 96;
                 const level = risk.riskLevel || risk.risk_level || 'CRITICAL';
@@ -3521,7 +4366,7 @@
                     banner.style.background = 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)';
                 }
                 
-                // Risk factors (Clery defaults)
+                // Risk factors (americans defaults)
                 const factors = risk.riskFactors || {};
                 document.getElementById('rf-financial').textContent = factors.financialPenalty?.score || 30;
                 document.getElementById('rf-funding').textContent = factors.federalFunding?.score || 25;
@@ -3536,7 +4381,7 @@
                 
                 // Enforcement history
                 document.getElementById('enforcement-history').innerHTML = `
-                    <div style="margin-bottom: 8px;"><strong>Liberty University (2016):</strong> $14M fine - largest Clery penalty ever</div>
+                    <div style="margin-bottom: 8px;"><strong>Liberty University (2016):</strong> $14M fine - largest americans penalty ever</div>
                     <div style="margin-bottom: 8px;"><strong>Penn State (2012):</strong> $2.4M fine</div>
                     <div><strong>Average settlement:</strong> $500K-$2M</div>
                 `;
@@ -3549,48 +4394,93 @@
             }
         }
         
-        // TAB 5: Load Customer Payload
+        // TAB 5: Load Customer Payload - Shows EXACT payload EdSteward receives
         async function loadCustomerPayload() {
             try {
                 const reg = await fetchRegulationData();
                 if (!reg) throw new Error('No regulation data');
                 
-                // Build the exact EdSteward payload
+                // Get the actual risk assessment from API data
+                const riskAssessment = reg.riskAssessment || reg.risk_assessment || {};
+                const riskFactors = riskAssessment.riskFactors || riskAssessment.risk_factors || {};
+                
+                // Build the EXACT EdSteward payload (matches delivery-server.js)
                 const payload = {
-                    regKey: reg.regKey || 'REG-015',
+                    // Core Identity
+                    regKey: reg.reg_key || reg.regKey || 'REG-015',
                     regulationId: reg.regulationId || reg.id,
                     name: reg.name,
                     statute: reg.statute,
+                    cfr: reg.cfr,
                     category: reg.category,
                     topic: reg.topic,
-                    jurisdictionSource: reg.jurisdictionSource || 'federal',
+                    jurisdictionSource: reg.jurisdictionSource || reg.jurisdiction_source || 'federal',
+                    
+                    // Content
                     summary: reg.summary,
                     requirements: reg.requirements,
-                    lovvLevel: reg.lovvLevel || 'B',
+                    regulationText: reg.regulationText || reg.regulation_text,
+                    
+                    // Validation
+                    lovvLevel: reg.lovvLevel || reg.lovv_level || 'A',
+                    
+                    // COMPLETE RISK ASSESSMENT (what EdSteward receives)
+                    riskScore: riskAssessment.riskScore || riskAssessment.risk_score,
+                    riskLevel: riskAssessment.riskLevel || riskAssessment.risk_level,
                     riskAssessment: {
-                        riskScore: 96,
-                        riskLevel: 'CRITICAL',
-                        riskFactors: {
-                            financialPenalty: { score: 30, rationale: '$14M fine precedent (Liberty University)' },
-                            federalFunding: { score: 25, rationale: 'Complete Title IV loss possible' },
-                            accreditationImpact: { score: 18, rationale: 'Direct accreditation implications' },
-                            reputationalLegal: { score: 15, rationale: 'National media coverage, class actions' },
-                            operationalDisruption: { score: 8, rationale: 'Major compliance restructuring' }
-                        }
+                        score: riskAssessment.riskScore || riskAssessment.risk_score,
+                        level: riskAssessment.riskLevel || riskAssessment.risk_level,
+                        
+                        // FULL FACTOR BREAKDOWN with rationale
+                        factors: riskFactors,
+                        
+                        // Quick reference scores
+                        factorScores: {
+                            financialPenalty: riskFactors.financialPenalty?.score || riskFactors.financialPenalty,
+                            federalFunding: riskFactors.federalFunding?.score || riskFactors.federalFunding,
+                            accreditationImpact: riskFactors.accreditationImpact?.score || riskFactors.accreditationImpact,
+                            reputationalLegal: riskFactors.reputationalLegal?.score || riskFactors.reputationalLegal,
+                            operationalDisruption: riskFactors.operationalDisruption?.score || riskFactors.operationalDisruption
+                        },
+                        
+                        // Enforcement context
+                        enforcementTrend: riskAssessment.enforcementTrend || riskAssessment.enforcement_trend,
+                        recentEnforcementActions: riskAssessment.recentEnforcementActions || riskAssessment.recent_enforcement_actions || [],
+                        
+                        // Metadata
+                        assessmentDate: riskAssessment.assessmentDate || riskAssessment.assessment_date,
+                        assessmentVersion: riskAssessment.assessmentVersion || '1.0',
+                        isPreliminary: riskAssessment.isPreliminary || false
                     },
+                    
+                    // Topics/Departments
                     topics: reg.topics || [],
-                    filingDeadlines: reg.filingDeadlines || [],
+                    
+                    // Deadlines with full details
+                    filingDeadlines: (reg.filingDeadlines || []).map(d => ({
+                        type: d.type || d.name,
+                        date: d.date || d.dueDate,
+                        description: d.description,
+                        frequency: d.frequency,
+                        responsibleRole: d.responsibleRole || d.responsible_role
+                    })),
+                    
+                    // Tasks with hierarchy
                     complianceTasks: (reg.complianceTasks || []).map((t, idx) => ({
-                        tempId: `task-${idx}`,
+                        tempId: `task-${t.id || idx}`,
                         parentTempId: t.parentTaskId ? `task-${t.parentTaskId}` : null,
                         title: t.title,
                         description: t.description,
-                        assignedRole: t.assignedRole,
+                        assignedRole: t.assignedRole || t.assigned_role,
                         priority: t.priority || 'medium',
-                        evidenceRequired: t.evidenceRequired || false
+                        evidenceRequired: t.evidenceRequired || t.evidence_required || false,
+                        sortOrder: t.sortOrder || t.sort_order
                     })),
+                    
+                    // Metadata
                     lastValidated: new Date().toISOString(),
-                    version: reg.version || 1
+                    version: reg.version || 1,
+                    source: 'MCP Engine'
                 };
                 
                 const jsonStr = JSON.stringify(payload, null, 2);
@@ -3928,7 +4818,7 @@
             // Add academic consensus note
             const consensusItem = document.createElement('li');
             const validationRate = Math.round((universities.filter(u => u.status === 'validated').length / universities.length) * 100);
-            consensusItem.innerHTML = `<strong>Academic Consensus:</strong> ${validationRate}% validation rate on Jeanne Clery Disclosure Of Campus Security Policy  interpretation`;
+            consensusItem.innerHTML = `<strong>Academic Consensus:</strong> ${validationRate}% validation rate on Jeanne americans Disclosure Of Campus Security Policy  interpretation`;
             list.appendChild(consensusItem);
             
             card.appendChild(titleElement);
@@ -3948,9 +4838,9 @@
             errorDiv.style.display = 'none';
             
             try {
-                console.log('📖 Fetching real Americans with Disabilities Act (Americans with Disabilities) and Violence Against Women Act (VAWA) CFR Implementation text from API...');
+                console.log('📖 Fetching real Americans with Disabilities Act (Americans with Disabilities Act) and Violence Against Women Act (VAWA) CFR Implementation text from API...');
                 
-                const response = await fetch('http://localhost:3004/api/llm/cfr/americans-with-disabilities-act');
+                const response = await fetch('http://localhost:3004/api/llm/cfr/jeanne-americans-disclosure-of-campus-security-policy-');
                 const result = await response.json();
                 
                 if (result.success && result.data) {
@@ -4058,7 +4948,7 @@
             try {
                 console.log('📋 Fetching real compliance guidance from API...');
                 
-                const response = await fetch('http://localhost:3004/api/llm/cfr/americans-with-disabilities-act');
+                const response = await fetch('http://localhost:3004/api/llm/cfr/jeanne-americans-disclosure-of-campus-security-policy-');
                 const result = await response.json();
                 
                 if (result.success && result.data) {
@@ -4259,11 +5149,11 @@
                 
                 // For demo purposes, use our generated requirements
                 const enhancedRequirements = {
-                    title: 'Jeanne Clery Disclosure Of Campus Security Policy  Enhanced Requirements',
+                    title: 'Jeanne americans Disclosure Of Campus Security Policy  Enhanced Requirements',
                     qualityScore: '100/100',
                     generatedAt: new Date().toISOString(),
                     apiKey: 'Requirements API Key (Second Key)',
-                    requirements: `**Key Compliance Requirements for Jeanne Clery Disclosure Of Campus Security Policy :**
+                    requirements: `**Key Compliance Requirements for Jeanne americans Disclosure Of Campus Security Policy :**
 
 1. **Technology Infrastructure Requirements**
    - IT Department must implement access control systems limiting content to enrolled students
@@ -4429,7 +5319,7 @@
                                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
                                     <div style="text-align: center;">
                                         <div style="font-size: 14px; font-weight: 600; color: #28a745;">${data.regulationSources.usc17_110.status.toUpperCase()}</div>
-                                        <div style="font-size: 12px; color: #6e7681;">Americans with Disabilities Act (Americans with Disabilities) and Violence Against Women Act (VAWA) CFR Implementation</div>
+                                        <div style="font-size: 12px; color: #6e7681;">Americans with Disabilities Act (Americans with Disabilities Act) and Violence Against Women Act (VAWA) CFR Implementation</div>
                                         <div style="font-size: 11px; color: #8b949e;">${data.regulationSources.usc17_110.source}</div>
                                     </div>
                                     <div style="text-align: center;">
@@ -4479,7 +5369,7 @@
             try {
                 console.log('📡 Fetching enhanced Regulation data for EdSteward preview...');
                 
-                const response = await fetch('http://localhost:3004/api/llm/cfr/enhanced/americans-with-disabilities-act?federal_register=true');
+                const response = await fetch('http://localhost:3004/api/llm/cfr/enhanced/jeanne-americans-disclosure-of-campus-security-policy-?federal_register=true');
                 const data = await response.json();
                 
                 if (!data.success) {
@@ -4671,7 +5561,7 @@
                 console.log('📡 Fetching complete Federal Register document list via LLM Gateway...');
                 
                 // Use our LLM Gateway endpoint to get all documents with debug info
-                const response = await fetch('http://localhost:3004/api/llm/cfr/enhanced/americans-with-disabilities-act?federal_register=true&debug=true&show_all_documents=true');
+                const response = await fetch('http://localhost:3004/api/llm/cfr/enhanced/jeanne-americans-disclosure-of-campus-security-policy-?federal_register=true&debug=true&show_all_documents=true');
                 const data = await response.json();
                 
                 console.log('📋 Full API response:', data);
@@ -4867,9 +5757,15 @@
         };
 
         // Auto-load first tab on page load (new 5-tab structure)
-        document.addEventListener('DOMContentLoaded', function() {
-            addConsoleLog('📋 MCP Engine Console Loaded - 5-Tab Structure', 'info');
-            addConsoleLog('🎯 Tabs: Regulation Text | Summary & Scope | Tasks & Deadlines | Risk Assessment | Customer Payload', 'success');
+        document.addEventListener('DOMContentLoaded', async function() {
+            addConsoleLog('📋 MCP Engine Console Loading...', 'info');
+            
+            // Initialize page with dynamic regulation data
+            await initializeRegulationPage();
+            
+            // Load version control status
+            loadVersionStatus();
+            addConsoleLog(`🔐 Loading version control for ${REG_KEY}...`, 'info');
             
             // Load the first tab (Regulation Text)
             loadRegulationText();
@@ -4900,11 +5796,11 @@
                     // Subscribe to updates for this specific regulation
                     const subscriptionMessage = {
                         type: 'subscribe',
-                        regulationIds: ['americans-with-disabilities-act'] // This will be replaced by console generator
+                        regulationIds: ['jeanne-americans-disclosure-of-campus-security-policy-'] // This will be replaced by console generator
                     };
                     
                     regulationWebSocket.send(JSON.stringify(subscriptionMessage));
-                    addConsoleLog('📋 Subscribed to Americans with Disabilities Act (Americans with Disabilities) and Violence Against Women Act (VAWA) updates', 'info');
+                    addConsoleLog('📋 Subscribed to Americans with Disabilities Act (Americans with Disabilities Act) and Violence Against Women Act (VAWA) updates', 'info');
                 };
                 
                 regulationWebSocket.onmessage = function(event) {
@@ -5107,15 +6003,15 @@
                             <div style="min-width:60px;">
                                 <div style="font-size:10px;color:rgba(255,255,255,0.8);font-weight:600;margin-bottom:2px;">SCORE</div>
                                 <div style="font-size:36px;font-weight:800;color:white;line-height:1;">${audit.overallScore}</div>
-                            </div>
+                    </div>
                             <div style="width:1px;height:40px;background:rgba(255,255,255,0.3);"></div>
                             <div style="min-width:40px;">
                                 <div style="font-size:10px;color:rgba(255,255,255,0.8);font-weight:600;margin-bottom:2px;">GRADE</div>
                                 <div style="font-size:36px;font-weight:800;color:white;line-height:1;">${audit.certaintyLevel || 'D'}</div>
-                            </div>
+                    </div>
                             <div style="background:${audit.passed ? '#10b981' : '#ef4444'};color:white;padding:4px 10px;border-radius:16px;font-size:11px;font-weight:700;white-space:nowrap;">
                                 ${audit.passed ? '✓ PASSED' : '✗ FAILED'}
-                            </div>
+                    </div>
                         </div>
                     </div>
                     
@@ -5133,8 +6029,8 @@
                                         <span style="font-size:10px;"><strong>${raw}</strong>/100 <span style="color:#94a3b8;">×${weight}%</span> <span style="font-weight:700;color:${scoreColor(contrib*2)};">+${contrib}</span></span>
                                     </div>
                                     ${buildBar(raw)}
-                                </div>
-                            `;
+                    </div>
+                `;
                         }).join('')}
                     </div>
                     
@@ -5209,15 +6105,15 @@
                         <span><strong style="color:#f59e0b;">${issues.high || 0}</strong> high</span>
                         <span><strong style="color:#3b82f6;">${issues.medium || 0}</strong> medium</span>
                         <span><strong style="color:#64748b;">${issues.warnings || 0}</strong> warnings</span>
-                    </div>
-                `;
+                        </div>
+                    `;
                 results.style.display = 'block';
             }
         } catch (err) {
             clearInterval(progressInterval);
             if (errorDiv) {
-                errorDiv.textContent = '⚠️ Error: ' + err.message;
-                errorDiv.style.display = 'block';
+            errorDiv.textContent = '⚠️ Error: ' + err.message;
+            errorDiv.style.display = 'block';
             }
             console.error('Inquisitor audit error:', err);
         } finally {
