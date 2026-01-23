@@ -269,7 +269,8 @@ export class DatabaseStorage implements IStorage {
           userId: update.reviewer_id,
           rejectionReason: update.rejection_reason,
           processedAt: update.reviewed_at ? new Date(update.reviewed_at) : null,
-          metadata: update.metadata
+          metadata: update.metadata,
+          pendingTasks: update.pending_tasks, // MCP Engine compliance tasks (Jan 2026)
         } as RegulationUpdate;
       }
       return null;
@@ -388,6 +389,141 @@ export class DatabaseStorage implements IStorage {
         sourceId: id.toString(),
         validationStatus: 'approved'
       });
+
+      // 3.5. Apply pending compliance tasks if present (MCP Engine sync Jan 2026)
+      const pendingTasks = (update as any).pendingTasks;
+      if (pendingTasks && Array.isArray(pendingTasks) && pendingTasks.length > 0) {
+        console.log(`📋 Applying ${pendingTasks.length} compliance tasks on approval...`);
+        
+        // Fetch role assignments for auto-assign (Jan 2026)
+        const roleAssignmentsResult = await pool.query(
+          'SELECT role_name, default_user_id, auto_assign_enabled FROM role_assignments WHERE auto_assign_enabled = true'
+        );
+        const roleToUserMap = new Map<string, number>();
+        for (const ra of roleAssignmentsResult.rows) {
+          if (ra.default_user_id) {
+            roleToUserMap.set(ra.role_name.toLowerCase(), ra.default_user_id);
+          }
+        }
+        console.log(`   🔗 Loaded ${roleToUserMap.size} role assignments for auto-assign`);
+        
+        // Helper function to resolve assigned_to from assignedRole
+        const resolveAssignedTo = (assignedRole: string | null): number | null => {
+          if (!assignedRole) return null;
+          return roleToUserMap.get(assignedRole.toLowerCase()) || null;
+        };
+        
+        // Delete existing tasks for this regulation (REPLACE mode)
+        await pool.query(
+          'DELETE FROM compliance_tasks WHERE regulation_id = $1',
+          [update.regulationId]
+        );
+        console.log(`   🗑️  Deleted existing tasks for regulation ${update.regulationId}`);
+        
+        // Build task ID mapping for parent-child relationships
+        const taskIdMap = new Map<string, number>();
+        let autoAssignedCount = 0;
+        
+        // First pass: insert root tasks (no parentTempId)
+        const rootTasks = pendingTasks.filter((t: any) => !t.parentTempId);
+        for (const task of rootTasks) {
+          // Auto-assign from statutory role first, then fallback to assigned role
+          const assignedTo = resolveAssignedTo(task.statutoryRole) || resolveAssignedTo(task.assignedRole);
+          if (assignedTo) autoAssignedCount++;
+          
+          const result = await pool.query(
+            `INSERT INTO compliance_tasks (
+              regulation_id, task_id, title, description, instructions, 
+              category, statutory_role, statutory_citation, assigned_to, assigned_role, 
+              due_date, reminder_days, status, priority, 
+              requirement_type, evidence_required, evidence_type, sort_order, is_template,
+              attestation_status
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20) 
+            RETURNING id`,
+            [
+              update.regulationId,
+              task.taskId || null,
+              task.title,
+              task.description || null,
+              task.instructions || null,
+              task.category || null, // Task category for grouping (Jan 2026)
+              task.statutoryRole || null, // Legally required role (Jan 2026)
+              task.statutoryCitation || null, // Legal citation (Jan 2026)
+              assignedTo, // Auto-assigned from role mapping (Jan 2026)
+              task.assignedRole || null,
+              task.dueDate ? new Date(task.dueDate) : null,
+              30, // default reminderDays
+              'pending',
+              task.priority || 'medium',
+              task.requirementType || 'requirement',
+              task.evidenceRequired || false,
+              task.evidenceType || 'none',
+              task.sortOrder || 0, // Use sortOrder from MCP Engine
+              false, // isTemplate
+              task.evidenceRequired ? 'pending' : 'not_required' // Set attestation status based on evidence requirement
+            ]
+          );
+          
+          if (task.tempId && result.rows[0]) {
+            taskIdMap.set(task.tempId, result.rows[0].id);
+          }
+        }
+        
+        // Second pass: insert child tasks (with parentTempId)
+        const childTasks = pendingTasks.filter((t: any) => t.parentTempId);
+        for (const task of childTasks) {
+          const parentId = taskIdMap.get(task.parentTempId);
+          if (!parentId) {
+            console.warn(`   ⚠️ Parent not found for child task "${task.title}" (parentTempId: ${task.parentTempId})`);
+            continue;
+          }
+          
+          // Auto-assign from statutory role first, then fallback to assigned role
+          const assignedTo = resolveAssignedTo(task.statutoryRole) || resolveAssignedTo(task.assignedRole);
+          if (assignedTo) autoAssignedCount++;
+          
+          const result = await pool.query(
+            `INSERT INTO compliance_tasks (
+              regulation_id, parent_task_id, task_id, title, description, instructions, 
+              category, statutory_role, statutory_citation, assigned_to, assigned_role, 
+              due_date, reminder_days, status, priority, 
+              requirement_type, evidence_required, evidence_type, sort_order, is_template,
+              attestation_status
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21) 
+            RETURNING id`,
+            [
+              update.regulationId,
+              parentId,
+              task.taskId || null,
+              task.title,
+              task.description || null,
+              task.instructions || null,
+              task.category || null, // Task category for grouping (Jan 2026)
+              task.statutoryRole || null, // Legally required role (Jan 2026)
+              task.statutoryCitation || null, // Legal citation (Jan 2026)
+              assignedTo, // Auto-assigned from role mapping (Jan 2026)
+              task.assignedRole || null,
+              task.dueDate ? new Date(task.dueDate) : null,
+              30, // default reminderDays
+              'pending',
+              task.priority || 'medium',
+              task.requirementType || 'requirement',
+              task.evidenceRequired || false,
+              task.evidenceType || 'none',
+              task.sortOrder || 0, // Use sortOrder from MCP Engine
+              false, // isTemplate
+              task.evidenceRequired ? 'pending' : 'not_required' // Set attestation status based on evidence requirement
+            ]
+          );
+          
+          if (task.tempId && result.rows[0]) {
+            taskIdMap.set(task.tempId, result.rows[0].id);
+          }
+        }
+        
+        console.log(`   ✅ Applied ${rootTasks.length} root tasks and ${childTasks.length} child tasks`);
+        console.log(`   👤 Auto-assigned ${autoAssignedCount} tasks based on role mappings`);
+      }
 
       // 4. Mark the update as accepted
       await this.db.update(regulationUpdates)

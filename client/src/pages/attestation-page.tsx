@@ -1,76 +1,103 @@
 /**
- * Email Attestation Confirmation Page
+ * Attestation Landing Page
  * 
- * This page is accessed via a secure link sent to field compliance officers.
- * No login is required - the token in the URL provides authentication.
+ * Public page for field compliance officers to:
+ * - View task details
+ * - Upload required evidence
+ * - Submit attestation signature
  * 
- * The page shows:
- * 1. What regulation they're attesting to
- * 2. The specific attestation statement
- * 3. Legal disclaimers
- * 4. A confirm button
+ * Accessed via magic link token (no login required)
  */
 
-import { useState } from 'react';
-import { useParams } from 'wouter';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import React, { useState, useCallback } from 'react';
+import { useRoute } from 'wouter';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Checkbox } from '@/components/ui/checkbox';
 import { 
   CheckCircle2, 
   AlertTriangle, 
-  Clock, 
   FileText, 
-  Shield,
+  Upload, 
+  Link as LinkIcon,
   XCircle,
-  Loader2
+  Loader2,
+  Shield,
+  Calendar,
+  Building2,
+  PenLine,
+  CheckCheck,
+  AlertCircle,
+  FileUp
 } from 'lucide-react';
 
 interface AttestationData {
-  valid: boolean;
-  attestation: {
-    regulationName: string;
-    regulationId: number;
-    statute?: string;
-    attestationType: string;
-    attestationStatement: string;
-    attestationPeriod?: string;
+  tokenValid: boolean;
+  token: {
+    email: string;
+    recipientName: string | null;
+    canUploadEvidence: boolean;
+    canAttest: boolean;
     expiresAt: string;
-    user: {
-      email: string;
-      name: string;
-    };
+    personalMessage: string | null;
   };
-}
-
-interface ConfirmResult {
-  success: boolean;
-  completedAt: string;
-  regulation: {
+  task: {
     id: number;
-    name: string;
+    title: string;
+    description: string | null;
+    instructions: string | null;
+    dueDate: string | null;
+    status: string;
+    priority: string;
+    evidenceRequired: boolean;
+    evidenceType: string;
+    evidenceInstructions: string | null;
+    assignedRole: string | null;
+    attestationStatus: string;
+    regulation: {
+      id: number;
+      name: string;
+      topic: string | null;
+    } | null;
   };
-  attestedBy: string;
+  existingEvidence: Array<{
+    id: number;
+    fileName: string;
+    fileType: string | null;
+    uploadedAt: string | null;
+    description: string | null;
+  }>;
 }
 
-export default function AttestationPage() {
-  const params = useParams();
-  const token = params.token as string;
-  const [acknowledged, setAcknowledged] = useState(false);
-  const [confirmed, setConfirmed] = useState(false);
-  const [confirmResult, setConfirmResult] = useState<ConfirmResult | null>(null);
+const AttestationPage: React.FC = () => {
+  const [, params] = useRoute<{ token: string }>('/attest/:token');
+  const token = params?.token;
+  const queryClient = useQueryClient();
 
-  // Verify the token
-  const { data, isLoading, error } = useQuery<AttestationData>({
+  // Form state
+  const [signature, setSignature] = useState('');
+  const [notes, setNotes] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [linkUrl, setLinkUrl] = useState('');
+  const [linkTitle, setLinkTitle] = useState('');
+  const [evidenceDescription, setEvidenceDescription] = useState('');
+  const [uploadMode, setUploadMode] = useState<'file' | 'link'>('file');
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+
+  // Fetch attestation data
+  const { data, isLoading, error, refetch } = useQuery<AttestationData>({
     queryKey: ['attestation', token],
     queryFn: async () => {
-      const response = await fetch(`/api/attestation/verify/${token}`);
+      const response = await fetch(`/api/compliance-tasks/attestation/${token}`);
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to verify attestation');
+        throw new Error(errorData.error || 'Failed to verify token');
       }
       return response.json();
     },
@@ -78,40 +105,104 @@ export default function AttestationPage() {
     retry: false,
   });
 
-  // Confirm attestation mutation
-  const confirmMutation = useMutation({
+  // Upload evidence mutation
+  const uploadMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch(`/api/attestation/confirm/${token}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to confirm attestation');
+      if (uploadMode === 'file' && selectedFile) {
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        formData.append('description', evidenceDescription);
+        
+        const response = await fetch(`/api/compliance-tasks/attestation/${token}/evidence`, {
+          method: 'POST',
+          body: formData,
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Upload failed');
+        }
+        return response.json();
+      } else if (uploadMode === 'link' && linkUrl) {
+        const response = await fetch(`/api/compliance-tasks/attestation/${token}/evidence`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            linkUrl,
+            linkTitle: linkTitle || linkUrl,
+            description: evidenceDescription,
+          }),
+        });
+        
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.error || 'Upload failed');
+        }
+        return response.json();
       }
-      return response.json();
+      throw new Error('No evidence provided');
     },
-    onSuccess: (result: ConfirmResult) => {
-      setConfirmed(true);
-      setConfirmResult(result);
+    onSuccess: () => {
+      setUploadSuccess(true);
+      setSelectedFile(null);
+      setLinkUrl('');
+      setLinkTitle('');
+      setEvidenceDescription('');
+      refetch();
+      setTimeout(() => setUploadSuccess(false), 3000);
     },
   });
 
-  // Handle confirm
-  const handleConfirm = () => {
-    if (acknowledged) {
-      confirmMutation.mutate();
+  // Submit attestation mutation
+  const attestMutation = useMutation({
+    mutationFn: async () => {
+      const response = await fetch(`/api/compliance-tasks/attestation/${token}/attest`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ signature, notes }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Attestation failed');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['attestation', token] });
+    },
+  });
+
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+    }
+  }, []);
+
+  const getPriorityColor = (priority: string) => {
+    switch (priority?.toLowerCase()) {
+      case 'critical': return 'bg-red-100 text-red-700 border-red-200';
+      case 'high': return 'bg-orange-100 text-orange-700 border-orange-200';
+      case 'medium': return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+      case 'low': return 'bg-green-100 text-green-700 border-green-200';
+      default: return 'bg-slate-100 text-slate-700 border-slate-200';
     }
   };
 
   // Loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
-        <Card className="w-full max-w-md">
-          <CardContent className="pt-6 text-center">
-            <Loader2 className="h-12 w-12 animate-spin text-blue-600 mx-auto mb-4" />
-            <p className="text-muted-foreground">Verifying attestation link...</p>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
+        <Card className="w-full max-w-2xl">
+          <CardHeader>
+            <Skeleton className="h-8 w-3/4 mb-2" />
+            <Skeleton className="h-4 w-1/2" />
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Skeleton className="h-24 w-full" />
+            <Skeleton className="h-12 w-full" />
+            <Skeleton className="h-12 w-full" />
           </CardContent>
         </Card>
       </div>
@@ -119,99 +210,25 @@ export default function AttestationPage() {
   }
 
   // Error state
-  if (error) {
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-    const isExpired = errorMessage.includes('expired');
-    const isUsed = errorMessage.includes('already been completed');
-    
+  if (error || !data) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
-        <Card className="w-full max-w-lg">
-          <CardHeader className="text-center">
-            <div className={`w-16 h-16 rounded-full mx-auto mb-4 flex items-center justify-center ${
-              isUsed ? 'bg-green-100' : 'bg-red-100'
-            }`}>
-              {isUsed ? (
-                <CheckCircle2 className="h-8 w-8 text-green-600" />
-              ) : isExpired ? (
-                <Clock className="h-8 w-8 text-amber-600" />
-              ) : (
-                <XCircle className="h-8 w-8 text-red-600" />
-              )}
+        <Card className="w-full max-w-md border-red-200">
+          <CardHeader>
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-red-100 rounded-full">
+                <XCircle className="h-6 w-6 text-red-600" />
+              </div>
+              <div>
+                <CardTitle className="text-red-700">Invalid or Expired Link</CardTitle>
+                <CardDescription>This attestation link is no longer valid.</CardDescription>
+              </div>
             </div>
-            <CardTitle className={isUsed ? 'text-green-700' : 'text-red-700'}>
-              {isUsed ? 'Attestation Already Completed' : isExpired ? 'Link Expired' : 'Invalid Link'}
-            </CardTitle>
-            <CardDescription className="mt-2">
-              {errorMessage}
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="text-center">
-            {!isUsed && (
-              <p className="text-sm text-muted-foreground">
-                If you need a new attestation link, please contact your Chief Compliance Officer.
-              </p>
-            )}
-            {isUsed && (
-              <p className="text-sm text-muted-foreground">
-                Your attestation was recorded successfully. No further action is needed.
-              </p>
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  // Success confirmation screen
-  if (confirmed && confirmResult) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 flex items-center justify-center p-4">
-        <Card className="w-full max-w-lg border-green-200">
-          <CardHeader className="text-center">
-            <div className="w-20 h-20 bg-green-100 rounded-full mx-auto mb-4 flex items-center justify-center">
-              <CheckCircle2 className="h-10 w-10 text-green-600" />
-            </div>
-            <CardTitle className="text-green-700 text-2xl">Attestation Complete</CardTitle>
-            <CardDescription className="mt-2 text-base">
-              Your compliance attestation has been recorded successfully.
-            </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="bg-green-50 rounded-lg p-4 space-y-3">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Regulation:</span>
-                <span className="font-medium">{confirmResult.regulation.name}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Attested by:</span>
-                <span className="font-medium">{confirmResult.attestedBy}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Date:</span>
-                <span className="font-medium">
-                  {new Date(confirmResult.completedAt).toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </span>
-              </div>
-            </div>
-            
-            <Alert className="mt-6 bg-blue-50 border-blue-200">
-              <Shield className="h-4 w-4 text-blue-600" />
-              <AlertTitle className="text-blue-800">Record Created</AlertTitle>
-              <AlertDescription className="text-blue-700">
-                This attestation has been logged in the compliance system and will be retained for audit purposes.
-              </AlertDescription>
-            </Alert>
-            
-            <p className="text-sm text-center text-muted-foreground mt-6">
-              You may close this window. No further action is required.
+            <p className="text-slate-600 text-sm">
+              {(error as Error)?.message || 'The link may have expired or been used already.'} 
+              Please contact your compliance officer for a new link.
             </p>
           </CardContent>
         </Card>
@@ -219,168 +236,373 @@ export default function AttestationPage() {
     );
   }
 
-  // Main attestation form
-  const attestation = data?.attestation;
-  if (!attestation) {
-    return null;
+  // Already attested
+  if (attestMutation.isSuccess) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md border-green-200">
+          <CardHeader className="text-center pb-2">
+            <div className="mx-auto p-4 bg-green-100 rounded-full w-fit mb-4">
+              <CheckCheck className="h-10 w-10 text-green-600" />
+            </div>
+            <CardTitle className="text-green-700 text-2xl">Attestation Complete</CardTitle>
+            <CardDescription className="text-lg">Thank you for your attestation!</CardDescription>
+          </CardHeader>
+          <CardContent className="text-center">
+            <p className="text-slate-600 mb-4">
+              Your compliance attestation for <strong>{data.task.title}</strong> has been successfully recorded.
+            </p>
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-sm text-green-700">
+              <p>A copy of this attestation has been saved for audit purposes.</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
   }
 
-  const expiresAt = new Date(attestation.expiresAt);
-  const daysRemaining = Math.ceil((expiresAt.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+  const { task, token: tokenData, existingEvidence } = data;
+  const canSubmitAttestation = !task.evidenceRequired || existingEvidence.length > 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4">
-      <div className="max-w-2xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8 px-4">
+      <div className="max-w-3xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8">
-          <Shield className="h-12 w-12 text-blue-600 mx-auto mb-4" />
-          <h1 className="text-2xl font-bold text-slate-800">Compliance Attestation</h1>
-          <p className="text-muted-foreground mt-1">EdSteward Compliance Management System</p>
+          <div className="inline-flex items-center gap-2 bg-white px-4 py-2 rounded-full shadow-sm border mb-4">
+            <Shield className="h-5 w-5 text-emerald-600" />
+            <span className="font-semibold text-slate-700">EdSteward Compliance Attestation</span>
+          </div>
+          <h1 className="text-3xl font-bold text-slate-900 mb-2">Task Attestation Required</h1>
+          <p className="text-slate-600">
+            Hello {tokenData.recipientName || tokenData.email}, please review and attest to the following compliance task.
+          </p>
         </div>
 
-        {/* Main Card */}
-        <Card className="shadow-lg">
-          <CardHeader className="bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-t-lg">
-            <div className="flex items-start justify-between">
-              <div>
-                <CardTitle className="text-xl">{attestation.regulationName}</CardTitle>
-                {attestation.statute && (
-                  <CardDescription className="text-blue-100 mt-1">
-                    {attestation.statute}
-                  </CardDescription>
+        {/* Personal Message */}
+        {tokenData.personalMessage && (
+          <Alert className="mb-6 bg-blue-50 border-blue-200">
+            <FileText className="h-4 w-4 text-blue-600" />
+            <AlertTitle className="text-blue-700">Message from Compliance Team</AlertTitle>
+            <AlertDescription className="text-blue-600">{tokenData.personalMessage}</AlertDescription>
+          </Alert>
+        )}
+
+        {/* Task Details Card */}
+        <Card className="mb-6 shadow-lg border-slate-200">
+          <CardHeader className="bg-gradient-to-r from-slate-50 to-slate-100 border-b">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1">
+                <CardTitle className="text-xl text-slate-900 mb-2">{task.title}</CardTitle>
+                {task.regulation && (
+                  <div className="flex items-center gap-2 text-sm text-slate-600">
+                    <Building2 className="h-4 w-4" />
+                    <span>{task.regulation.name}</span>
+                  </div>
                 )}
               </div>
-              <Badge variant="secondary" className="bg-blue-500 text-white border-0">
-                {attestation.attestationType}
+              <Badge className={getPriorityColor(task.priority)}>
+                {task.priority} priority
               </Badge>
             </div>
           </CardHeader>
-          
-          <CardContent className="pt-6 space-y-6">
-            {/* DRI Signature Block - Prominent display of who is attesting */}
-            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg p-5 border-2 border-blue-200">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
-                  <Shield className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <p className="text-xs text-blue-600 font-semibold uppercase tracking-wide">Directly Responsible Individual</p>
-                  <p className="text-xl font-bold text-slate-800">{attestation.user.name}</p>
-                  <p className="text-sm text-muted-foreground">{attestation.user.email}</p>
-                </div>
+          <CardContent className="p-6 space-y-4">
+            {task.description && (
+              <div>
+                <h3 className="font-semibold text-slate-700 mb-1">Description</h3>
+                <p className="text-slate-600">{task.description}</p>
               </div>
-              <div className="flex items-center gap-4 text-sm pt-2 border-t border-blue-200">
-                <div>
-                  <span className="text-muted-foreground">Period:</span>
-                  <span className="font-medium ml-1">{attestation.attestationPeriod || 'Current Period'}</span>
-                </div>
-                <div>
-                  <span className="text-muted-foreground">Type:</span>
-                  <span className="font-medium ml-1">{attestation.attestationType}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Attestation Statement */}
-            <div className="bg-slate-50 rounded-lg p-4 border">
-              <div className="flex items-center gap-2 mb-3">
-                <FileText className="h-5 w-5 text-blue-600" />
-                <h3 className="font-semibold">Attestation Statement</h3>
-              </div>
-              <p className="text-slate-700 whitespace-pre-wrap">
-                {attestation.attestationStatement}
-              </p>
-            </div>
-
-            {/* Legal Notice */}
-            <Alert className="bg-amber-50 border-amber-200">
-              <AlertTriangle className="h-4 w-4 text-amber-600" />
-              <AlertTitle className="text-amber-800">Important Notice</AlertTitle>
-              <AlertDescription className="text-amber-700 text-sm space-y-2">
-                <p>By confirming this attestation, you acknowledge that:</p>
-                <ul className="list-disc list-inside space-y-1 ml-2">
-                  <li>You have reviewed the compliance requirements for this regulation</li>
-                  <li>The institution is in compliance with all applicable requirements</li>
-                  <li>You are authorized as the DRI to make this attestation on behalf of the institution</li>
-                  <li>This attestation will be recorded and may be subject to audit</li>
-                  <li>False attestation may result in disciplinary action</li>
-                </ul>
-              </AlertDescription>
-            </Alert>
-
-            {/* Acknowledgment Checkbox */}
-            <div className="flex items-start space-x-3 p-4 bg-slate-50 rounded-lg border">
-              <Checkbox 
-                id="acknowledge" 
-                checked={acknowledged}
-                onCheckedChange={(checked) => setAcknowledged(checked === true)}
-                className="mt-1"
-              />
-              <label 
-                htmlFor="acknowledge" 
-                className="text-sm cursor-pointer"
-              >
-                I have read and understand the attestation statement above. I confirm that the 
-                information is accurate to the best of my knowledge and that I am authorized to 
-                make this attestation.
-              </label>
-            </div>
-
-            {/* Expiration Warning */}
-            {daysRemaining <= 3 && (
-              <Alert variant="destructive" className="bg-red-50 border-red-200">
-                <Clock className="h-4 w-4" />
-                <AlertTitle>Link Expiring Soon</AlertTitle>
-                <AlertDescription>
-                  This attestation link will expire in {daysRemaining} day{daysRemaining !== 1 ? 's' : ''}.
-                  Please complete your attestation before {expiresAt.toLocaleDateString()}.
-                </AlertDescription>
-              </Alert>
             )}
 
-            {/* Confirm Button */}
-            <div className="pt-4">
-              <Button 
-                onClick={handleConfirm}
-                disabled={!acknowledged || confirmMutation.isPending}
-                className="w-full h-12 text-lg bg-green-600 hover:bg-green-700"
-              >
-                {confirmMutation.isPending ? (
-                  <>
-                    <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                    Confirming...
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle2 className="mr-2 h-5 w-5" />
-                    Confirm Compliance Attestation
-                  </>
-                )}
-              </Button>
-              
-              {confirmMutation.isError && (
-                <Alert variant="destructive" className="mt-4">
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertDescription>
-                    {confirmMutation.error instanceof Error 
-                      ? confirmMutation.error.message 
-                      : 'Failed to confirm attestation. Please try again.'}
-                  </AlertDescription>
-                </Alert>
+            {task.instructions && (
+              <div>
+                <h3 className="font-semibold text-slate-700 mb-1">Instructions</h3>
+                <p className="text-slate-600 whitespace-pre-wrap">{task.instructions}</p>
+              </div>
+            )}
+
+            <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+              {task.dueDate && (
+                <div className="flex items-center gap-2">
+                  <Calendar className="h-4 w-4 text-slate-400" />
+                  <span className="text-sm text-slate-600">
+                    Due: {new Date(task.dueDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+                  </span>
+                </div>
+              )}
+              {task.assignedRole && (
+                <div className="flex items-center gap-2">
+                  <Building2 className="h-4 w-4 text-slate-400" />
+                  <span className="text-sm text-slate-600">Suggested: {task.assignedRole}</span>
+                </div>
               )}
             </div>
           </CardContent>
         </Card>
 
+        {/* Evidence Section */}
+        {tokenData.canUploadEvidence && (
+          <Card className="mb-6 shadow-lg border-slate-200">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FileUp className="h-5 w-5 text-amber-600" />
+                Evidence Upload
+                {task.evidenceRequired && (
+                  <Badge variant="destructive" className="ml-2">Required</Badge>
+                )}
+              </CardTitle>
+              <CardDescription>
+                {task.evidenceInstructions || 'Upload documentation to support your attestation.'}
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Existing Evidence */}
+              {existingEvidence.length > 0 && (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <h4 className="font-medium text-green-700 mb-2 flex items-center gap-2">
+                    <CheckCircle2 className="h-4 w-4" />
+                    Evidence Uploaded ({existingEvidence.length})
+                  </h4>
+                  <ul className="space-y-1">
+                    {existingEvidence.map((ev) => (
+                      <li key={ev.id} className="text-sm text-green-600 flex items-center gap-2">
+                        <FileText className="h-3 w-3" />
+                        {ev.fileName}
+                        {ev.uploadedAt && (
+                          <span className="text-green-500 text-xs">
+                            ({new Date(ev.uploadedAt).toLocaleDateString()})
+                          </span>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+
+              {uploadSuccess && (
+                <Alert className="bg-green-50 border-green-200">
+                  <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <AlertDescription className="text-green-700">Evidence uploaded successfully!</AlertDescription>
+                </Alert>
+              )}
+
+              {/* Upload Mode Toggle */}
+              <div className="flex gap-2">
+                <Button
+                  variant={uploadMode === 'file' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setUploadMode('file')}
+                >
+                  <Upload className="h-4 w-4 mr-2" />
+                  Upload File
+                </Button>
+                <Button
+                  variant={uploadMode === 'link' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setUploadMode('link')}
+                >
+                  <LinkIcon className="h-4 w-4 mr-2" />
+                  Add Link
+                </Button>
+              </div>
+
+              {uploadMode === 'file' ? (
+                <div className="space-y-3">
+                  <div>
+                    <Label htmlFor="evidence-file">Select File</Label>
+                    <Input
+                      id="evidence-file"
+                      type="file"
+                      onChange={handleFileChange}
+                      className="mt-1"
+                    />
+                    {selectedFile && (
+                      <p className="text-sm text-slate-500 mt-1">
+                        Selected: {selectedFile.name} ({(selectedFile.size / 1024).toFixed(1)} KB)
+                      </p>
+                    )}
+                  </div>
+                  <div>
+                    <Label htmlFor="evidence-desc">Description (optional)</Label>
+                    <Input
+                      id="evidence-desc"
+                      value={evidenceDescription}
+                      onChange={(e) => setEvidenceDescription(e.target.value)}
+                      placeholder="Brief description of this evidence"
+                      className="mt-1"
+                    />
+                  </div>
+                  <Button
+                    onClick={() => uploadMutation.mutate()}
+                    disabled={!selectedFile || uploadMutation.isPending}
+                  >
+                    {uploadMutation.isPending ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="h-4 w-4 mr-2" />
+                        Upload Evidence
+                      </>
+                    )}
+                  </Button>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  <div>
+                    <Label htmlFor="link-url">Link URL</Label>
+                    <Input
+                      id="link-url"
+                      type="url"
+                      value={linkUrl}
+                      onChange={(e) => setLinkUrl(e.target.value)}
+                      placeholder="https://..."
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="link-title">Link Title</Label>
+                    <Input
+                      id="link-title"
+                      value={linkTitle}
+                      onChange={(e) => setLinkTitle(e.target.value)}
+                      placeholder="Name of the document or resource"
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="link-desc">Description (optional)</Label>
+                    <Input
+                      id="link-desc"
+                      value={evidenceDescription}
+                      onChange={(e) => setEvidenceDescription(e.target.value)}
+                      placeholder="Brief description of this evidence"
+                      className="mt-1"
+                    />
+                  </div>
+                  <Button
+                    onClick={() => uploadMutation.mutate()}
+                    disabled={!linkUrl || uploadMutation.isPending}
+                  >
+                    {uploadMutation.isPending ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Adding...
+                      </>
+                    ) : (
+                      <>
+                        <LinkIcon className="h-4 w-4 mr-2" />
+                        Add Link
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
+
+              {uploadMutation.error && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{(uploadMutation.error as Error).message}</AlertDescription>
+                </Alert>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Attestation Form */}
+        <Card className="shadow-lg border-emerald-200">
+          <CardHeader className="bg-gradient-to-r from-emerald-50 to-green-50 border-b border-emerald-100">
+            <CardTitle className="flex items-center gap-2 text-emerald-700">
+              <PenLine className="h-5 w-5" />
+              Submit Attestation
+            </CardTitle>
+            <CardDescription>
+              By signing below, you attest that you have completed or verified this compliance requirement.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="p-6 space-y-4">
+            {!canSubmitAttestation && (
+              <Alert variant="destructive">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertTitle>Evidence Required</AlertTitle>
+                <AlertDescription>
+                  Please upload the required evidence above before submitting your attestation.
+                </AlertDescription>
+              </Alert>
+            )}
+
+            <div>
+              <Label htmlFor="signature" className="text-base font-semibold">
+                Digital Signature <span className="text-red-500">*</span>
+              </Label>
+              <p className="text-sm text-slate-500 mb-2">
+                Type your full legal name as your digital signature
+              </p>
+              <Input
+                id="signature"
+                value={signature}
+                onChange={(e) => setSignature(e.target.value)}
+                placeholder="Full Legal Name"
+                className="text-lg"
+                disabled={!canSubmitAttestation}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="notes">Additional Notes (optional)</Label>
+              <Textarea
+                id="notes"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Any additional comments or context..."
+                rows={3}
+                className="mt-1"
+                disabled={!canSubmitAttestation}
+              />
+            </div>
+
+            {attestMutation.error && (
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{(attestMutation.error as Error).message}</AlertDescription>
+              </Alert>
+            )}
+          </CardContent>
+          <CardFooter className="bg-slate-50 border-t flex items-center justify-between p-6">
+            <p className="text-xs text-slate-500">
+              Link expires: {new Date(tokenData.expiresAt).toLocaleDateString()}
+            </p>
+            <Button
+              size="lg"
+              className="bg-emerald-600 hover:bg-emerald-700"
+              onClick={() => attestMutation.mutate()}
+              disabled={!signature.trim() || !canSubmitAttestation || attestMutation.isPending}
+            >
+              {attestMutation.isPending ? (
+                <>
+                  <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                  Submitting...
+                </>
+              ) : (
+                <>
+                  <CheckCircle2 className="h-5 w-5 mr-2" />
+                  Submit Attestation
+                </>
+              )}
+            </Button>
+          </CardFooter>
+        </Card>
+
         {/* Footer */}
-        <p className="text-center text-sm text-muted-foreground mt-6">
-          This is a secure link generated by EdSteward Compliance Management System.
-          <br />
-          If you have questions, contact your Chief Compliance Officer.
-        </p>
+        <div className="text-center mt-8 text-sm text-slate-500">
+          <p>EdSteward Compliance Management Platform</p>
+          <p className="mt-1">Questions? Contact your compliance officer.</p>
+        </div>
       </div>
     </div>
   );
-}
+};
 
-
+export default AttestationPage;

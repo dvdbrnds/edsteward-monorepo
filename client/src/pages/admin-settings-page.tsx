@@ -19,6 +19,7 @@ import { InstitutionSettings } from "@/components/admin/institution-settings";
 import { BrandingSettingsV2 } from "@/components/admin/branding-settings";
 import { BackupManagement } from "@/components/admin/backup-management";
 import { NotificationSchedulerSettings } from "@/components/admin/notification-scheduler-settings";
+import { RoleAssignmentsSettings } from "@/components/admin/role-assignments-settings";
 import {
   Table,
   TableBody,
@@ -417,6 +418,7 @@ export default function SystemSettingsPage() {
               <TabsTrigger value="email" className="flex-shrink-0">Email</TabsTrigger>
               <TabsTrigger value="sms" className="flex-shrink-0">SMS</TabsTrigger>
               <TabsTrigger value="users" className="flex-shrink-0">Users</TabsTrigger>
+              <TabsTrigger value="roles" className="flex-shrink-0">Roles</TabsTrigger>
               <TabsTrigger value="backups" className="flex-shrink-0">Backups</TabsTrigger>
               <TabsTrigger value="logs" className="flex-shrink-0">Logs</TabsTrigger>
             </TabsList>
@@ -822,6 +824,10 @@ export default function SystemSettingsPage() {
                   </div>
                 </CardContent>
               </Card>
+            </TabsContent>
+
+            <TabsContent value="roles">
+              <RoleAssignmentsSettings />
             </TabsContent>
 
             <TabsContent value="backups">

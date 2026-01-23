@@ -33,6 +33,7 @@ import { debugRouter } from './api/debug';
 import { emergencyMoravianRouter } from './api/emergency-moravian-fix';
 import attestationRouter from './api/attestation';
 import complianceTasksRouter from './api/compliance-tasks';
+import roleAssignmentsRouter from './api/role-assignments';
 import dashboardAnalyticsRouter from './api/dashboard-analytics';
 import reportsRouter from './api/reports';
 // @ts-ignore
@@ -374,6 +375,7 @@ export function registerRoutes(app: express.Application): Server {
   app.use('/api/audit', auditRouter); // Audit trail for compliance tracking
   app.use('/api/attestation', attestationRouter); // Email attestation for low-risk regulations
   app.use('/api/compliance-tasks', complianceTasksRouter); // Complex regulation task management
+  app.use('/api/role-assignments', roleAssignmentsRouter); // Role-to-person mapping for auto-assignment
   app.use('/api/dashboard-analytics', dashboardAnalyticsRouter); // Executive dashboard analytics
   app.use('/api/reports', reportsRouter); // Compliance reports and exports
 

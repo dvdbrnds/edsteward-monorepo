@@ -2,8 +2,75 @@ import { Express, Request, Response } from 'express';
 import { storage } from './storage';
 import { calculateTextChangeDiff } from './services/diff-calculator';
 import { z } from 'zod';
-import { insertRegulationUpdateSchema } from '@shared/schema';
+import { insertRegulationUpdateSchema, InsertRegulation } from '@shared/schema';
 import { pool } from './db';
+
+/**
+ * Auto-create a regulation if it doesn't exist (Jan 2026 - MCP Engine workflow)
+ * Creates a minimal regulation record so the update can proceed through approval workflow
+ * @returns The regulation ID (new or existing)
+ */
+async function autoCreateRegulationIfNotExists(
+  regKey: string | undefined,
+  name: string,
+  options: {
+    statute?: string;
+    category?: string;
+    topic?: string;
+    itemId?: string;
+    jurisdictionSource?: string;
+    summary?: string;
+  } = {}
+): Promise<number> {
+  // First try to find existing regulation by regKey
+  if (regKey) {
+    const existingResult = await pool.query(
+      'SELECT id FROM regulations WHERE reg_key = $1 AND is_current = true LIMIT 1',
+      [regKey]
+    );
+    if (existingResult.rows.length > 0) {
+      return existingResult.rows[0].id;
+    }
+  }
+
+  // Generate itemId from name if not provided
+  const itemId = options.itemId || name
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .substring(0, 100);
+
+  // Check by itemId too
+  const itemIdResult = await pool.query(
+    'SELECT id FROM regulations WHERE item_id = $1 AND is_current = true LIMIT 1',
+    [itemId]
+  );
+  if (itemIdResult.rows.length > 0) {
+    return itemIdResult.rows[0].id;
+  }
+
+  // Create new regulation with minimal required fields
+  console.log(`📝 Auto-creating regulation: ${name} (${regKey || itemId})`);
+  
+  const newRegulation: InsertRegulation = {
+    name,
+    itemId,
+    regKey: regKey || null,
+    statute: options.statute || 'Pending',
+    category: options.category || 'Uncategorized',
+    topic: options.topic || 'General Compliance',
+    jurisdictionSource: (options.jurisdictionSource as any) || 'federal',
+    summary: options.summary || `Auto-created from MCP Engine update. Pending CCO review.`,
+    isApplicable: true,
+    isCurrent: true,
+    versionNumber: 1,
+    versionDate: new Date(),
+  };
+
+  const created = await storage.createRegulation(newRegulation);
+  console.log(`   ✅ Created regulation ID: ${created.id}`);
+  return created.id;
+}
 
 // MCP Engine credentials from environment
 const MCP_ENGINE_USERNAME = process.env.MCP_ENGINE_USERNAME || 'mcp-engine';
@@ -92,6 +159,12 @@ const mcpEngineUpdateSchema = z.object({
   regulationId: z.union([z.number(), z.string()]).optional(), // Legacy numeric ID
   
   name: z.string(),
+  
+  // Fields for auto-creation if regulation doesn't exist (Jan 2026)
+  statute: z.string().optional(),
+  category: z.string().optional(),
+  topic: z.string().optional(),
+  jurisdictionSource: z.string().optional(),
   // Risk metadata from MCP Engine
   riskScore: z.number().optional(),
   riskLevel: z.enum(['CRITICAL', 'SEVERE', 'HIGH', 'MODERATE', 'LOW']).optional(),
@@ -182,7 +255,27 @@ const mcpEngineUpdateSchema = z.object({
       changeType: z.string(),
       description: z.string()
     }).optional()
-  }).optional()
+  }).optional(),
+  
+  // Compliance tasks to be applied on approval (MCP Engine sync Jan 2026)
+  complianceTasks: z.array(z.object({
+    tempId: z.string().optional(),
+    parentTempId: z.string().optional().nullable(),
+    taskId: z.string().optional(),
+    title: z.string(),
+    description: z.string().optional(),
+    instructions: z.string().optional(),
+    assignedRole: z.string().optional(),
+    priority: z.enum(['high', 'medium', 'low']).optional(),
+    requirementType: z.enum(['requirement', 'best_practice']).optional(),
+    dueDate: z.string().optional(),
+    evidenceRequired: z.boolean().optional(),
+    evidenceType: z.string().optional(),
+  })).optional(),
+  
+  // Filing deadlines (multiple formats supported)
+  filingDeadlines: z.any().optional(),
+  filing_deadlines: z.any().optional(),
 });
 
 /**
@@ -407,31 +500,48 @@ export function setupRegulationUpdatesApi(app: Express) {
           // Resolve regulation ID - priority: regKey > itemId > regulationId
           const regKey = req.body.regKey;
           const identifier = req.body.itemId || rawData.regulationId;
-          const validRegulationId = await resolveRegulationId(identifier, regKey);
+          let validRegulationId = await resolveRegulationId(identifier, regKey);
           
+          // Auto-create regulation if it doesn't exist (Jan 2026 - MCP Engine workflow)
           if (validRegulationId === null) {
-            const lookupUsed = regKey || identifier;
-            console.error(`❌ Regulation not found: ${lookupUsed}`);
-            return res.status(400).json({ 
-              success: false,
-              error: `Regulation not found: ${lookupUsed}. Provide a valid regKey (REG-001), itemId, or numeric ID.`,
-              hint: 'Use GET /api/mcp/regulation-hashes to find valid regulation IDs'
+            const regulationName = rawData.name || req.body.name;
+            if (!regulationName) {
+              return res.status(400).json({ 
+                success: false,
+                error: 'Cannot auto-create regulation without a name. Provide "name" field.',
+              });
+            }
+            
+            console.log(`⚠️ Regulation not found: ${regKey || identifier}. Auto-creating...`);
+            validRegulationId = await autoCreateRegulationIfNotExists(regKey, regulationName, {
+              statute: req.body.statute,
+              category: req.body.category,
+              topic: req.body.topic,
+              itemId: req.body.itemId,
+              jurisdictionSource: req.body.jurisdictionSource,
+              summary: req.body.summary,
             });
           }
-          
           
           // Extract structured fields from request body
           const summary = req.body.summary || null;
           const requirements = req.body.requirements || null;
           const filingDeadlines = req.body.filingDeadlines || req.body.filing_deadlines || null;
+          const complianceTasks = req.body.complianceTasks || null;
           
+          // Log task count for debugging
+          if (complianceTasks && complianceTasks.length > 0) {
+            console.log(`📋 Received ${complianceTasks.length} compliance tasks for approval workflow`);
+          }
           
           updateData = {
             ...rawData,
             regulationId: validRegulationId,
             summary,
             requirements,
-            filingDeadlines
+            filingDeadlines,
+            // Store tasks for approval - will be applied when CCO accepts
+            pendingTasks: complianceTasks,
           };
         } else {
           // Try to parse as MCP Engine complex format
@@ -444,25 +554,34 @@ export function setupRegulationUpdatesApi(app: Express) {
             const regKey = mcpData.regKey;
             const identifier = mcpData.itemId || mcpData.regulationId;
             
-            if (!regKey && !identifier) {
+            if (!regKey && !identifier && !mcpData.name) {
               return res.status(400).json({ 
                 success: false,
-                error: 'Missing regulation identifier. Provide regKey (REG-001), itemId, or regulationId.'
+                error: 'Missing regulation identifier. Provide regKey (REG-001), itemId, regulationId, or name for auto-creation.'
               });
             }
             
-            const validRegulationId = await resolveRegulationId(identifier || '', regKey);
+            let validRegulationId = await resolveRegulationId(identifier || '', regKey);
             
+            // Auto-create regulation if it doesn't exist (Jan 2026 - MCP Engine workflow)
             if (validRegulationId === null) {
-              const lookupUsed = regKey || identifier;
-              console.error(`❌ Regulation not found: ${lookupUsed}`);
-              return res.status(400).json({ 
-                success: false,
-                error: `Regulation not found: ${lookupUsed}. Provide a valid regKey (REG-001), itemId, or numeric ID.`,
-                hint: 'Use GET /api/mcp/regulation-hashes to find valid regulation IDs'
+              if (!mcpData.name) {
+                return res.status(400).json({ 
+                  success: false,
+                  error: 'Cannot auto-create regulation without a name. Provide "name" field.',
+                });
+              }
+              
+              console.log(`⚠️ Regulation not found: ${regKey || identifier}. Auto-creating...`);
+              validRegulationId = await autoCreateRegulationIfNotExists(regKey, mcpData.name, {
+                statute: (mcpData as any).statute,
+                category: (mcpData as any).category,
+                topic: (mcpData as any).topic,
+                itemId: mcpData.itemId,
+                jurisdictionSource: (mcpData as any).jurisdictionSource,
+                summary: mcpData.summary,
               });
             }
-            
             
             // Check for Federal Register enhancement
             const hasEnhancement = mcpData.federal_register_enhancement?.attempted;
@@ -495,6 +614,14 @@ export function setupRegulationUpdatesApi(app: Express) {
             const filingDeadlinesContent = mcpData.filingDeadlines || mcpData.filing_deadlines || mcpData.content?.filing_deadlines || null;
             
             
+            // Get compliance tasks from payload
+            const complianceTasks = mcpData.complianceTasks || null;
+            
+            // Log task count for debugging
+            if (complianceTasks && complianceTasks.length > 0) {
+              console.log(`📋 Received ${complianceTasks.length} compliance tasks for approval workflow`);
+            }
+            
             // Convert MCP Engine format to EdSteward format
             updateData = {
               regulationId: validRegulationId,
@@ -505,6 +632,8 @@ export function setupRegulationUpdatesApi(app: Express) {
               summary: summaryContent,
               requirements: requirementsContent,
               filingDeadlines: filingDeadlinesContent,
+              // Store tasks for approval - will be applied when CCO accepts
+              pendingTasks: complianceTasks,
               // Store Federal Register metadata for future use
               metadata: {
                 federal_register_enhancement: mcpData.federal_register_enhancement,
@@ -680,8 +809,8 @@ export function setupRegulationUpdatesApi(app: Express) {
         content: originalContent,
       };
       
-      // Fetch compliance tasks for this regulation (including parent-child hierarchy)
-      let tasks: any[] = [];
+      // Fetch current compliance tasks for this regulation (including parent-child hierarchy)
+      let currentTasks: any[] = [];
       try {
         const tasksResult = await pool.query(
           `SELECT id, parent_task_id, title, description, status, priority, assigned_role, due_date, 
@@ -691,16 +820,34 @@ export function setupRegulationUpdatesApi(app: Express) {
            ORDER BY sort_order ASC`,
           [update.regulationId]
         );
-        tasks = tasksResult.rows;
+        currentTasks = tasksResult.rows;
       } catch (taskError) {
         console.error('Error fetching compliance tasks:', taskError);
       }
+      
+      // Get pending tasks from the update (will be applied on approval - Jan 2026 MCP Engine sync)
+      const pendingTasks = (update as any).pendingTasks || [];
+      const hasPendingTasks = pendingTasks && pendingTasks.length > 0;
+      
+      // If there are pending tasks, use those for display (what will be applied)
+      // Otherwise, show current tasks from the regulation
+      const tasks = hasPendingTasks ? pendingTasks : currentTasks;
+      
+      // Count pending task stats for UI
+      const pendingTaskStats = hasPendingTasks ? {
+        total: pendingTasks.length,
+        requirements: pendingTasks.filter((t: any) => t.requirementType === 'requirement').length,
+        bestPractices: pendingTasks.filter((t: any) => t.requirementType === 'best_practice').length,
+      } : null;
       
       res.json({
         update: enhancedUpdate,
         original: enhancedOriginal,
         diffData,
-        tasks
+        tasks,
+        pendingTasks: hasPendingTasks ? pendingTasks : null,
+        pendingTaskStats,
+        currentTasks, // The current tasks (before approval)
       });
     } catch (error) {
       console.error('Error getting regulation update:', error);

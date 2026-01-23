@@ -319,7 +319,7 @@ const DifferentialViewPage: React.FC<DifferentialViewPageProps> = ({ isDemo = fa
     );
   }
 
-  const { update, original, diffData, tasks = [] } = data;
+  const { update, original, diffData, tasks = [], pendingTasks, pendingTaskStats, currentTasks = [] } = data;
   const riskColors = getRiskColors(original.riskLevel || original.risk_level);
   const deadlines = parseDeadlines(update.filingDeadlines);
   const requirements = update.requirements?.split('\n').filter((r: string) => r.trim()) || [];
@@ -588,18 +588,48 @@ const DifferentialViewPage: React.FC<DifferentialViewPageProps> = ({ isDemo = fa
                     <div className="p-2 rounded-lg bg-indigo-100">
                       <ClipboardList className="h-5 w-5 text-indigo-600" />
                     </div>
-                    <h2 className="text-xl font-bold text-slate-900">Compliance Tasks</h2>
+                    <h2 className="text-xl font-bold text-slate-900">
+                      {pendingTasks ? 'Pending Compliance Tasks' : 'Compliance Tasks'}
+                    </h2>
                     <Badge variant="secondary" className="bg-indigo-100 text-indigo-700">{tasks.length} tasks</Badge>
+                    {pendingTaskStats && (
+                      <>
+                        <Badge className="bg-blue-100 text-blue-700">{pendingTaskStats.requirements} requirements</Badge>
+                        <Badge className="bg-purple-100 text-purple-700">{pendingTaskStats.bestPractices} best practices</Badge>
+                      </>
+                    )}
                   </div>
+                  
+                  {/* Notice about pending tasks */}
+                  {pendingTasks && (
+                    <Card className="mb-4 border-amber-300 bg-amber-50">
+                      <CardContent className="p-4">
+                        <div className="flex items-start gap-3">
+                          <AlertTriangle className="h-5 w-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                          <div>
+                            <p className="font-semibold text-amber-800">Tasks Pending Approval</p>
+                            <p className="text-sm text-amber-700 mt-1">
+                              These {tasks.length} tasks from MCP Engine will replace the current {currentTasks.length} tasks 
+                              when you approve this update. This includes both requirements and best practices.
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
                   
                   {/* Organize tasks hierarchically */}
                   {(() => {
-                    // Separate parent tasks (no parent_task_id) from subtasks
-                    const parentTasks = tasks.filter((t: any) => !t.parent_task_id);
+                    // For pending tasks, use tempId/parentTempId; for existing tasks, use id/parent_task_id
+                    const isPending = !!pendingTasks;
+                    const parentTasks = isPending 
+                      ? tasks.filter((t: any) => !t.parentTempId)
+                      : tasks.filter((t: any) => !t.parent_task_id);
                     const subtasksByParent = tasks.reduce((acc: any, task: any) => {
-                      if (task.parent_task_id) {
-                        if (!acc[task.parent_task_id]) acc[task.parent_task_id] = [];
-                        acc[task.parent_task_id].push(task);
+                      const parentKey = isPending ? task.parentTempId : task.parent_task_id;
+                      if (parentKey) {
+                        if (!acc[parentKey]) acc[parentKey] = [];
+                        acc[parentKey].push(task);
                       }
                       return acc;
                     }, {});
@@ -610,12 +640,13 @@ const DifferentialViewPage: React.FC<DifferentialViewPageProps> = ({ isDemo = fa
                     return (
                       <div className="space-y-4">
                         {sortedParents.map((parentTask: any, sectionIndex: number) => {
-                          const subtasks = subtasksByParent[parentTask.id] || [];
+                          const parentKey = isPending ? parentTask.tempId : parentTask.id;
+                          const subtasks = subtasksByParent[parentKey] || [];
                           const sortedSubtasks = subtasks.sort((a: any, b: any) => (a.sort_order || 0) - (b.sort_order || 0));
                           const parentPriority = getPriorityColors(parentTask.priority);
                           
                           return (
-                            <Card key={parentTask.id} className={`border-l-4 ${parentPriority.border.replace('border-', 'border-l-')} overflow-hidden`}>
+                            <Card key={parentKey || parentTask.id || sectionIndex} className={`border-l-4 ${parentPriority.border.replace('border-', 'border-l-')} overflow-hidden`}>
                               {/* Section Header (Parent Task) */}
                               <div className={`${parentPriority.bg} px-4 py-3 border-b`}>
                                 <div className="flex items-center justify-between">
@@ -625,23 +656,31 @@ const DifferentialViewPage: React.FC<DifferentialViewPageProps> = ({ isDemo = fa
                                     </span>
                                     <div>
                                       <h3 className="font-bold text-slate-900">{parentTask.title}</h3>
-                                      {parentTask.assigned_role && (
+                                      {(parentTask.assigned_role || parentTask.assignedRole) && (
                                         <span className="text-xs text-slate-600 flex items-center gap-1 mt-0.5">
                                           <User className="h-3 w-3" />
-                                          {parentTask.assigned_role}
+                                          {parentTask.assigned_role || parentTask.assignedRole}
                                         </span>
                                       )}
                                     </div>
                                   </div>
                                   <div className="flex items-center gap-2">
+                                    {/* Requirement Type Badge (for pending tasks) */}
+                                    {parentTask.requirementType && (
+                                      <Badge className={parentTask.requirementType === 'requirement' 
+                                        ? 'bg-blue-100 text-blue-700 border-blue-200' 
+                                        : 'bg-purple-100 text-purple-700 border-purple-200'}>
+                                        {parentTask.requirementType === 'requirement' ? '📋 Requirement' : '✨ Best Practice'}
+                                      </Badge>
+                                    )}
                                     <Badge className={`${parentPriority.bg} ${parentPriority.text} ${parentPriority.border} text-xs`}>
                                       {parentTask.priority === 'critical' && <AlertCircle className="h-3 w-3 mr-1" />}
                                       {parentTask.priority}
                                     </Badge>
-                                    {parentTask.due_date && (
+                                    {(parentTask.due_date || parentTask.dueDate) && (
                                       <Badge variant="outline" className="text-xs bg-white/80">
                                         <Calendar className="h-3 w-3 mr-1" />
-                                        {new Date(parentTask.due_date).toLocaleDateString()}
+                                        {new Date(parentTask.due_date || parentTask.dueDate).toLocaleDateString()}
                                       </Badge>
                                     )}
                                     {subtasks.length > 0 && (
@@ -661,8 +700,9 @@ const DifferentialViewPage: React.FC<DifferentialViewPageProps> = ({ isDemo = fa
                                 <div className="divide-y divide-slate-100">
                                   {sortedSubtasks.map((subtask: any, subIndex: number) => {
                                     const subPriority = getPriorityColors(subtask.priority);
+                                    const subKey = isPending ? subtask.tempId : subtask.id;
                                     return (
-                                      <div key={subtask.id} className="px-4 py-3 hover:bg-slate-50/50 transition-colors">
+                                      <div key={subKey || subIndex} className="px-4 py-3 hover:bg-slate-50/50 transition-colors">
                                         <div className="flex items-start gap-3 ml-8">
                                           {/* Subtask connector line */}
                                           <div className="flex items-center gap-2 flex-shrink-0">
@@ -676,10 +716,18 @@ const DifferentialViewPage: React.FC<DifferentialViewPageProps> = ({ isDemo = fa
                                             <div className="flex items-start justify-between gap-2">
                                               <h4 className="font-medium text-slate-800 text-sm">{subtask.title}</h4>
                                               <div className="flex items-center gap-1.5 flex-shrink-0">
+                                                {/* Requirement Type Badge */}
+                                                {subtask.requirementType && (
+                                                  <Badge className={`text-[10px] px-1.5 py-0 ${subtask.requirementType === 'requirement' 
+                                                    ? 'bg-blue-100 text-blue-700' 
+                                                    : 'bg-purple-100 text-purple-700'}`}>
+                                                    {subtask.requirementType === 'requirement' ? 'Req' : 'BP'}
+                                                  </Badge>
+                                                )}
                                                 <Badge className={`${subPriority.bg} ${subPriority.text} text-[10px] px-1.5 py-0`}>
                                                   {subtask.priority}
                                                 </Badge>
-                                                {subtask.evidence_required && (
+                                                {(subtask.evidence_required || subtask.evidenceRequired) && (
                                                   <Badge variant="outline" className="text-[10px] px-1.5 py-0 text-amber-600 border-amber-300">
                                                     📎 evidence
                                                   </Badge>
@@ -692,21 +740,21 @@ const DifferentialViewPage: React.FC<DifferentialViewPageProps> = ({ isDemo = fa
                                             )}
                                             
                                             <div className="flex flex-wrap items-center gap-3 mt-1.5 text-[10px] text-slate-400">
-                                              {subtask.assigned_role && (
+                                              {(subtask.assigned_role || subtask.assignedRole) && (
                                                 <span className="flex items-center gap-1">
                                                   <User className="h-2.5 w-2.5" />
-                                                  {subtask.assigned_role}
+                                                  {subtask.assigned_role || subtask.assignedRole}
                                                 </span>
                                               )}
-                                              {subtask.due_date && (
+                                              {(subtask.due_date || subtask.dueDate) && (
                                                 <span className="flex items-center gap-1">
                                                   <Calendar className="h-2.5 w-2.5" />
-                                                  {new Date(subtask.due_date).toLocaleDateString()}
+                                                  {new Date(subtask.due_date || subtask.dueDate).toLocaleDateString()}
                                                 </span>
                                               )}
-                                              {subtask.evidence_type && subtask.evidence_type !== 'none' && (
+                                              {((subtask.evidence_type || subtask.evidenceType) && (subtask.evidence_type || subtask.evidenceType) !== 'none') && (
                                                 <span className="text-amber-500">
-                                                  ({subtask.evidence_type})
+                                                  ({subtask.evidence_type || subtask.evidenceType})
                                                 </span>
                                               )}
                                             </div>
@@ -997,7 +1045,9 @@ const DifferentialViewPage: React.FC<DifferentialViewPageProps> = ({ isDemo = fa
             </AlertDialogTitle>
             <AlertDialogDescription>
               {action === 'approve' 
-                ? 'This will apply the update to the regulation. Are you sure?' 
+                ? pendingTasks 
+                  ? `This will apply the update to the regulation and replace ${currentTasks.length} existing tasks with ${tasks.length} new tasks. Are you sure?`
+                  : 'This will apply the update to the regulation. Are you sure?' 
                 : action === 'reject'
                   ? 'This will reject the update. You\'ll need to provide a reason.'
                   : 'This will defer the update for later review.'

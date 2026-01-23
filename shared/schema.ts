@@ -649,10 +649,49 @@ export const regulationUpdates = pgTable("regulation_updates", {
     submission_guidelines?: string;
     enhanced_summary?: string;
   }>(), // Federal Register enhancement metadata
+  // Pending compliance tasks to be applied on approval (MCP Engine sync)
+  pendingTasks: jsonb("pending_tasks").$type<Array<{
+    tempId?: string;
+    parentTempId?: string | null;
+    taskId?: string;
+    title: string;
+    description?: string;
+    instructions?: string;
+    category?: string; // Task category for grouping
+    statutoryRole?: string; // Legally required role (e.g., "Title IX Coordinator")
+    statutoryCitation?: string; // Legal citation (e.g., "34 CFR 106.8")
+    assignedRole?: string; // Suggested default assignment
+    priority?: 'high' | 'medium' | 'low';
+    requirementType?: 'requirement' | 'best_practice';
+    dueDate?: string;
+    evidenceRequired?: boolean;
+    evidenceType?: string;
+    sortOrder?: number;
+  }>>(),
 });
 
 // Schema for inserting regulation updates
 // Note: regulationId is made optional here because API accepts regKey/itemId and resolves internally
+// Schema for compliance task in regulation update (MCP Engine sync)
+const pendingTaskSchema = z.object({
+  tempId: z.string().optional(),
+  parentTempId: z.string().optional().nullable(),
+  taskId: z.string().optional(),
+  title: z.string(),
+  description: z.string().optional(),
+  instructions: z.string().optional(),
+  category: z.string().optional(), // Task category for grouping
+  statutoryRole: z.string().optional(), // Legally required role (e.g., "Title IX Coordinator")
+  statutoryCitation: z.string().optional(), // Legal citation (e.g., "34 CFR 106.8")
+  assignedRole: z.string().optional(), // Suggested default assignment
+  priority: z.enum(['high', 'medium', 'low']).optional(),
+  requirementType: z.enum(['requirement', 'best_practice']).optional(),
+  dueDate: z.string().optional(),
+  evidenceRequired: z.boolean().optional(),
+  evidenceType: z.string().optional(),
+  sortOrder: z.number().optional(),
+});
+
 export const insertRegulationUpdateSchema = createInsertSchema(regulationUpdates).extend({
   regulationId: z.number().optional(), // API resolves from regKey/itemId
   regKey: z.string().optional(), // Universal key (REG-001) - PREFERRED identifier
@@ -661,6 +700,8 @@ export const insertRegulationUpdateSchema = createInsertSchema(regulationUpdates
   signature: z.string().optional(),
   rejectionReason: z.string().optional(),
   requirements: z.string().optional().nullable(),
+  // Compliance tasks to be applied on approval (MCP Engine sync)
+  complianceTasks: z.array(pendingTaskSchema).optional(),
 });
 
 // Types for regulation updates
@@ -1050,11 +1091,13 @@ export const TASK_STATUS = ['pending', 'in_progress', 'completed', 'overdue', 'b
 export const EVIDENCE_TYPE = ['none', 'document', 'link', 'screenshot', 'attestation', 'form'] as const;
 export const TASK_PRIORITY = ['low', 'medium', 'high', 'critical'] as const;
 export const REQUIREMENT_TYPE = ['requirement', 'best_practice'] as const;
+export const ATTESTATION_STATUS = ['not_required', 'pending', 'attested', 'rejected'] as const;
 
 export type TaskStatus = typeof TASK_STATUS[number];
 export type EvidenceType = typeof EVIDENCE_TYPE[number];
 export type TaskPriority = typeof TASK_PRIORITY[number];
 export type RequirementType = typeof REQUIREMENT_TYPE[number];
+export type AttestationStatus = typeof ATTESTATION_STATUS[number];
 
 export const complianceTasks = pgTable("compliance_tasks", {
   id: serial("id").primaryKey(),
@@ -1070,11 +1113,16 @@ export const complianceTasks = pgTable("compliance_tasks", {
   instructions: text("instructions"), // Detailed instructions for completing the task
   
   // Task categorization - from MCP Engine sync (Jan 2026)
+  category: text("category"), // Task category for grouping (e.g., "Coordinator Requirements", "Training", "Documentation")
   requirementType: text("requirement_type").default('requirement'), // 'requirement' = legally mandated, 'best_practice' = recommended
+  
+  // Statutory requirement (Jan 2026) - who is legally required to do this task
+  statutoryRole: text("statutory_role"), // Role legally required by regulation (e.g., "Title IX Coordinator" per 34 CFR 106.8)
+  statutoryCitation: text("statutory_citation"), // Legal citation for the requirement (e.g., "34 CFR 106.8")
   
   // Assignment
   assignedTo: integer("assigned_to").references(() => users.id), // DRI for this specific task
-  assignedRole: text("assigned_role"), // Role name if no specific user assigned
+  assignedRole: text("assigned_role"), // Suggested role for default assignment (may differ from statutoryRole)
   
   // Scheduling
   dueDate: timestamp("due_date"),
@@ -1086,6 +1134,13 @@ export const complianceTasks = pgTable("compliance_tasks", {
   priority: text("priority").default('medium'),
   completedAt: timestamp("completed_at"),
   completedBy: integer("completed_by").references(() => users.id),
+  
+  // Attestation workflow (Jan 2026) - DRI signs off on task completion
+  attestedAt: timestamp("attested_at"), // When DRI attested to completion
+  attestedBy: integer("attested_by").references(() => users.id), // DRI who attested
+  attestationSignature: text("attestation_signature"), // Digital signature text
+  attestationNotes: text("attestation_notes"), // Optional notes from DRI
+  attestationStatus: text("attestation_status").default('not_required'), // 'not_required', 'pending', 'attested', 'rejected'
   
   // Evidence requirements
   evidenceRequired: boolean("evidence_required").default(false),
@@ -1121,6 +1176,7 @@ export const insertComplianceTaskSchema = createInsertSchema(complianceTasks).ex
   evidenceType: z.enum(EVIDENCE_TYPE).default('none'),
   priority: z.enum(TASK_PRIORITY).default('medium'),
   requirementType: z.enum(REQUIREMENT_TYPE).default('requirement'),
+  attestationStatus: z.enum(ATTESTATION_STATUS).default('not_required'),
 });
 
 export type ComplianceTask = typeof complianceTasks.$inferSelect;
@@ -1160,6 +1216,95 @@ export const taskEvidence = pgTable("task_evidence", {
 export const insertTaskEvidenceSchema = createInsertSchema(taskEvidence);
 export type TaskEvidence = typeof taskEvidence.$inferSelect;
 export type InsertTaskEvidence = z.infer<typeof insertTaskEvidenceSchema>;
+
+// ===== TASK ATTESTATION TOKENS (Magic Links) =====
+// Secure tokens for field compliance officers to attest/upload evidence via email link
+export const taskAttestationTokens = pgTable("task_attestation_tokens", {
+  id: serial("id").primaryKey(),
+  taskId: integer("task_id").notNull().references(() => complianceTasks.id),
+  
+  // Token for secure access
+  token: text("token").notNull().unique(), // UUID or secure random string
+  
+  // Who the token is for
+  email: text("email").notNull(), // Email address the link was sent to
+  recipientName: text("recipient_name"), // Name of field compliance officer
+  
+  // Token validity
+  expiresAt: timestamp("expires_at").notNull(), // Typically 7 days from creation
+  usedAt: timestamp("used_at"), // When the token was used (for attestation)
+  
+  // What actions are allowed
+  canUploadEvidence: boolean("can_upload_evidence").default(true),
+  canAttest: boolean("can_attest").default(true),
+  
+  // Audit trail
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  createdBy: integer("created_by").references(() => users.id), // Who sent the link
+  
+  // Optional message to include in email
+  personalMessage: text("personal_message"),
+}, (table) => {
+  return {
+    tokenIdx: index("task_attestation_tokens_token_idx").on(table.token),
+    taskIdIdx: index("task_attestation_tokens_task_id_idx").on(table.taskId),
+    emailIdx: index("task_attestation_tokens_email_idx").on(table.email),
+  };
+});
+
+export const insertTaskAttestationTokenSchema = createInsertSchema(taskAttestationTokens);
+export type TaskAttestationToken = typeof taskAttestationTokens.$inferSelect;
+export type InsertTaskAttestationToken = z.infer<typeof insertTaskAttestationTokenSchema>;
+
+// ===== ROLE ASSIGNMENTS (Jan 2026) =====
+// Map suggested roles to default DRIs for automatic task assignment
+// Example: "Registrar" → john.doe@university.edu
+export const roleAssignments = pgTable("role_assignments", {
+  id: serial("id").primaryKey(),
+  
+  // The role name (from MCP Engine suggestions or custom)
+  roleName: text("role_name").notNull().unique(), // e.g., "Registrar", "Title IX Coordinator", "Campus Police Chief"
+  
+  // Display name for UI
+  displayName: text("display_name"), // e.g., "Office of the Registrar"
+  
+  // Default assignee for this role
+  defaultUserId: integer("default_user_id").references(() => users.id), // Primary person for this role
+  
+  // For external assignees (not in system)
+  defaultEmail: text("default_email"), // Email if person not in users table
+  defaultName: text("default_name"), // Name for display/emails
+  
+  // Backup/escalation contact
+  backupUserId: integer("backup_user_id").references(() => users.id),
+  backupEmail: text("backup_email"),
+  
+  // Category for grouping in UI
+  category: text("category"), // e.g., "Academic", "Safety", "Student Affairs", "HR"
+  
+  // Description of this role's responsibilities
+  description: text("description"),
+  
+  // Whether auto-assignment is enabled for this role
+  autoAssignEnabled: boolean("auto_assign_enabled").default(true),
+  
+  // Audit
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+  createdBy: integer("created_by").references(() => users.id),
+  updatedBy: integer("updated_by").references(() => users.id),
+}, (table) => {
+  return {
+    roleNameIdx: index("role_assignments_role_name_idx").on(table.roleName),
+    categoryIdx: index("role_assignments_category_idx").on(table.category),
+  };
+});
+
+export const insertRoleAssignmentSchema = createInsertSchema(roleAssignments).extend({
+  roleName: z.string().min(1, "Role name is required"),
+});
+export type RoleAssignment = typeof roleAssignments.$inferSelect;
+export type InsertRoleAssignment = z.infer<typeof insertRoleAssignmentSchema>;
 
 // ===== TASK ACTIVITY LOG =====
 // Activity tracking for tasks (comments, status changes, nudges, escalations)
