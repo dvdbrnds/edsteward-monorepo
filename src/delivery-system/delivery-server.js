@@ -57,6 +57,15 @@ class DeliveryServer {
     this.setupRoutes();
   }
 
+  // Normalize priority to EdSteward's expected values: high, medium, low
+  normalizePriority(priority) {
+    if (!priority) return 'medium';
+    const p = priority.toLowerCase();
+    if (p === 'critical' || p === 'urgent') return 'high';
+    if (p === 'high' || p === 'medium' || p === 'low') return p;
+    return 'medium';
+  }
+
   setupMiddleware() {
     this.app.use(cors({
       origin: ['http://localhost:3050', 'http://localhost:3000', 'http://localhost:3010'],
@@ -342,7 +351,7 @@ class DeliveryServer {
                 title: task.title,
                 description: task.description || '',
                 category: task.category || '',
-                priority: task.priority || 'medium',
+                priority: this.normalizePriority(task.priority),
                 requirementType: task.requirement_type || task.requirementType || 'requirement',
                 assignedRole: task.assignedRole || task.assigned_role || '',
                 evidenceRequired: task.evidenceRequired || task.evidence_required || false,
@@ -363,7 +372,7 @@ class DeliveryServer {
                 title: task.title,
                 description: task.description || '',
                 category: task.category || '',
-                priority: task.priority || 'medium',
+                priority: this.normalizePriority(task.priority),
                 requirementType: task.requirement_type || task.requirementType || 'requirement',
                 assignedRole: task.assignedRole || task.assigned_role || '',
                 evidenceRequired: task.evidenceRequired || task.evidence_required || false,
