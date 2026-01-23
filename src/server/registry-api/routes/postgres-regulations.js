@@ -74,7 +74,10 @@ function transformTask(t) {
     category: t.category,
     topic: t.topic,  // Department/topic this task belongs to
     priority: t.priority,
-    assignedRole: t.assigned_role,
+    statutoryRole: t.statutory_role,  // Role required by statute (e.g., "Title IX Coordinator")
+    statutoryCitation: t.statutory_citation,  // Legal citation (e.g., "34 CFR 106.8")
+    assignedRole: t.assigned_role,    // Suggested operational assignee
+    requirementType: t.requirement_type || 'requirement',
     estimatedEffort: t.estimated_effort,
     evidenceRequired: t.evidence_required,
     evidenceType: t.evidence_type,

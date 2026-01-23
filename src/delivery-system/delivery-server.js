@@ -66,6 +66,69 @@ class DeliveryServer {
     return 'medium';
   }
 
+  // Normalize assigned roles to EdSteward's standard role names
+  // EdSteward standard roles: Registrar, Title IX Coordinator, Campus Police Chief,
+  // Dean of Students, HR Director, Financial Aid Director, VP Academic Affairs,
+  // VP Student Affairs, IT Security Officer, Legal Counsel, Disability Services, Athletic Director
+  normalizeRole(role) {
+    if (!role) return null;
+    
+    // Standard role mapping (MCP Engine → EdSteward standard)
+    const roleMapping = {
+      // Legal
+      'general counsel': 'Legal Counsel',
+      'legal': 'Legal Counsel',
+      'university counsel': 'Legal Counsel',
+      
+      // Campus Safety/Police
+      'campus safety director': 'Campus Police Chief',
+      'campus police/security': 'Campus Police Chief',
+      'campus safety': 'Campus Police Chief',
+      'security director': 'Campus Police Chief',
+      'public safety director': 'Campus Police Chief',
+      
+      // Academic Affairs
+      'academic affairs': 'VP Academic Affairs',
+      'provost': 'VP Academic Affairs',
+      'chief academic officer': 'VP Academic Affairs',
+      
+      // Student Affairs
+      'student affairs': 'VP Student Affairs',
+      'chief student affairs officer': 'VP Student Affairs',
+      
+      // IT/Security
+      'it director': 'IT Security Officer',
+      'ciso': 'IT Security Officer',
+      'chief information security officer': 'IT Security Officer',
+      'information security': 'IT Security Officer',
+      
+      // Disability Services
+      'disability services director': 'Disability Services',
+      'ada coordinator': 'Disability Services',
+      'accessibility coordinator': 'Disability Services',
+      
+      // HR variations
+      'human resources': 'HR Director',
+      'hr': 'HR Director',
+      'hr/training': 'HR Director',
+      'hr/title ix': 'HR Director',
+      
+      // Athletics
+      'athletics director': 'Athletic Director',
+      'athletics': 'Athletic Director'
+    };
+    
+    const normalized = role.toLowerCase().trim();
+    
+    // Check if there's a direct mapping
+    if (roleMapping[normalized]) {
+      return roleMapping[normalized];
+    }
+    
+    // Return original role (EdSteward admin can create custom mapping)
+    return role;
+  }
+
   setupMiddleware() {
     this.app.use(cors({
       origin: ['http://localhost:3050', 'http://localhost:3000', 'http://localhost:3010'],
@@ -353,7 +416,9 @@ class DeliveryServer {
                 category: task.category || '',
                 priority: this.normalizePriority(task.priority),
                 requirementType: task.requirement_type || task.requirementType || 'requirement',
-                assignedRole: task.assignedRole || task.assigned_role || '',
+                statutoryRole: task.statutory_role || task.statutoryRole || '',  // Role required by statute (empty if none)
+                statutoryCitation: task.statutory_citation || task.statutoryCitation || '',  // Legal citation (empty if none)
+                assignedRole: this.normalizeRole(task.assignedRole || task.assigned_role) || '',  // Suggested assignee
                 evidenceRequired: task.evidenceRequired || task.evidence_required || false,
                 evidenceType: task.evidenceType || task.evidence_type || 'document',
                 sortOrder: task.sortOrder || task.sort_order || 0
@@ -374,7 +439,9 @@ class DeliveryServer {
                 category: task.category || '',
                 priority: this.normalizePriority(task.priority),
                 requirementType: task.requirement_type || task.requirementType || 'requirement',
-                assignedRole: task.assignedRole || task.assigned_role || '',
+                statutoryRole: task.statutory_role || task.statutoryRole || '',  // Role required by statute (empty if none)
+                statutoryCitation: task.statutory_citation || task.statutoryCitation || '',  // Legal citation (empty if none)
+                assignedRole: this.normalizeRole(task.assignedRole || task.assigned_role) || '',  // Suggested assignee
                 evidenceRequired: task.evidenceRequired || task.evidence_required || false,
                 evidenceType: task.evidenceType || task.evidence_type || 'document',
                 sortOrder: task.sortOrder || task.sort_order || 0
@@ -907,6 +974,176 @@ class DeliveryServer {
       } catch (error) {
         console.error('❌ Error sending to EdSteward:', error.message);
         res.status(500).json({ success: false, error: error.message });
+      }
+    });
+
+    // TENANT PROVISIONING ENDPOINT
+    // Bulk sync all regulations to a new tenant (bypasses approval workflow)
+    this.app.post('/api/provision-tenant', async (req, res) => {
+      const { customerId, limit, startFrom, dryRun = false } = req.body;
+      
+      if (!customerId) {
+        return res.status(400).json({ error: 'customerId is required' });
+      }
+      
+      const customer = this.customers.find(c => c.id === customerId);
+      if (!customer) {
+        return res.status(404).json({ error: `Customer "${customerId}" not found` });
+      }
+      
+      console.log('╔══════════════════════════════════════════════════════════════╗');
+      console.log('║          TENANT PROVISIONING STARTED                         ║');
+      console.log('╚══════════════════════════════════════════════════════════════╝');
+      console.log(`📍 Target: ${customer.name} (${customer.url})`);
+      if (dryRun) console.log('🔍 DRY RUN MODE');
+      
+      try {
+        // Get all regulations
+        let regulations = await this.pool.query(`
+          SELECT id, reg_key, name, item_id, statute, cfr, 
+                 category, topic, summary, effective_date, jurisdiction_source
+          FROM regulations 
+          WHERE is_current = true AND reg_key IS NOT NULL
+          ORDER BY reg_key
+        `);
+        
+        let regs = regulations.rows;
+        
+        // Apply filters
+        if (startFrom) {
+          const startIdx = regs.findIndex(r => r.reg_key === startFrom);
+          if (startIdx >= 0) regs = regs.slice(startIdx);
+        }
+        if (limit) regs = regs.slice(0, parseInt(limit));
+        
+        console.log(`📋 Syncing ${regs.length} regulations...`);
+        
+        const results = {
+          total: regs.length,
+          success: 0,
+          failed: 0,
+          totalTasks: 0,
+          errors: []
+        };
+        
+        // Use /api/mcp/regulations/sync for direct provisioning
+        const syncUrl = `${customer.url}/api/mcp/regulations/sync`;
+        const headers = { 'Content-Type': 'application/json' };
+        if (customer.auth?.method === 'basic') {
+          headers['Authorization'] = `Basic ${Buffer.from(`${customer.auth.username}:${customer.auth.password}`).toString('base64')}`;
+        }
+        
+        for (let i = 0; i < regs.length; i++) {
+          const reg = regs[i];
+          
+          try {
+            // Get tasks with hierarchy
+            const tasksResult = await this.pool.query(`
+              SELECT id, task_id, title, description, category, priority,
+                     requirement_type, assigned_role, statutory_role, statutory_citation,
+                     evidence_required, evidence_type, sort_order, parent_task_id
+              FROM regulation_tasks WHERE regulation_id = $1
+              ORDER BY sort_order, id
+            `, [reg.id]);
+            
+            // Build hierarchical tasks
+            const taskMap = new Map();
+            const tasks = tasksResult.rows;
+            tasks.forEach(t => taskMap.set(t.id, `task-${t.id}`));
+            
+            const parentTasks = tasks.filter(t => !t.parent_task_id);
+            const childTasks = tasks.filter(t => t.parent_task_id);
+            
+            const hierarchicalTasks = [
+              ...parentTasks.map(t => ({
+                tempId: taskMap.get(t.id),
+                taskId: t.task_id || taskMap.get(t.id),
+                title: t.title,
+                description: t.description || '',
+                category: t.category || '',
+                priority: this.normalizePriority(t.priority),
+                requirementType: t.requirement_type || 'requirement',
+                statutoryRole: t.statutory_role || '',  // Role required by statute (empty if none)
+                statutoryCitation: t.statutory_citation || '',  // Legal citation (empty if none)
+                assignedRole: this.normalizeRole(t.assigned_role) || '',  // Suggested assignee
+                evidenceRequired: t.evidence_required || false
+              })),
+              ...childTasks.map(t => ({
+                tempId: taskMap.get(t.id),
+                taskId: t.task_id || taskMap.get(t.id),
+                parentTempId: taskMap.get(t.parent_task_id),
+                title: t.title,
+                description: t.description || '',
+                category: t.category || '',
+                priority: this.normalizePriority(t.priority),
+                requirementType: t.requirement_type || 'requirement',
+                statutoryRole: t.statutory_role || '',  // Role required by statute (empty if none)
+                statutoryCitation: t.statutory_citation || '',  // Legal citation (empty if none)
+                assignedRole: this.normalizeRole(t.assigned_role) || '',  // Suggested assignee
+                evidenceRequired: t.evidence_required || false
+              }))
+            ];
+            
+            const payload = {
+              mcpRegKey: reg.reg_key,
+              regKey: reg.reg_key,
+              itemId: reg.item_id,
+              name: reg.name,
+              statute: reg.statute || 'See CFR',
+              cfr: reg.cfr || '',
+              category: reg.category || 'Uncategorized',
+              topic: reg.topic || 'General',
+              jurisdictionSource: reg.jurisdiction_source || 'federal',
+              summary: reg.summary || '',
+              complianceTasks: hierarchicalTasks
+            };
+            
+            if (!dryRun) {
+              const response = await fetch(syncUrl, {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(payload)
+              });
+              
+              if (response.ok) {
+                results.success++;
+                results.totalTasks += hierarchicalTasks.length;
+                console.log(`✅ [${i+1}/${regs.length}] ${reg.reg_key}: ${hierarchicalTasks.length} tasks`);
+              } else {
+                const error = await response.json();
+                results.failed++;
+                results.errors.push({ regKey: reg.reg_key, error: error.error || response.status });
+                console.log(`❌ [${i+1}/${regs.length}] ${reg.reg_key}: ${error.error}`);
+              }
+              
+              // Rate limiting
+              await new Promise(resolve => setTimeout(resolve, 50));
+            } else {
+              results.success++;
+              results.totalTasks += hierarchicalTasks.length;
+            }
+            
+          } catch (error) {
+            results.failed++;
+            results.errors.push({ regKey: reg.reg_key, error: error.message });
+          }
+        }
+        
+        console.log('═'.repeat(60));
+        console.log(`✅ Success: ${results.success}/${results.total}`);
+        console.log(`❌ Failed: ${results.failed}/${results.total}`);
+        console.log(`📋 Tasks: ${results.totalTasks}`);
+        
+        res.json({
+          success: true,
+          customer: customer.name,
+          results,
+          timestamp: new Date().toISOString()
+        });
+        
+      } catch (error) {
+        console.error('Provisioning error:', error);
+        res.status(500).json({ error: error.message });
       }
     });
 
