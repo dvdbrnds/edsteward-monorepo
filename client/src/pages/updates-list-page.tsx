@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useLocation } from 'wouter';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -28,9 +29,7 @@ interface RegulationUpdate {
 }
 
 const UpdatesListPage: React.FC = () => {
-  
-  
-  
+  const [, setLocation] = useLocation();
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const queryClient = useQueryClient();
   
@@ -82,8 +81,7 @@ const UpdatesListPage: React.FC = () => {
       
       return response.json();
     },
-    onSuccess: (data) => {
-      
+    onSuccess: (_data) => {
       setSelectedIds([]);
       queryClient.invalidateQueries({ queryKey: ['/api/regulation-updates/pending'] });
     },
@@ -517,7 +515,7 @@ const UpdatesListPage: React.FC = () => {
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={() => window.open(`/regulations/updates/${update.id}`, '_blank')}
+                        onClick={() => setLocation(`/regulations/updates/${update.id}`)}
                       >
                         <Eye className="h-4 w-4 mr-1" />
                         View Changes

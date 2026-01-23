@@ -945,7 +945,8 @@ export function setupMCPIntegrationApi(app: express.Application) {
       }
       
       // Extract universal reg_key and risk data from payload
-      const regKey = data.regKey; // Universal key like REG-001
+      // Support both 'mcpRegKey' (MCP Engine sends this) and 'regKey' (legacy)
+      const regKey = data.mcpRegKey || data.regKey; // Universal key like REG-001
       const riskScore = data.riskScore; // 1-100 score
       const riskLevel = data.riskLevel; // CRITICAL, SEVERE, HIGH, MODERATE, LOW
       
