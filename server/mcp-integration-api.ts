@@ -1351,16 +1351,17 @@ export function setupMCPIntegrationApi(app: express.Application) {
    */
   app.get('/api/mcp/alignment-status', basicAuthMCP, async (req: Request, res: Response) => {
     try {
+      // Updated Jan 2026 to filter by is_current = true for active regulation counts
       const result = await db.execute(sql`
         SELECT 
-          (SELECT COUNT(*) FROM regulations) as total_regulations,
-          (SELECT COUNT(*) FROM regulations WHERE lovv_level IS NOT NULL) as mcp_validated,
-          (SELECT COUNT(*) FROM regulations WHERE jurisdiction_source = 'federal') as federal,
-          (SELECT COUNT(*) FROM regulations WHERE state_code = 'PA') as pennsylvania,
-          (SELECT COUNT(*) FROM regulations WHERE state_code = 'NJ') as new_jersey,
+          (SELECT COUNT(*) FROM regulations WHERE is_current = true) as total_regulations,
+          (SELECT COUNT(*) FROM regulations WHERE lovv_level IS NOT NULL AND is_current = true) as mcp_validated,
+          (SELECT COUNT(*) FROM regulations WHERE jurisdiction_source = 'federal' AND is_current = true) as federal,
+          (SELECT COUNT(*) FROM regulations WHERE state_code = 'PA' AND is_current = true) as pennsylvania,
+          (SELECT COUNT(*) FROM regulations WHERE state_code = 'NJ' AND is_current = true) as new_jersey,
           (SELECT COUNT(*) FROM regulation_topics) as topic_mappings,
           (SELECT COUNT(*) FROM compliance_tasks) as compliance_tasks,
-          (SELECT MAX(last_updated) FROM regulations) as last_sync
+          (SELECT MAX(last_updated) FROM regulations WHERE is_current = true) as last_sync
       `);
       
       const stats = result.rows[0] as any;

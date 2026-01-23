@@ -1049,20 +1049,28 @@ export type InsertAttestationToken = z.infer<typeof insertAttestationTokenSchema
 export const TASK_STATUS = ['pending', 'in_progress', 'completed', 'overdue', 'blocked', 'not_applicable'] as const;
 export const EVIDENCE_TYPE = ['none', 'document', 'link', 'screenshot', 'attestation', 'form'] as const;
 export const TASK_PRIORITY = ['low', 'medium', 'high', 'critical'] as const;
+export const REQUIREMENT_TYPE = ['requirement', 'best_practice'] as const;
 
 export type TaskStatus = typeof TASK_STATUS[number];
 export type EvidenceType = typeof EVIDENCE_TYPE[number];
 export type TaskPriority = typeof TASK_PRIORITY[number];
+export type RequirementType = typeof REQUIREMENT_TYPE[number];
 
 export const complianceTasks = pgTable("compliance_tasks", {
   id: serial("id").primaryKey(),
   regulationId: integer("regulation_id").notNull().references(() => regulations.id),
   parentTaskId: integer("parent_task_id"), // Self-reference for sub-tasks (can't use references() for self-ref)
   
+  // Task identification
+  taskId: text("task_id"), // Unique task identifier (e.g., GLBA-001, OSHA-005)
+  
   // Task details
   title: text("title").notNull(),
   description: text("description"),
   instructions: text("instructions"), // Detailed instructions for completing the task
+  
+  // Task categorization - from MCP Engine sync (Jan 2026)
+  requirementType: text("requirement_type").default('requirement'), // 'requirement' = legally mandated, 'best_practice' = recommended
   
   // Assignment
   assignedTo: integer("assigned_to").references(() => users.id), // DRI for this specific task
@@ -1112,6 +1120,7 @@ export const insertComplianceTaskSchema = createInsertSchema(complianceTasks).ex
   status: z.enum(TASK_STATUS).default('pending'),
   evidenceType: z.enum(EVIDENCE_TYPE).default('none'),
   priority: z.enum(TASK_PRIORITY).default('medium'),
+  requirementType: z.enum(REQUIREMENT_TYPE).default('requirement'),
 });
 
 export type ComplianceTask = typeof complianceTasks.$inferSelect;

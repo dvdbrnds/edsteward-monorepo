@@ -1,22 +1,17 @@
 /**
  * Theme Provider and Hook
  * Manages dark/light mode with localStorage persistence
+ * 
+ * FIXED: Uses direct DOM manipulation + event-based sync instead of React context
+ * to avoid context isolation issues during HMR and component mounting
  */
 
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 
 type Theme = 'light' | 'dark' | 'system';
 
-interface ThemeContextType {
-  theme: Theme;
-  resolvedTheme: 'light' | 'dark';
-  setTheme: (theme: Theme) => void;
-  toggleTheme: () => void;
-}
-
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
-
 const THEME_KEY = 'edsteward-theme';
+const THEME_CHANGE_EVENT = 'edsteward-theme-change';
 
 function getSystemTheme(): 'light' | 'dark' {
   if (typeof window !== 'undefined') {
@@ -25,88 +20,109 @@ function getSystemTheme(): 'light' | 'dark' {
   return 'light';
 }
 
+function getStoredTheme(): Theme {
+  if (typeof window !== 'undefined') {
+    const stored = localStorage.getItem(THEME_KEY) as Theme | null;
+    return stored || 'system';
+  }
+  return 'system';
+}
+
+function resolveTheme(theme: Theme): 'light' | 'dark' {
+  if (theme === 'system') {
+    return getSystemTheme();
+  }
+  return theme;
+}
+
+function applyThemeToDOM(resolved: 'light' | 'dark') {
+  const root = document.documentElement;
+  root.classList.remove('dark', 'light');
+  if (resolved === 'dark') {
+    root.classList.add('dark');
+  }
+}
+
+// Apply theme immediately on script load (before React hydrates)
+if (typeof window !== 'undefined') {
+  const initialTheme = getStoredTheme();
+  const resolved = resolveTheme(initialTheme);
+  applyThemeToDOM(resolved);
+}
+
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>(() => {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem(THEME_KEY) as Theme | null;
-      return stored || 'system';
-    }
-    return 'system';
-  });
-
-  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(() => {
-    if (theme === 'system') {
-      return getSystemTheme();
-    }
-    return theme;
-  });
-
-  // Apply theme to document
+  // Apply theme on mount
   useEffect(() => {
-    const root = document.documentElement;
-    const resolved = theme === 'system' ? getSystemTheme() : theme;
-    
-    setResolvedTheme(resolved);
-    
-    if (resolved === 'dark') {
-      root.classList.add('dark');
-    } else {
-      root.classList.remove('dark');
-    }
-  }, [theme]);
+    const theme = getStoredTheme();
+    const resolved = resolveTheme(theme);
+    applyThemeToDOM(resolved);
+  }, []);
 
-  // Listen for system theme changes
+  // Listen for system theme changes when in system mode
   useEffect(() => {
+    const theme = getStoredTheme();
     if (theme !== 'system') return;
 
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleChange = (e: MediaQueryListEvent) => {
-      setResolvedTheme(e.matches ? 'dark' : 'light');
-      if (e.matches) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
+      applyThemeToDOM(e.matches ? 'dark' : 'light');
+      window.dispatchEvent(new CustomEvent(THEME_CHANGE_EVENT));
     };
 
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
-  }, [theme]);
+  }, []);
 
-  const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme);
-    localStorage.setItem(THEME_KEY, newTheme);
-  };
-
-  const toggleTheme = () => {
-    const newTheme = resolvedTheme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-  };
-
-  return (
-    <ThemeContext.Provider value={{ theme, resolvedTheme, setTheme, toggleTheme }}>
-      {children}
-    </ThemeContext.Provider>
-  );
+  return <>{children}</>;
 }
 
 export function useTheme() {
-  const context = useContext(ThemeContext);
-  if (context === undefined) {
-    // Provide a fallback when context is not available (e.g., during HMR)
-    console.warn('useTheme called outside ThemeProvider, using fallback');
-    return {
-      theme: 'system' as const,
-      resolvedTheme: 'light' as const,
-      setTheme: () => {},
-      toggleTheme: () => {},
+  const [theme, setThemeState] = useState<Theme>(getStoredTheme);
+  const [resolvedTheme, setResolvedTheme] = useState<'light' | 'dark'>(() => resolveTheme(getStoredTheme()));
+
+  // Sync state when theme changes (from other components or tabs)
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === THEME_KEY) {
+        const newTheme = (e.newValue as Theme) || 'system';
+        setThemeState(newTheme);
+        setResolvedTheme(resolveTheme(newTheme));
+      }
     };
-  }
-  return context;
+
+    const handleThemeChange = () => {
+      const newTheme = getStoredTheme();
+      setThemeState(newTheme);
+      setResolvedTheme(resolveTheme(newTheme));
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    window.addEventListener(THEME_CHANGE_EVENT, handleThemeChange);
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener(THEME_CHANGE_EVENT, handleThemeChange);
+    };
+  }, []);
+
+  const setTheme = useCallback((newTheme: Theme) => {
+    console.log('[Theme] setTheme called:', newTheme);
+    localStorage.setItem(THEME_KEY, newTheme);
+    setThemeState(newTheme);
+    const resolved = resolveTheme(newTheme);
+    setResolvedTheme(resolved);
+    applyThemeToDOM(resolved);
+    window.dispatchEvent(new CustomEvent(THEME_CHANGE_EVENT));
+  }, []);
+
+  const toggleTheme = useCallback(() => {
+    const currentResolved = resolveTheme(getStoredTheme());
+    const newTheme = currentResolved === 'light' ? 'dark' : 'light';
+    console.log('[Theme] toggleTheme called! Current:', currentResolved, '-> New:', newTheme);
+    setTheme(newTheme);
+  }, [setTheme]);
+
+  return { theme, resolvedTheme, setTheme, toggleTheme };
 }
 
 export default ThemeProvider;
-
-
-
-

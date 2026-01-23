@@ -7,6 +7,7 @@
 import express, { Request, Response } from 'express';
 import { getDbForRequest } from '../../services/database';
 import { regulations, deadlines, complianceTasks, users } from '@shared/schema';
+import { eq } from 'drizzle-orm';
 
 const router = express.Router();
 
@@ -16,8 +17,8 @@ router.get('/compliance-summary', async (req: Request, res: Response) => {
     // TENANT ISOLATION: Get tenant-specific database
     const db = getDbForRequest(req);
     
-    // Fetch all data
-    const allRegulations = await db.select().from(regulations);
+    // Fetch all data (filter regulations by is_current = true, MCP Engine sync Jan 2026)
+    const allRegulations = await db.select().from(regulations).where(eq(regulations.isCurrent, true));
     const allDeadlines = await db.select().from(deadlines);
     const allTasks = await db.select().from(complianceTasks);
     const allUsers = await db.select().from(users);
@@ -117,7 +118,8 @@ router.get('/export/regulations/csv', async (req: Request, res: Response) => {
     // TENANT ISOLATION: Get tenant-specific database
     const db = getDbForRequest(req);
     
-    const allRegulations = await db.select().from(regulations);
+    // Filter by is_current = true to exclude deprecated/duplicate regulations (MCP Engine sync Jan 2026)
+    const allRegulations = await db.select().from(regulations).where(eq(regulations.isCurrent, true));
 
     // CSV header
     const headers = ['ID', 'Name', 'Category', 'Jurisdiction', 'Compliance Status', 'Last Updated', 'Effective Date'];
@@ -216,7 +218,8 @@ router.get('/full-report', async (req: Request, res: Response) => {
     // TENANT ISOLATION: Get tenant-specific database
     const db = getDbForRequest(req);
     
-    const allRegulations = await db.select().from(regulations);
+    // Filter regulations by is_current = true (MCP Engine sync Jan 2026)
+    const allRegulations = await db.select().from(regulations).where(eq(regulations.isCurrent, true));
     const allDeadlines = await db.select().from(deadlines);
     const allTasks = await db.select().from(complianceTasks);
 

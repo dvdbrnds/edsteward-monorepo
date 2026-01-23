@@ -90,6 +90,7 @@ interface ComplianceTask {
   id: number;
   regulationId: number;
   parentTaskId: number | null;
+  taskId: string | null; // Unique task identifier (e.g., GLBA-001, OSHA-005) - MCP Engine sync Jan 2026
   title: string;
   description: string | null;
   instructions: string | null;
@@ -98,6 +99,7 @@ interface ComplianceTask {
   dueDate: string | null;
   status: string;
   priority: string;
+  requirementType: 'requirement' | 'best_practice' | null; // MCP Engine sync Jan 2026
   completedAt: string | null;
   completedByUser?: {
     id: number;
@@ -151,6 +153,20 @@ const priorityColors: Record<string, string> = {
   high: 'bg-orange-100 text-orange-800 border-orange-200',
   medium: 'bg-blue-100 text-blue-800 border-blue-200',
   low: 'bg-gray-100 text-foreground border-border',
+};
+
+// Requirement type styling (MCP Engine sync Jan 2026)
+const requirementTypeStyles: Record<string, { label: string; className: string; description: string }> = {
+  requirement: { 
+    label: 'Required', 
+    className: 'bg-purple-100 text-purple-800 border-purple-200',
+    description: 'Legally mandated - non-compliance may result in violations'
+  },
+  best_practice: { 
+    label: 'Best Practice', 
+    className: 'bg-teal-100 text-teal-700 border-teal-200',
+    description: 'Recommended but not legally required'
+  },
 };
 
 const evidenceIcons: Record<string, React.ReactNode> = {
@@ -269,6 +285,26 @@ function TaskItem({
             <Badge variant="outline" className={cn("text-xs shrink-0", priorityColors[task.priority])}>
               {task.priority}
             </Badge>
+            
+            {/* Requirement Type Badge (MCP Engine sync Jan 2026) */}
+            {task.requirementType && requirementTypeStyles[task.requirementType] && (
+              <HoverCard>
+                <HoverCardTrigger asChild>
+                  <Badge 
+                    variant="outline" 
+                    className={cn("text-xs shrink-0 cursor-help", requirementTypeStyles[task.requirementType].className)}
+                  >
+                    {requirementTypeStyles[task.requirementType].label}
+                  </Badge>
+                </HoverCardTrigger>
+                <HoverCardContent className="w-64 text-sm">
+                  <p>{requirementTypeStyles[task.requirementType].description}</p>
+                  {task.taskId && (
+                    <p className="text-xs text-muted-foreground mt-2">Task ID: {task.taskId}</p>
+                  )}
+                </HoverCardContent>
+              </HoverCard>
+            )}
           </div>
 
           {/* Meta info */}
@@ -625,6 +661,9 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
   const [newTaskEvidenceRequired, setNewTaskEvidenceRequired] = useState(false);
   const [newTaskEvidenceType, setNewTaskEvidenceType] = useState<'none' | 'document' | 'link' | 'screenshot' | 'attestation'>('none');
   const [newTaskEvidenceInstructions, setNewTaskEvidenceInstructions] = useState('');
+  
+  // Requirement type filter (MCP Engine sync Jan 2026)
+  const [requirementTypeFilter, setRequirementTypeFilter] = useState<'all' | 'requirement' | 'best_practice'>('all');
 
   // Fetch tasks
   const { data, isLoading, error } = useQuery<TasksResponse>({
@@ -923,6 +962,50 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
         )}
       </div>
 
+      {/* Requirement Type Filter (MCP Engine sync Jan 2026) */}
+      {!hasNoTasks && (
+        <div className="flex items-center gap-4 pb-2 border-b">
+          <span className="text-sm text-muted-foreground">Filter by type:</span>
+          <div className="flex items-center gap-1">
+            <Button
+              variant={requirementTypeFilter === 'all' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setRequirementTypeFilter('all')}
+              className="h-7 text-xs"
+            >
+              All Tasks
+            </Button>
+            <Button
+              variant={requirementTypeFilter === 'requirement' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setRequirementTypeFilter('requirement')}
+              className="h-7 text-xs"
+            >
+              <span className="w-2 h-2 rounded-full bg-purple-500 mr-1.5" />
+              Requirements Only
+            </Button>
+            <Button
+              variant={requirementTypeFilter === 'best_practice' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setRequirementTypeFilter('best_practice')}
+              className="h-7 text-xs"
+            >
+              <span className="w-2 h-2 rounded-full bg-teal-500 mr-1.5" />
+              Best Practices
+            </Button>
+          </div>
+          {/* Task count by type */}
+          <div className="flex-1 text-right text-xs text-muted-foreground">
+            {(() => {
+              const allTasks = data?.tasks?.flatMap(t => [t, ...t.subTasks]) || [];
+              const reqCount = allTasks.filter(t => !t.requirementType || t.requirementType === 'requirement').length;
+              const bpCount = allTasks.filter(t => t.requirementType === 'best_practice').length;
+              return `${reqCount} requirements · ${bpCount} best practices`;
+            })()}
+          </div>
+        </div>
+      )}
+
       {/* Empty State */}
       {hasNoTasks ? (
         <div className="text-center py-12 bg-background rounded-lg border-2 border-dashed">
@@ -946,7 +1029,13 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
           
           {/* Task List */}
           <div className="space-y-2">
-            {data?.tasks.map(task => (
+            {data?.tasks
+              .filter(task => {
+                if (requirementTypeFilter === 'all') return true;
+                const taskType = task.requirementType || 'requirement';
+                return taskType === requirementTypeFilter;
+              })
+              .map(task => (
               <TaskItem
                 key={task.id}
                 task={task}

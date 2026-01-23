@@ -530,8 +530,10 @@ export class DatabaseStorage implements IStorage {
     try {
       
       // Temporary fix: Use raw SQL to bypass Drizzle column mapping issues
+      // Filter by is_current = true to exclude deprecated/duplicate regulations (MCP Engine sync Jan 2026)
       const result = await this.db.execute(sql`
         SELECT * FROM regulations 
+        WHERE is_current = true
         ORDER BY last_updated DESC 
         LIMIT 1000
       `);

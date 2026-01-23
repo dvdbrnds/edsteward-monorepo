@@ -6,8 +6,7 @@
 import express from 'express';
 import { getDbForRequest } from '../../services/database';
 import { regulations, deadlines, complianceTasks, users, attestationTokens } from '@shared/schema';
-// Note: drizzle-orm functions imported for potential future use
-// import { eq, sql, and, gte, lte, isNull, isNotNull, count, desc } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 
 const router = express.Router();
 
@@ -22,7 +21,8 @@ router.get('/', async (req, res) => {
     const thirtyDaysFromNow = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
 
     // === REGULATIONS METRICS ===
-    const allRegulations = await db.select().from(regulations);
+    // Filter by is_current = true to exclude deprecated/duplicate regulations (MCP Engine sync Jan 2026)
+    const allRegulations = await db.select().from(regulations).where(eq(regulations.isCurrent, true));
     const totalRegulations = allRegulations.length;
     
     // Count by compliance status
@@ -85,6 +85,16 @@ router.get('/', async (req, res) => {
       return new Date(t.dueDate) < now;
     }).length;
 
+    // === REQUIREMENT TYPE BREAKDOWN (MCP Engine sync Jan 2026) ===
+    // Separate legally mandated requirements from best practices
+    const requirementTasks = allTasks.filter(t => !t.requirementType || t.requirementType === 'requirement');
+    const bestPracticeTasks = allTasks.filter(t => t.requirementType === 'best_practice');
+    
+    const totalRequirements = requirementTasks.length;
+    const completedRequirements = requirementTasks.filter(t => t.status === 'completed').length;
+    const totalBestPractices = bestPracticeTasks.length;
+    const completedBestPractices = bestPracticeTasks.filter(t => t.status === 'completed').length;
+
     // Tasks by regulation
     const tasksByRegulation: Record<number, { total: number; completed: number; regName: string }> = {};
     for (const task of allTasks) {
@@ -115,19 +125,26 @@ router.get('/', async (req, res) => {
     const pendingAttestations = allAttestations.filter(a => a.usedAt === null && new Date(a.expiresAt) > now).length;
 
     // === CALCULATE OVERALL COMPLIANCE SCORE ===
-    // Weighted formula:
+    // Updated formula (MCP Engine sync Jan 2026):
     // - 40% regulation compliance status
-    // - 30% task completion rate
+    // - 30% REQUIREMENT task completion (legally mandated tasks)
     // - 20% deadline completion rate
     // - 10% attestation completion rate
+    // - Bonus: up to 10% for best practice completion
     
     const regComplianceRate = totalRegulations > 0 
       ? (compliantRegs / totalRegulations) * 100 
       : 0;
     
-    const taskCompletionRate = totalTasks > 0 
-      ? (completedTasks / totalTasks) * 100 
-      : 100; // If no tasks, consider it 100%
+    // Requirements are the primary measure - legally mandated tasks
+    const requirementCompletionRate = totalRequirements > 0 
+      ? (completedRequirements / totalRequirements) * 100 
+      : 100; // If no requirements, consider it 100%
+    
+    // Best practices provide bonus points but don't affect the main score negatively
+    const bestPracticeBonus = totalBestPractices > 0 
+      ? (completedBestPractices / totalBestPractices) * 10 // Up to 10% bonus
+      : 0;
     
     const deadlineCompletionRate = totalDeadlines > 0 
       ? (completedDeadlines / totalDeadlines) * 100 
@@ -137,12 +154,16 @@ router.get('/', async (req, res) => {
       ? (completedAttestations / (completedAttestations + pendingAttestations)) * 100 
       : 100;
 
-    const overallComplianceScore = Math.round(
+    // Base score from requirements (capped at 100), plus best practice bonus
+    const baseScore = Math.round(
       (regComplianceRate * 0.4) + 
-      (taskCompletionRate * 0.3) + 
+      (requirementCompletionRate * 0.3) + 
       (deadlineCompletionRate * 0.2) + 
       (attestationRate * 0.1)
     );
+    
+    // Final score: base + best practice bonus, capped at 100
+    const overallComplianceScore = Math.min(baseScore + Math.round(bestPracticeBonus), 100);
 
     // Determine risk level
     let riskLevel: 'low' | 'medium' | 'high' | 'critical' = 'low';
@@ -204,7 +225,19 @@ router.get('/', async (req, res) => {
         inProgress: inProgressTasks,
         pending: pendingTasks,
         overdue: overdueTasks,
-        completionRate: Math.round(taskCompletionRate)
+        completionRate: Math.round(requirementCompletionRate),
+        // Requirement type breakdown (MCP Engine sync Jan 2026)
+        requirements: {
+          total: totalRequirements,
+          completed: completedRequirements,
+          completionRate: totalRequirements > 0 ? Math.round((completedRequirements / totalRequirements) * 100) : 100
+        },
+        bestPractices: {
+          total: totalBestPractices,
+          completed: completedBestPractices,
+          completionRate: totalBestPractices > 0 ? Math.round((completedBestPractices / totalBestPractices) * 100) : 0,
+          bonus: Math.round(bestPracticeBonus)
+        }
       },
       deadlines: {
         total: totalDeadlines,

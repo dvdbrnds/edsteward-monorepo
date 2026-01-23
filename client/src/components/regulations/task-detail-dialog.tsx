@@ -95,6 +95,7 @@ interface ComplianceTask {
   id: number;
   regulationId: number;
   parentTaskId: number | null;
+  taskId: string | null; // Unique task identifier (e.g., GLBA-001) - MCP Engine sync Jan 2026
   title: string;
   description: string | null;
   instructions: string | null;
@@ -103,6 +104,7 @@ interface ComplianceTask {
   dueDate: string | null;
   status: string;
   priority: string;
+  requirementType: 'requirement' | 'best_practice' | null; // MCP Engine sync Jan 2026
   completedAt: string | null;
   completedByUser?: User | null;
   evidenceRequired: boolean;
@@ -146,6 +148,20 @@ const priorityColors: Record<string, string> = {
   high: 'bg-orange-100 text-orange-800 border-orange-200',
   medium: 'bg-blue-100 text-blue-800 border-blue-200',
   low: 'bg-gray-100 text-foreground border-border',
+};
+
+// Requirement type styling (MCP Engine sync Jan 2026)
+const requirementTypeStyles: Record<string, { label: string; className: string; description: string }> = {
+  requirement: { 
+    label: 'Required', 
+    className: 'bg-purple-100 text-purple-800 border-purple-200',
+    description: 'Legally mandated - non-compliance may result in violations'
+  },
+  best_practice: { 
+    label: 'Best Practice', 
+    className: 'bg-teal-100 text-teal-700 border-teal-200',
+    description: 'Recommended but not legally required'
+  },
 };
 
 function formatFileSize(bytes: number | null): string {
@@ -346,7 +362,23 @@ export function TaskDetailDialog({
             <Badge variant="outline" className={cn("shrink-0", priorityColors[task.priority])}>
               {task.priority}
             </Badge>
+            {/* Requirement Type Badge (MCP Engine sync Jan 2026) */}
+            {task.requirementType && requirementTypeStyles[task.requirementType] && (
+              <Badge 
+                variant="outline" 
+                className={cn("shrink-0", requirementTypeStyles[task.requirementType].className)}
+                title={requirementTypeStyles[task.requirementType].description}
+              >
+                {requirementTypeStyles[task.requirementType].label}
+              </Badge>
+            )}
           </div>
+          {/* Task ID display (MCP Engine sync Jan 2026) */}
+          {task.taskId && (
+            <div className="text-xs text-muted-foreground mt-1">
+              Task ID: {task.taskId}
+            </div>
+          )}
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-4">
