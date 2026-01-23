@@ -13,8 +13,11 @@ import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import pg from 'pg';
 import { RegulationDeliveryEngine, REGULATION_EVENTS } from './regulation-delivery-engine.js';
 import { EdStewardIntegration } from './edsteward-integration.js';
+
+const { Pool } = pg;
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -41,6 +44,14 @@ class DeliveryServer {
     this.edstewardIntegration = null;
     this.customers = customerConfig.customers;
     this.customerDefaults = customerConfig.defaults;
+    
+    // Initialize database pool for regulation data
+    this.pool = new Pool({
+      host: 'localhost',
+      port: 5432,
+      database: 'mcp_engine',
+      user: process.env.PGUSER || process.env.USER,
+    });
     
     this.setupMiddleware();
     this.setupRoutes();
@@ -304,14 +315,15 @@ class DeliveryServer {
           // Build hierarchical compliance tasks with tempId and parentTempId
           // This preserves the parent-child relationships for EdSteward
           const hierarchicalTasks = [];
-          if (Array.isArray(regulationContent.complianceTasks)) {
+          const tasksArray = regulationContent.complianceTasks || regulationContent.tasks || [];
+          if (Array.isArray(tasksArray) && tasksArray.length > 0) {
             // Group tasks by parent relationship using database parent_task_id
             const taskMap = new Map();
             const parentTasks = [];
             const childTasks = [];
             
             // First pass: identify parents vs children
-            for (const task of regulationContent.complianceTasks) {
+            for (const task of tasksArray) {
               const tempId = `task-${task.id || task.sortOrder || hierarchicalTasks.length}`;
               taskMap.set(task.id, tempId);
               
@@ -326,10 +338,12 @@ class DeliveryServer {
             for (const task of parentTasks) {
               hierarchicalTasks.push({
                 tempId: task.tempId,
+                taskId: task.task_id || task.taskId || task.tempId,
                 title: task.title,
                 description: task.description || '',
                 category: task.category || '',
                 priority: task.priority || 'medium',
+                requirementType: task.requirement_type || task.requirementType || 'requirement',
                 assignedRole: task.assignedRole || task.assigned_role || '',
                 evidenceRequired: task.evidenceRequired || task.evidence_required || false,
                 evidenceType: task.evidenceType || task.evidence_type || 'document',
@@ -344,11 +358,13 @@ class DeliveryServer {
               
               hierarchicalTasks.push({
                 tempId: task.tempId,
+                taskId: task.task_id || task.taskId || task.tempId,
                 parentTempId: parentTempId,  // CRITICAL: links to parent task
                 title: task.title,
                 description: task.description || '',
                 category: task.category || '',
                 priority: task.priority || 'medium',
+                requirementType: task.requirement_type || task.requirementType || 'requirement',
                 assignedRole: task.assignedRole || task.assigned_role || '',
                 evidenceRequired: task.evidenceRequired || task.evidence_required || false,
                 evidenceType: task.evidenceType || task.evidence_type || 'document',
@@ -368,13 +384,20 @@ class DeliveryServer {
 
           const payload = {
             // PRIMARY IDENTIFIER - Universal REG-XXX key (REG-001 to REG-251)
+            mcpRegKey: regKey,
             regKey: regKey,
             
             // Backup identifiers (EdSteward will use regKey first)
             itemId: itemId,
             
-            // Required fields for /api/regulation-updates
+            // Required fields for /api/mcp/regulations/sync
             name: regulationContent.name || regulationId,
+            statute: regulationContent.statute || statutesText || 'See CFR',
+            category: regulationContent.category || 'Uncategorized',
+            topic: regulationContent.topic || 'General',
+            cfr: regulationContent.cfr || '',
+            
+            // Content fields
             originalContent: contentText.substring(0, 5000) || 'Current regulation content',
             updatedContent: contentText.substring(0, 5000) || 'Updated regulation content',
             status: 'pending',  // CRITICAL: Creates pending update for CCO review
@@ -752,75 +775,128 @@ class DeliveryServer {
       }
     });
 
-    // Send regulation to EdSteward - DEMO BUTTON ENDPOINT
+    // Send regulation to EdSteward - PRODUCTION ENDPOINT (fetches real data from DB)
     this.app.post('/api/send-to-edsteward', async (req, res) => {
-      const { regulationId, regulationSlug, name, edstewardId } = req.body;
+      const { regulationSlug, regKey, name } = req.body;
       
-      console.log('📤 [DEMO] Sending regulation to EdSteward:', regulationSlug || regulationId);
-      
-      const payload = {
-        regulationId: edstewardId || 9,
-        name: 'Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Act (Clery Act)',
-        originalContent: '',
-        updatedContent: `The Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Act (20 U.S.C. § 1092(f)), as amended by the Violence Against Women Reauthorization Act of 2013, requires institutions of higher education participating in federal student aid programs to disclose campus security policies and crime statistics.
-
-KEY REQUIREMENTS:
-• Annual Security Report (ASR) must be published by October 1st each year
-• Daily crime log must be maintained and made publicly available
-• Timely warnings must be issued for Clery Act crimes that pose ongoing threats
-• Emergency notification system must be tested annually
-• Missing student notification procedures required for residential students
-
-2026 AMENDMENT - EFFECTIVE JULY 1, 2026:
-The Department of Education has updated reporting requirements under 34 CFR 668.46 to include:
-• Enhanced dating violence incident categorization
-• Expanded stalking report documentation with geographic data
-• Mandatory emergency notification system testing documentation
-• Updated daily crime log accessibility standards
-• New requirements for online incident reporting systems
-
-COMPLIANCE DEADLINES:
-- October 1: Annual Security Report publication
-- Ongoing: Daily crime log maintenance (within 2 business days)
-- As needed: Timely warnings (without delay)
-- Annual: Emergency notification testing`,
-        status: 'pending',
-        summary: 'The Clery Act requires colleges to disclose campus security policies and crime statistics annually. Recent amendments (effective July 1, 2026) expand reporting requirements for dating violence, stalking, and emergency notification testing.',
-        requirements: '• Publish Annual Security Report by October 1\n• Maintain daily crime log\n• Issue timely warnings for ongoing threats\n• Test emergency notification systems annually\n• Document missing student procedures\n• NEW: Enhanced dating violence/stalking reporting\n• NEW: Emergency notification testing documentation',
-        filingDeadlines: 'October 1: Annual Security Report; Ongoing: Daily crime log; Annual: Emergency notification testing',
-        metadata: {
-          source: 'MCP_ENGINE_FEDERAL_REGISTER',
-          timestamp: new Date().toISOString(),
-          mcpEngineId: 'clery-act',
-          federalRegisterDoc: 'FR-2026-01-15-12345',
-          changeType: 'amendment',
-          effectiveDate: '2026-07-01',
-          affectedSections: ['34 CFR 668.46(b)', '34 CFR 668.46(c)', '34 CFR 668.46(g)'],
-          citation: '20 U.S.C. § 1092(f)'
-        }
-      };
+      console.log('📤 Sending regulation to EdSteward:', regKey || regulationSlug);
       
       try {
-        const response = await fetch('https://moravian.edsteward.ai/api/regulation-updates', {
+        // Fetch regulation from database
+        const regResult = await this.pool.query(`
+          SELECT id, reg_key, name, statute, cfr, summary, effective_date, item_id, category, topic
+          FROM regulations 
+          WHERE (reg_key = $1 OR item_id = $2) AND is_current = true
+          LIMIT 1
+        `, [regKey, regulationSlug]);
+        
+        if (regResult.rows.length === 0) {
+          return res.status(404).json({ success: false, error: 'Regulation not found' });
+        }
+        
+        const regulation = regResult.rows[0];
+        
+        // Fetch tasks from database
+        const tasksResult = await this.pool.query(`
+          SELECT task_id, title, description, priority, requirement_type, sort_order
+          FROM regulation_tasks 
+          WHERE regulation_id = $1
+          ORDER BY sort_order
+        `, [regulation.id]);
+        
+        // Fetch deadlines from database
+        const deadlinesResult = await this.pool.query(`
+          SELECT deadline_id, name, description, frequency, recurring_month, recurring_day
+          FROM regulation_deadlines 
+          WHERE regulation_id = $1
+        `, [regulation.id]);
+        
+        // Format compliance tasks for EdSteward
+        const complianceTasks = tasksResult.rows.map((task, index) => ({
+          taskId: task.task_id || `task-${regulation.reg_key}-${index}`,
+          title: task.title,
+          description: task.description || task.title,
+          priority: task.priority || 'medium',
+          requirementType: task.requirement_type || 'requirement'
+        }));
+        
+        // Build payload with real data
+        const payload = {
+          regulationId: regulation.id,
+          mcpRegKey: regulation.reg_key,
+          name: regulation.name,
+          statute: regulation.statute,
+          cfr: regulation.cfr,
+          category: regulation.category,
+          topic: regulation.topic,
+          summary: regulation.summary,
+          effectiveDate: regulation.effective_date,
+          complianceTasks,
+          deadlines: deadlinesResult.rows.map(d => ({
+            name: d.name,
+            description: d.description,
+            frequency: d.frequency,
+            recurringMonth: d.recurring_month,
+            recurringDay: d.recurring_day
+          })),
+          taskStats: {
+            total: tasksResult.rows.length,
+            requirements: tasksResult.rows.filter(t => t.requirement_type === 'requirement').length,
+            bestPractices: tasksResult.rows.filter(t => t.requirement_type === 'best_practice').length
+          },
+          status: 'pending',
+          metadata: {
+            source: 'MCP_ENGINE_GOLD_CERTIFIED',
+            timestamp: new Date().toISOString(),
+            mcpEngineId: regulationSlug,
+            syncType: 'gold-certified-push'
+          }
+        };
+        
+        console.log(`📋 Sending ${regulation.reg_key}: ${complianceTasks.length} tasks (${payload.taskStats.requirements} req, ${payload.taskStats.bestPractices} best)`);
+        
+        // Use local EdSteward for dev, production URL for prod
+        const edstewardUrl = process.env.EDSTEWARD_URL || 'http://localhost:3000';
+        const syncUrl = `${edstewardUrl}/api/mcp/regulations/sync`;
+        console.log(`📡 POST to: ${syncUrl}`);
+        console.log(`📡 Payload keys: ${Object.keys(payload).join(', ')}`);
+        console.log(`📡 Payload size: ${JSON.stringify(payload).length} bytes`);
+        const response = await fetch(syncUrl, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Basic ' + Buffer.from('dvdbrnds:gabadh').toString('base64')
+            'Authorization': 'Basic ' + Buffer.from('dvdbrnds:gabadh').toString('base64'),
+            'X-MCP-Source': 'mcp-engine',
+            'X-Sync-Type': 'gold-certified'
           },
           body: JSON.stringify(payload)
         });
         
-        const result = await response.json();
+        console.log(`📡 Response status: ${response.status} ${response.statusText}`);
+        const responseText = await response.text();
+        let result;
+        try {
+          result = JSON.parse(responseText);
+        } catch (e) {
+          console.log(`📡 Response body (not JSON): ${responseText.substring(0, 200)}`);
+          throw new Error(`EdSteward returned non-JSON: ${responseText.substring(0, 100)}`);
+        }
         
         if (response.ok) {
-          console.log('✅ [DEMO] Successfully sent to EdSteward');
-          res.json({ success: true, edstewardId: edstewardId || 9, result });
+          console.log(`✅ Successfully sent ${regulation.reg_key} to EdSteward (${complianceTasks.length} tasks)`);
+          res.json({ 
+            success: true, 
+            regKey: regulation.reg_key,
+            tasksCount: complianceTasks.length,
+            taskStats: payload.taskStats,
+            result 
+          });
         } else {
-          console.log('❌ [DEMO] EdSteward error:', result);
+          console.log('❌ EdSteward error:', result);
           res.status(response.status).json({ success: false, error: result });
         }
       } catch (error) {
-        console.error('❌ [DEMO] Error sending to EdSteward:', error.message);
+        console.error('❌ Error sending to EdSteward:', error.message);
         res.status(500).json({ success: false, error: error.message });
       }
     });
