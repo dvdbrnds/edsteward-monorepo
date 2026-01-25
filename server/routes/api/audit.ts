@@ -184,6 +184,7 @@ router.get('/summary', requireAuth, requirePermission('canViewSystemLogs'), asyn
 
 /**
  * GET /api/audit/regulation/:regulationId - Get all audit logs for a specific regulation
+ * Combines audit_logs table with task_activity for comprehensive history
  * Requires admin or compliance officer permissions
  */
 router.get('/regulation/:regulationId', requireAuth, requirePermission('canViewSystemLogs'), async (req, res) => {
@@ -197,30 +198,99 @@ router.get('/regulation/:regulationId', requireAuth, requirePermission('canViewS
       });
     }
 
-    const result = await AuditService.queryAuditLogs({
+    // Get audit logs from audit_logs table
+    const auditResult = await AuditService.queryAuditLogs({
       regulationId,
-      limit: 1000, // Higher limit for regulation-specific queries
+      limit: 1000,
       offset: 0
     });
 
+    // Also get task activity for tasks belonging to this regulation
+    // This gives us the real activity history (attestations, status changes, evidence uploads)
+    const taskActivityQuery = `
+      SELECT 
+        ta.id,
+        ta.task_id,
+        ta.user_id,
+        ta.activity_type,
+        ta.content,
+        ta.previous_value,
+        ta.new_value,
+        ta.created_at,
+        u.email as user_email,
+        u.username,
+        u."firstName",
+        u."lastName",
+        ct.title as task_title,
+        ct.regulation_id
+      FROM task_activity ta
+      LEFT JOIN users u ON ta.user_id = u.id
+      LEFT JOIN compliance_tasks ct ON ta.task_id = ct.id
+      WHERE ct.regulation_id = $1
+      ORDER BY ta.created_at DESC
+      LIMIT 500
+    `;
+    
+    const { Pool } = await import('pg');
+    const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+    const taskActivityResult = await pool.query(taskActivityQuery, [regulationId]);
+    await pool.end();
+
+    // Convert task_activity records to audit log format
+    const taskActivityLogs = taskActivityResult.rows.map((row: any) => ({
+      id: `ta_${row.id}`,
+      entityType: 'compliance_task',
+      entityId: row.task_id?.toString() || '',
+      action: mapActivityTypeToAction(row.activity_type),
+      userId: row.user_id,
+      userEmail: row.user_email,
+      userName: row.firstName && row.lastName 
+        ? `${row.firstName} ${row.lastName}` 
+        : row.username || row.user_email,
+      timestamp: row.created_at,
+      previousValues: row.previous_value ? { status: row.previous_value } : null,
+      newValues: row.new_value ? { status: row.new_value } : null,
+      changes: row.previous_value && row.new_value 
+        ? { status: { old: row.previous_value, new: row.new_value } } 
+        : null,
+      complianceImpact: row.activity_type === 'status_change' ? 'high' : 'medium',
+      riskLevel: row.activity_type === 'status_change' && row.new_value === 'completed' ? 'critical' : 'medium',
+      metadata: {
+        taskTitle: row.task_title,
+        content: row.content,
+        source: 'task_activity'
+      }
+    }));
+
+    // Combine both sources and sort by timestamp
+    const allLogs = [...auditResult.logs, ...taskActivityLogs]
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+
+    // Calculate summaries
+    const actionSummary: Record<string, number> = {};
+    const entitySummary: Record<string, number> = {};
+    
+    allLogs.forEach(log => {
+      actionSummary[log.action] = (actionSummary[log.action] || 0) + 1;
+      entitySummary[log.entityType] = (entitySummary[log.entityType] || 0) + 1;
+    });
+
     syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
-      `Regulation audit logs requested for regulation ${regulationId} by user ${req.user?.id} - ${result.logs.length} entries`
+      `Regulation audit logs requested for regulation ${regulationId} by user ${req.user?.id} - ${allLogs.length} entries (${auditResult.logs.length} audit + ${taskActivityLogs.length} task activity)`
     );
 
     res.json({
       success: true,
-      data: result.logs,
+      data: allLogs,
       regulationId,
       meta: {
-        totalEntries: result.total,
-        actionSummary: result.logs.reduce((acc, log) => {
-          acc[log.action] = (acc[log.action] || 0) + 1;
-          return acc;
-        }, {} as Record<string, number>),
-        entitySummary: result.logs.reduce((acc, log) => {
-          acc[log.entityType] = (acc[log.entityType] || 0) + 1;
-          return acc;
-        }, {} as Record<string, number>)
+        totalEntries: allLogs.length,
+        actionSummary,
+        entitySummary,
+        sources: {
+          auditLogs: auditResult.logs.length,
+          taskActivity: taskActivityLogs.length
+        }
       }
     });
 
@@ -236,6 +306,24 @@ router.get('/regulation/:regulationId', requireAuth, requirePermission('canViewS
     });
   }
 });
+
+// Helper to map task activity types to audit actions
+function mapActivityTypeToAction(activityType: string): 'create' | 'update' | 'delete' | 'view' {
+  switch (activityType) {
+    case 'status_change':
+      return 'update';
+    case 'comment':
+      return 'create';
+    case 'evidence_uploaded':
+      return 'create';
+    case 'evidence_deleted':
+      return 'delete';
+    case 'assigned':
+      return 'update';
+    default:
+      return 'update';
+  }
+}
 
 /**
  * GET /api/audit/compliance-report - Generate compliance audit report

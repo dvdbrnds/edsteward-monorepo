@@ -23,19 +23,25 @@ import {
 } from 'lucide-react';
 
 interface AuditLog {
-  id: number;
+  id: number | string;
   entityType: string;
   entityId: string;
   action: 'create' | 'update' | 'delete' | 'view';
   userId: number | null;
   userEmail: string | null;
+  userName?: string | null;
   timestamp: string;
   previousValues: Record<string, any> | null;
   newValues: Record<string, any> | null;
   changes: Record<string, { old: any; new: any }> | null;
   complianceImpact: string | null;
   riskLevel: string | null;
-  metadata: Record<string, any> | null;
+  metadata: {
+    taskTitle?: string;
+    content?: string;
+    source?: string;
+    note?: string;
+  } | null;
 }
 
 interface AuditTrailPanelProps {
@@ -240,15 +246,22 @@ export function AuditTrailPanel({ regulationId }: AuditTrailPanelProps) {
                       ) : (
                         <span className="flex items-center gap-1">
                           <User className="h-3 w-3" />
-                          {log.userEmail || `User #${log.userId}`}
+                          {log.userName || log.userEmail || `User #${log.userId}`}
                         </span>
                       )}
                     </p>
 
-                    {/* Show entity ID if relevant */}
-                    {log.entityId && log.entityType !== 'regulation' && (
-                      <p className="text-xs text-slate-500 mt-1">
-                        ID: {log.entityId}
+                    {/* Show task title if this is task activity */}
+                    {log.metadata?.taskTitle && (
+                      <p className="text-sm font-medium text-slate-700 mt-2">
+                        Task: {log.metadata.taskTitle}
+                      </p>
+                    )}
+
+                    {/* Show content/description from task activity */}
+                    {log.metadata?.content && (
+                      <p className="text-sm text-slate-600 mt-1 bg-slate-50 p-2 rounded">
+                        {log.metadata.content}
                       </p>
                     )}
 
