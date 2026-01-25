@@ -14,8 +14,8 @@ import {
   regulations,
   users
 } from '../../../shared/schema';
-import { requireAuth, requireAdmin } from '../../middleware/auth';
-import { getDbForRequest } from '../../tenant-db';
+import { requireAuth, requireAdmin } from '../../middleware/role-based-auth';
+import { getDbForRequest } from '../../services/database';
 
 const router = Router();
 
