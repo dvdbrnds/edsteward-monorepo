@@ -170,6 +170,7 @@ import { EscalateIssueDialog } from "@/components/regulations/escalate-issue-dia
 import { SendAttestationDialog } from "@/components/regulations/send-attestation-dialog";
 import { ComplianceTasksPanel } from "@/components/regulations/compliance-tasks-panel";
 import { ExecutiveOrdersPanel } from "@/components/regulations/executive-orders-panel";
+import { AuditTrailPanel } from "@/components/regulations/audit-trail-panel";
 import { useAuth } from "@/hooks/use-auth";
 
 const CATEGORIES = [
@@ -212,6 +213,7 @@ function RegulationDetailPage() {
   const [deadlinesOpen, setDeadlinesOpen] = useState(false);
   const [evidenceNotesOpen, setEvidenceNotesOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
+  const [auditOpen, setAuditOpen] = useState(false);
   const [fullTextOpen, setFullTextOpen] = useState(false);
   
   const regulationId = location.split("/")[2];
@@ -1394,6 +1396,27 @@ function RegulationDetailPage() {
                   </div>
                 </CollapsibleContent>
               </Collapsible>
+
+              {/* AUDIT TRAIL - Admin only */}
+              {isAdmin && (
+                <Collapsible open={auditOpen} onOpenChange={setAuditOpen}>
+                  <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-lg border hover:bg-background transition-colors">
+                    <div className="flex items-center gap-3">
+                      <Shield className="h-5 w-5 text-amber-600" />
+                      <span className="font-semibold text-foreground">Audit Trail</span>
+                      <Badge variant="secondary" className="text-xs bg-amber-100 text-amber-700">
+                        Compliance Log
+                      </Badge>
+                    </div>
+                    {auditOpen ? <ChevronDown className="h-5 w-5 text-muted-foreground" /> : <ChevronRight className="h-5 w-5 text-muted-foreground" />}
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="bg-card rounded-b-lg border-x border-b px-4 pb-4">
+                    <div className="pt-4">
+                      <AuditTrailPanel regulationId={regulation.id} />
+                    </div>
+                  </CollapsibleContent>
+                </Collapsible>
+              )}
 
               {/* FULL REGULATION TEXT */}
               <Collapsible open={fullTextOpen} onOpenChange={setFullTextOpen}>
