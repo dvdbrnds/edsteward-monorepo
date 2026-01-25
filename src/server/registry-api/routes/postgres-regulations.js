@@ -1132,4 +1132,258 @@ router.get('/api/regulation-hashes', async (req, res) => {
   }
 });
 
+// ============================================================
+// EXECUTIVE ORDER ENDPOINTS
+// ============================================================
+
+/**
+ * GET /api/executive-orders - List all executive orders
+ * Query params: status, president, term, limit
+ */
+router.get('/api/executive-orders', async (req, res) => {
+  try {
+    const { status, president, term, limit = 100 } = req.query;
+    
+    let sql = `
+      SELECT eo.*, 
+             COUNT(eori.id) as regulation_impact_count,
+             array_agg(DISTINCT r.reg_key) FILTER (WHERE r.reg_key IS NOT NULL) as affected_reg_keys
+      FROM executive_orders eo
+      LEFT JOIN eo_regulation_impacts eori ON eo.id = eori.eo_id
+      LEFT JOIN regulations r ON eori.regulation_id = r.id
+      WHERE 1=1
+    `;
+    const params = [];
+    
+    if (status) {
+      params.push(status);
+      sql += ` AND eo.status = $${params.length}`;
+    }
+    if (president) {
+      params.push(`%${president}%`);
+      sql += ` AND eo.president ILIKE $${params.length}`;
+    }
+    if (term) {
+      params.push(term);
+      sql += ` AND eo.term = $${params.length}`;
+    }
+    
+    sql += ` GROUP BY eo.id ORDER BY eo.signed_date DESC LIMIT $${params.length + 1}`;
+    params.push(parseInt(limit));
+    
+    const result = await pool.query(sql, params);
+    
+    res.json({
+      count: result.rows.length,
+      executiveOrders: result.rows.map(eo => ({
+        id: eo.id,
+        eoNumber: eo.eo_number,
+        title: eo.title,
+        signedDate: eo.signed_date,
+        publishedDate: eo.published_date,
+        status: eo.status,
+        president: eo.president,
+        term: eo.term,
+        summary: eo.summary,
+        fullTextUrl: eo.full_text_url,
+        pdfUrl: eo.pdf_url,
+        topics: eo.topics,
+        regulationImpactCount: parseInt(eo.regulation_impact_count) || 0,
+        affectedRegKeys: eo.affected_reg_keys?.filter(Boolean) || [],
+        enjoinedDate: eo.enjoined_date,
+        enjoinedBy: eo.enjoined_by
+      }))
+    });
+  } catch (err) {
+    console.error('[REGISTRY] Error fetching executive orders:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * GET /api/executive-orders/:eoNumber - Get single EO with impacts
+ */
+router.get('/api/executive-orders/:eoNumber', async (req, res) => {
+  try {
+    const { eoNumber } = req.params;
+    
+    const eoResult = await pool.query(
+      'SELECT * FROM executive_orders WHERE eo_number = $1',
+      [eoNumber.startsWith('EO') ? eoNumber : `EO ${eoNumber}`]
+    );
+    
+    if (eoResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Executive order not found' });
+    }
+    
+    const eo = eoResult.rows[0];
+    
+    // Get regulation impacts
+    const impactsResult = await pool.query(`
+      SELECT eori.*, r.reg_key, r.name as regulation_name, r.category
+      FROM eo_regulation_impacts eori
+      JOIN regulations r ON eori.regulation_id = r.id
+      WHERE eori.eo_id = $1
+      ORDER BY eori.impact_severity DESC
+    `, [eo.id]);
+    
+    // Get status history
+    const historyResult = await pool.query(`
+      SELECT * FROM eo_status_history
+      WHERE eo_id = $1
+      ORDER BY change_date DESC
+    `, [eo.id]);
+    
+    res.json({
+      eoNumber: eo.eo_number,
+      title: eo.title,
+      signedDate: eo.signed_date,
+      publishedDate: eo.published_date,
+      status: eo.status,
+      president: eo.president,
+      term: eo.term,
+      summary: eo.summary,
+      fullTextUrl: eo.full_text_url,
+      pdfUrl: eo.pdf_url,
+      federalRegisterCitation: eo.federal_register_citation,
+      topics: eo.topics,
+      enjoinedDate: eo.enjoined_date,
+      enjoinedBy: eo.enjoined_by,
+      revokedDate: eo.revoked_date,
+      revokedBy: eo.revoked_by,
+      regulationImpacts: impactsResult.rows.map(i => ({
+        regulationId: i.regulation_id,
+        regKey: i.reg_key,
+        regulationName: i.regulation_name,
+        category: i.category,
+        impactType: i.impact_type,
+        impactSeverity: i.impact_severity,
+        impactSummary: i.impact_summary,
+        assessedBy: i.assessed_by,
+        assessmentDate: i.assessment_date,
+        confidenceScore: i.confidence_score
+      })),
+      statusHistory: historyResult.rows
+    });
+  } catch (err) {
+    console.error('[REGISTRY] Error fetching executive order:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * GET /api/regulations/:regKey/executive-orders - Get EOs affecting a regulation
+ */
+router.get('/api/regulations/:regKey/executive-orders', async (req, res) => {
+  try {
+    const { regKey } = req.params;
+    
+    const result = await pool.query(`
+      SELECT eo.*, eori.impact_type, eori.impact_severity, eori.impact_summary,
+             eori.confidence_score, eori.assessed_by
+      FROM executive_orders eo
+      JOIN eo_regulation_impacts eori ON eo.id = eori.eo_id
+      JOIN regulations r ON eori.regulation_id = r.id
+      WHERE r.reg_key = $1
+      ORDER BY eo.signed_date DESC
+    `, [regKey]);
+    
+    res.json({
+      regKey,
+      count: result.rows.length,
+      executiveOrders: result.rows.map(eo => ({
+        eoNumber: eo.eo_number,
+        title: eo.title,
+        signedDate: eo.signed_date,
+        status: eo.status,
+        president: eo.president,
+        term: eo.term,
+        impactType: eo.impact_type,
+        impactSeverity: eo.impact_severity,
+        impactSummary: eo.impact_summary,
+        fullTextUrl: eo.full_text_url,
+        aiSummarized: eo.assessed_by === 'MCP Engine AI',
+        confidenceScore: eo.confidence_score
+      }))
+    });
+  } catch (err) {
+    console.error('[REGISTRY] Error fetching EOs for regulation:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+/**
+ * POST /api/regulations/:regKey/executive-orders/summarize - Generate AI summaries for EO impacts
+ */
+router.post('/api/regulations/:regKey/executive-orders/summarize', async (req, res) => {
+  try {
+    const { regKey } = req.params;
+    
+    // Get regulation ID
+    const regResult = await pool.query(
+      'SELECT id, name FROM regulations WHERE reg_key = $1 AND is_current = true',
+      [regKey]
+    );
+    
+    if (regResult.rows.length === 0) {
+      return res.status(404).json({ error: 'Regulation not found' });
+    }
+    
+    const regulation = regResult.rows[0];
+    
+    // Get EO impacts that need summarization
+    const impactsResult = await pool.query(`
+      SELECT eori.eo_id, eori.regulation_id, eo.eo_number, eo.title
+      FROM eo_regulation_impacts eori
+      JOIN executive_orders eo ON eo.id = eori.eo_id
+      WHERE eori.regulation_id = $1
+        AND (eori.impact_summary IS NULL 
+             OR eori.impact_summary LIKE 'Auto-detected%'
+             OR eori.assessed_by != 'MCP Engine AI')
+    `, [regulation.id]);
+    
+    if (impactsResult.rows.length === 0) {
+      return res.json({
+        message: 'All EO impacts already have AI summaries',
+        regulation: regulation.name,
+        summarized: 0
+      });
+    }
+    
+    // Dynamically import the summarizer to avoid circular dependencies
+    const { EOImpactSummarizer } = await import('../../../regulatory-sources/eo-impact-summarizer.js');
+    const summarizer = new EOImpactSummarizer({ pool });
+    
+    const results = [];
+    for (const impact of impactsResult.rows) {
+      try {
+        const summary = await summarizer.summarizeImpact(impact.eo_id, impact.regulation_id);
+        results.push({
+          eoNumber: impact.eo_number,
+          status: 'success',
+          summary: summary.substring(0, 200) + '...'
+        });
+      } catch (err) {
+        results.push({
+          eoNumber: impact.eo_number,
+          status: 'error',
+          error: err.message
+        });
+      }
+    }
+    
+    res.json({
+      regulation: regulation.name,
+      regKey,
+      summarized: results.filter(r => r.status === 'success').length,
+      errors: results.filter(r => r.status === 'error').length,
+      results
+    });
+    
+  } catch (err) {
+    console.error('[REGISTRY] Error generating EO summaries:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
 export default router;
