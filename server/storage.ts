@@ -525,6 +525,151 @@ export class DatabaseStorage implements IStorage {
         console.log(`   👤 Auto-assigned ${autoAssignedCount} tasks based on role mappings`);
       }
 
+      // 3.6. Apply Executive Orders if present in metadata (MCP Engine sync Jan 2026)
+      const metadata = (update as any).metadata;
+      const executiveOrders = metadata?.executiveOrders;
+      if (executiveOrders && Array.isArray(executiveOrders) && executiveOrders.length > 0) {
+        console.log(`⚖️ Processing ${executiveOrders.length} Executive Orders...`);
+        
+        for (const eo of executiveOrders) {
+          // 1. Insert or update the Executive Order
+          const existingEO = await pool.query(
+            'SELECT id FROM executive_orders WHERE eo_number = $1',
+            [eo.eoNumber]
+          );
+          
+          let eoId: number;
+          if (existingEO.rows.length > 0) {
+            // Update existing EO
+            eoId = existingEO.rows[0].id;
+            await pool.query(
+              `UPDATE executive_orders SET
+                title = $1, status = $2, president = $3, term = $4,
+                full_text_url = $5, updated_at = $6
+              WHERE id = $7`,
+              [
+                eo.title,
+                eo.status || 'active',
+                eo.president || null,
+                eo.term || null,
+                eo.fullTextUrl || null,
+                new Date(),
+                eoId
+              ]
+            );
+          } else {
+            // Insert new EO
+            const newEO = await pool.query(
+              `INSERT INTO executive_orders (
+                eo_number, title, signed_date, status, president, term, full_text_url
+              ) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
+              [
+                eo.eoNumber,
+                eo.title,
+                eo.signedDate,
+                eo.status || 'active',
+                eo.president || null,
+                eo.term || null,
+                eo.fullTextUrl || null
+              ]
+            );
+            eoId = newEO.rows[0].id;
+            console.log(`   📜 Created new EO: ${eo.eoNumber}`);
+          }
+          
+          // 2. Create or update the EO-Regulation impact
+          const existingImpact = await pool.query(
+            'SELECT id FROM eo_regulation_impacts WHERE eo_id = $1 AND regulation_id = $2',
+            [eoId, update.regulationId]
+          );
+          
+          let impactId: number;
+          if (existingImpact.rows.length > 0) {
+            impactId = existingImpact.rows[0].id;
+            await pool.query(
+              `UPDATE eo_regulation_impacts SET
+                impact_type = $1, impact_severity = $2, impact_summary = $3,
+                assessed_by = $4, confidence_score = $5, updated_at = $6
+              WHERE id = $7`,
+              [
+                eo.impactType,
+                eo.impactSeverity,
+                eo.impactSummary || null,
+                'MCP Engine AI',
+                eo.confidenceScore?.toString() || null,
+                new Date(),
+                impactId
+              ]
+            );
+          } else {
+            const newImpact = await pool.query(
+              `INSERT INTO eo_regulation_impacts (
+                eo_id, regulation_id, impact_type, impact_severity, impact_summary,
+                assessed_by, assessment_date, confidence_score, review_status
+              ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
+              [
+                eoId,
+                update.regulationId,
+                eo.impactType,
+                eo.impactSeverity,
+                eo.impactSummary || null,
+                'MCP Engine AI',
+                new Date().toISOString().split('T')[0],
+                eo.confidenceScore?.toString() || null,
+                'pending'
+              ]
+            );
+            impactId = newImpact.rows[0].id;
+          }
+          
+          // 3. Auto-create a best practice task for this EO impact
+          const taskTitle = `Review: ${eo.eoNumber} - ${eo.title}`;
+          const existingTask = await pool.query(
+            `SELECT id FROM compliance_tasks 
+             WHERE regulation_id = $1 AND title = $2`,
+            [update.regulationId, taskTitle]
+          );
+          
+          if (existingTask.rows.length === 0) {
+            const priorityMap: Record<string, string> = {
+              'critical': 'critical',
+              'high': 'high',
+              'medium': 'medium',
+              'low': 'low'
+            };
+            
+            const newTask = await pool.query(
+              `INSERT INTO compliance_tasks (
+                regulation_id, title, description, instructions,
+                priority, requirement_type, status, assigned_role
+              ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id`,
+              [
+                update.regulationId,
+                taskTitle,
+                eo.impactSummary || `Executive Order ${eo.eoNumber} may affect this regulation.`,
+                `Review the impact of ${eo.eoNumber} "${eo.title}" on your compliance policies. ` +
+                `Impact: ${eo.impactType} (${eo.impactSeverity} severity). ` +
+                `Federal Register: ${eo.fullTextUrl || 'N/A'}`,
+                priorityMap[eo.impactSeverity] || 'medium',
+                'best_practice', // EO reviews are best practices
+                'pending',
+                'Chief Compliance Officer' // Default to CCO
+              ]
+            );
+            
+            // Link the task to the impact
+            await pool.query(
+              'UPDATE eo_regulation_impacts SET generated_task_id = $1 WHERE id = $2',
+              [newTask.rows[0].id, impactId]
+            );
+            
+            console.log(`   ✅ Created review task for ${eo.eoNumber} (${eo.impactSeverity})`);
+          }
+        }
+        
+        console.log(`   ⚖️ Processed ${executiveOrders.length} Executive Orders`);
+      }
+
       // 4. Mark the update as accepted
       await this.db.update(regulationUpdates)
         .set({

@@ -28,6 +28,7 @@ import {
   Send,
   AlertCircle,
   User as UserIcon,
+  UserPlus,
   Calendar,
   Loader2,
   Plus,
@@ -63,6 +64,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 import { TaskDetailDialog } from './task-detail-dialog';
@@ -177,6 +183,14 @@ const evidenceIcons: Record<string, React.ReactNode> = {
   form: <FileText className="h-3 w-3" />,
 };
 
+interface AssignableUser {
+  id: number;
+  username: string;
+  email: string;
+  firstName: string | null;
+  lastName: string | null;
+}
+
 function TaskItem({ 
   task, 
   isAdmin, 
@@ -186,6 +200,9 @@ function TaskItem({
   onTaskClick,
   onAddEvidence,
   onDeleteEvidence,
+  onAssign,
+  availableUsers,
+  isAssigning,
   depth = 0,
   selectedTaskIds = [],
   onToggleSelect,
@@ -198,11 +215,15 @@ function TaskItem({
   onTaskClick: (_task: ComplianceTask) => void;
   onAddEvidence: (_task: ComplianceTask) => void;
   onDeleteEvidence: (_taskId: number, _evidenceId: number, _fileName: string) => void;
+  onAssign?: (_taskId: number, _userId: number | null) => void;
+  availableUsers?: AssignableUser[];
+  isAssigning?: boolean;
   depth?: number;
   selectedTaskIds?: number[];
   onToggleSelect?: (_taskId: number) => void;
 }) {
   const [expanded, setExpanded] = useState(depth === 0);
+  const [assignPopoverOpen, setAssignPopoverOpen] = useState(false);
   const hasSubTasks = task.subTasks && task.subTasks.length > 0;
   const isOverdue = task.dueDate && new Date(task.dueDate) < new Date() && task.status !== 'completed';
 
@@ -309,10 +330,66 @@ function TaskItem({
 
           {/* Meta info */}
           <div className="flex flex-wrap items-center gap-3 mt-2 text-xs text-muted-foreground">
-            {/* Assignee */}
+            {/* Assignee with inline assign */}
             <div className="flex items-center gap-1">
               <UserIcon className="h-3 w-3" />
-              <span>{assigneeName}</span>
+              <span className={cn(!task.assignedUser && task.assignedRole && "text-amber-600")}>
+                {assigneeName}
+              </span>
+              {isAdmin && onAssign && (
+                <Popover open={assignPopoverOpen} onOpenChange={setAssignPopoverOpen}>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="h-5 px-1.5 ml-1 text-xs text-primary border-primary/30 hover:bg-primary/10"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <UserPlus className="h-3 w-3 mr-0.5" />
+                      Assign
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-56 p-2" align="start" onClick={(e) => e.stopPropagation()}>
+                    <div className="space-y-1">
+                      <div className="text-xs font-medium text-muted-foreground px-2 py-1">
+                        Assign to:
+                      </div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="w-full justify-start text-xs h-8"
+                        disabled={isAssigning}
+                        onClick={() => {
+                          onAssign(task.id, null);
+                          setAssignPopoverOpen(false);
+                        }}
+                      >
+                        <span className="text-muted-foreground italic">Unassign</span>
+                      </Button>
+                      {availableUsers?.map((user) => (
+                        <Button
+                          key={user.id}
+                          variant="ghost"
+                          size="sm"
+                          className={cn(
+                            "w-full justify-start text-xs h-8",
+                            task.assignedTo === user.id && "bg-primary/10"
+                          )}
+                          disabled={isAssigning}
+                          onClick={() => {
+                            onAssign(task.id, user.id);
+                            setAssignPopoverOpen(false);
+                          }}
+                        >
+                          {user.firstName && user.lastName
+                            ? `${user.firstName} ${user.lastName}`
+                            : user.username}
+                        </Button>
+                      ))}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              )}
             </div>
 
             {/* Due Date */}
@@ -623,6 +700,9 @@ function TaskItem({
               onTaskClick={onTaskClick}
               onAddEvidence={onAddEvidence}
               onDeleteEvidence={onDeleteEvidence}
+              onAssign={onAssign}
+              availableUsers={availableUsers}
+              isAssigning={isAssigning}
               depth={depth + 1}
               selectedTaskIds={selectedTaskIds}
               onToggleSelect={onToggleSelect}
@@ -676,6 +756,42 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
       return response.json();
     },
   });
+
+  // Fetch users for assignment
+  const { data: availableUsers } = useQuery<AssignableUser[]>({
+    queryKey: ['users-for-assignment'],
+    queryFn: async () => {
+      const res = await fetch('/api/users', { credentials: 'include' });
+      if (!res.ok) throw new Error('Failed to fetch users');
+      return res.json();
+    },
+    enabled: !!isAdmin,
+  });
+
+  // Assign task mutation
+  const assignTaskMutation = useMutation({
+    mutationFn: async ({ taskId, userId }: { taskId: number; userId: number | null }) => {
+      const response = await fetch(`/api/compliance-tasks/${taskId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ assignedTo: userId }),
+      });
+      if (!response.ok) throw new Error('Failed to assign task');
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['compliance-tasks', regulationId] });
+      toast({ title: 'Task assigned' });
+    },
+    onError: () => {
+      toast({ title: 'Failed to assign task', variant: 'destructive' });
+    },
+  });
+
+  const handleAssignTask = (taskId: number, userId: number | null) => {
+    assignTaskMutation.mutate({ taskId, userId });
+  };
 
   // Update task status
   const updateStatusMutation = useMutation({
@@ -1046,6 +1162,9 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
                 onTaskClick={setSelectedTask}
                 onAddEvidence={setEvidenceTask}
                 onDeleteEvidence={handleDeleteEvidence}
+                onAssign={handleAssignTask}
+                availableUsers={availableUsers}
+                isAssigning={assignTaskMutation.isPending}
                 selectedTaskIds={selectedTaskIds}
                 onToggleSelect={(taskId) => {
                   setSelectedTaskIds(prev => 

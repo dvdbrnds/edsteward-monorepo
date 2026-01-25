@@ -273,6 +273,21 @@ const mcpEngineUpdateSchema = z.object({
     evidenceType: z.string().optional(),
   })).optional(),
   
+  // Executive Orders affecting this regulation (MCP Engine sync Jan 2026)
+  executiveOrders: z.array(z.object({
+    eoNumber: z.string(),                         // e.g., "EO 14322"
+    title: z.string(),
+    signedDate: z.string(),                       // ISO date
+    status: z.enum(['active', 'enjoined', 'revoked', 'superseded']).optional(),
+    president: z.string().optional(),
+    term: z.string().optional(),                  // e.g., "Trump-2"
+    impactType: z.enum(['modifies', 'reinforces', 'conflicts', 'supersedes']),
+    impactSeverity: z.enum(['critical', 'high', 'medium', 'low']),
+    impactSummary: z.string().optional(),
+    fullTextUrl: z.string().optional(),
+    confidenceScore: z.number().optional(),
+  })).optional(),
+  
   // Filing deadlines (multiple formats supported)
   filingDeadlines: z.any().optional(),
   filing_deadlines: z.any().optional(),
@@ -622,6 +637,18 @@ export function setupRegulationUpdatesApi(app: Express) {
               console.log(`📋 Received ${complianceTasks.length} compliance tasks for approval workflow`);
             }
             
+            // Get executive orders from payload (MCP Engine Jan 2026)
+            const executiveOrders = mcpData.executiveOrders || null;
+            
+            // Log EO count for debugging
+            if (executiveOrders && executiveOrders.length > 0) {
+              console.log(`⚖️ Received ${executiveOrders.length} Executive Orders affecting this regulation`);
+              const critical = executiveOrders.filter((e: any) => e.impactSeverity === 'critical').length;
+              if (critical > 0) {
+                console.log(`   🔴 ${critical} CRITICAL impact(s) require immediate review`);
+              }
+            }
+            
             // Convert MCP Engine format to EdSteward format
             updateData = {
               regulationId: validRegulationId,
@@ -640,7 +667,11 @@ export function setupRegulationUpdatesApi(app: Express) {
                 processing_metadata: mcpData.processing_metadata,
                 source_attribution: mcpData.source_attribution,
                 submission_guidelines: mcpData.submission_guidelines,
-                enhanced_summary: mcpData.summary
+                enhanced_summary: mcpData.summary,
+                // Executive Orders - will be processed on approval
+                executiveOrders: executiveOrders,
+                eo_count: executiveOrders?.length || 0,
+                eo_critical_count: executiveOrders?.filter((e: any) => e.impactSeverity === 'critical').length || 0,
               }
             };
             

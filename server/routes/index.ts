@@ -36,6 +36,7 @@ import complianceTasksRouter from './api/compliance-tasks';
 import roleAssignmentsRouter from './api/role-assignments';
 import dashboardAnalyticsRouter from './api/dashboard-analytics';
 import reportsRouter from './api/reports';
+import executiveOrdersRouter from './api/executive-orders';
 // @ts-ignore
 import migrationRoutes from './database-migration.js';
 
@@ -378,6 +379,7 @@ export function registerRoutes(app: express.Application): Server {
   app.use('/api/role-assignments', roleAssignmentsRouter); // Role-to-person mapping for auto-assignment
   app.use('/api/dashboard-analytics', dashboardAnalyticsRouter); // Executive dashboard analytics
   app.use('/api/reports', reportsRouter); // Compliance reports and exports
+  app.use('/api/executive-orders', executiveOrdersRouter); // Executive Order tracking (MCP Engine Jan 2026)
 
   // Note: AWS Tenant Management was removed - belongs in separate admin-console app at admin.edsteward.ai
   

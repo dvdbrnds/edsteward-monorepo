@@ -33,6 +33,7 @@ import AttestationPage from "@/pages/attestation-page";
 import TaskPage from "@/pages/task-page";
 import TaskAnalyticsPage from "@/pages/task-analytics-page";
 import ExecutiveDashboardPage from "@/pages/executive-dashboard-page";
+import ExecutiveOrdersPage from "@/pages/executive-orders-page";
 import { ProtectedRoute } from "./lib/protected-route";
 import { ProtectedRegulationRoute } from "./lib/protected-regulation-route";
 import { ErrorBoundary } from "@/components/ui/error-boundary";
@@ -112,6 +113,7 @@ function AppContent() {
               
               <ProtectedRoute path="/admin/logs" component={LogsPage} />
               <ProtectedRoute path="/admin/debug" component={DebugToolsPage} />
+              <ProtectedRoute path="/executive-orders" component={ExecutiveOrdersPage} />
               <ProtectedRoute path="/audit-trail" component={AuditTrailPage} />
               <ProtectedRoute path="/admin/regulations" component={RegulationViewer} />
               <Route path="/utilities" component={UtilitiesIndexPage} />

@@ -169,6 +169,7 @@ import { NotificationOverrideControl } from "@/components/regulations/notificati
 import { EscalateIssueDialog } from "@/components/regulations/escalate-issue-dialog";
 import { SendAttestationDialog } from "@/components/regulations/send-attestation-dialog";
 import { ComplianceTasksPanel } from "@/components/regulations/compliance-tasks-panel";
+import { ExecutiveOrdersPanel } from "@/components/regulations/executive-orders-panel";
 import { useAuth } from "@/hooks/use-auth";
 
 const CATEGORIES = [
@@ -1224,6 +1225,12 @@ function RegulationDetailPage() {
                   />
                 </CollapsibleContent>
               </Collapsible>
+
+              {/* EXECUTIVE ORDERS (MCP Engine Jan 2026) */}
+              <ExecutiveOrdersPanel
+                regulationId={regulation.id}
+                isAdmin={isRegulationAdmin}
+              />
 
               {/* REQUIREMENTS */}
               <Collapsible open={requirementsOpen} onOpenChange={setRequirementsOpen}>

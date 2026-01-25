@@ -107,6 +107,7 @@ export default function Navigation() {
         //   : []
         // ),
         { href: "/admin/settings", label: "System Settings", icon: Settings },
+        { href: "/executive-orders", label: "Executive Orders", icon: FileText },
         { href: "/audit-trail", label: "Audit Trail", icon: Shield },
         // AWS Tenant Management - DISABLED
         // ...(currentTenant === 'admin' 

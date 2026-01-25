@@ -34,6 +34,7 @@ import {
   Paperclip,
   File,
   X,
+  UserPlus,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -53,6 +54,13 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { toast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
@@ -201,6 +209,41 @@ export function TaskDetailDialog({
   const [comment, setComment] = useState('');
   const [isDragOver, setIsDragOver] = useState(false);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
+  const [showAssignSelect, setShowAssignSelect] = useState(false);
+
+  // Fetch users for assignment
+  const { data: availableUsers } = useQuery<User[]>({
+    queryKey: ['users-for-assignment'],
+    queryFn: async () => {
+      const res = await fetch('/api/users', { credentials: 'include' });
+      if (!res.ok) throw new Error('Failed to fetch users');
+      return res.json();
+    },
+    enabled: !!isAdmin && open,
+  });
+
+  // Assign DRI mutation
+  const assignDriMutation = useMutation({
+    mutationFn: async (userId: number | null) => {
+      const res = await fetch(`/api/compliance-tasks/${task?.id}`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ assignedTo: userId }),
+      });
+      if (!res.ok) throw new Error('Failed to assign task');
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['compliance-tasks', regulationId] });
+      queryClient.invalidateQueries({ queryKey: ['task-activity', task?.id] });
+      toast({ title: 'Task assigned successfully' });
+      setShowAssignSelect(false);
+    },
+    onError: () => {
+      toast({ title: 'Failed to assign task', variant: 'destructive' });
+    },
+  });
 
   // Fetch evidence for task
   const { data: evidence, isLoading: evidenceLoading } = useQuery<TaskEvidence[]>({
@@ -447,19 +490,77 @@ export function TaskDetailDialog({
             <div className="grid grid-cols-2 gap-4">
               {/* Assigned To */}
               <div className="p-3 bg-background rounded-lg">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-                  <UserIcon className="h-4 w-4" />
-                  Assigned To
+                <div className="flex items-center justify-between text-sm text-muted-foreground mb-1">
+                  <div className="flex items-center gap-2">
+                    <UserIcon className="h-4 w-4" />
+                    Assigned To
+                  </div>
+                  {isAdmin && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-6 px-2 text-xs"
+                      onClick={() => setShowAssignSelect(!showAssignSelect)}
+                    >
+                      <UserPlus className="h-3 w-3 mr-1" />
+                      {task.assignedUser ? 'Change' : 'Assign'}
+                    </Button>
+                  )}
                 </div>
-                <div className="font-medium">
-                  {task.assignedUser 
-                    ? (task.assignedUser.firstName && task.assignedUser.lastName
-                        ? `${task.assignedUser.firstName} ${task.assignedUser.lastName}`
-                        : task.assignedUser.username)
-                    : task.assignedRole || 'Unassigned'}
-                </div>
-                {task.assignedUser?.email && (
-                  <div className="text-xs text-muted-foreground">{task.assignedUser.email}</div>
+                
+                {showAssignSelect && isAdmin ? (
+                  <div className="space-y-2">
+                    <Select
+                      value={task.assignedTo?.toString() || 'unassigned'}
+                      onValueChange={(value) => {
+                        const userId = value === 'unassigned' ? null : parseInt(value);
+                        assignDriMutation.mutate(userId);
+                      }}
+                      disabled={assignDriMutation.isPending}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select a person..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="unassigned">
+                          <span className="text-muted-foreground italic">Unassigned</span>
+                        </SelectItem>
+                        {availableUsers?.map((user) => (
+                          <SelectItem key={user.id} value={user.id.toString()}>
+                            {user.firstName && user.lastName
+                              ? `${user.firstName} ${user.lastName}`
+                              : user.username}
+                            {user.email && (
+                              <span className="text-muted-foreground ml-2">({user.email})</span>
+                            )}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    {task.assignedRole && (
+                      <div className="text-xs text-muted-foreground">
+                        Suggested role: <span className="font-medium">{task.assignedRole}</span>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <>
+                    <div className="font-medium">
+                      {task.assignedUser 
+                        ? (task.assignedUser.firstName && task.assignedUser.lastName
+                            ? `${task.assignedUser.firstName} ${task.assignedUser.lastName}`
+                            : task.assignedUser.username)
+                        : task.assignedRole || 'Unassigned'}
+                    </div>
+                    {task.assignedUser?.email && (
+                      <div className="text-xs text-muted-foreground">{task.assignedUser.email}</div>
+                    )}
+                    {!task.assignedUser && task.assignedRole && (
+                      <div className="text-xs text-amber-600 mt-1">
+                        Click "Assign" to assign a person
+                      </div>
+                    )}
+                  </>
                 )}
               </div>
 

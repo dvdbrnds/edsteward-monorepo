@@ -1335,6 +1335,123 @@ export const insertTaskActivitySchema = createInsertSchema(taskActivity);
 export type TaskActivity = typeof taskActivity.$inferSelect;
 export type InsertTaskActivity = z.infer<typeof insertTaskActivitySchema>;
 
+// ===== EXECUTIVE ORDERS (MCP Engine Integration - Jan 2026) =====
+// Tracks Presidential Executive Orders and their impact on regulations
+
+// EO Status values
+export const EO_STATUS = ['active', 'enjoined', 'revoked', 'superseded'] as const;
+export type EOStatus = typeof EO_STATUS[number];
+
+// Impact types
+export const EO_IMPACT_TYPES = ['modifies', 'reinforces', 'conflicts', 'supersedes'] as const;
+export type EOImpactType = typeof EO_IMPACT_TYPES[number];
+
+// Impact severities
+export const EO_IMPACT_SEVERITIES = ['critical', 'high', 'medium', 'low'] as const;
+export type EOImpactSeverity = typeof EO_IMPACT_SEVERITIES[number];
+
+// Review status for CCO workflow
+export const EO_REVIEW_STATUS = ['pending', 'reviewed', 'addressed', 'dismissed'] as const;
+export type EOReviewStatus = typeof EO_REVIEW_STATUS[number];
+
+// Executive Orders table
+export const executiveOrders = pgTable("executive_orders", {
+  id: serial("id").primaryKey(),
+  eoNumber: text("eo_number").notNull().unique(),        // e.g., "EO 14322"
+  title: text("title").notNull(),
+  signedDate: date("signed_date").notNull(),
+  publishedDate: date("published_date"),
+  status: text("status").notNull().default('active'),    // active, enjoined, revoked, superseded
+  president: text("president"),                          // e.g., "Donald Trump"
+  term: text("term"),                                    // e.g., "Trump-2", "Biden-1"
+  summary: text("summary"),                              // Federal Register abstract
+  fullTextUrl: text("full_text_url"),                   // Link to Federal Register
+  pdfUrl: text("pdf_url"),
+  federalRegisterCitation: text("federal_register_citation"), // e.g., "90 FR 12345"
+  topics: text("topics").array(),                        // Array of keywords
+  // Court actions
+  enjoinedDate: date("enjoined_date"),
+  enjoinedBy: text("enjoined_by"),                      // Court that issued injunction
+  revokedDate: date("revoked_date"),
+  revokedBy: text("revoked_by"),                        // EO number that revoked this
+  // Timestamps
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => {
+  return {
+    statusIdx: index("eo_status_idx").on(table.status),
+    signedDateIdx: index("eo_signed_date_idx").on(table.signedDate),
+    presidentIdx: index("eo_president_idx").on(table.president),
+  };
+});
+
+export const insertExecutiveOrderSchema = createInsertSchema(executiveOrders);
+export type ExecutiveOrder = typeof executiveOrders.$inferSelect;
+export type InsertExecutiveOrder = z.infer<typeof insertExecutiveOrderSchema>;
+
+// EO Regulation Impacts table
+export const eoRegulationImpacts = pgTable("eo_regulation_impacts", {
+  id: serial("id").primaryKey(),
+  eoId: integer("eo_id").notNull().references(() => executiveOrders.id, { onDelete: 'cascade' }),
+  regulationId: integer("regulation_id").notNull().references(() => regulations.id, { onDelete: 'cascade' }),
+  
+  // Impact classification
+  impactType: text("impact_type").notNull(),             // modifies, reinforces, conflicts, supersedes
+  impactSeverity: text("impact_severity").notNull(),     // critical, high, medium, low
+  impactSummary: text("impact_summary"),                 // AI-generated analysis
+  
+  // Assessment metadata
+  assessedBy: text("assessed_by"),                       // "MCP Engine AI" or "Manual Review"
+  assessmentDate: date("assessment_date"),
+  confidenceScore: text("confidence_score"),             // 0.00-1.00 as text for simplicity
+  
+  // Review tracking (for CCO workflow)
+  reviewedAt: timestamp("reviewed_at"),
+  reviewedBy: integer("reviewed_by").references(() => users.id),
+  reviewNotes: text("review_notes"),
+  reviewStatus: text("review_status").default('pending'), // pending, reviewed, addressed, dismissed
+  
+  // Auto-generated task reference
+  generatedTaskId: integer("generated_task_id").references(() => complianceTasks.id),
+  
+  // Timestamps
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+}, (table) => {
+  return {
+    regulationIdx: index("eori_regulation_idx").on(table.regulationId),
+    severityIdx: index("eori_severity_idx").on(table.impactSeverity),
+    reviewStatusIdx: index("eori_review_status_idx").on(table.reviewStatus),
+    uniqueEoReg: index("eori_unique_idx").on(table.eoId, table.regulationId),
+  };
+});
+
+export const insertEORegulationImpactSchema = createInsertSchema(eoRegulationImpacts);
+export type EORegulationImpact = typeof eoRegulationImpacts.$inferSelect;
+export type InsertEORegulationImpact = z.infer<typeof insertEORegulationImpactSchema>;
+
+// EO Status History table
+export const eoStatusHistory = pgTable("eo_status_history", {
+  id: serial("id").primaryKey(),
+  eoId: integer("eo_id").notNull().references(() => executiveOrders.id, { onDelete: 'cascade' }),
+  previousStatus: text("previous_status"),
+  newStatus: text("new_status").notNull(),
+  changeDate: date("change_date").notNull(),
+  changeReason: text("change_reason"),                   // e.g., "Enjoined by 5th Circuit Court"
+  sourceUrl: text("source_url"),
+  createdBy: integer("created_by").references(() => users.id),
+  createdAt: timestamp("created_at").defaultNow(),
+}, (table) => {
+  return {
+    eoIdx: index("eo_history_eo_idx").on(table.eoId),
+    dateIdx: index("eo_history_date_idx").on(table.changeDate),
+  };
+});
+
+export const insertEOStatusHistorySchema = createInsertSchema(eoStatusHistory);
+export type EOStatusHistory = typeof eoStatusHistory.$inferSelect;
+export type InsertEOStatusHistory = z.infer<typeof insertEOStatusHistorySchema>;
+
 // ===== SINGLE-TENANT ARCHITECTURE =====
 // Single-tenant configuration is handled via environment variables and config files
 // No tenant tables needed for single-tenant deployment
