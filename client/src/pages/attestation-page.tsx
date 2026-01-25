@@ -190,6 +190,32 @@ const AttestationPage: React.FC = () => {
     }
   };
 
+  // Already attested - check this FIRST before error state
+  // (because successful submission invalidates query which returns error)
+  if (attestMutation.isSuccess) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md border-green-200">
+          <CardHeader className="text-center pb-2">
+            <div className="mx-auto p-4 bg-green-100 rounded-full w-fit mb-4">
+              <CheckCheck className="h-10 w-10 text-green-600" />
+            </div>
+            <CardTitle className="text-green-700 text-2xl">Attestation Complete</CardTitle>
+            <CardDescription className="text-lg">Thank you for your attestation!</CardDescription>
+          </CardHeader>
+          <CardContent className="text-center">
+            <p className="text-slate-600 mb-4">
+              Your compliance attestation has been successfully recorded.
+            </p>
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-sm text-green-700">
+              <p>A copy of this attestation has been saved for audit purposes.</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   // Loading state
   if (isLoading) {
     return (
@@ -230,31 +256,6 @@ const AttestationPage: React.FC = () => {
               {(error as Error)?.message || 'The link may have expired or been used already.'} 
               Please contact your compliance officer for a new link.
             </p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  // Already attested
-  if (attestMutation.isSuccess) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md border-green-200">
-          <CardHeader className="text-center pb-2">
-            <div className="mx-auto p-4 bg-green-100 rounded-full w-fit mb-4">
-              <CheckCheck className="h-10 w-10 text-green-600" />
-            </div>
-            <CardTitle className="text-green-700 text-2xl">Attestation Complete</CardTitle>
-            <CardDescription className="text-lg">Thank you for your attestation!</CardDescription>
-          </CardHeader>
-          <CardContent className="text-center">
-            <p className="text-slate-600 mb-4">
-              Your compliance attestation for <strong>{data.task.title}</strong> has been successfully recorded.
-            </p>
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-sm text-green-700">
-              <p>A copy of this attestation has been saved for audit purposes.</p>
-            </div>
           </CardContent>
         </Card>
       </div>
