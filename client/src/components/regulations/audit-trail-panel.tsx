@@ -20,7 +20,12 @@ import {
   AlertTriangle,
   Shield,
   Activity,
+  Download,
+  FileArchive,
+  Loader2,
 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { toast } from '@/hooks/use-toast';
 
 interface AuditLog {
   id: number | string;
@@ -49,6 +54,81 @@ interface AuditTrailPanelProps {
 }
 
 export function AuditTrailPanel({ regulationId }: AuditTrailPanelProps) {
+  const [isExporting, setIsExporting] = React.useState(false);
+  const [isDownloading, setIsDownloading] = React.useState(false);
+
+  const handleExportJSON = async () => {
+    setIsExporting(true);
+    try {
+      const response = await fetch(`/api/legal-export/regulation/${regulationId}?purpose=Legal%20Discovery%20Export`, {
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        throw new Error('Export failed');
+      }
+      const data = await response.json();
+      
+      // Download as file
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `legal-export-${data.exportId}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: 'Export Complete',
+        description: `Export ID: ${data.exportId} - ${data.stats.totalActivityRecords} activity records exported`,
+      });
+    } catch (err) {
+      toast({
+        title: 'Export Failed',
+        description: err instanceof Error ? err.message : 'Failed to export data',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleDownloadZIP = async () => {
+    setIsDownloading(true);
+    try {
+      const response = await fetch(`/api/legal-export/regulation/${regulationId}/download?purpose=Legal%20Discovery%20Export`, {
+        credentials: 'include',
+      });
+      if (!response.ok) {
+        throw new Error('Download failed');
+      }
+      
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `legal-export-regulation-${regulationId}.zip`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+
+      toast({
+        title: 'Download Complete',
+        description: 'ZIP archive with all data and evidence files downloaded',
+      });
+    } catch (err) {
+      toast({
+        title: 'Download Failed',
+        description: err instanceof Error ? err.message : 'Failed to download ZIP',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsDownloading(false);
+    }
+  };
+
   const { data, isLoading, error } = useQuery<{
     success: boolean;
     data: AuditLog[];
@@ -179,6 +259,47 @@ export function AuditTrailPanel({ regulationId }: AuditTrailPanelProps) {
 
   return (
     <div className="space-y-4">
+      {/* Legal Export Actions */}
+      <div className="flex items-center justify-between p-3 bg-amber-50 border border-amber-200 rounded-lg">
+        <div className="flex items-center gap-2">
+          <Shield className="h-5 w-5 text-amber-600" />
+          <div>
+            <p className="font-medium text-amber-800">Legal Discovery Export</p>
+            <p className="text-xs text-amber-600">Export all data for court-ordered subpoena response</p>
+          </div>
+        </div>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleExportJSON}
+            disabled={isExporting}
+            className="border-amber-300 hover:bg-amber-100"
+          >
+            {isExporting ? (
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            ) : (
+              <Download className="h-4 w-4 mr-2" />
+            )}
+            Export JSON
+          </Button>
+          <Button
+            variant="default"
+            size="sm"
+            onClick={handleDownloadZIP}
+            disabled={isDownloading}
+            className="bg-amber-600 hover:bg-amber-700"
+          >
+            {isDownloading ? (
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            ) : (
+              <FileArchive className="h-4 w-4 mr-2" />
+            )}
+            Download ZIP
+          </Button>
+        </div>
+      </div>
+
       {/* Summary Stats */}
       {meta && (
         <div className="grid grid-cols-4 gap-2 p-3 bg-slate-50 rounded-lg">
