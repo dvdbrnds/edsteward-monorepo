@@ -282,7 +282,25 @@ export class DatabaseStorage implements IStorage {
 
   async createRegulationUpdate(data: InsertRegulationUpdate): Promise<RegulationUpdate> {
     try {
+      // Debug: Log what we're inserting
+      console.log('📝 Creating regulation update with fields:', Object.keys(data));
+      if ((data as any).metadata) {
+        console.log('   📦 Has metadata with keys:', Object.keys((data as any).metadata));
+        if ((data as any).metadata.executiveOrders) {
+          console.log(`   ⚖️ Has ${(data as any).metadata.executiveOrders.length} executive orders`);
+        }
+      } else {
+        console.log('   ⚠️ No metadata in update data');
+      }
+      if ((data as any).pendingTasks) {
+        console.log(`   📋 Has ${(data as any).pendingTasks.length} pending tasks`);
+      }
+      
       const [newUpdate] = await this.db.insert(regulationUpdates).values(data).returning();
+      
+      // Debug: Verify what was saved
+      console.log('   ✅ Created update ID:', newUpdate.id, 'metadata saved:', !!newUpdate.metadata);
+      
       return newUpdate;
     } catch (error) {
       console.error("Error creating regulation update:", error);
@@ -391,9 +409,10 @@ export class DatabaseStorage implements IStorage {
       });
 
       // 3.5. Apply pending compliance tasks if present (MCP Engine sync Jan 2026)
+      // IMPORTANT: Preserve completed tasks and activity history - only add new or update pending tasks
       const pendingTasks = (update as any).pendingTasks;
       if (pendingTasks && Array.isArray(pendingTasks) && pendingTasks.length > 0) {
-        console.log(`📋 Applying ${pendingTasks.length} compliance tasks on approval...`);
+        console.log(`📋 Applying ${pendingTasks.length} compliance tasks on approval (preserving completed work)...`);
         
         // Fetch role assignments for auto-assign (Jan 2026)
         const roleAssignmentsResult = await pool.query(
@@ -413,63 +432,140 @@ export class DatabaseStorage implements IStorage {
           return roleToUserMap.get(assignedRole.toLowerCase()) || null;
         };
         
-        // Delete existing tasks for this regulation (REPLACE mode)
-        await pool.query(
-          'DELETE FROM compliance_tasks WHERE regulation_id = $1',
+        // Get existing tasks for this regulation to preserve completed work
+        const existingTasksResult = await pool.query(
+          `SELECT id, task_id, title, status, attestation_status FROM compliance_tasks WHERE regulation_id = $1`,
           [update.regulationId]
         );
-        console.log(`   🗑️  Deleted existing tasks for regulation ${update.regulationId}`);
+        
+        // Build lookup maps for existing tasks (by task_id and by title)
+        const existingByTaskId = new Map<string, any>();
+        const existingByTitle = new Map<string, any>();
+        let preservedCount = 0;
+        
+        for (const existing of existingTasksResult.rows) {
+          // Check if task is completed (either by status or attestation)
+          const isCompleted = existing.status === 'completed' || 
+                              existing.attestation_status === 'attested';
+          
+          if (existing.task_id) {
+            existingByTaskId.set(existing.task_id, { ...existing, isCompleted });
+          }
+          existingByTitle.set(existing.title.toLowerCase(), { ...existing, isCompleted });
+        }
+        
+        console.log(`   📊 Found ${existingTasksResult.rows.length} existing tasks`);
         
         // Build task ID mapping for parent-child relationships
         const taskIdMap = new Map<string, number>();
         let autoAssignedCount = 0;
+        let insertedCount = 0;
+        let updatedCount = 0;
         
-        // First pass: insert root tasks (no parentTempId)
+        // Helper to check if task already exists
+        const findExistingTask = (task: any) => {
+          if (task.taskId && existingByTaskId.has(task.taskId)) {
+            return existingByTaskId.get(task.taskId);
+          }
+          return existingByTitle.get(task.title.toLowerCase());
+        };
+        
+        // First pass: process root tasks (no parentTempId)
         const rootTasks = pendingTasks.filter((t: any) => !t.parentTempId);
         for (const task of rootTasks) {
+          const existing = findExistingTask(task);
+          
+          // If task exists and is completed, preserve it - don't touch it
+          if (existing?.isCompleted) {
+            console.log(`   ✅ Preserved completed task: "${task.title}"`);
+            preservedCount++;
+            if (task.tempId) {
+              taskIdMap.set(task.tempId, existing.id);
+            }
+            continue;
+          }
+          
           // Auto-assign from statutory role first, then fallback to assigned role
           const assignedTo = resolveAssignedTo(task.statutoryRole) || resolveAssignedTo(task.assignedRole);
           if (assignedTo) autoAssignedCount++;
           
-          const result = await pool.query(
-            `INSERT INTO compliance_tasks (
-              regulation_id, task_id, title, description, instructions, 
-              category, statutory_role, statutory_citation, assigned_to, assigned_role, 
-              due_date, reminder_days, status, priority, 
-              requirement_type, evidence_required, evidence_type, sort_order, is_template,
-              attestation_status
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20) 
-            RETURNING id`,
-            [
-              update.regulationId,
-              task.taskId || null,
-              task.title,
-              task.description || null,
-              task.instructions || null,
-              task.category || null, // Task category for grouping (Jan 2026)
-              task.statutoryRole || null, // Legally required role (Jan 2026)
-              task.statutoryCitation || null, // Legal citation (Jan 2026)
-              assignedTo, // Auto-assigned from role mapping (Jan 2026)
-              task.assignedRole || null,
-              task.dueDate ? new Date(task.dueDate) : null,
-              30, // default reminderDays
-              'pending',
-              task.priority || 'medium',
-              task.requirementType || 'requirement',
-              task.evidenceRequired || false,
-              task.evidenceType || 'none',
-              task.sortOrder || 0, // Use sortOrder from MCP Engine
-              false, // isTemplate
-              task.evidenceRequired ? 'pending' : 'not_required' // Set attestation status based on evidence requirement
-            ]
-          );
-          
-          if (task.tempId && result.rows[0]) {
-            taskIdMap.set(task.tempId, result.rows[0].id);
+          if (existing) {
+            // Task exists but is not completed - update it with new info
+            await pool.query(
+              `UPDATE compliance_tasks SET 
+                description = COALESCE($1, description),
+                instructions = COALESCE($2, instructions),
+                category = COALESCE($3, category),
+                statutory_role = COALESCE($4, statutory_role),
+                statutory_citation = COALESCE($5, statutory_citation),
+                assigned_role = COALESCE($6, assigned_role),
+                priority = COALESCE($7, priority),
+                requirement_type = COALESCE($8, requirement_type),
+                evidence_required = COALESCE($9, evidence_required),
+                evidence_type = COALESCE($10, evidence_type),
+                sort_order = COALESCE($11, sort_order)
+              WHERE id = $12`,
+              [
+                task.description || null,
+                task.instructions || null,
+                task.category || null,
+                task.statutoryRole || null,
+                task.statutoryCitation || null,
+                task.assignedRole || null,
+                task.priority || null,
+                task.requirementType || null,
+                task.evidenceRequired || null,
+                task.evidenceType || null,
+                task.sortOrder || null,
+                existing.id
+              ]
+            );
+            updatedCount++;
+            if (task.tempId) {
+              taskIdMap.set(task.tempId, existing.id);
+            }
+          } else {
+            // Task doesn't exist - insert it
+            const result = await pool.query(
+              `INSERT INTO compliance_tasks (
+                regulation_id, task_id, title, description, instructions, 
+                category, statutory_role, statutory_citation, assigned_to, assigned_role, 
+                due_date, reminder_days, status, priority, 
+                requirement_type, evidence_required, evidence_type, sort_order, is_template,
+                attestation_status
+              ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20) 
+              RETURNING id`,
+              [
+                update.regulationId,
+                task.taskId || null,
+                task.title,
+                task.description || null,
+                task.instructions || null,
+                task.category || null,
+                task.statutoryRole || null,
+                task.statutoryCitation || null,
+                assignedTo,
+                task.assignedRole || null,
+                task.dueDate ? new Date(task.dueDate) : null,
+                30,
+                'pending',
+                task.priority || 'medium',
+                task.requirementType || 'requirement',
+                task.evidenceRequired || false,
+                task.evidenceType || 'none',
+                task.sortOrder || 0,
+                false,
+                task.evidenceRequired ? 'pending' : 'not_required'
+              ]
+            );
+            insertedCount++;
+            if (task.tempId && result.rows[0]) {
+              taskIdMap.set(task.tempId, result.rows[0].id);
+            }
           }
         }
         
-        // Second pass: insert child tasks (with parentTempId)
+        // Second pass: process child tasks (with parentTempId)
         const childTasks = pendingTasks.filter((t: any) => t.parentTempId);
         for (const task of childTasks) {
           const parentId = taskIdMap.get(task.parentTempId);
@@ -478,50 +574,102 @@ export class DatabaseStorage implements IStorage {
             continue;
           }
           
+          const existing = findExistingTask(task);
+          
+          // If task exists and is completed, preserve it
+          if (existing?.isCompleted) {
+            console.log(`   ✅ Preserved completed child task: "${task.title}"`);
+            preservedCount++;
+            if (task.tempId) {
+              taskIdMap.set(task.tempId, existing.id);
+            }
+            continue;
+          }
+          
           // Auto-assign from statutory role first, then fallback to assigned role
           const assignedTo = resolveAssignedTo(task.statutoryRole) || resolveAssignedTo(task.assignedRole);
           if (assignedTo) autoAssignedCount++;
           
-          const result = await pool.query(
-            `INSERT INTO compliance_tasks (
-              regulation_id, parent_task_id, task_id, title, description, instructions, 
-              category, statutory_role, statutory_citation, assigned_to, assigned_role, 
-              due_date, reminder_days, status, priority, 
-              requirement_type, evidence_required, evidence_type, sort_order, is_template,
-              attestation_status
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21) 
-            RETURNING id`,
-            [
-              update.regulationId,
-              parentId,
-              task.taskId || null,
-              task.title,
-              task.description || null,
-              task.instructions || null,
-              task.category || null, // Task category for grouping (Jan 2026)
-              task.statutoryRole || null, // Legally required role (Jan 2026)
-              task.statutoryCitation || null, // Legal citation (Jan 2026)
-              assignedTo, // Auto-assigned from role mapping (Jan 2026)
-              task.assignedRole || null,
-              task.dueDate ? new Date(task.dueDate) : null,
-              30, // default reminderDays
-              'pending',
-              task.priority || 'medium',
-              task.requirementType || 'requirement',
-              task.evidenceRequired || false,
-              task.evidenceType || 'none',
-              task.sortOrder || 0, // Use sortOrder from MCP Engine
-              false, // isTemplate
-              task.evidenceRequired ? 'pending' : 'not_required' // Set attestation status based on evidence requirement
-            ]
-          );
-          
-          if (task.tempId && result.rows[0]) {
-            taskIdMap.set(task.tempId, result.rows[0].id);
+          if (existing) {
+            // Update existing pending task
+            await pool.query(
+              `UPDATE compliance_tasks SET 
+                parent_task_id = $1,
+                description = COALESCE($2, description),
+                instructions = COALESCE($3, instructions),
+                category = COALESCE($4, category),
+                statutory_role = COALESCE($5, statutory_role),
+                statutory_citation = COALESCE($6, statutory_citation),
+                assigned_role = COALESCE($7, assigned_role),
+                priority = COALESCE($8, priority),
+                requirement_type = COALESCE($9, requirement_type),
+                evidence_required = COALESCE($10, evidence_required),
+                evidence_type = COALESCE($11, evidence_type),
+                sort_order = COALESCE($12, sort_order)
+              WHERE id = $13`,
+              [
+                parentId,
+                task.description || null,
+                task.instructions || null,
+                task.category || null,
+                task.statutoryRole || null,
+                task.statutoryCitation || null,
+                task.assignedRole || null,
+                task.priority || null,
+                task.requirementType || null,
+                task.evidenceRequired || null,
+                task.evidenceType || null,
+                task.sortOrder || null,
+                existing.id
+              ]
+            );
+            updatedCount++;
+            if (task.tempId) {
+              taskIdMap.set(task.tempId, existing.id);
+            }
+          } else {
+            // Insert new child task
+            const result = await pool.query(
+              `INSERT INTO compliance_tasks (
+                regulation_id, parent_task_id, task_id, title, description, instructions, 
+                category, statutory_role, statutory_citation, assigned_to, assigned_role, 
+                due_date, reminder_days, status, priority, 
+                requirement_type, evidence_required, evidence_type, sort_order, is_template,
+                attestation_status
+              ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21) 
+              RETURNING id`,
+              [
+                update.regulationId,
+                parentId,
+                task.taskId || null,
+                task.title,
+                task.description || null,
+                task.instructions || null,
+                task.category || null,
+                task.statutoryRole || null,
+                task.statutoryCitation || null,
+                assignedTo,
+                task.assignedRole || null,
+                task.dueDate ? new Date(task.dueDate) : null,
+                30,
+                'pending',
+                task.priority || 'medium',
+                task.requirementType || 'requirement',
+                task.evidenceRequired || false,
+                task.evidenceType || 'none',
+                task.sortOrder || 0,
+                false,
+                task.evidenceRequired ? 'pending' : 'not_required'
+              ]
+            );
+            insertedCount++;
+            if (task.tempId && result.rows[0]) {
+              taskIdMap.set(task.tempId, result.rows[0].id);
+            }
           }
         }
         
-        console.log(`   ✅ Applied ${rootTasks.length} root tasks and ${childTasks.length} child tasks`);
+        console.log(`   📊 Task sync complete: ${insertedCount} new, ${updatedCount} updated, ${preservedCount} preserved (completed)`);
         console.log(`   👤 Auto-assigned ${autoAssignedCount} tasks based on role mappings`);
       }
 

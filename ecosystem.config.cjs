@@ -16,9 +16,9 @@ module.exports = {
   apps: [
     {
       name: 'edsteward',
-      script: 'npm',
-      args: 'run dev',
+      script: './scripts/start-dev.sh',  // Wrapper that kills port 3000 first
       cwd: '/Users/dvdbrnds/Desktop/ES Clientside/EdSteward',
+      interpreter: '/bin/zsh',
       
       // Auto-restart configuration
       autorestart: true,
@@ -28,7 +28,8 @@ module.exports = {
       // Restart policy
       max_restarts: 10,
       min_uptime: '10s',
-      restart_delay: 2000,
+      restart_delay: 3000,  // Wait 3s between restarts to ensure port is released
+      kill_timeout: 5000,   // Give 5s for graceful shutdown
       
       // Exponential backoff restart delay
       exp_backoff_restart_delay: 100,

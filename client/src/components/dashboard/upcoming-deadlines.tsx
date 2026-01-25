@@ -1,9 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useQuery } from "@tanstack/react-query";
-import type { Deadline, Regulation } from "@shared/schema";
+import type { Deadline, Regulation, User } from "@shared/schema";
 import { format, differenceInDays } from "date-fns";
 import { AlertCircle, CheckCircle, Clock } from "lucide-react";
 import { useLocation } from "wouter";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
 
 interface UpcomingDeadlinesProps {
@@ -11,18 +13,36 @@ interface UpcomingDeadlinesProps {
   limit?: number;
 }
 
+type ViewMode = 'my' | 'all';
+
 export default function UpcomingDeadlines({ categoryFilter, limit }: UpcomingDeadlinesProps) {
   const [, setLocation] = useLocation();
+  const [viewMode, setViewMode] = useState<ViewMode>('my');
+
+  // Check if user is logged in
+  const { data: currentUser } = useQuery<User>({
+    queryKey: ["/api/users/me"],
+  });
 
   const { data: regulations, isLoading: regulationsLoading } = useQuery<Regulation[]>({
     queryKey: ["/api/regulations"]
   });
 
-  const { data: deadlines, isLoading: deadlinesLoading } = useQuery<Deadline[]>({
-    queryKey: ["/api/deadlines"]
+  // Fetch deadlines based on view mode
+  const { data: allDeadlines, isLoading: allDeadlinesLoading } = useQuery<Deadline[]>({
+    queryKey: ["/api/deadlines"],
+    enabled: viewMode === 'all' || !currentUser, // Always fetch all if not logged in
   });
 
-  if (deadlinesLoading || regulationsLoading || !deadlines || !regulations) {
+  const { data: myDeadlines, isLoading: myDeadlinesLoading } = useQuery<Deadline[]>({
+    queryKey: ["/api/deadlines/my-deadlines"],
+    enabled: viewMode === 'my' && !!currentUser, // Only fetch when logged in and viewing my deadlines
+  });
+
+  const deadlinesLoading = viewMode === 'my' && currentUser ? myDeadlinesLoading : allDeadlinesLoading;
+  const deadlines = viewMode === 'my' && currentUser ? myDeadlines : allDeadlines;
+
+  if (deadlinesLoading || regulationsLoading || !regulations) {
     return (
       <Card className="h-[600px]">
         <CardHeader>
@@ -33,7 +53,7 @@ export default function UpcomingDeadlines({ categoryFilter, limit }: UpcomingDea
     );
   }
 
-  let filteredDeadlines = [...deadlines];
+  let filteredDeadlines = [...(deadlines || [])];
 
   if (categoryFilter) {
     const regulationIds = regulations
@@ -52,17 +72,34 @@ export default function UpcomingDeadlines({ categoryFilter, limit }: UpcomingDea
 
   return (
     <Card className="h-[600px]">
-      <CardHeader>
-        <CardTitle>
-          Upcoming Deadlines
-          {categoryFilter && (
-            <span className="text-sm font-normal text-muted-foreground ml-2">
-              ({categoryFilter})
+      <CardHeader className="pb-2">
+        <CardTitle className="flex items-center justify-between gap-2">
+          <span className="truncate">
+            Deadlines
+            <span className="text-sm font-normal text-muted-foreground ml-1">
+              ({sortedDeadlines.length})
             </span>
-          )}
-          <span className="text-sm font-normal text-muted-foreground ml-2">
-            ({sortedDeadlines.length} {sortedDeadlines.length === 1 ? 'deadline' : 'deadlines'})
           </span>
+          {currentUser && (
+            <div className="flex items-center gap-0.5 bg-muted rounded-md p-0.5 flex-shrink-0">
+              <Button
+                variant={viewMode === 'my' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('my')}
+                className="h-6 px-1.5 text-xs"
+              >
+                Mine
+              </Button>
+              <Button
+                variant={viewMode === 'all' ? 'default' : 'ghost'}
+                size="sm"
+                onClick={() => setViewMode('all')}
+                className="h-6 px-1.5 text-xs"
+              >
+                All
+              </Button>
+            </div>
+          )}
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
@@ -140,8 +177,20 @@ export default function UpcomingDeadlines({ categoryFilter, limit }: UpcomingDea
               );
             })}
             {sortedDeadlines.length === 0 && (
-              <div className="text-center text-muted-foreground py-4">
-                No deadlines {categoryFilter ? `for ${categoryFilter}` : ''} found
+              <div className="text-center text-muted-foreground py-8">
+                <Clock className="h-8 w-8 mx-auto mb-2 opacity-50" />
+                <p className="font-medium">
+                  {viewMode === 'my' && currentUser 
+                    ? 'No deadlines assigned to you'
+                    : 'No deadlines found'}
+                </p>
+                <p className="text-xs mt-1">
+                  {viewMode === 'my' && currentUser
+                    ? 'Switch to "All" to see institution-wide deadlines'
+                    : categoryFilter 
+                      ? `No deadlines for ${categoryFilter}` 
+                      : 'Deadlines will appear here when regulations have upcoming due dates'}
+                </p>
               </div>
             )}
         </div>

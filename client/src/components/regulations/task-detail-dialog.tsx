@@ -237,6 +237,8 @@ export function TaskDetailDialog({
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['compliance-tasks', regulationId] });
       queryClient.invalidateQueries({ queryKey: ['task-activity', task?.id] });
+      // Also refresh the "My Tasks" dashboard widget
+      queryClient.invalidateQueries({ queryKey: ['/api/compliance-tasks/my-tasks'] });
       toast({ title: 'Task assigned successfully' });
       setShowAssignSelect(false);
     },
@@ -525,16 +527,20 @@ export function TaskDetailDialog({
                         <SelectItem value="unassigned">
                           <span className="text-muted-foreground italic">Unassigned</span>
                         </SelectItem>
-                        {availableUsers?.map((user) => (
-                          <SelectItem key={user.id} value={user.id.toString()}>
-                            {user.firstName && user.lastName
-                              ? `${user.firstName} ${user.lastName}`
-                              : user.username}
-                            {user.email && (
-                              <span className="text-muted-foreground ml-2">({user.email})</span>
-                            )}
-                          </SelectItem>
-                        ))}
+                        {availableUsers?.map((user) => {
+                          const displayName = user.firstName && user.lastName
+                            ? `${user.firstName} ${user.lastName}`
+                            : user.username || user.email || `User #${user.id}`;
+                          const showEmail = user.email && displayName !== user.email;
+                          return (
+                            <SelectItem key={user.id} value={user.id.toString()}>
+                              {displayName}
+                              {showEmail && (
+                                <span className="text-muted-foreground ml-2">({user.email})</span>
+                              )}
+                            </SelectItem>
+                          );
+                        })}
                       </SelectContent>
                     </Select>
                     {task.assignedRole && (

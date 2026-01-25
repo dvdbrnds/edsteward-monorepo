@@ -648,7 +648,26 @@ export const regulationUpdates = pgTable("regulation_updates", {
     source_attribution?: string;
     submission_guidelines?: string;
     enhanced_summary?: string;
-  }>(), // Federal Register enhancement metadata
+    // Executive Orders affecting this regulation (MCP Engine sync Jan 2026)
+    executiveOrders?: Array<{
+      eoNumber: string;
+      title: string;
+      signedDate: string;
+      status?: string;
+      president?: string;
+      term?: string;
+      fullTextUrl?: string;
+      impactType: string;
+      impactSeverity: string;
+      impactSummary?: string;
+      confidenceScore?: number;
+      affectedSections?: string[];
+      complianceDeadline?: string;
+      actionRequired?: string;
+    }>;
+    eo_count?: number;
+    eo_critical_count?: number;
+  }>(), // Federal Register and Executive Order metadata
   // Pending compliance tasks to be applied on approval (MCP Engine sync)
   pendingTasks: jsonb("pending_tasks").$type<Array<{
     tempId?: string;

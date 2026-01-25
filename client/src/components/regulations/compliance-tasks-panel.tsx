@@ -36,6 +36,8 @@ import {
   Upload,
   Paperclip,
   Trash2,
+  Shield,
+  Mail,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -197,6 +199,7 @@ function TaskItem({
   onStatusChange, 
   onNudge, 
   onEscalate,
+  onRequestAttestation,
   onTaskClick,
   onAddEvidence,
   onDeleteEvidence,
@@ -212,6 +215,7 @@ function TaskItem({
   onStatusChange: (_id: number, _newStatus: string) => void;
   onNudge: (_taskToNudge: ComplianceTask) => void;
   onEscalate: (_taskToEscalate: ComplianceTask) => void;
+  onRequestAttestation: (_taskToAttest: ComplianceTask) => void;
   onTaskClick: (_task: ComplianceTask) => void;
   onAddEvidence: (_task: ComplianceTask) => void;
   onDeleteEvidence: (_taskId: number, _evidenceId: number, _fileName: string) => void;
@@ -366,26 +370,32 @@ function TaskItem({
                       >
                         <span className="text-muted-foreground italic">Unassign</span>
                       </Button>
-                      {availableUsers?.map((user) => (
-                        <Button
-                          key={user.id}
-                          variant="ghost"
-                          size="sm"
-                          className={cn(
-                            "w-full justify-start text-xs h-8",
-                            task.assignedTo === user.id && "bg-primary/10"
-                          )}
-                          disabled={isAssigning}
-                          onClick={() => {
-                            onAssign(task.id, user.id);
-                            setAssignPopoverOpen(false);
-                          }}
-                        >
-                          {user.firstName && user.lastName
-                            ? `${user.firstName} ${user.lastName}`
-                            : user.username}
-                        </Button>
-                      ))}
+                      {availableUsers?.map((user) => {
+                        const displayName = user.firstName && user.lastName
+                          ? `${user.firstName} ${user.lastName}`
+                          : user.username || user.email || `User #${user.id}`;
+                        return (
+                          <Button
+                            key={user.id}
+                            variant="ghost"
+                            size="sm"
+                            className={cn(
+                              "w-full justify-start text-xs h-auto py-1.5 flex-col items-start",
+                              task.assignedTo === user.id && "bg-primary/10"
+                            )}
+                            disabled={isAssigning}
+                            onClick={() => {
+                              onAssign(task.id, user.id);
+                              setAssignPopoverOpen(false);
+                            }}
+                          >
+                            <span>{displayName}</span>
+                            {user.email && (
+                              <span className="text-[10px] text-muted-foreground font-normal">{user.email}</span>
+                            )}
+                          </Button>
+                        );
+                      })}
                     </div>
                   </PopoverContent>
                 </Popover>
@@ -673,6 +683,10 @@ function TaskItem({
                 Mark Complete
               </DropdownMenuItem>
               <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => onRequestAttestation(task)} className="text-emerald-600">
+                <Shield className="h-4 w-4 mr-2" />
+                Request Attestation
+              </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onNudge(task)}>
                 <Send className="h-4 w-4 mr-2" />
                 Nudge DRI
@@ -697,6 +711,7 @@ function TaskItem({
               onStatusChange={onStatusChange}
               onNudge={onNudge}
               onEscalate={onEscalate}
+              onRequestAttestation={onRequestAttestation}
               onTaskClick={onTaskClick}
               onAddEvidence={onAddEvidence}
               onDeleteEvidence={onDeleteEvidence}
@@ -744,6 +759,12 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
   
   // Requirement type filter (MCP Engine sync Jan 2026)
   const [requirementTypeFilter, setRequirementTypeFilter] = useState<'all' | 'requirement' | 'best_practice'>('all');
+  
+  // Attestation request dialog state
+  const [attestationTask, setAttestationTask] = useState<ComplianceTask | null>(null);
+  const [attestationEmail, setAttestationEmail] = useState('');
+  const [attestationRecipientName, setAttestationRecipientName] = useState('');
+  const [attestationMessage, setAttestationMessage] = useState('');
 
   // Fetch tasks
   const { data, isLoading, error } = useQuery<TasksResponse>({
@@ -782,6 +803,8 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['compliance-tasks', regulationId] });
+      // Also refresh the "My Tasks" dashboard widget
+      queryClient.invalidateQueries({ queryKey: ['/api/compliance-tasks/my-tasks'] });
       toast({ title: 'Task assigned' });
     },
     onError: () => {
@@ -852,6 +875,39 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
     },
     onError: () => {
       toast({ title: 'Error', description: 'Failed to escalate task', variant: 'destructive' });
+    },
+  });
+
+  // Request attestation mutation
+  const requestAttestationMutation = useMutation({
+    mutationFn: async ({ taskId, email, recipientName, personalMessage }: { 
+      taskId: number; 
+      email: string; 
+      recipientName?: string;
+      personalMessage?: string;
+    }) => {
+      const response = await fetch(`/api/compliance-tasks/${taskId}/request-attestation`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, recipientName, personalMessage }),
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to request attestation');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      toast({ title: 'Success', description: 'Attestation request sent successfully' });
+      setAttestationTask(null);
+      setAttestationEmail('');
+      setAttestationRecipientName('');
+      setAttestationMessage('');
+      queryClient.invalidateQueries({ queryKey: ['compliance-tasks', regulationId] });
+    },
+    onError: (error: Error) => {
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
     },
   });
 
@@ -1159,6 +1215,18 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
                 onStatusChange={(taskId, status) => updateStatusMutation.mutate({ taskId, status })}
                 onNudge={setNudgeTask}
                 onEscalate={setEscalateTask}
+                onRequestAttestation={(task) => {
+                  setAttestationTask(task);
+                  // Pre-fill email if task is assigned
+                  if (task.assignedUser?.email) {
+                    setAttestationEmail(task.assignedUser.email);
+                    setAttestationRecipientName(
+                      task.assignedUser.firstName && task.assignedUser.lastName
+                        ? `${task.assignedUser.firstName} ${task.assignedUser.lastName}`
+                        : task.assignedUser.username
+                    );
+                  }
+                }}
                 onTaskClick={setSelectedTask}
                 onAddEvidence={setEvidenceTask}
                 onDeleteEvidence={handleDeleteEvidence}
@@ -1266,6 +1334,97 @@ export function ComplianceTasksPanel({ regulationId, regulationName: _regulation
             >
               {escalateMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <AlertCircle className="h-4 w-4 mr-2" />}
               Escalate
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Request Attestation Dialog */}
+      <Dialog open={!!attestationTask} onOpenChange={() => {
+        setAttestationTask(null);
+        setAttestationEmail('');
+        setAttestationRecipientName('');
+        setAttestationMessage('');
+      }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2 text-emerald-600">
+              <Shield className="h-5 w-5" />
+              Request Attestation
+            </DialogTitle>
+            <DialogDescription>
+              Send an attestation request email. The recipient will receive a secure link to confirm compliance.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="bg-emerald-50 p-3 rounded-lg border border-emerald-200">
+              <p className="font-medium">{attestationTask?.title}</p>
+              {attestationTask?.description && (
+                <p className="text-sm text-muted-foreground mt-1">{attestationTask.description}</p>
+              )}
+              {attestationTask?.evidenceRequired && (
+                <Badge variant="outline" className="mt-2 text-amber-700 border-amber-300 bg-amber-50">
+                  Evidence Required
+                </Badge>
+              )}
+            </div>
+            <div>
+              <Label htmlFor="attestation-email">Recipient Email *</Label>
+              <Input
+                id="attestation-email"
+                type="email"
+                placeholder="compliance-officer@university.edu"
+                value={attestationEmail}
+                onChange={(e) => setAttestationEmail(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="attestation-name">Recipient Name (optional)</Label>
+              <Input
+                id="attestation-name"
+                type="text"
+                placeholder="Jane Smith"
+                value={attestationRecipientName}
+                onChange={(e) => setAttestationRecipientName(e.target.value)}
+                className="mt-1"
+              />
+            </div>
+            <div>
+              <Label htmlFor="attestation-message">Personal Message (optional)</Label>
+              <Textarea
+                id="attestation-message"
+                placeholder="Please complete this attestation by end of week..."
+                value={attestationMessage}
+                onChange={(e) => setAttestationMessage(e.target.value)}
+                className="mt-1"
+                rows={3}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => {
+              setAttestationTask(null);
+              setAttestationEmail('');
+              setAttestationRecipientName('');
+              setAttestationMessage('');
+            }}>Cancel</Button>
+            <Button 
+              className="bg-emerald-600 hover:bg-emerald-700"
+              onClick={() => attestationTask && requestAttestationMutation.mutate({ 
+                taskId: attestationTask.id, 
+                email: attestationEmail,
+                recipientName: attestationRecipientName || undefined,
+                personalMessage: attestationMessage || undefined,
+              })}
+              disabled={!attestationEmail || requestAttestationMutation.isPending}
+            >
+              {requestAttestationMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : (
+                <Mail className="h-4 w-4 mr-2" />
+              )}
+              Send Request
             </Button>
           </DialogFooter>
         </DialogContent>

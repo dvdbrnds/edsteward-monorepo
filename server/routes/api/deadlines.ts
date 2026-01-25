@@ -5,6 +5,36 @@ import { sendDeadlineCreationNotification } from '../../services/deadline-notifi
 
 const router = express.Router();
 
+// GET /api/deadlines/my-deadlines - Get deadlines assigned to current user (requires auth)
+router.get("/my-deadlines", async (req, res) => {
+  try {
+    // Require authentication for personal deadlines
+    if (!req.isAuthenticated || !req.isAuthenticated()) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+
+    const userId = (req.user as any)?.id;
+    if (!userId) {
+      return res.status(401).json({ error: 'User ID not found in session' });
+    }
+
+    const tenantStorage = getDatabaseStorage(req.tenantId);
+    const allDeadlines = await tenantStorage.getDeadlines();
+    
+    // Filter deadlines assigned to the current user
+    const myDeadlines = allDeadlines.filter(d => d.assignedTo === userId);
+    
+    syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `Fetched ${myDeadlines.length} deadlines for user ${userId}`);
+    res.json(myDeadlines);
+  } catch (error) {
+    syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, `Failed to fetch my deadlines: ${error instanceof Error ? error.message : String(error)}`);
+    res.status(500).json({ 
+      error: "Failed to fetch my deadlines", 
+      details: error instanceof Error ? error.message : String(error) 
+    });
+  }
+});
+
 // GET /api/deadlines - Get all deadlines with regulation names (public access like regulations)
 router.get("/", async (req, res) => {
   try {

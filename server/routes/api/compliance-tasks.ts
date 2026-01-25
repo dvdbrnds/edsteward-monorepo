@@ -170,11 +170,16 @@ router.get('/regulation/:regulationId', requireAuth, async (req: Request, res: R
  * GET /api/compliance-tasks/:taskId
  * Get a single task with all details
  */
-router.get('/:taskId', requireAuth, async (req: Request, res: Response) => {
+router.get('/:taskId', requireAuth, async (req: Request, res: Response, next) => {
+  // Only handle numeric taskIds - let other routes handle named routes like 'my-tasks'
+  const taskId = parseInt(req.params.taskId);
+  if (isNaN(taskId)) {
+    return next(); // Pass to next matching route
+  }
+  
   try {
     // TENANT ISOLATION: Get tenant-specific database
     const db = getDbForRequest(req);
-    const taskId = parseInt(req.params.taskId);
     
     const [task] = await db.select({
       task: complianceTasks,
@@ -680,6 +685,9 @@ router.get('/my-tasks', requireAuth, async (req: Request, res: Response) => {
     // TENANT ISOLATION: Get tenant-specific database
     const db = getDbForRequest(req);
     const userId = req.user!.id;
+    
+    // DEBUG: Log the user ID being used for the query
+    console.log(`[my-tasks] Fetching tasks for user ID: ${userId}, username: ${req.user?.username}, email: ${req.user?.email}`);
 
     const tasks = await db.select({
       task: complianceTasks,
@@ -694,6 +702,9 @@ router.get('/my-tasks', requireAuth, async (req: Request, res: Response) => {
     .where(eq(complianceTasks.assignedTo, userId))
     .orderBy(asc(complianceTasks.dueDate), asc(complianceTasks.priority));
 
+    // DEBUG: Log the number of tasks found
+    console.log(`[my-tasks] Found ${tasks.length} tasks for user ID ${userId}`);
+    
     res.json(tasks.map(t => ({ ...t.task, regulation: t.regulation })));
   } catch (error) {
     console.error('Error fetching my tasks:', error);
@@ -2166,11 +2177,12 @@ router.post('/:taskId/request-attestation', requireAuth, async (req: Request, re
       </html>
     `;
 
-    await emailService.sendEmail({
-      to: email,
-      subject: `Attestation Required: ${task.title}`,
-      html: htmlContent,
-    });
+    await emailService.sendEmail(
+      email,
+      `Attestation Required: ${task.title}`,
+      htmlContent,
+      { html: true }
+    );
 
     // Log activity
     await db.insert(taskActivity).values({

@@ -149,9 +149,9 @@ export default function CustomPieChart({
           </ResponsiveContainer>
         </div>
         
-        {/* Custom legend outside of ResponsiveContainer */}
-        <div className="mt-2 px-8 pb-4">
-          <div className="flex flex-wrap justify-center gap-2">
+        {/* Custom legend outside of ResponsiveContainer - constrained width with grid */}
+        <div className="mt-2 px-4 pb-4 overflow-y-auto max-h-[280px]">
+          <div className="grid grid-cols-2 gap-1 max-w-[400px] mx-auto">
             {legendData.map((entry, index) => (
               <div 
                 key={`legend-${index}`} 
@@ -164,10 +164,10 @@ export default function CustomPieChart({
                 title={entry.name}
               >
                 <div 
-                  className="w-3 h-3 rounded-full mr-2" 
+                  className="w-3 h-3 rounded-full mr-2 flex-shrink-0" 
                   style={{ backgroundColor: COLORS[sortedData.findIndex(d => d.name === entry.name) % COLORS.length] }}
                 ></div>
-                <span className="text-xs truncate max-w-[120px]">{entry.name}</span>
+                <span className="text-xs truncate">{entry.name}</span>
               </div>
             ))}
           </div>
