@@ -645,9 +645,9 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
                         <div className="flex gap-3">
                           {(regulation.actions || [
                             { type: 'attestation', enabled: true, required: true, status: 'pending' },
-                            { type: 'website_publish', enabled: true, required: false, status: 'pending' },
-                            { type: 'community_communication', enabled: true, required: false, status: 'pending' },
-                            { type: 'agency_submission', enabled: true, required: true, status: 'pending' }
+                            { type: 'website_publish', enabled: false, required: false, status: 'pending' },
+                            { type: 'community_communication', enabled: false, required: false, status: 'pending' },
+                            { type: 'agency_submission', enabled: false, required: false, status: 'pending' }
                           ]).map((action: RegulationAction) => (
                             <div
                               key={action.type}

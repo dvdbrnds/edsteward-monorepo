@@ -479,7 +479,7 @@ export const insertRegulationSchema = createInsertSchema(regulations).extend({
     },
     {
       type: 'agency_submission',
-      enabled: true,
+      enabled: false,  // Only enable when regulation actually requires agency filing
       required: false,
       status: 'pending'
     }
