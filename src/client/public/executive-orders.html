@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Executive Orders - MCP Engine</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f5f6f8;
+            color: #1a1a1a;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #b45309 0%, #d97706 100%);
+            color: white;
+            padding: 24px 32px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .header h1 {
+            margin: 0 0 8px 0;
+            font-size: 28px;
+            font-weight: 700;
+        }
+        
+        .header p {
+            margin: 0;
+            opacity: 0.9;
+            font-size: 14px;
+        }
+        
+        .nav-bar {
+            background: white;
+            padding: 12px 32px;
+            border-bottom: 1px solid #e1e5e9;
+            display: flex;
+            gap: 16px;
+        }
+        
+        .nav-bar a {
+            color: #475569;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+        
+        .nav-bar a:hover {
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 24px 32px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        
+        .stat-label {
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 4px;
+        }
+        
+        .filters {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .filter-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            color: #64748b;
+            font-weight: 600;
+        }
+        
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            min-width: 150px;
+        }
+        
+        .search-input {
+            flex: 1;
+            padding: 10px 16px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .eo-grid {
+            display: grid;
+            gap: 16px;
+        }
+        
+        .eo-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            border-left: 4px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+        
+        .eo-card:hover {
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+        }
+        
+        .eo-card.high-impact {
+            border-left-color: #dc2626;
+        }
+        
+        .eo-card.medium-impact {
+            border-left-color: #f59e0b;
+        }
+        
+        .eo-card.low-impact {
+            border-left-color: #10b981;
+        }
+        
+        .eo-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 12px;
+        }
+        
+        .eo-number {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e293b;
+        }
+        
+        .eo-title {
+            font-size: 15px;
+            color: #475569;
+            margin-top: 4px;
+            line-height: 1.4;
+        }
+        
+        .eo-badges {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .badge {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .badge-active {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .badge-enjoined {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .badge-revoked {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .badge-impacts {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .eo-meta {
+            display: flex;
+            gap: 24px;
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 12px;
+        }
+        
+        .eo-summary {
+            font-size: 13px;
+            color: #334155;
+            line-height: 1.6;
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+        }
+        
+        .eo-regulations {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        
+        .reg-tag {
+            background: #fef3c7;
+            color: #92400e;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            text-decoration: none;
+        }
+        
+        .reg-tag:hover {
+            background: #fde68a;
+        }
+        
+        .eo-links {
+            margin-top: 12px;
+            display: flex;
+            gap: 16px;
+        }
+        
+        .eo-link {
+            font-size: 12px;
+            color: #2563eb;
+            text-decoration: none;
+        }
+        
+        .eo-link:hover {
+            text-decoration: underline;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #64748b;
+        }
+        
+        .empty {
+            text-align: center;
+            padding: 60px;
+            color: #64748b;
+            background: white;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⚠️ Executive Orders Tracker</h1>
+        <p>Presidential Executive Orders affecting higher education compliance</p>
+    </div>
+    
+    <div class="nav-bar">
+        <a href="http://localhost:3050/">← Dashboard</a>
+        <a href="#" onclick="syncEOs()">🔄 Sync from Federal Register</a>
+    </div>
+    
+    <div class="container">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="stat-total">--</div>
+                <div class="stat-label">Total Executive Orders</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-active" style="color: #16a34a;">--</div>
+                <div class="stat-label">Active</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-enjoined" style="color: #d97706;">--</div>
+                <div class="stat-label">Enjoined by Courts</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="stat-impacts" style="color: #dc2626;">--</div>
+                <div class="stat-label">Regulations Affected</div>
+            </div>
+        </div>
+        
+        <div class="filters">
+            <div class="filter-group">
+                <span class="filter-label">Status</span>
+                <select class="filter-select" id="filter-status" onchange="filterEOs()">
+                    <option value="">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="enjoined">Enjoined</option>
+                    <option value="revoked">Revoked</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">Term</span>
+                <select class="filter-select" id="filter-term" onchange="filterEOs()">
+                    <option value="">All Terms</option>
+                    <option value="Trump-2">Trump 2nd Term</option>
+                    <option value="Biden-1">Biden 1st Term</option>
+                    <option value="Trump-1">Trump 1st Term</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">Impact</span>
+                <select class="filter-select" id="filter-impact" onchange="filterEOs()">
+                    <option value="">All</option>
+                    <option value="has-impacts">Has Regulation Impacts</option>
+                </select>
+            </div>
+            <input type="text" class="search-input" id="search-input" placeholder="Search executive orders..." oninput="filterEOs()">
+        </div>
+        
+        <div id="eo-list" class="eo-grid">
+            <div class="loading">Loading executive orders...</div>
+        </div>
+    </div>
+    
+    <script>
+        let allEOs = [];
+        
+        async function loadExecutiveOrders() {
+            try {
+                const response = await fetch('http://localhost:3010/api/executive-orders?limit=200');
+                const data = await response.json();
+                
+                allEOs = data.executiveOrders || [];
+                
+                // Update stats
+                document.getElementById('stat-total').textContent = allEOs.length;
+                document.getElementById('stat-active').textContent = allEOs.filter(eo => eo.status === 'active').length;
+                document.getElementById('stat-enjoined').textContent = allEOs.filter(eo => eo.status === 'enjoined').length;
+                
+                const totalImpacts = allEOs.reduce((sum, eo) => sum + (eo.regulationImpactCount || 0), 0);
+                document.getElementById('stat-impacts').textContent = totalImpacts;
+                
+                renderEOs(allEOs);
+            } catch (error) {
+                console.error('Error loading EOs:', error);
+                document.getElementById('eo-list').innerHTML = '<div class="empty">Error loading executive orders</div>';
+            }
+        }
+        
+        function filterEOs() {
+            const status = document.getElementById('filter-status').value;
+            const term = document.getElementById('filter-term').value;
+            const impact = document.getElementById('filter-impact').value;
+            const search = document.getElementById('search-input').value.toLowerCase();
+            
+            let filtered = allEOs;
+            
+            if (status) {
+                filtered = filtered.filter(eo => eo.status === status);
+            }
+            if (term) {
+                filtered = filtered.filter(eo => eo.term === term);
+            }
+            if (impact === 'has-impacts') {
+                filtered = filtered.filter(eo => eo.regulationImpactCount > 0);
+            }
+            if (search) {
+                filtered = filtered.filter(eo => 
+                    eo.eoNumber?.toLowerCase().includes(search) ||
+                    eo.title?.toLowerCase().includes(search)
+                );
+            }
+            
+            renderEOs(filtered);
+        }
+        
+        function renderEOs(eos) {
+            if (eos.length === 0) {
+                document.getElementById('eo-list').innerHTML = '<div class="empty">No executive orders found</div>';
+                return;
+            }
+            
+            const html = eos.map(eo => {
+                const signedDate = new Date(eo.signedDate).toLocaleDateString('en-US', { 
+                    year: 'numeric', month: 'short', day: 'numeric' 
+                });
+                
+                const impactClass = eo.regulationImpactCount > 0 ? 
+                    (eo.regulationImpactCount > 3 ? 'high-impact' : 'medium-impact') : '';
+                
+                const statusBadge = eo.status === 'active' ? 'badge-active' :
+                    eo.status === 'enjoined' ? 'badge-enjoined' : 'badge-revoked';
+                
+                const regTags = (eo.affectedRegKeys || []).map(regKey => 
+                    `<a href="/regulations/${regKey.toLowerCase()}-console.html" class="reg-tag">${regKey}</a>`
+                ).join('');
+                
+                return `
+                    <div class="eo-card ${impactClass}">
+                        <div class="eo-header">
+                            <div>
+                                <div class="eo-number">${eo.eoNumber}</div>
+                                <div class="eo-title">${eo.title}</div>
+                            </div>
+                            <div class="eo-badges">
+                                <span class="badge ${statusBadge}">${eo.status}</span>
+                                ${eo.regulationImpactCount > 0 ? `<span class="badge badge-impacts">${eo.regulationImpactCount} regulations</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="eo-meta">
+                            <span>📅 Signed: ${signedDate}</span>
+                            <span>👤 ${eo.president}</span>
+                            <span>📍 ${eo.term}</span>
+                        </div>
+                        ${eo.summary ? `<div class="eo-summary">${eo.summary}</div>` : ''}
+                        ${regTags ? `<div class="eo-regulations">${regTags}</div>` : ''}
+                        <div class="eo-links">
+                            ${eo.fullTextUrl ? `<a href="${eo.fullTextUrl}" target="_blank" class="eo-link">📄 Federal Register</a>` : ''}
+                            ${eo.pdfUrl ? `<a href="${eo.pdfUrl}" target="_blank" class="eo-link">📥 Download PDF</a>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('eo-list').innerHTML = html;
+        }
+        
+        async function syncEOs() {
+            alert('Syncing from Federal Register... This may take a moment.');
+            // In production, this would call the sync endpoint
+        }
+        
+        // Load on page load
+        loadExecutiveOrders();
+    </script>
+</body>
+</html>

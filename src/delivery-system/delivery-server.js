@@ -887,6 +887,44 @@ class DeliveryServer {
           WHERE regulation_id = $1
         `, [regulation.id]);
         
+        // Fetch executive orders affecting this regulation
+        const eoResult = await this.pool.query(`
+          SELECT 
+            eo.eo_number,
+            eo.title,
+            eo.signed_date,
+            eo.status,
+            eo.president,
+            eo.term,
+            eo.full_text_url,
+            eo.summary as eo_summary,
+            impact.impact_type,
+            impact.impact_severity,
+            impact.impact_summary,
+            impact.affected_provisions,
+            impact.confidence_score
+          FROM executive_orders eo
+          JOIN eo_regulation_impacts impact ON eo.id = impact.eo_id
+          WHERE impact.regulation_id = $1
+          ORDER BY eo.signed_date DESC
+        `, [regulation.id]);
+        
+        // Format executive orders for EdSteward
+        const executiveOrders = eoResult.rows.map(eo => ({
+          eoNumber: eo.eo_number,
+          title: eo.title,
+          signedDate: eo.signed_date ? new Date(eo.signed_date).toISOString().split('T')[0] : null,
+          status: eo.status || 'active',
+          president: eo.president,
+          term: eo.term,
+          fullTextUrl: eo.full_text_url,
+          impactType: eo.impact_type || 'modifies',
+          impactSeverity: eo.impact_severity || 'medium',
+          impactSummary: eo.impact_summary || eo.eo_summary,
+          affectedSections: eo.affected_provisions ? (Array.isArray(eo.affected_provisions) ? eo.affected_provisions : [eo.affected_provisions]) : [],
+          confidenceScore: eo.confidence_score || 0.7
+        }));
+        
         // Format compliance tasks for EdSteward
         const complianceTasks = tasksResult.rows.map((task, index) => ({
           taskId: task.task_id || `task-${regulation.reg_key}-${index}`,
@@ -920,16 +958,21 @@ class DeliveryServer {
             requirements: tasksResult.rows.filter(t => t.requirement_type === 'requirement').length,
             bestPractices: tasksResult.rows.filter(t => t.requirement_type === 'best_practice').length
           },
+          taskSyncMode: 'merge',  // Preserves completed tasks, updates pending, adds new
           status: 'pending',
           metadata: {
             source: 'MCP_ENGINE_GOLD_CERTIFIED',
             timestamp: new Date().toISOString(),
             mcpEngineId: regulationSlug,
-            syncType: 'gold-certified-push'
+            syncType: 'gold-certified-push',
+            // Executive Order data for EdSteward
+            executiveOrders,
+            eo_count: executiveOrders.length,
+            eo_critical_count: executiveOrders.filter(eo => eo.impactSeverity === 'critical').length
           }
         };
         
-        console.log(`📋 Sending ${regulation.reg_key}: ${complianceTasks.length} tasks (${payload.taskStats.requirements} req, ${payload.taskStats.bestPractices} best)`);
+        console.log(`📋 Sending ${regulation.reg_key}: ${complianceTasks.length} tasks (${payload.taskStats.requirements} req, ${payload.taskStats.bestPractices} best), ${executiveOrders.length} EOs`);
         
         // Use local EdSteward for dev, production URL for prod
         const edstewardUrl = process.env.EDSTEWARD_URL || 'http://localhost:3000';
