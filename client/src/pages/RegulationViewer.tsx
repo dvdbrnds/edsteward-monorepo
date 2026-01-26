@@ -138,12 +138,12 @@ export function RegulationViewer() {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-64"
           />
-          <Select value={filterCategory} onValueChange={setFilterCategory}>
+          <Select value={filterCategory || "all"} onValueChange={(v) => setFilterCategory(v === "all" ? "" : v)}>
             <SelectTrigger className="w-48">
               <SelectValue placeholder="Filter by category" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">All Categories</SelectItem>
+              <SelectItem value="all">All Categories</SelectItem>
               {categories.map(category => (
                 <SelectItem key={category} value={category}>
                   {category}

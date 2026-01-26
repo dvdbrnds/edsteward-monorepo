@@ -448,19 +448,19 @@ export function RoleAssignmentsSettings() {
             <div>
               <Label>Assign to User (from system)</Label>
               <Select
-                value={formData.defaultUserId}
+                value={formData.defaultUserId || "_none_"}
                 onValueChange={(value) => setFormData(prev => ({ 
                   ...prev, 
-                  defaultUserId: value,
-                  defaultEmail: value ? '' : prev.defaultEmail, // Clear external email if user selected
-                  defaultName: value ? '' : prev.defaultName,
+                  defaultUserId: value === "_none_" ? "" : value,
+                  defaultEmail: value && value !== "_none_" ? '' : prev.defaultEmail, // Clear external email if user selected
+                  defaultName: value && value !== "_none_" ? '' : prev.defaultName,
                 }))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select a user..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">-- None --</SelectItem>
+                  <SelectItem value="_none_">-- None --</SelectItem>
                   {users?.map(user => (
                     <SelectItem key={user.id} value={user.id.toString()}>
                       {getUserName(user)} ({user.email})
@@ -578,19 +578,19 @@ export function RoleAssignmentsSettings() {
             <div>
               <Label>Assign to User</Label>
               <Select
-                value={newRoleData.defaultUserId}
+                value={newRoleData.defaultUserId || "_none_"}
                 onValueChange={(value) => setNewRoleData(prev => ({ 
                   ...prev, 
-                  defaultUserId: value,
-                  defaultEmail: value ? '' : prev.defaultEmail,
-                  defaultName: value ? '' : prev.defaultName,
+                  defaultUserId: value === "_none_" ? "" : value,
+                  defaultEmail: value && value !== "_none_" ? '' : prev.defaultEmail,
+                  defaultName: value && value !== "_none_" ? '' : prev.defaultName,
                 }))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select a user..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">-- None --</SelectItem>
+                  <SelectItem value="_none_">-- None --</SelectItem>
                   {users?.map(user => (
                     <SelectItem key={user.id} value={user.id.toString()}>
                       {getUserName(user)} ({user.email})
