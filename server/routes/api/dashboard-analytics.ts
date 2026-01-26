@@ -201,7 +201,7 @@ router.get('/', async (req, res) => {
       name,
       total: data.total,
       compliant: data.compliant,
-      rate: data.total > 0 ? Math.round((data.compliant / data.total) * 100) : 0
+      rate: data.total > 0 ? parseFloat(((data.compliant / data.total) * 100).toFixed(1)) : 0
     })).sort((a, b) => b.total - a.total);
 
     // === BUILD RESPONSE ===
@@ -217,7 +217,7 @@ router.get('/', async (req, res) => {
         needsAttention: needsAttentionRegs,
         nonCompliant: nonCompliantRegs,
         pending: pendingRegs,
-        complianceRate: Math.round(regComplianceRate)
+        complianceRate: parseFloat(regComplianceRate.toFixed(1))
       },
       tasks: {
         total: totalTasks,
@@ -225,18 +225,18 @@ router.get('/', async (req, res) => {
         inProgress: inProgressTasks,
         pending: pendingTasks,
         overdue: overdueTasks,
-        completionRate: Math.round(requirementCompletionRate),
+        completionRate: parseFloat(requirementCompletionRate.toFixed(1)),
         // Requirement type breakdown (MCP Engine sync Jan 2026)
         requirements: {
           total: totalRequirements,
           completed: completedRequirements,
-          completionRate: totalRequirements > 0 ? Math.round((completedRequirements / totalRequirements) * 100) : 100
+          completionRate: totalRequirements > 0 ? parseFloat(((completedRequirements / totalRequirements) * 100).toFixed(1)) : 100
         },
         bestPractices: {
           total: totalBestPractices,
           completed: completedBestPractices,
-          completionRate: totalBestPractices > 0 ? Math.round((completedBestPractices / totalBestPractices) * 100) : 0,
-          bonus: Math.round(bestPracticeBonus)
+          completionRate: totalBestPractices > 0 ? parseFloat(((completedBestPractices / totalBestPractices) * 100).toFixed(1)) : 0,
+          bonus: parseFloat(bestPracticeBonus.toFixed(1))
         }
       },
       deadlines: {
@@ -250,12 +250,12 @@ router.get('/', async (req, res) => {
           dueDate: d.dueDate,
           regulationId: d.regulationId
         })),
-        completionRate: Math.round(deadlineCompletionRate)
+        completionRate: parseFloat(deadlineCompletionRate.toFixed(1))
       },
       attestations: {
         completed: completedAttestations,
         pending: pendingAttestations,
-        rate: Math.round(attestationRate)
+        rate: parseFloat(attestationRate.toFixed(1))
       },
       users: {
         total: totalUsers,
