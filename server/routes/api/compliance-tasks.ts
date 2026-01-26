@@ -2359,7 +2359,19 @@ router.post('/attestation/:token/attest', async (req: Request, res: Response) =>
     const now = new Date();
 
     // Create attestation signature with timestamp
-    const fullSignature = `${signature}\n\nDigitally attested by ${attestationToken.recipientName || attestationToken.email} on ${now.toISOString()}`;
+    const attesterName = attestationToken.recipientName || attestationToken.email;
+    const fullSignature = `${signature}\n\nDigitally attested by ${attesterName} on ${now.toISOString()}`;
+
+    // Try to find a user matching the attestation email
+    let completedByUserId: number | null = null;
+    const matchingUser = await db.select({ id: users.id })
+      .from(users)
+      .where(eq(users.email, attestationToken.email))
+      .limit(1);
+    
+    if (matchingUser.length > 0) {
+      completedByUserId = matchingUser[0].id;
+    }
 
     // Update task with attestation
     const [updatedTask] = await db.update(complianceTasks)
@@ -2370,6 +2382,7 @@ router.post('/attestation/:token/attest', async (req: Request, res: Response) =>
         attestationStatus: 'attested',
         status: 'completed',
         completedAt: now,
+        completedBy: completedByUserId, // Set if email matches a user
         updatedAt: now,
       })
       .where(eq(complianceTasks.id, task.id))

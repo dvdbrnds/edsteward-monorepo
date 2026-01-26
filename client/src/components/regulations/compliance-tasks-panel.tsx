@@ -468,8 +468,10 @@ function TaskItem({
                   {task.completedByUser 
                     ? (task.completedByUser.firstName && task.completedByUser.lastName
                         ? `${task.completedByUser.firstName} ${task.completedByUser.lastName}`
-                        : task.completedByUser.username)
-                    : 'Unknown'}
+                        : task.completedByUser.username || task.completedByUser.email)
+                    : task.attestationSignature
+                      ? task.attestationSignature.match(/attested by ([^\n]+) on/)?.[1] || 'External Attester'
+                      : 'Unknown'}
                   {task.completedByUser?.email && (
                     <span className="text-green-600 ml-1">({task.completedByUser.email})</span>
                   )}
