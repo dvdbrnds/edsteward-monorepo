@@ -17,9 +17,9 @@ else
     echo "✅ Colima is already running"
 fi
 
-# Stop any existing containers
+# Stop any existing containers and remove stale volumes
 echo "🛑 Stopping any existing EdSteward containers..."
-docker-compose -f docker-compose.dev.yml down 2>/dev/null || true
+docker-compose -f docker-compose.dev.yml down -v 2>/dev/null || true
 
 # Start the development environment
 echo "🏗️  Starting EdSteward development containers..."

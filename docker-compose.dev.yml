@@ -8,12 +8,12 @@ services:
       - "3000:3000"
     environment:
       - NODE_ENV=development
-      - DATABASE_URL=postgresql://neondb_owner:npg_foSr6ixkzw7W@ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require
-      - DB_HOST=ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech
+      - DATABASE_URL=postgresql://neondb_owner:npg_a2BNKdZeg9FU@ep-summer-pine-ae88mdbc-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require
+      - DB_HOST=ep-summer-pine-ae88mdbc-pooler.c-2.us-east-2.aws.neon.tech
       - DB_PORT=5432
       - DB_NAME=neondb
       - DB_USER=neondb_owner
-      - DB_PASSWORD=npg_foSr6ixkzw7W
+      - DB_PASSWORD=npg_a2BNKdZeg9FU
       - DB_SSL=true
       - SESSION_SECRET=dev-secret-key-for-local-development-only
       - HOSTNAME=0.0.0.0
@@ -47,5 +47,5 @@ services:
     # Allow access from all local domains
     extra_hosts:
       - "edsteward.local:127.0.0.1"
-      - "admin.edsteward.local:127.0.0.1"  
+      - "admin.edsteward.local:127.0.0.1"
       - "moravian.edsteward.local:127.0.0.1"

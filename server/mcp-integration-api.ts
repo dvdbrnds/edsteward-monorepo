@@ -1085,11 +1085,12 @@ export function setupMCPIntegrationApi(app: express.Application) {
       }
       
       // Handle compliance tasks
-      // REPLACE mode (default): deletes all existing tasks and inserts new ones
-      // MERGE mode (preserveExistingTasks=true): adds new tasks without deleting existing
+      // MERGE mode (default, changed Jan 2026 to prevent data loss): adds new tasks without deleting existing
+      // REPLACE mode (preserveExistingTasks=false): deletes all existing tasks and inserts new ones
+      // NOTE: Changed default from REPLACE to MERGE after ~2400 tasks were accidentally deleted
       const createdTasks: Array<{ id: number; tempId?: string; title: string }> = [];
       const taskIdMap = new Map<string, number>();
-      const preserveTasks = data.preserveExistingTasks === true;
+      const preserveTasks = data.preserveExistingTasks !== false; // Default to MERGE (true) for safety
       
       if (data.complianceTasks && data.complianceTasks.length > 0) {
         const mode = preserveTasks ? 'MERGE' : 'REPLACE';
