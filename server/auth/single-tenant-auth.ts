@@ -332,6 +332,13 @@ function setupAuthRoutes(app: Express): void {
           console.error('🔐 SAML no user returned, info:', info);
           return res.redirect('/login?error=saml_no_user');
         }
+        
+        // CRITICAL: Attach tenantId to user for session serialization (same as /api/authenticate)
+        // This prevents the "Session tenant mismatch" error in multi-tenant mode
+        const tenantId = (req as any).tenantId || 'default';
+        (user as any)._tenantId = tenantId;
+        console.log(`🔐 SAML attaching tenant '${tenantId}' to user`);
+        
         req.logIn(user, (loginErr) => {
           if (loginErr) {
             console.error('🔐 SAML login error:', loginErr.message);
