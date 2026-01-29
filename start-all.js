@@ -14,6 +14,7 @@ import { execSync } from 'child_process';
 
 // Configuration
 const REGISTRY_PORT = 3010;
+const LLM_GATEWAY_PORT = 3002;
 const CLIENT_PORT = 3050;
 
 // Track running processes
@@ -102,9 +103,8 @@ async function uploadTestRegulations() {
 async function killProcessOnPort(port) {
   try {
     const { execSync } = await import('child_process');
-    // Find the PID(s) using the port - use a more aggressive approach for port 3000
-    const command = port === 3000 ? `lsof -ti :${port}` : `lsof -ti tcp:${port}`;
-    console.log(`Finding processes on port ${port} using: ${command}`);
+    const command = `lsof -ti tcp:${port}`;
+    console.log(`Finding processes on port ${port}...`);
     
     const stdout = execSync(command).toString();
     const pids = stdout.split('\n').filter(Boolean);
@@ -112,18 +112,11 @@ async function killProcessOnPort(port) {
       console.log(`Killing process(es) on port ${port}: ${pids.join(', ')}`);
       for (const pid of pids) {
         try {
-          // Force kill (-9) to ensure the process is terminated
           execSync(`kill -9 ${pid}`);
           console.log(`Successfully killed PID ${pid} on port ${port}`);
         } catch (e) {
           console.warn(`Failed to kill PID ${pid}:`, e.message);
         }
-      }
-      
-      // Add extra delay for port 3000 to ensure it's fully released
-      if (port === 3000) {
-        console.log(`Adding extra delay for port ${port} release...`);
-        await sleep(3000); // 3 second delay specifically for port 3000
       }
     } else {
       console.log(`No processes found using port ${port}`);
@@ -243,11 +236,9 @@ async function startAll() {
     ensureDependencies(path.join(process.cwd(), 'server'));
 
     // Kill any process using the required ports
-    await killProcessOnPort(3000);
-    await killProcessOnPort(3001);
-    await killProcessOnPort(3010);
-    await killProcessOnPort(REGISTRY_PORT);
-    await killProcessOnPort(CLIENT_PORT);
+    await killProcessOnPort(REGISTRY_PORT);    // 3010
+    await killProcessOnPort(LLM_GATEWAY_PORT); // 3002
+    await killProcessOnPort(CLIENT_PORT);      // 3050
 
     // Wait a bit to ensure ports are released
     await sleep(2000);
@@ -273,6 +264,7 @@ async function startAll() {
     
     console.log('\n🚀 All components started!');
     console.log(`- Registry API: http://localhost:${REGISTRY_PORT}`);
+    console.log(`- LLM Gateway: http://localhost:${LLM_GATEWAY_PORT}`);
     console.log(`- Client application (Vite): http://localhost:${CLIENT_PORT}`);
     console.log('Press Ctrl+C to stop all servers');
   } catch (error) {
