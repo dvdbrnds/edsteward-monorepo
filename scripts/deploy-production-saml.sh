@@ -146,7 +146,7 @@ cat > saml-task-definition.json << EOF
         },
         {
           "name": "DATABASE_URL",
-          "value": "postgresql://neondb_owner:npg_foSr6ixkzw7W@ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require"
+          "value": "postgresql://neondb_owner:npg_a2BNKdZeg9FU@ep-summer-pine-ae88mdbc-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require"
         },
         {
           "name": "SESSION_SECRET",
