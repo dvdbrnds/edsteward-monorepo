@@ -115,6 +115,8 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Session configuration
+// NOTE: sameSite must be 'none' for SAML callbacks (cross-origin POST from IdP)
+// This requires secure: true (HTTPS) which is enforced in production
 app.use(session({
   secret: process.env.SESSION_SECRET || 'your-secret-key',
   resave: false,
@@ -123,7 +125,8 @@ app.use(session({
     secure: process.env.NODE_ENV === 'production',
     httpOnly: true,
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    sameSite: 'lax', // CRITICAL: Required for modern browsers to send cookies
+    // 'none' required for SAML (cross-origin POST), 'lax' for dev without SAML
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
   },
 }));
 
