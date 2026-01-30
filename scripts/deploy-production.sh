@@ -1,138 +1,249 @@
 #!/bin/zsh
 
-# 🚀 EdSteward Production Deployment (AWS Only)
-# PROVEN WORKING METHOD - AWS-only deployment
-# Usage: ./scripts/deploy-production.sh
+# ============================================================================
+# EdSteward Production Deployment Script (GATED)
+# ============================================================================
+# Safely deploy to production with multiple safety gates.
+#
+# REQUIREMENTS:
+#   - Version MUST have been deployed to staging first
+#   - Interactive confirmation required
+#   - Health checks must pass before completion
+#
+# Usage: ./scripts/deploy-production.sh <version>
+# Example: ./scripts/deploy-production.sh v1.2.3
+#
+# Safety Gates:
+#   1. Version must exist in staging deployments
+#   2. Image must exist in ECR
+#   3. Staging health check must pass
+#   4. Interactive "deploy production" confirmation
+#   5. Cooldown check (warns if deploying too frequently)
+# ============================================================================
 
 set -e
 
-# Fix AWS CLI pager issue in zsh - CRITICAL for macOS
-export AWS_PAGER=""
+# Get script directory and source common functions
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+source "$SCRIPT_DIR/lib/deploy-common.sh"
+source "$SCRIPT_DIR/lib/safety-checks.sh"
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+# Production Configuration
+CLUSTER_NAME="edsteward-cluster"
+SERVICE_NAME="edsteward-service"
+TASK_FAMILY="edsteward-saml-production"
+ENVIRONMENT="production"
+PRODUCTION_URL="https://moravian.edsteward.ai"
 
-# Configuration - Production deployment values
-AWS_REGION="us-east-1"
-AWS_ACCOUNT_ID="259661441422"
-ECR_REPOSITORY="edsteward-multi-tenant"  # CORRECT: from working deployments
-ECR_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}"
-ECS_CLUSTER="edsteward-cluster"           # CORRECT: from working deployments
-ECS_SERVICE="edsteward-service"           # CORRECT: from working deployments
-COMMIT_SHA=$(git rev-parse --short HEAD)
-IMAGE_TAG="prod-${COMMIT_SHA}"
-LATEST_TAG="latest"
+# Parse arguments
+VERSION="${1:-}"
 
-# Functions
-log() {
-    echo -e "${BLUE}[INFO]${NC} $1"
-}
-
-success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1"
-}
-
-error() {
-    echo -e "${RED}[ERROR]${NC} $1"
+if [[ -z "$VERSION" ]]; then
+    echo -e "${RED}Error: Version required${NC}"
+    echo ""
+    echo "Usage: ./scripts/deploy-production.sh <version>"
+    echo "Example: ./scripts/deploy-production.sh v1.2.3"
+    echo ""
+    echo -e "${YELLOW}IMPORTANT:${NC} The version must first be deployed to staging!"
+    echo ""
+    echo "Workflow:"
+    echo "  1. Deploy to staging:    ./scripts/deploy-staging.sh v1.2.3"
+    echo "  2. Test on staging"
+    echo "  3. Deploy to production: ./scripts/deploy-production.sh v1.2.3"
+    echo ""
+    echo "Recent staging deployments:"
+    list_deployments "staging" 5
     exit 1
-}
-
-echo -e "${BLUE}🚀 EdSteward Production Deployment (Proven Working Method)${NC}"
-echo "=================================================================="
-
-# Step 1: Pre-flight checks
-log "Running pre-flight checks..."
-if ! command -v aws &> /dev/null; then
-    error "AWS CLI not found. Install with: brew install awscli"
 fi
-if ! command -v docker &> /dev/null; then
-    error "Docker not found. Install with: brew install docker"
-fi
-if ! docker info &> /dev/null; then
-    error "Docker is not running. Please start Docker Desktop"
-fi
-success "Pre-flight checks passed"
 
-# Step 2: Kill any processes on port 3000
-log "Clearing any processes on port 3000..."
-lsof -ti:3000 | xargs kill -9 2>/dev/null || true
-success "Port 3000 cleared"
+# Validate version format
+validate_version "$VERSION"
 
-# Step 3: Build frontend - EXACT command from working workflow
-log "Building frontend..."
-if ! npm run build; then
-    error "Frontend build failed"
-fi
-success "Frontend build completed"
+print_banner "EdSteward Production Deployment" "PRODUCTION"
 
-# Step 4: Build Docker Image - Deployment command
-log "Building Docker image for AWS (linux/amd64)..."
-if ! docker build --platform linux/amd64 -t ${ECR_URI}:${IMAGE_TAG} .; then
-    error "Docker build failed"
-fi
-success "Docker build successful: ${IMAGE_TAG}"
+echo -e "${RED}╔════════════════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${RED}║  WARNING: This will deploy to PRODUCTION and affect REAL USERS!       ║${NC}"
+echo -e "${RED}╚════════════════════════════════════════════════════════════════════════╝${NC}"
+echo ""
 
-# Step 5: Tag as latest - EXACT pattern from working GitHub Actions
-log "Tagging as latest..."
-docker tag ${ECR_URI}:${IMAGE_TAG} ${ECR_URI}:${LATEST_TAG}
+# Pre-flight checks
+run_preflight_checks
 
-# Step 6: Login to ECR - Deployment command
-log "Logging into ECR..."
-if ! aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${ECR_URI}; then
-    error "ECR login failed"
-fi
-success "ECR login successful"
+# Check for uncommitted changes
+check_uncommitted_changes
 
-# Step 7: Push to ECR - EXACT commands from working GitHub Actions
-log "Pushing images to ECR..."
-if ! docker push ${ECR_URI}:${IMAGE_TAG}; then
-    error "Image push failed"
-fi
-if ! docker push ${ECR_URI}:${LATEST_TAG}; then
-    error "Latest tag push failed"
-fi
-success "Images pushed successfully"
+# Check deployment cooldown (warn if < 5 minutes since last deploy)
+check_deployment_cooldown "production" 5
 
-# Step 8: Update ECS Service - Deployment command
-log "Updating ECS service..."
-if ! aws ecs update-service \
-    --cluster ${ECS_CLUSTER} \
-    --service ${ECS_SERVICE} \
-    --force-new-deployment \
-    --region ${AWS_REGION}; then
-    error "ECS service update failed"
-fi
-success "ECS service update initiated"
+# Get current production version BEFORE gates (for comparison)
+CURRENT_VERSION=$(get_current_version "$CLUSTER_NAME" "$SERVICE_NAME")
 
-# Step 9: Simple wait for stability
-log "Waiting for deployment to stabilize..."
-echo "This may take 2-5 minutes..."
-sleep 120  # Give it time to start
+# ============================================================================
+# SAFETY GATES
+# ============================================================================
 
-echo -e "\n${GREEN}🎉 DEPLOYMENT COMPLETED!${NC}"
-echo "=================================================================="
-echo -e "${GREEN}✅ EdSteward deployed with proven working method${NC}"
-echo -e "${BLUE}🌐 URL: https://edsteward-alb-554701445.us-east-1.elb.amazonaws.com${NC}"
-echo -e "${BLUE}📦 Image: ${ECR_URI}:${IMAGE_TAG}${NC}"
-echo -e "${BLUE}🏷️  Latest: ${ECR_URI}:${LATEST_TAG}${NC}"
-echo -e "${BLUE}⚡ Features: Branding + Database improvements deployed${NC}"
+echo ""
+echo -e "${CYAN}=== Running Safety Gates ===${NC}"
+echo ""
 
-log "Deployment summary saved to deployment-status.json"
-cat > deployment-status.json << EOF
+# Gate 1: Require staging deployment
+step "Gate 1/4: Checking staging deployment..."
+require_staging_deployment "$VERSION"
+
+# Gate 2: Verify image exists in ECR
+step "Gate 2/4: Verifying image in ECR..."
+require_image_in_ecr "$VERSION"
+
+# Gate 3: Check staging health
+step "Gate 3/4: Verifying staging health..."
+verify_staging_health
+
+# Gate 4: Check no deployment in progress
+step "Gate 4/4: Checking for in-progress deployments..."
+check_deployment_in_progress "$CLUSTER_NAME" "$SERVICE_NAME"
+
+echo ""
+success "All safety gates passed!"
+
+# Show deployment summary and get confirmation
+show_production_deploy_summary "$VERSION" "$CURRENT_VERSION"
+confirm_production_deploy "$VERSION"
+
+# ============================================================================
+# DEPLOYMENT
+# ============================================================================
+
+echo ""
+step "1/3 - Creating ECS Task Definition"
+
+log "Creating new task definition..."
+
+# Create task definition - using secrets from Secrets Manager
+TASK_DEF_JSON=$(cat << EOF
 {
-  "deploymentTime": "$(date -u +"%Y-%m-%dT%H:%M:%SZ")",
-  "imageTag": "${IMAGE_TAG}",
-  "commitSha": "${COMMIT_SHA}",
-  "ecrUri": "${ECR_URI}",
-  "cluster": "${ECS_CLUSTER}",
-  "service": "${ECS_SERVICE}",
-  "status": "completed",
-  "url": "https://edsteward-alb-554701445.us-east-1.elb.amazonaws.com"
+  "family": "${TASK_FAMILY}",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048",
+  "executionRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/ecsTaskRole",
+  "containerDefinitions": [
+    {
+      "name": "edsteward-app",
+      "image": "${ECR_URI}:${VERSION}",
+      "portMappings": [
+        {
+          "containerPort": 3000,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "environment": [
+        {"name": "NODE_ENV", "value": "production"},
+        {"name": "PORT", "value": "3000"},
+        {"name": "HOSTNAME", "value": "0.0.0.0"},
+        {"name": "ENVIRONMENT", "value": "production"},
+        {"name": "BASE_URL", "value": "${PRODUCTION_URL}"},
+        {"name": "VERSION", "value": "${VERSION}"},
+        {"name": "INSTITUTION_NAME", "value": "Moravian_University"},
+        {"name": "INSTITUTION_DOMAIN", "value": "moravian.edu"},
+        {"name": "AUTH_SAML_ENABLED", "value": "true"},
+        {"name": "AUTH_SAML_ENTITY_ID", "value": "urn:edsteward:sp"},
+        {"name": "AUTH_SAML_SSO_URL", "value": "https://login.moravian.edu/app/moravian_edstewardbeta_1/exk1c4nmsctSaNRIg0x8/sso/saml"},
+        {"name": "AUTH_ALLOW_SELF_REGISTRATION", "value": "true"},
+        {"name": "SAML_SP_ENTITY_ID", "value": "urn:edsteward:sp"},
+        {"name": "SAML_CALLBACK_URL", "value": "${PRODUCTION_URL}/auth/saml/callback"},
+        {"name": "SAML_SLO_URL", "value": "${PRODUCTION_URL}/auth/saml/logout"}
+      ],
+      "secrets": [
+        {
+          "name": "DATABASE_URL",
+          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:edsteward/production/database-url"
+        },
+        {
+          "name": "SESSION_SECRET",
+          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:edsteward/production/session-secret"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/edsteward-saml-production",
+          "awslogs-region": "${AWS_REGION}",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "healthCheck": {
+        "command": ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      }
+    }
+  ]
 }
 EOF
+)
 
-echo -e "\n${GREEN}🎯 DEPLOYMENT READY!${NC}" 
+echo "$TASK_DEF_JSON" > /tmp/production-task-def.json
+
+TASK_DEF_ARN=$(aws ecs register-task-definition \
+    --cli-input-json file:///tmp/production-task-def.json \
+    --query 'taskDefinition.taskDefinitionArn' \
+    --output text \
+    --region "$AWS_REGION")
+
+rm -f /tmp/production-task-def.json
+success "Task definition registered: $TASK_DEF_ARN"
+
+echo ""
+step "2/3 - Deploying to ECS"
+
+log "Updating ECS service..."
+aws ecs update-service \
+    --cluster "$CLUSTER_NAME" \
+    --service "$SERVICE_NAME" \
+    --task-definition "$TASK_DEF_ARN" \
+    --force-new-deployment \
+    --region "$AWS_REGION" > /dev/null
+
+# Also tag the image as production-latest
+log "Tagging image as production-latest..."
+docker pull "$ECR_URI:$VERSION" 2>/dev/null || true
+docker tag "$ECR_URI:$VERSION" "$ECR_URI:production-latest" 2>/dev/null || true
+docker push "$ECR_URI:production-latest" 2>/dev/null || warn "Could not update production-latest tag"
+
+# Wait for deployment with progress
+show_deployment_progress "$CLUSTER_NAME" "$SERVICE_NAME" 600
+
+echo ""
+step "3/3 - Verifying Deployment Health"
+
+# Verify health
+verify_health "$PRODUCTION_URL" 30 10
+
+# Record successful deployment
+record_deployment "$ENVIRONMENT" "$VERSION" "success" "$TASK_DEF_ARN" "$CURRENT_VERSION"
+
+# Final summary
+echo ""
+echo -e "${GREEN}╔════════════════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${GREEN}║              PRODUCTION DEPLOYMENT SUCCESSFUL!                          ║${NC}"
+echo -e "${GREEN}╚════════════════════════════════════════════════════════════════════════╝${NC}"
+echo ""
+echo -e "  ${CYAN}Version Deployed:${NC}    $VERSION"
+echo -e "  ${CYAN}Previous Version:${NC}    $CURRENT_VERSION"
+echo -e "  ${CYAN}Task Definition:${NC}     $TASK_DEF_ARN"
+echo -e "  ${CYAN}Production URL:${NC}      $PRODUCTION_URL"
+echo -e "  ${CYAN}Deployed By:${NC}         $(whoami)"
+echo -e "  ${CYAN}Deployed At:${NC}         $(date)"
+echo ""
+echo -e "${YELLOW}Important:${NC}"
+echo "  - Monitor logs: aws logs tail /ecs/edsteward-saml-production --follow"
+echo "  - Check health: curl $PRODUCTION_URL/api/health"
+echo ""
+echo -e "  If issues arise, rollback with:"
+echo -e "     ${CYAN}./scripts/rollback-production.sh${NC}"
+echo ""
