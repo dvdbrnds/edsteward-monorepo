@@ -66,6 +66,9 @@ admin-console/node_modules/
 
 # Coverage reports (too large)
 coverage/
+
+# ByteRover (decommissioned Jan 27, 2026)
+.brv/
 .clinerules/byterover-rules.md
 .kilocode/rules/byterover-rules.md
 .roo/rules/byterover-rules.md

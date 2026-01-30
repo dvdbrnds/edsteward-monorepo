@@ -28,7 +28,7 @@ IMAGE_TAG="saml-prod-${COMMIT_SHA}"
 LATEST_TAG="latest"
 
 # Production URLs for SAML
-PRODUCTION_BASE_URL="https://edsteward-alb-554701445.us-east-1.elb.amazonaws.com"
+PRODUCTION_BASE_URL="https://moravian.edsteward.ai"
 
 # Functions
 log() {
