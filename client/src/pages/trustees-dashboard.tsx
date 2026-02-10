@@ -254,7 +254,7 @@ export default function TrusteesDashboard() {
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold text-foreground mb-2">Error Loading Dashboard</h2>
+          <h1 className="text-xl font-semibold text-foreground mb-2">Error Loading Dashboard</h1>
           <p className="text-muted-foreground mb-4">{error}</p>
           <Button onClick={() => window.location.reload()}>
             Try Again

@@ -3,7 +3,7 @@ import { useAuth } from "@/hooks/use-auth";
 import { useLocation } from "wouter";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { insertUserSchema } from "@shared/schema";
+import { loginSchema } from "@shared/schema";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -23,7 +23,7 @@ export default function AuthPage() {
   const [loginCredentials, setLoginCredentials] = useState<{ username: string; password: string } | null>(null);
 
   const loginForm = useForm({
-    resolver: zodResolver(insertUserSchema.pick({ username: true, password: true })),
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       username: "",
       password: ""
@@ -157,7 +157,7 @@ export default function AuthPage() {
               {mfaRequired && (
                 <div className="mt-6 space-y-4">
                   <div className="text-center">
-                    <h3 className="text-lg font-semibold">Multi-Factor Authentication</h3>
+                    <h2 className="text-lg font-semibold">Multi-Factor Authentication</h2>
                     <p className="text-sm text-muted-foreground mt-1">
                       Enter the 6-digit code from your authenticator app
                     </p>

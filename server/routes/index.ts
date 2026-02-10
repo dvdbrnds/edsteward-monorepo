@@ -39,6 +39,9 @@ import roleAssignmentsRouter from './api/role-assignments';
 import dashboardAnalyticsRouter from './api/dashboard-analytics';
 import reportsRouter from './api/reports';
 import executiveOrdersRouter from './api/executive-orders';
+import complianceRouter from './api/compliance';
+import featureFlagsRouter from './api/feature-flags';
+import dataExportRouter from './api/data-export';
 // @ts-ignore
 import migrationRoutes from './database-migration.js';
 
@@ -384,6 +387,9 @@ export function registerRoutes(app: express.Application): Server {
   app.use('/api/dashboard-analytics', dashboardAnalyticsRouter); // Executive dashboard analytics
   app.use('/api/reports', reportsRouter); // Compliance reports and exports
   app.use('/api/executive-orders', executiveOrdersRouter); // Executive Order tracking (MCP Engine Jan 2026)
+  app.use('/api/compliance', complianceRouter); // HECVAT compliance reports for tenants
+  app.use('/api/feature-flags', featureFlagsRouter); // Feature flag management
+  app.use('/api/my-data', dataExportRouter); // Self-service data export (HECVAT PRIV-03)
 
   // Note: AWS Tenant Management was removed - belongs in separate admin-console app at admin.edsteward.ai
   

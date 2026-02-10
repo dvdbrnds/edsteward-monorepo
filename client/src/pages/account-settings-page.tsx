@@ -18,7 +18,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { User, Shield, Mail, Calendar, Building, Bell, Loader2 } from "lucide-react";
+import { User, Shield, Mail, Calendar, Building, Bell, Loader2, Download, Database } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import MFASetup from "@/components/features/mfa/mfa-setup";
 
@@ -360,6 +360,67 @@ export default function AccountSettingsPage() {
                 )}
               </Button>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Data Privacy & Export (HECVAT PRIV-03) */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Database className="h-5 w-5" />
+              Data Privacy
+            </CardTitle>
+            <CardDescription>
+              View and export your personal data held by the system
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="text-sm text-muted-foreground space-y-2">
+              <p>
+                You have the right to access, export, and request deletion of your personal data.
+                Use the button below to download a complete copy of all data associated with your account.
+              </p>
+              <p className="text-xs">
+                This includes your profile information, assigned tasks, activity history,
+                uploaded evidence metadata, notes, attestation records, and audit trail.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={async () => {
+                  try {
+                    const response = await fetch('/api/my-data');
+                    if (!response.ok) throw new Error('Export failed');
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `my-data-export-${new Date().toISOString().split('T')[0]}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                    toast({
+                      title: "Export complete",
+                      description: "Your data has been downloaded successfully.",
+                    });
+                  } catch {
+                    toast({
+                      title: "Export failed",
+                      description: "Unable to download your data. Please try again.",
+                      variant: "destructive",
+                    });
+                  }
+                }}
+              >
+                <Download className="h-4 w-4 mr-2" />
+                Download My Data
+              </Button>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              To request account deletion, please contact your system administrator.
+            </p>
           </CardContent>
         </Card>
 

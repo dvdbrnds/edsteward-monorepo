@@ -245,7 +245,7 @@ export default function PublicRegulationDetailPage() {
         <main className="py-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center pt-20">
-              <h2 className="text-2xl font-bold">Regulation Not Found</h2>
+              <h1 className="text-2xl font-bold">Regulation Not Found</h1>
               <p className="mt-2 text-muted-foreground">
                 The regulation you're looking for doesn't exist or you don't have permission to view it.
               </p>

@@ -813,6 +813,7 @@ const DifferentialViewPage: React.FC<DifferentialViewPageProps> = ({ isDemo = fa
                     <Button 
                       variant="outline" 
                       size="sm"
+                      aria-expanded={showDiffDetails}
                       onClick={() => setShowDiffDetails(!showDiffDetails)}
                     >
                       {showDiffDetails ? <ChevronUp className="h-4 w-4 mr-1" /> : <ChevronDown className="h-4 w-4 mr-1" />}
@@ -936,6 +937,8 @@ const DifferentialViewPage: React.FC<DifferentialViewPageProps> = ({ isDemo = fa
                     <Button 
                       variant="ghost" 
                       size="sm"
+                      aria-label={showMetadata ? 'Hide source info' : 'Show source info'}
+                      aria-expanded={showMetadata}
                       onClick={() => setShowMetadata(!showMetadata)}
                     >
                       {showMetadata ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}

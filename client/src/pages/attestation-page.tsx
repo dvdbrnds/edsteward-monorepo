@@ -310,14 +310,14 @@ const AttestationPage: React.FC = () => {
           <CardContent className="p-6 space-y-4">
             {task.description && (
               <div>
-                <h3 className="font-semibold text-slate-700 mb-1">Description</h3>
+                <h2 className="font-semibold text-slate-700 mb-1">Description</h2>
                 <p className="text-slate-600">{task.description}</p>
               </div>
             )}
 
             {task.instructions && (
               <div>
-                <h3 className="font-semibold text-slate-700 mb-1">Instructions</h3>
+                <h2 className="font-semibold text-slate-700 mb-1">Instructions</h2>
                 <p className="text-slate-600 whitespace-pre-wrap">{task.instructions}</p>
               </div>
             )}

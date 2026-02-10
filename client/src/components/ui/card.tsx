@@ -68,13 +68,15 @@ CardHeader.displayName = "CardHeader"
 
 /**
  * @component CardTitle
- * @description Primary heading for the card
+ * @description Primary heading for the card. Supports configurable heading level
+ * via the `as` prop to maintain proper heading hierarchy (WCAG 2.1 AA 1.3.1).
+ * Defaults to h3 for backward compatibility.
  */
 const CardTitle = React.forwardRef<
-  HTMLParagraphElement,
-  React.HTMLAttributes<HTMLHeadingElement>
->(({ className, ...props }, ref) => (
-  <h3
+  HTMLHeadingElement,
+  React.HTMLAttributes<HTMLHeadingElement> & { as?: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6' }
+>(({ className, as: Component = 'h3', ...props }, ref) => (
+  <Component
     ref={ref}
     className={cn(
       "text-2xl font-semibold leading-none tracking-tight",

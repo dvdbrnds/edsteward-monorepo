@@ -139,9 +139,25 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
 
+// Strong password validation for new accounts and password changes (HECVAT PROD-03)
+export const strongPasswordSchema = z.string()
+  .min(12, "Password must be at least 12 characters")
+  .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+  .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+  .regex(/[0-9]/, "Password must contain at least one number")
+  .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character");
+
+// Login schema - only validates that credentials are provided, NOT password strength
+// (existing users may have older passwords that don't meet new requirements)
+export const loginSchema = z.object({
+  username: z.string().min(1, "Username is required"),
+  password: z.string().min(1, "Password is required"),
+});
+
 // Schema for inserting users
 export const insertUserSchema = createInsertSchema(users).extend({
-  password: z.string().min(6).optional(), // Optional because SAML users won't have password
+  password: strongPasswordSchema
+    .optional(), // Optional because SAML users won't have password
   role: z.enum(["admin", "compliance_officer", "department_head", "viewer", "user"]), // Updated role options
   roles: z.string().optional(), // JSON string of roles array
   department: z.string().optional(),

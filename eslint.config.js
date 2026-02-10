@@ -3,6 +3,7 @@ import typescript from '@typescript-eslint/eslint-plugin';
 import typescriptParser from '@typescript-eslint/parser';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
+import jsxA11y from 'eslint-plugin-jsx-a11y';
 import globals from 'globals';
 
 export default [
@@ -31,6 +32,7 @@ export default [
       '@typescript-eslint': typescript,
       'react': react,
       'react-hooks': reactHooks,
+      'jsx-a11y': jsxA11y,
     },
     rules: {
       // Disable base rule in favor of @typescript-eslint version
@@ -47,6 +49,18 @@ export default [
       'react-hooks/exhaustive-deps': 'warn',
       'no-console': 'off', // Allow console for debugging
       'no-debugger': 'warn',
+      // Accessibility rules (WCAG 2.1 AA)
+      'jsx-a11y/alt-text': 'warn',
+      'jsx-a11y/aria-props': 'warn',
+      'jsx-a11y/aria-proptypes': 'warn',
+      'jsx-a11y/aria-unsupported-elements': 'warn',
+      'jsx-a11y/role-has-required-aria-props': 'warn',
+      'jsx-a11y/role-supports-aria-props': 'warn',
+      'jsx-a11y/heading-has-content': 'warn',
+      'jsx-a11y/anchor-has-content': 'warn',
+      'jsx-a11y/click-events-have-key-events': 'warn',
+      'jsx-a11y/no-static-element-interactions': 'warn',
+      'jsx-a11y/label-has-associated-control': 'warn',
     },
     settings: {
       react: {

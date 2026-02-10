@@ -13,7 +13,7 @@ export default function RegulationsPage() {
   return (
     <div className="flex items-center justify-center min-h-screen">
       <div className="text-center">
-        <h2 className="text-2xl font-bold mb-4">Redirecting to Dashboard</h2>
+        <h1 className="text-2xl font-bold mb-4">Redirecting to Dashboard</h1>
         <p className="text-muted-foreground">The regulations page has been integrated into the main dashboard for a better experience.</p>
       </div>
     </div>

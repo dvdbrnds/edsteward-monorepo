@@ -16,6 +16,47 @@ declare global {
 // Convert scrypt to async/await
 const scryptAsync = promisify(scrypt);
 
+// Account lockout tracking (in-memory, per-process)
+// In production, this should be backed by Redis or database
+const failedLoginAttempts = new Map<string, { count: number; lockedUntil: Date | null }>();
+const MAX_FAILED_ATTEMPTS = 5;
+const LOCKOUT_DURATION_MINUTES = 15;
+
+function getLoginKey(tenantId: string, username: string): string {
+  return `${tenantId}:${username}`;
+}
+
+function isAccountLocked(tenantId: string, username: string): boolean {
+  const key = getLoginKey(tenantId, username);
+  const record = failedLoginAttempts.get(key);
+  if (!record || !record.lockedUntil) return false;
+  if (new Date() > record.lockedUntil) {
+    // Lockout expired, reset
+    failedLoginAttempts.delete(key);
+    return false;
+  }
+  return true;
+}
+
+function recordFailedLogin(tenantId: string, username: string): { locked: boolean; attemptsRemaining: number } {
+  const key = getLoginKey(tenantId, username);
+  const record = failedLoginAttempts.get(key) || { count: 0, lockedUntil: null };
+  record.count += 1;
+  
+  if (record.count >= MAX_FAILED_ATTEMPTS) {
+    record.lockedUntil = new Date(Date.now() + LOCKOUT_DURATION_MINUTES * 60 * 1000);
+    failedLoginAttempts.set(key, record);
+    return { locked: true, attemptsRemaining: 0 };
+  }
+  
+  failedLoginAttempts.set(key, record);
+  return { locked: false, attemptsRemaining: MAX_FAILED_ATTEMPTS - record.count };
+}
+
+function clearFailedLogins(tenantId: string, username: string): void {
+  failedLoginAttempts.delete(getLoginKey(tenantId, username));
+}
+
 /**
  * Hash a password using scrypt (Node.js built-in, no external dependencies)
  * @param password - Plain text password
@@ -76,20 +117,34 @@ export function setupAuth(app: Express) {
         const tenantId = req.tenantId || 'default';
         console.log(`[AUTH] Login attempt for user '${username}' in tenant '${tenantId}'`);
         
+        // Account lockout check (HECVAT PROD-03)
+        if (isAccountLocked(tenantId, username)) {
+          await syslog.logAuthEvent(LogLevel.WARNING, "Login rejected - account locked due to failed attempts", undefined, username, { tenantId });
+          return done(null, false, { message: `Account temporarily locked due to too many failed login attempts. Please try again in ${LOCKOUT_DURATION_MINUTES} minutes.` });
+        }
+        
         // Use tenant-aware storage for user lookup
         const tenantStorage = getDatabaseStorage(tenantId);
         const user = await tenantStorage.getUserByUsername(username);
 
         if (!user) {
-          await syslog.logAuthEvent(LogLevel.WARNING, "Failed login attempt - user not found", undefined, username, { tenantId });
-          return done(null, false, { message: 'User not found' });
+          const lockResult = recordFailedLogin(tenantId, username);
+          await syslog.logAuthEvent(LogLevel.WARNING, "Failed login attempt - user not found", undefined, username, { tenantId, attemptsRemaining: lockResult.attemptsRemaining });
+          return done(null, false, { message: 'Invalid credentials' }); // Generic message to prevent username enumeration
         }
 
         const isValidPassword = await verifyPassword(password, user.password);
         if (!isValidPassword) {
-          await syslog.logAuthEvent(LogLevel.WARNING, "Failed login attempt - wrong password", undefined, username, { tenantId });
-          return done(null, false, { message: 'Invalid password' });
+          const lockResult = recordFailedLogin(tenantId, username);
+          await syslog.logAuthEvent(LogLevel.WARNING, `Failed login attempt - wrong password (${lockResult.attemptsRemaining} attempts remaining)`, undefined, username, { tenantId, locked: lockResult.locked });
+          if (lockResult.locked) {
+            return done(null, false, { message: `Account temporarily locked due to too many failed login attempts. Please try again in ${LOCKOUT_DURATION_MINUTES} minutes.` });
+          }
+          return done(null, false, { message: 'Invalid credentials' }); // Generic message
         }
+
+        // Successful login - clear failed attempts
+        clearFailedLogins(tenantId, username);
 
         // CRITICAL: Attach tenantId to user for session serialization
         // This ensures the session is tied to the tenant where login occurred

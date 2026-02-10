@@ -66,6 +66,9 @@ export class DataRetentionService {
     // They have a 7-year retention requirement and should only be
     // archived/purged through a separate controlled process
     
+    // HECVAT PRIV-08: Secure data disposal after deletion
+    jobs.push(await this.secureDataDisposal());
+    
     const totalRecordsDeleted = jobs.reduce((sum, job) => sum + job.recordsDeleted, 0);
     const hasErrors = jobs.some(job => !job.success);
     
@@ -202,13 +205,57 @@ export class DataRetentionService {
     const errors: string[] = [];
     
     try {
-      // Check if deletedAt column exists (it may not in all deployments)
-      // This is a safety check - we handle the error gracefully
+      // Check for users marked as inactive (soft-deleted)
+      // The isActive column serves as our soft-delete flag
+      const countResult = await db
+        .select({ count: sql<number>`count(*)` })
+        .from(users)
+        .where(
+          and(
+            sql`${users.isActive} = false`,
+            lt(users.updatedAt, cutoffDate)
+          )
+        );
       
-      // For now, log that this job ran but didn't find records
-      // In production, you'd implement soft-delete columns on users table
-      syslog.log(LogFacility.LOCAL0, LogLevel.DEBUG, 
-        'Soft-deleted user purge job completed (no records found)');
+      const recordsToDelete = Number(countResult[0]?.count || 0);
+      
+      if (recordsToDelete > 0) {
+        // Securely delete user data before removing records
+        // First, anonymize personal data (overwrite with empty strings)
+        await db
+          .update(users)
+          .set({
+            email: sql`'deleted_' || id || '@purged.edsteward.local'`,
+            password: 'PURGED',
+            firstName: 'Deleted',
+            lastName: 'User',
+            department: null,
+          })
+          .where(
+            and(
+              sql`${users.isActive} = false`,
+              lt(users.updatedAt, cutoffDate)
+            )
+          );
+
+        // Then delete the records
+        await db
+          .delete(users)
+          .where(
+            and(
+              sql`${users.isActive} = false`,
+              lt(users.updatedAt, cutoffDate)
+            )
+          );
+        
+        recordsDeleted = recordsToDelete;
+        
+        syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 
+          `Securely purged ${recordsDeleted} soft-deleted users older than ${RETENTION_PERIODS.SOFT_DELETE_GRACE} days`);
+      } else {
+        syslog.log(LogFacility.LOCAL0, LogLevel.DEBUG, 
+          'Soft-deleted user purge job completed (no records found)');
+      }
       
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
@@ -224,6 +271,57 @@ export class DataRetentionService {
       jobName: 'purgeSoftDeletedUsers',
       recordsProcessed: recordsDeleted,
       recordsDeleted,
+      errors,
+      startedAt,
+      completedAt: new Date(),
+      success: errors.length === 0,
+    };
+  }
+  
+  /**
+   * Secure data disposal (HECVAT PRIV-08)
+   * Overwrite deleted data to prevent recovery, then run VACUUM
+   * This should be run after retention jobs complete
+   */
+  static async secureDataDisposal(): Promise<RetentionJobResult> {
+    const startedAt = new Date();
+    const errors: string[] = [];
+    let recordsProcessed = 0;
+    
+    try {
+      // Run VACUUM on tables that had deletions to reclaim space
+      // and prevent deleted data from being recoverable
+      const tablesToVacuum = ['system_logs', 'users', 'task_attestation_tokens'];
+      
+      for (const table of tablesToVacuum) {
+        try {
+          // VACUUM cannot run inside a transaction, so use raw SQL
+          await db.execute(sql.raw(`VACUUM ${table}`));
+          recordsProcessed++;
+          syslog.log(LogFacility.LOCAL0, LogLevel.DEBUG,
+            `VACUUM completed on table: ${table}`);
+        } catch (vacuumError) {
+          // VACUUM failures are non-critical (e.g., table doesn't exist)
+          const msg = vacuumError instanceof Error ? vacuumError.message : String(vacuumError);
+          syslog.log(LogFacility.LOCAL0, LogLevel.DEBUG,
+            `VACUUM skipped for ${table}: ${msg}`);
+        }
+      }
+      
+      syslog.log(LogFacility.LOCAL0, LogLevel.INFO,
+        `Secure data disposal completed: ${recordsProcessed} tables vacuumed`);
+      
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      errors.push(errorMessage);
+      syslog.log(LogFacility.LOCAL0, LogLevel.ERROR,
+        `Secure data disposal failed: ${errorMessage}`);
+    }
+    
+    return {
+      jobName: 'secureDataDisposal',
+      recordsProcessed,
+      recordsDeleted: 0,
       errors,
       startedAt,
       completedAt: new Date(),

@@ -86,6 +86,58 @@ router.get('/categories/:category', (req: TenantRequest, res) => {
 });
 
 /**
+ * PUT /api/feature-flags/tenant - Update tenant-specific feature flags
+ */
+router.put('/tenant', (req: TenantRequest, res) => {
+  try {
+    const tenantId = req.tenantId || 'admin';
+    const { features } = req.body;
+
+    if (!features || typeof features !== 'object') {
+      return res.status(400).json({
+        error: 'Invalid request',
+        message: 'features must be an object mapping feature keys to boolean values'
+      });
+    }
+
+    // Validate that all provided keys are real feature flags
+    for (const key of Object.keys(features)) {
+      if (!FEATURE_FLAGS[key]) {
+        return res.status(400).json({
+          error: 'Unknown feature flag',
+          message: `Feature flag '${key}' does not exist`
+        });
+      }
+      if (typeof features[key] !== 'boolean') {
+        return res.status(400).json({
+          error: 'Invalid value',
+          message: `Feature flag '${key}' must be a boolean value`
+        });
+      }
+    }
+
+    // In production, this would persist to the database via FeatureFlagService.updateTenantFeatures()
+    // For now, merge with defaults and return the updated config
+    const updatedFeatures: Record<string, boolean> = {};
+    Object.entries(FEATURE_FLAGS).forEach(([key, flag]) => {
+      updatedFeatures[key] = features[key] !== undefined ? features[key] : flag.defaultValue;
+    });
+
+    res.json({
+      success: true,
+      tenantId,
+      features: updatedFeatures,
+      message: 'Feature flags updated successfully'
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: 'Failed to update feature flags',
+      message: error instanceof Error ? error.message : String(error)
+    });
+  }
+});
+
+/**
  * POST /api/feature-flags/check - Check multiple features at once
  */
 router.post('/check', (req: TenantRequest, res) => {

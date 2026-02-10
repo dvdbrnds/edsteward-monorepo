@@ -29,6 +29,7 @@ import { BrandingSettingsV2 } from "@/components/admin/branding-settings";
 import { BackupManagement } from "@/components/admin/backup-management";
 import { NotificationSchedulerSettings } from "@/components/admin/notification-scheduler-settings";
 import { RoleAssignmentsSettings } from "@/components/admin/role-assignments-settings";
+import { ComplianceDocuments } from "@/components/admin/compliance-documents";
 import {
   Table,
   TableBody,
@@ -445,7 +446,7 @@ export default function SystemSettingsPage() {
         <main className="py-10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
-              <h2 className="text-2xl font-semibold text-foreground">Access Denied</h2>
+              <h1 className="text-2xl font-semibold text-foreground">Access Denied</h1>
               <p className="mt-2 text-muted-foreground">You do not have permission to access admin settings.</p>
               <Button
                 variant="outline"
@@ -479,6 +480,7 @@ export default function SystemSettingsPage() {
               <TabsTrigger value="sms" className="flex-shrink-0">SMS</TabsTrigger>
               <TabsTrigger value="users" className="flex-shrink-0">Users</TabsTrigger>
               <TabsTrigger value="roles" className="flex-shrink-0">Roles</TabsTrigger>
+              <TabsTrigger value="compliance" className="flex-shrink-0">Compliance</TabsTrigger>
               <TabsTrigger value="backups" className="flex-shrink-0">Backups</TabsTrigger>
               <TabsTrigger value="logs" className="flex-shrink-0">Logs</TabsTrigger>
             </TabsList>
@@ -976,6 +978,7 @@ export default function SystemSettingsPage() {
                                     <Button
                                       variant="destructive"
                                       size="sm"
+                                      aria-label={`Delete user ${user.username || user.email}`}
                                       onClick={() => {
                                         if (confirm(`Delete user "${user.username || user.email}"? This cannot be undone.`)) {
                                           deleteUser(user.id);
@@ -1004,6 +1007,10 @@ export default function SystemSettingsPage() {
 
             <TabsContent value="roles">
               <RoleAssignmentsSettings />
+            </TabsContent>
+
+            <TabsContent value="compliance">
+              <ComplianceDocuments />
             </TabsContent>
 
             <TabsContent value="backups">

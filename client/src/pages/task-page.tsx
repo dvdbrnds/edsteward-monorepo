@@ -249,7 +249,7 @@ export default function TaskPage() {
             {/* Description */}
             {task.description && (
               <div>
-                <h3 className="font-medium text-foreground mb-2">Description</h3>
+                <h2 className="font-medium text-foreground mb-2">Description</h2>
                 <p className="text-muted-foreground">{task.description}</p>
               </div>
             )}
@@ -257,7 +257,7 @@ export default function TaskPage() {
             {/* Instructions */}
             {task.instructions && (
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <h3 className="font-medium text-blue-900 mb-2">Instructions</h3>
+                <h2 className="font-medium text-blue-900 mb-2">Instructions</h2>
                 <p className="text-blue-800 whitespace-pre-wrap">{task.instructions}</p>
               </div>
             )}

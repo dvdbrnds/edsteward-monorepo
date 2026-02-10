@@ -58,20 +58,6 @@ export const FEATURE_FLAGS: Record<string, FeatureFlag> = {
     category: 'ui',
     defaultValue: true,
   },
-  'regulation_ai': {
-    key: 'regulation_ai',
-    name: 'Regulation AI Assistant',
-    description: 'AI-powered compliance assistance and recommendations',
-    category: 'experimental',
-    defaultValue: false,
-  },
-  'document_ai': {
-    key: 'document_ai',
-    name: 'Document AI Analysis',
-    description: 'AI-powered document analysis and content extraction',
-    category: 'experimental',
-    defaultValue: false,
-  },
   'compliance_wizard': {
     key: 'compliance_wizard',
     name: 'Compliance Wizard',

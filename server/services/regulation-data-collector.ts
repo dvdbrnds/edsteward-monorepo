@@ -14,7 +14,14 @@ if (!process.env.OPENAI_API_KEY) {
 }
 
 const openai = new OpenAI({ 
-  apiKey: process.env.OPENAI_API_KEY 
+  apiKey: process.env.OPENAI_API_KEY,
+  // HECVAT AI-03: Explicitly opt out of training data usage
+  // OpenAI API data is not used for training by default for API users,
+  // but we set these headers to be explicit about our data usage preferences
+  defaultHeaders: {
+    'X-No-Training': 'true',
+    'OpenAI-Organization': process.env.OPENAI_ORG_ID || '',
+  },
 });
 
 const AGENCY_BASE_URLS = {

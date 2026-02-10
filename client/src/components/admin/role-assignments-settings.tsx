@@ -406,6 +406,7 @@ export function RoleAssignmentsSettings() {
                       <Button
                         variant="ghost"
                         size="sm"
+                        aria-label={`Edit role ${role.roleName}`}
                         onClick={() => openEditDialog(role)}
                       >
                         <Edit2 className="h-4 w-4" />
@@ -413,6 +414,7 @@ export function RoleAssignmentsSettings() {
                       <Button
                         variant="ghost"
                         size="sm"
+                        aria-label={`Delete role ${role.roleName}`}
                         onClick={() => deleteMutation.mutate(role.id)}
                         disabled={deleteMutation.isPending}
                       >

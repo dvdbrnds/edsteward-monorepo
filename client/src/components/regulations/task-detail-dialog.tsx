@@ -504,6 +504,7 @@ export function TaskDetailDialog({
                       variant="ghost"
                       size="sm"
                       className="h-6 px-2 text-xs"
+                      aria-expanded={showAssignSelect}
                       onClick={() => setShowAssignSelect(!showAssignSelect)}
                     >
                       <UserPlus className="h-3 w-3 mr-1" />
@@ -699,7 +700,11 @@ export function TaskDetailDialog({
                       disabled={isUploading}
                     />
                     <div
+                      role="button"
+                      tabIndex={0}
+                      aria-label={pendingFile ? `Selected file: ${pendingFile.name}. Press to change file.` : 'Click or drag to upload evidence file'}
                       onClick={() => !isUploading && fileInputRef.current?.click()}
+                      onKeyDown={(e) => { if ((e.key === 'Enter' || e.key === ' ') && !isUploading) { e.preventDefault(); fileInputRef.current?.click(); } }}
                       onDragOver={(e) => { e.preventDefault(); if (!isUploading) setIsDragOver(true); }}
                       onDragLeave={() => setIsDragOver(false)}
                       onDrop={(e) => {
