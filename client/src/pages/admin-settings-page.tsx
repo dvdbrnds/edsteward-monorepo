@@ -10,7 +10,16 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { useToast } from "@/hooks/use-toast";
-import { AlertCircle, Download, Loader2, RefreshCw, Trash2 } from "lucide-react";
+import { AlertCircle, Download, Loader2, RefreshCw, Trash2, UserPlus } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
 import { useAuth } from "@/hooks/use-auth";
 import Navigation from "@/components/layout/navigation";
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -105,6 +114,16 @@ export default function SystemSettingsPage() {
   const [page, setPage] = useState(1);
   const [autoRefresh, setAutoRefresh] = useState(false);
   const refreshInterval = 10000; // 10 seconds
+  const [showCreateUserDialog, setShowCreateUserDialog] = useState(false);
+  const [newUser, setNewUser] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    username: '',
+    role: 'department_head',
+    department: '',
+    password: '',
+  });
 
   // Check if user is admin (used for conditional rendering below)
   const isAdmin = user?.role?.toLowerCase() === "admin";
@@ -359,6 +378,47 @@ export default function SystemSettingsPage() {
     onError: (error: Error) => {
       toast({
         title: 'Error',
+        description: error.message,
+        variant: 'destructive'
+      });
+    }
+  });
+
+  const { mutate: createUser, isPending: isCreatingUser } = useMutation({
+    mutationFn: async (userData: typeof newUser) => {
+      const response = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(userData)
+      });
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.error || 'Failed to create user');
+      }
+      return response.json();
+    },
+    onSuccess: (data) => {
+      toast({
+        title: 'User Created',
+        description: `${data.firstName} ${data.lastName} has been added as ${data.role}`
+      });
+      queryClient.invalidateQueries({ queryKey: ['/api/admin/users'] });
+      queryClient.invalidateQueries({ queryKey: ['/api/users'] });
+      setShowCreateUserDialog(false);
+      setNewUser({
+        firstName: '',
+        lastName: '',
+        email: '',
+        username: '',
+        role: 'department_head',
+        department: '',
+        password: '',
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: 'Error Creating User',
         description: error.message,
         variant: 'destructive'
       });
@@ -718,10 +778,122 @@ export default function SystemSettingsPage() {
             <TabsContent value="users">
               <Card>
                 <CardHeader>
-                  <CardTitle>User Management</CardTitle>
-                  <CardDescription>
-                    Manage user accounts, roles, and departments.
-                  </CardDescription>
+                  <div className="flex justify-between items-start">
+                    <div>
+                      <CardTitle>User Management</CardTitle>
+                      <CardDescription>
+                        Manage user accounts, roles, and departments. Create Department Heads to assign as DRIs for regulations.
+                      </CardDescription>
+                    </div>
+                    <Dialog open={showCreateUserDialog} onOpenChange={setShowCreateUserDialog}>
+                      <DialogTrigger asChild>
+                        <Button>
+                          <UserPlus className="h-4 w-4 mr-2" />
+                          Create User
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-[500px]">
+                        <DialogHeader>
+                          <DialogTitle>Create New User</DialogTitle>
+                          <DialogDescription>
+                            Add a new user who can be assigned as a DRI for regulations. Department Heads (like Chief of Police) can be assigned to major regulations.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className="grid gap-4 py-4">
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium">First Name *</label>
+                              <Input
+                                value={newUser.firstName}
+                                onChange={(e) => setNewUser({ ...newUser, firstName: e.target.value })}
+                                placeholder="John"
+                              />
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium">Last Name *</label>
+                              <Input
+                                value={newUser.lastName}
+                                onChange={(e) => setNewUser({ ...newUser, lastName: e.target.value })}
+                                placeholder="Smith"
+                              />
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">Email *</label>
+                            <Input
+                              type="email"
+                              value={newUser.email}
+                              onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                              placeholder="john.smith@university.edu"
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">Username *</label>
+                            <Input
+                              value={newUser.username}
+                              onChange={(e) => setNewUser({ ...newUser, username: e.target.value })}
+                              placeholder="jsmith"
+                            />
+                          </div>
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium">Role *</label>
+                              <Select
+                                value={newUser.role}
+                                onValueChange={(role) => setNewUser({ ...newUser, role })}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue />
+                                </SelectTrigger>
+                                <SelectContent>
+                                  <SelectItem value="department_head">Department Head</SelectItem>
+                                  <SelectItem value="compliance_officer">Compliance Officer</SelectItem>
+                                  <SelectItem value="admin">Admin</SelectItem>
+                                  <SelectItem value="user">Staff</SelectItem>
+                                  <SelectItem value="viewer">Viewer</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            </div>
+                            <div className="space-y-2">
+                              <label className="text-sm font-medium">Department</label>
+                              <Input
+                                value={newUser.department}
+                                onChange={(e) => setNewUser({ ...newUser, department: e.target.value })}
+                                placeholder="Campus Police"
+                              />
+                            </div>
+                          </div>
+                          <div className="space-y-2">
+                            <label className="text-sm font-medium">Password (optional for SSO)</label>
+                            <Input
+                              type="password"
+                              value={newUser.password}
+                              onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                              placeholder="Leave blank for SSO users"
+                            />
+                          </div>
+                        </div>
+                        <DialogFooter>
+                          <Button variant="outline" onClick={() => setShowCreateUserDialog(false)}>
+                            Cancel
+                          </Button>
+                          <Button
+                            onClick={() => createUser(newUser)}
+                            disabled={isCreatingUser || !newUser.firstName || !newUser.lastName || !newUser.email || !newUser.username}
+                          >
+                            {isCreatingUser ? (
+                              <>
+                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                Creating...
+                              </>
+                            ) : (
+                              'Create User'
+                            )}
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -760,15 +932,19 @@ export default function SystemSettingsPage() {
                                       })
                                     }
                                   >
-                                    <SelectTrigger className="w-[140px]">
+                                    <SelectTrigger className="w-[160px]">
                                       <SelectValue />
                                     </SelectTrigger>
                                     <SelectContent>
-                                      <SelectItem value="user">User</SelectItem>
+                                      <SelectItem value="admin">Admin</SelectItem>
                                       <SelectItem value="compliance_officer">
                                         Compliance Officer
                                       </SelectItem>
-                                      <SelectItem value="admin">Admin</SelectItem>
+                                      <SelectItem value="department_head">
+                                        Department Head
+                                      </SelectItem>
+                                      <SelectItem value="user">Staff</SelectItem>
+                                      <SelectItem value="viewer">Viewer</SelectItem>
                                     </SelectContent>
                                   </Select>
                                 </TableCell>

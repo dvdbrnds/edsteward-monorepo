@@ -28,6 +28,7 @@ import usersRouter from './api/users';
 import mfaRouter from './api/mfa';
 import auditRouter from './api/audit';
 import legalExportRouter from './api/legal-export';
+import dataRetentionRouter from './api/data-retention';
 
 // Note: aws-tenant-management was removed - belongs in separate admin-console app
 import { debugRouter } from './api/debug';
@@ -376,6 +377,7 @@ export function registerRoutes(app: express.Application): Server {
   app.use('/api/mfa', mfaRouter); // Multi-Factor Authentication for local accounts
   app.use('/api/audit', auditRouter); // Audit trail for compliance tracking
   app.use('/api/legal-export', legalExportRouter); // Legal discovery/subpoena export
+  app.use('/api/admin/data-retention', dataRetentionRouter); // HECVAT data retention compliance
   app.use('/api/attestation', attestationRouter); // Email attestation for low-risk regulations
   app.use('/api/compliance-tasks', complianceTasksRouter); // Complex regulation task management
   app.use('/api/role-assignments', roleAssignmentsRouter); // Role-to-person mapping for auto-assignment

@@ -18,6 +18,51 @@ if (!process.env.DATABASE_URL) {
   dotenv.config({ path: join(__dirname, '..', '..', '.env') });
 }
 
+// SSO Provider types
+export type SSOProvider = 'saml' | 'oidc' | 'cas';
+
+// SAML-specific configuration
+export interface SAMLConfig {
+  entityId: string;
+  ssoUrl: string;
+  sloUrl?: string;
+  certificate: string;
+  attributeMapping?: Record<string, string>;
+  eduPersonEnabled?: boolean;  // For InCommon/Shibboleth
+  incommonMetadataUrl?: string;
+}
+
+// OIDC-specific configuration (Azure AD, Google, etc.)
+export interface OIDCConfig {
+  issuerUrl: string;
+  clientId: string;
+  clientSecret: string;
+  scopes: string[];
+  attributeMapping?: Record<string, string>;
+  // Common presets
+  preset?: 'azure-ad' | 'google' | 'auth0' | 'okta' | 'custom';
+}
+
+// CAS-specific configuration
+export interface CASConfig {
+  serverUrl: string;
+  serviceValidateUrl?: string;
+  version: '2.0' | '3.0';
+  attributeMapping?: Record<string, string>;
+}
+
+// Unified SSO configuration
+export interface SSOConfig {
+  provider: SSOProvider;
+  autoProvisioning: boolean;
+  defaultRole: string;
+  allowedDomains?: string[];
+  // Provider-specific config (only one will be set)
+  saml?: SAMLConfig;
+  oidc?: OIDCConfig;
+  cas?: CASConfig;
+}
+
 // Tenant interface - matches database schema
 export interface Tenant {
   id: string;
@@ -35,7 +80,8 @@ export interface Tenant {
   aws_region?: string;
   health_check_url?: string;
   sso_enabled: boolean;
-  sso_provider?: string;
+  sso_provider?: SSOProvider;
+  sso_config?: SSOConfig;  // New: flexible SSO configuration
   primary_color: string;
   logo_url?: string;
   created_at: Date;
@@ -93,6 +139,7 @@ export async function initializeAdminDatabase(): Promise<void> {
         sso_entity_id VARCHAR(500),
         sso_sso_url VARCHAR(500),
         sso_certificate TEXT,
+        sso_config JSONB DEFAULT '{}',
         primary_color VARCHAR(20) DEFAULT '#1e40af',
         logo_url VARCHAR(500),
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
@@ -110,6 +157,19 @@ export async function initializeAdminDatabase(): Promise<void> {
       ['moravian']
     );
     
+    // Migration: Add sso_config column if it doesn't exist
+    await client.query(`
+      DO $$
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns 
+          WHERE table_name = 'tenants' AND column_name = 'sso_config'
+        ) THEN
+          ALTER TABLE tenants ADD COLUMN sso_config JSONB DEFAULT '{}';
+        END IF;
+      END $$;
+    `);
+
     if (moravianExists.rows.length === 0 && process.env.DATABASE_URL) {
       await client.query(`
         INSERT INTO tenants (id, name, subdomain, status, database_url, contact_email, plan, deployment_type, health_check_url)
@@ -206,13 +266,20 @@ export async function updateTenant(tenantId: string, updates: Partial<Tenant>): 
   const updateableFields = [
     'name', 'status', 'database_url', 'contact_email', 'contact_name',
     'organization_url', 'plan', 'max_users', 'max_regulations', 'deployment_type',
-    'aws_region', 'health_check_url', 'sso_enabled', 'sso_provider', 'primary_color', 'logo_url'
+    'aws_region', 'health_check_url', 'sso_enabled', 'sso_provider', 'sso_config',
+    'sso_entity_id', 'sso_sso_url', 'sso_certificate', 'primary_color', 'logo_url'
   ];
 
   for (const field of updateableFields) {
     if (updates[field as keyof Tenant] !== undefined) {
       fields.push(`${field} = $${paramIndex}`);
-      values.push(updates[field as keyof Tenant]);
+      // Handle JSONB fields - need to stringify objects
+      const value = updates[field as keyof Tenant];
+      if (field === 'sso_config' && typeof value === 'object') {
+        values.push(JSON.stringify(value));
+      } else {
+        values.push(value);
+      }
       paramIndex++;
     }
   }

@@ -1,6 +1,5 @@
 import express, { type Request, Response } from "express";
-import { storage } from "./storage";
-import { db } from "./db";
+import { getDatabaseStorage, getTenantDb } from "./services/database";
 import { sql, eq } from "drizzle-orm";
 import { regulations, complianceTasks } from "@shared/schema";
 import { syslog, LogLevel, LogFacility } from './services/syslog';
@@ -14,6 +13,11 @@ import { normalizeCategory } from './services/category-normalizer';
  * @param app Express application
  */
 export function setupMCPIntegrationApi(app: express.Application) {
+  // Helper: Get tenant-aware storage and db from request
+  // CRITICAL: All MCP routes must use these instead of global imports
+  const getStorage = (req: Request) => getDatabaseStorage(req.tenantId);
+  const getDb = (req: Request) => getTenantDb(req.tenantId);
+
   // Authentication middleware for MCP requests
   const authenticateMCP = async (req: Request, res: Response, next: Function) => {
     const apiKey = req.headers['x-mcp-api-key'];
@@ -71,6 +75,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
   app.get('/api/mcp/sync-status', authenticateMCP, async (req: Request, res: Response) => {
     try {
       // Fetch all regulations
+      const storage = getStorage(req);
       const regulations = await storage.getRegulations();
       
       // Map regulations to their sync status

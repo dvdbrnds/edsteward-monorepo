@@ -48,8 +48,8 @@ interface TaskNotificationContext {
 /**
  * Get tasks that need notifications sent
  */
-async function getTasksNeedingNotification(): Promise<TaskNotificationContext[]> {
-  const storage = getDatabaseStorage();
+async function getTasksNeedingNotification(tenantId?: string): Promise<TaskNotificationContext[]> {
+  const storage = getDatabaseStorage(tenantId);
   const db = storage.getDb();
   
   if (!db) {
@@ -145,9 +145,10 @@ function shouldSendNotification(daysUntilDue: number): boolean {
  * Get notification recipients based on task assignment and escalation status
  */
 async function getTaskNotificationRecipients(
-  context: TaskNotificationContext
+  context: TaskNotificationContext,
+  tenantId?: string
 ): Promise<User[]> {
-  const storage = getDatabaseStorage();
+  const storage = getDatabaseStorage(tenantId);
   const recipients: User[] = [];
 
   // Always include assigned user if available
@@ -319,8 +320,8 @@ This is an automated notification from EdSteward Compliance Management.
 /**
  * Send notification for a single task
  */
-async function sendTaskNotification(context: TaskNotificationContext): Promise<boolean> {
-  const recipients = await getTaskNotificationRecipients(context);
+async function sendTaskNotification(context: TaskNotificationContext, tenantId?: string): Promise<boolean> {
+  const recipients = await getTaskNotificationRecipients(context, tenantId);
   
   if (recipients.length === 0) {
     return false;
@@ -351,7 +352,7 @@ async function sendTaskNotification(context: TaskNotificationContext): Promise<b
 /**
  * Main entry point - check all tasks and send notifications as needed
  */
-export async function checkAndSendTaskNotifications(): Promise<{
+export async function checkAndSendTaskNotifications(tenantId?: string): Promise<{
   tasksChecked: number;
   notificationsSent: number;
   errors: string[];
@@ -364,7 +365,7 @@ export async function checkAndSendTaskNotifications(): Promise<{
   };
 
   try {
-    const tasks = await getTasksNeedingNotification();
+    const tasks = await getTasksNeedingNotification(tenantId);
     results.tasksChecked = tasks.length;
     
 
@@ -374,7 +375,7 @@ export async function checkAndSendTaskNotifications(): Promise<{
       }
 
       try {
-        const sent = await sendTaskNotification(context);
+        const sent = await sendTaskNotification(context, tenantId);
         if (sent) {
           results.notificationsSent++;
         }
@@ -399,9 +400,10 @@ export async function checkAndSendTaskNotifications(): Promise<{
  */
 export async function sendImmediateTaskNotification(
   taskId: number,
-  _notificationType: 'assignment' | 'nudge' | 'escalation'
+  _notificationType: 'assignment' | 'nudge' | 'escalation',
+  tenantId?: string
 ): Promise<boolean> {
-  const storage = getDatabaseStorage();
+  const storage = getDatabaseStorage(tenantId);
   const db = storage.getDb();
   
   if (!db) {
@@ -457,7 +459,7 @@ export async function sendImmediateTaskNotification(
       isOverdue: daysUntilDue < 0,
     };
 
-    return await sendTaskNotification(context);
+    return await sendTaskNotification(context, tenantId);
   } catch (error) {
     console.error(`[TaskNotifications] Error sending immediate notification:`, error);
     return false;
@@ -465,4 +467,236 @@ export async function sendImmediateTaskNotification(
 }
 
 export { TASK_NOTIFICATION_CONFIG };
+
+/**
+ * Check if all tasks for a regulation are completed/attested
+ * If so, send notification to DRI and CCO that it's ready for final attestation
+ */
+export async function checkAndNotifyRegulationReadyForAttestation(
+  regulationId: number,
+  tenantId?: string
+): Promise<{ ready: boolean; notified: boolean; recipients: string[] }> {
+  const storage = getDatabaseStorage(tenantId);
+  const db = storage.getDb();
+
+  if (!db) {
+    console.error('[FinalAttestation] Database not available');
+    return { ready: false, notified: false, recipients: [] };
+  }
+
+  try {
+    // Get regulation details
+    const regResult = await db.execute(`
+      SELECT r.id, r.name, r.dro, r.owner_id, r.responsible_office_email,
+             u.email as owner_email, u.first_name as owner_first_name, u.last_name as owner_last_name
+      FROM regulations r
+      LEFT JOIN users u ON r.owner_id = u.id
+      WHERE r.id = $1
+    `, [regulationId]);
+
+    if (!regResult.rows.length) {
+      console.error(`[FinalAttestation] Regulation ${regulationId} not found`);
+      return { ready: false, notified: false, recipients: [] };
+    }
+
+    const regulation = regResult.rows[0] as any;
+
+    // Get all tasks for this regulation (excluding sub-tasks that are part of parent tasks)
+    const tasksResult = await db.execute(`
+      SELECT id, title, status, attestation_status, assigned_to
+      FROM compliance_tasks
+      WHERE regulation_id = $1
+        AND status != 'not_applicable'
+    `, [regulationId]);
+
+    const tasks = tasksResult.rows as any[];
+
+    if (tasks.length === 0) {
+      return { ready: false, notified: false, recipients: [] };
+    }
+
+    // Check if ALL tasks are completed
+    const allCompleted = tasks.every(t => t.status === 'completed');
+
+    if (!allCompleted) {
+      return { ready: false, notified: false, recipients: [] };
+    }
+
+    console.log(`[FinalAttestation] All ${tasks.length} tasks completed for regulation ${regulationId}: ${regulation.name}`);
+
+    // Gather recipients: DRI (owner or DRO) and CCO
+    const recipients: { email: string; name: string; role: string }[] = [];
+
+    // Add regulation owner (DRI)
+    if (regulation.owner_email) {
+      recipients.push({
+        email: regulation.owner_email,
+        name: `${regulation.owner_first_name || ''} ${regulation.owner_last_name || ''}`.trim() || 'Compliance Officer',
+        role: 'DRI (Regulation Owner)',
+      });
+    } else if (regulation.dro) {
+      recipients.push({
+        email: regulation.dro,
+        name: 'Designated Responsible Official',
+        role: 'DRO',
+      });
+    }
+
+    // Add responsible office if different from owner
+    if (regulation.responsible_office_email && 
+        regulation.responsible_office_email !== regulation.owner_email &&
+        regulation.responsible_office_email !== regulation.dro) {
+      recipients.push({
+        email: regulation.responsible_office_email,
+        name: 'Responsible Office',
+        role: 'Responsible Office',
+      });
+    }
+
+    // Add CCO (users with admin/cco role)
+    const allUsers = await storage.getAllUsers();
+    const ccoUsers = allUsers.filter(user => {
+      const userRoles = Array.isArray(user.roles) ? user.roles :
+        typeof user.roles === 'string' ? JSON.parse(user.roles || '[]') : [];
+
+      return userRoles.includes('admin') ||
+        userRoles.includes('cco') ||
+        userRoles.includes('chief_compliance_officer') ||
+        user.role === 'admin';
+    });
+
+    for (const cco of ccoUsers) {
+      if (cco.email && !recipients.find(r => r.email === cco.email)) {
+        recipients.push({
+          email: cco.email,
+          name: `${cco.firstName || ''} ${cco.lastName || ''}`.trim() || 'Administrator',
+          role: 'CCO',
+        });
+      }
+    }
+
+    if (recipients.length === 0) {
+      console.warn(`[FinalAttestation] No recipients found for regulation ${regulationId}`);
+      return { ready: true, notified: false, recipients: [] };
+    }
+
+    // Send notification emails
+    const baseUrl = process.env.PUBLIC_URL || 'https://moravian.edsteward.ai';
+    const regulationUrl = `${baseUrl}/regulations/${regulationId}`;
+
+    const subject = `✅ Ready for Final Attestation: ${regulation.name}`;
+    const html = generateFinalAttestationEmail(regulation, tasks.length, regulationUrl);
+    const text = `
+Ready for Final Attestation: ${regulation.name}
+
+All ${tasks.length} compliance tasks have been completed and attested for this regulation.
+
+This regulation is now ready for your final review and attestation.
+
+View Regulation: ${regulationUrl}
+
+---
+This is an automated notification from EdSteward Compliance Management.
+    `.trim();
+
+    const notifiedEmails: string[] = [];
+
+    for (const recipient of recipients) {
+      try {
+        await emailService.sendEmail({
+          to: recipient.email,
+          subject,
+          html,
+          text,
+        });
+        notifiedEmails.push(recipient.email);
+        console.log(`[FinalAttestation] Notified ${recipient.role}: ${recipient.email}`);
+      } catch (error) {
+        console.error(`[FinalAttestation] Failed to send to ${recipient.email}:`, error);
+      }
+    }
+
+    return {
+      ready: true,
+      notified: notifiedEmails.length > 0,
+      recipients: notifiedEmails,
+    };
+
+  } catch (error) {
+    console.error(`[FinalAttestation] Error checking regulation ${regulationId}:`, error);
+    return { ready: false, notified: false, recipients: [] };
+  }
+}
+
+/**
+ * Generate the HTML email for final attestation notification
+ */
+function generateFinalAttestationEmail(
+  regulation: { id: number; name: string },
+  taskCount: number,
+  regulationUrl: string
+): string {
+  return `
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; padding: 24px; border-radius: 12px 12px 0 0; }
+    .content { background: #f0fdf4; padding: 24px; border: 1px solid #bbf7d0; border-top: none; }
+    .footer { background: #1f2937; color: #9ca3af; padding: 16px 24px; border-radius: 0 0 12px 12px; font-size: 12px; }
+    .success-box { background: white; border-left: 4px solid #22c55e; padding: 16px; margin: 16px 0; border-radius: 0 8px 8px 0; }
+    .stats { display: flex; gap: 24px; margin: 20px 0; }
+    .stat { background: white; padding: 16px; border-radius: 8px; text-align: center; flex: 1; }
+    .stat-number { font-size: 32px; font-weight: bold; color: #059669; }
+    .stat-label { font-size: 12px; color: #6b7280; text-transform: uppercase; }
+    .btn { display: inline-block; background: #059669; color: white; padding: 14px 28px; text-decoration: none; border-radius: 8px; font-weight: 600; margin-top: 16px; }
+    .btn:hover { background: #047857; }
+    .check-icon { font-size: 48px; margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="check-icon">✅</div>
+    <h1 style="margin: 0; font-size: 24px;">Ready for Final Attestation</h1>
+    <p style="margin: 8px 0 0 0; opacity: 0.9;">All compliance tasks have been completed</p>
+  </div>
+  
+  <div class="content">
+    <div class="success-box">
+      <strong>Great news!</strong> All compliance tasks for this regulation have been completed and attested by the responsible parties.
+    </div>
+    
+    <h2 style="margin-top: 0; color: #166534;">${regulation.name}</h2>
+    
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-number">${taskCount}</div>
+        <div class="stat-label">Tasks Completed</div>
+      </div>
+      <div class="stat">
+        <div class="stat-number">100%</div>
+        <div class="stat-label">Compliance</div>
+      </div>
+    </div>
+    
+    <h3>What's Next?</h3>
+    <p>This regulation is now ready for your final review and attestation. Please:</p>
+    <ol style="padding-left: 20px;">
+      <li>Review the completed tasks and uploaded evidence</li>
+      <li>Verify that all compliance requirements have been met</li>
+      <li>Complete the final attestation to certify compliance</li>
+    </ol>
+    
+    <a href="${regulationUrl}" class="btn">Review & Attest →</a>
+  </div>
+  
+  <div class="footer">
+    <p>This is an automated notification from EdSteward Compliance Management.</p>
+    <p>You are receiving this because you are listed as a DRI or CCO for this regulation.</p>
+  </div>
+</body>
+</html>
+  `.trim();
+}
 

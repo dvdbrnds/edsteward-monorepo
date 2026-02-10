@@ -205,7 +205,7 @@ export default function Navigation() {
               size="sm"
               onClick={toggleTheme}
               className="text-gray-300 hover:text-white"
-              title={resolvedTheme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              aria-label={resolvedTheme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             >
               {resolvedTheme === 'dark' ? (
                 <Sun className="h-5 w-5" />

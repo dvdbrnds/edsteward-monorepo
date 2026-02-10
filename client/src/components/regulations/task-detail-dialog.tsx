@@ -898,6 +898,7 @@ export function TaskDetailDialog({
                           <Button
                             variant="ghost"
                             size="sm"
+                            aria-label="Open link in new tab"
                             onClick={() => window.open(item.linkUrl!, '_blank')}
                           >
                             <ExternalLink className="h-4 w-4" />
@@ -906,6 +907,7 @@ export function TaskDetailDialog({
                           <Button
                             variant="ghost"
                             size="sm"
+                            aria-label="Download file"
                             onClick={() => window.open(item.fileUrl!, '_blank')}
                           >
                             <Download className="h-4 w-4" />
@@ -915,6 +917,7 @@ export function TaskDetailDialog({
                           <Button
                             variant="ghost"
                             size="sm"
+                            aria-label="Delete evidence"
                             className="text-red-600 hover:text-red-700 hover:bg-red-50"
                             onClick={() => {
                               if (confirm('Delete this evidence?')) {

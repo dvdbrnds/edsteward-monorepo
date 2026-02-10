@@ -1,9 +1,8 @@
 import { Express, Request, Response } from 'express';
-import { storage } from './storage';
+import { getDatabaseStorage } from './services/database';
 import { calculateTextChangeDiff } from './services/diff-calculator';
 import { z } from 'zod';
 import { insertRegulationUpdateSchema, InsertRegulation } from '@shared/schema';
-import { pool } from './db';
 
 /**
  * Auto-create a regulation if it doesn't exist (Jan 2026 - MCP Engine workflow)
@@ -20,16 +19,17 @@ async function autoCreateRegulationIfNotExists(
     itemId?: string;
     jurisdictionSource?: string;
     summary?: string;
-  } = {}
+  } = {},
+  tenantId?: string
 ): Promise<number> {
+  // Use tenant-specific storage for database isolation
+  const storage = getDatabaseStorage(tenantId);
+  
   // First try to find existing regulation by regKey
   if (regKey) {
-    const existingResult = await pool.query(
-      'SELECT id FROM regulations WHERE reg_key = $1 AND is_current = true LIMIT 1',
-      [regKey]
-    );
-    if (existingResult.rows.length > 0) {
-      return existingResult.rows[0].id;
+    const existing = await storage.getRegulationByRegKey?.(regKey);
+    if (existing) {
+      return existing.id;
     }
   }
 
@@ -41,12 +41,9 @@ async function autoCreateRegulationIfNotExists(
     .substring(0, 100);
 
   // Check by itemId too
-  const itemIdResult = await pool.query(
-    'SELECT id FROM regulations WHERE item_id = $1 AND is_current = true LIMIT 1',
-    [itemId]
-  );
-  if (itemIdResult.rows.length > 0) {
-    return itemIdResult.rows[0].id;
+  const existingById = await storage.getRegulationById(itemId);
+  if (existingById) {
+    return existingById.id;
   }
 
   // Create new regulation with minimal required fields
@@ -312,18 +309,16 @@ const tufUpdateSchema = z.object({
  * @param regulationId The numeric regulation ID to validate
  * @returns The regulation ID if valid, null if not found
  */
-async function validateRegulationId(regulationId: number): Promise<number | null> {
+async function validateRegulationId(regulationId: number, tenantId?: string): Promise<number | null> {
   if (!regulationId || regulationId < 1) {
     return null;
   }
   
   try {
-    const result = await pool.query(
-      'SELECT id FROM regulations WHERE id = $1',
-      [regulationId]
-    );
+    const storage = getDatabaseStorage(tenantId);
+    const regulation = await storage.getRegulation(regulationId);
     
-    if (result.rows.length > 0) {
+    if (regulation) {
       return regulationId;
     }
     return null;
@@ -338,19 +333,17 @@ async function validateRegulationId(regulationId: number): Promise<number | null
  * @param itemId The string item_id (e.g., "jeanne-clery-disclosure-of-campus-security-policy-")
  * @returns The numeric regulation ID if found, null if not found
  */
-async function lookupRegulationByItemId(itemId: string): Promise<number | null> {
+async function lookupRegulationByItemId(itemId: string, tenantId?: string): Promise<number | null> {
   if (!itemId || typeof itemId !== 'string') {
     return null;
   }
   
   try {
-    const result = await pool.query(
-      'SELECT id FROM regulations WHERE item_id = $1',
-      [itemId]
-    );
+    const storage = getDatabaseStorage(tenantId);
+    const regulation = await storage.getRegulationById(itemId);
     
-    if (result.rows.length > 0) {
-      return result.rows[0].id;
+    if (regulation) {
+      return regulation.id;
     }
     return null;
   } catch (error) {
@@ -364,7 +357,7 @@ async function lookupRegulationByItemId(itemId: string): Promise<number | null> 
  * @param regKey The universal regulation key (e.g., "REG-001")
  * @returns The numeric regulation ID if found, null if not found
  */
-async function lookupRegulationByRegKey(regKey: string): Promise<number | null> {
+async function lookupRegulationByRegKey(regKey: string, tenantId?: string): Promise<number | null> {
   if (!regKey || typeof regKey !== 'string') {
     return null;
   }
@@ -373,13 +366,11 @@ async function lookupRegulationByRegKey(regKey: string): Promise<number | null> 
   const normalizedKey = regKey.toUpperCase().replace(/REG-0*(\d+)/, 'REG-$1').replace(/REG-(\d)$/, 'REG-00$1').replace(/REG-(\d\d)$/, 'REG-0$1');
   
   try {
-    const result = await pool.query(
-      'SELECT id FROM regulations WHERE reg_key = $1',
-      [normalizedKey]
-    );
+    const storage = getDatabaseStorage(tenantId);
+    const regulation = await storage.getRegulationByRegKey?.(normalizedKey);
     
-    if (result.rows.length > 0) {
-      return result.rows[0].id;
+    if (regulation) {
+      return regulation.id;
     }
     return null;
   } catch (error) {
@@ -397,30 +388,30 @@ async function lookupRegulationByRegKey(regKey: string): Promise<number | null> 
  * - regulationId: Numeric database primary key
  * @returns The numeric regulation ID if found, null if not found
  */
-async function resolveRegulationId(identifier: number | string, regKey?: string): Promise<number | null> {
+async function resolveRegulationId(identifier: number | string, regKey?: string, tenantId?: string): Promise<number | null> {
   // Priority 1: Try regKey lookup (REG-001 format)
   if (regKey && typeof regKey === 'string' && regKey.toUpperCase().startsWith('REG-')) {
-    const regKeyResult = await lookupRegulationByRegKey(regKey);
+    const regKeyResult = await lookupRegulationByRegKey(regKey, tenantId);
     if (regKeyResult) return regKeyResult;
   }
   
   // Priority 2: Check if identifier itself is a reg_key
   if (typeof identifier === 'string' && identifier.toUpperCase().startsWith('REG-')) {
-    const regKeyResult = await lookupRegulationByRegKey(identifier);
+    const regKeyResult = await lookupRegulationByRegKey(identifier, tenantId);
     if (regKeyResult) return regKeyResult;
   }
   
   // Priority 3: Numeric ID
   if (typeof identifier === 'number') {
-    return await validateRegulationId(identifier);
+    return await validateRegulationId(identifier, tenantId);
   } else if (typeof identifier === 'string') {
     // Try to parse as a number (in case it's "519" instead of 519)
     const asNumber = parseInt(identifier, 10);
     if (!isNaN(asNumber)) {
-      return await validateRegulationId(asNumber);
+      return await validateRegulationId(asNumber, tenantId);
     }
     // Otherwise treat as item_id
-    return await lookupRegulationByItemId(identifier);
+    return await lookupRegulationByItemId(identifier, tenantId);
   }
   return null;
 }
@@ -430,10 +421,15 @@ async function resolveRegulationId(identifier: number | string, regKey?: string)
  * @param app Express application
  */
 export function setupRegulationUpdatesApi(app: Express) {
+  // Helper: Get tenant-aware storage from request
+  // CRITICAL: All routes must use this instead of global storage import
+  const getStorage = (req: Request) => getDatabaseStorage(req.tenantId);
+
   // MCP Engine bulk import health check endpoint
   app.get('/api/regulation-updates/bulk-import/health', basicAuthMiddleware, async (req: Request, res: Response) => {
     try {
       // Check database connectivity and bulk import readiness
+      const storage = getStorage(req);
       let dbHealth = true;
       try {
         const pendingCount = await storage.getPendingRegulationUpdates();
@@ -468,6 +464,7 @@ export function setupRegulationUpdatesApi(app: Express) {
   // Apply Basic Auth middleware for MCP Engine bulk import
   app.post('/api/regulation-updates', basicAuthMiddleware, async (req: Request, res: Response) => {
     try {
+      const storage = getStorage(req);
       // Enhanced logging for MCP Engine bulk import
       const timestamp = new Date().toISOString();
       const regulationId = req.body.regulationId || req.body.itemId || 'unknown';
@@ -515,7 +512,7 @@ export function setupRegulationUpdatesApi(app: Express) {
           // Resolve regulation ID - priority: regKey > itemId > regulationId
           const regKey = req.body.regKey;
           const identifier = req.body.itemId || rawData.regulationId;
-          let validRegulationId = await resolveRegulationId(identifier, regKey);
+          let validRegulationId = await resolveRegulationId(identifier, regKey, req.tenantId);
           
           // Auto-create regulation if it doesn't exist (Jan 2026 - MCP Engine workflow)
           if (validRegulationId === null) {
@@ -535,7 +532,7 @@ export function setupRegulationUpdatesApi(app: Express) {
               itemId: req.body.itemId,
               jurisdictionSource: req.body.jurisdictionSource,
               summary: req.body.summary,
-            });
+            }, req.tenantId);
           }
           
           // Extract structured fields from request body
@@ -576,7 +573,7 @@ export function setupRegulationUpdatesApi(app: Express) {
               });
             }
             
-            let validRegulationId = await resolveRegulationId(identifier || '', regKey);
+            let validRegulationId = await resolveRegulationId(identifier || '', regKey, req.tenantId);
             
             // Auto-create regulation if it doesn't exist (Jan 2026 - MCP Engine workflow)
             if (validRegulationId === null) {
@@ -595,7 +592,7 @@ export function setupRegulationUpdatesApi(app: Express) {
                 itemId: mcpData.itemId,
                 jurisdictionSource: (mcpData as any).jurisdictionSource,
                 summary: mcpData.summary,
-              });
+              }, req.tenantId);
             }
             
             // Check for Federal Register enhancement
@@ -716,6 +713,7 @@ export function setupRegulationUpdatesApi(app: Express) {
   // Get all pending regulation updates
   app.get('/api/regulation-updates/pending', async (req: Request, res: Response) => {
     try {
+      const storage = getStorage(req);
       const updates = await storage.getPendingRegulationUpdates();
       
       // For each update, add the diff statistics
@@ -763,6 +761,7 @@ export function setupRegulationUpdatesApi(app: Express) {
   // Get a specific regulation update by ID
   app.get('/api/regulation-updates/:id', async (req: Request, res: Response) => {
     try {
+      const storage = getStorage(req);
       const updateId = parseInt(req.params.id, 10);
       
       if (isNaN(updateId)) {
@@ -843,15 +842,17 @@ export function setupRegulationUpdatesApi(app: Express) {
       // Fetch current compliance tasks for this regulation (including parent-child hierarchy)
       let currentTasks: any[] = [];
       try {
-        const tasksResult = await pool.query(
-          `SELECT id, parent_task_id, title, description, status, priority, assigned_role, due_date, 
-                  recurring_schedule, evidence_required, evidence_type, evidence_instructions, instructions, sort_order
-           FROM compliance_tasks 
-           WHERE regulation_id = $1 
-           ORDER BY sort_order ASC`,
-          [update.regulationId]
-        );
-        currentTasks = tasksResult.rows;
+        const db = storage.getDb();
+        if (db) {
+          const tasksResult = await db.execute(
+            `SELECT id, parent_task_id, title, description, status, priority, assigned_role, due_date, 
+                    recurring_schedule, evidence_required, evidence_type, evidence_instructions, instructions, sort_order
+             FROM compliance_tasks 
+             WHERE regulation_id = ${update.regulationId}
+             ORDER BY sort_order ASC`
+          );
+          currentTasks = tasksResult.rows as any[];
+        }
       } catch (taskError) {
         console.error('Error fetching compliance tasks:', taskError);
       }
@@ -889,6 +890,7 @@ export function setupRegulationUpdatesApi(app: Express) {
   // Accept a regulation update
   app.post('/api/regulation-updates/:id/accept', async (req: Request, res: Response) => {
     try {
+      const storage = getStorage(req);
       const updateId = parseInt(req.params.id, 10);
       
       if (isNaN(updateId)) {
@@ -940,6 +942,7 @@ export function setupRegulationUpdatesApi(app: Express) {
   // Reject a regulation update
   app.post('/api/regulation-updates/:id/reject', async (req: Request, res: Response) => {
     try {
+      const storage = getStorage(req);
       const updateId = parseInt(req.params.id, 10);
       
       if (isNaN(updateId)) {
@@ -991,6 +994,7 @@ export function setupRegulationUpdatesApi(app: Express) {
   // Defer a regulation update
   app.post('/api/regulation-updates/:id/defer', async (req: Request, res: Response) => {
     try {
+      const storage = getStorage(req);
       const updateId = parseInt(req.params.id, 10);
       
       if (isNaN(updateId)) {
@@ -1041,6 +1045,7 @@ export function setupRegulationUpdatesApi(app: Express) {
   // Bulk delete regulation updates (for testing)
   app.delete('/api/regulation-updates/bulk', async (req: Request, res: Response) => {
     try {
+      const storage = getStorage(req);
       const { ids } = req.body;
       
       if (!Array.isArray(ids) || ids.length === 0) {

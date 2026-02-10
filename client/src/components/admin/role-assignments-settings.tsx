@@ -481,8 +481,9 @@ export function RoleAssignmentsSettings() {
 
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label>External Email</Label>
+                <Label htmlFor="role-external-email">External Email</Label>
                 <Input
+                  id="role-external-email"
                   value={formData.defaultEmail}
                   onChange={(e) => setFormData(prev => ({ 
                     ...prev, 
@@ -494,8 +495,9 @@ export function RoleAssignmentsSettings() {
                 />
               </div>
               <div>
-                <Label>Name</Label>
+                <Label htmlFor="role-external-name">Name</Label>
                 <Input
+                  id="role-external-name"
                   value={formData.defaultName}
                   onChange={(e) => setFormData(prev => ({ ...prev, defaultName: e.target.value }))}
                   placeholder="John Doe"
@@ -507,8 +509,9 @@ export function RoleAssignmentsSettings() {
             <Separator />
 
             <div>
-              <Label>Category</Label>
+              <Label htmlFor="role-category">Category</Label>
               <Input
+                id="role-category"
                 value={formData.category}
                 onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
                 placeholder="e.g., Academic, Safety, HR"
@@ -516,8 +519,9 @@ export function RoleAssignmentsSettings() {
             </div>
 
             <div>
-              <Label>Description</Label>
+              <Label htmlFor="role-description">Description</Label>
               <Input
+                id="role-description"
                 value={formData.description}
                 onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                 placeholder="Role responsibilities..."

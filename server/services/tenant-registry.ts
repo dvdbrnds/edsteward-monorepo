@@ -195,6 +195,7 @@ export async function refreshAllTenants(): Promise<void> {
         id, name, subdomain, status, database_url,
         contact_email, plan, deployment_type,
         sso_enabled, sso_provider, sso_entity_id, sso_sso_url, sso_certificate,
+        sso_config,
         primary_color, logo_url, max_users, max_regulations,
         created_at, updated_at
       FROM tenants
@@ -233,6 +234,18 @@ export async function refreshAllTenants(): Promise<void> {
  * Map a database row to a Tenant object
  */
 function mapDatabaseRowToTenant(row: any): Tenant {
+  // Parse sso_config JSONB field
+  let ssoConfig: any = null;
+  if (row.sso_config) {
+    try {
+      ssoConfig = typeof row.sso_config === 'string' 
+        ? JSON.parse(row.sso_config) 
+        : row.sso_config;
+    } catch (e) {
+      console.warn(`[TENANT-REGISTRY] Failed to parse sso_config for ${row.id}:`, e);
+    }
+  }
+
   const tenant: Tenant = {
     id: row.id,
     name: row.name,
@@ -241,9 +254,10 @@ function mapDatabaseRowToTenant(row: any): Tenant {
     databaseName: `edsteward_${row.subdomain}`,
     status: row.status || 'active',
     settings: {
-      allowedDomains: [row.contact_email?.split('@')[1] || `${row.subdomain}.edsteward.ai`],
-      defaultRole: 'user',
-      enableAutoProvisioning: true,
+      allowedDomains: ssoConfig?.allowedDomains || [row.contact_email?.split('@')[1] || `${row.subdomain}.edsteward.ai`],
+      defaultRole: ssoConfig?.defaultRole || 'user',
+      enableAutoProvisioning: ssoConfig?.autoProvisioning !== false,
+      enableLocalAuth: true, // Local auth always available unless explicitly disabled
       features: {
         apiAccess: true,
         customDomain: false,
@@ -265,13 +279,29 @@ function mapDatabaseRowToTenant(row: any): Tenant {
     updatedAt: row.updated_at ? new Date(row.updated_at) : new Date(),
   };
 
-  // Add SAML config if enabled
+  // Add unified SSO config if present
+  if (ssoConfig && ssoConfig.provider) {
+    tenant.ssoConfig = ssoConfig;
+  }
+
+  // Add legacy SAML config if enabled (for backward compatibility)
   if (row.sso_enabled && row.sso_entity_id && row.sso_sso_url && row.sso_certificate) {
     tenant.samlConfig = {
       entityId: row.sso_entity_id,
       ssoUrl: row.sso_sso_url,
       certificate: row.sso_certificate,
+      sloUrl: ssoConfig?.saml?.sloUrl,
+      attributeMapping: ssoConfig?.saml?.attributeMapping,
+      eduPersonEnabled: ssoConfig?.saml?.eduPersonEnabled,
     };
+  }
+
+  // If ssoConfig has provider-specific configs, add them
+  if (ssoConfig?.oidc) {
+    tenant.oidcConfig = ssoConfig.oidc;
+  }
+  if (ssoConfig?.cas) {
+    tenant.casConfig = ssoConfig.cas;
   }
 
   return tenant;
@@ -295,6 +325,7 @@ export async function getTenant(identifier: string): Promise<TenantRecord | null
           id, name, subdomain, status, database_url,
           contact_email, plan, deployment_type,
           sso_enabled, sso_provider, sso_entity_id, sso_sso_url, sso_certificate,
+          sso_config,
           primary_color, logo_url, max_users, max_regulations,
           created_at, updated_at
         FROM tenants

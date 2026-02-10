@@ -66,6 +66,7 @@
   ],
   
   "// Git settings": {},
+  "git.enabled": true,
   "git.ignoreLimitWarning": true,
   "git.autofetch": true,
   
@@ -82,8 +83,6 @@
   
   "// Development workflow reminders": {},
   "workbench.colorCustomizations": {
-    "statusBar.background": "#1f4e8c",
-    "statusBar.foreground": "#ffffff",
     "statusBar.noFolderBackground": "#1f4e8c"
   },
   

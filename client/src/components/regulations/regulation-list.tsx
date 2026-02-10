@@ -120,11 +120,25 @@ type SortConfig = {
 
 type StatusFilter = 'all' | 'overdue' | 'upcoming' | 'no-deadlines';
 
+const HIDE_COMPLIANT_KEY = 'edsteward-hide-compliant';
+
 export default function RegulationList({ categoryFilter, jurisdictionFilter, appliesToFilter }: RegulationListProps) {
   const [search, setSearch] = useState("");
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'lastUpdated', direction: 'desc' });
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [hideCompliant, setHideCompliant] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(HIDE_COMPLIANT_KEY) === 'true';
+    } catch {
+      return false;
+    }
+  });
   const [, navigate] = useLocation();
+  
+  // Persist hide compliant preference
+  useEffect(() => {
+    localStorage.setItem(HIDE_COMPLIANT_KEY, String(hideCompliant));
+  }, [hideCompliant]);
   
   // Column visibility state - load from localStorage
   const [columnVisibility, setColumnVisibility] = useState<Record<ColumnKey, boolean>>(() => {
@@ -238,6 +252,10 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
       if (statusFilter !== deadlineStatus) {
         return false;
       }
+    }
+    // Hide compliant filter
+    if (hideCompliant && getComplianceStatus(reg) === 'compliant') {
+      return false;
     }
     if (search.trim()) {
       const searchLower = search.toLowerCase();
@@ -365,12 +383,55 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
     }
   };
 
-  const hasActiveFilters = search || statusFilter !== 'all' || categoryFilter || jurisdictionFilter || (appliesToFilter && appliesToFilter.length > 0);
+  // Get compliance status based on attestation/required actions
+  const getComplianceStatus = (regulation: Regulation): 'compliant' | 'partial' | 'non-compliant' => {
+    const actions: RegulationAction[] = regulation.actions || [
+      { type: 'attestation', enabled: true, required: true, status: 'pending' },
+      { type: 'website_publish', enabled: false, required: false, status: 'pending' },
+      { type: 'community_communication', enabled: false, required: false, status: 'pending' },
+      { type: 'agency_submission', enabled: false, required: false, status: 'pending' }
+    ];
+    
+    const requiredActions = actions.filter((a: RegulationAction) => a.required && a.enabled);
+    const completedRequired = requiredActions.filter((a: RegulationAction) => a.status === 'completed');
+    
+    if (requiredActions.length === 0) {
+      // No required actions - check if attestation is complete
+      const attestation = actions.find((a: RegulationAction) => a.type === 'attestation');
+      if (attestation?.status === 'completed') return 'compliant';
+      return 'non-compliant';
+    }
+    
+    if (completedRequired.length === requiredActions.length) {
+      return 'compliant'; // All required actions complete
+    } else if (completedRequired.length > 0) {
+      return 'partial'; // Some required actions complete
+    }
+    return 'non-compliant'; // No required actions complete
+  };
+
+  // Get row background tint based on compliance status
+  const getComplianceRowClass = (regulation: Regulation): string => {
+    const status = getComplianceStatus(regulation);
+    switch (status) {
+      case 'compliant':
+        return 'bg-green-50/50 hover:bg-green-100/50 border-l-4 border-l-green-500';
+      case 'partial':
+        return 'bg-yellow-50/50 hover:bg-yellow-100/50 border-l-4 border-l-yellow-500';
+      case 'non-compliant':
+        return 'bg-red-50/50 hover:bg-red-100/50 border-l-4 border-l-red-500';
+      default:
+        return '';
+    }
+  };
+
+  const hasActiveFilters = search || statusFilter !== 'all' || hideCompliant || categoryFilter || jurisdictionFilter || (appliesToFilter && appliesToFilter.length > 0);
   const totalCount = Array.isArray(regulations) ? regulations.length : 0;
 
   const clearAllFilters = () => {
     setSearch("");
     setStatusFilter('all');
+    setHideCompliant(false);
   };
 
   return (
@@ -482,12 +543,26 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
             </DropdownMenu>
           </div>
           
-          {/* Results count and clear filters */}
+          {/* Hide compliant checkbox and results count */}
           <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">
-              Showing {sortedRegulations.length} of {totalCount} regulations
-              {hasActiveFilters && " (filtered)"}
-            </span>
+            <div className="flex items-center gap-4">
+              <span className="text-muted-foreground">
+                Showing {sortedRegulations.length} of {totalCount} regulations
+                {hasActiveFilters && " (filtered)"}
+              </span>
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={hideCompliant}
+                  onChange={(e) => setHideCompliant(e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500 cursor-pointer"
+                />
+                <span className="text-muted-foreground hover:text-foreground flex items-center gap-1.5">
+                  <CheckCircle className="h-3.5 w-3.5 text-green-500" />
+                  Hide compliant
+                </span>
+              </label>
+            </div>
             {hasActiveFilters && (
               <Button variant="ghost" size="sm" onClick={clearAllFilters} className="text-muted-foreground hover:text-foreground">
                 <X className="h-3 w-3 mr-1" />
@@ -613,7 +688,10 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
                 return (
                   <TableRow
                     key={regulation.id}
-                    className="cursor-pointer hover:bg-muted"
+                    className={cn(
+                      "cursor-pointer transition-colors",
+                      getComplianceRowClass(regulation)
+                    )}
                     onClick={() => handleRowClick(regulation)}
                   >
                     {isColumnVisible('id') && (

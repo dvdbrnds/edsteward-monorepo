@@ -801,16 +801,36 @@ function RegulationDetailPage() {
                             <span className="text-muted-foreground">— No Primary DRI —</span>
                           </SelectItem>
                           {users
-                            .filter(u => (u.role === 'compliance_officer' || u.role === 'admin') && (u.firstName || u.lastName || u.username))
+                            .filter(u => {
+                              // Allow admins, compliance officers, department heads, and any user with a name
+                              const eligibleRoles = ['admin', 'compliance_officer', 'department_head', 'user'];
+                              return eligibleRoles.includes(u.role) && (u.firstName || u.lastName || u.username);
+                            })
+                            .sort((a, b) => {
+                              // Sort by role priority, then by name
+                              const rolePriority: Record<string, number> = { admin: 0, compliance_officer: 1, department_head: 2, user: 3 };
+                              const aPriority = rolePriority[a.role] ?? 4;
+                              const bPriority = rolePriority[b.role] ?? 4;
+                              if (aPriority !== bPriority) return aPriority - bPriority;
+                              const aName = `${a.firstName || ''} ${a.lastName || ''}`.trim() || a.username || '';
+                              const bName = `${b.firstName || ''} ${b.lastName || ''}`.trim() || b.username || '';
+                              return aName.localeCompare(bName);
+                            })
                             .map((u) => {
                               const displayName = (u.firstName && u.lastName) 
                                 ? `${u.firstName} ${u.lastName}` 
                                 : u.username || u.email || `User ${u.id}`;
+                              const roleLabels: Record<string, string> = {
+                                admin: 'Admin',
+                                compliance_officer: 'Compliance',
+                                department_head: 'Dept Head',
+                                user: 'Staff'
+                              };
                               return (
                                 <SelectItem key={u.id} value={u.id.toString()}>
                                   {displayName}
                                   <span className="text-xs text-muted-foreground ml-2">
-                                    ({u.role === 'admin' ? 'Admin' : 'Officer'})
+                                    ({roleLabels[u.role] || u.role})
                                   </span>
                                 </SelectItem>
                               );
@@ -1326,14 +1346,14 @@ function RegulationDetailPage() {
                         {isRegulationAdmin && (
                           <div className="flex items-center gap-1">
                             {deadline.status !== 'completed' && (
-                              <Button size="sm" variant="ghost" onClick={() => updateDeadlineMutation.mutate({ id: deadline.id, status: 'completed' })}>
+                              <Button size="sm" variant="ghost" aria-label="Mark deadline as completed" onClick={() => updateDeadlineMutation.mutate({ id: deadline.id, status: 'completed' })}>
                                 <Check className="h-4 w-4" />
                               </Button>
                             )}
-                            <Button size="sm" variant="ghost" onClick={() => setEditingDeadline(deadline)}>
+                            <Button size="sm" variant="ghost" aria-label="Edit deadline" onClick={() => setEditingDeadline(deadline)}>
                               <Edit className="h-4 w-4" />
                             </Button>
-                            <Button size="sm" variant="ghost" className="text-red-600" onClick={() => confirm('Delete?') && deleteDeadlineMutation.mutate(deadline.id)}>
+                            <Button size="sm" variant="ghost" aria-label="Delete deadline" className="text-red-600" onClick={() => confirm('Delete?') && deleteDeadlineMutation.mutate(deadline.id)}>
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>

@@ -19,23 +19,78 @@ declare global {
 
 // ===== CORE INTERFACES =====
 
+// SSO Provider types
+export type SSOProvider = 'saml' | 'oidc' | 'cas';
+
+// Unified SSO configuration structure
+export interface SSOConfig {
+  provider: SSOProvider;
+  autoProvisioning: boolean;
+  defaultRole: string;
+  allowedDomains?: string[];
+  saml?: SAMLConfigDetails;
+  oidc?: OIDCConfigDetails;
+  cas?: CASConfigDetails;
+}
+
+// SAML configuration details
+export interface SAMLConfigDetails {
+  entityId: string;
+  ssoUrl: string;
+  sloUrl?: string;
+  certificate: string;
+  attributeMapping?: Record<string, string>;
+  eduPersonEnabled?: boolean;
+  incommonMetadataUrl?: string;
+}
+
+// OIDC configuration details (Azure AD, Google, etc.)
+export interface OIDCConfigDetails {
+  issuerUrl: string;
+  clientId: string;
+  clientSecret: string;
+  scopes: string[];
+  attributeMapping?: Record<string, string>;
+  preset?: 'azure-ad' | 'google' | 'auth0' | 'okta' | 'custom';
+}
+
+// CAS configuration details
+export interface CASConfigDetails {
+  serverUrl: string;
+  serviceValidateUrl?: string;
+  version: '2.0' | '3.0';
+  attributeMapping?: Record<string, string>;
+}
+
 export interface Tenant {
   id: string;
   name: string;
   domain: string;
   subdomain: string;
   databaseName: string;
+  
+  // Legacy SAML config (for backward compatibility)
   samlConfig?: {
     entityId: string;
     ssoUrl: string;
     sloUrl?: string;
     certificate: string;
     attributeMapping?: Record<string, string>;
+    eduPersonEnabled?: boolean;
   };
+  
+  // New unified SSO config (supports SAML, OIDC, CAS)
+  ssoConfig?: SSOConfig;
+  
+  // Individual provider configs (populated from ssoConfig)
+  oidcConfig?: OIDCConfigDetails;
+  casConfig?: CASConfigDetails;
+  
   settings: {
     allowedDomains: string[];
-    defaultRole: 'user' | 'compliance_officer' | 'admin';
+    defaultRole: 'user' | 'compliance_officer' | 'admin' | 'viewer';
     enableAutoProvisioning: boolean;
+    enableLocalAuth?: boolean;
     region?: string;
     timeZone?: string;
     customBranding?: {
@@ -247,7 +302,7 @@ interface CachedTenant {
 }
 
 const tenantCache = new Map<string, CachedTenant>();
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+const CACHE_TTL = 60 * 1000; // 1 minute (matches tenant-registry.ts TTL)
 const MAX_CACHE_SIZE = 1000;
 
 // ===== TENANT FINDER =====
@@ -486,10 +541,50 @@ export class TenantFinder {
   }
 
   /**
-   * Get tenant by ID
+   * Get tenant by ID (sync - checks hardcoded registry and cache)
    */
   static getTenant(tenantId: string): Tenant | null {
+    // Check dynamic registry cache first (higher priority)
+    if (isRegistryInitialized()) {
+      const allTenants = getAllCachedTenants();
+      const dynamicTenant = allTenants.find(t => t.id === tenantId);
+      if (dynamicTenant) return dynamicTenant;
+    }
+    
+    // Fallback to hardcoded registry
     return TENANT_REGISTRY[tenantId] || null;
+  }
+
+  /**
+   * Get tenant by ID (async - full lookup including database)
+   * This is the preferred method for SSO and auth flows
+   */
+  static async getTenantById(tenantId: string): Promise<Tenant | null> {
+    const cacheKey = `id:${tenantId}`;
+    
+    // Check local cache first
+    const cached = tenantCache.get(cacheKey);
+    if (cached && Date.now() - cached.cachedAt < CACHE_TTL) {
+      return cached.tenant;
+    }
+
+    // Try dynamic registry (loads from admin database)
+    if (isRegistryInitialized()) {
+      const dynamicTenant = await getTenantConfig(tenantId);
+      if (dynamicTenant) {
+        this.setCachedTenant(cacheKey, dynamicTenant, 'database');
+        return dynamicTenant;
+      }
+    }
+
+    // Fallback to hardcoded registry
+    const registryTenant = TENANT_REGISTRY[tenantId];
+    if (registryTenant) {
+      this.setCachedTenant(cacheKey, registryTenant, 'registry');
+      return registryTenant;
+    }
+
+    return null;
   }
 
   /**
@@ -542,14 +637,14 @@ export async function tenantMiddleware(req: Request, res: Response, next: NextFu
       res.set('x-tenant-subdomain', tenant.subdomain);
       res.set('x-tenant-name', tenant.name);
 
-      const _duration = Date.now() - startTime;
+      // Tenant resolved successfully
     } else {
       // No tenant context (valid for public routes)
     }
 
     next();
   } catch (error) {
-    const _duration = Date.now() - startTime;
+    const duration = Date.now() - startTime;
     console.error(`[TENANT-MIDDLEWARE] Error after ${duration}ms:`, error);
     res.status(500).json({
       error: 'Internal server error during tenant identification',
@@ -579,9 +674,23 @@ export function extractTenantFromSAML(samlProfile: any): string | null {
 
   const emailDomain = samlProfile.email ? samlProfile.email.split('@')[1] : null;
   
-  // Map email domain to tenant subdomain
-  if (emailDomain === 'moravian.edu') return 'moravian';
-  if (emailDomain === 'edsteward.ai') return 'admin';
+  // Try to match email domain against all registered tenants (dynamic + hardcoded)
+  if (emailDomain) {
+    const allTenants = TenantFinder.getAllTenants();
+    for (const tenant of allTenants) {
+      // Match against tenant's allowed domains
+      if (tenant.settings.allowedDomains.includes(emailDomain)) {
+        return tenant.id;
+      }
+      // Match against tenant's primary domain
+      if (tenant.domain === emailDomain) {
+        return tenant.id;
+      }
+    }
+    // Hardcoded fallbacks for known domains
+    if (emailDomain === 'edsteward.ai') return 'admin';
+  }
+  
   if (orgDomain) return orgDomain.toLowerCase().replace(/[^a-z0-9-]/g, '-');
   
   return null;

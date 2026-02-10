@@ -6,13 +6,13 @@ CREATE TABLE IF NOT EXISTS tenants (
     id VARCHAR(50) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     subdomain VARCHAR(100) UNIQUE NOT NULL,
-    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('active', 'inactive', 'pending', 'suspended')),
+    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('active', 'inactive', 'pending', 'suspended', 'deleted')),
     
     -- Database connection
     database_url TEXT NOT NULL,
     
     -- Contact information
-    contact_email VARCHAR(255) NOT NULL,
+    contact_email VARCHAR(255),  -- Nullable: not all tenants have a contact email at creation time
     contact_name VARCHAR(255),
     organization_url VARCHAR(500),
     
@@ -28,10 +28,15 @@ CREATE TABLE IF NOT EXISTS tenants (
     
     -- SSO Configuration
     sso_enabled BOOLEAN DEFAULT FALSE,
-    sso_provider VARCHAR(50),
+    sso_provider VARCHAR(50),  -- 'saml' | 'oidc' | 'cas'
     sso_entity_id VARCHAR(500),
     sso_sso_url VARCHAR(500),
     sso_certificate TEXT,
+    -- New: Flexible SSO config for all providers (JSONB)
+    -- SAML: { entityId, ssoUrl, sloUrl, certificate, attributeMapping, eduPersonEnabled }
+    -- OIDC: { issuerUrl, clientId, clientSecret, scopes, attributeMapping }
+    -- CAS:  { serverUrl, serviceValidateUrl, version }
+    sso_config JSONB DEFAULT '{}',
     
     -- Branding
     primary_color VARCHAR(20) DEFAULT '#1e40af',
@@ -42,6 +47,11 @@ CREATE TABLE IF NOT EXISTS tenants (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     last_health_check TIMESTAMP WITH TIME ZONE,
     
+    -- Soft-delete tracking
+    deleted_at TIMESTAMP WITH TIME ZONE,
+    deleted_by VARCHAR(255),
+    deletion_reason TEXT,
+    
     -- Cached stats (updated periodically)
     cached_user_count INTEGER DEFAULT 0,
     cached_regulation_count INTEGER DEFAULT 0,
@@ -51,6 +61,37 @@ CREATE TABLE IF NOT EXISTS tenants (
 -- Create index for common queries
 CREATE INDEX IF NOT EXISTS idx_tenants_subdomain ON tenants(subdomain);
 CREATE INDEX IF NOT EXISTS idx_tenants_status ON tenants(status);
+
+-- ===== MIGRATIONS FOR EXISTING DATABASES =====
+-- These ALTER statements are safe to re-run (use IF NOT EXISTS / exception handling)
+
+-- Add soft-delete columns if they don't exist
+DO $$ BEGIN
+    ALTER TABLE tenants ADD COLUMN deleted_at TIMESTAMP WITH TIME ZONE;
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
+
+DO $$ BEGIN
+    ALTER TABLE tenants ADD COLUMN deleted_by VARCHAR(255);
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
+
+DO $$ BEGIN
+    ALTER TABLE tenants ADD COLUMN deletion_reason TEXT;
+EXCEPTION WHEN duplicate_column THEN NULL;
+END $$;
+
+-- Make contact_email nullable if it was NOT NULL
+ALTER TABLE tenants ALTER COLUMN contact_email DROP NOT NULL;
+
+-- Update status CHECK constraint to include 'deleted'
+-- (DROP + re-ADD is the only way to modify a CHECK constraint)
+DO $$ BEGIN
+    ALTER TABLE tenants DROP CONSTRAINT IF EXISTS tenants_status_check;
+    ALTER TABLE tenants ADD CONSTRAINT tenants_status_check 
+        CHECK (status IN ('active', 'inactive', 'pending', 'suspended', 'deleted'));
+EXCEPTION WHEN undefined_object THEN NULL;
+END $$;
 
 -- Admin users table
 CREATE TABLE IF NOT EXISTS admin_users (

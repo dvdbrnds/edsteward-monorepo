@@ -14,6 +14,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import compression from 'compression';
 import { createServer } from 'http';
+import { Pool } from 'pg';
 
 import {
   initializeAdminDatabase,
@@ -233,6 +234,9 @@ app.get('/api/customers', requireAuth, async (req, res) => {
           lastActivity: stats.lastActivity,
           healthCheckUrl: tenant.health_check_url,
           createdAt: tenant.created_at,
+          // SSO status
+          ssoEnabled: tenant.sso_enabled || false,
+          ssoProvider: tenant.sso_provider || null,
           health: {
             overall: health.overall,
             database: health.database,
@@ -379,6 +383,365 @@ app.get('/api/customers/:id/health', requireAuth, async (req, res) => {
 });
 
 // =============================================================================
+// SSO CONFIGURATION ROUTES
+// =============================================================================
+
+// Get SSO configuration for a tenant
+app.get('/api/customers/:id/sso', requireAuth, async (req, res) => {
+  try {
+    const tenant = await getTenantById(req.params.id);
+    if (!tenant) {
+      return res.status(404).json({ error: 'Tenant not found' });
+    }
+
+    // Parse sso_config if it exists
+    let ssoConfig = null;
+    if ((tenant as any).sso_config) {
+      try {
+        ssoConfig = typeof (tenant as any).sso_config === 'string' 
+          ? JSON.parse((tenant as any).sso_config) 
+          : (tenant as any).sso_config;
+      } catch (e) {
+        console.warn('Failed to parse sso_config:', e);
+      }
+    }
+
+    res.json({
+      tenantId: tenant.id,
+      tenantName: tenant.name,
+      ssoEnabled: tenant.sso_enabled,
+      ssoProvider: tenant.sso_provider || ssoConfig?.provider,
+      // Legacy SAML fields
+      saml: tenant.sso_enabled && tenant.sso_provider === 'saml' ? {
+        entityId: (tenant as any).sso_entity_id,
+        ssoUrl: (tenant as any).sso_sso_url,
+        certificate: (tenant as any).sso_certificate ? '[CONFIGURED]' : null,
+        sloUrl: ssoConfig?.saml?.sloUrl,
+        eduPersonEnabled: ssoConfig?.saml?.eduPersonEnabled,
+      } : null,
+      // New unified config
+      config: ssoConfig ? {
+        provider: ssoConfig.provider,
+        autoProvisioning: ssoConfig.autoProvisioning ?? true,
+        defaultRole: ssoConfig.defaultRole || 'user',
+        allowedDomains: ssoConfig.allowedDomains || [],
+        // Provider-specific (mask sensitive fields)
+        saml: ssoConfig.saml ? {
+          ...ssoConfig.saml,
+          certificate: ssoConfig.saml.certificate ? '[CONFIGURED]' : null,
+        } : null,
+        oidc: ssoConfig.oidc ? {
+          ...ssoConfig.oidc,
+          clientSecret: ssoConfig.oidc.clientSecret ? '[CONFIGURED]' : null,
+        } : null,
+        cas: ssoConfig.cas || null,
+      } : null,
+      // Metadata URLs for IT admins
+      metadataUrls: {
+        saml: `https://${tenant.subdomain}.edsteward.ai/auth/saml/metadata`,
+        oidc: `https://${tenant.subdomain}.edsteward.ai/auth/oidc/discovery`,
+        cas: `https://${tenant.subdomain}.edsteward.ai/auth/cas/discovery`,
+      },
+    });
+  } catch (error) {
+    console.error('Get SSO config error:', error);
+    res.status(500).json({ error: 'Failed to get SSO configuration' });
+  }
+});
+
+// Update SSO configuration for a tenant
+app.put('/api/customers/:id/sso', requireAuth, async (req, res) => {
+  try {
+    const tenantId = req.params.id;
+    const { provider, enabled, config } = req.body;
+
+    // Validate provider
+    const validProviders = ['saml', 'oidc', 'cas'];
+    if (provider && !validProviders.includes(provider)) {
+      return res.status(400).json({ 
+        error: `Invalid provider. Must be one of: ${validProviders.join(', ')}` 
+      });
+    }
+
+    // Validate required fields based on provider
+    if (enabled && provider === 'saml') {
+      if (!config?.saml?.entityId || !config?.saml?.ssoUrl || !config?.saml?.certificate) {
+        return res.status(400).json({
+          error: 'SAML requires: entityId, ssoUrl, certificate',
+          required: ['config.saml.entityId', 'config.saml.ssoUrl', 'config.saml.certificate']
+        });
+      }
+    }
+
+    if (enabled && provider === 'oidc') {
+      if (!config?.oidc?.issuerUrl || !config?.oidc?.clientId || !config?.oidc?.clientSecret) {
+        return res.status(400).json({
+          error: 'OIDC requires: issuerUrl, clientId, clientSecret',
+          required: ['config.oidc.issuerUrl', 'config.oidc.clientId', 'config.oidc.clientSecret']
+        });
+      }
+    }
+
+    if (enabled && provider === 'cas') {
+      if (!config?.cas?.serverUrl) {
+        return res.status(400).json({
+          error: 'CAS requires: serverUrl',
+          required: ['config.cas.serverUrl']
+        });
+      }
+    }
+
+    // Build sso_config object
+    const ssoConfig = {
+      provider: provider,
+      autoProvisioning: config?.autoProvisioning ?? true,
+      defaultRole: config?.defaultRole || 'user',
+      allowedDomains: config?.allowedDomains || [],
+      saml: config?.saml || null,
+      oidc: config?.oidc || null,
+      cas: config?.cas || null,
+    };
+
+    // Update tenant with SSO config
+    const adminPool = getAdminPool();
+    
+    // For SAML, also update legacy fields for backward compatibility
+    if (provider === 'saml' && config?.saml) {
+      await adminPool.query(`
+        UPDATE tenants SET
+          sso_enabled = $1,
+          sso_provider = $2,
+          sso_entity_id = $3,
+          sso_sso_url = $4,
+          sso_certificate = $5,
+          sso_config = $6,
+          updated_at = NOW()
+        WHERE id = $7
+      `, [
+        enabled,
+        provider,
+        config.saml.entityId,
+        config.saml.ssoUrl,
+        config.saml.certificate,
+        JSON.stringify(ssoConfig),
+        tenantId
+      ]);
+    } else {
+      // For OIDC/CAS, only use sso_config
+      await adminPool.query(`
+        UPDATE tenants SET
+          sso_enabled = $1,
+          sso_provider = $2,
+          sso_config = $3,
+          updated_at = NOW()
+        WHERE id = $4
+      `, [
+        enabled,
+        provider,
+        JSON.stringify(ssoConfig),
+        tenantId
+      ]);
+    }
+
+    // Trigger tenant registry refresh in main app
+    try {
+      await fetch('https://moravian.edsteward.ai/api/admin/tenant-registry/refresh', {
+        method: 'POST',
+      });
+      console.log('✅ Main app tenant registry refreshed');
+    } catch (refreshError) {
+      console.warn('⚠️ Could not refresh main app tenant registry');
+    }
+
+    console.log(`✅ Updated SSO config for tenant ${tenantId}: provider=${provider}, enabled=${enabled}`);
+    
+    res.json({
+      success: true,
+      tenantId,
+      ssoEnabled: enabled,
+      ssoProvider: provider,
+      message: `SSO configuration ${enabled ? 'enabled' : 'disabled'} for ${provider}`,
+    });
+
+  } catch (error) {
+    console.error('Update SSO config error:', error);
+    res.status(500).json({ error: 'Failed to update SSO configuration' });
+  }
+});
+
+// Test SSO configuration (validates settings)
+app.post('/api/customers/:id/sso/test', requireAuth, async (req, res) => {
+  try {
+    const tenant = await getTenantById(req.params.id);
+    if (!tenant) {
+      return res.status(404).json({ error: 'Tenant not found' });
+    }
+
+    const results: any = {
+      tenantId: tenant.id,
+      tests: [],
+    };
+
+    // Parse sso_config
+    let ssoConfig = null;
+    if ((tenant as any).sso_config) {
+      try {
+        ssoConfig = typeof (tenant as any).sso_config === 'string' 
+          ? JSON.parse((tenant as any).sso_config) 
+          : (tenant as any).sso_config;
+      } catch (e) {
+        results.tests.push({ name: 'Parse Config', status: 'failed', error: 'Invalid sso_config JSON' });
+        return res.json(results);
+      }
+    }
+
+    if (!tenant.sso_enabled) {
+      results.tests.push({ name: 'SSO Enabled', status: 'skipped', message: 'SSO is not enabled' });
+      return res.json(results);
+    }
+
+    results.tests.push({ name: 'SSO Enabled', status: 'passed' });
+
+    const provider = tenant.sso_provider || ssoConfig?.provider;
+
+    // Provider-specific tests
+    if (provider === 'saml') {
+      // Test SAML certificate format
+      const cert = (tenant as any).sso_certificate || ssoConfig?.saml?.certificate;
+      if (cert) {
+        if (cert.includes('BEGIN CERTIFICATE')) {
+          results.tests.push({ name: 'SAML Certificate Format', status: 'passed' });
+        } else {
+          results.tests.push({ name: 'SAML Certificate Format', status: 'warning', message: 'Certificate may not be in PEM format' });
+        }
+      } else {
+        results.tests.push({ name: 'SAML Certificate', status: 'failed', error: 'No certificate configured' });
+      }
+
+      // Test SSO URL accessibility
+      const ssoUrl = (tenant as any).sso_sso_url || ssoConfig?.saml?.ssoUrl;
+      if (ssoUrl) {
+        try {
+          const urlObj = new URL(ssoUrl);
+          results.tests.push({ name: 'SAML SSO URL Format', status: 'passed', url: urlObj.origin });
+        } catch (e) {
+          results.tests.push({ name: 'SAML SSO URL Format', status: 'failed', error: 'Invalid URL format' });
+        }
+      }
+    }
+
+    if (provider === 'oidc' && ssoConfig?.oidc) {
+      // Test issuer URL
+      try {
+        const issuerUrl = ssoConfig.oidc.issuerUrl;
+        const urlObj = new URL(issuerUrl);
+        results.tests.push({ name: 'OIDC Issuer URL Format', status: 'passed', url: urlObj.origin });
+
+        // Try to fetch .well-known/openid-configuration
+        try {
+          const discoveryUrl = `${issuerUrl.replace(/\/$/, '')}/.well-known/openid-configuration`;
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000);
+          
+          const response = await fetch(discoveryUrl, { signal: controller.signal });
+          clearTimeout(timeoutId);
+          
+          if (response.ok) {
+            results.tests.push({ name: 'OIDC Discovery', status: 'passed', url: discoveryUrl });
+          } else {
+            results.tests.push({ name: 'OIDC Discovery', status: 'warning', message: `HTTP ${response.status}` });
+          }
+        } catch (e) {
+          results.tests.push({ name: 'OIDC Discovery', status: 'warning', message: 'Could not reach discovery endpoint' });
+        }
+      } catch (e) {
+        results.tests.push({ name: 'OIDC Issuer URL', status: 'failed', error: 'Invalid URL format' });
+      }
+
+      // Check client credentials
+      if (ssoConfig.oidc.clientId) {
+        results.tests.push({ name: 'OIDC Client ID', status: 'passed' });
+      } else {
+        results.tests.push({ name: 'OIDC Client ID', status: 'failed', error: 'Missing client ID' });
+      }
+      if (ssoConfig.oidc.clientSecret) {
+        results.tests.push({ name: 'OIDC Client Secret', status: 'passed' });
+      } else {
+        results.tests.push({ name: 'OIDC Client Secret', status: 'failed', error: 'Missing client secret' });
+      }
+    }
+
+    if (provider === 'cas' && ssoConfig?.cas) {
+      // Test CAS server URL
+      try {
+        const serverUrl = ssoConfig.cas.serverUrl;
+        const urlObj = new URL(serverUrl);
+        results.tests.push({ name: 'CAS Server URL Format', status: 'passed', url: urlObj.origin });
+
+        // Try to reach CAS server
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 5000);
+          
+          const response = await fetch(serverUrl, { signal: controller.signal });
+          clearTimeout(timeoutId);
+          
+          results.tests.push({ name: 'CAS Server Reachable', status: 'passed', httpStatus: response.status });
+        } catch (e) {
+          results.tests.push({ name: 'CAS Server Reachable', status: 'warning', message: 'Could not reach CAS server' });
+        }
+      } catch (e) {
+        results.tests.push({ name: 'CAS Server URL', status: 'failed', error: 'Invalid URL format' });
+      }
+    }
+
+    // Overall status
+    const hasFailures = results.tests.some((t: any) => t.status === 'failed');
+    const hasWarnings = results.tests.some((t: any) => t.status === 'warning');
+    results.overall = hasFailures ? 'failed' : hasWarnings ? 'warning' : 'passed';
+
+    res.json(results);
+
+  } catch (error) {
+    console.error('Test SSO config error:', error);
+    res.status(500).json({ error: 'Failed to test SSO configuration' });
+  }
+});
+
+// Disable SSO for a tenant
+app.delete('/api/customers/:id/sso', requireAuth, async (req, res) => {
+  try {
+    const tenantId = req.params.id;
+    const adminPool = getAdminPool();
+    
+    await adminPool.query(`
+      UPDATE tenants SET
+        sso_enabled = FALSE,
+        sso_provider = NULL,
+        sso_config = '{}',
+        updated_at = NOW()
+      WHERE id = $1
+    `, [tenantId]);
+
+    // Refresh main app
+    try {
+      await fetch('https://moravian.edsteward.ai/api/admin/tenant-registry/refresh', {
+        method: 'POST',
+      });
+    } catch (e) {
+      // Non-critical
+    }
+
+    console.log(`🔒 Disabled SSO for tenant ${tenantId}`);
+    res.json({ success: true, message: 'SSO disabled for tenant' });
+
+  } catch (error) {
+    console.error('Disable SSO error:', error);
+    res.status(500).json({ error: 'Failed to disable SSO' });
+  }
+});
+
+// =============================================================================
 // USER ROUTES (Cross-tenant)
 // =============================================================================
 
@@ -412,11 +775,11 @@ app.post('/api/provisioning/full', requireAuth, async (req, res) => {
   try {
     const request: TenantProvisioningRequest = req.body;
 
-    // Validate required fields
-    if (!request.name || !request.subdomain || !request.contactEmail || !request.adminUser) {
+    // Validate required fields (contactEmail is now optional)
+    if (!request.name || !request.subdomain || !request.adminUser) {
       return res.status(400).json({
         error: 'Missing required fields',
-        required: ['name', 'subdomain', 'contactEmail', 'adminUser']
+        required: ['name', 'subdomain', 'adminUser']
       });
     }
 
@@ -790,7 +1153,7 @@ app.post('/api/tenants/:tenantId/soft-delete', requireAuth, async (req, res) => 
   try {
     const { tenantId } = req.params;
     const { confirmationPhrase, adminPassword, reason, acknowledgeDataLoss } = req.body;
-    const adminUser = (req as any).adminUser;
+    const adminUser = (req as any).user;
     const adminEmail = adminUser?.email || 'unknown';
     
     console.log(`\n${'='.repeat(60)}`);
@@ -861,7 +1224,7 @@ app.post('/api/tenants/:tenantId/hard-delete', requireAuth, async (req, res) => 
       deleteNeonDatabase,  // Default false - keep DB for recovery
       secondConfirmation 
     } = req.body;
-    const adminUser = (req as any).adminUser;
+    const adminUser = (req as any).user;
     const adminEmail = adminUser?.email || 'unknown';
     
     console.log(`\n${'='.repeat(60)}`);
@@ -980,6 +1343,282 @@ app.get('/api/health', (req, res) => {
       service: process.env.ECS_SERVICE || 'edsteward-service',
     }
   });
+});
+
+// =============================================================================
+// DATA SYNC ROUTES
+// =============================================================================
+
+// Get sync preview - shows what would be synced without doing it
+app.get('/api/sync/preview', requireAuth, async (req, res) => {
+  try {
+    // Source is the main DATABASE_URL (dev environment)
+    const sourceUrl = process.env.DATABASE_URL;
+    if (!sourceUrl) {
+      return res.status(500).json({ error: 'Source DATABASE_URL not configured' });
+    }
+
+    // Get template tenant database URL
+    const templateTenant = await getTenantById('template');
+    if (!templateTenant) {
+      return res.status(404).json({ error: 'Template tenant not found' });
+    }
+
+    const sourcePool = new Pool({
+      connectionString: sourceUrl,
+      ssl: sourceUrl.includes('neon.tech') ? { rejectUnauthorized: false } : false,
+      max: 2,
+    });
+
+    const templatePool = new Pool({
+      connectionString: templateTenant.database_url,
+      ssl: templateTenant.database_url.includes('neon.tech') ? { rejectUnauthorized: false } : false,
+      max: 2,
+    });
+
+    try {
+      // Get counts from source
+      const sourceCounts = await Promise.all([
+        sourcePool.query('SELECT COUNT(*) as count FROM regulations'),
+        sourcePool.query('SELECT COUNT(*) as count FROM compliance_tasks WHERE assigned_to IS NULL'),
+        sourcePool.query('SELECT COUNT(*) as count FROM guides'),
+        sourcePool.query('SELECT COUNT(*) as count FROM deadlines'),
+      ]);
+
+      // Get counts from template
+      const templateCounts = await Promise.all([
+        templatePool.query('SELECT COUNT(*) as count FROM regulations'),
+        templatePool.query('SELECT COUNT(*) as count FROM compliance_tasks WHERE assigned_to IS NULL'),
+        templatePool.query('SELECT COUNT(*) as count FROM guides'),
+        templatePool.query('SELECT COUNT(*) as count FROM deadlines'),
+      ]);
+
+      res.json({
+        source: {
+          name: 'Development Environment',
+          url: sourceUrl.replace(/:[^:@]+@/, ':****@'), // Hide password
+          counts: {
+            regulations: parseInt(sourceCounts[0].rows[0].count),
+            complianceTasks: parseInt(sourceCounts[1].rows[0].count),
+            guides: parseInt(sourceCounts[2].rows[0].count),
+            deadlines: parseInt(sourceCounts[3].rows[0].count),
+          }
+        },
+        template: {
+          name: 'EdSteward Template',
+          url: templateTenant.database_url.replace(/:[^:@]+@/, ':****@'),
+          counts: {
+            regulations: parseInt(templateCounts[0].rows[0].count),
+            complianceTasks: parseInt(templateCounts[1].rows[0].count),
+            guides: parseInt(templateCounts[2].rows[0].count),
+            deadlines: parseInt(templateCounts[3].rows[0].count),
+          }
+        }
+      });
+    } finally {
+      await sourcePool.end();
+      await templatePool.end();
+    }
+  } catch (error) {
+    console.error('Sync preview error:', error);
+    res.status(500).json({ error: error instanceof Error ? error.message : 'Failed to get sync preview' });
+  }
+});
+
+// Execute sync from dev to template
+app.post('/api/sync/dev-to-template', requireAuth, async (req, res) => {
+  try {
+    const { adminPassword, confirmSync } = req.body;
+    const adminUser = (req as any).user;
+    const adminEmail = adminUser?.email || 'unknown';
+
+    // Validate request
+    if (!confirmSync) {
+      return res.status(400).json({ error: 'You must confirm the sync operation' });
+    }
+
+    // Re-authenticate admin
+    const adminUsers = [
+      { id: 1, email: 'admin@edsteward.ai', password: 'admin123', name: 'EdSteward Admin', role: 'super_admin' },
+      { id: 2, email: 'dvdbrnds@gmail.com', password: 'gabadh', name: 'David Brands', role: 'super_admin' }
+    ];
+    const matchingAdmin = adminUsers.find(u => u.email === adminEmail);
+    if (!matchingAdmin || matchingAdmin.password !== adminPassword) {
+      return res.status(401).json({ error: 'Invalid admin password' });
+    }
+
+    console.log(`\n${'='.repeat(60)}`);
+    console.log(`🔄 SYNC DEV TO TEMPLATE requested by ${adminEmail}`);
+    console.log(`${'='.repeat(60)}\n`);
+
+    // Source is the main DATABASE_URL (dev environment)
+    const sourceUrl = process.env.DATABASE_URL;
+    if (!sourceUrl) {
+      return res.status(500).json({ error: 'Source DATABASE_URL not configured' });
+    }
+
+    // Get template tenant database URL
+    const templateTenant = await getTenantById('template');
+    if (!templateTenant) {
+      return res.status(404).json({ error: 'Template tenant not found' });
+    }
+
+    const sourcePool = new Pool({
+      connectionString: sourceUrl,
+      ssl: sourceUrl.includes('neon.tech') ? { rejectUnauthorized: false } : false,
+      max: 5,
+    });
+
+    const templatePool = new Pool({
+      connectionString: templateTenant.database_url,
+      ssl: templateTenant.database_url.includes('neon.tech') ? { rejectUnauthorized: false } : false,
+      max: 5,
+    });
+
+    const results: any = {
+      startedAt: new Date().toISOString(),
+      syncedBy: adminEmail,
+      tables: {},
+      errors: [],
+    };
+
+    try {
+      // SYNC REGULATIONS
+      console.log('📋 Syncing regulations...');
+      try {
+        // Get all regulations from source
+        const sourceRegs = await sourcePool.query('SELECT * FROM regulations');
+        
+        // Clear and insert into template (within transaction)
+        await templatePool.query('BEGIN');
+        await templatePool.query('DELETE FROM regulations');
+        
+        for (const reg of sourceRegs.rows) {
+          const columns = Object.keys(reg).filter(k => reg[k] !== null);
+          const values = columns.map(k => reg[k]);
+          const placeholders = columns.map((_, i) => `$${i + 1}`);
+          
+          await templatePool.query(
+            `INSERT INTO regulations (${columns.join(', ')}) VALUES (${placeholders.join(', ')}) ON CONFLICT (id) DO NOTHING`,
+            values
+          );
+        }
+        await templatePool.query('COMMIT');
+        
+        results.tables.regulations = { synced: sourceRegs.rows.length, status: 'success' };
+        console.log(`   ✅ Synced ${sourceRegs.rows.length} regulations`);
+      } catch (err) {
+        await templatePool.query('ROLLBACK');
+        results.tables.regulations = { error: err instanceof Error ? err.message : 'Unknown error', status: 'failed' };
+        results.errors.push(`regulations: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        console.log(`   ❌ Failed to sync regulations: ${err}`);
+      }
+
+      // SYNC COMPLIANCE TASKS (templates only - where assigned_to IS NULL)
+      console.log('📝 Syncing compliance task templates...');
+      try {
+        const sourceTasks = await sourcePool.query('SELECT * FROM compliance_tasks WHERE assigned_to IS NULL');
+        
+        await templatePool.query('BEGIN');
+        await templatePool.query('DELETE FROM compliance_tasks WHERE assigned_to IS NULL');
+        
+        for (const task of sourceTasks.rows) {
+          const columns = Object.keys(task).filter(k => task[k] !== null);
+          const values = columns.map(k => task[k]);
+          const placeholders = columns.map((_, i) => `$${i + 1}`);
+          
+          await templatePool.query(
+            `INSERT INTO compliance_tasks (${columns.join(', ')}) VALUES (${placeholders.join(', ')}) ON CONFLICT (id) DO NOTHING`,
+            values
+          );
+        }
+        await templatePool.query('COMMIT');
+        
+        results.tables.complianceTasks = { synced: sourceTasks.rows.length, status: 'success' };
+        console.log(`   ✅ Synced ${sourceTasks.rows.length} compliance task templates`);
+      } catch (err) {
+        await templatePool.query('ROLLBACK');
+        results.tables.complianceTasks = { error: err instanceof Error ? err.message : 'Unknown error', status: 'failed' };
+        results.errors.push(`complianceTasks: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        console.log(`   ❌ Failed to sync compliance tasks: ${err}`);
+      }
+
+      // SYNC GUIDES
+      console.log('📚 Syncing guides...');
+      try {
+        const sourceGuides = await sourcePool.query('SELECT * FROM guides');
+        
+        await templatePool.query('BEGIN');
+        await templatePool.query('DELETE FROM guides');
+        
+        for (const guide of sourceGuides.rows) {
+          const columns = Object.keys(guide).filter(k => guide[k] !== null);
+          const values = columns.map(k => guide[k]);
+          const placeholders = columns.map((_, i) => `$${i + 1}`);
+          
+          await templatePool.query(
+            `INSERT INTO guides (${columns.join(', ')}) VALUES (${placeholders.join(', ')}) ON CONFLICT (id) DO NOTHING`,
+            values
+          );
+        }
+        await templatePool.query('COMMIT');
+        
+        results.tables.guides = { synced: sourceGuides.rows.length, status: 'success' };
+        console.log(`   ✅ Synced ${sourceGuides.rows.length} guides`);
+      } catch (err) {
+        await templatePool.query('ROLLBACK');
+        results.tables.guides = { error: err instanceof Error ? err.message : 'Unknown error', status: 'failed' };
+        results.errors.push(`guides: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        console.log(`   ❌ Failed to sync guides: ${err}`);
+      }
+
+      // SYNC DEADLINES
+      console.log('📅 Syncing deadlines...');
+      try {
+        const sourceDeadlines = await sourcePool.query('SELECT * FROM deadlines');
+        
+        await templatePool.query('BEGIN');
+        await templatePool.query('DELETE FROM deadlines');
+        
+        for (const deadline of sourceDeadlines.rows) {
+          const columns = Object.keys(deadline).filter(k => deadline[k] !== null);
+          const values = columns.map(k => deadline[k]);
+          const placeholders = columns.map((_, i) => `$${i + 1}`);
+          
+          await templatePool.query(
+            `INSERT INTO deadlines (${columns.join(', ')}) VALUES (${placeholders.join(', ')}) ON CONFLICT (id) DO NOTHING`,
+            values
+          );
+        }
+        await templatePool.query('COMMIT');
+        
+        results.tables.deadlines = { synced: sourceDeadlines.rows.length, status: 'success' };
+        console.log(`   ✅ Synced ${sourceDeadlines.rows.length} deadlines`);
+      } catch (err) {
+        await templatePool.query('ROLLBACK');
+        results.tables.deadlines = { error: err instanceof Error ? err.message : 'Unknown error', status: 'failed' };
+        results.errors.push(`deadlines: ${err instanceof Error ? err.message : 'Unknown error'}`);
+        console.log(`   ❌ Failed to sync deadlines: ${err}`);
+      }
+
+      results.completedAt = new Date().toISOString();
+      results.success = results.errors.length === 0;
+
+      console.log(`\n${'='.repeat(60)}`);
+      console.log(`🔄 SYNC ${results.success ? 'COMPLETED' : 'COMPLETED WITH ERRORS'}`);
+      console.log(`${'='.repeat(60)}\n`);
+
+      res.json(results);
+
+    } finally {
+      await sourcePool.end();
+      await templatePool.end();
+    }
+
+  } catch (error) {
+    console.error('Sync error:', error);
+    res.status(500).json({ error: error instanceof Error ? error.message : 'Sync failed' });
+  }
 });
 
 // =============================================================================

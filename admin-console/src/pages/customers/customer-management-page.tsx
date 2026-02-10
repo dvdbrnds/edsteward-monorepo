@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { apiGet } from '@/lib/api';
+import { apiGet, apiPost } from '@/lib/api';
 import { TenantDeletionDialog } from '@/components/tenant-deletion-dialog';
+import SSOConfiguration from './sso-configuration';
+import TemplateSyncDialog from './template-sync-dialog';
 
 interface Customer {
   id: string;
@@ -22,6 +24,9 @@ interface Customer {
     application: { status: string; responding: boolean; error?: string };
   };
   error?: string;
+  // SSO status
+  ssoEnabled?: boolean;
+  ssoProvider?: string;
 }
 
 export function CustomerManagementPage() {
@@ -29,6 +34,8 @@ export function CustomerManagementPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deletingTenant, setDeletingTenant] = useState<{ id: string; name: string } | null>(null);
+  const [configuringSSO, setConfiguringSSO] = useState<{ id: string; name: string; subdomain: string } | null>(null);
+  const [showSyncDialog, setShowSyncDialog] = useState(false);
 
   useEffect(() => {
     fetchCustomers();
@@ -106,6 +113,14 @@ export function CustomerManagementPage() {
         </div>
         
         <div className="flex space-x-3">
+          <button
+            onClick={() => setShowSyncDialog(true)}
+            className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 flex items-center gap-2"
+            title="Update the baseline regulation data for new tenants"
+          >
+            Update Template Baseline
+          </button>
+          
           <Link
             to="/customers/new"
             className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 font-semibold flex items-center gap-2"
@@ -174,6 +189,11 @@ export function CustomerManagementPage() {
                           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                             {customer.plan}
                           </span>
+                          {customer.ssoEnabled && (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                              🔐 SSO: {customer.ssoProvider?.toUpperCase() || 'Enabled'}
+                            </span>
+                          )}
                         </div>
                         <div className="mt-2 flex items-center text-sm text-gray-500 space-x-6">
                           <span>🌐 {customer.subdomain}.edsteward.ai</span>
@@ -214,6 +234,21 @@ export function CustomerManagementPage() {
                       </div>
                     </div>
                     <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => setConfiguringSSO({ 
+                          id: customer.id, 
+                          name: customer.name,
+                          subdomain: customer.subdomain 
+                        })}
+                        className={`inline-flex items-center px-3 py-2 border shadow-sm text-sm leading-4 font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 ${
+                          customer.ssoEnabled 
+                            ? 'border-purple-300 text-purple-700 bg-white hover:bg-purple-50'
+                            : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
+                        }`}
+                        title="Configure SSO"
+                      >
+                        🔐 SSO
+                      </button>
                       {customer.healthCheckUrl && (
                         <a
                           href={customer.healthCheckUrl}
@@ -258,6 +293,41 @@ export function CustomerManagementPage() {
           onDeleted={() => {
             setDeletingTenant(null);
             fetchCustomers(); // Refresh the list
+          }}
+        />
+      )}
+
+      {/* SSO Configuration Dialog */}
+      {configuringSSO && (
+        <div className="fixed inset-0 z-50 overflow-y-auto">
+          <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:p-0">
+            <div 
+              className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
+              onClick={() => setConfiguringSSO(null)}
+            />
+            <div className="relative inline-block w-full max-w-4xl p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-gray-100 shadow-xl rounded-lg">
+              <SSOConfiguration
+                tenantId={configuringSSO.id}
+                tenantName={configuringSSO.name}
+                subdomain={configuringSSO.subdomain}
+                onClose={() => setConfiguringSSO(null)}
+                onSave={() => {
+                  fetchCustomers(); // Refresh the list to show updated SSO status
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Template Sync Dialog */}
+      {showSyncDialog && (
+        <TemplateSyncDialog
+          isOpen={showSyncDialog}
+          onClose={() => setShowSyncDialog(false)}
+          onSyncComplete={() => {
+            setShowSyncDialog(false);
+            fetchCustomers();
           }}
         />
       )}

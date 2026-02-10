@@ -61,7 +61,7 @@ import { eq, desc, or, like, sql } from "drizzle-orm";
 import { getDatabaseStorage } from "./services/database";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
-import { pool } from "./db";
+// NOTE: Do NOT import { pool } from "./db" here — use this.pool for tenant isolation
 import { Pool } from "pg";
 
 const PostgresSessionStore = connectPg(session);
@@ -247,7 +247,7 @@ export class DatabaseStorage implements IStorage {
   async getRegulationUpdateById(id: number): Promise<RegulationUpdate | null> {
     try {
       // Use parameterized query with pool for safety
-      const result = await pool.query(
+      const result = await this.pool.query(
         'SELECT * FROM regulation_updates WHERE id = $1',
         [id]
       );
@@ -367,7 +367,7 @@ export class DatabaseStorage implements IStorage {
       // Add the regulation ID for WHERE clause
       updateValues.push(update.regulationId);
 
-      await pool.query(
+      await this.pool.query(
         `UPDATE regulations 
          SET ${updateFields.join(', ')} 
          WHERE id = $${paramIndex}`,
@@ -415,7 +415,7 @@ export class DatabaseStorage implements IStorage {
         console.log(`📋 Applying ${pendingTasks.length} compliance tasks on approval (preserving completed work)...`);
         
         // Fetch role assignments for auto-assign (Jan 2026)
-        const roleAssignmentsResult = await pool.query(
+        const roleAssignmentsResult = await this.pool.query(
           'SELECT role_name, default_user_id, auto_assign_enabled FROM role_assignments WHERE auto_assign_enabled = true'
         );
         const roleToUserMap = new Map<string, number>();
@@ -433,7 +433,7 @@ export class DatabaseStorage implements IStorage {
         };
         
         // Get existing tasks for this regulation to preserve completed work
-        const existingTasksResult = await pool.query(
+        const existingTasksResult = await this.pool.query(
           `SELECT id, task_id, title, status, attestation_status FROM compliance_tasks WHERE regulation_id = $1`,
           [update.regulationId]
         );
@@ -491,7 +491,7 @@ export class DatabaseStorage implements IStorage {
           
           if (existing) {
             // Task exists but is not completed - update it with new info
-            await pool.query(
+            await this.pool.query(
               `UPDATE compliance_tasks SET 
                 description = COALESCE($1, description),
                 instructions = COALESCE($2, instructions),
@@ -526,7 +526,7 @@ export class DatabaseStorage implements IStorage {
             }
           } else {
             // Task doesn't exist - insert it
-            const result = await pool.query(
+            const result = await this.pool.query(
               `INSERT INTO compliance_tasks (
                 regulation_id, task_id, title, description, instructions, 
                 category, statutory_role, statutory_citation, assigned_to, assigned_role, 
@@ -592,7 +592,7 @@ export class DatabaseStorage implements IStorage {
           
           if (existing) {
             // Update existing pending task
-            await pool.query(
+            await this.pool.query(
               `UPDATE compliance_tasks SET 
                 parent_task_id = $1,
                 description = COALESCE($2, description),
@@ -629,7 +629,7 @@ export class DatabaseStorage implements IStorage {
             }
           } else {
             // Insert new child task
-            const result = await pool.query(
+            const result = await this.pool.query(
               `INSERT INTO compliance_tasks (
                 regulation_id, parent_task_id, task_id, title, description, instructions, 
                 category, statutory_role, statutory_citation, assigned_to, assigned_role, 
@@ -681,7 +681,7 @@ export class DatabaseStorage implements IStorage {
         
         for (const eo of executiveOrders) {
           // 1. Insert or update the Executive Order
-          const existingEO = await pool.query(
+          const existingEO = await this.pool.query(
             'SELECT id FROM executive_orders WHERE eo_number = $1',
             [eo.eoNumber]
           );
@@ -690,7 +690,7 @@ export class DatabaseStorage implements IStorage {
           if (existingEO.rows.length > 0) {
             // Update existing EO
             eoId = existingEO.rows[0].id;
-            await pool.query(
+            await this.pool.query(
               `UPDATE executive_orders SET
                 title = $1, status = $2, president = $3, term = $4,
                 full_text_url = $5, updated_at = $6
@@ -707,7 +707,7 @@ export class DatabaseStorage implements IStorage {
             );
           } else {
             // Insert new EO
-            const newEO = await pool.query(
+            const newEO = await this.pool.query(
               `INSERT INTO executive_orders (
                 eo_number, title, signed_date, status, president, term, full_text_url
               ) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
@@ -726,7 +726,7 @@ export class DatabaseStorage implements IStorage {
           }
           
           // 2. Create or update the EO-Regulation impact
-          const existingImpact = await pool.query(
+          const existingImpact = await this.pool.query(
             'SELECT id FROM eo_regulation_impacts WHERE eo_id = $1 AND regulation_id = $2',
             [eoId, update.regulationId]
           );
@@ -734,7 +734,7 @@ export class DatabaseStorage implements IStorage {
           let impactId: number;
           if (existingImpact.rows.length > 0) {
             impactId = existingImpact.rows[0].id;
-            await pool.query(
+            await this.pool.query(
               `UPDATE eo_regulation_impacts SET
                 impact_type = $1, impact_severity = $2, impact_summary = $3,
                 assessed_by = $4, confidence_score = $5, updated_at = $6
@@ -750,7 +750,7 @@ export class DatabaseStorage implements IStorage {
               ]
             );
           } else {
-            const newImpact = await pool.query(
+            const newImpact = await this.pool.query(
               `INSERT INTO eo_regulation_impacts (
                 eo_id, regulation_id, impact_type, impact_severity, impact_summary,
                 assessed_by, assessment_date, confidence_score, review_status
@@ -772,7 +772,7 @@ export class DatabaseStorage implements IStorage {
           
           // 3. Auto-create a best practice task for this EO impact
           const taskTitle = `Review: ${eo.eoNumber} - ${eo.title}`;
-          const existingTask = await pool.query(
+          const existingTask = await this.pool.query(
             `SELECT id FROM compliance_tasks 
              WHERE regulation_id = $1 AND title = $2`,
             [update.regulationId, taskTitle]
@@ -786,7 +786,7 @@ export class DatabaseStorage implements IStorage {
               'low': 'low'
             };
             
-            const newTask = await pool.query(
+            const newTask = await this.pool.query(
               `INSERT INTO compliance_tasks (
                 regulation_id, title, description, instructions,
                 priority, requirement_type, status, assigned_role
@@ -806,7 +806,7 @@ export class DatabaseStorage implements IStorage {
             );
             
             // Link the task to the impact
-            await pool.query(
+            await this.pool.query(
               'UPDATE eo_regulation_impacts SET generated_task_id = $1 WHERE id = $2',
               [newTask.rows[0].id, impactId]
             );
@@ -871,7 +871,7 @@ export class DatabaseStorage implements IStorage {
     try {
       // Use raw SQL for bulk delete with IN clause
       const placeholders = ids.map((_, index) => `$${index + 1}`).join(',');
-      await pool.query(
+      await this.pool.query(
         `DELETE FROM regulation_updates WHERE id IN (${placeholders})`,
         ids
       );
@@ -922,11 +922,9 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createUser(insertUser: InsertUser, _tenantId?: string): Promise<User> {
-    // Use tenant-specific storage if tenantId provided
-    if (_tenantId) {
-      const tenantStorage = getDatabaseStorage();
-      return await tenantStorage.createUser(insertUser);
-    }
+    // NOTE: In multi-tenant mode, this storage instance is already bound to the
+    // correct tenant database via getDatabaseStorage(tenantId). We do NOT need to
+    // re-resolve tenant storage here — this.db already points to the right database.
 
     // Handle optional password for SAML users - ensure we have a valid password or null
     const userToCreate = {
@@ -1060,7 +1058,7 @@ export class DatabaseStorage implements IStorage {
       // If we're updating content/requirements, handle it differently due to potential size
       if (regulation.requirements) {
         // First, update the text field directly using parameterized query
-        await pool.query(
+        await this.pool.query(
           `UPDATE regulations SET requirements = $1, last_updated = $2 WHERE id = $3`,
           [regulation.requirements, new Date(), id]
         );
@@ -1142,7 +1140,7 @@ export class DatabaseStorage implements IStorage {
       ORDER BY last_updated DESC
     `;
 
-    const result = await pool.query(query, [
+    const result = await this.pool.query(query, [
       JSON.stringify([institutionType]),
       JSON.stringify(['all-institutions'])
     ]);

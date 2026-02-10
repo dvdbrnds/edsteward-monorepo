@@ -1,8 +1,8 @@
 import passport from 'passport';
 import { MultiSamlStrategy } from '@node-saml/passport-saml';
 import { Express, Request, Response, NextFunction } from 'express';
-import { storage } from '../storage';
 import { TenantService, extractTenantFromSAML } from '../middleware/tenant';
+import { getDatabaseStorage } from '../services/database';
 import { syslog, LogLevel } from '../services/syslog';
 
 // Extend session type for tenant-aware SAML
@@ -26,6 +26,20 @@ interface SamlProfile {
   department?: string;
   organization?: string;
   issuer?: string;
+  // eduPerson attributes (InCommon/Shibboleth)
+  eduPersonPrincipalName?: string;        // ePPN - unique identifier
+  eduPersonAffiliation?: string[];        // faculty, staff, student, etc.
+  eduPersonScopedAffiliation?: string[];  // affiliation@scope
+  eduPersonEntitlement?: string[];        // authorization entitlements
+  eduPersonTargetedID?: string;           // privacy-preserving identifier
+  eduPersonOrgDN?: string;                // organization DN
+  eduPersonOrgUnitDN?: string;            // organizational unit DN
+  eduPersonPrimaryAffiliation?: string;   // primary affiliation
+  displayName?: string;
+  givenName?: string;
+  sn?: string;                            // surname
+  cn?: string;                            // common name
+  uid?: string;
   [key: string]: any;
 }
 
@@ -59,8 +73,34 @@ async function getTenantSamlConfig(tenantId: string, req: Request) {
   };
 }
 
+// eduPerson attribute URIs (InCommon/Shibboleth standard)
+const EDUPERSON_ATTRIBUTES = {
+  eduPersonPrincipalName: 'urn:oid:1.3.6.1.4.1.5923.1.1.1.6',
+  eduPersonAffiliation: 'urn:oid:1.3.6.1.4.1.5923.1.1.1.1',
+  eduPersonScopedAffiliation: 'urn:oid:1.3.6.1.4.1.5923.1.1.1.9',
+  eduPersonEntitlement: 'urn:oid:1.3.6.1.4.1.5923.1.1.1.7',
+  eduPersonTargetedID: 'urn:oid:1.3.6.1.4.1.5923.1.1.1.10',
+  eduPersonPrimaryAffiliation: 'urn:oid:1.3.6.1.4.1.5923.1.1.1.5',
+  eduPersonOrgDN: 'urn:oid:1.3.6.1.4.1.5923.1.1.1.3',
+  eduPersonOrgUnitDN: 'urn:oid:1.3.6.1.4.1.5923.1.1.1.4',
+  // Common LDAP attributes used with Shibboleth
+  mail: 'urn:oid:0.9.2342.19200300.100.1.3',
+  givenName: 'urn:oid:2.5.4.42',
+  sn: 'urn:oid:2.5.4.4',  // surname
+  cn: 'urn:oid:2.5.4.3',  // common name
+  displayName: 'urn:oid:2.16.840.1.113730.3.1.241',
+  uid: 'urn:oid:0.9.2342.19200300.100.1.1',
+  o: 'urn:oid:2.5.4.10',  // organization
+  ou: 'urn:oid:2.5.4.11', // organizational unit
+};
+
 // Extract and map user attributes based on tenant configuration
+// Supports: Microsoft/Azure AD claims, Okta, Shibboleth/InCommon eduPerson
 function extractTenantUserAttributes(profile: SamlProfile, tenant: any): any {
+  // Check if eduPerson mode is enabled (for InCommon/Shibboleth)
+  const eduPersonEnabled = tenant.ssoConfig?.saml?.eduPersonEnabled || tenant.samlConfig?.eduPersonEnabled;
+  
+  // Default mapping for Microsoft/Azure AD style claims
   const defaultMapping = {
     email: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress',
     firstName: 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname',
@@ -70,35 +110,170 @@ function extractTenantUserAttributes(profile: SamlProfile, tenant: any): any {
     groups: 'http://schemas.microsoft.com/ws/2008/06/identity/claims/groups'
   };
 
-  // Use tenant-specific mapping if available
-  const mapping = tenant.samlConfig?.attributeMapping || defaultMapping;
+  // eduPerson/Shibboleth mapping
+  const eduPersonMapping = {
+    email: EDUPERSON_ATTRIBUTES.mail,
+    firstName: EDUPERSON_ATTRIBUTES.givenName,
+    lastName: EDUPERSON_ATTRIBUTES.sn,
+    username: EDUPERSON_ATTRIBUTES.eduPersonPrincipalName,
+    department: EDUPERSON_ATTRIBUTES.ou,
+    groups: EDUPERSON_ATTRIBUTES.eduPersonAffiliation,
+    entitlements: EDUPERSON_ATTRIBUTES.eduPersonEntitlement,
+  };
+
+  // Use tenant-specific mapping, or auto-detect based on available attributes
+  let mapping = tenant.samlConfig?.attributeMapping || tenant.ssoConfig?.saml?.attributeMapping;
+  
+  // Auto-detect eduPerson attributes if not explicitly configured
+  if (!mapping) {
+    const hasEduPerson = profile.eduPersonPrincipalName || 
+                         profile[EDUPERSON_ATTRIBUTES.eduPersonPrincipalName] ||
+                         profile.eduPersonAffiliation ||
+                         profile[EDUPERSON_ATTRIBUTES.eduPersonAffiliation];
+    
+    mapping = (eduPersonEnabled || hasEduPerson) ? eduPersonMapping : defaultMapping;
+  }
+  
+  // Helper to get attribute value from profile (handles OID and friendly name)
+  const getAttr = (attrName: string, oidUri?: string): any => {
+    // Try direct property name first
+    if (profile[attrName] !== undefined) return profile[attrName];
+    // Try OID URI
+    if (oidUri && profile[oidUri] !== undefined) return profile[oidUri];
+    // Try from mapping
+    if (mapping[attrName] && profile[mapping[attrName]] !== undefined) {
+      return profile[mapping[attrName]];
+    }
+    return undefined;
+  };
+
+  // Extract email - try multiple sources
+  let email = getAttr('email', EDUPERSON_ATTRIBUTES.mail) ||
+              profile.email ||
+              profile.mail ||
+              profile[defaultMapping.email] ||
+              profile[eduPersonMapping.email];
+  
+  // For eduPerson, email might be in eduPersonPrincipalName
+  if (!email && profile.eduPersonPrincipalName) {
+    email = profile.eduPersonPrincipalName;
+  }
+  if (!email && profile[EDUPERSON_ATTRIBUTES.eduPersonPrincipalName]) {
+    email = profile[EDUPERSON_ATTRIBUTES.eduPersonPrincipalName];
+  }
+  // Fallback to nameID if it looks like an email
+  if (!email && profile.nameID && profile.nameID.includes('@')) {
+    email = profile.nameID;
+  }
+
+  // Extract name
+  let firstName = getAttr('firstName', EDUPERSON_ATTRIBUTES.givenName) ||
+                  profile.firstName ||
+                  profile.givenName ||
+                  profile[defaultMapping.firstName] ||
+                  '';
+  
+  let lastName = getAttr('lastName', EDUPERSON_ATTRIBUTES.sn) ||
+                 profile.lastName ||
+                 profile.sn ||
+                 profile[defaultMapping.lastName] ||
+                 '';
+
+  // If no first/last name but have displayName, try to parse it
+  if (!firstName && !lastName) {
+    const displayName = profile.displayName || 
+                        profile[EDUPERSON_ATTRIBUTES.displayName] ||
+                        profile.cn ||
+                        profile[EDUPERSON_ATTRIBUTES.cn];
+    if (displayName) {
+      const parts = displayName.split(' ');
+      firstName = parts[0] || '';
+      lastName = parts.slice(1).join(' ') || '';
+    }
+  }
+
+  // Extract username
+  let username = getAttr('username', EDUPERSON_ATTRIBUTES.eduPersonPrincipalName) ||
+                 profile.username ||
+                 profile.uid ||
+                 profile[EDUPERSON_ATTRIBUTES.uid] ||
+                 profile.eduPersonPrincipalName ||
+                 profile[EDUPERSON_ATTRIBUTES.eduPersonPrincipalName] ||
+                 email ||
+                 profile.nameID;
+
+  // Extract external ID (use targeted ID for privacy-preserving identifier)
+  const externalId = profile.eduPersonTargetedID ||
+                     profile[EDUPERSON_ATTRIBUTES.eduPersonTargetedID] ||
+                     profile.nameID;
   
   const extractedData = {
-    email: profile.email || profile[mapping.email] || profile.nameID,
-    firstName: profile.firstName || profile[mapping.firstName] || '',
-    lastName: profile.lastName || profile[mapping.lastName] || '',
-    username: profile.username || profile[mapping.username] || profile.nameID,
-    department: profile.department || profile[mapping.department] || '',
-    externalId: profile.nameID,
+    email: email || profile.nameID,
+    firstName: Array.isArray(firstName) ? firstName[0] : firstName,
+    lastName: Array.isArray(lastName) ? lastName[0] : lastName,
+    username: Array.isArray(username) ? username[0] : username,
+    department: getAttr('department', EDUPERSON_ATTRIBUTES.ou) ||
+                profile.department ||
+                profile[defaultMapping.department] ||
+                '',
+    externalId: externalId,
     identityProvider: 'saml',
     providerId: tenant.id,
     tenantId: tenant.id,
-    role: tenant.settings.defaultRole || 'user',
-    organization: profile.organization || tenant.name
+    role: tenant.settings?.defaultRole || tenant.ssoConfig?.defaultRole || 'user',
+    organization: profile.organization || 
+                  profile[EDUPERSON_ATTRIBUTES.o] ||
+                  tenant.name,
+    // Store eduPerson metadata for reference
+    eduPersonAffiliation: profile.eduPersonAffiliation ||
+                          profile[EDUPERSON_ATTRIBUTES.eduPersonAffiliation],
+    eduPersonEntitlement: profile.eduPersonEntitlement ||
+                          profile[EDUPERSON_ATTRIBUTES.eduPersonEntitlement],
   };
 
-  // Role mapping based on groups or attributes
+  // Role mapping based on groups, affiliations, or entitlements
   const groups = profile[mapping.groups] || profile.groups || [];
-  if (Array.isArray(groups)) {
-    if (groups.some(group => group.toLowerCase().includes('admin'))) {
+  const affiliations = profile.eduPersonAffiliation || 
+                       profile[EDUPERSON_ATTRIBUTES.eduPersonAffiliation] ||
+                       profile.eduPersonScopedAffiliation ||
+                       profile[EDUPERSON_ATTRIBUTES.eduPersonScopedAffiliation] ||
+                       [];
+  const entitlements = profile.eduPersonEntitlement ||
+                       profile[EDUPERSON_ATTRIBUTES.eduPersonEntitlement] ||
+                       [];
+
+  // Combine all sources for role determination
+  const allRoleIndicators = [
+    ...(Array.isArray(groups) ? groups : [groups]),
+    ...(Array.isArray(affiliations) ? affiliations : [affiliations]),
+    ...(Array.isArray(entitlements) ? entitlements : [entitlements]),
+  ].filter(Boolean).map(s => (s || '').toLowerCase());
+
+  if (allRoleIndicators.length > 0) {
+    // Admin role detection
+    if (allRoleIndicators.some(indicator => 
+      indicator.includes('admin') ||
+      indicator.includes('administrator') ||
+      indicator.includes('superuser')
+    )) {
       extractedData.role = 'admin';
-    } else if (groups.some(group => 
-      group.toLowerCase().includes('compliance') || 
-      group.toLowerCase().includes('officer') ||
-      group.toLowerCase().includes('faculty') ||
-      group.toLowerCase().includes('staff')
+    } 
+    // Compliance officer role detection
+    else if (allRoleIndicators.some(indicator => 
+      indicator.includes('compliance') || 
+      indicator.includes('officer') ||
+      indicator.includes('faculty') ||
+      indicator.includes('staff') ||
+      indicator.includes('employee')
     )) {
       extractedData.role = 'compliance_officer';
+    }
+    // Student/viewer role (lower privilege)
+    else if (allRoleIndicators.some(indicator =>
+      indicator.includes('student') ||
+      indicator.includes('alum')
+    )) {
+      extractedData.role = 'viewer';
     }
   }
 
@@ -171,15 +346,18 @@ export function setupTenantSamlAuth(app: Express) {
 
         const userData = extractTenantUserAttributes(profile, tenant);
         
+        // CRITICAL: Use tenant-specific storage for database isolation
+        const tenantStorage = getDatabaseStorage(tenantId);
+        
         // Check if user exists in this tenant
-        let user = await storage.getUserByExternalId(userData.externalId, tenantId);
+        let user = await tenantStorage.getUserByExternalId(userData.externalId, tenantId);
         if (!user && userData.email) {
-          user = await storage.getUserByEmail(userData.email, tenantId);
+          user = await tenantStorage.getUserByEmail(userData.email, tenantId);
         }
 
         if (user) {
           // Update existing user
-          await storage.updateUser(user.id, {
+          await tenantStorage.updateUser(user.id, {
             lastLogin: new Date(),
             identityProvider: userData.identityProvider,
             providerId: userData.providerId
@@ -195,7 +373,7 @@ export function setupTenantSamlAuth(app: Express) {
           return done(null, user);
         } else if (tenant.settings.enableAutoProvisioning) {
           // Create new user for this tenant
-          const newUser = await storage.createUser({
+          const newUser = await tenantStorage.createUser({
             ...userData,
             lastLogin: new Date()
           }, tenantId);
@@ -228,7 +406,8 @@ export function setupTenantSamlAuth(app: Express) {
       try {
         const tenantId = req.session?.tenantId || req.tenantId;
         if (tenantId) {
-          const user = await storage.getUserByExternalId(profile.nameID || '', tenantId);
+          const tenantStorage = getDatabaseStorage(tenantId);
+          const user = await tenantStorage.getUserByExternalId(profile.nameID || '', tenantId);
           if (user) {
             await syslog.logAuthEvent(
               LogLevel.INFO, 
@@ -332,11 +511,15 @@ export function setupTenantSamlAuth(app: Express) {
 }
 
 // Generate tenant-specific service provider metadata
+// Includes both standard SAML claims AND eduPerson attributes for InCommon/Shibboleth
 function generateTenantServiceProviderMetadata(tenant: any): string {
   const spEntityId = `urn:edsteward:sp:${tenant.id}`;
   const baseUrl = `https://${tenant.subdomain}.${process.env.BASE_DOMAIN || 'edsteward.ai'}`;
   const callbackUrl = `${baseUrl}/auth/saml/callback`;
   const sloUrl = `${baseUrl}/auth/saml/logout`;
+  
+  // Check if eduPerson mode is enabled
+  const eduPersonEnabled = tenant.ssoConfig?.saml?.eduPersonEnabled || tenant.samlConfig?.eduPersonEnabled;
 
   return `<?xml version="1.0" encoding="UTF-8"?>
 <md:EntityDescriptor xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata"
@@ -353,9 +536,13 @@ function generateTenantServiceProviderMetadata(tenant: any): string {
                                  isDefault="true"/>
     <md:SingleLogoutService Binding="urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
                            Location="${sloUrl}"/>
+    
+    <!-- Standard SAML Claims (Microsoft/Azure AD, Okta) -->
     <md:AttributeConsumingService index="1" isDefault="true">
       <md:ServiceName xml:lang="en">EdSteward - ${tenant.name}</md:ServiceName>
       <md:ServiceDescription xml:lang="en">Regulatory Compliance Tracking System for ${tenant.name}</md:ServiceDescription>
+      
+      <!-- Microsoft/Azure AD style claims -->
       <md:RequestedAttribute Name="http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress" 
                             NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" 
                             FriendlyName="email" isRequired="true"/>
@@ -371,15 +558,57 @@ function generateTenantServiceProviderMetadata(tenant: any): string {
       <md:RequestedAttribute Name="http://schemas.microsoft.com/ws/2008/06/identity/claims/groups" 
                             NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" 
                             FriendlyName="groups" isRequired="false"/>
+      
+      <!-- eduPerson attributes (InCommon/Shibboleth) -->
+      <md:RequestedAttribute Name="urn:oid:1.3.6.1.4.1.5923.1.1.1.6" 
+                            NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" 
+                            FriendlyName="eduPersonPrincipalName" isRequired="false"/>
+      <md:RequestedAttribute Name="urn:oid:1.3.6.1.4.1.5923.1.1.1.1" 
+                            NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" 
+                            FriendlyName="eduPersonAffiliation" isRequired="false"/>
+      <md:RequestedAttribute Name="urn:oid:1.3.6.1.4.1.5923.1.1.1.9" 
+                            NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" 
+                            FriendlyName="eduPersonScopedAffiliation" isRequired="false"/>
+      <md:RequestedAttribute Name="urn:oid:1.3.6.1.4.1.5923.1.1.1.7" 
+                            NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" 
+                            FriendlyName="eduPersonEntitlement" isRequired="false"/>
+      <md:RequestedAttribute Name="urn:oid:1.3.6.1.4.1.5923.1.1.1.10" 
+                            NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" 
+                            FriendlyName="eduPersonTargetedID" isRequired="false"/>
+      
+      <!-- Common LDAP attributes used by Shibboleth -->
+      <md:RequestedAttribute Name="urn:oid:0.9.2342.19200300.100.1.3" 
+                            NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" 
+                            FriendlyName="mail" isRequired="false"/>
+      <md:RequestedAttribute Name="urn:oid:2.5.4.42" 
+                            NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" 
+                            FriendlyName="givenName" isRequired="false"/>
+      <md:RequestedAttribute Name="urn:oid:2.5.4.4" 
+                            NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" 
+                            FriendlyName="sn" isRequired="false"/>
+      <md:RequestedAttribute Name="urn:oid:2.16.840.1.113730.3.1.241" 
+                            NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" 
+                            FriendlyName="displayName" isRequired="false"/>
+      <md:RequestedAttribute Name="urn:oid:0.9.2342.19200300.100.1.1" 
+                            NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri" 
+                            FriendlyName="uid" isRequired="false"/>
     </md:AttributeConsumingService>
   </md:SPSSODescriptor>
+  
   <md:Organization>
     <md:OrganizationName xml:lang="en">${tenant.name}</md:OrganizationName>
     <md:OrganizationDisplayName xml:lang="en">${tenant.name}</md:OrganizationDisplayName>
     <md:OrganizationURL xml:lang="en">${baseUrl}</md:OrganizationURL>
   </md:Organization>
+  
   <md:ContactPerson contactType="technical">
+    <md:GivenName>Technical Support</md:GivenName>
     <md:EmailAddress>support@edsteward.ai</md:EmailAddress>
+  </md:ContactPerson>
+  
+  <md:ContactPerson contactType="administrative">
+    <md:GivenName>EdSteward Administration</md:GivenName>
+    <md:EmailAddress>admin@edsteward.ai</md:EmailAddress>
   </md:ContactPerson>
 </md:EntityDescriptor>`;
 }

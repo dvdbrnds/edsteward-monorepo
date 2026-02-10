@@ -108,8 +108,8 @@ const TenantCreationWizard: React.FC = () => {
     if (!formData.subdomain.trim()) return 'Subdomain is required';
     if (!/^[a-z0-9-]+$/.test(formData.subdomain)) return 'Subdomain must be lowercase letters, numbers, and hyphens only';
     if (formData.subdomain.length < 3) return 'Subdomain must be at least 3 characters';
-    if (!formData.contactEmail.trim()) return 'Contact email is required';
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.contactEmail)) return 'Invalid email format';
+    // Contact email is optional - only validate format if provided
+    if (formData.contactEmail.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.contactEmail)) return 'Invalid email format';
     return null;
   };
 
@@ -292,7 +292,7 @@ const TenantCreationWizard: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="contactEmail">Contact Email *</Label>
+          <Label htmlFor="contactEmail">Contact Email (optional)</Label>
           <Input
             id="contactEmail"
             type="email"
@@ -453,7 +453,9 @@ const TenantCreationWizard: React.FC = () => {
           <div><span className="text-gray-500">Name:</span> <strong>{formData.name}</strong></div>
           <div><span className="text-gray-500">Plan:</span> <strong className="capitalize">{formData.plan}</strong></div>
           <div><span className="text-gray-500">URL:</span> <strong>https://{formData.subdomain}.edsteward.ai</strong></div>
-          <div><span className="text-gray-500">Contact:</span> <strong>{formData.contactEmail}</strong></div>
+          {formData.contactEmail && (
+            <div><span className="text-gray-500">Contact:</span> <strong>{formData.contactEmail}</strong></div>
+          )}
         </div>
       </div>
 
@@ -487,7 +489,7 @@ const TenantCreationWizard: React.FC = () => {
       <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
         <p className="text-sm text-yellow-800">
           <strong>Ready to provision?</strong> This will create a new Neon database, 
-          copy {' '}356 regulations and 107 compliance tasks from the template, 
+          copy all regulations and compliance tasks from the template, 
           and set up the admin user. This process takes about 1-2 minutes.
         </p>
       </div>

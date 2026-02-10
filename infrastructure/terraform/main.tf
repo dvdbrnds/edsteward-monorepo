@@ -69,10 +69,24 @@ resource "aws_security_group" "alb" {
   tags = local.common_tags
 }
 
-# CloudWatch Log Group
+# CloudWatch Log Group - Application Logs (90 days for HECVAT compliance)
 resource "aws_cloudwatch_log_group" "ecs" {
   name              = "/aws/ecs/${var.project_name}"
-  retention_in_days = 7
+  retention_in_days = 90
+  tags = local.common_tags
+}
+
+# CloudWatch Log Group - Audit Logs (7 years for HECVAT compliance)
+resource "aws_cloudwatch_log_group" "audit" {
+  name              = "/aws/ecs/${var.project_name}/audit"
+  retention_in_days = 2557  # 7 years (HECVAT requirement for audit logs)
+  tags = local.common_tags
+}
+
+# CloudWatch Log Group - Security Logs (1 year for HECVAT compliance)
+resource "aws_cloudwatch_log_group" "security" {
+  name              = "/aws/ecs/${var.project_name}/security"
+  retention_in_days = 365
   tags = local.common_tags
 }
 
@@ -305,6 +319,12 @@ variable "session_secret" {
   description = "Session secret for authentication"
   type        = string
   default     = "9qbArxksSA8llE2Gpkt1Hs2jvFBPFE9G9ZEN"
+}
+
+variable "alert_email" {
+  description = "Email address for CloudWatch alerts"
+  type        = string
+  default     = "david@edsteward.ai"
 }
 
 # Outputs

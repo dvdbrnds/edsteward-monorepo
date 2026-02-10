@@ -16,6 +16,7 @@ import { requireAuth, requireAdmin } from '../../middleware/role-based-auth';
 import { emailService } from '../../services/email';
 import { getCleryTasksWithDates, getCleryTaskCount } from '../../templates/clery-act-tasks';
 import { uploadLimiter } from '../../middleware/rate-limiter';
+import { checkAndNotifyRegulationReadyForAttestation } from '../../services/task-notifications';
 
 // JWT secret for task tokens (use same as attestation or a dedicated one)
 const TASK_TOKEN_SECRET = process.env.ATTESTATION_JWT_SECRET || process.env.JWT_SECRET || 'edsteward-task-secret-key';
@@ -395,6 +396,14 @@ router.patch('/:taskId', requireAuth, async (req: Request, res: Response) => {
       .set(updateData)
       .where(eq(complianceTasks.id, taskId))
       .returning();
+
+    // Check if all tasks are now completed for this regulation - notify DRI/CCO
+    if (updates.status === 'completed' && currentTask.regulationId) {
+      // Run async without blocking response
+      checkAndNotifyRegulationReadyForAttestation(currentTask.regulationId, req.tenantId).catch(err => {
+        console.error('[TaskUpdate] Error checking regulation attestation readiness:', err);
+      });
+    }
 
     res.json(updatedTask);
   } catch (error) {
@@ -1607,6 +1616,13 @@ router.post('/token/:token/complete', async (req: Request, res: Response) => {
       newValue: 'completed',
     });
 
+    // Check if all tasks are now completed for this regulation - notify DRI/CCO
+    if (currentTask[0].regulationId) {
+      checkAndNotifyRegulationReadyForAttestation(currentTask[0].regulationId, req.tenantId).catch(err => {
+        console.error('[QuickComplete] Error checking regulation attestation readiness:', err);
+      });
+    }
+
     res.json({
       success: true,
       task: updatedTask,
@@ -1742,6 +1758,16 @@ router.post('/bulk/status', requireAdmin, async (req: Request, res: Response) =>
       }
     }
 
+    // If completing tasks, check each unique regulation for attestation readiness
+    if (status === 'completed') {
+      const regulationIds = [...new Set(updatedTasks.map(t => t.regulationId).filter(Boolean))];
+      for (const regId of regulationIds) {
+        checkAndNotifyRegulationReadyForAttestation(regId as number, req.tenantId).catch(err => {
+          console.error(`[BulkUpdate] Error checking regulation ${regId} attestation readiness:`, err);
+        });
+      }
+    }
+
     res.json({
       success: true,
       updatedCount: updatedTasks.length,
@@ -1777,7 +1803,7 @@ router.post('/bulk/notify', requireAdmin, async (req: Request, res: Response) =>
 
     for (const taskId of taskIds) {
       try {
-        const success = await sendImmediateTaskNotification(taskId, notificationType);
+        const success = await sendImmediateTaskNotification(taskId, notificationType, req.tenantId);
         if (success) {
           results.sent++;
         } else {
@@ -1992,7 +2018,7 @@ router.post('/:taskId/notify', requireAdmin, async (req: Request, res: Response)
     }
 
     const { sendImmediateTaskNotification } = await import('../../services/task-notifications');
-    const success = await sendImmediateTaskNotification(taskId, type);
+    const success = await sendImmediateTaskNotification(taskId, type, req.tenantId);
     
     if (success) {
       res.json({ success: true, message: 'Notification sent' });
@@ -2402,6 +2428,13 @@ router.post('/attestation/:token/attest', async (req: Request, res: Response) =>
       previousValue: task.status,
       newValue: 'completed',
     });
+
+    // Check if all tasks are now completed for this regulation - notify DRI/CCO
+    if (task.regulationId) {
+      checkAndNotifyRegulationReadyForAttestation(task.regulationId, req.tenantId).catch(err => {
+        console.error('[Attestation] Error checking regulation attestation readiness:', err);
+      });
+    }
 
     res.json({
       success: true,

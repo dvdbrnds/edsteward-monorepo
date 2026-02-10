@@ -28,7 +28,7 @@ const ECS_TASK_FAMILY = process.env.ECS_TASK_FAMILY || 'edsteward-saml-step3';
 export interface TenantProvisioningRequest {
   name: string;
   subdomain: string;
-  contactEmail: string;
+  contactEmail?: string;  // Optional - for hands-on tenant handover
   contactName?: string;
   plan: 'starter' | 'professional' | 'enterprise';
   adminUser: {
@@ -358,10 +358,10 @@ export async function copyDataFromTemplate(targetDatabaseUrl: string): Promise<{
     await targetPool.query(`
       UPDATE compliance_tasks 
       SET status = 'pending',
-          "completedAt" = NULL,
-          "completedBy" = NULL,
-          "assignedTo" = NULL
-      WHERE status != 'pending' OR "completedAt" IS NOT NULL
+          completed_at = NULL,
+          completed_by = NULL,
+          assigned_to = NULL
+      WHERE status != 'pending' OR completed_at IS NOT NULL
     `);
 
     // Clear ALL tenant-specific operational data - new tenants start completely fresh
@@ -506,7 +506,7 @@ export async function addTenantToOwnDatabase(
     id: string;
     name: string;
     subdomain: string;
-    contactEmail: string;
+    contactEmail?: string;
   }
 ): Promise<void> {
   console.log('📝 Adding tenant record to database...');
@@ -526,7 +526,7 @@ export async function addTenantToOwnDatabase(
       tenant.name,
       tenant.subdomain,
       databaseUrl,
-      tenant.contactEmail,
+      tenant.contactEmail || null,  // Allow null contact email
       `https://${tenant.subdomain}.edsteward.ai/api/health`
     ]);
 
@@ -610,8 +610,8 @@ export async function provisionTenant(
       request.name,
       request.subdomain,
       databaseUrl,
-      request.contactEmail,
-      request.contactName,
+      request.contactEmail || null,  // Allow null contact email
+      request.contactName || null,
       request.plan,
       `https://${request.subdomain}.edsteward.ai/api/health`,
       request.plan === 'enterprise' ? 999 : request.plan === 'professional' ? 100 : 10,
@@ -623,7 +623,7 @@ export async function provisionTenant(
       id: tenantId,
       name: request.name,
       subdomain: request.subdomain,
-      contactEmail: request.contactEmail,
+      contactEmail: request.contactEmail || undefined,
     });
     
     updateStep(6, 'completed', 'Tenant registered');
