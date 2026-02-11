@@ -1225,16 +1225,17 @@ function RegulationDetailPage() {
                 </CollapsibleContent>
               </Collapsible>
 
-              {/* COMPLIANCE TASKS - Only show for regulations that have tasks */}
-              {(complianceTasksData?.totalTasks ?? 0) > 0 && (
+              {/* COMPLIANCE TASKS */}
               <Collapsible open={complianceTasksOpen} onOpenChange={setComplianceTasksOpen}>
                 <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-lg border hover:bg-background transition-colors">
                   <div className="flex items-center gap-3">
                     <ListTodo className="h-5 w-5 text-indigo-600" />
                     <span className="font-semibold text-foreground">Compliance Tasks</span>
-                    <Badge variant="secondary" className="text-xs bg-indigo-100 text-indigo-700">
-                      {complianceTasksData?.completedTasks ?? 0}/{complianceTasksData?.totalTasks ?? 0} Complete
-                    </Badge>
+                    {(complianceTasksData?.totalTasks ?? 0) > 0 && (
+                      <Badge variant="secondary" className="text-xs bg-indigo-100 text-indigo-700">
+                        {complianceTasksData?.completedTasks ?? 0}/{complianceTasksData?.totalTasks ?? 0} Complete
+                      </Badge>
+                    )}
                   </div>
                   <div className="flex items-center gap-2">
                     {complianceTasksOpen ? <ChevronDown className="h-5 w-5 text-muted-foreground" /> : <ChevronRight className="h-5 w-5 text-muted-foreground" />}
@@ -1248,7 +1249,6 @@ function RegulationDetailPage() {
                   />
                 </CollapsibleContent>
               </Collapsible>
-              )}
 
               {/* EXECUTIVE ORDERS (MCP Engine Jan 2026) */}
               <ExecutiveOrdersPanel
