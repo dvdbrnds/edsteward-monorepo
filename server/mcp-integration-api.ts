@@ -969,12 +969,15 @@ export function setupMCPIntegrationApi(app: express.Application) {
       const riskScore = data.riskScore; // 1-100 score
       const riskLevel = data.riskLevel; // CRITICAL, SEVERE, HIGH, MODERATE, LOW
       
-      // Use regulationId from payload, or generate one
-      const itemId = data.regulationId || data.itemId || 
+      // regulationId from MCP Engine is the EdSteward database primary key (id)
+      // itemId is the slug-style identifier (e.g., 'title-ix', 'REG1987')
+      const regulationDbId = typeof data.regulationId === 'number' ? data.regulationId : null;
+      const itemId = data.itemId || 
         `REG-${data.name.replace(/[^a-zA-Z0-9]/g, '-').substring(0, 30).toUpperCase()}-${Date.now()}`;
       
       console.log(`🔍 Looking for existing regulation...`);
       if (regKey) console.log(`   reg_key: ${regKey}`);
+      if (regulationDbId) console.log(`   regulationId (DB pk): ${regulationDbId}`);
       console.log(`   item_id: ${itemId}`);
       
       // Normalize category (smart mapping to canonical categories)
@@ -987,21 +990,45 @@ export function setupMCPIntegrationApi(app: express.Application) {
         console.log(`🏷️ Auto-mapped category: "${data.category}" → "${categoryResult.canonicalName}" (${(categoryResult.confidence * 100).toFixed(0)}% confidence)`);
       }
       
-      // Check if regulation exists - try reg_key first, then item_id
+      // Check if regulation exists - try reg_key first, then DB primary key, then item_id
       let existingReg;
+      
+      // 1. Try reg_key (universal key like REG-002) - most reliable match
       if (regKey) {
         existingReg = await db.select()
           .from(regulations)
           .where(eq(regulations.regKey, regKey))
           .limit(1);
+        if (existingReg.length > 0) {
+          console.log(`   ✅ Matched by reg_key: ${regKey} → id ${existingReg[0].id}`);
+        }
       }
       
-      // If not found by reg_key, try item_id
+      // 2. Try regulationId as database primary key (id column)
+      if ((!existingReg || existingReg.length === 0) && regulationDbId) {
+        existingReg = await db.select()
+          .from(regulations)
+          .where(eq(regulations.id, regulationDbId))
+          .limit(1);
+        if (existingReg.length > 0) {
+          console.log(`   ✅ Matched by DB id: ${regulationDbId}`);
+        }
+      }
+      
+      // 3. Try item_id (slug-style identifier) as last resort
       if (!existingReg || existingReg.length === 0) {
         existingReg = await db.select()
           .from(regulations)
           .where(eq(regulations.itemId, itemId))
           .limit(1);
+        if (existingReg.length > 0) {
+          console.log(`   ✅ Matched by item_id: ${itemId} → id ${existingReg[0].id}`);
+        }
+      }
+      
+      if (!existingReg || existingReg.length === 0) {
+        console.log(`   ⚠️ No existing record found — will create new`);
+        existingReg = [];
       }
       
       const isUpdate = existingReg.length > 0;
