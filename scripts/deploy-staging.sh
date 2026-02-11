@@ -104,69 +104,54 @@ tag_and_push "$VERSION" "staging-latest"
 echo ""
 step "5/6 - Updating ECS Task Definition"
 
-# Create task definition with the new image
+# Retrieve the currently ACTIVE (running) task definition and update only the image + version.
+# This preserves correct Secrets Manager ARNs (which include random suffixes).
+log "Retrieving active task definition as base..."
+
+ACTIVE_TASK_DEF=$(aws ecs describe-services \
+    --cluster "$CLUSTER_NAME" \
+    --services "$SERVICE_NAME" \
+    --query 'services[0].deployments[?status==`ACTIVE`].taskDefinition | [0]' \
+    --output text \
+    --region "$AWS_REGION" 2>/dev/null)
+
+if [[ -z "$ACTIVE_TASK_DEF" || "$ACTIVE_TASK_DEF" == "None" ]]; then
+    ACTIVE_TASK_DEF=$(aws ecs describe-services \
+        --cluster "$CLUSTER_NAME" \
+        --services "$SERVICE_NAME" \
+        --query 'services[0].deployments[0].taskDefinition' \
+        --output text \
+        --region "$AWS_REGION" 2>/dev/null)
+fi
+
+log "Base task definition: $ACTIVE_TASK_DEF"
+
+# Extract the full task definition JSON, keeping only the fields needed for registration
+aws ecs describe-task-definition \
+    --task-definition "$ACTIVE_TASK_DEF" \
+    --query 'taskDefinition.{family:family,networkMode:networkMode,requiresCompatibilities:requiresCompatibilities,cpu:cpu,memory:memory,executionRoleArn:executionRoleArn,taskRoleArn:taskRoleArn,containerDefinitions:containerDefinitions}' \
+    --output json \
+    --region "$AWS_REGION" > /tmp/staging-task-def-base.json
+
+# Update the image to the new version
+log "Updating image to ${ECR_URI}:${VERSION}..."
+python3 -c "
+import json, sys
+with open('/tmp/staging-task-def-base.json') as f:
+    td = json.load(f)
+td['containerDefinitions'][0]['image'] = '${ECR_URI}:${VERSION}'
+# Update VERSION env var
+for env in td['containerDefinitions'][0].get('environment', []):
+    if env['name'] == 'VERSION':
+        env['value'] = '${VERSION}'
+        break
+else:
+    td['containerDefinitions'][0].setdefault('environment', []).append({'name': 'VERSION', 'value': '${VERSION}'})
+with open('/tmp/staging-task-def.json', 'w') as f:
+    json.dump(td, f, indent=2)
+"
+
 log "Creating new task definition..."
-
-TASK_DEF_JSON=$(cat << EOF
-{
-  "family": "${TASK_FAMILY}",
-  "networkMode": "awsvpc",
-  "requiresCompatibilities": ["FARGATE"],
-  "cpu": "512",
-  "memory": "1024",
-  "executionRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/ecsTaskExecutionRole",
-  "taskRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/ecsTaskRole",
-  "containerDefinitions": [
-    {
-      "name": "edsteward-app",
-      "image": "${ECR_URI}:${VERSION}",
-      "portMappings": [
-        {
-          "containerPort": 3000,
-          "protocol": "tcp"
-        }
-      ],
-      "essential": true,
-      "environment": [
-        {"name": "NODE_ENV", "value": "staging"},
-        {"name": "PORT", "value": "3000"},
-        {"name": "HOSTNAME", "value": "0.0.0.0"},
-        {"name": "ENVIRONMENT", "value": "staging"},
-        {"name": "BASE_URL", "value": "${STAGING_URL}"},
-        {"name": "VERSION", "value": "${VERSION}"}
-      ],
-      "secrets": [
-        {
-          "name": "DATABASE_URL",
-          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:edsteward/staging/database-url"
-        },
-        {
-          "name": "SESSION_SECRET",
-          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:edsteward/staging/session-secret"
-        }
-      ],
-      "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-          "awslogs-group": "/ecs/edsteward-staging",
-          "awslogs-region": "${AWS_REGION}",
-          "awslogs-stream-prefix": "ecs"
-        }
-      },
-      "healthCheck": {
-        "command": ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1"],
-        "interval": 30,
-        "timeout": 5,
-        "retries": 3,
-        "startPeriod": 60
-      }
-    }
-  ]
-}
-EOF
-)
-
-echo "$TASK_DEF_JSON" > /tmp/staging-task-def.json
 
 TASK_DEF_ARN=$(aws ecs register-task-definition \
     --cli-input-json file:///tmp/staging-task-def.json \
@@ -174,7 +159,7 @@ TASK_DEF_ARN=$(aws ecs register-task-definition \
     --output text \
     --region "$AWS_REGION")
 
-rm -f /tmp/staging-task-def.json
+rm -f /tmp/staging-task-def.json /tmp/staging-task-def-base.json
 success "Task definition registered: $TASK_DEF_ARN"
 
 echo ""
