@@ -126,70 +126,75 @@ confirm_production_deploy "$VERSION"
 echo ""
 step "1/3 - Creating ECS Task Definition"
 
+# Retrieve the currently ACTIVE (running) task definition and update only the image + version.
+# This preserves all existing environment variables including DATABASE_URL, SESSION_SECRET,
+# and SAML configuration. NEVER recreate the task definition from scratch — secrets will be lost.
+log "Retrieving active task definition as base..."
+
+ACTIVE_TASK_DEF=$(aws ecs describe-services \
+    --cluster "$CLUSTER_NAME" \
+    --services "$SERVICE_NAME" \
+    --query 'services[0].deployments[?status==`ACTIVE`].taskDefinition | [0]' \
+    --output text \
+    --region "$AWS_REGION" 2>/dev/null)
+
+if [[ -z "$ACTIVE_TASK_DEF" || "$ACTIVE_TASK_DEF" == "None" ]]; then
+    ACTIVE_TASK_DEF=$(aws ecs describe-services \
+        --cluster "$CLUSTER_NAME" \
+        --services "$SERVICE_NAME" \
+        --query 'services[0].deployments[0].taskDefinition' \
+        --output text \
+        --region "$AWS_REGION" 2>/dev/null)
+fi
+
+log "Base task definition: $ACTIVE_TASK_DEF"
+
+# Verify the base task definition has DATABASE_URL set (safety check)
+DB_URL_CHECK=$(aws ecs describe-task-definition \
+    --task-definition "$ACTIVE_TASK_DEF" \
+    --query 'taskDefinition.containerDefinitions[0].environment[?name==`DATABASE_URL`].value | [0]' \
+    --output text \
+    --region "$AWS_REGION" 2>/dev/null)
+
+if [[ -z "$DB_URL_CHECK" || "$DB_URL_CHECK" == "None" || "$DB_URL_CHECK" == "" ]]; then
+    echo ""
+    echo -e "${RED}╔════════════════════════════════════════════════════════════════════════╗${NC}"
+    echo -e "${RED}║  SAFETY ABORT: Base task definition has empty DATABASE_URL!            ║${NC}"
+    echo -e "${RED}║  This would deploy a broken container. Fix the active task def first.  ║${NC}"
+    echo -e "${RED}╚════════════════════════════════════════════════════════════════════════╝${NC}"
+    echo ""
+    error "Cannot deploy: base task definition is missing DATABASE_URL"
+fi
+
+# Extract the full task definition JSON, keeping only the fields needed for registration
+aws ecs describe-task-definition \
+    --task-definition "$ACTIVE_TASK_DEF" \
+    --query 'taskDefinition.{family:family,networkMode:networkMode,requiresCompatibilities:requiresCompatibilities,cpu:cpu,memory:memory,executionRoleArn:executionRoleArn,taskRoleArn:taskRoleArn,containerDefinitions:containerDefinitions}' \
+    --output json \
+    --region "$AWS_REGION" > /tmp/production-task-def-base.json
+
+# Update only the image and VERSION env var — preserve everything else
+log "Updating image to ${ECR_URI}:${VERSION}..."
+python3 -c "
+import json, sys
+with open('/tmp/production-task-def-base.json') as f:
+    td = json.load(f)
+# Remove taskRoleArn if null (Fargate doesn't accept null)
+if td.get('taskRoleArn') is None:
+    del td['taskRoleArn']
+td['containerDefinitions'][0]['image'] = '${ECR_URI}:${VERSION}'
+# Update VERSION env var
+for env in td['containerDefinitions'][0].get('environment', []):
+    if env['name'] == 'VERSION':
+        env['value'] = '${VERSION}'
+        break
+else:
+    td['containerDefinitions'][0].setdefault('environment', []).append({'name': 'VERSION', 'value': '${VERSION}'})
+with open('/tmp/production-task-def.json', 'w') as f:
+    json.dump(td, f, indent=2)
+"
+
 log "Creating new task definition..."
-
-# Create task definition - using secrets from Secrets Manager
-TASK_DEF_JSON=$(cat << EOF
-{
-  "family": "${TASK_FAMILY}",
-  "networkMode": "awsvpc",
-  "requiresCompatibilities": ["FARGATE"],
-  "cpu": "1024",
-  "memory": "2048",
-  "executionRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/ecsTaskExecutionRole",
-  "taskRoleArn": "arn:aws:iam::${AWS_ACCOUNT_ID}:role/ecsTaskRole",
-  "containerDefinitions": [
-    {
-      "name": "edsteward-app",
-      "image": "${ECR_URI}:${VERSION}",
-      "portMappings": [
-        {
-          "containerPort": 3000,
-          "protocol": "tcp"
-        }
-      ],
-      "essential": true,
-      "environment": [
-        {"name": "NODE_ENV", "value": "production"},
-        {"name": "PORT", "value": "3000"},
-        {"name": "HOSTNAME", "value": "0.0.0.0"},
-        {"name": "ENVIRONMENT", "value": "production"},
-        {"name": "BASE_URL", "value": "${PRODUCTION_URL}"},
-        {"name": "VERSION", "value": "${VERSION}"},
-        {"name": "INSTITUTION_NAME", "value": "Moravian_University"},
-        {"name": "INSTITUTION_DOMAIN", "value": "moravian.edu"},
-        {"name": "AUTH_SAML_ENABLED", "value": "true"},
-        {"name": "AUTH_SAML_ENTITY_ID", "value": "urn:edsteward:sp"},
-        {"name": "AUTH_SAML_SSO_URL", "value": "https://login.moravian.edu/app/moravian_edstewardbeta_1/exk1c4nmsctSaNRIg0x8/sso/saml"},
-        {"name": "AUTH_ALLOW_SELF_REGISTRATION", "value": "true"},
-        {"name": "SAML_SP_ENTITY_ID", "value": "urn:edsteward:sp"},
-        {"name": "SAML_CALLBACK_URL", "value": "${PRODUCTION_URL}/auth/saml/callback"},
-        {"name": "SAML_SLO_URL", "value": "${PRODUCTION_URL}/auth/saml/logout"},
-        {"name": "DATABASE_URL", "value": "${DATABASE_URL}"},
-        {"name": "SESSION_SECRET", "value": "${SESSION_SECRET}"}
-      ],
-      "logConfiguration": {
-        "logDriver": "awslogs",
-        "options": {
-          "awslogs-group": "/ecs/edsteward-saml-production",
-          "awslogs-region": "${AWS_REGION}",
-          "awslogs-stream-prefix": "ecs"
-        }
-      },
-      "healthCheck": {
-        "command": ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1"],
-        "interval": 30,
-        "timeout": 5,
-        "retries": 3,
-        "startPeriod": 60
-      }
-    }
-  ]
-}
-EOF
-)
-
-echo "$TASK_DEF_JSON" > /tmp/production-task-def.json
 
 TASK_DEF_ARN=$(aws ecs register-task-definition \
     --cli-input-json file:///tmp/production-task-def.json \
@@ -197,7 +202,7 @@ TASK_DEF_ARN=$(aws ecs register-task-definition \
     --output text \
     --region "$AWS_REGION")
 
-rm -f /tmp/production-task-def.json
+rm -f /tmp/production-task-def.json /tmp/production-task-def-base.json
 success "Task definition registered: $TASK_DEF_ARN"
 
 echo ""
