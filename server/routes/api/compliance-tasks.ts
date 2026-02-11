@@ -2203,24 +2203,33 @@ router.post('/:taskId/request-attestation', requireAuth, async (req: Request, re
       </html>
     `;
 
-    await emailService.sendEmail(
+    const emailSent = await emailService.sendEmail(
       email,
       `Attestation Required: ${task.title}`,
       htmlContent,
       { html: true }
     );
 
+    if (!emailSent) {
+      console.error(`[Attestation] Email delivery failed for ${email}, but token was created`);
+    }
+
     // Log activity
     await db.insert(taskActivity).values({
       taskId,
       userId: req.user!.id,
       activityType: 'comment',
-      content: `Attestation request sent to ${displayName} (${email})`,
+      content: emailSent 
+        ? `Attestation request sent to ${displayName} (${email})`
+        : `Attestation request created for ${displayName} (${email}) - email delivery failed`,
     });
 
     res.json({
       success: true,
-      message: `Attestation request sent to ${email}`,
+      emailDelivered: emailSent,
+      message: emailSent 
+        ? `Attestation request sent to ${email}`
+        : `Attestation link created but email delivery failed. Share the link manually.`,
       token: tokenRecord.id,
       attestationUrl,
       expiresAt,

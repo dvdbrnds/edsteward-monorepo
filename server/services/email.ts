@@ -1,5 +1,4 @@
 import nodemailer from 'nodemailer';
-import { log } from '../vite';
 import { db } from '../db';
 import { emailConfigs } from '@shared/schema';
 
@@ -11,7 +10,7 @@ export class EmailService {
       const configs = await db.select().from(emailConfigs).limit(1);
       return configs[0];
     } catch (error) {
-      log(`Error fetching email config: ${error}`);
+      console.error(`[EmailService] Error fetching email config:`, error);
       return null;
     }
   }
@@ -19,11 +18,13 @@ export class EmailService {
   private async initializeTransporter() {
     const config = await this.getEmailConfig();
     if (!config) {
-      log('No email configuration found');
+      console.error('[EmailService] No email configuration found in database');
       return false;
     }
 
     try {
+      console.log(`[EmailService] Initializing SMTP transporter: ${config.smtpHost}:${config.smtpPort} (secure=${config.smtpSecure}) user=${config.smtpUser}`);
+      
       this.transporter = nodemailer.createTransport({
         host: config.smtpHost,
         port: config.smtpPort,
@@ -36,21 +37,43 @@ export class EmailService {
 
       // Verify the connection
       await this.transporter.verify();
-      log('Email service initialized successfully');
+      console.log('[EmailService] SMTP connection verified successfully');
       return true;
     } catch (error) {
-      log(`Failed to initialize email service: ${error}`);
+      console.error(`[EmailService] Failed to initialize SMTP transporter:`, error);
       this.transporter = null;
       return false;
     }
   }
 
-  async sendEmail(to: string, subject: string, content: string, options?: { html?: boolean }) {
+  async sendEmail(to: string | Record<string, any>, subject?: string, content?: string, options?: { html?: boolean; cc?: string }) {
     try {
+      // Handle both positional args and object-style args
+      let recipientTo: string;
+      let emailSubject: string;
+      let emailContent: string;
+      let emailOptions: { html?: boolean; cc?: string } | undefined;
+
+      if (typeof to === 'object' && to !== null) {
+        // Object-style call: sendEmail({ to, subject, html, cc })
+        recipientTo = to.to;
+        emailSubject = to.subject;
+        emailContent = to.html || to.text || to.content || '';
+        emailOptions = { html: !!to.html, cc: to.cc };
+      } else {
+        // Positional args: sendEmail(to, subject, content, options)
+        recipientTo = to;
+        emailSubject = subject!;
+        emailContent = content!;
+        emailOptions = options;
+      }
+
+      console.log(`[EmailService] Sending email to=${recipientTo}, subject="${emailSubject}"`);
+
       if (!this.transporter) {
         const initialized = await this.initializeTransporter();
         if (!initialized) {
-          throw new Error('Email service not configured');
+          throw new Error('Email service not configured - SMTP initialization failed');
         }
       }
 
@@ -60,28 +83,32 @@ export class EmailService {
       }
 
       // Determine if content is HTML (auto-detect or use option)
-      const isHtml = options?.html ?? content.trim().startsWith('<');
+      const isHtml = emailOptions?.html ?? emailContent.trim().startsWith('<');
       
       const mailOptions: nodemailer.SendMailOptions = {
         from: config.fromEmail,
-        to,
-        subject,
+        to: recipientTo,
+        subject: emailSubject,
       };
 
+      if (emailOptions?.cc) {
+        mailOptions.cc = emailOptions.cc;
+      }
+
       if (isHtml) {
-        mailOptions.html = content;
+        mailOptions.html = emailContent;
         // Create plain text fallback by stripping HTML
-        mailOptions.text = content.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
+        mailOptions.text = emailContent.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
       } else {
-        mailOptions.text = content;
+        mailOptions.text = emailContent;
       }
 
       const info = await this.transporter!.sendMail(mailOptions);
 
-      log(`Email sent: ${info.messageId}`);
+      console.log(`[EmailService] Email sent successfully: messageId=${info.messageId} to=${recipientTo}`);
       return true;
     } catch (error) {
-      log(`Email error: ${error}`);
+      console.error(`[EmailService] Email send failed:`, error);
       return false;
     }
   }
