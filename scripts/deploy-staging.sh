@@ -6,8 +6,9 @@
 # Safely deploy to the staging environment.
 # This is a REQUIRED step before any production deployment.
 #
-# Usage: ./scripts/deploy-staging.sh <version>
+# Usage: ./scripts/deploy-staging.sh <version> [--yes|-y]
 # Example: ./scripts/deploy-staging.sh v1.2.3
+# Example: ./scripts/deploy-staging.sh v1.2.3 --yes
 #
 # The script will:
 #   1. Build the Docker image
@@ -32,8 +33,17 @@ TASK_FAMILY="edsteward-staging-task"
 ENVIRONMENT="staging"
 STAGING_URL="https://staging.edsteward.ai"
 
-# Parse arguments
-VERSION="${1:-}"
+# Parse global flags (--yes, -y)
+parse_global_flags "$@"
+
+# Parse arguments (skip flags)
+VERSION=""
+for arg in "$@"; do
+    case "$arg" in
+        --yes|-y) ;; # skip flags
+        *) VERSION="$arg" ;;
+    esac
+done
 
 if [[ -z "$VERSION" ]]; then
     echo -e "${RED}Error: Version required${NC}"
@@ -67,8 +77,7 @@ log "Deploying version: $VERSION"
 
 if [[ "$VERSION" == "$CURRENT_VERSION" ]]; then
     warn "Version $VERSION is already deployed to staging."
-    read "?Re-deploy anyway? (y/N): " confirm
-    if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+    if ! confirm_prompt "Re-deploy anyway?"; then
         echo "Aborted."
         exit 0
     fi

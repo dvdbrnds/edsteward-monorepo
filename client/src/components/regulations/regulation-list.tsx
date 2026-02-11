@@ -192,6 +192,34 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
     }
   };
 
+  // Get compliance status based on attestation/required actions
+  // NOTE: Must be defined before filteredRegulations which references it
+  const getComplianceStatus = (regulation: Regulation): 'compliant' | 'partial' | 'non-compliant' => {
+    const actions: RegulationAction[] = regulation.actions || [
+      { type: 'attestation', enabled: true, required: true, status: 'pending' },
+      { type: 'website_publish', enabled: false, required: false, status: 'pending' },
+      { type: 'community_communication', enabled: false, required: false, status: 'pending' },
+      { type: 'agency_submission', enabled: false, required: false, status: 'pending' }
+    ];
+    
+    const requiredActions = actions.filter((a: RegulationAction) => a.required && a.enabled);
+    const completedRequired = requiredActions.filter((a: RegulationAction) => a.status === 'completed');
+    
+    if (requiredActions.length === 0) {
+      // No required actions - check if attestation is complete
+      const attestation = actions.find((a: RegulationAction) => a.type === 'attestation');
+      if (attestation?.status === 'completed') return 'compliant';
+      return 'non-compliant';
+    }
+    
+    if (completedRequired.length === requiredActions.length) {
+      return 'compliant'; // All required actions complete
+    } else if (completedRequired.length > 0) {
+      return 'partial'; // Some required actions complete
+    }
+    return 'non-compliant'; // No required actions complete
+  };
+
   if (regulationsLoading || deadlinesLoading) {
     return (
       <Card>
@@ -381,33 +409,6 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
       default:
         return 'bg-slate-100 text-slate-800 border-slate-200';
     }
-  };
-
-  // Get compliance status based on attestation/required actions
-  const getComplianceStatus = (regulation: Regulation): 'compliant' | 'partial' | 'non-compliant' => {
-    const actions: RegulationAction[] = regulation.actions || [
-      { type: 'attestation', enabled: true, required: true, status: 'pending' },
-      { type: 'website_publish', enabled: false, required: false, status: 'pending' },
-      { type: 'community_communication', enabled: false, required: false, status: 'pending' },
-      { type: 'agency_submission', enabled: false, required: false, status: 'pending' }
-    ];
-    
-    const requiredActions = actions.filter((a: RegulationAction) => a.required && a.enabled);
-    const completedRequired = requiredActions.filter((a: RegulationAction) => a.status === 'completed');
-    
-    if (requiredActions.length === 0) {
-      // No required actions - check if attestation is complete
-      const attestation = actions.find((a: RegulationAction) => a.type === 'attestation');
-      if (attestation?.status === 'completed') return 'compliant';
-      return 'non-compliant';
-    }
-    
-    if (completedRequired.length === requiredActions.length) {
-      return 'compliant'; // All required actions complete
-    } else if (completedRequired.length > 0) {
-      return 'partial'; // Some required actions complete
-    }
-    return 'non-compliant'; // No required actions complete
   };
 
   // Get row background tint based on compliance status

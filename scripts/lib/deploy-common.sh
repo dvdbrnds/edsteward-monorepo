@@ -25,9 +25,39 @@ export ECR_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPO
 # Disable AWS pager
 export AWS_PAGER=""
 
+# Auto-confirm flag (set by --yes / -y)
+export AUTO_CONFIRM="${AUTO_CONFIRM:-false}"
+
+# Parse global flags from any position in args
+parse_global_flags() {
+    for arg in "$@"; do
+        case "$arg" in
+            --yes|-y)
+                export AUTO_CONFIRM="true"
+                ;;
+        esac
+    done
+}
+
+# Prompt for confirmation, auto-accepts if --yes flag is set
+# Usage: confirm_or_abort "Continue?" (exits on N)
+# Returns 0 if confirmed, 1 if declined
+confirm_prompt() {
+    local prompt="${1:-Continue?}"
+    if [[ "$AUTO_CONFIRM" == "true" ]]; then
+        log "Auto-confirmed: $prompt"
+        return 0
+    fi
+    read "?$prompt (y/N): " confirm
+    if [[ "$confirm" == "y" || "$confirm" == "Y" ]]; then
+        return 0
+    fi
+    return 1
+}
+
 # Get the project root directory
 get_project_root() {
-    local script_dir="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
+    local script_dir="$(cd "$(dirname "${(%):-%x}")" && pwd)"
     echo "$(cd "$script_dir/../.." && pwd)"
 }
 
@@ -272,7 +302,7 @@ wait_for_healthy_deployment() {
 record_deployment() {
     local environment="$1"
     local version="$2"
-    local status="$3"
+    local deploy_result="$3"
     local task_def_arn="${4:-}"
     local previous_version="${5:-unknown}"
     
@@ -296,7 +326,7 @@ record_deployment() {
   "gitBranch": "$(get_git_branch)",
   "taskDefinitionArn": "$task_def_arn",
   "previousVersion": "$previous_version",
-  "status": "$status",
+  "status": "$deploy_result",
   "environment": "$environment"
 }
 EOF

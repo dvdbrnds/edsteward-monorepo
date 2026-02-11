@@ -10,8 +10,9 @@
 #   - Interactive confirmation required
 #   - Health checks must pass before completion
 #
-# Usage: ./scripts/deploy-production.sh <version>
+# Usage: ./scripts/deploy-production.sh <version> [--yes|-y]
 # Example: ./scripts/deploy-production.sh v1.2.3
+# Example: ./scripts/deploy-production.sh v1.2.3 --yes
 #
 # Safety Gates:
 #   1. Version must exist in staging deployments
@@ -35,8 +36,17 @@ TASK_FAMILY="edsteward-saml-production"
 ENVIRONMENT="production"
 PRODUCTION_URL="https://moravian.edsteward.ai"
 
-# Parse arguments
-VERSION="${1:-}"
+# Parse global flags (--yes, -y)
+parse_global_flags "$@"
+
+# Parse arguments (skip flags)
+VERSION=""
+for arg in "$@"; do
+    case "$arg" in
+        --yes|-y) ;; # skip flags
+        *) VERSION="$arg" ;;
+    esac
+done
 
 if [[ -z "$VERSION" ]]; then
     echo -e "${RED}Error: Version required${NC}"
@@ -154,17 +164,9 @@ TASK_DEF_JSON=$(cat << EOF
         {"name": "AUTH_ALLOW_SELF_REGISTRATION", "value": "true"},
         {"name": "SAML_SP_ENTITY_ID", "value": "urn:edsteward:sp"},
         {"name": "SAML_CALLBACK_URL", "value": "${PRODUCTION_URL}/auth/saml/callback"},
-        {"name": "SAML_SLO_URL", "value": "${PRODUCTION_URL}/auth/saml/logout"}
-      ],
-      "secrets": [
-        {
-          "name": "DATABASE_URL",
-          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:edsteward/production/database-url"
-        },
-        {
-          "name": "SESSION_SECRET",
-          "valueFrom": "arn:aws:secretsmanager:${AWS_REGION}:${AWS_ACCOUNT_ID}:secret:edsteward/production/session-secret"
-        }
+        {"name": "SAML_SLO_URL", "value": "${PRODUCTION_URL}/auth/saml/logout"},
+        {"name": "DATABASE_URL", "value": "${DATABASE_URL}"},
+        {"name": "SESSION_SECRET", "value": "${SESSION_SECRET}"}
       ],
       "logConfiguration": {
         "logDriver": "awslogs",

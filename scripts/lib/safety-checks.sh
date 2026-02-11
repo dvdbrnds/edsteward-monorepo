@@ -20,8 +20,7 @@ check_uncommitted_changes() {
         echo ""
         git status --short
         echo ""
-        read "?Continue anyway? (y/N): " confirm
-        if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+        if ! confirm_prompt "Continue anyway?"; then
             echo "Aborted. Commit or stash your changes first."
             exit 0
         fi
@@ -98,15 +97,19 @@ show_production_deploy_summary() {
 confirm_production_deploy() {
     local version="$1"
     
-    echo -e "${RED}This will deploy to PRODUCTION and affect real users.${NC}"
-    echo ""
-    echo -e "Type ${YELLOW}deploy production${NC} to confirm: "
-    read confirmation
-    
-    if [[ "$confirmation" != "deploy production" ]]; then
+    if [[ "$AUTO_CONFIRM" == "true" ]]; then
+        log "Auto-confirmed: production deployment"
+    else
+        echo -e "${RED}This will deploy to PRODUCTION and affect real users.${NC}"
         echo ""
-        echo "Deployment cancelled."
-        exit 0
+        echo -e "Type ${YELLOW}deploy production${NC} to confirm: "
+        read confirmation
+        
+        if [[ "$confirmation" != "deploy production" ]]; then
+            echo ""
+            echo "Deployment cancelled."
+            exit 0
+        fi
     fi
     
     echo ""
@@ -162,15 +165,19 @@ confirm_rollback() {
     echo -e "  ${CYAN}Current Version:${NC}  $current_version"
     echo -e "  ${CYAN}Rolling Back To:${NC}  $target_version"
     echo ""
-    echo -e "${RED}This will rollback production to a previous version.${NC}"
-    echo ""
-    echo -e "Type ${YELLOW}rollback production${NC} to confirm: "
-    read confirmation
-    
-    if [[ "$confirmation" != "rollback production" ]]; then
+    if [[ "$AUTO_CONFIRM" == "true" ]]; then
+        log "Auto-confirmed: production rollback"
+    else
+        echo -e "${RED}This will rollback production to a previous version.${NC}"
         echo ""
-        echo "Rollback cancelled."
-        exit 0
+        echo -e "Type ${YELLOW}rollback production${NC} to confirm: "
+        read confirmation
+        
+        if [[ "$confirmation" != "rollback production" ]]; then
+            echo ""
+            echo "Rollback cancelled."
+            exit 0
+        fi
     fi
     
     echo ""
@@ -188,8 +195,7 @@ verify_staging_health() {
         warn "Staging environment health check failed!"
         echo "  URL: $staging_url/api/health"
         echo ""
-        read "?Continue with production deployment anyway? (y/N): " confirm
-        if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+        if ! confirm_prompt "Continue with production deployment anyway?"; then
             echo "Aborted. Fix staging first."
             exit 0
         fi
@@ -234,10 +240,14 @@ check_deployment_in_progress() {
             --output table \
             --region "$AWS_REGION" 2>/dev/null
         echo ""
-        read "?Wait for current deployment to complete? (Y/n): " confirm
-        if [[ "$confirm" == "n" || "$confirm" == "N" ]]; then
-            echo "Aborted."
-            exit 0
+        if [[ "$AUTO_CONFIRM" != "true" ]]; then
+            read "?Wait for current deployment to complete? (Y/n): " confirm
+            if [[ "$confirm" == "n" || "$confirm" == "N" ]]; then
+                echo "Aborted."
+                exit 0
+            fi
+        else
+            log "Auto-confirmed: waiting for current deployment"
         fi
         
         log "Waiting for current deployment to complete..."
@@ -264,8 +274,7 @@ check_deployment_cooldown() {
             local last_version=$(jq -r '.version' "$last_deploy")
             warn "Last deployment ($last_version) was only $diff_minutes minutes ago."
             echo ""
-            read "?Deploy again so soon? (y/N): " confirm
-            if [[ "$confirm" != "y" && "$confirm" != "Y" ]]; then
+            if ! confirm_prompt "Deploy again so soon?"; then
                 echo "Aborted. Wait a few minutes before deploying again."
                 exit 0
             fi
@@ -284,7 +293,7 @@ show_deployment_progress() {
     echo ""
     
     local start_time=$(date +%s)
-    local last_status=""
+    local last_progress=""
     
     while true; do
         local current_time=$(date +%s)
@@ -294,22 +303,22 @@ show_deployment_progress() {
             error "Deployment timed out after ${timeout}s"
         fi
         
-        local status=$(aws ecs describe-services \
+        local svc_status=$(aws ecs describe-services \
             --cluster "$cluster" \
             --services "$service" \
             --query 'services[0].deployments[0].{Status:status,Running:runningCount,Desired:desiredCount}' \
             --output json \
             --region "$AWS_REGION" 2>/dev/null)
         
-        local deploy_status=$(echo "$status" | jq -r '.Status')
-        local running=$(echo "$status" | jq -r '.Running')
-        local desired=$(echo "$status" | jq -r '.Desired')
+        local deploy_status=$(echo "$svc_status" | jq -r '.Status')
+        local running=$(echo "$svc_status" | jq -r '.Running')
+        local desired=$(echo "$svc_status" | jq -r '.Desired')
         
         local progress_msg="  Status: $deploy_status | Running: $running/$desired | Elapsed: ${elapsed}s"
         
-        if [[ "$progress_msg" != "$last_status" ]]; then
+        if [[ "$progress_msg" != "$last_progress" ]]; then
             echo -e "\r$progress_msg"
-            last_status="$progress_msg"
+            last_progress="$progress_msg"
         fi
         
         if [[ "$deploy_status" == "PRIMARY" && "$running" == "$desired" ]]; then
