@@ -107,6 +107,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
   // Get sync status for a specific regulation
   app.get('/api/mcp/sync-status/:regulationId', authenticateMCP, async (req: Request, res: Response) => {
     try {
+      const storage = getStorage(req);
       const regulationId = parseInt(req.params.regulationId, 10);
       
       if (isNaN(regulationId)) {
@@ -142,6 +143,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
   // Get latest version for a regulation
   app.get('/api/mcp/versions/:regulationId/latest', authenticateMCP, async (req: Request, res: Response) => {
     try {
+      const storage = getStorage(req);
       const regulationId = parseInt(req.params.regulationId, 10);
       
       if (isNaN(regulationId)) {
@@ -165,6 +167,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
   // Get all versions for a regulation
   app.get('/api/mcp/versions/:regulationId', authenticateMCP, async (req: Request, res: Response) => {
     try {
+      const storage = getStorage(req);
       const regulationId = parseInt(req.params.regulationId, 10);
       
       if (isNaN(regulationId)) {
@@ -184,6 +187,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
   // Create a new version for a regulation (used when MCP pushes updates)
   app.post('/api/mcp/versions/:regulationId', authenticateMCP, async (req: Request, res: Response) => {
     try {
+      const storage = getStorage(req);
       const regulationId = parseInt(req.params.regulationId, 10);
       
       if (isNaN(regulationId)) {
@@ -256,6 +260,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
   // Register a version conflict for a regulation
   app.post('/api/mcp/conflicts/:regulationId', authenticateMCP, async (req: Request, res: Response) => {
     try {
+      const storage = getStorage(req);
       const regulationId = parseInt(req.params.regulationId, 10);
       
       if (isNaN(regulationId)) {
@@ -319,6 +324,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
   // Get all pending conflicts
   app.get('/api/mcp/conflicts/pending', authenticateMCP, async (req: Request, res: Response) => {
     try {
+      const storage = getStorage(req);
       const conflicts = await storage.getVersionConflicts('pending');
       
       // Enrich conflicts with regulation details
@@ -341,6 +347,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
   // Get conflicts for a specific regulation
   app.get('/api/mcp/conflicts/:regulationId', authenticateMCP, async (req: Request, res: Response) => {
     try {
+      const storage = getStorage(req);
       const regulationId = parseInt(req.params.regulationId, 10);
       
       if (isNaN(regulationId)) {
@@ -360,6 +367,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
   // Schedule a sync for a regulation
   app.post('/api/mcp/sync/:regulationId', authenticateMCP, async (req: Request, res: Response) => {
     try {
+      const storage = getStorage(req);
       const regulationId = parseInt(req.params.regulationId, 10);
       
       if (isNaN(regulationId)) {
@@ -437,6 +445,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
   // Validate a regulation version
   app.post('/api/mcp/validate/:versionId', authenticateMCP, async (req: Request, res: Response) => {
     try {
+      const storage = getStorage(req);
       const versionId = parseInt(req.params.versionId, 10);
       
       if (isNaN(versionId)) {
@@ -468,6 +477,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
   // Get validation status for a version
   app.get('/api/mcp/validate/:versionId', authenticateMCP, async (req: Request, res: Response) => {
     try {
+      const storage = getStorage(req);
       const versionId = parseInt(req.params.versionId, 10);
       
       if (isNaN(versionId)) {
@@ -660,6 +670,8 @@ export function setupMCPIntegrationApi(app: express.Application) {
     console.log(`========================================`);
     
     try {
+      const db = getDb(req);
+      const storage = getStorage(req);
       // Validate the payload
       const validation = createRegulationWithTasksSchema.safeParse(req.body);
       
@@ -938,6 +950,8 @@ export function setupMCPIntegrationApi(app: express.Application) {
     console.log(`========================================`);
     
     try {
+      const db = getDb(req);
+      const storage = getStorage(req);
       const data = req.body;
       
       // Validate required fields
@@ -1256,6 +1270,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
    */
   app.get('/api/mcp/regulations/lookup', basicAuthMCP, async (req: Request, res: Response) => {
     try {
+      const storage = getStorage(req);
       const { name, statute, category } = req.query;
       
       if (!name && !statute) {
@@ -1314,6 +1329,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
    */
   app.get('/api/mcp/regulations/:id/tasks', basicAuthMCP, async (req: Request, res: Response) => {
     try {
+      const storage = getStorage(req);
       const regulationId = parseInt(req.params.id, 10);
       
       if (isNaN(regulationId)) {
@@ -1358,6 +1374,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
    */
   app.get('/api/mcp/alignment-status', basicAuthMCP, async (req: Request, res: Response) => {
     try {
+      const db = getDb(req);
       // Updated Jan 2026 to filter by is_current = true for active regulation counts
       const result = await db.execute(sql`
         SELECT 
@@ -1403,6 +1420,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
    */
   app.get('/api/mcp/regulation-hashes', basicAuthMCP, async (req: Request, res: Response) => {
     try {
+      const db = getDb(req);
       const result = await db.execute(sql`
         SELECT item_id, version_hash, lovv_level, last_updated
         FROM regulations
