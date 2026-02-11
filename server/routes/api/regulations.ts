@@ -3,7 +3,7 @@ import fs from 'fs';
 import { storage } from '../../storage';
 import { getDatabaseStorage, getDbForRequest } from '../../services/database';
 import { evidenceFiles } from '@shared/schema';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, sql } from 'drizzle-orm';
 import { syslog, LogLevel, LogFacility } from '../../services/syslog';
 import type { Regulation } from '@shared/schema';
 import { 
@@ -624,8 +624,20 @@ router.patch("/:regulationId/actions/:actionType", requireAuth, requireComplianc
       };
     }
     
-    // Update the regulation with the new actions
-    await tenantStorage.updateRegulation(regulationId, { actions });
+    // Update just the actions JSONB field directly via SQL to avoid
+    // serialization issues with the full updateRegulation method
+    try {
+      const db = tenantStorage.getDb();
+      const actionsJson = JSON.stringify(actions);
+      await db.execute(
+        sql`UPDATE regulations SET actions = ${actionsJson}::jsonb, last_updated = NOW() WHERE id = ${regulationId}`
+      );
+    } catch (dbError) {
+      console.error('❌ DB update failed for actions:', dbError);
+      console.error('Regulation ID:', regulationId, 'Action type:', actionType);
+      console.error('Actions data:', JSON.stringify(actions, null, 2));
+      throw dbError;
+    }
     
     const totalTime = Date.now() - startTime;
     
