@@ -9,7 +9,7 @@
  * Accessed via magic link token (no login required)
  */
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { useRoute } from 'wouter';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
@@ -34,8 +34,10 @@ import {
   PenLine,
   CheckCheck,
   AlertCircle,
-  FileUp
+  FileUp,
+  ChevronDown
 } from 'lucide-react';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 interface AttestationData {
   tokenValid: boolean;
@@ -88,6 +90,8 @@ const AttestationPage: React.FC = () => {
   const [linkTitle, setLinkTitle] = useState('');
   const [evidenceDescription, setEvidenceDescription] = useState('');
   const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [evidenceOpen, setEvidenceOpen] = useState(true);
+  const attestationCardRef = useRef<HTMLDivElement>(null);
 
   // Fetch attestation data
   const { data, isLoading, error, refetch } = useQuery<AttestationData>({
@@ -103,6 +107,15 @@ const AttestationPage: React.FC = () => {
     enabled: !!token,
     retry: false,
   });
+
+  // After evidence is added, collapse the card and scroll to attestation
+  const collapseAndScrollToAttestation = useCallback(() => {
+    setEvidenceOpen(false);
+    // Small delay so the collapse animation starts before scrolling
+    setTimeout(() => {
+      attestationCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 300);
+  }, []);
 
   // Upload file mutation - for immediate file uploads
   const uploadFileMutation = useMutation({
@@ -128,6 +141,7 @@ const AttestationPage: React.FC = () => {
       if (fileInputRef.current) fileInputRef.current.value = '';
       refetch();
       setTimeout(() => setUploadSuccess(false), 3000);
+      collapseAndScrollToAttestation();
     },
   });
 
@@ -158,6 +172,7 @@ const AttestationPage: React.FC = () => {
       setEvidenceDescription('');
       refetch();
       setTimeout(() => setUploadSuccess(false), 3000);
+      collapseAndScrollToAttestation();
     },
   });
 
@@ -391,22 +406,46 @@ const AttestationPage: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Evidence Section */}
+        {/* Evidence Section - Collapsible */}
         {tokenData.canUploadEvidence && (
-          <Card className="mb-6 shadow-lg border-slate-200">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <FileUp className="h-5 w-5 text-amber-600" />
-                Evidence Upload
-                {task.evidenceRequired && (
-                  <Badge variant="destructive" className="ml-2">Required</Badge>
+          <Collapsible open={evidenceOpen} onOpenChange={setEvidenceOpen}>
+          <Card className="mb-6 shadow-lg border-slate-200 transition-all duration-300">
+            <CollapsibleTrigger asChild>
+              <CardHeader className="cursor-pointer select-none hover:bg-slate-50/50 transition-colors">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="flex items-center gap-2">
+                    {existingEvidence.length > 0 && !evidenceOpen ? (
+                      <CheckCircle2 className="h-5 w-5 text-green-600" />
+                    ) : (
+                      <FileUp className="h-5 w-5 text-amber-600" />
+                    )}
+                    Evidence Upload
+                    {task.evidenceRequired && existingEvidence.length === 0 && (
+                      <Badge variant="destructive" className="ml-2">Required</Badge>
+                    )}
+                    {existingEvidence.length > 0 && (
+                      <Badge variant="secondary" className="ml-2 bg-green-100 text-green-700 border-green-200">
+                        {existingEvidence.length} uploaded
+                      </Badge>
+                    )}
+                  </CardTitle>
+                  <ChevronDown className={`h-5 w-5 text-slate-400 transition-transform duration-200 ${evidenceOpen ? 'rotate-180' : ''}`} />
+                </div>
+                {evidenceOpen ? (
+                  <CardDescription>
+                    {task.evidenceInstructions || 'Upload documentation to support your attestation.'}
+                  </CardDescription>
+                ) : existingEvidence.length > 0 ? (
+                  <p className="text-sm text-green-600 mt-1">
+                    {existingEvidence.map(ev => ev.fileName).join(', ')}
+                  </p>
+                ) : (
+                  <CardDescription>Click to expand and upload evidence.</CardDescription>
                 )}
-              </CardTitle>
-              <CardDescription>
-                {task.evidenceInstructions || 'Upload documentation to support your attestation.'}
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+              </CardHeader>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0">
+            <CardContent className="space-y-4 pt-0">
               {/* Existing Evidence - with remove buttons */}
               {existingEvidence.length > 0 && (
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4">
@@ -584,11 +623,13 @@ const AttestationPage: React.FC = () => {
                 </Alert>
               )}
             </CardContent>
+            </CollapsibleContent>
           </Card>
+          </Collapsible>
         )}
 
         {/* Attestation Form */}
-        <Card className="shadow-lg border-emerald-200">
+        <Card ref={attestationCardRef} className="shadow-lg border-emerald-200">
           <CardHeader className="bg-gradient-to-r from-emerald-50 to-green-50 border-b border-emerald-100">
             <CardTitle className="flex items-center gap-2 text-emerald-700">
               <PenLine className="h-5 w-5" />
