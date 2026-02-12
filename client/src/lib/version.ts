@@ -3,6 +3,6 @@
  * Update this file when releasing new versions
  */
 
-export const APP_VERSION = "1.2.5";
+export const APP_VERSION = "1.4.11";
 export const APP_STAGE = "BETA"; // "BETA" | "RC" | "STABLE"
 export const FULL_VERSION = `${APP_STAGE} v${APP_VERSION}`;
