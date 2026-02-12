@@ -1,7 +1,7 @@
 import express, { type Request, Response } from "express";
 import { getDatabaseStorage, getTenantDb } from "./services/database";
 import { sql, eq } from "drizzle-orm";
-import { regulations, complianceTasks } from "@shared/schema";
+import { regulations, complianceTasks, executiveOrders as executiveOrdersTable, eoRegulationImpacts } from "@shared/schema";
 import { syslog, LogLevel, LogFacility } from './services/syslog';
 import { z } from "zod";
 import { ValidationLevel } from "@shared/schema";
@@ -505,28 +505,66 @@ export function setupMCPIntegrationApi(app: express.Application) {
   // =====================================================
   
   /**
-   * Schema for compliance task from MCP Engine
+   * Canonical MCP compliance task schema — 21 fields
+   * Unified across all endpoints (Feb 2026 schema alignment)
    */
   const mcpComplianceTaskSchema = z.object({
     tempId: z.string().optional(),
     parentTempId: z.string().optional().nullable(),
+    taskId: z.string().optional(),                    // Stable ID e.g. "002-001"
     title: z.string(),
     description: z.string().optional(),
-    instructions: z.string().optional(),
+    instructions: z.string().optional(),              // Step-by-step guidance
+    category: z.string().optional(),                  // Grouping (Reporting, Training, Policy)
     assignedRole: z.string().optional(),
+    statutoryRole: z.string().optional(),             // Legal role e.g. "Title IX Coordinator"
+    statutoryCitation: z.string().optional(),          // Legal citation e.g. "34 CFR 106.8"
+    requirementType: z.enum(['requirement', 'best_practice']).optional(),
+    priority: z.enum(['critical', 'high', 'medium', 'low']).optional(),
     dueDate: z.string().optional(),
-    recurringSchedule: z.string().optional(),
+    recurringSchedule: z.string().optional(),          // "annual", "quarterly", etc.
     reminderDays: z.number().optional(),
-    priority: z.enum(['low', 'medium', 'high', 'critical']).optional(),
     evidenceRequired: z.boolean().optional(),
     evidenceType: z.string().optional(),
-    evidenceInstructions: z.string().optional(),
+    evidenceInstructions: z.string().optional(),       // What to upload as proof
+    estimatedEffort: z.string().optional(),            // Time estimate
+    deliverable: z.string().optional(),                // Expected output
+    deliverableTemplateUrl: z.string().optional(),     // Template download link
     sortOrder: z.number().optional(),
   });
 
   /**
-   * Schema for creating a NEW regulation with compliance tasks
-   * This is the correct endpoint for MCP Engine to add regulations that don't exist yet
+   * Canonical MCP Executive Order schema — 22 fields
+   * Unified across all endpoints (Feb 2026 schema alignment)
+   */
+  const mcpExecutiveOrderSchema = z.object({
+    eoNumber: z.string(),
+    title: z.string(),
+    signedDate: z.string(),
+    publishedDate: z.string().optional(),
+    status: z.enum(['active', 'enjoined', 'revoked', 'superseded']).optional(),
+    president: z.string().optional(),
+    term: z.string().optional(),
+    summary: z.string().optional(),
+    fullTextUrl: z.string().optional(),
+    pdfUrl: z.string().optional(),
+    federalRegisterCitation: z.string().optional(),
+    topics: z.array(z.string()).optional(),
+    impactType: z.enum(['modifies', 'reinforces', 'conflicts', 'supersedes']),
+    impactSeverity: z.enum(['critical', 'high', 'medium', 'low']),
+    impactSummary: z.string().optional(),
+    affectedSections: z.array(z.string()).optional(),
+    confidenceScore: z.number().optional(),
+    assessmentDate: z.string().optional(),
+    enjoinedDate: z.string().optional(),
+    enjoinedBy: z.string().optional(),
+    revokedDate: z.string().optional(),
+    revokedBy: z.string().optional(),
+  });
+
+  /**
+   * Schema for creating/syncing a regulation with compliance tasks and EOs
+   * FULL 48-field payload — expanded Feb 2026 for endpoint parity
    */
   const createRegulationWithTasksSchema = z.object({
     // Required fields
@@ -535,50 +573,105 @@ export function setupMCPIntegrationApi(app: express.Application) {
     category: z.string().min(1, "Category is required"),
     topic: z.string().min(1, "Topic is required"),
     
+    // Universal identifier (REG-001 style)
+    regKey: z.string().optional(),
+    mcpRegKey: z.string().optional(), // Alias for regKey
+    
     // Optional regulation fields
-    itemId: z.string().optional(), // If not provided, will auto-generate
+    itemId: z.string().optional(),
     jurisdictionSource: z.string().default("federal"),
     summary: z.string().optional(),
-    requirements: z.string().optional(),
+    requirements: z.union([z.string(), z.array(z.string())]).optional(),
     regulationText: z.string().optional(),
     applicableInstitutions: z.array(z.string()).optional(),
     dro: z.string().optional(),
+    
+    // Dates
     effectiveDate: z.string().optional(),
     originationDate: z.string().optional(),
+    nextReviewDate: z.string().optional(),
+    
+    // Content fields (expanded Feb 2026)
+    statuteIds: z.array(z.string()).optional(),
+    publicLaw: z.string().optional(),
+    purpose: z.string().optional(),
+    scope: z.string().optional(),
+    submissionGuidelines: z.string().optional(),
+    complianceNotes: z.string().optional(),
+    verificationMethod: z.string().optional(),
+    reportingFrequency: z.string().optional(),
+    reportingRequirements: z.any().optional(),
+    
+    // Source and reference information
+    sources: z.array(z.object({
+      type: z.string().optional(),
+      name: z.string().optional(),
+      url: z.string().optional(),
+      citation: z.string().optional(),
+      lastChecked: z.string().optional(),
+    })).optional(),
+    sections: z.array(z.object({
+      type: z.string().optional(),
+      value: z.string().optional(),
+    })).optional(),
+    relatedRegulations: z.array(z.object({
+      regKey: z.string().optional(),
+      relationship: z.string().optional(),
+    })).optional(),
+    applicableForms: z.array(z.string()).optional(),
+    
+    // Agency information (camelCase canonical)
+    agencyName: z.string().optional(),
+    agencyUrl: z.string().optional(),
+    agencyContact: z.string().optional(),
+    agencyDepartment: z.string().optional(),
+    enforcementAgency: z.string().optional(),
+    // snake_case backward compat
     agency_name: z.string().optional(),
     agency_url: z.string().optional(),
     agency_contact: z.string().optional(),
     agency_department: z.string().optional(),
+    
+    // URLs
     regulationUrl: z.string().optional(),
     requirementsUrl: z.string().optional(),
     submissionGuideUrl: z.string().optional(),
     formsUrl: z.string().optional(),
-    submissionGuidelines: z.string().optional(),
-    reportingFrequency: z.string().optional(),
+    sourceUrl: z.string().optional(),
+    
+    // Risk & validation
+    riskScore: z.number().optional(),
+    riskLevel: z.enum(['CRITICAL', 'SEVERE', 'HIGH', 'MODERATE', 'LOW']).optional(),
+    riskAssessment: z.object({
+      score: z.number().optional(),
+      level: z.string().optional(),
+      factors: z.array(z.any()).optional(),
+      enforcementTrend: z.string().optional(),
+    }).passthrough().optional(),
+    lovvLevel: z.enum(['A', 'B', 'C', 'D']).optional(),
+    lastValidated: z.string().optional(),
+    version: z.number().optional(),
+    versionHash: z.string().optional(),
+    stateCode: z.string().max(2).optional(),
+    
+    // Filing deadlines
     filingDeadlines: z.array(z.object({
       type: z.string(),
       date: z.string(),
-      frequency: z.string(),
-      description: z.string(),
+      frequency: z.string().optional(),
+      description: z.string().optional(),
     })).optional(),
     
-    // MCP Engine specific fields
-    lovvLevel: z.enum(['A', 'B', 'C', 'D']).optional(), // L.O.V.V. validation level
-    lastValidated: z.string().optional(), // ISO timestamp of last validation
-    version: z.number().optional(), // Version number
-    versionHash: z.string().optional(), // SHA-256 hash for change detection
-    stateCode: z.string().max(2).optional(), // Two-letter state code (PA, NJ)
-    sourceUrl: z.string().optional(), // Original source URL
-    
-    // Compliance tasks
+    // Compliance tasks — canonical 21-field schema
     complianceTasks: z.array(mcpComplianceTaskSchema).optional(),
     
+    // Executive Orders — canonical 22-field schema (NEW Feb 2026)
+    executiveOrders: z.array(mcpExecutiveOrderSchema).optional(),
+    
     // Task sync behavior flag
-    // When true: adds new tasks without deleting existing ones (MERGE mode)
-    // When false/undefined: replaces all existing tasks (REPLACE mode - default)
     preserveExistingTasks: z.boolean().optional(),
     
-    // Topic mappings (for multi-topic regulations)
+    // Topic mappings
     topics: z.array(z.object({
       topic: z.string().optional(),
       name: z.string().optional(),
@@ -595,12 +688,16 @@ export function setupMCPIntegrationApi(app: express.Application) {
       mcpVersion: z.string().optional(),
       createdBy: z.string().optional(),
       audit: z.any().optional(),
-    }).optional(),
+    }).passthrough().optional(),
   });
 
   /**
-   * Basic Auth middleware for MCP Engine (shared with regulation-updates-api)
-   * Supports: dvdbrnds:gabadh (Base64: ZHZkYnJuZHM6Z2FiYWRo)
+   * Unified MCP Auth middleware for Create/Sync endpoints
+   * Accepts EITHER:
+   *   1. X-MCP-API-Key header (preferred — matches orchestrator)
+   *   2. Basic Auth with MCP_ENGINE_USERNAME/PASSWORD from env (backward compat)
+   *   3. Legacy hardcoded Basic Auth (deprecated — will be removed)
+   * ALLOWS BYPASS for localhost requests
    */
   function basicAuthMCP(req: Request, res: Response, next: Function) {
     // Allow localhost requests to bypass authentication
@@ -609,12 +706,19 @@ export function setupMCPIntegrationApi(app: express.Application) {
       return next();
     }
 
+    // Method 1: X-MCP-API-Key header (preferred)
+    const apiKey = req.headers['x-mcp-api-key'];
+    if (apiKey && apiKey === process.env.MCP_API_KEY) {
+      return next();
+    }
+
+    // Method 2 & 3: Basic Auth
     const authHeader = req.headers.authorization;
     
     if (!authHeader || !authHeader.startsWith('Basic ')) {
       return res.status(401).json({ 
-        error: 'Basic Authentication required',
-        message: 'MCP Engine integration requires Basic Auth with valid credentials'
+        error: 'Authentication required',
+        message: 'Provide X-MCP-API-Key header or Basic Auth credentials'
       });
     }
 
@@ -622,14 +726,23 @@ export function setupMCPIntegrationApi(app: express.Application) {
     const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
     const [username, password] = credentials.split(':');
 
-    if (username === 'dvdbrnds' && password === 'gabadh') {
-      next();
-    } else {
-      return res.status(401).json({ 
-        error: 'Invalid credentials',
-        message: 'MCP Engine integration requires valid username and password'
-      });
+    // Check env-configured credentials first
+    const mcpUser = process.env.MCP_ENGINE_USERNAME || 'mcp-engine';
+    const mcpPass = process.env.MCP_ENGINE_PASSWORD;
+    if (mcpPass && username === mcpUser && password === mcpPass) {
+      return next();
     }
+
+    // Legacy fallback (deprecated — remove after MCP Engine migrates to API key)
+    if (username === 'dvdbrnds' && password === 'gabadh') {
+      console.warn('⚠️ MCP Create/Sync using deprecated hardcoded credentials. Migrate to X-MCP-API-Key.');
+      return next();
+    }
+
+    return res.status(401).json({ 
+      error: 'Invalid credentials',
+      message: 'Provide valid X-MCP-API-Key header or Basic Auth credentials'
+    });
   }
 
   /**
@@ -741,26 +854,45 @@ export function setupMCPIntegrationApi(app: express.Application) {
         },
       ];
       
-      // Create the regulation with all MCP Engine fields
+      // Resolve camelCase vs snake_case agency fields
+      const resolvedAgencyName = data.agencyName || data.agency_name || null;
+      const resolvedAgencyUrl = data.agencyUrl || data.agency_url || null;
+      const resolvedAgencyContact = data.agencyContact || data.agency_contact || null;
+      const resolvedAgencyDepartment = data.agencyDepartment || data.agency_department || null;
+      
+      // Resolve regKey (prefer regKey, fall back to mcpRegKey)
+      const resolvedRegKey = data.regKey || data.mcpRegKey || null;
+      
+      // Normalize requirements to string
+      const requirementsStr = Array.isArray(data.requirements)
+        ? data.requirements.join('\n• ')
+        : data.requirements || null;
+      
+      // Create the regulation with ALL MCP Engine fields (expanded Feb 2026)
       console.log('💾 Inserting regulation into database...');
       const [newRegulation] = await db.insert(regulations).values({
         itemId,
+        regKey: resolvedRegKey,
         name: data.name,
         topic: data.topic,
         statute: data.statute,
+        statuteIds: data.statuteIds ? JSON.stringify(data.statuteIds) : null,
         category: data.category,
         jurisdictionSource: data.jurisdictionSource,
         summary: data.summary || null,
-        requirements: data.requirements || null,
+        requirements: requirementsStr,
         regulationText: data.regulationText || null,
         applicableInstitutions: data.applicableInstitutions || null,
         dro: data.dro || '',
         effectiveDate: data.effectiveDate ? new Date(data.effectiveDate) : null,
         originationDate: data.originationDate ? new Date(data.originationDate) : null,
-        agency_name: data.agency_name || null,
-        agency_url: data.agency_url || null,
-        agency_contact: data.agency_contact || null,
-        agency_department: data.agency_department || null,
+        nextReviewDate: data.nextReviewDate ? new Date(data.nextReviewDate) : null,
+        // Agency info (camelCase with snake_case fallback)
+        agency_name: resolvedAgencyName,
+        agency_url: resolvedAgencyUrl,
+        agency_contact: resolvedAgencyContact,
+        agency_department: resolvedAgencyDepartment,
+        // URLs
         regulationUrl: data.regulationUrl || null,
         requirementsUrl: data.requirementsUrl || null,
         submissionGuideUrl: data.submissionGuideUrl || null,
@@ -768,15 +900,30 @@ export function setupMCPIntegrationApi(app: express.Application) {
         submissionGuidelines: data.submissionGuidelines || null,
         reportingFrequency: data.reportingFrequency || null,
         filingDeadlines: data.filingDeadlines || null,
+        // New content fields (Feb 2026)
+        publicLaw: data.publicLaw || null,
+        purpose: data.purpose || null,
+        scope: data.scope || null,
+        complianceNotes: data.complianceNotes || null,
+        verificationMethod: data.verificationMethod || null,
+        reportingRequirements: data.reportingRequirements || null,
+        sources: data.sources || null,
+        sections: data.sections || null,
+        relatedRegulations: data.relatedRegulations || null,
+        applicableforms: data.applicableForms || null,
+        sourceUrl: data.sourceUrl || null,
+        // Risk & validation
+        riskScore: data.riskScore || null,
+        riskLevel: data.riskLevel || null,
+        riskAssessment: data.riskAssessment || null,
+        lovvLevel: data.lovvLevel || null,
+        lastValidated: data.lastValidated ? new Date(data.lastValidated) : null,
+        versionHash: data.versionHash || null,
+        stateCode: data.stateCode || null,
+        // Standard flags
         isApplicable: true,
         isCurrent: true,
-        versionNumber: (data as any).version || 1,
-        // MCP Engine specific fields
-        lovvLevel: (data as any).lovvLevel || null,
-        lastValidated: (data as any).lastValidated ? new Date((data as any).lastValidated) : null,
-        versionHash: (data as any).versionHash || null,
-        stateCode: (data as any).stateCode || null,
-        sourceUrl: (data as any).sourceUrl || null,
+        versionNumber: data.version || 1,
         // Default actions for compliance workflow
         actions: defaultActions,
       }).returning();
@@ -790,26 +937,40 @@ export function setupMCPIntegrationApi(app: express.Application) {
       if (data.complianceTasks && data.complianceTasks.length > 0) {
         console.log(`📝 Creating ${data.complianceTasks.length} compliance tasks...`);
         
+        // Helper: build task values from canonical 21-field schema
+        const buildTaskValues = (task: typeof data.complianceTasks[0], parentId?: number) => ({
+          regulationId: newRegulation.id,
+          parentTaskId: parentId || null,
+          taskId: task.taskId || null,
+          title: task.title,
+          description: task.description || null,
+          instructions: task.instructions || null,
+          category: task.category || null,
+          assignedRole: task.assignedRole || null,
+          statutoryRole: task.statutoryRole || null,
+          statutoryCitation: task.statutoryCitation || null,
+          requirementType: task.requirementType || 'requirement',
+          dueDate: task.dueDate ? new Date(task.dueDate) : null,
+          recurringSchedule: task.recurringSchedule || null,
+          reminderDays: task.reminderDays || 30,
+          priority: task.priority || 'medium',
+          evidenceRequired: task.evidenceRequired || false,
+          evidenceType: task.evidenceType || 'none',
+          evidenceInstructions: task.evidenceInstructions || null,
+          estimatedEffort: task.estimatedEffort || null,
+          deliverable: task.deliverable || null,
+          deliverableTemplateUrl: task.deliverableTemplateUrl || null,
+          sortOrder: task.sortOrder || 0,
+          status: 'pending',
+          isTemplate: false,
+        });
+        
         // First pass: create root tasks (no parent)
         const rootTasks = data.complianceTasks.filter(t => !t.parentTempId);
         for (const task of rootTasks) {
-          const [newTask] = await db.insert(complianceTasks).values({
-            regulationId: newRegulation.id,
-            title: task.title,
-            description: task.description || null,
-            instructions: task.instructions || null,
-            assignedRole: task.assignedRole || null,
-            dueDate: task.dueDate ? new Date(task.dueDate) : null,
-            recurringSchedule: task.recurringSchedule || null,
-            reminderDays: task.reminderDays || 30,
-            priority: task.priority || 'medium',
-            evidenceRequired: task.evidenceRequired || false,
-            evidenceType: task.evidenceType || 'none',
-            evidenceInstructions: task.evidenceInstructions || null,
-            sortOrder: task.sortOrder || 0,
-            status: 'pending',
-            isTemplate: false,
-          }).returning();
+          const [newTask] = await db.insert(complianceTasks).values(
+            buildTaskValues(task)
+          ).returning();
           
           if (task.tempId) {
             taskIdMap.set(task.tempId, newTask.id);
@@ -830,24 +991,9 @@ export function setupMCPIntegrationApi(app: express.Application) {
             continue;
           }
           
-          const [newTask] = await db.insert(complianceTasks).values({
-            regulationId: newRegulation.id,
-            parentTaskId: parentId,
-            title: task.title,
-            description: task.description || null,
-            instructions: task.instructions || null,
-            assignedRole: task.assignedRole || null,
-            dueDate: task.dueDate ? new Date(task.dueDate) : null,
-            recurringSchedule: task.recurringSchedule || null,
-            reminderDays: task.reminderDays || 30,
-            priority: task.priority || 'medium',
-            evidenceRequired: task.evidenceRequired || false,
-            evidenceType: task.evidenceType || 'none',
-            evidenceInstructions: task.evidenceInstructions || null,
-            sortOrder: task.sortOrder || 0,
-            status: 'pending',
-            isTemplate: false,
-          }).returning();
+          const [newTask] = await db.insert(complianceTasks).values(
+            buildTaskValues(task, parentId)
+          ).returning();
           
           if (task.tempId) {
             taskIdMap.set(task.tempId, newTask.id);
@@ -892,25 +1038,107 @@ export function setupMCPIntegrationApi(app: express.Application) {
         console.log(`✅ Created ${(data as any).topics.length} topic mappings`);
       }
       
+      // Process Executive Orders if provided (Feb 2026 schema alignment)
+      let createdEOs = 0;
+      if (data.executiveOrders && data.executiveOrders.length > 0) {
+        console.log(`⚖️ Processing ${data.executiveOrders.length} Executive Orders...`);
+        
+        for (const eo of data.executiveOrders) {
+          try {
+            // Upsert the EO record
+            const topicsValue = eo.topics && Array.isArray(eo.topics) && eo.topics.length > 0
+              ? '{' + eo.topics.map((t: string) => '"' + t.replace(/"/g, '\\"') + '"').join(',') + '}'
+              : null;
+            
+            const eoResult = await db.execute(sql`
+              INSERT INTO executive_orders (
+                eo_number, title, signed_date, published_date, status,
+                president, term, summary, full_text_url, pdf_url,
+                federal_register_citation, topics,
+                enjoined_date, enjoined_by, revoked_date, revoked_by
+              ) VALUES (
+                ${eo.eoNumber}, ${eo.title}, ${eo.signedDate},
+                ${eo.publishedDate || null}, ${eo.status || 'active'},
+                ${eo.president || null}, ${eo.term || null},
+                ${eo.summary || null}, ${eo.fullTextUrl || null}, ${eo.pdfUrl || null},
+                ${eo.federalRegisterCitation || null},
+                ${topicsValue},
+                ${eo.enjoinedDate || null}, ${eo.enjoinedBy || null},
+                ${eo.revokedDate || null}, ${eo.revokedBy || null}
+              )
+              ON CONFLICT (eo_number) DO UPDATE SET
+                title = EXCLUDED.title,
+                status = EXCLUDED.status,
+                summary = EXCLUDED.summary,
+                full_text_url = EXCLUDED.full_text_url,
+                pdf_url = EXCLUDED.pdf_url,
+                federal_register_citation = EXCLUDED.federal_register_citation,
+                topics = EXCLUDED.topics,
+                enjoined_date = EXCLUDED.enjoined_date,
+                enjoined_by = EXCLUDED.enjoined_by,
+                revoked_date = EXCLUDED.revoked_date,
+                revoked_by = EXCLUDED.revoked_by,
+                updated_at = NOW()
+              RETURNING id
+            `);
+            
+            // db.execute returns QueryResult — extract the id from first row
+            const eoRows = (eoResult as any)?.rows || [];
+            const eoId = eoRows.length > 0 ? eoRows[0]?.id : null;
+            if (eoId) {
+              // Upsert the impact record
+              await db.execute(sql`
+                INSERT INTO eo_regulation_impacts (
+                  eo_id, regulation_id, impact_type, impact_severity,
+                  impact_summary, affected_sections, confidence_score,
+                  assessed_by, assessment_date
+                ) VALUES (
+                  ${eoId}, ${newRegulation.id}, ${eo.impactType}, ${eo.impactSeverity},
+                  ${eo.impactSummary || null},
+                  ${eo.affectedSections ? JSON.stringify(eo.affectedSections) : null},
+                  ${eo.confidenceScore ? String(eo.confidenceScore) : null},
+                  ${'MCP Engine AI'}, ${eo.assessmentDate || new Date().toISOString().split('T')[0]}
+                )
+                ON CONFLICT (eo_id, regulation_id) DO UPDATE SET
+                  impact_type = EXCLUDED.impact_type,
+                  impact_severity = EXCLUDED.impact_severity,
+                  impact_summary = EXCLUDED.impact_summary,
+                  affected_sections = EXCLUDED.affected_sections,
+                  confidence_score = EXCLUDED.confidence_score,
+                  updated_at = NOW()
+              `);
+              createdEOs++;
+            }
+          } catch (eoError) {
+            console.warn(`⚠️ Error processing EO ${eo.eoNumber}:`, eoError);
+          }
+        }
+        
+        console.log(`✅ Processed ${createdEOs} Executive Orders`);
+      }
+      
       // Log to syslog
       syslog.log(LogFacility.LOCAL0, LogLevel.INFO, `New regulation created via MCP: ${data.name}`, {
         regulationId: newRegulation.id,
         taskCount: createdTasks.length,
+        eoCount: createdEOs,
       });
       
       // Success response
       const response = {
         success: true,
-        message: `Successfully created regulation "${data.name}" with ${createdTasks.length} compliance tasks`,
+        message: `Successfully created regulation "${data.name}" with ${createdTasks.length} compliance tasks and ${createdEOs} executive orders`,
         regulation: {
           id: newRegulation.id,
           itemId: newRegulation.itemId,
+          regKey: resolvedRegKey,
           name: newRegulation.name,
           category: newRegulation.category,
           jurisdictionSource: newRegulation.jurisdictionSource,
         },
         tasks: createdTasks,
         taskIdMapping: Object.fromEntries(taskIdMap),
+        executiveOrders: createdEOs,
         timestamp,
       };
       
@@ -1049,36 +1277,70 @@ export function setupMCPIntegrationApi(app: express.Application) {
         // UPDATE existing regulation
         console.log(`📝 Updating existing regulation ID: ${existingReg[0].id}`);
         
+        // Resolve camelCase vs snake_case field names
+        const resolvedAgencyName = data.agencyName || data.agency_name;
+        const resolvedAgencyUrl = data.agencyUrl || data.agency_url;
+        const resolvedAgencyContact = data.agencyContact || data.agency_contact;
+        const resolvedAgencyDepartment = data.agencyDepartment || data.agency_department;
+        const requirementsStr = Array.isArray(data.requirements)
+          ? data.requirements.join('\n• ')
+          : data.requirements || null;
+        
         const [updated] = await db.update(regulations)
           .set({
             name: data.name,
             topic: data.topic,
             statute: data.statute,
-            category: categoryResult.canonicalName || data.category, // Use canonical if available
-            originalCategory: categoryResult.originalCategory, // Preserve original
-            canonicalCategoryId: categoryResult.canonicalId, // Link to canonical
+            statuteIds: data.statuteIds ? JSON.stringify(data.statuteIds) : existingReg[0].statuteIds,
+            category: categoryResult.canonicalName || data.category,
+            originalCategory: categoryResult.originalCategory,
+            canonicalCategoryId: categoryResult.canonicalId,
             jurisdictionSource: data.jurisdictionSource || 'federal',
             summary: data.summary || null,
-            requirements: data.requirements || null,
+            requirements: requirementsStr,
             regulationText: data.regulationText || null,
             applicableInstitutions: data.applicableInstitutions || null,
             dro: data.dro || existingReg[0].dro || '',
             effectiveDate: data.effectiveDate ? new Date(data.effectiveDate) : existingReg[0].effectiveDate,
-            agency_name: data.agency_name || data.agencyName || existingReg[0].agency_name,
-            agency_url: data.agency_url || data.agencyUrl || existingReg[0].agency_url,
+            originationDate: data.originationDate ? new Date(data.originationDate) : existingReg[0].originationDate,
+            nextReviewDate: data.nextReviewDate ? new Date(data.nextReviewDate) : existingReg[0].nextReviewDate,
+            // Agency info (camelCase with snake_case fallback)
+            agency_name: resolvedAgencyName || existingReg[0].agency_name,
+            agency_url: resolvedAgencyUrl || existingReg[0].agency_url,
+            agency_contact: resolvedAgencyContact || existingReg[0].agency_contact,
+            agency_department: resolvedAgencyDepartment || existingReg[0].agency_department,
+            // URLs
             regulationUrl: data.regulationUrl || existingReg[0].regulationUrl,
+            requirementsUrl: data.requirementsUrl || existingReg[0].requirementsUrl,
+            submissionGuideUrl: data.submissionGuideUrl || existingReg[0].submissionGuideUrl,
+            formsUrl: data.formsUrl || existingReg[0].formsUrl,
+            submissionGuidelines: data.submissionGuidelines || existingReg[0].submissionGuidelines,
+            reportingFrequency: data.reportingFrequency || existingReg[0].reportingFrequency,
             filingDeadlines: data.filingDeadlines || existingReg[0].filingDeadlines,
+            // New content fields (Feb 2026)
+            publicLaw: data.publicLaw || existingReg[0].publicLaw,
+            purpose: data.purpose || existingReg[0].purpose,
+            scope: data.scope || existingReg[0].scope,
+            complianceNotes: data.complianceNotes || existingReg[0].complianceNotes,
+            verificationMethod: data.verificationMethod || existingReg[0].verificationMethod,
+            reportingRequirements: data.reportingRequirements || existingReg[0].reportingRequirements,
+            sources: data.sources || existingReg[0].sources,
+            sections: data.sections || existingReg[0].sections,
+            relatedRegulations: data.relatedRegulations || existingReg[0].relatedRegulations,
+            applicableforms: data.applicableForms || existingReg[0].applicableforms,
+            sourceUrl: data.sourceUrl || existingReg[0].sourceUrl,
+            // Risk & validation
+            riskScore: riskScore || existingReg[0].riskScore,
+            riskLevel: riskLevel || existingReg[0].riskLevel,
+            riskAssessment: data.riskAssessment || existingReg[0].riskAssessment,
             lovvLevel: data.lovvLevel || existingReg[0].lovvLevel,
             lastValidated: data.lastValidated ? new Date(data.lastValidated) : new Date(),
             versionHash: data.versionHash || null,
             stateCode: data.stateCode || existingReg[0].stateCode,
-            sourceUrl: data.sourceUrl || existingReg[0].sourceUrl,
-            // Universal reg_key and risk metadata from MCP Engine
+            // Universal reg_key
             regKey: regKey || existingReg[0].regKey,
-            riskScore: riskScore || existingReg[0].riskScore,
-            riskLevel: riskLevel || existingReg[0].riskLevel,
             lastUpdated: new Date(),
-            // Keep existing actions if not provided, otherwise use defaults
+            // Keep existing actions if not provided
             actions: existingReg[0].actions || defaultActions,
           })
           .where(eq(regulations.id, existingReg[0].id))
@@ -1091,38 +1353,71 @@ export function setupMCPIntegrationApi(app: express.Application) {
         // CREATE new regulation
         console.log(`✨ Creating new regulation with item_id: ${itemId}`);
         
+        // Resolve camelCase vs snake_case field names for create
+        const resolvedAgencyNameC = data.agencyName || data.agency_name;
+        const resolvedAgencyUrlC = data.agencyUrl || data.agency_url;
+        const resolvedAgencyContactC = data.agencyContact || data.agency_contact;
+        const resolvedAgencyDepartmentC = data.agencyDepartment || data.agency_department;
+        const requirementsStrC = Array.isArray(data.requirements)
+          ? data.requirements.join('\n• ')
+          : data.requirements || null;
+        
         const [created] = await db.insert(regulations).values({
           itemId,
+          regKey: regKey || null,
           name: data.name,
           topic: data.topic,
           statute: data.statute,
-          category: categoryResult.canonicalName || data.category, // Use canonical if available
-          originalCategory: categoryResult.originalCategory, // Preserve original
-          canonicalCategoryId: categoryResult.canonicalId, // Link to canonical
+          statuteIds: data.statuteIds ? JSON.stringify(data.statuteIds) : null,
+          category: categoryResult.canonicalName || data.category,
+          originalCategory: categoryResult.originalCategory,
+          canonicalCategoryId: categoryResult.canonicalId,
           jurisdictionSource: data.jurisdictionSource || 'federal',
           summary: data.summary || null,
-          requirements: data.requirements || null,
+          requirements: requirementsStrC,
           regulationText: data.regulationText || null,
           applicableInstitutions: data.applicableInstitutions || null,
           dro: data.dro || '',
           effectiveDate: data.effectiveDate ? new Date(data.effectiveDate) : null,
           originationDate: data.originationDate ? new Date(data.originationDate) : null,
-          agency_name: data.agency_name || data.agencyName || null,
-          agency_url: data.agency_url || data.agencyUrl || null,
+          nextReviewDate: data.nextReviewDate ? new Date(data.nextReviewDate) : null,
+          // Agency info
+          agency_name: resolvedAgencyNameC || null,
+          agency_url: resolvedAgencyUrlC || null,
+          agency_contact: resolvedAgencyContactC || null,
+          agency_department: resolvedAgencyDepartmentC || null,
+          // URLs
           regulationUrl: data.regulationUrl || null,
+          requirementsUrl: data.requirementsUrl || null,
+          submissionGuideUrl: data.submissionGuideUrl || null,
+          formsUrl: data.formsUrl || null,
+          submissionGuidelines: data.submissionGuidelines || null,
+          reportingFrequency: data.reportingFrequency || null,
           filingDeadlines: data.filingDeadlines || null,
-          isApplicable: true,
-          isCurrent: true,
-          versionNumber: data.version || 1,
+          // New content fields (Feb 2026)
+          publicLaw: data.publicLaw || null,
+          purpose: data.purpose || null,
+          scope: data.scope || null,
+          complianceNotes: data.complianceNotes || null,
+          verificationMethod: data.verificationMethod || null,
+          reportingRequirements: data.reportingRequirements || null,
+          sources: data.sources || null,
+          sections: data.sections || null,
+          relatedRegulations: data.relatedRegulations || null,
+          applicableforms: data.applicableForms || null,
+          sourceUrl: data.sourceUrl || null,
+          // Risk & validation
+          riskScore: riskScore || null,
+          riskLevel: riskLevel || null,
+          riskAssessment: data.riskAssessment || null,
           lovvLevel: data.lovvLevel || null,
           lastValidated: data.lastValidated ? new Date(data.lastValidated) : null,
           versionHash: data.versionHash || null,
           stateCode: data.stateCode || null,
-          sourceUrl: data.sourceUrl || null,
-          // Universal reg_key and risk metadata from MCP Engine
-          regKey: regKey || null,
-          riskScore: riskScore || null,
-          riskLevel: riskLevel || null,
+          // Standard flags
+          isApplicable: true,
+          isCurrent: true,
+          versionNumber: data.version || 1,
           actions: defaultActions,
         }).returning();
         
@@ -1159,26 +1454,40 @@ export function setupMCPIntegrationApi(app: express.Application) {
           console.log(`   🔒 Preserving existing tasks (MERGE mode)`);
         }
         
+        // Helper: build full 21-field task values for sync endpoint
+        const buildSyncTaskValues = (task: any, parentId?: number) => ({
+          regulationId,
+          parentTaskId: parentId || null,
+          taskId: task.taskId || null,
+          title: task.title,
+          description: task.description || null,
+          instructions: task.instructions || null,
+          category: task.category || null,
+          assignedRole: task.assignedRole || null,
+          statutoryRole: task.statutoryRole || null,
+          statutoryCitation: task.statutoryCitation || null,
+          requirementType: task.requirementType || 'requirement',
+          dueDate: task.dueDate ? new Date(task.dueDate) : null,
+          recurringSchedule: task.recurringSchedule || null,
+          reminderDays: task.reminderDays || 30,
+          priority: task.priority || 'medium',
+          evidenceRequired: task.evidenceRequired || false,
+          evidenceType: task.evidenceType || 'none',
+          evidenceInstructions: task.evidenceInstructions || null,
+          estimatedEffort: task.estimatedEffort || null,
+          deliverable: task.deliverable || null,
+          deliverableTemplateUrl: task.deliverableTemplateUrl || null,
+          sortOrder: task.sortOrder || 0,
+          status: 'pending',
+          isTemplate: false,
+        });
+        
         // First pass: create root tasks (no parent)
         console.log(`   ▶️ Pass 1: Creating ${rootTasks.length} root tasks...`);
         for (const task of rootTasks) {
-          const [newTask] = await db.insert(complianceTasks).values({
-            regulationId,
-            title: task.title,
-            description: task.description || null,
-            instructions: task.instructions || null,
-            assignedRole: task.assignedRole || null,
-            dueDate: task.dueDate ? new Date(task.dueDate) : null,
-            recurringSchedule: task.recurringSchedule || null,
-            reminderDays: task.reminderDays || 30,
-            priority: task.priority || 'medium',
-            evidenceRequired: task.evidenceRequired || false,
-            evidenceType: task.evidenceType || 'none',
-            evidenceInstructions: task.evidenceInstructions || null,
-            sortOrder: task.sortOrder || 0,
-            status: 'pending',
-            isTemplate: false,
-          }).returning();
+          const [newTask] = await db.insert(complianceTasks).values(
+            buildSyncTaskValues(task)
+          ).returning();
           
           if (task.tempId) taskIdMap.set(task.tempId, newTask.id);
           createdTasks.push({ id: newTask.id, tempId: task.tempId, title: task.title });
@@ -1198,20 +1507,9 @@ export function setupMCPIntegrationApi(app: express.Application) {
             continue;
           }
           
-          const [newTask] = await db.insert(complianceTasks).values({
-            regulationId,
-            parentTaskId: parentId,
-            title: task.title,
-            description: task.description || null,
-            assignedRole: task.assignedRole || null,
-            dueDate: task.dueDate ? new Date(task.dueDate) : null,
-            priority: task.priority || 'medium',
-            evidenceRequired: task.evidenceRequired || false,
-            evidenceType: task.evidenceType || 'none',
-            sortOrder: task.sortOrder || 0,
-            status: 'pending',
-            isTemplate: false,
-          }).returning();
+          const [newTask] = await db.insert(complianceTasks).values(
+            buildSyncTaskValues(task, parentId)
+          ).returning();
           
           if (task.tempId) taskIdMap.set(task.tempId, newTask.id);
           createdTasks.push({ id: newTask.id, tempId: task.tempId, title: task.title });

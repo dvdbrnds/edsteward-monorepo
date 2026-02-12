@@ -360,6 +360,93 @@ export class DatabaseStorage implements IStorage {
         }
       }
 
+      // 2.5. Apply expanded regulation fields from MCP metadata (Feb 2026 schema alignment)
+      // When the Updates endpoint stores MCP data, it puts expanded fields in metadata.regulationFields
+      const updateMetadata = (update as any).metadata;
+      const regFields = updateMetadata?.regulationFields;
+      if (regFields && typeof regFields === 'object') {
+        console.log('📋 Applying expanded regulation fields from MCP metadata...');
+        
+        // Map of metadata field → DB column name
+        const fieldMap: Record<string, string> = {
+          statute: 'statute',
+          statuteIds: 'statute_ids',
+          publicLaw: 'public_law',
+          category: 'category',
+          topic: 'topic',
+          jurisdictionSource: 'jurisdiction_source',
+          effectiveDate: 'effective_date',
+          originationDate: 'origination_date',
+          nextReviewDate: 'next_review_date',
+          purpose: 'purpose',
+          scope: 'scope',
+          submissionGuidelines: 'submission_guidelines',
+          complianceNotes: 'compliance_notes',
+          verificationMethod: 'verification_method',
+          reportingFrequency: 'reporting_frequency',
+          agencyName: 'agency_name',
+          agencyUrl: 'agency_url',
+          agencyContact: 'agency_contact',
+          agencyDepartment: 'agency_department',
+          regulationUrl: 'regulation_url',
+          requirementsUrl: 'requirements_url',
+          submissionGuideUrl: 'submission_guide_url',
+          formsUrl: 'forms_url',
+          sourceUrl: 'source_url',
+          stateCode: 'state_code',
+          lovvLevel: 'lovv_level',
+          versionHash: 'version_hash',
+        };
+        
+        // Simple text/varchar fields
+        for (const [jsField, dbCol] of Object.entries(fieldMap)) {
+          const value = regFields[jsField];
+          if (value !== undefined && value !== null) {
+            updateFields.push(`${dbCol} = $${paramIndex++}`);
+            updateValues.push(value);
+          }
+        }
+        
+        // JSONB fields (need JSON.stringify)
+        const jsonbFields: Record<string, string> = {
+          sources: 'sources',
+          sections: 'sections',
+          relatedRegulations: 'related_regulations',
+          reportingRequirements: 'reporting_requirements',
+          riskAssessment: 'risk_assessment',
+        };
+        
+        for (const [jsField, dbCol] of Object.entries(jsonbFields)) {
+          const value = regFields[jsField];
+          if (value !== undefined && value !== null) {
+            updateFields.push(`${dbCol} = $${paramIndex++}`);
+            updateValues.push(JSON.stringify(value));
+          }
+        }
+        
+        // Array fields (store as JSONB)
+        if (regFields.applicableInstitutions) {
+          updateFields.push(`applicable_institutions = $${paramIndex++}`);
+          updateValues.push(JSON.stringify(regFields.applicableInstitutions));
+        }
+        if (regFields.applicableForms) {
+          updateFields.push(`applicableforms = $${paramIndex++}`);
+          updateValues.push(JSON.stringify(regFields.applicableForms));
+        }
+        
+        // Numeric fields
+        if (regFields.riskScore !== undefined && regFields.riskScore !== null) {
+          updateFields.push(`risk_score = $${paramIndex++}`);
+          updateValues.push(regFields.riskScore);
+        }
+        if (regFields.riskLevel) {
+          updateFields.push(`risk_level = $${paramIndex++}`);
+          updateValues.push(regFields.riskLevel);
+        }
+        
+        console.log(`   📝 Applying ${Object.keys(regFields).filter(k => regFields[k] !== null && regFields[k] !== undefined).length} expanded fields`);
+      }
+
       // Always update last_updated timestamp
       updateFields.push(`last_updated = $${paramIndex++}`);
       updateValues.push(new Date());
@@ -490,7 +577,7 @@ export class DatabaseStorage implements IStorage {
           if (assignedTo) autoAssignedCount++;
           
           if (existing) {
-            // Task exists but is not completed - update it with new info
+            // Task exists but is not completed - update it with new info (21-field schema Feb 2026)
             await this.pool.query(
               `UPDATE compliance_tasks SET 
                 description = COALESCE($1, description),
@@ -503,8 +590,13 @@ export class DatabaseStorage implements IStorage {
                 requirement_type = COALESCE($8, requirement_type),
                 evidence_required = COALESCE($9, evidence_required),
                 evidence_type = COALESCE($10, evidence_type),
-                sort_order = COALESCE($11, sort_order)
-              WHERE id = $12`,
+                sort_order = COALESCE($11, sort_order),
+                evidence_instructions = COALESCE($12, evidence_instructions),
+                estimated_effort = COALESCE($13, estimated_effort),
+                deliverable = COALESCE($14, deliverable),
+                deliverable_template_url = COALESCE($15, deliverable_template_url),
+                recurring_schedule = COALESCE($16, recurring_schedule)
+              WHERE id = $17`,
               [
                 task.description || null,
                 task.instructions || null,
@@ -517,6 +609,11 @@ export class DatabaseStorage implements IStorage {
                 task.evidenceRequired || null,
                 task.evidenceType || null,
                 task.sortOrder || null,
+                task.evidenceInstructions || null,
+                task.estimatedEffort || null,
+                task.deliverable || null,
+                task.deliverableTemplateUrl || null,
+                task.recurringSchedule || null,
                 existing.id
               ]
             );
@@ -525,15 +622,16 @@ export class DatabaseStorage implements IStorage {
               taskIdMap.set(task.tempId, existing.id);
             }
           } else {
-            // Task doesn't exist - insert it
+            // Task doesn't exist - insert with full 21-field schema (Feb 2026)
             const result = await this.pool.query(
               `INSERT INTO compliance_tasks (
                 regulation_id, task_id, title, description, instructions, 
                 category, statutory_role, statutory_citation, assigned_to, assigned_role, 
-                due_date, reminder_days, status, priority, 
-                requirement_type, evidence_required, evidence_type, sort_order, is_template,
-                attestation_status
-              ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20) 
+                due_date, recurring_schedule, reminder_days, status, priority, 
+                requirement_type, evidence_required, evidence_type, evidence_instructions,
+                estimated_effort, deliverable, deliverable_template_url,
+                sort_order, is_template, attestation_status
+              ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25) 
               RETURNING id`,
               [
                 update.regulationId,
@@ -547,12 +645,17 @@ export class DatabaseStorage implements IStorage {
                 assignedTo,
                 task.assignedRole || null,
                 task.dueDate ? new Date(task.dueDate) : null,
-                30,
+                task.recurringSchedule || null,
+                task.reminderDays || 30,
                 'pending',
                 task.priority || 'medium',
                 task.requirementType || 'requirement',
                 task.evidenceRequired || false,
                 task.evidenceType || 'none',
+                task.evidenceInstructions || null,
+                task.estimatedEffort || null,
+                task.deliverable || null,
+                task.deliverableTemplateUrl || null,
                 task.sortOrder || 0,
                 false,
                 task.evidenceRequired ? 'pending' : 'not_required'
@@ -591,7 +694,7 @@ export class DatabaseStorage implements IStorage {
           if (assignedTo) autoAssignedCount++;
           
           if (existing) {
-            // Update existing pending task
+            // Update existing pending child task (21-field schema Feb 2026)
             await this.pool.query(
               `UPDATE compliance_tasks SET 
                 parent_task_id = $1,
@@ -605,8 +708,13 @@ export class DatabaseStorage implements IStorage {
                 requirement_type = COALESCE($9, requirement_type),
                 evidence_required = COALESCE($10, evidence_required),
                 evidence_type = COALESCE($11, evidence_type),
-                sort_order = COALESCE($12, sort_order)
-              WHERE id = $13`,
+                sort_order = COALESCE($12, sort_order),
+                evidence_instructions = COALESCE($13, evidence_instructions),
+                estimated_effort = COALESCE($14, estimated_effort),
+                deliverable = COALESCE($15, deliverable),
+                deliverable_template_url = COALESCE($16, deliverable_template_url),
+                recurring_schedule = COALESCE($17, recurring_schedule)
+              WHERE id = $18`,
               [
                 parentId,
                 task.description || null,
@@ -620,6 +728,11 @@ export class DatabaseStorage implements IStorage {
                 task.evidenceRequired || null,
                 task.evidenceType || null,
                 task.sortOrder || null,
+                task.evidenceInstructions || null,
+                task.estimatedEffort || null,
+                task.deliverable || null,
+                task.deliverableTemplateUrl || null,
+                task.recurringSchedule || null,
                 existing.id
               ]
             );
@@ -628,15 +741,16 @@ export class DatabaseStorage implements IStorage {
               taskIdMap.set(task.tempId, existing.id);
             }
           } else {
-            // Insert new child task
+            // Insert new child task with full 21-field schema (Feb 2026)
             const result = await this.pool.query(
               `INSERT INTO compliance_tasks (
                 regulation_id, parent_task_id, task_id, title, description, instructions, 
                 category, statutory_role, statutory_citation, assigned_to, assigned_role, 
-                due_date, reminder_days, status, priority, 
-                requirement_type, evidence_required, evidence_type, sort_order, is_template,
-                attestation_status
-              ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21) 
+                due_date, recurring_schedule, reminder_days, status, priority, 
+                requirement_type, evidence_required, evidence_type, evidence_instructions,
+                estimated_effort, deliverable, deliverable_template_url,
+                sort_order, is_template, attestation_status
+              ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22, $23, $24, $25, $26) 
               RETURNING id`,
               [
                 update.regulationId,
@@ -651,12 +765,17 @@ export class DatabaseStorage implements IStorage {
                 assignedTo,
                 task.assignedRole || null,
                 task.dueDate ? new Date(task.dueDate) : null,
-                30,
+                task.recurringSchedule || null,
+                task.reminderDays || 30,
                 'pending',
                 task.priority || 'medium',
                 task.requirementType || 'requirement',
                 task.evidenceRequired || false,
                 task.evidenceType || 'none',
+                task.evidenceInstructions || null,
+                task.estimatedEffort || null,
+                task.deliverable || null,
+                task.deliverableTemplateUrl || null,
                 task.sortOrder || 0,
                 false,
                 task.evidenceRequired ? 'pending' : 'not_required'
@@ -674,8 +793,7 @@ export class DatabaseStorage implements IStorage {
       }
 
       // 3.6. Apply Executive Orders if present in metadata (MCP Engine sync Jan 2026)
-      const metadata = (update as any).metadata;
-      const executiveOrders = metadata?.executiveOrders;
+      const executiveOrders = updateMetadata?.executiveOrders;
       if (executiveOrders && Array.isArray(executiveOrders) && executiveOrders.length > 0) {
         console.log(`⚖️ Processing ${executiveOrders.length} Executive Orders...`);
         
@@ -688,37 +806,68 @@ export class DatabaseStorage implements IStorage {
           
           let eoId: number;
           if (existingEO.rows.length > 0) {
-            // Update existing EO
+            // Update existing EO — full 22-field schema (Feb 2026)
             eoId = existingEO.rows[0].id;
             await this.pool.query(
               `UPDATE executive_orders SET
                 title = $1, status = $2, president = $3, term = $4,
-                full_text_url = $5, updated_at = $6
-              WHERE id = $7`,
+                summary = COALESCE($5, summary),
+                full_text_url = COALESCE($6, full_text_url),
+                pdf_url = COALESCE($7, pdf_url),
+                federal_register_citation = COALESCE($8, federal_register_citation),
+                topics = COALESCE($9, topics),
+                enjoined_date = COALESCE($10, enjoined_date),
+                enjoined_by = COALESCE($11, enjoined_by),
+                revoked_date = COALESCE($12, revoked_date),
+                revoked_by = COALESCE($13, revoked_by),
+                published_date = COALESCE($14, published_date),
+                updated_at = $15
+              WHERE id = $16`,
               [
                 eo.title,
                 eo.status || 'active',
                 eo.president || null,
                 eo.term || null,
+                eo.summary || null,
                 eo.fullTextUrl || null,
+                eo.pdfUrl || null,
+                eo.federalRegisterCitation || null,
+                eo.topics || null,
+                eo.enjoinedDate || null,
+                eo.enjoinedBy || null,
+                eo.revokedDate || null,
+                eo.revokedBy || null,
+                eo.publishedDate || null,
                 new Date(),
                 eoId
               ]
             );
           } else {
-            // Insert new EO
+            // Insert new EO — full 22-field schema (Feb 2026)
             const newEO = await this.pool.query(
               `INSERT INTO executive_orders (
-                eo_number, title, signed_date, status, president, term, full_text_url
-              ) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING id`,
+                eo_number, title, signed_date, published_date, status,
+                president, term, summary, full_text_url, pdf_url,
+                federal_register_citation, topics,
+                enjoined_date, enjoined_by, revoked_date, revoked_by
+              ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16) RETURNING id`,
               [
                 eo.eoNumber,
                 eo.title,
                 eo.signedDate,
+                eo.publishedDate || null,
                 eo.status || 'active',
                 eo.president || null,
                 eo.term || null,
-                eo.fullTextUrl || null
+                eo.summary || null,
+                eo.fullTextUrl || null,
+                eo.pdfUrl || null,
+                eo.federalRegisterCitation || null,
+                eo.topics || null,
+                eo.enjoinedDate || null,
+                eo.enjoinedBy || null,
+                eo.revokedDate || null,
+                eo.revokedBy || null
               ]
             );
             eoId = newEO.rows[0].id;
@@ -737,14 +886,19 @@ export class DatabaseStorage implements IStorage {
             await this.pool.query(
               `UPDATE eo_regulation_impacts SET
                 impact_type = $1, impact_severity = $2, impact_summary = $3,
-                assessed_by = $4, confidence_score = $5, updated_at = $6
-              WHERE id = $7`,
+                assessed_by = $4, confidence_score = $5,
+                affected_sections = COALESCE($6, affected_sections),
+                assessment_date = COALESCE($7, assessment_date),
+                updated_at = $8
+              WHERE id = $9`,
               [
                 eo.impactType,
                 eo.impactSeverity,
                 eo.impactSummary || null,
                 'MCP Engine AI',
                 eo.confidenceScore?.toString() || null,
+                eo.affectedSections ? JSON.stringify(eo.affectedSections) : null,
+                eo.assessmentDate || null,
                 new Date(),
                 impactId
               ]
@@ -753,8 +907,8 @@ export class DatabaseStorage implements IStorage {
             const newImpact = await this.pool.query(
               `INSERT INTO eo_regulation_impacts (
                 eo_id, regulation_id, impact_type, impact_severity, impact_summary,
-                assessed_by, assessment_date, confidence_score, review_status
-              ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING id`,
+                assessed_by, assessment_date, confidence_score, affected_sections, review_status
+              ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id`,
               [
                 eoId,
                 update.regulationId,
@@ -762,8 +916,9 @@ export class DatabaseStorage implements IStorage {
                 eo.impactSeverity,
                 eo.impactSummary || null,
                 'MCP Engine AI',
-                new Date().toISOString().split('T')[0],
+                eo.assessmentDate || new Date().toISOString().split('T')[0],
                 eo.confidenceScore?.toString() || null,
+                eo.affectedSections ? JSON.stringify(eo.affectedSections) : null,
                 'pending'
               ]
             );

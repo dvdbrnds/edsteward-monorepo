@@ -40,10 +40,13 @@ async function autoCreateRegulationIfNotExists(
     .replace(/\s+/g, '-')
     .substring(0, 100);
 
-  // Check by itemId too
-  const existingById = await storage.getRegulationById(itemId);
-  if (existingById) {
-    return existingById.id;
+  // Check by itemId too (only if it looks like a numeric ID)
+  const numericId = parseInt(String(itemId), 10);
+  if (!isNaN(numericId)) {
+    const existingById = await storage.getRegulationById(numericId);
+    if (existingById) {
+      return existingById.id;
+    }
   }
 
   // Create new regulation with minimal required fields
@@ -74,8 +77,10 @@ const MCP_ENGINE_USERNAME = process.env.MCP_ENGINE_USERNAME || 'mcp-engine';
 const MCP_ENGINE_PASSWORD = process.env.MCP_ENGINE_PASSWORD;
 
 /**
- * Basic Authentication middleware for MCP Engine integration
- * Credentials configured via MCP_ENGINE_USERNAME and MCP_ENGINE_PASSWORD env vars
+ * Unified MCP Authentication middleware
+ * Accepts EITHER:
+ *   1. X-MCP-API-Key header (preferred — matches orchestrator endpoint)
+ *   2. Basic Auth with MCP_ENGINE_USERNAME/PASSWORD (backward compat)
  * ALLOWS BYPASS for localhost requests (for local MCP Engine testing)
  */
 function basicAuthMiddleware(req: Request, res: Response, next: Function) {
@@ -85,12 +90,25 @@ function basicAuthMiddleware(req: Request, res: Response, next: Function) {
     return next();
   }
 
+  // Method 1: X-MCP-API-Key header (preferred)
+  const apiKey = req.headers['x-mcp-api-key'];
+  if (apiKey && apiKey === process.env.MCP_API_KEY) {
+    return next();
+  }
+
+  // Method 2: Basic Auth (backward compatibility)
   // Check if MCP credentials are configured
   if (!MCP_ENGINE_PASSWORD) {
-    console.error('MCP_ENGINE_PASSWORD not configured - MCP Engine requests will fail');
-    return res.status(500).json({
-      error: 'MCP Engine not configured',
-      message: 'Server missing MCP_ENGINE_PASSWORD environment variable'
+    // If no Basic Auth password AND no valid API key, fail
+    if (!apiKey) {
+      return res.status(401).json({
+        error: 'Authentication required',
+        message: 'Provide X-MCP-API-Key header or Basic Auth credentials'
+      });
+    }
+    return res.status(403).json({
+      error: 'Invalid API key',
+      message: 'The provided X-MCP-API-Key is not valid'
     });
   }
 
@@ -98,8 +116,8 @@ function basicAuthMiddleware(req: Request, res: Response, next: Function) {
   
   if (!authHeader || !authHeader.startsWith('Basic ')) {
     return res.status(401).json({ 
-      error: 'Basic Authentication required',
-      message: 'MCP Engine integration requires Basic Auth with valid credentials'
+      error: 'Authentication required',
+      message: 'Provide X-MCP-API-Key header or Basic Auth credentials'
     });
   }
 
@@ -146,34 +164,159 @@ const deferUpdateSchema = z.object({
  * Schema for MCP Engine complex payload with Federal Register enhancement
  * Now accepts regKey (REG-001), regulationId (number), or itemId (string) for flexibility
  */
+/**
+ * Canonical MCP compliance task schema — shared across all endpoints
+ * 21 fields per task, standardized Feb 2026
+ */
+const mcpComplianceTaskSchemaCanonical = z.object({
+  tempId: z.string().optional(),
+  parentTempId: z.string().optional().nullable(),
+  taskId: z.string().optional(),                    // Stable ID e.g. "002-001"
+  title: z.string(),
+  description: z.string().optional(),
+  instructions: z.string().optional(),              // Step-by-step guidance
+  category: z.string().optional(),                  // Grouping (Reporting, Training, Policy, etc.)
+  assignedRole: z.string().optional(),
+  statutoryRole: z.string().optional(),             // Legal role e.g. "Title IX Coordinator"
+  statutoryCitation: z.string().optional(),          // Legal citation e.g. "34 CFR 106.8"
+  requirementType: z.enum(['requirement', 'best_practice']).optional(),
+  priority: z.enum(['critical', 'high', 'medium', 'low']).optional(),
+  dueDate: z.string().optional(),
+  recurringSchedule: z.string().optional(),          // "annual", "quarterly", etc.
+  reminderDays: z.number().optional(),
+  evidenceRequired: z.boolean().optional(),
+  evidenceType: z.string().optional(),
+  evidenceInstructions: z.string().optional(),       // What to upload as proof
+  estimatedEffort: z.string().optional(),            // Time estimate e.g. "2-4 hours"
+  deliverable: z.string().optional(),                // Expected output
+  deliverableTemplateUrl: z.string().optional(),     // Template download link
+  sortOrder: z.number().optional(),
+});
+
+/**
+ * Canonical MCP Executive Order schema — 22 fields
+ * Standardized Feb 2026
+ */
+const mcpExecutiveOrderSchemaCanonical = z.object({
+  eoNumber: z.string(),                              // e.g., "EO 14322"
+  title: z.string(),
+  signedDate: z.string(),                            // ISO date
+  publishedDate: z.string().optional(),              // Federal Register publication date
+  status: z.enum(['active', 'enjoined', 'revoked', 'superseded']).optional(),
+  president: z.string().optional(),
+  term: z.string().optional(),                       // e.g., "Trump-2"
+  summary: z.string().optional(),                    // EO summary text
+  fullTextUrl: z.string().optional(),
+  pdfUrl: z.string().optional(),                     // PDF link
+  federalRegisterCitation: z.string().optional(),    // e.g., "90 FR 35821"
+  topics: z.array(z.string()).optional(),            // Topic tags
+  impactType: z.enum(['modifies', 'reinforces', 'conflicts', 'supersedes']),
+  impactSeverity: z.enum(['critical', 'high', 'medium', 'low']),
+  impactSummary: z.string().optional(),
+  affectedSections: z.array(z.string()).optional(),  // Which regulation sections affected
+  confidenceScore: z.number().optional(),            // 0-1 confidence
+  assessmentDate: z.string().optional(),             // When impact was assessed
+  enjoinedDate: z.string().optional(),               // Court injunction date
+  enjoinedBy: z.string().optional(),                 // Court that issued injunction
+  revokedDate: z.string().optional(),                // Revocation date
+  revokedBy: z.string().optional(),                  // What revoked it
+});
+
+/**
+ * MCP Engine regulation update schema — FULL 48-field payload
+ * Expanded Feb 2026 to achieve endpoint parity with Create/Sync
+ * Accepts camelCase (canonical) with snake_case fallbacks for backward compat
+ */
 const mcpEngineUpdateSchema = z.object({
   // PRIMARY IDENTIFIER: Universal regulation key (REG-001 to REG-251)
-  // MCP Engine should use this as the main identifier for all updates
   regKey: z.string().optional(),
+  mcpRegKey: z.string().optional(), // Alias for regKey
   
-  // FALLBACK IDENTIFIERS (used if regKey not provided)
-  itemId: z.string().optional(),           // Slug-based ID (e.g., "clery-act-vawa")
-  regulationId: z.union([z.number(), z.string()]).optional(), // Legacy numeric ID
+  // FALLBACK IDENTIFIERS
+  itemId: z.string().optional(),
+  regulationId: z.union([z.number(), z.string()]).optional(),
   
   name: z.string(),
   
-  // Fields for auto-creation if regulation doesn't exist (Jan 2026)
+  // Core regulation fields (parity with Create/Sync)
   statute: z.string().optional(),
+  statuteIds: z.array(z.string()).optional(),         // Multiple statute identifiers
+  publicLaw: z.string().optional(),                   // e.g., "Public Law 101-542"
   category: z.string().optional(),
   topic: z.string().optional(),
   jurisdictionSource: z.string().optional(),
-  // Risk metadata from MCP Engine
+  status: z.enum(["pending", "accepted", "rejected", "deferred"]).default("pending"),
+  
+  // Dates
+  effectiveDate: z.string().optional(),
+  originationDate: z.string().optional(),
+  nextReviewDate: z.string().optional(),
+  
+  // Content fields (camelCase canonical, snake_case backward compat)
+  regulationText: z.string().optional(),
+  regulation_text: z.string().optional(),             // backward compat
+  summary: z.string().optional(),
+  requirements: z.union([z.string(), z.array(z.string())]).optional(),
+  purpose: z.string().optional(),
+  scope: z.string().optional(),
+  submissionGuidelines: z.string().optional(),
+  submission_guidelines: z.string().optional(),       // backward compat
+  complianceNotes: z.string().optional(),
+  verificationMethod: z.string().optional(),
+  reportingFrequency: z.string().optional(),
+  reportingRequirements: z.any().optional(),          // Structured reporting requirements
+  
+  // Source and reference information
+  sources: z.array(z.object({
+    type: z.string().optional(),
+    name: z.string().optional(),
+    url: z.string().optional(),
+    citation: z.string().optional(),
+    lastChecked: z.string().optional(),
+  })).optional(),
+  sections: z.array(z.object({
+    type: z.string().optional(),
+    value: z.string().optional(),
+  })).optional(),
+  relatedRegulations: z.array(z.object({
+    regKey: z.string().optional(),
+    relationship: z.string().optional(),
+  })).optional(),
+  applicableForms: z.array(z.string()).optional(),
+  applicableInstitutions: z.array(z.string()).optional(),
+  source_attribution: z.string().optional(),
+  
+  // Agency information
+  agencyName: z.string().optional(),
+  agencyUrl: z.string().optional(),
+  agencyContact: z.string().optional(),
+  agencyDepartment: z.string().optional(),
+  enforcementAgency: z.string().optional(),
+  // snake_case backward compat
+  agency_name: z.string().optional(),
+  agency_url: z.string().optional(),
+  agency_contact: z.string().optional(),
+  agency_department: z.string().optional(),
+  
+  // URLs
+  regulationUrl: z.string().optional(),
+  requirementsUrl: z.string().optional(),
+  submissionGuideUrl: z.string().optional(),
+  formsUrl: z.string().optional(),
+  sourceUrl: z.string().optional(),
+  
+  // Risk & validation (MCP Engine specific)
   riskScore: z.number().optional(),
   riskLevel: z.enum(['CRITICAL', 'SEVERE', 'HIGH', 'MODERATE', 'LOW']).optional(),
-  status: z.enum(["pending", "accepted", "rejected", "deferred"]).default("pending"),
-  effectiveDate: z.string().optional(),
-  
-  // Enhanced Federal Register fields
-  regulation_text: z.string().optional(),
-  summary: z.string().optional(),
-  submission_guidelines: z.string().optional(),
-  requirements: z.array(z.string()).optional(),
-  source_attribution: z.string().optional(),
+  riskAssessment: z.object({
+    score: z.number().optional(),
+    level: z.string().optional(),
+    factors: z.array(z.any()).optional(),
+    enforcementTrend: z.string().optional(),
+  }).passthrough().optional(),
+  lovvLevel: z.enum(['A', 'B', 'C', 'D']).optional(),
+  versionHash: z.string().optional(),
+  stateCode: z.string().max(2).optional(),
   
   // Federal Register enhancement metadata
   federal_register_enhancement: z.object({
@@ -210,7 +353,7 @@ const mcpEngineUpdateSchema = z.object({
     enhancement_successful: z.boolean()
   }).optional(),
   
-  // Legacy content structure (for backward compatibility)
+  // Legacy content structure (backward compatibility)
   content: z.object({
     uscText: z.object({
       title: z.string(),
@@ -254,40 +397,18 @@ const mcpEngineUpdateSchema = z.object({
     }).optional()
   }).optional(),
   
-  // Compliance tasks to be applied on approval (MCP Engine sync Jan 2026)
-  complianceTasks: z.array(z.object({
-    tempId: z.string().optional(),
-    parentTempId: z.string().optional().nullable(),
-    taskId: z.string().optional(),
-    title: z.string(),
-    description: z.string().optional(),
-    instructions: z.string().optional(),
-    assignedRole: z.string().optional(),
-    priority: z.enum(['high', 'medium', 'low']).optional(),
-    requirementType: z.enum(['requirement', 'best_practice']).optional(),
-    dueDate: z.string().optional(),
-    evidenceRequired: z.boolean().optional(),
-    evidenceType: z.string().optional(),
-  })).optional(),
+  // Compliance tasks — canonical 21-field schema
+  complianceTasks: z.array(mcpComplianceTaskSchemaCanonical).optional(),
   
-  // Executive Orders affecting this regulation (MCP Engine sync Jan 2026)
-  executiveOrders: z.array(z.object({
-    eoNumber: z.string(),                         // e.g., "EO 14322"
-    title: z.string(),
-    signedDate: z.string(),                       // ISO date
-    status: z.enum(['active', 'enjoined', 'revoked', 'superseded']).optional(),
-    president: z.string().optional(),
-    term: z.string().optional(),                  // e.g., "Trump-2"
-    impactType: z.enum(['modifies', 'reinforces', 'conflicts', 'supersedes']),
-    impactSeverity: z.enum(['critical', 'high', 'medium', 'low']),
-    impactSummary: z.string().optional(),
-    fullTextUrl: z.string().optional(),
-    confidenceScore: z.number().optional(),
-  })).optional(),
+  // Executive Orders — canonical 22-field schema
+  executiveOrders: z.array(mcpExecutiveOrderSchemaCanonical).optional(),
   
   // Filing deadlines (multiple formats supported)
   filingDeadlines: z.any().optional(),
   filing_deadlines: z.any().optional(),
+  
+  // Metadata passthrough
+  metadata: z.any().optional(),
 });
 
 /**
@@ -562,8 +683,8 @@ export function setupRegulationUpdatesApi(app: Express) {
           if (mcpValidation.success) {
             const mcpData = mcpValidation.data;
             
-            // Resolve regulation ID - priority: regKey > itemId > regulationId
-            const regKey = mcpData.regKey;
+            // Resolve regulation ID - priority: regKey/mcpRegKey > itemId > regulationId
+            const regKey = mcpData.regKey || mcpData.mcpRegKey;
             const identifier = mcpData.itemId || mcpData.regulationId;
             
             if (!regKey && !identifier && !mcpData.name) {
@@ -647,6 +768,14 @@ export function setupRegulationUpdatesApi(app: Express) {
             }
             
             // Convert MCP Engine format to EdSteward format
+            // Resolve camelCase vs snake_case field names (prefer camelCase)
+            const resolvedRegText = mcpData.regulationText || mcpData.regulation_text;
+            const resolvedSubmissionGuidelines = mcpData.submissionGuidelines || mcpData.submission_guidelines;
+            const resolvedAgencyName = mcpData.agencyName || mcpData.agency_name;
+            const resolvedAgencyUrl = mcpData.agencyUrl || mcpData.agency_url;
+            const resolvedAgencyContact = mcpData.agencyContact || mcpData.agency_contact;
+            const resolvedAgencyDepartment = mcpData.agencyDepartment || mcpData.agency_department;
+            
             updateData = {
               regulationId: validRegulationId,
               name: mcpData.name,
@@ -658,17 +787,62 @@ export function setupRegulationUpdatesApi(app: Express) {
               filingDeadlines: filingDeadlinesContent,
               // Store tasks for approval - will be applied when CCO accepts
               pendingTasks: complianceTasks,
-              // Store Federal Register metadata for future use
+              // Store ALL MCP fields as metadata for processing on approval
               metadata: {
+                // Federal Register enhancement
                 federal_register_enhancement: mcpData.federal_register_enhancement,
                 processing_metadata: mcpData.processing_metadata,
                 source_attribution: mcpData.source_attribution,
-                submission_guidelines: mcpData.submission_guidelines,
                 enhanced_summary: mcpData.summary,
                 // Executive Orders - will be processed on approval
                 executiveOrders: executiveOrders,
                 eo_count: executiveOrders?.length || 0,
                 eo_critical_count: executiveOrders?.filter((e: any) => e.impactSeverity === 'critical').length || 0,
+                // Expanded regulation fields (Feb 2026 schema alignment)
+                regulationFields: {
+                  statute: mcpData.statute,
+                  statuteIds: mcpData.statuteIds,
+                  publicLaw: mcpData.publicLaw,
+                  category: mcpData.category,
+                  topic: mcpData.topic,
+                  jurisdictionSource: mcpData.jurisdictionSource,
+                  effectiveDate: mcpData.effectiveDate,
+                  originationDate: mcpData.originationDate,
+                  nextReviewDate: mcpData.nextReviewDate,
+                  purpose: mcpData.purpose,
+                  scope: mcpData.scope,
+                  submissionGuidelines: resolvedSubmissionGuidelines,
+                  complianceNotes: mcpData.complianceNotes,
+                  verificationMethod: mcpData.verificationMethod,
+                  reportingFrequency: mcpData.reportingFrequency,
+                  reportingRequirements: mcpData.reportingRequirements,
+                  applicableInstitutions: mcpData.applicableInstitutions,
+                  applicableForms: mcpData.applicableForms,
+                  sources: mcpData.sources,
+                  sections: mcpData.sections,
+                  relatedRegulations: mcpData.relatedRegulations,
+                  // Agency info
+                  agencyName: resolvedAgencyName,
+                  agencyUrl: resolvedAgencyUrl,
+                  agencyContact: resolvedAgencyContact,
+                  agencyDepartment: resolvedAgencyDepartment,
+                  enforcementAgency: mcpData.enforcementAgency,
+                  // URLs
+                  regulationUrl: mcpData.regulationUrl,
+                  requirementsUrl: mcpData.requirementsUrl,
+                  submissionGuideUrl: mcpData.submissionGuideUrl,
+                  formsUrl: mcpData.formsUrl,
+                  sourceUrl: mcpData.sourceUrl,
+                  // Risk & validation
+                  riskScore: mcpData.riskScore,
+                  riskLevel: mcpData.riskLevel,
+                  riskAssessment: mcpData.riskAssessment,
+                  lovvLevel: mcpData.lovvLevel,
+                  versionHash: mcpData.versionHash,
+                  stateCode: mcpData.stateCode,
+                },
+                // Passthrough any additional metadata from MCP
+                ...(mcpData.metadata || {}),
               }
             };
             

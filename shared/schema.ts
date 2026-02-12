@@ -306,6 +306,12 @@ export const regulations = pgTable("regulations", {
   regKey: text("reg_key").unique(), // Universal key REG-001 to REG-251, ordered by risk score
   riskScore: integer("risk_score"), // Institutional risk score 1-100
   riskLevel: text("risk_level"), // CRITICAL, SEVERE, HIGH, MODERATE, LOW
+  // MCP Engine expanded fields (Feb 2026 schema alignment)
+  publicLaw: text("public_law"), // e.g., "Public Law 101-542"
+  purpose: text("purpose"), // Regulation purpose statement
+  scope: text("scope"), // Regulation scope description
+  reportingRequirements: jsonb("reporting_requirements"), // Structured reporting requirements
+  riskAssessment: jsonb("risk_assessment"), // Full risk assessment object from MCP
 });
 
 // Canonical Categories - the 15 master categories
@@ -1181,6 +1187,10 @@ export const complianceTasks = pgTable("compliance_tasks", {
   evidenceRequired: boolean("evidence_required").default(false),
   evidenceType: text("evidence_type").default('none'), // What kind of evidence is needed
   evidenceInstructions: text("evidence_instructions"), // Specific guidance on what to upload
+  // MCP Engine expanded task fields (Feb 2026 schema alignment)
+  estimatedEffort: text("estimated_effort"), // e.g., "2-4 hours", "1 week"
+  deliverable: text("deliverable"), // Expected output description
+  deliverableTemplateUrl: text("deliverable_template_url"), // Link to template document
   
   // Ordering and display
   sortOrder: integer("sort_order").default(0),
@@ -1434,6 +1444,7 @@ export const eoRegulationImpacts = pgTable("eo_regulation_impacts", {
   impactType: text("impact_type").notNull(),             // modifies, reinforces, conflicts, supersedes
   impactSeverity: text("impact_severity").notNull(),     // critical, high, medium, low
   impactSummary: text("impact_summary"),                 // AI-generated analysis
+  affectedSections: jsonb("affected_sections").$type<string[]>(), // Which regulation sections are affected
   
   // Assessment metadata
   assessedBy: text("assessed_by"),                       // "MCP Engine AI" or "Manual Review"

@@ -5,6 +5,39 @@ All notable changes to EdSteward are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.11] - 2026-02-12
+
+### Added
+- MCP Engine schema alignment: all 3 inbound endpoints now accept 48 regulation
+  fields, 21 compliance task fields, and 22 Executive Order fields at full parity
+- `X-MCP-API-Key` header authentication across all MCP integration endpoints
+  (preferred over Basic Auth, which is now deprecated)
+- Database columns: `public_law`, `purpose`, `scope`, `reporting_requirements`,
+  `risk_assessment` on regulations; `estimated_effort`, `deliverable`,
+  `deliverable_template_url` on compliance_tasks; `affected_sections` on
+  eo_regulation_impacts
+- Executive Order tables deployed to all tenant databases
+- `storage.ts` `acceptRegulationUpdate()` now applies expanded regulation fields,
+  full 21-field task schema, and full 22-field EO schema on CCO approval
+- Integration test: `scripts/test-mcp-schema-alignment.cjs` (45 assertions)
+- Migration scripts: `scripts/migrate-mcp-schema-alignment.cjs`,
+  `scripts/migrate-eo-tables-all-tenants.cjs`
+- MCP Engine coordination docs: `docs/MCP-ENGINE-BRIEF.md`,
+  `docs/MCP-DATA-GAP-AUDIT.md`
+
+### Fixed
+- `autoCreateRegulationIfNotExists()` NaN error when passing non-numeric itemId
+- Drizzle `db.execute()` result destructuring for EO RETURNING clause
+- PostgreSQL `text[]` array handling through Drizzle's `sql` template
+- EO impact upsert constraint reference (use column-based ON CONFLICT)
+- `reg_key` column expanded from VARCHAR(10) to VARCHAR(100)
+- `eo_number` column expanded from VARCHAR(20) to VARCHAR(50)
+
+### Changed
+- All MCP endpoints accept `regKey` / `mcpRegKey` as primary identifier
+- camelCase is now the canonical naming convention (snake_case still accepted)
+- MCP Engine team confirmed fully aligned: 57/57 fields, 153 EO links, 198 tasks
+
 ## [1.2.0] - 2026-01-15
 
 ### Fixed
