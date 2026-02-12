@@ -1448,6 +1448,17 @@ export function setupMCPIntegrationApi(app: express.Application) {
         
         if (!preserveTasks) {
           // REPLACE mode: Delete existing tasks for this regulation
+          // Must clear dependent rows first (attestation tokens, evidence, activity logs)
+          const existingTaskIds = await db.execute(sql`
+            SELECT id FROM compliance_tasks WHERE regulation_id = ${regulationId}
+          `);
+          if (existingTaskIds.rows.length > 0) {
+            const taskIds = existingTaskIds.rows.map((r: any) => r.id);
+            await db.execute(sql`DELETE FROM task_attestation_tokens WHERE task_id = ANY(${taskIds})`);
+            await db.execute(sql`DELETE FROM task_evidence WHERE task_id = ANY(${taskIds})`);
+            await db.execute(sql`DELETE FROM task_activity WHERE task_id = ANY(${taskIds})`);
+            console.log(`   🧹 Cleared dependents for ${taskIds.length} existing tasks`);
+          }
           await db.delete(complianceTasks).where(eq(complianceTasks.regulationId, regulationId));
           console.log(`   🗑️  Deleted existing tasks for regulation ${regulationId}`);
         } else {
