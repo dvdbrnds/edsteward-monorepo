@@ -76,12 +76,23 @@ EdSteward/
 
 ### Starting the System
 
-```zsh
-# Kill any stale processes first
-lsof -ti:3000,3001,4000 | xargs kill -9 2>/dev/null
+Check what's already running before starting anything. Only start services that
+aren't already up. **Do not kill processes unless they are genuinely stale or
+erroring.**
 
+```zsh
+# 1. Check which ports are already in use
+lsof -ti:3000 && echo "Port 3000 in use" || echo "Port 3000 free"
+lsof -ti:3001 && echo "Port 3001 in use" || echo "Port 3001 free"
+lsof -ti:4000 && echo "Port 4000 in use" || echo "Port 4000 free"
+
+# 2. Verify running services are healthy (not stuck/erroring)
+curl -s http://localhost:3000/api/health  # Should return {"status":"healthy"...}
+curl -s -o /dev/null -w "%{http_code}" http://localhost:3001/  # Should return 200
+
+# 3. Only start what's NOT already running and healthy
 # Main app (port 3000)
-cd /path/to/EdSteward && npm run dev
+npm run dev
 
 # Admin console frontend (port 3001)
 cd admin-console && npm run dev
@@ -89,6 +100,9 @@ cd admin-console && npm run dev
 # Admin console backend (port 4000)
 cd admin-console/server && npx tsx watch index.ts
 ```
+
+If a port is in use but the service is unhealthy or erroring, **then** kill just
+that specific process and restart it.
 
 ### Key Ports
 
@@ -100,7 +114,7 @@ cd admin-console/server && npx tsx watch index.ts
 
 ### Common Issues
 
-- **EADDRINUSE on port 3000**: Kill stale tsx processes: `pkill -f "tsx server/index.ts"`
+- **EADDRINUSE**: Check if the service is already running and healthy first. Only kill the specific stale process if needed: `lsof -ti:3000 | xargs kill`
 - **Admin console DB error "database dvdbrnds does not exist"**: The dotenv path in `admin-console/server/config/database-connections.ts` was fixed in v1.4.8
 - **MFA warnings on startup**: Expected in dev — set `MFA_ENCRYPTION_KEY` env var to persist MFA data
 
