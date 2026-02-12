@@ -624,8 +624,8 @@ export const regulationUpdates = pgTable("regulation_updates", {
   id: serial("id").primaryKey(),
   regulationId: integer("regulation_id").notNull().references(() => regulations.id),
   name: text("name").notNull(),
-  originalContent: text("original_content").notNull(),
-  updatedContent: text("updated_content").notNull(),
+  originalContent: text("original_content"),
+  updatedContent: text("updated_content"),
   requirements: text("requirements"), // AI-generated compliance requirements
   summary: text("summary"), // Brief summary of the regulation
   filingDeadlines: text("filing_deadlines"), // Deadlines for filing/reporting
@@ -689,26 +689,13 @@ export const regulationUpdates = pgTable("regulation_updates", {
     }>;
     eo_count?: number;
     eo_critical_count?: number;
+    // Expanded regulation fields (Feb 2026 schema alignment)
+    regulationFields?: Record<string, any>;
   }>(), // Federal Register and Executive Order metadata
   // Pending compliance tasks to be applied on approval (MCP Engine sync)
-  pendingTasks: jsonb("pending_tasks").$type<Array<{
-    tempId?: string;
-    parentTempId?: string | null;
-    taskId?: string;
-    title: string;
-    description?: string;
-    instructions?: string;
-    category?: string; // Task category for grouping
-    statutoryRole?: string; // Legally required role (e.g., "Title IX Coordinator")
-    statutoryCitation?: string; // Legal citation (e.g., "34 CFR 106.8")
-    assignedRole?: string; // Suggested default assignment
-    priority?: 'high' | 'medium' | 'low';
-    requirementType?: 'requirement' | 'best_practice';
-    dueDate?: string;
-    evidenceRequired?: boolean;
-    evidenceType?: string;
-    sortOrder?: number;
-  }>>(),
+  pendingTasks: jsonb("pending_tasks").$type<Array<Record<string, any>>>(),
+  // Complete MCP Engine payload — stored verbatim for CCO review (Feb 2026)
+  mcpPayload: jsonb("mcp_payload").$type<Record<string, any>>(),
 });
 
 // Schema for inserting regulation updates
@@ -721,29 +708,58 @@ const pendingTaskSchema = z.object({
   title: z.string(),
   description: z.string().optional(),
   instructions: z.string().optional(),
-  category: z.string().optional(), // Task category for grouping
-  statutoryRole: z.string().optional(), // Legally required role (e.g., "Title IX Coordinator")
-  statutoryCitation: z.string().optional(), // Legal citation (e.g., "34 CFR 106.8")
-  assignedRole: z.string().optional(), // Suggested default assignment
-  priority: z.enum(['high', 'medium', 'low']).optional(),
-  requirementType: z.enum(['requirement', 'best_practice']).optional(),
+  category: z.string().optional(),
+  statutoryRole: z.string().optional(),
+  statutoryCitation: z.string().optional(),
+  assignedRole: z.string().optional(),
+  priority: z.string().optional(),                 // Any priority string (critical, high, medium, low)
+  requirementType: z.string().optional(),           // Any type (requirement, recommendation, best-practice, best_practice)
   dueDate: z.string().optional(),
+  recurringSchedule: z.string().optional(),
+  reminderDays: z.number().optional(),
   evidenceRequired: z.boolean().optional(),
   evidenceType: z.string().optional(),
+  evidenceInstructions: z.string().optional(),
+  estimatedEffort: z.string().optional(),
+  deliverable: z.string().optional(),
+  deliverableTemplateUrl: z.string().optional(),
   sortOrder: z.number().optional(),
-});
+  source: z.string().optional(),                    // "rules-engine", "llm-extractor", "manual"
+}).passthrough();
 
 export const insertRegulationUpdateSchema = createInsertSchema(regulationUpdates).extend({
   regulationId: z.number().optional(), // API resolves from regKey/itemId
   regKey: z.string().optional(), // Universal key (REG-001) - PREFERRED identifier
+  mcpRegKey: z.string().optional(), // Alias for regKey
   itemId: z.string().optional(), // Slug-based ID fallback
   status: z.enum(["pending", "accepted", "rejected", "deferred"]).default("pending"),
   signature: z.string().optional(),
   rejectionReason: z.string().optional(),
-  requirements: z.string().optional().nullable(),
+  originalContent: z.string().optional().nullable(), // Now optional — MCP Engine may not send
+  updatedContent: z.string().optional().nullable(),   // Now optional — MCP Engine may not send
+  requirements: z.union([z.string(), z.array(z.any())]).optional().nullable(),
+  filingDeadlines: z.any().optional().nullable(),     // Accept string, array, or object
   // Compliance tasks to be applied on approval (MCP Engine sync)
   complianceTasks: z.array(pendingTaskSchema).optional(),
-});
+  // Executive Orders
+  executiveOrders: z.array(z.any()).optional(),
+  // Risk assessment
+  riskScore: z.number().optional().nullable(),
+  riskLevel: z.string().optional().nullable(),
+  riskAssessment: z.any().optional().nullable(),
+  // Additional MCP Engine fields — accept and passthrough
+  relatedRegulations: z.any().optional(),
+  applicableForms: z.any().optional(),
+  sections: z.any().optional(),
+  mcpEngineTimestamp: z.string().optional(),
+  lovvLevel: z.string().optional().nullable(),
+  agencyDepartment: z.string().optional().nullable(),
+  regulationUrl: z.string().optional().nullable(),
+  applicableInstitutions: z.any().optional().nullable(),
+  reportingRequirements: z.any().optional().nullable(),
+  submissionGuidelines: z.string().optional().nullable(),
+  reportingFrequency: z.string().optional().nullable(),
+}).passthrough();
 
 // Types for regulation updates
 export type RegulationUpdate = typeof regulationUpdates.$inferSelect;

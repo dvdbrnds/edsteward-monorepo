@@ -271,6 +271,7 @@ export class DatabaseStorage implements IStorage {
           processedAt: update.reviewed_at ? new Date(update.reviewed_at) : null,
           metadata: update.metadata,
           pendingTasks: update.pending_tasks, // MCP Engine compliance tasks (Jan 2026)
+          mcpPayload: update.mcp_payload, // Complete raw MCP Engine payload (Feb 2026)
         } as RegulationUpdate;
       }
       return null;

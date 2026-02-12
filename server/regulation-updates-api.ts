@@ -171,56 +171,60 @@ const deferUpdateSchema = z.object({
 const mcpComplianceTaskSchemaCanonical = z.object({
   tempId: z.string().optional(),
   parentTempId: z.string().optional().nullable(),
-  taskId: z.string().optional(),                    // Stable ID e.g. "002-001"
+  taskId: z.string().optional(),
   title: z.string(),
   description: z.string().optional(),
-  instructions: z.string().optional(),              // Step-by-step guidance
-  category: z.string().optional(),                  // Grouping (Reporting, Training, Policy, etc.)
+  instructions: z.string().optional(),
+  category: z.string().optional(),
   assignedRole: z.string().optional(),
-  statutoryRole: z.string().optional(),             // Legal role e.g. "Title IX Coordinator"
-  statutoryCitation: z.string().optional(),          // Legal citation e.g. "34 CFR 106.8"
-  requirementType: z.enum(['requirement', 'best_practice']).optional(),
-  priority: z.enum(['critical', 'high', 'medium', 'low']).optional(),
+  statutoryRole: z.string().optional(),
+  statutoryCitation: z.string().optional(),
+  requirementType: z.string().optional(),            // Any: requirement, recommendation, best-practice
+  priority: z.string().optional(),                   // Any: critical, high, medium, low
   dueDate: z.string().optional(),
-  recurringSchedule: z.string().optional(),          // "annual", "quarterly", etc.
+  recurringSchedule: z.string().optional(),
   reminderDays: z.number().optional(),
   evidenceRequired: z.boolean().optional(),
   evidenceType: z.string().optional(),
-  evidenceInstructions: z.string().optional(),       // What to upload as proof
-  estimatedEffort: z.string().optional(),            // Time estimate e.g. "2-4 hours"
-  deliverable: z.string().optional(),                // Expected output
-  deliverableTemplateUrl: z.string().optional(),     // Template download link
+  evidenceInstructions: z.string().optional(),
+  estimatedEffort: z.string().optional(),
+  deliverable: z.string().optional(),
+  deliverableTemplateUrl: z.string().optional(),
   sortOrder: z.number().optional(),
-});
+  source: z.string().optional(),                     // "rules-engine", "llm-extractor", "manual"
+}).passthrough();
 
 /**
  * Canonical MCP Executive Order schema — 22 fields
  * Standardized Feb 2026
  */
 const mcpExecutiveOrderSchemaCanonical = z.object({
-  eoNumber: z.string(),                              // e.g., "EO 14322"
+  eoNumber: z.string(),
   title: z.string(),
-  signedDate: z.string(),                            // ISO date
-  publishedDate: z.string().optional(),              // Federal Register publication date
-  status: z.enum(['active', 'enjoined', 'revoked', 'superseded']).optional(),
+  signedDate: z.string().optional(),
+  publishedDate: z.string().optional(),
+  status: z.string().optional(),                     // active, enjoined, revoked, superseded
   president: z.string().optional(),
-  term: z.string().optional(),                       // e.g., "Trump-2"
-  summary: z.string().optional(),                    // EO summary text
+  term: z.string().optional(),
+  summary: z.string().optional(),
   fullTextUrl: z.string().optional(),
-  pdfUrl: z.string().optional(),                     // PDF link
-  federalRegisterCitation: z.string().optional(),    // e.g., "90 FR 35821"
-  topics: z.array(z.string()).optional(),            // Topic tags
-  impactType: z.enum(['modifies', 'reinforces', 'conflicts', 'supersedes']),
-  impactSeverity: z.enum(['critical', 'high', 'medium', 'low']),
+  pdfUrl: z.string().optional(),
+  federalRegisterCitation: z.string().optional(),
+  topics: z.array(z.string()).optional(),
+  // Accept both canonical and MCP Engine field names
+  impactType: z.string().optional(),                 // modifies, reinforces, conflicts, supersedes
+  impactSeverity: z.string().optional(),             // critical, high, medium, low
+  impactLevel: z.string().optional(),                // MCP Engine alias for impactSeverity
+  relevance: z.string().optional(),                  // MCP Engine alias for impactSummary
   impactSummary: z.string().optional(),
-  affectedSections: z.array(z.string()).optional(),  // Which regulation sections affected
-  confidenceScore: z.number().optional(),            // 0-1 confidence
-  assessmentDate: z.string().optional(),             // When impact was assessed
-  enjoinedDate: z.string().optional(),               // Court injunction date
-  enjoinedBy: z.string().optional(),                 // Court that issued injunction
-  revokedDate: z.string().optional(),                // Revocation date
-  revokedBy: z.string().optional(),                  // What revoked it
-});
+  affectedSections: z.array(z.string()).optional(),
+  confidenceScore: z.number().optional(),
+  assessmentDate: z.string().optional(),
+  enjoinedDate: z.string().optional(),
+  enjoinedBy: z.string().optional(),
+  revokedDate: z.string().optional(),
+  revokedBy: z.string().optional(),
+}).passthrough();
 
 /**
  * MCP Engine regulation update schema — FULL 48-field payload
@@ -278,12 +282,9 @@ const mcpEngineUpdateSchema = z.object({
     type: z.string().optional(),
     value: z.string().optional(),
   })).optional(),
-  relatedRegulations: z.array(z.object({
-    regKey: z.string().optional(),
-    relationship: z.string().optional(),
-  })).optional(),
+  relatedRegulations: z.any().optional(),              // Accept string[] or {regKey, relationship}[]
   applicableForms: z.array(z.string()).optional(),
-  applicableInstitutions: z.array(z.string()).optional(),
+  applicableInstitutions: z.any().optional(),           // String or string[]
   source_attribution: z.string().optional(),
   
   // Agency information
@@ -307,16 +308,11 @@ const mcpEngineUpdateSchema = z.object({
   
   // Risk & validation (MCP Engine specific)
   riskScore: z.number().optional(),
-  riskLevel: z.enum(['CRITICAL', 'SEVERE', 'HIGH', 'MODERATE', 'LOW']).optional(),
-  riskAssessment: z.object({
-    score: z.number().optional(),
-    level: z.string().optional(),
-    factors: z.array(z.any()).optional(),
-    enforcementTrend: z.string().optional(),
-  }).passthrough().optional(),
-  lovvLevel: z.enum(['A', 'B', 'C', 'D']).optional(),
+  riskLevel: z.string().optional(),                  // Any: CRITICAL, SEVERE, HIGH, MODERATE, LOW
+  riskAssessment: z.any().optional(),                 // Full risk assessment object — complex nested structure
+  lovvLevel: z.string().optional().nullable(),        // LOVV validation level: A, B, C, D, or null
   versionHash: z.string().optional(),
-  stateCode: z.string().max(2).optional(),
+  stateCode: z.string().optional(),
   
   // Federal Register enhancement metadata
   federal_register_enhancement: z.object({
@@ -407,9 +403,15 @@ const mcpEngineUpdateSchema = z.object({
   filingDeadlines: z.any().optional(),
   filing_deadlines: z.any().optional(),
   
+  // Content fields from MCP Engine spec (accepted for passthrough)
+  originalContent: z.string().optional(),
+  updatedContent: z.string().optional(),
+  cfr: z.string().optional(),
+  mcpEngineTimestamp: z.string().optional(),
+  
   // Metadata passthrough
   metadata: z.any().optional(),
-});
+}).passthrough();
 
 /**
  * Schema for TUF-verified regulation update payload
@@ -624,77 +626,41 @@ export function setupRegulationUpdatesApi(app: Express) {
         isTUFVerified = true;
         
       } else {
-        // Try simple format first (most common from MCP Engine)
+        // Try to parse as MCP Engine complex format FIRST (most common from MCP Engine GUI)
+        const mcpValidation = mcpEngineUpdateSchema.safeParse(req.body);
+        
+        // Also try simple format
         const simpleValidation = insertRegulationUpdateSchema.safeParse(req.body);
         
-        if (simpleValidation.success) {
-          const rawData = simpleValidation.data;
-          
-          // Resolve regulation ID - priority: regKey > itemId > regulationId
-          const regKey = req.body.regKey;
-          const identifier = req.body.itemId || rawData.regulationId;
-          let validRegulationId = await resolveRegulationId(identifier, regKey, req.tenantId);
-          
-          // Auto-create regulation if it doesn't exist (Jan 2026 - MCP Engine workflow)
-          if (validRegulationId === null) {
-            const regulationName = rawData.name || req.body.name;
-            if (!regulationName) {
-              return res.status(400).json({ 
-                success: false,
-                error: 'Cannot auto-create regulation without a name. Provide "name" field.',
-              });
-            }
-            
-            console.log(`⚠️ Regulation not found: ${regKey || identifier}. Auto-creating...`);
-            validRegulationId = await autoCreateRegulationIfNotExists(regKey, regulationName, {
-              statute: req.body.statute,
-              category: req.body.category,
-              topic: req.body.topic,
-              itemId: req.body.itemId,
-              jurisdictionSource: req.body.jurisdictionSource,
-              summary: req.body.summary,
-            }, req.tenantId);
-          }
-          
-          // Extract structured fields from request body
-          const summary = req.body.summary || null;
-          const requirements = req.body.requirements || null;
-          const filingDeadlines = req.body.filingDeadlines || req.body.filing_deadlines || null;
-          const complianceTasks = req.body.complianceTasks || null;
-          
-          // Log task count for debugging
-          if (complianceTasks && complianceTasks.length > 0) {
-            console.log(`📋 Received ${complianceTasks.length} compliance tasks for approval workflow`);
-          }
-          
-          updateData = {
-            ...rawData,
-            regulationId: validRegulationId,
-            summary,
-            requirements,
-            filingDeadlines,
-            // Store tasks for approval - will be applied when CCO accepts
-            pendingTasks: complianceTasks,
-          };
-        } else {
-          // Try to parse as MCP Engine complex format
-          const mcpValidation = mcpEngineUpdateSchema.safeParse(req.body);
-          
-          if (mcpValidation.success) {
+        if (mcpValidation.success) {
             const mcpData = mcpValidation.data;
             
-            // Resolve regulation ID - priority: regKey/mcpRegKey > itemId > regulationId
+            // Resolve regulation ID - priority: regKey > numeric regulationId > itemId
             const regKey = mcpData.regKey || mcpData.mcpRegKey;
-            const identifier = mcpData.itemId || mcpData.regulationId;
             
-            if (!regKey && !identifier && !mcpData.name) {
+            if (!regKey && !mcpData.regulationId && !mcpData.itemId && !mcpData.name) {
               return res.status(400).json({ 
                 success: false,
                 error: 'Missing regulation identifier. Provide regKey (REG-001), itemId, regulationId, or name for auto-creation.'
               });
             }
             
-            let validRegulationId = await resolveRegulationId(identifier || '', regKey, req.tenantId);
+            // Try regKey first, then numeric regulationId, then itemId slug
+            let validRegulationId: number | null = null;
+            if (regKey) {
+              validRegulationId = await resolveRegulationId('', regKey, req.tenantId);
+            }
+            if (validRegulationId === null && mcpData.regulationId) {
+              const numId = typeof mcpData.regulationId === 'number'
+                ? mcpData.regulationId
+                : parseInt(String(mcpData.regulationId), 10);
+              if (!isNaN(numId)) {
+                validRegulationId = await validateRegulationId(numId, req.tenantId);
+              }
+            }
+            if (validRegulationId === null && mcpData.itemId) {
+              validRegulationId = await resolveRegulationId(mcpData.itemId, undefined, req.tenantId);
+            }
             
             // Auto-create regulation if it doesn't exist (Jan 2026 - MCP Engine workflow)
             if (validRegulationId === null) {
@@ -743,8 +709,12 @@ export function setupRegulationUpdatesApi(app: Express) {
             }
             
             // Extract summary and filing deadlines from MCP data
-            const summaryContent = mcpData.summary || mcpData.content?.summary || null;
-            const filingDeadlinesContent = mcpData.filingDeadlines || mcpData.filing_deadlines || mcpData.content?.filing_deadlines || null;
+            const summaryContent = typeof mcpData.summary === 'string' ? mcpData.summary : (mcpData.content?.summary || null);
+            const rawFilingDeadlines = mcpData.filingDeadlines || mcpData.filing_deadlines || mcpData.content?.filing_deadlines || null;
+            // filing_deadlines column is TEXT — stringify arrays/objects for storage
+            const filingDeadlinesContent = rawFilingDeadlines && typeof rawFilingDeadlines !== 'string'
+              ? JSON.stringify(rawFilingDeadlines)
+              : rawFilingDeadlines;
             
             
             // Get compliance tasks from payload
@@ -787,6 +757,8 @@ export function setupRegulationUpdatesApi(app: Express) {
               filingDeadlines: filingDeadlinesContent,
               // Store tasks for approval - will be applied when CCO accepts
               pendingTasks: complianceTasks,
+              // Store the COMPLETE raw payload for CCO review (Feb 2026)
+              mcpPayload: req.body,
               // Store ALL MCP fields as metadata for processing on approval
               metadata: {
                 // Federal Register enhancement
@@ -846,6 +818,62 @@ export function setupRegulationUpdatesApi(app: Express) {
               }
             };
             
+          } else if (simpleValidation.success) {
+            // Fallback to simple format
+            const rawData = simpleValidation.data;
+          
+            // Resolve regulation ID - priority: regKey > itemId > regulationId
+            const regKey = req.body.regKey || req.body.mcpRegKey;
+            const identifier = req.body.itemId || rawData.regulationId;
+            let validRegulationId = await resolveRegulationId(identifier, regKey, req.tenantId);
+          
+            // Auto-create regulation if it doesn't exist
+            if (validRegulationId === null) {
+              const regulationName = rawData.name || req.body.name;
+              if (!regulationName) {
+                return res.status(400).json({ 
+                  success: false,
+                  error: 'Cannot auto-create regulation without a name. Provide "name" field.',
+                });
+              }
+            
+              console.log(`⚠️ Regulation not found: ${regKey || identifier}. Auto-creating...`);
+              validRegulationId = await autoCreateRegulationIfNotExists(regKey, regulationName, {
+                statute: req.body.statute,
+                category: req.body.category,
+                topic: req.body.topic,
+                itemId: req.body.itemId,
+                jurisdictionSource: req.body.jurisdictionSource,
+                summary: req.body.summary,
+              }, req.tenantId);
+            }
+          
+            const summary = req.body.summary || null;
+            const rawRequirements = req.body.requirements || null;
+            // requirements column is TEXT — stringify arrays
+            const requirements = rawRequirements && Array.isArray(rawRequirements)
+              ? rawRequirements.join('\n• ')
+              : rawRequirements;
+            const rawFilingDeadlines = req.body.filingDeadlines || req.body.filing_deadlines || null;
+            // filing_deadlines column is TEXT — stringify arrays/objects
+            const filingDeadlines = rawFilingDeadlines && typeof rawFilingDeadlines !== 'string'
+              ? JSON.stringify(rawFilingDeadlines)
+              : rawFilingDeadlines;
+            const complianceTasks = req.body.complianceTasks || null;
+          
+            if (complianceTasks && complianceTasks.length > 0) {
+              console.log(`📋 Received ${complianceTasks.length} compliance tasks for approval workflow`);
+            }
+          
+            updateData = {
+              ...rawData,
+              regulationId: validRegulationId,
+              summary,
+              requirements,
+              filingDeadlines,
+              pendingTasks: complianceTasks,
+              mcpPayload: req.body, // Store full payload for CCO review
+            };
           } else {
             console.error('❌ Validation failed for all formats');
             console.error('TUF format errors:', tufValidation.error.issues);
@@ -854,10 +882,12 @@ export function setupRegulationUpdatesApi(app: Express) {
             
             return res.status(400).json({ 
               error: 'Invalid regulation update data', 
-              details: simpleValidation.error.issues 
+              details: [
+                ...simpleValidation.error.issues.map((i: any) => ({ ...i, format: 'simple' })),
+                ...mcpValidation.error.issues.map((i: any) => ({ ...i, format: 'mcp-engine' })),
+              ]
             });
           }
-        }
       }
       
       // Create the regulation update with optimized bulk processing
@@ -973,6 +1003,8 @@ export function setupRegulationUpdatesApi(app: Express) {
         metadata: update.metadata || null,
         originalContent: update.originalContent || null,
         updatedContent: update.updatedContent || null,
+        // Complete MCP Engine payload (Feb 2026 — verbatim storage for CCO review)
+        mcpPayload: (update as any).mcpPayload || null,
         // Add useful context
         regulationName: regulation.name,
         regKey: regulation.regKey || null,

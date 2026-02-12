@@ -1454,9 +1454,11 @@ export function setupMCPIntegrationApi(app: express.Application) {
           `);
           if (existingTaskIds.rows.length > 0) {
             const taskIds = existingTaskIds.rows.map((r: any) => r.id);
-            await db.execute(sql`DELETE FROM task_attestation_tokens WHERE task_id = ANY(${taskIds})`);
-            await db.execute(sql`DELETE FROM task_evidence WHERE task_id = ANY(${taskIds})`);
-            await db.execute(sql`DELETE FROM task_activity WHERE task_id = ANY(${taskIds})`);
+            // Build a proper PostgreSQL int array literal for ANY()
+            const pgArray = `{${taskIds.join(',')}}`;
+            await db.execute(sql`DELETE FROM task_attestation_tokens WHERE task_id = ANY(${pgArray}::int[])`);
+            await db.execute(sql`DELETE FROM task_evidence WHERE task_id = ANY(${pgArray}::int[])`);
+            await db.execute(sql`DELETE FROM task_activity WHERE task_id = ANY(${pgArray}::int[])`);
             console.log(`   🧹 Cleared dependents for ${taskIds.length} existing tasks`);
           }
           await db.delete(complianceTasks).where(eq(complianceTasks.regulationId, regulationId));

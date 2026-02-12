@@ -5,6 +5,43 @@ All notable changes to EdSteward are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.14] - 2026-02-12
+
+### Fixed
+- `/api/regulation-updates` endpoint rebuilt to accept full MCP Engine payload
+  (arrays, nested objects, compliance tasks, executive orders, risk assessments,
+  filing deadlines) — previously rejected with Zod validation errors
+- Loosened strict enums: `requirementType` now accepts "recommendation",
+  "best-practice"; `priority` accepts "critical"; EO fields accept any string
+- Reordered validation: MCP Engine schema tried first, simple schema fallback
+- `ANY()` SQL bug in sync endpoint REPLACE mode: JS array was not cast to
+  PostgreSQL int array — now uses `::int[]` cast
+
+### Added
+- `mcp_payload JSONB` column on `regulation_updates` — stores the complete raw
+  MCP Engine payload verbatim for CCO review and future reprocessing
+- `pending_tasks JSONB` column (ensured on all tenants via migration)
+- `originalContent` and `updatedContent` now nullable (MCP Engine sends
+  `regulationText` instead)
+- GET `/api/regulation-updates/:id` now returns `mcpPayload` in the response
+- Migration script: `scripts/migrate-mcp-payload-column.cjs`
+- Regulation ID resolution now tries numeric `regulationId` before `itemId` slug
+
+## [1.4.13] - 2026-02-12
+
+### Fixed
+- Foreign key constraint violation on compliance task replacement: explicitly
+  clear `task_attestation_tokens`, `task_evidence`, `task_activity` before
+  deleting tasks in REPLACE mode
+- Added `ON DELETE CASCADE` to FK constraints via `migrate-task-fk-cascade.cjs`
+
+## [1.4.12] - 2026-02-12
+
+### Fixed
+- Production deployment: MCP_API_KEY stored in AWS Secrets Manager (not SSM
+  Parameter Store) to match existing ECS secret handling pattern
+- Version badge updated to reflect deployed version
+
 ## [1.4.11] - 2026-02-12
 
 ### Added
