@@ -14,8 +14,13 @@ import { dirname, join } from 'path';
 if (!process.env.DATABASE_URL) {
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = dirname(__filename);
-  // When compiled, we're in dist/config, so go up two levels to server/
-  dotenv.config({ path: join(__dirname, '..', '..', '.env') });
+  // When compiled, we're in dist/config, so go up to server/ where .env lives
+  // In source: config/ -> server/.env (one level up)
+  // In dist: dist/config/ -> server/.env (two levels up)
+  const envPath = __dirname.includes('dist') 
+    ? join(__dirname, '..', '..', '.env')
+    : join(__dirname, '..', '.env');
+  dotenv.config({ path: envPath });
 }
 
 // SSO Provider types
