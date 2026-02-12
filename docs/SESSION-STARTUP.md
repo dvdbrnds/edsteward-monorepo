@@ -1,75 +1,68 @@
-# EdSteward — New Session Startup Prompt
+# EdSteward — Session Startup
 
-Copy and paste this into a new Cursor chat to get the AI up to speed.
+When this file is referenced, follow these instructions to get up to speed.
 
----
+## 1. Read Context Files
 
-## Startup Prompt
+Read these files to understand the project:
 
-```
-Read CLAUDE.md and ROADMAP.md to understand the project.
-Check git log --oneline -15 for recent changes.
+- `CLAUDE.md` — project overview, tech stack, structure, dev setup, deployment flow
+- `ROADMAP.md` — current priorities, completed milestones, planned features, known issues
 
-Then check if the dev servers are already running before starting anything:
-- Port 3000: Main EdSteward app (npm run dev)
-- Port 3001: Admin console frontend (cd admin-console && npm run dev)
-- Port 4000: Admin console backend (cd admin-console/server && npx tsx watch index.ts)
+Then run `git log --oneline -15` to see recent changes.
 
-For each port, check if it's in use and if the service is healthy.
-Only start services that aren't already running. Do NOT kill processes
-unless they are genuinely stale or erroring.
+## 2. Check Dev Servers
 
-Verify all running services are healthy before proceeding.
-```
+Check if the dev servers are already running. **Do NOT kill processes unless they
+are genuinely stale or erroring.** Only start services that aren't already up.
+
+| Port | Service | Start Command | Health Check |
+|------|---------|--------------|-------------|
+| 3000 | Main app | `npm run dev` (from project root) | `curl http://localhost:3000/api/health` |
+| 3001 | Admin frontend | `npm run dev` (from `admin-console/`) | `curl -o /dev/null -w "%{http_code}" http://localhost:3001/` |
+| 4000 | Admin backend | `npx tsx watch index.ts` (from `admin-console/server/`) | `curl http://localhost:4000/api/dashboard/stats` |
+
+For each port:
+1. Check if the port is in use: `lsof -ti:PORT`
+2. If in use, verify the service is healthy via its health check
+3. If healthy, leave it alone
+4. If not in use, start it
+5. If in use but unhealthy/erroring, kill only that specific process and restart
+
+## 3. Confirm Ready
+
+Report which services are running and healthy before asking what to work on.
 
 ---
 
 ## Key Reference Files
 
-| File | What It Contains |
-|------|-----------------|
-| `CLAUDE.md` | Project overview, tech stack, structure, dev setup, deployment flow |
-| `ROADMAP.md` | Current priorities, completed milestones, planned features, known issues |
-| `CHANGELOG.md` | Release history (may lag behind — check git log for latest) |
+| File | Purpose |
+|------|---------|
+| `CLAUDE.md` | Project overview, tech stack, structure, local dev, deployment |
+| `ROADMAP.md` | Priorities, milestones, planned features, known issues |
+| `CHANGELOG.md` | Release history (may lag — check git log for latest) |
 | `docs/AWS-DEPLOYMENT-GUIDE.md` | Full deployment process: tag, staging, production, rollback |
-| `shared/schema.ts` | Database schema (Drizzle ORM) — single source of truth for all tables |
+| `shared/schema.ts` | Database schema (Drizzle ORM) — single source of truth |
 | `server/index.ts` | Main server entry point |
-| `server/routes/api/compliance-tasks.ts` | Compliance tasks + attestation API routes |
-| `client/src/pages/attestation-page.tsx` | Public attestation page (magic link, evidence upload) |
-| `client/src/pages/regulations-page.tsx` | Main regulations list page |
-| `.env` | Environment variables (DB URLs, auth config, MCP engine, etc.) |
-| `package.json` | Dependencies and npm scripts |
-| `admin-console/package.json` | Admin console frontend dependencies |
-| `admin-console/server/package.json` | Admin console backend dependencies |
+| `server/routes/api/compliance-tasks.ts` | Compliance tasks + attestation API |
+| `client/src/pages/attestation-page.tsx` | Public attestation page (magic link) |
+| `.env` | Environment variables (secrets — never commit) |
 
----
-
-## Architecture Quick Reference
+## Architecture
 
 | Component | Details |
 |-----------|---------|
-| **Frontend** | React 18, TypeScript, Vite, Tailwind, shadcn/ui (Radix) |
-| **Backend** | Express.js, TypeScript (tsx), Drizzle ORM |
-| **Database** | Neon Serverless PostgreSQL (database-per-tenant) |
-| **Auth** | Passport.js (Local + SAML/Okta), MFA (TOTP) |
-| **Hosting** | AWS ECS Fargate, ALB, ECR, Route53 |
-| **Docker** | Colima on macOS (not Docker Desktop) |
-| **Admin Console** | Separate React+Express app in `admin-console/` |
-| **Real-time** | WebSocket (MCP Engine for regulation updates) |
+| Frontend | React 18, TypeScript, Vite, Tailwind, shadcn/ui |
+| Backend | Express.js, TypeScript (tsx), Drizzle ORM |
+| Database | Neon Serverless PostgreSQL (database-per-tenant) |
+| Auth | Passport.js (Local + SAML/Okta), MFA (TOTP) |
+| Hosting | AWS ECS Fargate, ALB, ECR, Route53 |
+| Docker | Colima on macOS (not Docker Desktop) |
+| Admin Console | Separate app in `admin-console/` (frontend + backend) |
+| Real-time | WebSocket (MCP Engine for regulation updates) |
 
----
-
-## Ports
-
-| Port | Service | Health Check |
-|------|---------|-------------|
-| 3000 | Main app | `curl http://localhost:3000/api/health` |
-| 3001 | Admin frontend | `curl -o /dev/null -w "%{http_code}" http://localhost:3001/` |
-| 4000 | Admin backend | `curl http://localhost:4000/api/dashboard/stats` (needs auth token) |
-
----
-
-## Deployment Flow
+## Deployment
 
 ```
 Commit & Push → Tag Version → Deploy Staging → Verify → Deploy Production
@@ -77,31 +70,24 @@ Commit & Push → Tag Version → Deploy Staging → Verify → Deploy Productio
 
 | Step | Command |
 |------|---------|
-| Tag patch release | `./scripts/tag-release.sh patch` or `git tag -a v1.X.X -m "msg" && git push origin v1.X.X` |
+| Tag release | `git tag -a v1.X.X -m "msg" && git push origin v1.X.X` |
 | Deploy staging | `./scripts/deploy-staging.sh v1.X.X --yes` |
 | Verify staging | `curl https://staging.edsteward.ai/api/health` |
 | Deploy production | `./scripts/deploy-production.sh v1.X.X --yes` |
 | Verify production | `curl https://moravian.edsteward.ai/api/health` |
 | Rollback | `./scripts/rollback-production.sh` |
 
----
-
 ## Live URLs
 
-| Environment | URL |
-|-------------|-----|
-| Production | https://moravian.edsteward.ai |
-| Staging | https://staging.edsteward.ai |
-| Admin Console | https://admin.edsteward.ai _(pending deployment)_ |
-
----
+- **Production:** https://moravian.edsteward.ai
+- **Staging:** https://staging.edsteward.ai
+- **Admin Console:** https://admin.edsteward.ai _(pending deployment)_
 
 ## Common Gotchas
 
-- **Sessions are in-memory** — every deployment logs out all users
-- **Colima must be running** for Docker builds: `colima status` / `colima start`
-- **AWS CLI must be configured**: `aws sts get-caller-identity`
-- **Don't kill running dev servers** unless they're actually broken
-- **`.env` has secrets** — never commit it (it's in `.gitignore`)
-- **`shared/schema.ts`** is the single source of truth for the DB schema
-- **Deploy scripts are interactive** unless you pass `--yes`
+- Sessions are in-memory — every deployment logs out all users
+- Colima must be running for Docker builds: `colima start`
+- AWS CLI must be configured: `aws sts get-caller-identity`
+- `.env` has secrets — never commit it
+- `shared/schema.ts` is the single source of truth for the DB schema
+- Deploy scripts are interactive unless you pass `--yes`
