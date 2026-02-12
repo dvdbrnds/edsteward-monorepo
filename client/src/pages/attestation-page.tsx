@@ -104,52 +104,78 @@ const AttestationPage: React.FC = () => {
     retry: false,
   });
 
-  // Upload evidence mutation - auto-detects file vs link
-  const uploadMutation = useMutation({
-    mutationFn: async () => {
-      if (selectedFile) {
-        const formData = new FormData();
-        formData.append('file', selectedFile);
-        formData.append('description', evidenceDescription);
-        
-        const response = await fetch(`/api/compliance-tasks/attestation/${token}/evidence`, {
-          method: 'POST',
-          body: formData,
-        });
-        
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Upload failed');
-        }
-        return response.json();
-      } else if (linkUrl) {
-        const response = await fetch(`/api/compliance-tasks/attestation/${token}/evidence`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            linkUrl,
-            linkTitle: linkTitle || linkUrl,
-            description: evidenceDescription,
-          }),
-        });
-        
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || 'Upload failed');
-        }
-        return response.json();
+  // Upload file mutation - for immediate file uploads
+  const uploadFileMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('description', '');
+      
+      const response = await fetch(`/api/compliance-tasks/attestation/${token}/evidence`, {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Upload failed');
       }
-      throw new Error('Please select a file or enter a link URL');
+      return response.json();
     },
     onSuccess: () => {
       setUploadSuccess(true);
       setSelectedFile(null);
-      setLinkUrl('');
-      setLinkTitle('');
-      setEvidenceDescription('');
       if (fileInputRef.current) fileInputRef.current.value = '';
       refetch();
       setTimeout(() => setUploadSuccess(false), 3000);
+    },
+  });
+
+  // Add link mutation
+  const addLinkMutation = useMutation({
+    mutationFn: async () => {
+      if (!linkUrl) throw new Error('Please enter a link URL');
+      const response = await fetch(`/api/compliance-tasks/attestation/${token}/evidence`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          linkUrl,
+          linkTitle: linkTitle || linkUrl,
+          description: evidenceDescription,
+        }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Upload failed');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      setUploadSuccess(true);
+      setLinkUrl('');
+      setLinkTitle('');
+      setEvidenceDescription('');
+      refetch();
+      setTimeout(() => setUploadSuccess(false), 3000);
+    },
+  });
+
+  // Delete evidence mutation
+  const deleteEvidenceMutation = useMutation({
+    mutationFn: async (evidenceId: number) => {
+      const response = await fetch(`/api/compliance-tasks/attestation/${token}/evidence/${evidenceId}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to remove evidence');
+      }
+      return response.json();
+    },
+    onSuccess: () => {
+      refetch();
     },
   });
 
@@ -180,8 +206,9 @@ const AttestationPage: React.FC = () => {
     const file = e.target.files?.[0];
     if (file) {
       setSelectedFile(file);
+      uploadFileMutation.mutate(file);
     }
-  }, []);
+  }, [uploadFileMutation]);
 
   const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -189,8 +216,9 @@ const AttestationPage: React.FC = () => {
     const file = e.dataTransfer.files?.[0];
     if (file) {
       setSelectedFile(file);
+      uploadFileMutation.mutate(file);
     }
-  }, []);
+  }, [uploadFileMutation]);
 
   const handleDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -379,23 +407,38 @@ const AttestationPage: React.FC = () => {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {/* Existing Evidence */}
+              {/* Existing Evidence - with remove buttons */}
               {existingEvidence.length > 0 && (
                 <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                  <h4 className="font-medium text-green-700 mb-2 flex items-center gap-2">
+                  <h4 className="font-medium text-green-700 mb-3 flex items-center gap-2">
                     <CheckCircle2 className="h-4 w-4" />
                     Evidence Uploaded ({existingEvidence.length})
                   </h4>
-                  <ul className="space-y-1">
+                  <ul className="space-y-2">
                     {existingEvidence.map((ev) => (
-                      <li key={ev.id} className="text-sm text-green-600 flex items-center gap-2">
-                        <FileText className="h-3 w-3" />
-                        {ev.fileName}
-                        {ev.uploadedAt && (
-                          <span className="text-green-500 text-xs">
-                            ({new Date(ev.uploadedAt).toLocaleDateString()})
-                          </span>
-                        )}
+                      <li key={ev.id} className="flex items-center justify-between bg-white/60 rounded-md px-3 py-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <FileText className="h-4 w-4 text-green-600 flex-shrink-0" />
+                          <span className="text-sm text-slate-700 truncate">{ev.fileName}</span>
+                          {ev.uploadedAt && (
+                            <span className="text-slate-400 text-xs flex-shrink-0">
+                              {new Date(ev.uploadedAt).toLocaleDateString()}
+                            </span>
+                          )}
+                        </div>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-slate-400 hover:text-red-500 hover:bg-red-50 flex-shrink-0 h-7 w-7 p-0"
+                          disabled={deleteEvidenceMutation.isPending}
+                          onClick={() => deleteEvidenceMutation.mutate(ev.id)}
+                        >
+                          {deleteEvidenceMutation.isPending ? (
+                            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                          ) : (
+                            <XCircle className="h-3.5 w-3.5" />
+                          )}
+                        </Button>
                       </li>
                     ))}
                   </ul>
@@ -409,19 +452,19 @@ const AttestationPage: React.FC = () => {
                 </Alert>
               )}
 
-              {/* File Upload Drop Zone */}
+              {/* File Upload Drop Zone - auto-uploads on selection */}
               <div
-                onClick={() => fileInputRef.current?.click()}
+                onClick={() => !uploadFileMutation.isPending && fileInputRef.current?.click()}
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 className={`
-                  relative cursor-pointer rounded-lg border-2 border-dashed transition-all duration-200
-                  ${isDragging
-                    ? 'border-blue-400 bg-blue-50'
-                    : selectedFile
-                      ? 'border-emerald-300 bg-emerald-50/50'
-                      : 'border-slate-300 bg-slate-50/50 hover:border-blue-300 hover:bg-blue-50/30'
+                  relative rounded-lg border-2 border-dashed transition-all duration-200
+                  ${uploadFileMutation.isPending
+                    ? 'border-blue-300 bg-blue-50/50 cursor-wait'
+                    : isDragging
+                      ? 'border-blue-400 bg-blue-50 cursor-pointer'
+                      : 'border-slate-300 bg-slate-50/50 hover:border-blue-300 hover:bg-blue-50/30 cursor-pointer'
                   }
                   p-6
                 `}
@@ -432,28 +475,17 @@ const AttestationPage: React.FC = () => {
                   type="file"
                   onChange={handleFileChange}
                   className="sr-only"
+                  disabled={uploadFileMutation.isPending}
                 />
-                {selectedFile ? (
-                  <div className="flex items-center gap-3">
-                    <div className="flex-shrink-0 h-10 w-10 rounded-lg bg-emerald-100 flex items-center justify-center">
-                      <FileText className="h-5 w-5 text-emerald-600" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-slate-900 truncate">{selectedFile.name}</p>
-                      <p className="text-xs text-slate-500">{(selectedFile.size / 1024).toFixed(1)} KB</p>
-                    </div>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="text-slate-400 hover:text-red-500 flex-shrink-0"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setSelectedFile(null);
-                        if (fileInputRef.current) fileInputRef.current.value = '';
-                      }}
-                    >
-                      <XCircle className="h-4 w-4" />
-                    </Button>
+                {uploadFileMutation.isPending ? (
+                  <div className="text-center">
+                    <Loader2 className="mx-auto h-8 w-8 text-blue-500 animate-spin" />
+                    <p className="mt-2 text-sm font-medium text-blue-700">
+                      Uploading {selectedFile?.name}...
+                    </p>
+                    <p className="mt-1 text-xs text-blue-400">
+                      {selectedFile ? `${(selectedFile.size / 1024).toFixed(1)} KB` : ''}
+                    </p>
                   </div>
                 ) : (
                   <div className="text-center">
@@ -466,6 +498,13 @@ const AttestationPage: React.FC = () => {
                   </div>
                 )}
               </div>
+
+              {uploadFileMutation.error && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{(uploadFileMutation.error as Error).message}</AlertDescription>
+                </Alert>
+              )}
 
               {/* Divider */}
               <div className="relative">
@@ -502,57 +541,46 @@ const AttestationPage: React.FC = () => {
                     />
                   </div>
                 </div>
+                <div>
+                  <Label htmlFor="evidence-desc" className="text-xs text-slate-500">Description (optional)</Label>
+                  <Input
+                    id="evidence-desc"
+                    value={evidenceDescription}
+                    onChange={(e) => setEvidenceDescription(e.target.value)}
+                    placeholder="Brief description of this evidence"
+                    className="mt-1"
+                  />
+                </div>
+                <Button
+                  onClick={() => addLinkMutation.mutate()}
+                  disabled={!linkUrl || addLinkMutation.isPending}
+                  size="sm"
+                >
+                  {addLinkMutation.isPending ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Adding...
+                    </>
+                  ) : (
+                    <>
+                      <LinkIcon className="h-4 w-4 mr-2" />
+                      Add Link
+                    </>
+                  )}
+                </Button>
               </div>
 
-              {/* Shared Description */}
-              <div>
-                <Label htmlFor="evidence-desc" className="text-xs text-slate-500">Description (optional)</Label>
-                <Input
-                  id="evidence-desc"
-                  value={evidenceDescription}
-                  onChange={(e) => setEvidenceDescription(e.target.value)}
-                  placeholder="Brief description of this evidence"
-                  className="mt-1"
-                />
-              </div>
-
-              {/* Submit */}
-              <Button
-                onClick={() => uploadMutation.mutate()}
-                disabled={(!selectedFile && !linkUrl) || uploadMutation.isPending}
-                className="w-full sm:w-auto"
-              >
-                {uploadMutation.isPending ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    {selectedFile ? 'Uploading...' : 'Adding...'}
-                  </>
-                ) : (
-                  <>
-                    {selectedFile ? (
-                      <>
-                        <Upload className="h-4 w-4 mr-2" />
-                        Upload Evidence
-                      </>
-                    ) : linkUrl ? (
-                      <>
-                        <LinkIcon className="h-4 w-4 mr-2" />
-                        Add Link
-                      </>
-                    ) : (
-                      <>
-                        <Upload className="h-4 w-4 mr-2" />
-                        Submit Evidence
-                      </>
-                    )}
-                  </>
-                )}
-              </Button>
-
-              {uploadMutation.error && (
+              {addLinkMutation.error && (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
-                  <AlertDescription>{(uploadMutation.error as Error).message}</AlertDescription>
+                  <AlertDescription>{(addLinkMutation.error as Error).message}</AlertDescription>
+                </Alert>
+              )}
+
+              {deleteEvidenceMutation.error && (
+                <Alert variant="destructive">
+                  <AlertCircle className="h-4 w-4" />
+                  <AlertDescription>{(deleteEvidenceMutation.error as Error).message}</AlertDescription>
                 </Alert>
               )}
             </CardContent>

@@ -2638,6 +2638,82 @@ router.post('/attestation/:token/evidence', uploadLimiter, async (req: Request, 
 });
 
 /**
+ * DELETE /api/compliance-tasks/attestation/:token/evidence/:evidenceId
+ * Delete evidence via magic link (public - no auth required)
+ */
+router.delete('/attestation/:token/evidence/:evidenceId', async (req: Request, res: Response) => {
+  try {
+    const db = getDbForRequest(req);
+    const { token, evidenceId } = req.params;
+    const eid = parseInt(evidenceId);
+
+    if (isNaN(eid)) {
+      return res.status(400).json({ error: 'Invalid evidence ID' });
+    }
+
+    // Find valid token
+    const tokenResult = await db.select()
+      .from(taskAttestationTokens)
+      .where(and(
+        eq(taskAttestationTokens.token, token),
+        gt(taskAttestationTokens.expiresAt, new Date())
+      ))
+      .limit(1);
+
+    if (tokenResult.length === 0) {
+      return res.status(401).json({ error: 'Invalid or expired token' });
+    }
+
+    const attestationToken = tokenResult[0];
+
+    if (!attestationToken.canUploadEvidence) {
+      return res.status(403).json({ error: 'This token does not allow evidence management' });
+    }
+
+    // Find the evidence and verify it belongs to this token's task
+    const existingEvidence = await db.select()
+      .from(taskEvidence)
+      .where(and(
+        eq(taskEvidence.id, eid),
+        eq(taskEvidence.taskId, attestationToken.taskId)
+      ))
+      .limit(1);
+
+    if (existingEvidence.length === 0) {
+      return res.status(404).json({ error: 'Evidence not found for this task' });
+    }
+
+    // Delete the physical file if it exists
+    if (existingEvidence[0].fileUrl) {
+      try {
+        const fs = await import('fs/promises');
+        const path = await import('path');
+        const filePath = path.join(process.cwd(), existingEvidence[0].fileUrl);
+        await fs.unlink(filePath);
+      } catch (e) {
+        console.warn('Could not delete evidence file:', e);
+      }
+    }
+
+    // Delete the evidence record
+    await db.delete(taskEvidence).where(eq(taskEvidence.id, eid));
+
+    // Log activity
+    await db.insert(taskActivity).values({
+      taskId: attestationToken.taskId,
+      userId: attestationToken.createdBy || 1,
+      activityType: 'comment',
+      content: `Evidence removed via attestation link: ${existingEvidence[0].fileName} (by ${attestationToken.recipientName || attestationToken.email})`,
+    });
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Error deleting evidence via attestation:', error);
+    res.status(500).json({ error: 'Failed to delete evidence' });
+  }
+});
+
+/**
  * PATCH /api/compliance-tasks/:taskId/assign-dri
  * Assign a DRI (user) to a task while keeping the suggested role
  */
