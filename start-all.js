@@ -14,7 +14,7 @@ import { execSync } from 'child_process';
 
 // Configuration
 const REGISTRY_PORT = 3010;
-const LLM_GATEWAY_PORT = 3002;
+const LLM_GATEWAY_PORT = 3004;
 const CLIENT_PORT = 3050;
 
 // Track running processes
@@ -55,12 +55,12 @@ async function waitForServer(url, maxRetries = 10, delay = 1000) {
 }
 
 /**
- * Start the registry API server
+ * Start the registry API server (PostgreSQL mode - authoritative source of truth)
  */
 function startRegistryServer() {
-  console.log('Starting Registry API Server...');
+  console.log('Starting Registry API Server (PostgreSQL)...');
   
-  const registry = spawn('node', ['src/server/registry-api/registry-server.js'], {
+  const registry = spawn('node', ['start-registry-postgres.js'], {
     stdio: ['ignore', 'pipe', 'pipe']
   });
   
@@ -175,12 +175,13 @@ function startViteDevServer() {
  * Start the LLM Gateway
  */
 function startLLMGateway() {
-  console.log('Starting LLM Gateway...');
+  console.log(`Starting LLM Gateway on port ${LLM_GATEWAY_PORT}...`);
 
-  const llmGateway = spawn('node', ['src/llm-gateway/start-llm-gateway.js'], {
+  const llmGateway = spawn('node', ['src/llm-gateway/start-llm-gateway-phase4.js'], {
     stdio: ['ignore', 'pipe', 'pipe'],
     cwd: process.cwd(),
     shell: true,
+    env: { ...process.env, LLM_GATEWAY_PORT: LLM_GATEWAY_PORT.toString() }
   });
 
   runningProcesses.llmGateway = llmGateway;

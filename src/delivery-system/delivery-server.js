@@ -319,7 +319,26 @@ class DeliveryServer {
           // Use regKey as the universal identifier (REG-001 to REG-251)
           const regKey = regulationContent.regKey || regulationContent.reg_key;
           const itemId = regulationContent.regulationId || regulationContent.item_id || regulationId;
-          console.log(`   📋 Using regKey: ${regKey || 'N/A'}, itemId: ${itemId}`);
+          
+          // Look up EdSteward numeric regulationId from regkey mapping
+          // The /api/regulation-updates endpoint REQUIRES this numeric ID
+          let edstewardRegId = null;
+          try {
+            const fs = await import('fs');
+            const path = await import('path');
+            const mappingPath = path.default.resolve(process.cwd(), 'data', 'edsteward-regkey-bulk-mapping.json');
+            const mappingData = JSON.parse(fs.default.readFileSync(mappingPath, 'utf8'));
+            const mapping = mappingData.find(m => m.regKey === regKey);
+            if (mapping) {
+              edstewardRegId = mapping.edstewardId;
+              console.log(`   ✅ Mapped ${regKey} → EdSteward ID ${edstewardRegId}`);
+            } else {
+              console.warn(`   ⚠️ No EdSteward mapping found for regKey: ${regKey}`);
+            }
+          } catch (mappingErr) {
+            console.warn(`   ⚠️ Could not load regkey mapping: ${mappingErr.message}`);
+          }
+          console.log(`   📋 Using regKey: ${regKey || 'N/A'}, itemId: ${itemId}, edstewardId: ${edstewardRegId || 'N/A'}`);
 
           // Build EdSteward /api/regulation-updates payload (PENDING UPDATE format)
           // This creates a pending update for CCO review, NOT a direct sync
@@ -406,46 +425,38 @@ class DeliveryServer {
               }
             }
             
+            // Build task object with all fields EdSteward expects (no nulls — empty strings for missing)
+            const buildTaskPayload = (task, parentTempIdRef = null) => ({
+              tempId: task.tempId,
+              taskId: task.task_id || task.taskId || task.tempId,
+              ...(parentTempIdRef ? { parentTempId: parentTempIdRef } : {}),
+              title: task.title,
+              description: task.description || '',
+              category: task.category || '',
+              priority: this.normalizePriority(task.priority),
+              requirementType: task.requirement_type || task.requirementType || 'requirement',
+              statutoryRole: task.statutory_role || task.statutoryRole || '',
+              statutoryCitation: task.statutory_citation || task.statutoryCitation || '',
+              assignedRole: this.normalizeRole(task.assignedRole || task.assigned_role) || '',
+              evidenceRequired: task.evidenceRequired || task.evidence_required || false,
+              evidenceType: task.evidenceType || task.evidence_type || 'document',
+              sortOrder: task.sortOrder || task.sort_order || 0,
+              estimatedEffort: task.estimatedEffort || task.estimated_effort || '',
+              deliverable: task.deliverable || '',
+              source: task.source || 'rules-engine',
+              dueDate: task.dueDate || task.due_date || ''
+            });
+
             // Add parent tasks first
             for (const task of parentTasks) {
-              hierarchicalTasks.push({
-                tempId: task.tempId,
-                taskId: task.task_id || task.taskId || task.tempId,
-                title: task.title,
-                description: task.description || '',
-                category: task.category || '',
-                priority: this.normalizePriority(task.priority),
-                requirementType: task.requirement_type || task.requirementType || 'requirement',
-                statutoryRole: task.statutory_role || task.statutoryRole || '',  // Role required by statute (empty if none)
-                statutoryCitation: task.statutory_citation || task.statutoryCitation || '',  // Legal citation (empty if none)
-                assignedRole: this.normalizeRole(task.assignedRole || task.assigned_role) || '',  // Suggested assignee
-                evidenceRequired: task.evidenceRequired || task.evidence_required || false,
-                evidenceType: task.evidenceType || task.evidence_type || 'document',
-                sortOrder: task.sortOrder || task.sort_order || 0
-              });
+              hierarchicalTasks.push(buildTaskPayload(task));
             }
             
             // Add child tasks with parentTempId reference
             for (const task of childTasks) {
               const parentDbId = task.parentTaskId || task.parent_task_id;
-              const parentTempId = taskMap.get(parentDbId);
-              
-              hierarchicalTasks.push({
-                tempId: task.tempId,
-                taskId: task.task_id || task.taskId || task.tempId,
-                parentTempId: parentTempId,  // CRITICAL: links to parent task
-                title: task.title,
-                description: task.description || '',
-                category: task.category || '',
-                priority: this.normalizePriority(task.priority),
-                requirementType: task.requirement_type || task.requirementType || 'requirement',
-                statutoryRole: task.statutory_role || task.statutoryRole || '',  // Role required by statute (empty if none)
-                statutoryCitation: task.statutory_citation || task.statutoryCitation || '',  // Legal citation (empty if none)
-                assignedRole: this.normalizeRole(task.assignedRole || task.assigned_role) || '',  // Suggested assignee
-                evidenceRequired: task.evidenceRequired || task.evidence_required || false,
-                evidenceType: task.evidenceType || task.evidence_type || 'document',
-                sortOrder: task.sortOrder || task.sort_order || 0
-              });
+              const parentTempIdRef = taskMap.get(parentDbId);
+              hierarchicalTasks.push(buildTaskPayload(task, parentTempIdRef));
             }
           }
 
@@ -458,76 +469,111 @@ class DeliveryServer {
               }))
             : [];
 
+          // Build COMPLETE PENDING UPDATE payload for /api/regulation-updates
+          // This sends the FULL canonical data to EdSteward's CCO review queue.
+          // EdSteward's /api/regulation-updates endpoint MUST accept and store
+          // all of this data in its pending_updates table for CCO review.
+          // NOTHING gets written to production tables until CCO approves.
+
           const payload = {
-            // PRIMARY IDENTIFIER - Universal REG-XXX key (REG-001 to REG-251)
-            mcpRegKey: regKey,
-            regKey: regKey,
-            
-            // Backup identifiers (EdSteward will use regKey first)
-            itemId: itemId,
-            
-            // Required fields for /api/mcp/regulations/sync
+            // ═══════════════════════════════════════════════════════════
+            // IDENTIFIERS
+            // ═══════════════════════════════════════════════════════════
+            regulationId: edstewardRegId,         // EdSteward numeric ID (REQUIRED)
+            mcpRegKey: regKey,                     // MCP Engine canonical key (REG-001 to REG-251)
+            regKey: regKey,                        // Alias for mcpRegKey
+            itemId: itemId,                        // MCP Engine item/slug ID
+
+            // ═══════════════════════════════════════════════════════════
+            // REGULATION CORE FIELDS
+            // ═══════════════════════════════════════════════════════════
             name: regulationContent.name || regulationId,
             statute: regulationContent.statute || statutesText || 'See CFR',
             category: regulationContent.category || 'Uncategorized',
             topic: regulationContent.topic || 'General',
             cfr: regulationContent.cfr || '',
-            
-            // Content fields
-            originalContent: contentText.substring(0, 5000) || 'Current regulation content',
-            updatedContent: contentText.substring(0, 5000) || 'Updated regulation content',
-            status: 'pending',  // CRITICAL: Creates pending update for CCO review
-            
-            // Additional context
+
+            // ═══════════════════════════════════════════════════════════
+            // CONTENT FOR CCO REVIEW
+            // ═══════════════════════════════════════════════════════════
+            originalContent: contentText.substring(0, 10000) || 'Current regulation content',
+            updatedContent: contentText.substring(0, 10000) || 'Updated regulation content',
+            status: 'pending',  // CRITICAL: Creates pending update for CCO review — NEVER 'approved'
             summary: regulationContent.summary || regulationContent.description || `MCP Engine update for ${regulationContent.name}`,
             requirements: requirementsText || '',
-            filingDeadlines: JSON.stringify(filingDeadlinesArray),
-            
-            // Full hierarchical task list (parent-child relationships preserved)
+
+            // ═══════════════════════════════════════════════════════════
+            // COMPLIANCE TASKS — Full hierarchical task tree
+            // Parent-child relationships preserved via tempId/parentTempId
+            // ═══════════════════════════════════════════════════════════
             complianceTasks: hierarchicalTasks,
-            
-            // INSTITUTIONAL RISK SCORE (1-100) - COMPLETE BREAKDOWN
-            riskScore: riskScore,
-            riskLevel: riskLevel,
+
+            // ═══════════════════════════════════════════════════════════
+            // FILING & REPORTING
+            // ═══════════════════════════════════════════════════════════
+            filingDeadlines: filingDeadlinesArray,  // Array of {deadline, description}
+            reportingRequirements: regulationContent.reportingRequirements || '',
+            submissionGuidelines: regulationContent.submissionGuidelines || '',
+            reportingFrequency: regulationContent.reportingFrequency || '',
+
+            // ═══════════════════════════════════════════════════════════
+            // INSTITUTIONAL RISK ASSESSMENT — Complete breakdown
+            // ═══════════════════════════════════════════════════════════
+            riskScore: riskScore || 0,
+            riskLevel: riskLevel || '',
             riskAssessment: riskAssessment ? {
-              score: riskScore,
-              level: riskLevel,
-              
-              // Full risk factor breakdown with rationale for each score
-              factors: riskAssessment.riskFactors || riskAssessment.risk_factors || null,
-              
-              // Factor summary for quick reference (score only)
+              score: riskScore || 0,
+              level: riskLevel || '',
+              factors: riskAssessment.riskFactors || riskAssessment.risk_factors || {},
               factorScores: {
-                financialPenalty: riskAssessment.riskFactors?.financialPenalty?.score || riskAssessment.riskFactors?.financialPenalty || null,
-                federalFunding: riskAssessment.riskFactors?.federalFunding?.score || riskAssessment.riskFactors?.federalFunding || null,
-                accreditationImpact: riskAssessment.riskFactors?.accreditationImpact?.score || riskAssessment.riskFactors?.accreditationImpact || null,
-                reputationalLegal: riskAssessment.riskFactors?.reputationalLegal?.score || riskAssessment.riskFactors?.reputationalLegal || null,
-                operationalDisruption: riskAssessment.riskFactors?.operationalDisruption?.score || riskAssessment.riskFactors?.operationalDisruption || null
+                financialPenalty: riskAssessment.riskFactors?.financialPenalty?.score || riskAssessment.riskFactors?.financialPenalty || 0,
+                federalFunding: riskAssessment.riskFactors?.federalFunding?.score || riskAssessment.riskFactors?.federalFunding || 0,
+                accreditationImpact: riskAssessment.riskFactors?.accreditationImpact?.score || riskAssessment.riskFactors?.accreditationImpact || 0,
+                reputationalLegal: riskAssessment.riskFactors?.reputationalLegal?.score || riskAssessment.riskFactors?.reputationalLegal || 0,
+                operationalDisruption: riskAssessment.riskFactors?.operationalDisruption?.score || riskAssessment.riskFactors?.operationalDisruption || 0
               },
-              
-              // Enforcement context
-              enforcementTrend: riskAssessment.enforcementTrend || riskAssessment.enforcement_trend || null,
+              enforcementTrend: riskAssessment.enforcementTrend || riskAssessment.enforcement_trend || '',
               recentEnforcementActions: riskAssessment.recentEnforcementActions || riskAssessment.recent_enforcement_actions || [],
-              
-              // Assessment metadata
               assessmentDate: riskAssessment.assessmentDate || riskAssessment.assessment_date || new Date().toISOString(),
               assessmentVersion: riskAssessment.assessmentVersion || riskAssessment.assessment_version || '1.0',
               isPreliminary: riskAssessment.isPreliminary || riskAssessment.is_preliminary || false
-            } : null,
+            } : {},
+
+            // ═══════════════════════════════════════════════════════════
+            // EXECUTIVE ORDERS & RELATED REGULATIONS
+            // ═══════════════════════════════════════════════════════════
+            executiveOrders: regulationContent.executiveOrders || regulationContent.executive_orders || [],
+            relatedRegulations: Array.isArray(regulationContent.relatedRegulations) ? regulationContent.relatedRegulations : [],
+
+            // ═══════════════════════════════════════════════════════════
+            // ADDITIONAL METADATA
+            // ═══════════════════════════════════════════════════════════
+            agencyDepartment: regulationContent.agencyDepartment || regulationContent.agency_department || '',
+            regulationUrl: regulationContent.regulationUrl || regulationContent.regulation_url || '',
+            applicableInstitutions: regulationContent.applicableInstitutions || regulationContent.applicable_institutions || '',
+            applicableForms: Array.isArray(regulationContent.applicableForms) ? regulationContent.applicableForms : [],
+            sections: Array.isArray(regulationContent.sections) ? regulationContent.sections : [],
+            lovvLevel: regulationContent.lovvLevel || regulationContent.lovv_level || '',
             
-            // LOVV Validation Level
-            lovvLevel: regulationContent.lovvLevel || regulationContent.lovv_level || null
+            // Timestamp
+            mcpEngineTimestamp: new Date().toISOString()
           };
           
           console.log(`   📋 Sending ${hierarchicalTasks.length} tasks (hierarchy preserved)`);
 
           const headers = { 'Content-Type': 'application/json' };
-          if (customer.auth?.method === 'basic') {
+          const mcpApiKey = process.env.MCP_API_KEY || '';
+          if (mcpApiKey) {
+            headers['X-MCP-API-Key'] = mcpApiKey;
+          } else if (customer.auth?.method === 'basic') {
             const authString = Buffer.from(`${customer.auth.username}:${customer.auth.password}`).toString('base64');
             headers['Authorization'] = `Basic ${authString}`;
           }
 
-          const response = await fetch(`${customer.url}${customer.apiEndpoint}`, {
+          const pushUrl = `${customer.url}${customer.apiEndpoint}`;
+          console.log(`   📡 Sending to ${pushUrl} (status: pending, CCO review)`);
+
+          const response = await fetch(pushUrl, {
             method: 'POST',
             headers,
             body: JSON.stringify(payload)

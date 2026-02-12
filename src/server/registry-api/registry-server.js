@@ -250,6 +250,11 @@ app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
     time: new Date().toISOString(),
+    database: {
+      status: regulationsLoaded && allRegulations.length > 0 ? 'healthy' : 'disconnected',
+      type: 'csv',
+      records: allRegulations.length
+    },
     regulations: {
       total: allRegulations.length,
       federal: federalCount,
