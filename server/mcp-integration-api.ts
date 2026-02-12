@@ -1464,8 +1464,40 @@ export function setupMCPIntegrationApi(app: express.Application) {
           await db.delete(complianceTasks).where(eq(complianceTasks.regulationId, regulationId));
           console.log(`   🗑️  Deleted existing tasks for regulation ${regulationId}`);
         } else {
-          console.log(`   🔒 Preserving existing tasks (MERGE mode)`);
+          console.log(`   🔒 MERGE mode with deduplication`);
         }
+        
+        // Load existing tasks for dedup in MERGE mode
+        // Index by taskId (stable ID from MCP) and by title (fallback)
+        const existingByTaskId = new Map<string, any>();
+        const existingByTitle = new Map<string, any>();
+        if (preserveTasks) {
+          const existing = await db.execute(sql`
+            SELECT id, task_id, title, status, attestation_status
+            FROM compliance_tasks WHERE regulation_id = ${regulationId}
+          `);
+          for (const row of existing.rows as any[]) {
+            if (row.task_id) existingByTaskId.set(row.task_id, row);
+            existingByTitle.set(row.title, row);
+          }
+          console.log(`   📋 Found ${existing.rows.length} existing tasks (${existingByTaskId.size} with taskId, ${existingByTitle.size} unique titles)`);
+        }
+        
+        // Helper: find existing task match (by taskId first, then title)
+        const findExisting = (task: any): any | null => {
+          if (task.taskId && existingByTaskId.has(task.taskId)) {
+            return existingByTaskId.get(task.taskId);
+          }
+          if (existingByTitle.has(task.title)) {
+            return existingByTitle.get(task.title);
+          }
+          return null;
+        };
+        
+        // Helper: check if task should be skipped (completed/attested tasks are preserved)
+        const shouldSkipUpdate = (existing: any): boolean => {
+          return existing.status === 'completed' || existing.attestation_status === 'attested';
+        };
         
         // Helper: build full 21-field task values for sync endpoint
         const buildSyncTaskValues = (task: any, parentId?: number) => ({
@@ -1495,19 +1527,77 @@ export function setupMCPIntegrationApi(app: express.Application) {
           isTemplate: false,
         });
         
-        // First pass: create root tasks (no parent)
-        console.log(`   ▶️ Pass 1: Creating ${rootTasks.length} root tasks...`);
+        // Helper: build SET clause for updating existing tasks (skip status/attestation fields)
+        const buildUpdateFields = (task: any) => ({
+          description: task.description || null,
+          instructions: task.instructions || null,
+          category: task.category || null,
+          assignedRole: task.assignedRole || null,
+          statutoryRole: task.statutoryRole || null,
+          statutoryCitation: task.statutoryCitation || null,
+          requirementType: task.requirementType || 'requirement',
+          priority: task.priority || 'medium',
+          evidenceRequired: task.evidenceRequired || false,
+          evidenceType: task.evidenceType || 'none',
+          evidenceInstructions: task.evidenceInstructions || null,
+          estimatedEffort: task.estimatedEffort || null,
+          deliverable: task.deliverable || null,
+          deliverableTemplateUrl: task.deliverableTemplateUrl || null,
+          sortOrder: task.sortOrder || 0,
+        });
+        
+        let tasksUpdated = 0;
+        let tasksSkipped = 0;
+        
+        // First pass: root tasks (no parent)
+        console.log(`   ▶️ Pass 1: Processing ${rootTasks.length} root tasks...`);
         for (const task of rootTasks) {
-          const [newTask] = await db.insert(complianceTasks).values(
-            buildSyncTaskValues(task)
-          ).returning();
+          const existing = preserveTasks ? findExisting(task) : null;
           
-          if (task.tempId) taskIdMap.set(task.tempId, newTask.id);
-          createdTasks.push({ id: newTask.id, tempId: task.tempId, title: task.title });
+          if (existing) {
+            if (shouldSkipUpdate(existing)) {
+              // Completed/attested — don't touch it
+              if (task.tempId) taskIdMap.set(task.tempId, existing.id);
+              createdTasks.push({ id: existing.id, tempId: task.tempId, title: task.title });
+              tasksSkipped++;
+              continue;
+            }
+            // Update existing task in place — no duplicate
+            const updates = buildUpdateFields(task);
+            await db.execute(sql`
+              UPDATE compliance_tasks SET
+                description = ${updates.description},
+                instructions = ${updates.instructions},
+                category = ${updates.category},
+                assigned_role = ${updates.assignedRole},
+                statutory_role = ${updates.statutoryRole},
+                statutory_citation = ${updates.statutoryCitation},
+                requirement_type = ${updates.requirementType},
+                priority = ${updates.priority},
+                evidence_required = ${updates.evidenceRequired},
+                evidence_type = ${updates.evidenceType},
+                evidence_instructions = ${updates.evidenceInstructions},
+                estimated_effort = ${updates.estimatedEffort},
+                deliverable = ${updates.deliverable},
+                deliverable_template_url = ${updates.deliverableTemplateUrl},
+                sort_order = ${updates.sortOrder}
+              WHERE id = ${existing.id}
+            `);
+            if (task.tempId) taskIdMap.set(task.tempId, existing.id);
+            createdTasks.push({ id: existing.id, tempId: task.tempId, title: task.title });
+            tasksUpdated++;
+          } else {
+            // New task — insert it
+            const [newTask] = await db.insert(complianceTasks).values(
+              buildSyncTaskValues(task)
+            ).returning();
+            if (task.tempId) taskIdMap.set(task.tempId, newTask.id);
+            createdTasks.push({ id: newTask.id, tempId: task.tempId, title: task.title });
+          }
         }
         
-        // Second pass: create child tasks (with parent)
-        console.log(`   ▶️ Pass 2: Creating ${childTasks.length} child tasks...`);
+        // Second pass: child tasks (with parent)
+        console.log(`   ▶️ Pass 2: Processing ${childTasks.length} child tasks...`);
         console.log(`   🗺️ TaskIdMap has ${taskIdMap.size} entries`);
         
         let childrenCreated = 0;
@@ -1520,18 +1610,58 @@ export function setupMCPIntegrationApi(app: express.Application) {
             continue;
           }
           
-          const [newTask] = await db.insert(complianceTasks).values(
-            buildSyncTaskValues(task, parentId)
-          ).returning();
+          const existing = preserveTasks ? findExisting(task) : null;
           
-          if (task.tempId) taskIdMap.set(task.tempId, newTask.id);
-          createdTasks.push({ id: newTask.id, tempId: task.tempId, title: task.title });
-          childrenCreated++;
+          if (existing) {
+            if (shouldSkipUpdate(existing)) {
+              if (task.tempId) taskIdMap.set(task.tempId, existing.id);
+              createdTasks.push({ id: existing.id, tempId: task.tempId, title: task.title });
+              tasksSkipped++;
+              continue;
+            }
+            // Update existing child task
+            const updates = buildUpdateFields(task);
+            await db.execute(sql`
+              UPDATE compliance_tasks SET
+                parent_task_id = ${parentId},
+                description = ${updates.description},
+                instructions = ${updates.instructions},
+                category = ${updates.category},
+                assigned_role = ${updates.assignedRole},
+                statutory_role = ${updates.statutoryRole},
+                statutory_citation = ${updates.statutoryCitation},
+                requirement_type = ${updates.requirementType},
+                priority = ${updates.priority},
+                evidence_required = ${updates.evidenceRequired},
+                evidence_type = ${updates.evidenceType},
+                evidence_instructions = ${updates.evidenceInstructions},
+                estimated_effort = ${updates.estimatedEffort},
+                deliverable = ${updates.deliverable},
+                deliverable_template_url = ${updates.deliverableTemplateUrl},
+                sort_order = ${updates.sortOrder}
+              WHERE id = ${existing.id}
+            `);
+            if (task.tempId) taskIdMap.set(task.tempId, existing.id);
+            createdTasks.push({ id: existing.id, tempId: task.tempId, title: task.title });
+            tasksUpdated++;
+          } else {
+            // New child task — insert it
+            const [newTask] = await db.insert(complianceTasks).values(
+              buildSyncTaskValues(task, parentId)
+            ).returning();
+            if (task.tempId) taskIdMap.set(task.tempId, newTask.id);
+            createdTasks.push({ id: newTask.id, tempId: task.tempId, title: task.title });
+            childrenCreated++;
+          }
         }
         
-        const taskAction = preserveTasks ? 'Added' : (isUpdate ? 'Replaced with' : 'Created');
+        const newInserts = createdTasks.length - tasksUpdated - tasksSkipped;
+        const taskAction = preserveTasks ? 'Merged' : (isUpdate ? 'Replaced with' : 'Created');
         console.log(`✅ ${taskAction} ${createdTasks.length} compliance tasks`);
-        console.log(`   📈 Hierarchy result: ${rootTasks.length} parents + ${childrenCreated} children created, ${childrenSkipped} children skipped`);
+        if (preserveTasks) {
+          console.log(`   📊 Dedup: ${tasksUpdated} updated, ${newInserts} new, ${tasksSkipped} skipped (completed/attested)`);
+        }
+        console.log(`   📈 Hierarchy: ${rootTasks.length} parents + ${childrenCreated} children created, ${childrenSkipped} children skipped`);
       }
       
       // Handle topic mappings if provided

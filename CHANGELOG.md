@@ -5,6 +5,20 @@ All notable changes to EdSteward are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.16] - 2026-02-12
+
+### Fixed
+- MERGE mode in `/api/mcp/regulations/sync` now deduplicates tasks instead of
+  blindly inserting — matches by `taskId` first, then by `title`
+- Existing tasks are updated in place; only genuinely new tasks are inserted
+- Completed/attested tasks are never overwritten (preserves evidence and signatures)
+
+## [1.4.15] - 2026-02-12
+
+### Fixed
+- `applicableforms` column name typo in `acceptRegulationUpdate` — changed to
+  `applicable_forms` (with underscore) to match actual database column
+
 ## [1.4.14] - 2026-02-12
 
 ### Fixed
