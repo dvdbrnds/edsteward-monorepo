@@ -431,7 +431,7 @@ export class DatabaseStorage implements IStorage {
           updateValues.push(JSON.stringify(regFields.applicableInstitutions));
         }
         if (regFields.applicableForms) {
-          updateFields.push(`applicableforms = $${paramIndex++}`);
+          updateFields.push(`applicable_forms = $${paramIndex++}`);
           updateValues.push(JSON.stringify(regFields.applicableForms));
         }
         
