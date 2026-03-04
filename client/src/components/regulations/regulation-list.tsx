@@ -1,7 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import type { Regulation, Deadline, RegulationAction } from "@shared/schema";
 import { useLocation } from "wouter";
-import { Search, CheckCircle, AlertCircle, Clock, Loader2, ArrowUpDown, Check, Globe, Mail, FileText, X, Filter, Eye, EyeOff, Columns, RotateCcw } from "lucide-react";
+import { Search, CheckCircle, AlertCircle, Clock, Loader2, ArrowUpDown, ArrowUp, ArrowDown, Check, Globe, Mail, FileText, X, Filter, Eye, EyeOff, Columns, RotateCcw, MapPin } from "lucide-react";
+import { JURISDICTION_SOURCES } from "@/components/filters/enhanced-jurisdiction-filter";
 import { format } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -62,12 +63,20 @@ interface ColumnHeaderProps {
   label: string;
   sortable?: boolean;
   sortKey?: string;
+  activeSortKey?: string | null;
+  activeSortDirection?: 'asc' | 'desc' | null;
   onSort?: (key: string) => void;
   onHide: (key: ColumnKey) => void;
   canHide?: boolean;
 }
 
-function ColumnHeader({ columnKey, label, sortable, sortKey, onSort, onHide, canHide = true }: ColumnHeaderProps) {
+function ColumnHeader({ columnKey, label, sortable, sortKey, activeSortKey, activeSortDirection, onSort, onHide, canHide = true }: ColumnHeaderProps) {
+  const isActive = sortable && sortKey && activeSortKey === sortKey;
+
+  const SortIcon = isActive
+    ? (activeSortDirection === 'asc' ? ArrowUp : ArrowDown)
+    : ArrowUpDown;
+
   return (
     <div className="flex items-center gap-1 group">
       <div 
@@ -75,7 +84,7 @@ function ColumnHeader({ columnKey, label, sortable, sortKey, onSort, onHide, can
         onClick={() => sortable && sortKey && onSort?.(sortKey)}
       >
         {label}
-        {sortable && <ArrowUpDown className="h-4 w-4" />}
+        {sortable && <SortIcon className={cn("h-4 w-4", isActive && "text-foreground")} />}
       </div>
       {canHide && (
         <button
@@ -126,6 +135,7 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
   const [search, setSearch] = useState("");
   const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'lastUpdated', direction: 'desc' });
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
+  const [jurisdictionSourceFilter, setJurisdictionSourceFilter] = useState<string>('all');
   const [hideCompliant, setHideCompliant] = useState<boolean>(() => {
     try {
       return localStorage.getItem(HIDE_COMPLIANT_KEY) === 'true';
@@ -265,6 +275,10 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
     }
     if (jurisdictionFilter && reg.jurisdictionSource !== jurisdictionFilter) {
       return false;
+    }
+    if (jurisdictionSourceFilter !== 'all') {
+      const regSource = reg.jurisdictionSource || 'federal';
+      if (regSource !== jurisdictionSourceFilter) return false;
     }
     if (appliesToFilter && appliesToFilter.length > 0) {
       const hasMatch = appliesToFilter.some(filterType => 
@@ -426,12 +440,13 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
     }
   };
 
-  const hasActiveFilters = search || statusFilter !== 'all' || hideCompliant || categoryFilter || jurisdictionFilter || (appliesToFilter && appliesToFilter.length > 0);
+  const hasActiveFilters = search || statusFilter !== 'all' || jurisdictionSourceFilter !== 'all' || hideCompliant || categoryFilter || jurisdictionFilter || (appliesToFilter && appliesToFilter.length > 0);
   const totalCount = Array.isArray(regulations) ? regulations.length : 0;
 
   const clearAllFilters = () => {
     setSearch("");
     setStatusFilter('all');
+    setJurisdictionSourceFilter('all');
     setHideCompliant(false);
   };
 
@@ -487,6 +502,20 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
                     No Deadlines
                   </span>
                 </SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={jurisdictionSourceFilter} onValueChange={setJurisdictionSourceFilter}>
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <MapPin className="h-4 w-4 mr-2" />
+                <SelectValue placeholder="Jurisdiction" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Jurisdictions</SelectItem>
+                {JURISDICTION_SOURCES.map((source) => (
+                  <SelectItem key={source.value} value={source.value}>
+                    {source.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
             
@@ -584,6 +613,8 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
                       label="ID" 
                       sortable 
                       sortKey="id" 
+                      activeSortKey={sortConfig?.key ?? null}
+                      activeSortDirection={sortConfig?.direction ?? null}
                       onSort={handleSort}
                       onHide={toggleColumn}
                     />
@@ -596,6 +627,8 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
                       label="Name" 
                       sortable 
                       sortKey="name" 
+                      activeSortKey={sortConfig?.key ?? null}
+                      activeSortDirection={sortConfig?.direction ?? null}
                       onSort={handleSort}
                       onHide={toggleColumn}
                       canHide={false}
@@ -609,6 +642,8 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
                       label="Category" 
                       sortable 
                       sortKey="category" 
+                      activeSortKey={sortConfig?.key ?? null}
+                      activeSortDirection={sortConfig?.direction ?? null}
                       onSort={handleSort}
                       onHide={toggleColumn}
                     />
@@ -621,6 +656,8 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
                       label="DRO" 
                       sortable 
                       sortKey="dro" 
+                      activeSortKey={sortConfig?.key ?? null}
+                      activeSortDirection={sortConfig?.direction ?? null}
                       onSort={handleSort}
                       onHide={toggleColumn}
                     />
@@ -651,6 +688,8 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
                       label="Last Updated" 
                       sortable 
                       sortKey="lastUpdated" 
+                      activeSortKey={sortConfig?.key ?? null}
+                      activeSortDirection={sortConfig?.direction ?? null}
                       onSort={handleSort}
                       onHide={toggleColumn}
                     />
@@ -663,6 +702,8 @@ export default function RegulationList({ categoryFilter, jurisdictionFilter, app
                       label="Jurisdiction" 
                       sortable 
                       sortKey="jurisdictionSource" 
+                      activeSortKey={sortConfig?.key ?? null}
+                      activeSortDirection={sortConfig?.direction ?? null}
                       onSort={handleSort}
                       onHide={toggleColumn}
                     />

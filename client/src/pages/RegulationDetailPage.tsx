@@ -148,7 +148,9 @@ import {
   FolderOpen,
   MessageSquare,
   ListTodo,
-  FileCheck
+  FileCheck,
+  CalendarClock,
+  RotateCcw
 } from "lucide-react";
 import {
   Collapsible,
@@ -211,6 +213,7 @@ function RegulationDetailPage() {
   const [complianceTasksOpen, setComplianceTasksOpen] = useState(true); // Default open, will close if fully compliant
   const [requirementsOpen, setRequirementsOpen] = useState(false);
   const [deadlinesOpen, setDeadlinesOpen] = useState(false);
+  const [filingDeadlinesOpen, setFilingDeadlinesOpen] = useState(false);
   const [evidenceNotesOpen, setEvidenceNotesOpen] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const [auditOpen, setAuditOpen] = useState(false);
@@ -1368,6 +1371,67 @@ function RegulationDetailPage() {
                   </div>
                 </CollapsibleContent>
               </Collapsible>
+
+              {/* FILING DEADLINES (from MCP Engine — stored on the regulation record) */}
+              {regulation.filingDeadlines && (() => {
+                const deadlines: Array<{ type: string; date: string; frequency?: string; description?: string }> = 
+                  typeof regulation.filingDeadlines === 'string'
+                    ? (() => { try { return JSON.parse(regulation.filingDeadlines); } catch { return []; } })()
+                    : Array.isArray(regulation.filingDeadlines) ? regulation.filingDeadlines : [];
+                if (deadlines.length === 0) return null;
+                const getUrgency = (dateStr: string, frequency?: string) => {
+                  if (frequency === 'continuous' || frequency === 'annual' || dateStr === 'continuous' || dateStr === 'annual') {
+                    return { label: 'Recurring', color: 'bg-blue-100 text-blue-800 border-blue-200', icon: RotateCcw, bg: 'bg-blue-50 border-blue-200' };
+                  }
+                  const d = new Date(dateStr);
+                  if (isNaN(d.getTime())) return { label: 'Ongoing', color: 'bg-blue-100 text-blue-800 border-blue-200', icon: RotateCcw, bg: 'bg-blue-50 border-blue-200' };
+                  const now = new Date();
+                  const daysUntil = Math.ceil((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+                  if (daysUntil < 0) return { label: 'PASSED', color: 'bg-red-100 text-red-800 border-red-200', icon: AlertCircle, bg: 'bg-red-50 border-red-200' };
+                  if (daysUntil <= 30) return { label: `${daysUntil}d left`, color: 'bg-yellow-100 text-yellow-800 border-yellow-200', icon: Clock, bg: 'bg-yellow-50 border-yellow-200' };
+                  return { label: 'Upcoming', color: 'bg-green-100 text-green-800 border-green-200', icon: CalendarClock, bg: 'bg-green-50 border-green-200' };
+                };
+                const passedCount = deadlines.filter(dl => {
+                  const d = new Date(dl.date);
+                  return !isNaN(d.getTime()) && d < new Date() && dl.frequency !== 'continuous' && dl.frequency !== 'annual' && dl.date !== 'continuous' && dl.date !== 'annual';
+                }).length;
+                return (
+                  <Collapsible open={filingDeadlinesOpen} onOpenChange={setFilingDeadlinesOpen}>
+                    <CollapsibleTrigger className="flex items-center justify-between w-full p-4 bg-card rounded-lg border hover:bg-background transition-colors">
+                      <div className="flex items-center gap-3">
+                        <CalendarClock className="h-5 w-5 text-purple-600" />
+                        <span className="font-semibold text-foreground">Filing Deadlines</span>
+                        <Badge variant="secondary" className="text-xs">{deadlines.length}</Badge>
+                        {passedCount > 0 && (
+                          <Badge variant="destructive" className="text-xs">{passedCount} passed</Badge>
+                        )}
+                      </div>
+                      {filingDeadlinesOpen ? <ChevronDown className="h-5 w-5 text-muted-foreground" /> : <ChevronRight className="h-5 w-5 text-muted-foreground" />}
+                    </CollapsibleTrigger>
+                    <CollapsibleContent className="bg-card rounded-b-lg border-x border-b px-4 pb-4">
+                      <div className="space-y-3 pt-4">
+                        {deadlines.map((dl, idx) => {
+                          const urgency = getUrgency(dl.date, dl.frequency);
+                          const UrgencyIcon = urgency.icon;
+                          return (
+                            <div key={idx} className={`flex items-center justify-between p-3 rounded-lg border ${urgency.bg}`}>
+                              <div className="flex items-center gap-3">
+                                <UrgencyIcon className="h-5 w-5 flex-shrink-0" />
+                                <div>
+                                  <p className="font-medium text-foreground">{dl.type}</p>
+                                  <p className="text-sm text-muted-foreground">{dl.description || dl.date}</p>
+                                  {dl.frequency && <p className="text-xs text-muted-foreground">Frequency: {dl.frequency}</p>}
+                                </div>
+                              </div>
+                              <Badge className={`text-xs ${urgency.color}`}>{urgency.label}</Badge>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </CollapsibleContent>
+                  </Collapsible>
+                );
+              })()}
 
               {/* EVIDENCE & NOTES */}
               <Collapsible open={evidenceNotesOpen} onOpenChange={setEvidenceNotesOpen}>

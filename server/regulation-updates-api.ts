@@ -313,6 +313,7 @@ const mcpEngineUpdateSchema = z.object({
   lovvLevel: z.string().optional().nullable(),        // LOVV validation level: A, B, C, D, or null
   versionHash: z.string().optional(),
   stateCode: z.string().optional(),
+  countryCode: z.string().optional(),
   
   // Federal Register enhancement metadata
   federal_register_enhancement: z.object({

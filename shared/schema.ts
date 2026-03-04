@@ -298,6 +298,7 @@ export const regulations = pgTable("regulations", {
   lastValidated: timestamp("last_validated", { withTimezone: true }),
   versionHash: text("version_hash"), // SHA-256 hash of content for change detection
   stateCode: text("state_code"), // Two-letter state code for state regulations (PA, NJ, etc.)
+  countryCode: text("country_code"), // Two-letter country code (US, GB, etc.)
   sourceUrl: text("source_url"), // Original source URL for the regulation
   // Category normalization fields
   originalCategory: text("original_category"), // Preserves the original category from source
@@ -405,6 +406,7 @@ export const insertRegulationSchema = createInsertSchema(regulations).extend({
   jurisdictionSource: z.enum(JURISDICTION_SOURCES),
   applicableInstitutions: z.array(z.enum(INSTITUTION_TYPES)).optional().nullable(),
   stateCode: z.string().max(2).optional(),
+  countryCode: z.string().max(2).optional(),
   stateAgency: z.string().optional(),
   // MCP Engine integration fields
   lovvLevel: z.enum(['A', 'B', 'C', 'D']).optional().nullable(),

@@ -653,6 +653,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
     version: z.number().optional(),
     versionHash: z.string().optional(),
     stateCode: z.string().max(2).optional(),
+    countryCode: z.string().max(2).optional(),
     
     // Filing deadlines
     filingDeadlines: z.array(z.object({
@@ -920,6 +921,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
         lastValidated: data.lastValidated ? new Date(data.lastValidated) : null,
         versionHash: data.versionHash || null,
         stateCode: data.stateCode || null,
+        countryCode: data.countryCode || null,
         // Standard flags
         isApplicable: true,
         isCurrent: true,
@@ -1337,6 +1339,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
             lastValidated: data.lastValidated ? new Date(data.lastValidated) : new Date(),
             versionHash: data.versionHash || null,
             stateCode: data.stateCode || existingReg[0].stateCode,
+            countryCode: data.countryCode || existingReg[0].countryCode,
             // Universal reg_key
             regKey: regKey || existingReg[0].regKey,
             lastUpdated: new Date(),
@@ -1414,6 +1417,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
           lastValidated: data.lastValidated ? new Date(data.lastValidated) : null,
           versionHash: data.versionHash || null,
           stateCode: data.stateCode || null,
+          countryCode: data.countryCode || null,
           // Standard flags
           isApplicable: true,
           isCurrent: true,
