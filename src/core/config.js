@@ -81,7 +81,7 @@ export const config = {
   
   // File paths
   paths: {
-    regulationsFile: process.env.REGULATIONS_FILE || 'compmat.csv',
+    regulationsFile: process.env.REGULATIONS_FILE || '',
     logsDir: process.env.LOGS_DIR || 'logs',
     tempDir: process.env.TEMP_DIR || 'tmp',
     registryFile: process.env.REGISTRY_FILE || 'regulation-servers-registry.json'

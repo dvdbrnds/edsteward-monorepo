@@ -126,11 +126,27 @@ class RegulationCDCService extends Emittery {
     // Store the list for polling
     this.monitoredRegulations = regulationsToMonitor;
     
-    // Initialize baseline state for all regulations without triggering updates
-    console.log(`📋 Initializing baselines for ${regulationsToMonitor.length} regulations...`);
-    for (const regId of regulationsToMonitor) {
-      await this.initializeRegulationBaseline(regId);
-    }
+    // Initialize baselines in background with batched concurrency
+    // Server starts accepting requests immediately; baselines load in parallel
+    const BATCH_SIZE = 15;
+    const totalRegs = regulationsToMonitor.length;
+    console.log(`📋 Initializing baselines for ${totalRegs} regulations (batches of ${BATCH_SIZE}, non-blocking)...`);
+    
+    this._baselineInitPromise = (async () => {
+      const startTime = Date.now();
+      let completed = 0;
+      for (let i = 0; i < totalRegs; i += BATCH_SIZE) {
+        const batch = regulationsToMonitor.slice(i, i + BATCH_SIZE);
+        await Promise.allSettled(
+          batch.map(regId => this.initializeRegulationBaseline(regId))
+        );
+        completed += batch.length;
+        if (completed % 60 === 0 || completed === totalRegs) {
+          console.log(`📋 Baseline progress: ${completed}/${totalRegs} (${Math.round((Date.now() - startTime) / 1000)}s)`);
+        }
+      }
+      console.log(`✅ All ${totalRegs} baselines initialized in ${Math.round((Date.now() - startTime) / 1000)}s`);
+    })().catch(err => console.error('❌ Baseline init error:', err.message));
     
     // ✅ PRODUCTION: Staggered batch polling for efficient monitoring of all regulations
     // Processes regulations in batches to avoid overwhelming the system

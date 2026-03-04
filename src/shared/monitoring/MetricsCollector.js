@@ -28,6 +28,9 @@ export class MetricsCollector extends EventEmitter {
       ...config
     };
 
+    this.startedAt = Date.now();
+    this.warmupMs = config.warmupMs || 120000; // 2-minute grace period after startup
+
     this.metrics = {
       requests: new Map(),
       responses: new Map(),
@@ -286,7 +289,9 @@ export class MetricsCollector extends EventEmitter {
       metrics: this.getRealTimeMetrics()
     };
 
-    // Check error rate
+    const inWarmup = (Date.now() - this.startedAt) < this.warmupMs;
+
+    // Check error rate (always enforced, even during warmup)
     const errorRate = this.calculateErrorRate();
     health.checks.errorRate = {
       status: errorRate < this.config.alertThresholds.errorRate ? 'healthy' : 'unhealthy',
@@ -294,18 +299,18 @@ export class MetricsCollector extends EventEmitter {
       threshold: this.config.alertThresholds.errorRate
     };
 
-    // Check response time
+    // Check response time (skip during warmup — startup traffic skews this)
     const avgResponseTime = this.calculateAverageResponseTime();
     health.checks.responseTime = {
-      status: avgResponseTime < this.config.alertThresholds.responseTime ? 'healthy' : 'degraded',
+      status: inWarmup || avgResponseTime < this.config.alertThresholds.responseTime ? 'healthy' : 'degraded',
       value: avgResponseTime,
       threshold: this.config.alertThresholds.responseTime
     };
 
-    // Check memory usage
+    // Check memory usage (skip during warmup)
     const memoryUsage = this.calculateMemoryUsage();
     health.checks.memoryUsage = {
-      status: memoryUsage < this.config.alertThresholds.memoryUsage ? 'healthy' : 'degraded',
+      status: inWarmup || memoryUsage < this.config.alertThresholds.memoryUsage ? 'healthy' : 'degraded',
       value: memoryUsage,
       threshold: this.config.alertThresholds.memoryUsage
     };
@@ -531,10 +536,11 @@ export class MetricsCollector extends EventEmitter {
     const errorRate = this.calculateErrorRate();
     const avgResponseTime = this.calculateAverageResponseTime();
     const memoryUsage = this.calculateMemoryUsage();
+    const inWarmup = (Date.now() - this.startedAt) < this.warmupMs;
 
     if (errorRate > this.config.alertThresholds.errorRate) return 'unhealthy';
-    if (avgResponseTime > this.config.alertThresholds.responseTime) return 'degraded';
-    if (memoryUsage > this.config.alertThresholds.memoryUsage) return 'degraded';
+    if (!inWarmup && avgResponseTime > this.config.alertThresholds.responseTime) return 'degraded';
+    if (!inWarmup && memoryUsage > this.config.alertThresholds.memoryUsage) return 'degraded';
 
     return 'healthy';
   }

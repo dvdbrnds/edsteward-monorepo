@@ -18,64 +18,15 @@ export class RegulationRepository extends BaseRepository {
   }
 
   /**
-   * Load regulations from CSV file
-   * @returns {Promise<void>}
+   * Initialize the repository.
+   * PostgreSQL (via Registry API) is the source of truth.
+   * This in-memory repository exists for the AdvancedRegulationService interface.
    */
   async loadFromCSV() {
-    try {
-      if (this.loaded) {
-        this.logger.debug('Regulations already loaded, skipping...');
-        return;
-      }
-
-      // Check cache first
-      if (this.cacheEnabled) {
-        const cached = await this.cacheRepository.get('regulations:all');
-        if (cached) {
-          this.regulations = cached;
-          this.loaded = true;
-          this.logger.info(`Loaded ${this.regulations.length} regulations from cache`);
-          return;
-        }
-      }
-
-      const { parse } = await import('csv-parse/sync');
-      const fs = await import('fs');
-      const path = await import('path');
-      
-      const csvFilePath = path.resolve(process.cwd(), config.paths.regulationsFile);
-      
-      if (!fs.existsSync(csvFilePath)) {
-        throw new DatabaseError(`Regulations file not found: ${csvFilePath}`);
-      }
-      
-      const fileContent = fs.readFileSync(csvFilePath, 'utf8');
-      
-      const records = parse(fileContent, {
-        columns: true,
-        skip_empty_lines: true
-      });
-      
-      // Transform and validate records
-      this.regulations = records.map((record, index) => 
-        this._transformRecord(record, index)
-      ).filter(reg => this._isValidRegulation(reg));
-      
-      this.loaded = true;
-      
-      // Cache the results
-      if (this.cacheEnabled) {
-        await this.cacheRepository.set('regulations:all', this.regulations, 3600); // Cache for 1 hour
-      }
-      
-      this.logger.info(`Loaded ${this.regulations.length} regulations from CSV`);
-    } catch (error) {
-      this.logger.error(`Failed to load regulations: ${error.message}`);
-      throw new DatabaseError(`Failed to load regulations: ${error.message}`, {
-        source: 'csv',
-        file: config.paths.regulationsFile
-      });
-    }
+    if (this.loaded) return;
+    this.regulations = [];
+    this.loaded = true;
+    this.logger.info('Regulation repository initialized (PostgreSQL is source of truth)');
   }
 
   /**
