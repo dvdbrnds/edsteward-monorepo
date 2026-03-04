@@ -7,6 +7,8 @@ export class DatabaseHealthMonitor {
   private consecutiveFailures = 0;
   private readonly MAX_CONSECUTIVE_FAILURES = 3;
   private readonly HEALTH_CHECK_INTERVAL = 30000; // 30 seconds
+  private readonly WARMUP_PERIOD_MS = 60_000; // 60 seconds
+  private readonly startedAt = Date.now();
 
   async startMonitoring(): Promise<void> {
     if (this.isMonitoring) {
@@ -41,6 +43,10 @@ export class DatabaseHealthMonitor {
     syslog.log(LogFacility.LOCAL0, LogLevel.INFO, 'Database health monitoring stopped');
   }
 
+  isWarming(): boolean {
+    return Date.now() - this.startedAt < this.WARMUP_PERIOD_MS;
+  }
+
   private async performHealthCheck(): Promise<void> {
     try {
       const isHealthy = await checkConnectionHealth();
@@ -52,6 +58,10 @@ export class DatabaseHealthMonitor {
         }
         this.consecutiveFailures = 0;
       } else {
+        if (this.isWarming()) {
+          console.log('[HEALTH] Warmup period — skipping failure increment');
+          return;
+        }
         this.consecutiveFailures++;
         console.warn(`⚠️ Database health check failed (${this.consecutiveFailures}/${this.MAX_CONSECUTIVE_FAILURES})`);
         
@@ -59,7 +69,6 @@ export class DatabaseHealthMonitor {
           syslog.log(LogFacility.LOCAL0, LogLevel.ERROR, 
             `Database connection failed ${this.consecutiveFailures} consecutive times - initiating emergency shutdown`);
           
-          // Emergency connection reset to prevent route loops
           await this.emergencyConnectionReset();
         }
       }
@@ -95,11 +104,13 @@ export class DatabaseHealthMonitor {
     isMonitoring: boolean;
     consecutiveFailures: number;
     maxFailures: number;
+    warming: boolean;
   } {
     return {
       isMonitoring: this.isMonitoring,
       consecutiveFailures: this.consecutiveFailures,
-      maxFailures: this.MAX_CONSECUTIVE_FAILURES
+      maxFailures: this.MAX_CONSECUTIVE_FAILURES,
+      warming: this.isWarming(),
     };
   }
 }

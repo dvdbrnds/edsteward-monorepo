@@ -144,17 +144,7 @@ if (process.env.MULTI_TENANT === 'true') {
   // Prevents cross-tenant session hijacking via shared cookies
   app.use(tenantSessionVerificationMiddleware);
   
-  // Initialize dynamic tenant registry (reads from admin database)
-  (async () => {
-    try {
-      console.log('[TENANT-REGISTRY] Initializing dynamic tenant registry...');
-      await initializeTenantRegistry();
-      console.log('[TENANT-REGISTRY] ✅ Registry initialized successfully');
-    } catch (error) {
-      console.error('[TENANT-REGISTRY] ❌ Failed to initialize:', error);
-      console.log('[TENANT-REGISTRY] Using fallback hardcoded tenants');
-    }
-  })();
+  // Tenant registry initialization is batched in the listen callback via Promise.allSettled
 } else {
   console.log('🏠 Single-tenant mode - using default database');
 }
@@ -410,12 +400,18 @@ app.get('/api/config', (req, res) => {
 
 // Health check
 app.get('/api/health', async (req, res) => {
+  const { databaseHealthMonitor } = await import('./services/database-health');
   const dbStatus = await testConnection();
+  const warming = databaseHealthMonitor.isWarming();
+
+  const status = warming ? 'warming_up' : (dbStatus ? 'healthy' : 'degraded');
+
   res.json({
-    status: 'ok',
+    status,
     database: dbStatus ? 'connected' : 'disconnected',
     timestamp: new Date().toISOString(),
     institution: institutionConfig.name,
+    warming,
   });
 });
 
@@ -553,17 +549,33 @@ async function setupFrontend() {
 
 // Start server
 httpServer.listen(PORT, '0.0.0.0', async () => {
-  
-  // Setup frontend serving (Vite dev server or static)
-  await setupFrontend();
-  
-  log(`🚀 Server running on port ${PORT} (${isDev ? 'development' : 'production'} mode)`);
-  
-  // Start database connection monitoring to prevent crashes
+  const isMultiTenant = process.env.MULTI_TENANT === 'true';
+
+  const startupTasks: Array<{ name: string; task: Promise<void> }> = [
+    { name: 'frontend', task: setupFrontend() },
+  ];
+
+  if (isMultiTenant) {
+    startupTasks.push({
+      name: 'tenant-registry',
+      task: initializeTenantRegistry().then(() => {
+        console.log('[TENANT-REGISTRY] ✅ Registry initialized successfully');
+      }),
+    });
+  }
+
+  const results = await Promise.allSettled(startupTasks.map(t => t.task));
+
+  results.forEach((result, i) => {
+    if (result.status === 'rejected') {
+      console.error(`Startup task "${startupTasks[i].name}" failed:`, result.reason);
+    }
+  });
+
   startDatabaseMonitoring();
-  
-  // Start task notification scheduler
   startTaskScheduler();
+
+  log(`🚀 Server running on port ${PORT} (${isDev ? 'development' : 'production'} mode)`);
 });
 
 // DATABASE MONITORING: Prevent database-related crashes

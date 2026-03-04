@@ -120,8 +120,12 @@ export function registerRoutes(app: express.Application): Server {
         (req.tenantContext?.detectionMethod || 'subdomain') : 
         (isMultiTenant ? 'not-detected' : 'single-tenant');
 
+      const effectiveStatus = healthStatus.warming
+        ? "warming_up"
+        : dbHealthy ? "healthy" : "degraded";
+
       const response = {
-        status: dbHealthy ? "healthy" : "degraded",
+        status: effectiveStatus,
         timestamp: new Date().toISOString(),
         server: "running",
         multiTenant: isMultiTenant,
@@ -129,7 +133,8 @@ export function registerRoutes(app: express.Application): Server {
           connected: dbHealthy,
           monitoring: healthStatus.isMonitoring,
           consecutiveFailures: healthStatus.consecutiveFailures,
-          maxFailures: healthStatus.maxFailures
+          maxFailures: healthStatus.maxFailures,
+          warming: healthStatus.warming,
         },
         tenant: {
           detected: !!req.tenant,

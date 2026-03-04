@@ -571,56 +571,6 @@ export const insertTwilioConfigSchema = createInsertSchema(twilioConfigs).extend
   fromNumber: z.string().regex(/^\+\d{1,15}$/, "Must be a valid phone number in E.164 format"),
 });
 
-// Add the specific schema field type definition
-export interface CsvSchemaField {
-  type: "string" | "number" | "boolean" | "date";
-  required: boolean;
-  format?: string;
-}
-
-// Update the csvSchemas table definition to include proper typing
-export const csvSchemas = pgTable("csv_schemas", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull(),
-  description: text("description"),
-  schema: jsonb("schema").notNull().$type<Record<string, CsvSchemaField>>(), // Explicit typing
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-  createdBy: integer("created_by").notNull(),
-});
-
-// Update the insert schema to match the new typing
-export const insertCsvSchemaSchema = createInsertSchema(csvSchemas).extend({
-  schema: z.record(z.string(), z.object({
-    type: z.enum(["string", "number", "boolean", "date"]),
-    required: z.boolean(),
-    format: z.string().optional(),
-  })),
-});
-
-// Field Mappings table
-export const fieldMappings = pgTable("field_mappings", {
-  id: serial("id").primaryKey(),
-  schemaId: integer("schema_id").notNull(),
-  sourceField: text("source_field").notNull(),
-  targetField: text("target_field").notNull(),
-  transformationRule: text("transformation_rule"),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
-
-// Validation Rules table
-export const validationRules = pgTable("validation_rules", {
-  id: serial("id").primaryKey(),
-  schemaId: integer("schema_id").notNull(),
-  fieldName: text("field_name").notNull(),
-  ruleType: text("rule_type").notNull(), // e.g., "regex", "range", "required"
-  ruleConfig: jsonb("rule_config").notNull(),
-  enabled: boolean("enabled").notNull().default(true),
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-  updatedAt: timestamp("updated_at").notNull().defaultNow(),
-});
-
 // Table for regulation updates
 export const regulationUpdates = pgTable("regulation_updates", {
   id: serial("id").primaryKey(),
@@ -953,21 +903,6 @@ export const errorRecords = pgTable("error_records", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-// Schema for inserting Field Mapping
-export const insertFieldMappingSchema = createInsertSchema(fieldMappings);
-
-// Schema for inserting Validation Rule
-export const insertValidationRuleSchema = createInsertSchema(validationRules).extend({
-  ruleType: z.enum(["regex", "range", "required", "enum", "custom"]),
-  ruleConfig: z.object({
-    pattern: z.string().optional(),
-    min: z.number().optional(),
-    max: z.number().optional(),
-    values: z.array(z.string()).optional(),
-    customValidation: z.string().optional(),
-  }),
-});
-
 // Schema for inserting Transformation Log
 export const insertTransformationLogSchema = createInsertSchema(transformationLogs).extend({
   status: z.enum(["success", "partial", "failed"]),
@@ -980,12 +915,6 @@ export const insertErrorRecordSchema = createInsertSchema(errorRecords).extend({
 });
 
 // Additional type exports
-export type CsvSchema = typeof csvSchemas.$inferSelect;
-export type InsertCsvSchema = z.infer<typeof insertCsvSchemaSchema>;
-export type FieldMapping = typeof fieldMappings.$inferSelect;
-export type InsertFieldMapping = z.infer<typeof insertFieldMappingSchema>;
-export type ValidationRule = typeof validationRules.$inferSelect;
-export type InsertValidationRule = z.infer<typeof insertValidationRuleSchema>;
 export type TransformationLog = typeof transformationLogs.$inferSelect;
 export type InsertTransformationLog = z.infer<typeof insertTransformationLogSchema>;
 export type ErrorRecord = typeof errorRecords.$inferSelect;

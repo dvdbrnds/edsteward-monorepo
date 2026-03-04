@@ -4,9 +4,6 @@ import {
   notifications,
   deadlines,
   guides,
-  csvSchemas,
-  validationRules,
-  fieldMappings,
   notes,
   noteHistory,
   evidenceFiles,
@@ -32,12 +29,6 @@ import type {
   InsertDeadline,
   Guide,
   InsertGuide,
-  CsvSchema,
-  InsertCsvSchema,
-  ValidationRule,
-  InsertValidationRule,
-  FieldMapping,
-  InsertFieldMapping,
   Note,
   InsertNote,
   // MCP Integration types
@@ -165,14 +156,6 @@ export interface IStorage {
   getGuide(_id: number): Promise<Guide | undefined>;
   createGuide(_guide: InsertGuide): Promise<Guide>;
   updateGuide(_id: number, _guide: Partial<InsertGuide>): Promise<Guide>;
-
-  // ETL methods
-  getCsvSchemas(): Promise<CsvSchema[]>;
-  getCsvSchema(_id: number): Promise<CsvSchema | undefined>;
-  createCsvSchema(_schema: InsertCsvSchema): Promise<CsvSchema>;
-  getValidationRules(_schemaId: number): Promise<ValidationRule[]>;
-  createValidationRule(_rule: InsertValidationRule): Promise<ValidationRule>;
-  createFieldMapping(_mapping: InsertFieldMapping): Promise<FieldMapping>;
 
   // Session store
   sessionStore: session.Store;
@@ -1426,49 +1409,6 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.role, "admin"))
       .limit(1);
     return !!adminUser;
-  }
-
-  async getCsvSchemas(): Promise<CsvSchema[]> {
-    return await this.db.select().from(csvSchemas);
-  }
-
-  async getCsvSchema(id: number): Promise<CsvSchema | undefined> {
-    const [schema] = await this.db
-      .select()
-      .from(csvSchemas)
-      .where(eq(csvSchemas.id, id));
-    return schema;
-  }
-
-  async createCsvSchema(schema: InsertCsvSchema): Promise<CsvSchema> {
-    const [newSchema] = await this.db
-      .insert(csvSchemas)
-      .values(schema)
-      .returning();
-    return newSchema;
-  }
-
-  async getValidationRules(schemaId: number): Promise<ValidationRule[]> {
-    return await this.db
-      .select()
-      .from(validationRules)
-      .where(eq(validationRules.schemaId, schemaId));
-  }
-
-  async createValidationRule(rule: InsertValidationRule): Promise<ValidationRule> {
-    const [newRule] = await this.db
-      .insert(validationRules)
-      .values(rule)
-      .returning();
-    return newRule;
-  }
-
-  async createFieldMapping(mapping: InsertFieldMapping): Promise<FieldMapping> {
-    const [newMapping] = await this.db
-      .insert(fieldMappings)
-      .values(mapping)
-      .returning();
-    return newMapping;
   }
 
   async getNotesByRegulation(regulationId: number): Promise<Note[]> {
