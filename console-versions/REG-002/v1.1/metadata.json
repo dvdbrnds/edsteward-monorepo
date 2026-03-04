@@ -1,0 +1,13 @@
+{
+  "regKey": "REG-002",
+  "version": "v1.1",
+  "status": "gold",
+  "certifiedBy": "console-user",
+  "certifiedAt": "2026-02-12T18:17:33.079Z",
+  "contentHash": "9bc82bab8ae0f558bb42062a94c1fd9cd9247166500d12b283fa88e46282dadf",
+  "contentSize": 323231,
+  "workflowScore": 90,
+  "taskCount": "21",
+  "deadlineCount": "5",
+  "notes": ""
+}

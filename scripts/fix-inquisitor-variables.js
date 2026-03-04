@@ -4,7 +4,7 @@
 import fs from 'fs';
 import path from 'path';
 
-const regulationsDir = './src/client/public/regulations';
+const regulationsDir = '../src/client/public/regulations';
 const files = fs.readdirSync(regulationsDir).filter(f => f.endsWith('-console.html'));
 
 console.log(`Fixing ${files.length} console files...`);
