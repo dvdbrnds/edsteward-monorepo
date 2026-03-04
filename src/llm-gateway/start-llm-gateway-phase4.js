@@ -1408,9 +1408,17 @@ The Family Educational Rights and Privacy Act (FERPA) is a federal law that prot
               // Source validation metadata
               source_validation: pkg.sourceValidation,
               
-              // Rich government source data
+              // Jurisdiction metadata (state vs federal)
+              jurisdiction_type: pkg.jurisdiction?.type || 'federal',
+              jurisdiction_data: pkg.jurisdiction || null,
+              
+              // Rich government source data (federal path)
               ecfr_data: result.steps?.governmentSources?.data?.ecfr || null,
               federal_register_data: result.steps?.governmentSources?.data?.federalRegister || null,
+              
+              // State source data (state path)
+              state_sources_data: result.steps?.governmentSources?.data?.stateSources || null,
+              legislative_history: pkg.legislativeHistory || null,
               
               // Legal database cross-reference data
               legal_database_data: result.steps?.legalValidation?.data?.lawLibrarySources || null,
@@ -1420,7 +1428,8 @@ The Family Educational Rights and Privacy Act (FERPA) is a federal law that prot
               penalties: pkg.penalties,
               citations: {
                 usc: pkg.statute,
-                cfr: pkg.cfrCitation,
+                cfr: pkg.cfrCitation || '',
+                stateStatute: pkg.jurisdiction?.citation || '',
                 fullCitations: pkg.sourceValidation?.legalDatabases || null
               },
               
@@ -1438,7 +1447,7 @@ The Family Educational Rights and Privacy Act (FERPA) is a federal law that prot
               last_workflow_run: new Date().toISOString()
             };
             
-            logger.info(`[WORKFLOW] 📦 Comprehensive payload: summary=${(pkg.summary || '').length} chars, keyReqs=${(pkg.keyRequirements || []).length}, hasEcfr=${!!savePayload.ecfr_data}`);
+            logger.info(`[WORKFLOW] 📦 Comprehensive payload: jurisdiction=${savePayload.jurisdiction_type}, summary=${(pkg.summary || '').length} chars, keyReqs=${(pkg.keyRequirements || []).length}, hasEcfr=${!!savePayload.ecfr_data}, hasStateSources=${!!savePayload.state_sources_data}`);
             
             const saveResponse = await fetch('http://localhost:3010/api/regulations/workflow-update', {
               method: 'POST',

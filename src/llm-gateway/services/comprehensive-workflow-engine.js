@@ -19,6 +19,7 @@ import { extractComplianceRequirements, getKnownRegulationTasks } from './regula
 import { detectChanges, generateHash } from './differential-analysis.js';
 import { FederalRegisterAPIClient } from '../federal-register-api-client.js';
 import { fetchCFRPart } from '../ecfr-api-client.js';
+import { fetchStateStatute, getStateMapping, isStateRegulation, detectStateCode } from '../state-legislature-api-client.js';
 import ConsistentSummaryService from '../../services/consistent-summary-service.js';
 
 // Initialize the AI summary service
@@ -178,40 +179,74 @@ export async function executeComprehensiveWorkflow(regulationSlug, existingData 
     console.log(`\n📖 STEP 1: FETCHING FROM GOVERNMENT SOURCES...`);
     result.steps.governmentSources.status = 'running';
     
-    // Get regulation citations
-    const cfrMapping = getCFRMapping(regulationSlug);
+    // Detect jurisdiction: state vs federal
+    const isState = isStateRegulation(regulationSlug);
+    const stateMapping = isState ? getStateMapping(regulationSlug) : null;
+    const stateCode = isState ? (stateMapping?.state || detectStateCode(regulationSlug)) : null;
     
-    // Fetch from eCFR
     let ecfrData = null;
-    if (cfrMapping) {
-      const citation = cfrMapping.section 
-        ? `${cfrMapping.title} CFR ${cfrMapping.part}.${cfrMapping.section}`
-        : `${cfrMapping.title} CFR ${cfrMapping.part}`;
-      console.log(`   Fetching ${citation} (${cfrMapping.name || regulationSlug})...`);
+    let federalRegisterData = null;
+    let stateData = null;
+    
+    if (isState) {
+      // ---- STATE REGULATION: Fetch from state sources ----
+      console.log(`   🏛️  DETECTED STATE REGULATION (${stateCode || 'unknown state'})`);
+      console.log(`   📍 Using state source pipeline instead of federal eCFR/FR`);
       
-      // Pass section and search terms for more precise fetching
-      ecfrData = await fetchCFRPart(cfrMapping.title, cfrMapping.part, {
-        section: cfrMapping.section,
-        searchTerms: cfrMapping.searchTerms,
-        name: cfrMapping.name
-      });
+      stateData = await fetchStateStatute(regulationSlug, stateMapping);
+      
+      // Also do a limited Federal Register search for federal cross-references
+      const searchTerm = regulationSlug.replace(/-/g, ' ').substring(0, 50);
+      console.log(`   🔗 Cross-ref: Searching Federal Register for related federal guidance...`);
+      federalRegisterData = await federalRegisterClient.searchDocuments(searchTerm, { perPage: 5 });
+      
+      result.steps.governmentSources.status = 'completed';
+      result.steps.governmentSources.data = {
+        jurisdiction: 'state',
+        stateCode,
+        stateSources: stateData,
+        federalRegister: federalRegisterData,
+        timestamp: new Date().toISOString()
+      };
+      
+      console.log(`   ✅ State sources fetched`);
+      console.log(`      - State sources: ${stateData?.successfulSources?.length || 0} successful`);
+      console.log(`      - Primary text: ${stateData?.fullText?.length || 0} chars`);
+      console.log(`      - Federal cross-refs: ${federalRegisterData?.count || 0} documents`);
+      
+    } else {
+      // ---- FEDERAL REGULATION: Original eCFR + Federal Register pipeline ----
+      const cfrMapping = getCFRMapping(regulationSlug);
+      
+      if (cfrMapping) {
+        const citation = cfrMapping.section 
+          ? `${cfrMapping.title} CFR ${cfrMapping.part}.${cfrMapping.section}`
+          : `${cfrMapping.title} CFR ${cfrMapping.part}`;
+        console.log(`   Fetching ${citation} (${cfrMapping.name || regulationSlug})...`);
+        
+        ecfrData = await fetchCFRPart(cfrMapping.title, cfrMapping.part, {
+          section: cfrMapping.section,
+          searchTerms: cfrMapping.searchTerms,
+          name: cfrMapping.name
+        });
+      }
+      
+      const searchTerm = regulationSlug.replace(/-/g, ' ').substring(0, 50);
+      console.log(`   Searching Federal Register for "${searchTerm}"...`);
+      federalRegisterData = await federalRegisterClient.searchDocuments(searchTerm, { perPage: 10 });
+      
+      result.steps.governmentSources.status = 'completed';
+      result.steps.governmentSources.data = {
+        jurisdiction: 'federal',
+        ecfr: ecfrData,
+        federalRegister: federalRegisterData,
+        timestamp: new Date().toISOString()
+      };
+      
+      console.log(`   ✅ Federal sources fetched`);
+      console.log(`      - eCFR: ${ecfrData?.success ? 'SUCCESS' : 'N/A'}`);
+      console.log(`      - Federal Register: ${federalRegisterData?.count || 0} documents`);
     }
-    
-    // Fetch from Federal Register
-    const searchTerm = regulationSlug.replace(/-/g, ' ').substring(0, 50);
-    console.log(`   Searching Federal Register for "${searchTerm}"...`);
-    const federalRegisterData = await federalRegisterClient.searchDocuments(searchTerm, { perPage: 10 });
-    
-    result.steps.governmentSources.status = 'completed';
-    result.steps.governmentSources.data = {
-      ecfr: ecfrData,
-      federalRegister: federalRegisterData,
-      timestamp: new Date().toISOString()
-    };
-    
-    console.log(`   ✅ Government sources fetched`);
-    console.log(`      - eCFR: ${ecfrData?.success ? 'SUCCESS' : 'N/A'}`);
-    console.log(`      - Federal Register: ${federalRegisterData?.count || 0} documents`);
     
     // ========================================================================
     // STEP 2: DIFFERENTIAL ANALYSIS
@@ -219,10 +254,15 @@ export async function executeComprehensiveWorkflow(regulationSlug, existingData 
     console.log(`\n🔍 STEP 2: PERFORMING DIFFERENTIAL ANALYSIS...`);
     result.steps.differentialAnalysis.status = 'running';
     
-    // Build incoming data from government sources
+    // Build incoming data from government sources (state or federal)
+    const primaryRegulationText = isState
+      ? (stateData?.fullText || '')
+      : (ecfrData?.fullText || '');
+    
     const incomingData = {
-      regulationText: ecfrData?.fullText || '',
+      regulationText: primaryRegulationText,
       federalRegisterDocs: federalRegisterData?.results || [],
+      stateSources: isState ? stateData?.sources : null,
       lastUpdated: new Date().toISOString()
     };
     
@@ -272,11 +312,18 @@ export async function executeComprehensiveWorkflow(regulationSlug, existingData 
     console.log(`\n📋 STEP 4: EXTRACTING COMPLIANCE TASKS & DEADLINES...`);
     result.steps.taskExtraction.status = 'running';
     
-    // Combine all text sources for analysis
-    const combinedText = [
-      ecfrData?.fullText || '',
-      federalRegisterData?.results?.map(d => d.abstract || d.title).join('\n') || ''
-    ].join('\n\n');
+    // Combine all text sources for analysis (state-aware)
+    const combinedText = isState
+      ? [
+          stateData?.fullText || '',
+          stateData?.requirements || '',
+          stateData?.adminCode?.fullText || '',
+          federalRegisterData?.results?.map(d => d.abstract || d.title).join('\n') || ''
+        ].filter(Boolean).join('\n\n')
+      : [
+          ecfrData?.fullText || '',
+          federalRegisterData?.results?.map(d => d.abstract || d.title).join('\n') || ''
+        ].join('\n\n');
     
     // Extract compliance requirements
     const extractionResult = await extractComplianceRequirements(
@@ -311,8 +358,10 @@ export async function executeComprehensiveWorkflow(regulationSlug, existingData 
     
     let generatedSummary = null;
     try {
-      const regulationTitle = crossRefResult.fullName || crossRefResult.regulationName || regulationSlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
-      const regulationTextForSummary = ecfrData?.fullText || combinedText || '';
+      const regulationTitle = isState
+        ? (stateMapping?.name || regulationSlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()))
+        : (crossRefResult.fullName || crossRefResult.regulationName || regulationSlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()));
+      const regulationTextForSummary = primaryRegulationText || combinedText || '';
       
       if (regulationTextForSummary.length > 100) {
         // Use AI to generate consistent, high-quality summary
@@ -349,14 +398,28 @@ export async function executeComprehensiveWorkflow(regulationSlug, existingData 
       regulationId: regulationSlug,
       itemId: regulationSlug,
       
-      // Basic info
-      name: crossRefResult.fullName || crossRefResult.regulationName || regulationSlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
-      statute: crossRefResult.citations?.usc || existingData?.statute || '',
-      cfrCitation: crossRefResult.citations?.cfr || existingData?.cfrCitation || '',
+      // Basic info (state regulations use mapping name to avoid cross-ref contamination)
+      name: isState
+        ? (stateMapping?.name || stateData?.sources?.enhancedJson?.regulatoryBody || regulationSlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase()))
+        : (crossRefResult.fullName || crossRefResult.regulationName || regulationSlug.replace(/-/g, ' ').replace(/\b\w/g, l => l.toUpperCase())),
+      statute: isState ? (stateData?.citation || crossRefResult.citations?.usc || existingData?.statute || '') : (crossRefResult.citations?.usc || existingData?.statute || ''),
+      cfrCitation: isState ? '' : (crossRefResult.citations?.cfr || existingData?.cfrCitation || ''),
       
-      // Full regulation content
-      regulationText: ecfrData?.fullText || existingData?.regulationText || '',
-      contentHash: generateHash(ecfrData?.fullText || existingData?.regulationText || ''),
+      // Jurisdiction metadata
+      jurisdiction: isState ? {
+        type: 'state',
+        stateCode,
+        stateName: stateData?.stateName || '',
+        citation: stateData?.citation || '',
+        regulatoryBody: stateData?.sources?.enhancedJson?.regulatoryBody || '',
+      } : {
+        type: 'federal',
+        citation: crossRefResult.citations?.cfr || '',
+      },
+      
+      // Full regulation content (state text takes priority for state regulations)
+      regulationText: primaryRegulationText || existingData?.regulationText || '',
+      contentHash: generateHash(primaryRegulationText || existingData?.regulationText || ''),
       
       // AI-GENERATED SUMMARY (The authoritative MCP Engine deserves authoritative summaries!)
       summary: generatedSummary?.summary || existingData?.summary || `Compliance requirements for ${crossRefResult.regulationName || regulationSlug}`,
@@ -369,11 +432,35 @@ export async function executeComprehensiveWorkflow(regulationSlug, existingData 
       primaryStakeholders: generatedSummary?.primaryStakeholders || [],
       enforcementAgency: generatedSummary?.enforcementAgency || null,
       
-      // Source validation
-      sourceValidation: {
+      // Source validation (adapts to jurisdiction type)
+      sourceValidation: isState ? {
+        type: 'state',
+        stateCode,
+        stateSources: stateData?.sourceValidation || {},
+        successfulSources: stateData?.successfulSources || [],
+        federalCrossRefs: {
+          status: federalRegisterData?.count > 0 ? 'found' : 'none',
+          note: 'Federal sources shown for cross-reference only — not authoritative for state law',
+          documentCount: federalRegisterData?.count || 0,
+          recentDocuments: (federalRegisterData?.results || []).slice(0, 3).map(d => ({
+            title: d.title,
+            type: d.type,
+            date: d.publication_date,
+            url: d.html_url
+          })),
+        },
+        legalDatabases: {
+          courtListener: crossRefResult.lawLibrarySources?.courtListener?.confidence || 0,
+          cornell: crossRefResult.academicSources?.cornellLII?.confidence || 0,
+          overallConfidence: crossRefResult.summary?.averageConfidence || 0,
+          certaintyLevel: crossRefResult.summary?.certaintyLevel || 'D'
+        },
+        lastChecked: new Date().toISOString()
+      } : {
+        type: 'federal',
         ecfr: {
           status: ecfrData?.success ? 'verified' : 'unavailable',
-          url: ecfrData?.url || `https://www.ecfr.gov/current/title-${cfrMapping?.title || '34'}/part-${cfrMapping?.part || '99'}`,
+          url: ecfrData?.url || `https://www.ecfr.gov/current/title-${getCFRMapping(regulationSlug)?.title || '34'}/part-${getCFRMapping(regulationSlug)?.part || '99'}`,
           lastChecked: new Date().toISOString()
         },
         federalRegister: {
@@ -411,17 +498,23 @@ export async function executeComprehensiveWorkflow(regulationSlug, existingData 
         sortOrder: task.sortOrder
       })),
       
-      // FILING DEADLINES
-      filingDeadlines: extractionResult.deadlines.map(d => ({
-        type: d.type,
+      // FILING DEADLINES (merge task extractor results with state source deadlines)
+      filingDeadlines: (extractionResult.deadlines.length > 0
+        ? extractionResult.deadlines
+        : (isState && stateData?.deadlines?.length > 0 ? stateData.deadlines : [])
+      ).map(d => ({
+        type: d.type || 'compliance',
         date: d.date,
-        description: d.description,
-        frequency: d.frequency,
+        description: d.description || d.label || '',
+        frequency: d.frequency || 'one-time',
         advanceNoticeDays: d.advanceNoticeDays || 30
       })),
       
-      // PENALTIES
-      penalties: extractionResult.penalties.map(p => ({
+      // PENALTIES (merge task extractor results with state source penalties)
+      penalties: (extractionResult.penalties.length > 0
+        ? extractionResult.penalties
+        : (isState && stateData?.penalties?.length > 0 ? stateData.penalties : [])
+      ).map(p => ({
         type: p.type,
         amount: p.amount,
         description: p.description,
@@ -442,7 +535,7 @@ export async function executeComprehensiveWorkflow(regulationSlug, existingData 
         changeSeverity: differentialResult.changeSeverity,
         changeSummary: differentialResult.summary,
         previousHash: existingData?.contentHash || null,
-        currentHash: generateHash(ecfrData?.fullText || existingData?.regulationText || '')
+        currentHash: generateHash(primaryRegulationText || existingData?.regulationText || '')
       },
       
       // Validation metadata
@@ -455,11 +548,16 @@ export async function executeComprehensiveWorkflow(regulationSlug, existingData 
         sourcesVerified: crossRefResult.summary?.successfulFetches || 0
       },
       
+      // Legislative history (state regulations only)
+      legislativeHistory: isState ? stateData?.legislativeHistory : null,
+      
       // Workflow metadata
       workflowMetadata: {
         workflowId,
         executedAt: new Date().toISOString(),
         duration: `${Date.now() - startTime}ms`,
+        jurisdictionType: isState ? 'state' : 'federal',
+        stateCode: stateCode || null,
         isReal: true,
         noMockData: true,
         allApiCallsReal: true

@@ -1,11 +1,50 @@
 {
   "regulationId": "pennsylvania-higher-education-gift-disclosure-act",
+  "schemaVersion": "2.0",
+
+  "jurisdiction": {
+    "source": "state",
+    "countryCode": "US",
+    "stateCodes": ["PA"],
+    "label": "Pennsylvania",
+    "regulatoryBody": "Pennsylvania Department of Education",
+    "actNumber": null,
+    "applicability": "all"
+  },
+
   "enhanced": {
     "fullText": "The Pennsylvania Higher Education Gift Disclosure Act, codified at 24 P.S. § 2510-A et seq., establishes comprehensive financial transparency requirements for institutions of higher education operating within Pennsylvania. Enacted to promote accountability and public awareness of significant financial contributions, this Act mandates disclosure of substantial gifts and donations received by covered educational institutions.\n\nUnder 24 P.S. § 2510-A(b), the Act applies to all institutions of higher education that receive state appropriations or are chartered by the Commonwealth of Pennsylvania, including state universities, community colleges, and private institutions receiving public funding. The disclosure threshold is established at $50,000 for individual gifts or $100,000 in aggregate contributions from a single source within any fiscal year, as specified in 24 P.S. § 2510-A(c).\n\nKey provisions require institutions to maintain detailed records of all qualifying gifts, including donor identity, gift value, intended purpose, and any conditions or restrictions attached to the contribution. Under 24 P.S. § 2510-A(d), institutions must publicly disclose this information through annual reports submitted to the Pennsylvania Department of Education and made available on institutional websites within 90 days of fiscal year-end.\n\nThe Act specifically addresses foreign gift reporting, requiring enhanced disclosure for contributions from non-U.S. sources exceeding $25,000, aligning with federal requirements under 20 U.S.C. § 1011f. This includes detailed reporting of foreign government contracts, grants, and restricted or conditional gifts that may influence academic programs, research activities, or institutional policies.\n\nEnforcement mechanisms under 24 P.S. § 2510-A(f) authorize the Pennsylvania Department of Education to conduct compliance audits and impose penalties ranging from warning letters to suspension of state funding for non-compliant institutions. Civil penalties may reach $10,000 per violation for willful non-disclosure or misrepresentation of required information.\n\nRecent amendments in 2022 expanded reporting requirements to include gifts-in-kind valued above threshold amounts and established electronic filing procedures through the Pennsylvania Higher Education Assistance Agency's online portal. The 2023 regulatory updates at 22 Pa. Code § 31.41 clarified that endowment contributions, research grants with commercial applications, and naming rights agreements are subject to disclosure regardless of payment structure or timing.\n\nInstitutions must also implement internal compliance programs including designated gift disclosure officers, staff training protocols, and donor notification procedures regarding potential public disclosure obligations, ensuring comprehensive adherence to transparency mandates while maintaining donor relations and institutional advancement activities.",
     "summary": "Pennsylvania Act requiring higher education institutions to disclose gifts exceeding $50,000 individually or $100,000 aggregate annually, with enhanced reporting for foreign contributions above $25,000, enforced through state audits and funding penalties.",
     "requirements": "## Disclosure Thresholds\n- Report individual gifts of $50,000 or more from any single source\n- Disclose aggregate contributions of $100,000+ per donor within fiscal year\n- Enhanced reporting for foreign gifts exceeding $25,000 under 24 P.S. § 2510-A(d)\n\n## Record Maintenance\n- Maintain comprehensive donor identification records\n- Document gift value, purpose, and attached conditions\n- Preserve supporting documentation for minimum seven years\n\n## Public Reporting\n- Submit annual disclosure reports to PA Department of Education\n- Publish gift information on institutional website within 90 days of fiscal year-end\n- Include gifts-in-kind, endowments, and naming rights agreements per 22 Pa. Code § 31.41\n\n## Compliance Infrastructure\n- Designate qualified gift disclosure officer\n- Implement staff training programs on disclosure obligations\n- Establish donor notification procedures regarding transparency requirements",
     "reportingRequirements": "Annual gift disclosure reports due within 90 days of fiscal year-end to Pennsylvania Department of Education via online portal. Foreign gift reports required within 60 days of receipt for contributions exceeding $25,000. Public website disclosure mandatory concurrent with state filing."
   },
+
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Annual Gift Disclosure Report",
+      "type": "reporting",
+      "description": "Annual gift disclosure reports due within 90 days of fiscal year-end to Pennsylvania Department of Education via online portal.",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Foreign Gift Report (60 days)",
+      "type": "reporting",
+      "description": "Foreign gift reports required within 60 days of receipt for contributions exceeding $25,000.",
+      "isRecurring": false
+    }
+  ],
+
+  "relationships": [],
+
+  "tags": [
+    "Finance and Administration",
+    "Ethics",
+    "Disclosure"
+  ],
+
   "audit": {
     "score": 93,
     "certainty": "A",

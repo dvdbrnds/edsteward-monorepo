@@ -342,6 +342,126 @@ const REGULATION_TEMPLATES = {
       { type: 'civil', description: 'Private right of action for damages' },
       { type: 'ocr', description: 'OCR investigation and resolution agreement' }
     ]
+  },
+  
+  'pennsylvania-act-55-of-2022': {
+    searchTerms: ['act 55', 'pa act 55', '24 p.s. § 20-2001-g', 'article xx-g', 'pennsylvania-act-55'],
+    jurisdiction: 'state',
+    stateCode: 'PA',
+    sections: [
+      {
+        title: 'Evidence-Based Education Program (Section 2003-G)',
+        description: 'Establish and implement evidence-based education program for ALL students covering sexual violence, dating violence, domestic violence, and stalking.',
+        category: 'Education Program',
+        priority: 'critical',
+        deadline: { type: 'annual', date: '08-15', description: 'Before start of each academic year' },
+        assignedRole: 'Dean of Students / Student Affairs',
+        subtasks: [
+          { title: 'Consult with Local Rape Crisis Center', description: 'Engage local rape crisis center in development or review of education program per Section 2003-G.', priority: 'critical' },
+          { title: 'Consult with Domestic Violence Program', description: 'Engage local domestic violence program in development or review of education program per Section 2003-G.', priority: 'critical' },
+          { title: 'Cover All Required Topics', description: 'Ensure program covers: consent, drug/alcohol-facilitated violence, risk education, assistance resources, pregnancy/STI info, campus/community resources, confidentiality.', priority: 'critical' },
+          { title: 'Deliver to All Students', description: 'Ensure ALL enrolled students receive the education program, not just new students.', priority: 'high' },
+          { title: 'Review PA DOE Clearinghouse Resources', description: 'Check PA Department of Education online clearinghouse for model programs and resources.', priority: 'medium' }
+        ]
+      },
+      {
+        title: 'Consent Definition (Section 2003-G.1)',
+        description: 'Adopt a formal definition of consent as part of the code of conduct or sexual misconduct/harassment policy.',
+        category: 'Policy',
+        priority: 'critical',
+        deadline: { type: 'continuous', description: 'Must be in code of conduct at all times' },
+        assignedRole: 'General Counsel / Compliance Officer',
+        subtasks: [
+          { title: 'Draft Consent Definition', description: 'Develop formal consent definition that meets PA Act 55 requirements.', priority: 'critical' },
+          { title: 'Incorporate into Code of Conduct', description: 'Add consent definition to student code of conduct or sexual misconduct/harassment policy.', priority: 'critical' },
+          { title: 'Publish Definition', description: 'Make consent definition accessible to all students and employees.', priority: 'high' }
+        ]
+      },
+      {
+        title: 'Follow-Up Programming (Section 2004-G)',
+        description: 'Conduct at least one follow-up program during the school year for students who participated in the education program.',
+        category: 'Education Program',
+        priority: 'high',
+        deadline: { type: 'annual', date: '04-30', description: 'At least one follow-up per academic year' },
+        assignedRole: 'Dean of Students / Student Affairs',
+        subtasks: [
+          { title: 'Schedule Follow-Up Program', description: 'Plan at least one follow-up session (lecture, interactive learning, activity, video, or educational materials).', priority: 'high' },
+          { title: 'Document Attendance', description: 'Record participation in follow-up programming for compliance reporting.', priority: 'medium' }
+        ]
+      },
+      {
+        title: 'Notification of Rights (Section 2003-G(c))',
+        description: 'Make concise notification of rights, accommodations, and protective measures available in writing and on public website.',
+        category: 'Communications',
+        priority: 'high',
+        deadline: { type: 'continuous', description: 'Must be available at all times' },
+        assignedRole: 'Communications / Compliance Officer',
+        subtasks: [
+          { title: 'Draft Rights Notification', description: 'Create concise written notification covering counseling, advocacy, legal assistance, reporting options, protection orders, and crime victims\' compensation.', priority: 'high' },
+          { title: 'Publish on Website', description: 'Post notification on institution\'s public-facing website.', priority: 'high' },
+          { title: 'Make Available in Print', description: 'Ensure written copies are available at relevant offices.', priority: 'medium' }
+        ]
+      },
+      {
+        title: 'Memorandum of Understanding — Rape Crisis Center (Section 2007-G)',
+        description: 'Enter into and maintain MOU with at least one rape crisis center (per 42 Pa.C.S. § 5945.1) for main campus and each branch campus.',
+        category: 'Partnerships',
+        priority: 'critical',
+        deadline: { type: 'annual', date: '07-01', description: 'Must be in effect; review annually' },
+        assignedRole: 'General Counsel / Compliance Officer',
+        subtasks: [
+          { title: 'Identify Qualified Rape Crisis Center', description: 'Identify center meeting the definition under 42 Pa.C.S. § 5945.1 for each campus.', priority: 'critical' },
+          { title: 'Negotiate MOU Terms', description: 'MOU must cover: policy development, off-campus victim services, notification of services, cooperation/cross-training, education program consultation.', priority: 'critical' },
+          { title: 'Ensure Required Services', description: 'MOU must provide: crisis counseling, longer-term counseling, legal assistance, protection orders, forensic rape exams by SANE, crime victims\' compensation.', priority: 'critical' },
+          { title: 'Execute MOU for Each Campus', description: 'Signed MOU required for main campus AND each branch campus separately.', priority: 'critical' },
+          { title: 'Request Good-Faith Waiver if Needed', description: 'If unable to obtain signed MOU despite good-faith efforts, request waiver from PA DOE.', priority: 'medium' }
+        ]
+      },
+      {
+        title: 'Memorandum of Understanding — Domestic Violence Program (Section 2007-G)',
+        description: 'Enter into and maintain MOU with at least one domestic violence program (per 23 Pa.C.S. § 6102) for main campus and each branch campus.',
+        category: 'Partnerships',
+        priority: 'critical',
+        deadline: { type: 'annual', date: '07-01', description: 'Must be in effect; review annually' },
+        assignedRole: 'General Counsel / Compliance Officer',
+        subtasks: [
+          { title: 'Identify Qualified DV Program', description: 'Identify domestic violence program meeting the definition under 23 Pa.C.S. § 6102 for each campus.', priority: 'critical' },
+          { title: 'Negotiate MOU Terms', description: 'MOU must address same areas as rape crisis center MOU: policy, services, notification, cooperation, education consultation.', priority: 'critical' },
+          { title: 'Execute MOU for Each Campus', description: 'Signed MOU required for main campus AND each branch campus.', priority: 'critical' }
+        ]
+      },
+      {
+        title: 'Annual Attestation of Compliance (Section 2006-G)',
+        description: 'Report to PA Department of Education on implementation of education program and MOU status through annual attestation.',
+        category: 'Reporting',
+        priority: 'critical',
+        deadline: { type: 'annual', date: '10-01', description: 'Annual attestation to PA DOE' },
+        assignedRole: 'Compliance Officer / President',
+        subtasks: [
+          { title: 'Document Education Program Implementation', description: 'Compile evidence of education program delivery under Section 2003-G.', priority: 'high' },
+          { title: 'Document MOU Status', description: 'Verify all MOUs are current and compile copies for attestation.', priority: 'high' },
+          { title: 'Document Follow-Up Programming', description: 'Compile records of follow-up programming conducted during the year.', priority: 'high' },
+          { title: 'Submit Attestation to PA DOE', description: 'Submit completed attestation of compliance to the Pennsylvania Department of Education.', priority: 'critical' }
+        ]
+      },
+      {
+        title: 'Employee Programming (Institutions Without Full-Time Students)',
+        description: 'Institutions without full-time students must maintain MOUs and provide programming for employees.',
+        category: 'Employee Programs',
+        priority: 'high',
+        deadline: { type: 'annual', date: '08-15', description: 'Before start of each academic year' },
+        assignedRole: 'HR Director / Compliance Officer',
+        subtasks: [
+          { title: 'Develop Employee Education Program', description: 'Create education program adapted for employees if no full-time students enrolled.', priority: 'high' },
+          { title: 'Maintain Employee MOUs', description: 'Ensure MOUs remain in effect even without full-time student population.', priority: 'high' }
+        ]
+      }
+    ],
+    penalties: [
+      { type: 'administrative', description: 'PA Department of Education compliance action and required corrective plan' },
+      { type: 'funding', description: 'Potential impact on state funding and It\'s On Us PA grant eligibility' },
+      { type: 'accreditation', description: 'Compliance findings may affect institutional accreditation reviews' }
+    ]
   }
 };
 
@@ -444,25 +564,45 @@ function extractPenalties(text) {
 
 /**
  * Match regulation to known template
+ * 
+ * Priority: exact slug match > slug partial match > text match
+ * Requires at least 2 search term hits to prevent false positives
+ * (e.g., PA Act 55 accidentally matching Title IX because the text contains "sexual")
  */
 function matchToTemplate(regulationSlug, regulationText) {
   const lowerSlug = regulationSlug.toLowerCase();
   const lowerText = (regulationText || '').toLowerCase();
   
+  let bestMatch = null;
+  let bestScore = 0;
+  
   for (const [key, template] of Object.entries(REGULATION_TEMPLATES)) {
-    const matchScore = template.searchTerms.reduce((score, term) => {
-      if (lowerSlug.includes(term) || lowerText.includes(term)) {
-        return score + 1;
-      }
-      return score;
-    }, 0);
+    let slugScore = 0;
+    let textScore = 0;
     
-    if (matchScore >= 1) {
-      return { templateKey: key, template, matchScore };
+    // Exact slug match gets massive bonus (prevents cross-contamination)
+    if (lowerSlug.includes(key) || key.includes(lowerSlug.substring(0, 15))) {
+      slugScore = 100;
+    }
+    
+    for (const term of template.searchTerms) {
+      if (lowerSlug.includes(term)) slugScore += 10;
+      if (lowerText.includes(term)) textScore += 1;
+    }
+    
+    const totalScore = slugScore + textScore;
+    
+    // Require either a slug match or at least 2 text matches
+    // This prevents "sexual violence" in PA Act 55 text from matching the Title IX template
+    const meetsThreshold = slugScore >= 10 || textScore >= 2;
+    
+    if (meetsThreshold && totalScore > bestScore) {
+      bestScore = totalScore;
+      bestMatch = { templateKey: key, template, matchScore: totalScore };
     }
   }
   
-  return null;
+  return bestMatch;
 }
 
 /**

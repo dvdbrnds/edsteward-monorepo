@@ -467,6 +467,7 @@ router.get('/api/regulations/:id', async (req, res) => {
       topic: regulation.topic,
       category: regulation.category,
       statute: regulation.statute,
+      cfr: regulation.cfr,
       
       // Jurisdiction
       jurisdictionSource: regulation.jurisdiction_source,
@@ -658,11 +659,16 @@ router.post('/api/regulations/workflow-update', async (req, res) => {
       // Rich source data - SAVE EVERYTHING!
       ecfr_data,
       federal_register_data,
+      state_sources_data,
       legal_database_data,
       academic_sources_data,
       penalties,
       citations,
       differential_data,
+      // Jurisdiction
+      jurisdiction_type,
+      jurisdiction_data,
+      legislative_history,
       // Full backup
       full_compliance_package
     } = req.body;
@@ -807,7 +813,9 @@ router.post('/api/regulations/workflow-update', async (req, res) => {
       lovv_level: lovv_level || existing?.lovv_level || 'D',
       source_validation: JSON.stringify(source_validation || {}),
       last_workflow_run: last_workflow_run || new Date().toISOString(),
-      workflow_id: workflow_id
+      workflow_id: workflow_id,
+      jurisdiction_source: jurisdiction_type || existing?.jurisdiction_source || 'federal',
+      state_code: jurisdiction_data?.stateCode || existing?.state_code || null
     };
     
     // Log what fields were protected
@@ -930,6 +938,24 @@ router.post('/api/regulations/workflow-update', async (req, res) => {
           for (const deadline of deadlines) {
             try {
               const deadlineName = deadline.name || deadline.type || 'Filing Deadline';
+              
+              // Handle date formats: full date (YYYY-MM-DD), partial (MM-DD), or null
+              let dueDate = deadline.date || deadline.dueDate || null;
+              if (dueDate && typeof dueDate === 'string') {
+                // If it's just MM-DD (like "08-15"), make it a recurring date with current year
+                if (/^\d{2}-\d{2}$/.test(dueDate)) {
+                  dueDate = `${new Date().getFullYear()}-${dueDate}`;
+                }
+                // If it's not a valid date string (like "continuous", "None"), set to null
+                if (dueDate === 'None' || dueDate === 'continuous' || dueDate === 'event-triggered' || dueDate === 'ongoing') {
+                  dueDate = null;
+                }
+                // Validate it's actually a parseable date
+                if (dueDate && isNaN(Date.parse(dueDate))) {
+                  dueDate = null;
+                }
+              }
+              
               await pool.query(`
                 INSERT INTO regulation_deadlines (
                   regulation_id, name, deadline_type, due_date, description, frequency
@@ -938,13 +964,13 @@ router.post('/api/regulations/workflow-update', async (req, res) => {
                 reg.id,
                 deadlineName,
                 deadline.type || deadline.deadlineType || null,
-                deadline.date || deadline.dueDate || null,
+                dueDate,
                 deadline.description || null,
                 deadline.frequency || null
               ]);
               actualDeadlinesSaved++;
             } catch (dlErr) {
-              console.error(`[REGISTRY]    ❌ Failed to insert deadline "${deadline.type}": ${dlErr.message}`);
+              console.error(`[REGISTRY]    ❌ Failed to insert deadline "${deadline.type}" (date: ${deadline.date}): ${dlErr.message}`);
             }
           }
           

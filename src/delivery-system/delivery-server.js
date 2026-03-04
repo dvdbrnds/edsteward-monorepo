@@ -463,10 +463,19 @@ class DeliveryServer {
           // Build the PENDING UPDATE payload for /api/regulation-updates
           // This goes to CCO review queue - NOT direct database write
           const filingDeadlinesArray = Array.isArray(regulationContent.filingDeadlines)
-            ? regulationContent.filingDeadlines.map(d => ({
-                deadline: d.dueDate || d.date || null,
-                description: d.name || d.description || d.type || 'Filing deadline'
-              }))
+            ? regulationContent.filingDeadlines.map(d => {
+                const freq = d.frequency || d.type || d.name || 'annual';
+                const isRecurring = freq !== 'one-time';
+                const dateStr = d.dueDate
+                  ? new Date(d.dueDate).toLocaleDateString('en-US', { month: 'long', day: 'numeric' })
+                  : (freq === 'continuous' ? 'Ongoing' : d.date || null);
+                return {
+                  date: dateStr,
+                  type: freq.charAt(0).toUpperCase() + freq.slice(1),
+                  recurring: isRecurring,
+                  description: d.description || d.name || 'Filing deadline'
+                };
+              })
             : [];
 
           // Build COMPLETE PENDING UPDATE payload for /api/regulation-updates
@@ -475,23 +484,31 @@ class DeliveryServer {
           // all of this data in its pending_updates table for CCO review.
           // NOTHING gets written to production tables until CCO approves.
 
+          const isNewRegulation = !edstewardRegId;
+          if (isNewRegulation) {
+            console.log(`   📋 NEW REGULATION — no EdSteward ID yet, will be created on approval`);
+          }
+
           const payload = {
             // ═══════════════════════════════════════════════════════════
             // IDENTIFIERS
             // ═══════════════════════════════════════════════════════════
-            regulationId: edstewardRegId,         // EdSteward numeric ID (REQUIRED)
-            mcpRegKey: regKey,                     // MCP Engine canonical key (REG-001 to REG-251)
-            regKey: regKey,                        // Alias for mcpRegKey
-            itemId: itemId,                        // MCP Engine item/slug ID
+            ...(edstewardRegId ? { regulationId: edstewardRegId } : {}),
+            mcpRegKey: regKey,
+            regKey: regKey,
+            itemId: itemId,
+            isNewRegulation,
 
             // ═══════════════════════════════════════════════════════════
             // REGULATION CORE FIELDS
             // ═══════════════════════════════════════════════════════════
             name: regulationContent.name || regulationId,
-            statute: regulationContent.statute || statutesText || 'See CFR',
+            statute: regulationContent.statute || statutesText || 'See source documentation',
             category: regulationContent.category || 'Uncategorized',
             topic: regulationContent.topic || 'General',
             cfr: regulationContent.cfr || '',
+            jurisdictionSource: regulationContent.jurisdictionSource || regulationContent.jurisdiction_source || 'federal',
+            stateCode: regulationContent.stateCode || regulationContent.state_code || null,
 
             // ═══════════════════════════════════════════════════════════
             // CONTENT FOR CCO REVIEW

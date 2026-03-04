@@ -1,6 +1,7 @@
 -- ============================================================
 -- MCP ENGINE DATABASE SCHEMA
 -- PostgreSQL Migration - Complete Schema
+-- Includes: Multi-jurisdiction support (migration 005)
 -- ============================================================
 
 -- Enable extensions
@@ -15,6 +16,9 @@ DROP TABLE IF EXISTS regulation_audit_log CASCADE;
 DROP TABLE IF EXISTS regulation_versions CASCADE;
 DROP TABLE IF EXISTS regulation_tasks CASCADE;
 DROP TABLE IF EXISTS regulation_deadlines CASCADE;
+DROP TABLE IF EXISTS regulation_relationships CASCADE;
+DROP TABLE IF EXISTS regulation_jurisdictions CASCADE;
+DROP TABLE IF EXISTS regulation_tags CASCADE;
 DROP TABLE IF EXISTS regulations CASCADE;
 
 -- ============================================================
@@ -39,6 +43,12 @@ CREATE TABLE regulations (
     topic VARCHAR(100) NOT NULL,
     jurisdiction_source VARCHAR(50) NOT NULL DEFAULT 'federal',
     state_code VARCHAR(2),
+    country_code VARCHAR(3) DEFAULT 'US',
+    regulatory_body VARCHAR(200),
+    jurisdiction_label VARCHAR(100),
+    act_number VARCHAR(100),
+    applicability VARCHAR(50) DEFAULT 'all',
+    reg_key VARCHAR(20),
     
     -- Content
     summary TEXT,
@@ -101,8 +111,56 @@ CREATE TABLE regulation_deadlines (
     penalty_for_missing TEXT,
     reporting_to VARCHAR(200),
     
+    deadline_label VARCHAR(200),
+    is_recurring BOOLEAN DEFAULT FALSE,
+    is_passed BOOLEAN DEFAULT FALSE,
+    
     created_at TIMESTAMP NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);
+
+-- ============================================================
+-- REGULATION JURISDICTIONS (multi-state/multi-region)
+-- ============================================================
+CREATE TABLE regulation_jurisdictions (
+    id SERIAL PRIMARY KEY,
+    regulation_id INTEGER NOT NULL REFERENCES regulations(id) ON DELETE CASCADE,
+    state_code VARCHAR(2),
+    country_code VARCHAR(3) DEFAULT 'US',
+    region_code VARCHAR(20),
+    applies_to VARCHAR(50) DEFAULT 'all',
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    UNIQUE(regulation_id, state_code, country_code)
+);
+
+-- ============================================================
+-- REGULATION RELATIONSHIPS (implements, amends, extends, etc.)
+-- ============================================================
+CREATE TABLE regulation_relationships (
+    id SERIAL PRIMARY KEY,
+    source_regulation_id INTEGER NOT NULL REFERENCES regulations(id) ON DELETE CASCADE,
+    target_regulation_id INTEGER NOT NULL REFERENCES regulations(id) ON DELETE CASCADE,
+    relationship_type VARCHAR(50) NOT NULL
+        CHECK (relationship_type IN (
+            'implements', 'amends', 'extends', 'supersedes',
+            'related', 'conflicts', 'complements'
+        )),
+    notes TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    UNIQUE(source_regulation_id, target_regulation_id, relationship_type)
+);
+
+-- ============================================================
+-- REGULATION TAGS (multi-category/topic tagging)
+-- ============================================================
+CREATE TABLE regulation_tags (
+    id SERIAL PRIMARY KEY,
+    regulation_id INTEGER NOT NULL REFERENCES regulations(id) ON DELETE CASCADE,
+    tag VARCHAR(100) NOT NULL,
+    tag_type VARCHAR(50) NOT NULL DEFAULT 'category'
+        CHECK (tag_type IN ('category', 'topic', 'keyword', 'agency', 'program')),
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    UNIQUE(regulation_id, tag, tag_type)
 );
 
 -- ============================================================
@@ -218,9 +276,27 @@ CREATE INDEX idx_regulations_lovv ON regulations(lovv_level);
 CREATE INDEX idx_regulations_item_id ON regulations(item_id);
 CREATE INDEX idx_regulations_current ON regulations(is_current) WHERE is_current = TRUE;
 CREATE INDEX idx_regulations_name_search ON regulations USING gin(to_tsvector('english', name));
+CREATE INDEX idx_regulations_country ON regulations(country_code);
+CREATE INDEX idx_regulations_body ON regulations(regulatory_body);
+CREATE INDEX idx_regulations_label ON regulations(jurisdiction_label);
+CREATE INDEX idx_regulations_applicability ON regulations(applicability);
+CREATE INDEX idx_regulations_reg_key ON regulations(reg_key);
 
 CREATE INDEX idx_deadlines_regulation ON regulation_deadlines(regulation_id);
 CREATE INDEX idx_deadlines_due_date ON regulation_deadlines(due_date);
+CREATE INDEX idx_deadlines_is_passed ON regulation_deadlines(is_passed);
+
+CREATE INDEX idx_reg_jurisdictions_state ON regulation_jurisdictions(state_code);
+CREATE INDEX idx_reg_jurisdictions_country ON regulation_jurisdictions(country_code);
+CREATE INDEX idx_reg_jurisdictions_reg ON regulation_jurisdictions(regulation_id);
+
+CREATE INDEX idx_reg_relationships_source ON regulation_relationships(source_regulation_id);
+CREATE INDEX idx_reg_relationships_target ON regulation_relationships(target_regulation_id);
+CREATE INDEX idx_reg_relationships_type ON regulation_relationships(relationship_type);
+
+CREATE INDEX idx_reg_tags_reg ON regulation_tags(regulation_id);
+CREATE INDEX idx_reg_tags_tag ON regulation_tags(tag);
+CREATE INDEX idx_reg_tags_type ON regulation_tags(tag_type);
 
 CREATE INDEX idx_tasks_regulation ON regulation_tasks(regulation_id);
 CREATE INDEX idx_tasks_deadline ON regulation_tasks(deadline_id);

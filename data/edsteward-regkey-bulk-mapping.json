@@ -3613,5 +3613,20 @@
     "riskLevel": "MODERATE",
     "edstewardId": 240,
     "matchMethod": "regKey"
+  },
+  {
+    "regKey": "REG-252",
+    "mcpDbId": 418,
+    "itemId": "pennsylvania-act-55-of-2022-sexual-violence-higher-ed",
+    "name": "PA Act 55 of 2022 - Sexual Violence in Higher Ed",
+    "statute": "24 P.S. § 20-2001-G et seq.",
+    "category": "Sexual Violence Prevention",
+    "topic": "Campus Safety",
+    "jurisdictionSource": "state",
+    "stateCode": "PA",
+    "riskScore": 82,
+    "riskLevel": "HIGH",
+    "edstewardId": 389,
+    "matchMethod": "regKey"
   }
 ]
