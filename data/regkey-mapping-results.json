@@ -1,0 +1,2490 @@
+{
+  "matched": [
+    {
+      "regKey": "REG-001",
+      "mcpName": "Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Act (Clery Act) and Violence Against Women Act (VAWA)",
+      "esId": 9,
+      "esName": "Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Act",
+      "matchMethod": "edstewardId→canonical",
+      "confidence": 0.95,
+      "riskScore": 96,
+      "riskLevel": "CRITICAL"
+    },
+    {
+      "regKey": "REG-002",
+      "mcpName": "Title IX",
+      "esId": 7,
+      "esName": "Title IX of the Education Amendments of 1972",
+      "matchMethod": "edstewardId",
+      "confidence": 1,
+      "riskScore": 88,
+      "riskLevel": "SEVERE"
+    },
+    {
+      "regKey": "REG-004",
+      "mcpName": "Family Educational Rights and Privacy Act (FERPA)",
+      "esId": 223,
+      "esName": "Family Educational Rights and Privacy Act (FERPA)",
+      "matchMethod": "edstewardId",
+      "confidence": 1,
+      "riskScore": 85,
+      "riskLevel": "SEVERE"
+    },
+    {
+      "regKey": "REG-006",
+      "mcpName": "Pennsylvania Sexual Violence Education Act",
+      "esId": 297,
+      "esName": "Pennsylvania Sexual Violence Education Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 78,
+      "riskLevel": "SEVERE"
+    },
+    {
+      "regKey": "REG-007",
+      "mcpName": "Campus Sex Crimes Prevention Act (§ 1601 of the Victims of Trafficking and Violence Protection Act of 2000)",
+      "esId": 257,
+      "esName": "Campus Sex Crimes Prevention Act (§ 1601 of the Victims of Trafficking and Violence Protection Act of 2000)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 77,
+      "riskLevel": "SEVERE"
+    },
+    {
+      "regKey": "REG-008",
+      "mcpName": "Title VI of the Civil Rights Act of 1964",
+      "esId": 8,
+      "esName": "Title VI of the Civil Rights Act of 1964",
+      "matchMethod": "edstewardId",
+      "confidence": 1,
+      "riskScore": 77,
+      "riskLevel": "SEVERE"
+    },
+    {
+      "regKey": "REG-010",
+      "mcpName": "Title VII of the Civil Rights Act of 1964",
+      "esId": 70,
+      "esName": "Title VII of the Civil Rights Act of 1964",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 77,
+      "riskLevel": "SEVERE"
+    },
+    {
+      "regKey": "REG-011",
+      "mcpName": "False Claims Act",
+      "esId": 179,
+      "esName": "False Claims Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 75,
+      "riskLevel": "SEVERE"
+    },
+    {
+      "regKey": "REG-012",
+      "mcpName": "Higher Education Act: Recognition of Accrediting Agency or Association",
+      "esId": 26,
+      "esName": "Higher Education Act: Recognition of Accrediting Agency or Association",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 75,
+      "riskLevel": "SEVERE"
+    },
+    {
+      "regKey": "REG-015",
+      "mcpName": "Americans with Disabilities Act",
+      "esId": 2,
+      "esName": "Americans with Disabilities Act of 1990",
+      "matchMethod": "edstewardId",
+      "confidence": 1,
+      "riskScore": 74,
+      "riskLevel": "SEVERE"
+    },
+    {
+      "regKey": "REG-016",
+      "mcpName": "Americans with Disabilities Act of 1990",
+      "esId": 2,
+      "esName": "Americans with Disabilities Act of 1990",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 74,
+      "riskLevel": "SEVERE"
+    },
+    {
+      "regKey": "REG-017",
+      "mcpName": "Equity in Athletics Disclosure Act (EADA)",
+      "esId": 33,
+      "esName": "Equity in Athletics Disclosure Act (EADA)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 74,
+      "riskLevel": "SEVERE"
+    },
+    {
+      "regKey": "REG-018",
+      "mcpName": "Section 504 of The Rehabilitation Act of 1973",
+      "esId": 6,
+      "esName": "Section 504 of The Rehabilitation Act of 1973",
+      "matchMethod": "edstewardId",
+      "confidence": 1,
+      "riskScore": 74,
+      "riskLevel": "SEVERE"
+    },
+    {
+      "regKey": "REG-019",
+      "mcpName": "Emergency Planning and Community Right to Know Act (EPCRA)",
+      "esId": 100,
+      "esName": "Emergency Planning and Community Right Act (EPCRA)",
+      "matchMethod": "fuzzy_name (83%)",
+      "confidence": 0.8333333333333334,
+      "riskScore": 72,
+      "riskLevel": "SEVERE"
+    },
+    {
+      "regKey": "REG-020",
+      "mcpName": "HIPAA",
+      "esId": 2,
+      "esName": "Americans with Disabilities Act of 1990",
+      "matchMethod": "edstewardId→canonical",
+      "confidence": 0.95,
+      "riskScore": 72,
+      "riskLevel": "SEVERE"
+    },
+    {
+      "regKey": "REG-021",
+      "mcpName": "Health Insurance Portability and Accountability Act",
+      "esId": 189,
+      "esName": "Health Insurance Portability and Accountability Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 72,
+      "riskLevel": "SEVERE"
+    },
+    {
+      "regKey": "REG-022",
+      "mcpName": "Health Insurance Portability and Accountability Act",
+      "esId": 189,
+      "esName": "Health Insurance Portability and Accountability Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 72,
+      "riskLevel": "SEVERE"
+    },
+    {
+      "regKey": "REG-023",
+      "mcpName": "Higher Education Act: Drug and Alcohol Abuse Prevention",
+      "esId": 67,
+      "esName": "Drug-Free Schools and Communities Act",
+      "matchMethod": "edstewardId",
+      "confidence": 1,
+      "riskScore": 72,
+      "riskLevel": "SEVERE"
+    },
+    {
+      "regKey": "REG-026",
+      "mcpName": "Pennsylvania Uniform Crime Reporting Act",
+      "esId": 296,
+      "esName": "Pennsylvania Uniform Crime Reporting Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 72,
+      "riskLevel": "SEVERE"
+    },
+    {
+      "regKey": "REG-027",
+      "mcpName": "Children’s Online Privacy Protection Act of 1998 (COPPA)",
+      "esId": 219,
+      "esName": "Children’s Online Privacy Protection Act of 1998 (COPPA)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 68,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-028",
+      "mcpName": "Electronic Communications Privacy Act",
+      "esId": 220,
+      "esName": "Electronic Communications Privacy Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 68,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-029",
+      "mcpName": "Fair and Accurate Credit Transaction Act (FACTA)",
+      "esId": 222,
+      "esName": "Fair and Accurate Credit Transaction Act (FACTA)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 68,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-030",
+      "mcpName": "Federal Information Security Management Act (FISMA)",
+      "esId": 224,
+      "esName": "Federal Information Security Management Act (FISMA)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 68,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-031",
+      "mcpName": "Freedom of Information Act",
+      "esId": 225,
+      "esName": "Freedom of Information Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 68,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-032",
+      "mcpName": "Gramm Leach Bliley Act (GLBA)",
+      "esId": 226,
+      "esName": "Gramm Leach Bliley Act (GLBA)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 68,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-033",
+      "mcpName": "Health Information Technology for Economic and Clinical Health (HITECH) Act of 2009",
+      "esId": 228,
+      "esName": "Health Information Technology for Economic and Clinical Health (HITECH) Act of 2009",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 68,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-034",
+      "mcpName": "Arms Export Control Act of 1976",
+      "esId": 136,
+      "esName": "Arms Export Control Act of 1976",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-035",
+      "mcpName": "Contracts with Third Party Servicers",
+      "esId": 142,
+      "esName": "Contracts with Third Party Servicers",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-036",
+      "mcpName": "Cooperative Research and Technology Enhancement Act (CREATE Act)",
+      "esId": 208,
+      "esName": "Cooperative Research and Technology Enhancement Act (CREATE Act)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-037",
+      "mcpName": "Export Administration Act of 1979",
+      "esId": 137,
+      "esName": "Export Administration Act of 1979",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-038",
+      "mcpName": "Export Administration Regulations",
+      "esId": 244,
+      "esName": "Export Administration Regulations",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-039",
+      "mcpName": "Foreign Assets Control Regulations",
+      "esId": 138,
+      "esName": "Foreign Assets Control Regulations",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-040",
+      "mcpName": "Higher Education Act: Aid Application Verification",
+      "esId": 143,
+      "esName": "Higher Education Act: Aid Application Verification",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-041",
+      "mcpName": "Higher Education Act: Audits",
+      "esId": 144,
+      "esName": "Higher Education Act: Audits",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-042",
+      "mcpName": "Higher Education Act: Borrower Defense to Repayment",
+      "esId": 145,
+      "esName": "Higher Education Act: Borrower Defense to Repayment",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-043",
+      "mcpName": "Higher Education Act: Cash Management",
+      "esId": 146,
+      "esName": "Higher Education Act: Cash Management",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-044",
+      "mcpName": "Higher Education Act: Cohort Default Rate",
+      "esId": 148,
+      "esName": "Higher Education Act: Cohort Default Rate",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-045",
+      "mcpName": "Higher Education Act: Eligibility and Certification",
+      "esId": 149,
+      "esName": "Higher Education Act: Eligibility and Certification",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-046",
+      "mcpName": "Higher Education Act: Entrance and Exit Counseling",
+      "esId": 150,
+      "esName": "Higher Education Act: Entrance and Exit Counseling",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-047",
+      "mcpName": "Higher Education Act: Federal Supplemental Educational Opportunity Grant Program",
+      "esId": 151,
+      "esName": "Higher Education Act: Federal Supplemental Educational Opportunity Grant Program",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-048",
+      "mcpName": "Higher Education Act: Federal Work Study",
+      "esId": 152,
+      "esName": "Higher Education Act: Federal Work Study",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-049",
+      "mcpName": "Higher Education Act: Financial Responsibility Requirements",
+      "esId": 153,
+      "esName": "Higher Education Act: Financial Responsibility Requirements",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-050",
+      "mcpName": "Higher Education Act: Information Distributed to Students",
+      "esId": 154,
+      "esName": "Higher Education Act: Information Distributed to Students",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-051",
+      "mcpName": "Higher Education Act: Net Price Calculator",
+      "esId": 155,
+      "esName": "Higher Education Act: Net Price Calculator",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-052",
+      "mcpName": "Higher Education Act: PLUS Loans",
+      "esId": 156,
+      "esName": "Higher Education Act: PLUS Loans",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-053",
+      "mcpName": "Higher Education Act: Penalties for Drug Violations",
+      "esId": 157,
+      "esName": "Higher Education Act: Penalties for Drug Violations",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-054",
+      "mcpName": "Higher Education Act: Perkins Loans",
+      "esId": 158,
+      "esName": "Higher Education Act: Perkins Loans",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-055",
+      "mcpName": "Higher Education Act: Preferred Lenders",
+      "esId": 159,
+      "esName": "Higher Education Act: Preferred Lenders",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-056",
+      "mcpName": "Higher Education Act: Program Participation Agreements",
+      "esId": 52,
+      "esName": "Higher Education Act: Program Participation Agreements",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-057",
+      "mcpName": "Higher Education Act: Record Retention",
+      "esId": 161,
+      "esName": "Higher Education Act: Record Retention",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-058",
+      "mcpName": "Higher Education Act: Standard of Conduct",
+      "esId": 162,
+      "esName": "Higher Education Act: Standard of Conduct",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-059",
+      "mcpName": "International Emergency Economic Powers Act",
+      "esId": 139,
+      "esName": "International Emergency Economic Powers Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-060",
+      "mcpName": "International Traffic in Arms Regulations (ITAR)",
+      "esId": 140,
+      "esName": "International Traffic in Arms Regulations (ITAR)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-061",
+      "mcpName": "National Science Foundation Research Misconduct Policies",
+      "esId": 246,
+      "esName": "National Science Foundation Research Misconduct Policies",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-064",
+      "mcpName": "Outside Earned Income and Activities",
+      "esId": 133,
+      "esName": "Outside Earned Income and Activities",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-065",
+      "mcpName": "Public Health Service Policies on Research Misconduct",
+      "esId": 249,
+      "esName": "Public Health Service Policies on Research Misconduct",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-066",
+      "mcpName": "Responsibility of Applicants for Promoting Objectivity in Research for which PHS Funding is Sought",
+      "esId": 250,
+      "esName": "Responsibility of Applicants for Promoting Objectivity in Research for which PHS Funding is Sought",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-067",
+      "mcpName": "Student Loan Default Prevention Initiative Act of 1990",
+      "esId": 164,
+      "esName": "Student Loan Default Prevention Initiative Act of 1990",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-068",
+      "mcpName": "Student Right to Know Act",
+      "esId": 165,
+      "esName": "Student Right to Know Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-069",
+      "mcpName": "Teacher Preparation Programs",
+      "esId": 166,
+      "esName": "Teacher Preparation Programs",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-070",
+      "mcpName": "Trading with the Enemy Act of 1917",
+      "esId": 141,
+      "esName": "Trading with the Enemy Act of 1917",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 65,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-071",
+      "mcpName": "Fair Housing Act, Section 6",
+      "esId": 57,
+      "esName": "Fair Housing Act, Section 6",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 62,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-072",
+      "mcpName": "Patient Protection and Affordable Care Act (Section 1557)",
+      "esId": 58,
+      "esName": "Patient Protection and Affordable Care Act (Section 1557)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 62,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-073",
+      "mcpName": "Equal Employment Opportunity",
+      "esId": 63,
+      "esName": "Equal Employment Opportunity",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 60,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-074",
+      "mcpName": "Higher Education Act Financial Value Transparency & Gainful Employment",
+      "esId": 229,
+      "esName": "Higher Education Act Financial Value Transparency & Gainful Employment",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 60,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-075",
+      "mcpName": "Pregnant Workers Fairness Act (PWFA)",
+      "esId": 72,
+      "esName": "Pregnant Workers Fairness Act (PWFA)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 60,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-077",
+      "mcpName": "The Family and Medical Leave Act of 1993",
+      "esId": 60,
+      "esName": "The Family and Medical Leave Act of 1993",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 60,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-078",
+      "mcpName": "America COMPETES Act",
+      "esId": 241,
+      "esName": "America COMPETES Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 58,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-079",
+      "mcpName": "Animal Welfare Act",
+      "esId": 242,
+      "esName": "Animal Welfare Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 58,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-080",
+      "mcpName": "Clinical Trials § Financial Disclosures by Investigator",
+      "esId": 243,
+      "esName": "Clinical Trials § Financial Disclosures by Investigator",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 58,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-081",
+      "mcpName": "Food and Drug Administration (FDA) Amendments Act of 2007",
+      "esId": 245,
+      "esName": "Food and Drug Administration (FDA) Amendments Act of 2007",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 58,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-082",
+      "mcpName": "Higher Education Act: Credit Hour Definition",
+      "esId": 230,
+      "esName": "Higher Education Act: Credit Hour Definition",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 58,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-083",
+      "mcpName": "Higher Education Act: Incentive Compensation Prohibition",
+      "esId": 231,
+      "esName": "Higher Education Act: Incentive Compensation Prohibition",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 58,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-084",
+      "mcpName": "Higher Education Act: Misrepresentation",
+      "esId": 232,
+      "esName": "Higher Education Act: Misrepresentation",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 58,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-085",
+      "mcpName": "Higher Education Act: State Authorization",
+      "esId": 233,
+      "esName": "Higher Education Act: State Authorization",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 58,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-086",
+      "mcpName": "Native American Graves Protection and Repatriation Act (NAGPRA)",
+      "esId": 247,
+      "esName": "Native American Graves Protection and Repatriation Act (NAGPRA)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 58,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-087",
+      "mcpName": "OSHA",
+      "esId": 111,
+      "esName": "OSHA",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 58,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-088",
+      "mcpName": "OSHA Asbestos in Construction Standard",
+      "esId": 112,
+      "esName": "OSHA Asbestos in Construction Standard",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 58,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-089",
+      "mcpName": "OSHA Asbestos in General Industry Standard",
+      "esId": 113,
+      "esName": "OSHA Asbestos in General Industry Standard",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 58,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-090",
+      "mcpName": "OSHA Enforcement Guidance for Personal Protective Equipment (PPE) in General Industry",
+      "esId": 114,
+      "esName": "OSHA Enforcement Guidance for Personal Protective Equipment (PPE) in General Industry",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 58,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-091",
+      "mcpName": "OSHA Lead in Construction Standard",
+      "esId": 115,
+      "esName": "OSHA Lead in Construction Standard",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 58,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-092",
+      "mcpName": "OSHA Lead in General Industry Standard",
+      "esId": 116,
+      "esName": "OSHA Lead in General Industry Standard",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 58,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-093",
+      "mcpName": "OSHA Welding, Cutting, and Brazing",
+      "esId": 117,
+      "esName": "OSHA Welding, Cutting, and Brazing",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 58,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-094",
+      "mcpName": "OSHA – Bloodborne Pathogens Standard",
+      "esId": 118,
+      "esName": "OSHA – Bloodborne Pathogens Standard",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 58,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-095",
+      "mcpName": "OSHA’s  Emergency Action Plan Standard",
+      "esId": 119,
+      "esName": "OSHA’s  Emergency Action Plan Standard",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 58,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-096",
+      "mcpName": "OSHA’s  Occupational Noise Exposure Standard",
+      "esId": 120,
+      "esName": "OSHA’s  Occupational Noise Exposure Standard",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 58,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-097",
+      "mcpName": "OSHA’s Occupational Exposure to Hazardous Chemicals in Laboratories Standard",
+      "esId": 121,
+      "esName": "OSHA’s Occupational Exposure to Hazardous Chemicals in Laboratories Standard",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 58,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-098",
+      "mcpName": "Occupational Safety and Health Act of 1970",
+      "esId": 111,
+      "esName": "OSHA",
+      "matchMethod": "statute_only",
+      "confidence": 0.7,
+      "riskScore": 58,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-099",
+      "mcpName": "Small Unmanned Aircraft Systems",
+      "esId": 251,
+      "esName": "Small Unmanned Aircraft Systems",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 58,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-100",
+      "mcpName": "Affirmative Action/Equal Employment Opportunity",
+      "esId": 73,
+      "esName": "Affirmative Action/Equal Employment Opportunity",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 55,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-101",
+      "mcpName": "Communications Assistance for Law Enforcement Act (CALEA)",
+      "esId": 193,
+      "esName": "Communications Assistance for Law Enforcement Act (CALEA)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 55,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-102",
+      "mcpName": "Controlled Substances Act",
+      "esId": 183,
+      "esName": "Controlled Substances Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 55,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-103",
+      "mcpName": "Controlling the Assault of Non-Solicited Pornography And Marketing Act of 2003 (CAN-SPAM Act)",
+      "esId": 168,
+      "esName": "Controlling the Assault of Non-Solicited Pornography And Marketing Act of 2003 (CAN-SPAM Act)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 55,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-104",
+      "mcpName": "Department of Education General Administrative Regulations and Other Applicable Grant Regulations",
+      "esId": 178,
+      "esName": "Department of Education General Administrative Regulations and Other Applicable Grant Regulations",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 55,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-105",
+      "mcpName": "Electronic Communications Privacy Act of 1986",
+      "esId": 196,
+      "esName": "Electronic Communications Privacy Act of 1986",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 55,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-106",
+      "mcpName": "Equal Employment of Veterans",
+      "esId": 64,
+      "esName": "Equal Employment of Veterans",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 55,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-108",
+      "mcpName": "FCC – Cable Certification",
+      "esId": 197,
+      "esName": "FCC – Cable Certification",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 55,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-109",
+      "mcpName": "FCC – Fixed Microwave Services, Licensing",
+      "esId": 198,
+      "esName": "FCC – Fixed Microwave Services, Licensing",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 55,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-110",
+      "mcpName": "FCC – Wireless Communications, Licensing",
+      "esId": 199,
+      "esName": "FCC – Wireless Communications, Licensing",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 55,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-111",
+      "mcpName": "Federal Awardee Performance and Integrity Information System (FAPIIS)",
+      "esId": 180,
+      "esName": "Federal Awardee Performance and Integrity Information System (FAPIIS)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 55,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-112",
+      "mcpName": "Federal Funding Accountability and Transparency Act of 2006 (FFATA)",
+      "esId": 181,
+      "esName": "Federal Funding Accountability and Transparency Act of 2006 (FFATA)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 55,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-113",
+      "mcpName": "Fraud Enforcement and Recovery Act of 2009 (FERA)",
+      "esId": 182,
+      "esName": "Fraud Enforcement and Recovery Act of 2009 (FERA)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 55,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-114",
+      "mcpName": "Genetic Information Non-Discrimination Act of 2008",
+      "esId": 65,
+      "esName": "Genetic Information Non-Discrimination Act of 2008",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 55,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-115",
+      "mcpName": "Hazardous Materials Transportation Act",
+      "esId": 105,
+      "esName": "Hazardous Materials Transportation Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 55,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-116",
+      "mcpName": "Homeland Security Act of 2002",
+      "esId": 202,
+      "esName": "Homeland Security Act of 2002",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 55,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-117",
+      "mcpName": "Junk Fax Prevention Act of 2005",
+      "esId": 203,
+      "esName": "Junk Fax Prevention Act of 2005",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 55,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-118",
+      "mcpName": "Lilly Ledbetter Fair Pay Act of 2009",
+      "esId": 66,
+      "esName": "Lilly Ledbetter Fair Pay Act of 2009",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 55,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-119",
+      "mcpName": "No Electronic Theft Act",
+      "esId": 204,
+      "esName": "No Electronic Theft Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 55,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-120",
+      "mcpName": "Protection of Human Subjects Regulations (Common Rule)",
+      "esId": 248,
+      "esName": "Protection of Human Subjects Regulations (Common Rule)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 55,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-121",
+      "mcpName": "Telemarketing",
+      "esId": 205,
+      "esName": "Telemarketing",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 55,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-122",
+      "mcpName": "Unknown Regulation",
+      "esId": 176,
+      "esName": "REG1891",
+      "matchMethod": "statute_only",
+      "confidence": 0.7,
+      "riskScore": 55,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-123",
+      "mcpName": "Veterans’ employment emphasis under Federal contracts",
+      "esId": 86,
+      "esName": "Veterans’ employment emphasis under Federal contracts",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 55,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-124",
+      "mcpName": "Atomic Energy Act of 1954",
+      "esId": 95,
+      "esName": "Atomic Energy Act of 1954",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 52,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-125",
+      "mcpName": "Chemical Facility Anti-Terrorism Standards",
+      "esId": 96,
+      "esName": "Chemical Facility Anti-Terrorism Standards",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 52,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-126",
+      "mcpName": "Clean Air Act",
+      "esId": 97,
+      "esName": "Clean Air Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 52,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-127",
+      "mcpName": "Clean Water Act",
+      "esId": 98,
+      "esName": "Clean Water Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 52,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-128",
+      "mcpName": "Comprehensive Environmental Response, Compensation, and Liability Act (CERCLA)",
+      "esId": 99,
+      "esName": "Comprehensive Environmental Response, Compensation, and Liability Act (CERCLA)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 52,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-130",
+      "mcpName": "Drug Free Workplace Act",
+      "esId": 235,
+      "esName": "Drug Free Workplace Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 52,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-131",
+      "mcpName": "Emergency Planning and Community Right Act (EPCRA)",
+      "esId": 100,
+      "esName": "Emergency Planning and Community Right Act (EPCRA)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 52,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-132",
+      "mcpName": "Energy Policy Act",
+      "esId": 101,
+      "esName": "Energy Policy Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 52,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-133",
+      "mcpName": "Energy Reorganization Act of 1974, as amended",
+      "esId": 102,
+      "esName": "Energy Reorganization Act of 1974, as amended",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 52,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-134",
+      "mcpName": "Federal Insecticide, Fungicide and Rodenticide Act",
+      "esId": 103,
+      "esName": "Federal Insecticide, Fungicide and Rodenticide Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 52,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-135",
+      "mcpName": "Guarding and Use of Hand & Portable Powered Tools",
+      "esId": 104,
+      "esName": "Guarding and Use of Hand & Portable Powered Tools",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 52,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-136",
+      "mcpName": "Hazardous and Solid Waste Amendments of 1984",
+      "esId": 106,
+      "esName": "Hazardous and Solid Waste Amendments of 1984",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 52,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-137",
+      "mcpName": "Higher Education Opportunity Act",
+      "esId": 185,
+      "esName": "Higher Education Opportunity Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 52,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-138",
+      "mcpName": "Higher Education Opportunity Act Sections 152 and 153",
+      "esId": 5,
+      "esName": "Higher Education Opportunity Act Sections 152 and 153",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 52,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-139",
+      "mcpName": "Housing & Urban Development Lead Based Paint Poisoning in Certain Residential Structures",
+      "esId": 107,
+      "esName": "Housing & Urban Development Lead Based Paint Poisoning in Certain Residential Structures",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 52,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-140",
+      "mcpName": "Mandatory Reporting of Greenhouse Gases",
+      "esId": 108,
+      "esName": "Mandatory Reporting of Greenhouse Gases",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 52,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-141",
+      "mcpName": "Motor Carrier Act of 1980",
+      "esId": 109,
+      "esName": "Motor Carrier Act of 1980",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 52,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-142",
+      "mcpName": "National Emission Standards for Hazardous Air Pollutants (NESHAP)",
+      "esId": 110,
+      "esName": "National Emission Standards for Hazardous Air Pollutants (NESHAP)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 52,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-143",
+      "mcpName": "Oil Pollution Act",
+      "esId": 122,
+      "esName": "Oil Pollution Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 52,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-144",
+      "mcpName": "Residential Lead-Based Paint Hazard Reduction Act of 1992",
+      "esId": 123,
+      "esName": "Residential Lead-Based Paint Hazard Reduction Act of 1992",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 52,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-145",
+      "mcpName": "Resource Conservation and Recovery Act",
+      "esId": 124,
+      "esName": "Resource Conservation and Recovery Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 52,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-146",
+      "mcpName": "Standards For the Management of Used Oil",
+      "esId": 125,
+      "esName": "Standards For the Management of Used Oil",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 52,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-147",
+      "mcpName": "The Public Health Security and Bioterrorism Preparedness and Response Act",
+      "esId": 126,
+      "esName": "The Public Health Security and Bioterrorism Preparedness and Response Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 52,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-148",
+      "mcpName": "Toxic Substances Control Act",
+      "esId": 127,
+      "esName": "Toxic Substances Control Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 52,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-149",
+      "mcpName": "Bankruptcy Abuse Prevention & Consumer Protection Act of 2005",
+      "esId": 10,
+      "esName": "Bankruptcy Abuse Prevention & Consumer Protection Act of 2005",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 50,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-150",
+      "mcpName": "Clayton Antitrust Act of 1914",
+      "esId": 11,
+      "esName": "Clayton Antitrust Act of 1914",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 50,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-151",
+      "mcpName": "Federal Unemployment Tax Act (FUTA)",
+      "esId": 14,
+      "esName": "Federal Unemployment Tax Act (FUTA)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 50,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-152",
+      "mcpName": "Higher Education Act – Disclosure of Foreign Gifts",
+      "esId": 15,
+      "esName": "Higher Education Act – Disclosure of Foreign Gifts",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 50,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-153",
+      "mcpName": "Higher Education Act: Readmission Requirements for Servicemembers",
+      "esId": 29,
+      "esName": "Higher Education Act: Readmission Requirements for Servicemembers",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 50,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-154",
+      "mcpName": "Immigration and Nationality Act (INA)",
+      "esId": 192,
+      "esName": "Immigration and Nationality Act (INA)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 50,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-155",
+      "mcpName": "Regulation E: Electronic Fund Transfers",
+      "esId": 17,
+      "esName": "Regulation E: Electronic Fund Transfers",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 50,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-156",
+      "mcpName": "Sarbanes Oxley Act of 2002 (SOX)",
+      "esId": 18,
+      "esName": "Sarbanes Oxley Act of 2002 (SOX)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 50,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-157",
+      "mcpName": "Sherman Antitrust Act",
+      "esId": 19,
+      "esName": "Sherman Antitrust Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 50,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-158",
+      "mcpName": "Social Security Act",
+      "esId": 20,
+      "esName": "Social Security Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 50,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-159",
+      "mcpName": "Student Exchange and Visitor Information System (SEVIS)",
+      "esId": 191,
+      "esName": "Student Exchange and Visitor Information System (SEVIS)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 50,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-160",
+      "mcpName": "Tax Cuts and Jobs Act of 2017 (endowment excise tax)",
+      "esId": 21,
+      "esName": "Tax Cuts and Jobs Act of 2017 (endowment excise tax)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 50,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-161",
+      "mcpName": "Truth in Lending Act",
+      "esId": 22,
+      "esName": "Truth in Lending Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 50,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-162",
+      "mcpName": "Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance, Super Circular, or Omni Circular)",
+      "esId": 23,
+      "esName": "Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance, Super Circular, or Omni Circular)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 50,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-163",
+      "mcpName": "Unrelated Business Income Tax (UBIT)",
+      "esId": 24,
+      "esName": "Unrelated Business Income Tax (UBIT)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 50,
+      "riskLevel": "HIGH"
+    },
+    {
+      "regKey": "REG-164",
+      "mcpName": "Acts Affecting a Personal Financial Interest",
+      "esId": 128,
+      "esName": "Acts Affecting a Personal Financial Interest",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-165",
+      "mcpName": "Bribery of Public Officials and Witnesses",
+      "esId": 129,
+      "esName": "Bribery of Public Officials and Witnesses",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-166",
+      "mcpName": "Byrd Amendment",
+      "esId": 39,
+      "esName": "Byrd Amendment",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-167",
+      "mcpName": "Cafeteria Plans 26 U.S.C. § 125",
+      "esId": 261,
+      "esName": "Cafeteria Plans 26 U.S.C. § 125",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-168",
+      "mcpName": "Charitable Gift Annuity Antitrust Relief Act",
+      "esId": 262,
+      "esName": "Charitable Gift Annuity Antitrust Relief Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-169",
+      "mcpName": "Compensation to Members of Congress, Officers, Others in Matters Affecting the Government",
+      "esId": 130,
+      "esName": "Compensation to Members of Congress, Officers, Others in Matters Affecting the Government",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-170",
+      "mcpName": "Consumer Credit Protection Act, Title III (CCPA) – Garnishments",
+      "esId": 279,
+      "esName": "Consumer Credit Protection Act, Title III (CCPA) – Garnishments",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-171",
+      "mcpName": "Deferred Compensation",
+      "esId": 252,
+      "esName": "Deferred Compensation",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-172",
+      "mcpName": "Employee Annuities",
+      "esId": 253,
+      "esName": "Employee Annuities",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-173",
+      "mcpName": "Ethics in Government Act (Amended by Ethics Reform Act and Honest Leadership and Open Government Act of 2007)",
+      "esId": 131,
+      "esName": "Ethics in Government Act (Amended by Ethics Reform Act and Honest Leadership and Open Government Act of 2007)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-174",
+      "mcpName": "Fair Labor Standards Act (FLSA)",
+      "esId": 280,
+      "esName": "Fair Labor Standards Act (FLSA)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-175",
+      "mcpName": "Federal Insurance Contributions Act (FICA)",
+      "esId": 13,
+      "esName": "Federal Insurance Contributions Act (FICA)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-176",
+      "mcpName": "Federal Sentencing Guidelines",
+      "esId": 174,
+      "esName": "Federal Sentencing Guidelines",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-177",
+      "mcpName": "Federal Unemployment Tax Act",
+      "esId": 265,
+      "esName": "Federal Unemployment Tax Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-178",
+      "mcpName": "Foreign Bank Accounts and Tax Filings",
+      "esId": 266,
+      "esName": "Foreign Bank Accounts and Tax Filings",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-179",
+      "mcpName": "Fringe Benefits",
+      "esId": 267,
+      "esName": "Fringe Benefits",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-180",
+      "mcpName": "Honest Leadership and Open Government Act of 2007",
+      "esId": 214,
+      "esName": "Honest Leadership and Open Government Act of 2007",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-181",
+      "mcpName": "House and Senate Gift Ban and Ethics Rules",
+      "esId": 132,
+      "esName": "House and Senate Gift Ban and Ethics Rules",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-182",
+      "mcpName": "Independent Contractors",
+      "esId": 268,
+      "esName": "Independent Contractors",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-183",
+      "mcpName": "Industrial Alcohol User Permits and Special Tax",
+      "esId": 269,
+      "esName": "Industrial Alcohol User Permits and Special Tax",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-184",
+      "mcpName": "Internal Revenue Service: Governance Information Required on Form 990",
+      "esId": 175,
+      "esName": "Internal Revenue Service: Governance Information Required on Form 990",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-185",
+      "mcpName": "Lobbying Disclosure Act",
+      "esId": 216,
+      "esName": "Lobbying Disclosure Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-186",
+      "mcpName": "Nonqualified Deferred Inclusion",
+      "esId": 255,
+      "esName": "Nonqualified Deferred Inclusion",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-187",
+      "mcpName": "Pennsylvania Higher Education Gift Disclosure Act",
+      "esId": 298,
+      "esName": "Pennsylvania Higher Education Gift Disclosure Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-188",
+      "mcpName": "Political Activities",
+      "esId": 217,
+      "esName": "Political Activities",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-189",
+      "mcpName": "Public Disclosure of Material",
+      "esId": 271,
+      "esName": "Public Disclosure of Material",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-190",
+      "mcpName": "Qualified Pensions",
+      "esId": 256,
+      "esName": "Qualified Pensions",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-191",
+      "mcpName": "Qualified Tuition Reductions",
+      "esId": 283,
+      "esName": "Qualified Tuition Reductions",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-192",
+      "mcpName": "Qualified Tuition and Student Loan Interest Reporting",
+      "esId": 16,
+      "esName": "Qualified Tuition and Student Loan Interest Reporting",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-193",
+      "mcpName": "Reporting of Payments of Royalties",
+      "esId": 274,
+      "esName": "Reporting of Payments of Royalties",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-194",
+      "mcpName": "Restrictions on Former Officers, Employees, and Elected Officials of the Executive and Legislative",
+      "esId": 134,
+      "esName": "Restrictions on Former Officers, Employees, and Elected Officials of the Executive and Legislative",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-195",
+      "mcpName": "Salary of Government Officials and Employees Payable Only by United States",
+      "esId": 135,
+      "esName": "Salary of Government Officials and Employees Payable Only by United States",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-196",
+      "mcpName": "Small Business Job Protection Act",
+      "esId": 275,
+      "esName": "Small Business Job Protection Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-197",
+      "mcpName": "Unrelated Business Income (UBIT)",
+      "esId": 276,
+      "esName": "Unrelated Business Income (UBIT)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 48,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-198",
+      "mcpName": "American Jobs Creation Act of 2004",
+      "esId": 206,
+      "esName": "American Jobs Creation Act of 2004",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-199",
+      "mcpName": "Anti-Kickback Act of 1986",
+      "esId": 37,
+      "esName": "Anti-Kickback Act of 1986",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-200",
+      "mcpName": "Anti-discrimination laws for federal contractors",
+      "esId": 38,
+      "esName": "Anti-discrimination laws for federal contractors",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-201",
+      "mcpName": "Bayh-Dole Act of 1980",
+      "esId": 207,
+      "esName": "Bayh-Dole Act of 1980",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-202",
+      "mcpName": "Copeland Anti-Kickback Act",
+      "esId": 40,
+      "esName": "Copeland Anti-Kickback Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-203",
+      "mcpName": "Copyright Act",
+      "esId": 48,
+      "esName": "Copyright Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-204",
+      "mcpName": "Copyright Term Extension Act",
+      "esId": 49,
+      "esName": "Copyright Term Extension Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-205",
+      "mcpName": "Davis-Bacon Act",
+      "esId": 41,
+      "esName": "Davis-Bacon Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-206",
+      "mcpName": "Digital Millennium Copyright Act (DMCA)",
+      "esId": 50,
+      "esName": "Digital Millennium Copyright Act (DMCA)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-207",
+      "mcpName": "Drug & Alcohol Testing of Transportation Employees",
+      "esId": 234,
+      "esName": "Drug & Alcohol Testing of Transportation Employees",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-208",
+      "mcpName": "E-Verify Executive Order 13465-Amending Executive Order 12989",
+      "esId": 42,
+      "esName": "E-Verify Executive Order 13465-Amending Executive Order 12989",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-209",
+      "mcpName": "Employee Polygraph Protection Act",
+      "esId": 236,
+      "esName": "Employee Polygraph Protection Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-210",
+      "mcpName": "Fair Credit Reporting Act (FCRA)",
+      "esId": 12,
+      "esName": "Fair Credit Reporting Act (FCRA)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-211",
+      "mcpName": "Federal Volunteer Protection Act",
+      "esId": 238,
+      "esName": "Federal Volunteer Protection Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-212",
+      "mcpName": "Foreign Agents Registration Act of 1938",
+      "esId": 212,
+      "esName": "Foreign Agents Registration Act of 1938",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-213",
+      "mcpName": "Foreign Corrupt Practices Act (FCPA)",
+      "esId": 213,
+      "esName": "Foreign Corrupt Practices Act (FCPA)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-214",
+      "mcpName": "Higher Education Act: Institutional and financial assistance information for students",
+      "esId": 3,
+      "esName": "Higher Education Act: Institutional and Financial Assistance Information for Students",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-215",
+      "mcpName": "Immigration and Nationality Act",
+      "esId": 80,
+      "esName": "Immigration and Nationality Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-216",
+      "mcpName": "Lanham Act",
+      "esId": 53,
+      "esName": "Lanham Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-217",
+      "mcpName": "NSF grant term and condition, September 21, 2018",
+      "esId": 190,
+      "esName": "NSF grant term and condition, September 21, 2018",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-218",
+      "mcpName": "Non-Retaliation for Disclosure of Compensation Information",
+      "esId": 47,
+      "esName": "Non-Retaliation for Disclosure of Compensation Information",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-219",
+      "mcpName": "Pennsylvania English Fluency In Higher Education A",
+      "esId": 299,
+      "esName": "Pennsylvania English Fluency in Higher Education Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-220",
+      "mcpName": "Pennsylvania Graduation Rates Reporting Act",
+      "esId": 300,
+      "esName": "Pennsylvania Graduation Rates Reporting Act 88",
+      "matchMethod": "fuzzy_name (93%)",
+      "confidence": 0.9285714285714286,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-221",
+      "mcpName": "Pennsylvania Higher Education Standards",
+      "esId": 303,
+      "esName": "Pennsylvania Higher Education - Academic Standards",
+      "matchMethod": "fuzzy_name (80%)",
+      "confidence": 0.8,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-222",
+      "mcpName": "Small Business Act and Small Business Investment Act of 1958",
+      "esId": 45,
+      "esName": "Small Business Act and Small Business Investment Act of 1958",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-223",
+      "mcpName": "Small Webcasters Settlement Act of 2002",
+      "esId": 54,
+      "esName": "Small Webcasters Settlement Act of 2002",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-224",
+      "mcpName": "Technology Education and Copyright Harmonization Act (TEACH ACT) of 2002",
+      "esId": 55,
+      "esName": "Technology Education and Copyright Harmonization Act (TEACH ACT) of 2002",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-225",
+      "mcpName": "Trade Sanctions Reform and Export Enhancement",
+      "esId": 46,
+      "esName": "Trade Sanctions Reform and Export Enhancement",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-226",
+      "mcpName": "Trademark Revision Act",
+      "esId": 209,
+      "esName": "Trademark Revision Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-227",
+      "mcpName": "U.S. Patent Act",
+      "esId": 210,
+      "esName": "U.S. Patent Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-228",
+      "mcpName": "Visual Artists Rights Act",
+      "esId": 211,
+      "esName": "Visual Artists Rights Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-229",
+      "mcpName": "Worker Adjustment and Retraining Notification Act (WARN)",
+      "esId": 240,
+      "esName": "Worker Adjustment and Retraining Notification Act (WARN)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 45,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-230",
+      "mcpName": "Cafeteria Plan Regulations",
+      "esId": 87,
+      "esName": "Cafeteria Plan Regulations",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 42,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-231",
+      "mcpName": "Consolidated Omnibus Budget Reconciliation Act (COBRA)",
+      "esId": 88,
+      "esName": "Consolidated Omnibus Budget Reconciliation Act (COBRA)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 42,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-232",
+      "mcpName": "Employee Retirement Income Security Act of 1974 (ERISA)",
+      "esId": 89,
+      "esName": "Employee Retirement Income Security Act of 1974 (ERISA)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 42,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-233",
+      "mcpName": "Medicare, Medicaid, and SCHIP Extension Act of 2007",
+      "esId": 90,
+      "esName": "Medicare, Medicaid, and SCHIP Extension Act of 2007",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 42,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-234",
+      "mcpName": "Patient Protection and Affordable Care Act",
+      "esId": 91,
+      "esName": "Patient Protection and Affordable Care Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 42,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-235",
+      "mcpName": "The Veterans’ Readjustment Benefits Act",
+      "esId": 92,
+      "esName": "The Veterans’ Readjustment Benefits Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 42,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-236",
+      "mcpName": "Uniformed Services Employment and Reemployment Rights Act (USERRA)",
+      "esId": 71,
+      "esName": "Uniformed Services Employment and Reemployment Rights Act (USERRA)",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 42,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-237",
+      "mcpName": "Age Discrimination Act of 1975",
+      "esId": 1,
+      "esName": "Age Discrimination Act of 1975",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 40,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-238",
+      "mcpName": "Age Discrimination Employment Act of 1967",
+      "esId": 61,
+      "esName": "Age Discrimination in Employment Act of 1967",
+      "matchMethod": "exact_name+statute",
+      "confidence": 0.98,
+      "riskScore": 40,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-239",
+      "mcpName": "Age Discrimination in Employment Act of 1967",
+      "esId": 61,
+      "esName": "Age Discrimination in Employment Act of 1967",
+      "matchMethod": "exact_name+statute",
+      "confidence": 0.98,
+      "riskScore": 40,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-241",
+      "mcpName": "Civil Service Reform Act of 1978",
+      "esId": 277,
+      "esName": "Civil Service Reform Act of 1978",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 40,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-242",
+      "mcpName": "General Data Protection Regulation",
+      "esId": 356,
+      "esName": "General Data Protection Regulation (GDPR)",
+      "matchMethod": "fuzzy_name (87%)",
+      "confidence": 0.8717948717948718,
+      "riskScore": 40,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-243",
+      "mcpName": "National Labor Relations Act",
+      "esId": 278,
+      "esName": "National Labor Relations Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 40,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-245",
+      "mcpName": "Higher Education Act: Code of Conduct",
+      "esId": 147,
+      "esName": "Higher Education Act: Code of Conduct",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 38,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-246",
+      "mcpName": "Higher Education Act: Foreign Gift and Contract Reports",
+      "esId": 44,
+      "esName": "Higher Education Act: Foreign Gift and Contract Reports",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 38,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-247",
+      "mcpName": "Internal Revenue Code: Substantiation and Disclosure Provisions",
+      "esId": 171,
+      "esName": "Internal Revenue Code: Substantiation and Disclosure Provisions",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 38,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-248",
+      "mcpName": "Pension Protection Act",
+      "esId": 172,
+      "esName": "Pension Protection Act",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 38,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-249",
+      "mcpName": "Philanthropy Protection Act of 1995",
+      "esId": 173,
+      "esName": "Philanthropy Protection Act of 1995",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 38,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-250",
+      "mcpName": "Higher Education Act: Textbook Informatoin",
+      "esId": 36,
+      "esName": "Higher Education Act: Textbook Informatoin",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 35,
+      "riskLevel": "MODERATE"
+    },
+    {
+      "regKey": "REG-251",
+      "mcpName": "Higher Education Act: Textbook Information",
+      "esId": 4,
+      "esName": "Higher Education Act: Textbook Information",
+      "matchMethod": "exact_name",
+      "confidence": 0.95,
+      "riskScore": 29,
+      "riskLevel": "LOW"
+    }
+  ],
+  "unmatched": [
+    {
+      "regKey": "REG-005",
+      "name": "New Jersey Campus Sex Assault Victim Bill Of Rights",
+      "statute": "N.J.S.A. 18A:61E-1 et seq.",
+      "category": "Sexual Misconduct",
+      "edstewardId": null,
+      "riskScore": 78
+    },
+    {
+      "regKey": "REG-009",
+      "name": "Title VI of the Civil Rights Act of 1964  42 U.S.C. §§ 2000d-2000d-7",
+      "statute": "42 U.S.C. § 2000d et seq.; 34 CFR Part 100",
+      "category": "Campus Safety",
+      "edstewardId": null,
+      "riskScore": 77
+    },
+    {
+      "regKey": "REG-013",
+      "name": "New Jersey Licensure Accreditation Standards",
+      "statute": "N.J.A.C. 9A:1-1 et seq.",
+      "category": "Accreditation",
+      "edstewardId": null,
+      "riskScore": 75
+    },
+    {
+      "regKey": "REG-014",
+      "name": "Pennsylvania Institutional Accreditation",
+      "statute": "22 Pa. Code § 31.21",
+      "category": "Accreditation",
+      "edstewardId": null,
+      "riskScore": 75
+    },
+    {
+      "regKey": "REG-024",
+      "name": "New Jersey Hazing Prevention",
+      "statute": "N.J.S.A. 2C:40-3 et seq.",
+      "category": "Campus Safety",
+      "edstewardId": null,
+      "riskScore": 72
+    },
+    {
+      "regKey": "REG-025",
+      "name": "New Jersey Uniform Crime Reporting",
+      "statute": "N.J.S.A. 52:17B-5",
+      "category": "Campus Safety",
+      "edstewardId": null,
+      "riskScore": 72
+    },
+    {
+      "regKey": "REG-062",
+      "name": "New Jersey Tuition Aid Grant Program",
+      "statute": "N.J.A.C. 9A:9-2",
+      "category": "Financial Aid",
+      "edstewardId": null,
+      "riskScore": 65
+    },
+    {
+      "regKey": "REG-063",
+      "name": "New Jersey Veterans Benefits Compliance",
+      "statute": "N.J.S.A. 18A:62-6",
+      "category": "Financial Aid",
+      "edstewardId": null,
+      "riskScore": 65
+    },
+    {
+      "regKey": "REG-076",
+      "name": "The Equal Pay Act of 1963",
+      "statute": "29 U.S.C. § 206(d)",
+      "category": "Discrimination",
+      "edstewardId": null,
+      "riskScore": 60
+    },
+    {
+      "regKey": "REG-107",
+      "name": "Equal Pay Act of 1963",
+      "statute": "29 U.S.C. § 206(d)",
+      "category": "Diversity/Affirmative Action",
+      "edstewardId": null,
+      "riskScore": 55
+    },
+    {
+      "regKey": "REG-129",
+      "name": "Drug Free Schools and Communities Act",
+      "statute": "20 U.S.C. § 1011i",
+      "category": "Campus Safety",
+      "edstewardId": null,
+      "riskScore": 52
+    },
+    {
+      "regKey": "REG-240",
+      "name": "California Consumer Privacy Act",
+      "statute": null,
+      "category": "Uncategorized",
+      "edstewardId": null,
+      "riskScore": 40
+    },
+    {
+      "regKey": "REG-244",
+      "name": "Pennsylvania Student Consumer Protection",
+      "statute": "24 P.S. § 6601 et seq.",
+      "category": "Student Services",
+      "edstewardId": null,
+      "riskScore": 40
+    }
+  ],
+  "alreadyMapped": [
+    {
+      "regKey": "REG-003",
+      "name": "Title IX of the Education Amendment of 1972",
+      "esId": 7,
+      "existingRegKey": "REG-002",
+      "matchMethod": "fuzzy_name (60%)"
+    }
+  ],
+  "timestamp": "2026-02-11T19:05:29.901Z"
+}
