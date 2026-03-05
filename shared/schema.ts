@@ -265,7 +265,7 @@ export const regulations = pgTable("regulations", {
   notificationsDisabledReason: text("notifications_disabled_reason"),
   regulationText: text("regulation_text"),
   applicableforms: jsonb("applicable_forms").$type<string[]>(),
-  relatedRegulations: jsonb("related_regulations").$type<string[]>(),
+  relatedRegulations: jsonb("related_regulations").$type<Array<{ id: string; relationship: string; type: 'overlap' | 'dependency' | 'related' }> | string[]>(),
   complianceNotes: text("compliance_notes"),
   verificationMethod: text("verification_method"),
   notificationSchedule: jsonb("notification_schedule").$type<{
@@ -313,6 +313,22 @@ export const regulations = pgTable("regulations", {
   scope: text("scope"), // Regulation scope description
   reportingRequirements: jsonb("reporting_requirements"), // Structured reporting requirements
   riskAssessment: jsonb("risk_assessment"), // Full risk assessment object from MCP
+  // Bespoke / enriched sync fields (Mar 2026)
+  bespokeSource: boolean("bespoke_source").default(false), // true when data from hand-audited bespoke config
+  penalties: jsonb("penalties").$type<Array<{
+    type: 'funding' | 'monetary' | 'administrative' | 'criminal';
+    description: string;
+    statutoryCitation: string;
+    statutoryLanguage: string;
+    severity: 'critical' | 'high' | 'medium' | 'low';
+    amount: string | null;
+    enforcingAgency: string;
+  }>>(),
+  responsibleRoles: jsonb("responsible_roles").$type<Array<{
+    role: string;
+    statutoryCitation: string;
+    responsibilities: string;
+  }>>(),
 });
 
 // Canonical Categories - the 15 master categories
@@ -1107,6 +1123,7 @@ export const complianceTasks = pgTable("compliance_tasks", {
   // Statutory requirement (Jan 2026) - who is legally required to do this task
   statutoryRole: text("statutory_role"), // Role legally required by regulation (e.g., "Title IX Coordinator" per 34 CFR 106.8)
   statutoryCitation: text("statutory_citation"), // Legal citation for the requirement (e.g., "34 CFR 106.8")
+  statutoryLanguage: text("statutory_language"), // Quoted text from the actual statute
   
   // Assignment
   assignedTo: integer("assigned_to").references(() => users.id), // DRI for this specific task

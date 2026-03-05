@@ -669,8 +669,9 @@ export function setupMCPIntegrationApi(app: express.Application) {
     // Executive Orders — canonical 22-field schema (NEW Feb 2026)
     executiveOrders: z.array(mcpExecutiveOrderSchema).optional(),
     
-    // Task sync behavior flag
-    preserveExistingTasks: z.boolean().optional(),
+    // Task sync behavior flags
+    taskSyncMode: z.enum(['replace', 'merge']).optional(),
+    preserveExistingTasks: z.boolean().optional(), // legacy; taskSyncMode takes precedence
     
     // Topic mappings
     topics: z.array(z.object({
@@ -1335,6 +1336,10 @@ export function setupMCPIntegrationApi(app: express.Application) {
             riskScore: riskScore || existingReg[0].riskScore,
             riskLevel: riskLevel || existingReg[0].riskLevel,
             riskAssessment: data.riskAssessment || existingReg[0].riskAssessment,
+            // Bespoke / enriched fields (Mar 2026)
+            bespokeSource: data.bespokeSource ?? existingReg[0].bespokeSource ?? false,
+            penalties: data.penalties || existingReg[0].penalties,
+            responsibleRoles: data.responsibleRoles || existingReg[0].responsibleRoles,
             lovvLevel: data.lovvLevel || existingReg[0].lovvLevel,
             lastValidated: data.lastValidated ? new Date(data.lastValidated) : new Date(),
             versionHash: data.versionHash || null,
@@ -1413,6 +1418,10 @@ export function setupMCPIntegrationApi(app: express.Application) {
           riskScore: riskScore || null,
           riskLevel: riskLevel || null,
           riskAssessment: data.riskAssessment || null,
+          // Bespoke / enriched fields (Mar 2026)
+          bespokeSource: data.bespokeSource ?? false,
+          penalties: data.penalties || null,
+          responsibleRoles: data.responsibleRoles || null,
           lovvLevel: data.lovvLevel || null,
           lastValidated: data.lastValidated ? new Date(data.lastValidated) : null,
           versionHash: data.versionHash || null,
@@ -1430,12 +1439,26 @@ export function setupMCPIntegrationApi(app: express.Application) {
       }
       
       // Handle compliance tasks
-      // MERGE mode (default, changed Jan 2026 to prevent data loss): adds new tasks without deleting existing
-      // REPLACE mode (preserveExistingTasks=false): deletes all existing tasks and inserts new ones
-      // NOTE: Changed default from REPLACE to MERGE after ~2400 tasks were accidentally deleted
+      // REPLACE mode: deletes all existing tasks, inserts only the incoming set
+      // MERGE mode: keeps existing tasks, adds/updates new ones (dedup by taskId then title)
+      //
+      // Priority: explicit taskSyncMode > bespokeSource > preserveExistingTasks > default (merge)
       const createdTasks: Array<{ id: number; tempId?: string; title: string }> = [];
       const taskIdMap = new Map<string, number>();
-      const preserveTasks = data.preserveExistingTasks !== false; // Default to MERGE (true) for safety
+
+      let preserveTasks: boolean;
+      if (data.taskSyncMode === 'replace') {
+        preserveTasks = false;
+      } else if (data.taskSyncMode === 'merge') {
+        preserveTasks = true;
+      } else if (data.bespokeSource) {
+        // Bespoke payloads are hand-audited and authoritative — replace by default
+        preserveTasks = false;
+      } else if (data.preserveExistingTasks !== undefined) {
+        preserveTasks = data.preserveExistingTasks !== false;
+      } else {
+        preserveTasks = true; // safe default
+      }
       
       if (data.complianceTasks && data.complianceTasks.length > 0) {
         const mode = preserveTasks ? 'MERGE' : 'REPLACE';
@@ -1503,52 +1526,77 @@ export function setupMCPIntegrationApi(app: express.Application) {
           return existing.status === 'completed' || existing.attestation_status === 'attested';
         };
         
-        // Helper: build full 21-field task values for sync endpoint
-        const buildSyncTaskValues = (task: any, parentId?: number) => ({
-          regulationId,
-          parentTaskId: parentId || null,
-          taskId: task.taskId || null,
-          title: task.title,
-          description: task.description || null,
-          instructions: task.instructions || null,
-          category: task.category || null,
-          assignedRole: task.assignedRole || null,
-          statutoryRole: task.statutoryRole || null,
-          statutoryCitation: task.statutoryCitation || null,
-          requirementType: task.requirementType || 'requirement',
-          dueDate: task.dueDate ? new Date(task.dueDate) : null,
-          recurringSchedule: task.recurringSchedule || null,
-          reminderDays: task.reminderDays || 30,
-          priority: task.priority || 'medium',
-          evidenceRequired: task.evidenceRequired || false,
-          evidenceType: task.evidenceType || 'none',
-          evidenceInstructions: task.evidenceInstructions || null,
-          estimatedEffort: task.estimatedEffort || null,
-          deliverable: task.deliverable || null,
-          deliverableTemplateUrl: task.deliverableTemplateUrl || null,
-          sortOrder: task.sortOrder || 0,
-          status: 'pending',
-          isTemplate: false,
-        });
+        // Resolve evidenceRequired: payload may send a string description instead of boolean
+        const resolveEvidence = (task: any) => {
+          if (typeof task.evidenceRequired === 'string' && task.evidenceRequired) {
+            return { flag: true, instructions: task.evidenceRequired };
+          }
+          return {
+            flag: !!task.evidenceRequired,
+            instructions: task.evidenceInstructions || null,
+          };
+        };
+
+        // Resolve deadline object: { type, date, description } → dueDate + metadata
+        const resolveDueDate = (task: any): Date | null => {
+          if (task.dueDate) return new Date(task.dueDate);
+          if (task.deadline?.date) return new Date(task.deadline.date);
+          return null;
+        };
+
+        const buildSyncTaskValues = (task: any, parentId?: number) => {
+          const ev = resolveEvidence(task);
+          return {
+            regulationId,
+            parentTaskId: parentId || null,
+            taskId: task.taskId || null,
+            title: task.title,
+            description: task.description || null,
+            instructions: task.instructions || null,
+            category: task.category || null,
+            assignedRole: task.assignedRole || null,
+            statutoryRole: task.statutoryRole || null,
+            statutoryCitation: task.statutoryCitation || null,
+            statutoryLanguage: task.statutoryLanguage || null,
+            requirementType: task.requirementType || 'requirement',
+            dueDate: resolveDueDate(task),
+            recurringSchedule: task.recurringSchedule || null,
+            reminderDays: task.reminderDays || 30,
+            priority: task.priority || 'medium',
+            evidenceRequired: ev.flag,
+            evidenceType: task.evidenceType || 'none',
+            evidenceInstructions: ev.instructions,
+            estimatedEffort: task.estimatedEffort || null,
+            deliverable: task.deliverable || null,
+            deliverableTemplateUrl: task.deliverableTemplateUrl || null,
+            sortOrder: task.sortOrder || 0,
+            status: 'pending',
+            isTemplate: false,
+            metadata: task.deadline ? { deadline: task.deadline } : null,
+          };
+        };
         
-        // Helper: build SET clause for updating existing tasks (skip status/attestation fields)
-        const buildUpdateFields = (task: any) => ({
-          description: task.description || null,
-          instructions: task.instructions || null,
-          category: task.category || null,
-          assignedRole: task.assignedRole || null,
-          statutoryRole: task.statutoryRole || null,
-          statutoryCitation: task.statutoryCitation || null,
-          requirementType: task.requirementType || 'requirement',
-          priority: task.priority || 'medium',
-          evidenceRequired: task.evidenceRequired || false,
-          evidenceType: task.evidenceType || 'none',
-          evidenceInstructions: task.evidenceInstructions || null,
-          estimatedEffort: task.estimatedEffort || null,
-          deliverable: task.deliverable || null,
-          deliverableTemplateUrl: task.deliverableTemplateUrl || null,
-          sortOrder: task.sortOrder || 0,
-        });
+        const buildUpdateFields = (task: any) => {
+          const ev = resolveEvidence(task);
+          return {
+            description: task.description || null,
+            instructions: task.instructions || null,
+            category: task.category || null,
+            assignedRole: task.assignedRole || null,
+            statutoryRole: task.statutoryRole || null,
+            statutoryCitation: task.statutoryCitation || null,
+            statutoryLanguage: task.statutoryLanguage || null,
+            requirementType: task.requirementType || 'requirement',
+            priority: task.priority || 'medium',
+            evidenceRequired: ev.flag,
+            evidenceType: task.evidenceType || 'none',
+            evidenceInstructions: ev.instructions,
+            estimatedEffort: task.estimatedEffort || null,
+            deliverable: task.deliverable || null,
+            deliverableTemplateUrl: task.deliverableTemplateUrl || null,
+            sortOrder: task.sortOrder || 0,
+          };
+        };
         
         let tasksUpdated = 0;
         let tasksSkipped = 0;
@@ -1576,6 +1624,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
                 assigned_role = ${updates.assignedRole},
                 statutory_role = ${updates.statutoryRole},
                 statutory_citation = ${updates.statutoryCitation},
+                statutory_language = ${updates.statutoryLanguage},
                 requirement_type = ${updates.requirementType},
                 priority = ${updates.priority},
                 evidence_required = ${updates.evidenceRequired},
@@ -1591,16 +1640,61 @@ export function setupMCPIntegrationApi(app: express.Application) {
             createdTasks.push({ id: existing.id, tempId: task.tempId, title: task.title });
             tasksUpdated++;
           } else {
-            // New task — insert it
             const [newTask] = await db.insert(complianceTasks).values(
               buildSyncTaskValues(task)
             ).returning();
             if (task.tempId) taskIdMap.set(task.tempId, newTask.id);
             createdTasks.push({ id: newTask.id, tempId: task.tempId, title: task.title });
           }
+
+          // Process inline subtasks[] if present on this root task
+          if (Array.isArray(task.subtasks) && task.subtasks.length > 0) {
+            const parentDbId = task.tempId ? taskIdMap.get(task.tempId) : createdTasks[createdTasks.length - 1]?.id;
+            if (parentDbId) {
+              for (const sub of task.subtasks) {
+                const subExisting = preserveTasks ? findExisting(sub) : null;
+                if (subExisting) {
+                  if (shouldSkipUpdate(subExisting)) {
+                    createdTasks.push({ id: subExisting.id, tempId: sub.tempId, title: sub.title });
+                    tasksSkipped++;
+                    continue;
+                  }
+                  const subUpdates = buildUpdateFields(sub);
+                  await db.execute(sql`
+                    UPDATE compliance_tasks SET
+                      parent_task_id = ${parentDbId},
+                      description = ${subUpdates.description},
+                      instructions = ${subUpdates.instructions},
+                      category = ${subUpdates.category},
+                      assigned_role = ${subUpdates.assignedRole},
+                      statutory_role = ${subUpdates.statutoryRole},
+                      statutory_citation = ${subUpdates.statutoryCitation},
+                      statutory_language = ${subUpdates.statutoryLanguage},
+                      requirement_type = ${subUpdates.requirementType},
+                      priority = ${subUpdates.priority},
+                      evidence_required = ${subUpdates.evidenceRequired},
+                      evidence_type = ${subUpdates.evidenceType},
+                      evidence_instructions = ${subUpdates.evidenceInstructions},
+                      estimated_effort = ${subUpdates.estimatedEffort},
+                      deliverable = ${subUpdates.deliverable},
+                      deliverable_template_url = ${subUpdates.deliverableTemplateUrl},
+                      sort_order = ${subUpdates.sortOrder}
+                    WHERE id = ${subExisting.id}
+                  `);
+                  createdTasks.push({ id: subExisting.id, tempId: sub.tempId, title: sub.title });
+                  tasksUpdated++;
+                } else {
+                  const [newSub] = await db.insert(complianceTasks).values(
+                    buildSyncTaskValues(sub, parentDbId)
+                  ).returning();
+                  createdTasks.push({ id: newSub.id, tempId: sub.tempId, title: sub.title });
+                }
+              }
+            }
+          }
         }
         
-        // Second pass: child tasks (with parent)
+        // Second pass: child tasks (with parent via parentTempId — legacy flat format)
         console.log(`   ▶️ Pass 2: Processing ${childTasks.length} child tasks...`);
         console.log(`   🗺️ TaskIdMap has ${taskIdMap.size} entries`);
         
@@ -1623,7 +1717,6 @@ export function setupMCPIntegrationApi(app: express.Application) {
               tasksSkipped++;
               continue;
             }
-            // Update existing child task
             const updates = buildUpdateFields(task);
             await db.execute(sql`
               UPDATE compliance_tasks SET
@@ -1634,6 +1727,7 @@ export function setupMCPIntegrationApi(app: express.Application) {
                 assigned_role = ${updates.assignedRole},
                 statutory_role = ${updates.statutoryRole},
                 statutory_citation = ${updates.statutoryCitation},
+                statutory_language = ${updates.statutoryLanguage},
                 requirement_type = ${updates.requirementType},
                 priority = ${updates.priority},
                 evidence_required = ${updates.evidenceRequired},
@@ -1696,9 +1790,44 @@ export function setupMCPIntegrationApi(app: express.Application) {
       });
       
       const taskSyncMode = preserveTasks ? 'merge' : 'replace';
+
+      // Count subtasks (child tasks from both inline subtasks[] and flat parentTempId)
+      const inlineSubtaskCount = (data.complianceTasks || []).reduce(
+        (sum: number, t: any) => sum + (Array.isArray(t.subtasks) ? t.subtasks.length : 0), 0);
+      const flatChildCount = (data.complianceTasks || []).filter((t: any) => t.parentTempId).length;
+      const subtaskTotal = inlineSubtaskCount + flatChildCount;
+      const sectionCount = (data.complianceTasks || []).filter((t: any) => !t.parentTempId).length;
+
+      // Collect unique roles with deadlines across tasks
+      const rolesSet = new Set<string>();
+      let deadlineCount = 0;
+      for (const t of (data.complianceTasks || [])) {
+        if (t.assignedRole) rolesSet.add(t.assignedRole);
+        if (t.statutoryRole) rolesSet.add(t.statutoryRole);
+        if (t.dueDate || t.deadline?.date) deadlineCount++;
+        for (const sub of (t.subtasks || [])) {
+          if (sub.assignedRole) rolesSet.add(sub.assignedRole);
+          if (sub.dueDate || sub.deadline?.date) deadlineCount++;
+        }
+      }
+
+      const taskStats = {
+        total: createdTasks.length,
+        sections: sectionCount,
+        subtasks: subtaskTotal,
+        penalties: Array.isArray(data.penalties) ? data.penalties.length : 0,
+        roles: rolesSet.size,
+        deadlines: deadlineCount,
+      };
+
+      const metadataSource = data.bespokeSource
+        ? 'MCP_ENGINE_BESPOKE_AUDITED'
+        : 'MCP_ENGINE_GOLD_CERTIFIED';
+
       const response = {
         success: true,
         action: isUpdate ? 'updated' : 'created',
+        bespokeSource: !!data.bespokeSource,
         message: `Successfully ${isUpdate ? 'updated' : 'created'} regulation "${data.name}" with ${createdTasks.length} compliance tasks (${taskSyncMode} mode)`,
         regulation: {
           id: regulationId,
@@ -1711,8 +1840,10 @@ export function setupMCPIntegrationApi(app: express.Application) {
           riskLevel: regulationRecord.riskLevel,
         },
         tasks: createdTasks,
-        taskSyncMode, // 'replace' (default) or 'merge' (preserveExistingTasks=true)
+        taskStats,
+        taskSyncMode,
         taskIdMapping: Object.fromEntries(taskIdMap),
+        metadata: { source: metadataSource },
         timestamp,
       };
       

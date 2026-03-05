@@ -480,11 +480,40 @@ export class DatabaseStorage implements IStorage {
       });
 
       // 3.5. Apply pending compliance tasks if present (MCP Engine sync Jan 2026)
-      // IMPORTANT: Preserve completed tasks and activity history - only add new or update pending tasks
       const pendingTasks = (update as any).pendingTasks;
       if (pendingTasks && Array.isArray(pendingTasks) && pendingTasks.length > 0) {
-        console.log(`📋 Applying ${pendingTasks.length} compliance tasks on approval (preserving completed work)...`);
-        
+        // Determine sync mode from stored mcpPayload
+        const mcpPayload = (update as any).mcpPayload || updateMetadata || {};
+        let replaceMode = false;
+        if (mcpPayload.taskSyncMode === 'replace') {
+          replaceMode = true;
+        } else if (mcpPayload.taskSyncMode === 'merge') {
+          replaceMode = false;
+        } else if (mcpPayload.bespokeSource) {
+          replaceMode = true;
+        }
+
+        const mode = replaceMode ? 'REPLACE' : 'MERGE';
+        console.log(`📋 Applying ${pendingTasks.length} compliance tasks on approval (${mode} mode)...`);
+
+        if (replaceMode) {
+          // REPLACE: delete all existing tasks (and dependents) before inserting
+          const existingIds = await this.pool.query(
+            `SELECT id FROM compliance_tasks WHERE regulation_id = $1`,
+            [update.regulationId]
+          );
+          if (existingIds.rows.length > 0) {
+            const ids = existingIds.rows.map((r: any) => r.id);
+            const pgArray = `{${ids.join(',')}}`;
+            await this.pool.query(`DELETE FROM task_attestation_tokens WHERE task_id = ANY($1::int[])`, [pgArray]);
+            await this.pool.query(`DELETE FROM task_evidence WHERE task_id = ANY($1::int[])`, [pgArray]);
+            await this.pool.query(`DELETE FROM task_activity WHERE task_id = ANY($1::int[])`, [pgArray]);
+            console.log(`   🧹 Cleared dependents for ${ids.length} existing tasks`);
+          }
+          await this.pool.query(`DELETE FROM compliance_tasks WHERE regulation_id = $1`, [update.regulationId]);
+          console.log(`   🗑️  Deleted ${existingIds.rows.length} existing tasks for regulation ${update.regulationId}`);
+        }
+
         // Fetch role assignments for auto-assign (Jan 2026)
         const roleAssignmentsResult = await this.pool.query(
           'SELECT role_name, default_user_id, auto_assign_enabled FROM role_assignments WHERE auto_assign_enabled = true'
@@ -503,29 +532,26 @@ export class DatabaseStorage implements IStorage {
           return roleToUserMap.get(assignedRole.toLowerCase()) || null;
         };
         
-        // Get existing tasks for this regulation to preserve completed work
-        const existingTasksResult = await this.pool.query(
-          `SELECT id, task_id, title, status, attestation_status FROM compliance_tasks WHERE regulation_id = $1`,
-          [update.regulationId]
-        );
-        
-        // Build lookup maps for existing tasks (by task_id and by title)
+        // Build lookup maps for existing tasks (skip in REPLACE mode — nothing left)
         const existingByTaskId = new Map<string, any>();
         const existingByTitle = new Map<string, any>();
         let preservedCount = 0;
-        
-        for (const existing of existingTasksResult.rows) {
-          // Check if task is completed (either by status or attestation)
-          const isCompleted = existing.status === 'completed' || 
-                              existing.attestation_status === 'attested';
-          
-          if (existing.task_id) {
-            existingByTaskId.set(existing.task_id, { ...existing, isCompleted });
+
+        if (!replaceMode) {
+          const existingTasksResult = await this.pool.query(
+            `SELECT id, task_id, title, status, attestation_status FROM compliance_tasks WHERE regulation_id = $1`,
+            [update.regulationId]
+          );
+          for (const existing of existingTasksResult.rows) {
+            const isCompleted = existing.status === 'completed' || 
+                                existing.attestation_status === 'attested';
+            if (existing.task_id) {
+              existingByTaskId.set(existing.task_id, { ...existing, isCompleted });
+            }
+            existingByTitle.set(existing.title.toLowerCase(), { ...existing, isCompleted });
           }
-          existingByTitle.set(existing.title.toLowerCase(), { ...existing, isCompleted });
+          console.log(`   📊 Found ${existingTasksResult.rows.length} existing tasks`);
         }
-        
-        console.log(`   📊 Found ${existingTasksResult.rows.length} existing tasks`);
         
         // Build task ID mapping for parent-child relationships
         const taskIdMap = new Map<string, number>();
@@ -544,7 +570,7 @@ export class DatabaseStorage implements IStorage {
         // First pass: process root tasks (no parentTempId)
         const rootTasks = pendingTasks.filter((t: any) => !t.parentTempId);
         for (const task of rootTasks) {
-          const existing = findExistingTask(task);
+          const existing = replaceMode ? null : findExistingTask(task);
           
           // If task exists and is completed, preserve it - don't touch it
           if (existing?.isCompleted) {
@@ -650,6 +676,83 @@ export class DatabaseStorage implements IStorage {
               taskIdMap.set(task.tempId, result.rows[0].id);
             }
           }
+
+          // Process inline subtasks[] if present on this root task
+          if (Array.isArray(task.subtasks) && task.subtasks.length > 0) {
+            const parentDbId = task.tempId ? taskIdMap.get(task.tempId) : (existing?.id || null);
+            if (parentDbId) {
+              for (const sub of task.subtasks) {
+                const subAssignedTo = resolveAssignedTo(sub.statutoryRole) || resolveAssignedTo(sub.assignedRole);
+                if (subAssignedTo) autoAssignedCount++;
+
+                const subExisting = replaceMode ? null : findExistingTask(sub);
+                if (subExisting?.isCompleted) {
+                  preservedCount++;
+                  continue;
+                }
+                if (subExisting) {
+                  await this.pool.query(
+                    `UPDATE compliance_tasks SET 
+                      parent_task_id = $1,
+                      description = COALESCE($2, description),
+                      instructions = COALESCE($3, instructions),
+                      category = COALESCE($4, category),
+                      statutory_role = COALESCE($5, statutory_role),
+                      statutory_citation = COALESCE($6, statutory_citation),
+                      assigned_role = COALESCE($7, assigned_role),
+                      priority = COALESCE($8, priority),
+                      sort_order = COALESCE($9, sort_order)
+                    WHERE id = $10`,
+                    [
+                      parentDbId,
+                      sub.description || null,
+                      sub.instructions || null,
+                      sub.category || null,
+                      sub.statutoryRole || null,
+                      sub.statutoryCitation || null,
+                      sub.assignedRole || null,
+                      sub.priority || null,
+                      sub.sortOrder || null,
+                      subExisting.id
+                    ]
+                  );
+                  updatedCount++;
+                } else {
+                  const subResult = await this.pool.query(
+                    `INSERT INTO compliance_tasks (
+                      regulation_id, parent_task_id, task_id, title, description, instructions,
+                      category, statutory_role, statutory_citation, assigned_to, assigned_role,
+                      due_date, status, priority, sort_order, is_template, attestation_status
+                    ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+                    RETURNING id`,
+                    [
+                      update.regulationId,
+                      parentDbId,
+                      sub.taskId || null,
+                      sub.title,
+                      sub.description || null,
+                      sub.instructions || null,
+                      sub.category || null,
+                      sub.statutoryRole || null,
+                      sub.statutoryCitation || null,
+                      subAssignedTo,
+                      sub.assignedRole || null,
+                      sub.dueDate ? new Date(sub.dueDate) : null,
+                      'pending',
+                      sub.priority || 'medium',
+                      sub.sortOrder || 0,
+                      false,
+                      'not_required'
+                    ]
+                  );
+                  insertedCount++;
+                  if (sub.tempId && subResult.rows[0]) {
+                    taskIdMap.set(sub.tempId, subResult.rows[0].id);
+                  }
+                }
+              }
+            }
+          }
         }
         
         // Second pass: process child tasks (with parentTempId)
@@ -661,7 +764,7 @@ export class DatabaseStorage implements IStorage {
             continue;
           }
           
-          const existing = findExistingTask(task);
+          const existing = replaceMode ? null : findExistingTask(task);
           
           // If task exists and is completed, preserve it
           if (existing?.isCompleted) {
