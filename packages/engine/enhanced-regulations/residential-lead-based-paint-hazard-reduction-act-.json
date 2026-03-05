@@ -1,0 +1,50 @@
+{
+  "regulationId": "residential-lead-based-paint-hazard-reduction-act-",
+  "enhanced": {
+    "fullText": "The Residential Lead-Based Paint Hazard Reduction Act of 1992, codified at 42 U.S.C. § 4851 et seq., establishes comprehensive federal requirements for disclosure of lead-based paint hazards in residential properties built before 1978. The implementing regulations, found at 24 CFR Part 35 and 40 CFR Part 745, create specific obligations for property owners, including higher education institutions that own or lease residential housing units.\n\nFor universities and colleges, this regulation applies when the institution owns more than four residential housing units constructed before 1978, including dormitories, apartment complexes, faculty housing, or graduate student housing. The Act's disclosure requirements under 42 U.S.C. § 4852d mandate that educational institutions provide comprehensive lead-based paint information to prospective residents before lease execution.\n\nKey statutory provisions require institutions to distribute the EPA-approved pamphlet \"Protect Your Family From Lead In Your Home\" as specified in 40 CFR § 745.113. Universities must disclose all known information about lead-based paint or hazards, including location, condition of painted surfaces, and any available inspection records or risk assessments as required under 42 U.S.C. § 4852d(a)(1). For multi-unit campus housing, disclosure must include building-wide evaluation results covering common areas and other units per 24 CFR § 35.92.\n\nCompliance documentation requires a Lead Warning Statement attachment to all lease agreements, executed in the same language as the primary contract. Both institutional representatives and student residents must sign and date these disclosures under 42 U.S.C. § 4852d(a)(2). For property sales, universities must provide purchasers a 10-day inspection period, though this provision typically applies to disposition of campus real estate rather than student housing operations.\n\nEnforcement authority rests with EPA under 42 U.S.C. § 4852d(b)(3), with civil penalties up to $37,500 per violation as adjusted under 40 CFR § 19.4. The Department of Housing and Urban Development also maintains concurrent jurisdiction for certain residential properties under 24 CFR § 35.178. Universities must retain disclosure records for three years from lease commencement as mandated by 42 U.S.C. § 4852d(a)(3).\n\nRecent regulatory updates include the 2021 EPA Lead Renovation, Repair, and Painting Rule amendments at 40 CFR § 745.80, which affect campus maintenance operations in pre-1978 housing facilities. The 2019 HUD Lead Safe Housing Rule updates at 24 CFR § 35.86 also impact federally-assisted student housing programs.",
+    "summary": "Federal law requiring universities with pre-1978 residential housing to disclose lead-based paint hazards, provide EPA pamphlets, maintain disclosure records, and allow inspection periods before lease execution.",
+    "requirements": "## Pre-Contract Disclosure Requirements\n- Distribute EPA-approved pamphlet \"Protect Your Family From Lead In Your Home\" per 40 CFR § 745.113\n- Disclose all known lead-based paint information including location and surface conditions\n- Provide available inspection records and risk assessments for building-wide evaluations\n\n## Documentation and Execution\n- Include Lead Warning Statement attachment in lease agreements under 42 U.S.C. § 4852d(a)(2)\n- Obtain signatures from both institutional representatives and student residents\n- Provide disclosures in same language as primary lease contract\n\n## Record Retention and Compliance\n- Maintain signed disclosure documents for minimum three years from lease commencement\n- Apply requirements to all pre-1978 housing units when institution owns more than four residential units\n- Coordinate with campus facilities management for ongoing lead hazard assessments",
+    "reportingRequirements": "No periodic federal reporting required; maintain signed lead disclosure records for three years from lease start date per 42 U.S.C. § 4852d(a)(3); report violations to EPA within 30 days of discovery under enforcement provisions."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T16:16:56.796Z"
+  },
+  "deadlines": [
+    {
+      "date": "02-01",
+      "label": "OSHA 300 Log Posting",
+      "type": "posting",
+      "description": "OSHA 300 Log Posting for Residential Lead-Based Paint Hazard Reduction Act of 1992",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Annual Safety Training",
+      "type": "training",
+      "description": "Annual Safety Training for Residential Lead-Based Paint Hazard Reduction Act of 1992",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Hazardous Waste Manifest Submission",
+      "type": "filing",
+      "description": "Hazardous Waste Manifest Submission for Residential Lead-Based Paint Hazard Reduction Act of 1992",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Environmental Health and Safety"
+  ]
+}

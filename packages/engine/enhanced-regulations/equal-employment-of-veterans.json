@@ -1,0 +1,50 @@
+{
+  "regulationId": "equal-employment-of-veterans",
+  "enhanced": {
+    "fullText": "The Equal Employment of Veterans regulation, codified in 38 U.S.C. §§ 4211-4215 and implemented through 41 CFR Part 60-250, establishes comprehensive nondiscrimination and affirmative action obligations for federal contractors and subcontractors, including higher education institutions. This regulation applies to universities holding federal contracts or subcontracts valued at $100,000 or more, requiring them to ensure equal employment opportunities for protected veterans.\n\nUnder 38 U.S.C. § 4212, covered universities must not discriminate against qualified individuals who are special disabled veterans, veterans of the Vietnam era, recently separated veterans (discharged within three years), or other protected veterans as defined in 38 U.S.C. § 4211(1)-(4). The statute mandates affirmative action to employ and advance qualified veterans in all employment practices, including recruitment, hiring, promotion, compensation, and training.\n\nKey provisions under 41 CFR § 60-250.20 require universities to develop written affirmative action programs when holding contracts exceeding $100,000. These programs must include annual hiring benchmarks, outreach efforts, and accommodation procedures for disabled veterans. Universities must also comply with 41 CFR § 60-250.42, which mandates job listing requirements with state employment agencies and appropriate veterans' organizations.\n\nFor subcontracts exceeding the $100,000 threshold, universities must incorporate the equal opportunity clause specified in 41 CFR § 60-250.5 into all subcontract agreements. This clause requires subcontractors to adopt identical nondiscrimination and affirmative action commitments, creating cascading compliance obligations throughout the contracting chain.\n\nEnforcement authority rests with the Department of Labor's Office of Federal Contract Compliance Programs (OFCCP) under 41 CFR § 60-250.65. Violations may result in contract cancellation, debarment from future federal contracting, or monetary sanctions. The OFCCP conducts compliance reviews and investigates complaints filed under 41 CFR § 60-250.70.\n\nRecent amendments in 2014 strengthened reporting requirements under 41 CFR § 60-300.44, mandating annual VETS-4212 reports detailing veteran employment statistics. Universities must also maintain records per 41 CFR § 60-250.80 for three years, including applications, personnel actions, and accommodation requests. These comprehensive requirements ensure meaningful employment opportunities for veterans while protecting institutional federal funding eligibility.",
+    "summary": "Federal regulation requiring universities with contracts/subcontracts ≥$100K to prohibit veteran discrimination and implement affirmative action programs, including mandatory subcontract clauses and OFCCP compliance reporting.",
+    "requirements": "## Core Nondiscrimination Obligations\n- Prohibit discrimination against special disabled, Vietnam era, recently separated, and other protected veterans per 38 U.S.C. § 4212\n- Include equal opportunity clause in all subcontracts exceeding $100,000 threshold\n- Implement reasonable accommodations for disabled veterans' known limitations\n\n## Affirmative Action Program Development\n- Create written affirmative action plans for contracts ≥$100,000 under 41 CFR § 60-250.44\n- Establish annual veteran hiring benchmarks and document outreach efforts\n- Designate responsible compliance officer for program oversight\n\n## Subcontract Management\n- Incorporate 41 CFR § 60-250.5 equal opportunity clause in applicable subcontracts\n- Monitor subcontractor compliance with veteran employment requirements\n- Maintain documentation of subcontract clause inclusion\n\n## Record Retention\n- Preserve employment records for three years per 41 CFR § 60-250.80\n- Document veteran applicant data, accommodation requests, and personnel actions",
+    "reportingRequirements": "Annual VETS-4212 reports due September 30th to Department of Labor detailing veteran employment statistics per 41 CFR § 60-300.44. Maintain three-year records of applications, personnel actions, and accommodations per 41 CFR § 60-250.80."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T16:04:43.804Z"
+  },
+  "deadlines": [
+    {
+      "date": "03-31",
+      "label": "EEO-1 Report",
+      "type": "filing",
+      "description": "EEO-1 Report for Equal Employment of Veterans",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Affirmative Action Plan Update",
+      "type": "plan",
+      "description": "Affirmative Action Plan Update for Equal Employment of Veterans",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "09-30",
+      "label": "VETS-4212 Report",
+      "type": "filing",
+      "description": "VETS-4212 Report for Equal Employment of Veterans",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Diversity/Affirmative Action"
+  ]
+}

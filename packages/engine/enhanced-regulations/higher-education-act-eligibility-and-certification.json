@@ -1,0 +1,50 @@
+{
+  "regulationId": "higher-education-act-eligibility-and-certification",
+  "enhanced": {
+    "fullText": "The Higher Education Act Eligibility and Certification provisions, codified at 20 U.S.C. § 1099c and implemented through 34 CFR Part 600, establish fundamental prerequisites for institutional participation in federal Title IV student financial assistance programs. Under the Higher Education Opportunity Act of 2008 (Public Law 110-315), institutions must obtain and maintain Department of Education certification as eligible institutions to administer federal student aid programs including Pell Grants, Federal Direct Loans, and Federal Work-Study programs.\n\nEligible institutions must satisfy statutory requirements under 20 U.S.C. § 1001, including accreditation by a recognized accrediting agency, authorization to operate in their state, and demonstration of administrative capability under 34 CFR § 668.16. The Secretary of Education evaluates institutional eligibility based on academic standards, financial responsibility standards under 34 CFR Part 668 Subpart B, and administrative capability requirements.\n\nChange in ownership provisions under 20 U.S.C. § 1099c-1 and 34 CFR § 600.31 require institutions undergoing ownership changes resulting in control changes to recertify eligibility. Following such changes, both the chief administrator and designated Title IV administrator must complete comprehensive program training within 12 months of executing the new program participation agreement under 34 CFR § 668.16(a). This training covers regulatory compliance, financial management, student eligibility determinations, and program administration requirements.\n\nEnforcement mechanisms include suspension or termination of program participation under 34 CFR § 668.86, fine assessments, and limitation on administrative capability findings. The Department may impose provisional certification under 34 CFR § 668.13 for institutions demonstrating compliance deficiencies. Recent amendments through the FAFSA Simplification Act have enhanced oversight requirements and modified administrative capability standards effective July 2023.\n\nInstitutions must maintain continuous compliance with eligibility criteria, submit annual compliance audits under 34 CFR Part 668 Subpart E, and report material changes in organizational structure, ownership, or control within 10 days under 34 CFR § 600.21. Non-compliance may result in program termination, financial liability for improperly disbursed funds, and exclusion from future Title IV participation.",
+    "summary": "Higher Education Act provisions requiring institutions to obtain Department of Education certification for Title IV program participation, complete mandatory administrator training following ownership changes, and maintain continuous compliance with federal eligibility standards.",
+    "requirements": "## Institutional Certification Requirements\n- Obtain initial certification from Department of Education as eligible institution under 20 U.S.C. § 1001\n- Maintain recognized accreditation and state authorization to operate\n- Demonstrate financial responsibility per 34 CFR Part 668 Subpart B standards\n- Submit recertification applications every six years or following material changes\n\n## Change in Ownership Obligations\n- Complete recertification process for ownership changes resulting in control changes per 34 CFR § 600.31\n- Chief administrator must complete Title IV training within 12 months of new participation agreement\n- Designated financial aid administrator must complete specialized program training within same timeframe\n\n## Ongoing Compliance Monitoring\n- Submit annual compliance audits under 34 CFR Part 668 Subpart E\n- Report material changes in ownership, control, or organizational structure within 10 days\n- Maintain administrative capability standards including proper internal controls and staff qualifications\n- Ensure continuous accreditation and state authorization throughout program participation",
+    "reportingRequirements": "Annual compliance audits due within six months of fiscal year end per 34 CFR § 668.23. Material change notifications required within 10 days under 34 CFR § 600.21. Recertification applications submitted every six years or within 90 days of ownership changes."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T19:57:02.338Z"
+  },
+  "deadlines": [
+    {
+      "date": "10-01",
+      "label": "FISAP Annual Report",
+      "type": "filing",
+      "description": "FISAP Annual Report for Higher Education Act: Eligibility and Certification",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "06-30",
+      "label": "Annual Financial Aid Audit",
+      "type": "audit",
+      "description": "Annual Financial Aid Audit for Higher Education Act: Eligibility and Certification",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "07-01",
+      "label": "Gainful Employment Disclosure Update",
+      "type": "disclosure",
+      "description": "Gainful Employment Disclosure Update for Higher Education Act: Eligibility and Certification",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Financial Aid"
+  ]
+}

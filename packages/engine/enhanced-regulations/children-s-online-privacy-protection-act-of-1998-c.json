@@ -1,0 +1,50 @@
+{
+  "regulationId": "children-s-online-privacy-protection-act-of-1998-c",
+  "enhanced": {
+    "fullText": "The Children's Online Privacy Protection Act of 1998 (COPPA), codified at 15 U.S.C. § 6501-6506, establishes comprehensive privacy protections for children under age 13 using online services. The Federal Trade Commission (FTC) enforces COPPA through regulations at 16 CFR Part 312, which apply to operators of commercial websites and online services directed to children or with actual knowledge they are collecting personal information from children.\n\nFor higher education institutions, COPPA compliance becomes critical when universities operate websites, mobile applications, or online services that target children under 13 or knowingly collect their personal information. This includes educational outreach programs, summer camps, K-12 partnerships, community education initiatives, and research activities involving minors.\n\nKey provisions under 16 CFR § 312.3 require covered operators to: (1) post clear privacy notices describing information collection practices, uses, and disclosure policies; (2) obtain verifiable parental consent before collecting, using, or disclosing personal information from children; (3) provide parents access to their child's information and ability to refuse further collection; (4) establish reasonable procedures to protect collected information's confidentiality, security, and integrity; and (5) retain personal information only as long as reasonably necessary for the stated purpose.\n\nPersonal information under 16 CFR § 312.2 includes names, addresses, email addresses, telephone numbers, Social Security numbers, persistent identifiers like IP addresses when used to recognize users over time, photographs, videos, audio recordings, and geolocation information. Universities must be particularly cautious with interactive features, user-generated content, and behavioral tracking technologies.\n\nThe FTC can impose civil penalties up to $46,517 per violation under 15 U.S.C. § 6505, as adjusted by 16 CFR § 1.98. Recent enforcement actions demonstrate the FTC's commitment to aggressive enforcement, with settlements often exceeding millions of dollars. Universities face additional reputational risks and potential coordination with Department of Education oversight.\n\nThe 2013 COPPA Rule amendments expanded coverage to mobile applications, social networking services, and behavioral advertising, creating new compliance challenges for educational technology platforms. Universities must conduct regular audits of their digital properties, implement privacy-by-design principles, and establish clear policies distinguishing between services directed to children versus general audiences.\n\nInstitutions should coordinate COPPA compliance with existing FERPA obligations under 20 U.S.C. § 1232g, as both regulations may apply simultaneously to educational records of children under 13. Legal counsel should review all university-operated or sponsored online services targeting minors to ensure comprehensive regulatory compliance.",
+    "summary": "COPPA regulates collection of personal information from children under 13 via websites and online services. Universities must obtain parental consent, provide privacy notices, enable parental access, and implement security safeguards for covered digital properties targeting or knowingly serving minors.",
+    "requirements": "## Privacy Notice Requirements\n- Post clear, prominent privacy policies on all covered websites per 16 CFR § 312.4(b)\n- Describe types of personal information collected, use purposes, and disclosure practices\n- Include operator contact information and parental rights explanations\n- Update notices when practices change materially\n\n## Parental Consent Obligations\n- Obtain verifiable parental consent before collecting personal information per 16 CFR § 312.5\n- Use acceptable consent methods including signed forms, credit card verification, or video conferencing\n- Document consent mechanisms and maintain records of authorization\n\n## Data Security & Retention\n- Implement reasonable security procedures per 16 CFR § 312.8\n- Limit data retention to periods necessary for stated collection purposes\n- Establish data deletion protocols when retention periods expire\n\n## Parental Access Rights\n- Respond to parental requests for information access within reasonable timeframes\n- Provide mechanisms for parents to refuse further data collection or request deletion",
+    "reportingRequirements": "COPPA does not mandate routine reporting to federal agencies. However, universities must maintain internal documentation of parental consent, privacy notice updates, and data security incident responses. Following data breaches involving children's information, institutions should notify affected parents promptly and may need to report incidents to the FTC depending on scope and severity under 16 CFR § 312.8."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T17:32:39.676Z"
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Privacy Assessment",
+      "type": "assessment",
+      "description": "Annual Privacy Assessment for Children’s Online Privacy Protection Act of 1998 (COPPA)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Data Breach Notification (if applicable)",
+      "type": "notification",
+      "description": "Data Breach Notification (if applicable) for Children’s Online Privacy Protection Act of 1998 (COPPA)",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    },
+    {
+      "date": "12-31",
+      "label": "Security Awareness Training",
+      "type": "training",
+      "description": "Security Awareness Training for Children’s Online Privacy Protection Act of 1998 (COPPA)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Privacy & Information Security"
+  ]
+}

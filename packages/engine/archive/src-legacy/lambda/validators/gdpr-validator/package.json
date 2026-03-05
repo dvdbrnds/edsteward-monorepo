@@ -1,0 +1,26 @@
+{
+  "name": "gdpr-mcp-validator",
+  "version": "1.0.0",
+  "description": "GDPR-specific MCP server for validation",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "deploy": "serverless deploy",
+    "remove": "serverless remove",
+    "logs": "serverless logs -f gdprValidator -t"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.10.2",
+    "aws-sdk": "^2.1435.0",
+    "axios": "^1.9.0",
+    "cheerio": "^1.0.0-rc.12",
+    "diff": "^5.1.0",
+    "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "serverless": "^3.35.2"
+  }
+}

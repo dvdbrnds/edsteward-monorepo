@@ -1,0 +1,50 @@
+{
+  "regulationId": "atomic-energy-act-of-1954",
+  "enhanced": {
+    "fullText": "The Atomic Energy Act of 1954 (42 U.S.C. §§ 2011-2296b-7) establishes comprehensive federal regulation of nuclear materials and facilities, requiring licensing for all civilian uses of atomic energy. For higher education institutions, this regulation is particularly relevant to universities conducting nuclear research, operating research reactors, or using radioactive materials in educational and research activities.\n\nUnder Section 53 of the Act (42 U.S.C. § 2073), the Nuclear Regulatory Commission (NRC) maintains exclusive federal authority to license the possession and use of special nuclear materials, including uranium-235 and plutonium. Universities must obtain specific licenses under 10 CFR Part 50 for research reactors and 10 CFR Part 70 for special nuclear materials. Section 81 (42 U.S.C. § 2111) requires licensing for byproduct materials, commonly used in university medical and research programs under 10 CFR Part 35.\n\nSection 274 agreements (42 U.S.C. § 2021) allow states to assume regulatory authority over certain radioactive materials, creating a dual regulatory framework. In Agreement States, universities must comply with state regulations that mirror federal standards, while in non-Agreement States, direct NRC oversight applies. Currently, 39 states have Agreement State status, affecting compliance obligations for approximately 75% of higher education institutions.\n\nKey compliance requirements include mandatory radiation safety programs under 10 CFR Part 20, appointment of qualified radiation safety officers, comprehensive training programs, and detailed record-keeping. Universities must maintain financial assurance for decommissioning costs under 10 CFR Part 30.35, often requiring substantial financial guarantees or insurance policies.\n\nEnforcement mechanisms include civil penalties up to $146,016 per violation per day (adjusted annually for inflation under 10 CFR Part 2, Appendix C), license suspension or revocation, and criminal penalties under Section 223 (42 U.S.C. § 2273) for willful violations, including fines up to $2 million and imprisonment up to life for violations involving nuclear weapons data.\n\nRecent amendments include the Nuclear Energy Innovation and Modernization Act of 2019 (Public Law 116-4), which modernized licensing processes for advanced reactors and updated fee structures. The Act also enhanced cybersecurity requirements under Section 170E (42 U.S.C. § 2210e), requiring universities to implement robust information security programs for nuclear facilities and materials.\n\nUniversities operating under general licenses must comply with possession limits and reporting requirements specified in 10 CFR Part 31, while those with specific licenses face more stringent oversight, including periodic inspections, annual reports, and immediate notification requirements for incidents involving potential radiation exposure exceeding regulatory limits.",
+    "summary": "The Atomic Energy Act of 1954 requires federal licensing for university use of nuclear materials and facilities through NRC or Agreement State programs, mandating comprehensive radiation safety programs, qualified personnel, financial assurance, and strict reporting.",
+    "requirements": "## Licensing and Authorization\n- Obtain specific licenses under 10 CFR Part 50 (research reactors) or 10 CFR Part 70 (special nuclear materials)\n- Maintain current licenses for byproduct materials under 10 CFR Part 35\n- Comply with Agreement State regulations where applicable\n\n## Radiation Safety Program\n- Appoint qualified Radiation Safety Officer meeting 10 CFR Part 35.50 requirements\n- Establish comprehensive training programs per 10 CFR Part 19\n- Implement ALARA (As Low As Reasonably Achievable) principles\n- Maintain detailed exposure records for 30 years minimum\n\n## Financial Assurance\n- Provide decommissioning financial assurance under 10 CFR Part 30.35\n- Update cost estimates every three years\n- Maintain acceptable financial instruments (surety bonds, insurance, trusts)\n\n## Security and Cybersecurity\n- Implement physical security measures for Category I and II quantities\n- Establish cybersecurity programs meeting 10 CFR Part 73.54 requirements\n- Conduct background investigations for personnel with unescorted access",
+    "reportingRequirements": "Annual reports due by March 31st to NRC or Agreement State authority. Immediate notification within 24 hours for incidents involving radiation exposure exceeding 10 CFR Part 20 limits. Material transfer reports required within 30 days using NRC Form 748."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T17:18:16.171Z"
+  },
+  "deadlines": [
+    {
+      "date": "02-01",
+      "label": "OSHA 300 Log Posting",
+      "type": "posting",
+      "description": "OSHA 300 Log Posting for Atomic Energy Act of 1954",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Annual Safety Training",
+      "type": "training",
+      "description": "Annual Safety Training for Atomic Energy Act of 1954",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Hazardous Waste Manifest Submission",
+      "type": "filing",
+      "description": "Hazardous Waste Manifest Submission for Atomic Energy Act of 1954",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Environmental Health and Safety"
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "regulationId": "the-public-health-security-and-bioterrorism-prepar",
+  "enhanced": {
+    "fullText": "The Public Health Security and Bioterrorism Preparedness and Response Act of 2002, codified at 18 U.S.C. § 175b and implemented through 42 CFR Part 73, establishes comprehensive federal oversight of select agents and toxins that pose severe threats to public health and safety. This regulation applies to all higher education institutions conducting research with biological agents and toxins listed in 42 CFR § 73.3 and § 73.4, including dangerous pathogens such as Bacillus anthracis, Francisella tularensis, and Ebola virus.\n\nUnder 42 CFR § 73.6, universities must register with the Centers for Disease Control and Prevention (CDC) and obtain approval before possessing, using, or transferring select agents. The registration process requires submission of detailed facility information, security plans, and personnel screening protocols through the CDC's Select Agent Program. Universities must designate a Responsible Official under 42 CFR § 73.10 who serves as the primary point of contact and ensures institutional compliance.\n\nPersonnel access restrictions under 18 U.S.C. § 175b(d)(1) prohibit institutions from granting access to individuals who are restricted persons, including those with criminal histories involving controlled substances, mental health adjudications, or non-immigrant visa status restrictions. All personnel must undergo FBI background checks and receive approval before accessing select agents.\n\nImmediate reporting obligations under 42 CFR § 73.19 require universities to notify the CDC within 24 hours of theft, loss, release, or exposure incidents involving select agents. Annual reports detailing inventory changes, research activities, and security measures must be submitted by March 31st each year per 42 CFR § 73.20.\n\nViolations carry severe penalties under 18 U.S.C. § 175b, including criminal prosecution with fines up to $250,000 and imprisonment up to five years for individuals, and civil penalties up to $500,000 per violation for institutions. The 2019 amendments strengthened cybersecurity requirements and expanded reporting obligations for incidents involving information systems containing select agent data.\n\nUniversities must maintain comprehensive security plans addressing physical security, personnel reliability, information security, and incident response protocols. Regular inspections by CDC officials ensure ongoing compliance with biosafety and security standards outlined in 42 CFR Part 73.",
+    "summary": "Federal regulation requiring universities possessing dangerous biological agents to register with CDC, implement strict security measures, conduct personnel background checks, and report incidents within 24 hours. Violations carry criminal penalties up to $500,000 per incident.",
+    "requirements": "## Registration and Approval\n- Register facility with CDC Select Agent Program before possessing select agents\n- Obtain written approval for each agent possessed or transferred\n- Designate qualified Responsible Official per 42 CFR § 73.10\n- Submit comprehensive security plan and facility information\n\n## Personnel Security\n- Conduct FBI background checks for all personnel accessing select agents\n- Deny access to restricted persons under 18 U.S.C. § 175b(d)(1)\n- Maintain current personnel access lists and security clearances\n- Implement personnel reliability programs\n\n## Security and Containment\n- Maintain physical security measures preventing unauthorized access\n- Implement biosafety containment appropriate for each agent\n- Establish cybersecurity protocols for information systems\n- Develop incident response and emergency procedures\n\n## Record Keeping\n- Maintain detailed inventory records of all select agents\n- Document personnel training and access authorizations\n- Preserve security incident logs and investigation reports",
+    "reportingRequirements": "Universities must notify CDC within 24 hours of theft, loss, release, or exposure incidents per 42 CFR § 73.19. Annual reports due March 31st detailing inventory changes, research activities, and security measures. Immediate notification required for personnel security concerns or access violations."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T02:27:25.159Z"
+  },
+  "deadlines": [
+    {
+      "date": "02-01",
+      "label": "OSHA 300 Log Posting",
+      "type": "posting",
+      "description": "OSHA 300 Log Posting for The Public Health Security and Bioterrorism Preparedness and Response Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Annual Safety Training",
+      "type": "training",
+      "description": "Annual Safety Training for The Public Health Security and Bioterrorism Preparedness and Response Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Hazardous Waste Manifest Submission",
+      "type": "filing",
+      "description": "Hazardous Waste Manifest Submission for The Public Health Security and Bioterrorism Preparedness and Response Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Environmental Health and Safety"
+  ]
+}

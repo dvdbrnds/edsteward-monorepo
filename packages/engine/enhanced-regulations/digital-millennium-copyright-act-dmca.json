@@ -1,0 +1,50 @@
+{
+  "regulationId": "digital-millennium-copyright-act-dmca",
+  "enhanced": {
+    "fullText": "The Digital Millennium Copyright Act (DMCA), codified at 17 U.S.C. §§ 512, 1201-1205, provides critical copyright protections and safe harbor provisions that significantly impact higher education institutions. Enacted as Public Law No. 105-304, the DMCA establishes a framework for addressing online copyright infringement while providing qualified immunity for eligible service providers.\n\nUnder 17 U.S.C. § 512(c), universities operating as online service providers can obtain safe harbor protection from monetary damages for copyright infringement by users of their systems. To qualify, institutions must: (1) designate a DMCA agent with the U.S. Copyright Office and on their website; (2) implement a repeat infringer policy; (3) lack actual knowledge of infringing activity; and (4) respond expeditiously to proper takedown notices.\n\nThe notice-and-takedown provisions under 17 U.S.C. § 512(c)(3) require universities to remove allegedly infringing content upon receiving compliant notices containing: (a) identification of copyrighted work; (b) identification of infringing material; (c) contact information; (d) good faith belief statement; and (e) statement of accuracy under penalty of perjury. Universities must also provide counter-notification procedures per 17 U.S.C. § 512(g) for users to contest takedowns.\n\nSection 1201 anti-circumvention provisions prohibit bypassing technological protection measures, with specific educational exemptions under 17 U.S.C. § 1201(d) allowing accredited nonprofit educational institutions and libraries to circumvent access controls solely for good faith determination of acquisition decisions. The Library of Congress Triennial Rulemaking process under 17 U.S.C. § 1201(a)(1)(C) provides additional temporary exemptions, including distance education exemptions applicable to universities.\n\nCompliance failures can result in loss of safe harbor protection, exposing institutions to statutory damages up to $150,000 per work under 17 U.S.C. § 504(c), plus attorney fees under 17 U.S.C. § 505. Universities must maintain current agent designations through the Copyright Office's electronic system and update policies reflecting current legal standards to preserve protections.",
+    "summary": "DMCA provides safe harbor protections for universities against copyright infringement liability through notice-and-takedown procedures, designated agent requirements, and repeat infringer policies under 17 U.S.C. § 512.",
+    "requirements": "## DMCA Agent Designation\n- Register designated agent with U.S. Copyright Office electronic system\n- Post agent contact information prominently on university website\n- Update agent information within 30 days of changes per 17 U.S.C. § 512(c)(2)\n\n## Notice and Takedown Procedures\n- Establish expeditious response system for valid DMCA notices\n- Implement counter-notification process under 17 U.S.C. § 512(g)\n- Maintain takedown and restoration logs for compliance documentation\n\n## Repeat Infringer Policy\n- Adopt written policy for terminating accounts of repeat copyright infringers\n- Reasonably implement policy in appropriate circumstances\n- Communicate policy to university community through acceptable use policies\n\n## Anti-Circumvention Compliance\n- Ensure technology circumvention activities comply with 17 U.S.C. § 1201(d) educational exemptions\n- Monitor Library of Congress triennial exemption updates for applicable research and educational uses",
+    "reportingRequirements": "No periodic federal reporting required. Universities must maintain current DMCA agent designations with the U.S. Copyright Office and update within 30 days of contact changes. Document all takedown notices, responses, and counter-notifications."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T15:54:31.232Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Annual IT Security Assessment",
+      "type": "assessment",
+      "description": "Annual IT Security Assessment for Digital Millennium Copyright Act (DMCA)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Vulnerability Scan",
+      "type": "scan",
+      "description": "Vulnerability Scan for Digital Millennium Copyright Act (DMCA)",
+      "isRecurring": true,
+      "recurrenceFrequency": "quarterly"
+    },
+    {
+      "date": "continuous",
+      "label": "Disaster Recovery Plan Test",
+      "type": "test",
+      "description": "Disaster Recovery Plan Test for Digital Millennium Copyright Act (DMCA)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Information Technology"
+  ]
+}

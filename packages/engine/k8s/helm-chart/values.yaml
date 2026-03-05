@@ -1,0 +1,411 @@
+# MCP Engine Phase 5 - Helm Chart Values
+# Default values for mcp-engine.
+
+# Global configuration
+global:
+  imageRegistry: ""
+  imagePullSecrets: []
+  storageClass: "fast-ssd"
+  
+# Application metadata
+nameOverride: ""
+fullnameOverride: ""
+
+# Namespace configuration
+namespace:
+  create: true
+  name: mcp-engine
+  labels:
+    phase: "5"
+    environment: production
+  annotations:
+    description: "MCP Engine Phase 5 - Enterprise Kubernetes & Advanced Operations"
+
+# LLM Gateway configuration
+llmGateway:
+  enabled: true
+  replicaCount: 3
+  
+  image:
+    repository: mcp-engine/llm-gateway
+    tag: phase4-latest
+    pullPolicy: IfNotPresent
+  
+  service:
+    type: ClusterIP
+    port: 3002
+    targetPort: 3002
+    annotations:
+      prometheus.io/scrape: "true"
+      prometheus.io/port: "3002"
+      prometheus.io/path: "/api/llm/metrics"
+  
+  resources:
+    requests:
+      cpu: 200m
+      memory: 256Mi
+    limits:
+      cpu: 1000m
+      memory: 1Gi
+  
+  autoscaling:
+    enabled: true
+    minReplicas: 3
+    maxReplicas: 10
+    targetCPUUtilizationPercentage: 70
+    targetMemoryUtilizationPercentage: 80
+  
+  env:
+    NODE_ENV: production
+    LOG_LEVEL: info
+    ENABLE_METRICS: "true"
+    ENABLE_AUTH: "true"
+    ENABLE_RATE_LIMITING: "true"
+    CACHE_TTL: "3600"
+    MAX_BULK_SIZE: "1000"
+    METRICS_RETENTION_DAYS: "30"
+  
+  secrets:
+    openaiApiKey: "sk-project-example-key"
+  
+  persistence:
+    enabled: true
+    size: 5Gi
+    accessMode: ReadWriteMany
+  
+  probes:
+    liveness:
+      enabled: true
+      path: /api/llm/health
+      initialDelaySeconds: 60
+      periodSeconds: 30
+    readiness:
+      enabled: true
+      path: /api/llm/health
+      initialDelaySeconds: 30
+      periodSeconds: 10
+    startup:
+      enabled: true
+      path: /api/llm/health
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      failureThreshold: 10
+
+# Frontend configuration
+frontend:
+  enabled: true
+  replicaCount: 2
+  
+  image:
+    repository: mcp-engine/frontend
+    tag: phase4-latest
+    pullPolicy: IfNotPresent
+  
+  service:
+    type: ClusterIP
+    port: 3050
+    targetPort: 3050
+  
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  
+  env:
+    NODE_ENV: production
+    REACT_APP_ENABLE_ANALYTICS: "true"
+
+# Redis configuration
+redis:
+  enabled: true
+  
+  image:
+    repository: redis
+    tag: 7-alpine
+    pullPolicy: IfNotPresent
+  
+  service:
+    type: ClusterIP
+    port: 6379
+  
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  
+  persistence:
+    enabled: true
+    size: 10Gi
+    accessMode: ReadWriteOnce
+  
+  auth:
+    enabled: true
+    password: "mcp-redis-secure-password"
+  
+  config:
+    maxmemory: "256mb"
+    maxmemoryPolicy: "allkeys-lru"
+
+# Monitoring configuration
+monitoring:
+  enabled: true
+  
+  prometheus:
+    enabled: true
+    
+    image:
+      repository: prom/prometheus
+      tag: latest
+      pullPolicy: IfNotPresent
+    
+    service:
+      type: ClusterIP
+      port: 9090
+    
+    resources:
+      requests:
+        cpu: 200m
+        memory: 512Mi
+      limits:
+        cpu: 1000m
+        memory: 2Gi
+    
+    persistence:
+      enabled: true
+      size: 50Gi
+      accessMode: ReadWriteOnce
+    
+    retention: "30d"
+    
+    config:
+      scrapeInterval: "15s"
+      evaluationInterval: "15s"
+  
+  grafana:
+    enabled: true
+    
+    image:
+      repository: grafana/grafana
+      tag: latest
+      pullPolicy: IfNotPresent
+    
+    service:
+      type: ClusterIP
+      port: 3000
+    
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+    
+    persistence:
+      enabled: true
+      size: 10Gi
+      accessMode: ReadWriteOnce
+    
+    auth:
+      adminPassword: "mcp-grafana-admin"
+    
+    plugins:
+      - grafana-kubernetes-app
+      - grafana-piechart-panel
+      - grafana-worldmap-panel
+  
+  jaeger:
+    enabled: true
+    
+    image:
+      repository: jaegertracing/all-in-one
+      tag: latest
+      pullPolicy: IfNotPresent
+    
+    service:
+      query:
+        type: ClusterIP
+        port: 16686
+      collector:
+        type: ClusterIP
+        port: 14268
+    
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 1Gi
+    
+    storage:
+      type: memory
+
+# Ingress configuration
+ingress:
+  enabled: true
+  className: nginx
+  
+  annotations:
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    nginx.ingress.kubernetes.io/rate-limit: "100"
+    nginx.ingress.kubernetes.io/rate-limit-window: "1m"
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+  
+  tls:
+    enabled: true
+    secretName: mcp-engine-tls
+  
+  hosts:
+    - host: mcp-engine.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: frontend
+    - host: api.mcp-engine.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: llm-gateway
+    - host: monitoring.mcp-engine.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: grafana
+        - path: /prometheus
+          pathType: Prefix
+          service: prometheus
+    - host: tracing.mcp-engine.com
+      paths:
+        - path: /
+          pathType: Prefix
+          service: jaeger
+
+# Security configuration
+security:
+  networkPolicy:
+    enabled: true
+    
+  podSecurityPolicy:
+    enabled: true
+    
+  rbac:
+    enabled: true
+    
+  serviceAccount:
+    create: true
+    name: mcp-engine
+    annotations: {}
+
+# Storage configuration
+storage:
+  storageClass: fast-ssd
+  
+  persistence:
+    llmGateway:
+      size: 5Gi
+      accessMode: ReadWriteMany
+    redis:
+      size: 10Gi
+      accessMode: ReadWriteOnce
+    prometheus:
+      size: 50Gi
+      accessMode: ReadWriteOnce
+    grafana:
+      size: 10Gi
+      accessMode: ReadWriteOnce
+
+# Resource quotas and limits
+resourceQuota:
+  enabled: true
+  hard:
+    requests.cpu: "4"
+    requests.memory: 8Gi
+    limits.cpu: "8"
+    limits.memory: 16Gi
+    persistentvolumeclaims: "10"
+    services: "10"
+    secrets: "20"
+    configmaps: "20"
+
+limitRange:
+  enabled: true
+  default:
+    cpu: "500m"
+    memory: "512Mi"
+  defaultRequest:
+    cpu: "100m"
+    memory: "128Mi"
+  max:
+    cpu: "2"
+    memory: "4Gi"
+  min:
+    cpu: "50m"
+    memory: "64Mi"
+
+# Node affinity and tolerations
+nodeSelector: {}
+
+tolerations: []
+
+affinity:
+  podAntiAffinity:
+    enabled: true
+    weight: 100
+
+# External dependencies
+externalDependencies:
+  certManager:
+    enabled: true
+    version: "v1.8.0"
+  
+  nginxIngress:
+    enabled: true
+    version: "4.1.0"
+  
+  metricsServer:
+    enabled: true
+    version: "3.8.0"
+
+# Backup and disaster recovery
+backup:
+  enabled: false
+  schedule: "0 2 * * *"
+  retention: "30d"
+  
+  storage:
+    type: s3
+    bucket: mcp-engine-backups
+    region: us-west-2
+
+# Testing configuration
+testing:
+  enabled: false
+  
+  loadTesting:
+    enabled: false
+    tool: k6
+    scenarios:
+      - name: baseline
+        duration: "5m"
+        vus: 10
+      - name: stress
+        duration: "10m"
+        vus: 100
+  
+  securityTesting:
+    enabled: false
+    tool: zap
+    
+  chaosTesting:
+    enabled: false
+    tool: chaos-monkey 

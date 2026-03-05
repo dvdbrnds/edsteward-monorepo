@@ -1,0 +1,389 @@
+// src/lambda/orchestrator/classifier.js
+/**
+ * MCP Regulation Classifier
+ * 
+ * This module is responsible for analyzing regulations and determining the appropriate
+ * validation approach based on complexity and requested validation level.
+ */
+
+const { ValidationLevels } = require('../../common/mcp/protocol');
+const dbOps = require('../../common/db/operations');
+
+/**
+ * Classify a regulation and determine validation approach
+ * 
+ * @param {Object} regulation - Regulation information from database
+ * @param {Object} version - Regulation version information
+ * @param {number} requestedLevel - Requested validation level (1-4)
+ * @returns {Object} Validation plan with routing information
+ */
+async function classifyRegulation(regulation, version, requestedLevel) {
+  console.log(`Classifying regulation ${regulation.code} at level ${requestedLevel}`);
+  
+  // Get regulation complexity from database or use from regulation
+  const complexityLevel = regulation.complexity_level || getDefaultComplexity(regulation);
+  
+  // Get validation rules for this regulation
+  const validationRules = await dbOps.getValidationRules(regulation.regulation_id, version.version_id);
+  
+  // Calculate statistics about rules
+  const ruleStats = analyzeRules(validationRules);
+  
+  // Determine if specialized validators are needed
+  const needsSpecializedValidators = 
+    hasSpecializedDomain(regulation) || 
+    ruleStats.complexRuleCount > 0;
+  
+  // Determine validation approach based on complexity and requested level
+  const validationApproach = determineValidationApproach(
+    complexityLevel,
+    requestedLevel,
+    needsSpecializedValidators,
+    regulation,
+    ruleStats
+  );
+  
+  return {
+    regulationId: regulation.regulation_id,
+    regulationCode: regulation.code,
+    versionId: version.version_id,
+    versionNumber: version.version_number,
+    requestedLevel,
+    complexityLevel,
+    ruleStats,
+    validationApproach
+  };
+}
+
+/**
+ * Get default complexity level for a regulation if not specified
+ * 
+ * @param {Object} regulation - Regulation information
+ * @returns {number} Default complexity level
+ */
+function getDefaultComplexity(regulation) {
+  // Analyze regulation attributes to determine complexity
+  
+  // Check if regulation code matches known complex domains
+  const complexDomains = [
+    'HIPAA', 'PCI', 'GDPR', 'CCPA', 'SOX', 'FINRA', 'SEC', 'FDA'
+  ];
+  
+  for (const domain of complexDomains) {
+    if (regulation.code.includes(domain)) {
+      return ValidationLevels.LEVEL_3;
+    }
+  }
+  
+  // Check regulation name for complexity indicators
+  const complexityIndicators = [
+    'complex', 'advanced', 'detailed', 'comprehensive', 'technical'
+  ];
+  
+  for (const indicator of complexityIndicators) {
+    if (regulation.name.toLowerCase().includes(indicator)) {
+      return ValidationLevels.LEVEL_2;
+    }
+  }
+  
+  // Default to Level 1 for unknown regulations
+  return ValidationLevels.LEVEL_1;
+}
+
+/**
+ * Analyze validation rules to determine complexity
+ * 
+ * @param {Array} rules - Validation rules for the regulation
+ * @returns {Object} Statistics about the rules
+ */
+function analyzeRules(rules) {
+  if (!rules || !Array.isArray(rules)) {
+    return {
+      totalRuleCount: 0,
+      simpleRuleCount: 0,
+      moderateRuleCount: 0,
+      complexRuleCount: 0,
+      validationTypes: {}
+    };
+  }
+  
+  let simpleRuleCount = 0;
+  let moderateRuleCount = 0;
+  let complexRuleCount = 0;
+  const validationTypes = {};
+  
+  // Analyze each rule
+  for (const rule of rules) {
+    // Track validation types
+    validationTypes[rule.validation_type] = (validationTypes[rule.validation_type] || 0) + 1;
+    
+    // Classify rule complexity
+    if (isSimpleRule(rule)) {
+      simpleRuleCount++;
+    } else if (isComplexRule(rule)) {
+      complexRuleCount++;
+    } else {
+      moderateRuleCount++;
+    }
+  }
+  
+  return {
+    totalRuleCount: rules.length,
+    simpleRuleCount,
+    moderateRuleCount,
+    complexRuleCount,
+    validationTypes
+  };
+}
+
+/**
+ * Determine if a rule is simple (suitable for Level 1 validation)
+ * 
+ * @param {Object} rule - Validation rule
+ * @returns {boolean} True if the rule is simple
+ */
+function isSimpleRule(rule) {
+  // Simple validation types
+  const simpleTypes = ['EXISTS', 'PATTERN', 'EQUALS', 'RANGE'];
+  
+  return simpleTypes.includes(rule.validation_type) && 
+         !rule.data_path.includes('[') &&   // No array access
+         !rule.data_path.includes('*');     // No wildcards
+}
+
+/**
+ * Determine if a rule is complex (requiring Level 3 validation)
+ * 
+ * @param {Object} rule - Validation rule
+ * @returns {boolean} True if the rule is complex
+ */
+function isComplexRule(rule) {
+  // Complex validation types
+  const complexTypes = ['CROSS_REFERENCE', 'CONDITIONAL', 'TEMPORAL', 'CUSTOM'];
+  
+  return complexTypes.includes(rule.validation_type) || 
+         rule.data_path.includes('*') ||                // Has wildcards
+         rule.validation_params && rule.validation_params.custom; // Has custom logic
+}
+
+/**
+ * Check if regulation belongs to a specialized domain
+ * 
+ * @param {Object} regulation - Regulation information
+ * @returns {boolean} True if the regulation requires specialized validation
+ */
+function hasSpecializedDomain(regulation) {
+  // Check regulation category for specialized domains
+  const specializedDomains = [
+    'HEALTHCARE', 'FINANCE', 'PRIVACY', 'SECURITY', 'ACADEMIC'
+  ];
+  
+  // Check category_id or code
+  return regulation.category_id && specializedDomains.includes(regulation.category_id) ||
+         specializedDomains.some(domain => regulation.code.includes(domain));
+}
+
+/**
+ * Determine validation approach based on regulation complexity and requested level
+ * 
+ * @param {number} complexityLevel - Regulation complexity level
+ * @param {number} requestedLevel - Requested validation level
+ * @param {boolean} needsSpecializedValidators - If specialized validators are needed
+ * @param {Object} regulation - Regulation information
+ * @param {Object} ruleStats - Statistics about validation rules
+ * @returns {Object} Validation approach configuration
+ */
+function determineValidationApproach(complexityLevel, requestedLevel, needsSpecializedValidators, regulation, ruleStats) {
+  // Determine effective validation level (cannot exceed regulation complexity)
+  const effectiveLevel = Math.min(requestedLevel, complexityLevel);
+  
+  // Determine validators to use
+  const validators = [];
+  
+  // Level 1 validation is always performed
+  validators.push({
+    type: 'LEVEL_1',
+    functionName: process.env.LEVEL1_VALIDATOR_FUNCTION || 'compliance-tracker-dev-level1-validator',
+    priority: 10,
+    rulesCount: ruleStats.simpleRuleCount
+  });
+  
+  // Add Level 2 validator if needed
+  if (effectiveLevel >= ValidationLevels.LEVEL_2 && ruleStats.moderateRuleCount > 0) {
+    validators.push({
+      type: 'LEVEL_2',
+      functionName: process.env.LEVEL2_VALIDATOR_FUNCTION || 'compliance-tracker-dev-level2-validator',
+      priority: 20,
+      rulesCount: ruleStats.moderateRuleCount
+    });
+  }
+  
+  // Add Level 3 validator if needed
+  if (effectiveLevel >= ValidationLevels.LEVEL_3 && ruleStats.complexRuleCount > 0) {
+    validators.push({
+      type: 'LEVEL_3',
+      functionName: process.env.LEVEL3_VALIDATOR_FUNCTION || 'compliance-tracker-dev-level3-validator',
+      priority: 30,
+      rulesCount: ruleStats.complexRuleCount
+    });
+  }
+  
+  // Add specialized domain validators if needed
+  if (needsSpecializedValidators) {
+    const specializedValidator = getSpecializedValidator(regulation);
+    if (specializedValidator) {
+      validators.push({
+        type: 'SPECIALIZED',
+        functionName: specializedValidator.functionName,
+        domain: specializedValidator.domain,
+        priority: 40,
+        rulesCount: 0 // Will be determined by the specialized validator
+      });
+    }
+  }
+  
+  // Determine if human review is needed (Level 4)
+  const needsHumanReview = effectiveLevel >= ValidationLevels.LEVEL_4;
+  
+  return {
+    effectiveLevel,
+    validators,
+    needsHumanReview,
+    parallel: validators.length > 1, // Run validators in parallel if more than one
+    timeoutMs: calculateTimeout(validators, needsHumanReview)
+  };
+}
+
+/**
+ * Get specialized validator for a regulation domain
+ * 
+ * @param {Object} regulation - Regulation information
+ * @returns {Object|null} Specialized validator information or null if not found
+ */
+function getSpecializedValidator(regulation) {
+  // Map of domain identifiers to specialized validator functions
+  const domainValidatorMap = {
+    'HEALTHCARE': {
+      functionName: process.env.HEALTHCARE_VALIDATOR_FUNCTION || 'compliance-tracker-dev-healthcare-validator',
+      domain: 'HEALTHCARE'
+    },
+    'FINANCE': {
+      functionName: process.env.FINANCE_VALIDATOR_FUNCTION || 'compliance-tracker-dev-finance-validator',
+      domain: 'FINANCE'
+    },
+    'PRIVACY': {
+      functionName: process.env.PRIVACY_VALIDATOR_FUNCTION || 'compliance-tracker-dev-privacy-validator',
+      domain: 'PRIVACY'
+    },
+    'ACADEMIC': {
+      functionName: process.env.ACADEMIC_VALIDATOR_FUNCTION || 'compliance-tracker-dev-academic-validator',
+      domain: 'ACADEMIC'
+    },
+    'SECURITY': {
+      functionName: process.env.SECURITY_VALIDATOR_FUNCTION || 'compliance-tracker-dev-security-validator',
+      domain: 'SECURITY'
+    }
+  };
+  
+  // Check regulation category
+  if (regulation.category_id && domainValidatorMap[regulation.category_id]) {
+    return domainValidatorMap[regulation.category_id];
+  }
+  
+  // Check regulation code for domain indicators
+  for (const [domain, validator] of Object.entries(domainValidatorMap)) {
+    if (regulation.code.includes(domain)) {
+      return validator;
+    }
+  }
+  
+  // Check specific regulation codes
+  if (regulation.code.includes('HIPAA') || regulation.code.includes('FDA')) {
+    return domainValidatorMap['HEALTHCARE'];
+  }
+  
+  if (regulation.code.includes('FERPA') || regulation.code.includes('TEACH')) {
+    return domainValidatorMap['ACADEMIC'];
+  }
+  
+  if (regulation.code.includes('PCI') || regulation.code.includes('SOX') || 
+      regulation.code.includes('FINRA') || regulation.code.includes('SEC')) {
+    return domainValidatorMap['FINANCE'];
+  }
+  
+  if (regulation.code.includes('GDPR') || regulation.code.includes('CCPA') || 
+      regulation.code.includes('PRIVACY')) {
+    return domainValidatorMap['PRIVACY'];
+  }
+  
+  return null;
+}
+
+/**
+ * Calculate timeout for validation based on validators
+ * 
+ * @param {Array} validators - List of validators to use
+ * @param {boolean} needsHumanReview - If human review is needed
+ * @returns {number} Timeout in milliseconds
+ */
+function calculateTimeout(validators, needsHumanReview) {
+  // Base timeout
+  let timeout = 5000; // 5 seconds
+  
+  // Add time for each validator
+  for (const validator of validators) {
+    switch (validator.type) {
+      case 'LEVEL_1':
+        timeout += 3000; // 3 seconds for Level 1
+        break;
+      case 'LEVEL_2':
+        timeout += 5000; // 5 seconds for Level 2
+        break;
+      case 'LEVEL_3':
+        timeout += 10000; // 10 seconds for Level 3
+        break;
+      case 'SPECIALIZED':
+        timeout += 8000; // 8 seconds for specialized validators
+        break;
+    }
+  }
+  
+  // If parallel execution, use max instead of sum
+  if (validators.length > 1 && validators.some(v => v.parallel)) {
+    // Calculate maximum validator time
+    let maxValidatorTime = 0;
+    for (const validator of validators) {
+      let validatorTime = 0;
+      switch (validator.type) {
+        case 'LEVEL_1':
+          validatorTime = 3000;
+          break;
+        case 'LEVEL_2':
+          validatorTime = 5000;
+          break;
+        case 'LEVEL_3':
+          validatorTime = 10000;
+          break;
+        case 'SPECIALIZED':
+          validatorTime = 8000;
+          break;
+      }
+      maxValidatorTime = Math.max(maxValidatorTime, validatorTime);
+    }
+    
+    // Base timeout plus max validator time
+    timeout = 5000 + maxValidatorTime;
+  }
+  
+  // Human review is typically asynchronous, so it doesn't affect timeout
+  if (needsHumanReview) {
+    timeout += 2000; // Just add a bit more for processing
+  }
+  
+  // Lambda maximum is 15 minutes (900,000 ms), but we'll be more conservative
+  return Math.min(timeout, 29000); // 29 seconds max
+}
+
+module.exports = {
+  classifyRegulation
+};

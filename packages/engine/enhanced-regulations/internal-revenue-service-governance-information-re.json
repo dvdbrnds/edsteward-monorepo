@@ -1,0 +1,34 @@
+{
+  "regulationId": "internal-revenue-service-governance-information-re",
+  "enhanced": {
+    "fullText": "The Internal Revenue Service mandates comprehensive governance disclosure requirements for tax-exempt organizations under Section 501(c)(3) of the Internal Revenue Code, codified at 26 U.S.C. § 501(c)(3), with implementing regulations found in 26 CFR § 1.501(c)(3)-1. Higher education institutions holding tax-exempt status must complete Form 990, which includes detailed governance information in Part VI, pursuant to Treasury Regulations § 1.6033-2(a)(2)(i). The regulation requires disclosure of governing body composition, including the number of voting members, independent members, and any material conflicts of interest policies. Universities must report whether they maintain a conflict of interest policy covering directors, trustees, officers, and key employees, as mandated by 26 CFR § 53.4958-6(c). Institutions must disclose their whistleblower policy compliance under Section 1107 of the Sarbanes-Oxley Act, codified at 18 U.S.C. § 1514A, which extends protections to nonprofit employees. Document retention and destruction policies must be reported, referencing compliance with 18 U.S.C. § 1519 obstruction of justice provisions. The regulation encompasses CEO/executive compensation determination processes, requiring disclosure of comparability data usage and independent review procedures under intermediate sanctions rules in 26 U.S.C. § 4958. Universities must report governing document amendments, joint venture policies, and any business relationships with interested persons. Form 990 Part VI specifically addresses whether the organization provided copies of Form 990 to governing body members before filing, ensuring transparency in governance oversight. Penalties for non-compliance include automatic revocation of tax-exempt status under 26 U.S.C. § 6033(j) for organizations failing to file for three consecutive years. The IRS may impose excise taxes on excess benefit transactions under Section 4958, with initial taxes of 25% on the disqualified person and 10% on organization managers. Recent amendments through the Tax Cuts and Jobs Act of 2017 expanded reporting requirements for executive compensation and added new excise taxes on compensation exceeding $1 million annually at exempt organizations under 26 U.S.C. § 4960. Higher education institutions face enhanced scrutiny due to their significant endowments and public trust responsibilities, making governance transparency particularly critical for maintaining tax-exempt status and public accountability.",
+    "summary": "IRS Form 990 Part VI requires 501(c)(3) higher education institutions to disclose comprehensive governance information including board composition, conflict of interest policies, whistleblower protections, and executive compensation procedures to maintain tax-exempt status.",
+    "requirements": "## Board Governance Disclosures\n- Report total number of voting members and independent members on governing board\n- Disclose any family or business relationships between officers, directors, trustees, and key employees\n- Document board meeting attendance and participation requirements\n\n## Conflict of Interest Compliance\n- Maintain written conflict of interest policy covering all directors, trustees, officers, and key employees\n- Implement annual disclosure statements and recusal procedures for conflicted transactions\n- Report monitoring and enforcement mechanisms for policy violations\n\n## Whistleblower and Document Policies\n- Establish whistleblower policy protecting employees who report suspected violations\n- Maintain document retention and destruction policy with specific retention periods\n- Ensure policies cover electronic records and litigation hold procedures\n\n## Executive Compensation Oversight\n- Document compensation committee independence and deliberation processes\n- Obtain and review comparability data for executive compensation decisions\n- Maintain contemporaneous documentation of compensation approval rationale",
+    "reportingRequirements": "Form 990 must be filed annually by the 15th day of the 5th month after the organization's accounting period ends (May 15 for calendar year filers). Extensions available through Form 8868. Electronic filing required through IRS e-file system for organizations with assets exceeding $10 million or filing 250+ returns annually."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T03:09:00.287Z"
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Compliance Review",
+      "type": "review",
+      "description": "Annual Compliance Review for Internal Revenue Service: Governance Information Required on Form 990",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Governance"
+  ]
+}

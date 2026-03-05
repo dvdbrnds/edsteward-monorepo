@@ -1,0 +1,50 @@
+{
+  "regulationId": "tax-cuts-and-jobs-act-of-2017-endowment-excise-tax",
+  "enhanced": {
+    "fullText": "The Tax Cuts and Jobs Act of 2017 (TCJA) established Section 4968 of the Internal Revenue Code (26 U.S.C. § 4968), imposing a 1.4 percent excise tax on the net investment income of certain private colleges and universities. This federal regulation represents the first time in U.S. history that higher education endowments have been subject to federal taxation.\n\nLegal Authority: The excise tax is codified under 26 U.S.C. § 4968 and implemented through Treasury Regulations 26 CFR § 53.4968-1 through 53.4968-3. The Internal Revenue Service (IRS) has enforcement authority under 26 U.S.C. § 7805.\n\nApplicability Requirements: Private educational institutions are subject to this tax if they meet three specific criteria simultaneously: (1) at least 500 tuition-paying students during the preceding taxable year, determined under 26 CFR § 53.4968-1(b); (2) more than 50 percent of students are located in the United States, as defined in 26 CFR § 53.4968-1(c); and (3) aggregate fair market value of assets at year-end (other than those used directly in educational purposes) equals at least $500,000 per full-time student, calculated under 26 CFR § 53.4968-1(d).\n\nNet Investment Income Definition: Under 26 CFR § 53.4968-2, taxable net investment income includes dividends, interest, rents, royalties, capital gains, and similar amounts, minus directly connected deductions. Income from assets used directly in the institution's educational purpose is excluded.\n\nCompliance and Reporting: Affected institutions must file Form 4720 (Return of Certain Excise Taxes) annually by the 15th day of the 5th month following the tax year end, as specified in 26 U.S.C. § 6033(a). The tax must be paid with the return filing.\n\nEnforcement and Penalties: The IRS enforces compliance through standard tax collection procedures under 26 U.S.C. § 6651. Failure to file results in penalties of 5 percent per month up to 25 percent of unpaid tax. Failure to pay incurs 0.5 percent monthly penalties under 26 U.S.C. § 6651(a)(2).\n\nRecent Developments: Treasury Regulations finalized in 2020 clarified asset valuation methods and student counting procedures. The COVID-19 pandemic raised questions about student location requirements for remote learning, addressed through IRS guidance permitting temporary location changes without affecting the 50 percent threshold calculation.",
+    "summary": "Federal excise tax of 1.4% on net investment income of private colleges with 500+ students, majority U.S.-located, and assets exceeding $500,000 per full-time student, enforced through annual IRS reporting.",
+    "requirements": "## Institutional Eligibility Assessment\n- Conduct annual evaluation of three-part test: student count, U.S. location percentage, and asset-to-student ratio\n- Document full-time student enrollment using 26 CFR § 53.4968-1(b) methodology\n- Calculate asset values excluding direct educational use property per 26 CFR § 53.4968-1(d)\n\n## Net Investment Income Calculation\n- Identify all investment income including dividends, interest, rents, royalties, and capital gains\n- Apply exclusions for assets used directly in educational purposes under 26 CFR § 53.4968-2\n- Subtract directly connected deductions from gross investment income\n\n## Tax Computation and Payment\n- Apply 1.4% rate to net investment income exceeding threshold\n- Remit payment with Form 4720 by 15th day of 5th month after tax year end\n- Maintain detailed records supporting all calculations and exclusions",
+    "reportingRequirements": "Annual Form 4720 filing due by May 15th (for calendar year institutions) reporting net investment income and tax calculation. Electronic filing required for institutions with assets exceeding $10 million. Quarterly estimated payments may be required under 26 U.S.C. § 6655 if prior year tax exceeded $500."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T15:40:49.868Z"
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Financial Audit",
+      "type": "audit",
+      "description": "Annual Financial Audit for Tax Cuts and Jobs Act of 2017 (endowment excise tax)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "03-31",
+      "label": "A-133 Single Audit (if applicable)",
+      "type": "audit",
+      "description": "A-133 Single Audit (if applicable) for Tax Cuts and Jobs Act of 2017 (endowment excise tax)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Quarterly Financial Review",
+      "type": "review",
+      "description": "Quarterly Financial Review for Tax Cuts and Jobs Act of 2017 (endowment excise tax)",
+      "isRecurring": true,
+      "recurrenceFrequency": "quarterly"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Accounting"
+  ]
+}

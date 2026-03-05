@@ -1,0 +1,42 @@
+{
+  "regulationId": "outside-earned-income-and-activities",
+  "enhanced": {
+    "fullText": "The Outside Earned Income and Activities regulation, codified at 5 U.S.C. app. 4 §§ 501-505, establishes comprehensive restrictions on outside employment and income-generating activities for covered noncareer employees in executive branch agencies, including senior administrators at federally-chartered universities and government-affiliated higher education institutions.\n\nUnder 5 U.S.C. app. 4 § 501(a), covered noncareer employees are prohibited from receiving any outside earned income exceeding 15% of the annual rate of basic pay for level II of the Executive Schedule, currently approximately $32,000 annually. This limitation applies to compensation from any source outside the employee's government position, including consulting fees, speaking honoraria, board service compensation, and teaching income from private institutions.\n\nSection 502 defines \"outside earned income\" broadly to encompass wages, salaries, fees, and other compensation for personal services, excluding investment income, pensions, and certain grandfathered arrangements. For university presidents and senior administrators at institutions like military academies or federally-controlled universities, this creates significant restrictions on traditional academic income sources such as book royalties, conference speaking fees, and private sector consulting.\n\nThe regulation's scope, detailed in 5 U.S.C. app. 4 § 505, applies to Presidential appointees subject to Senate confirmation, noncareer Senior Executive Service members, and Schedule C appointees compensated at GS-15 level or above. In higher education contexts, this typically includes university presidents, provosts, and other senior administrators at federal service academies, government research institutions, and federally-chartered universities.\n\nCompliance monitoring occurs through annual financial disclosure requirements under 5 U.S.C. app. 4 § 101, with institutions' designated agency ethics officials (DAEOs) responsible for oversight. Violations may result in disciplinary action including removal from position, civil penalties up to $50,000 under 5 U.S.C. app. 4 § 104, and potential criminal prosecution for willful violations.\n\nRecent Office of Government Ethics guidance clarified that virtual speaking engagements and online course instruction constitute covered activities subject to income limitations. The 2023 amendments strengthened enforcement mechanisms and expanded reporting requirements for cryptocurrency and digital asset compensation. Universities must establish robust tracking systems to monitor covered employees' outside activities and ensure compliance with both income thresholds and prior approval requirements for any outside employment or business relationships.",
+    "summary": "Restricts outside earned income for senior noncareer federal employees to 15% of Executive Level II pay (~$32K annually). Applies to university presidents and administrators at federal institutions. Requires prior approval for outside activities and annual disclosure reporting.",
+    "requirements": "## Income Limitations\n- Maximum outside earned income: 15% of Executive Schedule Level II pay annually\n- Covers all compensation including consulting, speaking fees, teaching income\n- Investment income and pensions excluded from calculations\n\n## Prior Approval Process\n- Written approval required before engaging in outside employment\n- Submit detailed activity descriptions to designated ethics officials\n- 30-day advance notice required for new income sources\n\n## Prohibited Activities\n- No compensation from entities doing business with employee's agency\n- Prohibited from using government position or inside information\n- Cannot receive payments from foreign governments or entities\n\n## Documentation Requirements\n- Maintain detailed records of all outside income sources\n- Submit quarterly income tracking reports to ethics office\n- Annual certification of compliance with income thresholds",
+    "reportingRequirements": "Annual financial disclosure reports due May 15th via OGE Form 278. Quarterly income summaries required within 15 days of quarter-end. Immediate notification required for any outside activity exceeding $5,000 per source. All reports submitted through agency ethics officials to OGE."
+  },
+  "audit": {
+    "score": 89,
+    "certainty": "B",
+    "scores": {
+      "content": 80,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T01:40:11.446Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Annual Ethics Training",
+      "type": "training",
+      "description": "Annual Ethics Training for Outside Earned Income and Activities",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Conflict of Interest Disclosure Review",
+      "type": "review",
+      "description": "Conflict of Interest Disclosure Review for Outside Earned Income and Activities",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Ethics"
+  ]
+}

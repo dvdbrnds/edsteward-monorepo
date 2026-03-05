@@ -1,0 +1,396 @@
+<!-- ============================================ -->
+<!-- AI QUALITY AUDITOR WIDGET                 -->
+<!-- Add this to the sidebar of console pages   -->
+<!-- ============================================ -->
+
+<!-- CSS Styles (add to <style> section) -->
+<style>
+.inquisitor-widget {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 24px;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.inquisitor-header {
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.inquisitor-button {
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.3s;
+    backdrop-filter: blur(10px);
+}
+
+.inquisitor-button:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.inquisitor-button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.inquisitor-progress {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 12px;
+}
+
+.inquisitor-progress-bar {
+    width: 100%;
+    height: 6px;
+    background: #e9ecef;
+    border-radius: 3px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.inquisitor-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    transition: width 0.3s ease;
+}
+
+.inquisitor-results {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 8px;
+    padding: 12px;
+    margin-top: 12px;
+}
+
+.inquisitor-score-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.inquisitor-score-item {
+    text-align: center;
+    padding: 10px;
+    background: white;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.inquisitor-score-label {
+    font-size: 11px;
+    color: #6c757d;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.inquisitor-score-value {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.score-excellent { color: #10b981; }
+.score-good { color: #3b82f6; }
+.score-fair { color: #f59e0b; }
+.score-poor { color: #ef4444; }
+
+.inquisitor-ai-section {
+    margin-top: 12px;
+    padding: 12px;
+    background: white;
+    border-radius: 6px;
+}
+
+.inquisitor-ai-title {
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #1a1a1a;
+}
+
+.inquisitor-ai-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    font-size: 11px;
+}
+
+.inquisitor-ai-metric {
+    display: flex;
+    justify-content: space-between;
+    padding: 6px;
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+.inquisitor-assessment {
+    margin-top: 10px;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    font-size: 11px;
+    line-height: 1.5;
+    color: #495057;
+}
+
+.inquisitor-error {
+    background: #fee;
+    color: #dc2626;
+    padding: 10px;
+    border-radius: 6px;
+    font-size: 12px;
+    margin-top: 12px;
+}
+
+.spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+</style>
+
+<!-- HTML Widget (add to sidebar) -->
+<div class="inquisitor-widget">
+    <div class="inquisitor-header">
+        <span>🤖</span>
+        <span>AI Quality Auditor</span>
+    </div>
+    
+    <button id="inquisitorRunButton" class="inquisitor-button" onclick="runInquisitorAudit()">
+        <span id="inquisitorButtonIcon">⚡</span>
+        <span id="inquisitorButtonText">Run AI Audit</span>
+    </button>
+    
+    <div id="inquisitorProgress" class="inquisitor-progress" style="display: none;">
+        <div style="font-size: 12px; color: #495057; margin-bottom: 6px;">
+            <span class="spinner"></span>
+            <span style="margin-left: 8px;">AI analyzing regulation quality...</span>
+        </div>
+        <div class="inquisitor-progress-bar">
+            <div id="inquisitorProgressFill" class="inquisitor-progress-fill" style="width: 0%"></div>
+        </div>
+        <div id="inquisitorProgressText" style="font-size: 11px; color: #6c757d; margin-top: 4px; text-align: center;">
+            0%
+        </div>
+    </div>
+    
+    <div id="inquisitorResults" class="inquisitor-results" style="display: none;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+            <span style="font-weight: 600; font-size: 14px;">Quality Report</span>
+            <span id="inquisitorCertainty" style="font-weight: 700; font-size: 18px;">-</span>
+        </div>
+        
+        <div class="inquisitor-score-grid">
+            <div class="inquisitor-score-item">
+                <div class="inquisitor-score-label">Overall</div>
+                <div id="inquisitorOverallScore" class="inquisitor-score-value">-</div>
+            </div>
+            <div class="inquisitor-score-item">
+                <div class="inquisitor-score-label">Content</div>
+                <div id="inquisitorContentScore" class="inquisitor-score-value">-</div>
+            </div>
+            <div class="inquisitor-score-item">
+                <div class="inquisitor-score-label">Summary</div>
+                <div id="inquisitorSummaryScore" class="inquisitor-score-value">-</div>
+            </div>
+            <div class="inquisitor-score-item">
+                <div class="inquisitor-score-label">Requirements</div>
+                <div id="inquisitorRequirementsScore" class="inquisitor-score-value">-</div>
+            </div>
+        </div>
+        
+        <div id="inquisitorAISection" class="inquisitor-ai-section" style="display: none;">
+            <div class="inquisitor-ai-title">🤖 AI Semantic Analysis</div>
+            <div class="inquisitor-ai-metrics">
+                <div class="inquisitor-ai-metric">
+                    <span>Legal Accuracy:</span>
+                    <strong id="inquisitorLegalAccuracy">-</strong>
+                </div>
+                <div class="inquisitor-ai-metric">
+                    <span>Completeness:</span>
+                    <strong id="inquisitorCompleteness">-</strong>
+                </div>
+                <div class="inquisitor-ai-metric">
+                    <span>Clarity:</span>
+                    <strong id="inquisitorClarity">-</strong>
+                </div>
+                <div class="inquisitor-ai-metric">
+                    <span>Actionability:</span>
+                    <strong id="inquisitorActionability">-</strong>
+                </div>
+            </div>
+            <div id="inquisitorAssessment" class="inquisitor-assessment">
+                <strong>AI Assessment:</strong> <span id="inquisitorAssessmentText"></span>
+            </div>
+        </div>
+    </div>
+    
+    <div id="inquisitorError" class="inquisitor-error" style="display: none;">
+        <strong>⚠️ Error:</strong> <span id="inquisitorErrorText"></span>
+    </div>
+</div>
+
+<!-- JavaScript (add before closing </body> tag) -->
+<script>
+// Extract regulation slug from URL
+function getRegulationSlug() {
+    const path = window.location.pathname;
+    const filename = path.split('/').pop();
+    const slug = filename.replace('-console.html', '');
+    return slug;
+}
+
+// Get color class based on score
+function getScoreClass(score) {
+    if (score >= 90) return 'score-excellent';
+    if (score >= 75) return 'score-good';
+    if (score >= 60) return 'score-fair';
+    return 'score-poor';
+}
+
+// Run Inquisitor Audit
+async function runInquisitorAudit() {
+    const regulationSlug = getRegulationSlug();
+    const button = document.getElementById('inquisitorRunButton');
+    const buttonText = document.getElementById('inquisitorButtonText');
+    const buttonIcon = document.getElementById('inquisitorButtonIcon');
+    const progress = document.getElementById('inquisitorProgress');
+    const progressFill = document.getElementById('inquisitorProgressFill');
+    const progressText = document.getElementById('inquisitorProgressText');
+    const results = document.getElementById('inquisitorResults');
+    const errorDiv = document.getElementById('inquisitorError');
+    const errorText = document.getElementById('inquisitorErrorText');
+    
+    // Reset UI
+    button.disabled = true;
+    buttonText.textContent = 'Analyzing...';
+    buttonIcon.innerHTML = '<span class="spinner"></span>';
+    progress.style.display = 'block';
+    results.style.display = 'none';
+    errorDiv.style.display = 'none';
+    
+    // Simulate progress
+    let progressValue = 0;
+    const progressInterval = setInterval(() => {
+        progressValue = Math.min(progressValue + 10, 90);
+        progressFill.style.width = progressValue + '%';
+        progressText.textContent = progressValue + '%';
+    }, 800);
+    
+    try {
+        const response = await fetch('http://localhost:3061/api/inquisitor/audit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ regulationSlug }),
+            signal: AbortSignal.timeout(60000)
+        });
+        
+        clearInterval(progressInterval);
+        progressFill.style.width = '100%';
+        progressText.textContent = '100%';
+        
+        if (!response.ok) {
+            throw new Error(`Server returned ${response.status}: ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.success && data.audit) {
+            displayResults(data.audit);
+        } else {
+            throw new Error(data.error || 'Audit failed');
+        }
+    } catch (err) {
+        clearInterval(progressInterval);
+        errorDiv.style.display = 'block';
+        errorText.textContent = err.message;
+        console.error('Inquisitor audit error:', err);
+    } finally {
+        button.disabled = false;
+        buttonText.textContent = 'Run AI Audit';
+        buttonIcon.textContent = '⚡';
+        setTimeout(() => {
+            progress.style.display = 'none';
+        }, 1000);
+    }
+}
+
+// Display audit results
+function displayResults(audit) {
+    const results = document.getElementById('inquisitorResults');
+    const overallScore = document.getElementById('inquisitorOverallScore');
+    const contentScore = document.getElementById('inquisitorContentScore');
+    const summaryScore = document.getElementById('inquisitorSummaryScore');
+    const requirementsScore = document.getElementById('inquisitorRequirementsScore');
+    const certainty = document.getElementById('inquisitorCertainty');
+    const aiSection = document.getElementById('inquisitorAISection');
+    
+    // Display scores
+    overallScore.textContent = audit.overallScore || 0;
+    overallScore.className = 'inquisitor-score-value ' + getScoreClass(audit.overallScore || 0);
+    
+    contentScore.textContent = audit.scores?.content || 0;
+    contentScore.className = 'inquisitor-score-value ' + getScoreClass(audit.scores?.content || 0);
+    
+    summaryScore.textContent = audit.scores?.summary || 0;
+    summaryScore.className = 'inquisitor-score-value ' + getScoreClass(audit.scores?.summary || 0);
+    
+    requirementsScore.textContent = audit.scores?.requirements || 0;
+    requirementsScore.className = 'inquisitor-score-value ' + getScoreClass(audit.scores?.requirements || 0);
+    
+    certainty.textContent = audit.certaintyLevel || 'D';
+    certainty.className = getScoreClass(audit.overallScore || 0);
+    
+    // Display AI analysis if available
+    if (audit.aiAnalysis && audit.aiAnalysis.enabled) {
+        aiSection.style.display = 'block';
+        
+        document.getElementById('inquisitorLegalAccuracy').textContent = 
+            (audit.aiAnalysis.legalAccuracy?.score || 0) + '/100';
+        document.getElementById('inquisitorCompleteness').textContent = 
+            (audit.aiAnalysis.completeness?.score || 0) + '/100';
+        document.getElementById('inquisitorClarity').textContent = 
+            (audit.aiAnalysis.clarity?.score || 0) + '/100';
+        document.getElementById('inquisitorActionability').textContent = 
+            (audit.aiAnalysis.actionability?.score || 0) + '/100';
+        
+        document.getElementById('inquisitorAssessmentText').textContent = 
+            audit.aiAnalysis.overallAssessment || 'No assessment available';
+    }
+    
+    results.style.display = 'block';
+}
+
+// Auto-run audit on page load (optional)
+// window.addEventListener('load', () => {
+//     setTimeout(runInquisitorAudit, 2000);
+// });
+</script>
+

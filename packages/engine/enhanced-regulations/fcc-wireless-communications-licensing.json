@@ -1,0 +1,50 @@
+{
+  "regulationId": "fcc-wireless-communications-licensing",
+  "enhanced": {
+    "fullText": "The Federal Communications Commission (FCC) regulates wireless communications licensing for higher education institutions under 47 U.S.C. § 151 et seq. and implementing regulations in 47 CFR Parts 1, 20, 22, 24, 27, and 90. Universities seeking to provide wireless communication services must obtain appropriate FCC authorization through a comprehensive licensing framework that governs spectrum use, equipment deployment, and service provision.\n\nUnder 47 U.S.C. § 301, no person shall use or operate any apparatus for the transmission of energy or communications by radio without a license issued by the FCC. Higher education institutions may apply for licenses covering four distinct service categories: (1) common carrier services under 47 CFR Part 22 for commercial telecommunications offerings; (2) non-common carrier services under 47 CFR Part 101 for point-to-point microwave communications; (3) private internal communications under 47 CFR Part 90 for campus security, facilities management, and administrative operations; and (4) broadcast services under 47 CFR Part 73 for educational radio and television stations.\n\nThe licensing process requires submission of FCC Form 601 through the Universal Licensing System (ULS), with specific technical showings demonstrating frequency coordination, interference protection, and compliance with RF exposure limits under 47 CFR § 1.1307. Universities must provide detailed engineering studies showing antenna patterns, effective radiated power, and coverage areas. For educational broadcast services, institutions must file FCC Form 2100 demonstrating compliance with public interest obligations under 47 U.S.C. § 309(a).\n\nKey compliance requirements include maintaining accurate station records per 47 CFR § 1.913, conducting annual equipment inspections, and ensuring operators hold appropriate licenses under 47 CFR Part 97. Universities must also comply with environmental assessment requirements under 47 CFR § 1.1301 for antenna installations and demonstrate compliance with local zoning ordinances.\n\nEnforcement mechanisms include monetary forfeitures up to $100,000 per violation under 47 U.S.C. § 503(b), license revocation proceedings, and criminal penalties for willful violations. The FCC conducts regular compliance audits and responds to interference complaints. Recent amendments through the Spectrum Frontiers proceeding have expanded millimeter wave opportunities for campus wireless networks under 47 CFR Part 30.\n\nUniversities must renew licenses every ten years for most services, with renewal applications due between 90-120 days before expiration. License modifications require prior FCC approval for changes in frequency, power, or antenna specifications under 47 CFR § 1.929.",
+    "summary": "FCC wireless communications licensing regulates university spectrum use for common carrier, non-common carrier, private internal, and broadcast services under 47 U.S.C. § 151, requiring license applications, technical compliance, and periodic renewals.",
+    "requirements": "## License Application Requirements\n- File FCC Form 601 through Universal Licensing System for wireless services\n- Submit FCC Form 2100 for educational broadcast applications\n- Provide technical studies demonstrating frequency coordination and interference protection\n- Complete environmental assessment under 47 CFR § 1.1301 for antenna installations\n\n## Operational Compliance\n- Maintain accurate station records per 47 CFR § 1.913\n- Ensure operators hold appropriate FCC licenses under Part 97\n- Conduct annual equipment performance inspections\n- Comply with RF exposure limits under 47 CFR § 1.1307\n\n## Modification and Renewal Process\n- File license modifications 90 days before implementing changes\n- Submit renewal applications 90-120 days before ten-year license expiration\n- Obtain prior FCC approval for frequency, power, or antenna modifications per 47 CFR § 1.929",
+    "reportingRequirements": "License renewal applications due 90-120 days before expiration (ten-year terms). Modification requests required 90 days before technical changes. Annual equipment inspection records maintained on-site per 47 CFR § 1.913."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T18:47:32.549Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Annual IT Security Assessment",
+      "type": "assessment",
+      "description": "Annual IT Security Assessment for FCC – Wireless Communications, Licensing",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Vulnerability Scan",
+      "type": "scan",
+      "description": "Vulnerability Scan for FCC – Wireless Communications, Licensing",
+      "isRecurring": true,
+      "recurrenceFrequency": "quarterly"
+    },
+    {
+      "date": "continuous",
+      "label": "Disaster Recovery Plan Test",
+      "type": "test",
+      "description": "Disaster Recovery Plan Test for FCC – Wireless Communications, Licensing",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Information Technology"
+  ]
+}

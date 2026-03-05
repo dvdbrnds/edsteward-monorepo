@@ -1,0 +1,50 @@
+{
+  "regulationId": "animal-welfare-act",
+  "enhanced": {
+    "fullText": "The Animal Welfare Act (AWA), codified at 7 U.S.C. §§ 2131-2159, establishes federal standards for the treatment of animals used in research, exhibition, transport, and by dealers. For higher education institutions, this regulation is critical as many universities conduct research involving covered animals including dogs, cats, non-human primates, guinea pigs, hamsters, rabbits, and other warm-blooded animals except birds, rats, and mice bred for research.\n\nThe AWA is administered by the Animal and Plant Health Inspection Service (APHIS) under the U.S. Department of Agriculture, with implementing regulations found in 9 CFR Parts 1, 2, and 3. Universities conducting research with covered species must obtain a research facility license under 7 U.S.C. § 2133 and maintain registration with USDA-APHIS.\n\nKey provisions require institutions to establish Institutional Animal Care and Use Committees (IACUCs) per 7 U.S.C. § 2143(b), which must include a veterinarian, a scientist experienced in animal research, a non-scientist, and a public member unaffiliated with the institution. The IACUC reviews and approves all research protocols, conducts semiannual facility inspections, and ensures compliance with animal welfare standards outlined in 9 CFR Part 3.\n\nUniversities must maintain detailed records of animal acquisition, disposition, and veterinary care for at least three years under 9 CFR § 2.35. Annual reports must be submitted to APHIS detailing research activities, animal numbers by species, and pain/distress categories as specified in 7 U.S.C. § 2143(a)(7).\n\nViolations can result in significant penalties including fines up to $10,000 per violation under 7 U.S.C. § 2149, license suspension or revocation, and cease and desist orders. The 2018 Farm Bill amended the AWA to strengthen enforcement mechanisms and increase transparency requirements. APHIS conducts unannounced inspections and publishes inspection reports publicly, making compliance failures highly visible to the academic community and public.\n\nInstitutions must also ensure adequate veterinary care, proper housing conditions meeting species-specific requirements in 9 CFR Part 3, environmental enrichment programs, and personnel training on humane animal handling and care procedures.",
+    "summary": "The Animal Welfare Act establishes federal standards for research animal care at universities. Institutions must obtain USDA licenses, maintain IACUCs, follow housing/care standards, submit annual reports, and undergo federal inspections.",
+    "requirements": "## IACUC Establishment and Operations\n- Establish Institutional Animal Care and Use Committee with required membership per 7 U.S.C. § 2143(b)\n- Conduct semiannual facility inspections and protocol reviews\n- Maintain meeting minutes and approval documentation\n\n## Facility Registration and Licensing\n- Obtain research facility license from USDA-APHIS under 7 U.S.C. § 2133\n- Maintain current registration and renew as required\n- Display license conspicuously at facility entrance\n\n## Animal Care Standards\n- Comply with species-specific housing requirements in 9 CFR Part 3\n- Provide adequate veterinary care and environmental enrichment\n- Maintain personnel training records on animal handling procedures\n\n## Record Keeping\n- Maintain acquisition and disposition records for minimum three years per 9 CFR § 2.35\n- Document veterinary care, breeding records, and research protocols\n- Ensure records are available for APHIS inspection",
+    "reportingRequirements": "Annual reports due December 1st to USDA-APHIS detailing animal numbers by species and pain/distress categories per 7 U.S.C. § 2143(a)(7). Submit semiannual IACUC inspection reports. Report animal deaths and protocol deviations within required timeframes."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T16:38:12.586Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "IRB Protocol Annual Review",
+      "type": "review",
+      "description": "IRB Protocol Annual Review for Animal Welfare Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Conflict of Interest Disclosure",
+      "type": "disclosure",
+      "description": "Conflict of Interest Disclosure for Animal Welfare Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Export Control Assessment",
+      "type": "assessment",
+      "description": "Export Control Assessment for Animal Welfare Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Research"
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "regulationId": "foreign-bank-accounts-and-tax-filings",
+  "enhanced": {
+    "fullText": "The Foreign Bank Account Report (FBAR) requirements under 31 U.S.C. § 5314(a) and 31 CFR § 1010.350 impose critical compliance obligations on U.S. higher education institutions and their personnel who maintain financial interests in foreign accounts. This regulation, administered by the Financial Crimes Enforcement Network (FinCEN), requires comprehensive reporting of foreign financial accounts exceeding $10,000 in aggregate value.\n\nHigher education institutions face FBAR obligations through multiple pathways. Universities with direct ownership interests in foreign bank accounts, including those established for international campuses, research collaborations, or study abroad programs, must file FinCEN Form 114 electronically. Under 31 CFR § 1010.350(f), institutions must report accounts where they hold legal title or beneficial ownership, regardless of account location or currency.\n\nPersonnel obligations create additional institutional risk. University employees, trustees, and officers with signature authority over foreign accounts must file individual FBARs under 31 CFR § 1010.350(f)(2)(ii), even when the institution files its own report for the same account. This dual reporting requirement affects international program directors, research administrators, and financial officers managing overseas operations.\n\nThe $10,000 threshold applies to aggregate account values during the calendar year's maximum balance, not year-end balances. For institutions with multiple foreign accounts, all accounts must be reported if the combined maximum value exceeds this threshold at any point during the reporting year.\n\nEnforcement penalties are substantial under 31 U.S.C. § 5321. Willful violations carry criminal penalties up to $500,000 and five years imprisonment, while non-willful violations incur civil penalties up to $12,921 per account per year (adjusted for inflation). The IRS may also impose additional penalties under 26 U.S.C. § 5314 for related income tax violations.\n\nRecent regulatory updates include enhanced electronic filing requirements through FinCEN's BSA E-Filing System, mandatory since 2013. The 2020 amendments to 31 CFR § 1010.350 clarified signature authority definitions and expanded virtual currency reporting obligations, affecting institutions involved in blockchain research or cryptocurrency transactions.\n\nHigher education institutions must implement robust compliance programs addressing both institutional and individual reporting obligations, ensuring coordination between international programs, finance offices, and affected personnel to avoid costly violations.",
+    "summary": "U.S. higher education institutions and personnel with foreign financial account interests exceeding $10,000 must file annual FBAR reports with FinCEN under 31 U.S.C. § 5314(a), covering institutional accounts and individual signature authority.",
+    "requirements": "## Institutional Reporting Obligations\n- File FinCEN Form 114 electronically for all foreign accounts with ownership interest exceeding $10,000 aggregate maximum balance\n- Report accounts held by international campuses, research centers, and study abroad programs\n- Maintain detailed records of account ownership, balances, and authorized signatories\n\n## Personnel Compliance Requirements\n- Ensure employees with foreign account signature authority file individual FBARs\n- Identify all university personnel with signing authority over institutional foreign accounts\n- Implement annual certification process for potential FBAR filers\n\n## Documentation and Record-Keeping\n- Maintain account statements showing maximum balances during reporting year\n- Document ownership structure and signature authority for all foreign accounts\n- Preserve FBAR filings and supporting documentation for five years per 31 CFR § 1010.430\n\n## Compliance Monitoring\n- Establish annual review process for new foreign account relationships\n- Coordinate between international programs, finance, and legal departments\n- Monitor threshold compliance for aggregate account values throughout calendar year",
+    "reportingRequirements": "Annual FinCEN Form 114 filing deadline: April 15 following the calendar year, with automatic six-month extension to October 15. Electronic submission required through BSA E-Filing System. No paper filing permitted under 31 CFR § 1010.306."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T19:13:38.692Z"
+  },
+  "deadlines": [
+    {
+      "date": "05-15",
+      "label": "Form 990 Filing",
+      "type": "filing",
+      "description": "Form 990 Filing for Foreign Bank Accounts and Tax Filings",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "05-15",
+      "label": "Form 990-T Filing (if applicable)",
+      "type": "filing",
+      "description": "Form 990-T Filing (if applicable) for Foreign Bank Accounts and Tax Filings",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Form 1099 Filing",
+      "type": "filing",
+      "description": "Form 1099 Filing for Foreign Bank Accounts and Tax Filings",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "W-2 Distribution",
+      "type": "distribution",
+      "description": "W-2 Distribution for Foreign Bank Accounts and Tax Filings",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Tax"
+  ]
+}

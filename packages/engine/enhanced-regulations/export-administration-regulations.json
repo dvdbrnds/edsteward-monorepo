@@ -1,0 +1,50 @@
+{
+  "regulationId": "export-administration-regulations",
+  "enhanced": {
+    "fullText": "The Export Administration Regulations (EAR), codified at 15 C.F.R. Parts 730-774, are administered by the Bureau of Industry and Security (BIS) under the Department of Commerce. These regulations implement the Export Administration Act of 1979, as amended (50 U.S.C. §§ 4801-4852), and control the export of dual-use items that have both civilian and military applications.\n\nFor higher education institutions, the EAR governs the export of controlled goods, technology, and software listed on the Commerce Control List (CCL) found at 15 C.F.R. Part 774. The regulations define \"export\" broadly under 15 C.F.R. § 734.13 to include not only physical shipment of goods outside the United States but also the transmission of controlled technology or software to foreign nationals, whether inside or outside the U.S. This \"deemed export\" provision is particularly relevant to universities with international students, faculty, and researchers.\n\nThe fundamental research exclusion under 15 C.F.R. § 734.8 provides critical relief for academic institutions. This exclusion applies to basic and applied research in science and engineering where results are ordinarily published and shared broadly within the scientific community. To qualify, research must be conducted by accredited institutions of higher learning in the U.S. and cannot be subject to publication restrictions. The exclusion covers research resulting in a thesis or academic publication, or research for which the principal investigator's students are encouraged to attend or present at academic conferences.\n\nHowever, universities must carefully evaluate sponsored research agreements. Research subject to publication delays beyond prepublication review (typically exceeding 90 days under 15 C.F.R. § 734.8(b)) or other restrictions may lose fundamental research protection. Additionally, the exclusion does not apply to research conducted for, or sponsored by, parties to prohibited transactions under 15 C.F.R. Part 744.\n\nKey compliance areas include: export licensing requirements for controlled items under 15 C.F.R. § 740 (general authorizations) and 15 C.F.R. Part 748 (specific licenses); screening procedures for denied persons listed in 15 C.F.R. Part 744, Supplement No. 4; and technology transfer controls affecting international collaborations.\n\nViolations can result in administrative penalties up to $300,000 per violation or twice the transaction value under 15 C.F.R. Part 766, criminal penalties including fines up to $1 million and 20 years imprisonment per 50 U.S.C. § 4819, and export privileges denial. Recent amendments in 2022 strengthened controls on emerging technologies including artificial intelligence and quantum computing research, requiring enhanced due diligence for international partnerships in these areas.",
+    "summary": "EAR controls export of dual-use goods and technology, including deemed exports to foreign nationals. Universities generally qualify for fundamental research exclusion under 15 C.F.R. § 734.8 when research results are published without restrictions.",
+    "requirements": "## Export Control Program Development\n- Establish written export control policies and procedures per 15 C.F.R. Part 730\n- Designate responsible export control officer with BIS training\n- Implement screening procedures for denied persons list verification\n\n## Research Classification and Review\n- Evaluate all sponsored research for fundamental research exclusion eligibility under 15 C.F.R. § 734.8\n- Review publication restrictions in research agreements before execution\n- Maintain documentation supporting fundamental research determinations\n\n## International Engagement Controls\n- Screen foreign nationals for export license requirements before technology access\n- Implement deemed export controls for Commerce Control List items per 15 C.F.R. § 734.13\n- Establish procedures for international collaboration agreements review\n\n## Training and Monitoring\n- Provide annual EAR training for research administrators and principal investigators\n- Conduct periodic compliance audits of high-risk research programs\n- Monitor regulatory updates from Bureau of Industry and Security",
+    "reportingRequirements": "No routine reporting required for fundamental research activities. License applications must be submitted via SNAP-R system within 15 days of export need. Voluntary self-disclosure of violations should be reported to BIS within 30 days of discovery per 15 C.F.R. § 764.5."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T18:33:46.150Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "IRB Protocol Annual Review",
+      "type": "review",
+      "description": "IRB Protocol Annual Review for Export Administration Regulations",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Conflict of Interest Disclosure",
+      "type": "disclosure",
+      "description": "Conflict of Interest Disclosure for Export Administration Regulations",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Export Control Assessment",
+      "type": "assessment",
+      "description": "Export Control Assessment for Export Administration Regulations",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Research"
+  ]
+}

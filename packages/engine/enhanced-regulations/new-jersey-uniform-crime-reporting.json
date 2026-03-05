@@ -1,0 +1,79 @@
+{
+  "regulationId": "new-jersey-uniform-crime-reporting",
+  "schemaVersion": "2.0",
+  "jurisdiction": {
+    "source": "state",
+    "countryCode": "US",
+    "stateCodes": [
+      "NJ"
+    ],
+    "label": "New Jersey",
+    "regulatoryBody": "NJ State Police / Uniform Crime Reporting Unit",
+    "actNumber": null,
+    "applicability": "all"
+  },
+  "enhanced": {
+    "fullText": "The New Jersey Uniform Crime Reporting for Higher Education statute (N.J.S.A. 52:17B-5.1) establishes comprehensive requirements for institutions of higher education to report criminal incidents occurring on campus property and adjacent areas under institutional control. This regulation serves to enhance campus safety transparency and ensure consistent crime data collection across all New Jersey colleges and universities.\n\nUnder this statute, all institutions of higher education operating within New Jersey must participate in the state's uniform crime reporting system by submitting detailed incident reports to the New Jersey State Police within specified timeframes. The reporting requirements encompass all criminal incidents classified under the Uniform Crime Reporting (UCR) system, including violent crimes, property crimes, drug offenses, and other criminal violations that occur on campus grounds, in campus buildings, on public property immediately adjacent to campus, and in non-campus buildings or property owned or controlled by the institution.\n\nInstitutions must designate a qualified campus safety official responsible for collecting, compiling, and submitting crime data to state authorities. This designated official must receive appropriate training in UCR classification procedures and maintain current certification in crime data reporting protocols. The institution shall ensure that all campus security personnel, local law enforcement agencies with jurisdiction over campus property, and other relevant campus officials provide incident information to the designated reporting official in a timely manner.\n\nThe statute requires institutions to establish formal procedures for collecting crime data from multiple sources, including campus security departments, local police agencies, and other campus officials with significant responsibility for student and campus activities. Institutions must maintain comprehensive records of all reported incidents, including those reported to pastoral counselors and professional mental health counselors, when deemed appropriate for inclusion in crime statistics while respecting confidentiality requirements.\n\nReporting categories include murder and non-negligent manslaughter, negligent manslaughter, sexual offenses including rape and fondling, robbery, aggravated assault, burglary, motor vehicle theft, arson, domestic violence, dating violence, stalking, and hate crimes. Additionally, institutions must report arrests and disciplinary referrals for weapons law violations, drug abuse violations, and liquor law violations. Each incident must be classified according to UCR definitions and assigned to the appropriate geographic category based on where the offense occurred.\n\nInstitutions must submit monthly reports to the New Jersey State Police by the tenth day of each month, covering all incidents that occurred during the previous month. Annual comprehensive reports must be submitted by March 1st of each year, covering the previous calendar year's criminal activity. Emergency notifications for serious crimes posing immediate threats to campus community safety must be reported within 24 hours of discovery.\n\nThe regulation mandates that institutions maintain detailed incident logs accessible to the public during normal business hours. These logs must contain the nature, date, time, and general location of each crime reported to campus security authorities or local police agencies. Personal identifying information of victims and suspects shall be redacted from public logs in accordance with privacy protection requirements.\n\nInstitutions must ensure coordination between campus security personnel and local law enforcement agencies to prevent double-counting of incidents and ensure accurate geographic classification. Written agreements with local police departments should establish clear protocols for information sharing and joint response procedures for criminal incidents occurring on or near campus property.\n\nCompliance monitoring includes regular audits by the New Jersey State Police to verify accuracy and completeness of reported data. Institutions found to be non-compliant may face penalties including monetary fines, mandatory additional training requirements, and enhanced oversight measures. Repeat violations may result in more severe sanctions as determined by the appropriate state agencies.\n\nThe statute recognizes the importance of victim confidentiality and includes provisions protecting the identity of crime victims in accordance with applicable privacy laws. However, statistical reporting requirements remain mandatory even when personal identifying information cannot be disclosed. Institutions must balance transparency obligations with victim privacy rights throughout the reporting process.\n\nTraining requirements extend beyond the designated reporting official to include all campus security personnel, student affairs staff, residence hall personnel, and other employees who may receive reports of criminal activity. Regular training updates ensure consistent application of reporting standards and maintain data quality across all reporting periods.\n\nSpecial provisions address off-campus incidents involving enrolled students, particularly those occurring in areas with significant student populations or at institution-sponsored events. While not all off-campus incidents require inclusion in UCR reporting, institutions must maintain awareness of criminal activity affecting their student populations and coordinate with local authorities as appropriate.\n\nThe regulation emphasizes the critical role of accurate crime reporting in campus safety planning and resource allocation. Data collected through this reporting system assists institutions in identifying crime trends, evaluating security measures, and implementing targeted prevention strategies. Furthermore, consistent statewide reporting enables comparative analysis between institutions and supports evidence-based policy development for campus safety initiatives across New Jersey's higher education system.",
+    "summary": "N.J.S.A. 52:17B-5.1 requires New Jersey higher education institutions to report criminal incidents to state police using Uniform Crime Reporting standards. Institutions must designate trained officials to collect and submit crime data monthly, maintain public incident logs, and coordinate with local law enforcement. Reporting covers violent crimes, property crimes, drug offenses, and disciplinary violations occurring on campus and adjacent properties. Emergency incidents require 24-hour notification, with comprehensive annual reports due by March 1st.",
+    "requirements": [
+      "Designate a qualified campus safety official responsible for collecting, compiling, and submitting crime data with appropriate UCR training and certification",
+      "Establish formal procedures for collecting crime data from campus security, local police, and other relevant campus officials",
+      "Maintain comprehensive incident logs accessible to the public during business hours with appropriate privacy protections",
+      "Coordinate with local law enforcement agencies to ensure accurate reporting and prevent double-counting of incidents",
+      "Implement regular training programs for campus security personnel and staff who may receive reports of criminal activity"
+    ],
+    "reportingRequirements": {
+      "monthly": "Submit crime data reports by the 10th day of each month covering previous month's incidents",
+      "annual": "Submit comprehensive annual reports by March 1st covering previous calendar year",
+      "emergency": "Report serious crimes posing immediate threats within 24 hours of discovery",
+      "ongoing": "Maintain daily incident logs with continuous public access during normal business hours"
+    }
+  },
+  "deadlines": [
+    {
+      "date": "10-01",
+      "label": "Annual Security Report (Clery)",
+      "type": "report",
+      "description": "Annual Security Report (Clery) for New Jersey Uniform Crime Reporting",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "08-01",
+      "label": "Emergency Response Plan Review",
+      "type": "review",
+      "description": "Emergency Response Plan Review for New Jersey Uniform Crime Reporting",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "10-01",
+      "label": "Fire Safety Report",
+      "type": "report",
+      "description": "Fire Safety Report for New Jersey Uniform Crime Reporting",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "09-01",
+      "label": "Campus Security Authority Training",
+      "type": "training",
+      "description": "Campus Security Authority Training for New Jersey Uniform Crime Reporting",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Campus Safety",
+    "Crime Reporting",
+    "Law Enforcement"
+  ],
+  "audit": {
+    "score": 95,
+    "certainty": "A",
+    "timestamp": "2025-12-05T15:55:16.542Z"
+  },
+  "statute": "N.J.S.A. 52:17B-5",
+  "topic": "Campus Safety"
+}

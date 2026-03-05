@@ -1,0 +1,50 @@
+{
+  "regulationId": "chemical-facility-anti-terrorism-standards",
+  "enhanced": {
+    "fullText": "The Chemical Facility Anti-Terrorism Standards (CFATS), codified at 6 CFR Part 27, establishes comprehensive risk-based performance standards for securing the nation's high-risk chemical facilities against terrorist threats. Administered by the Cybersecurity and Infrastructure Security Agency (CISA) under the Department of Homeland Security, CFATS derives its authority from Section 550 of the Department of Homeland Security Appropriations Act of 2007 (Public Law 109-295) and subsequent reauthorizations under 6 U.S.C. § 621-629.\n\nFor higher education institutions, CFATS applies to any university facility that possesses, uses, manufactures, or stores chemicals of interest (COI) at or above screening threshold quantities as specified in 6 CFR § 27.204. This includes research laboratories, pilot plants, chemistry departments, medical schools, and facilities management operations that maintain water treatment chemicals, refrigerants, or fuel storage systems. Universities must determine applicability by comparing their chemical inventories against the 322 chemicals listed in Appendix A to 6 CFR Part 27.\n\nCovered facilities must complete a Top-Screen assessment within 60 days of exceeding threshold quantities (6 CFR § 27.210). Based on this screening, DHS assigns facilities to one of four risk-based tiers, with Tier 1 representing the highest risk. Tiered facilities must then conduct Security Vulnerability Assessments (SVAs) and develop Site Security Plans (SSPs) addressing 18 risk-based performance standards outlined in 6 CFR § 27.230, including restricting area perimeter, securing site assets, screening personnel, and controlling cyber systems.\n\nCompliance deadlines vary by tier assignment: Tier 1 facilities have 12 months, Tier 2 facilities have 18 months, and Tiers 3-4 have 24 months from receipt of tiering letter to submit SSPs (6 CFR § 27.215). Universities must maintain current chemical inventories and resubmit Top-Screen assessments whenever holdings change significantly or at least every five years.\n\nEnforcement mechanisms under 6 U.S.C. § 624 include civil penalties up to $25,000 per day per violation, with maximum penalties reaching $700,000 for willful violations. CISA may also issue orders to cease operations at non-compliant facilities. Recent amendments through the Protecting and Securing Chemical Facilities from Terrorist Attacks Act of 2019 (Public Law 116-50) extended CFATS authorization through July 2023 and enhanced information sharing provisions while maintaining core regulatory framework requirements for covered educational institutions.",
+    "summary": "CFATS requires higher education facilities with threshold quantities of chemicals of interest to conduct vulnerability assessments, implement security plans meeting 18 performance standards, and submit compliance documentation to DHS within specified timeframes.",
+    "requirements": "## Risk Assessment and Screening\n- Complete Top-Screen assessment within 60 days of exceeding chemical threshold quantities per 6 CFR § 27.210\n- Maintain current chemical inventory records for all 322 chemicals of interest listed in regulation\n- Resubmit screening assessments every five years or when chemical holdings change significantly\n\n## Security Planning and Implementation\n- Develop Security Vulnerability Assessment identifying facility weaknesses and threats\n- Create Site Security Plan addressing all 18 risk-based performance standards in 6 CFR § 27.230\n- Submit SSP within 12-24 months of tier assignment depending on risk level\n\n## Ongoing Compliance Obligations\n- Conduct annual security plan reviews and updates as required by facility changes\n- Provide personnel security training and background screening programs\n- Implement cyber security measures for critical digital systems\n- Maintain restricted area access controls and visitor management protocols",
+    "reportingRequirements": "Submit Top-Screen within 60 days of threshold exceedance. File Security Vulnerability Assessments and Site Security Plans within 12-24 months based on tier assignment. Provide annual compliance certifications and incident reports within 24 hours of security breaches."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T16:10:32.358Z"
+  },
+  "deadlines": [
+    {
+      "date": "02-01",
+      "label": "OSHA 300 Log Posting",
+      "type": "posting",
+      "description": "OSHA 300 Log Posting for Chemical Facility Anti-Terrorism Standards",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Annual Safety Training",
+      "type": "training",
+      "description": "Annual Safety Training for Chemical Facility Anti-Terrorism Standards",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Hazardous Waste Manifest Submission",
+      "type": "filing",
+      "description": "Hazardous Waste Manifest Submission for Chemical Facility Anti-Terrorism Standards",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Environmental Health and Safety"
+  ]
+}

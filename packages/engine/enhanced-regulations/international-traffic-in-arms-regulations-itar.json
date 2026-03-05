@@ -1,0 +1,42 @@
+{
+  "regulationId": "international-traffic-in-arms-regulations-itar",
+  "enhanced": {
+    "fullText": "The International Traffic in Arms Regulations (ITAR), codified at 22 CFR Parts 120-130 and authorized by the Arms Export Control Act at 22 U.S.C. § 2778, constitute a comprehensive regulatory framework governing the export and temporary import of defense articles, defense services, and related technical data. Administered by the U.S. Department of State's Directorate of Defense Trade Controls (DDTC), ITAR significantly impacts higher education institutions engaged in research, international collaboration, and technology transfer activities.\n\nUnder 22 CFR § 120.6, ITAR applies to any export of defense articles or services listed on the United States Munitions List (USML), found at 22 CFR § 121.1. For universities, this includes controlled research data, technical assistance to foreign persons, and educational exchanges involving defense-related technologies. The regulation defines \"export\" broadly under 22 CFR § 120.17 to include oral, written, electronic, or visual disclosure of technical data to foreign persons, whether in the United States or abroad.\n\nHigher education institutions must obtain appropriate licenses from DDTC before engaging in ITAR-controlled activities. Technical Assistance Agreements (TAA) under 22 CFR § 124.1 are required for ongoing research collaborations, while Manufacturing License Agreements (MLA) under 22 CFR § 124.2 govern technology transfer arrangements. Universities must also comply with registration requirements under 22 CFR § 122.1 if regularly engaged in ITAR-controlled activities.\n\nKey compliance obligations include implementing robust export control programs, conducting pre-publication reviews of research materials, screening foreign nationals for access to controlled technology, and maintaining detailed records per 22 CFR § 122.5. Universities must establish written policies addressing deemed exports, which occur when foreign persons gain access to controlled technical data within the United States under 22 CFR § 120.17(a)(4).\n\nViolations carry severe penalties under 22 U.S.C. § 2778(c), including criminal fines up to $1 million per violation, imprisonment up to 20 years, and civil penalties reaching $500,000 per violation under 22 CFR § 127.10. Administrative sanctions may include debarment from export privileges and consent agreements requiring enhanced compliance measures.\n\nRecent amendments through the Export Control Reform Act of 2018 have refined USML categories and enhanced interagency coordination. Universities must stay current with Federal Register updates and DDTC guidance documents to maintain compliance with evolving requirements.",
+    "summary": "ITAR regulates export of defense articles and services, requiring universities to obtain State Department licenses for defense-related research, international collaborations, and foreign person access to controlled technologies.",
+    "requirements": "## Registration and Licensing\n- Register with DDTC under 22 CFR § 122.1 if regularly engaged in ITAR activities\n- Obtain Technical Assistance Agreements for research collaborations involving foreign entities\n- Secure appropriate export licenses before disclosing controlled technical data\n\n## Export Control Program\n- Establish written export control policies and procedures\n- Implement deemed export protocols for foreign person access\n- Conduct pre-publication reviews of research materials and presentations\n- Screen foreign nationals against restricted party lists\n\n## Record Keeping and Training\n- Maintain records per 22 CFR § 122.5 for minimum five years\n- Document all ITAR-controlled transactions and authorizations\n- Provide regular training to faculty, staff, and students on ITAR requirements\n\n## Reporting and Notifications\n- Submit annual registration statements to DDTC\n- Report violations and potential violations promptly to appropriate authorities",
+    "reportingRequirements": "Annual registration renewal required by May 31st for registered entities per 22 CFR § 122.4. Violation reports must be submitted immediately upon discovery to DDTC and appropriate law enforcement. License holders must file annual reports documenting authorized activities and technical data transfers."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T00:11:48.403Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Deemed Export Assessment",
+      "type": "assessment",
+      "description": "Deemed Export Assessment for International Traffic in Arms Regulations (ITAR)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Export License Application (if applicable)",
+      "type": "application",
+      "description": "Export License Application (if applicable) for International Traffic in Arms Regulations (ITAR)",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Export Controls"
+  ]
+}

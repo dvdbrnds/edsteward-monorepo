@@ -1,0 +1,58 @@
+{
+  "regulationId": "public-disclosure-of-material",
+  "enhanced": {
+    "fullText": "The Public Disclosure of Material regulation under 26 U.S.C. § 6104(d) mandates that tax-exempt organizations, including institutions of higher education, must make specific tax-related documents publicly available upon request. This federal requirement ensures transparency and accountability for organizations receiving tax-exempt status under Internal Revenue Code Section 501(c)(3). Higher education institutions must comply with these disclosure requirements regardless of their size, endowment, or public/private status.\n\nThe regulation requires disclosure of two primary categories of documents: (1) the organization's application for tax-exempt status (Form 1023 or 1023-EZ), and (2) the three most recent annual information returns. For organizations that filed their exemption applications before July 15, 1987, disclosure is only required if the organization possessed a copy of the application on that date, as codified in Treasury Regulations 301.6104(d)-1(a)(1).\n\nAnnual information returns subject to disclosure include Forms 990, 990-EZ, 990-BL (for Black Lung Benefit Trusts), Form 1065 (for certain LLCs), and all associated schedules and attachments filed with the IRS. Per 26 U.S.C. § 6104(d)(1)(A)(ii), each return must remain available for public inspection for three years from the later of either the required filing date or actual filing date. Universities filing Form 990-T (Exempt Organization Business Income Tax Return) after August 17, 2006, must also disclose these returns under the expanded requirements established by the Pension Protection Act of 2006.\n\nHigher education institutions may redact contributor names and addresses from Schedule B and similar donor identification sections, as protected under 26 U.S.C. § 6104(d)(3)(A). However, compensation information for officers, directors, trustees, and key employees must remain disclosed on Schedule J and Form 990 Part VII.\n\nCompliance mechanisms include both in-person inspection at the organization's principal office during regular business hours and provision of copies upon written request. Under Treasury Regulation 301.6104(d)-1(b), universities must provide requested documents immediately for in-person requests or within 30 days for written requests. Failure to comply results in penalties of $20 per day (up to $10,000 maximum) for each document not disclosed, as specified in 26 U.S.C. § 6685.\n\nThe regulation applies to all university-related tax-exempt entities, including the institution itself, affiliated foundations, booster clubs, and supporting organizations. Universities must establish internal protocols ensuring compliance across all covered entities and maintain current copies of required documents in accessible formats.",
+    "summary": "Federal tax law requiring higher education institutions to publicly disclose their tax-exemption applications and three most recent annual returns (Forms 990, 990-EZ) upon request, with donor information redacted.",
+    "requirements": "## Document Disclosure Obligations\n- Maintain publicly accessible copies of Form 1023/1023-EZ tax-exemption applications\n- Provide three most recent annual information returns (Forms 990, 990-EZ, 990-T)\n- Include all schedules and attachments filed with returns\n- Redact donor names and addresses from Schedule B before disclosure\n\n## Response Timeframes\n- Immediate provision for in-person inspection requests during business hours\n- 30-day response deadline for written copy requests\n- Maintain 3-year availability period from filing deadline or actual filing date\n\n## Compliance Infrastructure\n- Designate responsible staff for managing disclosure requests\n- Establish protocols for affiliated foundations and supporting organizations\n- Implement document retention systems ensuring current versions available\n\n## Fee Structure\n- Charge reasonable copying fees not exceeding $1 for first page, $0.15 for additional pages\n- Postage and shipping costs may be added for mailed requests",
+    "reportingRequirements": "No specific reporting to federal agencies required. Universities must respond to public requests within 30 days for written requests and immediately for in-person requests during regular business hours."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T01:47:36.824Z"
+  },
+  "deadlines": [
+    {
+      "date": "05-15",
+      "label": "Form 990 Filing",
+      "type": "filing",
+      "description": "Form 990 Filing for Public Disclosure of Material",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "05-15",
+      "label": "Form 990-T Filing (if applicable)",
+      "type": "filing",
+      "description": "Form 990-T Filing (if applicable) for Public Disclosure of Material",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Form 1099 Filing",
+      "type": "filing",
+      "description": "Form 1099 Filing for Public Disclosure of Material",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "W-2 Distribution",
+      "type": "distribution",
+      "description": "W-2 Distribution for Public Disclosure of Material",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Tax"
+  ]
+}

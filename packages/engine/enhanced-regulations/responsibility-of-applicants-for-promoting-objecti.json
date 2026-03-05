@@ -1,0 +1,50 @@
+{
+  "regulationId": "responsibility-of-applicants-for-promoting-objecti",
+  "enhanced": {
+    "fullText": "The Responsibility of Applicants for Promoting Objectivity in Research for which PHS Funding is Sought regulation, codified at 42 CFR Part 50 Subpart F, establishes comprehensive standards for higher education institutions receiving research funding from Public Health Service (PHS) agencies, including the National Institutes of Health (NIH). This regulation implements the statutory authority under 42 U.S.C. § 289b-1 and affects all institutions applying for or receiving PHS grants, cooperative agreements, or research contracts exceeding $5,000.\n\nThe regulation requires institutions to maintain written financial conflict of interest (FCOI) policies that comply with federal standards and apply to all Investigators participating in PHS-funded research. Under 42 CFR § 50.603, institutions must identify and manage, reduce, or eliminate financial conflicts before research expenditure of funds. Key provisions mandate that Investigators with significant financial interests exceeding $5,000 in entities related to their research must disclose these interests annually and within 30 days of acquiring new interests.\n\nHigher education institutions must establish FCOI training requirements under 42 CFR § 50.604, mandating that all Investigators complete training before conducting PHS-funded research, immediately upon identification of FCOIs, and at least every four years thereafter. The regulation defines 'Investigator' broadly to include principal investigators, co-investigators, and any person responsible for design, conduct, or reporting of research.\n\nFor identified FCOIs, institutions must develop and implement management plans within 60 days of identification, as specified in 42 CFR § 50.605. These plans may include public disclosure, monitoring by independent reviewers, modification of research plans, or divestiture of financial interests. Institutions must report FCOIs to PHS awarding components prior to expenditure of funds and within 60 days of identification during ongoing projects.\n\nEnforcement mechanisms include suspension of funding, requirement for corrective action, and potential civil monetary penalties under 42 U.S.C. § 289b-1(d). The 2011 amendments strengthened disclosure requirements, enhanced public transparency through 42 CFR § 50.605(a)(5) requiring public accessibility of FCOI information, and increased institutional accountability through expanded reporting obligations. Non-compliance may result in funding suspension, required remedial actions, or civil penalties up to $10,000 per violation as authorized under the Public Health Service Act.",
+    "summary": "Federal regulation requiring higher education institutions receiving PHS funding to implement financial conflict of interest policies, training programs, and disclosure requirements for research Investigators to ensure research objectivity and integrity.",
+    "requirements": "## Policy Development and Implementation\n- Establish written FCOI policy complying with 42 CFR § 50.604 standards\n- Designate responsible institutional officials for FCOI oversight\n- Implement procedures for collecting and reviewing financial disclosures\n\n## Investigator Training and Disclosure\n- Mandate FCOI training for all Investigators before research participation\n- Require annual financial interest disclosures from all research personnel\n- Update disclosures within 30 days of acquiring new significant financial interests\n\n## Conflict Management and Reporting\n- Review disclosures and identify FCOIs within institutional timeframes\n- Develop management plans within 60 days of FCOI identification\n- Report FCOIs to PHS awarding components before fund expenditure\n- Maintain public accessibility of FCOI information per 42 CFR § 50.605(a)(5)\n\n## Compliance Monitoring\n- Conduct retrospective reviews when bias is identified\n- Maintain records for three years post-final expenditure report\n- Ensure subrecipient compliance through written agreements",
+    "reportingRequirements": "Institutions must report identified FCOIs to PHS awarding components prior to expenditure of funds and within 60 days during ongoing projects per 42 CFR § 50.605. Annual FCOI reports are required for ongoing conflicts, and updated reports must be submitted within 60 days of any changes to management plans or new conflict identification."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T02:06:31.726Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "IRB Protocol Annual Review",
+      "type": "review",
+      "description": "IRB Protocol Annual Review for Responsibility of Applicants for Promoting Objectivity in Research for which PHS Funding is Sought",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Conflict of Interest Disclosure",
+      "type": "disclosure",
+      "description": "Conflict of Interest Disclosure for Responsibility of Applicants for Promoting Objectivity in Research for which PHS Funding is Sought",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Export Control Assessment",
+      "type": "assessment",
+      "description": "Export Control Assessment for Responsibility of Applicants for Promoting Objectivity in Research for which PHS Funding is Sought",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Research"
+  ]
+}

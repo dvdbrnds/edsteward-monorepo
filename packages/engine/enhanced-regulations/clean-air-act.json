@@ -1,0 +1,50 @@
+{
+  "regulationId": "clean-air-act",
+  "enhanced": {
+    "fullText": "The Clean Air Act (CAA), codified at 42 U.S.C. §§ 7401-7671q, represents the primary federal legislation governing air quality and emissions control in the United States. Administered by the Environmental Protection Agency (EPA) under implementing regulations at 40 CFR Parts 50-99, the CAA establishes comprehensive requirements for stationary and mobile source emissions that directly impact higher education institutions operating research facilities, power plants, laboratories, and vehicle fleets.\n\nUnder 42 U.S.C. § 7661a and 40 CFR Part 70, universities with major stationary sources emitting 100 tons per year or more of any regulated pollutant must obtain Title V operating permits. These permits require detailed emissions monitoring, recordkeeping, and annual compliance certifications. Research universities commonly trigger these thresholds through central heating plants, emergency generators, laboratory fume hoods, and specialized research equipment.\n\nThe National Ambient Air Quality Standards (NAAQS), established under 42 U.S.C. § 7409 and 40 CFR Part 50, set maximum allowable concentrations for six criteria pollutants: particulate matter, ozone, carbon monoxide, nitrogen dioxide, sulfur dioxide, and lead. Universities must ensure their operations do not contribute to NAAQS violations and may face construction restrictions in nonattainment areas under 42 U.S.C. § 7502.\n\nNew Source Review requirements under 42 U.S.C. § 7475 and 40 CFR Parts 51-52 mandate pre-construction permits for new major sources or significant modifications. Universities expanding research facilities or constructing new buildings with substantial emissions sources must undergo Prevention of Significant Deterioration review or nonattainment New Source Review, including public participation processes.\n\nThe Acid Rain Program under 42 U.S.C. § 7651 requires universities operating affected coal-fired units to participate in the sulfur dioxide allowance trading system. Similarly, the Cross-State Air Pollution Rule at 40 CFR Part 97 may impose seasonal nitrogen oxide controls on university power plants.\n\nHazardous Air Pollutants (HAPs) regulation under 42 U.S.C. § 7412 establishes Maximum Achievable Control Technology standards for over 180 toxic substances. University laboratories, research facilities, and sterilization equipment frequently emit HAPs requiring compliance with specific standards at 40 CFR Part 63.\n\nEnforcement mechanisms include administrative orders, civil penalties up to $46,989 per day per violation (adjusted annually per 40 CFR Part 19), and criminal sanctions for knowing violations under 42 U.S.C. § 7413. The EPA conducts regular inspections and can issue Notices of Violation requiring corrective action.\n\nRecent amendments include the American Innovation and Manufacturing Act provisions added to 42 U.S.C. § 7675, requiring universities to phase down hydrofluorocarbon use in refrigeration and air conditioning systems by 85% by 2036, with mandatory leak detection and repair programs.",
+    "summary": "Federal law regulating air emissions from university stationary sources including research facilities, power plants, and laboratories, requiring permits, emissions monitoring, and compliance with national air quality standards.",
+    "requirements": "## Permit Requirements\n- Obtain Title V operating permits for major sources emitting ≥100 tons/year of regulated pollutants per 40 CFR Part 70\n- Secure New Source Review permits before constructing new major emission sources under 42 U.S.C. § 7475\n- Submit annual compliance certifications by designated deadlines\n\n## Emissions Monitoring and Control\n- Install and maintain continuous emissions monitoring systems where required\n- Implement Maximum Achievable Control Technology for hazardous air pollutants per 40 CFR Part 63\n- Conduct mandatory leak detection and repair for HFC-containing equipment\n\n## Recordkeeping and Reporting\n- Maintain detailed emissions records and operating data for minimum five years\n- Submit semi-annual monitoring reports for Title V sources\n- Report deviations and excess emissions within required timeframes\n\n## Compliance Management\n- Designate responsible officials for certification submissions per 40 CFR § 70.2\n- Conduct regular internal compliance audits and training programs",
+    "reportingRequirements": "Annual Title V compliance certifications due by permit anniversary date. Semi-annual monitoring reports due 30 days after end of each reporting period. Excess emissions reports within 2 working days of discovery per 40 CFR § 70.6(a)(3)(iii)."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T17:38:46.648Z"
+  },
+  "deadlines": [
+    {
+      "date": "02-01",
+      "label": "OSHA 300 Log Posting",
+      "type": "posting",
+      "description": "OSHA 300 Log Posting for Clean Air Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Annual Safety Training",
+      "type": "training",
+      "description": "Annual Safety Training for Clean Air Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Hazardous Waste Manifest Submission",
+      "type": "filing",
+      "description": "Hazardous Waste Manifest Submission for Clean Air Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Environmental Health and Safety"
+  ]
+}

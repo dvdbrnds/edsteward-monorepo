@@ -1,0 +1,50 @@
+{
+  "regulationId": "america-competes-act",
+  "enhanced": {
+    "fullText": "The America Creating Opportunities to Meaningfully Promote Excellence in Technology, Education, and Science (COMPETES) Act of 2010, codified at 42 U.S.C. § 1862o-1, establishes mandatory research integrity training requirements for higher education institutions receiving National Science Foundation (NSF) funding. This federal regulation fundamentally transformed research compliance obligations by requiring comprehensive responsible conduct of research (RCR) training programs.\n\nUnder 42 U.S.C. § 1862o-1(a)(1), institutions applying for NSF financial assistance for science and engineering research or education must include detailed RCR training plans in their grant proposals. The statute specifically mandates training for undergraduate students, graduate students, and postdoctoral researchers participating in proposed research projects. This requirement extends beyond principal investigators to encompass all research participants at these academic levels.\n\nThe NSF has implemented these statutory requirements through the Grant Proposal Guide (GPG) and Award & Administration Guide (AAG), which specify that institutions must describe their plans for providing \"appropriate training and oversight in the responsible and ethical conduct of research.\" Training must address core areas including research misconduct, data management, conflict of interest, authorship, peer review, and collaborative research practices.\n\nCompliance obligations under 42 U.S.C. § 1862o-1(b) require institutions to demonstrate ongoing oversight mechanisms and evaluation procedures for RCR training effectiveness. The regulation applies to all higher education institutions, including universities, colleges, and research institutes that seek or receive NSF funding for science, technology, engineering, and mathematics (STEM) research or education activities.\n\nEnforcement mechanisms include NSF's authority to suspend, terminate, or deny funding for non-compliant institutions pursuant to 2 CFR Part 200. The NSF Office of Inspector General investigates violations and can recommend sanctions including debarment from federal funding programs. Institutions failing to provide adequate RCR training may face award modifications, funding reductions, or exclusion from future NSF competitions.\n\nThe regulation has been updated through subsequent NSF guidance, including clarifications in NSF 23-1 regarding virtual training options and documentation requirements. Recent amendments emphasize institution-specific training approaches rather than one-size-fits-all programs, allowing flexibility while maintaining rigorous standards for research integrity education.",
+    "summary": "The America COMPETES Act requires higher education institutions applying for NSF science and engineering funding to include comprehensive responsible conduct of research training plans in grant proposals, covering undergraduate, graduate, and postdoctoral researchers.",
+    "requirements": "## Grant Proposal Requirements\n- Include detailed RCR training plan in all NSF science and engineering funding applications per 42 U.S.C. § 1862o-1(a)(1)\n- Describe specific training methods, content areas, and delivery mechanisms\n- Address training for undergraduate students, graduate students, and postdoctoral researchers\n\n## Training Content Standards\n- Cover core RCR areas: research misconduct, data management, conflict of interest, authorship, peer review\n- Provide discipline-specific ethical guidance relevant to proposed research\n- Include both didactic instruction and interactive discussion components\n\n## Oversight and Documentation\n- Establish mechanisms for monitoring training completion and effectiveness\n- Maintain records of participant completion and training content\n- Designate responsible personnel for RCR program administration\n\n## Institutional Compliance\n- Ensure training plans align with institutional RCR policies\n- Coordinate with research integrity officers and compliance staff\n- Update training programs based on NSF guidance and best practices",
+    "reportingRequirements": "Grant proposals must include RCR training plans at time of NSF submission. Annual and final reports must document training implementation and participant completion. Post-award modifications required if training plans change substantially during project period."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T16:37:04.611Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "IRB Protocol Annual Review",
+      "type": "review",
+      "description": "IRB Protocol Annual Review for America COMPETES Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Conflict of Interest Disclosure",
+      "type": "disclosure",
+      "description": "Conflict of Interest Disclosure for America COMPETES Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Export Control Assessment",
+      "type": "assessment",
+      "description": "Export Control Assessment for America COMPETES Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Research"
+  ]
+}

@@ -1,0 +1,25 @@
+{
+  "regulationId": "false-claims-act",
+  "enhanced": {
+    "fullText": "The False Claims Act (FCA), codified at 31 U.S.C. §§ 3729-3733, represents one of the federal government's most powerful tools for combating fraud against federal programs, with significant implications for higher education institutions receiving federal funding. Originally enacted during the Civil War and substantially amended by the False Claims Amendments Act of 1986 and the Fraud Enforcement and Recovery Act of 2009, the FCA imposes civil liability on any person who knowingly submits, or causes the submission of, false or fraudulent claims for payment to the United States government.\n\nUnder 31 U.S.C. § 3729(a)(1), liability attaches when an individual or entity \"knowingly presents, or causes to be presented, a false or fraudulent claim for payment or approval.\" The statute defines \"knowingly\" broadly under 31 U.S.C. § 3729(b)(1) to include actual knowledge, deliberate ignorance, or reckless disregard for the truth or falsity of information, establishing a scienter standard that does not require specific intent to defraud.\n\nFor higher education institutions, FCA exposure is particularly acute given their extensive receipt of federal funding through Title IV student financial aid programs (20 U.S.C. § 1070 et seq.), federal research grants from agencies like NSF and NIH, and other federal contracts. Common FCA violations in higher education include: inflated indirect cost claims under federal grants, false certification of compliance with federal regulations for continued program eligibility, misrepresentation of student enrollment status affecting financial aid disbursements, and submission of inaccurate effort reporting for federally-funded research personnel.\n\nThe FCA's enforcement mechanisms are particularly robust. Under 31 U.S.C. § 3729(a)(1), violators face civil penalties of $13,508 to $27,018 per false claim (as adjusted for inflation under 31 U.S.C. § 3729(a)(1) and 28 CFR § 85.3), plus treble damages representing three times the government's actual damages. The statute's unique qui tam provision under 31 U.S.C. § 3730 allows private whistleblowers (relators) to file lawsuits on behalf of the government, with successful relators entitled to 15-30% of any recovery.\n\nRecent amendments have expanded FCA liability significantly. The 2009 FERA eliminated the requirement that false statements be made directly to the government, encompassing false statements made to third-party contractors or grantees. The 2010 Patient Protection and Affordable Care Act clarified that retention of overpayments constitutes a false claim under 31 U.S.C. § 3729(a)(1)(G).\n\nHigher education institutions must implement comprehensive compliance programs addressing grant management, financial aid administration, research integrity, and regulatory compliance to mitigate FCA exposure and ensure adherence to all federal program requirements.",
+    "summary": "The False Claims Act (31 U.S.C. §§ 3729-3733) imposes civil liability on higher education institutions that knowingly submit false claims to federal programs, with penalties of $13,508-$27,018 per violation plus treble damages.",
+    "requirements": "## Compliance Program Implementation\n- Establish written policies addressing federal grant management, financial aid administration, and research compliance\n- Implement regular training programs for faculty and staff handling federal funds\n- Designate responsible compliance officers for monitoring federal program adherence\n\n## Claims Verification Procedures  \n- Institute pre-submission review processes for all federal grant applications and reports\n- Verify accuracy of indirect cost rate calculations and effort reporting certifications\n- Maintain documentation supporting all federal funding requests and expenditure reports\n\n## Whistleblower Protection Protocols\n- Establish confidential reporting mechanisms for suspected fraud or compliance violations\n- Implement non-retaliation policies protecting employees who report potential FCA violations\n- Conduct prompt internal investigations of reported compliance concerns\n\n## Overpayment Response Requirements\n- Identify and return federal overpayments within 60 days of discovery per 31 U.S.C. § 3729(a)(1)(G)\n- Document overpayment identification and remediation efforts\n- Report material compliance violations to appropriate federal agencies",
+    "reportingRequirements": "No specific periodic reporting requirements under the FCA itself, but institutions must return identified overpayments within 60 days per 31 U.S.C. § 3729(a)(1)(G). Event-triggered obligations include immediate investigation of suspected violations and voluntary disclosure to relevant federal agencies when material non-compliance is discovered."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T18:40:50.221Z"
+  },
+  "relationships": [],
+  "tags": [
+    "False Claims Act"
+  ],
+  "deadlines": []
+}

@@ -1,0 +1,34 @@
+{
+  "regulationId": "higher-education-act-incentive-compensation-prohib",
+  "enhanced": {
+    "fullText": "The Higher Education Act's Incentive Compensation Prohibition, codified at 20 U.S.C. § 1094(a)(20) and implemented through 34 CFR § 668.14(b)(22), establishes a comprehensive ban on performance-based compensation schemes in student recruitment and financial aid administration. This regulation applies to all institutions participating in Title IV federal student aid programs, including colleges, universities, and proprietary schools.\n\nUnder this provision, institutions are strictly prohibited from providing any commission, bonus, or other incentive payment based directly or indirectly upon success in securing student enrollments or awarding financial aid to personnel engaged in recruitment, admissions, or Title IV fund allocation decisions. The prohibition extends beyond direct employees to include third-party contractors, vendors, and affiliated entities performing recruitment functions on behalf of the institution.\n\nKey statutory requirements under 20 U.S.C. § 1094(a)(20) include: (1) absolute prohibition on enrollment-based compensation for recruitment staff; (2) elimination of financial aid award-based incentives; (3) compliance monitoring of all compensation arrangements; and (4) documentation of legitimate compensation structures. The regulation recognizes one significant exception under 34 CFR § 668.14(b)(22)(ii) for recruitment of foreign students residing abroad who are ineligible for federal student assistance.\n\nThe Department of Education's 2015 interpretive guidance clarified that compensation based on student graduation rates, program completion, or academic outcomes does not violate the prohibition, provided such metrics are not tied to enrollment numbers. Additionally, institutions may implement salary adjustments, profit-sharing arrangements, and recognition programs that apply broadly across the organization without regard to recruitment success.\n\nViolations trigger severe enforcement actions under 20 U.S.C. § 1094(c), including program participation agreement termination, Title IV funding suspension, monetary penalties up to $27,500 per violation under 34 CFR § 668.87, and required repayment of improperly awarded federal funds. The Department may also impose heightened oversight requirements, mandatory compliance audits, and restrictions on enrollment growth.\n\nInstitutions must establish robust internal controls, conduct regular compensation audits, provide compliance training to recruitment staff, and maintain detailed documentation of all compensation arrangements. Recent enforcement actions demonstrate the Department's commitment to aggressive prosecution of violations, particularly in the proprietary education sector where enrollment-driven business models have historically conflicted with regulatory requirements.",
+    "summary": "Federal law prohibits higher education institutions from providing commission, bonus, or incentive compensation based on student enrollment success or financial aid awards to recruitment and admissions personnel under 20 U.S.C. § 1094(a)(20) and 34 CFR § 668.14(b)(22).",
+    "requirements": "## Compensation Structure Compliance\n- Eliminate all enrollment-based bonuses, commissions, and incentive payments for recruitment staff\n- Remove financial aid award volume from compensation calculations\n- Implement salary-based compensation structures independent of enrollment metrics\n- Document legitimate performance measures unrelated to recruitment success\n\n## Personnel and Contractor Management\n- Apply prohibition to all employees engaged in student recruitment or admissions activities\n- Extend compliance requirements to third-party contractors and vendors\n- Establish written agreements with external recruitment services specifying prohibited practices\n- Monitor affiliate and subsidiary organization compensation arrangements\n\n## Documentation and Monitoring\n- Maintain detailed records of all compensation arrangements and modifications\n- Conduct annual audits of recruitment staff compensation structures\n- Implement compliance training programs for recruitment and financial aid personnel\n- Establish internal reporting mechanisms for potential violations",
+    "reportingRequirements": "No specific periodic reporting required to Department of Education. Institutions must maintain comprehensive documentation of compensation arrangements and provide records during program reviews, compliance audits, or upon Department request within 30 days of notice."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T20:09:02.419Z"
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Compliance Review",
+      "type": "review",
+      "description": "Annual Compliance Review for Higher Education Act: Incentive Compensation Prohibition",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Program Integrity Rules"
+  ]
+}

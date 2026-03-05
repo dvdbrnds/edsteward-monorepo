@@ -1,0 +1,34 @@
+{
+  "regulationId": "immigration-and-nationality-act-ina",
+  "enhanced": {
+    "fullText": "The Immigration and Nationality Act (INA), codified at 8 U.S.C. §§ 1101-1537, establishes comprehensive federal immigration law governing the admission, employment, and status of foreign nationals in the United States. For higher education institutions, the INA creates critical compliance obligations across student admissions, faculty hiring, and administrative operations.\n\nUnder 8 U.S.C. § 1324a, all employers, including universities, must verify employment eligibility through Form I-9 completion within three business days of hire. This applies to all employees regardless of citizenship status. Universities must examine acceptable documents establishing both identity and work authorization as specified in 8 CFR § 274a.2, maintaining I-9 forms for three years after hire or one year after termination, whichever is longer.\n\nThe Student and Exchange Visitor Program (SEVP), established under 8 U.S.C. § 1101(a)(15)(F), requires institutions enrolling F-1 students to obtain certification and maintain compliance with reporting requirements in 8 CFR Part 214. Universities must issue Forms I-20, track student academic progress, report status changes within 21 days, and maintain Student and Exchange Visitor Information System (SEVIS) records.\n\nFor H-1B specialty occupation workers, commonly hired as faculty and researchers, universities must comply with attestation requirements under 8 U.S.C. § 1101(a)(15)(H)(i)(b) and 20 CFR Part 655. Cap-exempt institutions under 8 U.S.C. § 1184(g)(5)(A) may petition year-round but must maintain Labor Condition Applications and pay required wages.\n\nJ-1 exchange visitor programs, governed by 22 CFR Part 62, require Department of State designation and compliance with program-specific regulations. Universities sponsoring research scholars, professors, or students must maintain responsible officer designation and submit annual reports.\n\nViolations carry substantial penalties: I-9 violations range from $252 to $2,507 per form under 8 U.S.C. § 1324a(e)(5), while SEVP violations may result in program termination. H-1B violations include back wages, civil penalties up to $35,000 per violation, and potential debarment under 8 U.S.C. § 1182(n)(2). Recent amendments include the 2022 DHS rule expanding STEM OPT eligibility and enhanced SEVIS reporting requirements effective January 2023.",
+    "summary": "The INA governs immigration compliance for universities, requiring I-9 employment verification, SEVIS reporting for international students, H-1B attestations for specialty workers, and J-1 program management with substantial penalties for violations.",
+    "requirements": "## Employment Verification\n- Complete Form I-9 for all employees within 3 business days of hire per 8 U.S.C. § 1324a\n- Maintain I-9 records for 3 years post-hire or 1 year post-termination\n- Conduct internal audits to ensure document compliance\n\n## Student and Exchange Visitor Program\n- Maintain SEVP certification for F-1 student enrollment\n- Issue Forms I-20 and update SEVIS within 21 days of status changes per 8 CFR Part 214\n- Designate Principal Designated School Official (PDSO) and Designated School Officials (DSOs)\n\n## H-1B Specialty Workers\n- File Labor Condition Applications for faculty/researcher positions\n- Maintain public access file with required wage documentation per 20 CFR Part 655\n- Post notice of LCA filing in conspicuous locations\n\n## J-1 Exchange Programs\n- Obtain Department of State program designation\n- Maintain Responsible Officer and Alternate Responsible Officer appointments\n- Ensure compliance with program-specific requirements under 22 CFR Part 62",
+    "reportingRequirements": "SEVIS reporting within 21 days of student status changes; Annual SEVP recertification by March 15; J-1 program annual reports due February 15; H-1B public access file maintenance throughout employment; I-9 forms available for inspection within 3 business days of government request."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T03:04:29.669Z"
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Compliance Review",
+      "type": "review",
+      "description": "Annual Compliance Review for Immigration and Nationality Act (INA)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Immigration,Recruitment Hiring & Termination"
+  ]
+}

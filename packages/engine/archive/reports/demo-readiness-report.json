@@ -1,0 +1,176 @@
+{
+  "timestamp": "2025-12-04T13:35:37.132Z",
+  "services": {
+    "Registry API": {
+      "status": "healthy",
+      "port": 3010
+    },
+    "LLM Gateway": {
+      "status": "degraded",
+      "port": 3002,
+      "code": 404
+    },
+    "Frontend": {
+      "status": "healthy",
+      "port": 3050
+    },
+    "Inquisitor": {
+      "status": "healthy",
+      "port": 3061
+    }
+  },
+  "demoRegulations": [
+    {
+      "name": "FERPA",
+      "id": 223,
+      "score": 91,
+      "certainty": "A",
+      "passed": true,
+      "contentScore": 100,
+      "summaryScore": 90,
+      "requirementsScore": 90,
+      "aiScore": 0
+    },
+    {
+      "name": "Title IX",
+      "id": 7,
+      "score": 84,
+      "certainty": "B",
+      "passed": false,
+      "contentScore": 80,
+      "summaryScore": 90,
+      "requirementsScore": 90,
+      "aiScore": 0
+    },
+    {
+      "name": "ADA",
+      "id": 2,
+      "score": 84,
+      "certainty": "B",
+      "passed": false,
+      "contentScore": 80,
+      "summaryScore": 90,
+      "requirementsScore": 90,
+      "aiScore": 0
+    },
+    {
+      "name": "Title IV",
+      "id": 78,
+      "score": 93,
+      "certainty": "A",
+      "passed": true,
+      "contentScore": 100,
+      "summaryScore": 100,
+      "requirementsScore": 90,
+      "aiScore": 0
+    },
+    {
+      "name": "Section 504",
+      "id": 6,
+      "score": 93,
+      "certainty": "A",
+      "passed": true,
+      "contentScore": 100,
+      "summaryScore": 100,
+      "requirementsScore": 90,
+      "aiScore": 0
+    },
+    {
+      "name": "Title VI",
+      "id": 8,
+      "score": 93,
+      "certainty": "A",
+      "passed": true,
+      "contentScore": 100,
+      "summaryScore": 100,
+      "requirementsScore": 90,
+      "aiScore": 0
+    },
+    {
+      "name": "HEOA",
+      "id": 87,
+      "score": 93,
+      "certainty": "A",
+      "passed": true,
+      "contentScore": 100,
+      "summaryScore": 100,
+      "requirementsScore": 90,
+      "aiScore": 0
+    },
+    {
+      "name": "Drug-Free Schools",
+      "id": 67,
+      "score": 93,
+      "certainty": "A",
+      "passed": true,
+      "contentScore": 100,
+      "summaryScore": 100,
+      "requirementsScore": 90,
+      "aiScore": 0
+    },
+    {
+      "name": "TEACH Act",
+      "id": 55,
+      "score": 93,
+      "certainty": "A",
+      "passed": true,
+      "contentScore": 100,
+      "summaryScore": 100,
+      "requirementsScore": 90,
+      "aiScore": 0
+    },
+    {
+      "name": "Clery Act",
+      "id": 355,
+      "score": 93,
+      "certainty": "A",
+      "passed": true,
+      "contentScore": 100,
+      "summaryScore": 100,
+      "requirementsScore": 90,
+      "aiScore": 0
+    }
+  ],
+  "reliability": {
+    "FERPA": {
+      "passed": true,
+      "scores": [
+        91,
+        91,
+        91
+      ],
+      "average": 91,
+      "variance": 0
+    },
+    "Clery Act": {
+      "passed": true,
+      "scores": [
+        93,
+        93,
+        93
+      ],
+      "average": 93,
+      "variance": 0
+    }
+  },
+  "endpoints": {
+    "USC FERPA": {
+      "status": "pass",
+      "contentLength": 1614,
+      "confidence": 95
+    },
+    "CFR FERPA": {
+      "status": "pass",
+      "contentLength": 2040,
+      "confidence": 85
+    },
+    "CFR Clery": {
+      "status": "pass",
+      "contentLength": 2072,
+      "confidence": 85
+    }
+  },
+  "criticalIssues": [
+    "2 demo regulations failed quality check"
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "regulationId": "fair-credit-reporting-act-fcra",
+  "enhanced": {
+    "fullText": "The Fair Credit Reporting Act (FCRA), codified at 15 U.S.C. §§ 1681-1681v, is a federal statute that regulates the collection, dissemination, and use of consumer information, including consumer credit information and employment background checks. For higher education institutions, FCRA compliance is critical when conducting background checks on prospective employees, including faculty, staff, and student employees.\n\nUnder 15 U.S.C. § 1681b(b)(2)(A), colleges and universities must provide clear and conspicuous written disclosure to applicants before obtaining any consumer report for employment purposes. This disclosure must be in a document that consists solely of the disclosure and cannot be included within employment applications or other materials. The institution must also obtain written authorization from the applicant as specified in 15 U.S.C. § 1681b(b)(2)(B).\n\nWhen adverse employment action is contemplated based on information in a consumer report, institutions must comply with the pre-adverse action requirements under 15 U.S.C. § 1681b(b)(3)(A). This includes providing the applicant with a copy of the consumer report and a summary of consumer rights under FCRA. After taking adverse action, institutions must provide notice that includes the name and contact information of the consumer reporting agency, a statement that the agency did not make the decision, and notification of the applicant's right to dispute the accuracy of the report under 15 U.S.C. § 1681m(a).\n\nHigher education institutions must certify to consumer reporting agencies that they will comply with FCRA requirements and will not use information in violation of equal employment opportunity laws, as mandated by 15 U.S.C. § 1681b(b)(1). The Federal Trade Commission (FTC) enforces FCRA compliance and can impose civil penalties up to $4,304 per violation under 15 U.S.C. § 1681s(a)(2)(A). Private parties may also bring civil actions for willful or negligent non-compliance, with damages ranging from $100-$1,000 per violation plus actual damages and attorney fees under 15 U.S.C. § 1681n.\n\nRecent amendments through the Fair and Accurate Credit Transactions Act have enhanced requirements for disposal of consumer information and identity theft prevention, requiring institutions to implement reasonable measures to protect against unauthorized access to consumer reports.",
+    "summary": "FCRA mandates that higher education institutions provide written disclosure and obtain consent before conducting employment background checks, deliver pre-adverse action notices when denying employment based on consumer reports, and comply with strict procedural requirements to protect applicant rights.",
+    "requirements": "## Pre-Employment Screening Requirements\n- Provide standalone written disclosure before obtaining consumer reports per 15 U.S.C. § 1681b(b)(2)(A)\n- Obtain separate written authorization from all employment candidates\n- Certify FCRA compliance and EEO law adherence to consumer reporting agencies\n\n## Adverse Action Procedures\n- Deliver pre-adverse action notice with copy of consumer report and rights summary\n- Provide final adverse action notice with consumer reporting agency contact information\n- Allow reasonable time between pre-adverse and final adverse action notices\n\n## Record Management and Disposal\n- Implement secure disposal procedures for consumer report information\n- Maintain documentation of FCRA compliance procedures and training\n- Establish identity theft prevention protocols for sensitive applicant data\n\n## Institutional Oversight\n- Designate HR compliance officer responsible for FCRA adherence\n- Conduct annual training for hiring managers on background check procedures\n- Monitor consumer reporting agency compliance with FCRA requirements",
+    "reportingRequirements": "FCRA does not mandate specific periodic reports to federal agencies. However, institutions must maintain internal documentation of compliance procedures and may be subject to FTC investigations. Required notices to applicants must be provided within reasonable timeframes during the hiring process."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T18:39:46.669Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "I-9 Form Audit",
+      "type": "audit",
+      "description": "I-9 Form Audit for Fair Credit Reporting Act (FCRA)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Background Check Policy Review",
+      "type": "review",
+      "description": "Background Check Policy Review for Fair Credit Reporting Act (FCRA)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Recruitment Hiring & Termination"
+  ]
+}

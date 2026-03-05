@@ -1,0 +1,94 @@
+[
+  {
+    "regulationId": "gdpr-2018",
+    "name": "General Data Protection Regulation",
+    "description": "EU data protection and privacy regulation",
+    "version": "1.0",
+    "enactedDate": "2018-05-25",
+    "publicLaw": "EU 2016/679",
+    "keyProvisions": [
+      {
+        "title": "Right to Access",
+        "description": "Individuals have the right to access their personal data"
+      },
+      {
+        "title": "Right to be Forgotten",
+        "description": "Individuals have the right to have their personal data erased"
+      }
+    ],
+    "updatedAt": "2025-12-03T16:25:01.800Z"
+  },
+  {
+    "regulationId": "hipaa-1996",
+    "name": "Health Insurance Portability and Accountability Act",
+    "description": "US healthcare privacy regulation",
+    "version": "2.1",
+    "enactedDate": "1996-08-21",
+    "publicLaw": "104-191",
+    "keyProvisions": [
+      {
+        "title": "Privacy Rule",
+        "description": "Establishes national standards for the protection of health information"
+      },
+      {
+        "title": "Security Rule",
+        "description": "Sets standards for securing patient data"
+      }
+    ],
+    "updatedAt": "2025-12-03T16:25:01.800Z"
+  },
+  {
+    "regulationId": "ccpa-2018",
+    "name": "California Consumer Privacy Act",
+    "description": "California law focused on consumer privacy rights",
+    "version": "1.0",
+    "enactedDate": "2018-06-28",
+    "publicLaw": "AB-375",
+    "keyProvisions": [
+      {
+        "title": "Right to Know",
+        "description": "Consumers have the right to know what personal information businesses collect"
+      },
+      {
+        "title": "Right to Delete",
+        "description": "Consumers have the right to request deletion of personal information"
+      }
+    ],
+    "updatedAt": "2025-12-03T16:25:01.800Z"
+  },
+  {
+    "regulationId": "reg-66",
+    "name": "FERPA Section 66 - Advanced LinearEngine Template",
+    "description": "ADVANCED TEMPLATE: FERPA Section 66 regulation server with LinearEngine workflow processing, real-time government data integration, differential analysis, and advanced compliance analytics. This serves as the model for all future regulation implementations.",
+    "version": "2.0.0",
+    "enactedDate": "1974-08-21",
+    "publicLaw": "Pub. L. 93-380",
+    "keyProvisions": [
+      {
+        "title": "Educational Records Privacy",
+        "description": "Establishes privacy protections for student educational records"
+      },
+      {
+        "title": "Parent Access Rights",
+        "description": "Grants parents access to their children's educational records"
+      },
+      {
+        "title": "Disclosure Restrictions",
+        "description": "Limits disclosure of educational records without consent"
+      },
+      {
+        "title": "Directory Information",
+        "description": "Defines what constitutes directory information"
+      }
+    ],
+    "advancedFeatures": {
+      "linearEngine": true,
+      "realTimeData": true,
+      "differentialAnalysis": true,
+      "universityLibraries": true,
+      "complianceAnalytics": true,
+      "templateStatus": "MASTER_TEMPLATE"
+    },
+    "updatedAt": "2025-08-08T15:50:00.000Z"
+  }
+]

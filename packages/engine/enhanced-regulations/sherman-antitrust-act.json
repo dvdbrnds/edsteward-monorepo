@@ -1,0 +1,50 @@
+{
+  "regulationId": "sherman-antitrust-act",
+  "enhanced": {
+    "fullText": "The Sherman Antitrust Act of 1890, codified at 15 U.S.C. §§ 1-7, represents foundational federal legislation prohibiting anticompetitive business practices that restrain trade or commerce. Section 1 of the Act (15 U.S.C. § 1) specifically prohibits \"every contract, combination in the form of trust or otherwise, or conspiracy, in restraint of trade or commerce among the several States, or with foreign nations.\"\n\nFor higher education institutions, the Sherman Act has particular significance in several operational areas. The Department of Justice has consistently interpreted the Act to require that financial aid determinations must be made independently by each institution without coordination or agreement with competing institutions. This interpretation stems from the principle that financial aid represents price competition in the higher education marketplace, and coordination could constitute illegal price-fixing under 15 U.S.C. § 1.\n\nHowever, Congress created a limited antitrust exemption specifically for higher education through Section 568 of the Improving America's Schools Act of 1994 (15 U.S.C. § 1 note). This exemption permits institutions to collaborate on methodologies for determining student financial need, provided they meet specific criteria including need-blind admissions practices and commitment to meet full demonstrated financial need. The exemption has been reauthorized multiple times, most recently extended through September 30, 2022.\n\nThe Act's application extends beyond financial aid to institutional purchasing decisions. Universities engaging in group purchasing organizations or collaborative procurement must ensure such arrangements do not constitute unlawful restraints on trade. Similarly, bookstore operations face scrutiny when coordinating pricing with wholesalers or other retailers, as such coordination may violate 15 U.S.C. § 1 if it unreasonably restrains competition.\n\nEnforcement mechanisms include both criminal and civil penalties under 15 U.S.C. § 2 and § 4. Criminal violations can result in fines up to $100 million for corporations and up to $1 million and 10 years imprisonment for individuals under 15 U.S.C. § 1. Civil enforcement allows for treble damages and injunctive relief. The Federal Trade Commission and Department of Justice share enforcement authority, with private parties also able to bring civil actions under 15 U.S.C. § 15.\n\nRecent enforcement actions have targeted graduate student stipend coordination and faculty salary discussions among competing institutions. The DOJ has emphasized that any agreement affecting price, including non-monetary benefits, may constitute a Sherman Act violation regardless of benevolent intent.",
+    "summary": "The Sherman Antitrust Act prohibits anticompetitive agreements restraining trade. Higher education institutions must make financial aid decisions independently, avoid coordinated purchasing that restrains competition, and ensure bookstore pricing practices comply with federal antitrust law.",
+    "requirements": "## Financial Aid Independence\n- Establish financial aid awards without coordination with competing institutions per 15 U.S.C. § 1\n- Document independent decision-making processes for aid determinations\n- Avoid sharing specific aid offer information with competitors\n\n## Purchasing and Procurement Compliance\n- Ensure group purchasing arrangements do not unreasonably restrain trade\n- Review vendor agreements for potential Sherman Act violations\n- Avoid price coordination with other institutions for goods and services\n\n## Bookstore Operations\n- Establish pricing policies independent of competitor coordination\n- Review wholesaler agreements for antitrust compliance under 15 U.S.C. § 1\n- Maintain documentation supporting independent pricing decisions\n\n## Section 568 Exemption Eligibility\n- Maintain need-blind admissions practices if utilizing financial aid methodology collaboration\n- Commit to meeting full demonstrated financial need for eligible students\n- Document compliance with exemption requirements under 15 U.S.C. § 1 note",
+    "reportingRequirements": "No routine reporting requirements exist under the Sherman Act. However, institutions must respond to DOJ or FTC investigations within specified timeframes. Document requests typically require 30-day responses. Merger notifications exceeding Hart-Scott-Rodino thresholds require pre-merger filings."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T15:39:45.892Z"
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Financial Audit",
+      "type": "audit",
+      "description": "Annual Financial Audit for Sherman Antitrust Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "03-31",
+      "label": "A-133 Single Audit (if applicable)",
+      "type": "audit",
+      "description": "A-133 Single Audit (if applicable) for Sherman Antitrust Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Quarterly Financial Review",
+      "type": "review",
+      "description": "Quarterly Financial Review for Sherman Antitrust Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "quarterly"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Accounting"
+  ]
+}

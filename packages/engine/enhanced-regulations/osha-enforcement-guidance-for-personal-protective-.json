@@ -1,0 +1,50 @@
+{
+  "regulationId": "osha-enforcement-guidance-for-personal-protective-",
+  "enhanced": {
+    "fullText": "The Occupational Safety and Health Administration (OSHA) Personal Protective Equipment (PPE) standards under 29 CFR 1910.95, 29 CFR 1910.132-138, and 29 USC 654(a)(1) establish comprehensive requirements for protecting workers from workplace hazards in higher education institutions. These regulations mandate that employers provide necessary PPE at no cost to employees when engineering controls and administrative measures cannot adequately reduce exposure to safety and health hazards.\n\nUnder 29 CFR 1910.132(a), higher education institutions must conduct hazard assessments of all workplace areas including laboratories, research facilities, maintenance operations, and clinical settings. The assessment must identify potential hazards requiring eye protection, head protection, foot protection, hand protection, or respiratory equipment. Universities must document these assessments in writing per 29 CFR 1910.132(d)(2) and update them when workplace conditions change.\n\nKey provisions under 29 CFR 1910.132(h) require institutions to provide PPE training to all affected employees before initial assignment and when new equipment is introduced. Training must cover proper PPE selection, use, maintenance, limitations, and disposal procedures. Universities must maintain training records demonstrating employee competency.\n\nThe employer payment requirements under 29 CFR 1910.95(i) and 29 CFR 1910.132(h)(1) specify that institutions must provide and pay for PPE except for non-specialty safety-toe protective footwear, non-specialty prescription safety eyewear, and everyday clothing items. This includes laboratory coats designated as PPE, chemical-resistant gloves, safety goggles, hard hats, and specialized respiratory equipment.\n\nEnforcement occurs through OSHA inspections triggered by employee complaints, workplace incidents, or programmed inspections under 29 USC 657(a). Violations can result in citations ranging from $15,625 per serious violation to $156,259 for willful or repeated violations under 29 CFR 1903.15. Universities may face criminal penalties under 29 USC 666(e) if willful violations result in employee fatalities.\n\nRecent updates through OSHA's COVID-19 guidance expanded PPE requirements for healthcare training programs and research facilities handling biological agents. The agency emphasizes respiratory protection compliance under 29 CFR 1910.134 for laboratory work involving chemical exposures and medical surveillance requirements for employees using tight-fitting respirators.",
+    "summary": "OSHA PPE regulations require higher education institutions to provide personal protective equipment at no cost to employees, conduct workplace hazard assessments, maintain training programs, and document compliance to protect workers from safety hazards.",
+    "requirements": "## Hazard Assessment and Documentation\n- Conduct written hazard assessments per 29 CFR 1910.132(d)(2) for all workplace areas\n- Update assessments when conditions change or new hazards emerge\n- Maintain assessment records for OSHA inspection\n\n## PPE Provision and Payment\n- Provide required PPE at no cost to employees per 29 CFR 1910.132(h)(1)\n- Replace damaged or contaminated equipment immediately\n- Ensure proper fit and functionality of all protective equipment\n\n## Training and Certification\n- Train employees before initial PPE use and when equipment changes\n- Document training completion and employee competency\n- Cover selection, use, maintenance, limitations, and disposal procedures\n\n## Respiratory Protection Program\n- Implement written program per 29 CFR 1910.134 for respirator use\n- Conduct medical evaluations and fit testing\n- Maintain equipment and provide proper storage\n\n## Record Maintenance\n- Keep training records, hazard assessments, and medical surveillance data\n- Ensure records accessibility for employee review and OSHA inspection",
+    "reportingRequirements": "Report workplace injuries requiring PPE within 24 hours to OSHA per 29 CFR 1904.39. Maintain OSHA 300 logs documenting PPE-related incidents. Submit annual respiratory medical surveillance reports for affected employees. Provide hazard assessment documentation upon OSHA request."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T01:25:40.352Z"
+  },
+  "deadlines": [
+    {
+      "date": "02-01",
+      "label": "OSHA 300 Log Posting",
+      "type": "posting",
+      "description": "OSHA 300 Log Posting for OSHA Enforcement Guidance for Personal Protective Equipment (PPE) in General Industry",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Annual Safety Training",
+      "type": "training",
+      "description": "Annual Safety Training for OSHA Enforcement Guidance for Personal Protective Equipment (PPE) in General Industry",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Hazardous Waste Manifest Submission",
+      "type": "filing",
+      "description": "Hazardous Waste Manifest Submission for OSHA Enforcement Guidance for Personal Protective Equipment (PPE) in General Industry",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Environmental Health and Safety"
+  ]
+}

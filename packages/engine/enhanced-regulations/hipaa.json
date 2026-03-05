@@ -1,0 +1,98 @@
+{
+  "regulationId": "hipaa",
+  "enhanced": {
+    "fullText": "The Health Insurance Portability and Accountability Act (HIPAA) of 1996, enacted as Public Law 104-191 and codified at 42 U.S.C. § 1320d et seq., establishes comprehensive national standards for protecting individually identifiable health information. The HIPAA Privacy Rule (45 CFR Part 160 and Part 164, Subparts A and E) and Security Rule (45 CFR Part 164, Subparts A and C) directly impact higher education institutions that operate as covered entities or business associates in healthcare contexts.\n\nHigher education institutions commonly fall under HIPAA jurisdiction through campus health centers, student counseling services, health professional training programs, and research activities involving protected health information (PHI). Universities operating hospitals, medical schools, or providing direct healthcare services must comply as covered entities under 45 CFR § 160.103. Institutions handling PHI on behalf of covered entities function as business associates under 45 CFR § 160.103(1).\n\nKey HIPAA provisions require institutions to implement administrative, physical, and technical safeguards protecting PHI confidentiality, integrity, and availability. The Privacy Rule mandates written policies governing PHI use and disclosure, employee training programs, and designated privacy officers per 45 CFR § 164.530. Minimum necessary standards under 45 CFR § 164.502(b) require limiting PHI access to essential personnel and purposes only.\n\nIndividual rights provisions grant students and patients access to their health records within 30 days (45 CFR § 164.524), amendment request procedures (45 CFR § 164.526), and accounting of disclosures (45 CFR § 164.528). Breach notification requirements under 45 CFR § 164.400-414 mandate reporting unsecured PHI breaches affecting 500+ individuals to HHS within 60 days and media notification in affected jurisdictions.\n\nEnforcement authority rests with the Office for Civil Rights (OCR) under 42 U.S.C. § 1320d-5 and 45 CFR Part 160, Subpart D. Civil monetary penalties range from $137-$2,067,813 per violation category, with annual maximums reaching $2,067,813 per identical violation type. Criminal penalties under 42 U.S.C. § 1320d-6 include fines up to $250,000 and 10 years imprisonment for wrongful PHI disclosure with intent to sell or malicious harm.\n\nThe 2013 HIPAA Omnibus Rule significantly expanded covered entity liability for business associate violations and strengthened individual rights. Recent OCR guidance emphasizes cybersecurity risk assessments and breach prevention in educational healthcare settings.",
+    "summary": "HIPAA mandates comprehensive privacy and security protections for health information in higher education institutions operating campus health services, conducting health research, or training healthcare professionals through administrative, physical, and technical safeguards.",
+    "requirements": "## Privacy and Security Safeguards\n- Implement written privacy policies and procedures per 45 CFR § 164.530\n- Designate HIPAA Privacy and Security Officers with defined responsibilities\n- Conduct annual risk assessments for PHI handling systems and processes\n- Establish minimum necessary access controls limiting PHI to authorized personnel\n\n## Training and Workforce Management\n- Provide mandatory HIPAA training to all workforce members accessing PHI\n- Implement sanctions policy for privacy violations per 45 CFR § 164.530(e)\n- Maintain training documentation and periodic refresher programs\n\n## Individual Rights Compliance\n- Establish procedures for PHI access requests within 30-day response timeframe\n- Implement amendment request processes per 45 CFR § 164.526\n- Provide accounting of disclosures upon individual request\n\n## Breach Response Protocol\n- Develop incident response procedures for suspected PHI breaches\n- Report breaches affecting 500+ individuals to OCR within 60 days\n- Notify affected individuals within 60 days of breach discovery",
+    "reportingRequirements": "Annual breach summary reports to OCR by March 1st for breaches affecting fewer than 500 individuals. Immediate notification to OCR within 60 days for breaches affecting 500+ individuals. Individual breach notifications within 60 days of discovery."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T20:29:50.329Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Annual Risk Analysis",
+      "type": "assessment",
+      "description": "Conduct comprehensive security risk analysis",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Annual HIPAA Training",
+      "type": "training",
+      "description": "Complete workforce HIPAA training",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Breach Notification (Individual)",
+      "type": "notification",
+      "description": "Notify affected individuals within 60 days of breach discovery",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    },
+    {
+      "date": "continuous",
+      "label": "HHS Annual Breach Report",
+      "type": "report",
+      "description": "Submit annual breach report to HHS for breaches affecting <500 individuals",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "HHS Immediate Breach Report",
+      "type": "report",
+      "description": "Report breaches affecting 500+ individuals within 60 days",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    },
+    {
+      "date": "continuous",
+      "label": "Policy Review",
+      "type": "review",
+      "description": "Review and update HIPAA policies and procedures",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "BAA Review",
+      "type": "review",
+      "description": "Review business associate agreements for compliance",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Contingency Plan Testing",
+      "type": "testing",
+      "description": "Test data backup and disaster recovery procedures",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "12-31",
+      "label": "Annual Compliance Review",
+      "type": "review",
+      "description": "Annual Compliance Review for Health Insurance Portability and Accountability Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Health Insurance Portability and Accountability Act (HIPAA)"
+  ]
+}

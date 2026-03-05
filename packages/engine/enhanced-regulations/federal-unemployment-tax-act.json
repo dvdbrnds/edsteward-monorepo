@@ -1,0 +1,42 @@
+{
+  "regulationId": "federal-unemployment-tax-act",
+  "enhanced": {
+    "fullText": "The Federal Unemployment Tax Act (FUTA), codified at 26 U.S.C. §§ 3301-3311, establishes a federal unemployment insurance system requiring employers, including higher education institutions, to pay federal unemployment taxes to fund unemployment compensation for eligible workers. FUTA works in conjunction with state unemployment insurance programs to provide financial assistance to individuals who have lost their jobs through no fault of their own.\n\nUnder 26 U.S.C. § 3301, FUTA imposes an excise tax on employers who pay wages to employees. For higher education institutions, this includes all employees except those specifically exempted under 26 U.S.C. § 3306(c), such as students employed by their school in positions that are incident to and for the purpose of pursuing a course of study. The current FUTA tax rate is 6.0% on the first $7,000 of wages paid to each employee during the calendar year, as specified in 26 U.S.C. § 3301(1).\n\nHigher education institutions may qualify for a credit of up to 5.4% against their FUTA tax liability under 26 U.S.C. § 3302, effectively reducing the net FUTA tax rate to 0.6%, provided the institution pays state unemployment taxes in a state that meets federal requirements. This credit mechanism ensures coordination between federal and state unemployment systems while maintaining adequate funding for unemployment benefits.\n\nDeposit requirements under 26 U.S.C. § 3302 and implementing regulations at 26 CFR § 31.6302-1 mandate that institutions with FUTA tax liability exceeding $500 for any calendar year must make quarterly deposits by the last day of the month following each quarter. Institutions with annual FUTA tax liability of $500 or less may pay the full amount with their annual Form 940 filing by January 31 of the following year.\n\nCompliance obligations include maintaining detailed payroll records, properly classifying workers, and filing annual Form 940 (Employer's Annual Federal Unemployment Tax Return) by January 31 following the tax year, with an automatic extension to February 10 if all required deposits were made timely. Penalties for non-compliance include failure-to-deposit penalties under 26 U.S.C. § 6656, failure-to-file penalties under 26 U.S.C. § 6651, and potential interest charges on unpaid balances.\n\nRecent developments include adjustments to the taxable wage base and continued emphasis on proper worker classification, particularly regarding graduate student employees and adjunct faculty positions, which require careful analysis under 26 U.S.C. § 3306(c)(10) to determine FUTA applicability.",
+    "summary": "FUTA requires higher education institutions to pay federal unemployment tax at 6.0% on first $7,000 of annual wages per employee, with potential 5.4% credit for state unemployment tax payments, effectively reducing rate to 0.6% for compliant institutions.",
+    "requirements": "## Tax Liability and Payment\n- Calculate FUTA tax at 6.0% rate on first $7,000 of wages per employee annually\n- Apply up to 5.4% credit for timely state unemployment tax payments\n- Make quarterly deposits if annual liability exceeds $500 by last day of month following each quarter\n\n## Employee Classification\n- Properly classify all workers to determine FUTA applicability under 26 U.S.C. § 3306\n- Exclude qualifying student employees per 26 U.S.C. § 3306(c)(10)\n- Document classification decisions for graduate assistants and adjunct faculty\n\n## Record Maintenance\n- Maintain detailed payroll records for all employees subject to FUTA\n- Document wage payments, tax calculations, and deposit transactions\n- Retain records for minimum four years following tax year\n\n## Annual Reporting\n- File Form 940 by January 31 following tax year (February 10 if deposits current)\n- Reconcile quarterly deposits with annual liability\n- Report any adjustments or corrections to prior year filings",
+    "reportingRequirements": "File Form 940 (Employer's Annual Federal Unemployment Tax Return) by January 31 following tax year. Make quarterly FUTA deposits by last day of month following each quarter if annual liability exceeds $500. Submit deposits electronically through EFTPS system."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T19:00:39.530Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Minimum Wage Compliance Review",
+      "type": "review",
+      "description": "Minimum Wage Compliance Review for Federal Unemployment Tax Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Pay Equity Analysis",
+      "type": "analysis",
+      "description": "Pay Equity Analysis for Federal Unemployment Tax Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Wages"
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "regulationId": "higher-education-act-code-of-conduct",
+  "enhanced": {
+    "fullText": "The Higher Education Act Code of Conduct requirement, codified at 20 U.S.C. § 1094(a)(25) and implemented through 34 CFR § 668.14(b)(27), mandates that institutions participating in Title IV federal student aid programs establish and maintain comprehensive codes of conduct governing financial aid practices. This regulation emerged from concerns about conflicts of interest in student lending practices and was strengthened by the College Cost Reduction and Access Act of 2007.\n\nUnder 34 CFR § 668.14(b)(27), institutions must develop codes that explicitly prohibit conflicts of interest in all financial aid activities. The code must address revenue-sharing arrangements with lenders, preferential lending arrangements that benefit institutional personnel, staffing assistance from lenders, and gifts or other benefits provided by lending institutions. These provisions ensure that financial aid decisions serve student interests rather than institutional financial gain.\n\nThe regulation requires prominent publication of the code on the institution's website, making it easily accessible to students, families, and oversight agencies. Additionally, 20 U.S.C. § 1094(a)(25)(B) mandates annual distribution to all personnel involved in financial aid administration, including financial aid officers, admissions staff, and institutional agents who interact with students regarding educational financing.\n\nCompliance monitoring occurs through the Department of Education's program reviews and audits. Violations may result in penalties under 20 U.S.C. § 1094(c), including fine assessments, limitation or termination of Title IV program participation, and required corrective action plans. The Department may impose civil monetary penalties up to $25,000 per violation for institutions that fail to maintain adequate codes of conduct.\n\nRecent enforcement actions have emphasized the need for codes to address online education partnerships, third-party servicer relationships, and emerging financial aid technologies. Institutions must regularly review and update their codes to address evolving practices in higher education finance, ensuring continued compliance with federal requirements and protection of student interests in all financial aid processes.",
+    "summary": "Title IV participating institutions must establish comprehensive codes of conduct prohibiting financial aid conflicts of interest, publish them prominently online, and distribute annually to relevant personnel per 20 U.S.C. § 1094.",
+    "requirements": "## Code Development and Content\n- Establish written code prohibiting all conflicts of interest in financial aid practices per 34 CFR § 668.14(b)(27)\n- Address revenue-sharing arrangements, preferential lending terms, and staff benefits from lenders\n- Include provisions covering third-party servicers and institutional partnerships\n\n## Publication and Distribution\n- Publish code prominently on institutional website with easy public access\n- Distribute annually to all financial aid personnel, admissions staff, and relevant institutional agents\n- Maintain documentation of distribution and employee acknowledgment\n\n## Ongoing Compliance Management\n- Conduct annual code review and updates to address emerging practices\n- Train personnel on code provisions and conflict identification\n- Establish internal monitoring and violation reporting procedures\n- Designate responsible compliance officer for code oversight and enforcement",
+    "reportingRequirements": "No specific periodic reporting required to Department of Education. Institutions must maintain internal documentation of annual code distribution and employee acknowledgments. Code violations must be reported during federal program reviews and audits."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T19:49:15.207Z"
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Compliance Review",
+      "type": "review",
+      "description": "Annual Compliance Review for Higher Education Act: Code of Conduct",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Fundraising & Development"
+  ]
+}

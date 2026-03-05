@@ -1,0 +1,66 @@
+{
+  "regulationId": "family-educational-rights-and-privacy-act-ferpa",
+  "enhanced": {
+    "fullText": "The Family Educational Rights and Privacy Act (FERPA), codified at 20 U.S.C. § 1232g and implemented through 34 CFR Part 99, is a federal law that protects the privacy of student education records. FERPA applies to all schools that receive funds under an applicable program of the U.S. Department of Education.\n\nUnder FERPA, parents have the right to inspect and review their children's education records maintained by the school, request corrections to records they believe are inaccurate or misleading, and consent to disclosures of personally identifiable information contained in the student's education records, except to the extent that FERPA authorizes disclosure without consent.\n\nWhen a student turns 18 years old or enters a postsecondary institution at any age, these rights transfer from the parents to the student ('eligible student'). Schools must annually notify parents and eligible students of their rights under FERPA.\n\nFERPA permits disclosure without consent in specific circumstances including: to school officials with legitimate educational interest; to other schools where the student seeks to enroll; to specified officials for audit or evaluation purposes; in connection with financial aid; to organizations conducting studies for the school; to accrediting organizations; to comply with a judicial order or subpoena; to appropriate officials in health and safety emergencies; and to state and local authorities within the juvenile justice system.\n\nEducation records include records directly related to a student that are maintained by an educational agency or institution or by a party acting for the agency or institution. This excludes sole possession records, law enforcement unit records, employment records (unless based on student status), and treatment records.\n\nViolations of FERPA may result in the withdrawal of federal funding from the institution. The Department of Education's Student Privacy Policy Office investigates complaints and ensures compliance.",
+    "summary": "FERPA protects student education record privacy. Parents (or eligible students 18+) can inspect records, request corrections, and control disclosures. Schools must provide annual notification of rights and may only disclose without consent in specific authorized circumstances.",
+    "requirements": "## Core Privacy Protections\n- Protect personally identifiable information in student education records\n- Obtain written consent before disclosing student records (with exceptions)\n- Provide parents/eligible students access to inspect and review education records\n- Respond to record amendment requests within reasonable time\n\n## Annual Notification Requirements\n- Notify parents and eligible students annually of FERPA rights\n- Include right to inspect records, request amendments, consent to disclosures\n- Explain complaint procedures to Department of Education\n- Publish directory information policy and opt-out procedures\n\n## Record-Keeping Requirements\n- Maintain record of each disclosure request and disclosure made\n- Include parties who received information and legitimate interests\n- Retain disclosure records with education records\n- Make disclosure records available for inspection",
+    "reportingRequirements": "No routine reporting to federal agencies required. Institutions must maintain records of disclosures and respond to Department of Education investigations. Annual FERPA notification must be provided to all parents and eligible students through normal school communication channels."
+  },
+  "audit": {
+    "score": 95,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T18:00:00.000Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "annual",
+      "type": "annual",
+      "description": "Beginning of each academic year",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "annual",
+      "type": "annual",
+      "description": "Review annually",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "within-45-days",
+      "type": "within-45-days",
+      "description": "Respond to access requests within 45 days",
+      "isRecurring": true,
+      "recurrenceFrequency": "within-45-days"
+    },
+    {
+      "date": "continuous",
+      "label": "ongoing",
+      "type": "ongoing",
+      "description": "Log each disclosure",
+      "isRecurring": true,
+      "recurrenceFrequency": "ongoing"
+    },
+    {
+      "date": "continuous",
+      "label": "ongoing",
+      "type": "ongoing",
+      "description": "Upon hire and periodically",
+      "isRecurring": true,
+      "recurrenceFrequency": "ongoing"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Family Educational Rights and Privacy Act"
+  ]
+}

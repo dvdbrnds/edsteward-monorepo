@@ -1,0 +1,42 @@
+{
+  "regulationId": "arms-export-control-act-of-1976",
+  "enhanced": {
+    "fullText": "The Arms Export Control Act (AECA) of 1976, codified at 22 U.S.C. §§ 2751-2799aa-2, establishes comprehensive federal authority over the export of defense articles, services, and technical data. For higher education institutions, the AECA operates through the International Traffic in Arms Regulations (ITAR), implemented at 22 CFR Parts 120-130, which directly impacts university research, international collaborations, and foreign national participation in defense-related activities.\n\nUnder 22 U.S.C. § 2778, the Secretary of State maintains the United States Munitions List (USML), defining defense articles subject to export controls. Universities conducting research involving USML items must obtain appropriate licenses before sharing technical data with foreign persons, including international students, visiting researchers, or collaborative partners. The definition of \"export\" under 22 CFR § 120.17 includes not only physical shipment but also oral, written, electronic, or visual disclosure of technical data to foreign nationals within the United States.\n\nHigher education institutions face significant compliance obligations under 22 CFR § 120.11, which defines \"defense services\" to include training, technical assistance, and consulting services related to defense articles. Universities must implement robust compliance programs addressing: registration requirements under 22 CFR Part 122 for institutions regularly engaged in manufacturing or exporting defense articles; licensing procedures under 22 CFR Part 123 for temporary and permanent exports; and technical data release protocols under 22 CFR Part 125.\n\nEnforcement authority rests with the Directorate of Defense Trade Controls (DDTC) under 22 CFR Part 128. Violations may result in civil penalties up to $1,049,820 per violation under 22 U.S.C. § 2778(e), criminal penalties including fines up to $1 million and 20 years imprisonment under 22 U.S.C. § 2778(c), and debarment from export privileges. The State Department's consent agreements with universities, including recent settlements exceeding $750,000, demonstrate active enforcement in academic settings.\n\nRecent regulatory developments include the 2020-2021 ITAR reforms transferring certain items to Commerce Department jurisdiction under the Export Administration Regulations, and enhanced cybersecurity requirements for technical data storage and transmission under 22 CFR § 120.50. Universities must maintain current awareness of USML modifications and categorical exemption updates affecting fundamental research under 22 CFR § 120.11(8).",
+    "summary": "The Arms Export Control Act regulates university export of defense-related technical data and services through ITAR compliance. Universities must license transfers to foreign persons, register applicable activities, and maintain robust export control programs with potential penalties exceeding $1M per violation.",
+    "requirements": "## Registration and Licensing\n- Register with DDTC under 22 CFR Part 122 if regularly engaged in USML activities\n- Obtain export licenses under 22 CFR Part 123 before transferring defense articles or technical data\n- Implement pre-publication review processes for defense-related research\n\n## Foreign Person Controls\n- Screen international students and researchers against USML categories\n- Establish physical and electronic access controls for technical data under 22 CFR § 120.50\n- Document fundamental research exemption applicability under 22 CFR § 120.11(8)\n\n## Compliance Program Requirements\n- Designate responsible officials for ITAR compliance oversight\n- Conduct annual training for faculty and staff involved in controlled research\n- Maintain export transaction records for five years per 22 CFR § 122.5\n\n## Reporting and Notifications\n- Submit annual registration renewals and fees to DDTC\n- Report violations and suspicious activities within required timeframes",
+    "reportingRequirements": "Annual DDTC registration renewals due by May 31st with fees ranging from $2,250-$2,750. License applications submitted via DDTC's D-Trade system with processing times of 60-90 days. Violation reports required immediately upon discovery to DDTC Office of Defense Trade Controls Compliance."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T17:17:27.274Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Deemed Export Assessment",
+      "type": "assessment",
+      "description": "Deemed Export Assessment for Arms Export Control Act of 1976",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Export License Application (if applicable)",
+      "type": "application",
+      "description": "Export License Application (if applicable) for Arms Export Control Act of 1976",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Export Controls"
+  ]
+}

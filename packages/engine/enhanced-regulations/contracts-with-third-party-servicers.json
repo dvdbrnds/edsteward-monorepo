@@ -1,0 +1,50 @@
+{
+  "regulationId": "contracts-with-third-party-servicers",
+  "enhanced": {
+    "fullText": "The Contracts with Third Party Servicers regulation, codified under 20 U.S.C. § 1094(c) and implemented through 34 CFR § 668.25, establishes mandatory oversight requirements for higher education institutions that engage external entities to administer any aspect of federal Title IV student financial aid programs. This comprehensive regulatory framework ensures institutional accountability while maintaining program integrity across all federal student aid operations.\n\nUnder 34 CFR § 668.25(a), institutions may only contract with third-party servicers whose eligibility remains intact and has not been limited, suspended, or terminated by the Department of Education. The regulation defines third-party servicers broadly to include any entity that contracts with an institution to administer, through either manual or automated processing, any aspect of Title IV programs, including application processing, need analysis, disbursement management, or student status reporting.\n\nKey provisions under 34 CFR § 668.25(b) require institutions to provide written notification to the Department within 10 business days of: (1) executing new contracts or substantially modifying existing agreements; (2) contract terminations; or (3) servicer cessation of operations. Substantial modifications include changes to services provided, compensation structures, or administrative responsibilities that affect Title IV program operations.\n\nThe regulation mandates under 34 CFR § 668.25(c) that all contracts include specific provisions ensuring Department access to servicer records, compliance with federal regulations, and liability allocation between institutions and servicers. Institutions retain ultimate responsibility for Title IV compliance regardless of contracted services, as established in 20 U.S.C. § 1094(c)(1)(A).\n\nEnforcement mechanisms include contract termination requirements, financial liability assessments, and potential limitation or suspension of institutional Title IV eligibility under 34 CFR § 668.86. The Department maintains authority to require immediate contract cessation if servicer eligibility is compromised or compliance violations are identified.\n\nRecent updates through Federal Register Vol. 84, No. 209 strengthened oversight requirements, expanded notification obligations, and clarified institutional liability standards for servicer actions affecting Title IV program integrity and student aid delivery.",
+    "summary": "Federal regulation requiring higher education institutions to notify the Department of Education when contracting with third-party servicers for Title IV financial aid administration, ensuring servicer eligibility verification and maintaining institutional compliance responsibility.",
+    "requirements": "## Servicer Eligibility Verification\n- Confirm third-party servicer eligibility status before contract execution\n- Verify servicer has not been limited, suspended, or terminated by Department of Education\n- Maintain documentation of eligibility verification in institutional records\n\n## Contract Notification Obligations\n- Submit written notification within 10 business days of new contracts or substantial modifications\n- Report contract terminations immediately upon occurrence\n- Notify Department when servicer ceases operations or declares bankruptcy\n\n## Contract Documentation Requirements\n- Include mandatory compliance provisions in all servicer agreements\n- Ensure Department access rights to servicer records and facilities\n- Define liability allocation and institutional oversight responsibilities\n- Maintain current copies of all servicer contracts for Department review\n\n## Ongoing Compliance Monitoring\n- Monitor servicer performance and regulatory compliance continuously\n- Terminate contracts immediately if servicer eligibility is compromised\n- Conduct regular audits of servicer Title IV program administration activities",
+    "reportingRequirements": "Institutions must notify the Department of Education within 10 business days of entering new contracts, substantially modifying existing agreements, or terminating servicer relationships. Immediate notification required when servicers cease operations or become ineligible for Title IV program administration."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T17:46:52.719Z"
+  },
+  "deadlines": [
+    {
+      "date": "10-01",
+      "label": "FISAP Annual Report",
+      "type": "filing",
+      "description": "FISAP Annual Report for Contracts with Third Party Servicers",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "06-30",
+      "label": "Annual Financial Aid Audit",
+      "type": "audit",
+      "description": "Annual Financial Aid Audit for Contracts with Third Party Servicers",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "07-01",
+      "label": "Gainful Employment Disclosure Update",
+      "type": "disclosure",
+      "description": "Gainful Employment Disclosure Update for Contracts with Third Party Servicers",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Financial Aid"
+  ]
+}

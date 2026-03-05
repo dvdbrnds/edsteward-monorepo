@@ -1,0 +1,34 @@
+{
+  "regulationId": "the-equal-pay-act-of-1963",
+  "enhanced": {
+    "fullText": "The Equal Pay Act of 1963, codified at 29 U.S.C. § 206(d), represents a landmark federal statute prohibiting sex-based wage discrimination in American workplaces, including higher education institutions. This legislation amends the Fair Labor Standards Act and establishes the fundamental principle that employers cannot discriminate in compensation between male and female employees performing substantially equal work.\n\nUnder 29 U.S.C. § 206(d)(1), the Act prohibits employers from paying wages at rates less favorable to employees of one sex than to employees of the opposite sex for equal work requiring substantially equal skill, effort, and responsibility, performed under similar working conditions within the same establishment. For universities and colleges, this encompasses all employment categories including faculty, administrative staff, support personnel, and student workers covered by the Fair Labor Standards Act.\n\nThe statute establishes four narrow exceptions permitting wage differentials based on: (1) a seniority system; (2) a merit system; (3) a system measuring earnings by quantity or quality of production; or (4) any factor other than sex, as specified in 29 U.S.C. § 206(d)(1)(i)-(iv). These exceptions require objective, gender-neutral justifications that employers must demonstrate through clear documentation and consistent application.\n\nHigher education institutions face unique compliance challenges given complex academic hierarchies, tenure systems, and diverse compensation structures. The Department of Labor's enforcement authority under 29 U.S.C. § 216 includes investigation powers, back pay recovery, and liquidated damages equal to the amount of unpaid wages. Violations may result in individual liability for executives under 29 U.S.C. § 216(b), with willful violations carrying criminal penalties under 29 U.S.C. § 216(a).\n\nThe Equal Employment Opportunity Commission (EEOC) enforces related provisions through Title VII coordination, while the Office of Federal Contract Compliance Programs (OFCCP) oversees compliance for federal contractors under Executive Order 11246. Universities receiving federal funding face additional scrutiny through comprehensive compensation analysis requirements and affirmative action obligations codified in 41 CFR Parts 60-2 and 60-20.\n\nRecent regulatory developments include enhanced EEOC enforcement initiatives focusing on systemic pay discrimination and increased coordination between agencies. The Lilly Ledbetter Fair Pay Act of 2009 extends statute of limitations protections, while proposed legislation continues addressing persistent wage gap challenges in academic settings.",
+    "summary": "Federal law prohibiting sex-based wage discrimination for substantially equal work in higher education. Universities must ensure equal compensation regardless of gender, maintain compliant pay systems, and document legitimate differentials based on seniority, merit, or gender-neutral factors.",
+    "requirements": "## Pay Equity Analysis\n- Conduct annual compensation audits comparing male and female employees in substantially similar positions\n- Document job requirements, skills, effort, responsibility, and working conditions for all positions\n- Identify and remediate unjustified wage disparities between sexes\n\n## Documentation Standards\n- Maintain detailed records justifying all compensation decisions and pay differentials\n- Establish objective criteria for merit-based pay systems and advancement opportunities\n- Document seniority systems and ensure gender-neutral application\n\n## Policy Implementation\n- Develop written equal pay policies covering all employment categories including faculty and staff\n- Train hiring managers and compensation decision-makers on Equal Pay Act requirements\n- Establish complaint procedures for pay discrimination allegations\n\n## Compliance Monitoring\n- Review job classifications to ensure accurate groupings for comparison purposes\n- Monitor starting salaries, raises, and promotional increases for potential disparities\n- Coordinate with Title VII and federal contractor obligations for comprehensive compliance",
+    "reportingRequirements": "No specific federal reporting required under the Equal Pay Act itself. However, federal contractors must submit annual EEO-1 reports to EEOC by March 31st and maintain compensation data. Universities must retain payroll records for three years per 29 CFR § 516.6 and provide documentation during DOL investigations."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T16:00:30.033Z"
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Compliance Review",
+      "type": "review",
+      "description": "Annual Compliance Review for The Equal Pay Act of 1963",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Discrimination"
+  ]
+}

@@ -1,0 +1,192 @@
+{
+  "generatedAt": "2025-09-04T20:54:48.523Z",
+  "totalRegulations": 10,
+  "successfullyProcessed": 10,
+  "failedProcessing": 0,
+  "averageRequirementsQuality": 100,
+  "totalWordsGenerated": 3717,
+  "readyForEdSteward": true,
+  "results": [
+    {
+      "regulationId": "ferpa",
+      "title": "Family Educational Rights and Privacy Act (FERPA)",
+      "description": "Student privacy and education records protection",
+      "priority": 1,
+      "enhancedSummary": "Your educational institution must protect the privacy of student education records and obtain written consent before disclosing personally identifiable information. You must provide parents and eligible students the right to inspect records, and ensure these rights transfer to students at age 18 or when attending post-secondary education.",
+      "structuredRequirements": "**Key Compliance Requirements for FERPA:**\n\n1. **Student Records Access Management**\n   - Registrar must establish written procedures for students/parents to inspect education records\n   - Response required within 45 days of request\n   - Registrar's Office maintains primary responsibility for access management\n   - IT Department must implement secure authentication for digital records access\n\n2. **Consent Management**\n   - Registrar must obtain written consent before releasing protected information\n   - Consent forms must specify records released, purpose, and recipients\n   - Implementation within 24 hours of receiving valid consent request\n   - Exceptions must be documented and verified by Legal Affairs\n\n**Documentation Requirements:**\n- Maintain all signed consent forms for 5 years after student departure\n- Record all requests for records access and responses\n- Store documentation in secured Registrar's Office or approved digital system\n- Maintain current directory information opt-out records\n- Retention period: Permanent for basic student records, 5 years for access logs\n\n**Reporting Requirements:**\n- Annual notification to students of FERPA rights (by September 1 each year)\n- Document all disclosures made without consent within 3 business days\n- Report security breaches to Department of Education within 30 days\n- Submit annual FERPA compliance certification to ED\n\n**Training Requirements:**\n- Mandatory FERPA training for all new faculty and staff within 30 days of hire\n- Annual refresher training for all employees handling student records\n- Specialized training for Registrar's Office staff (quarterly updates)\n- Document all training completion in HR records\n\n**Monitoring & Compliance:**\n- Monthly audit of records access logs by Compliance Office\n- Quarterly review of consent documentation\n- Random sampling of record releases to verify proper authorization\n- Annual comprehensive FERPA compliance audit\n\n**Risk Management:**\n- Monitor unauthorized record access attempts\n- Track and investigate all FERPA complaints within 5 business days\n- Establish incident response team for potential violations\n- Regular risk assessment of electronic systems storing student data\n- Document all security measures protecting student records\n\n**Implementation Steps:**\n1. Designate FERPA Compliance Officer\n2. Create written policies and procedures\n3. Implement secure records management system\n4. Establish training program\n5. Develop monitoring protocols\n6. Create incident response plan\n\n**Critical Controls:**\n- Two-factor authentication for digital records access\n- Written consent verification process\n- Access log monitoring system\n- Regular staff training verification\n- Annual policy review and updates\n- Incident response procedures\n\nThis structured approach ensures comprehensive FERPA compliance with clear accountability and actionable steps for higher education institutions.",
+      "masterKeyFields": {
+        "summaryApiKey": "Summary API Key (First Key)",
+        "requirementsApiKey": "Requirements API Key (Second Key)",
+        "summaryQuality": 100,
+        "requirementsQuality": 100,
+        "generatedAt": "2025-09-04T20:51:45.813Z",
+        "templateVersion": "1.0.0",
+        "wordCount": 399,
+        "characterCount": 2910
+      }
+    },
+    {
+      "regulationId": "title-ix",
+      "title": "Title IX of the Education Amendments of 1972",
+      "description": "Sex-based discrimination prevention in education",
+      "priority": 2,
+      "enhancedSummary": "Your institution must prevent sex-based discrimination, harassment, and assault in all education programs receiving federal funding. You must establish clear policies and procedures to address sexual misconduct, provide prompt response to complaints, and ensure equal access to educational opportunities regardless of sex.",
+      "structuredRequirements": "**Key Compliance Requirements for Title IX:**\n\n1. **Non-Discrimination Policy Implementation**\n   - Title IX Coordinator must develop and publish comprehensive non-discrimination policy\n   - Policy must be reviewed/updated annually by August 1\n   - General Counsel and Title IX Coordinator jointly responsible\n   - Must be published in student handbook, employee handbook, and website\n\n2. **Title IX Coordinator Designation**\n   - Institution President must appoint qualified Title IX Coordinator\n   - Coordinator's contact information must be prominently displayed on website and all major publications\n   - Position cannot be vacant for more than 30 days\n   - Must have direct reporting line to senior leadership\n\n**Documentation Requirements:**\n- Maintain all discrimination complaints for 7 years minimum\n- Keep records of all investigations, determinations, and appeals\n- Document all training materials and attendance records\n- Title IX Coordinator maintains central repository of all documentation\n- Store records in secure, access-controlled location (physical or digital)\n\n**Reporting Requirements:**\n- Submit annual Title IX compliance report to Department of Education\n- Due by October 1 each year\n- Report all sexual harassment/assault incidents within 24 hours to Title IX Coordinator\n- Provide quarterly summary reports to institution President\n\n**Training Requirements:**\n- Conduct annual Title IX training for all employees\n   - New employees within 30 days of hire\n   - All employees annually by September 30\n- Student orientation must include Title IX rights/procedures\n- Title IX Coordinator must complete specialized training annually\n- Document all training completion with attendance records\n\n**Monitoring & Compliance:**\n- Conduct quarterly compliance audits of Title IX procedures\n- Review all promotional materials for discriminatory content\n- Monitor sports program participation rates by gender\n- Perform annual assessment of grievance procedures\n- Title IX Coordinator to conduct monthly case review meetings\n\n**Risk Management:**\n- Key Risks:\n   - Failure to respond promptly to complaints\n   - Inconsistent application of procedures\n   - Insufficient documentation of incidents\n- Mitigation:\n   - Establish 24/7 reporting hotline\n   - Create standardized investigation procedures\n   - Implement case management software\n- Escalation Process:\n   - Define clear reporting chain for violations\n   - Establish response timelines (24 hours for serious incidents)\n   - Create communication protocols for senior leadership\n\nEach department head must designate a Title IX liaison to coordinate with Title IX Coordinator by September 1 annually.",
+      "masterKeyFields": {
+        "summaryApiKey": "Summary API Key (First Key)",
+        "requirementsApiKey": "Requirements API Key (Second Key)",
+        "summaryQuality": 100,
+        "requirementsQuality": 100,
+        "generatedAt": "2025-09-04T20:52:04.769Z",
+        "templateVersion": "1.0.0",
+        "wordCount": 366,
+        "characterCount": 2666
+      }
+    },
+    {
+      "regulationId": "ada-section-504",
+      "title": "Americans with Disabilities Act (ADA) & Section 504",
+      "description": "Disability accommodation and accessibility requirements",
+      "priority": 3,
+      "enhancedSummary": "Your organization must prevent discrimination against individuals with disabilities and ensure equal access to all programs and services. You must provide appropriate educational accommodations for students with disabilities, including modifications to regular classrooms, supplementary services, and special education resources when needed.",
+      "structuredRequirements": "**Key Compliance Requirements for ADA & Section 504:**\n\n1. **Accessibility Infrastructure**\n   - Disability Services Office (DSO) must establish and maintain an accessible physical and digital infrastructure\n   - Facilities Management must conduct quarterly accessibility audits of all campus buildings\n   - IT Department must ensure all digital systems meet WCAG 2.1 AA standards\n   - Complete initial assessment within 60 days of academic year start\n\n2. **Accommodation Process**\n   - DSO must establish written procedures for requesting accommodations\n   - Process student accommodation requests within 10 business days\n   - Maintain confidential documentation of all disability-related information\n   - Academic Affairs must implement approved accommodations within 5 business days\n\n**Documentation Requirements:**\n- Maintain records of:\n  - All accommodation requests and responses (7 years retention)\n  - Medical documentation and disability verification (7 years after student departure)\n  - Accommodation implementation plans (7 years)\n- DSO maintains central repository of all disability-related documentation\n- Store records in FERPA-compliant secure system\n\n**Reporting Requirements:**\n- Annual ADA compliance report to Department of Education\n  - Due: July 1st annually\n  - Include: accommodation statistics, implementation metrics, complaint resolutions\n- Internal quarterly reports to senior administration\n  - Due: Within 15 days of quarter end\n  - Detail: accommodation trends, implementation challenges, resource needs\n\n**Training Requirements:**\n- Faculty Training:\n  - Annual ADA compliance basics (August)\n  - Accommodation implementation procedures (Start of each semester)\n  - Documentation: completion records maintained by HR\n- Staff Training:\n  - Biannual ADA awareness training\n  - Customer service for disabled students (annually)\n- Student Services Staff:\n  - Quarterly updates on accommodation procedures\n  - Annual intensive ADA compliance training\n\n**Monitoring & Compliance:**\n- DSO conducts monthly audit of accommodation implementation\n- IT Department performs quarterly digital accessibility scans\n- Facilities conducts monthly physical accessibility checks\n- Document all monitoring activities in compliance tracking system\n\n**Risk Management:**\n- High-Risk Areas:\n  - Digital accessibility of learning management systems\n  - Timeliness of accommodation implementation\n  - Consistency in accommodation provision\n- Mitigation Strategies:\n  - Regular accessibility testing of all new technology\n  - Weekly DSO team reviews of pending accommodations\n  - Monthly cross-departmental accessibility committee meetings\n- Escalation Procedures:\n  - Immediate notification to DSO Director for implementation delays\n  - 24-hour response requirement for accessibility emergencies\n  - Weekly review of unresolved accommodation issues\n\nThis structured approach ensures comprehensive ADA and Section 504 compliance while providing clear, actionable steps for implementation.",
+      "masterKeyFields": {
+        "summaryApiKey": "Summary API Key (First Key)",
+        "requirementsApiKey": "Requirements API Key (Second Key)",
+        "summaryQuality": 100,
+        "requirementsQuality": 100,
+        "generatedAt": "2025-09-04T20:52:24.276Z",
+        "templateVersion": "1.0.0",
+        "wordCount": 379,
+        "characterCount": 2995
+      }
+    },
+    {
+      "regulationId": "clery-act",
+      "title": "Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Act",
+      "description": "Campus safety reporting and emergency notification requirements",
+      "priority": 4,
+      "enhancedSummary": "Your institution must publish and distribute an annual security report (ASR) by October 1st each year to all employees and students. You must include three years of campus crime statistics for specified geographic areas and maintain detailed security policy statements that cover your institution's safety procedures and response protocols.",
+      "structuredRequirements": "**Key Compliance Requirements for the Clery Act:**\n\n1. **Annual Security Report (ASR) Publication**\n   - Campus Security/Compliance Officer must compile and publish ASR\n   - Deadline: October 1st annually\n   - Must include three years of crime statistics\n   - Distribution to all current employees and students\n   - Make publicly available on institution's website\n\n2. **Crime Statistics Collection**\n   - Campus Security Department must collect and maintain statistics for:\n     * On-campus incidents\n     * Designated off-campus properties\n     * Adjacent public property\n   - Update statistics daily/weekly as incidents occur\n   - Maintain rolling 3-year dataset\n\n**Documentation Requirements:**\n- Maintain copies of all published ASRs\n- Keep crime statistics records for 7 years minimum\n- Store incident reports and crime logs electronically and in hard copy\n- Campus Security Department maintains central repository\n- Document distribution methods and dates for ASR\n\n**Reporting Requirements:**\n- Submit crime statistics to Department of Education\n- Deadline: October 1st annually\n- Include statistics in institutional catalog and admissions materials\n- Provide paper copy upon request within 2 business days\n\n**Training Requirements:**\n- Train Campus Security staff on:\n  * Crime classification procedures\n  * Reporting requirements\n  * Data collection methods\n- Train CSAs (Campus Security Authorities) annually on:\n  * Reporting obligations\n  * Crime categories\n  * Documentation requirements\n\n**Monitoring & Compliance:**\n- Daily crime log review by Security Director\n- Monthly statistical reconciliation\n- Quarterly compliance checks of:\n  * Crime classification accuracy\n  * Documentation completeness\n  * Reporting timeliness\n\n**Risk Management:**\n- Key Risks:\n  * Missed reporting deadlines\n  * Incorrect crime classification\n  * Incomplete statistics\n- Mitigation:\n  * Set internal deadlines 30 days before requirements\n  * Implement dual review process for classifications\n  * Use automated tracking system for incidents\n- Escalation:\n  * Report compliance issues to Compliance Officer\n  * Notify General Counsel of potential violations\n  * Document all compliance concerns and resolutions\n\nThis structured format provides clear, actionable requirements for higher education compliance officers to implement Clery Act requirements effectively.",
+      "masterKeyFields": {
+        "summaryApiKey": "Summary API Key (First Key)",
+        "requirementsApiKey": "Requirements API Key (Second Key)",
+        "summaryQuality": 100,
+        "requirementsQuality": 100,
+        "generatedAt": "2025-09-04T20:52:42.695Z",
+        "templateVersion": "1.0.0",
+        "wordCount": 313,
+        "characterCount": 2358
+      }
+    },
+    {
+      "regulationId": "hipaa-education",
+      "title": "Health Insurance Portability and Accountability Act (HIPAA) in Education",
+      "description": "Student health information privacy in educational settings",
+      "priority": 5,
+      "enhancedSummary": "Your educational institution must protect student health information and understand when HIPAA versus FERPA regulations apply to student health records. You must maintain appropriate safeguards for health data, recognize that most student health records fall under FERPA protection, and ensure compliant handling of any HIPAA-covered transactions.",
+      "structuredRequirements": "**Key Compliance Requirements for HIPAA in Education**\n\n1. **Records Classification & Management**\n   - Privacy Officer must classify all student health records to determine HIPAA vs FERPA coverage\n   - Complete initial classification within 30 days of record creation\n   - Health Center Director and Registrar jointly responsible for classification decisions\n   - Document classification decisions in writing using standardized form\n\n2. **Privacy Protection Measures**\n   - IT Department must implement technical safeguards for electronic health records\n   - Health Center staff must use secure methods when sharing health information\n   - Implement role-based access controls within 60 days of system implementation\n   - Require signed confidentiality agreements from all staff with health record access\n\n**Documentation Requirements:**\n- Maintain inventory of all student health records with HIPAA/FERPA classification\n- Keep signed confidentiality agreements for 6 years after employment ends\n- Store classification decisions in secure electronic system managed by Privacy Officer\n- Retain access logs for health records for minimum of 6 years\n- Document all disclosures of protected health information\n\n**Reporting Requirements:**\n- Report any unauthorized disclosures to Privacy Officer within 24 hours\n- Submit annual compliance report to institution's compliance committee by June 30\n- File breach notifications with HHS within 60 days of discovery if affecting 500+ individuals\n- Maintain breach log for incidents affecting fewer than 500 individuals\n\n**Training Requirements:**\n- Initial HIPAA training for all health center staff within 30 days of hire\n- Annual refresher training for anyone accessing health records\n- Role-specific training for IT staff managing health record systems\n- Document all training completion with dates and content covered\n- Conduct quarterly privacy awareness sessions for student health center staff\n\n**Monitoring & Compliance:**\n- Privacy Officer conducts monthly audits of health record access logs\n- Quarterly review of role-based access controls by IT Security\n- Annual assessment of privacy safeguards and procedures\n- Random spot checks of proper record handling procedures\n- Document all monitoring activities and findings\n\n**Risk Management:**\n- Maintain risk register of potential HIPAA compliance violations\n- Review and update risk assessment annually\n- Establish clear escalation procedures for privacy incidents:\n  1. Immediate notification to Privacy Officer\n  2. Investigation within 24 hours\n  3. Remediation plan within 72 hours\n  4. Documentation of incident and response\n- Conduct quarterly privacy impact assessments for new systems/processes\n\n**Implementation Steps:**\n1. Designate Privacy Officer and define responsibilities\n2. Develop written policies and procedures\n3. Create training program and materials\n4. Implement technical safeguards\n5. Establish monitoring procedures\n6. Create incident response plan\n7. Develop documentation systems\n\nThis structured approach ensures comprehensive HIPAA compliance while recognizing the unique aspects of educational institutions and FERPA intersection.",
+      "masterKeyFields": {
+        "summaryApiKey": "Summary API Key (First Key)",
+        "requirementsApiKey": "Requirements API Key (Second Key)",
+        "summaryQuality": 100,
+        "requirementsQuality": 100,
+        "generatedAt": "2025-09-04T20:53:05.737Z",
+        "templateVersion": "1.0.0",
+        "wordCount": 432,
+        "characterCount": 3161
+      }
+    },
+    {
+      "regulationId": "copyright-fair-use",
+      "title": "Copyright Law and Fair Use in Education (17 U.S.C. § 107)",
+      "description": "Intellectual property rights and educational fair use",
+      "priority": 6,
+      "enhancedSummary": "Your organization must evaluate and document fair use determinations when using copyrighted materials for educational purposes. You must assess four specific factors before using copyrighted content: purpose of use, nature of work, amount used, and market impact. You must ensure all educational uses of copyrighted materials fall within established fair use guidelines.",
+      "structuredRequirements": "**Key Compliance Requirements for Copyright Fair Use in Education**\n\n1. **Fair Use Assessment Protocol**\n   - Academic departments must establish a documented fair use evaluation process\n   - Department chairs must ensure faculty complete fair use checklists before using copyrighted materials\n   - Implementation deadline: Before each academic term\n   - Responsible party: Department Chairs and Academic Affairs Office\n\n2. **Content Usage Documentation**\n   - Faculty must document all instances of copyrighted material usage in courses\n   - Include source attribution, portion used, and fair use justification\n   - Maintain records for each course section per semester\n   - Responsible party: Individual faculty members with oversight from Department Chairs\n\n**Documentation Requirements:**\n- Maintain completed fair use evaluation checklists for all copyrighted materials\n- Retain documentation for 3 years after last use of materials\n- Store records in department's digital content management system\n- Academic Affairs Office maintains master repository of all fair use evaluations\n\n**Reporting Requirements:**\n- Department Chairs submit semester summary of fair use implementations\n- Due: Within 30 days of semester end\n- Submit to: Academic Affairs Office and University Counsel\n- Include any challenges or potential violations\n\n**Training Requirements:**\n- Annual copyright compliance training for all faculty\n- New faculty orientation must include fair use training\n- Department-specific workshops each semester on fair use in specific disciplines\n- Refresher training required every 2 years for continuing faculty\n- Online training modules available year-round\n\n**Monitoring & Compliance:**\n- Academic Affairs conducts quarterly audits of course materials\n- Department Chairs review fair use implementations monthly\n- Library staff provides ongoing consultation for questionable cases\n- Random sampling of 10% of courses each semester for compliance review\n\n**Risk Management:**\n- Key Risks:\n  - Excessive use of copyrighted materials\n  - Failure to document fair use evaluations\n  - Incomplete attribution of sources\n  \n- Mitigation Strategies:\n  - Establish pre-approved content usage guidelines\n  - Maintain institutional subscriptions to common academic resources\n  - Create template documentation forms\n  \n- Escalation Procedures:\n  1. Initial review by Department Chair\n  2. Referral to Academic Affairs for unresolved issues\n  3. University Counsel consultation for potential violations\n  4. Immediate cessation of content use if violation confirmed\n\nThis structured approach ensures systematic compliance with fair use requirements while providing clear guidance for all stakeholders in the educational institution.",
+      "masterKeyFields": {
+        "summaryApiKey": "Summary API Key (First Key)",
+        "requirementsApiKey": "Requirements API Key (Second Key)",
+        "summaryQuality": 100,
+        "requirementsQuality": 100,
+        "generatedAt": "2025-09-04T20:53:25.600Z",
+        "templateVersion": "1.0.0",
+        "wordCount": 368,
+        "characterCount": 2732
+      }
+    },
+    {
+      "regulationId": "student-right-to-know",
+      "title": "Student Right-to-Know and Campus Security Act",
+      "description": "Institutional transparency and graduation rate reporting",
+      "priority": 7,
+      "enhancedSummary": "Your institution must calculate and disclose completion/graduation rates for first-time, full-time undergraduate students receiving federal aid. You must provide these statistics to all current and prospective students, with additional detailed reporting requirements for student athletes receiving athletic aid.",
+      "structuredRequirements": "**Key Compliance Requirements:**\n\n1. **Graduation Rate Calculation**\n   - Institutional Research Office must calculate completion/graduation rates for first-time, full-time undergraduate students\n   - Calculate annually by July 1 for the previous academic year\n   - Must include all certificate and degree-seeking students\n   - Institutional Research Director is responsible for accuracy\n\n2. **Athletic Program Reporting**\n   - Athletics Department must compile graduation rates by:\n     * Race/ethnicity\n     * Sex\n     * Sport category\n     * Recipients of athletic aid\n   - Calculate 4-year average completion rate for athletic aid recipients\n   - Due annually by October 15\n\n**Documentation Requirements:**\n- Maintain detailed calculation methodology and source data\n- Keep records for minimum 5 years\n- Store in institutional research database with secure backup\n- Athletics Department maintains separate athletic aid recipient records\n- Document all disclosure requests and responses\n\n**Reporting Requirements:**\n- Publish graduation rates in annual institutional catalog\n- Include rates in admissions materials\n- Post on institutional website by July 15 annually\n- Respond to individual requests within 15 business days\n- Submit to Department of Education via IPEDS system by deadline\n\n**Training Requirements:**\n- Train Admissions staff annually on disclosure requirements\n- Train Athletics staff on sport-specific reporting\n- Train Institutional Research staff on calculation methods\n- Document all training completion with dated records\n\n**Monitoring & Compliance:**\n- Quarterly review of calculation accuracy\n- Annual audit of athletic aid recipient data\n- Regular verification of public disclosures\n- Monthly website checks for current information\n- Track all information requests and response times\n\n**Risk Management:**\n- Key Risks:\n  * Incorrect calculations\n  * Missed deadlines\n  * Incomplete athletic data\n  * Failure to respond to requests\n- Mitigation:\n  * Double-check all calculations\n  * Set calendar reminders for deadlines\n  * Create standardized response procedures\n  * Maintain calculation documentation\n\n**Implementation Steps:**\n1. Designate responsible parties\n2. Create data collection templates\n3. Establish calculation schedule\n4. Develop disclosure procedures\n5. Set up monitoring system\n6. Create training program\n7. Document all processes\n\nThis structured approach ensures comprehensive compliance with the Student Right-to-Know and Campus Security Act requirements.",
+      "masterKeyFields": {
+        "summaryApiKey": "Summary API Key (First Key)",
+        "requirementsApiKey": "Requirements API Key (Second Key)",
+        "summaryQuality": 100,
+        "requirementsQuality": 100,
+        "generatedAt": "2025-09-04T20:53:46.878Z",
+        "templateVersion": "1.0.0",
+        "wordCount": 334,
+        "characterCount": 2502
+      }
+    },
+    {
+      "regulationId": "gainful-employment",
+      "title": "Gainful Employment Regulations (34 CFR 668.6)",
+      "description": "Career program outcomes and debt-to-earnings requirements",
+      "priority": 8,
+      "enhancedSummary": "Your institution must ensure designated programs prepare students for gainful employment in recognized occupations and maintain acceptable debt-to-earnings ratios. You must monitor and report program outcomes, maintain federal aid eligibility through passing debt-to-earnings rates, and apply these requirements to all for-profit programs and non-degree programs at nonprofit/public institutions.",
+      "structuredRequirements": "**Key Compliance Requirements for Gainful Employment Regulations:**\n\n1. **Program Eligibility Assessment**\n   - Financial Aid Director must identify all programs subject to GE requirements\n   - Complete initial assessment by July 1 of each year\n   - Document all for-profit programs and non-degree programs at public/nonprofit institutions\n   - Create and maintain master list of GE programs with CIP codes\n\n2. **Debt-to-Earnings Calculations**\n   - Financial Aid Office must calculate annual debt-to-earnings rates for each GE program\n   - Calculate by January 31 annually for previous award year\n   - Must use ED-provided earnings data and institutional debt data\n   - Document methodology and maintain supporting calculations\n\n**Documentation Requirements:**\n- Maintain complete list of GE programs with enrollment data\n- Keep debt-to-earnings calculations for 7 years\n- Store student loan data and program completion records\n- Financial Aid Office maintains central repository of all GE documentation\n- Retain all warning notices and student acknowledgments for 5 years\n\n**Reporting Requirements:**\n- Submit annual GE program data to Department of Education\n- Due October 1 for previous award year\n- Include program completion rates, cost, debt levels\n- Report changes to GE programs within 30 days\n- Financial Aid Director responsible for submissions\n\n**Training Requirements:**\n- Train Financial Aid staff on GE calculations annually\n- Train Admissions staff on GE disclosure requirements\n- New employee training within 30 days of hire\n- Annual refresher training for all relevant staff\n- Document all training completion\n\n**Monitoring & Compliance:**\n- Monthly review of debt-to-earnings rates\n- Quarterly audit of GE program list accuracy\n- Semi-annual review of student warning notifications\n- Track program changes affecting GE status\n- Institutional Research office conducts annual compliance review\n\n**Risk Management:**\n- Monitor programs near minimum debt-to-earnings thresholds\n- Develop improvement plans for at-risk programs\n- Establish process for removing failing programs\n- Create student notification templates for failing programs\n- Document all program improvement efforts\n\n**Implementation Steps:**\n1. Designate GE compliance coordinator\n2. Create GE program inventory\n3. Establish data collection procedures\n4. Develop monitoring schedule\n5. Create required disclosure templates\n6. Train relevant staff\n7. Implement documentation system\n\nThis structured approach ensures comprehensive compliance with GE regulations while clearly defining responsibilities and timelines.",
+      "masterKeyFields": {
+        "summaryApiKey": "Summary API Key (First Key)",
+        "requirementsApiKey": "Requirements API Key (Second Key)",
+        "summaryQuality": 100,
+        "requirementsQuality": 100,
+        "generatedAt": "2025-09-04T20:54:06.148Z",
+        "templateVersion": "1.0.0",
+        "wordCount": 359,
+        "characterCount": 2595
+      }
+    },
+    {
+      "regulationId": "campus-save-act",
+      "title": "Campus Sexual Violence Elimination (SaVE) Act",
+      "description": "Sexual violence prevention and response requirements",
+      "priority": 9,
+      "enhancedSummary": "Your institution must track and report statistics on domestic violence, dating violence, sexual assault, and stalking incidents in annual security reports. You must implement comprehensive prevention programs for new students and employees, while maintaining ongoing awareness campaigns for your entire campus community.",
+      "structuredRequirements": "**Key Compliance Requirements for the Campus SaVE Act:**\n\n1. **Statistical Reporting Requirements**\n   - Title IX Coordinator must compile and maintain statistics for domestic violence, dating violence, sexual assault, and stalking incidents\n   - Statistics must be updated continuously and finalized annually by October 1\n   - Campus Security/Police Department must provide incident data to Title IX Coordinator monthly\n\n2. **Policy Development & Publication**\n   - Dean of Students Office must develop and publish procedures for reporting incidents\n   - Title IX Coordinator must review and update all related policies annually by August 1\n   - Communications Office must ensure policies are accessible in Annual Security Report and student handbook\n\n**Documentation Requirements:**\n- Maintain incident reports and statistics for 7 years\n- Store investigation records and outcome documentation for 7 years\n- Title IX Office must maintain all records in confidential electronic system\n- Security Department must maintain incident log with specific crime categories\n- Generate annual statistical summary for Clery Act reporting\n\n**Reporting Requirements:**\n- Submit Annual Security Report to Department of Education by October 1\n- Include all required statistics in annual Clery Act report\n- Title IX Coordinator must provide quarterly summary reports to institution leadership\n- Report immediate threats to campus community within 24 hours\n\n**Training Requirements:**\n- Provide primary prevention programs for all incoming students during orientation\n- Conduct new employee training within 30 days of hire\n- Deliver ongoing awareness campaigns at least quarterly\n- Training content must include:\n  * Definitions of domestic violence, dating violence, sexual assault, stalking\n  * Reporting procedures and resources\n  * Bystander intervention strategies\n  * Risk reduction options\n\n**Monitoring & Compliance:**\n- Title IX Coordinator must conduct monthly review of incident reports\n- Compliance Officer must audit documentation quarterly\n- Review training completion rates monthly\n- Verify policy accessibility and updates annually\n- Conduct program effectiveness assessment annually\n\n**Risk Management:**\n- Monitor compliance with reporting deadlines\n- Review investigation procedures for consistency\n- Ensure confidentiality protocols are followed\n- Establish clear escalation procedures for serious incidents\n- Maintain relationships with local law enforcement\n- Document all prevention efforts and their outcomes\n\n**Implementation Steps:**\n1. Designate responsible parties for each requirement\n2. Create documentation templates and systems\n3. Establish training schedule and curriculum\n4. Develop monitoring checklist and calendar\n5. Create incident response protocols\n6. Set up regular compliance review meetings\n\nThis structured approach ensures comprehensive compliance with the Campus SaVE Act requirements while providing clear accountability and actionable steps for implementation.",
+      "masterKeyFields": {
+        "summaryApiKey": "Summary API Key (First Key)",
+        "requirementsApiKey": "Requirements API Key (Second Key)",
+        "summaryQuality": 100,
+        "requirementsQuality": 100,
+        "generatedAt": "2025-09-04T20:54:25.330Z",
+        "templateVersion": "1.0.0",
+        "wordCount": 405,
+        "characterCount": 2992
+      }
+    },
+    {
+      "regulationId": "higher-education-act-title-iv",
+      "title": "Higher Education Act Title IV (Federal Student Aid)",
+      "description": "Federal financial aid program administration and compliance",
+      "priority": 10,
+      "enhancedSummary": "Your institution must maintain eligibility to participate in federal student aid programs through proper authorization, accreditation, and Department of Education certification. You must demonstrate ongoing administrative capability, financial responsibility, and program integrity to disburse Title IV funds.",
+      "structuredRequirements": "**Key Compliance Requirements for Title IV Federal Student Aid**\n\n1. **Authorization & Certification**\n   - State Authorization Officer must obtain and maintain state authorization to operate\n   - Financial Aid Director must ensure valid accreditation from recognized agency\n   - President/CEO must obtain ED certification (renew every 4-6 years)\n   - Compliance Officer must verify all three approvals remain current quarterly\n\n2. **Administrative Capability**\n   - Financial Aid Director must maintain adequate staffing ratios (1:200 aid recipients)\n   - Registrar must implement satisfactory academic progress monitoring system\n   - Financial Aid Office must separate duties between awarding and disbursing aid\n   - IT Director must maintain secure student information system\n\n**Documentation Requirements:**\n- Maintain complete student financial aid files for 3 years from last award year\n- Store program participation agreement (PPA) and ECAR permanently\n- Financial Aid Office maintains all documentation electronically and in fireproof storage\n- Track all student eligibility documentation in centralized system\n- Retain accreditation reports and correspondence for 6 years\n\n**Reporting Requirements:**\n- Submit FISAP report annually by October 1\n- Report program changes to ED within 10 days of implementation\n- File quarterly enrollment reports to NSLDS\n- Submit annual compliance audit by June 30\n- Report any suspected fraud to OIG immediately\n\n**Training Requirements:**\n- All Financial Aid staff complete Title IV training annually\n- New Financial Aid staff complete basic training within 30 days\n- Conduct monthly updates on regulatory changes for aid staff\n- Train faculty on SAP requirements each semester\n- Document all training completion in HR system\n\n**Monitoring & Compliance:**\n- Conduct monthly reconciliation of Title IV accounts\n- Review random sample of 10% of aid files quarterly\n- Perform annual internal audit of aid processes\n- Monitor cohort default rates monthly\n- Track and resolve student complaints within 14 days\n\n**Risk Management:**\n- Key Risks:\n  - Late/inaccurate aid disbursements\n  - Missing/incomplete documentation\n  - Incorrect aid calculations\n  - Unauthorized program changes\n- Mitigation:\n  - Use automated aid management system\n  - Implement multi-level review process\n  - Maintain detailed procedure manuals\n  - Conduct regular staff training\n- Escalation Process:\n  1. Report to Financial Aid Director\n  2. Escalate to Compliance Officer\n  3. Notify President if unresolved\n  4. Report to ED if required",
+      "masterKeyFields": {
+        "summaryApiKey": "Summary API Key (First Key)",
+        "requirementsApiKey": "Requirements API Key (Second Key)",
+        "summaryQuality": 100,
+        "requirementsQuality": 100,
+        "generatedAt": "2025-09-04T20:54:46.522Z",
+        "templateVersion": "1.0.0",
+        "wordCount": 362,
+        "characterCount": 2554
+      }
+    }
+  ],
+  "errors": []
+}

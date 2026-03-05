@@ -1,0 +1,42 @@
+{
+  "regulationId": "political-activities",
+  "enhanced": {
+    "fullText": "Under Internal Revenue Code Section 501(c)(3), tax-exempt organizations, including colleges and universities, are absolutely prohibited from participating in or intervening in political campaigns for or against candidates for public office. This prohibition, codified in 26 U.S.C. § 501(c)(3) and interpreted through Treasury Regulation 1.501(c)(3)-1(c)(3), applies comprehensively to all activities of the institution, including statements by officials, use of facilities, and allocation of resources. The regulation distinguishes between prohibited political campaign activities and permissible lobbying activities under the substantial part test or Section 501(h) election (26 U.S.C. § 501(h)). Political campaign intervention includes any activities that favor or oppose a candidate for public office, whether through financial contributions, endorsements, distribution of campaign materials, or providing facilities for campaign events. Higher education institutions must exercise particular caution regarding faculty statements, student organization activities, and campus event policies that could be attributed to the institution. The prohibition extends to indirect support through seemingly neutral activities that effectively benefit specific candidates. Violations can result in revocation of tax-exempt status under 26 U.S.C. § 7701, imposition of excise taxes on organization managers under 26 U.S.C. § 4955, and potential intermediate sanctions. The IRS Political Activity Compliance Initiative specifically targets educational institutions, with increased scrutiny following Revenue Ruling 2007-41 clarifying candidate forum guidelines. Universities may engage in voter education and registration drives provided they are conducted in a non-partisan manner. Issue advocacy remains permissible if it does not reference specific candidates or elections. The regulation requires institutions to implement comprehensive policies covering all personnel, establish training programs, and maintain documentation of political activity reviews. Enforcement mechanisms include IRS examinations, referrals from complaints under IRC § 7623, and self-disclosure through voluntary compliance programs established in Rev. Proc. 2021-35.",
+    "summary": "IRC § 501(c)(3) absolutely prohibits tax-exempt universities from participating in political campaigns for or against candidates. Violations risk loss of tax-exempt status and excise tax penalties under 26 U.S.C. § 4955.",
+    "requirements": "## Absolute Prohibition Requirements\n- Prohibit all direct or indirect political campaign intervention by the institution\n- Ensure no organizational resources support or oppose any candidate for public office\n- Implement policies preventing institutional endorsements or contributions to political campaigns\n\n## Personnel and Faculty Compliance\n- Train officials that public statements may be attributed to the institution under 26 U.S.C. § 501(c)(3)\n- Require disclaimers for personal political activities by employees\n- Monitor faculty and staff political communications in official capacity\n\n## Campus Activities Management\n- Establish non-partisan policies for candidate forums per Revenue Ruling 2007-41\n- Prohibit preferential treatment of political candidates in facility usage\n- Ensure student organization political activities comply with institutional tax-exempt status\n\n## Documentation and Monitoring\n- Maintain records of all political activity reviews and decisions\n- Document non-partisan nature of voter registration and education programs\n- Establish complaint procedures for potential violations under IRC § 7623",
+    "reportingRequirements": "File Form 990 annually reporting any political activities. Submit immediate disclosure under Rev. Proc. 2021-35 if violations discovered. Report excise tax liability on Form 4720 within prescribed deadlines if political intervention occurs."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T01:46:54.325Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "LD-2 Lobbying Report",
+      "type": "report",
+      "description": "LD-2 Lobbying Report for Political Activities",
+      "isRecurring": true,
+      "recurrenceFrequency": "quarterly"
+    },
+    {
+      "date": "continuous",
+      "label": "Political Activity Compliance Review",
+      "type": "review",
+      "description": "Political Activity Compliance Review for Political Activities",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Lobbying and Political Activities"
+  ]
+}

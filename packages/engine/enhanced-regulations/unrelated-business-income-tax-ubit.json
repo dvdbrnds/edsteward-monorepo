@@ -1,0 +1,50 @@
+{
+  "regulationId": "unrelated-business-income-tax-ubit",
+  "enhanced": {
+    "fullText": "The Unrelated Business Income Tax (UBIT) regulation under 26 U.S.C. § 511 imposes federal income tax on tax-exempt organizations, including higher education institutions, for income derived from unrelated business activities. This regulation ensures that exempt organizations do not gain unfair competitive advantages over taxable businesses while engaging in commercial activities unrelated to their exempt purposes.\n\nUnder 26 U.S.C. § 512, unrelated business taxable income (UBTI) consists of gross income from any unrelated trade or business regularly carried on by the organization, less allowable deductions directly connected to such business. The Internal Revenue Code defines unrelated trade or business as any trade or business not substantially related to the organization's exempt purpose, except that it provides funds for such purpose. For universities, this includes activities like operating commercial businesses, rental of facilities to outside parties for non-educational purposes, and advertising revenue from publications.\n\nHigher education institutions must evaluate three criteria under 26 U.S.C. § 513: (1) the activity constitutes a trade or business, (2) it is regularly carried on with frequency and continuity comparable to commercial enterprises, and (3) it is not substantially related to the institution's educational mission. Treasury Regulation § 1.513-1 clarifies that substantially related means the activity contributes importantly to accomplishing the organization's exempt purposes, beyond merely providing funds.\n\nKey exemptions under 26 U.S.C. § 512(b) include passive income such as dividends, interest, royalties, and rents from real property, volunteer-conducted activities, businesses carried on primarily for member convenience, and activities where substantially all work is performed by volunteers. Educational institutions benefit from specific exceptions including qualified research activities under 26 U.S.C. § 512(b)(7)-(9).\n\nCompliance requires filing Form 990-T annually if gross unrelated business income exceeds $1,000, as mandated by 26 U.S.C. § 6012(a)(6). The current corporate tax rate applies to net UBTI. Penalties for non-compliance include failure-to-file penalties under 26 U.S.C. § 6652(c)(1)(A) of $20 per day up to the lesser of $10,000 or 5% of gross receipts, plus potential loss of tax-exempt status for substantial commercial activities.\n\nRecent amendments include the Tax Cuts and Jobs Act of 2017, which requires separate calculation of UBTI for each unrelated trade or business under 26 U.S.C. § 512(a)(6), and subjects certain fringe benefits to UBIT under 26 U.S.C. § 512(a)(7). The IRS has increased enforcement through detailed Form 990-T instructions and audit initiatives targeting higher education institutions with significant commercial activities.",
+    "summary": "UBIT regulation taxes exempt organizations on income from commercial activities unrelated to their educational mission, requiring universities to file Form 990-T when unrelated business income exceeds $1,000 annually.",
+    "requirements": "## Income Assessment and Documentation\n- Evaluate all revenue-generating activities using the three-part test under 26 U.S.C. § 513\n- Document substantial relationship analysis for each business activity\n- Maintain detailed records of income, expenses, and activity descriptions\n- Chief Financial Officer responsible for annual UBTI review\n\n## Tax Filing Obligations\n- File Form 990-T by 15th day of 5th month after fiscal year end if gross UBTI exceeds $1,000\n- Calculate separate UBTI for each unrelated trade or business per 26 U.S.C. § 512(a)(6)\n- Make quarterly estimated tax payments if expected tax liability exceeds $500\n\n## Compliance Monitoring\n- Review rental agreements, licensing deals, and commercial partnerships quarterly\n- Assess new revenue streams before implementation\n- Train business development staff on UBIT implications\n- Legal Counsel to review substantial commercial ventures\n\n## Record Retention\n- Maintain supporting documentation for seven years minimum\n- Preserve contemporaneous records of exempt purpose analysis",
+    "reportingRequirements": "Form 990-T due annually by the 15th day of the 5th month following fiscal year end when gross unrelated business income exceeds $1,000. Submit electronically through IRS e-file system. Quarterly estimated payments due if tax liability exceeds $500."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T02:47:03.917Z"
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Financial Audit",
+      "type": "audit",
+      "description": "Annual Financial Audit for Unrelated Business Income Tax (UBIT)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "03-31",
+      "label": "A-133 Single Audit (if applicable)",
+      "type": "audit",
+      "description": "A-133 Single Audit (if applicable) for Unrelated Business Income Tax (UBIT)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Quarterly Financial Review",
+      "type": "review",
+      "description": "Quarterly Financial Review for Unrelated Business Income Tax (UBIT)",
+      "isRecurring": true,
+      "recurrenceFrequency": "quarterly"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Accounting"
+  ]
+}

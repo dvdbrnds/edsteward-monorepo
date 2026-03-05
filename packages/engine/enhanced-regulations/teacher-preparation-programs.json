@@ -1,0 +1,50 @@
+{
+  "regulationId": "teacher-preparation-programs",
+  "enhanced": {
+    "fullText": "The Teacher Preparation Program reporting requirements under 20 U.S.C. §§ 1022-1022h mandate comprehensive annual reporting by institutions of higher education that offer teacher preparation programs. This federal regulation, implemented through 34 CFR Part 686, establishes accountability standards for educator preparation programs and ensures transparency in program performance.\n\nLegal Authority: These requirements derive from the Higher Education Act of 1965, as reauthorized, specifically Title II Part A (20 U.S.C. § 1022a through 1022h). The Department of Education's implementing regulations at 34 CFR 686.10 specify detailed reporting procedures and content requirements.\n\nCore Reporting Requirements: Institutions must submit annual institutional report cards containing: (1) achievement of annual goals for increasing teachers in shortage areas, including specific numerical targets and actual placement data; (2) detailed improvement strategies and performance enhancement measures; (3) comprehensive program information including admissions criteria, GPA requirements, clinical experience hours per 20 U.S.C. § 1022c(a)(3); (4) state teacher licensing examination pass rates, average scores, and comparative state performance data; (7) current accreditation status from recognized accrediting bodies; (8) any state low-performing program designations under 20 U.S.C. § 1022e; (9) technology integration training activities and curriculum components; and (10) special education preparation activities addressing students with disabilities instruction.\n\nScope and Applicability: All institutions of higher education offering teacher preparation programs leading to initial teacher certification must comply, including public universities, private colleges, and alternative certification programs receiving federal funding under Title IV of the Higher Education Act.\n\nEnforcement and Penalties: Non-compliance may result in loss of federal funding eligibility, program closure orders, or designation as low-performing under 20 U.S.C. § 1022f. The Secretary of Education may impose corrective action plans and enhanced monitoring requirements.\n\nRecent Updates: The 2022 Department of Education guidance clarified technology integration reporting standards and expanded disability preparation documentation requirements, effective for reports submitted after October 2022.",
+    "summary": "Federal regulation requiring institutions with teacher preparation programs to submit annual report cards detailing program performance, licensing exam pass rates, shortage area goals, and improvement strategies under 20 U.S.C. §§ 1022-1022h.",
+    "requirements": "## Annual Report Card Submission\n- Submit institutional report card by April 30th annually to Department of Education\n- Include all ten required data elements per 20 U.S.C. § 1022d\n- Post complete report card on institution's public website\n\n## Performance Data Reporting\n- Document teacher shortage area placement goals and achievements\n- Report state licensing exam pass rates and average scores\n- Compare institutional performance to state averages\n- Provide three-year trend analysis\n\n## Program Information Disclosure\n- Detail admissions criteria and GPA requirements\n- Document clinical experience hours and placements\n- Report current accreditation status and any sanctions\n- Identify any state low-performing designations\n\n## Special Requirements\n- Describe technology integration training activities\n- Document special education preparation components\n- Maintain records supporting all reported data for five years",
+    "reportingRequirements": "Annual institutional report card due April 30th each year to U.S. Department of Education via online portal. Public website posting required within 30 days of submission. Event-triggered reporting required within 60 days of accreditation changes or state sanctions."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T16:22:42.548Z"
+  },
+  "deadlines": [
+    {
+      "date": "10-01",
+      "label": "FISAP Annual Report",
+      "type": "filing",
+      "description": "FISAP Annual Report for Teacher Preparation Programs",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "06-30",
+      "label": "Annual Financial Aid Audit",
+      "type": "audit",
+      "description": "Annual Financial Aid Audit for Teacher Preparation Programs",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "07-01",
+      "label": "Gainful Employment Disclosure Update",
+      "type": "disclosure",
+      "description": "Gainful Employment Disclosure Update for Teacher Preparation Programs",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Financial Aid"
+  ]
+}

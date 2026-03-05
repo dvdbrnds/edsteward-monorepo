@@ -1,0 +1,50 @@
+{
+  "regulationId": "higher-education-act-federal-work-study",
+  "enhanced": {
+    "fullText": "The Federal Work Study (FWS) Program, established under Title IV of the Higher Education Act of 1965 as amended by the Higher Education Opportunity Act (Public Law 110-315, 42 U.S.C. §§ 2751-2757), provides part-time employment opportunities for undergraduate and graduate students with demonstrated financial need. This need-based federal aid program enables students to earn money to help pay educational expenses while gaining valuable work experience.\n\nUnder 34 CFR § 675.18, participating institutions must contribute a minimum non-federal share of 25% of student wages, with the federal government providing the remaining 75%. The total compensation must meet Fair Labor Standards Act requirements (29 U.S.C. § 206), paying federal minimum wage ($7.25/hour) or applicable state minimum wage, whichever is higher. Volunteered or unpaid work hours cannot count toward FWS employment under any circumstances (34 CFR § 675.20).\n\nA critical statutory requirement mandates institutions use at least 7% of their total FWS allocation for community service positions (42 U.S.C. § 2756a). Within this allocation, institutions must employ at least one student as a reading tutor for children, particularly in elementary schools or family literacy projects. Private for-profit organizations are explicitly prohibited from participating as community service employers under 34 CFR § 675.19(a).\n\nStudent eligibility during non-enrollment periods requires careful compliance monitoring. Students may continue FWS employment during breaks or between terms only if they plan to enroll in the subsequent academic period (34 CFR § 675.16(a)). If a student fails to re-enroll, institutions must demonstrate reasonable belief that the student intended to return, based on documentation such as advance registration, housing deposits, or written enrollment commitments.\n\nTitle III (Strengthening Institutions) and Title V (Hispanic-Serving Institutions) designated institutions may qualify for waivers of the 25% non-federal share requirement for both FWS and Federal Supplemental Educational Opportunity Grant programs (20 U.S.C. §§ 1057-1059g, 1101a-1103g). Institutions must submit annual \"Application for Designation as an Eligible Institution\" through the Department of Education's grants management system.\n\nEnforcement mechanisms include program review audits, fund recapture for non-compliance, and potential termination of institutional participation. The Department of Education conducts regular monitoring through Federal Student Aid's oversight protocols, with institutions required to maintain detailed payroll records, student eligibility documentation, and community service tracking reports for federal examination.",
+    "summary": "Federal Work Study provides need-based employment for students, requiring institutions to contribute 25% wage matching, allocate 7% for community service including reading tutoring, and ensure compliance with wage/hour laws and student eligibility requirements.",
+    "requirements": "## Wage and Cost-Sharing Requirements\n- Pay federal or state minimum wage, whichever is higher (29 U.S.C. § 206)\n- Contribute minimum 25% non-federal share of all student wages (34 CFR § 675.18)\n- Prohibit volunteered or unpaid work arrangements (34 CFR § 675.20)\n\n## Community Service Obligations\n- Allocate minimum 7% of total FWS funds for community service positions (42 U.S.C. § 2756a)\n- Employ at least one student as reading tutor for children\n- Exclude private for-profit employers from community service opportunities\n- Actively promote community service awareness to FWS students\n\n## Student Eligibility Monitoring\n- Verify continued enrollment eligibility for non-attendance period employment\n- Document reasonable belief of student's intent to return if non-enrollment occurs\n- Maintain enrollment verification and work authorization records\n\n## Title III/V Designation Process\n- Submit annual \"Application for Designation as an Eligible Institution\" for non-federal share waivers\n- Complete applications through Department of Education's designated system\n- Maintain qualifying institutional characteristics for waiver eligibility",
+    "reportingRequirements": "Annual Application for Designation as Eligible Institution due by Department of Education specified deadlines for Title III/V waivers. Maintain detailed payroll records, community service allocation tracking, and student eligibility documentation for federal program reviews and audits."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T16:24:25.066Z"
+  },
+  "deadlines": [
+    {
+      "date": "10-01",
+      "label": "FISAP Annual Report",
+      "type": "filing",
+      "description": "FISAP Annual Report for Higher Education Act: Federal Work Study",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "06-30",
+      "label": "Annual Financial Aid Audit",
+      "type": "audit",
+      "description": "Annual Financial Aid Audit for Higher Education Act: Federal Work Study",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "07-01",
+      "label": "Gainful Employment Disclosure Update",
+      "type": "disclosure",
+      "description": "Gainful Employment Disclosure Update for Higher Education Act: Federal Work Study",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Financial Aid"
+  ]
+}

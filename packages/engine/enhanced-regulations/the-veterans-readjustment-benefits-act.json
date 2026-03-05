@@ -1,0 +1,50 @@
+{
+  "regulationId": "the-veterans-readjustment-benefits-act",
+  "enhanced": {
+    "fullText": "The Veterans' Readjustment Benefits Act, codified in 38 U.S.C. §§ 4211-4214, establishes comprehensive employment protections and benefits for veterans and service members, with significant implications for higher education institutions as employers. This federal legislation ensures that individuals who serve in the uniformed services retain their employment rights and receive appropriate benefits upon return to civilian employment.\n\nUnder 38 U.S.C. § 4211, higher education institutions must provide reemployment rights to employees who leave their positions for military service, including active duty, National Guard, and reserve obligations. The Act requires institutions to maintain health insurance coverage during military leave periods not exceeding 24 months, with the employee responsible for paying up to 102% of the full premium cost as specified in 38 U.S.C. § 4317.\n\nKey provisions under 38 U.S.C. § 4212 mandate that returning service members be restored to their previous position or an equivalent role with the same seniority, status, and pay they would have attained had they remained continuously employed. Universities must accommodate service-connected disabilities through reasonable efforts to qualify returning employees for their former positions, as detailed in 38 U.S.C. § 4313.\n\nHigher education institutions are subject to specific compliance obligations under 38 U.S.C. § 4214, including posting notices of veterans' employment rights in conspicuous locations accessible to employees and applicants. The Department of Labor Veterans' Employment and Training Service (DOL-VETS) enforces these provisions, with violations potentially resulting in federal contract suspension under 38 U.S.C. § 4323.\n\nThe Act prohibits discrimination against employees based on military service obligations, as established in 38 U.S.C. § 4311. Universities cannot discharge, discipline, or otherwise discriminate against employees who miss work for military training, deployment, or service-related activities. Advance notice requirements vary based on service duration, with employees typically required to provide notice unless precluded by military necessity.\n\nRecent amendments through the National Defense Authorization Act have expanded coverage to include employees serving in disaster relief operations and extended certain benefit continuation periods. Enforcement mechanisms include federal litigation support through the Department of Justice for employees whose rights are violated, with potential remedies including reinstatement, back pay, and benefits restoration under 38 U.S.C. § 4323(d).",
+    "summary": "Federal legislation requiring higher education institutions to protect employment rights of service members, including reemployment guarantees, benefits continuation, and anti-discrimination protections under 38 U.S.C. §§ 4211-4214.",
+    "requirements": "## Employment Protection Requirements\n- Guarantee reemployment rights for employees serving up to five years cumulative military service\n- Restore returning service members to same or equivalent positions with full seniority and benefits\n- Accommodate service-connected disabilities through reasonable qualification efforts\n\n## Benefits Continuation Obligations\n- Maintain health insurance coverage during military leave periods up to 24 months\n- Continue employer contribution for leaves under 31 days\n- Allow employee premium payment up to 102% of full cost for extended leaves\n\n## Notice and Posting Requirements\n- Display federal veterans' employment rights notices in prominent employee areas\n- Provide employees with written information about USERRA protections\n- Establish clear procedures for military leave requests and documentation\n\n## Anti-Discrimination Compliance\n- Prohibit adverse employment actions based on military service obligations\n- Ensure equal treatment for employees with Guard/Reserve commitments\n- Implement training for supervisors on veterans' employment rights",
+    "reportingRequirements": "No routine federal reporting required. Institutions must maintain employment records for service members and document compliance with reemployment and benefits continuation. Report violations or complaints to DOL-VETS within prescribed timeframes when issues arise."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T02:28:06.206Z"
+  },
+  "deadlines": [
+    {
+      "date": "07-31",
+      "label": "Form 5500 Filing",
+      "type": "filing",
+      "description": "Form 5500 Filing for The Veterans’ Readjustment Benefits Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Summary Annual Report Distribution",
+      "type": "distribution",
+      "description": "Summary Annual Report Distribution for The Veterans’ Readjustment Benefits Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "COBRA Notice (as needed)",
+      "type": "notice",
+      "description": "COBRA Notice (as needed) for The Veterans’ Readjustment Benefits Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Employee Benefits"
+  ]
+}

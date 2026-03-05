@@ -1,0 +1,42 @@
+{
+  "regulationId": "non-retaliation-for-disclosure-of-compensation-inf",
+  "enhanced": {
+    "fullText": "Executive Order 13665, codified at 41 CFR 60-1.35, establishes comprehensive non-retaliation protections for federal contractor employees who discuss compensation information. This regulation applies to all higher education institutions holding federal contracts valued at any amount, entered into or modified on or after January 11, 2016.\n\nThe Office of Federal Contract Compliance Programs (OFCCP) enforces this regulation under 41 USC Chapter 81, prohibiting contractors from discharging, discriminating, or retaliating against employees or job applicants who inquire about, discuss, or disclose compensation information. The scope extends beyond the individual's own pay to include discussions about colleagues' compensation, creating broad speech protections in academic employment contexts.\n\nHigher education institutions must implement specific compliance measures under 41 CFR 60-1.35(b), including incorporating prescribed language into job postings and employment communications. The regulation requires contractors to include the following statement: \"The contractor will not discharge or in any other manner discriminate against employees or applicants because they have inquired about, discussed, or disclosed their own pay or the pay of another employee or applicant.\"\n\nEnforcement mechanisms under 41 USC 4712 include OFCCP investigations, administrative proceedings, and potential contract suspension or termination. Violations may result in back pay awards, reinstatement, and debarment from federal contracting. The Department of Labor may initiate compliance reviews under 41 CFR 60-1.20, examining university personnel policies, compensation practices, and anti-retaliation training programs.\n\nUniversities must establish internal grievance procedures per 41 CFR 60-1.21(c) and maintain records demonstrating compliance with non-retaliation requirements. Recent OFCCP guidance emphasizes that confidentiality policies cannot prohibit protected compensation discussions, though institutions may restrict disclosure of confidential business information unrelated to individual pay rates.\n\nThe regulation intersects with Title VII protections under 42 USC 2000e-3(a) and state wage transparency laws, creating layered compliance obligations for university human resources departments managing faculty, staff, and student employee compensation discussions.",
+    "summary": "Executive Order 13665 prohibits federal contractors from retaliating against employees who discuss compensation. Universities with federal contracts must include anti-retaliation language in job postings and cannot discipline employees for wage discussions under 41 CFR 60-1.35.",
+    "requirements": "## Employee Communication Rights\n- Employees may discuss their own compensation without retaliation\n- Staff can inquire about colleagues' pay rates and salary information\n- Protection extends to job applicants during recruitment processes\n\n## Mandatory Policy Implementation\n- Include prescribed anti-retaliation language in all job postings per 41 CFR 60-1.35(b)\n- Revise employee handbooks to reflect compensation discussion rights\n- Train supervisors on prohibited retaliation practices under OFCCP guidelines\n\n## Documentation and Record-Keeping\n- Maintain personnel files documenting non-discriminatory employment actions\n- Preserve compensation-related communications and grievance records\n- Document training programs and policy dissemination efforts\n\n## Grievance Procedures\n- Establish internal complaint mechanisms per 41 CFR 60-1.21(c)\n- Designate responsible officials for investigating retaliation claims\n- Implement corrective action protocols for policy violations",
+    "reportingRequirements": "No specific periodic reporting required to federal agencies. Universities must respond to OFCCP compliance reviews within 30 days per 41 CFR 60-1.20. Maintain compensation discussion records for two years minimum under standard contractor obligations."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T15:53:27.723Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Vendor Compliance Review",
+      "type": "review",
+      "description": "Vendor Compliance Review for Non-Retaliation for Disclosure of Compensation Information",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "SAM.gov Registration Renewal",
+      "type": "registration",
+      "description": "SAM.gov Registration Renewal for Non-Retaliation for Disclosure of Compensation Information",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Contracts & Procurement,Recruitment Hiring & Termination"
+  ]
+}

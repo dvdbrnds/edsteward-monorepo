@@ -1,0 +1,50 @@
+{
+  "regulationId": "veterans-employment-emphasis-under-federal-contrac",
+  "enhanced": {
+    "fullText": "Veterans' employment emphasis under federal contracts, codified at 38 U.S.C. § 4212, establishes mandatory affirmative action requirements for federal contractors, including higher education institutions receiving federal contracts exceeding $150,000. This regulation, implemented through 41 CFR Part 60-250, requires covered contractors to take affirmative action to employ and advance qualified covered veterans, including disabled veterans, recently separated veterans, active duty wartime or campaign badge veterans, and Armed Forces service medal veterans.\n\nHigher education institutions subject to this regulation must develop and maintain written affirmative action programs (AAPs) for veterans within 120 days of contract commencement. The AAP must include policy statements, review of personnel processes, problem identification, action-oriented programs, and internal audit procedures as specified in 41 CFR § 60-250.44. Universities must conduct annual reviews of their veteran employment practices and update their AAPs accordingly.\n\nKey compliance obligations include listing all suitable job openings with appropriate employment service delivery systems, particularly state workforce agencies and Department of Veterans Affairs vocational rehabilitation specialists, as mandated by 38 U.S.C. § 4212(a)(1). Covered contractors must provide priority referral of protected veterans to available positions for which they are qualified. The regulation applies to all employment actions including recruitment, advertising, layoff, termination, rates of pay, and selection for training.\n\nEnforcement authority rests with the Office of Federal Contract Compliance Programs (OFCCP) under the Department of Labor. Violations may result in contract cancellation, termination, or suspension, and contractors may be declared ineligible for future government contracts under 41 CFR § 60-250.66. The OFCCP conducts compliance evaluations and complaint investigations, with remedies including back pay, reinstatement, and prospective relief.\n\nRecent amendments through Executive Order 14042 (2021) strengthened enforcement mechanisms and expanded covered veteran categories. Universities must also comply with concurrent obligations under the Vietnam Era Veterans' Readjustment Assistance Act (VEVRAA) and Section 503 of the Rehabilitation Act. The regulation's intersection with Title VII and other employment laws requires careful coordination to ensure comprehensive compliance while avoiding conflicting obligations in recruitment and hiring practices.",
+    "summary": "Mandates affirmative action requirements for federal contractors exceeding $150,000 to employ qualified veterans through written action plans, priority referrals, and job listing obligations.",
+    "requirements": "## Written Affirmative Action Program\n- Develop comprehensive AAP within 120 days of contract execution\n- Include policy statements and personnel process reviews per 41 CFR § 60-250.44\n- Conduct annual program reviews and updates\n- Maintain records of veteran recruitment and hiring efforts\n\n## Job Listing and Recruitment Obligations\n- List all suitable openings with state workforce agencies under 38 U.S.C. § 4212(a)(1)\n- Provide listings to VA vocational rehabilitation specialists\n- Implement priority referral systems for qualified covered veterans\n- Document recruitment outreach to veteran service organizations\n\n## Record Keeping and Documentation\n- Maintain employment records for two years minimum\n- Document reasonable accommodation efforts for disabled veterans\n- Track veteran hiring statistics and advancement metrics\n- Preserve correspondence with employment service delivery systems\n\n## Training and Awareness\n- Train HR personnel on veteran preference requirements\n- Educate hiring managers on protected veteran categories\n- Implement bias prevention measures in selection processes",
+    "reportingRequirements": "Submit VETS-4212 Federal Contractor Veterans' Employment Report annually by September 30 to Department of Labor. Report veteran hiring statistics, reasonable accommodations provided, and compliance efforts undertaken during preceding federal fiscal year."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T16:07:37.579Z"
+  },
+  "deadlines": [
+    {
+      "date": "03-31",
+      "label": "EEO-1 Report",
+      "type": "filing",
+      "description": "EEO-1 Report for Veterans’ employment emphasis under Federal contracts",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Affirmative Action Plan Update",
+      "type": "plan",
+      "description": "Affirmative Action Plan Update for Veterans’ employment emphasis under Federal contracts",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "09-30",
+      "label": "VETS-4212 Report",
+      "type": "filing",
+      "description": "VETS-4212 Report for Veterans’ employment emphasis under Federal contracts",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Diversity/Affirmative Action"
+  ]
+}

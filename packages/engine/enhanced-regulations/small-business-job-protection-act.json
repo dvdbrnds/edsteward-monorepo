@@ -1,0 +1,58 @@
+{
+  "regulationId": "small-business-job-protection-act",
+  "enhanced": {
+    "fullText": "The Small Business Job Protection Act of 1996 (P.L. 104-188) significantly modified minimum distribution requirements for tax-qualified retirement plans, with particular implications for higher education institutions maintaining TIAA-CREF, 403(b), and other qualified retirement programs. Under Internal Revenue Code Section 401(a)(9), as amended by this Act, employees who continue working beyond age 70½ are exempt from required minimum distributions (RMDs) from their employer's retirement plan, provided they are not 5% owners of the business.\n\nFor universities and colleges, this provision applies to faculty and staff participating in 403(b) tax-sheltered annuities, 401(a) qualified plans, and governmental 457(b) plans. The exemption extends only to distributions from the current employer's plan - participants must still take RMDs from previous employers' retirement accounts and traditional IRAs. Treasury Regulation 1.401(a)(9)-2 clarifies that the still-working exception applies separately to each employer's plan.\n\nHigher education institutions operating defined benefit pension plans must ensure actuarial adjustments comply with Internal Revenue Code Section 411(a)(7). Benefits for employees working past normal retirement age must be actuarially increased to account for the delayed commencement and shorter payment period. The Pension Benefit Guaranty Corporation (PBGC) under 29 U.S.C. § 1322 provides guidance on actuarial assumptions for covered plans.\n\nCompliance requires universities to coordinate with plan administrators to identify employees eligible for the still-working exception. Plan documents must be amended to incorporate these provisions, and annual testing under Internal Revenue Code Section 401(a)(4) must account for delayed distributions. The Internal Revenue Service imposes a 50% excise tax under Section 4974 on missed required distributions, making accurate identification of exempt participants critical.\n\nRecent IRS Notice 2020-51 and the SECURE Act have modified certain RMD timelines, but the still-working exception remains intact for employees of educational institutions. Universities must maintain documentation proving active employment status and ensure proper coordination between payroll systems and retirement plan administration to avoid inadvertent penalties.",
+    "summary": "The Small Business Job Protection Act exempts employees over age 70½ from required minimum distributions while still working, requiring universities to coordinate retirement plan administration and ensure actuarial adjustments for defined benefit plans.",
+    "requirements": "## Employee Eligibility Verification\n- Identify all employees over age 70½ in active employment status\n- Verify employees are not 5% owners (generally not applicable to universities)\n- Coordinate with HR systems to track employment status changes\n\n## Plan Administration Compliance\n- Amend retirement plan documents to include still-working exception provisions\n- Coordinate with TIAA-CREF or other plan providers on RMD suspension procedures\n- Maintain documentation of active employment for audit purposes\n\n## Actuarial Adjustment Requirements\n- Calculate increased benefits for defined benefit plan participants working past normal retirement\n- Apply IRS-approved actuarial assumptions for benefit adjustments\n- Ensure compliance with IRC Section 411(a)(7) anti-cutback rules\n\n## Distribution Monitoring\n- Track RMD obligations for employees with multiple employer accounts\n- Provide annual notices about continued employment exception\n- Resume RMD calculations upon employee retirement or separation",
+    "reportingRequirements": "Universities must file annual Form 5500 reporting retirement plan operations and participant data. Plan amendments implementing still-working provisions require IRS submission within specified deadlines. No separate federal reporting is required for the exemption itself, but documentation of employee eligibility must be maintained for IRS audit purposes."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T02:13:17.642Z"
+  },
+  "deadlines": [
+    {
+      "date": "05-15",
+      "label": "Form 990 Filing",
+      "type": "filing",
+      "description": "Form 990 Filing for Small Business Job Protection Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "05-15",
+      "label": "Form 990-T Filing (if applicable)",
+      "type": "filing",
+      "description": "Form 990-T Filing (if applicable) for Small Business Job Protection Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Form 1099 Filing",
+      "type": "filing",
+      "description": "Form 1099 Filing for Small Business Job Protection Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "W-2 Distribution",
+      "type": "distribution",
+      "description": "W-2 Distribution for Small Business Job Protection Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Tax"
+  ]
+}

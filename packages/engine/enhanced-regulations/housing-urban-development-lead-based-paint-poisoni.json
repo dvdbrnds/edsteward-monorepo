@@ -1,0 +1,50 @@
+{
+  "regulationId": "housing-urban-development-lead-based-paint-poisoni",
+  "enhanced": {
+    "fullText": "The Housing and Urban Development Lead-Based Paint Poisoning Prevention requirements, codified under 42 U.S.C. § 4852d and implemented through 24 CFR Part 35, establish mandatory disclosure and educational obligations for higher education institutions that lease residential housing constructed before 1978. This federal regulation, part of the Residential Lead-Based Paint Hazard Reduction Act of 1992, requires universities to provide comprehensive lead hazard information to all residential lessees.\n\nUnder 42 U.S.C. § 4852d(a)(1), institutions must distribute the EPA-approved pamphlet 'Protect Your Family From Lead In Your Home' to every lessee before lease execution or renewal. The regulation applies to all target housing, defined in 42 U.S.C. § 4851b(27) as residential structures built prior to 1978, excluding zero-bedroom units. Universities operating student housing, faculty residences, or family housing units constructed before this date must comply with these disclosure requirements.\n\nKey provisions under 24 CFR § 35.88 mandate that lessors provide lessees with: (1) the federally-approved lead hazard information pamphlet, (2) disclosure of known lead-based paint and hazards, (3) any available records or reports pertaining to lead-based paint, and (4) an attachment to the lease contract including specific lead warning language prescribed in 24 CFR § 35.92(b). The disclosure must occur before the lessee is obligated under the lease agreement.\n\nCompliance obligations extend beyond initial disclosure. Universities must retain signed acknowledgment forms for three years per 24 CFR § 35.90(b) and ensure all renewal leases include updated disclosures. The regulation requires lessees acknowledge receipt of all required information through written certification.\n\nEnforcement mechanisms include civil penalties up to $16,773 per violation under 24 CFR § 30.65, with the Department of Housing and Urban Development authorized to conduct investigations and issue compliance orders. The EPA may also pursue enforcement under the Toxic Substances Control Act for related violations.\n\nRecent updates include adjusted civil monetary penalties effective January 2023, reflecting annual inflation adjustments mandated by the Federal Civil Penalties Inflation Adjustment Act. Universities should note that state laws may impose additional requirements beyond federal minimums, particularly regarding lead testing and remediation in residential structures.",
+    "summary": "Federal law requires universities to provide EPA-approved lead poisoning prevention pamphlets to all lessees of pre-1978 residential housing, maintain disclosure records, and include specific warning language in lease agreements.",
+    "requirements": "## Disclosure Documentation\n- Provide EPA pamphlet 'Protect Your Family From Lead In Your Home' to all lessees\n- Include federally-mandated lead warning language in lease agreements per 24 CFR § 35.92(b)\n- Disclose known lead-based paint hazards and available inspection records\n\n## Record Keeping\n- Maintain signed lessee acknowledgment forms for minimum three years\n- Document delivery of all required disclosures before lease execution\n- Retain copies of lease attachments with lead warning language\n\n## Staff Training\n- Train housing staff on disclosure requirements and proper documentation\n- Ensure leasing personnel understand timing requirements for disclosure delivery\n- Establish protocols for lease renewal disclosure procedures\n\n## Compliance Monitoring\n- Conduct annual reviews of disclosure procedures and documentation\n- Update pamphlets when EPA issues new versions\n- Coordinate with legal counsel for state-specific additional requirements",
+    "reportingRequirements": "No periodic reporting required to federal agencies. Universities must maintain internal records of lessee acknowledgments for three years per 24 CFR § 35.90(b). Document compliance through retained signed disclosure forms and lease attachments."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T20:37:21.456Z"
+  },
+  "deadlines": [
+    {
+      "date": "02-01",
+      "label": "OSHA 300 Log Posting",
+      "type": "posting",
+      "description": "OSHA 300 Log Posting for Housing & Urban Development Lead Based Paint Poisoning in Certain Residential Structures",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Annual Safety Training",
+      "type": "training",
+      "description": "Annual Safety Training for Housing & Urban Development Lead Based Paint Poisoning in Certain Residential Structures",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Hazardous Waste Manifest Submission",
+      "type": "filing",
+      "description": "Hazardous Waste Manifest Submission for Housing & Urban Development Lead Based Paint Poisoning in Certain Residential Structures",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Environmental Health and Safety"
+  ]
+}

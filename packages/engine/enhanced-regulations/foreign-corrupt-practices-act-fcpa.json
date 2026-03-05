@@ -1,0 +1,34 @@
+{
+  "regulationId": "foreign-corrupt-practices-act-fcpa",
+  "enhanced": {
+    "fullText": "The Foreign Corrupt Practices Act (FCPA) of 1977, codified at 15 U.S.C. §§ 78dd-1 through 78dd-3, establishes strict anti-bribery and accounting provisions that significantly impact higher education institutions engaged in international activities. The FCPA applies to U.S. persons, including universities, their officers, directors, employees, and agents, prohibiting corrupt payments to foreign officials to obtain or retain business advantages.\n\nThe anti-bribery provisions under 15 U.S.C. § 78dd-2 prohibit covered entities from willfully using interstate commerce to corruptly offer, pay, promise, or authorize payment of money or anything of value to foreign officials. This includes foreign government employees, political parties, party officials, candidates for political office, and employees of government-owned or controlled enterprises. Universities must ensure compliance when establishing overseas campuses, conducting research partnerships, recruiting international students, or engaging in any business activities abroad.\n\nKey provisions require universities to implement robust compliance programs addressing: (1) accurate books and records maintenance under 15 U.S.C. § 78m(b)(2)(A), requiring detailed recording of all transactions; (2) internal accounting controls under 15 U.S.C. § 78m(b)(2)(B) to prevent unauthorized payments; and (3) due diligence procedures for third-party representatives, including education agents, consultants, and joint venture partners.\n\nThe Department of Justice and Securities and Exchange Commission enforce FCPA violations through both criminal and civil proceedings. Criminal penalties under 15 U.S.C. § 78dd-2(g) include fines up to $2 million for organizations and $250,000 for individuals, plus imprisonment up to five years. Civil penalties can reach $16,000 per violation under 15 U.S.C. § 78u-2. The SEC may impose additional sanctions including disgorgement of ill-gotten gains and injunctive relief.\n\nUniversities face particular risks in international student recruitment, where payments to education agents or government officials for student visa facilitation could constitute violations. Research collaborations involving government-affiliated foreign institutions require careful structuring to avoid prohibited payments. The 2012 FCPA Resource Guide clarifies that facilitating payments for routine governmental actions remain permissible under limited circumstances defined in 15 U.S.C. § 78dd-1(b), though best practices discourage such payments.\n\nRecent enforcement actions demonstrate increased scrutiny of educational institutions. Universities must establish comprehensive FCPA compliance programs including regular risk assessments, employee training, third-party due diligence, and clear escalation procedures for potential violations.",
+    "summary": "FCPA prohibits U.S. universities from making corrupt payments to foreign officials to obtain business advantages. Universities must maintain accurate records, implement internal controls, and establish compliance programs for international activities including overseas campuses, research partnerships, and student recruitment.",
+    "requirements": "## Anti-Bribery Compliance\n- Prohibit all corrupt payments to foreign officials, political parties, or candidates per 15 U.S.C. § 78dd-2\n- Implement written policies defining prohibited conduct and permissible facilitating payments\n- Conduct pre-approval reviews for all international partnerships and agreements\n\n## Books and Records Requirements\n- Maintain accurate, detailed records of all international transactions under 15 U.S.C. § 78m(b)(2)(A)\n- Document legitimate business purposes for all payments to foreign entities\n- Preserve records for minimum seven-year retention period\n\n## Internal Controls\n- Establish adequate internal accounting controls per 15 U.S.C. § 78m(b)(2)(B)\n- Implement approval hierarchies for international expenditures and contracts\n- Conduct periodic compliance audits of overseas operations\n\n## Third-Party Management\n- Perform enhanced due diligence on education agents, consultants, and foreign partners\n- Include FCPA compliance representations in all third-party contracts\n- Monitor ongoing third-party activities and payments\n\n## Training and Oversight\n- Provide annual FCPA training to employees involved in international activities\n- Designate compliance officers for overseas campuses and programs\n- Establish confidential reporting mechanisms for potential violations",
+    "reportingRequirements": "No mandatory periodic FCPA reporting required; however, universities must immediately report potential violations to legal counsel and compliance officers. SEC reporting companies must disclose material FCPA investigations in quarterly and annual filings. Voluntary disclosure to DOJ recommended for discovered violations."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T19:14:22.085Z"
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Compliance Review",
+      "type": "review",
+      "description": "Annual Compliance Review for Foreign Corrupt Practices Act (FCPA)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "International Activities and Programs"
+  ]
+}

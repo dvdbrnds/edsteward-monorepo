@@ -1,0 +1,34 @@
+{
+  "regulationId": "employee-retirement-income-security-act-of-1974-er",
+  "enhanced": {
+    "fullText": "The Employee Retirement Income Security Act of 1974 (ERISA), codified at 29 U.S.C. §§ 1001-1461, establishes comprehensive federal standards governing employee benefit plans, including pension and welfare benefit plans offered by higher education institutions. ERISA applies to virtually all private colleges and universities, while public institutions may be subject to certain provisions depending on their plan structures.\n\nERISA's core provisions mandate minimum participation standards under 29 U.S.C. § 1052, requiring plans to allow employee participation after one year of service and age 21. Vesting requirements under 29 U.S.C. § 1053 establish maximum vesting schedules, with full vesting required after three years for non-contributory plans or graded vesting over six years. Universities must comply with minimum funding standards under 29 U.S.C. § 1082, requiring actuarial valuations and contributions to maintain plan solvency.\n\nFiduciary responsibilities under 29 U.S.C. §§ 1104-1106 impose strict duties on university administrators managing benefit plans. Fiduciaries must act solely in participants' interests, diversify investments, and follow plan documents. The Department of Labor enforces these provisions through 29 CFR Part 2550, with civil penalties up to $2,140 per day for reporting violations under 29 U.S.C. § 1132.\n\nDisclosure requirements under 29 U.S.C. § 1021 mandate annual Form 5500 filings and participant communications. Universities must provide Summary Plan Descriptions, Summary Annual Reports, and benefit statements. The Pension Protection Act of 2006 enhanced disclosure requirements, particularly for defined contribution plans common in higher education.\n\nEnforcement mechanisms include DOL investigations, participant lawsuits under 29 U.S.C. § 1132, and criminal penalties under 29 U.S.C. § 1131. Recent developments include the SECURE Act of 2019 and SECURE 2.0 Act of 2022, which modified participation, vesting, and distribution rules affecting university retirement plans. Universities face significant liability exposure for fiduciary breaches, with personal liability for plan losses and restoration of profits.",
+    "summary": "ERISA establishes federal standards for employee benefit plans at private higher education institutions, requiring compliance with participation, vesting, funding, and fiduciary responsibility rules under 29 U.S.C. Chapter 18.",
+    "requirements": "## Fiduciary Responsibilities\n- Designate named fiduciaries with exclusive authority over plan administration\n- Implement prudent investment procedures under 29 U.S.C. § 1104(a)(1)\n- Maintain fidelity bonding for plan officials handling funds\n- Document fiduciary decisions and investment committee meetings\n\n## Participation and Vesting Standards\n- Allow employee participation after one year of service and age 21 per 29 U.S.C. § 1052\n- Implement compliant vesting schedules not exceeding statutory maximums\n- Track service credit accurately for eligibility determinations\n\n## Disclosure and Reporting\n- File annual Form 5500 by July 31st following plan year end\n- Distribute Summary Plan Descriptions within 120 days of coverage\n- Provide participant benefit statements annually for defined contribution plans\n- Maintain plan documents and participant records per 29 U.S.C. § 1027",
+    "reportingRequirements": "Annual Form 5500 filing due July 31st with DOL/IRS/PBGC. Summary Annual Reports distributed within nine months of plan year end. Participant benefit statements provided annually. Material plan amendments require updated SPDs within 210 days per 29 U.S.C. § 1024."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T18:20:13.183Z"
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Compliance Review",
+      "type": "review",
+      "description": "Annual Compliance Review for Employee Retirement Income Security Act of 1974 (ERISA)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Retirement"
+  ]
+}

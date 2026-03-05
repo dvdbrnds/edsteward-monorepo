@@ -1,0 +1,50 @@
+{
+  "regulationId": "electronic-communications-privacy-act",
+  "enhanced": {
+    "fullText": "The Electronic Communications Privacy Act (ECPA) of 1986, codified at 18 U.S.C. §§ 2510-2523 (Wiretap Act) and 18 U.S.C. §§ 2701-2713 (Stored Communications Act), establishes comprehensive federal privacy protections for electronic communications that directly impact higher education institutions. The Act comprises three distinct titles: the Wiretap Act protecting real-time communications, the Stored Communications Act (SCA) governing stored electronic communications, and the Pen Register Act regulating metadata collection.\n\nUnder 18 U.S.C. § 2511, universities are prohibited from intentionally intercepting wire, oral, or electronic communications without proper authorization. This includes email monitoring, phone call interception, and surveillance of electronic messaging systems. The SCA provisions in 18 U.S.C. § 2701 protect stored communications in electronic storage for 180 days or less, while communications stored longer than 180 days receive reduced protection under 18 U.S.C. § 2703.\n\nHigher education institutions must navigate several key exceptions. The business use exception under 18 U.S.C. § 2510(5)(a)(i) permits monitoring when conducted in the ordinary course of business using university-provided equipment. The consent exception in 18 U.S.C. § 2511(2)(d) allows interception when one party consents, enabling certain administrative monitoring with proper notice. The provider exception in 18 U.S.C. § 2701(c) permits access to communications when the institution acts as an electronic communication service provider.\n\nUniversities must establish clear electronic communications policies addressing email retention, network monitoring, and law enforcement cooperation. Institutional policies must comply with 18 U.S.C. § 2702, which restricts voluntary disclosure of communications content and customer records. When responding to law enforcement requests, institutions must verify proper legal process under 18 U.S.C. § 2703, requiring warrants for content less than 180 days old and court orders or subpoenas for older content.\n\nViolations carry significant penalties under 18 U.S.C. § 2511(4), including criminal fines up to $500,000 and imprisonment up to five years for willful violations. Civil remedies under 18 U.S.C. § 2520 include actual damages, statutory damages of $100 per day (minimum $1,000), punitive damages, and attorney fees. Recent updates through the USA FREEDOM Act and various court decisions have clarified institutional obligations regarding third-party service providers and cloud storage arrangements.",
+    "summary": "ECPA protects electronic communications privacy through wiretap and stored communications provisions. Universities must establish compliant monitoring policies, obtain proper consent for surveillance, and follow strict procedures for law enforcement requests.",
+    "requirements": "## Electronic Communications Monitoring\n- Implement written policies governing email and network monitoring per 18 U.S.C. § 2511\n- Obtain explicit user consent before conducting surveillance activities\n- Limit monitoring to ordinary course of business operations\n- Document all interception activities with proper authorization\n\n## Stored Communications Protection\n- Establish data retention policies compliant with 18 U.S.C. § 2701\n- Restrict unauthorized access to stored electronic communications\n- Implement technical safeguards for email and messaging systems\n- Train IT staff on SCA disclosure restrictions under 18 U.S.C. § 2702\n\n## Law Enforcement Cooperation\n- Verify legal process requirements under 18 U.S.C. § 2703\n- Require warrants for communications stored less than 180 days\n- Accept court orders/subpoenas for communications older than 180 days\n- Maintain records of all disclosure requests and institutional responses",
+    "reportingRequirements": "No specific federal reporting deadlines exist under ECPA. Universities must maintain internal records of electronic surveillance activities, law enforcement requests, and compliance training. Document all legal process served and institutional responses within institutional records retention policies."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T18:07:18.119Z"
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Privacy Assessment",
+      "type": "assessment",
+      "description": "Annual Privacy Assessment for Electronic Communications Privacy Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Data Breach Notification (if applicable)",
+      "type": "notification",
+      "description": "Data Breach Notification (if applicable) for Electronic Communications Privacy Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    },
+    {
+      "date": "12-31",
+      "label": "Security Awareness Training",
+      "type": "training",
+      "description": "Security Awareness Training for Electronic Communications Privacy Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Privacy & Information Security"
+  ]
+}

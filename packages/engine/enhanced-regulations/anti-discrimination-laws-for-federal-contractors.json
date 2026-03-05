@@ -1,0 +1,42 @@
+{
+  "regulationId": "anti-discrimination-laws-for-federal-contractors",
+  "enhanced": {
+    "fullText": "Anti-discrimination laws for federal contractors establish comprehensive civil rights protections applicable to higher education institutions receiving federal contracts or financial assistance. The primary legal framework derives from Executive Order 11246 (41 U.S.C. § 4212), Section 503 of the Rehabilitation Act of 1973 (29 U.S.C. § 793), and the Vietnam Era Veterans' Readjustment Assistance Act (38 U.S.C. § 4212), implemented through 41 CFR Parts 60-1 through 60-741.\n\nExecutive Order 11246 prohibits federal contractors from discriminating based on race, color, religion, sex, sexual orientation, gender identity, or national origin. Universities with federal contracts exceeding $10,000 must comply with basic non-discrimination provisions under 41 CFR § 60-1.4. Institutions with contracts of $50,000 or more and 50+ employees must develop written affirmative action programs under 41 CFR § 60-2.10, requiring annual updates and comprehensive workforce analyses.\n\nSection 503 mandates that contractors take affirmative action to employ qualified individuals with disabilities, establishing a 7% utilization goal under 41 CFR § 60-741.45. Universities must conduct annual workforce analyses, implement outreach programs, and maintain accessibility standards for all employment practices.\n\nVEVRAA requires affirmative action for protected veterans, establishing an 8% hiring benchmark under 41 CFR § 60-300.45. Covered contractors must conduct annual reviews of personnel processes, maintain job listing requirements with state employment services, and document outreach efforts to veteran organizations.\n\nThe Office of Federal Contract Compliance Programs (OFCCP) enforces these requirements through compliance evaluations, investigating complaints, and conducting desk audits. Violations may result in contract cancellation, debarment under 41 CFR § 60-1.27, back pay awards, and injunctive relief. Recent updates include enhanced data collection requirements under 41 CFR § 60-741.44 and expanded sexual orientation protections implemented in 2021.\n\nHigher education institutions must integrate these requirements into hiring practices, faculty recruitment, staff development, and contractor oversight. Universities receiving federal research grants, participating in federal student aid programs, or holding federal service contracts must maintain comprehensive compliance programs addressing recruitment, selection, promotion, and compensation practices across all employment categories.",
+    "summary": "Federal anti-discrimination laws require universities with federal contracts to implement affirmative action programs, maintain non-discriminatory employment practices, and meet specific hiring benchmarks for individuals with disabilities (7%) and protected veterans (8%).",
+    "requirements": "## Affirmative Action Program Development\n- Create written affirmative action programs for contracts ≥$50,000 with 50+ employees per 41 CFR § 60-2.10\n- Update programs annually with workforce utilization analyses\n- Establish specific goals and timetables for underrepresented groups\n\n## Disability and Veteran Compliance\n- Achieve 7% utilization goal for individuals with disabilities under 41 CFR § 60-741.45\n- Meet 8% hiring benchmark for protected veterans per 41 CFR § 60-300.45\n- Conduct annual workforce analyses and document outreach efforts\n- Maintain job accessibility and reasonable accommodation procedures\n\n## Recordkeeping and Documentation\n- Maintain personnel records for minimum 2 years per 41 CFR § 60-1.12\n- Document recruitment sources, applicant flow data, and hiring decisions\n- Preserve accommodation requests and veteran status information\n\n## OFCCP Compliance Cooperation\n- Respond to compliance evaluations and desk audits\n- Provide requested documentation within specified timeframes\n- Implement corrective actions as directed",
+    "reportingRequirements": "Submit annual VETS-4212 reports by September 30 to Department of Labor per 41 CFR § 60-300.44. File EEO-1 reports annually by March 31 for establishments with 50+ employees. Provide self-identification data collection for disability status using OFCCP forms. Report personnel activity data during compliance evaluations within 30 days of OFCCP request."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T15:45:01.962Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Vendor Compliance Review",
+      "type": "review",
+      "description": "Vendor Compliance Review for Anti-discrimination laws for federal contractors",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "SAM.gov Registration Renewal",
+      "type": "registration",
+      "description": "SAM.gov Registration Renewal for Anti-discrimination laws for federal contractors",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Contracts & Procurement"
+  ]
+}

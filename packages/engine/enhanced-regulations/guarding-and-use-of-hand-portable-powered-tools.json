@@ -1,0 +1,50 @@
+{
+  "regulationId": "guarding-and-use-of-hand-portable-powered-tools",
+  "enhanced": {
+    "fullText": "The regulation governing guarding and use of hand and portable powered tools in higher education institutions derives its authority from the Occupational Safety and Health Act of 1970 (29 U.S.C. § 651 et seq.) and corresponding federal regulations under 29 CFR Part 1910, Subpart P - Hand and Portable Powered Tools and Other Hand-Held Equipment. Universities must comply with comprehensive safety standards that protect faculty, staff, students, and contractors from workplace hazards associated with powered tool operations.\n\nUnder 29 CFR § 1910.243, employers are mandated to ensure that all hand and power tools, whether university-owned or employee-provided, are maintained in safe operating condition. This regulation specifically requires that employees using hand and power tools be trained to recognize hazards and follow proper safety procedures. The scope encompasses all portable electric tools, pneumatic tools, liquid fuel tools, hydraulic tools, and powder-actuated tools used in educational settings including maintenance operations, research laboratories, vocational training programs, and construction projects.\n\nKey provisions under 29 CFR § 1910.243(a)(1) establish that defective tools must be immediately removed from service and tagged as unsafe. Universities bear responsibility for implementing regular inspection protocols and ensuring proper guarding mechanisms are in place. Electric tools must comply with 29 CFR § 1910.243(a)(1)(i) requiring ground-fault circuit interrupters or assured equipment grounding conductor programs in wet or conductive work locations common in university facilities.\n\nPneumatic tools, frequently used in university maintenance and research applications, must adhere to 29 CFR § 1910.243(b) requirements including secure hose connections, excess flow valves, and proper pressure ratings. Powder-actuated tools, governed by 29 CFR § 1910.243(d), require specialized training certification and daily inspection protocols particularly relevant for university facilities management operations.\n\nViolations of these standards subject institutions to OSHA penalties ranging from $15,625 for serious violations to $156,259 for willful or repeated violations under current penalty structures established by the Federal Civil Penalties Inflation Adjustment Act Improvements Act of 2015 (28 U.S.C. § 2461 note). Universities must also comply with state-specific requirements, including Pennsylvania's Occupational Safety and Health Act (43 P.S. § 1201 et seq.) where applicable.\n\nRecent updates include the 2023 OSHA emphasis on silica exposure prevention during powered tool operations, requiring enhanced respiratory protection and engineering controls when cutting, grinding, or drilling materials containing crystalline silica, particularly relevant for university construction and renovation projects.",
+    "summary": "Federal regulation requiring universities to maintain safe condition and proper guarding of all hand and portable powered tools under OSHA standards 29 CFR Part 1910.243, covering employee training, equipment inspection, defective tool removal, and specialized requirements for pneumatic and powder-actuated tools.",
+    "requirements": "## Tool Inspection and Maintenance\n- Conduct daily visual inspections of all portable powered tools before use per 29 CFR § 1910.243(a)(1)\n- Immediately remove and tag defective tools as unsafe until repaired or replaced\n- Maintain written inspection logs documenting tool condition and maintenance history\n- Ensure all electric tools have proper grounding or GFCI protection in wet locations\n\n## Employee Training and Certification\n- Provide mandatory safety training for all personnel using portable powered tools\n- Require specialized certification for powder-actuated tool operators under 29 CFR § 1910.243(d)\n- Document training completion and maintain certification records for OSHA inspection\n\n## Safety Equipment and Guards\n- Install and maintain appropriate guards on all grinding, cutting, and drilling equipment\n- Provide required personal protective equipment including eye protection, hearing protection, and respiratory equipment\n- Implement lockout/tagout procedures for tool maintenance and repair operations\n\n## Compliance Documentation\n- Establish written safety procedures for each category of powered tool usage\n- Maintain accident/injury reports related to powered tool incidents\n- Conduct annual safety program reviews and updates",
+    "reportingRequirements": "Report all powered tool-related workplace injuries to OSHA within 8 hours if hospitalization required per 29 CFR § 1904.39. Submit annual OSHA Form 300A summary by February 1st. Document quarterly safety inspections and maintain records for 5 years. Report fatalities within 8 hours and amputations within 24 hours."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T16:12:55.617Z"
+  },
+  "deadlines": [
+    {
+      "date": "02-01",
+      "label": "OSHA 300 Log Posting",
+      "type": "posting",
+      "description": "OSHA 300 Log Posting for Guarding and Use of Hand & Portable Powered Tools",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Annual Safety Training",
+      "type": "training",
+      "description": "Annual Safety Training for Guarding and Use of Hand & Portable Powered Tools",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Hazardous Waste Manifest Submission",
+      "type": "filing",
+      "description": "Hazardous Waste Manifest Submission for Guarding and Use of Hand & Portable Powered Tools",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Environmental Health and Safety"
+  ]
+}

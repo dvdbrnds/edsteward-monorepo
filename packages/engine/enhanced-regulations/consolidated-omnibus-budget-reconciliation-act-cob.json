@@ -1,0 +1,50 @@
+{
+  "regulationId": "consolidated-omnibus-budget-reconciliation-act-cob",
+  "enhanced": {
+    "fullText": "The Consolidated Omnibus Budget Reconciliation Act (COBRA), codified at 29 U.S.C. §§ 1161-1168 and implemented through 29 CFR § 2590.606, mandates that higher education institutions with 20 or more employees provide continuation coverage options for group health plans. This federal law ensures that employees, their spouses, and dependent children can maintain health insurance coverage following qualifying events that would otherwise terminate their eligibility.\n\nHigher education institutions must comply with COBRA's comprehensive requirements across all employee categories, including faculty, staff, and administrators. The law applies to both public and private colleges and universities that maintain group health plans, with limited exceptions for governmental plans under certain circumstances as specified in 29 U.S.C. § 1003(b).\n\nQualifying events triggering COBRA rights include voluntary or involuntary termination (except for gross misconduct), reduction in work hours, death of the covered employee, divorce or legal separation, loss of dependent child status, and entitlement to Medicare. Educational institutions must provide initial COBRA notices within 90 days of plan coverage commencement and election notices within 14 days of qualifying events, as mandated by 29 CFR § 2590.606-4.\n\nCoverage periods extend 18 months for employment-related events and 36 months for other qualifying events, with institutions permitted to charge up to 102% of applicable premiums during standard periods and 150% during disability extensions under 29 U.S.C. § 1162(3). Universities must maintain identical coverage terms, conditions, and benefits as active employees receive.\n\nEnforcement occurs through the Department of Labor's Employee Benefits Security Administration, with penalties reaching $110 per day per affected individual for notification failures under 29 U.S.C. § 1132(c). The IRS may impose excise taxes of $100 per day per qualified beneficiary for coverage failures, as outlined in 26 U.S.C. § 4980B. Recent amendments through the American Rescue Plan Act of 2021 provided temporary premium assistance for certain involuntarily terminated employees.\n\nInstitutions must establish robust administrative procedures including beneficiary tracking systems, premium collection mechanisms, and coordination with third-party administrators. Compliance requires integration with HIPAA privacy requirements under 45 CFR Part 164 and coordination with state continuation coverage laws where applicable. Universities face potential litigation risks under ERISA's civil enforcement provisions in 29 U.S.C. § 1132(a) for compliance failures affecting beneficiary rights.",
+    "summary": "COBRA requires higher education institutions with 20+ employees to offer continued group health plan coverage to employees and families after qualifying events like termination or divorce, lasting 18-36 months.",
+    "requirements": "## Notice Obligations\n- Provide initial COBRA notices within 90 days of plan coverage start\n- Issue election notices within 14 days of qualifying events per 29 CFR § 2590.606-4\n- Maintain updated beneficiary contact information\n\n## Coverage Administration\n- Offer identical benefits as active employees receive\n- Allow 18-month continuation for employment events, 36 months for other events\n- Charge maximum 102% of applicable premiums (150% during disability extensions)\n\n## Recordkeeping Requirements\n- Document all qualifying events and notification dates\n- Maintain beneficiary election records for six years\n- Track premium payments and coverage termination dates\n\n## Coordination Responsibilities\n- Integrate with existing HR and benefits administration systems\n- Coordinate with third-party administrators and insurance carriers\n- Ensure compliance with both federal and applicable state continuation laws",
+    "reportingRequirements": "No specific federal reporting required to DOL. Institutions must maintain internal documentation of qualifying events, notice distributions, and beneficiary elections. Annual Form 5500 filings must include COBRA-eligible participants in coverage counts."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T16:08:47.721Z"
+  },
+  "deadlines": [
+    {
+      "date": "07-31",
+      "label": "Form 5500 Filing",
+      "type": "filing",
+      "description": "Form 5500 Filing for Consolidated Omnibus Budget Reconciliation Act (COBRA)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Summary Annual Report Distribution",
+      "type": "distribution",
+      "description": "Summary Annual Report Distribution for Consolidated Omnibus Budget Reconciliation Act (COBRA)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "COBRA Notice (as needed)",
+      "type": "notice",
+      "description": "COBRA Notice (as needed) for Consolidated Omnibus Budget Reconciliation Act (COBRA)",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Employee Benefits"
+  ]
+}

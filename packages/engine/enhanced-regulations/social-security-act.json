@@ -1,0 +1,50 @@
+{
+  "regulationId": "social-security-act",
+  "enhanced": {
+    "fullText": "The Social Security Act, codified at 42 U.S.C. §§ 301-1397mm, establishes the framework for social security taxation and reporting obligations that significantly impact higher education institutions as employers. Under 26 U.S.C. § 3101 and § 3111, both employers and employees must pay Federal Insurance Contributions Act (FICA) taxes at 6.2% for Social Security and 1.45% for Medicare on wages up to the annual wage base ($160,200 for 2023).\n\nHigher education institutions benefit from specific exemptions under 26 U.S.C. § 3121(b)(10) and implementing regulations at 26 CFR § 31.3121(b)(10)-2. Students enrolled at least half-time and employed by the same institution are exempt from FICA taxes when their primary relationship is educational rather than employment-focused. This exemption applies to undergraduate students, graduate students in degree programs, and professional students. The exemption terminates when the educational relationship ends, requiring immediate implementation of FICA withholding.\n\nClergy members performing services in the exercise of their ministry are exempt under 26 U.S.C. § 3121(b)(8)(A), though they remain subject to Self-Employment Contributions Act (SECA) taxes under 26 U.S.C. § 1402. Professional employees, as defined in 26 CFR § 31.3121(b)(10)-2(d), may qualify for exemptions when employed in their capacity as enrolled students.\n\nCompliance requires universities to maintain accurate Social Security Number (SSN) records under 26 U.S.C. § 6051 and 26 CFR § 31.6051-1. The Social Security Administration Number Verification Service (SSNVS) mandate requires electronic verification of employee SSNs to prevent penalties under 26 U.S.C. § 6721, which imposes fines up to $280 per incorrect Form W-2 (maximum $3.4 million annually). Universities must submit quarterly new hire reports to state directories under 42 U.S.C. § 653a within 20 days of hire, including employee name, SSN, address, and employment date.\n\nEnforcement mechanisms include IRS audits, penalty assessments, and potential criminal sanctions under 26 U.S.C. § 7201 for willful evasion. The IRS may impose trust fund recovery penalties under 26 U.S.C. § 6672 against responsible university officials who willfully fail to collect or remit required taxes. Recent updates include increased penalty amounts under the Protecting Americans from Tax Hikes Act and enhanced electronic filing requirements for institutions with 10+ employees.",
+    "summary": "The Social Security Act requires universities to pay FICA taxes on employee wages while providing exemptions for qualified students, clergy, and certain professionals, mandating accurate SSN verification and quarterly reporting.",
+    "requirements": "## FICA Tax Obligations\n- Pay 6.2% Social Security tax on wages up to annual limit ($160,200 for 2023)\n- Pay 1.45% Medicare tax on all wages per 26 U.S.C. § 3111\n- Apply 0.9% additional Medicare tax on wages exceeding $200,000\n\n## Student Exemption Management\n- Verify half-time enrollment status per 26 CFR § 31.3121(b)(10)-2\n- Document primary educational relationship versus employment\n- Implement FICA withholding immediately upon graduation or enrollment termination\n\n## SSN Verification Requirements\n- Use SSA Number Verification Service for all new hires\n- Resolve SSN mismatches before filing Forms W-2\n- Maintain documentation per 26 CFR § 31.6001-1\n\n## Quarterly Reporting\n- Submit new hire reports within 20 days per 42 U.S.C. § 653a\n- File Form 941 by last day of month following quarter\n- Electronic filing mandatory for institutions with 10+ employees",
+    "reportingRequirements": "File Form 941 quarterly by April 30, July 31, October 31, and January 31. Submit new hire reports within 20 days of employment start date. File annual Forms W-2 and W-3 by January 31. Electronic SSN verification required before each W-2 filing period."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T15:40:18.698Z"
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Financial Audit",
+      "type": "audit",
+      "description": "Annual Financial Audit for Social Security Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "03-31",
+      "label": "A-133 Single Audit (if applicable)",
+      "type": "audit",
+      "description": "A-133 Single Audit (if applicable) for Social Security Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Quarterly Financial Review",
+      "type": "review",
+      "description": "Quarterly Financial Review for Social Security Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "quarterly"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Accounting"
+  ]
+}

@@ -1,0 +1,1 @@
+User has another SaaS product running on port 3000 that we must not interfere with. The MCP Engine SaaS should only use its designated ports (3002, 3010, 3050, 3051, 3100, 3200, 3300, 3366, 3400, 3500) and never attempt to connect to or use port 3000. The EdSteward integration should be configured to work with the external SaaS on port 3000 without disrupting it.

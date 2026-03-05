@@ -1,0 +1,42 @@
+{
+  "regulationId": "acts-affecting-a-personal-financial-interest",
+  "enhanced": {
+    "fullText": "18 U.S.C. § 208 establishes comprehensive conflict of interest prohibitions for executive branch employees, including those at federally-funded higher education institutions. This criminal statute prohibits government employees from participating personally and substantially in particular government matters that would affect their financial interests or those of specified family members, business partners, and affiliated organizations.\n\nThe regulation applies broadly to higher education personnel involved in federal programs, including administrators overseeing federal grants under 2 CFR Part 200, financial aid officers managing Title IV programs under 20 U.S.C. § 1070 et seq., and research faculty participating in federal research contracts. Coverage extends to spouses, minor children, general partners, organizations where the employee serves as officer or trustee, and any person with whom contractual arrangements exist that could be affected by government actions.\n\nKey provisions under 18 U.S.C. § 208(a) create criminal liability for knowing participation in conflicted matters, with penalties including fines up to $50,000 and imprisonment up to five years. The Office of Government Ethics (OGE) provides regulatory guidance through 5 CFR Part 2635, establishing standards for identifying covered relationships and financial interests. Violations may also result in administrative sanctions including suspension, removal, or debarment from federal programs under 2 CFR § 180.800.\n\nHigher education institutions must implement robust compliance frameworks addressing common conflict scenarios: faculty serving on federal peer review panels while holding grants from the same agencies; administrators making procurement decisions involving vendors in which they hold stock; and university officials participating in federal funding determinations affecting institutional partnerships. The regulation requires prospective analysis of potential conflicts before participation in any federal matter.\n\nExceptions exist under 18 U.S.C. § 208(b)(1)-(4), including de minimis financial interests below statutory thresholds updated annually by OGE, diversified mutual funds meeting 5 CFR § 2635.403(b) requirements, and matters of general applicability affecting broad classes of similarly situated persons. Written advance authorization may be obtained when conflicts are not substantial or participation serves government interests.\n\nRecent amendments through the STOCK Act of 2012 enhanced disclosure requirements, while Executive Order 13989 (2021) strengthened ethics enforcement mechanisms. Institutions must establish ongoing monitoring systems, mandatory disclosure protocols, and remediation procedures including divestiture, recusal, or assignment of duties to avoid violations that could jeopardize federal funding eligibility totaling billions annually across higher education.",
+    "summary": "18 U.S.C. § 208 prohibits higher education personnel from participating in federal matters affecting their financial interests or those of family members and affiliated organizations, with violations subject to criminal penalties and potential loss of federal funding.",
+    "requirements": "## Financial Interest Identification\n- Conduct annual disclosure reviews for all personnel involved in federal programs under 2 CFR Part 200\n- Document spouse, minor children, and business partnership financial holdings\n- Track investments in organizations affected by federal education funding decisions\n\n## Participation Restrictions\n- Prohibit personal and substantial involvement in matters affecting identified financial interests\n- Implement recusal procedures for conflicted federal grant reviews and procurement decisions\n- Establish alternative assignment protocols when conflicts prevent normal duty performance\n\n## Compliance Monitoring\n- Create prospective conflict screening for federal peer review panel appointments\n- Maintain ethics consultation processes with designated reviewing officials\n- Document exception determinations under 18 U.S.C. § 208(b) with OGE guidance compliance\n\n## Remediation Procedures\n- Develop divestiture timelines for prohibited financial interests exceeding de minimis thresholds\n- Establish written authorization request procedures for potential government interest exceptions\n- Implement immediate disclosure protocols for newly discovered conflicts affecting ongoing federal matters",
+    "reportingRequirements": "Annual financial disclosure reports required for personnel participating in federal matters, submitted to designated agency ethics officials. Immediate disclosure mandatory upon discovery of new conflicts during federal program participation. Exception requests under 18 U.S.C. § 208(b) must be submitted in writing with supporting documentation to appropriate reviewing officials prior to participation in conflicted matters."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T16:36:30.333Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Annual Ethics Training",
+      "type": "training",
+      "description": "Annual Ethics Training for Acts Affecting a Personal Financial Interest",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Conflict of Interest Disclosure Review",
+      "type": "review",
+      "description": "Conflict of Interest Disclosure Review for Acts Affecting a Personal Financial Interest",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Ethics"
+  ]
+}

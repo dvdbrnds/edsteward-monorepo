@@ -1,0 +1,34 @@
+{
+  "regulationId": "federal-sentencing-guidelines",
+  "enhanced": {
+    "fullText": "The Federal Sentencing Guidelines establish mandatory requirements for effective compliance and ethics programs under 18 U.S.C. § 3553(a) and chapters 227-235, with specific provisions codified in the United States Sentencing Guidelines Manual § 8B2.1. These guidelines create a framework of organizational accountability that directly applies to higher education institutions as \"organizations\" under 18 U.S.C. § 18, encompassing non-profit entities including universities, colleges, and educational foundations.\n\nUnder § 8B2.1(b), universities must establish comprehensive compliance programs featuring seven essential elements: (1) compliance standards and procedures capable of reducing criminal conduct; (2) oversight by high-level personnel with sufficient authority and resources; (3) due care in delegating substantial discretionary authority; (4) effective communication of standards through training and publications; (5) reasonable monitoring and auditing systems; (6) consistent enforcement including disciplinary mechanisms; and (7) reasonable response to detected violations.\n\nThe legal authority extends through 28 U.S.C. Chapter 58, which governs the United States Sentencing Commission's regulatory authority. Universities face vicarious liability for criminal acts committed by agents, employees, or students acting within their scope of authority. This includes violations of federal research regulations, Title IX violations with criminal elements, financial aid fraud, and export control violations.\n\nEnforcement mechanisms under 18 U.S.C. § 3571 include organizational fines up to $500 million for felonies, with mitigation factors available for institutions demonstrating effective compliance programs per § 8C2.5. The 2010 amendments to § 8B2.1 strengthened requirements for periodic risk assessments and enhanced training protocols, while 2018 revisions emphasized data analytics and confidential reporting mechanisms.\n\nHigher education institutions must integrate these requirements with existing regulatory frameworks including the Clery Act (20 U.S.C. § 1092(f)), Title IX (20 U.S.C. § 1681), and research integrity standards under 2 CFR Part 200. The guidelines' effectiveness is measured through reduced recidivism and demonstrated organizational commitment to ethical conduct, with sentencing courts evaluating compliance program adequacy during criminal proceedings involving institutional defendants.",
+    "summary": "Federal Sentencing Guidelines § 8B2.1 mandates comprehensive compliance programs for universities to mitigate criminal liability. Requirements include executive oversight, employee training, monitoring systems, and disciplinary mechanisms to prevent violations.",
+    "requirements": "## Executive Leadership and Oversight\n- Designate senior executive with direct board reporting authority for compliance program oversight per § 8B2.1(b)(2)(A)\n- Ensure adequate resources and staffing for compliance operations\n- Conduct annual board-level compliance program effectiveness reviews\n\n## Compliance Program Infrastructure\n- Implement written standards addressing federal criminal law risks including research misconduct, Title IX violations, and financial crimes\n- Establish confidential reporting mechanisms with whistleblower protections per § 8B2.1(b)(5)(C)\n- Conduct periodic risk assessments identifying institutional criminal law exposure areas\n\n## Training and Communication\n- Provide mandatory compliance training to all personnel with role-specific criminal law education\n- Disseminate compliance standards through accessible publications and electronic systems\n- Document training completion and comprehension testing results\n\n## Monitoring and Enforcement\n- Deploy auditing systems for high-risk areas including research grants, student aid, and campus safety\n- Establish disciplinary matrix ensuring consistent enforcement of violations\n- Implement corrective action protocols for identified compliance deficiencies per § 8B2.1(b)(7)",
+    "reportingRequirements": "Annual compliance program effectiveness reports to governing board. Immediate notification to federal authorities within 24 hours of discovering criminal violations per organizational cooperation guidelines. Quarterly risk assessment updates to designated compliance officer."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T18:59:58.233Z"
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Compliance Review",
+      "type": "review",
+      "description": "Annual Compliance Review for Federal Sentencing Guidelines",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Governance"
+  ]
+}

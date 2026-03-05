@@ -1,0 +1,50 @@
+{
+  "regulationId": "higher-education-act-plus-loans",
+  "enhanced": {
+    "fullText": "The Higher Education Act PLUS Loan Program, codified under 20 U.S.C. § 1078-2 and implemented through 34 CFR § 685.203, provides federal credit-based loans to parents of dependent undergraduate students and graduate/professional students. Established under the Higher Education Opportunity Act of 2008 (Public Law No. 110-315), PLUS loans are administered through the William D. Ford Federal Direct Loan Program, following the discontinuation of the Federal Family Education Loan (FFEL) Program in 2010.\n\nUnder 20 U.S.C. § 1087e, institutions must verify borrower eligibility through comprehensive documentation requirements. For Parent PLUS loans, universities must verify the parent's citizenship status per 20 U.S.C. § 1091 and Social Security number through the Department of Education's National Student Loan Data System (NSLDS). Credit history verification is mandatory under 34 CFR § 685.203(c), requiring institutions to confirm that borrowers do not have adverse credit histories as defined by 90+ day delinquencies, default determinations, bankruptcy discharge, foreclosure, repossession, tax lien, wage garnishment, or write-off of federal student aid debt within five years.\n\nLoan amounts are governed by 20 U.S.C. § 1087e(a)(2), limiting borrowing to the student's cost of attendance minus other financial assistance. Institutions must maintain current Cost of Attendance calculations per 20 U.S.C. § 1087ll and verify all other aid through NSLDS queries. Graduate PLUS loans follow identical terms under 34 CFR § 685.203(d), with borrowing limits calculated similarly.\n\nDisbursement procedures under 34 CFR § 685.303 require electronic funds transfer directly to institutional accounts, with any credit balances returned to borrowers within 14 days per 34 CFR § 685.305(c). Schools must maintain Master Promissory Note records and provide entrance counseling per 20 U.S.C. § 1092(l).\n\nNon-compliance penalties include program suspension, limitation, or termination under 20 U.S.C. § 1094, with potential liability for improperly certified loans. The Department of Education conducts program reviews under 34 CFR § 668.23, with findings potentially resulting in monetary penalties up to statutory maximums or loss of Title IV eligibility.\n\nRecent updates include interest rate modifications effective July 1, 2023, and enhanced credit counseling requirements under the FAFSA Simplification Act provisions taking effect for 2024-2025 award year.",
+    "summary": "Federal PLUS Loan Program provides credit-based loans to parents and graduate students up to cost of attendance minus other aid, requiring institutions to verify eligibility, conduct credit checks, and manage proper disbursement procedures.",
+    "requirements": "## Borrower Verification Requirements\n- Verify parent/borrower citizenship status through USCIS documentation per 20 U.S.C. § 1091\n- Confirm Social Security numbers via SSA database matching\n- Conduct credit history checks through Department of Education systems\n- Document adverse credit determination appeals and endorser arrangements\n\n## Loan Certification and Disbursement\n- Calculate annual loan limits using current Cost of Attendance minus estimated financial assistance\n- Query NSLDS for enrollment and aid history verification\n- Process Master Promissory Note execution and maintenance\n- Execute disbursements via Electronic Data Exchange (EDE) to institutional accounts\n\n## Documentation and Recordkeeping\n- Maintain borrower eligibility files for federal audit requirements\n- Track loan disbursement dates and amounts in student information systems\n- Document credit appeal outcomes and endorser agreements\n- Preserve entrance counseling completion records per 34 CFR § 685.304",
+    "reportingRequirements": "Submit monthly enrollment reporting through NSLDS Enrollment Reporting. File annual Fiscal Operations Report and Application to Participate (FISAP) by October 1st. Report loan disbursements via Common Origination and Disbursement system within 15 days. Submit immediate notification of program violations or irregular transactions to Federal Student Aid."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T16:17:34.392Z"
+  },
+  "deadlines": [
+    {
+      "date": "10-01",
+      "label": "FISAP Annual Report",
+      "type": "filing",
+      "description": "FISAP Annual Report for Higher Education Act: PLUS Loans",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "06-30",
+      "label": "Annual Financial Aid Audit",
+      "type": "audit",
+      "description": "Annual Financial Aid Audit for Higher Education Act: PLUS Loans",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "07-01",
+      "label": "Gainful Employment Disclosure Update",
+      "type": "disclosure",
+      "description": "Gainful Employment Disclosure Update for Higher Education Act: PLUS Loans",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Financial Aid"
+  ]
+}

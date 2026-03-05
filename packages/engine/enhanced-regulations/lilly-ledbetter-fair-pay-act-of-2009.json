@@ -1,0 +1,50 @@
+{
+  "regulationId": "lilly-ledbetter-fair-pay-act-of-2009",
+  "enhanced": {
+    "fullText": "The Lilly Ledbetter Fair Pay Act of 2009 (Public Law 111-2, codified at 42 U.S.C. § 2000e-5(e)(3)) fundamentally reformed the statute of limitations for filing compensation discrimination claims under federal employment discrimination laws. This landmark legislation directly impacts higher education institutions by extending the timeframe for employees to challenge discriminatory pay practices under Title VII of the Civil Rights Act of 1964 (42 U.S.C. § 2000e et seq.), the Age Discrimination in Employment Act of 1967 (29 U.S.C. § 621 et seq.), the Americans with Disabilities Act of 1990 (42 U.S.C. § 12101 et seq.), and the Rehabilitation Act of 1973 (29 U.S.C. § 701 et seq.).\n\nUnder the Act's provisions, codified at 42 U.S.C. § 2000e-5(e)(3)(A), each discriminatory paycheck constitutes a separate actionable unlawful employment practice, effectively restarting the 180-day (or 300-day in deferral states) filing period with each pay period. This \"paycheck accrual rule\" applies when: (1) a discriminatory compensation decision is adopted; (2) an individual becomes subject to discriminatory compensation practices; or (3) compensation is affected by discriminatory decisions, including each payment based on such practices.\n\nFor higher education institutions, this creates significant compliance obligations regarding faculty salaries, administrative compensation, staff wages, and benefit determinations. Universities must maintain comprehensive compensation records and implement robust equal pay monitoring systems, as liability can extend back years through successive paychecks. The Act's retroactive effective date of May 28, 2007, applies to all pending claims, creating ongoing exposure for institutions.\n\nEnforcement occurs through the Equal Employment Opportunity Commission (EEOC) under 29 CFR Part 1601, with remedies including back pay, front pay, compensatory damages, punitive damages up to statutory caps under 42 U.S.C. § 1981a, and attorney's fees under 42 U.S.C. § 2000e-5(k). Universities face particular vulnerability given the academic employment model's reliance on subjective evaluation criteria for tenure, promotion, and merit increases.\n\nCompliance requires proactive pay equity audits, transparent compensation policies, systematic documentation of pay decisions, and regular training for administrators involved in compensation determinations. The Act's interaction with Title IX (20 U.S.C. § 1681) creates additional considerations for gender-based pay equity in higher education settings.",
+    "summary": "The Lilly Ledbetter Fair Pay Act extends statute of limitations for compensation discrimination claims, treating each discriminatory paycheck as a new violation under Title VII, ADA, and ADEA, requiring universities to implement comprehensive pay equity monitoring and documentation systems.",
+    "requirements": "## Compensation Monitoring Systems\n- Conduct annual comprehensive pay equity analyses across all employee classifications\n- Document and justify all compensation decisions with objective criteria\n- Implement systematic review processes for salary, promotion, and merit increase decisions\n- Maintain detailed compensation records for extended retention periods\n\n## Policy Development and Training\n- Establish written equal pay policies incorporating Ledbetter Act requirements\n- Train hiring managers, department chairs, and HR personnel on discrimination-free compensation practices\n- Create transparent salary structures and advancement criteria\n- Implement complaint procedures for compensation-related concerns\n\n## Documentation and Record Retention\n- Preserve all compensation-related documents, including evaluation materials and decision rationales\n- Maintain electronic tracking systems for pay equity metrics and trend analysis\n- Document remedial actions taken to address identified pay disparities\n- Retain records beyond standard employment file retention periods due to extended liability exposure",
+    "reportingRequirements": "No specific federal reporting requirements mandated by the Act itself. However, institutions must respond to EEOC charges within statutory timeframes, typically 30 days for position statements. Universities should conduct internal pay equity reporting annually and document remediation efforts for potential EEOC or litigation discovery purposes."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T00:52:26.696Z"
+  },
+  "deadlines": [
+    {
+      "date": "03-31",
+      "label": "EEO-1 Report",
+      "type": "filing",
+      "description": "EEO-1 Report for Lilly Ledbetter Fair Pay Act of 2009",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Affirmative Action Plan Update",
+      "type": "plan",
+      "description": "Affirmative Action Plan Update for Lilly Ledbetter Fair Pay Act of 2009",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "09-30",
+      "label": "VETS-4212 Report",
+      "type": "filing",
+      "description": "VETS-4212 Report for Lilly Ledbetter Fair Pay Act of 2009",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Diversity/Affirmative Action"
+  ]
+}

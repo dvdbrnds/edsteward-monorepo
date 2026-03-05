@@ -1,0 +1,13 @@
+{
+  "regKey": "REG-002",
+  "version": "v1.0",
+  "status": "gold",
+  "certifiedBy": "mcp-admin",
+  "certifiedAt": "2026-01-22T14:05:57.504Z",
+  "contentHash": "0191ed23ebc217fb8c9f24be19484bfca8d8089c8ac2d567bc330317baac637f",
+  "contentSize": 288834,
+  "workflowScore": 100,
+  "taskCount": 0,
+  "deadlineCount": 0,
+  "notes": "Initial gold standard - 62 compliance tasks, comprehensive Title IX coverage including athletics, employment, housing"
+}

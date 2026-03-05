@@ -1,0 +1,50 @@
+{
+  "regulationId": "resource-conservation-and-recovery-act",
+  "enhanced": {
+    "fullText": "The Resource Conservation and Recovery Act (RCRA), codified at 42 U.S.C. §§ 6901-6992k, grants the Environmental Protection Agency (EPA) comprehensive authority to regulate hazardous waste from generation to disposal through a comprehensive \"cradle-to-grave\" management system. Higher education institutions frequently fall under RCRA jurisdiction due to research activities, laboratory operations, maintenance facilities, and campus infrastructure that generate regulated hazardous wastes.\n\nUnder 40 CFR Part 262, universities are classified as hazardous waste generators based on monthly generation quantities: Large Quantity Generators (LQGs) produce ≥1,000 kg/month, Small Quantity Generators (SQGs) produce 100-1,000 kg/month, and Very Small Quantity Generators produce <100 kg/month. Each classification carries distinct regulatory obligations.\n\nLQG universities must comply with stringent requirements under 40 CFR §§ 262.11-262.87, including waste minimization certifications on EPA Form 8700-22A, comprehensive recordkeeping for three years per 40 CFR § 262.40, proper containerization and labeling per 40 CFR § 262.34, and hazardous waste manifest usage for off-site shipments. SQG institutions face similar but less intensive requirements under 40 CFR § 262.44, including annual EPA reporting detailing waste quantities, disposal methods, minimization efforts, and toxicity reduction achievements.\n\nRCRA Subtitle I (42 U.S.C. §§ 6991-6991m) governs Underground Storage Tank (UST) systems common at universities for fuel storage. Under 40 CFR Part 280, UST operators must complete EPA-approved training every seven years, maintain leak detection systems, and implement corrosion protection measures. Financial responsibility requirements under 40 CFR § 280.93 mandate universities demonstrate ability to cover cleanup costs up to $1 million per occurrence.\n\nEnforcement mechanisms include administrative orders, civil penalties up to $37,500 per violation per day under 42 U.S.C. § 6928(a), and criminal sanctions for knowing violations. The EPA's 2020 amendments to 40 CFR Part 262 expanded academic laboratory standards, allowing eligible universities to manage laboratory chemicals under alternative timelines and procedures, reducing compliance burdens while maintaining environmental protection.",
+    "summary": "RCRA establishes EPA's comprehensive hazardous waste regulatory framework requiring universities to implement waste minimization programs, maintain detailed records, use proper containers/labeling, submit annual reports, and conduct UST training every seven years based on generator status.",
+    "requirements": "## Hazardous Waste Generator Obligations\n- Certify waste minimization programs reducing quantity and toxicity to economically practicable levels\n- Maintain comprehensive records of all hazardous waste generated for minimum three years\n- Implement proper containerization, labeling, and manifest systems per 40 CFR Part 262\n- Designate qualified personnel to oversee hazardous waste management operations\n\n## Small Quantity Generator Reporting\n- Submit annual EPA reports detailing waste quantities and characteristics\n- Document disposal methods and waste management practices\n- Report waste minimization efforts and toxicity reduction achievements\n- Demonstrate compliance with applicable storage time limits\n\n## Underground Storage Tank Compliance\n- Conduct EPA-approved UST operator training every seven years\n- Maintain leak detection and monitoring systems\n- Implement corrosion protection measures and regular inspections\n- Establish financial responsibility coverage for potential releases",
+    "reportingRequirements": "Small Quantity Generators must submit annual reports to EPA by March 1 documenting previous year's waste generation quantities, disposal methods, minimization efforts, and toxicity reductions. UST facilities require immediate release reporting within 24 hours and suspected release reports within 30 days to implementing agencies."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T02:01:09.578Z"
+  },
+  "deadlines": [
+    {
+      "date": "02-01",
+      "label": "OSHA 300 Log Posting",
+      "type": "posting",
+      "description": "OSHA 300 Log Posting for Resource Conservation and Recovery Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Annual Safety Training",
+      "type": "training",
+      "description": "Annual Safety Training for Resource Conservation and Recovery Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Hazardous Waste Manifest Submission",
+      "type": "filing",
+      "description": "Hazardous Waste Manifest Submission for Resource Conservation and Recovery Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Environmental Health and Safety"
+  ]
+}

@@ -1,0 +1,58 @@
+{
+  "regulationId": "unrelated-business-income-ubit",
+  "enhanced": {
+    "fullText": "The Unrelated Business Income Tax (UBIT) provisions under 26 U.S.C. § 511-514 require tax-exempt organizations, including colleges and universities, to pay federal income tax on income derived from unrelated business activities. This regulation ensures tax-exempt institutions do not gain unfair competitive advantages over taxable businesses while conducting commercial activities outside their exempt purposes.\n\nUnder 26 U.S.C. § 511(a)(2), unrelated business income constitutes income from any trade or business that is: (1) regularly carried on, (2) not substantially related to the organization's exempt purpose, and (3) not specifically excluded under 26 U.S.C. § 512(b). For higher education institutions, common UBIT-generating activities include advertising revenue from alumni publications, rental income from non-educational property use, corporate sponsorship payments exceeding qualified sponsorship standards under 26 U.S.C. § 513(i), and certain auxiliary services like bookstore operations selling non-educational merchandise.\n\nThe Internal Revenue Service enforces UBIT compliance through Form 990-T filing requirements under 26 U.S.C. § 511(a)(2)(B) and Treasury Regulation 1.6012-2(e). Universities with $1,000 or more in gross unrelated business income must file Form 990-T by the 15th day of the 5th month following their tax year end. Institutions expecting annual UBIT liability of $500 or more must make quarterly estimated tax payments using Form 990-W under 26 U.S.C. § 6655.\n\nPenalties for non-compliance include late filing penalties under 26 U.S.C. § 6652(c)(1)(A) of $20 per day (maximum $10,000) for organizations with gross receipts exceeding $1 million annually, and failure-to-pay penalties under 26 U.S.C. § 6651(a)(2). The IRS may also impose accuracy-related penalties under 26 U.S.C. § 6662 for substantial understatements.\n\nRecent developments include the Tax Cuts and Jobs Act amendments effective 2018, which expanded UBIT to include qualified transportation fringe benefits under 26 U.S.C. § 512(a)(7) and required separate calculation for each unrelated trade or business under 26 U.S.C. § 512(a)(6). Universities must now track multiple UBIT activities separately, preventing loss offset between different unrelated business lines.",
+    "summary": "Federal tax law requiring tax-exempt universities to pay income tax on unrelated business activities exceeding $1,000 annually, with mandatory Form 990-T filing and quarterly estimated payments when liability reaches $500.",
+    "requirements": "## Income Identification Requirements\n- Monitor all commercial activities for UBIT applicability under 26 U.S.C. § 512\n- Document substantial relationship to educational mission for each revenue source\n- Calculate gross income separately for each unrelated business line per 26 U.S.C. § 512(a)(6)\n\n## Filing and Payment Obligations\n- File Form 990-T annually when gross unrelated business income ≥ $1,000\n- Submit quarterly estimated payments using Form 990-W when expected liability ≥ $500\n- Meet 15th day of 5th month deadline following tax year end\n\n## Documentation Standards\n- Maintain detailed records of all revenue-generating activities\n- Prepare written analysis of relationship between commercial activities and exempt purposes\n- Track transportation fringe benefits separately under 26 U.S.C. § 512(a)(7)\n\n## Compliance Monitoring\n- Assign responsibility to tax compliance officer or external advisor\n- Conduct annual review of auxiliary enterprises and sponsored programs\n- Implement controls for advertising revenue and corporate sponsorships",
+    "reportingRequirements": "Annual Form 990-T filing due 15th day of 5th month after tax year end when gross unrelated business income exceeds $1,000. Quarterly estimated tax payments due 15th of 4th, 6th, 9th, and 12th months when expected annual liability reaches $500 or more."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T02:47:45.432Z"
+  },
+  "deadlines": [
+    {
+      "date": "05-15",
+      "label": "Form 990 Filing",
+      "type": "filing",
+      "description": "Form 990 Filing for Unrelated Business Income (UBIT)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "05-15",
+      "label": "Form 990-T Filing (if applicable)",
+      "type": "filing",
+      "description": "Form 990-T Filing (if applicable) for Unrelated Business Income (UBIT)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Form 1099 Filing",
+      "type": "filing",
+      "description": "Form 1099 Filing for Unrelated Business Income (UBIT)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "W-2 Distribution",
+      "type": "distribution",
+      "description": "W-2 Distribution for Unrelated Business Income (UBIT)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Tax"
+  ]
+}

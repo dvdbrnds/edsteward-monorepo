@@ -1,0 +1,128 @@
+service: mcp-engine-mvp
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: ${opt:region, 'us-east-1'}
+  stage: ${opt:stage, 'dev'}
+  memorySize: 256
+  timeout: 30
+  
+  environment:
+    NODE_ENV: ${self:provider.stage}
+    AWS_REGION: ${self:provider.region}
+    LEVEL1_VALIDATOR_FUNCTION: ${self:service}-${self:provider.stage}-level1-validator
+    
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - lambda:InvokeFunction
+      Resource: 
+        - "arn:aws:lambda:${self:provider.region}:*:function:${self:service}-${self:provider.stage}-*"
+    - Effect: Allow
+      Action:
+        - logs:CreateLogGroup
+        - logs:CreateLogStream
+        - logs:PutLogEvents
+      Resource: "*"
+
+functions:
+  # MCP Orchestrator - Main entry point
+  orchestrator:
+    handler: src/lambda/orchestrator/index.handler
+    name: ${self:service}-${self:provider.stage}-orchestrator
+    description: "MCP MVP Orchestrator - Routes all requests to Level 1 validator"
+    events:
+      - http:
+          path: /mcp/validate
+          method: post
+          cors: true
+          integration: lambda
+    environment:
+      LEVEL1_VALIDATOR_FUNCTION: ${self:service}-${self:provider.stage}-level1-validator
+
+  # Level 1 Validator - Basic text validation
+  level1-validator:
+    handler: src/lambda/validators/level1/index.handler
+    name: ${self:service}-${self:provider.stage}-level1-validator
+    description: "MCP Level 1 Validator - Basic text pattern matching"
+    memorySize: 512
+    timeout: 60
+
+  # Health check endpoint
+  health:
+    handler: src/lambda/health/index.handler
+    name: ${self:service}-${self:provider.stage}-health
+    description: "MCP MVP Health Check"
+    events:
+      - http:
+          path: /health
+          method: get
+          cors: true
+
+plugins:
+  - serverless-offline
+
+custom:
+  serverless-offline:
+    httpPort: 3000
+    stage: local
+
+# Package configuration
+package:
+  patterns:
+    - '!.git/**'
+    - '!.gitignore'
+    - '!README.md'
+    - '!.DS_Store'
+    - '!npm-debug.log'
+    - '!.serverless/**'
+    - '!.nyc_output/**'
+    - '!coverage/**'
+    - '!__tests__/**'
+    - '!test/**'
+    - '!*.test.js'
+    - '!docs/**'
+    - 'src/lambda/**'
+    - 'src/common/**'
+    - 'node_modules/**'
+
+resources:
+  Resources:
+    # API Gateway configuration
+    MCPApiGateway:
+      Type: AWS::ApiGateway::RestApi
+      Properties:
+        Name: ${self:service}-${self:provider.stage}-api
+        Description: MCP Engine MVP API Gateway
+        
+  Outputs:
+    MCPValidationEndpoint:
+      Description: "MCP Validation API endpoint"
+      Value:
+        Fn::Join:
+          - ""
+          - - "https://"
+            - Ref: ApiGatewayRestApi
+            - ".execute-api."
+            - ${self:provider.region}
+            - ".amazonaws.com/"
+            - ${self:provider.stage}
+            - "/mcp/validate"
+      Export:
+        Name: ${self:service}-${self:provider.stage}-validation-endpoint
+        
+    MCPHealthEndpoint:
+      Description: "MCP Health check endpoint"
+      Value:
+        Fn::Join:
+          - ""
+          - - "https://"
+            - Ref: ApiGatewayRestApi
+            - ".execute-api."
+            - ${self:provider.region}
+            - ".amazonaws.com/"
+            - ${self:provider.stage}
+            - "/health"
+      Export:
+        Name: ${self:service}-${self:provider.stage}-health-endpoint

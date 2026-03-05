@@ -1,0 +1,1 @@
+Byterover handbook instructions generated for web-app project with full scope. Phases: discovery, layer1_generation, layer2_generation, layer3_generation, layer4_generation, validation.

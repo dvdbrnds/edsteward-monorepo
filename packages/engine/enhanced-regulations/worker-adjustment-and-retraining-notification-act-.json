@@ -1,0 +1,42 @@
+{
+  "regulationId": "worker-adjustment-and-retraining-notification-act-",
+  "enhanced": {
+    "fullText": "The Worker Adjustment and Retraining Notification Act (WARN), codified at 29 U.S.C. §§ 2101-2109 and implemented through regulations at 20 CFR Part 639, mandates that covered employers, including universities, provide advance written notice of plant closings and mass layoffs. Universities employing 100 or more full-time employees are subject to WARN requirements when conducting workforce reductions.\n\nUnder 29 U.S.C. § 2102(a), covered universities must provide 60 calendar days advance written notice before ordering a plant closing or mass layoff. A \"plant closing\" occurs when a facility or operating unit is shut down for more than six months or when 50 or more employees lose their jobs during any 30-day period. A \"mass layoff\" is defined under 29 U.S.C. § 2101(a)(3) as a reduction in force resulting in employment loss for at least 33% of the active workforce and at least 50 employees, or 500 or more employees regardless of percentage, during any 30-day period at a single employment site.\n\nNotice requirements under 20 CFR § 639.7 mandate that universities provide written notification to: (1) affected employees or their authorized representatives (labor unions), (2) the chief elected official of local government where the closing or layoff will occur, and (3) the state rapid response dislocated worker unit. For Pennsylvania institutions, notice must be sent to the Department of Labor & Industry's Bureau of Workforce Development Administration.\n\nExceptions to the 60-day notice requirement exist under 29 U.S.C. § 2102(b), including unforeseeable business circumstances, natural disasters, and faltering company provisions. However, universities must demonstrate that the circumstances were not reasonably foreseeable and provide as much notice as practicable.\n\nPenalties for non-compliance under 29 U.S.C. § 2104 include liability to each affected employee for back pay and benefits for up to 60 days of violation, plus attorney fees. Local government entities may recover $500 per day for each day of violation when proper notice was not provided. Recent Department of Labor guidance emphasizes that temporary layoffs exceeding six months trigger WARN obligations.\n\nUniversities must maintain detailed records of workforce reduction decisions and ensure compliance officers coordinate with human resources, legal counsel, and senior administration when planning significant employment actions affecting multiple employees or entire departments.",
+    "summary": "WARN Act requires universities with 100+ employees to provide 60 days advance written notice of plant closings or mass layoffs to affected workers, labor representatives, local government, and state agencies, with penalties up to 60 days back pay per employee plus $500 daily fines for non-compliance.",
+    "requirements": "## Notice Obligations\n- Provide 60 calendar days advance written notice before plant closings or mass layoffs affecting 50+ employees\n- Submit notices to affected employees, labor unions (if applicable), local chief elected official, and state dislocated worker unit\n- Include specific information per 20 CFR § 639.7: reason for layoff, expected date, contact information, and bumping rights\n\n## Triggering Events\n- Plant closing: facility shutdown affecting 50+ employees for 6+ months\n- Mass layoff: 33% reduction with 50+ employees OR 500+ employees regardless of percentage\n- Employment losses occurring within 30-day or 90-day periods (aggregated)\n\n## Documentation Requirements\n- Maintain records justifying workforce reduction decisions\n- Document unforeseeable circumstances if claiming exceptions\n- Coordinate with HR, legal counsel, and administration for compliance review\n\n## Compliance Monitoring\n- Monitor employment levels and reduction planning across all university facilities\n- Establish procedures for rapid response to triggering events\n- Ensure proper calculation of affected employee counts and timeframes",
+    "reportingRequirements": "Submit written WARN notices 60 days before qualifying events to: (1) affected employees/union representatives, (2) chief elected local government official, and (3) state dislocated worker unit. No periodic reporting required - notifications are event-triggered only when plant closings or mass layoffs occur."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T02:53:54.575Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "I-9 Form Audit",
+      "type": "audit",
+      "description": "I-9 Form Audit for Worker Adjustment and Retraining Notification Act (WARN)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Background Check Policy Review",
+      "type": "review",
+      "description": "Background Check Policy Review for Worker Adjustment and Retraining Notification Act (WARN)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Recruitment Hiring & Termination"
+  ]
+}

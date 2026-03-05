@@ -1,0 +1,1484 @@
+{
+  "timestamp": "2025-12-05T03:49:07.876Z",
+  "total": 295,
+  "sent": 290,
+  "failed": 5,
+  "successRate": 98,
+  "results": [
+    {
+      "regulation": "age-discrimination-act-of-1975",
+      "success": true,
+      "edstewardId": 1
+    },
+    {
+      "regulation": "americans-with-disabilities-act-of-1990",
+      "success": true,
+      "edstewardId": 2
+    },
+    {
+      "regulation": "higher-education-act-institutional-and-financial-a",
+      "success": true,
+      "edstewardId": 3
+    },
+    {
+      "regulation": "higher-education-act-textbook-information",
+      "success": true,
+      "edstewardId": 4
+    },
+    {
+      "regulation": "higher-education-opportunity-act-sections-152-and-",
+      "success": true,
+      "edstewardId": 5
+    },
+    {
+      "regulation": "section-504-of-the-rehabilitation-act-of-1973",
+      "success": true,
+      "edstewardId": 6
+    },
+    {
+      "regulation": "title-ix-of-the-education-amendment-of-1972",
+      "success": true,
+      "edstewardId": 7
+    },
+    {
+      "regulation": "title-vi-of-the-civil-rights-act-of-1964",
+      "success": true,
+      "edstewardId": 8
+    },
+    {
+      "regulation": "teacher-preparation-programs",
+      "success": true,
+      "edstewardId": 9
+    },
+    {
+      "regulation": "bankruptcy-abuse-prevention-consumer-protection-ac",
+      "success": true,
+      "edstewardId": 10
+    },
+    {
+      "regulation": "clayton-antitrust-act-of-1914",
+      "success": true,
+      "edstewardId": 11
+    },
+    {
+      "regulation": "fair-credit-reporting-act-fcra",
+      "success": true,
+      "edstewardId": 12
+    },
+    {
+      "regulation": "federal-insurance-contributions-act-fica",
+      "success": true,
+      "edstewardId": 13
+    },
+    {
+      "regulation": "federal-unemployment-tax-act-futa",
+      "success": true,
+      "edstewardId": 14
+    },
+    {
+      "regulation": "higher-education-act-disclosure-of-foreign-gifts",
+      "success": true,
+      "edstewardId": 15
+    },
+    {
+      "regulation": "qualified-tuition-and-student-loan-interest-report",
+      "success": true,
+      "edstewardId": 16
+    },
+    {
+      "regulation": "regulation-e-electronic-fund-transfers",
+      "success": true,
+      "edstewardId": 17
+    },
+    {
+      "regulation": "sarbanes-oxley-act-of-2002-sox",
+      "success": true,
+      "edstewardId": 18
+    },
+    {
+      "regulation": "sherman-antitrust-act",
+      "success": true,
+      "edstewardId": 19
+    },
+    {
+      "regulation": "social-security-act",
+      "success": true,
+      "edstewardId": 20
+    },
+    {
+      "regulation": "tax-cuts-and-jobs-act-of-2017-endowment-excise-tax",
+      "success": true,
+      "edstewardId": 21
+    },
+    {
+      "regulation": "truth-in-lending-act",
+      "success": true,
+      "edstewardId": 22
+    },
+    {
+      "regulation": "uniform-administrative-requirements-cost-principle",
+      "success": true,
+      "edstewardId": 23
+    },
+    {
+      "regulation": "unrelated-business-income-tax-ubit",
+      "success": true,
+      "edstewardId": 24
+    },
+    {
+      "regulation": "higher-education-act-institutional-and-financial-a",
+      "success": true,
+      "edstewardId": 25
+    },
+    {
+      "regulation": "higher-education-act-recognition-of-accrediting-ag",
+      "success": true,
+      "edstewardId": 26
+    },
+    {
+      "regulation": "age-discrimination-act-of-1975",
+      "success": true,
+      "edstewardId": 27
+    },
+    {
+      "regulation": "higher-education-act-institutional-and-financial-a",
+      "success": true,
+      "edstewardId": 28
+    },
+    {
+      "regulation": "higher-education-act-readmission-requirements-for-",
+      "success": true,
+      "edstewardId": 29
+    },
+    {
+      "regulation": "section-504-of-the-rehabilitation-act-of-1973",
+      "success": true,
+      "edstewardId": 30
+    },
+    {
+      "regulation": "title-ix-of-the-education-amendment-of-1972",
+      "success": true,
+      "edstewardId": 31
+    },
+    {
+      "regulation": "title-vi-of-the-civil-rights-act-of-1964",
+      "success": true,
+      "edstewardId": 32
+    },
+    {
+      "regulation": "equity-in-athletics-disclosure-act-eada",
+      "success": true,
+      "edstewardId": 33
+    },
+    {
+      "regulation": "section-504-of-the-rehabilitation-act-of-1973",
+      "success": true,
+      "edstewardId": 34
+    },
+    {
+      "regulation": "title-ix",
+      "success": true,
+      "edstewardId": 35
+    },
+    {
+      "regulation": "higher-education-act-textbook-informatoin",
+      "success": true,
+      "edstewardId": 36
+    },
+    {
+      "regulation": "americans-with-disabilities-act",
+      "success": true,
+      "edstewardId": 37
+    },
+    {
+      "regulation": "campus-sex-crimes-prevention-act-1601-of-the-victi",
+      "success": true,
+      "edstewardId": 38
+    },
+    {
+      "regulation": "drug-free-schools-and-communities-act",
+      "success": true,
+      "edstewardId": 39
+    },
+    {
+      "regulation": "emergency-planning-and-community-right-to-know-act",
+      "success": true,
+      "edstewardId": 40
+    },
+    {
+      "regulation": "higher-education-act-drug-and-alcohol-abuse-preven",
+      "success": true,
+      "edstewardId": 41
+    },
+    {
+      "regulation": "higher-education-act-institutional-and-financial-a",
+      "success": true,
+      "edstewardId": 42
+    },
+    {
+      "regulation": "higher-education-act-institutional-and-financial-a",
+      "success": true,
+      "edstewardId": 43
+    },
+    {
+      "regulation": "higher-education-act-program-participation-agreeme",
+      "success": true,
+      "edstewardId": 44
+    },
+    {
+      "regulation": "jeanne-clery-disclosure-of-campus-security-policy-",
+      "success": true,
+      "edstewardId": 45
+    },
+    {
+      "regulation": "occupational-safety-and-health-act-of-1970",
+      "success": true,
+      "edstewardId": 46
+    },
+    {
+      "regulation": "title-vi-of-the-civil-rights-act-of-1964-42-u-s-c-",
+      "success": true,
+      "edstewardId": 47
+    },
+    {
+      "regulation": "anti-kickback-act-of-1986",
+      "success": true,
+      "edstewardId": 48
+    },
+    {
+      "regulation": "anti-discrimination-laws-for-federal-contractors",
+      "success": true,
+      "edstewardId": 49
+    },
+    {
+      "regulation": "byrd-amendment",
+      "success": true,
+      "edstewardId": 50
+    },
+    {
+      "regulation": "copeland-anti-kickback-act",
+      "success": true,
+      "edstewardId": 51
+    },
+    {
+      "regulation": "davis-bacon-act",
+      "success": true,
+      "edstewardId": 52
+    },
+    {
+      "regulation": "e-verify-executive-order-13465-amending-executive-",
+      "success": true,
+      "edstewardId": 53
+    },
+    {
+      "regulation": "health-insurance-portability-and-accountability-ac",
+      "success": true,
+      "edstewardId": 54
+    },
+    {
+      "regulation": "higher-education-act-foreign-gift-and-contract-rep",
+      "success": true,
+      "edstewardId": 55
+    },
+    {
+      "regulation": "small-business-act-and-small-business-investment-a",
+      "success": true,
+      "edstewardId": 56
+    },
+    {
+      "regulation": "trade-sanctions-reform-and-export-enhancement",
+      "success": true,
+      "edstewardId": 57
+    },
+    {
+      "regulation": "non-retaliation-for-disclosure-of-compensation-inf",
+      "success": true,
+      "edstewardId": 58
+    },
+    {
+      "regulation": "copyright-act",
+      "success": true,
+      "edstewardId": 59
+    },
+    {
+      "regulation": "copyright-term-extension-act",
+      "success": true,
+      "edstewardId": 60
+    },
+    {
+      "regulation": "digital-millennium-copyright-act-dmca",
+      "success": true,
+      "edstewardId": 61
+    },
+    {
+      "regulation": "higher-education-act-institutional-and-financial-a",
+      "success": true,
+      "edstewardId": 62
+    },
+    {
+      "regulation": "higher-education-act-program-participation-agreeme",
+      "success": true,
+      "edstewardId": 63
+    },
+    {
+      "regulation": "lanham-act",
+      "success": true,
+      "edstewardId": 64
+    },
+    {
+      "regulation": "small-webcasters-settlement-act-of-2002",
+      "success": true,
+      "edstewardId": 65
+    },
+    {
+      "regulation": "technology-education-and-copyright-harmonization-a",
+      "success": true,
+      "edstewardId": 66
+    },
+    {
+      "regulation": "americans-with-disabilities-act-of-1990",
+      "success": true,
+      "edstewardId": 67
+    },
+    {
+      "regulation": "fair-housing-act-section-6",
+      "success": true,
+      "edstewardId": 68
+    },
+    {
+      "regulation": "patient-protection-and-affordable-care-act-section",
+      "success": true,
+      "edstewardId": 69
+    },
+    {
+      "regulation": "section-504-of-the-rehabilitation-act-of-1973",
+      "success": true,
+      "edstewardId": 70
+    },
+    {
+      "regulation": "the-family-and-medical-leave-act-of-1993",
+      "success": true,
+      "edstewardId": 71
+    },
+    {
+      "regulation": "age-discrimination-in-employment-act-of-1967",
+      "success": true,
+      "edstewardId": 72
+    },
+    {
+      "regulation": "americans-with-disabilities-act-of-1990",
+      "success": true,
+      "edstewardId": 73
+    },
+    {
+      "regulation": "equal-employment-opportunity",
+      "success": true,
+      "edstewardId": 74
+    },
+    {
+      "regulation": "equal-employment-of-veterans",
+      "success": true,
+      "edstewardId": 75
+    },
+    {
+      "regulation": "genetic-information-non-discrimination-act-of-2008",
+      "success": true,
+      "edstewardId": 76
+    },
+    {
+      "regulation": "lilly-ledbetter-fair-pay-act-of-2009",
+      "success": true,
+      "edstewardId": 77
+    },
+    {
+      "regulation": "the-equal-pay-act-of-1963",
+      "success": true,
+      "edstewardId": 78
+    },
+    {
+      "regulation": "the-family-and-medical-leave-act-of-1993",
+      "success": true,
+      "edstewardId": 79
+    },
+    {
+      "regulation": "title-ix-of-the-education-amendment-of-1972",
+      "success": true,
+      "edstewardId": 80
+    },
+    {
+      "regulation": "title-vii-of-the-civil-rights-act-of-1964",
+      "success": true,
+      "edstewardId": 81
+    },
+    {
+      "regulation": "uniformed-services-employment-and-reemployment-rig",
+      "success": true,
+      "edstewardId": 82
+    },
+    {
+      "regulation": "pregnant-workers-fairness-act-pwfa",
+      "success": true,
+      "edstewardId": 83
+    },
+    {
+      "regulation": "affirmative-action-equal-employment-opportunity",
+      "success": true,
+      "edstewardId": 84
+    },
+    {
+      "regulation": "age-discrimination-act-of-1975",
+      "success": true,
+      "edstewardId": 85
+    },
+    {
+      "regulation": "age-discrimination-employment-act-of-1967",
+      "success": true,
+      "edstewardId": 86
+    },
+    {
+      "regulation": "americans-with-disabilities-act-of-1990",
+      "success": true,
+      "edstewardId": 87
+    },
+    {
+      "regulation": "equal-employment-of-veterans",
+      "success": true,
+      "edstewardId": 88
+    },
+    {
+      "regulation": "equal-pay-act-of-1963",
+      "success": true,
+      "edstewardId": 89
+    },
+    {
+      "regulation": "genetic-information-non-discrimination-act-of-2008",
+      "success": true,
+      "edstewardId": 90
+    },
+    {
+      "regulation": "immigration-and-nationality-act",
+      "success": true,
+      "edstewardId": 91
+    },
+    {
+      "regulation": "lilly-ledbetter-fair-pay-act-of-2009",
+      "success": true,
+      "edstewardId": 92
+    },
+    {
+      "regulation": "section-504-of-the-rehabilitation-act-of-1973",
+      "success": true,
+      "edstewardId": 93
+    },
+    {
+      "regulation": "title-ix-of-the-education-amendment-of-1972",
+      "success": true,
+      "edstewardId": 94
+    },
+    {
+      "regulation": "title-vii-of-the-civil-rights-act-of-1964",
+      "success": true,
+      "edstewardId": 95
+    },
+    {
+      "regulation": "uniformed-services-employment-and-reemployment-rig",
+      "success": true,
+      "edstewardId": 96
+    },
+    {
+      "regulation": "veterans-employment-emphasis-under-federal-contrac",
+      "success": true,
+      "edstewardId": 97
+    },
+    {
+      "regulation": "cafeteria-plan-regulations",
+      "success": true,
+      "edstewardId": 98
+    },
+    {
+      "regulation": "consolidated-omnibus-budget-reconciliation-act-cob",
+      "success": true,
+      "edstewardId": 99
+    },
+    {
+      "regulation": "employee-retirement-income-security-act-of-1974-er",
+      "success": true,
+      "edstewardId": 100
+    },
+    {
+      "regulation": "medicare-medicaid-and-schip-extension-act-of-2007",
+      "success": false,
+      "error": "request to http://localhost:3000/api/regulation-updates failed, reason: socket hang up"
+    },
+    {
+      "regulation": "patient-protection-and-affordable-care-act",
+      "success": false,
+      "error": "request to http://localhost:3000/api/regulation-updates failed, reason: socket hang up"
+    },
+    {
+      "regulation": "the-veterans-readjustment-benefits-act",
+      "success": false,
+      "error": "request to http://localhost:3000/api/regulation-updates failed, reason: socket hang up"
+    },
+    {
+      "regulation": "title-ix-of-the-education-amendment-of-1972",
+      "success": false,
+      "error": "request to http://localhost:3000/api/regulation-updates failed, reason: socket hang up"
+    },
+    {
+      "regulation": "uniformed-services-employment-and-reemployment-rig",
+      "success": false,
+      "error": "request to http://localhost:3000/api/regulation-updates failed, reason: socket hang up"
+    },
+    {
+      "regulation": "atomic-energy-act-of-1954",
+      "success": true,
+      "edstewardId": 106
+    },
+    {
+      "regulation": "chemical-facility-anti-terrorism-standards",
+      "success": true,
+      "edstewardId": 107
+    },
+    {
+      "regulation": "clean-air-act",
+      "success": true,
+      "edstewardId": 108
+    },
+    {
+      "regulation": "clean-water-act",
+      "success": true,
+      "edstewardId": 109
+    },
+    {
+      "regulation": "comprehensive-environmental-response-compensation-",
+      "success": true,
+      "edstewardId": 110
+    },
+    {
+      "regulation": "emergency-planning-and-community-right-act-epcra",
+      "success": true,
+      "edstewardId": 111
+    },
+    {
+      "regulation": "energy-policy-act",
+      "success": true,
+      "edstewardId": 112
+    },
+    {
+      "regulation": "energy-reorganization-act-of-1974-as-amended",
+      "success": true,
+      "edstewardId": 113
+    },
+    {
+      "regulation": "federal-insecticide-fungicide-and-rodenticide-act",
+      "success": true,
+      "edstewardId": 114
+    },
+    {
+      "regulation": "guarding-and-use-of-hand-portable-powered-tools",
+      "success": true,
+      "edstewardId": 115
+    },
+    {
+      "regulation": "hazardous-materials-transportation-act",
+      "success": true,
+      "edstewardId": 116
+    },
+    {
+      "regulation": "hazardous-and-solid-waste-amendments-of-1984",
+      "success": true,
+      "edstewardId": 117
+    },
+    {
+      "regulation": "housing-urban-development-lead-based-paint-poisoni",
+      "success": true,
+      "edstewardId": 118
+    },
+    {
+      "regulation": "mandatory-reporting-of-greenhouse-gases",
+      "success": true,
+      "edstewardId": 119
+    },
+    {
+      "regulation": "motor-carrier-act-of-1980",
+      "success": true,
+      "edstewardId": 120
+    },
+    {
+      "regulation": "national-emission-standards-for-hazardous-air-poll",
+      "success": true,
+      "edstewardId": 121
+    },
+    {
+      "regulation": "osha",
+      "success": true,
+      "edstewardId": 122
+    },
+    {
+      "regulation": "osha-asbestos-in-construction-standard",
+      "success": true,
+      "edstewardId": 123
+    },
+    {
+      "regulation": "osha-asbestos-in-general-industry-standard",
+      "success": true,
+      "edstewardId": 124
+    },
+    {
+      "regulation": "osha-enforcement-guidance-for-personal-protective-",
+      "success": true,
+      "edstewardId": 125
+    },
+    {
+      "regulation": "osha-lead-in-construction-standard",
+      "success": true,
+      "edstewardId": 126
+    },
+    {
+      "regulation": "osha-lead-in-general-industry-standard",
+      "success": true,
+      "edstewardId": 127
+    },
+    {
+      "regulation": "osha-welding-cutting-and-brazing",
+      "success": true,
+      "edstewardId": 128
+    },
+    {
+      "regulation": "osha-bloodborne-pathogens-standard",
+      "success": true,
+      "edstewardId": 129
+    },
+    {
+      "regulation": "osha-s-emergency-action-plan-standard",
+      "success": true,
+      "edstewardId": 130
+    },
+    {
+      "regulation": "osha-s-occupational-noise-exposure-standard",
+      "success": true,
+      "edstewardId": 131
+    },
+    {
+      "regulation": "osha-s-occupational-exposure-to-hazardous-chemical",
+      "success": true,
+      "edstewardId": 132
+    },
+    {
+      "regulation": "oil-pollution-act",
+      "success": true,
+      "edstewardId": 133
+    },
+    {
+      "regulation": "residential-lead-based-paint-hazard-reduction-act-",
+      "success": true,
+      "edstewardId": 134
+    },
+    {
+      "regulation": "resource-conservation-and-recovery-act",
+      "success": true,
+      "edstewardId": 135
+    },
+    {
+      "regulation": "standards-for-the-management-of-used-oil",
+      "success": true,
+      "edstewardId": 136
+    },
+    {
+      "regulation": "the-public-health-security-and-bioterrorism-prepar",
+      "success": true,
+      "edstewardId": 137
+    },
+    {
+      "regulation": "toxic-substances-control-act",
+      "success": true,
+      "edstewardId": 138
+    },
+    {
+      "regulation": "acts-affecting-a-personal-financial-interest",
+      "success": true,
+      "edstewardId": 139
+    },
+    {
+      "regulation": "bribery-of-public-officials-and-witnesses",
+      "success": true,
+      "edstewardId": 140
+    },
+    {
+      "regulation": "compensation-to-members-of-congress-officers-other",
+      "success": true,
+      "edstewardId": 141
+    },
+    {
+      "regulation": "ethics-in-government-act-amended-by-ethics-reform-",
+      "success": true,
+      "edstewardId": 142
+    },
+    {
+      "regulation": "house-and-senate-gift-ban-and-ethics-rules",
+      "success": true,
+      "edstewardId": 143
+    },
+    {
+      "regulation": "outside-earned-income-and-activities",
+      "success": true,
+      "edstewardId": 144
+    },
+    {
+      "regulation": "restrictions-on-former-officers-employees-and-elec",
+      "success": true,
+      "edstewardId": 145
+    },
+    {
+      "regulation": "salary-of-government-officials-and-employees-payab",
+      "success": true,
+      "edstewardId": 146
+    },
+    {
+      "regulation": "arms-export-control-act-of-1976",
+      "success": true,
+      "edstewardId": 147
+    },
+    {
+      "regulation": "export-administration-act-of-1979",
+      "success": true,
+      "edstewardId": 148
+    },
+    {
+      "regulation": "foreign-assets-control-regulations",
+      "success": true,
+      "edstewardId": 149
+    },
+    {
+      "regulation": "international-emergency-economic-powers-act",
+      "success": true,
+      "edstewardId": 150
+    },
+    {
+      "regulation": "international-traffic-in-arms-regulations-itar",
+      "success": true,
+      "edstewardId": 151
+    },
+    {
+      "regulation": "trading-with-the-enemy-act-of-1917",
+      "success": true,
+      "edstewardId": 152
+    },
+    {
+      "regulation": "contracts-with-third-party-servicers",
+      "success": true,
+      "edstewardId": 153
+    },
+    {
+      "regulation": "higher-education-act-aid-application-verification",
+      "success": true,
+      "edstewardId": 154
+    },
+    {
+      "regulation": "higher-education-act-audits",
+      "success": true,
+      "edstewardId": 155
+    },
+    {
+      "regulation": "higher-education-act-borrower-defense-to-repayment",
+      "success": true,
+      "edstewardId": 156
+    },
+    {
+      "regulation": "higher-education-act-cash-management",
+      "success": true,
+      "edstewardId": 157
+    },
+    {
+      "regulation": "higher-education-act-code-of-conduct",
+      "success": true,
+      "edstewardId": 158
+    },
+    {
+      "regulation": "higher-education-act-cohort-default-rate",
+      "success": true,
+      "edstewardId": 159
+    },
+    {
+      "regulation": "higher-education-act-eligibility-and-certification",
+      "success": true,
+      "edstewardId": 160
+    },
+    {
+      "regulation": "higher-education-act-entrance-and-exit-counseling",
+      "success": true,
+      "edstewardId": 161
+    },
+    {
+      "regulation": "higher-education-act-federal-supplemental-educatio",
+      "success": true,
+      "edstewardId": 162
+    },
+    {
+      "regulation": "higher-education-act-federal-work-study",
+      "success": true,
+      "edstewardId": 163
+    },
+    {
+      "regulation": "higher-education-act-financial-responsibility-requ",
+      "success": true,
+      "edstewardId": 164
+    },
+    {
+      "regulation": "higher-education-act-information-distributed-to-st",
+      "success": true,
+      "edstewardId": 165
+    },
+    {
+      "regulation": "higher-education-act-net-price-calculator",
+      "success": true,
+      "edstewardId": 166
+    },
+    {
+      "regulation": "higher-education-act-plus-loans",
+      "success": true,
+      "edstewardId": 167
+    },
+    {
+      "regulation": "higher-education-act-penalties-for-drug-violations",
+      "success": true,
+      "edstewardId": 168
+    },
+    {
+      "regulation": "higher-education-act-perkins-loans",
+      "success": true,
+      "edstewardId": 169
+    },
+    {
+      "regulation": "higher-education-act-preferred-lenders",
+      "success": true,
+      "edstewardId": 170
+    },
+    {
+      "regulation": "higher-education-act-program-participation-agreeme",
+      "success": true,
+      "edstewardId": 171
+    },
+    {
+      "regulation": "higher-education-act-record-retention",
+      "success": true,
+      "edstewardId": 172
+    },
+    {
+      "regulation": "higher-education-act-standard-of-conduct",
+      "success": true,
+      "edstewardId": 173
+    },
+    {
+      "regulation": "qualified-tuition-and-student-loan-interest-report",
+      "success": true,
+      "edstewardId": 174
+    },
+    {
+      "regulation": "student-loan-default-prevention-initiative-act-of-",
+      "success": true,
+      "edstewardId": 175
+    },
+    {
+      "regulation": "student-right-to-know-act",
+      "success": true,
+      "edstewardId": 176
+    },
+    {
+      "regulation": "teacher-preparation-programs",
+      "success": true,
+      "edstewardId": 177
+    },
+    {
+      "regulation": "title-ix-of-the-education-amendment-of-1972",
+      "success": true,
+      "edstewardId": 178
+    },
+    {
+      "regulation": "controlling-the-assault-of-non-solicited-pornograp",
+      "success": true,
+      "edstewardId": 179
+    },
+    {
+      "regulation": "higher-education-act-code-of-conduct",
+      "success": true,
+      "edstewardId": 180
+    },
+    {
+      "regulation": "higher-education-act-foreign-gift-and-contract-rep",
+      "success": true,
+      "edstewardId": 181
+    },
+    {
+      "regulation": "internal-revenue-code-substantiation-and-disclosur",
+      "success": true,
+      "edstewardId": 182
+    },
+    {
+      "regulation": "pension-protection-act",
+      "success": true,
+      "edstewardId": 183
+    },
+    {
+      "regulation": "philanthropy-protection-act-of-1995",
+      "success": true,
+      "edstewardId": 184
+    },
+    {
+      "regulation": "federal-sentencing-guidelines",
+      "success": true,
+      "edstewardId": 185
+    },
+    {
+      "regulation": "internal-revenue-service-governance-information-re",
+      "success": true,
+      "edstewardId": 186
+    },
+    {
+      "regulation": "unknown",
+      "success": true,
+      "edstewardId": 187
+    },
+    {
+      "regulation": "byrd-amendment",
+      "success": true,
+      "edstewardId": 188
+    },
+    {
+      "regulation": "department-of-education-general-administrative-reg",
+      "success": true,
+      "edstewardId": 189
+    },
+    {
+      "regulation": "false-claims-act",
+      "success": true,
+      "edstewardId": 190
+    },
+    {
+      "regulation": "federal-awardee-performance-and-integrity-informat",
+      "success": true,
+      "edstewardId": 191
+    },
+    {
+      "regulation": "federal-funding-accountability-and-transparency-ac",
+      "success": true,
+      "edstewardId": 192
+    },
+    {
+      "regulation": "fraud-enforcement-and-recovery-act-of-2009-fera",
+      "success": true,
+      "edstewardId": 193
+    },
+    {
+      "regulation": "controlled-substances-act",
+      "success": true,
+      "edstewardId": 194
+    },
+    {
+      "regulation": "hipaa",
+      "success": true,
+      "edstewardId": 195
+    },
+    {
+      "regulation": "higher-education-opportunity-act",
+      "success": true,
+      "edstewardId": 196
+    },
+    {
+      "regulation": "americans-with-disabilities-act-of-1990",
+      "success": true,
+      "edstewardId": 197
+    },
+    {
+      "regulation": "section-504-of-the-rehabilitation-act-of-1973",
+      "success": true,
+      "edstewardId": 198
+    },
+    {
+      "regulation": "title-ix-of-the-education-amendment-of-1972",
+      "success": true,
+      "edstewardId": 199
+    },
+    {
+      "regulation": "health-insurance-portability-and-accountability-ac",
+      "success": true,
+      "edstewardId": 200
+    },
+    {
+      "regulation": "nsf-grant-term-and-condition-september-21-2018",
+      "success": true,
+      "edstewardId": 201
+    },
+    {
+      "regulation": "student-exchange-and-visitor-information-system-se",
+      "success": true,
+      "edstewardId": 202
+    },
+    {
+      "regulation": "immigration-and-nationality-act-ina",
+      "success": true,
+      "edstewardId": 203
+    },
+    {
+      "regulation": "communications-assistance-for-law-enforcement-act-",
+      "success": true,
+      "edstewardId": 204
+    },
+    {
+      "regulation": "controlling-the-assault-of-non-solicited-pornograp",
+      "success": true,
+      "edstewardId": 205
+    },
+    {
+      "regulation": "digital-millennium-copyright-act-dmca",
+      "success": true,
+      "edstewardId": 206
+    },
+    {
+      "regulation": "electronic-communications-privacy-act-of-1986",
+      "success": true,
+      "edstewardId": 207
+    },
+    {
+      "regulation": "fcc-cable-certification",
+      "success": true,
+      "edstewardId": 208
+    },
+    {
+      "regulation": "fcc-fixed-microwave-services-licensing",
+      "success": true,
+      "edstewardId": 209
+    },
+    {
+      "regulation": "fcc-wireless-communications-licensing",
+      "success": true,
+      "edstewardId": 210
+    },
+    {
+      "regulation": "hazardous-materials-transportation-act",
+      "success": true,
+      "edstewardId": 211
+    },
+    {
+      "regulation": "higher-education-opportunity-act",
+      "success": true,
+      "edstewardId": 212
+    },
+    {
+      "regulation": "homeland-security-act-of-2002",
+      "success": true,
+      "edstewardId": 213
+    },
+    {
+      "regulation": "junk-fax-prevention-act-of-2005",
+      "success": true,
+      "edstewardId": 214
+    },
+    {
+      "regulation": "no-electronic-theft-act",
+      "success": true,
+      "edstewardId": 215
+    },
+    {
+      "regulation": "telemarketing",
+      "success": true,
+      "edstewardId": 216
+    },
+    {
+      "regulation": "american-jobs-creation-act-of-2004",
+      "success": true,
+      "edstewardId": 217
+    },
+    {
+      "regulation": "bayh-dole-act-of-1980",
+      "success": true,
+      "edstewardId": 218
+    },
+    {
+      "regulation": "cooperative-research-and-technology-enhancement-ac",
+      "success": true,
+      "edstewardId": 219
+    },
+    {
+      "regulation": "trademark-revision-act",
+      "success": true,
+      "edstewardId": 220
+    },
+    {
+      "regulation": "u-s-patent-act",
+      "success": true,
+      "edstewardId": 221
+    },
+    {
+      "regulation": "visual-artists-rights-act",
+      "success": true,
+      "edstewardId": 222
+    },
+    {
+      "regulation": "foreign-agents-registration-act-of-1938",
+      "success": true,
+      "edstewardId": 223
+    },
+    {
+      "regulation": "foreign-corrupt-practices-act-fcpa",
+      "success": true,
+      "edstewardId": 224
+    },
+    {
+      "regulation": "honest-leadership-and-open-government-act-of-2007",
+      "success": true,
+      "edstewardId": 225
+    },
+    {
+      "regulation": "house-and-senate-gift-ban-and-ethics-rules",
+      "success": true,
+      "edstewardId": 226
+    },
+    {
+      "regulation": "lobbying-disclosure-act",
+      "success": true,
+      "edstewardId": 227
+    },
+    {
+      "regulation": "political-activities",
+      "success": true,
+      "edstewardId": 228
+    },
+    {
+      "regulation": "americans-with-disabilities-act-of-1990",
+      "success": true,
+      "edstewardId": 229
+    },
+    {
+      "regulation": "children-s-online-privacy-protection-act-of-1998-c",
+      "success": true,
+      "edstewardId": 230
+    },
+    {
+      "regulation": "electronic-communications-privacy-act",
+      "success": true,
+      "edstewardId": 231
+    },
+    {
+      "regulation": "fair-credit-reporting-act-fcra",
+      "success": true,
+      "edstewardId": 232
+    },
+    {
+      "regulation": "fair-and-accurate-credit-transaction-act-facta",
+      "success": true,
+      "edstewardId": 233
+    },
+    {
+      "regulation": "family-educational-rights-and-privacy-act-ferpa",
+      "success": true,
+      "edstewardId": 234
+    },
+    {
+      "regulation": "federal-information-security-management-act-fisma",
+      "success": true,
+      "edstewardId": 235
+    },
+    {
+      "regulation": "freedom-of-information-act",
+      "success": true,
+      "edstewardId": 236
+    },
+    {
+      "regulation": "gramm-leach-bliley-act-glba",
+      "success": true,
+      "edstewardId": 237
+    },
+    {
+      "regulation": "hipaa",
+      "success": true,
+      "edstewardId": 238
+    },
+    {
+      "regulation": "health-information-technology-for-economic-and-cli",
+      "success": true,
+      "edstewardId": 239
+    },
+    {
+      "regulation": "higher-education-act-financial-value-transparency-",
+      "success": true,
+      "edstewardId": 240
+    },
+    {
+      "regulation": "higher-education-act-credit-hour-definition",
+      "success": true,
+      "edstewardId": 241
+    },
+    {
+      "regulation": "higher-education-act-incentive-compensation-prohib",
+      "success": true,
+      "edstewardId": 242
+    },
+    {
+      "regulation": "higher-education-act-misrepresentation",
+      "success": true,
+      "edstewardId": 243
+    },
+    {
+      "regulation": "higher-education-act-state-authorization",
+      "success": true,
+      "edstewardId": 244
+    },
+    {
+      "regulation": "drug-alcohol-testing-of-transportation-employees",
+      "success": true,
+      "edstewardId": 245
+    },
+    {
+      "regulation": "drug-free-workplace-act",
+      "success": true,
+      "edstewardId": 246
+    },
+    {
+      "regulation": "employee-polygraph-protection-act",
+      "success": true,
+      "edstewardId": 247
+    },
+    {
+      "regulation": "fair-credit-reporting-act-fcra",
+      "success": true,
+      "edstewardId": 248
+    },
+    {
+      "regulation": "federal-volunteer-protection-act",
+      "success": true,
+      "edstewardId": 249
+    },
+    {
+      "regulation": "immigration-and-nationality-act",
+      "success": true,
+      "edstewardId": 250
+    },
+    {
+      "regulation": "worker-adjustment-and-retraining-notification-act-",
+      "success": true,
+      "edstewardId": 251
+    },
+    {
+      "regulation": "america-competes-act",
+      "success": true,
+      "edstewardId": 252
+    },
+    {
+      "regulation": "animal-welfare-act",
+      "success": true,
+      "edstewardId": 253
+    },
+    {
+      "regulation": "clinical-trials-financial-disclosures-by-investiga",
+      "success": true,
+      "edstewardId": 254
+    },
+    {
+      "regulation": "export-administration-regulations",
+      "success": true,
+      "edstewardId": 255
+    },
+    {
+      "regulation": "food-and-drug-administration-fda-amendments-act-of",
+      "success": true,
+      "edstewardId": 256
+    },
+    {
+      "regulation": "national-science-foundation-research-misconduct-po",
+      "success": true,
+      "edstewardId": 257
+    },
+    {
+      "regulation": "native-american-graves-protection-and-repatriation",
+      "success": true,
+      "edstewardId": 258
+    },
+    {
+      "regulation": "protection-of-human-subjects-regulations-common-ru",
+      "success": true,
+      "edstewardId": 259
+    },
+    {
+      "regulation": "public-health-service-policies-on-research-miscond",
+      "success": true,
+      "edstewardId": 260
+    },
+    {
+      "regulation": "responsibility-of-applicants-for-promoting-objecti",
+      "success": true,
+      "edstewardId": 261
+    },
+    {
+      "regulation": "small-unmanned-aircraft-systems",
+      "success": true,
+      "edstewardId": 262
+    },
+    {
+      "regulation": "deferred-compensation",
+      "success": true,
+      "edstewardId": 263
+    },
+    {
+      "regulation": "employee-annuities",
+      "success": true,
+      "edstewardId": 264
+    },
+    {
+      "regulation": "employee-retirement-income-security-act-of-1974-er",
+      "success": true,
+      "edstewardId": 265
+    },
+    {
+      "regulation": "nonqualified-deferred-inclusion",
+      "success": true,
+      "edstewardId": 266
+    },
+    {
+      "regulation": "qualified-pensions",
+      "success": true,
+      "edstewardId": 267
+    },
+    {
+      "regulation": "campus-sex-crimes-prevention-act-1601-of-the-victi",
+      "success": true,
+      "edstewardId": 268
+    },
+    {
+      "regulation": "jeanne-clery-disclosure-of-campus-security-policy-",
+      "success": true,
+      "edstewardId": 269
+    },
+    {
+      "regulation": "title-ix-of-the-education-amendment-of-1972",
+      "success": true,
+      "edstewardId": 270
+    },
+    {
+      "regulation": "title-vii-of-the-civil-rights-act-of-1964",
+      "success": true,
+      "edstewardId": 271
+    },
+    {
+      "regulation": "byrd-amendment",
+      "success": true,
+      "edstewardId": 272
+    },
+    {
+      "regulation": "cafeteria-plans-26-u-s-c-125",
+      "success": true,
+      "edstewardId": 273
+    },
+    {
+      "regulation": "charitable-gift-annuity-antitrust-relief-act",
+      "success": true,
+      "edstewardId": 274
+    },
+    {
+      "regulation": "deferred-compensation",
+      "success": true,
+      "edstewardId": 275
+    },
+    {
+      "regulation": "employee-annuities",
+      "success": true,
+      "edstewardId": 276
+    },
+    {
+      "regulation": "federal-unemployment-tax-act",
+      "success": true,
+      "edstewardId": 277
+    },
+    {
+      "regulation": "foreign-bank-accounts-and-tax-filings",
+      "success": true,
+      "edstewardId": 278
+    },
+    {
+      "regulation": "fringe-benefits",
+      "success": true,
+      "edstewardId": 279
+    },
+    {
+      "regulation": "independent-contractors",
+      "success": true,
+      "edstewardId": 280
+    },
+    {
+      "regulation": "industrial-alcohol-user-permits-and-special-tax",
+      "success": true,
+      "edstewardId": 281
+    },
+    {
+      "regulation": "nonqualified-deferred-inclusion",
+      "success": true,
+      "edstewardId": 282
+    },
+    {
+      "regulation": "public-disclosure-of-material",
+      "success": true,
+      "edstewardId": 283
+    },
+    {
+      "regulation": "qualified-pensions",
+      "success": true,
+      "edstewardId": 284
+    },
+    {
+      "regulation": "qualified-tuition-and-student-loan-interest-report",
+      "success": true,
+      "edstewardId": 285
+    },
+    {
+      "regulation": "reporting-of-payments-of-royalties",
+      "success": true,
+      "edstewardId": 286
+    },
+    {
+      "regulation": "small-business-job-protection-act",
+      "success": true,
+      "edstewardId": 287
+    },
+    {
+      "regulation": "unrelated-business-income-ubit",
+      "success": true,
+      "edstewardId": 288
+    },
+    {
+      "regulation": "civil-service-reform-act-of-1978",
+      "success": true,
+      "edstewardId": 289
+    },
+    {
+      "regulation": "national-labor-relations-act",
+      "success": true,
+      "edstewardId": 290
+    },
+    {
+      "regulation": "consumer-credit-protection-act-title-iii-ccpa-garn",
+      "success": true,
+      "edstewardId": 291
+    },
+    {
+      "regulation": "fair-labor-standards-act-flsa",
+      "success": true,
+      "edstewardId": 292
+    },
+    {
+      "regulation": "federal-insurance-contributions-act-fica",
+      "success": true,
+      "edstewardId": 293
+    },
+    {
+      "regulation": "federal-unemployment-tax-act",
+      "success": true,
+      "edstewardId": 294
+    },
+    {
+      "regulation": "qualified-tuition-reductions",
+      "success": true,
+      "edstewardId": 295
+    }
+  ]
+}

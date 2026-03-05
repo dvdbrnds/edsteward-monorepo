@@ -1,0 +1,50 @@
+{
+  "regulationId": "higher-education-act-perkins-loans",
+  "enhanced": {
+    "fullText": "The Federal Perkins Loan Program, established under Title IV of the Higher Education Act of 1965 (20 U.S.C. §§ 1087aa-1087ii), was a campus-based student loan program that provided low-interest loans to undergraduate and graduate students with exceptional financial need. Following the Higher Education Opportunity Act of 2008 (Public Law No. 110-315), the program has undergone significant changes and restrictions.\n\nUnder 20 U.S.C. § 1087aa(b), authorization for additional federal appropriations to the Federal Perkins Loan program beyond fiscal year 2015 is explicitly prohibited. This means institutions can only make new loans using existing institutional funds and collections from previous borrowers, making the program entirely self-sustaining without federal capital contributions.\n\nInstitutions participating in the program must comply with stringent requirements under 20 U.S.C. § 1087dd. First, loans must be awarded primarily to students with exceptional financial need, as defined in 20 U.S.C. § 1087bb. Second, institutions must provide comprehensive loan counseling and information to all borrowers as specified in 20 U.S.C. § 1087dd(c). Third, participating institutions must enter cooperative agreements with credit reporting agencies to exchange borrower information pursuant to 20 U.S.C. § 1087cc(c)(8).\n\nComprehensive disclosure requirements are mandated under 20 U.S.C. § 1087dd(c)(1), requiring institutions to provide borrowers with detailed loan information including: institutional name and payment address, principal amount and interest rate, all fees and charges, annual and cumulative borrowing limits, repayment terms and conditions, default consequences, consolidation options, prepayment rights, deferment provisions, and impact on other financial aid eligibility.\n\nLoan availability restrictions under the program's wind-down provisions specify that undergraduate loans could only be made through September 30, 2016, provided students had exhausted Federal Direct Loan eligibility. Graduate students could receive loans through March 31, 2018, only if they previously received Perkins loans for academic years ending before October 1, 2016, and had maximized Direct Loan eligibility as outlined in 20 U.S.C. § 1087bb(b).\n\nEnforcement mechanisms include program participation suspension, fine assessment, and liability for federal fund recovery under 20 U.S.C. § 1087hh. The Department of Education conducts program reviews to ensure institutional compliance with federal requirements and proper fund management. Non-compliance may result in immediate program termination and institutional liability for outstanding federal capital contributions.",
+    "summary": "Federal Perkins Loans ended new appropriations after FY2015, operating as self-sustaining institutional programs. Universities must prioritize exceptional need students, provide comprehensive loan disclosures, and maintain credit bureau agreements.",
+    "requirements": "## Student Eligibility and Award Priority\n- Award loans first to undergraduate and graduate students with exceptional financial need per 20 U.S.C. § 1087bb\n- Verify student has exhausted Federal Direct Loan eligibility before Perkins loan disbursement\n- Document financial need calculations in student files\n\n## Mandatory Borrower Disclosures\n- Provide complete loan information at or before loan origination including principal amount, interest rate, and fees\n- Disclose yearly and cumulative borrowing limits, repayment terms, and default consequences\n- Include notice regarding program termination and future unavailability per 20 U.S.C. § 1087dd(c)\n\n## Credit Reporting and Information Exchange\n- Establish cooperative agreements with credit bureaus for borrower information exchange\n- Report loan status changes, defaults, and rehabilitation to credit agencies\n- Maintain accurate borrower contact and enrollment information\n\n## Fund Management and Sustainability\n- Operate program using only institutional funds and loan collections without federal appropriations\n- Maintain separate accounting for Perkins loan funds and administrative costs",
+    "reportingRequirements": "Institutions must submit annual Federal Perkins Loan Program reports to ED by October 1st detailing loan volume, default rates, and fund status. Quarterly NSLDS enrollment reporting required for all active borrowers. Default and status changes must be reported to credit bureaus within 60 days per cooperative agreements."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T16:25:00.529Z"
+  },
+  "deadlines": [
+    {
+      "date": "10-01",
+      "label": "FISAP Annual Report",
+      "type": "filing",
+      "description": "FISAP Annual Report for Higher Education Act: Perkins Loans",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "06-30",
+      "label": "Annual Financial Aid Audit",
+      "type": "audit",
+      "description": "Annual Financial Aid Audit for Higher Education Act: Perkins Loans",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "07-01",
+      "label": "Gainful Employment Disclosure Update",
+      "type": "disclosure",
+      "description": "Gainful Employment Disclosure Update for Higher Education Act: Perkins Loans",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Financial Aid"
+  ]
+}

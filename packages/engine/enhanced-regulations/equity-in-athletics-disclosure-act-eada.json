@@ -1,0 +1,34 @@
+{
+  "regulationId": "equity-in-athletics-disclosure-act-eada",
+  "enhanced": {
+    "fullText": "The Equity in Athletics Disclosure Act (EADA), codified at 20 U.S.C. § 1092(g), mandates comprehensive annual reporting of athletic program data by coeducational institutions of higher education that participate in Title IV federal student aid programs and maintain intercollegiate athletics programs. Implemented through 34 CFR § 668.41, this federal transparency requirement serves to promote gender equity awareness in collegiate athletics by making comparative data publicly available.\n\nThe statute requires institutions to report detailed information disaggregated by men's and women's teams, including: (1) the number of male and female students participating in intercollegiate athletics; (2) operating expenses and revenues attributable to men's and women's teams; (3) the number, gender, and employment status of athletic trainers and team physicians; (4) coaching staff compensation and demographics; and (5) recruitment expenses by gender. Under 20 U.S.C. § 1092(g)(4), institutions must also report athletically-related student aid awarded to male and female athletes.\n\nApplicability extends to all Title IV-eligible institutions offering intercollegiate athletic programs, regardless of NCAA membership or division status. The Department of Education's implementing regulations at 34 CFR § 668.41(c) specify that institutions must compile data for each sport in which they sponsor teams and maintain detailed records supporting their annual submissions.\n\nCompliance obligations include submitting the EADA report electronically through the Department's web-based survey system by October 15 annually, covering the preceding academic year's data. The reported information becomes publicly accessible through the Department's Equity in Athletics Data Analysis website, enabling stakeholders to compare institutional athletic program investments across gender lines.\n\nEnforcement mechanisms include potential Title IV funding penalties for non-compliance, administrative sanctions, and public disclosure of institutional non-participation. Recent regulatory updates have clarified reporting requirements for emerging sports and standardized expense categorization methodologies. Institutions failing to submit complete, accurate reports within required timeframes may face federal compliance reviews and corrective action requirements under general Title IV enforcement authorities at 34 CFR Part 668, Subpart G.",
+    "summary": "EADA requires Title IV institutions with intercollegiate athletics to submit annual reports detailing athletic participation, expenses, revenues, and staffing by gender, promoting transparency in collegiate sports equity through public data disclosure.",
+    "requirements": "## Annual Data Collection Requirements\n- Compile participation numbers for male and female student-athletes by sport\n- Document operating expenses and revenues for men's and women's teams\n- Track coaching staff demographics, compensation, and employment status\n- Record recruitment expenditures disaggregated by gender\n- Maintain athletically-related student aid records by recipient gender\n\n## Reporting and Submission Obligations  \n- Submit complete EADA survey through Department of Education web portal\n- Ensure data accuracy covering full preceding academic year\n- Designate institutional representative responsible for survey completion\n- Retain supporting documentation for federal audit purposes\n\n## Public Disclosure and Transparency\n- Make athletic financial aid information available upon request per 20 U.S.C. § 1092(g)(7)\n- Ensure reported data becomes publicly searchable through federal database\n- Provide institutional stakeholders access to comparative equity analysis tools",
+    "reportingRequirements": "Annual EADA survey submission required by October 15 through Department of Education's electronic reporting system, covering prior academic year data. Institutions must also provide athletic financial aid information to students and prospective students upon request per federal disclosure requirements."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T18:26:59.647Z"
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Compliance Review",
+      "type": "review",
+      "description": "Annual Compliance Review for Equity in Athletics Disclosure Act (EADA)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Athletics"
+  ]
+}

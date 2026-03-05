@@ -1,0 +1,58 @@
+{
+  "regulationId": "qualified-tuition-and-student-loan-interest-report",
+  "enhanced": {
+    "fullText": "26 U.S.C. § 6050S establishes mandatory information reporting requirements for eligible educational institutions regarding qualified tuition payments and student loan interest received. This regulation, implemented through Treasury Regulation 1.6050S-1, requires institutions to file annual information returns with the Internal Revenue Service and furnish corresponding statements to payors. The statutory framework originated from the Taxpayer Relief Act of 1997 and has been amended by subsequent legislation including the American Opportunity Tax Credit provisions under 26 U.S.C. § 25A.\n\nEligible educational institutions, defined under 26 U.S.C. § 25A(f)(2) as institutions eligible to participate in federal student aid programs under Title IV of the Higher Education Act (20 U.S.C. § 1088), must report qualified tuition and related expenses on Form 1098-T. Qualified expenses include tuition, fees required for enrollment, and course materials required for enrollment, but exclude room and board, medical expenses, transportation, and similar personal expenses as specified in 26 U.S.C. § 25A(f)(1).\n\nInstitutions must report aggregate payments received during the calendar year for qualified tuition and related expenses, scholarships and grants processed by the institution, adjustments to prior year amounts, and whether the student was enrolled at least half-time or was a graduate student. The reporting threshold requires institutions to file Form 1098-T for any student who paid qualified tuition and related expenses during the calendar year, with limited exceptions for nonresident aliens unless requested by the student.\n\nFor student loan interest reporting, institutions that receive interest payments of $600 or more during the calendar year must file Form 1098-E and furnish statements to payors under 26 U.S.C. § 6050S(e). This applies to qualified student loans as defined in 26 U.S.C. § 221(d), covering loans incurred solely to pay qualified education expenses.\n\nCompliance deadlines mandate filing information returns with the IRS by February 28 (or March 31 if filing electronically) following the calendar year for which reporting is required. Payee statements must be furnished by January 31 following the calendar year. Institutions filing 250 or more information returns annually must file electronically pursuant to 26 U.S.C. § 6011(e).\n\nPenalty provisions under 26 U.S.C. § 6721 impose fines for failure to file correct information returns, currently $280 per return with maximum annual penalties reaching $3.426 million for large institutions. Failure to furnish correct payee statements incurs penalties under 26 U.S.C. § 6722, with similar monetary amounts. Intentional disregard of filing requirements results in minimum penalties of $580 per return with no maximum limitation.",
+    "summary": "26 U.S.C. § 6050S requires higher education institutions to annually report qualified tuition payments and student loan interest to the IRS via Forms 1098-T and 1098-E, with corresponding statements provided to students and loan payors by January 31.",
+    "requirements": "## Annual Information Returns\n- File Form 1098-T for students with qualified tuition payments during calendar year\n- File Form 1098-E for student loan interest payments of $600 or more\n- Submit returns by February 28 (paper) or March 31 (electronic)\n\n## Student Statements\n- Furnish Form 1098-T copies to students by January 31\n- Provide Form 1098-E copies to loan interest payors by January 31\n- Include all required data elements per Treasury Regulation 1.6050S-1\n\n## Electronic Filing Requirements\n- Mandatory electronic filing for institutions submitting 250+ returns annually\n- Utilize IRS-approved electronic filing systems per 26 U.S.C. § 6011(e)\n\n## Record Maintenance\n- Retain supporting documentation for minimum three years\n- Maintain student enrollment status and payment records\n- Document scholarship and grant distributions processed by institution",
+    "reportingRequirements": "Form 1098-T due February 28 (paper) or March 31 (electronic) annually. Student copies due January 31. Form 1098-E required for loan interest $600+ with same deadlines. Electronic filing mandatory for 250+ returns per 26 U.S.C. § 6011(e)."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T01:54:21.464Z"
+  },
+  "deadlines": [
+    {
+      "date": "05-15",
+      "label": "Form 990 Filing",
+      "type": "filing",
+      "description": "Form 990 Filing for Qualified Tuition and Student Loan Interest Reporting",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "05-15",
+      "label": "Form 990-T Filing (if applicable)",
+      "type": "filing",
+      "description": "Form 990-T Filing (if applicable) for Qualified Tuition and Student Loan Interest Reporting",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Form 1099 Filing",
+      "type": "filing",
+      "description": "Form 1099 Filing for Qualified Tuition and Student Loan Interest Reporting",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "W-2 Distribution",
+      "type": "distribution",
+      "description": "W-2 Distribution for Qualified Tuition and Student Loan Interest Reporting",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Tax"
+  ]
+}

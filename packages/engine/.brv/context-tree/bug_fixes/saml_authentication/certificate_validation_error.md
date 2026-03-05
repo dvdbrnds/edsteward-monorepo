@@ -1,0 +1,1 @@
+SAML LIBRARY VERSION ISSUE: EdSteward was running outdated @node-saml/passport-saml@4.0.4 and @node-saml/node-saml@4.0.5, but latest is 5.1.0. The "error:0680009B:asn1 encoding routines::too long" error can be caused by outdated SAML library versions. Updating to latest versions often resolves certificate signature validation issues.

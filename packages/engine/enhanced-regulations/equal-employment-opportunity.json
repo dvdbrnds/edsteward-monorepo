@@ -1,0 +1,34 @@
+{
+  "regulationId": "equal-employment-opportunity",
+  "enhanced": {
+    "fullText": "Executive Order 11246, implemented through 41 CFR Parts 60-1 through 60-741, establishes comprehensive equal employment opportunity requirements for federal contractors, including higher education institutions receiving federal contracts exceeding $10,000 annually. This regulation, enforced by the Office of Federal Contract Compliance Programs (OFCCP), prohibits employment discrimination based on race, color, religion, sex, sexual orientation, gender identity, or national origin under 41 CFR § 60-1.4.\n\nCovered institutions must develop written affirmative action programs (AAPs) when holding contracts of $50,000 or more and employing 50+ workers, as specified in 41 CFR § 60-2.1. These AAPs require annual updates and must include workforce analyses, availability determinations, utilization analyses, and placement goals for underrepresented groups. Universities must conduct self-evaluations identifying problem areas and develop action-oriented programs addressing deficiencies under 41 CFR § 60-2.17.\n\nThe regulation extends beyond basic non-discrimination to mandate proactive recruitment efforts. Institutions must post equal opportunity notices per 41 CFR § 60-1.42, maintain employment records for two years under 41 CFR § 60-1.12, and ensure all personnel involved in recruitment, screening, and selection receive EEO training. Subcontractor compliance monitoring is required under 41 CFR § 60-1.8, with written assurances of EEO compliance for subcontracts exceeding $10,000.\n\nOFCCP conducts compliance evaluations examining hiring practices, compensation systems, and advancement opportunities. Violations may result in contract cancellation, debarment from future contracts, and back-pay remedies under 41 CFR § 60-1.27. Recent updates include enhanced LGBT protections and veteran employment requirements under 41 CFR § 60-300. The regulation intersects with Title VII of the Civil Rights Act of 1964 (42 U.S.C. § 2000e) but imposes additional affirmative obligations unique to federal contractors. Universities must designate EEO officers, establish complaint procedures, and maintain detailed records demonstrating good faith efforts in minority and women recruitment.",
+    "summary": "Executive Order 11246 requires federal contractor universities to maintain non-discriminatory employment practices and implement affirmative action programs promoting equal opportunity in hiring, compensation, and advancement for protected classes.",
+    "requirements": "## Affirmative Action Program Development\n- Create written AAPs for contracts ≥$50,000 with 50+ employees\n- Conduct annual workforce utilization analyses by job category\n- Establish numerical placement goals for underrepresented groups\n- Update AAPs annually by December 31st\n\n## Recruitment and Hiring Practices\n- Post EEO taglines on all job announcements per 41 CFR § 60-1.42\n- Implement proactive recruitment strategies targeting underrepresented populations\n- Train hiring managers on EEO compliance requirements\n- Document good faith recruitment efforts\n\n## Record Keeping and Monitoring\n- Maintain employment records for minimum two years\n- Track applicant flow data by protected class status\n- Monitor subcontractor EEO compliance for contracts >$10,000\n- Designate responsible EEO compliance officer\n\n## Internal Compliance Systems\n- Establish employee complaint procedures\n- Conduct periodic compensation equity analyses\n- Implement corrective action plans addressing identified deficiencies",
+    "reportingRequirements": "Annual AAP updates due December 31st. Submit EEO-1 reports to EEOC by May 31st for institutions with 100+ employees. Maintain applicant flow logs and provide data during OFCCP compliance evaluations within 30 days of request per 41 CFR § 60-1.43."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T15:58:48.629Z"
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Compliance Review",
+      "type": "review",
+      "description": "Annual Compliance Review for Equal Employment Opportunity",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Discrimination"
+  ]
+}

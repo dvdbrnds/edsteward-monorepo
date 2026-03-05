@@ -1,0 +1,34 @@
+{
+  "regulationId": "american-jobs-creation-act-of-2004",
+  "enhanced": {
+    "fullText": "The American Jobs Creation Act of 2004 significantly modified the federal tax treatment of intellectual property donations to tax-exempt organizations, including higher education institutions. Under 26 U.S.C. § 170(e)(1)(B)(iii), the Act fundamentally altered charitable deduction calculations for patents, copyrights, trademarks, trade names, trade secrets, know-how, software, and similar intellectual property donated to 501(c)(3) organizations after June 3, 2004.\n\nPrior to this legislation, donors could claim charitable deductions based on the fair market value of contributed intellectual property, often resulting in substantial tax benefits. The Act restricts the initial deduction to the lesser of the donor's basis in the property or its fair market value, typically limiting deductions to out-of-pocket costs rather than potential market valuations.\n\nUnder 26 U.S.C. § 170(m), universities receiving qualifying intellectual property donations may provide additional benefits to donors through sliding-scale additional deductions based on net income generated from the donated property over ten years following the contribution. These supplemental deductions are calculated as percentages of qualifying income: 100% in years one and two, decreasing by ten percentage points annually until reaching 10% in year ten, as specified in 26 U.S.C. § 170(m)(7).\n\nHigher education institutions must maintain detailed records pursuant to 26 U.S.C. § 170(f)(8) and provide contemporaneous written acknowledgments for donations exceeding $250. Universities must also comply with Form 8899 annual reporting requirements under Treas. Reg. § 1.170A-13(f)(5), documenting net income derived from donated intellectual property and calculating additional deduction amounts for qualifying donors.\n\nThe regulation applies to all accredited higher education institutions holding 501(c)(3) tax-exempt status under 26 U.S.C. § 501(c)(3). Scope includes technology transfer offices, research foundations, and affiliated entities receiving intellectual property donations. Non-compliance may result in loss of tax-exempt status, penalty assessments under 26 U.S.C. § 6652, and potential donor deduction disallowance.\n\nRecent Treasury guidance through Revenue Ruling 2003-28 and subsequent interpretations clarify that the Act's provisions extend to partial interest donations and licensing arrangements. Universities must coordinate with institutional advancement, legal counsel, and external tax advisors to ensure full regulatory compliance and optimize donor relationships within statutory parameters.",
+    "summary": "The American Jobs Creation Act of 2004 limits charitable deductions for intellectual property donations to universities to the lesser of donor basis or fair market value, while providing potential supplemental deductions based on income generated over ten years.",
+    "requirements": "## Initial Deduction Limitations\n- Restrict donor deductions to lesser of basis or fair market value per 26 U.S.C. § 170(e)(1)(B)(iii)\n- Apply limitations to patents, copyrights, trademarks, software, and similar IP donated after June 3, 2004\n- Coordinate with development offices to manage donor expectations regarding tax benefits\n\n## Sliding-Scale Additional Deductions\n- Track net income generated from donated intellectual property for ten-year period\n- Calculate supplemental deductions: 100% years 1-2, decreasing 10% annually to 10% in year 10\n- Provide annual income reports to qualifying donors per 26 U.S.C. § 170(m)\n\n## Documentation and Recordkeeping\n- Maintain contemporaneous written acknowledgments for donations exceeding $250\n- Document fair market value assessments and donor basis calculations\n- Preserve income tracking records for minimum ten-year retention period\n\n## Form 8899 Compliance\n- File annual information returns reporting IP donation income by April 15th\n- Coordinate between technology transfer offices and tax compliance departments\n- Ensure accurate donor identification and income allocation reporting",
+    "reportingRequirements": "Universities must file Form 8899 annually by April 15th reporting net income from donated intellectual property. Annual income statements must be provided to qualifying donors by January 31st. Contemporaneous written acknowledgments required for all IP donations exceeding $250 value."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T16:37:40.528Z"
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Compliance Review",
+      "type": "review",
+      "description": "Annual Compliance Review for American Jobs Creation Act of 2004",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Intellectual Property and Technology Transfer"
+  ]
+}

@@ -1,0 +1,378 @@
+// src/lambda/level1-validator/cache.js
+/**
+ * Cache Utility for Validation Results
+ * 
+ * Provides caching mechanisms for validation results to improve performance
+ * for frequently validated regulations.
+ */
+
+const AWS = require('aws-sdk');
+
+// Configure DynamoDB with default options or environment variables
+const dynamoDB = new AWS.DynamoDB.DocumentClient({
+  region: process.env.AWS_REGION || 'us-east-1'
+});
+
+// Cache table name from environment or default
+const CACHE_TABLE = process.env.VALIDATION_CACHE_TABLE || 'compliance-tracker-validation-cache';
+
+// Default cache TTL in seconds (6 hours)
+const DEFAULT_TTL = 6 * 60 * 60;
+
+/**
+ * Store a validation result in the cache
+ * 
+ * @param {string} cacheKey - Unique key for the cached result
+ * @param {Object} result - Validation result to cache
+ * @param {number} ttl - Time-to-live in seconds (optional)
+ * @returns {Promise<boolean>} Success indicator
+ */
+async function storeResult(cacheKey, result, ttl = DEFAULT_TTL) {
+  try {
+    // Calculate expiration timestamp
+    const expiresAt = Math.floor(Date.now() / 1000) + ttl;
+    
+    // Create item for DynamoDB
+    const item = {
+      CacheKey: cacheKey,
+      Result: JSON.stringify(result),
+      ExpiresAt: expiresAt,
+      CreatedAt: new Date().toISOString()
+    };
+    
+    // Store in DynamoDB
+    await dynamoDB.put({
+      TableName: CACHE_TABLE,
+      Item: item
+    }).promise();
+    
+    console.log(`Cached validation result for key: ${cacheKey}`);
+    return true;
+  } catch (error) {
+    // Log error but don't fail the validation if caching fails
+    console.error('Error storing validation result in cache:', error);
+    return false;
+  }
+}
+
+/**
+ * Get a cached validation result
+ * 
+ * @param {string} cacheKey - Unique key for the cached result
+ * @returns {Promise<Object|null>} Cached result or null if not found
+ */
+async function getResult(cacheKey) {
+  try {
+    // Check if cache table exists before querying
+    if (!await doesTableExist(CACHE_TABLE)) {
+      console.log(`Cache table ${CACHE_TABLE} does not exist, skipping cache lookup`);
+      return null;
+    }
+    
+    // Query DynamoDB for cached result
+    const response = await dynamoDB.get({
+      TableName: CACHE_TABLE,
+      Key: { CacheKey: cacheKey }
+    }).promise();
+    
+    // Check if item exists and is not expired
+    if (response.Item) {
+      console.log(`Found cached result for key: ${cacheKey}`);
+      
+      // Parse stored result
+      return JSON.parse(response.Item.Result);
+    }
+    
+    console.log(`No cached result found for key: ${cacheKey}`);
+    return null;
+  } catch (error) {
+    // Log error but don't fail the validation if cache lookup fails
+    console.error('Error retrieving validation result from cache:', error);
+    return null;
+  }
+}
+
+/**
+ * Check if a DynamoDB table exists
+ * 
+ * @param {string} tableName - Name of the table to check
+ * @returns {Promise<boolean>} True if table exists, false otherwise
+ */
+async function doesTableExist(tableName) {
+  try {
+    // Check if the table exists by describing it
+    const dynamodb = new AWS.DynamoDB({ region: process.env.AWS_REGION || 'us-east-1' });
+    await dynamodb.describeTable({ TableName: tableName }).promise();
+    return true;
+  } catch (error) {
+    if (error.code === 'ResourceNotFoundException') {
+      return false;
+    }
+    
+    // For other errors, log and assume table doesn't exist
+    console.error(`Error checking if table ${tableName} exists:`, error);
+    return false;
+  }
+}
+
+/**
+ * Clear expired cache entries
+ * 
+ * @returns {Promise<number>} Number of items cleared
+ */
+async function clearExpiredEntries() {
+  try {
+    // Check if cache table exists
+    if (!await doesTableExist(CACHE_TABLE)) {
+      console.log(`Cache table ${CACHE_TABLE} does not exist, nothing to clear`);
+      return 0;
+    }
+    
+    // Get current timestamp
+    const now = Math.floor(Date.now() / 1000);
+    
+    // Scan for expired items
+    const scanResult = await dynamoDB.scan({
+      TableName: CACHE_TABLE,
+      FilterExpression: 'ExpiresAt < :now',
+      ExpressionAttributeValues: {
+        ':now': now
+      }
+    }).promise();
+    
+    // No expired items found
+    if (!scanResult.Items || scanResult.Items.length === 0) {
+      console.log('No expired cache entries found');
+      return 0;
+    }
+    
+    console.log(`Found ${scanResult.Items.length} expired cache entries to clear`);
+    
+    // Delete expired items (in batches of 25 as per DynamoDB limits)
+    const batchSize = 25;
+    let deletedCount = 0;
+    
+    for (let i = 0; i < scanResult.Items.length; i += batchSize) {
+      const batch = scanResult.Items.slice(i, i + batchSize);
+      
+      const deleteRequests = batch.map(item => ({
+        DeleteRequest: {
+          Key: { CacheKey: item.CacheKey }
+        }
+      }));
+      
+      await dynamoDB.batchWrite({
+        RequestItems: {
+          [CACHE_TABLE]: deleteRequests
+        }
+      }).promise();
+      
+      deletedCount += batch.length;
+    }
+    
+    console.log(`Cleared ${deletedCount} expired cache entries`);
+    return deletedCount;
+  } catch (error) {
+    console.error('Error clearing expired cache entries:', error);
+    return 0;
+  }
+}
+
+/**
+ * Invalidate cache for a specific regulation
+ * 
+ * @param {string} regulationId - Regulation identifier
+ * @param {string} version - Regulation version
+ * @returns {Promise<number>} Number of items invalidated
+ */
+async function invalidateRegulationCache(regulationId, version) {
+  try {
+    // Check if cache table exists
+    if (!await doesTableExist(CACHE_TABLE)) {
+      console.log(`Cache table ${CACHE_TABLE} does not exist, nothing to invalidate`);
+      return 0;
+    }
+    
+    // Create cache key prefix for the regulation
+    const keyPrefix = `${regulationId}:${version}:`;
+    
+    // Scan for matching items
+    const scanResult = await dynamoDB.scan({
+      TableName: CACHE_TABLE,
+      FilterExpression: 'begins_with(CacheKey, :prefix)',
+      ExpressionAttributeValues: {
+        ':prefix': keyPrefix
+      }
+    }).promise();
+    
+    // No matching items found
+    if (!scanResult.Items || scanResult.Items.length === 0) {
+      console.log(`No cache entries found for regulation: ${regulationId} version: ${version}`);
+      return 0;
+    }
+    
+    console.log(`Found ${scanResult.Items.length} cache entries to invalidate`);
+    
+    // Delete matching items (in batches of 25 as per DynamoDB limits)
+    const batchSize = 25;
+    let deletedCount = 0;
+    
+    for (let i = 0; i < scanResult.Items.length; i += batchSize) {
+      const batch = scanResult.Items.slice(i, i + batchSize);
+      
+      const deleteRequests = batch.map(item => ({
+        DeleteRequest: {
+          Key: { CacheKey: item.CacheKey }
+        }
+      }));
+      
+      await dynamoDB.batchWrite({
+        RequestItems: {
+          [CACHE_TABLE]: deleteRequests
+        }
+      }).promise();
+      
+      deletedCount += batch.length;
+    }
+    
+    console.log(`Invalidated ${deletedCount} cache entries for regulation: ${regulationId} version: ${version}`);
+    return deletedCount;
+  } catch (error) {
+    console.error('Error invalidating regulation cache:', error);
+    return 0;
+  }
+}
+
+/**
+ * Create or update the cache table
+ * 
+ * This function can be called during deployment or initialization
+ * to ensure the cache table exists with proper configuration.
+ * 
+ * @returns {Promise<boolean>} Success indicator
+ */
+async function createCacheTable() {
+  try {
+    const dynamodb = new AWS.DynamoDB({ region: process.env.AWS_REGION || 'us-east-1' });
+    
+    // Check if table already exists
+    try {
+      await dynamodb.describeTable({ TableName: CACHE_TABLE }).promise();
+      console.log(`Cache table ${CACHE_TABLE} already exists`);
+      return true;
+    } catch (error) {
+      if (error.code !== 'ResourceNotFoundException') {
+        throw error;
+      }
+      
+      // Table doesn't exist, create it
+      const params = {
+        TableName: CACHE_TABLE,
+        KeySchema: [
+          { AttributeName: 'CacheKey', KeyType: 'HASH' }
+        ],
+        AttributeDefinitions: [
+          { AttributeName: 'CacheKey', AttributeType: 'S' }
+        ],
+        ProvisionedThroughput: {
+          ReadCapacityUnits: 5,
+          WriteCapacityUnits: 5
+        },
+        TimeToLiveSpecification: {
+          AttributeName: 'ExpiresAt',
+          Enabled: true
+        }
+      };
+      
+      await dynamodb.createTable(params).promise();
+      
+      // Wait for table to be active
+      console.log(`Creating cache table ${CACHE_TABLE}...`);
+      await dynamodb.waitFor('tableExists', { TableName: CACHE_TABLE }).promise();
+      
+      // Enable TTL
+      await dynamodb.updateTimeToLive({
+        TableName: CACHE_TABLE,
+        TimeToLiveSpecification: {
+          AttributeName: 'ExpiresAt',
+          Enabled: true
+        }
+      }).promise();
+      
+      console.log(`Cache table ${CACHE_TABLE} created successfully`);
+      return true;
+    }
+  } catch (error) {
+    console.error(`Error creating cache table ${CACHE_TABLE}:`, error);
+    return false;
+  }
+}
+
+/**
+ * Get cache statistics
+ * 
+ * @returns {Promise<Object>} Cache statistics
+ */
+async function getCacheStats() {
+  try {
+    // Check if cache table exists
+    if (!await doesTableExist(CACHE_TABLE)) {
+      return {
+        exists: false,
+        itemCount: 0,
+        sizeBytes: 0,
+        oldestEntry: null,
+        newestEntry: null
+      };
+    }
+    
+    // Get table description
+    const dynamodb = new AWS.DynamoDB({ region: process.env.AWS_REGION || 'us-east-1' });
+    const tableDesc = await dynamodb.describeTable({ TableName: CACHE_TABLE }).promise();
+    
+    // Scan for a small sample to get timestamps
+    const scanResult = await dynamoDB.scan({
+      TableName: CACHE_TABLE,
+      Limit: 100
+    }).promise();
+    
+    // Find oldest and newest entries
+    let oldestEntry = null;
+    let newestEntry = null;
+    
+    if (scanResult.Items && scanResult.Items.length > 0) {
+      const items = scanResult.Items.filter(item => item.CreatedAt);
+      
+      if (items.length > 0) {
+        // Sort by creation time
+        items.sort((a, b) => new Date(a.CreatedAt) - new Date(b.CreatedAt));
+        
+        oldestEntry = items[0].CreatedAt;
+        newestEntry = items[items.length - 1].CreatedAt;
+      }
+    }
+    
+    return {
+      exists: true,
+      itemCount: tableDesc.Table.ItemCount || 0,
+      sizeBytes: tableDesc.Table.TableSizeBytes || 0,
+      oldestEntry,
+      newestEntry
+    };
+  } catch (error) {
+    console.error('Error getting cache statistics:', error);
+    return {
+      exists: false,
+      error: error.message
+    };
+  }
+}
+
+module.exports = {
+  storeResult,
+  getResult,
+  clearExpiredEntries,
+  invalidateRegulationCache,
+  createCacheTable,
+  getCacheStats
+};

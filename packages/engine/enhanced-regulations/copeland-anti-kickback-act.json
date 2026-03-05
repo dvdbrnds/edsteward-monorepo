@@ -1,0 +1,42 @@
+{
+  "regulationId": "copeland-anti-kickback-act",
+  "enhanced": {
+    "fullText": "The Copeland Anti-Kickback Act, codified at 18 U.S.C. § 874 and 40 U.S.C. § 3145, serves as a fundamental protection against corruption in federally funded construction and public works projects, with significant implications for higher education institutions. Originally enacted in 1934 and strengthened through subsequent amendments, this Act prohibits contractors and subcontractors from inducing employees to kickback any portion of their wages on public buildings or works financed wholly or in part by loans or grants from the United States.\n\nFor higher education institutions, the Act's scope encompasses all construction projects exceeding $2,000 that receive federal funding, including dormitory construction, academic buildings, research facilities, and infrastructure improvements funded through federal grants, loans, or appropriations. Under 40 U.S.C. § 3145(a), contractors and subcontractors must furnish weekly certified payroll statements showing wages paid to each employee, their classifications, and hours worked. These statements must be submitted to the contracting agency and made available for public inspection.\n\nThe criminal provisions under 18 U.S.C. § 874 impose severe penalties for violations, including fines up to $5,000 and imprisonment up to five years for anyone who demands or receives kickbacks from employees working on covered projects. Universities serving as contracting entities must ensure their contractors comply with these requirements through contract provisions and ongoing monitoring.\n\nEnforcement mechanisms include investigations by the Department of Labor's Wage and Hour Division, which has authority to conduct compliance reviews and initiate enforcement actions. The Act works in conjunction with the Davis-Bacon Act (40 U.S.C. § 3141 et seq.) to protect workers on federally funded construction projects. Recent regulatory updates through 29 CFR Part 5 have clarified electronic submission procedures for payroll statements and enhanced transparency requirements.\n\nUniversities must establish robust procurement procedures that include Copeland Act compliance clauses in all applicable construction contracts, designate responsible officials to monitor contractor submissions, and maintain records for audit purposes. Failure to ensure contractor compliance can result in federal funding suspension, debarment proceedings, and potential criminal liability for institutional officials who knowingly permit violations.",
+    "summary": "The Copeland Anti-Kickback Act prohibits wage kickbacks on federally funded construction projects exceeding $2,000, requiring universities to ensure contractors submit weekly certified payroll statements and comply with anti-corruption provisions under 18 U.S.C. § 874 and 40 U.S.C. § 3145.",
+    "requirements": "## Contractor Compliance Monitoring\n- Verify all construction contracts over $2,000 include Copeland Act compliance clauses per 40 U.S.C. § 3145\n- Establish procedures to collect and review weekly certified payroll statements from contractors and subcontractors\n- Designate compliance officers to monitor contractor wage reporting and investigate potential violations\n\n## Documentation and Record-Keeping\n- Maintain certified payroll records for public inspection as required under 40 U.S.C. § 3145(a)\n- Preserve all contractor wage statements and compliance documentation for minimum three years post-project completion\n- Document contractor compliance reviews and corrective actions taken\n\n## Contract Administration\n- Include specific anti-kickback provisions and penalty clauses in all applicable federal construction contracts\n- Require contractors to certify compliance with 18 U.S.C. § 874 prohibition on wage kickbacks\n- Establish procedures for contractor debarment and contract termination for violations\n\n## Training and Oversight\n- Train procurement and facilities management staff on Copeland Act requirements and violation indicators\n- Implement regular auditing procedures to verify contractor payroll statement accuracy and completeness",
+    "reportingRequirements": "Contractors must submit weekly certified payroll statements to the university within seven days of each payroll period per 40 U.S.C. § 3145. Universities must make these statements available for public inspection and report suspected violations to the Department of Labor immediately upon discovery."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T17:59:00.328Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Vendor Compliance Review",
+      "type": "review",
+      "description": "Vendor Compliance Review for Copeland Anti-Kickback Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "SAM.gov Registration Renewal",
+      "type": "registration",
+      "description": "SAM.gov Registration Renewal for Copeland Anti-Kickback Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Contracts & Procurement"
+  ]
+}

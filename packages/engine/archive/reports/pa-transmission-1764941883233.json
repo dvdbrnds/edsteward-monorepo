@@ -1,0 +1,114 @@
+{
+  "timestamp": "2025-12-05T13:38:03.233Z",
+  "results": [
+    {
+      "slug": "pennsylvania-uniform-crime-reporting-act",
+      "success": false,
+      "status": 400,
+      "error": {
+        "error": "Invalid regulation update data",
+        "details": [
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "name"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "originalContent"
+            ],
+            "message": "Required"
+          }
+        ]
+      }
+    },
+    {
+      "slug": "pennsylvania-sexual-violence-education-act-article-",
+      "success": false,
+      "error": "File not found"
+    },
+    {
+      "slug": "pennsylvania-higher-education-gift-disclosure-act",
+      "success": false,
+      "status": 400,
+      "error": {
+        "error": "Invalid regulation update data",
+        "details": [
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "name"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "originalContent"
+            ],
+            "message": "Required"
+          }
+        ]
+      }
+    },
+    {
+      "slug": "pennsylvania-english-fluency-in-higher-education-a",
+      "success": false,
+      "status": 400,
+      "error": {
+        "error": "Invalid regulation update data",
+        "details": [
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "name"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "originalContent"
+            ],
+            "message": "Required"
+          }
+        ]
+      }
+    },
+    {
+      "slug": "pennsylvania-graduation-rates-reporting-act-88-of-",
+      "success": false,
+      "error": "File not found"
+    },
+    {
+      "slug": "pa-paeducation-1741813075070",
+      "success": false,
+      "error": "File not found"
+    },
+    {
+      "slug": "pa-padeptEd-1741813075521",
+      "success": false,
+      "error": "File not found"
+    },
+    {
+      "slug": "pa-padeptEd-1741813212673",
+      "success": false,
+      "error": "File not found"
+    }
+  ]
+}

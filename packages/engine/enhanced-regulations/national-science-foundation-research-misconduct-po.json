@@ -1,0 +1,50 @@
+{
+  "regulationId": "national-science-foundation-research-misconduct-po",
+  "enhanced": {
+    "fullText": "The National Science Foundation Research Misconduct Policies, codified under 42 U.S.C. § 1870(a) and implemented through 45 CFR Part 689, establish comprehensive standards for investigating and adjudicating research misconduct allegations at institutions receiving NSF funding. These regulations define research misconduct as fabrication, falsification, or plagiarism in proposing, performing, or reviewing research, or in reporting research results, with three critical elements required for a finding: (1) significant departure from accepted practices of the relevant research community, (2) intentional, knowing, or reckless commission of the misconduct, and (3) proof by preponderance of evidence standard under 45 CFR § 689.3.\n\nHigher education institutions receiving NSF awards exceeding $50,000 must maintain written policies and procedures consistent with 45 CFR Part 689 requirements. Institutional responsibilities include conducting preliminary inquiries within 60 days of allegation receipt, formal investigations when warranted, and providing due process protections to respondents per 42 U.S.C. § 1870(a)(3). Universities must designate Research Integrity Officers (RIOs) responsible for overseeing misconduct proceedings and ensuring compliance with federal notification requirements under 45 CFR § 689.4.\n\nEnforcement mechanisms include suspension or termination of federal funding, debarment from federal programs for up to three years under 2 CFR Part 180, and required institutional corrective actions. NSF may impose administrative actions including supervision of future research activities, certification requirements for data accuracy, and mandatory research integrity training per 45 CFR § 689.3(c). Recent amendments in 2022 expanded reporting requirements to include research security violations and foreign influence concerns under NSF 22-060 guidance.\n\nInstitutions must report substantiated misconduct findings to NSF within 30 days of final determination, including detailed investigation reports, institutional actions taken, and respondent's written response. The regulation's scope extends to all NSF-funded research activities, including collaborative projects, graduate student research, and international partnerships, ensuring comprehensive oversight of federal research integrity standards across higher education.",
+    "summary": "NSF Research Misconduct Policies under 42 U.S.C. § 1870(a) and 45 CFR Part 689 require universities receiving NSF funding to maintain written misconduct policies, conduct formal investigations, and report substantiated findings within 30 days.",
+    "requirements": "## Investigation Procedures\n- Conduct preliminary inquiries within 60 days of receiving misconduct allegations\n- Complete formal investigations within 120 days when warranted per 45 CFR § 689.4\n- Maintain detailed documentation throughout all phases of proceedings\n- Provide due process protections including respondent notification and response opportunities\n\n## Institutional Policies\n- Establish written research misconduct policies consistent with 45 CFR Part 689\n- Designate qualified Research Integrity Officers (RIOs) for oversight responsibilities\n- Implement training programs for research personnel on integrity standards\n- Maintain confidentiality protections for complainants and respondents\n\n## Federal Notification Requirements\n- Report substantiated misconduct findings to NSF within 30 days of final determination\n- Submit annual reports on institutional research integrity activities\n- Notify NSF immediately of any criminal or civil proceedings related to covered research",
+    "reportingRequirements": "Institutions must submit substantiated misconduct findings to NSF within 30 days of final institutional determination per 45 CFR § 689.4. Annual institutional reports on research integrity activities are due January 31st each year."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T01:05:58.074Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "IRB Protocol Annual Review",
+      "type": "review",
+      "description": "IRB Protocol Annual Review for National Science Foundation Research Misconduct Policies",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Conflict of Interest Disclosure",
+      "type": "disclosure",
+      "description": "Conflict of Interest Disclosure for National Science Foundation Research Misconduct Policies",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Export Control Assessment",
+      "type": "assessment",
+      "description": "Export Control Assessment for National Science Foundation Research Misconduct Policies",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Research"
+  ]
+}

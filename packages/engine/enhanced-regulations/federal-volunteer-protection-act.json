@@ -1,0 +1,42 @@
+{
+  "regulationId": "federal-volunteer-protection-act",
+  "enhanced": {
+    "fullText": "The Federal Volunteer Protection Act of 1997, codified at 42 U.S.C. §§ 14501-14505, provides qualified liability protection for volunteers serving nonprofit organizations and governmental entities, including public higher education institutions. This federal legislation establishes uniform standards across states to encourage volunteer service by limiting personal liability exposure for good-faith volunteer activities.\n\nUnder 42 U.S.C. § 14503, the Act protects volunteers from liability for harm caused by acts or omissions on behalf of qualifying organizations, provided specific conditions are met. For higher education institutions, this encompasses student mentors, alumni volunteers, advisory board members, athletic boosters, fundraising volunteers, and community service coordinators. The protection applies when volunteers act within the scope of their responsibilities, are properly licensed or certified when required, and were not operating motor vehicles, aircraft, or vessels during the incident.\n\nKey statutory requirements under 42 U.S.C. § 14502 mandate that protected organizations must be nonprofit entities or governmental bodies operating for public benefit. Private universities qualify as 501(c)(3) organizations, while public institutions satisfy the governmental entity requirement. Volunteers must not receive compensation exceeding $500 annually, excluding reimbursement for actual expenses incurred.\n\nThe Act's limitations, detailed in 42 U.S.C. § 14503(a)(3), exclude protection for volunteers acting outside their authorized scope, under influence of alcohol or drugs, engaging in criminal conduct, hate crimes, sexual offenses, or violations of civil rights laws including Title VI, Title VII, and Title IX. Additionally, protection does not extend to harm caused by willful or criminal misconduct, gross negligence, or reckless misconduct.\n\nPursuant to 42 U.S.C. § 14503(f), institutions may be held liable for volunteers' conduct under respondeat superior principles, even when individual volunteers receive protection. This provision ensures injured parties retain recourse against organizations while protecting individual volunteers from personal financial exposure.\n\nState preemption provisions under 42 U.S.C. § 14504 establish federal standards as minimum protection levels, allowing states to provide broader volunteer protections but not narrower coverage. Higher education institutions must comply with applicable state laws that may impose additional requirements or expanded protections.\n\nThe Act requires no federal reporting but mandates institutions maintain proper volunteer documentation, including scope of authority definitions, background checks where appropriate, and training records. Institutions should establish clear volunteer policies delineating authorized activities, conduct expectations, and supervision requirements to maximize protection coverage and minimize organizational liability exposure.",
+    "summary": "The Federal Volunteer Protection Act (42 U.S.C. §§ 14501-14505) shields individual volunteers of nonprofit organizations and governmental entities from personal liability for negligent acts performed within their authorized volunteer scope, protecting higher education institution volunteers while maintaining organizational accountability.",
+    "requirements": "## Volunteer Qualification Standards\n- Ensure volunteers receive no compensation exceeding $500 annually per 42 U.S.C. § 14502(4)\n- Verify volunteers possess required licenses, certifications, or credentials when applicable\n- Confirm volunteers act within explicitly defined scope of authorized responsibilities\n\n## Organizational Compliance Obligations\n- Maintain nonprofit tax-exempt status or governmental entity classification under 42 U.S.C. § 14502(1)\n- Establish written volunteer policies defining authorized activities and conduct standards\n- Document volunteer training completion and scope of authority designations\n\n## Exclusion Prevention Measures\n- Implement background screening procedures for volunteers working with minors or vulnerable populations\n- Prohibit volunteer operation of institutional vehicles, aircraft, or vessels during protected activities\n- Establish zero-tolerance policies for alcohol, drug use, and discriminatory conduct per 42 U.S.C. § 14503(a)(3)\n\n## Liability Management Protocols\n- Maintain adequate institutional liability insurance coverage for volunteer activities\n- Review state-specific volunteer protection laws for enhanced coverage opportunities under 42 U.S.C. § 14504",
+    "reportingRequirements": "The Federal Volunteer Protection Act imposes no federal reporting requirements on higher education institutions. However, institutions must maintain comprehensive volunteer documentation including authorization scopes, training records, background check results, and incident reports to substantiate protection eligibility during potential litigation proceedings."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T19:01:24.303Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "I-9 Form Audit",
+      "type": "audit",
+      "description": "I-9 Form Audit for Federal Volunteer Protection Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Background Check Policy Review",
+      "type": "review",
+      "description": "Background Check Policy Review for Federal Volunteer Protection Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Recruitment Hiring & Termination"
+  ]
+}

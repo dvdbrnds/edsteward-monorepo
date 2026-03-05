@@ -1,0 +1,50 @@
+{
+  "regulationId": "federal-insecticide-fungicide-and-rodenticide-act",
+  "enhanced": {
+    "fullText": "The Federal Insecticide, Fungicide and Rodenticide Act (FIFRA), codified at 7 U.S.C. §§ 136-136y, establishes comprehensive federal oversight of pesticide distribution, sale, and use throughout the United States. Administered by the Environmental Protection Agency (EPA) under 40 CFR Parts 150-189, FIFRA requires registration of all pesticides before commercial distribution and mandates compliance with labeling, application, and safety requirements that directly impact higher education institutions.\n\nHigher education institutions fall under FIFRA jurisdiction when conducting agricultural research, maintaining campus grounds, operating dining facilities, or managing dormitories where pesticides are used. Under 7 U.S.C. § 136a, all pesticides used on campus must be EPA-registered, and institutions must ensure applications comply with approved labeling under 7 U.S.C. § 136j(a)(2)(G). Universities conducting pesticide research must obtain Experimental Use Permits under 7 U.S.C. § 136c and 40 CFR Part 172.\n\nCritical compliance requirements include: maintaining certified pesticide applicators per 7 U.S.C. § 136i and state certification programs; implementing restricted use pesticide controls under 7 U.S.C. § 136a(d); establishing proper storage and disposal procedures per 40 CFR Part 165; and maintaining application records as required by 7 U.S.C. § 136i-1. Agricultural programs must comply with worker protection standards under 40 CFR Part 170, including training, notification, and personal protective equipment requirements.\n\nEnforcement mechanisms include EPA inspections under 7 U.S.C. § 136f, civil penalties up to $19,246 per violation for commercial users under 7 U.S.C. § 136l(a)(1), and criminal penalties including fines up to $50,000 and imprisonment for knowing violations under 7 U.S.C. § 136l(b)(1). The EPA's 2022 amendments strengthened enforcement procedures and expanded electronic reporting requirements under 40 CFR Part 169.\n\nInstitutions must designate responsible environmental health officers, establish integrated pest management programs, coordinate with state lead agencies, and ensure all campus pesticide activities comply with federal registration and labeling requirements. Non-compliance risks significant financial penalties and potential suspension of agricultural research activities.",
+    "summary": "FIFRA regulates pesticide distribution, sale, and use on college campuses. Universities must use EPA-registered pesticides, maintain certified applicators, comply with labeling requirements, and implement worker protection standards for agricultural and maintenance operations.",
+    "requirements": "## Registration and Certification Requirements\n- Ensure all campus pesticides are EPA-registered per 7 U.S.C. § 136a\n- Maintain certified pesticide applicators under 7 U.S.C. § 136i\n- Obtain Experimental Use Permits for research activities per 40 CFR Part 172\n- Implement restricted use pesticide controls under 7 U.S.C. § 136a(d)\n\n## Operational Compliance Standards\n- Follow approved pesticide labeling requirements under 7 U.S.C. § 136j(a)(2)(G)\n- Implement worker protection standards per 40 CFR Part 170\n- Establish proper storage and disposal procedures under 40 CFR Part 165\n- Maintain integrated pest management programs\n\n## Record Keeping and Documentation\n- Maintain pesticide application records per 7 U.S.C. § 136i-1\n- Document worker training and notification activities\n- Prepare for EPA inspections under 7 U.S.C. § 136f\n\n## Institutional Management\n- Designate responsible environmental health officers\n- Coordinate compliance with state lead agencies\n- Establish emergency response procedures for pesticide incidents",
+    "reportingRequirements": "Institutions must maintain pesticide application records under 7 U.S.C. § 136i-1 for two years minimum. Research facilities require Experimental Use Permit reporting per 40 CFR Part 172. Adverse effects must be reported to EPA immediately per 7 U.S.C. § 136d(a)(6). Electronic reporting submissions follow 40 CFR Part 169 requirements with annual compliance certifications to state lead agencies."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T16:12:17.511Z"
+  },
+  "deadlines": [
+    {
+      "date": "02-01",
+      "label": "OSHA 300 Log Posting",
+      "type": "posting",
+      "description": "OSHA 300 Log Posting for Federal Insecticide, Fungicide and Rodenticide Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Annual Safety Training",
+      "type": "training",
+      "description": "Annual Safety Training for Federal Insecticide, Fungicide and Rodenticide Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Hazardous Waste Manifest Submission",
+      "type": "filing",
+      "description": "Hazardous Waste Manifest Submission for Federal Insecticide, Fungicide and Rodenticide Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Environmental Health and Safety"
+  ]
+}

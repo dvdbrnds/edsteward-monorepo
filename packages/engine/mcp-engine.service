@@ -1,0 +1,49 @@
+[Unit]
+Description=MCP Engine - Model Context Protocol Regulation Management System
+Documentation=https://github.com/your-org/mcp-engine
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=mcp-engine
+Group=mcp-engine
+WorkingDirectory=/opt/mcp-engine
+ExecStart=/usr/bin/node start-production.js
+ExecReload=/bin/kill -HUP $MAINPID
+KillMode=mixed
+KillSignal=SIGTERM
+TimeoutStopSec=30
+Restart=always
+RestartSec=10
+StartLimitInterval=60
+StartLimitBurst=3
+
+# Security settings
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=yes
+ReadWritePaths=/opt/mcp-engine/logs /opt/mcp-engine/data /opt/mcp-engine/cache
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+
+# Resource limits
+LimitNOFILE=65536
+LimitNPROC=4096
+MemoryMax=4G
+CPUQuota=200%
+
+# Environment
+Environment=NODE_ENV=production
+Environment=PORT=3050
+Environment=LOG_LEVEL=info
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=mcp-engine
+
+[Install]
+WantedBy=multi-user.target

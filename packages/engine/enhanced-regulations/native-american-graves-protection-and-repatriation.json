@@ -1,0 +1,50 @@
+{
+  "regulationId": "native-american-graves-protection-and-repatriation",
+  "enhanced": {
+    "fullText": "The Native American Graves Protection and Repatriation Act (NAGPRA), codified at 25 U.S.C. §§ 3001-3013, represents landmark federal legislation enacted in 1990 that fundamentally transformed how museums, universities, and federal agencies handle Native American cultural items and human remains. For higher education institutions, NAGPRA establishes comprehensive legal obligations that extend far beyond simple compliance requirements, mandating active collaboration with tribal communities and fundamental changes to research, curation, and educational practices.\n\nUnder 25 U.S.C. § 3003, institutions receiving federal funding must inventory all Native American human remains and associated funerary objects in their collections, providing detailed summaries to affiliated tribes and Native Hawaiian organizations. The statute defines four protected categories: human remains, associated funerary objects, unassociated funerary objects, sacred objects, and objects of cultural patrimony (25 U.S.C. § 3001). Universities must complete comprehensive inventories within five years of the Act's passage, with ongoing obligations for newly acquired materials.\n\nThe repatriation process, governed by 43 CFR Part 10, requires institutions to notify potentially affiliated tribes and lineal descendants upon completing inventories. Tribes have specific rights to request repatriation, and institutions must comply unless they can prove right of possession by clear and convincing evidence (25 U.S.C. § 3005). For universities conducting research on federal or tribal lands, 25 U.S.C. § 3002 establishes strict protocols for inadvertent discoveries, requiring immediate cessation of activities and notification of appropriate officials within three days.\n\nEnforcement mechanisms include both civil and criminal penalties. Criminal violations under 18 U.S.C. § 1170 can result in fines up to $100,000 and imprisonment up to one year for trafficking in Native American human remains or cultural items. The Department of Interior may also impose civil penalties up to $12,000 per violation for non-compliance with repatriation requirements (43 CFR § 10.12). Universities face potential loss of federal funding for willful non-compliance.\n\nRecent regulatory updates, including 2023 amendments to 43 CFR Part 10, strengthened tribal consultation requirements and expanded definitions of cultural affiliation. These changes require institutions to obtain free, prior, and informed consent from tribes before conducting certain research activities and mandate enhanced consultation throughout the repatriation process. Universities must now demonstrate ongoing relationships with tribal communities rather than treating consultation as a one-time requirement.",
+    "summary": "NAGPRA requires federally-funded universities to inventory and repatriate Native American human remains and cultural items to affiliated tribes, establish consultation protocols, and follow strict procedures for discoveries on federal lands.",
+    "requirements": "## Inventory and Documentation Requirements\n- Complete comprehensive inventories of all Native American human remains and funerary objects within institutional collections per 25 U.S.C. § 3003\n- Prepare detailed summaries of unassociated funerary objects, sacred objects, and cultural patrimony items\n- Maintain updated records using National NAGPRA Program databases and reporting systems\n- Document chain of custody and acquisition history for all covered materials\n\n## Tribal Consultation and Notification\n- Notify potentially affiliated tribes and Native Hawaiian organizations upon inventory completion per 43 CFR § 10.8\n- Establish ongoing consultation relationships with tribal cultural resource departments\n- Provide tribes reasonable access to collections for examination and ceremonial purposes\n- Obtain free, prior, and informed consent before conducting research on covered materials\n\n## Repatriation Process Management\n- Process tribal repatriation requests within reasonable timeframes as specified in 43 CFR Part 10\n- Transfer items to requesting tribes unless institution can prove right of possession by clear and convincing evidence\n- Coordinate physical transfer logistics and provide appropriate documentation\n\n## Federal Land Discovery Protocols\n- Immediately cease excavation activities upon inadvertent discovery of Native American remains or objects on federal or tribal lands\n- Notify federal land managers and appropriate tribes within three days per 25 U.S.C. § 3002\n- Secure discovery sites and implement protective measures until consultation completed",
+    "reportingRequirements": "Submit annual summary reports to the National NAGPRA Program by December 31st detailing inventory progress, consultation activities, and completed repatriations. File immediate notifications within 72 hours for inadvertent discoveries on federal lands per 43 CFR § 10.4. Submit civil penalties assessment responses within 45 days when issued by Department of Interior."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T01:06:42.444Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "IRB Protocol Annual Review",
+      "type": "review",
+      "description": "IRB Protocol Annual Review for Native American Graves Protection and Repatriation Act (NAGPRA)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Conflict of Interest Disclosure",
+      "type": "disclosure",
+      "description": "Conflict of Interest Disclosure for Native American Graves Protection and Repatriation Act (NAGPRA)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Export Control Assessment",
+      "type": "assessment",
+      "description": "Export Control Assessment for Native American Graves Protection and Repatriation Act (NAGPRA)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Research"
+  ]
+}

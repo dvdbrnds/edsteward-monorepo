@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Delivery Dashboard | MCP Engine v5.3.0</title>
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-tertiary: #21262d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent-blue: #58a6ff;
+            --accent-green: #3fb950;
+            --accent-red: #f85149;
+            --accent-yellow: #d29922;
+            --accent-purple: #a371f7;
+            --border-color: #30363d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #3d1a5a 0%, #1a0a2e 100%);
+            padding: 24px 32px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header h1 span {
+            background: var(--accent-purple);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .header p {
+            color: var(--text-secondary);
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 32px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+        }
+
+        .stat-card h3 {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .stat-card.online .value { color: var(--accent-green); }
+        .stat-card.offline .value { color: var(--accent-red); }
+        .stat-card.pending .value { color: var(--accent-yellow); }
+        .stat-card.total .value { color: var(--accent-blue); }
+
+        .section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+
+        .section-header {
+            background: var(--bg-tertiary);
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-header h2 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: var(--accent-blue);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #4393e6;
+        }
+
+        .btn-success {
+            background: var(--accent-green);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #2ea043;
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border-color);
+        }
+
+        .customer-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .customer-table th,
+        .customer-table td {
+            padding: 16px 20px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .customer-table th {
+            font-size: 12px;
+            text-transform: uppercase;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .customer-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .customer-table tr:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .status-online {
+            background: rgba(63, 185, 80, 0.15);
+            color: var(--accent-green);
+        }
+
+        .status-offline {
+            background: rgba(248, 81, 73, 0.15);
+            color: var(--accent-red);
+        }
+
+        .status-checking {
+            background: rgba(210, 153, 34, 0.15);
+            color: var(--accent-yellow);
+        }
+
+        .customer-name {
+            font-weight: 600;
+        }
+
+        .customer-type {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .customer-url {
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .push-panel {
+            padding: 20px;
+            background: var(--bg-tertiary);
+            border-top: 1px solid var(--border-color);
+        }
+
+        .push-panel h3 {
+            font-size: 14px;
+            margin-bottom: 16px;
+        }
+
+        .push-form {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .form-group {
+            flex: 1;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .log-container {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 16px 20px;
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 13px;
+        }
+
+        .log-entry {
+            padding: 4px 0;
+            display: flex;
+            gap: 12px;
+        }
+
+        .log-timestamp {
+            color: var(--text-secondary);
+            flex-shrink: 0;
+        }
+
+        .log-success { color: var(--accent-green); }
+        .log-error { color: var(--accent-red); }
+        .log-info { color: var(--accent-blue); }
+        .log-warn { color: var(--accent-yellow); }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            color: var(--text-secondary);
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border-color);
+            border-top-color: var(--accent-blue);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📊 Customer Delivery Dashboard <span>MCP Engine v5.3.0</span></h1>
+        <p>Manage and monitor regulation delivery to EdSteward customers</p>
+    </div>
+
+    <div class="container">
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card online">
+                <h3>Online Customers</h3>
+                <div class="value" id="onlineCount">-</div>
+            </div>
+            <div class="stat-card offline">
+                <h3>Offline Customers</h3>
+                <div class="value" id="offlineCount">-</div>
+            </div>
+            <div class="stat-card pending">
+                <h3>Pending Updates</h3>
+                <div class="value" id="pendingCount">0</div>
+            </div>
+            <div class="stat-card total">
+                <h3>Total Regulations</h3>
+                <div class="value" id="regulationCount">-</div>
+            </div>
+        </div>
+
+        <!-- Customer Table -->
+        <div class="section">
+            <div class="section-header">
+                <h2>🏢 Customer Registry</h2>
+                <div class="section-actions">
+                    <button class="btn btn-secondary" onclick="refreshStatuses()">
+                        🔄 Refresh Status
+                    </button>
+                    <button class="btn btn-success" onclick="pushToSelected()">
+                        📤 Push to Selected
+                    </button>
+                </div>
+            </div>
+            
+            <table class="customer-table">
+                <thead>
+                    <tr>
+                        <th style="width: 40px;"><input type="checkbox" class="checkbox" id="selectAll" onchange="toggleSelectAll()"></th>
+                        <th>Customer</th>
+                        <th>Endpoint</th>
+                        <th>Type</th>
+                        <th>Status</th>
+                        <th>Last Push</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="customerTable">
+                    <tr>
+                        <td colspan="7" class="loading">
+                            <div class="spinner"></div>
+                            Loading customers...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <!-- Push Panel -->
+            <div class="push-panel">
+                <h3>📤 Quick Push</h3>
+                <div class="push-form">
+                    <div class="form-group" style="flex: 2;">
+                        <label>Regulation</label>
+                        <select id="regulationSelect">
+                            <option value="">Select a regulation...</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Target</label>
+                        <select id="targetSelect">
+                            <option value="selected">Selected Customers</option>
+                            <option value="all">All Customers</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="executePush()">
+                        🚀 Execute Push
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Activity Log -->
+        <div class="section">
+            <div class="section-header">
+                <h2>📋 Activity Log</h2>
+                <button class="btn btn-secondary" onclick="clearLog()">Clear</button>
+            </div>
+            <div class="log-container" id="activityLog">
+                <div class="log-entry">
+                    <span class="log-timestamp">[System]</span>
+                    <span class="log-info">Dashboard initialized. Loading customers...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const DELIVERY_API = 'http://localhost:3051';
+        const REGISTRY_API = 'http://localhost:3010';
+        
+        let customers = [];
+        let regulations = [];
+        let lastPushTimes = {};
+
+        // Initialize dashboard
+        async function init() {
+            await loadCustomers();
+            await loadRegulations();
+            await refreshStatuses();
+        }
+
+        // Load customers from API
+        async function loadCustomers() {
+            try {
+                const response = await fetch(`${DELIVERY_API}/api/customers`);
+                const data = await response.json();
+                customers = data.customers;
+                renderCustomerTable();
+                log('Loaded ' + customers.length + ' customers', 'success');
+            } catch (error) {
+                log('Failed to load customers: ' + error.message, 'error');
+            }
+        }
+
+        // Load regulations from registry
+        async function loadRegulations() {
+            try {
+                const response = await fetch(`${REGISTRY_API}/api/regulations`);
+                regulations = await response.json();
+                populateRegulationSelect();
+                document.getElementById('regulationCount').textContent = regulations.length;
+                log('Loaded ' + regulations.length + ' regulations', 'success');
+            } catch (error) {
+                log('Failed to load regulations: ' + error.message, 'error');
+                document.getElementById('regulationCount').textContent = '?';
+            }
+        }
+
+        // Render customer table
+        function renderCustomerTable() {
+            const tbody = document.getElementById('customerTable');
+            tbody.innerHTML = customers.map(c => `
+                <tr data-customer-id="${c.id}">
+                    <td><input type="checkbox" class="checkbox customer-checkbox" data-id="${c.id}"></td>
+                    <td>
+                        <div class="customer-name">${c.name}</div>
+                        <div class="customer-type">${c.shortName}</div>
+                    </td>
+                    <td class="customer-url">${c.url}</td>
+                    <td><span class="status-badge ${c.type === 'production' ? 'status-online' : 'status-checking'}">${c.type}</span></td>
+                    <td><span class="status-badge status-checking" id="status-${c.id}">⏳ Checking</span></td>
+                    <td id="lastPush-${c.id}">${lastPushTimes[c.id] || 'Never'}</td>
+                    <td>
+                        <button class="btn btn-secondary" onclick="pushToCustomer('${c.id}')" style="padding: 6px 12px; font-size: 12px;">
+                            📤 Push
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Refresh customer statuses
+        async function refreshStatuses() {
+            let online = 0;
+            let offline = 0;
+            
+            for (const customer of customers) {
+                const statusEl = document.getElementById('status-' + customer.id);
+                statusEl.innerHTML = '⏳ Checking';
+                statusEl.className = 'status-badge status-checking';
+                
+                try {
+                    const response = await fetch(`${DELIVERY_API}/api/customers/${customer.id}/status`);
+                    const data = await response.json();
+                    
+                    if (data.status === 'online') {
+                        statusEl.innerHTML = '🟢 Online';
+                        statusEl.className = 'status-badge status-online';
+                        online++;
+                    } else {
+                        statusEl.innerHTML = '🔴 Offline';
+                        statusEl.className = 'status-badge status-offline';
+                        offline++;
+                    }
+                } catch (error) {
+                    statusEl.innerHTML = '🔴 Error';
+                    statusEl.className = 'status-badge status-offline';
+                    offline++;
+                }
+            }
+            
+            document.getElementById('onlineCount').textContent = online;
+            document.getElementById('offlineCount').textContent = offline;
+            log('Status refresh complete: ' + online + ' online, ' + offline + ' offline', 'info');
+        }
+
+        // Populate regulation dropdown
+        function populateRegulationSelect() {
+            const select = document.getElementById('regulationSelect');
+            const options = regulations.slice(0, 50).map(r => 
+                `<option value="${r.regulationId}">${r.name}</option>`
+            ).join('');
+            select.innerHTML = '<option value="">Select a regulation...</option>' + options;
+        }
+
+        // Toggle select all
+        function toggleSelectAll() {
+            const checked = document.getElementById('selectAll').checked;
+            document.querySelectorAll('.customer-checkbox').forEach(cb => cb.checked = checked);
+        }
+
+        // Get selected customer IDs
+        function getSelectedCustomerIds() {
+            return Array.from(document.querySelectorAll('.customer-checkbox:checked'))
+                .map(cb => cb.dataset.id);
+        }
+
+        // Push to selected customers
+        async function pushToSelected() {
+            const regulationId = document.getElementById('regulationSelect').value;
+            if (!regulationId) {
+                alert('Please select a regulation first');
+                return;
+            }
+            
+            const customerIds = getSelectedCustomerIds();
+            if (customerIds.length === 0) {
+                alert('Please select at least one customer');
+                return;
+            }
+            
+            await executePushToCustomers(regulationId, customerIds);
+        }
+
+        // Push to specific customer
+        async function pushToCustomer(customerId) {
+            const regulationId = document.getElementById('regulationSelect').value;
+            if (!regulationId) {
+                alert('Please select a regulation first');
+                return;
+            }
+            
+            await executePushToCustomers(regulationId, [customerId]);
+        }
+
+        // Execute push
+        async function executePush() {
+            const regulationId = document.getElementById('regulationSelect').value;
+            const target = document.getElementById('targetSelect').value;
+            
+            if (!regulationId) {
+                alert('Please select a regulation first');
+                return;
+            }
+            
+            if (target === 'all') {
+                await executePushToCustomers(regulationId, null, true);
+            } else {
+                const customerIds = getSelectedCustomerIds();
+                if (customerIds.length === 0) {
+                    alert('Please select at least one customer');
+                    return;
+                }
+                await executePushToCustomers(regulationId, customerIds);
+            }
+        }
+
+        // Execute push to customers
+        async function executePushToCustomers(regulationId, customerIds, pushToAll = false) {
+            log('Starting push: ' + regulationId + ' to ' + (pushToAll ? 'ALL' : customerIds.join(', ')), 'info');
+            
+            try {
+                const response = await fetch(`${DELIVERY_API}/api/customers/push`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        regulationId,
+                        customerIds,
+                        pushToAll
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    log('✅ Push successful: ' + result.successCount + '/' + result.totalCustomers + ' customers', 'success');
+                    
+                    // Update last push times
+                    result.results.forEach(r => {
+                        if (r.success) {
+                            lastPushTimes[r.customerId] = new Date().toLocaleTimeString();
+                            const el = document.getElementById('lastPush-' + r.customerId);
+                            if (el) el.textContent = lastPushTimes[r.customerId];
+                            log('   ✅ ' + r.customerName + ': Delivered (Update ID: ' + (r.response?.updateId || 'N/A') + ')', 'success');
+                        } else {
+                            log('   ❌ ' + r.customerName + ': ' + (r.error || 'Failed'), 'error');
+                        }
+                    });
+                } else {
+                    log('❌ Push failed: ' + (result.error || 'Unknown error'), 'error');
+                }
+            } catch (error) {
+                log('❌ Push error: ' + error.message, 'error');
+            }
+        }
+
+        // Logging
+        function log(message, type = 'info') {
+            const container = document.getElementById('activityLog');
+            const timestamp = new Date().toLocaleTimeString();
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            entry.innerHTML = `
+                <span class="log-timestamp">[${timestamp}]</span>
+                <span class="log-${type}">${message}</span>
+            `;
+            container.appendChild(entry);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('activityLog').innerHTML = '';
+            log('Log cleared', 'info');
+        }
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>

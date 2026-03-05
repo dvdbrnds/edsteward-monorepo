@@ -1,0 +1,50 @@
+{
+  "regulationId": "energy-reorganization-act-of-1974-as-amended",
+  "enhanced": {
+    "fullText": "The Energy Reorganization Act of 1974, codified at 42 U.S.C. § 5801 et seq., established the Nuclear Regulatory Commission (NRC) and governs the civilian use of nuclear materials, including their handling, storage, and disposal at higher education institutions. This comprehensive federal statute provides the legal framework for regulating radioactive materials used in research, medical applications, and educational programs across university campuses.\n\nUnder 42 U.S.C. § 5841, the NRC maintains exclusive regulatory authority over special nuclear materials, source materials, and byproduct materials. Higher education institutions conducting nuclear research, operating research reactors, or using radioactive isotopes in medical or scientific applications must obtain appropriate licenses under 10 CFR Part 30 (byproduct materials), 10 CFR Part 40 (source materials), or 10 CFR Part 50 (utilization facilities). Universities typically operate under broad scope licenses pursuant to 10 CFR § 30.33, which allow possession and use of various radioactive materials for research and educational purposes.\n\nKey compliance obligations include establishing radiation safety programs headed by qualified Radiation Safety Officers (RSOs) as specified in 10 CFR § 30.32(a)(3). Universities must maintain detailed records of radioactive material acquisitions, transfers, and disposals per 10 CFR Part 30, Subpart F. The Act requires institutions to implement comprehensive safety training programs, conduct regular radiation surveys, and maintain exposure monitoring records for all personnel working with radioactive materials.\n\nEnforcement mechanisms under 42 U.S.C. § 5848 include civil penalties up to $146,813 per violation per day for non-willful violations and up to $293,626 per violation per day for willful violations, as adjusted by 10 CFR § 2.205. The NRC may issue notices of violation, impose license conditions, or suspend operations for serious safety violations. Universities face potential criminal penalties under 42 U.S.C. § 2273 for willful violations that could endanger public health or safety.\n\nRecent amendments include enhanced security requirements following the Energy Policy Act of 2005, particularly affecting institutions possessing quantities of concern under 10 CFR Part 37. Universities must now implement enhanced access controls and conduct fingerprinting and background investigations for personnel accessing Category 1 and Category 2 quantities of radioactive materials. The Act also incorporates updated emergency response requirements under 44 CFR Part 351, mandating coordination with state and local emergency management agencies.",
+    "summary": "Federal statute establishing NRC authority over radioactive materials at universities. Requires licenses, radiation safety programs, qualified personnel, comprehensive recordkeeping, and regulatory compliance for all nuclear materials used in research and education.",
+    "requirements": "## Licensing and Authorization\n- Obtain appropriate NRC licenses under 10 CFR Parts 30, 40, or 50 before acquiring radioactive materials\n- Maintain current license conditions and notify NRC of material changes per 10 CFR § 30.34\n- Designate qualified Radiation Safety Officer meeting criteria in 10 CFR § 30.32(a)(3)\n\n## Safety Program Implementation\n- Establish comprehensive radiation safety program with written procedures\n- Conduct mandatory safety training for all personnel handling radioactive materials\n- Perform regular radiation surveys and maintain monitoring equipment per 10 CFR § 30.53\n\n## Security and Access Controls\n- Implement enhanced security measures for Category 1 and Category 2 materials under 10 CFR Part 37\n- Conduct fingerprinting and background investigations for authorized personnel\n- Maintain secure storage and implement access control systems\n\n## Recordkeeping and Documentation\n- Maintain detailed records of material receipts, transfers, and disposals per 10 CFR § 30.51\n- Document personnel radiation exposure monitoring and medical examinations\n- Preserve records for specified retention periods ranging from 3 years to permanent",
+    "reportingRequirements": "Annual radioactive material inventory reports due March 31st via NRC's Web-Based Licensing system. Immediate notification required within 24 hours for lost, stolen, or leaked materials exceeding regulatory limits per 10 CFR § 30.50. Submit license renewal applications 30 days before expiration."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T18:26:17.459Z"
+  },
+  "deadlines": [
+    {
+      "date": "02-01",
+      "label": "OSHA 300 Log Posting",
+      "type": "posting",
+      "description": "OSHA 300 Log Posting for Energy Reorganization Act of 1974, as amended",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Annual Safety Training",
+      "type": "training",
+      "description": "Annual Safety Training for Energy Reorganization Act of 1974, as amended",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Hazardous Waste Manifest Submission",
+      "type": "filing",
+      "description": "Hazardous Waste Manifest Submission for Energy Reorganization Act of 1974, as amended",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Environmental Health and Safety"
+  ]
+}

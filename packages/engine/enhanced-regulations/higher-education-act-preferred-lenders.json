@@ -1,0 +1,50 @@
+{
+  "regulationId": "higher-education-act-preferred-lenders",
+  "enhanced": {
+    "fullText": "The Higher Education Act's Preferred Lender provisions, codified at 20 U.S.C. § 1094(h) and implemented through Public Law No. 110-315, establish comprehensive requirements for institutions of higher education that maintain preferred lender lists for student loan programs. These regulations were enacted as part of the Higher Education Opportunity Act of 2008 to enhance transparency and prevent conflicts of interest in student lending practices.\n\nUnder 20 U.S.C. § 1094(h)(1), institutions may maintain preferred lender lists provided they comply with strict operational requirements. The statute mandates that such lists must include at least three unaffiliated lenders and cannot be used to restrict or impede borrower choice in lender selection. Critically, 20 U.S.C. § 1094(h)(2) prohibits institutions from including lenders that have provided financial incentives, gifts, or other benefits in exchange for preferred status.\n\nTransparency requirements under 20 U.S.C. § 1094(h)(3) mandate that institutions disclose their selection methodology and criteria to all borrowers. Institutions must provide comparative information regarding each preferred lender's loan terms, benefits, and borrower services. The statute requires prominent disclosure that borrowers are not obligated to select from the preferred list and may choose any eligible lender.\n\nEnforcement mechanisms are outlined in 20 U.S.C. § 1094(c), which authorizes the Department of Education to impose sanctions including fines, limitation of Title IV eligibility, or termination of federal student aid programs for non-compliance. Violations may result in civil monetary penalties up to $27,500 per violation under 34 CFR § 668.83.\n\nThe regulation specifically prohibits certification delays when borrowers select non-preferred lenders, as established in 20 U.S.C. § 1094(h)(4). Annual updates to preferred lender lists and associated materials are mandatory, ensuring current and accurate information for borrower decision-making. Recent amendments through the CARES Act and subsequent appropriations have maintained these core requirements while expanding oversight mechanisms for institutional compliance monitoring.",
+    "summary": "The Higher Education Act requires institutions maintaining preferred lender lists to include three unaffiliated lenders, prohibit incentive-based selections, provide transparent comparative information, and ensure borrower choice without certification delays.",
+    "requirements": "## List Composition Requirements\n- Maintain minimum three unaffiliated lenders per 20 U.S.C. § 1094(h)(1)\n- Exclude lenders providing financial incentives or benefits for preferred status\n- Ensure list does not restrict borrower lender selection\n\n## Transparency and Disclosure\n- Disclose selection methodology and criteria to all borrowers\n- Provide comparative information on lender terms and benefits\n- Include prominent statement that borrowers may choose any eligible lender\n\n## Operational Compliance\n- Prohibit certification delays for non-preferred lender selections\n- Update preferred lender materials annually\n- Maintain documentation supporting lender selection decisions\n\n## Oversight and Monitoring\n- Establish internal controls preventing prohibited lender relationships\n- Train financial aid staff on compliance requirements under 20 U.S.C. § 1094(h)",
+    "reportingRequirements": "Annual updates to preferred lender lists and comparative materials required by each academic year. Maintain documentation of lender selection criteria and borrower disclosures. Report suspected violations to institutional compliance officer immediately."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T20:17:04.916Z"
+  },
+  "deadlines": [
+    {
+      "date": "10-01",
+      "label": "FISAP Annual Report",
+      "type": "filing",
+      "description": "FISAP Annual Report for Higher Education Act: Preferred Lenders",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "06-30",
+      "label": "Annual Financial Aid Audit",
+      "type": "audit",
+      "description": "Annual Financial Aid Audit for Higher Education Act: Preferred Lenders",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "07-01",
+      "label": "Gainful Employment Disclosure Update",
+      "type": "disclosure",
+      "description": "Gainful Employment Disclosure Update for Higher Education Act: Preferred Lenders",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Financial Aid"
+  ]
+}

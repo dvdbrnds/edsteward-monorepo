@@ -1,0 +1,42 @@
+{
+  "regulationId": "technology-education-and-copyright-harmonization-a",
+  "enhanced": {
+    "fullText": "The Technology Education and Copyright Harmonization Act (TEACH Act) of 2002, codified at 17 U.S.C. § 110(2), significantly expanded copyright exemptions for accredited nonprofit educational institutions conducting distance education. This legislation amended the Copyright Act of 1976 to address the growing need for digital instruction while balancing copyright holders' rights with educational access.\n\nUnder 17 U.S.C. § 110(2), qualifying institutions may perform and display copyrighted works in digital transmissions without obtaining permission or paying licensing fees, provided strict conditions are met. The institution must be accredited and operate on a nonprofit basis. Instruction must be mediated by an instructor as an integral part of systematic mediated instructional activities, analogous to traditional classroom teaching.\n\nKey technological safeguards are mandated under 17 U.S.C. § 110(2)(D)(ii). Institutions must apply technological measures that reasonably prevent retention of works in accessible form for longer than the class session and unauthorized further dissemination. Access must be limited to students officially enrolled in the course through technological means such as password protection or institutional authentication systems.\n\nThe scope of permissible works varies significantly. For nondramatic literary and musical works, entire performances are permitted. However, for audiovisual works, only reasonable and limited portions may be used, similar to traditional classroom display limitations under 17 U.S.C. § 110(1). Works produced or marketed primarily for instructional use in mediated instructional activities are specifically excluded from TEACH Act protections.\n\nInstitutional policy requirements under 17 U.S.C. § 110(2)(D)(i) mandate that qualifying institutions establish copyright policies, provide informational materials describing copyright law, and notify faculty and students that course materials may be subject to copyright protection. These policies must address the use of copyrighted materials in distance education contexts.\n\nCompliance failures can result in loss of TEACH Act protections, exposing institutions to copyright infringement liability under 17 U.S.C. § 501 et seq. Statutory damages range from $750 to $30,000 per work infringed, with potential increases to $150,000 for willful infringement under 17 U.S.C. § 504(c). Courts may also award attorney fees to prevailing copyright holders under 17 U.S.C. § 505.\n\nThe Digital Millennium Copyright Act's safe harbor provisions under 17 U.S.C. § 512(e) provide additional protection for qualifying educational institutions that comply with notice-and-takedown procedures and maintain designated copyright agents. Institutions must reasonably implement policies to terminate repeat infringers' access.\n\nNo formal reporting requirements exist under the TEACH Act itself, but institutions should maintain documentation demonstrating compliance with technological safeguards, policy implementation, and proper scope of use to defend against potential infringement claims.",
+    "summary": "The TEACH Act permits nonprofit educational institutions to use copyrighted materials in distance education without permission, requiring technological safeguards, student access restrictions, instructor mediation, and institutional copyright policies under 17 U.S.C. § 110(2).",
+    "reportingRequirements": "No federal reporting requirements mandated under TEACH Act. Institutions must maintain internal documentation of compliance with technological safeguards, copyright policies, and proper use scope. DMCA safe harbor requires designated copyright agent registration with U.S. Copyright Office.",
+    "requirements": "## Institutional Eligibility Requirements\n- Must be accredited nonprofit educational institution\n- Systematic mediated instructional activities required\n- Instructor-mediated transmission as integral part of class session\n\n## Technological Safeguard Obligations\n- Implement measures preventing retention beyond class session per 17 U.S.C. § 110(2)(D)(ii)\n- Restrict access to enrolled students only through authentication systems\n- Apply technology reasonably preventing unauthorized redistribution\n\n## Content Usage Limitations\n- Entire nondramatic literary/musical works permitted\n- Reasonable portions only for audiovisual works\n- Exclude works produced primarily for instructional use\n\n## Policy and Notice Requirements\n- Establish institutional copyright policies under 17 U.S.C. § 110(2)(D)(i)\n- Provide copyright informational materials to faculty and students\n- Notify users of copyright protection on materials\n\n## Documentation and Compliance\n- Maintain records demonstrating technological safeguard implementation\n- Document proper scope of copyrighted material usage\n- Register DMCA designated agent for safe harbor protection"
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T15:55:42.434Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Annual DMCA Agent Registration Renewal",
+      "type": "registration",
+      "description": "Annual DMCA Agent Registration Renewal for Technology Education and Copyright Harmonization Act (TEACH ACT) of 2002",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Copyright Policy Review",
+      "type": "review",
+      "description": "Copyright Policy Review for Technology Education and Copyright Harmonization Act (TEACH ACT) of 2002",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Copyright & Trademark"
+  ]
+}

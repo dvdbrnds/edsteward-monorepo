@@ -1,0 +1,42 @@
+{
+  "regulationId": "small-business-act-and-small-business-investment-a",
+  "enhanced": {
+    "fullText": "The Small Business Act and Small Business Investment Act of 1958, codified at 15 U.S.C. §§ 631-657s, establishes comprehensive requirements for federal contractors, including higher education institutions, to provide maximum practicable opportunities for small business participation in contract performance. This regulation applies to all federal contracts exceeding the simplified acquisition threshold, currently set at $250,000 under 48 CFR 2.101.\n\nUnder 15 U.S.C. § 637(d), prime contractors must agree to utilize small business concerns, veteran-owned small businesses (VOSBs), service-disabled veteran-owned small businesses (SDVOSBs), Historically Underutilized Business Zone (HUBZone) small businesses, small disadvantaged businesses (SDBs), and women-owned small businesses (WOSBs) to the maximum extent practicable. The Federal Acquisition Regulation at 48 CFR 19.702 implements these statutory requirements through mandatory contract clauses.\n\nHigher education institutions receiving federal research contracts, construction agreements, or service contracts must incorporate FAR clause 52.219-8, \"Utilization of Small Business Concerns,\" into covered contracts. This clause requires universities to establish subcontracting plans when contracts exceed $750,000 ($1.5 million for construction) per 48 CFR 19.702(a). Universities must conduct market research to identify qualified small businesses, maintain records of subcontracting opportunities, and report achievements through the Electronic Subcontracting Reporting System (eSRS).\n\nThe Small Business Administration (SBA) enforces compliance through periodic reviews and investigations under 15 U.S.C. § 634(b)(15). Violations may result in contract termination, debarment proceedings under 48 CFR Part 9.4, or civil penalties. The SBA's Office of Government Contracting maintains oversight authority and can initiate compliance reviews based on subcontracting plan performance.\n\nParallel requirements exist for grants under 2 CFR 200.321, requiring recipients to take affirmative steps to utilize small businesses and minority-owned firms. Universities must document efforts to identify and engage these businesses in grant-funded activities, including research collaborations and equipment purchases.\n\nRecent amendments through the National Defense Authorization Act for Fiscal Year 2023 expanded HUBZone eligibility criteria and modified reporting thresholds. The SBA updated implementing regulations in 13 CFR Parts 121 and 126, effective January 2024, requiring enhanced documentation of small business utilization efforts and standardized reporting formats across federal agencies.",
+    "summary": "Federal law requiring universities with contracts exceeding $250,000 to provide maximum opportunities for small business participation, including veteran-owned, disadvantaged, and women-owned businesses through subcontracting plans and documented outreach efforts.",
+    "requirements": "## Contract Threshold Compliance\n- Apply requirements to all federal contracts exceeding $250,000 (15 U.S.C. § 637)\n- Include FAR clause 52.219-8 in applicable contracts\n- Develop subcontracting plans for contracts over $750,000 ($1.5M construction)\n\n## Small Business Categories\n- Target small business concerns, veteran-owned small businesses (VOSBs)\n- Engage service-disabled veteran-owned small businesses (SDVOSBs)\n- Utilize HUBZone and small disadvantaged businesses (SDBs)\n- Include women-owned small businesses (WOSBs) in procurement activities\n\n## Documentation and Outreach\n- Conduct market research to identify qualified small businesses per 48 CFR 19.702\n- Maintain records of subcontracting opportunities and awards\n- Document \"maximum practicable\" efforts in contract files\n\n## Reporting Obligations\n- Submit semi-annual reports through Electronic Subcontracting Reporting System (eSRS)\n- Report subcontracting achievements and expenditures by business category",
+    "reportingRequirements": "Semi-annual subcontracting reports due April 30 and October 30 through eSRS system for contracts with approved subcontracting plans. Grant recipients must document small business utilization efforts in annual performance reports per 2 CFR 200.328."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T15:52:23.212Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Vendor Compliance Review",
+      "type": "review",
+      "description": "Vendor Compliance Review for Small Business Act and Small Business Investment Act of 1958",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "SAM.gov Registration Renewal",
+      "type": "registration",
+      "description": "SAM.gov Registration Renewal for Small Business Act and Small Business Investment Act of 1958",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Contracts & Procurement"
+  ]
+}

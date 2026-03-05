@@ -1,0 +1,42 @@
+{
+  "regulationId": "foreign-assets-control-regulations",
+  "enhanced": {
+    "fullText": "The Foreign Assets Control Regulations (FACR), codified at 31 CFR Parts 500-599, represent a comprehensive framework of economic sanctions administered by the Treasury Department's Office of Foreign Assets Control (OFAC). These regulations implement various statutory authorities including the International Emergency Economic Powers Act (50 U.S.C. § 1701-1706), the Trading with the Enemy Act (50 U.S.C. § 4301 et seq.), and the Cuba Assets Control Regulations (31 CFR Part 515). For higher education institutions, FACR compliance presents complex challenges involving international research collaborations, student exchanges, and educational programs.\n\nThe regulations prohibit U.S. persons from engaging in transactions with designated foreign nationals, entities, and countries without proper OFAC licensing. Higher education institutions must navigate these restrictions when conducting research partnerships, accepting donations, enrolling international students, or operating study abroad programs in sanctioned jurisdictions. The scope extends to any transaction involving U.S. jurisdiction, including dollar-denominated payments processed through U.S. financial institutions.\n\nKey provisions under 31 CFR § 501.601 require institutions to block assets of designated persons and file Blocked Property Reports within 10 business days. Universities must screen all parties against OFAC's Specially Designated Nationals (SDN) List and consolidated sanctions list before engaging in transactions. Academic activities may qualify for general licenses under 31 CFR § 515.564 for educational exchanges with Cuba, or specific licenses for research collaborations with sanctioned entities.\n\nEnforcement mechanisms include civil monetary penalties up to $307,922 per violation for non-egregious cases and up to $1,503,470 for egregious violations under 31 CFR § 501.805. Criminal penalties may reach $1,000,000 and 20 years imprisonment per 50 U.S.C. § 1705(c). Recent enforcement actions against universities include NYU's $122,000 settlement for Cuba-related violations and potential violations involving Iranian students' stipend payments.\n\nRecent amendments include expanded sectoral sanctions on Russia under Executive Order 13662 and enhanced due diligence requirements for financial institutions processing educational transactions. Universities must implement robust compliance programs including regular screening procedures, staff training, and legal consultation for complex international arrangements involving potentially sanctioned parties or jurisdictions.",
+    "summary": "FACR requires higher education institutions to obtain OFAC licenses for transactions with sanctioned countries and designated persons, implement comprehensive screening procedures, and report blocked assets within 10 business days.",
+    "requirements": "## Screening and Due Diligence\n- Screen all international students, faculty, researchers, and partners against OFAC SDN List and consolidated sanctions list before engagement\n- Implement automated screening systems for financial transactions and wire transfers\n- Conduct enhanced due diligence for transactions exceeding $3,000 involving high-risk jurisdictions\n\n## Licensing and Authorization\n- Obtain specific licenses for educational programs in comprehensively sanctioned countries (Cuba, Iran, North Korea, Syria)\n- File license applications 60 days before planned sanctioned activities\n- Maintain records of all general license authorizations and compliance documentation\n\n## Asset Blocking and Reporting\n- Immediately block assets of designated persons upon identification\n- File Blocked Property Reports (Form TD F 90-22.50) within 10 business days to OFAC\n- Submit annual reports by June 30 for blocked property holdings\n\n## Compliance Program Management\n- Designate OFAC compliance officer responsible for sanctions oversight\n- Provide annual training to finance, admissions, and international programs staff\n- Establish written procedures for transaction screening and license applications",
+    "reportingRequirements": "Blocked Property Reports due within 10 business days of asset blocking via OFAC reporting system. Annual blocked property reports due June 30. License renewal applications required 60 days before expiration. Voluntary self-disclosure of violations recommended within 30 days of discovery."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T19:08:14.683Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Deemed Export Assessment",
+      "type": "assessment",
+      "description": "Deemed Export Assessment for Foreign Assets Control Regulations",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Export License Application (if applicable)",
+      "type": "application",
+      "description": "Export License Application (if applicable) for Foreign Assets Control Regulations",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Export Controls"
+  ]
+}

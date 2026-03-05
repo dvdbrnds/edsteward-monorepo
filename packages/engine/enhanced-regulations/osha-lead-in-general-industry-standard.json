@@ -1,0 +1,50 @@
+{
+  "regulationId": "osha-lead-in-general-industry-standard",
+  "enhanced": {
+    "fullText": "The OSHA Lead in General Industry Standard, codified at 29 CFR 1910.1025, establishes comprehensive requirements for protecting employees from occupational lead exposure in non-construction environments. This regulation directly applies to higher education institutions operating laboratories, maintenance facilities, research centers, and other areas where lead exposure may occur.\n\nUnder 29 CFR 1910.1025(c), universities must maintain employee exposure to airborne lead concentrations at or below the permissible exposure limit (PEL) of 50 micrograms per cubic meter of air (50 μg/m³) averaged over an 8-hour time-weighted average. Additionally, institutions must comply with the action level of 30 μg/m³ over an 8-hour period, which triggers specific monitoring and medical surveillance requirements.\n\nThe regulation's scope encompasses all university operations where employees may encounter lead exposure, including chemistry and materials science laboratories, art studios using lead-based materials, maintenance of older buildings with lead paint, and research facilities. Per 29 CFR 1910.1025(d), initial exposure determinations must be conducted for each job classification and work area where lead exposure may occur.\n\nWhen exposure monitoring indicates levels at or above the action level, universities must implement engineering controls, work practice controls, and administrative controls as specified in 29 CFR 1910.1025(e). Personal protective equipment requirements are detailed in 29 CFR 1910.1025(f), mandating appropriate respiratory protection when engineering controls cannot adequately reduce exposure.\n\nMedical surveillance provisions under 29 CFR 1910.1025(j) require universities to provide medical examinations and consultations for employees exposed at or above the action level for more than 30 days per year. This includes baseline examinations, periodic monitoring, and medical removal protection for employees with elevated blood lead levels.\n\nCompliance monitoring under 29 CFR 1910.1025(d) mandates initial exposure assessments, periodic monitoring every six months when exposures exceed the action level, and additional monitoring following changes in production, process, control equipment, or personnel. Universities must maintain accurate exposure monitoring records for 40 years and medical surveillance records for the duration of employment plus 30 years.\n\nViolations of the Lead Standard can result in significant OSHA penalties under 29 U.S.C. 666, with serious violations carrying fines up to $15,625 per violation and willful or repeated violations subject to penalties up to $156,259. Recent enforcement trends show increased focus on academic institutions, particularly regarding laboratory safety and maintenance operations.\n\nThe regulation was last significantly updated in 2019 with revised penalty structures and clarified medical surveillance requirements, emphasizing the importance of proactive compliance programs in higher education settings.",
+    "summary": "OSHA's Lead Standard (29 CFR 1910.1025) requires universities to limit employee lead exposure to 50 μg/m³ over 8 hours, conduct exposure monitoring, implement controls, and provide medical surveillance when action levels are exceeded.",
+    "requirements": "## Exposure Monitoring and Assessment\n- Conduct initial exposure determinations for all job classifications with potential lead exposure per 29 CFR 1910.1025(d)\n- Perform periodic monitoring every six months when exposures exceed 30 μg/m³ action level\n- Complete additional monitoring following process changes or equipment modifications\n\n## Engineering and Administrative Controls\n- Implement engineering controls to reduce airborne lead concentrations below PEL of 50 μg/m³\n- Establish regulated areas when exposures exceed PEL per 29 CFR 1910.1025(e)\n- Provide appropriate respiratory protection when engineering controls are insufficient\n\n## Medical Surveillance Program\n- Offer medical examinations for employees exposed above action level for 30+ days annually\n- Maintain medical surveillance records for employment duration plus 30 years\n- Implement medical removal protection for employees with elevated blood lead levels\n\n## Training and Communication\n- Provide annual lead safety training for exposed employees per 29 CFR 1910.1025(l)\n- Post warning signs in regulated areas and on contaminated equipment",
+    "reportingRequirements": "No routine federal reporting required. Maintain exposure monitoring records for 40 years and medical surveillance records for employment plus 30 years per 29 CFR 1910.1025(n). Report work-related lead poisoning cases to OSHA within 24 hours if hospitalization occurs."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T01:26:44.155Z"
+  },
+  "deadlines": [
+    {
+      "date": "02-01",
+      "label": "OSHA 300 Log Posting",
+      "type": "posting",
+      "description": "OSHA 300 Log Posting for OSHA Lead in General Industry Standard",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Annual Safety Training",
+      "type": "training",
+      "description": "Annual Safety Training for OSHA Lead in General Industry Standard",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Hazardous Waste Manifest Submission",
+      "type": "filing",
+      "description": "Hazardous Waste Manifest Submission for OSHA Lead in General Industry Standard",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Environmental Health and Safety"
+  ]
+}

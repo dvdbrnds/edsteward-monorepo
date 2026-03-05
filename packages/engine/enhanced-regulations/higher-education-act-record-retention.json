@@ -1,0 +1,50 @@
+{
+  "regulationId": "higher-education-act-record-retention",
+  "enhanced": {
+    "fullText": "The Higher Education Act Record Retention requirements, codified in 34 CFR § 668.24, establish comprehensive documentation and record-keeping obligations for institutions participating in federal student aid programs under Title IV of the Higher Education Act (20 U.S.C. § 1070 et seq.). These regulations ensure proper administration, oversight, and accountability of federal education funding programs.\n\n**Legal Authority and Scope**\nDerived from the Higher Education Act of 1965 as amended (20 U.S.C. § 1094), these requirements apply to all postsecondary institutions participating in Title IV programs, including Federal Pell Grants, Federal Work-Study (FWS), Federal Supplemental Educational Opportunity Grants (FSEOG), Federal Perkins Loans, Federal Family Education Loans (FFEL), and Direct Loans (34 CFR § 668.1).\n\n**Core Documentation Requirements**\nInstitutions must maintain comprehensive records documenting: (1) institutional eligibility and program authorization under 34 CFR § 600.4; (2) compliance with administrative requirements per 34 CFR Part 668; (3) financial responsibility standards under 34 CFR § 668.15; (4) complete application data for all program funds; and (5) accurate disbursement and delivery documentation per 34 CFR § 668.164.\n\n**Student Financial Aid Records**\nSpecific documentation includes Student Aid Reports (SARs) or Institutional Student Information Records (ISIRs), all application data submitted for students or parent borrowers, comprehensive eligibility and receipt documentation, entrance and exit counseling records per 34 CFR § 685.304, federal reports and supporting verification data, and completion/graduation rate calculations under 34 CFR § 668.45.\n\n**Retention Periods**\nGeneral Title IV records (Pell, FSEOG, FWS, Perkins) must be retained for three years following the award year end (34 CFR § 668.24(e)). Direct Loan and FFEL student records require three-year retention after the student's last attendance, while other loan program records must be kept three years after submission to the Department of Education. Records subject to audit, investigation, or dispute resolution must be retained until final resolution, regardless of standard retention periods.\n\n**Enforcement and Penalties**\nNon-compliance may result in program suspension, termination of Title IV eligibility, financial liability for improperly awarded funds, and civil penalties under 34 CFR § 668.83. The Department of Education conducts regular program reviews and audits to ensure compliance with these retention requirements.",
+    "summary": "Federal regulation requiring higher education institutions to maintain comprehensive records for Title IV student aid programs, including eligibility documentation, financial records, and student data for specified retention periods ranging from three years to resolution of disputes.",
+    "requirements": "## Core Record Maintenance\n- Maintain all Title IV program applications and eligibility documentation per 34 CFR § 668.24\n- Document institutional financial responsibility and program administration compliance\n- Preserve complete student financial aid files including SARs/ISIRs and application data\n- Retain loan counseling documentation and disbursement records\n\n## Retention Timeframes\n- Keep Pell Grant, FSEOG, FWS, and Perkins Loan records for three years after award year end\n- Maintain Direct Loan/FFEL student records for three years after last attendance\n- Preserve loan program administrative records for three years after submission to ED\n\n## Special Circumstances\n- Extend retention indefinitely for records under audit, review, or investigation until resolution\n- Maintain supporting documentation for all federal reports and completion rate calculations\n- Ensure accessibility of records for Department of Education review and verification",
+    "reportingRequirements": "Submit annual Federal Student Aid completion and graduation rate reports with supporting documentation. Provide immediate access to retained records upon Department of Education request during program reviews or audits. Maintain continuous availability of questioned records until final audit resolution."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T16:18:07.992Z"
+  },
+  "deadlines": [
+    {
+      "date": "10-01",
+      "label": "FISAP Annual Report",
+      "type": "filing",
+      "description": "FISAP Annual Report for Higher Education Act: Record Retention",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "06-30",
+      "label": "Annual Financial Aid Audit",
+      "type": "audit",
+      "description": "Annual Financial Aid Audit for Higher Education Act: Record Retention",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "07-01",
+      "label": "Gainful Employment Disclosure Update",
+      "type": "disclosure",
+      "description": "Gainful Employment Disclosure Update for Higher Education Act: Record Retention",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Financial Aid"
+  ]
+}

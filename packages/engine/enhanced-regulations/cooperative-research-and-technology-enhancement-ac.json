@@ -1,0 +1,34 @@
+{
+  "regulationId": "cooperative-research-and-technology-enhancement-ac",
+  "enhanced": {
+    "fullText": "The Cooperative Research and Technology Enhancement Act (CREATE Act), codified as Public Law No. 108-453 and enacted December 10, 2004, fundamentally reformed patent law to encourage collaborative research between universities and private sector entities. The Act amends 35 U.S.C. § 103(c) by establishing that information sharing under joint research agreements will not constitute prior art for obviousness determinations in patent applications.\n\nUnder 35 U.S.C. § 103(c)(1), the CREATE Act provides that subject matter developed by another shall not preclude patentability when: (A) the subject matter and claimed invention were commonly owned at the time the invention was made, or (B) the subject matter and claimed invention were developed under a joint research agreement that was in effect on or before the date the claimed invention was made.\n\nFor higher education institutions, this regulation is particularly significant as universities frequently enter collaborative research arrangements with industry partners, government agencies, and other academic institutions. The Act defines 'joint research agreement' under 35 U.S.C. § 103(c)(3) as a written contract between two or more persons or entities for performing experimental, developmental, or research work in the field of the claimed invention.\n\nKey provisions require that joint research agreements must be in writing and executed prior to the invention date. Universities must maintain comprehensive documentation demonstrating the existence and scope of collaborative arrangements. The regulation applies retroactively to patent applications filed after the Act's effective date, regardless of when the underlying research was conducted.\n\nCompliance obligations include establishing formal technology transfer policies that align with CREATE Act provisions, implementing standardized joint research agreement templates that satisfy statutory requirements, and maintaining detailed records of collaborative research activities. Universities must coordinate with their Office of Research and Technology Transfer to ensure proper documentation and patent filing procedures.\n\nThe Act significantly impacts university intellectual property strategies by enabling institutions to pursue patent protection for collaborative inventions without concern that information sharing with research partners will render patents obvious. This encourages more robust university-industry partnerships and enhances the commercial viability of academic research.\n\nEnforcement occurs through the USPTO patent examination process, where examiners must consider CREATE Act protections when evaluating obviousness rejections. While no specific penalties exist for non-compliance, failure to properly structure and document joint research agreements may result in patent rejections and loss of intellectual property rights.\n\nThe Act has not undergone major amendments since enactment, though USPTO guidance documents and Federal Circuit decisions have clarified implementation requirements. Universities should regularly review their technology transfer policies to ensure continued compliance with evolving interpretations of CREATE Act provisions.",
+    "summary": "The CREATE Act amends 35 U.S.C. § 103(c) to exclude information shared under joint research agreements from patent obviousness determinations, encouraging university-industry collaboration while preserving patent rights for collaborative inventions.",
+    "requirements": "## Joint Research Agreement Documentation\n- Execute written agreements before invention disclosure dates per 35 U.S.C. § 103(c)(3)\n- Maintain comprehensive records of all collaborative research activities\n- Ensure agreements specify research scope and participating entities\n\n## Technology Transfer Policy Updates\n- Align institutional policies with CREATE Act provisions\n- Implement standardized agreement templates meeting statutory requirements\n- Coordinate with Office of Research for compliance oversight\n\n## Patent Application Procedures\n- Document joint research agreement existence in patent filings\n- Provide USPTO examiners with agreement details when claiming CREATE Act protections\n- Maintain invention disclosure protocols consistent with collaborative arrangements\n\n## Institutional Coordination\n- Designate responsible parties for CREATE Act compliance monitoring\n- Establish cross-departmental communication between research and legal offices",
+    "reportingRequirements": "No specific federal reporting requirements exist under the CREATE Act. Universities must maintain internal documentation of joint research agreements and provide relevant information to USPTO during patent prosecution when claiming CREATE Act protections."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T17:53:38.931Z"
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Compliance Review",
+      "type": "review",
+      "description": "Annual Compliance Review for Cooperative Research and Technology Enhancement Act (CREATE Act)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Intellectual Property and Technology Transfer"
+  ]
+}

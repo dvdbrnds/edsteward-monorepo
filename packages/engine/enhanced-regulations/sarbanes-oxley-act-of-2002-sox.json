@@ -1,0 +1,50 @@
+{
+  "regulationId": "sarbanes-oxley-act-of-2002-sox",
+  "enhanced": {
+    "fullText": "The Sarbanes-Oxley Act of 2002 (SOX), enacted as Public Law No. 107-204, was designed to enhance corporate accountability and financial transparency following major corporate scandals. While primarily targeting publicly traded companies, SOX contains provisions with significant implications for higher education institutions, particularly private universities with substantial endowments and public institutions managing federal funds.\n\nUnder 15 U.S.C. § 7201 et seq., SOX established the Public Company Accounting Oversight Board (PCAOB) and mandated enhanced financial reporting standards. For higher education, the most critical provision is 18 U.S.C. § 1519, which criminalizes the destruction, alteration, or falsification of records in federal investigations or matters within federal agency jurisdiction. This statute applies to all entities, including universities receiving federal funding through Title IV programs, research grants, or other federal assistance.\n\nSection 802 of SOX, codified at 18 U.S.C. § 1519, imposes severe penalties including fines and up to 20 years imprisonment for knowingly altering, destroying, mutilating, concealing, or falsifying documents with intent to impede federal investigations. Universities must maintain comprehensive document retention policies covering financial records, research data, student files, and correspondence related to federal compliance matters.\n\nSOX Section 201, codified at 15 U.S.C. § 78j-1, prohibits auditing firms from providing certain non-audit services to clients, including bookkeeping, financial system design, appraisal services, actuarial services, internal audit outsourcing, management functions, human resources, broker-dealer services, legal services, and expert services unrelated to auditing. Universities engaging external auditors must ensure strict separation between audit and consulting services to maintain auditor independence.\n\nWhile not legally required to comply with SOX corporate governance provisions, many universities adopt SOX best practices including establishing audit committees with independent oversight, implementing internal controls over financial reporting similar to Section 404 requirements (15 U.S.C. § 7262), and maintaining whistleblower protection policies aligned with Section 806 provisions (18 U.S.C. § 1514A).\n\nEnforcement mechanisms include criminal prosecution by the Department of Justice under 18 U.S.C. § 1519 and potential civil penalties through federal agency actions. Universities may face additional consequences including suspension or termination of federal funding, exclusion from federal programs, and civil liability under related statutes. The statute of limitations for criminal violations is generally five years under 18 U.S.C. § 3282, though ongoing conspiracies may extend this period.",
+    "summary": "SOX criminalizes document destruction in federal matters under 18 U.S.C. § 1519, applying to all universities receiving federal funds. Institutions must maintain comprehensive document retention policies and ensure auditor independence through service separation requirements.",
+    "requirements": "## Document Retention and Preservation\n- Establish written document retention policies covering all federal compliance matters per 18 U.S.C. § 1519\n- Implement litigation hold procedures for federal investigations or audits\n- Train staff on criminal penalties for document destruction (up to 20 years imprisonment)\n- Maintain records for minimum seven years or longer if specified by federal agencies\n\n## Auditor Independence Standards\n- Prohibit external auditors from providing non-audit services under 15 U.S.C. § 78j-1\n- Separate audit and consulting service contracts with different firms\n- Require audit committee pre-approval for all auditor services\n- Document auditor independence assessments annually\n\n## Internal Controls and Governance\n- Establish independent audit committee with financial expertise\n- Implement internal controls over financial reporting processes\n- Maintain whistleblower protection policies and reporting mechanisms\n- Conduct annual internal control effectiveness assessments",
+    "reportingRequirements": "No direct federal reporting required for non-public institutions. Universities must preserve all documents related to federal investigations indefinitely until conclusion. Annual audited financial statements must demonstrate auditor independence compliance per 15 U.S.C. § 78j-1."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T15:39:13.474Z"
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Financial Audit",
+      "type": "audit",
+      "description": "Annual Financial Audit for Sarbanes Oxley Act of 2002 (SOX)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "03-31",
+      "label": "A-133 Single Audit (if applicable)",
+      "type": "audit",
+      "description": "A-133 Single Audit (if applicable) for Sarbanes Oxley Act of 2002 (SOX)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Quarterly Financial Review",
+      "type": "review",
+      "description": "Quarterly Financial Review for Sarbanes Oxley Act of 2002 (SOX)",
+      "isRecurring": true,
+      "recurrenceFrequency": "quarterly"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Accounting"
+  ]
+}

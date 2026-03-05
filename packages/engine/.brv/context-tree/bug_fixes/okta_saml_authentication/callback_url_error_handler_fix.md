@@ -1,0 +1,1 @@
+SAML Production Testing Status: Fixed OKTA callback URL configuration from /auth/saml to /auth/saml/callback. Express error handler fix is in place (includes _next parameter). SAML login initiation working correctly - redirects to proper OKTA URL. Ready to test full authentication flow to verify callback handling works without signature validation errors.

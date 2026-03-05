@@ -1,0 +1,58 @@
+{
+  "regulationId": "employee-annuities",
+  "enhanced": {
+    "fullText": "Employee annuities under Section 403(a) of the Internal Revenue Code (26 U.S.C. § 403) establish critical tax treatment rules for retirement distributions at higher education institutions. This regulation governs tax-sheltered annuity plans, commonly known as 403(b) plans, which are exclusively available to employees of public schools, colleges, universities, and certain tax-exempt organizations under Section 501(c)(3).\n\nUnder 26 U.S.C. § 403(a), when an employer purchases an annuity contract for an employee under a qualifying plan that meets Section 404(a)(2) requirements, distributions become taxable to the recipient under Section 72 annuity rules in the year distributed. This applies regardless of whether the employer claims deductions for premium payments under Section 404(a)(2).\n\nHigher education institutions must ensure compliance with Treasury Regulation 1.403(a)-1, which details specific requirements for qualifying annuity contracts. The regulation mandates that contracts must be non-transferable except to the issuing insurance company, and employees cannot assign benefits or use them as collateral for loans, as specified in 26 U.S.C. § 403(b)(1).\n\nUniversities administering 403(b) plans must adhere to contribution limits under 26 U.S.C. § 415(c), with special catch-up provisions for employees with 15+ years of service at educational institutions per Section 403(b)(12)(B). The annual exclusion allowance calculation requires careful documentation to prevent excess contributions that trigger immediate taxation and potential 6% excise tax under Section 4973.\n\nEnforcement mechanisms include IRS plan disqualification procedures under Section 403(b)(12), which can result in immediate taxation of all participant account balances. The Department of Labor enforces fiduciary responsibilities under ERISA Section 403, imposing penalties up to $2,140 per participant per day for reporting failures under 29 U.S.C. § 1132(c)(2).\n\nRecent amendments under the SECURE Act 2.0 (Division T of P.L. 117-328) modified catch-up contribution rules effective 2024, requiring universities to update plan documents and administrative procedures. Form 5500 reporting requirements under 29 CFR 2520.104-20 apply to plans covering 100+ participants, with enhanced disclosure obligations under Section 403(b)(14) for mutual fund investments.",
+    "summary": "Section 403(a) governs tax treatment of employee annuity distributions from 403(b) plans at higher education institutions, requiring compliance with contribution limits, non-transferability rules, and federal reporting requirements under IRC and ERISA provisions.",
+    "requirements": "## Plan Administration Requirements\n- Maintain non-transferable annuity contracts per 26 U.S.C. § 403(b)(1)\n- Implement annual contribution limit monitoring under Section 415(c)\n- Calculate exclusion allowances to prevent excess contributions triggering Section 4973 penalties\n\n## Documentation and Recordkeeping\n- Preserve participant election records for plan years under audit statute of limitations\n- Document 15-year service calculations for catch-up contribution eligibility per Section 403(b)(12)(B)\n- Maintain vendor agreements meeting Treasury Regulation 1.403(b)-3 standards\n\n## Compliance Monitoring\n- Conduct annual plan testing for contribution limits and non-discrimination requirements\n- Review investment options quarterly for Section 403(b)(14) compliance\n- Coordinate with payroll systems to ensure accurate salary reduction elections\n\n## Fiduciary Responsibilities\n- Establish investment committee oversight per ERISA Section 403 standards\n- Provide required disclosures under 29 CFR 2550.404c-1 for participant-directed accounts",
+    "reportingRequirements": "Form 5500 annual returns due July 31st for plans with 100+ participants per 29 CFR 2520.104-20. Form 1099-R distributions reporting required by January 31st following distribution year under 26 CFR 1.6047-2. Excess contribution corrections must be reported within 2½ months after plan year end to avoid Section 4973 excise taxes."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T18:19:32.977Z"
+  },
+  "deadlines": [
+    {
+      "date": "05-15",
+      "label": "Form 990 Filing",
+      "type": "filing",
+      "description": "Form 990 Filing for Employee Annuities",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "05-15",
+      "label": "Form 990-T Filing (if applicable)",
+      "type": "filing",
+      "description": "Form 990-T Filing (if applicable) for Employee Annuities",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Form 1099 Filing",
+      "type": "filing",
+      "description": "Form 1099 Filing for Employee Annuities",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "W-2 Distribution",
+      "type": "distribution",
+      "description": "W-2 Distribution for Employee Annuities",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Tax"
+  ]
+}

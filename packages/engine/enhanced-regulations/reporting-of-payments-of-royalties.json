@@ -1,0 +1,58 @@
+{
+  "regulationId": "reporting-of-payments-of-royalties",
+  "enhanced": {
+    "fullText": "The Reporting of Payments of Royalties regulation, codified under 26 U.S.C. § 6041 and 26 U.S.C. § 6050N, establishes mandatory information reporting requirements for higher education institutions making attorney fee payments of $600 or more annually. This federal tax regulation ensures comprehensive income reporting for legal services payments, regardless of whether services were performed for or against the institution.\n\nUnder 26 U.S.C. § 6041, universities must file Form 1099-MISC for any attorney receiving aggregate payments of $600 or more during a calendar year. The regulation applies broadly to all legal service payments, including court-ordered attorney fees in litigation where the university was a defendant, settlement payments to opposing counsel, and routine legal services. Per 26 CFR § 1.6041-1(a), the payment threshold is measured annually, not per transaction.\n\nHigher education institutions face unique compliance challenges under this regulation. Universities frequently engage in complex litigation involving employment disputes, Title IX matters, contract disputes, and intellectual property issues. When courts order attorney fee payments to prevailing parties under statutes like 42 U.S.C. § 1988 (civil rights cases) or 20 U.S.C. § 1681 (Title IX), universities must report these payments even though the legal services benefited opposing parties.\n\nThe dual reporting requirement under 26 U.S.C. § 6050N creates additional obligations for settlement payments. Universities must report the entire settlement amount as income to the plaintiff on Form 1099-MISC, while simultaneously issuing a separate Form 1099-MISC to the plaintiff's attorney for their portion. This dual reporting prevents income tax avoidance and ensures proper attribution of settlement proceeds.\n\nCompliance requires universities to provide written statements to attorneys by January 31st following the payment year, containing identical information reported to the IRS. Under 26 CFR § 1.6041-2, these statements must include the university's name, address, taxpayer identification number, the attorney's name and address, and total payments made.\n\nEnforcement mechanisms include significant penalties under 26 U.S.C. § 6721 for failure to file correct information returns ($280 per return for 2023, maximum $3.426 million annually) and 26 U.S.C. § 6722 for failure to provide correct payee statements ($280 per statement, maximum $3.426 million annually). The IRS may waive penalties for reasonable cause under 26 CFR § 301.6724-1.\n\nRecent updates include inflation adjustments to penalty amounts effective January 2023, and enhanced IRS matching procedures for professional services payments. Universities should implement robust tracking systems for legal payments and coordinate between legal affairs, accounts payable, and tax compliance departments to ensure comprehensive reporting.",
+    "summary": "Federal regulation requiring higher education institutions to file Form 1099-MISC for attorney payments exceeding $600 annually, including court-ordered fees and settlement payments, with dual reporting obligations for settlements and specific deadlines.",
+    "requirements": "## Core Reporting Obligations\n- File Form 1099-MISC for attorneys receiving $600+ annually per 26 U.S.C. § 6041\n- Apply $600 threshold to calendar year aggregate, not individual transactions\n- Include court-ordered attorney fees paid to opposing counsel\n- Report payments for services performed for or against the institution\n\n## Settlement Payment Requirements\n- Report entire settlement amount as plaintiff income per 26 U.S.C. § 6050N\n- Issue separate Form 1099-MISC to plaintiff's attorney for their portion\n- Coordinate dual reporting to prevent double taxation issues\n- Maintain documentation supporting payment allocation\n\n## Payee Statement Obligations\n- Provide written statements to attorneys by January 31st per 26 CFR § 1.6041-2\n- Include university TIN, attorney information, and total payments\n- Ensure statement information matches IRS filings exactly\n\n## Compliance Coordination\n- Establish tracking systems for legal department payments\n- Coordinate between legal affairs, accounts payable, and tax offices\n- Implement annual review procedures for payment threshold monitoring",
+    "reportingRequirements": "File Form 1099-MISC with IRS by January 31st annually for prior calendar year payments. Provide identical written statements to attorneys by January 31st. Submit corrections within 30 days of discovery per 26 CFR § 1.6041-2."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T02:00:28.233Z"
+  },
+  "deadlines": [
+    {
+      "date": "05-15",
+      "label": "Form 990 Filing",
+      "type": "filing",
+      "description": "Form 990 Filing for Reporting of Payments of Royalties",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "05-15",
+      "label": "Form 990-T Filing (if applicable)",
+      "type": "filing",
+      "description": "Form 990-T Filing (if applicable) for Reporting of Payments of Royalties",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Form 1099 Filing",
+      "type": "filing",
+      "description": "Form 1099 Filing for Reporting of Payments of Royalties",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "W-2 Distribution",
+      "type": "distribution",
+      "description": "W-2 Distribution for Reporting of Payments of Royalties",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Tax"
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "regulationId": "higher-education-act-cash-management",
+  "enhanced": {
+    "fullText": "The Higher Education Act Cash Management regulations, codified primarily in 34 CFR Part 668 Subpart K and authorized by 20 U.S.C. § 1094, establish comprehensive requirements for institutions of higher education to properly manage Federal Student Aid (FSA) program funds. These regulations govern how colleges and universities request, receive, disburse, maintain, and account for Title IV federal student aid funds, including Pell Grants, Direct Loans, Federal Work-Study, and SEOG programs.\n\nUnder 34 CFR § 668.162, institutions must maintain separate accountability for Title IV funds through proper cash management procedures. The Department of Education requires institutions to minimize the time between receipt of federal funds and disbursement to students, following the \"minimize cash-on-hand\" principle outlined in 34 CFR § 668.166. Institutions may request funds through the reimbursement, advance, or heightened cash monitoring payment methods, with specific eligibility criteria defined in 34 CFR § 668.162.\n\nKey provisions include mandatory reconciliation procedures under 34 CFR § 668.16(h), requiring institutions to reconcile FSA program records within 60 days of the payment period end date. Institutions must maintain detailed financial records demonstrating compliance with federal cash management standards, including proper segregation of Title IV funds from institutional operating accounts. The regulations mandate specific disbursement timeframes, generally requiring institutions to disburse aid within 14 days of crediting student accounts for educational expenses.\n\nViolations can result in severe enforcement actions under 20 U.S.C. § 1094(c), including placement on reimbursement payment method, fine assessments up to $55,000 per violation, or program participation suspension. Recent amendments through the FAFSA Simplification Act have modified certain cash management requirements effective for the 2024-25 award year, particularly regarding Professional Judgment documentation and verification procedures. Institutions must also comply with Federal Register guidance updates and Dear Colleague Letters that clarify cash management procedures and provide implementation timelines for regulatory changes.",
+    "summary": "Federal regulation requiring higher education institutions to properly manage Title IV student aid funds through specific cash management procedures, including minimizing cash-on-hand, timely disbursements, and detailed reconciliation processes, with violations subject to significant penalties.",
+    "requirements": "## Cash Management Procedures\n- Maintain separate accountability for Title IV funds per 34 CFR § 668.162\n- Implement minimize cash-on-hand principle for all FSA programs\n- Establish proper segregation between federal funds and institutional accounts\n- Document all fund requests, receipts, and disbursements with audit trails\n\n## Disbursement Requirements\n- Disburse aid within 14 days of crediting student accounts for allowable charges\n- Verify student enrollment status before each disbursement\n- Obtain required student authorizations for non-educational expenses\n- Process return calculations for withdrawn students within 45 days\n\n## Reconciliation and Reporting\n- Complete monthly bank reconciliations for all Title IV fund accounts\n- Reconcile FSA program records within 60 days of payment period end\n- Submit required cash management reports through COD system\n- Maintain documentation supporting all cash management activities\n\n## Compliance Monitoring\n- Conduct internal audits of cash management procedures annually\n- Train financial aid staff on current cash management requirements\n- Establish written policies governing Title IV fund management\n- Monitor regulatory updates and implement required changes timely",
+    "reportingRequirements": "Monthly reconciliation reports due by 15th of following month through COD system. Annual FSA cash management certification required by September 30th. Immediate reporting of cash management irregularities within 10 business days to FSA."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T19:48:34.828Z"
+  },
+  "deadlines": [
+    {
+      "date": "10-01",
+      "label": "FISAP Annual Report",
+      "type": "filing",
+      "description": "FISAP Annual Report for Higher Education Act: Cash Management",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "06-30",
+      "label": "Annual Financial Aid Audit",
+      "type": "audit",
+      "description": "Annual Financial Aid Audit for Higher Education Act: Cash Management",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "07-01",
+      "label": "Gainful Employment Disclosure Update",
+      "type": "disclosure",
+      "description": "Gainful Employment Disclosure Update for Higher Education Act: Cash Management",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Higher Education Act: Cash Management"
+  ]
+}

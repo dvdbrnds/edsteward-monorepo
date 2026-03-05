@@ -1,0 +1,58 @@
+{
+  "regulationId": "qualified-pensions",
+  "enhanced": {
+    "fullText": "Qualified pension plans under 26 U.S.C. § 401 represent employer-sponsored retirement benefit programs that must meet stringent federal tax qualification requirements to receive favorable tax treatment. For higher education institutions, these plans serve as critical components of faculty and staff compensation packages, providing systematically determined retirement benefits based on service years and compensation history rather than institutional profits.\n\nUnder 26 U.S.C. § 401(a), qualified plans must satisfy numerous operational and structural requirements. The Internal Revenue Code mandates that benefits be definitely determinable, meaning the exact benefit amount or calculation method must be specified in plan documents. For universities, this typically involves formula-based calculations considering factors such as final average salary, years of creditable service, and applicable multipliers established in collective bargaining agreements or institutional policies.\n\nKey qualification requirements under 26 U.S.C. § 401(a)(4) include nondiscrimination testing to ensure benefits do not disproportionately favor highly compensated employees, including senior administrators and tenured faculty. Universities must demonstrate that contribution or benefit formulas satisfy actual deferral percentage and actual contribution percentage tests annually. The Employee Retirement Income Security Act (ERISA) under 29 U.S.C. § 1001 et seq. imposes additional fiduciary responsibilities on plan administrators, requiring prudent investment management and participant disclosure obligations.\n\nHigher education institutions must comply with minimum participation standards under 26 U.S.C. § 410, ensuring eligible employees can participate after completing one year of service with 1,000+ hours. Vesting schedules under 26 U.S.C. § 411 must provide participants with nonforfeitable rights to accrued benefits, typically following five-year cliff or three-to-seven-year graded vesting schedules for university employees.\n\nEnforcement mechanisms include Internal Revenue Service plan disqualification procedures under 26 U.S.C. § 401(a), potentially resulting in immediate tax consequences for all participants and loss of employer deduction benefits. The Department of Labor enforces ERISA fiduciary standards under 29 U.S.C. § 1132, with civil penalties reaching $2,259 per day for late Form 5500 filings. Recent amendments under the SECURE Act (P.L. 116-94) modified required minimum distribution ages from 70½ to 72, affecting university retiree benefit calculations beginning in 2020.",
+    "summary": "Federal tax-qualified retirement plans for higher education institutions must comply with IRC Section 401 requirements, including nondiscrimination testing, vesting schedules, and ERISA fiduciary standards to maintain tax-advantaged status.",
+    "requirements": "## Plan Qualification Standards\n- Maintain definitely determinable benefit formulas per 26 U.S.C. § 401(a)\n- Conduct annual nondiscrimination testing under 26 U.S.C. § 401(a)(4)\n- Implement compliant vesting schedules per 26 U.S.C. § 411\n- Establish minimum participation standards under 26 U.S.C. § 410\n\n## Fiduciary Responsibilities\n- Appoint qualified plan administrators under ERISA 29 U.S.C. § 1002(16)(A)\n- Maintain prudent investment policies per 29 U.S.C. § 1104(a)(1)\n- Provide required participant disclosures under 29 U.S.C. § 1021\n\n## Documentation Requirements\n- Maintain current plan documents and summary plan descriptions\n- Document annual administrative resolutions and investment committee decisions\n- Preserve participant records and beneficiary designations per ERISA retention standards",
+    "reportingRequirements": "File Form 5500 annually by July 31st for plans with 100+ participants, October 15th extension available. Submit actuarial valuations for defined benefit plans every three years or annually if underfunded. File Form 8955-SSA for separated participants by December 31st following plan year end."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T01:53:38.310Z"
+  },
+  "deadlines": [
+    {
+      "date": "05-15",
+      "label": "Form 990 Filing",
+      "type": "filing",
+      "description": "Form 990 Filing for Qualified Pensions",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "05-15",
+      "label": "Form 990-T Filing (if applicable)",
+      "type": "filing",
+      "description": "Form 990-T Filing (if applicable) for Qualified Pensions",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Form 1099 Filing",
+      "type": "filing",
+      "description": "Form 1099 Filing for Qualified Pensions",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "W-2 Distribution",
+      "type": "distribution",
+      "description": "W-2 Distribution for Qualified Pensions",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Tax"
+  ]
+}

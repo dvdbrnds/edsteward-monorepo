@@ -1,0 +1,50 @@
+{
+  "regulationId": "bankruptcy-abuse-prevention-consumer-protection-ac",
+  "enhanced": {
+    "fullText": "The Bankruptcy Abuse Prevention and Consumer Protection Act of 2005 (BAPCPA), codified at 11 U.S.C. §§ 101-1532 and enacted as Public Law No. 109-8, fundamentally altered the dischargeability of educational debt in bankruptcy proceedings. Under 11 U.S.C. § 523(a)(8), student loans obtained from government entities, nonprofit institutions of higher education, or private lenders for qualified educational expenses are presumptively non-dischargeable in both Chapter 7 and Chapter 13 bankruptcy proceedings.\n\nThe Act applies to all federally-funded student loans, including Direct Loans, FFEL Program loans, Perkins Loans, and PLUS loans, as well as private educational loans meeting the statutory definition under 11 U.S.C. § 101(25). Higher education institutions must understand that loans they originate or guarantee fall under this protection, significantly impacting their financial aid counseling obligations under 34 CFR § 685.304.\n\nThe primary exception exists under the 'undue hardship' standard, typically evaluated using the three-prong Brunner test: (1) the debtor cannot maintain a minimal standard of living while repaying loans; (2) additional circumstances suggest the hardship will persist; and (3) the debtor has made good faith efforts to repay. Courts apply this standard restrictively, with fewer than 1% of debtors successfully discharging student loans.\n\nUnder 11 U.S.C. § 523(a)(8)(A), loans from governmental units or nonprofit institutions of higher education maintaining tax-exempt status under 26 U.S.C. § 501(c)(3) receive absolute protection. The seven-year discharge provision was eliminated by BAPCPA, closing a previous avenue for discharge.\n\nInstitutions must implement proper loan documentation procedures and maintain accurate records supporting the educational purpose of disbursed funds. The Department of Education, through 34 CFR Part 682, requires institutions to certify loan eligibility and maintain comprehensive borrower records.\n\nEnforcement occurs through bankruptcy court proceedings where creditors, including institutions, may object to discharge attempts. Institutions should monitor bankruptcy filings affecting their loan portfolios and engage qualified bankruptcy counsel when borrowers seek discharge.\n\nRecent interpretations have clarified that loans for bar exam preparation courses and continuing education may qualify for protection if meeting statutory educational expense definitions under 11 U.S.C. § 101(25). The Supreme Court's decision in Lamar, Archer & Cofrin, LLP v. Appling (2014) reinforced broad application of non-dischargeability provisions.",
+    "summary": "BAPCPA prohibits discharge of government and nonprofit institution student loans in bankruptcy except for undue hardship. Institutions must maintain proper documentation and may participate in discharge proceedings to protect their interests.",
+    "requirements": "## Loan Documentation Standards\n- Maintain comprehensive records demonstrating educational purpose under 11 U.S.C. § 101(25)\n- Document borrower eligibility certification per 34 CFR § 685.304\n- Preserve loan origination and disbursement records for bankruptcy proceedings\n\n## Borrower Counseling Obligations\n- Inform students of non-dischargeable nature of educational loans\n- Provide entrance and exit counseling addressing bankruptcy implications\n- Document completion of required counseling sessions\n\n## Bankruptcy Monitoring Procedures\n- Establish systems to identify borrower bankruptcy filings\n- Engage qualified bankruptcy counsel for discharge proceedings\n- File appropriate objections to protect institutional interests under 11 U.S.C. § 523(a)(8)",
+    "reportingRequirements": "No specific federal reporting requirements under BAPCPA. Institutions must maintain loan records and may need to file responsive pleadings in bankruptcy proceedings when borrowers attempt discharge. Monitor NSLDS for borrower status changes."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T15:36:39.011Z"
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Financial Audit",
+      "type": "audit",
+      "description": "Annual Financial Audit for Bankruptcy Abuse Prevention & Consumer Protection Act of 2005",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "03-31",
+      "label": "A-133 Single Audit (if applicable)",
+      "type": "audit",
+      "description": "A-133 Single Audit (if applicable) for Bankruptcy Abuse Prevention & Consumer Protection Act of 2005",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Quarterly Financial Review",
+      "type": "review",
+      "description": "Quarterly Financial Review for Bankruptcy Abuse Prevention & Consumer Protection Act of 2005",
+      "isRecurring": true,
+      "recurrenceFrequency": "quarterly"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Accounting"
+  ]
+}

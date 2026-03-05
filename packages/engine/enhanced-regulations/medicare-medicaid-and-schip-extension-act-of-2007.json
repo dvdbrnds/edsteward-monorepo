@@ -1,0 +1,50 @@
+{
+  "regulationId": "medicare-medicaid-and-schip-extension-act-of-2007",
+  "enhanced": {
+    "fullText": "The Medicare, Medicaid, and SCHIP Extension Act of 2007 (MMSEA), codified at 42 U.S.C. § 1395y(b)(8), establishes mandatory reporting requirements for group health plan sponsors, including higher education institutions offering self-insured health plans. Under Section 111 of MMSEA, universities must report settlement, judgment, award, or other payment information to the Centers for Medicare & Medicaid Services (CMS) to facilitate Medicare Secondary Payer (MSP) coordination and recovery efforts.\n\nHigher education institutions operating as Responsible Reporting Entities (RREs) under 42 CFR § 411.25 must identify Medicare beneficiaries among their covered employees, retirees, and dependents. The regulation applies to universities with self-insured group health plans, worker's compensation programs, and no-fault insurance arrangements. Universities must determine Medicare entitlement status for all claimants receiving payments exceeding the Total Payment Obligation to Claimant (TPOC) threshold of $750 for ongoing responsibility for medicals or $5,000 for settlements.\n\nReporting obligations under 42 U.S.C. § 1395y(b)(8)(F) require universities to submit specific data elements including: Social Security numbers, Health Insurance Claim numbers, dates of birth, gender, addresses, diagnosis codes (ICD-10), dates of incident, and payment amounts. Universities must register with the Coordination of Benefits Contractor and utilize the Section 111 NGHP web portal or electronic data interchange for submissions.\n\nThe Centers for Medicare & Medicaid Services enforces compliance through 42 CFR § 411.25, with penalties reaching $1,000 per day per unreported claim under 42 U.S.C. § 1395y(b)(8)(E). Universities face additional exposure to Medicare conditional payment recovery actions and potential exclusion from federal programs for non-compliance.\n\nRecent amendments through the Bipartisan Budget Act of 2018 modified reporting thresholds and expanded Medicare Secondary Payer provisions. Universities must maintain comprehensive policies addressing beneficiary identification, data security under HIPAA compliance, and coordination with third-party administrators. The regulation's intersection with FERPA requirements necessitates careful handling of student employee information and proper legal basis determination for disclosures under 20 U.S.C. § 1232g(b)(1)(C).",
+    "summary": "MMSEA Section 111 requires universities with self-insured health plans to report Medicare beneficiary claim information to CMS for coordination of benefits and recovery purposes, with penalties up to $1,000 per day per unreported claim.",
+    "requirements": "## Beneficiary Identification Requirements\n- Determine Medicare entitlement status for all claimants receiving payments above threshold amounts\n- Verify eligibility through Social Security Administration queries or beneficiary attestations\n- Maintain current Medicare beneficiary databases for covered population\n\n## Mandatory Reporting Obligations\n- Submit quarterly reports for ongoing responsibility for medicals claims exceeding $750\n- Report settlements, judgments, or awards exceeding $5,000 within specified timeframes\n- Include all required data elements: SSN, HICN, diagnosis codes, payment amounts, and incident dates\n\n## Registration and System Requirements\n- Register as Responsible Reporting Entity with CMS Coordination of Benefits Contractor\n- Establish Section 111 NGHP web portal access or electronic data interchange capabilities\n- Implement secure data transmission protocols compliant with federal security standards",
+    "reportingRequirements": "Quarterly submissions due by last day of month following quarter end. Settlement reports due within timeframes specified in query-response process. Initial RRE registration required before first submission through CMS Section 111 portal."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T00:59:12.869Z"
+  },
+  "deadlines": [
+    {
+      "date": "07-31",
+      "label": "Form 5500 Filing",
+      "type": "filing",
+      "description": "Form 5500 Filing for Medicare, Medicaid, and SCHIP Extension Act of 2007",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Summary Annual Report Distribution",
+      "type": "distribution",
+      "description": "Summary Annual Report Distribution for Medicare, Medicaid, and SCHIP Extension Act of 2007",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "COBRA Notice (as needed)",
+      "type": "notice",
+      "description": "COBRA Notice (as needed) for Medicare, Medicaid, and SCHIP Extension Act of 2007",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Employee Benefits"
+  ]
+}

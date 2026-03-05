@@ -1,0 +1,350 @@
+{
+  "regulationId": 7,
+  "mcpRegKey": "REG-002",
+  "name": "Title IX of the Education Amendments of 1972",
+  "statute": "20 U.S.C. § 1681",
+  "cfr": "34 CFR Part 106",
+  "category": "Uncategorized",
+  "topic": "General",
+  "summary": "Title IX prohibits sex discrimination in federally funded education programs. Universities must appoint coordinators, establish grievance procedures, investigate complaints promptly, and maintain comprehensive anti-discrimination policies across academics, athletics, and employment.",
+  "effectiveDate": null,
+  "complianceTasks": [
+    {
+      "taskId": "TITLE-IX-001",
+      "title": "Designate Title IX Coordinator",
+      "description": "Designate at least one employee as Title IX Coordinator responsible for coordination of compliance efforts",
+      "priority": "high",
+      "requirementType": "requirement"
+    },
+    {
+      "taskId": "TITLE-IX-002",
+      "title": "Publicize Coordinator Contact Information",
+      "description": "Publish name, office address, email, and phone number of Title IX Coordinator",
+      "priority": "high",
+      "requirementType": "requirement"
+    },
+    {
+      "taskId": "TITLE-IX-003",
+      "title": "Notify All Persons of Coordinator",
+      "description": "Notify applicants, students, employees, and unions of coordinator designation",
+      "priority": "high",
+      "requirementType": "requirement"
+    },
+    {
+      "taskId": "TITLE-IX-004",
+      "title": "Adopt Non-Discrimination Policy",
+      "description": "Adopt and publish policy stating institution does not discriminate on basis of sex",
+      "priority": "high",
+      "requirementType": "requirement"
+    },
+    {
+      "taskId": "TITLE-IX-005",
+      "title": "Publish Policy in Catalog",
+      "description": "Include non-discrimination statement in course catalogs and bulletins",
+      "priority": "high",
+      "requirementType": "requirement"
+    },
+    {
+      "taskId": "TITLE-IX-006",
+      "title": "Publish Policy on Website",
+      "description": "Display non-discrimination policy prominently on institution website",
+      "priority": "high",
+      "requirementType": "requirement"
+    },
+    {
+      "taskId": "TITLE-IX-007",
+      "title": "Include Policy in Handbooks",
+      "description": "Include non-discrimination statement in student and employee handbooks",
+      "priority": "high",
+      "requirementType": "requirement"
+    },
+    {
+      "taskId": "TITLE-IX-008",
+      "title": "Adopt Grievance Procedures",
+      "description": "Adopt and publish grievance procedures for resolving complaints of sex discrimination",
+      "priority": "high",
+      "requirementType": "requirement"
+    },
+    {
+      "taskId": "TITLE-IX-009",
+      "title": "Provide Prompt and Equitable Resolution",
+      "description": "Ensure grievance procedures provide for prompt and equitable resolution",
+      "priority": "high",
+      "requirementType": "requirement"
+    },
+    {
+      "taskId": "TITLE-IX-010",
+      "title": "Include Notice of Grievance Process",
+      "description": "Notify students and employees of grievance procedures",
+      "priority": "high",
+      "requirementType": "requirement"
+    },
+    {
+      "taskId": "TITLE-IX-011",
+      "title": "Train Title IX Coordinator",
+      "description": "Provide training on definition of sexual harassment, scope of institution program",
+      "priority": "high",
+      "requirementType": "requirement"
+    },
+    {
+      "taskId": "TITLE-IX-012",
+      "title": "Train Investigators",
+      "description": "Train investigators on issues of relevance and how to conduct investigation",
+      "priority": "high",
+      "requirementType": "requirement"
+    },
+    {
+      "taskId": "TITLE-IX-013",
+      "title": "Train Decision-Makers",
+      "description": "Train decision-makers on issues of relevance of questions and evidence",
+      "priority": "high",
+      "requirementType": "requirement"
+    },
+    {
+      "taskId": "TITLE-IX-014",
+      "title": "Train Informal Resolution Facilitators",
+      "description": "Train any person who facilitates informal resolution process",
+      "priority": "medium",
+      "requirementType": "requirement"
+    },
+    {
+      "taskId": "TITLE-IX-015",
+      "title": "Publish Training Materials",
+      "description": "Make training materials publicly available on website",
+      "priority": "high",
+      "requirementType": "requirement"
+    },
+    {
+      "taskId": "TITLE-IX-016",
+      "title": "Offer Supportive Measures",
+      "description": "Offer supportive measures to complainant upon receiving report",
+      "priority": "high",
+      "requirementType": "requirement"
+    },
+    {
+      "taskId": "TITLE-IX-017",
+      "title": "Provide Written Explanation of Options",
+      "description": "Explain to complainant process for filing formal complaint",
+      "priority": "high",
+      "requirementType": "requirement"
+    },
+    {
+      "taskId": "TITLE-IX-018",
+      "title": "Maintain Records for Seven Years",
+      "description": "Maintain records of investigations, appeals, and informal resolutions for 7 years",
+      "priority": "high",
+      "requirementType": "requirement"
+    },
+    {
+      "taskId": "TITLE-IX-019",
+      "title": "Document Supportive Measures",
+      "description": "Create records documenting basis for supportive measures provided",
+      "priority": "high",
+      "requirementType": "requirement"
+    },
+    {
+      "taskId": "TITLE-IX-020",
+      "title": "Retain Training Records",
+      "description": "Maintain all materials used to train Title IX personnel for 7 years",
+      "priority": "high",
+      "requirementType": "requirement"
+    },
+    {
+      "taskId": "TITLE-IX-021",
+      "title": "Provide Equal Athletic Opportunity",
+      "description": "Provide equal athletic opportunity for members of both sexes",
+      "priority": "high",
+      "requirementType": "requirement"
+    },
+    {
+      "taskId": "TITLE-IX-022",
+      "title": "Assess Athletic Program Equity",
+      "description": "Evaluate whether athletic interests and abilities are equally accommodated",
+      "priority": "medium",
+      "requirementType": "best_practice"
+    },
+    {
+      "taskId": "TITLE-IX-023",
+      "title": "Review Athletic Financial Assistance",
+      "description": "Ensure athletic scholarships are proportionate to participation",
+      "priority": "high",
+      "requirementType": "requirement"
+    },
+    {
+      "taskId": "TITLE-IX-024",
+      "title": "Audit Athletic Equipment and Supplies",
+      "description": "Review equivalence of athletic equipment, uniforms, and supplies",
+      "priority": "medium",
+      "requirementType": "best_practice"
+    },
+    {
+      "taskId": "TITLE-IX-025",
+      "title": "Review Coaching and Support Staff",
+      "description": "Ensure equivalence in coaching, tutoring, and other support",
+      "priority": "medium",
+      "requirementType": "best_practice"
+    },
+    {
+      "taskId": "TITLE-IX-026",
+      "title": "Prohibit Admissions Discrimination",
+      "description": "Do not discriminate on basis of sex in admissions",
+      "priority": "high",
+      "requirementType": "requirement"
+    },
+    {
+      "taskId": "TITLE-IX-027",
+      "title": "Review Recruitment Materials",
+      "description": "Ensure recruitment materials do not discriminate",
+      "priority": "medium",
+      "requirementType": "best_practice"
+    },
+    {
+      "taskId": "TITLE-IX-028",
+      "title": "Accommodate Pregnant Students",
+      "description": "Treat pregnancy, childbirth, and related conditions as temporary disability",
+      "priority": "high",
+      "requirementType": "requirement"
+    },
+    {
+      "taskId": "TITLE-IX-029",
+      "title": "Provide Lactation Space",
+      "description": "Provide reasonable break time and private space for lactation",
+      "priority": "high",
+      "requirementType": "requirement"
+    },
+    {
+      "taskId": "TITLE-IX-030",
+      "title": "Allow Medical Leave",
+      "description": "Allow medical leave for pregnancy and childbirth",
+      "priority": "high",
+      "requirementType": "requirement"
+    },
+    {
+      "taskId": "TITLE-IX-031",
+      "title": "Prohibit Employment Discrimination",
+      "description": "Do not discriminate on basis of sex in employment",
+      "priority": "high",
+      "requirementType": "requirement"
+    },
+    {
+      "taskId": "TITLE-IX-032",
+      "title": "Review Hiring Practices",
+      "description": "Ensure hiring practices do not discriminate",
+      "priority": "high",
+      "requirementType": "requirement"
+    },
+    {
+      "taskId": "TITLE-IX-033",
+      "title": "Review Compensation Equity",
+      "description": "Ensure equal pay for equal work regardless of sex",
+      "priority": "high",
+      "requirementType": "requirement"
+    },
+    {
+      "taskId": "TITLE-IX-034",
+      "title": "Review Promotion Practices",
+      "description": "Ensure promotion and tenure decisions are non-discriminatory",
+      "priority": "high",
+      "requirementType": "requirement"
+    },
+    {
+      "taskId": "TITLE-IX-035",
+      "title": "Prohibit Retaliation",
+      "description": "Prohibit retaliation against anyone who reports or participates in Title IX process",
+      "priority": "high",
+      "requirementType": "requirement"
+    },
+    {
+      "taskId": "TITLE-IX-036",
+      "title": "Monitor for Retaliation",
+      "description": "Actively monitor for and address any retaliatory conduct",
+      "priority": "medium",
+      "requirementType": "best_practice"
+    },
+    {
+      "taskId": "TITLE-IX-BP-001",
+      "title": "Conduct Climate Survey",
+      "description": "Periodically assess campus climate regarding sexual harassment",
+      "priority": "medium",
+      "requirementType": "best_practice"
+    },
+    {
+      "taskId": "TITLE-IX-BP-002",
+      "title": "Provide Prevention Education",
+      "description": "Offer education programs on sexual harassment prevention",
+      "priority": "medium",
+      "requirementType": "best_practice"
+    },
+    {
+      "taskId": "TITLE-IX-BP-003",
+      "title": "Review Policies Annually",
+      "description": "Conduct annual review of Title IX policies and procedures",
+      "priority": "medium",
+      "requirementType": "best_practice"
+    },
+    {
+      "taskId": "TITLE-IX-BP-004",
+      "title": "Track and Report Data",
+      "description": "Maintain and analyze data on Title IX complaints and resolutions",
+      "priority": "medium",
+      "requirementType": "best_practice"
+    }
+  ],
+  "preserveExistingTasks": false,
+  "deadlines": [
+    {
+      "deadlineId": null,
+      "name": "continuous",
+      "description": "Must always have designated coordinator",
+      "frequency": "continuous",
+      "recurringMonth": null,
+      "recurringDay": null,
+      "reportingTo": null
+    },
+    {
+      "deadlineId": null,
+      "name": "continuous",
+      "description": "Must be in place and published",
+      "frequency": "continuous",
+      "recurringMonth": null,
+      "recurringDay": null,
+      "reportingTo": null
+    },
+    {
+      "deadlineId": null,
+      "name": "continuous",
+      "description": "All publications must include statement",
+      "frequency": "continuous",
+      "recurringMonth": null,
+      "recurringDay": null,
+      "reportingTo": null
+    },
+    {
+      "deadlineId": null,
+      "name": "event-triggered",
+      "description": "Upon receipt of report",
+      "frequency": "event-triggered",
+      "recurringMonth": null,
+      "recurringDay": null,
+      "reportingTo": null
+    },
+    {
+      "deadlineId": null,
+      "name": "ongoing",
+      "description": "Upon hire and annually",
+      "frequency": "ongoing",
+      "recurringMonth": null,
+      "recurringDay": null,
+      "reportingTo": null
+    }
+  ],
+  "taskStats": {
+    "total": 40,
+    "requirements": 31,
+    "bestPractices": 9,
+    "taskSource": "static-payload"
+  },
+  "source": "mcp-engine",
+  "syncTimestamp": "2026-02-11T18:58:18.398Z",
+  "requirements": "## Institutional Coordination Requirements\n- Designate Title IX Coordinator with authority and training per 34 CFR § 106.8(a)\n- Publish coordinator contact information to entire campus community\n- Ensure coordinator independence from conflicting institutional roles\n\n## Policy and Procedure Mandates\n- Adopt formal grievance procedures for prompt, equitable complaint resolution\n- Implement live hearing processes for sexual harassment allegations\n- Establish appeal procedures with different decision-makers\n- Conduct annual policy reviews and updates\n\n## Investigation and Documentation Standards\n- Complete investigations within reasonably prompt timeframes\n- Maintain detailed records of all complaints and institutional responses\n- Preserve grievance documentation per state personal injury limitation periods\n- Provide interim supportive measures during pending investigations\n\n## Training and Communication Obligations\n- Train all relevant personnel on Title IX requirements annually\n- Publish non-discrimination notices in recruitment and admissions materials\n- Notify campus community of grievance procedures and coordinator information"
+}

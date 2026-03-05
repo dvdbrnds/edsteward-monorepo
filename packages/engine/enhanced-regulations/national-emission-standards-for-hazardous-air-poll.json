@@ -1,0 +1,50 @@
+{
+  "regulationId": "national-emission-standards-for-hazardous-air-poll",
+  "enhanced": {
+    "fullText": "The National Emission Standards for Hazardous Air Pollutants (NESHAP) for asbestos, codified at 40 CFR Part 61, Subpart M, establishes comprehensive federal standards governing asbestos management during demolition and renovation activities at higher education institutions. This regulation derives its authority from the Clean Air Act, 42 U.S.C. § 7412, and applies to all structures containing regulated asbestos-containing material (RACM).\n\nUniversities must comply with strict notification requirements under 40 CFR § 61.145(b) before conducting any demolition or renovation activities. The regulation mandates notification to the appropriate state agency at least 10 working days prior to commencement of work when demolishing any structure or renovating buildings containing threshold amounts of asbestos: 260 linear feet of RACM on pipes, 160 square feet on other facility components, or 35 cubic feet when the material cannot be measured in linear or square feet.\n\nKey provisions under 40 CFR § 61.150 require institutions to thoroughly inspect buildings for asbestos before renovation or demolition, using EPA-certified inspectors. Work practice standards under 40 CFR § 61.145 mandate proper wetting procedures, careful removal techniques, and appropriate waste disposal methods. The regulation prohibits visible emissions during asbestos removal and requires air monitoring in occupied buildings.\n\nHigher education institutions face significant enforcement actions for violations. EPA may impose civil penalties up to $37,500 per day per violation under 42 U.S.C. § 7413(d)(1). Criminal penalties may reach $250,000 for individuals and $500,000 for organizations under 42 U.S.C. § 7413(c)(1). Recent amendments in 2020 updated notification procedures and clarified inspection requirements for emergency renovations.\n\nCompliance requires designated institutional personnel to maintain detailed records of all asbestos activities, coordinate with certified contractors, and ensure proper training for facilities staff. Universities must establish comprehensive asbestos management programs integrating NESHAP requirements with OSHA standards under 29 CFR § 1926.1101 for complete regulatory compliance.",
+    "summary": "NESHAP asbestos regulations under 40 CFR Part 61 require universities to notify state agencies 10 days before demolition/renovation, conduct certified inspections, follow strict work practices, and maintain detailed records to avoid penalties up to $37,500 per day per violation.",
+    "requirements": "## Notification Requirements\n- Submit Form 7550-5 to state agency 10 working days before demolition or renovation exceeding thresholds under 40 CFR § 61.145(b)\n- Update notifications for project changes or delays\n- Maintain notification records for two years minimum\n\n## Inspection and Assessment\n- Conduct thorough asbestos inspection using EPA-certified inspectors before any work\n- Document all findings with detailed written reports\n- Identify and quantify regulated asbestos-containing materials (RACM)\n\n## Work Practice Standards\n- Implement proper wetting procedures during asbestos removal per 40 CFR § 61.145(c)\n- Prohibit visible emissions during removal activities\n- Use certified asbestos contractors for RACM removal\n- Establish containment areas and negative air pressure systems\n\n## Waste Management\n- Package asbestos waste in leak-tight containers with proper labeling\n- Transport waste only to EPA-approved disposal facilities\n- Maintain waste shipment records and disposal receipts\n\n## Training and Personnel\n- Ensure facilities staff receive appropriate asbestos awareness training\n- Designate qualified personnel to oversee compliance programs\n- Coordinate with certified contractors and environmental consultants",
+    "reportingRequirements": "Submit Form 7550-5 notification to state environmental agency minimum 10 working days before demolition or renovation activities exceeding regulatory thresholds. Annual waste generator reports due March 1st for previous calendar year activities. Maintain inspection records, work documentation, and waste disposal receipts for minimum two years post-completion."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T00:59:55.059Z"
+  },
+  "deadlines": [
+    {
+      "date": "02-01",
+      "label": "OSHA 300 Log Posting",
+      "type": "posting",
+      "description": "OSHA 300 Log Posting for National Emission Standards for Hazardous Air Pollutants (NESHAP)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Annual Safety Training",
+      "type": "training",
+      "description": "Annual Safety Training for National Emission Standards for Hazardous Air Pollutants (NESHAP)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Hazardous Waste Manifest Submission",
+      "type": "filing",
+      "description": "Hazardous Waste Manifest Submission for National Emission Standards for Hazardous Air Pollutants (NESHAP)",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Environmental Health and Safety"
+  ]
+}

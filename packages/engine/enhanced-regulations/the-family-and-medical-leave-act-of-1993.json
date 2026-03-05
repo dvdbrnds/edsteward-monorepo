@@ -1,0 +1,34 @@
+{
+  "regulationId": "the-family-and-medical-leave-act-of-1993",
+  "enhanced": {
+    "fullText": "The Family and Medical Leave Act of 1993 (FMLA), codified at 29 U.S.C. §§ 2601-2654 and implemented through Department of Labor regulations at 29 CFR Part 825, establishes comprehensive leave rights for eligible employees at covered higher education institutions. Under Public Law 103-3, universities employing 50 or more employees within a 75-mile radius must provide eligible faculty and staff up to 12 weeks of unpaid, job-protected leave annually for qualifying family and medical reasons, including birth or adoption of a child, serious health conditions, or military family leave circumstances.\n\nEligibility requirements under 29 U.S.C. § 2611(2)(A) mandate employees must have worked for the institution for at least 12 months, completed 1,250 hours of service during the preceding 12-month period, and work at a location where 50 or more employees are employed within 75 miles. Higher education institutions face unique challenges given academic calendar considerations and faculty sabbatical arrangements, which the Department of Labor addresses through specialized guidance in 29 CFR § 825.601.\n\nKey provisions require universities to maintain group health insurance coverage during FMLA leave under identical terms as if the employee remained actively working, pursuant to 29 U.S.C. § 2614(c). Institutions must restore employees to the same or equivalent position upon return, with equivalent pay, benefits, and working conditions under 29 U.S.C. § 2614(a)(1). The Act prohibits retaliation against employees exercising FMLA rights under 29 U.S.C. § 2615.\n\nUniversities must display FMLA notices as required by 29 CFR § 825.300 and provide individual notice rights under 29 CFR § 825.301. Academic employees, including faculty with primarily teaching responsibilities, receive special consideration under 29 CFR § 825.602, particularly regarding leave timing near semester conclusions.\n\nEnforcement mechanisms include Department of Labor investigations and private civil actions under 29 U.S.C. § 2617, with remedies including reinstatement, back pay, benefits restoration, and liquidated damages. The 2008 National Defense Authorization Act expanded military family leave provisions under 29 U.S.C. § 2612(a)(3), while the 2009 amendments clarified serious health condition definitions affecting university compliance obligations.",
+    "summary": "FMLA mandates eligible university employees receive up to 12 weeks unpaid, job-protected leave for family/medical reasons. Universities must maintain health benefits, provide job restoration, and comply with specialized academic employee provisions.",
+    "requirements": "## Employee Eligibility Verification\n- Confirm 12-month employment tenure and 1,250 hours worked per 29 U.S.C. § 2611(2)(A)\n- Verify 50+ employee threshold within 75-mile radius\n- Document academic employee status for specialized provisions under 29 CFR § 825.602\n\n## Notice and Documentation Requirements\n- Post required FMLA workplace notices per 29 CFR § 825.300\n- Provide individual eligibility notices within five business days per 29 CFR § 825.301\n- Obtain medical certifications using DOL forms WH-380-E/F within 15 days\n\n## Benefits Administration\n- Maintain group health insurance coverage during leave per 29 U.S.C. § 2614(c)\n- Calculate premium responsibilities and establish payment procedures\n- Coordinate with other paid leave policies and state family leave laws\n\n## Academic Scheduling Considerations\n- Apply semester-end limitations for instructional employees per 29 CFR § 825.602\n- Manage intermittent leave requests during critical academic periods\n- Document equivalent position determinations for faculty restoration",
+    "reportingRequirements": "No routine federal reporting required. Maintain employee FMLA records for three years per 29 CFR § 825.500. Submit documentation during DOL investigations. Report FMLA-related EEOC charges and litigation to institutional counsel within 24 hours."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T16:01:04.539Z"
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Compliance Review",
+      "type": "review",
+      "description": "Annual Compliance Review for The Family and Medical Leave Act of 1993",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Discrimination"
+  ]
+}

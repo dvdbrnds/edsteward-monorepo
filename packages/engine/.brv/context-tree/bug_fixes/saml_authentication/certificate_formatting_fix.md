@@ -1,0 +1,1 @@
+SAML Configuration Fix: Fixed certificate formatting issue in .env file - removed quotes around AUTH_SAML_CERT that were preventing proper parsing. Certificate now properly formatted as multi-line environment variable without quotes. Server needs restart to pick up configuration changes. Ready to test SAML authentication flow with Moravian OKTA development app.

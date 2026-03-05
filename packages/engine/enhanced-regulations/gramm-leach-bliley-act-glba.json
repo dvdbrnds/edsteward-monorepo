@@ -1,0 +1,50 @@
+{
+  "regulationId": "gramm-leach-bliley-act-glba",
+  "enhanced": {
+    "fullText": "The Gramm-Leach-Bliley Act (GLBA), codified at 15 U.S.C. § 6801-6827, establishes comprehensive privacy and data security requirements for financial institutions, including higher education institutions that provide financial services to students and families. Enacted in 1999, GLBA's Financial Privacy Rule (16 CFR Part 313) and Safeguards Rule (16 CFR Part 314) directly impact universities offering federal student loans, institutional financing, or investment advisory services.\n\nUnder 15 U.S.C. § 6805, covered institutions must provide annual privacy notices explaining information collection, sharing practices, and opt-out rights. The Safeguards Rule, enforced by the Federal Trade Commission under 16 CFR § 314.3, mandates written information security programs protecting nonpublic personal information (NPI). Universities must designate qualified personnel to coordinate safeguards, conduct risk assessments, and implement access controls.\n\nThe Act's scope extends to institutions meeting the \"financial institution\" definition under 15 U.S.C. § 6809(3)(A), encompassing universities providing loans, financial counseling, or managing endowments. Privacy notices must detail information sharing with affiliates and third parties, as required by 15 U.S.C. § 6803. Students and borrowers retain opt-out rights for non-essential sharing under 15 U.S.C. § 6802.\n\nCompliance failures trigger FTC enforcement under 15 U.S.C. § 6805(a), with civil penalties up to $100,000 per violation for institutions and $10,000 for individuals under 15 U.S.C. § 6823. The 2021 Safeguards Rule amendments (16 CFR § 314.4) strengthened encryption, access controls, and incident response requirements.\n\nUniversities must establish ongoing monitoring systems, vendor oversight protocols, and annual program evaluations. Integration with FERPA requirements under 20 U.S.C. § 1232g ensures comprehensive student data protection across academic and financial services.",
+    "summary": "GLBA requires higher education institutions providing financial services to implement comprehensive privacy notices, data safeguards, and security programs protecting student financial information, with FTC oversight and significant penalties for non-compliance.",
+    "requirements": "## Privacy Notice Requirements\n- Provide annual privacy notices to all customers detailing information practices per 16 CFR § 313.4\n- Deliver initial notices before establishing customer relationships\n- Include opt-out mechanisms for non-essential information sharing\n- Maintain current notices reflecting actual practices\n\n## Information Security Program\n- Designate qualified information security coordinator per 16 CFR § 314.4(a)\n- Conduct comprehensive risk assessments of student financial data systems\n- Implement access controls, encryption, and monitoring systems\n- Establish incident response and breach notification procedures\n\n## Vendor Oversight\n- Execute written agreements with service providers handling NPI per 16 CFR § 314.4(d)\n- Monitor third-party security practices and compliance\n- Conduct due diligence before engaging financial service vendors\n\n## Ongoing Compliance\n- Perform annual security program evaluations and updates\n- Train staff on GLBA requirements and data handling procedures\n- Document all safeguards implementation and testing activities",
+    "reportingRequirements": "No specific federal reporting requirements under GLBA; however, institutions must maintain documentation of security program implementation, annual evaluations, and incident response activities. Privacy notices must be distributed annually to all customers and updated within reasonable timeframes following material changes to information practices."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T19:21:49.845Z"
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Privacy Assessment",
+      "type": "assessment",
+      "description": "Annual Privacy Assessment for Gramm Leach Bliley Act (GLBA)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Data Breach Notification (if applicable)",
+      "type": "notification",
+      "description": "Data Breach Notification (if applicable) for Gramm Leach Bliley Act (GLBA)",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    },
+    {
+      "date": "12-31",
+      "label": "Security Awareness Training",
+      "type": "training",
+      "description": "Security Awareness Training for Gramm Leach Bliley Act (GLBA)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Privacy & Information Security"
+  ]
+}

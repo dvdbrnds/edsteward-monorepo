@@ -1,0 +1,42 @@
+{
+  "regulationId": "trade-sanctions-reform-and-export-enhancement",
+  "enhanced": {
+    "fullText": "The Trade Sanctions Reform and Export Enhancement Act (TSREEA) of 2000, codified at 22 U.S.C. §§ 7201-7211, establishes comprehensive regulations governing international trade and academic exchanges involving sanctioned countries. The Act significantly impacts higher education institutions by requiring compliance with Treasury's Office of Foreign Assets Control (OFAC) regulations under 31 CFR Chapter V.\n\nUnder 22 U.S.C. § 7203, universities must obtain specific licenses for educational activities involving Cuba, Iran, North Korea, Syria, and other designated countries. The regulation prohibits unlicensed transactions including student exchanges, research collaborations, and faculty travel without proper authorization. Educational institutions face particular scrutiny under 31 CFR § 515.565 for Cuban academic programs and 31 CFR § 560.525 for Iranian educational exchanges.\n\nKey provisions mandate that universities establish robust compliance programs to screen international students, faculty, and research partners against OFAC's Specially Designated Nationals (SDN) list updated under 31 CFR § 501.807. Institutions must verify that foreign collaborators are not affiliated with sanctioned entities before engaging in research partnerships or accepting funding.\n\nThe Department of Treasury enforces violations through civil penalties up to $307,922 per violation under 22 U.S.C. § 7209, with criminal penalties reaching $1 million and 20 years imprisonment. Recent enforcement actions have targeted universities for inadequate screening procedures and unlicensed research collaborations.\n\nThe 2019 amendments under Executive Order 13902 expanded restrictions on educational technology transfers, requiring universities to obtain export licenses for sharing certain research data and software with foreign nationals from designated countries. Universities must now classify research under Export Administration Regulations (EAR) at 15 CFR Parts 730-774 before international collaboration.\n\nHigher education institutions must implement comprehensive due diligence procedures, maintain transaction records for five years per 31 CFR § 501.601, and report suspicious activities to OFAC within specified timeframes. Compliance failures result in immediate transaction prohibitions and potential federal funding restrictions across all university programs.",
+    "summary": "TSREEA requires universities to obtain Treasury licenses for educational activities with sanctioned countries, screen international partners against OFAC lists, and maintain comprehensive compliance programs with penalties up to $307,922 per violation.",
+    "requirements": "## Licensing Requirements\n- Obtain OFAC licenses before engaging with sanctioned countries under 22 U.S.C. § 7203\n- Submit license applications 60 days before planned activities\n- Maintain current authorizations for ongoing programs\n\n## Screening Obligations\n- Screen all international students, faculty, and partners against SDN list per 31 CFR § 501.807\n- Conduct enhanced due diligence for high-risk countries\n- Update screening procedures within 30 days of SDN list changes\n\n## Export Control Compliance\n- Classify research projects under EAR regulations at 15 CFR Parts 730-774\n- Obtain export licenses for controlled technology transfers\n- Implement deemed export controls for foreign national access\n\n## Record Maintenance\n- Retain transaction documentation for five years per 31 CFR § 501.601\n- Maintain licensing correspondence and compliance decisions\n- Document screening results and risk assessments",
+    "reportingRequirements": "Report suspicious transactions to OFAC within 10 business days of discovery. Submit annual compliance certifications by March 31st. File voluntary self-disclosures within 30 days of violation discovery. Maintain quarterly screening reports for internal audit."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T15:52:55.344Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Vendor Compliance Review",
+      "type": "review",
+      "description": "Vendor Compliance Review for Trade Sanctions Reform and Export Enhancement",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "SAM.gov Registration Renewal",
+      "type": "registration",
+      "description": "SAM.gov Registration Renewal for Trade Sanctions Reform and Export Enhancement",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Contracts & Procurement"
+  ]
+}

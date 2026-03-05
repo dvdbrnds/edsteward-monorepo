@@ -1,0 +1,42 @@
+{
+  "regulationId": "salary-of-government-officials-and-employees-payab",
+  "enhanced": {
+    "fullText": "18 U.S.C. § 209 establishes a fundamental prohibition against dual compensation for federal employees, including those working at public higher education institutions receiving federal funding. This statute prevents government employees from accepting salary, supplementary compensation, or any other payment from non-federal sources for performing their official government duties.\n\nUnder 18 U.S.C. § 209(a), any officer or employee of the United States who receives compensation from any source other than the United States for services as such officer or employee commits a federal offense punishable by fine and imprisonment up to one year. The Office of Government Ethics (OGE) provides interpretive guidance through 5 CFR Part 2635, which clarifies that this prohibition extends to employees of federally-funded research institutions and universities.\n\nFor higher education institutions, this regulation significantly impacts faculty and staff involved in federally-funded research programs, ROTC units, and cooperative education agreements. University employees holding concurrent federal positions, such as researchers with federal lab appointments or military personnel in academic roles, must ensure their compensation structure complies with these restrictions. The prohibition covers direct salary payments, consulting fees, honoraria, and any other form of monetary compensation for official duties.\n\nKey provisions under 5 CFR § 2635.204 specify that the prohibition applies regardless of whether the outside source is a private entity, state government, or foreign organization. Universities must implement robust oversight mechanisms to identify potential violations, particularly in research collaborations where faculty may receive funding from multiple sources.\n\nEnforcement mechanisms include criminal prosecution under 18 U.S.C. § 209, administrative sanctions through employing agencies, and civil penalties. Violations can result in fines up to $50,000, imprisonment, and immediate termination of federal employment. The Department of Justice has prosecuted numerous cases involving dual compensation schemes.\n\nRecent interpretations by OGE have clarified that the statute applies to indirect compensation arrangements, including situations where third parties pay universities specifically to cover salaries of federal employees. Universities must maintain clear documentation separating federal employee compensation from other funding sources to ensure compliance with these stringent requirements.",
+    "summary": "18 U.S.C. § 209 prohibits federal employees from receiving compensation from non-federal sources for official duties. Universities must ensure faculty/staff with federal positions are paid only by the government, implement oversight systems, and maintain documentation to prevent dual compensation violations.",
+    "requirements": "## Core Prohibition Requirements\n- Ensure federal employees receive compensation solely from United States government sources per 18 U.S.C. § 209(a)\n- Prohibit acceptance of supplementary payments, consulting fees, or honoraria for official duties\n- Implement screening procedures for faculty with concurrent federal appointments\n\n## Documentation and Oversight\n- Maintain clear separation between federal employee salaries and other institutional funding sources\n- Establish verification systems for research faculty with federal laboratory affiliations\n- Document compensation sources for all employees in federally-funded programs\n\n## Training and Compliance Monitoring\n- Provide annual ethics training covering dual compensation restrictions under 5 CFR Part 2635\n- Conduct regular audits of faculty compensation arrangements in federal research programs\n- Establish reporting protocols for potential violations to appropriate federal agencies",
+    "reportingRequirements": "No specific periodic reporting required under 18 U.S.C. § 209. However, suspected violations must be immediately reported to employing federal agency and Department of Justice. Universities must maintain compensation documentation for federal audit purposes and report any dual payment arrangements discovered through internal monitoring to relevant federal oversight authorities."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T02:07:54.437Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Annual Ethics Training",
+      "type": "training",
+      "description": "Annual Ethics Training for Salary of Government Officials and Employees Payable Only by United States",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Conflict of Interest Disclosure Review",
+      "type": "review",
+      "description": "Conflict of Interest Disclosure Review for Salary of Government Officials and Employees Payable Only by United States",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Ethics"
+  ]
+}

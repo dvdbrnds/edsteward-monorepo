@@ -1,0 +1,50 @@
+{
+  "regulationId": "osha-s-emergency-action-plan-standard",
+  "enhanced": {
+    "fullText": "The Occupational Safety and Health Administration's Emergency Action Plan (EAP) Standard, codified at 29 CFR 1910.38, mandates that higher education institutions develop, implement, and maintain comprehensive written emergency action plans to protect employees during workplace emergencies. This federal regulation, established under the authority of the Occupational Safety and Health Act of 1970 (29 U.S.C. § 651 et seq.), applies to all employers with more than 10 employees and those required to have emergency action plans under other OSHA standards.\n\nUnder 29 CFR 1910.38(a), universities must establish a written EAP covering procedures for reporting fires and other emergencies, emergency evacuation including type of evacuation and exit route assignments, procedures for employees who remain to operate critical university operations before evacuation, procedures to account for all employees after evacuation, rescue and medical duties for designated employees, and contact information for persons responsible for additional information about the plan.\n\nThe regulation requires universities to designate and train employees to assist in safe and orderly emergency evacuation per 29 CFR 1910.38(b). Plans must be kept in the workplace and made available for employee review upon request under 29 CFR 1910.38(c). For institutions with 10 or fewer employees, oral communication of the plan is permitted if specific requirements are met.\n\nHigher education institutions face unique compliance challenges due to their complex physical environments, including residence halls, laboratories, athletic facilities, and research buildings. The standard applies to all university employees, including faculty, staff, graduate assistants, and student workers. Universities must coordinate EAPs with local emergency responders and integrate plans with campus security policies under the Clery Act (20 U.S.C. § 1092(f)).\n\nOSHA enforces compliance through workplace inspections, with violations classified as serious, willful, or repeat offenses under 29 U.S.C. § 666. Penalties range from $1,000 to $156,259 per violation as of 2023 adjustments under 29 CFR 1903.15. Universities may face increased scrutiny following emergency incidents or employee complaints filed under 29 CFR 1977.\n\nRecent enforcement trends emphasize coordination between EAPs and COVID-19 workplace safety plans, integration with active shooter preparedness protocols, and enhanced accountability measures for employee training documentation. Universities must regularly review and update plans to reflect organizational changes, new hazards, and lessons learned from emergency drills or actual incidents.",
+    "summary": "OSHA's Emergency Action Plan Standard (29 CFR 1910.38) requires universities to maintain written emergency plans detailing evacuation procedures, employee responsibilities, and emergency contacts. Plans must be accessible to employees and regularly updated to ensure workplace safety compliance.",
+    "requirements": "## Written Plan Development\n- Create comprehensive emergency action plan per 29 CFR 1910.38(c)\n- Include evacuation procedures and exit route assignments\n- Document emergency reporting procedures and alarm systems\n- Identify employees responsible for critical operations during evacuation\n\n## Employee Training and Designation\n- Train designated employees in emergency response procedures per 29 CFR 1910.38(b)\n- Assign specific roles for evacuation assistance and employee accounting\n- Coordinate with local emergency responders and campus security\n\n## Plan Accessibility and Maintenance\n- Keep written plans available in workplace for employee review\n- Update plans when organizational changes occur\n- Conduct regular reviews and emergency drills\n- Maintain documentation of training and plan updates",
+    "reportingRequirements": "No specific federal reporting deadlines under 29 CFR 1910.38. Universities must make plans available for employee review upon request and provide to OSHA compliance officers during inspections. Document all emergency drills and training sessions for compliance verification."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T01:32:06.219Z"
+  },
+  "deadlines": [
+    {
+      "date": "02-01",
+      "label": "OSHA 300 Log Posting",
+      "type": "posting",
+      "description": "OSHA 300 Log Posting for OSHA’s  Emergency Action Plan Standard",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Annual Safety Training",
+      "type": "training",
+      "description": "Annual Safety Training for OSHA’s  Emergency Action Plan Standard",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Hazardous Waste Manifest Submission",
+      "type": "filing",
+      "description": "Hazardous Waste Manifest Submission for OSHA’s  Emergency Action Plan Standard",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Environmental Health and Safety"
+  ]
+}

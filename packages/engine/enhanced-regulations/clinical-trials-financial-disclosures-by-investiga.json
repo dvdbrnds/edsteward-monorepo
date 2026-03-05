@@ -1,0 +1,50 @@
+{
+  "regulationId": "clinical-trials-financial-disclosures-by-investiga",
+  "enhanced": {
+    "fullText": "The Clinical Trials Financial Disclosures by Investigator regulation, codified under 21 CFR Part 54, establishes mandatory disclosure requirements for clinical investigators conducting FDA-regulated studies. This regulation operates under the authority of the Federal Food, Drug, and Cosmetic Act (21 U.S.C. § 355) and applies comprehensively to higher education institutions conducting clinical research.\n\nUnder 21 CFR § 54.2, covered clinical investigators must disclose any financial arrangements that could reasonably affect the conduct or reporting of clinical studies. The regulation defines four categories of disclosable financial interests: (1) compensation exceeding $25,000 from the study sponsor during the study and for one year following completion; (2) proprietary interests in the tested product, including patents, trademarks, copyrights, or licensing agreements; (3) equity interests in a publicly held sponsor company exceeding $50,000, or any equity interest in a non-publicly held sponsor; and (4) significant payments of other sorts, including grants to fund ongoing research, compensation in the form of equipment or retainers for ongoing consultation.\n\nHigher education institutions bear primary responsibility under 21 CFR § 54.4 for collecting, maintaining, and submitting these disclosures to study sponsors. Universities must establish robust systems to identify covered investigators, collect required financial information, and ensure timely disclosure submission. The regulation requires institutions to obtain written disclosure statements from investigators before study initiation and update these annually throughout the study duration.\n\nEnforcement mechanisms include FDA inspection authority under 21 U.S.C. § 374, potential study rejection, and regulatory sanctions. The FDA may refuse to file or approve applications based on inadequate financial disclosure compliance. Recent guidance documents, including FDA's 2013 Financial Disclosure Guidance for Clinical Investigators, emphasize proactive institutional compliance programs and enhanced documentation requirements.\n\nInstitutions must maintain disclosure records for two years after marketing application approval or study termination, whichever is later, as specified in 21 CFR § 54.6. Non-compliance can result in Warning Letters, consent decrees, or debarment proceedings under 21 U.S.C. § 335a, potentially devastating institutional research programs and federal funding eligibility.",
+    "summary": "Federal regulation requiring clinical investigators to disclose financial arrangements with study sponsors exceeding specified thresholds. Universities must collect, verify, and maintain investigator financial disclosures for FDA-regulated clinical trials, ensuring compliance with 21 CFR Part 54 disclosure requirements and enforcement provisions.",
+    "requirements": "## Core Disclosure Obligations\n- Collect financial disclosures from all covered clinical investigators per 21 CFR § 54.2\n- Document compensation exceeding $25,000 from study sponsors\n- Report proprietary interests in tested products or sponsor entities\n- Identify equity interests above regulatory thresholds\n\n## Institutional Responsibilities\n- Establish written disclosure collection procedures under 21 CFR § 54.4\n- Verify investigator disclosure accuracy and completeness\n- Submit disclosures to study sponsors before study initiation\n- Update disclosure information annually throughout study duration\n\n## Documentation and Record-Keeping\n- Maintain disclosure records for minimum two years post-study completion\n- Ensure written investigator certification of financial interests\n- Document institutional review and verification processes\n- Prepare records for potential FDA inspection under 21 U.S.C. § 374",
+    "reportingRequirements": "Submit initial financial disclosures to study sponsors before clinical trial initiation. Provide annual updates throughout study duration. Maintain comprehensive disclosure records for two years following study completion or marketing application approval. Report changes in financial interests within 30 days of investigator notification per institutional policies."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T17:39:28.477Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "IRB Protocol Annual Review",
+      "type": "review",
+      "description": "IRB Protocol Annual Review for Clinical Trials § Financial Disclosures by Investigator",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Conflict of Interest Disclosure",
+      "type": "disclosure",
+      "description": "Conflict of Interest Disclosure for Clinical Trials § Financial Disclosures by Investigator",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Export Control Assessment",
+      "type": "assessment",
+      "description": "Export Control Assessment for Clinical Trials § Financial Disclosures by Investigator",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Research"
+  ]
+}

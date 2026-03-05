@@ -1,0 +1,34 @@
+{
+  "regulationId": "u-s-patent-act",
+  "enhanced": {
+    "fullText": "The U.S. Patent Act, codified at 35 U.S.C. §§ 1-390, establishes the comprehensive legal framework governing patent rights, procedures, and administration in the United States. This federal statute is administered by the United States Patent and Trademark Office (USPTO) and has significant implications for higher education institutions engaged in research, technology transfer, and innovation activities.\n\nUnder 35 U.S.C. § 101, patents may be obtained for \"any new and useful process, machine, manufacture, or composition of matter, or any new and useful improvement thereof.\" Universities must navigate patentability requirements including novelty (35 U.S.C. § 102), non-obviousness (35 U.S.C. § 103), and utility standards. The Act's enablement requirement under 35 U.S.C. § 112 mandates that patent applications contain sufficient detail for a person skilled in the art to make and use the invention.\n\nHigher education institutions face specific obligations under the Bayh-Dole Act provisions incorporated within 35 U.S.C. §§ 200-212, which govern ownership and commercialization of federally-funded research inventions. Universities must establish invention disclosure procedures, maintain accurate records of government-funded research, and comply with march-in rights provisions under 35 U.S.C. § 203.\n\nThe Act requires institutions to file patent applications within statutory deadlines, including the critical one-year grace period following public disclosure under 35 U.S.C. § 102(b). Universities must implement robust invention management systems to track disclosure deadlines and maintain chain of title documentation. Patent prosecution procedures under 35 U.S.C. §§ 131-135 require institutions to respond to USPTO office actions within specified timeframes, typically three months with possible extensions.\n\nEnforcement mechanisms include patent infringement remedies under 35 U.S.C. §§ 281-299, allowing universities to seek injunctive relief and monetary damages. The Act also establishes post-grant proceedings including inter partes review (35 U.S.C. §§ 311-319) and post-grant review procedures (35 U.S.C. §§ 321-329) that may challenge university-held patents.\n\nRecent amendments include the America Invents Act modifications, which transitioned the U.S. to a first-inventor-to-file system under 35 U.S.C. § 102, requiring universities to prioritize rapid patent filing strategies. The PTAB Trial Practice Guide updates under 37 CFR Part 42 have streamlined post-grant challenge procedures affecting university patent portfolios.",
+    "summary": "The U.S. Patent Act governs patent rights and procedures for higher education institutions, establishing patentability standards, prosecution requirements, and technology transfer obligations under federal law.",
+    "requirements": "## Patent Application Requirements\n- File patent applications within one-year grace period following public disclosure per 35 U.S.C. § 102(b)\n- Ensure applications meet enablement and written description requirements under 35 U.S.C. § 112\n- Respond to USPTO office actions within three-month statutory periods\n\n## Bayh-Dole Compliance Obligations\n- Establish invention disclosure procedures for federally-funded research under 35 U.S.C. §§ 200-212\n- Maintain detailed records of government funding sources and invention development\n- Comply with government license rights and march-in provisions per 35 U.S.C. § 203\n\n## Technology Transfer Management\n- Implement robust invention tracking systems for disclosure deadlines\n- Maintain proper chain of title documentation for all university inventions\n- Establish procedures for inventor identification and assignment agreements\n\n## Patent Portfolio Administration\n- Monitor patent maintenance fee deadlines under 35 U.S.C. § 41\n- Implement strategies addressing post-grant challenge proceedings under 35 U.S.C. §§ 311-329",
+    "reportingRequirements": "No specific federal reporting requirements under the Patent Act itself. However, institutions must file timely USPTO responses within statutory deadlines, typically 3-6 months for office actions, and maintain Bayh-Dole invention reporting to federal funding agencies as required."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T02:40:15.247Z"
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Compliance Review",
+      "type": "review",
+      "description": "Annual Compliance Review for U.S. Patent Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Intellectual Property and Technology Transfer"
+  ]
+}

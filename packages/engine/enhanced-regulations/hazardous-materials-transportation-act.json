@@ -1,0 +1,50 @@
+{
+  "regulationId": "hazardous-materials-transportation-act",
+  "enhanced": {
+    "fullText": "The Hazardous Materials Transportation Act (HMTA), codified at 49 U.S.C. §§ 5101-5128, establishes comprehensive federal oversight of hazardous materials transportation to protect public safety and property. The Department of Transportation (DOT) implements this statute through extensive regulations at 49 CFR Parts 100-185, creating binding obligations for higher education institutions that handle, store, or transport hazardous materials.\n\nUnder 49 U.S.C. § 5103, the Secretary of Transportation maintains exclusive authority to regulate hazardous materials transportation in interstate commerce. Higher education institutions fall under this jurisdiction when conducting research activities, laboratory operations, waste disposal, or any transportation of hazardous substances across state lines or affecting interstate commerce.\n\nKey provisions under 49 CFR Part 172 require comprehensive employee training within 90 days of employment or job function changes, with mandatory recurrent training every three years. Universities must maintain detailed training records per 49 CFR § 172.704, documenting completion dates, training content, and employee acknowledgments. Training must cover general awareness, function-specific protocols, safety procedures, security awareness, and in-depth security training for applicable personnel.\n\nClassification requirements under 49 CFR Part 173 mandate proper identification and packaging of hazardous materials. Universities must ensure accurate hazard class determination, appropriate packaging selection meeting DOT specifications, and proper marking and labeling per 49 CFR Parts 172.300-172.450. Research institutions frequently handle Class 3 flammable liquids, Class 6 toxic substances, and Class 9 miscellaneous hazardous materials requiring specific compliance protocols.\n\nShipping documentation under 49 CFR § 172.200 requires detailed shipping papers accompanying all hazardous materials shipments. Universities must maintain these records for 375 days, including proper shipping names, identification numbers, hazard classes, and packing groups. Electronic record-keeping systems must comply with 49 CFR § 172.201 authentication requirements.\n\nEnforcement mechanisms include civil penalties up to $81,993 per violation under 49 U.S.C. § 5123, with criminal penalties reaching $500,000 and five years imprisonment for knowing violations. The Pipeline and Hazardous Materials Safety Administration (PHMSA) conducts compliance inspections and maintains violation databases accessible through FOIA requests.\n\nRecent amendments through the FAST Act of 2015 enhanced security requirements and expanded training mandates. The Hazmat Intelligence Portal, established under 49 CFR § 172.800, requires universities to report security incidents within 24 hours of discovery.",
+    "summary": "Federal statute governing hazardous materials transportation with mandatory employee training every 90 days/3 years, proper classification/packaging requirements, detailed documentation protocols, and significant civil/criminal penalties for violations.",
+    "requirements": "## Training and Certification\n- Initial hazmat training within 90 days of employment per 49 CFR § 172.704\n- Recurrent training every three years with documented completion\n- Maintain training records for minimum 90 days post-employment\n- Cover general awareness, function-specific, safety, and security protocols\n\n## Classification and Packaging\n- Proper hazard class determination under 49 CFR Part 173\n- DOT-specification packaging selection and testing\n- Accurate marking and labeling per 49 CFR Parts 172.300-450\n- Packaging certification and requalification programs\n\n## Documentation and Recordkeeping\n- Maintain shipping papers per 49 CFR § 172.200 for 375 days\n- Electronic records must meet authentication requirements\n- Proper shipping names, ID numbers, hazard classes required\n- Security incident reporting within 24 hours to PHMSA\n\n## Compliance Oversight\n- Designate qualified dangerous goods safety advisor\n- Conduct regular internal compliance audits\n- Coordinate with campus environmental health and safety offices",
+    "reportingRequirements": "Security incidents must be reported to PHMSA within 24 hours per 49 CFR § 172.800. Shipping papers retained 375 days per 49 CFR § 172.201. Training records maintained 90 days post-employment. Annual compliance certification to DOT for high-volume shippers."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T19:27:58.213Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Annual IT Security Assessment",
+      "type": "assessment",
+      "description": "Annual IT Security Assessment for Hazardous Materials Transportation Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Vulnerability Scan",
+      "type": "scan",
+      "description": "Vulnerability Scan for Hazardous Materials Transportation Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "quarterly"
+    },
+    {
+      "date": "continuous",
+      "label": "Disaster Recovery Plan Test",
+      "type": "test",
+      "description": "Disaster Recovery Plan Test for Hazardous Materials Transportation Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Information Technology"
+  ]
+}

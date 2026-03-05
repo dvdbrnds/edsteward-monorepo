@@ -1,0 +1,50 @@
+{
+  "regulationId": "clayton-antitrust-act-of-1914",
+  "enhanced": {
+    "fullText": "The Clayton Antitrust Act of 1914, codified at 15 U.S.C. §§ 12-27, serves as a critical supplement to the Sherman Act, establishing comprehensive antitrust provisions that significantly impact higher education institutions' business operations, procurement practices, and institutional governance. Originally enacted to address specific anti-competitive practices not adequately covered by existing antitrust legislation, the Clayton Act prohibits four primary categories of conduct that can substantially reduce competition.\n\nSection 2 of the Clayton Act (15 U.S.C. § 13) prohibits price discrimination, preventing universities from engaging in discriminatory pricing practices when purchasing goods or services. This provision, enhanced by the Robinson-Patman Act amendments, requires higher education institutions to ensure their procurement processes do not involve receiving preferential pricing that could harm competition among suppliers. Universities must maintain documentation demonstrating that any price differentials are based on legitimate cost justifications or competitive bidding processes.\n\nSection 3 (15 U.S.C. § 14) addresses exclusive dealing arrangements and tying agreements, prohibiting universities from conditioning purchases on exclusive supplier relationships when such arrangements may substantially lessen competition. This impacts technology contracts, food service agreements, bookstore operations, and other vendor relationships. Institutions must carefully structure contracts to avoid creating illegal market monopolies while maintaining operational efficiency.\n\nSection 7 (15 U.S.C. § 18) regulates mergers and acquisitions, requiring universities considering institutional mergers, asset acquisitions, or joint ventures to evaluate potential anti-competitive effects. The Hart-Scott-Rodino Antitrust Improvements Act of 1976 (15 U.S.C. § 18a) mandates pre-merger notification to federal antitrust agencies for transactions exceeding specified thresholds, currently $101 million as adjusted annually.\n\nSection 8 (15 U.S.C. § 19) prohibits interlocking directorates, preventing individuals from simultaneously serving on boards of competing institutions or companies. This provision directly impacts university governance, requiring institutions to screen board members, trustees, and senior administrators for potential conflicts involving competing educational institutions or related businesses.\n\nEnforcement mechanisms include civil penalties up to $46,517 per violation as adjusted under the Federal Civil Penalties Inflation Adjustment Act (28 U.S.C. § 2461 note). The Federal Trade Commission and Department of Justice Antitrust Division share enforcement authority, with private parties also empowered to seek treble damages under 15 U.S.C. § 15. Universities face significant exposure given their substantial procurement volumes, extensive vendor relationships, and complex governance structures.\n\nRecent enforcement trends emphasize digital marketplace competition, particularly relevant for universities' technology procurement and online education platforms. The 2021 Executive Order on Promoting Competition in the American Economy specifically addresses educational market competition, signaling increased scrutiny of higher education practices.",
+    "summary": "The Clayton Antitrust Act prohibits price discrimination, exclusive dealing, anti-competitive mergers, and interlocking directorates. Universities must ensure compliant procurement processes, vendor relationships, governance structures, and merger activities to avoid civil penalties up to $46,517 per violation.",
+    "requirements": "## Anti-Competitive Practices Prevention\n- Prohibit price discrimination in procurement under 15 U.S.C. § 13\n- Document cost justifications for pricing differentials\n- Avoid exclusive dealing arrangements that reduce competition per 15 U.S.C. § 14\n\n## Merger and Acquisition Compliance\n- Evaluate anti-competitive effects before institutional mergers under 15 U.S.C. § 18\n- File Hart-Scott-Rodino notifications for transactions exceeding $101 million threshold\n- Conduct antitrust risk assessments for joint ventures\n\n## Governance Structure Requirements\n- Screen board members for interlocking directorate violations under 15 U.S.C. § 19\n- Prohibit simultaneous service on competing institution boards\n- Maintain conflict of interest documentation for trustees and administrators\n\n## Vendor Relationship Management\n- Structure technology, food service, and bookstore contracts to preserve competition\n- Implement competitive bidding processes for major procurement\n- Monitor supplier market concentration effects",
+    "reportingRequirements": "Hart-Scott-Rodino pre-merger notifications must be filed 30 days before closing transactions exceeding $101 million with both FTC and DOJ. Annual conflict of interest disclosures required for board members. Antitrust compliance violations must be reported immediately to institutional counsel and relevant federal agencies."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T15:36:39.426Z"
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Financial Audit",
+      "type": "audit",
+      "description": "Annual Financial Audit for Clayton Antitrust Act of 1914",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "03-31",
+      "label": "A-133 Single Audit (if applicable)",
+      "type": "audit",
+      "description": "A-133 Single Audit (if applicable) for Clayton Antitrust Act of 1914",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Quarterly Financial Review",
+      "type": "review",
+      "description": "Quarterly Financial Review for Clayton Antitrust Act of 1914",
+      "isRecurring": true,
+      "recurrenceFrequency": "quarterly"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Accounting"
+  ]
+}

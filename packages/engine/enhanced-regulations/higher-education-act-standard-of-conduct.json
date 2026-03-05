@@ -1,0 +1,50 @@
+{
+  "regulationId": "higher-education-act-standard-of-conduct",
+  "enhanced": {
+    "fullText": "The Higher Education Act (HEA) Standard of Conduct establishes fiduciary obligations for institutions participating in Title IV federal student aid programs under 20 U.S.C. § 1094(a)(3) and 34 CFR § 668.14. This regulation requires universities to administer federal financial aid programs with the highest standard of care and diligence, creating stringent accountability measures for institutional stewardship of federal funds.\n\nUnder 20 U.S.C. § 1094, institutions assume fiduciary responsibility for all Title IV funds, including Pell Grants, Federal Direct Loans, Federal Work-Study, and SEOG programs. The fiduciary standard demands meticulous administration, accurate recordkeeping, proper fund disbursement timing, and strict adherence to all program requirements as outlined in 34 CFR Parts 668-690.\n\nKey fiduciary obligations include: maintaining accurate student enrollment and academic progress records; ensuring proper Return to Title IV (R2T4) calculations under 34 CFR § 668.22; implementing robust internal controls for cash management; conducting timely fund reconciliations; and maintaining comprehensive audit trails for all transactions. Institutions must establish written policies addressing conflicts of interest, particularly regarding preferred lender arrangements under 20 U.S.C. § 1094(a)(25).\n\nThe Department of Education enforces compliance through multiple mechanisms under 34 CFR § 668.86. Violations can trigger emergency actions including immediate fund suspension, civil monetary penalties up to $27,500 per violation under 20 U.S.C. § 1094(c)(3)(B), or program participation limitations. The 2008 Higher Education Opportunity Act (Public Law 110-315) strengthened enforcement provisions and increased penalty amounts, reflecting heightened congressional concern over institutional accountability.\n\nInstitutions must implement comprehensive compliance systems including annual third-party audits under 34 CFR § 668.23, regular staff training programs, and documented quality assurance procedures. The fiduciary standard applies institution-wide, encompassing financial aid offices, business offices, registrar operations, and senior administration. Failure to meet these obligations jeopardizes institutional eligibility for all federal student aid programs, potentially affecting thousands of students and millions in federal funding.",
+    "summary": "HEA Standard of Conduct requires universities administering Title IV federal student aid programs to maintain fiduciary responsibility with highest care standards, subject to penalties up to $27,500 per violation.",
+    "requirements": "## Core Fiduciary Obligations\n- Maintain highest standard of care and diligence in Title IV program administration per 20 U.S.C. § 1094(a)(3)\n- Establish comprehensive internal controls for federal fund management and disbursement\n- Implement written conflict of interest policies addressing preferred lender arrangements\n- Conduct accurate Return to Title IV calculations within required timeframes under 34 CFR § 668.22\n\n## Financial Management Standards\n- Maintain separate accounting records for all federal student aid funds\n- Perform monthly cash reconciliations with federal draw-down systems\n- Ensure timely and accurate fund disbursements according to regulatory schedules\n- Document all financial aid transactions with complete audit trails\n\n## Compliance Monitoring Requirements\n- Conduct annual compliance reviews of Title IV program operations\n- Provide mandatory staff training on fiduciary responsibilities and regulatory updates\n- Implement quality assurance procedures for all federal student aid processes\n- Maintain documentation supporting all compliance activities for audit purposes",
+    "reportingRequirements": "Annual compliance audits must be submitted within six months of fiscal year end per 34 CFR § 668.23. Institutions must report material compliance issues to ED within 10 business days of discovery and submit annual financial responsibility reports."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T20:23:45.347Z"
+  },
+  "deadlines": [
+    {
+      "date": "10-01",
+      "label": "FISAP Annual Report",
+      "type": "filing",
+      "description": "FISAP Annual Report for Higher Education Act: Standard of Conduct",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "06-30",
+      "label": "Annual Financial Aid Audit",
+      "type": "audit",
+      "description": "Annual Financial Aid Audit for Higher Education Act: Standard of Conduct",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "07-01",
+      "label": "Gainful Employment Disclosure Update",
+      "type": "disclosure",
+      "description": "Gainful Employment Disclosure Update for Higher Education Act: Standard of Conduct",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Financial Aid"
+  ]
+}

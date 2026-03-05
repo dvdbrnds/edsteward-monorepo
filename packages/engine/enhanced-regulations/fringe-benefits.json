@@ -1,0 +1,58 @@
+{
+  "regulationId": "fringe-benefits",
+  "enhanced": {
+    "fullText": "The federal fringe benefits taxation regulation under 26 U.S.C. § 132 establishes that any property, service, or cash provided to employees beyond regular compensation constitutes taxable income unless specifically excluded by statute. For higher education institutions, this regulation has significant implications given the diverse array of benefits commonly offered to faculty, staff, and administrators.\n\nUnder 26 U.S.C. § 61(a)(1), gross income includes all compensation for services, including fees, commissions, fringe benefits, and similar items. The Internal Revenue Code at 26 U.S.C. § 132 provides specific exclusions for certain fringe benefits, including qualified employee discounts, working condition fringe benefits, de minimis fringe benefits, and qualified tuition reduction programs particularly relevant to educational institutions under 26 U.S.C. § 117(d).\n\nHigher education institutions must comply with Treasury Regulation 1.61-21, which requires employers to determine the fair market value of fringe benefits and include this amount in employees' taxable income. Common university fringe benefits subject to taxation include personal use of employer-provided vehicles, housing allowances exceeding statutory limits, spousal travel expenses for business trips, and athletic facility memberships when not job-related.\n\nThe regulation specifically impacts universities through qualified tuition reduction provisions under 26 U.S.C. § 117(d), which allows tax-free tuition benefits for employees and their dependents for undergraduate education, but subjects graduate-level tuition assistance to taxation unless related to the employee's work. Universities must report taxable fringe benefits on Form W-2 and include them in quarterly Form 941 filings.\n\nEnforcement mechanisms include IRS audits, penalties for underreporting under 26 U.S.C. § 6662, and potential employment tax assessments. Universities face accuracy-related penalties of 20% of underpayments exceeding $5,000 annually. The IRS may impose failure-to-deposit penalties under 26 U.S.C. § 6656 ranging from 2% to 15% of unpaid taxes.\n\nRecent developments include IRS Notice 2020-33 addressing COVID-19 related benefits and updated guidance on transportation fringe benefits under the Tax Cuts and Jobs Act. Universities must maintain detailed records supporting fringe benefit valuations and exclusion determinations for audit purposes under 26 U.S.C. § 6001.",
+    "summary": "Federal tax regulation requiring higher education institutions to include the fair market value of employee fringe benefits in taxable income unless specifically excluded by statute, with special provisions for tuition benefits and comprehensive reporting obligations.",
+    "requirements": "## Valuation and Inclusion Requirements\n- Determine fair market value of all fringe benefits using Treasury Regulation 1.61-21 methodologies\n- Include taxable fringe benefit values in employee gross income calculations\n- Apply qualified tuition reduction exclusions under 26 U.S.C. § 117(d) for undergraduate education only\n\n## Reporting and Documentation Obligations\n- Report fringe benefit values on Form W-2 Box 1 and applicable supplemental boxes\n- Include fringe benefits in quarterly Form 941 federal tax deposits\n- Maintain detailed records supporting benefit valuations and exclusion determinations\n\n## Payroll Tax Compliance\n- Withhold federal income taxes on taxable fringe benefit amounts\n- Apply FICA and FUTA taxes to includible fringe benefits\n- Process supplemental wage withholding for benefit amounts exceeding $1 million annually",
+    "reportingRequirements": "Quarterly Form 941 filing by last day of month following quarter end, including fringe benefits in gross wages. Annual Form W-2 distribution to employees by January 31 and filing with SSA by January 31, reporting all taxable fringe benefit amounts in appropriate boxes."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T19:21:08.256Z"
+  },
+  "deadlines": [
+    {
+      "date": "05-15",
+      "label": "Form 990 Filing",
+      "type": "filing",
+      "description": "Form 990 Filing for Fringe Benefits",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "05-15",
+      "label": "Form 990-T Filing (if applicable)",
+      "type": "filing",
+      "description": "Form 990-T Filing (if applicable) for Fringe Benefits",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Form 1099 Filing",
+      "type": "filing",
+      "description": "Form 1099 Filing for Fringe Benefits",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "W-2 Distribution",
+      "type": "distribution",
+      "description": "W-2 Distribution for Fringe Benefits",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Tax"
+  ]
+}

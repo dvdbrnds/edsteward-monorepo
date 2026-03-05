@@ -1,0 +1,42 @@
+{
+  "regulationId": "lanham-act",
+  "enhanced": {
+    "fullText": "The Lanham Act, codified at 15 U.S.C. §§ 1051-1141n, establishes the federal trademark registration system and provides comprehensive protection against trademark infringement, trademark dilution, and false advertising. Originally enacted in 1946 and substantially amended by the Trademark Law Revision Act of 1988, the Act serves as the primary federal framework governing trademark rights and commercial speech.\n\nUnder 15 U.S.C. § 1114, the Act prohibits unauthorized use of registered trademarks that creates likelihood of confusion, mistake, or deception. Section 1125(a) extends protection to unregistered marks and prohibits false or misleading representations in commercial advertising. For higher education institutions, compliance is critical given extensive use of institutional marks, logos, athletic branding, and promotional materials.\n\nKey provisions include trademark infringement under 15 U.S.C. § 1114, requiring proof of valid trademark ownership and likelihood of confusion. Universities must monitor unauthorized use of institutional marks by vendors, student organizations, and third parties. The Federal Trademark Dilution Act, codified at 15 U.S.C. § 1125(c), protects famous marks from dilution by blurring or tarnishment, particularly relevant for prestigious university brands.\n\nFalse advertising claims under 15 U.S.C. § 1125(a)(1)(B) require commercial advertising or promotion that misrepresents the nature, characteristics, qualities, or geographic origin of goods or services. Universities face exposure through recruitment materials, program descriptions, employment outcome statistics, and research claims. The Supreme Court's decision in Lexmark International, Inc. v. Static Control Components, Inc. (2014) established standing requirements for false advertising claims.\n\nEnforcement mechanisms include federal court jurisdiction under 15 U.S.C. § 1121, with remedies encompassing injunctive relief, monetary damages, defendant's profits, destruction of infringing materials, and attorney fees in exceptional cases per 15 U.S.C. § 1117. The Trademark Counterfeiting Act of 1984 provides enhanced penalties for willful counterfeiting, including potential criminal prosecution.\n\nUniversities must establish comprehensive trademark policies covering licensing agreements, merchandise approval processes, domain name management, and social media guidelines. Regular trademark portfolio audits, opposition and cancellation proceedings monitoring through the Trademark Trial and Appeal Board, and swift enforcement against infringers are essential compliance measures. Recent developments include the Trademark Modernization Act of 2020, streamlining USPTO procedures and enhancing post-registration review mechanisms.",
+    "summary": "Federal trademark law prohibiting infringement, dilution, and false advertising. Universities must protect institutional marks, monitor unauthorized use, ensure accurate promotional materials, and maintain comprehensive trademark policies and enforcement procedures.",
+    "requirements": "## Trademark Protection and Monitoring\n- Register institutional trademarks with USPTO under 15 U.S.C. § 1051\n- Conduct regular searches for unauthorized mark usage\n- Maintain trademark portfolio with renewal filings every 10 years\n- Monitor Trademark Trial and Appeal Board proceedings\n\n## Licensing and Usage Controls\n- Implement written trademark licensing agreements with vendors\n- Establish approval processes for merchandise and promotional materials\n- Develop usage guidelines for student organizations and departments\n- Control domain name registrations incorporating university marks\n\n## False Advertising Compliance\n- Review recruitment materials and program descriptions for accuracy under 15 U.S.C. § 1125(a)\n- Verify employment outcome statistics and research claims\n- Implement approval processes for commercial advertising content\n- Document substantiation for promotional claims\n\n## Enforcement Procedures\n- Establish procedures for cease and desist communications\n- Coordinate with legal counsel for federal court actions under 15 U.S.C. § 1114\n- Document infringement evidence and economic harm\n- Maintain records of enforcement activities and outcomes",
+    "reportingRequirements": "No specific federal reporting requirements. Universities must file trademark renewal applications every 10 years with USPTO. Section 8 declarations of continued use required between years 5-6 after registration. Monitor TTAB proceedings quarterly for potential oppositions or challenges."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T15:55:06.288Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Annual DMCA Agent Registration Renewal",
+      "type": "registration",
+      "description": "Annual DMCA Agent Registration Renewal for Lanham Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Copyright Policy Review",
+      "type": "review",
+      "description": "Copyright Policy Review for Lanham Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Copyright & Trademark"
+  ]
+}

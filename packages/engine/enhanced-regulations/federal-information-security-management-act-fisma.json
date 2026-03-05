@@ -1,0 +1,50 @@
+{
+  "regulationId": "federal-information-security-management-act-fisma",
+  "enhanced": {
+    "fullText": "The Federal Information Security Management Act (FISMA), codified at 44 U.S.C. §§ 3541-3549, establishes comprehensive information security requirements for federal agencies and extends to higher education institutions through their role as federal contractors handling federal data in connection with federally-funded research. Originally enacted in 2002 and significantly updated by the Federal Information Security Modernization Act of 2014 (Pub. L. 113-283), FISMA mandates a risk-based approach to cybersecurity that universities must implement when managing federal information systems and data.\n\nUnder 44 U.S.C. § 3544, universities receiving federal funding must develop, document, and implement comprehensive information security programs. These programs must include security policies addressing access controls, incident response procedures, personnel security measures, and system and communications protection protocols. The National Institute of Standards and Technology (NIST) provides implementation guidance through Special Publication 800-53, which establishes security control baselines that universities must adopt based on their system categorization under Federal Information Processing Standard (FIPS) Publication 199.\n\nFISMA compliance requires universities to conduct thorough risk assessments pursuant to 44 U.S.C. § 3544(a)(2)(A), identifying vulnerabilities in information systems that process, store, or transmit federal data. These assessments must follow NIST guidelines and consider threats, vulnerabilities, likelihood of occurrence, and potential impact. Universities must categorize information systems as low, moderate, or high impact according to FIPS 199 standards, with corresponding security control requirements detailed in NIST SP 800-53.\n\nPeriodic security control testing and evaluation represents a critical FISMA requirement under 44 U.S.C. § 3544(a)(2)(C). Universities must conduct annual assessments of security controls effectiveness, document findings, and remediate identified deficiencies. Independent testing by qualified assessors ensures objective evaluation of security posture and compliance with federal standards.\n\nEnforcement mechanisms include federal funding suspension, contract termination, and civil monetary penalties administered by sponsoring agencies. The Office of Management and Budget (OMB) oversees federal agency FISMA implementation through annual reporting requirements detailed in OMB Memorandum M-21-02, while the Department of Homeland Security provides operational cybersecurity support through Continuous Diagnostics and Mitigation (CDM) programs.\n\nRecent updates emphasize continuous monitoring requirements, supply chain risk management under Executive Order 14028, and enhanced incident reporting obligations. Universities must now implement automated security monitoring tools and maintain real-time visibility into their security posture for systems handling federal data, representing a significant evolution from traditional periodic assessment approaches.",
+    "summary": "FISMA requires universities holding federal research data to implement comprehensive information security programs, conduct regular risk assessments, and perform periodic security testing under 44 U.S.C. §§ 3541-3549.",
+    "requirements": "## Information Security Program Development\n- Establish comprehensive security policies covering access controls, incident response, and personnel security per 44 U.S.C. § 3544\n- Implement NIST SP 800-53 security controls based on system categorization under FIPS 199\n- Designate Senior Agency Information Security Officer responsible for program oversight\n\n## Risk Assessment and System Categorization\n- Conduct annual risk assessments identifying vulnerabilities in federal information systems\n- Categorize systems as low, moderate, or high impact following FIPS 199 methodology\n- Document threat analysis and impact assessments for all federal data repositories\n\n## Security Control Testing and Monitoring\n- Perform annual independent security control assessments with qualified assessors\n- Implement continuous monitoring programs with automated security tools\n- Maintain security assessment reports and remediation plans\n\n## Incident Response and Reporting\n- Establish incident response procedures compliant with federal requirements\n- Report cybersecurity incidents to sponsoring agencies within specified timeframes\n- Maintain incident documentation and lessons learned analyses",
+    "reportingRequirements": "Annual security assessment reports due to federal sponsoring agencies by November 30. Cybersecurity incidents must be reported within 72 hours to agency incident response teams. Quarterly continuous monitoring reports required for high-impact systems."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T18:54:35.256Z"
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Privacy Assessment",
+      "type": "assessment",
+      "description": "Annual Privacy Assessment for Federal Information Security Management Act (FISMA)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Data Breach Notification (if applicable)",
+      "type": "notification",
+      "description": "Data Breach Notification (if applicable) for Federal Information Security Management Act (FISMA)",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    },
+    {
+      "date": "12-31",
+      "label": "Security Awareness Training",
+      "type": "training",
+      "description": "Security Awareness Training for Federal Information Security Management Act (FISMA)",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Privacy & Information Security"
+  ]
+}

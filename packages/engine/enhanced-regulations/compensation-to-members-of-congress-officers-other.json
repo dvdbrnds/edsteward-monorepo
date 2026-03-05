@@ -1,0 +1,42 @@
+{
+  "regulationId": "compensation-to-members-of-congress-officers-other",
+  "enhanced": {
+    "fullText": "The Compensation to Members of Congress, Officers, Others in Matters Affecting the Government regulation, codified at 18 U.S.C. § 203, establishes comprehensive prohibitions against certain compensated representational activities involving federal matters. This criminal statute applies to Members of Congress, officers and employees of the United States, and members of the uniformed services, creating significant compliance obligations for higher education institutions engaging these individuals.\n\n**Legal Authority and Scope**\nSection 203 operates in conjunction with 18 U.S.C. § 205 (activities of officers and employees in claims against and other matters affecting the Government) and is enforced by the Department of Justice. The statute prohibits covered individuals from receiving compensation for representational services before any department, agency, court, or court-martial regarding matters in which the United States is a party or has a direct and substantial interest.\n\n**Key Provisions and Higher Education Applications**\nFor universities, this regulation creates critical compliance challenges when engaging current or former federal officials as consultants, board members, or representatives. Under 18 U.S.C. § 203(a), current federal employees cannot receive compensation for representing third parties in federal matters. The post-employment restrictions under § 203(c) prohibit former senior federal officials from representing clients before their former agencies for two years after leaving federal service.\n\nHigher education institutions must exercise particular caution when retaining former Department of Education officials, NIH administrators, or NSF personnel for grant applications, regulatory compliance matters, or advocacy activities. The \"direct and substantial interest\" standard encompasses virtually all federal funding decisions, regulatory proceedings, and policy determinations affecting universities.\n\n**Enforcement and Penalties**\nViolations constitute felony offenses punishable by fines up to $50,000 and imprisonment up to two years under 18 U.S.C. § 203(f). The Office of Government Ethics provides interpretive guidance through 5 CFR Part 2635, while individual agencies maintain supplemental ethics regulations. Universities face potential criminal liability, civil penalties, and debarment from federal programs under the Federal Acquisition Regulation (48 CFR Part 9.4).\n\n**Compliance Requirements**\nInstitutions must implement robust due diligence procedures for all consultant agreements, board appointments, and representational arrangements. This includes verification of federal employment history, assessment of potential conflicts under 18 U.S.C. § 207 (post-employment restrictions), and ongoing monitoring of activities. Universities should maintain comprehensive records of all engagements and establish clear protocols for identifying prohibited representational activities before federal agencies.",
+    "summary": "Federal criminal statute prohibiting compensation to current and former federal officials for representational activities in matters where the U.S. has interest. Universities must verify employment history and restrict consulting arrangements with former federal employees to avoid felony violations.",
+    "requirements": "## Prohibited Compensation Activities\n- Current federal employees cannot receive compensation for representing universities before any federal agency, court, or department\n- Former senior federal officials face two-year prohibition on representing clients before their former agencies per 18 U.S.C. § 203(c)\n- Prohibition applies to all matters where United States is party or has direct and substantial interest\n\n## Due Diligence Obligations\n- Verify federal employment history for all consultants, board members, and representatives\n- Assess potential conflicts under 18 U.S.C. § 207 post-employment restrictions\n- Document compliance procedures and maintain records of all engagements\n\n## Institutional Safeguards\n- Establish protocols for identifying prohibited representational activities\n- Implement approval processes for engaging former federal officials\n- Train procurement and legal staff on recognition of covered individuals and restricted activities",
+    "reportingRequirements": "No specific federal reporting requirements under 18 U.S.C. § 203, but institutions must maintain comprehensive documentation of consultant agreements, board appointments, and representational arrangements for DOJ compliance review and potential audit purposes."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T17:45:30.380Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Annual Ethics Training",
+      "type": "training",
+      "description": "Annual Ethics Training for Compensation to Members of Congress, Officers, Others in Matters Affecting the Government",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Conflict of Interest Disclosure Review",
+      "type": "review",
+      "description": "Conflict of Interest Disclosure Review for Compensation to Members of Congress, Officers, Others in Matters Affecting the Government",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Ethics"
+  ]
+}

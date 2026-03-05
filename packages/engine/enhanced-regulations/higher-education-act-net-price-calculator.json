@@ -1,0 +1,50 @@
+{
+  "regulationId": "higher-education-act-net-price-calculator",
+  "enhanced": {
+    "fullText": "The Higher Education Act Net Price Calculator requirements, codified at 20 U.S.C. § 1015a and implemented through 34 CFR § 668.6, mandate that all institutions participating in Title IV federal student aid programs maintain transparent pricing information through standardized calculators and cost reporting mechanisms.\n\nUnder 20 U.S.C. § 1015a(a)(1), any institution receiving Title IV funds must prominently display a net price calculator on its primary website that enables current and prospective students to estimate their individual net price of attendance. The calculator must use the template developed by the Department of Education and include comprehensive cost data encompassing tuition, fees, room, board, books, supplies, transportation, and other expenses as defined in 34 CFR § 668.2.\n\nThe net price calculator must incorporate institution-specific data including average amounts of federal, state, institutional, and other financial aid awarded to students in different income categories, disaggregated by dependency status and family income levels pursuant to 20 U.S.C. § 1015a(b). Institutions must update calculator data annually using the most recent cohort information available, typically from the prior academic year's enrolled students.\n\nAdditionally, 20 U.S.C. § 1015a(f) establishes enhanced reporting requirements for institutions appearing on the Department's annual list of schools with the highest percentage increases in tuition and fees or net price over the preceding three academic years. These institutions must submit detailed explanatory reports within 30 days of notification, documenting specific reasons for cost increases and concrete remediation strategies to control future price growth.\n\nThe Department of Education enforces compliance through its Federal Student Aid office, with violations potentially resulting in program review activities, provisional certification, or loss of Title IV eligibility under 34 CFR § 668.13. The Secretary may impose administrative actions against non-compliant institutions, including fines and restrictions on federal funding disbursement.\n\nRecent updates through the FUTURE Act of 2019 enhanced data sharing capabilities and streamlined FAFSA processes, while maintaining core net price calculator obligations. Institutions must ensure calculators reflect current pricing models and incorporate all mandatory disclosures required by federal consumer information regulations under 34 CFR § 668.41.",
+    "summary": "Higher Education Act requires Title IV institutions to maintain Department-approved net price calculators on websites and mandates detailed cost increase reporting for institutions with highest tuition growth rates.",
+    "requirements": "## Net Price Calculator Implementation\n- Post Department-approved calculator prominently on institutional website per 20 U.S.C. § 1015a(a)\n- Update calculator data annually with most recent cohort information\n- Include comprehensive cost breakdowns for tuition, fees, room, board, and additional expenses\n- Disaggregate financial aid data by income levels and dependency status\n\n## Cost Increase Reporting\n- Submit explanatory reports within 30 days if listed for high tuition increases under 20 U.S.C. § 1015a(f)\n- Document specific reasons for cost increases with supporting data\n- Provide concrete remediation plans to control future price growth\n\n## Data Maintenance and Accuracy\n- Ensure calculator reflects current institutional pricing and aid policies\n- Maintain compliance with consumer information disclosure requirements under 34 CFR § 668.41\n- Coordinate with financial aid office for accurate aid estimation algorithms",
+    "reportingRequirements": "Annual calculator data updates using prior year cohort information. Institutions on Department's high-increase list must submit detailed explanatory reports within 30 days of notification per 20 U.S.C. § 1015a(f)."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T20:15:46.973Z"
+  },
+  "deadlines": [
+    {
+      "date": "10-01",
+      "label": "FISAP Annual Report",
+      "type": "filing",
+      "description": "FISAP Annual Report for Higher Education Act: Net Price Calculator",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "06-30",
+      "label": "Annual Financial Aid Audit",
+      "type": "audit",
+      "description": "Annual Financial Aid Audit for Higher Education Act: Net Price Calculator",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "07-01",
+      "label": "Gainful Employment Disclosure Update",
+      "type": "disclosure",
+      "description": "Gainful Employment Disclosure Update for Higher Education Act: Net Price Calculator",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Financial Aid"
+  ]
+}

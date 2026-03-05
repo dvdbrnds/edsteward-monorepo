@@ -1,0 +1,42 @@
+{
+  "regulationId": "higher-education-act-institutional-and-financial-a",
+  "enhanced": {
+    "fullText": "The Higher Education Act's Institutional and Financial Assistance Information for Students provisions, codified at 20 U.S.C. § 1092, establish comprehensive annual disclosure requirements for institutions participating in federal student aid programs under Title IV. These consumer information disclosures ensure prospective and enrolled students have access to essential institutional data for informed decision-making.\n\nUnder 20 U.S.C. § 1092(a)(1)(L) and implementing regulations at 34 CFR § 668.41, institutions must annually disclose diversity statistics including enrollment data by race, ethnicity, gender, and other demographic characteristics. These statistics must be prominently displayed and made available to all prospective students during recruitment and enrollment processes.\n\nRetention rate disclosures, mandated by 20 U.S.C. § 1092(a)(1)(R) and detailed in 34 CFR § 668.45, require institutions to report student persistence data including first-time, full-time undergraduate retention rates and completion percentages. Institutions must calculate these rates using standardized federal methodologies and present data in accessible formats.\n\nEmployment placement data requirements under 20 U.S.C. § 1092(d) and 34 CFR § 668.42 mandate disclosure of job placement rates, employment statistics, and salary information for graduates by program. For career-focused programs, institutions must provide specific employment outcomes within designated timeframes post-graduation.\n\nFire safety reporting, governed by 20 U.S.C. § 1092(i) and 34 CFR § 668.49, requires annual security reports including fire statistics, safety systems information, and emergency procedures for campus housing facilities. These reports must be distributed to campus community members and made publicly available.\n\nTransfer of credit policies, required under 20 U.S.C. § 1092(a)(1)(T) and 34 CFR § 668.43, must clearly articulate institutional policies regarding acceptance of transfer credits, including specific criteria, limitations, and procedures. Institutions must disclose any transfer agreements with other institutions.\n\nThe Department of Education enforces compliance through program reviews, audits, and potential penalties including fines up to $55,000 per violation under 34 CFR § 668.83. Recent amendments through the FAFSA Simplification Act have enhanced disclosure requirements effective for the 2024-2025 academic year, particularly regarding outcome data transparency and standardized reporting formats.\n\nInstitutions must ensure disclosures are prominently displayed on websites, included in promotional materials, and readily accessible to students. Non-compliance may result in loss of Title IV eligibility, civil monetary penalties, and required corrective actions under federal oversight.",
+    "summary": "Federal law requiring higher education institutions to annually disclose diversity statistics, retention rates, employment placement data, fire safety reports, and transfer credit policies to students and prospective students.",
+    "requirements": "## Core Disclosure Obligations\n- Publish annual diversity statistics by race, ethnicity, and gender per 34 CFR § 668.41\n- Report student retention and completion rates using federal calculation methods\n- Maintain publicly accessible institutional websites with required disclosures\n\n## Employment and Academic Data\n- Disclose job placement rates and salary data by academic program\n- Publish detailed transfer of credit policies and inter-institutional agreements\n- Provide employment outcomes data within specified post-graduation timeframes\n\n## Safety and Security Reporting\n- Compile annual fire safety reports for all campus housing facilities\n- Include fire statistics, safety systems, and emergency response procedures\n- Distribute reports to campus community and maintain public accessibility\n\n## Compliance and Distribution\n- Ensure disclosures appear prominently in recruitment materials and websites\n- Implement standardized federal reporting methodologies and formats\n- Maintain records demonstrating timely distribution to enrolled and prospective students",
+    "reportingRequirements": "Annual disclosures must be published by October 1st each year. Fire safety reports due by October 1st to campus community. Employment data updated annually with most recent graduate cohort information. All disclosures must be continuously available on institutional websites."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T20:09:44.383Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Annual DMCA Agent Registration Renewal",
+      "type": "registration",
+      "description": "Annual DMCA Agent Registration Renewal for Higher Education Act: Institutional and financial assistance information for students",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Copyright Policy Review",
+      "type": "review",
+      "description": "Copyright Policy Review for Higher Education Act: Institutional and financial assistance information for students",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Copyright & Trademark"
+  ]
+}

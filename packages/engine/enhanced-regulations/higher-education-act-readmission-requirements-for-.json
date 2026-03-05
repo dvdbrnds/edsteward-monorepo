@@ -1,0 +1,34 @@
+{
+  "regulationId": "higher-education-act-readmission-requirements-for-",
+  "enhanced": {
+    "fullText": "The Higher Education Act Readmission Requirements for Servicemembers, codified at 20 U.S.C. § 1091c, establishes comprehensive protections for students who interrupt their higher education to serve in the uniformed services. This federal mandate requires institutions of higher education participating in Title IV federal student aid programs to readmit qualified servicemembers to their original academic programs with the same academic status they held prior to military service.\n\nUnder 20 U.S.C. § 1091c(a), eligible students include those who served in the Army, Navy, Air Force, Marine Corps, Coast Guard, commissioned corps of the Public Health Service, or National Oceanic and Atmospheric Administration. The statute applies to both voluntary enlistment and involuntary service, including National Guard and Reserve activations exceeding 30 days.\n\nThe five-year service limitation, established in 20 U.S.C. § 1091c(a)(2), begins from the initial date of service and includes cumulative military service periods. However, this limitation extends beyond five years for servicemembers unable to return due to hospitalization or convalescence from service-connected injuries, or those serving beyond their initial obligation involuntarily.\n\nExclusions from readmission protection under 20 U.S.C. § 1091c(c) include students discharged under other than honorable conditions, including dishonorable discharge, bad conduct discharge, or dismissal by court-martial. Additionally, institutions may deny readmission when they determine it is not reasonably feasible to prepare the student to resume their program, considering technological or curricular changes during the absence period.\n\nInstitutions must readmit eligible servicemembers with the same academic status, enrollment status, and number of credit hours previously attained, as specified in 20 U.S.C. § 1091c(b)(1). This includes maintaining the same academic standing and progression toward degree completion. The institution must also provide the same academic catalog under which the student was previously enrolled, unless the student requests enrollment under current catalog provisions.\n\nApplication procedures require servicemembers to provide advance written or oral notice of military service, except when precluded by military necessity or otherwise impossible. Upon return, students must submit readmission applications within three years of service completion, as mandated by 20 U.S.C. § 1091c(a)(2)(A).\n\nTuition and fee obligations under this regulation require institutions to assess the same rates that would have been charged for the academic period during which the student served, adjusted for any generally applicable increases. The Department of Education enforces compliance through Title IV program reviews and may impose sanctions including fine, limitation, suspension, or termination of federal student aid eligibility for non-compliant institutions.\n\nRecent interpretative guidance from the Department of Education clarifies that online and distance education programs fall within the statute's scope, and institutions must accommodate reasonable scheduling conflicts arising from continued military obligations, including Reserve and National Guard duties.",
+    "summary": "Federal law requiring higher education institutions to readmit servicemembers with same academic status following military service up to five years, with specific exclusions for dishonorable discharge and institutional feasibility determinations.",
+    "requirements": "## Readmission Eligibility Verification\n- Confirm honorable service discharge status through DD-214 or equivalent military documentation\n- Verify cumulative military service does not exceed five years from initial service date\n- Document advance notice provision by student prior to military departure\n\n## Academic Status Restoration\n- Reinstate identical enrollment status, credit hours, and academic standing held prior to service\n- Apply original academic catalog provisions unless student requests current catalog\n- Accommodate reasonable scheduling conflicts from ongoing Reserve or Guard obligations\n\n## Application Processing Requirements\n- Accept readmission applications within three years of service completion\n- Process applications expeditiously with priority consideration\n- Provide written justification if denying based on institutional feasibility determination\n\n## Financial Obligations\n- Assess tuition and fees at rates applicable during service period with standard adjustments\n- Restore previously awarded institutional financial aid where applicable\n- Coordinate with VA education benefits and federal student aid eligibility",
+    "reportingRequirements": "No specific federal reporting requirements mandated under 20 U.S.C. § 1091c. Institutions must maintain documentation of servicemember readmissions for Department of Education program reviews and compliance audits conducted periodically as part of Title IV oversight."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T15:42:45.976Z"
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Compliance Review",
+      "type": "review",
+      "description": "Annual Compliance Review for Higher Education Act: Readmission Requirements for Servicemembers",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Admissions"
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "regulationId": "reg-66",
+  "name": "TEACH Act (Technology, Education, and Copyright Harmonization Act)",
+  "shortName": "TEACH Act",
+  "citation": "17 U.S.C. § 110(2)",
+  "audit": {
+    "timestamp": "2025-12-19T08:30:00.000Z",
+    "score": 94,
+    "certainty": "A"
+  },
+  "enhanced": {
+    "fullText": "The Technology, Education, and Copyright Harmonization Act (TEACH Act), codified at 17 U.S.C. § 110(2), modernizes copyright exemptions for distance education. This landmark legislation permits accredited nonprofit educational institutions to transmit copyrighted materials during digital distance learning without obtaining prior permission from copyright holders, subject to specific requirements and limitations.\n\nThe TEACH Act significantly expands the scope of materials that can be used in distance education compared to previous law. Under the Act, instructors may display or perform 'reasonable and limited portions' of dramatic literary or musical works, and may display or perform nondramatic literary or musical works in their entirety. This includes streaming video clips, displaying images, and playing audio recordings as part of mediated instructional activities.\n\nKey requirements under 17 U.S.C. § 110(2) include: (1) the institution must be an accredited nonprofit educational institution; (2) the performance or display must be made by, at the direction of, or under the supervision of an instructor as an integral part of a class session; (3) the transmission must be made solely for students officially enrolled in the course; (4) the institution must apply technological measures to reasonably prevent retention and unauthorized dissemination of the work.\n\nThe institution must also provide notice to students that materials may be subject to copyright protection, and must develop and disseminate copyright policies to faculty, students, and staff. The institution cannot interfere with technological measures used by copyright owners to prevent retention or unauthorized access.\n\nCritical limitations apply: the Act does not permit use of materials produced or marketed primarily for the digital education market, works the institution knows or has reason to believe were not lawfully made or acquired, or textbooks, coursepacks, or other materials typically purchased by students.\n\nEnforcement mechanisms include statutory damages under 17 U.S.C. § 504, which can range from $750 to $30,000 per work infringed, or up to $150,000 for willful infringement. Educational institutions that fail to comply may lose their exemption status and face significant copyright liability.",
+    "summary": "The TEACH Act (17 U.S.C. § 110(2)) permits accredited nonprofit educational institutions to transmit copyrighted materials during digital distance education without prior permission, subject to technological protection requirements, enrollment restrictions, and institutional copyright policy requirements.",
+    "requirements": "## Institutional Requirements\n- Must be an accredited nonprofit educational institution\n- Must have copyright policies in place and actively disseminate them\n- Must provide informational materials about copyright to faculty, students, and staff\n- Must provide notice to students that materials may be protected by copyright\n\n## Transmission Requirements\n- Performances and displays must be made by, at the direction of, or under actual supervision of an instructor\n- Must be an integral part of a class session offered as a regular part of systematic mediated instructional activities\n- Must be directly related to and of material assistance to the teaching content\n- Reception must be limited to students officially enrolled in the course\n\n## Technological Requirements\n- Apply technological measures that reasonably prevent retention of the work beyond the class session\n- Apply technological measures that reasonably prevent unauthorized further dissemination\n- Do not engage in conduct that could interfere with technological measures used by copyright owners\n\n## Content Limitations\n- Only reasonable and limited portions of dramatic literary or musical works may be performed\n- Nondramatic literary or musical works may be performed in their entirety\n- Cannot use materials produced primarily for the digital education market\n- Cannot use works the institution knows or should know were unlawfully made or acquired\n- Cannot use textbooks, coursepacks, or materials typically purchased by students",
+    "reportingRequirements": "Institutions must maintain records demonstrating compliance with TEACH Act requirements, including documentation of copyright policies, faculty training completion, and technological protection measures. Annual compliance audits are recommended to verify proper implementation of access controls and copyright notices in learning management systems."
+  }
+}
+
+
+
+
+
+
+

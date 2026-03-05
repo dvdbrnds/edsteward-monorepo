@@ -1,0 +1,50 @@
+{
+  "regulationId": "age-discrimination-employment-act-of-1967",
+  "enhanced": {
+    "fullText": "The Age Discrimination in Employment Act of 1967 (ADEA), codified at 29 U.S.C. §§ 621-634, prohibits employment discrimination against individuals who are 40 years of age or older in universities and other covered employers. This federal statute applies to higher education institutions with 20 or more employees and encompasses all aspects of the employment relationship, including hiring, termination, promotion, compensation, job assignments, training opportunities, and benefits administration.\n\nUnder 29 U.S.C. § 623(a), universities are prohibited from failing or refusing to hire, discharging, or otherwise discriminating against individuals aged 40 and above because of their age. The statute specifically prohibits limiting, segregating, or classifying employees in ways that would deprive them of employment opportunities or adversely affect their employment status due to age considerations. Universities must ensure that job postings, recruitment practices, and selection criteria do not contain explicit or implicit age preferences, as outlined in 29 CFR § 1625.4.\n\nThe ADEA's application to higher education presents unique considerations, particularly regarding tenured faculty positions and mandatory retirement policies. Under 29 U.S.C. § 631(d), the previous exemption allowing mandatory retirement of tenured faculty at age 70 was eliminated in 1994, making such policies generally unlawful. Universities must now evaluate faculty performance based on legitimate, non-age-related criteria when making tenure and promotion decisions.\n\nEnforcement authority rests with the Equal Employment Opportunity Commission (EEOC) under 29 U.S.C. § 626. The EEOC investigates complaints, attempts conciliation, and may file lawsuits against non-compliant institutions. Universities found in violation face potential remedies including back pay, front pay, liquidated damages, attorney fees, and injunctive relief. Under 29 U.S.C. § 626(b), willful violations may result in liquidated damages equal to the amount of actual damages awarded.\n\nCompliance obligations include maintaining employment records for inspection, posting required ADEA notices as specified in 29 CFR § 1625.10, and ensuring that employee benefit plans comply with the Older Workers Benefit Protection Act provisions found in 29 U.S.C. § 623(f). Universities must also provide proper disclosures when requesting waivers of ADEA claims during voluntary separation programs, following the specific requirements outlined in 29 U.S.C. § 626(f).\n\nRecent EEOC guidance emphasizes that universities cannot use age as a factor in budget-driven layoffs or restructuring decisions. The Supreme Court's decision in Gross v. FBL Financial Services (2009) clarified that plaintiffs must prove age was the \"but-for\" cause of adverse employment action, raising the burden of proof standard for ADEA claims compared to other discrimination statutes.",
+    "summary": "The ADEA prohibits universities with 20+ employees from discriminating against individuals aged 40 and older in all employment practices including hiring, promotion, and termination decisions.",
+    "requirements": "## Core Compliance Obligations\n- Eliminate age-based hiring preferences and discriminatory job postings per 29 CFR § 1625.4\n- Remove mandatory retirement policies for faculty and staff positions\n- Ensure age-neutral performance evaluation criteria for tenure and promotion decisions\n- Maintain non-discriminatory compensation and benefits structures\n\n## Policy Development Requirements\n- Establish written ADEA compliance policies covering all employment practices\n- Implement age-neutral recruitment and selection procedures\n- Develop complaint investigation protocols for age discrimination allegations\n- Create documentation standards for employment decisions affecting workers 40+\n\n## Training and Notice Obligations\n- Post ADEA notices in prominent workplace locations per 29 CFR § 1625.10\n- Conduct regular training for HR staff and hiring managers on age discrimination prevention\n- Educate supervisors on proper documentation of performance-based employment decisions",
+    "reportingRequirements": "Universities must file EEO-6 reports with EEOC by October 15th annually, detailing employee demographics by age group. Maintain employment records for EEOC inspection. Report litigation and settlement agreements to institutional counsel immediately."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T16:04:09.918Z"
+  },
+  "deadlines": [
+    {
+      "date": "03-31",
+      "label": "EEO-1 Report",
+      "type": "filing",
+      "description": "EEO-1 Report for Age Discrimination Employment Act of 1967",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Affirmative Action Plan Update",
+      "type": "plan",
+      "description": "Affirmative Action Plan Update for Age Discrimination Employment Act of 1967",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "09-30",
+      "label": "VETS-4212 Report",
+      "type": "filing",
+      "description": "VETS-4212 Report for Age Discrimination Employment Act of 1967",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Diversity/Affirmative Action"
+  ]
+}

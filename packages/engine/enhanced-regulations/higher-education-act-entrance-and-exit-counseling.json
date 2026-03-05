@@ -1,0 +1,50 @@
+{
+  "regulationId": "higher-education-act-entrance-and-exit-counseling",
+  "enhanced": {
+    "fullText": "The Higher Education Act's Entrance and Exit Counseling requirements under 20 U.S.C. § 1092(b) and (l), implemented through 34 CFR § 685.304, mandate comprehensive loan counseling obligations for institutions participating in federal student aid programs. Section 488 of the Higher Education Opportunity Act (Public Law 110-315) established detailed counseling requirements to ensure borrowers understand their loan obligations and available options.\n\nEntrance counseling, required under 20 U.S.C. § 1092(b), must be provided to first-time federal loan borrowers before loan disbursement. Institutions must deliver comprehensive information including loan terms, interest rates, fees, borrower rights and responsibilities, consequences of default, and debt management strategies. The counseling must be provided through in-person sessions, signed written materials, or interactive online programs that test borrower comprehension, as specified in 34 CFR § 685.304(a).\n\nExit counseling requirements under 20 U.S.C. § 1092(l) apply when borrowers cease enrollment below half-time status, graduate, or withdraw. Institutions must provide detailed information on repayment options, loan servicer contact information, consequences of delinquency and default, loan consolidation options, forbearance and deferment programs, and tax implications of loan forgiveness. The Department of Education's regulations at 34 CFR § 685.304(b) require completion within 30 days of the triggering event.\n\nInstitutions must maintain documentation of counseling completion for federal compliance reviews and audits. Non-compliance can result in program review findings, financial liability, and potential loss of Title IV eligibility under 34 CFR § 668.14. The Department's Federal Student Aid office conducts regular monitoring through program reviews and student complaints to ensure institutional adherence to counseling requirements.\n\nRecent updates through the FUTURE Act and regulatory changes have enhanced online counseling capabilities and standardized content requirements. Institutions must ensure counseling materials remain current with federal regulations and provide borrowers with accurate, comprehensive information to support informed borrowing decisions and successful loan repayment.",
+    "summary": "Federal law requires higher education institutions to provide mandatory entrance counseling to first-time loan borrowers and exit counseling to departing students, covering loan terms, repayment options, and borrower responsibilities under 20 U.S.C. § 1092.",
+    "requirements": "## Entrance Counseling Requirements\n- Provide comprehensive loan counseling to all first-time federal loan borrowers before disbursement\n- Deliver counseling through in-person sessions, signed written forms, or interactive online programs per 34 CFR § 685.304(a)\n- Include loan terms, interest rates, borrower rights, default consequences, and debt management information\n- Test borrower understanding through interactive elements when using online delivery methods\n\n## Exit Counseling Requirements\n- Conduct exit counseling when students withdraw, graduate, or drop below half-time enrollment\n- Complete counseling within 30 days of triggering event under 34 CFR § 685.304(b)\n- Provide repayment plan options, loan servicer information, and forbearance/deferment details\n- Document all counseling completion for compliance verification\n\n## Documentation and Compliance\n- Maintain records of all counseling sessions and borrower acknowledgments\n- Ensure materials comply with current federal regulations and Department guidance\n- Submit to federal program reviews and audits as required",
+    "reportingRequirements": "Institutions must maintain documentation of entrance and exit counseling completion for all borrowers and provide records during federal program reviews, audits, and upon Department of Education request. Exit counseling must be completed within 30 days of enrollment changes."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T20:02:21.896Z"
+  },
+  "deadlines": [
+    {
+      "date": "10-01",
+      "label": "FISAP Annual Report",
+      "type": "filing",
+      "description": "FISAP Annual Report for Higher Education Act: Entrance and Exit Counseling",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "06-30",
+      "label": "Annual Financial Aid Audit",
+      "type": "audit",
+      "description": "Annual Financial Aid Audit for Higher Education Act: Entrance and Exit Counseling",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "07-01",
+      "label": "Gainful Employment Disclosure Update",
+      "type": "disclosure",
+      "description": "Gainful Employment Disclosure Update for Higher Education Act: Entrance and Exit Counseling",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Financial Aid"
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "regulationId": "small-webcasters-settlement-act-of-2002",
+  "enhanced": {
+    "fullText": "The Small Webcasters Settlement Act of 2002 (Public Law No. 107-321) provides a specialized framework for digital audio transmission licensing that significantly impacts higher education institutions operating internet radio stations, streaming services, and educational broadcasting platforms. This federal legislation amends 17 U.S.C. §§ 101 and 114 to create alternative royalty structures for qualifying small commercial and noncommercial webcasters, including college radio stations and university-operated streaming services.\n\nUnder 17 U.S.C. § 114(f)(5)(A), the Act establishes two distinct categories: \"Small Commercial Webcasters\" with annual revenues under $1.25 million and \"Noncommercial Webcasters\" including educational institutions exempt from federal income tax under 26 U.S.C. § 501. Higher education institutions typically qualify as noncommercial webcasters when operating student radio stations, distance learning platforms with audio content, or campus broadcasting services.\n\nThe legislation enables SoundExchange, designated under 17 U.S.C. § 114(g) as the collective rights organization, to negotiate reduced royalty rates with qualifying institutions. For educational webcasters, this includes streamlined reporting requirements and potentially waived minimum fees that would otherwise apply under standard Copyright Royalty Board determinations.\n\nKey compliance obligations for universities include: maintaining detailed logs of sound recordings transmitted digitally per 17 U.S.C. § 114(f)(4)(A); ensuring webcasting operations don't exceed the sound recording performance complement limitations defined in 17 U.S.C. § 114(j)(13); and filing appropriate licensing agreements with SoundExchange within specified timeframes.\n\nViolations may result in statutory damages ranging from $750 to $30,000 per work under 17 U.S.C. § 504(c)(1), with potential increases to $150,000 for willful infringement. The Copyright Royalty Board, established under 17 U.S.C. § 801, maintains enforcement authority and periodically reviews rate structures.\n\nRecent interpretations by federal courts have clarified that university podcasting, online course materials with background music, and campus event streaming may trigger these requirements. The Digital Performance Right in Sound Recordings Act amendments continue to evolve the regulatory landscape affecting institutional compliance obligations.",
+    "summary": "Federal law providing alternative copyright royalty structures for educational webcasters and small commercial internet radio operations, requiring universities to obtain appropriate licenses from SoundExchange for digital audio transmissions including campus radio and streaming services.",
+    "requirements": "## Licensing and Registration\n- Obtain appropriate licensing agreement with SoundExchange for digital audio transmissions\n- Maintain noncommercial status documentation per 17 U.S.C. § 114(f)(5)(B)\n- File initial registration within 45 days of commencing webcasting operations\n\n## Operational Compliance\n- Implement sound recording performance complement limitations per 17 U.S.C. § 114(j)(13)\n- Maintain detailed logs of all transmitted sound recordings with timestamps and metadata\n- Ensure webcasting doesn't promote sale of sound recordings or merchandise\n\n## Reporting and Documentation\n- Submit monthly reports of use to SoundExchange including artist, title, and transmission data\n- Maintain records of all digital transmissions for minimum three-year period\n- Document compliance with advance playlist restrictions and simultaneous streaming limitations\n\n## Payment Obligations\n- Remit applicable royalty payments according to negotiated rate schedules\n- Pay minimum annual fees if applicable based on transmission volume and revenue",
+    "reportingRequirements": "Monthly Reports of Use due to SoundExchange by 45th day following each calendar month containing detailed transmission logs per 17 U.S.C. § 114(f)(4). Annual compliance certification required by January 31st documenting noncommercial status and operational adherence to performance complement limitations."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T02:14:42.295Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Annual DMCA Agent Registration Renewal",
+      "type": "registration",
+      "description": "Annual DMCA Agent Registration Renewal for Small Webcasters Settlement Act of 2002",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Copyright Policy Review",
+      "type": "review",
+      "description": "Copyright Policy Review for Small Webcasters Settlement Act of 2002",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Copyright & Trademark"
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "regulationId": "student-right-to-know-act",
+  "enhanced": {
+    "fullText": "The Student Right to Know Act, codified at 20 U.S.C. § 1092 and implemented through 34 CFR § 668.41-668.49, mandates comprehensive disclosure requirements for postsecondary institutions participating in federal student aid programs under Title IV of the Higher Education Act. Enacted as Public Law No. 101-542, this legislation ensures prospective and enrolled students receive essential information to make informed educational decisions.\n\nUnder 20 U.S.C. § 1092(a), institutions must maintain qualified financial aid staff and make readily available through publications, mailings, and electronic media fifteen categories of information: (1) available financial aid programs; (2) distribution methods among recipients; (3) application requirements and procedures; (4) student rights and responsibilities; (5) cost of attendance calculations; (6) refund policies and Return to Title IV requirements; (7) academic program descriptions; (8) financial aid personnel contact information; (9) disability services and facilities; (10) accrediting agency names; (11) academic standards for aid eligibility; (12) completion and graduation rates; (13) loan deferment and cancellation provisions; (14) study abroad program aid applicability; and (15) annual campus security reports per the Clery Act.\n\nThe completion rate disclosure requirement under 20 U.S.C. § 1092(a)(1)(L) mandates annual calculation of graduation rates for certificate or degree-seeking, full-time undergraduate students entering during the most recent fall term. For NCAA member institutions, 34 CFR § 668.41(d) permits satisfaction through athletic program disclosures to prospective student-athletes, coaches, parents, and guidance counselors. Publication must occur by July 1st annually, with Spring IPEDS reporting fulfilling this deadline per 34 CFR § 668.45.\n\nEnforcement mechanisms under 20 U.S.C. § 1094 include program review findings, compliance audits, and potential sanctions ranging from monetary fines to Title IV program suspension or termination. The Department of Education's Federal Student Aid office conducts oversight through systematic reviews and complaint investigations. Recent amendments through the FAFSA Simplification Act have enhanced disclosure requirements for net price calculators and outcome measures, effective for the 2024-2025 award year. Exit counseling requirements under 34 CFR § 685.304 mandate comprehensive loan repayment information sessions for all Direct Loan borrowers before graduation, withdrawal, or enrollment below half-time status.",
+    "summary": "Federal law requiring higher education institutions to disclose comprehensive information about financial aid programs, graduation rates, campus safety, and institutional policies to prospective and enrolled students participating in Title IV federal aid programs.",
+    "requirements": "## Information Disclosure Requirements\n- Maintain comprehensive publications covering 15 mandated disclosure categories per 20 U.S.C. § 1092(a)\n- Provide information through multiple channels: print publications, electronic media, and direct mailings\n- Ensure ready availability upon student request with reasonable response timeframes\n\n## Staffing and Personnel\n- Employ qualified full-time financial aid staff with appropriate training and expertise\n- Publish current contact information for all financial aid personnel\n- Provide adequate staffing levels to meet student assistance needs\n\n## Annual Reporting and Publication\n- Calculate and publish completion/graduation rates by July 1st annually per 34 CFR § 668.45\n- Distribute comprehensive information list to all enrolled students with access procedures\n- Submit Spring IPEDS graduation rate data to satisfy federal reporting requirements\n\n## Exit Counseling Program\n- Conduct mandatory exit counseling for all federal loan borrowers before separation\n- Cover loan repayment options, deferment/forbearance rights, and default consequences\n- Document completion and maintain records per federal retention requirements",
+    "reportingRequirements": "Annual graduation rate publication by July 1st via Spring IPEDS reporting; continuous disclosure maintenance through publications and electronic media; exit counseling documentation for loan borrowers; annual distribution of information availability notices to enrolled students."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T16:22:11.250Z"
+  },
+  "deadlines": [
+    {
+      "date": "10-01",
+      "label": "FISAP Annual Report",
+      "type": "filing",
+      "description": "FISAP Annual Report for Student Right to Know Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "06-30",
+      "label": "Annual Financial Aid Audit",
+      "type": "audit",
+      "description": "Annual Financial Aid Audit for Student Right to Know Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "07-01",
+      "label": "Gainful Employment Disclosure Update",
+      "type": "disclosure",
+      "description": "Gainful Employment Disclosure Update for Student Right to Know Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Financial Aid"
+  ]
+}

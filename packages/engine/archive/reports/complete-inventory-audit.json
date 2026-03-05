@@ -1,0 +1,2536 @@
+{
+  "audit_date": "2026-01-18T21:16:48.000Z",
+  "sources": {
+    "registry_api": 295,
+    "enhanced_folder": 241,
+    "console_pages": 285,
+    "csv_source": 689
+  },
+  "by_jurisdiction": {
+    "federal": [
+      {
+        "regulationId": "age-discrimination-act-of-1975",
+        "name": "Age Discrimination Act of 1975",
+        "source": "registry",
+        "statute": "42 U.S.C. §§ 6101-6107"
+      },
+      {
+        "regulationId": "americans-with-disabilities-act-of-1990",
+        "name": "Americans with Disabilities Act of 1990",
+        "source": "registry",
+        "statute": "42 U.S.C. §§ 12101-12213"
+      },
+      {
+        "regulationId": "higher-education-act-institutional-and-financial-a",
+        "name": "Higher Education Act: Institutional and Financial Assistance Information for Students",
+        "source": "registry",
+        "statute": "20 U.S.C. 1092"
+      },
+      {
+        "regulationId": "higher-education-act-textbook-information",
+        "name": "Higher Education Act: Textbook Information",
+        "source": "registry",
+        "statute": "20 USC § 1015(b)"
+      },
+      {
+        "regulationId": "higher-education-opportunity-act-sections-152-and-",
+        "name": "Higher Education Opportunity Act Sections 152 and 153",
+        "source": "registry",
+        "statute": "Public Law No. 110-315"
+      },
+      {
+        "regulationId": "section-504-of-the-rehabilitation-act-of-1973",
+        "name": "Section 504 of The Rehabilitation Act of 1973",
+        "source": "registry",
+        "statute": "29 U.S.C. § 701"
+      },
+      {
+        "regulationId": "title-ix-of-the-education-amendment-of-1972",
+        "name": "Title IX of the Education Amendment of 1972",
+        "source": "registry",
+        "statute": "20 U.S.C. §§ 1681-1688"
+      },
+      {
+        "regulationId": "title-vi-of-the-civil-rights-act-of-1964",
+        "name": "Title VI of the Civil Rights Act of 1964",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "teacher-preparation-programs",
+        "name": "Teacher Preparation Programs",
+        "source": "registry",
+        "statute": "20 U.S.C. §§ 1022 - 1022h"
+      },
+      {
+        "regulationId": "bankruptcy-abuse-prevention-consumer-protection-ac",
+        "name": "Bankruptcy Abuse Prevention & Consumer Protection Act of 2005",
+        "source": "registry",
+        "statute": "11 U.S.C. §§ 101-1532"
+      },
+      {
+        "regulationId": "clayton-antitrust-act-of-1914",
+        "name": "Clayton Antitrust Act of 1914",
+        "source": "registry",
+        "statute": "15 U.S.C. §§ 12-27"
+      },
+      {
+        "regulationId": "fair-credit-reporting-act-fcra",
+        "name": "Fair Credit Reporting Act (FCRA)",
+        "source": "registry",
+        "statute": "15 U.S.C. §§ 1681-1681v"
+      },
+      {
+        "regulationId": "federal-insurance-contributions-act-fica",
+        "name": "Federal Insurance Contributions Act (FICA)",
+        "source": "registry",
+        "statute": "26 U.S.C. §§ 3101-3128"
+      },
+      {
+        "regulationId": "federal-unemployment-tax-act-futa",
+        "name": "Federal Unemployment Tax Act (FUTA)",
+        "source": "registry",
+        "statute": "26 U.S.C. §§ 3301-3311"
+      },
+      {
+        "regulationId": "higher-education-act-disclosure-of-foreign-gifts",
+        "name": "Higher Education Act – Disclosure of Foreign Gifts",
+        "source": "registry",
+        "statute": "20 U.S.C. § 1011f"
+      },
+      {
+        "regulationId": "qualified-tuition-and-student-loan-interest-report",
+        "name": "Qualified Tuition and Student Loan Interest Reporting",
+        "source": "registry",
+        "statute": "26 U.S.C. § 6050S"
+      },
+      {
+        "regulationId": "regulation-e-electronic-fund-transfers",
+        "name": "Regulation E: Electronic Fund Transfers",
+        "source": "registry",
+        "statute": "15 U.S.C. § 1693b"
+      },
+      {
+        "regulationId": "sarbanes-oxley-act-of-2002-sox",
+        "name": "Sarbanes Oxley Act of 2002 (SOX)",
+        "source": "registry",
+        "statute": "Public Law No. 107-204"
+      },
+      {
+        "regulationId": "sherman-antitrust-act",
+        "name": "Sherman Antitrust Act",
+        "source": "registry",
+        "statute": "15 U.S.C. §§ 1-7"
+      },
+      {
+        "regulationId": "social-security-act",
+        "name": "Social Security Act",
+        "source": "registry",
+        "statute": "42 U.S.C. §§ 301-1397mm"
+      },
+      {
+        "regulationId": "tax-cuts-and-jobs-act-of-2017-endowment-excise-tax",
+        "name": "Tax Cuts and Jobs Act of 2017 (endowment excise tax)",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "truth-in-lending-act",
+        "name": "Truth in Lending Act",
+        "source": "registry",
+        "statute": "15 U.S.C. §§ 1601-1693r"
+      },
+      {
+        "regulationId": "uniform-administrative-requirements-cost-principle",
+        "name": "Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance, Super Circular, or Omni Circular)",
+        "source": "registry",
+        "statute": "Uniform Administrative Requirements, Cost Principles, and Audit Requirements for Federal Awards (Uniform Guidance, Super Circular, or Omni Circular)"
+      },
+      {
+        "regulationId": "unrelated-business-income-tax-ubit",
+        "name": "Unrelated Business Income Tax (UBIT)",
+        "source": "registry",
+        "statute": "26 U.S.C. § 511"
+      },
+      {
+        "regulationId": "higher-education-act-institutional-and-financial-a",
+        "name": "Higher Education Act: Institutional and Financial Assistance Information for Students",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "higher-education-act-recognition-of-accrediting-ag",
+        "name": "Higher Education Act: Recognition of Accrediting Agency or Association",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "age-discrimination-act-of-1975",
+        "name": "Age Discrimination Act of 1975",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "higher-education-act-institutional-and-financial-a",
+        "name": "Higher Education Act: Institutional and Financial Assistance Information for Students",
+        "source": "registry",
+        "statute": "20 U.S.C. 1092(k)"
+      },
+      {
+        "regulationId": "higher-education-act-readmission-requirements-for-",
+        "name": "Higher Education Act: Readmission Requirements for Servicemembers",
+        "source": "registry",
+        "statute": "20 U.S.C. § 1091c"
+      },
+      {
+        "regulationId": "section-504-of-the-rehabilitation-act-of-1973",
+        "name": "Section 504 of The Rehabilitation Act of 1973",
+        "source": "registry",
+        "statute": "29 U.S.C. § 794"
+      },
+      {
+        "regulationId": "title-ix-of-the-education-amendment-of-1972",
+        "name": "Title IX of the Education Amendment of 1972",
+        "source": "registry",
+        "statute": "20 U.S.C. §§ 1681-1688"
+      },
+      {
+        "regulationId": "title-vi-of-the-civil-rights-act-of-1964",
+        "name": "Title VI of the Civil Rights Act of 1964",
+        "source": "registry",
+        "statute": "42 U.S.C. §§ 2000d-2000d-7"
+      },
+      {
+        "regulationId": "equity-in-athletics-disclosure-act-eada",
+        "name": "Equity in Athletics Disclosure Act (EADA)",
+        "source": "registry",
+        "statute": "20 U.S.C. § 1092(g)"
+      },
+      {
+        "regulationId": "section-504-of-the-rehabilitation-act-of-1973",
+        "name": "Section 504 of The Rehabilitation Act of 1973",
+        "source": "registry",
+        "statute": "29 U.S.C. § 701"
+      },
+      {
+        "regulationId": "title-ix",
+        "name": "Title IX",
+        "source": "registry",
+        "statute": "20 U.S.C. §§ 1681-1688"
+      },
+      {
+        "regulationId": "higher-education-act-textbook-informatoin",
+        "name": "Higher Education Act: Textbook Informatoin",
+        "source": "registry",
+        "statute": "Public Law No. 110-315"
+      },
+      {
+        "regulationId": "americans-with-disabilities-act",
+        "name": "Americans with Disabilities Act",
+        "source": "registry",
+        "statute": "42 U.S.C. § 12101-12213"
+      },
+      {
+        "regulationId": "campus-sex-crimes-prevention-act-1601-of-the-victi",
+        "name": "Campus Sex Crimes Prevention Act (§ 1601 of the Victims of Trafficking and Violence Protection Act of 2000)",
+        "source": "registry",
+        "statute": "Public Law No. 106-386 (Title VI)"
+      },
+      {
+        "regulationId": "drug-free-schools-and-communities-act",
+        "name": "Drug Free Schools and Communities Act",
+        "source": "registry",
+        "statute": "20 U.S.C. § 1011i"
+      },
+      {
+        "regulationId": "emergency-planning-and-community-right-to-know-act",
+        "name": "Emergency Planning and Community Right to Know Act (EPCRA)",
+        "source": "registry",
+        "statute": "42 U.S.C. §§ 11001 - 11050"
+      },
+      {
+        "regulationId": "higher-education-act-drug-and-alcohol-abuse-preven",
+        "name": "Higher Education Act: Drug and Alcohol Abuse Prevention",
+        "source": "registry",
+        "statute": "20 U.S.C. § 1011i"
+      },
+      {
+        "regulationId": "higher-education-act-institutional-and-financial-a",
+        "name": "Higher Education Act: Institutional and Financial Assistance Information for Students: Disclosure of Fire Safety Standards and Measures",
+        "source": "registry",
+        "statute": "20 U.S.C. § 1092(j)"
+      },
+      {
+        "regulationId": "higher-education-act-institutional-and-financial-a",
+        "name": "Higher Education Act: Institutional and Financial Assistance Information for Students: Missing Person Procedures",
+        "source": "registry",
+        "statute": "20 U.S.C. § 1092(j)"
+      },
+      {
+        "regulationId": "higher-education-act-program-participation-agreeme",
+        "name": "Higher Education Act: Program Participation Agreements",
+        "source": "registry",
+        "statute": "20 U.S.C. § 1094(a)(26)"
+      },
+      {
+        "regulationId": "jeanne-clery-disclosure-of-campus-security-policy-",
+        "name": "Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Act (Clery Act) and Violence Against Women Act (VAWA)",
+        "source": "registry",
+        "statute": "20 U.S.C. § 1092(f)"
+      },
+      {
+        "regulationId": "occupational-safety-and-health-act-of-1970",
+        "name": "Occupational Safety and Health Act of 1970",
+        "source": "registry",
+        "statute": "29 U.S.C. §§ 651-678"
+      },
+      {
+        "regulationId": "title-vi-of-the-civil-rights-act-of-1964-42-u-s-c-",
+        "name": "Title VI of the Civil Rights Act of 1964  42 U.S.C. §§ 2000d-2000d-7",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "anti-kickback-act-of-1986",
+        "name": "Anti-Kickback Act of 1986",
+        "source": "registry",
+        "statute": "41 U.S.C. §§ 8701-8707"
+      },
+      {
+        "regulationId": "anti-discrimination-laws-for-federal-contractors",
+        "name": "Anti-discrimination laws for federal contractors",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "byrd-amendment",
+        "name": "Byrd Amendment",
+        "source": "registry",
+        "statute": "31 U.S.C. § 1352"
+      },
+      {
+        "regulationId": "copeland-anti-kickback-act",
+        "name": "Copeland Anti-Kickback Act",
+        "source": "registry",
+        "statute": "18 U.S.C. § 874"
+      },
+      {
+        "regulationId": "davis-bacon-act",
+        "name": "Davis-Bacon Act",
+        "source": "registry",
+        "statute": "40 U.S.C. §§ 3141- 3144, 3146, 3147"
+      },
+      {
+        "regulationId": "e-verify-executive-order-13465-amending-executive-",
+        "name": "E-Verify Executive Order 13465-Amending Executive Order 12989",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "health-insurance-portability-and-accountability-ac",
+        "name": "Health Insurance Portability and Accountability Act of 1996 (HIPAA)",
+        "source": "registry",
+        "statute": "42 U.S.C. § 300gg"
+      },
+      {
+        "regulationId": "higher-education-act-foreign-gift-and-contract-rep",
+        "name": "Higher Education Act: Foreign Gift and Contract Reports",
+        "source": "registry",
+        "statute": "20 U.S.C. § 1011f"
+      },
+      {
+        "regulationId": "small-business-act-and-small-business-investment-a",
+        "name": "Small Business Act and Small Business Investment Act of 1958",
+        "source": "registry",
+        "statute": "15 U.S.C.  631-657s"
+      },
+      {
+        "regulationId": "trade-sanctions-reform-and-export-enhancement",
+        "name": "Trade Sanctions Reform and Export Enhancement",
+        "source": "registry",
+        "statute": "22 U.S.C. §§ 7201-7211"
+      },
+      {
+        "regulationId": "non-retaliation-for-disclosure-of-compensation-inf",
+        "name": "Non-Retaliation for Disclosure of Compensation Information",
+        "source": "registry",
+        "statute": "Executive Order 13665"
+      },
+      {
+        "regulationId": "copyright-act",
+        "name": "Copyright Act",
+        "source": "registry",
+        "statute": "17 U.S.C. §§ 101-1332"
+      },
+      {
+        "regulationId": "copyright-term-extension-act",
+        "name": "Copyright Term Extension Act",
+        "source": "registry",
+        "statute": "Public Law No. 10-298"
+      },
+      {
+        "regulationId": "digital-millennium-copyright-act-dmca",
+        "name": "Digital Millennium Copyright Act (DMCA)",
+        "source": "registry",
+        "statute": "17 U.S.C. §§ 117"
+      },
+      {
+        "regulationId": "higher-education-act-institutional-and-financial-a",
+        "name": "Higher Education Act: Institutional and financial assistance information for students",
+        "source": "registry",
+        "statute": "20 U.S.C. § 1092(a)(1)(P)"
+      },
+      {
+        "regulationId": "higher-education-act-program-participation-agreeme",
+        "name": "Higher Education Act: Program Participation Agreements",
+        "source": "registry",
+        "statute": "Public Law No. 110-315 § 493"
+      },
+      {
+        "regulationId": "lanham-act",
+        "name": "Lanham Act",
+        "source": "registry",
+        "statute": "15 U.S.C. §§ 1051-1141n"
+      },
+      {
+        "regulationId": "small-webcasters-settlement-act-of-2002",
+        "name": "Small Webcasters Settlement Act of 2002",
+        "source": "registry",
+        "statute": "Public Law No. 107-321"
+      },
+      {
+        "regulationId": "technology-education-and-copyright-harmonization-a",
+        "name": "Technology Education and Copyright Harmonization Act (TEACH ACT) of 2002",
+        "source": "registry",
+        "statute": "Public Law No. 107-273"
+      },
+      {
+        "regulationId": "americans-with-disabilities-act-of-1990",
+        "name": "Americans with Disabilities Act of 1990",
+        "source": "registry",
+        "statute": "42 U.S.C. §§ 12101-12213"
+      },
+      {
+        "regulationId": "fair-housing-act-section-6",
+        "name": "Fair Housing Act, Section 6",
+        "source": "registry",
+        "statute": "42 U.S.C. 3604(3)"
+      },
+      {
+        "regulationId": "patient-protection-and-affordable-care-act-section",
+        "name": "Patient Protection and Affordable Care Act (Section 1557)",
+        "source": "registry",
+        "statute": "42 U.S.C. 18116"
+      },
+      {
+        "regulationId": "section-504-of-the-rehabilitation-act-of-1973",
+        "name": "Section 504 of The Rehabilitation Act of 1973",
+        "source": "registry",
+        "statute": "29 U.S.C. § 701"
+      },
+      {
+        "regulationId": "the-family-and-medical-leave-act-of-1993",
+        "name": "The Family and Medical Leave Act of 1993",
+        "source": "registry",
+        "statute": "Public Law 103-3"
+      },
+      {
+        "regulationId": "age-discrimination-in-employment-act-of-1967",
+        "name": "Age Discrimination in Employment Act of 1967",
+        "source": "registry",
+        "statute": "29 U.S.C. §§ 621-634"
+      },
+      {
+        "regulationId": "americans-with-disabilities-act-of-1990",
+        "name": "Americans with Disabilities Act of 1990",
+        "source": "registry",
+        "statute": "42 U.S.C. §§ 12101-12213"
+      },
+      {
+        "regulationId": "equal-employment-opportunity",
+        "name": "Equal Employment Opportunity",
+        "source": "registry",
+        "statute": "Executive Order 11246 (OFCCP)"
+      },
+      {
+        "regulationId": "equal-employment-of-veterans",
+        "name": "Equal Employment of Veterans",
+        "source": "registry",
+        "statute": "38 U.S.C. §§ 4211-4215"
+      },
+      {
+        "regulationId": "genetic-information-non-discrimination-act-of-2008",
+        "name": "Genetic Information Non-Discrimination Act of 2008",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "lilly-ledbetter-fair-pay-act-of-2009",
+        "name": "Lilly Ledbetter Fair Pay Act of 2009",
+        "source": "registry",
+        "statute": "Public Law No. 111-2"
+      },
+      {
+        "regulationId": "the-equal-pay-act-of-1963",
+        "name": "The Equal Pay Act of 1963",
+        "source": "registry",
+        "statute": "29 U.S.C. § 206(d)"
+      },
+      {
+        "regulationId": "the-family-and-medical-leave-act-of-1993",
+        "name": "The Family and Medical Leave Act of 1993",
+        "source": "registry",
+        "statute": "29 U.S.C. §§ 2601-2654"
+      },
+      {
+        "regulationId": "title-ix-of-the-education-amendment-of-1972",
+        "name": "Title IX of the Education Amendment of 1972",
+        "source": "registry",
+        "statute": "20 U.S.C. §§ 1681-1688"
+      },
+      {
+        "regulationId": "title-vii-of-the-civil-rights-act-of-1964",
+        "name": "Title VII of the Civil Rights Act of 1964",
+        "source": "registry",
+        "statute": "42 USCU.S.C. §§ 2000e-2000e-17"
+      },
+      {
+        "regulationId": "uniformed-services-employment-and-reemployment-rig",
+        "name": "Uniformed Services Employment and Reemployment Rights Act (USERRA)",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "pregnant-workers-fairness-act-pwfa",
+        "name": "Pregnant Workers Fairness Act (PWFA)",
+        "source": "registry",
+        "statute": "42 U.S.C. Chapter 21G"
+      },
+      {
+        "regulationId": "affirmative-action-equal-employment-opportunity",
+        "name": "Affirmative Action/Equal Employment Opportunity",
+        "source": "registry",
+        "statute": "Executive Order 11246"
+      },
+      {
+        "regulationId": "age-discrimination-act-of-1975",
+        "name": "Age Discrimination Act of 1975",
+        "source": "registry",
+        "statute": "42 U.S.C. §§ 6101-6107"
+      },
+      {
+        "regulationId": "age-discrimination-employment-act-of-1967",
+        "name": "Age Discrimination Employment Act of 1967",
+        "source": "registry",
+        "statute": "29 U.S.C. §§ 621-634"
+      },
+      {
+        "regulationId": "americans-with-disabilities-act-of-1990",
+        "name": "Americans with Disabilities Act of 1990",
+        "source": "registry",
+        "statute": "42 U.S.C. §§ 12101-12213"
+      },
+      {
+        "regulationId": "equal-employment-of-veterans",
+        "name": "Equal Employment of Veterans",
+        "source": "registry",
+        "statute": "38 U.S.C. §§ 4211-4215"
+      },
+      {
+        "regulationId": "equal-pay-act-of-1963",
+        "name": "Equal Pay Act of 1963",
+        "source": "registry",
+        "statute": "29 U.S.C. § 206(d)"
+      },
+      {
+        "regulationId": "genetic-information-non-discrimination-act-of-2008",
+        "name": "Genetic Information Non-Discrimination Act of 2008",
+        "source": "registry",
+        "statute": "Public Law No. 110-233"
+      },
+      {
+        "regulationId": "immigration-and-nationality-act",
+        "name": "Immigration and Nationality Act",
+        "source": "registry",
+        "statute": "8 U.S.C. §§ 1101-1106"
+      },
+      {
+        "regulationId": "lilly-ledbetter-fair-pay-act-of-2009",
+        "name": "Lilly Ledbetter Fair Pay Act of 2009",
+        "source": "registry",
+        "statute": "Public Law No. 111-2"
+      },
+      {
+        "regulationId": "section-504-of-the-rehabilitation-act-of-1973",
+        "name": "Section 504 of The Rehabilitation Act of 1973",
+        "source": "registry",
+        "statute": "29 U.S.C. § 701"
+      },
+      {
+        "regulationId": "title-ix-of-the-education-amendment-of-1972",
+        "name": "Title IX of the Education Amendment of 1972",
+        "source": "registry",
+        "statute": "20 U.S.C. §§ 1681-1688"
+      },
+      {
+        "regulationId": "title-vii-of-the-civil-rights-act-of-1964",
+        "name": "Title VII of the Civil Rights Act of 1964",
+        "source": "registry",
+        "statute": "42 U.S.C. §§ 2000d-2000d-7"
+      },
+      {
+        "regulationId": "uniformed-services-employment-and-reemployment-rig",
+        "name": "Uniformed Services Employment and Reemployment Rights Act (USERRA)",
+        "source": "registry",
+        "statute": "38 U.S.C. §§ 4301-4335"
+      },
+      {
+        "regulationId": "veterans-employment-emphasis-under-federal-contrac",
+        "name": "Veterans’ employment emphasis under Federal contracts",
+        "source": "registry",
+        "statute": "38 U.S.C § 4212"
+      },
+      {
+        "regulationId": "cafeteria-plan-regulations",
+        "name": "Cafeteria Plan Regulations",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "consolidated-omnibus-budget-reconciliation-act-cob",
+        "name": "Consolidated Omnibus Budget Reconciliation Act (COBRA)",
+        "source": "registry",
+        "statute": "Public Law No. 99-272"
+      },
+      {
+        "regulationId": "employee-retirement-income-security-act-of-1974-er",
+        "name": "Employee Retirement Income Security Act of 1974 (ERISA)",
+        "source": "registry",
+        "statute": "29 U.S.C. Chapter 18"
+      },
+      {
+        "regulationId": "medicare-medicaid-and-schip-extension-act-of-2007",
+        "name": "Medicare, Medicaid, and SCHIP Extension Act of 2007",
+        "source": "registry",
+        "statute": "Public Law No. 110-173"
+      },
+      {
+        "regulationId": "patient-protection-and-affordable-care-act",
+        "name": "Patient Protection and Affordable Care Act",
+        "source": "registry",
+        "statute": "Public Law No. 111-148"
+      },
+      {
+        "regulationId": "the-veterans-readjustment-benefits-act",
+        "name": "The Veterans’ Readjustment Benefits Act",
+        "source": "registry",
+        "statute": "38 U.S.C. §§ 4211-4214"
+      },
+      {
+        "regulationId": "title-ix-of-the-education-amendment-of-1972",
+        "name": "Title IX of the Education Amendment of 1972",
+        "source": "registry",
+        "statute": "20 U.S.C. §§ 1681-1688"
+      },
+      {
+        "regulationId": "uniformed-services-employment-and-reemployment-rig",
+        "name": "Uniformed Services Employment and Reemployment Rights Act (USERRA)",
+        "source": "registry",
+        "statute": "38 U.S.C. § 4301-4335"
+      },
+      {
+        "regulationId": "atomic-energy-act-of-1954",
+        "name": "Atomic Energy Act of 1954",
+        "source": "registry",
+        "statute": "42 U.S.C. §§ 2011-2296b-7"
+      },
+      {
+        "regulationId": "chemical-facility-anti-terrorism-standards",
+        "name": "Chemical Facility Anti-Terrorism Standards",
+        "source": "registry",
+        "statute": "Executive Order 13563 and 12866"
+      },
+      {
+        "regulationId": "clean-air-act",
+        "name": "Clean Air Act",
+        "source": "registry",
+        "statute": "42 U.S.C. §§ 7401-7671q"
+      },
+      {
+        "regulationId": "clean-water-act",
+        "name": "Clean Water Act",
+        "source": "registry",
+        "statute": "33 U.S.C. §§ 1251-1387"
+      },
+      {
+        "regulationId": "comprehensive-environmental-response-compensation-",
+        "name": "Comprehensive Environmental Response, Compensation, and Liability Act (CERCLA)",
+        "source": "registry",
+        "statute": "42 U.S.C. §§ 9601-9675"
+      },
+      {
+        "regulationId": "emergency-planning-and-community-right-act-epcra",
+        "name": "Emergency Planning and Community Right Act (EPCRA)",
+        "source": "registry",
+        "statute": "42 U.S.C. §§ 11001 - 11050"
+      },
+      {
+        "regulationId": "energy-policy-act",
+        "name": "Energy Policy Act",
+        "source": "registry",
+        "statute": "42 U.S.C. §§ 13201-13574"
+      },
+      {
+        "regulationId": "energy-reorganization-act-of-1974-as-amended",
+        "name": "Energy Reorganization Act of 1974, as amended",
+        "source": "registry",
+        "statute": "42 U.S.C. § 5801 et seq."
+      },
+      {
+        "regulationId": "federal-insecticide-fungicide-and-rodenticide-act",
+        "name": "Federal Insecticide, Fungicide and Rodenticide Act",
+        "source": "registry",
+        "statute": "7 U.S.C. §§ 136-136y"
+      },
+      {
+        "regulationId": "guarding-and-use-of-hand-portable-powered-tools",
+        "name": "Guarding and Use of Hand & Portable Powered Tools",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "hazardous-materials-transportation-act",
+        "name": "Hazardous Materials Transportation Act",
+        "source": "registry",
+        "statute": "49 U.S.C. §§ 5101-5128"
+      },
+      {
+        "regulationId": "hazardous-and-solid-waste-amendments-of-1984",
+        "name": "Hazardous and Solid Waste Amendments of 1984",
+        "source": "registry",
+        "statute": "42 U.S.C. §§ 6921-6939g"
+      },
+      {
+        "regulationId": "housing-urban-development-lead-based-paint-poisoni",
+        "name": "Housing & Urban Development Lead Based Paint Poisoning in Certain Residential Structures",
+        "source": "registry",
+        "statute": "42 U.S.C. § 4852d"
+      },
+      {
+        "regulationId": "mandatory-reporting-of-greenhouse-gases",
+        "name": "Mandatory Reporting of Greenhouse Gases",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "motor-carrier-act-of-1980",
+        "name": "Motor Carrier Act of 1980",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "national-emission-standards-for-hazardous-air-poll",
+        "name": "National Emission Standards for Hazardous Air Pollutants (NESHAP)",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "osha",
+        "name": "OSHA",
+        "source": "registry",
+        "statute": "29 U.S.C. § 651-678"
+      },
+      {
+        "regulationId": "osha-asbestos-in-construction-standard",
+        "name": "OSHA Asbestos in Construction Standard",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "osha-asbestos-in-general-industry-standard",
+        "name": "OSHA Asbestos in General Industry Standard",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "osha-enforcement-guidance-for-personal-protective-",
+        "name": "OSHA Enforcement Guidance for Personal Protective Equipment (PPE) in General Industry",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "osha-lead-in-construction-standard",
+        "name": "OSHA Lead in Construction Standard",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "osha-lead-in-general-industry-standard",
+        "name": "OSHA Lead in General Industry Standard",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "osha-welding-cutting-and-brazing",
+        "name": "OSHA Welding, Cutting, and Brazing",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "osha-bloodborne-pathogens-standard",
+        "name": "OSHA – Bloodborne Pathogens Standard",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "osha-s-emergency-action-plan-standard",
+        "name": "OSHA’s  Emergency Action Plan Standard",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "osha-s-occupational-noise-exposure-standard",
+        "name": "OSHA’s  Occupational Noise Exposure Standard",
+        "source": "registry",
+        "statute": "29 C.F.R 1910.95"
+      },
+      {
+        "regulationId": "osha-s-occupational-exposure-to-hazardous-chemical",
+        "name": "OSHA’s Occupational Exposure to Hazardous Chemicals in Laboratories Standard",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "oil-pollution-act",
+        "name": "Oil Pollution Act",
+        "source": "registry",
+        "statute": "33 U.S.C.§§ 2701-2762"
+      },
+      {
+        "regulationId": "residential-lead-based-paint-hazard-reduction-act-",
+        "name": "Residential Lead-Based Paint Hazard Reduction Act of 1992",
+        "source": "registry",
+        "statute": "42 U.S.C. § 4851 et seq."
+      },
+      {
+        "regulationId": "resource-conservation-and-recovery-act",
+        "name": "Resource Conservation and Recovery Act",
+        "source": "registry",
+        "statute": "42 U.S.C. §§ 6901-6992k"
+      },
+      {
+        "regulationId": "standards-for-the-management-of-used-oil",
+        "name": "Standards For the Management of Used Oil",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "the-public-health-security-and-bioterrorism-prepar",
+        "name": "The Public Health Security and Bioterrorism Preparedness and Response Act",
+        "source": "registry",
+        "statute": "18 U.S.C. § 175b"
+      },
+      {
+        "regulationId": "toxic-substances-control-act",
+        "name": "Toxic Substances Control Act",
+        "source": "registry",
+        "statute": "15 U.S.C. § 2601-2629"
+      },
+      {
+        "regulationId": "acts-affecting-a-personal-financial-interest",
+        "name": "Acts Affecting a Personal Financial Interest",
+        "source": "registry",
+        "statute": "18 U.S.C. § 208"
+      },
+      {
+        "regulationId": "bribery-of-public-officials-and-witnesses",
+        "name": "Bribery of Public Officials and Witnesses",
+        "source": "registry",
+        "statute": "18 U.S.C. § 201"
+      },
+      {
+        "regulationId": "compensation-to-members-of-congress-officers-other",
+        "name": "Compensation to Members of Congress, Officers, Others in Matters Affecting the Government",
+        "source": "registry",
+        "statute": "18 U.S.C. § 203"
+      },
+      {
+        "regulationId": "ethics-in-government-act-amended-by-ethics-reform-",
+        "name": "Ethics in Government Act (Amended by Ethics Reform Act and Honest Leadership and Open Government Act of 2007)",
+        "source": "registry",
+        "statute": "5 U.S.C. § 7353"
+      },
+      {
+        "regulationId": "house-and-senate-gift-ban-and-ethics-rules",
+        "name": "House and Senate Gift Ban and Ethics Rules",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "outside-earned-income-and-activities",
+        "name": "Outside Earned Income and Activities",
+        "source": "registry",
+        "statute": "5 U.S.C. app. 4 §§ 501-505"
+      },
+      {
+        "regulationId": "restrictions-on-former-officers-employees-and-elec",
+        "name": "Restrictions on Former Officers, Employees, and Elected Officials of the Executive and Legislative",
+        "source": "registry",
+        "statute": "18 U.S.C. § 207"
+      },
+      {
+        "regulationId": "salary-of-government-officials-and-employees-payab",
+        "name": "Salary of Government Officials and Employees Payable Only by United States",
+        "source": "registry",
+        "statute": "18 U.S.C. § 209"
+      },
+      {
+        "regulationId": "arms-export-control-act-of-1976",
+        "name": "Arms Export Control Act of 1976",
+        "source": "registry",
+        "statute": "22 U.S.C. §§ 2751-2799aa-2"
+      },
+      {
+        "regulationId": "export-administration-act-of-1979",
+        "name": "Export Administration Act of 1979",
+        "source": "registry",
+        "statute": "Export Controls Act of 2018"
+      },
+      {
+        "regulationId": "foreign-assets-control-regulations",
+        "name": "Foreign Assets Control Regulations",
+        "source": "registry",
+        "statute": "22 U.S.C. § 7201-7211"
+      },
+      {
+        "regulationId": "international-emergency-economic-powers-act",
+        "name": "International Emergency Economic Powers Act",
+        "source": "registry",
+        "statute": "50 U.S.C. §§ 1701-1707"
+      },
+      {
+        "regulationId": "international-traffic-in-arms-regulations-itar",
+        "name": "International Traffic in Arms Regulations (ITAR)",
+        "source": "registry",
+        "statute": "22 U.S.C. § 2778"
+      },
+      {
+        "regulationId": "trading-with-the-enemy-act-of-1917",
+        "name": "Trading with the Enemy Act of 1917",
+        "source": "registry",
+        "statute": "22 U.S.C. § 7201-7211"
+      },
+      {
+        "regulationId": "contracts-with-third-party-servicers",
+        "name": "Contracts with Third Party Servicers",
+        "source": "registry",
+        "statute": "20 U.S.C. § 1094(c)"
+      },
+      {
+        "regulationId": "higher-education-act-aid-application-verification",
+        "name": "Higher Education Act: Aid Application Verification",
+        "source": "registry",
+        "statute": "Public Law No. 110-315"
+      },
+      {
+        "regulationId": "higher-education-act-audits",
+        "name": "Higher Education Act: Audits",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "higher-education-act-borrower-defense-to-repayment",
+        "name": "Higher Education Act: Borrower Defense to Repayment",
+        "source": "registry",
+        "statute": "20 U.S.C. § 1087e(h)"
+      },
+      {
+        "regulationId": "higher-education-act-cash-management",
+        "name": "Higher Education Act: Cash Management",
+        "source": "registry",
+        "statute": "Public Law No. 110-315"
+      },
+      {
+        "regulationId": "higher-education-act-code-of-conduct",
+        "name": "Higher Education Act: Code of Conduct",
+        "source": "registry",
+        "statute": "20 U.S.C. § 1094"
+      },
+      {
+        "regulationId": "higher-education-act-cohort-default-rate",
+        "name": "Higher Education Act: Cohort Default Rate",
+        "source": "registry",
+        "statute": "20 U.S.C. § 1015a"
+      },
+      {
+        "regulationId": "higher-education-act-eligibility-and-certification",
+        "name": "Higher Education Act: Eligibility and Certification",
+        "source": "registry",
+        "statute": "Public Law No. 110-315"
+      },
+      {
+        "regulationId": "higher-education-act-entrance-and-exit-counseling",
+        "name": "Higher Education Act: Entrance and Exit Counseling",
+        "source": "registry",
+        "statute": "Public Law No. 110-315"
+      },
+      {
+        "regulationId": "higher-education-act-federal-supplemental-educatio",
+        "name": "Higher Education Act: Federal Supplemental Educational Opportunity Grant Program",
+        "source": "registry",
+        "statute": "Public Law No. 110-315"
+      },
+      {
+        "regulationId": "higher-education-act-federal-work-study",
+        "name": "Higher Education Act: Federal Work Study",
+        "source": "registry",
+        "statute": "Public Law No. 110-315"
+      },
+      {
+        "regulationId": "higher-education-act-financial-responsibility-requ",
+        "name": "Higher Education Act: Financial Responsibility Requirements",
+        "source": "registry",
+        "statute": "20 U.S.C. § 1094"
+      },
+      {
+        "regulationId": "higher-education-act-information-distributed-to-st",
+        "name": "Higher Education Act: Information Distributed to Students",
+        "source": "registry",
+        "statute": "Public Law No. 110-315"
+      },
+      {
+        "regulationId": "higher-education-act-net-price-calculator",
+        "name": "Higher Education Act: Net Price Calculator",
+        "source": "registry",
+        "statute": "20 U.S.C. § 1015"
+      },
+      {
+        "regulationId": "higher-education-act-plus-loans",
+        "name": "Higher Education Act: PLUS Loans",
+        "source": "registry",
+        "statute": "Public Law No. 110-315"
+      },
+      {
+        "regulationId": "higher-education-act-penalties-for-drug-violations",
+        "name": "Higher Education Act: Penalties for Drug Violations",
+        "source": "registry",
+        "statute": "20 U.S.C. 1092(k)"
+      },
+      {
+        "regulationId": "higher-education-act-perkins-loans",
+        "name": "Higher Education Act: Perkins Loans",
+        "source": "registry",
+        "statute": "Public Law No. 110-315"
+      },
+      {
+        "regulationId": "higher-education-act-preferred-lenders",
+        "name": "Higher Education Act: Preferred Lenders",
+        "source": "registry",
+        "statute": "Public Law No. 110-315"
+      },
+      {
+        "regulationId": "higher-education-act-program-participation-agreeme",
+        "name": "Higher Education Act: Program Participation Agreements",
+        "source": "registry",
+        "statute": "20 U.S.C. § 1094"
+      },
+      {
+        "regulationId": "higher-education-act-record-retention",
+        "name": "Higher Education Act: Record Retention",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "higher-education-act-standard-of-conduct",
+        "name": "Higher Education Act: Standard of Conduct",
+        "source": "registry",
+        "statute": "Public Law No. 110-315"
+      },
+      {
+        "regulationId": "qualified-tuition-and-student-loan-interest-report",
+        "name": "Qualified Tuition and Student Loan Interest Reporting",
+        "source": "registry",
+        "statute": "26 U.S.C. § 6050S"
+      },
+      {
+        "regulationId": "student-loan-default-prevention-initiative-act-of-",
+        "name": "Student Loan Default Prevention Initiative Act of 1990",
+        "source": "registry",
+        "statute": "20 U.S.C. §§ 1001-1019d"
+      },
+      {
+        "regulationId": "student-right-to-know-act",
+        "name": "Student Right to Know Act",
+        "source": "registry",
+        "statute": "20 U.S.C. § 1092"
+      },
+      {
+        "regulationId": "teacher-preparation-programs",
+        "name": "Teacher Preparation Programs",
+        "source": "registry",
+        "statute": "20 U.S.C. §§ 1022 - 1022h"
+      },
+      {
+        "regulationId": "title-ix-of-the-education-amendment-of-1972",
+        "name": "Title IX of the Education Amendment of 1972",
+        "source": "registry",
+        "statute": "20 U.S.C. §§ 1681-1688"
+      },
+      {
+        "regulationId": "controlling-the-assault-of-non-solicited-pornograp",
+        "name": "Controlling the Assault of Non-Solicited Pornography And Marketing Act of 2003 (CAN-SPAM Act)",
+        "source": "registry",
+        "statute": "15 U.S.C. §§ 7701-7713"
+      },
+      {
+        "regulationId": "higher-education-act-code-of-conduct",
+        "name": "Higher Education Act: Code of Conduct",
+        "source": "registry",
+        "statute": "20 U.S.C. § 1094"
+      },
+      {
+        "regulationId": "higher-education-act-foreign-gift-and-contract-rep",
+        "name": "Higher Education Act: Foreign Gift and Contract Reports",
+        "source": "registry",
+        "statute": "20 U.S.C. § 1011f"
+      },
+      {
+        "regulationId": "internal-revenue-code-substantiation-and-disclosur",
+        "name": "Internal Revenue Code: Substantiation and Disclosure Provisions",
+        "source": "registry",
+        "statute": "26 U.S.C. § 170"
+      },
+      {
+        "regulationId": "pension-protection-act",
+        "name": "Pension Protection Act",
+        "source": "registry",
+        "statute": "26 U.S.C. § 170"
+      },
+      {
+        "regulationId": "philanthropy-protection-act-of-1995",
+        "name": "Philanthropy Protection Act of 1995",
+        "source": "registry",
+        "statute": "Public Law No. 104-62"
+      },
+      {
+        "regulationId": "federal-sentencing-guidelines",
+        "name": "Federal Sentencing Guidelines",
+        "source": "registry",
+        "statute": "18 U.S.C. chapters 227-235"
+      },
+      {
+        "regulationId": "internal-revenue-service-governance-information-re",
+        "name": "Internal Revenue Service: Governance Information Required on Form 990",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "unknown",
+        "name": "Unknown Regulation",
+        "source": "registry",
+        "statute": "Department of Health and Human Services Grants Policy Statement"
+      },
+      {
+        "regulationId": "byrd-amendment",
+        "name": "Byrd Amendment",
+        "source": "registry",
+        "statute": "31 U.S.C. § 1352"
+      },
+      {
+        "regulationId": "department-of-education-general-administrative-reg",
+        "name": "Department of Education General Administrative Regulations and Other Applicable Grant Regulations",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "false-claims-act",
+        "name": "False Claims Act",
+        "source": "registry",
+        "statute": "31 U.S.C. §§ 3729-3733"
+      },
+      {
+        "regulationId": "federal-awardee-performance-and-integrity-informat",
+        "name": "Federal Awardee Performance and Integrity Information System (FAPIIS)",
+        "source": "registry",
+        "statute": "Public Law No. 110-417, § 872"
+      },
+      {
+        "regulationId": "federal-funding-accountability-and-transparency-ac",
+        "name": "Federal Funding Accountability and Transparency Act of 2006 (FFATA)",
+        "source": "registry",
+        "statute": "Public Law No. 109-282"
+      },
+      {
+        "regulationId": "fraud-enforcement-and-recovery-act-of-2009-fera",
+        "name": "Fraud Enforcement and Recovery Act of 2009 (FERA)",
+        "source": "registry",
+        "statute": "Public Law No. 111-21"
+      },
+      {
+        "regulationId": "controlled-substances-act",
+        "name": "Controlled Substances Act",
+        "source": "registry",
+        "statute": "21 U.S.C. §§ 801-889"
+      },
+      {
+        "regulationId": "hipaa",
+        "name": "HIPAA",
+        "source": "registry",
+        "statute": "Public Law No. 104-191"
+      },
+      {
+        "regulationId": "higher-education-opportunity-act",
+        "name": "Higher Education Opportunity Act",
+        "source": "registry",
+        "statute": "Public Law No. 110-315"
+      },
+      {
+        "regulationId": "americans-with-disabilities-act-of-1990",
+        "name": "Americans with Disabilities Act of 1990",
+        "source": "registry",
+        "statute": "42 U.S.C. §§ 12101-12213"
+      },
+      {
+        "regulationId": "section-504-of-the-rehabilitation-act-of-1973",
+        "name": "Section 504 of The Rehabilitation Act of 1973",
+        "source": "registry",
+        "statute": "29 U.S.C. § 701"
+      },
+      {
+        "regulationId": "title-ix-of-the-education-amendment-of-1972",
+        "name": "Title IX of the Education Amendment of 1972",
+        "source": "registry",
+        "statute": "20 U.S.C. §§ 1681-1688"
+      },
+      {
+        "regulationId": "health-insurance-portability-and-accountability-ac",
+        "name": "Health Insurance Portability and Accountability Act",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "nsf-grant-term-and-condition-september-21-2018",
+        "name": "NSF grant term and condition, September 21, 2018",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "student-exchange-and-visitor-information-system-se",
+        "name": "Student Exchange and Visitor Information System (SEVIS)",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "immigration-and-nationality-act-ina",
+        "name": "Immigration and Nationality Act (INA)",
+        "source": "registry",
+        "statute": "8 U.S.C. §§ 1101-1537"
+      },
+      {
+        "regulationId": "communications-assistance-for-law-enforcement-act-",
+        "name": "Communications Assistance for Law Enforcement Act (CALEA)",
+        "source": "registry",
+        "statute": "47 U.S.C. §§ 1001-1010"
+      },
+      {
+        "regulationId": "controlling-the-assault-of-non-solicited-pornograp",
+        "name": "Controlling the Assault of Non-Solicited Pornography And Marketing Act of 2003 (CAN-SPAM Act)",
+        "source": "registry",
+        "statute": "15 U.S.C. §§ 7701-7713"
+      },
+      {
+        "regulationId": "digital-millennium-copyright-act-dmca",
+        "name": "Digital Millennium Copyright Act (DMCA)",
+        "source": "registry",
+        "statute": "Public Law 105-304"
+      },
+      {
+        "regulationId": "electronic-communications-privacy-act-of-1986",
+        "name": "Electronic Communications Privacy Act of 1986",
+        "source": "registry",
+        "statute": "18 U.S.C. §§ 2510-2523 (Wiretap)"
+      },
+      {
+        "regulationId": "fcc-cable-certification",
+        "name": "FCC – Cable Certification",
+        "source": "registry",
+        "statute": "47 U.S.C. § 151"
+      },
+      {
+        "regulationId": "fcc-fixed-microwave-services-licensing",
+        "name": "FCC – Fixed Microwave Services, Licensing",
+        "source": "registry",
+        "statute": "47 U.S.C. § 151"
+      },
+      {
+        "regulationId": "fcc-wireless-communications-licensing",
+        "name": "FCC – Wireless Communications, Licensing",
+        "source": "registry",
+        "statute": "47 U.S.C. § 151"
+      },
+      {
+        "regulationId": "hazardous-materials-transportation-act",
+        "name": "Hazardous Materials Transportation Act",
+        "source": "registry",
+        "statute": "49 U.S.C. §§ 5101-5128"
+      },
+      {
+        "regulationId": "higher-education-opportunity-act",
+        "name": "Higher Education Opportunity Act",
+        "source": "registry",
+        "statute": "Public Law No. 110-315"
+      },
+      {
+        "regulationId": "homeland-security-act-of-2002",
+        "name": "Homeland Security Act of 2002",
+        "source": "registry",
+        "statute": "6 U.S.C. §§ 101 – 674"
+      },
+      {
+        "regulationId": "junk-fax-prevention-act-of-2005",
+        "name": "Junk Fax Prevention Act of 2005",
+        "source": "registry",
+        "statute": "Public Law 109–21"
+      },
+      {
+        "regulationId": "no-electronic-theft-act",
+        "name": "No Electronic Theft Act",
+        "source": "registry",
+        "statute": "No Electronic Theft (NET) Act"
+      },
+      {
+        "regulationId": "telemarketing",
+        "name": "Telemarketing",
+        "source": "registry",
+        "statute": "47 U.S.C. § 227"
+      },
+      {
+        "regulationId": "american-jobs-creation-act-of-2004",
+        "name": "American Jobs Creation Act of 2004",
+        "source": "registry",
+        "statute": "26 U.S.C. § 170"
+      },
+      {
+        "regulationId": "bayh-dole-act-of-1980",
+        "name": "Bayh-Dole Act of 1980",
+        "source": "registry",
+        "statute": "35 U.S.C. §§ 200-212"
+      },
+      {
+        "regulationId": "cooperative-research-and-technology-enhancement-ac",
+        "name": "Cooperative Research and Technology Enhancement Act (CREATE Act)",
+        "source": "registry",
+        "statute": "Public Law No. 108-453"
+      },
+      {
+        "regulationId": "trademark-revision-act",
+        "name": "Trademark Revision Act",
+        "source": "registry",
+        "statute": "15 U.S.C. § 1051"
+      },
+      {
+        "regulationId": "u-s-patent-act",
+        "name": "U.S. Patent Act",
+        "source": "registry",
+        "statute": "35 U.S.C. §§ 1-390"
+      },
+      {
+        "regulationId": "visual-artists-rights-act",
+        "name": "Visual Artists Rights Act",
+        "source": "registry",
+        "statute": "17 U.S.C. § 106A"
+      },
+      {
+        "regulationId": "foreign-agents-registration-act-of-1938",
+        "name": "Foreign Agents Registration Act of 1938",
+        "source": "registry",
+        "statute": "22 U.S.C. §§§ 611-621"
+      },
+      {
+        "regulationId": "foreign-corrupt-practices-act-fcpa",
+        "name": "Foreign Corrupt Practices Act (FCPA)",
+        "source": "registry",
+        "statute": "15 U.S.C. §§ 78dd-1, et seq."
+      },
+      {
+        "regulationId": "honest-leadership-and-open-government-act-of-2007",
+        "name": "Honest Leadership and Open Government Act of 2007",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "house-and-senate-gift-ban-and-ethics-rules",
+        "name": "House and Senate Gift Ban and Ethics Rules",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "lobbying-disclosure-act",
+        "name": "Lobbying Disclosure Act",
+        "source": "registry",
+        "statute": "2 U.S.C. §§ 1601-1614"
+      },
+      {
+        "regulationId": "political-activities",
+        "name": "Political Activities",
+        "source": "registry",
+        "statute": "IRC § 501 (c )(3)"
+      },
+      {
+        "regulationId": "americans-with-disabilities-act-of-1990",
+        "name": "Americans with Disabilities Act of 1990",
+        "source": "registry",
+        "statute": "42 U.S.C. §§ 12101-12213"
+      },
+      {
+        "regulationId": "children-s-online-privacy-protection-act-of-1998-c",
+        "name": "Children’s Online Privacy Protection Act of 1998 (COPPA)",
+        "source": "registry",
+        "statute": "15 U.S.C. §  6501"
+      },
+      {
+        "regulationId": "electronic-communications-privacy-act",
+        "name": "Electronic Communications Privacy Act",
+        "source": "registry",
+        "statute": "18 U.S.C. §§ 2510-2523 (Wiretap)"
+      },
+      {
+        "regulationId": "fair-credit-reporting-act-fcra",
+        "name": "Fair Credit Reporting Act (FCRA)",
+        "source": "registry",
+        "statute": "15 U.S.C. §§ 1681-1681x"
+      },
+      {
+        "regulationId": "fair-and-accurate-credit-transaction-act-facta",
+        "name": "Fair and Accurate Credit Transaction Act (FACTA)",
+        "source": "registry",
+        "statute": "Public Law No. 108-159"
+      },
+      {
+        "regulationId": "family-educational-rights-and-privacy-act-ferpa",
+        "name": "Family Educational Rights and Privacy Act (FERPA)",
+        "source": "registry",
+        "statute": "20 U.S.C. § 1232g"
+      },
+      {
+        "regulationId": "federal-information-security-management-act-fisma",
+        "name": "Federal Information Security Management Act (FISMA)",
+        "source": "registry",
+        "statute": "44 U.S.C. § 35"
+      },
+      {
+        "regulationId": "freedom-of-information-act",
+        "name": "Freedom of Information Act",
+        "source": "registry",
+        "statute": "5 U.S.C. § 552"
+      },
+      {
+        "regulationId": "gramm-leach-bliley-act-glba",
+        "name": "Gramm Leach Bliley Act (GLBA)",
+        "source": "registry",
+        "statute": "15 U.S.C. § 6801"
+      },
+      {
+        "regulationId": "hipaa",
+        "name": "HIPAA",
+        "source": "registry",
+        "statute": "Public Law No. 104-191"
+      },
+      {
+        "regulationId": "health-information-technology-for-economic-and-cli",
+        "name": "Health Information Technology for Economic and Clinical Health (HITECH) Act of 2009",
+        "source": "registry",
+        "statute": "Public Law No. 111-5"
+      },
+      {
+        "regulationId": "higher-education-act-financial-value-transparency-",
+        "name": "Higher Education Act Financial Value Transparency & Gainful Employment",
+        "source": "registry",
+        "statute": "20 U.S.C. §§ 1001, 1002"
+      },
+      {
+        "regulationId": "higher-education-act-credit-hour-definition",
+        "name": "Higher Education Act: Credit Hour Definition",
+        "source": "registry",
+        "statute": "20 U.S.C. §§ 1001, 1002"
+      },
+      {
+        "regulationId": "higher-education-act-incentive-compensation-prohib",
+        "name": "Higher Education Act: Incentive Compensation Prohibition",
+        "source": "registry",
+        "statute": "20 U.S.C. § 1094"
+      },
+      {
+        "regulationId": "higher-education-act-misrepresentation",
+        "name": "Higher Education Act: Misrepresentation",
+        "source": "registry",
+        "statute": "20 U.S.C. § 1094"
+      },
+      {
+        "regulationId": "higher-education-act-state-authorization",
+        "name": "Higher Education Act: State Authorization",
+        "source": "registry",
+        "statute": "20 U.S.C. §§ 1001, 1002"
+      },
+      {
+        "regulationId": "drug-alcohol-testing-of-transportation-employees",
+        "name": "Drug & Alcohol Testing of Transportation Employees",
+        "source": "registry",
+        "statute": "49 U.S.C. § 31144"
+      },
+      {
+        "regulationId": "drug-free-workplace-act",
+        "name": "Drug Free Workplace Act",
+        "source": "registry",
+        "statute": "41 U.S.C. §§ 701-707"
+      },
+      {
+        "regulationId": "employee-polygraph-protection-act",
+        "name": "Employee Polygraph Protection Act",
+        "source": "registry",
+        "statute": "29 U.S.C. §§ 2001-2009"
+      },
+      {
+        "regulationId": "fair-credit-reporting-act-fcra",
+        "name": "Fair Credit Reporting Act (FCRA)",
+        "source": "registry",
+        "statute": "15 U.S.C. §§ 1681-1681x"
+      },
+      {
+        "regulationId": "federal-volunteer-protection-act",
+        "name": "Federal Volunteer Protection Act",
+        "source": "registry",
+        "statute": "Public Law No. 105-19"
+      },
+      {
+        "regulationId": "immigration-and-nationality-act",
+        "name": "Immigration and Nationality Act",
+        "source": "registry",
+        "statute": "8 U.S.C. §§ 1101-1537"
+      },
+      {
+        "regulationId": "worker-adjustment-and-retraining-notification-act-",
+        "name": "Worker Adjustment and Retraining Notification Act (WARN)",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "america-competes-act",
+        "name": "America COMPETES Act",
+        "source": "registry",
+        "statute": "Public Law No. 111-358"
+      },
+      {
+        "regulationId": "animal-welfare-act",
+        "name": "Animal Welfare Act",
+        "source": "registry",
+        "statute": "7 U.S.C. §§ 2131-2159"
+      },
+      {
+        "regulationId": "clinical-trials-financial-disclosures-by-investiga",
+        "name": "Clinical Trials § Financial Disclosures by Investigator",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "export-administration-regulations",
+        "name": "Export Administration Regulations",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "food-and-drug-administration-fda-amendments-act-of",
+        "name": "Food and Drug Administration (FDA) Amendments Act of 2007",
+        "source": "registry",
+        "statute": "Public Law No. 110-85"
+      },
+      {
+        "regulationId": "national-science-foundation-research-misconduct-po",
+        "name": "National Science Foundation Research Misconduct Policies",
+        "source": "registry",
+        "statute": "42 U.S.C. § 1870(a)"
+      },
+      {
+        "regulationId": "native-american-graves-protection-and-repatriation",
+        "name": "Native American Graves Protection and Repatriation Act (NAGPRA)",
+        "source": "registry",
+        "statute": "25 U.S.C. 32"
+      },
+      {
+        "regulationId": "protection-of-human-subjects-regulations-common-ru",
+        "name": "Protection of Human Subjects Regulations (Common Rule)",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "public-health-service-policies-on-research-miscond",
+        "name": "Public Health Service Policies on Research Misconduct",
+        "source": "registry",
+        "statute": "42 U.S.C. § 241"
+      },
+      {
+        "regulationId": "responsibility-of-applicants-for-promoting-objecti",
+        "name": "Responsibility of Applicants for Promoting Objectivity in Research for which PHS Funding is Sought",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "small-unmanned-aircraft-systems",
+        "name": "Small Unmanned Aircraft Systems",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "deferred-compensation",
+        "name": "Deferred Compensation",
+        "source": "registry",
+        "statute": "26 U.S.C. § 457"
+      },
+      {
+        "regulationId": "employee-annuities",
+        "name": "Employee Annuities",
+        "source": "registry",
+        "statute": "26 U.S.C. § 403"
+      },
+      {
+        "regulationId": "employee-retirement-income-security-act-of-1974-er",
+        "name": "Employee Retirement Income Security Act of 1974 (ERISA)",
+        "source": "registry",
+        "statute": "29 U.S.C. Chapter 18"
+      },
+      {
+        "regulationId": "nonqualified-deferred-inclusion",
+        "name": "Nonqualified Deferred Inclusion",
+        "source": "registry",
+        "statute": "26 U.S.C. § 409A"
+      },
+      {
+        "regulationId": "qualified-pensions",
+        "name": "Qualified Pensions",
+        "source": "registry",
+        "statute": "26 U.S.C. § 401"
+      },
+      {
+        "regulationId": "campus-sex-crimes-prevention-act-1601-of-the-victi",
+        "name": "Campus Sex Crimes Prevention Act (§ 1601 of the Victims of Trafficking and Violence Protection Act of 2000)",
+        "source": "registry",
+        "statute": "Public Law No. 106-386 (Title VI)"
+      },
+      {
+        "regulationId": "jeanne-clery-disclosure-of-campus-security-policy-",
+        "name": "Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Act (Clery Act) and Violence Against Women Act (VAWA)",
+        "source": "registry",
+        "statute": "20 U.S.C. § 1092(f)"
+      },
+      {
+        "regulationId": "title-ix-of-the-education-amendment-of-1972",
+        "name": "Title IX of the Education Amendment of 1972",
+        "source": "registry",
+        "statute": "20 U.S.C. §§ 1681-1688"
+      },
+      {
+        "regulationId": "title-vii-of-the-civil-rights-act-of-1964",
+        "name": "Title VII of the Civil Rights Act of 1964",
+        "source": "registry",
+        "statute": "42 U.S.C. §§ 2000e-2000e-17"
+      },
+      {
+        "regulationId": "byrd-amendment",
+        "name": "Byrd Amendment",
+        "source": "registry",
+        "statute": "31 U.S.C. § 1352"
+      },
+      {
+        "regulationId": "cafeteria-plans-26-u-s-c-125",
+        "name": "Cafeteria Plans 26 U.S.C. § 125",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "charitable-gift-annuity-antitrust-relief-act",
+        "name": "Charitable Gift Annuity Antitrust Relief Act",
+        "source": "registry",
+        "statute": "15 U.S.C. § 37"
+      },
+      {
+        "regulationId": "deferred-compensation",
+        "name": "Deferred Compensation",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "employee-annuities",
+        "name": "Employee Annuities",
+        "source": "registry",
+        "statute": "26 U.S.C. § 403"
+      },
+      {
+        "regulationId": "federal-unemployment-tax-act",
+        "name": "Federal Unemployment Tax Act",
+        "source": "registry",
+        "statute": "26 U.S.C. §§ 3301-3311"
+      },
+      {
+        "regulationId": "foreign-bank-accounts-and-tax-filings",
+        "name": "Foreign Bank Accounts and Tax Filings",
+        "source": "registry",
+        "statute": "31 U.S.C. § 5314(a)"
+      },
+      {
+        "regulationId": "fringe-benefits",
+        "name": "Fringe Benefits",
+        "source": "registry",
+        "statute": "26 U.S.C. § 132"
+      },
+      {
+        "regulationId": "independent-contractors",
+        "name": "Independent Contractors",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "industrial-alcohol-user-permits-and-special-tax",
+        "name": "Industrial Alcohol User Permits and Special Tax",
+        "source": "registry",
+        "statute": "26 U.S.C. §§ 5001-5692"
+      },
+      {
+        "regulationId": "nonqualified-deferred-inclusion",
+        "name": "Nonqualified Deferred Inclusion",
+        "source": "registry",
+        "statute": "26 U.S.C. § 409A"
+      },
+      {
+        "regulationId": "public-disclosure-of-material",
+        "name": "Public Disclosure of Material",
+        "source": "registry",
+        "statute": "26 U.S.C. § 6104(d)"
+      },
+      {
+        "regulationId": "qualified-pensions",
+        "name": "Qualified Pensions",
+        "source": "registry",
+        "statute": "26 U.S.C. § 401"
+      },
+      {
+        "regulationId": "qualified-tuition-and-student-loan-interest-report",
+        "name": "Qualified Tuition and Student Loan Interest Reporting",
+        "source": "registry",
+        "statute": "26 U.S.C. Sec. 6050S"
+      },
+      {
+        "regulationId": "reporting-of-payments-of-royalties",
+        "name": "Reporting of Payments of Royalties",
+        "source": "registry",
+        "statute": "20 U.S.C. § 6041"
+      },
+      {
+        "regulationId": "small-business-job-protection-act",
+        "name": "Small Business Job Protection Act",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "unrelated-business-income-ubit",
+        "name": "Unrelated Business Income (UBIT)",
+        "source": "registry",
+        "statute": "26 U.S.C. 511(a)(2)"
+      },
+      {
+        "regulationId": "civil-service-reform-act-of-1978",
+        "name": "Civil Service Reform Act of 1978",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "national-labor-relations-act",
+        "name": "National Labor Relations Act",
+        "source": "registry",
+        "statute": "Unknown"
+      },
+      {
+        "regulationId": "consumer-credit-protection-act-title-iii-ccpa-garn",
+        "name": "Consumer Credit Protection Act, Title III (CCPA) – Garnishments",
+        "source": "registry",
+        "statute": "15 U.S.C. § 1673"
+      },
+      {
+        "regulationId": "fair-labor-standards-act-flsa",
+        "name": "Fair Labor Standards Act (FLSA)",
+        "source": "registry",
+        "statute": "29 U.S.C. §§ 201-219"
+      },
+      {
+        "regulationId": "federal-insurance-contributions-act-fica",
+        "name": "Federal Insurance Contributions Act (FICA)",
+        "source": "registry",
+        "statute": "42 U.S.C. §§ 401-434"
+      },
+      {
+        "regulationId": "federal-unemployment-tax-act",
+        "name": "Federal Unemployment Tax Act",
+        "source": "registry",
+        "statute": "26 U.S.C. §§ 3301-3311"
+      },
+      {
+        "regulationId": "qualified-tuition-reductions",
+        "name": "Qualified Tuition Reductions",
+        "source": "registry",
+        "statute": "Publication"
+      },
+      {
+        "regulationId": "reg-66",
+        "name": "The TEACH Act (17 U",
+        "source": "enhanced",
+        "inRegistry": false,
+        "hasFullText": true,
+        "hasRequirements": true,
+        "auditScore": 94
+      }
+    ],
+    "state_pennsylvania": [
+      {
+        "regulationId": "consumer-credit-protection-act-title-iii-ccpa-garn",
+        "name": "CCPA Title III limits employee wage garnishments to 25% of disposable earnings or amounts exceeding 30x federal minimum wage weekly, whichever is less, and prohibits employment discrimination based on garnishment status with $1,000 penalties",
+        "source": "enhanced",
+        "inRegistry": true,
+        "hasFullText": true,
+        "hasRequirements": true,
+        "auditScore": 93
+      },
+      {
+        "regulationId": "pennsylvania-english-fluency-in-higher-education-a",
+        "name": "Pennsylvania statute requiring higher education institutions to ensure English language proficiency of all instructional faculty through assessment, testing, and student complaint procedures, with state funding penalties for non-compliance",
+        "source": "enhanced",
+        "inRegistry": false,
+        "hasFullText": true,
+        "hasRequirements": true,
+        "auditScore": 96
+      },
+      {
+        "regulationId": "pennsylvania-graduation-rates-reporting-act",
+        "name": "This regulation implements Pennsylvania's Graduation Rates Reporting Act, requiring all public educational institutions to submit comprehensive annual reports on graduation and retention rates",
+        "source": "enhanced",
+        "inRegistry": false,
+        "hasFullText": true,
+        "hasRequirements": true,
+        "auditScore": 95
+      },
+      {
+        "regulationId": "pennsylvania-higher-education-gift-disclosure-act",
+        "name": "Pennsylvania Act requiring higher education institutions to disclose gifts exceeding $50,000 individually or $100,000 aggregate annually, with enhanced reporting for foreign contributions above $25,000, enforced through state audits and funding penalties",
+        "source": "enhanced",
+        "inRegistry": false,
+        "hasFullText": true,
+        "hasRequirements": true,
+        "auditScore": 93
+      },
+      {
+        "regulationId": "pennsylvania-higher-education-standards",
+        "name": "22 Pa",
+        "source": "enhanced",
+        "inRegistry": false,
+        "hasFullText": true,
+        "hasRequirements": true,
+        "auditScore": 95
+      },
+      {
+        "regulationId": "pennsylvania-institutional-accreditation",
+        "name": "Pennsylvania's Institutional Accreditation Requirements (22 Pa",
+        "source": "enhanced",
+        "inRegistry": false,
+        "hasFullText": true,
+        "hasRequirements": true,
+        "auditScore": 95
+      },
+      {
+        "regulationId": "pennsylvania-sexual-violence-education-act",
+        "name": "The Pennsylvania Sexual Violence Education Act requires all public school districts to implement age-appropriate sexual violence prevention education programs from grades K-12",
+        "source": "enhanced",
+        "inRegistry": false,
+        "hasFullText": true,
+        "hasRequirements": true,
+        "auditScore": 95
+      },
+      {
+        "regulationId": "pennsylvania-student-consumer-protection",
+        "name": "Pennsylvania Student Consumer Protection Standards under 22 Pa",
+        "source": "enhanced",
+        "inRegistry": false,
+        "hasFullText": true,
+        "hasRequirements": true,
+        "auditScore": 95
+      },
+      {
+        "regulationId": "pennsylvania-uniform-crime-reporting-act",
+        "name": "Pennsylvania's Uniform Crime Reporting Act requires higher education institutions with sworn police departments to submit monthly crime statistics to state authorities within ten days of month-end, encompassing detailed incident data",
+        "source": "enhanced",
+        "inRegistry": false,
+        "hasFullText": true,
+        "hasRequirements": true,
+        "auditScore": 96
+      },
+      {
+        "regulationId": "pa-padeptEd-1741813075521",
+        "name": "Pa PadeptEd 1741813075521",
+        "source": "console_only",
+        "inRegistry": false
+      },
+      {
+        "regulationId": "pa-padeptEd-1741813212673",
+        "name": "Pa PadeptEd 1741813212673",
+        "source": "console_only",
+        "inRegistry": false
+      },
+      {
+        "regulationId": "pa-paeducation-1741813075070",
+        "name": "Pa Paeducation 1741813075070",
+        "source": "console_only",
+        "inRegistry": false
+      },
+      {
+        "regulationId": "pennsylvania-graduation-rates-reporting-act-88-of-",
+        "name": "Pennsylvania Graduation Rates Reporting Act 88 Of ",
+        "source": "console_only",
+        "inRegistry": false
+      },
+      {
+        "regulationId": "pennsylvania-sexual-violence-education-act-article-",
+        "name": "Pennsylvania Sexual Violence Education Act Article ",
+        "source": "console_only",
+        "inRegistry": false
+      }
+    ],
+    "state_new_jersey": [
+      {
+        "regulationId": "new-jersey-campus-sex-assault-victim-bill-of-rights",
+        "name": "New Jersey's Campus Sexual Assault Victim Bill of Rights mandates comprehensive protections for sexual assault victims at higher education institutions",
+        "source": "enhanced",
+        "inRegistry": false,
+        "hasFullText": true,
+        "hasRequirements": true,
+        "auditScore": 95
+      },
+      {
+        "regulationId": "new-jersey-hazing-prevention",
+        "name": "The New Jersey Anti-Hazing Law criminalizes hazing activities in educational institutions and student organizations, defining hazing as intentional actions causing mental or physical discomfort, embarrassment, or harassment",
+        "source": "enhanced",
+        "inRegistry": false,
+        "hasFullText": true,
+        "hasRequirements": true,
+        "auditScore": 95
+      },
+      {
+        "regulationId": "new-jersey-licensure-accreditation-standards",
+        "name": "N",
+        "source": "enhanced",
+        "inRegistry": false,
+        "hasFullText": true,
+        "hasRequirements": true,
+        "auditScore": 95
+      },
+      {
+        "regulationId": "new-jersey-tuition-aid-grant-program",
+        "name": "N",
+        "source": "enhanced",
+        "inRegistry": false,
+        "hasFullText": true,
+        "hasRequirements": true,
+        "auditScore": 95
+      },
+      {
+        "regulationId": "new-jersey-uniform-crime-reporting",
+        "name": "N",
+        "source": "enhanced",
+        "inRegistry": false,
+        "hasFullText": true,
+        "hasRequirements": true,
+        "auditScore": 95
+      },
+      {
+        "regulationId": "new-jersey-veterans-benefits-compliance",
+        "name": "N",
+        "source": "enhanced",
+        "inRegistry": false,
+        "hasFullText": true,
+        "hasRequirements": true,
+        "auditScore": 95
+      }
+    ],
+    "state_other": [],
+    "international": []
+  },
+  "totals": {
+    "federal": 296,
+    "state_pennsylvania": 14,
+    "state_new_jersey": 6,
+    "state_other": 0,
+    "international": 0,
+    "total_unique": 254,
+    "in_registry": 295,
+    "missing_from_registry": 63
+  },
+  "missing_from_registry": [
+    {
+      "regulationId": "new-jersey-campus-sex-assault-victim-bill-of-rights",
+      "source": "enhanced_folder",
+      "hasConsole": false
+    },
+    {
+      "regulationId": "new-jersey-hazing-prevention",
+      "source": "enhanced_folder",
+      "hasConsole": false
+    },
+    {
+      "regulationId": "new-jersey-licensure-accreditation-standards",
+      "source": "enhanced_folder",
+      "hasConsole": false
+    },
+    {
+      "regulationId": "new-jersey-tuition-aid-grant-program",
+      "source": "enhanced_folder",
+      "hasConsole": false
+    },
+    {
+      "regulationId": "new-jersey-uniform-crime-reporting",
+      "source": "enhanced_folder",
+      "hasConsole": false
+    },
+    {
+      "regulationId": "new-jersey-veterans-benefits-compliance",
+      "source": "enhanced_folder",
+      "hasConsole": false
+    },
+    {
+      "regulationId": "pennsylvania-english-fluency-in-higher-education-a",
+      "source": "enhanced_folder",
+      "hasConsole": true
+    },
+    {
+      "regulationId": "pennsylvania-graduation-rates-reporting-act",
+      "source": "enhanced_folder",
+      "hasConsole": false
+    },
+    {
+      "regulationId": "pennsylvania-higher-education-gift-disclosure-act",
+      "source": "enhanced_folder",
+      "hasConsole": true
+    },
+    {
+      "regulationId": "pennsylvania-higher-education-standards",
+      "source": "enhanced_folder",
+      "hasConsole": false
+    },
+    {
+      "regulationId": "pennsylvania-institutional-accreditation",
+      "source": "enhanced_folder",
+      "hasConsole": false
+    },
+    {
+      "regulationId": "pennsylvania-sexual-violence-education-act",
+      "source": "enhanced_folder",
+      "hasConsole": false
+    },
+    {
+      "regulationId": "pennsylvania-student-consumer-protection",
+      "source": "enhanced_folder",
+      "hasConsole": false
+    },
+    {
+      "regulationId": "pennsylvania-uniform-crime-reporting-act",
+      "source": "enhanced_folder",
+      "hasConsole": true
+    },
+    {
+      "regulationId": "reg-66",
+      "source": "enhanced_folder",
+      "hasConsole": false
+    },
+    {
+      "regulationId": "academic-standards",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "accreditation-requirements",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "affirmative-action",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "americans-with-disabilities-act-compliance",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "assessment-and-evaluation",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "campus-security-act",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "civil-rights-compliance",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "community-health",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "compliance-monitoring",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "data-management",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "diversity-and-inclusion",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "emergency-preparedness",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "environmental-health",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "equal-opportunity-employment",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "faculty-qualifications",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "family-educational-rights-and-privacy-act-ferpa-20",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "financial-aid-administration",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "global-health",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "harassment-prevention",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "health-promotion",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "information-security",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "infrastructure-requirements",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "institutional-research",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "insurance-requirements",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "liability-coverage",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "non-discrimination-policies",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "occupational-health",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "pa-padeptEd-1741813075521",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "pa-padeptEd-1741813212673",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "pa-paeducation-1741813075070",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "pennsylvania-graduation-rates-reporting-act-88-of-",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "pennsylvania-sexual-violence-education-act-article-",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "privacy-protection",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "programs-majors",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "property-protection",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "public-health",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "quality-assurance",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "record-keeping",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "reporting-requirements",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "risk-management",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "safety-and-security",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "section-504-compliance",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "state-board-of-higher-education",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "student-complaints-html",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "student-services",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "technology-standards",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "title-ix-compliance",
+      "source": "console_page",
+      "hasEnhanced": false
+    },
+    {
+      "regulationId": "workplace-safety",
+      "source": "console_page",
+      "hasEnhanced": false
+    }
+  ],
+  "pa_regulation_details": [
+    {
+      "regulationId": "consumer-credit-protection-act-title-iii-ccpa-garn",
+      "name": "CCPA Title III limits employee wage garnishments to 25% of disposable earnings or amounts exceeding 30x federal minimum wage weekly, whichever is less, and prohibits employment discrimination based on garnishment status with $1,000 penalties",
+      "source": "enhanced",
+      "inRegistry": true,
+      "hasFullText": true,
+      "hasRequirements": true,
+      "auditScore": 93,
+      "statute": null,
+      "category": "Student Affairs",
+      "topic": "Student Services",
+      "summary": "CCPA Title III limits employee wage garnishments to 25% of disposable earnings or amounts exceeding 30x federal minimum wage weekly, whichever is less, and prohibits employment discrimination based on garnishment status with $1,000 penalties.",
+      "requirements": "## Garnishment Calculation Compliance\n- Calculate maximum garnishment as lesser of 25% disposable earnings or amount exceeding $217.50 weekly\n- Implement payroll systems ensuring accurate disposable earnings calculations after required legal deductions\n- Establish procedures for handling multiple garnishment orders with proper priority sequencing\n\n## Anti-Retaliation Protections\n- Prohibit discharge, discipline, or discrimination against employees subject to garnishment for single indebtedness\n- Train HR personnel on 15 U.S.C. § 1674 compliance requirements and $1,000 penalty provisions\n- Document garnishment-related employment decisions to demonstrate compliance\n\n## Multi-State Operations\n- Review state garnishment laws in all operating jurisdictions for employee-favorable provisions\n- Implement systems applying most protective garnishment limitations between federal and state law\n- Maintain current knowledge of state law changes affecting garnishment calculations",
+      "completeness": 100
+    },
+    {
+      "regulationId": "pennsylvania-english-fluency-in-higher-education-a",
+      "name": "Pennsylvania statute requiring higher education institutions to ensure English language proficiency of all instructional faculty through assessment, testing, and student complaint procedures, with state funding penalties for non-compliance",
+      "source": "enhanced",
+      "inRegistry": false,
+      "hasFullText": true,
+      "hasRequirements": true,
+      "auditScore": 96,
+      "statute": null,
+      "category": "Academic Standards",
+      "topic": "Academic Affairs",
+      "summary": "Pennsylvania statute requiring higher education institutions to ensure English language proficiency of all instructional faculty through assessment, testing, and student complaint procedures, with state funding penalties for non-compliance.",
+      "requirements": "## Core Assessment Requirements\n- Conduct English proficiency testing for all new instructional faculty before classroom assignment\n- Maintain TOEFL iBT speaking scores ≥26 or IELTS speaking band scores ≥8.0 for non-native speakers\n- Implement institutional assessment protocols approved by Pennsylvania Department of Education\n- Complete assessments within 30 days of hiring or appointment\n\n## Student Complaint Procedures\n- Establish formal complaint mechanisms for students to report instructor communication issues\n- Investigate all formal complaints within 30-day timeframe\n- Provide written responses to complainants with specific remedial actions\n- Maintain appeal processes allowing Department of Education review\n\n## Faculty Remediation Programs\n- Provide English language improvement resources for faculty not meeting standards\n- Complete remedial instruction within 12-month period\n- Document all remediation efforts and outcomes\n- Implement employment actions for faculty failing to achieve proficiency\n\n## Record Maintenance\n- Retain all proficiency test results and assessment documentation\n- Maintain complaint records and institutional responses for five-year period\n- Document all remedial actions and faculty improvement plans",
+      "completeness": 100
+    },
+    {
+      "regulationId": "pennsylvania-graduation-rates-reporting-act",
+      "name": "This regulation implements Pennsylvania's Graduation Rates Reporting Act, requiring all public educational institutions to submit comprehensive annual reports on graduation and retention rates",
+      "source": "enhanced",
+      "inRegistry": false,
+      "hasFullText": true,
+      "hasRequirements": true,
+      "auditScore": 95,
+      "statute": null,
+      "category": "Academic Standards",
+      "topic": "Academic Affairs",
+      "summary": "This regulation implements Pennsylvania's Graduation Rates Reporting Act, requiring all public educational institutions to submit comprehensive annual reports on graduation and retention rates. Reports must include demographic breakdowns, program-specific data, and employment outcomes. Institutions must use standardized cohort methodology and submit reports by March 15 annually. The Department of Education will compile statewide summaries and make data publicly available. Non-compliance may result in withheld state funding and required improvement plans.",
+      "requirements": [
+        "Submit annual graduation rate reports with demographic disaggregation by gender, race, ethnicity, first-generation status, and financial aid status",
+        "Provide program-specific graduation rates for all degree and certificate programs offered by the institution",
+        "Report retention rates, transfer-out rates, and employment outcomes data for graduates within specified timeframes",
+        "Use standardized cohort methodology consistent with federal IPEDS reporting standards for data calculation",
+        "Maintain comprehensive student tracking systems and supporting documentation for all reported graduation rate data"
+      ],
+      "completeness": 100
+    },
+    {
+      "regulationId": "pennsylvania-higher-education-gift-disclosure-act",
+      "name": "Pennsylvania Act requiring higher education institutions to disclose gifts exceeding $50,000 individually or $100,000 aggregate annually, with enhanced reporting for foreign contributions above $25,000, enforced through state audits and funding penalties",
+      "source": "enhanced",
+      "inRegistry": false,
+      "hasFullText": true,
+      "hasRequirements": true,
+      "auditScore": 93,
+      "statute": "22 Pa. Code § 31.41",
+      "category": "Academic Standards",
+      "topic": "Academic Affairs",
+      "summary": "Pennsylvania Act requiring higher education institutions to disclose gifts exceeding $50,000 individually or $100,000 aggregate annually, with enhanced reporting for foreign contributions above $25,000, enforced through state audits and funding penalties.",
+      "requirements": "## Disclosure Thresholds\n- Report individual gifts of $50,000 or more from any single source\n- Disclose aggregate contributions of $100,000+ per donor within fiscal year\n- Enhanced reporting for foreign gifts exceeding $25,000 under 24 P.S. § 2510-A(d)\n\n## Record Maintenance\n- Maintain comprehensive donor identification records\n- Document gift value, purpose, and attached conditions\n- Preserve supporting documentation for minimum seven years\n\n## Public Reporting\n- Submit annual disclosure reports to PA Department of Education\n- Publish gift information on institutional website within 90 days of fiscal year-end\n- Include gifts-in-kind, endowments, and naming rights agreements per 22 Pa. Code § 31.41\n\n## Compliance Infrastructure\n- Designate qualified gift disclosure officer\n- Implement staff training programs on disclosure obligations\n- Establish donor notification procedures regarding transparency requirements",
+      "completeness": 100
+    },
+    {
+      "regulationId": "pennsylvania-higher-education-standards",
+      "name": "22 Pa",
+      "source": "enhanced",
+      "inRegistry": false,
+      "hasFullText": true,
+      "hasRequirements": true,
+      "auditScore": 95,
+      "statute": null,
+      "category": "Academic Standards",
+      "topic": "Academic Affairs",
+      "summary": "22 Pa. Code Ch. 31 establishes comprehensive academic and operational standards for Pennsylvania higher education institutions. The regulation covers academic program quality, institutional governance, faculty qualifications, student services, facilities, and distance learning requirements. Institutions must maintain appropriate accreditation, demonstrate financial stability, provide adequate student support services, and ensure faculty meet terminal degree requirements. Compliance is monitored through annual reporting, periodic reviews, and site visits by the Pennsylvania Department of Education. Non-compliance may result in probationary status, operational restrictions, or loss of authorization. The regulation promotes educational quality, student protection, and institutional accountability across all degree-granting institutions operating in Pennsylvania.",
+      "requirements": "• Maintain regional accreditation and specialized program accreditation where applicable\n• Ensure 75% of credit hours are taught by appropriately qualified full-time faculty with terminal degrees\n• Conduct comprehensive program reviews every five years with documented learning outcomes assessment\n• Submit annual compliance reports including financial audits, student data, and program effectiveness metrics\n• Maintain adequate financial reserves and demonstrate fiscal stability through multi-year financial planning\n• Provide comprehensive student support services including academic advising, career counseling, and disability services\n• Implement robust student complaint processes with annual reporting to the Department of Education\n• Participate in statewide transfer articulation agreements and maintain transparent credit transfer policies\n• Ensure physical facilities and technology infrastructure meet current educational and accessibility standards\n• Maintain FERPA-compliant student records management with appropriate security measures",
+      "completeness": 100
+    },
+    {
+      "regulationId": "pennsylvania-institutional-accreditation",
+      "name": "Pennsylvania's Institutional Accreditation Requirements (22 Pa",
+      "source": "enhanced",
+      "inRegistry": false,
+      "hasFullText": true,
+      "hasRequirements": true,
+      "auditScore": 95,
+      "statute": null,
+      "category": "Accreditation",
+      "topic": "Accreditation & Quality",
+      "summary": "Pennsylvania's Institutional Accreditation Requirements (22 Pa. Code Ch. 36) mandate that all degree-granting institutions obtain Department of Education authorization and maintain recognized accreditation. Key requirements include demonstrated financial stability through audited statements and surety bonds, qualified faculty with appropriate credentials, adequate physical facilities and learning resources, comprehensive student services, and transparent consumer disclosures. The Department conducts ongoing oversight through annual reporting, site visits, and complaint investigations. Non-compliance may result in warnings, probation, fines, or revocation of operating authority. Authorization renewal occurs every five years with comprehensive institutional review. Institutions must notify the Department of material changes and maintain detailed compliance documentation.",
+      "requirements": [
+        "• Obtain and maintain regional or national accreditation from a U.S. Department of Education recognized accrediting agency",
+        "• Submit annual audited financial statements prepared by certified public accountants and maintain required surety bonds or escrow accounts",
+        "• Employ faculty with appropriate academic credentials (master's degree minimum for undergraduate instruction, doctoral for graduate programs)",
+        "• Maintain adequate physical facilities, library resources, and technological infrastructure to support educational programs",
+        "• Provide comprehensive student services including academic advising, financial aid administration, and accurate transcript maintenance",
+        "• Submit annual institutional reports including enrollment data, financial information, and program outcomes by specified deadlines",
+        "• Notify the Department within 30 days of any material changes to ownership, governance, financial status, or program offerings",
+        "• Maintain transparent consumer disclosures regarding program costs, graduation rates, and employment outcomes",
+        "• Develop and maintain teach-out plans and student record preservation procedures in case of institutional closure",
+        "• Renew institutional authorization every five years through comprehensive application process submitted 12 months before expiration"
+      ],
+      "completeness": 100
+    },
+    {
+      "regulationId": "pennsylvania-sexual-violence-education-act",
+      "name": "The Pennsylvania Sexual Violence Education Act requires all public school districts to implement age-appropriate sexual violence prevention education programs from grades K-12",
+      "source": "enhanced",
+      "inRegistry": false,
+      "hasFullText": true,
+      "hasRequirements": true,
+      "auditScore": 95,
+      "statute": null,
+      "category": "Campus Safety",
+      "topic": "Safety & Security",
+      "summary": "The Pennsylvania Sexual Violence Education Act requires all public school districts to implement age-appropriate sexual violence prevention education programs from grades K-12. Districts must use qualified instructors, trauma-informed approaches, and evidence-based curricula while maintaining parent notification requirements. Programs must address consent, healthy relationships, bystander intervention, and available resources. Schools must establish clear reporting protocols, collaborate with community partners, and maintain supportive environments that encourage disclosure of incidents.",
+      "requirements": [
+        "Implement developmentally appropriate sexual violence prevention education for grades K-12 using state-approved, evidence-based curricula delivered by specially trained instructors",
+        "Establish clear parent/guardian notification procedures with advance notice of program content, material review opportunities, and opt-out provisions with alternative activities",
+        "Provide annual training for all school personnel on recognizing signs of sexual violence, responding to disclosures, and fulfilling mandatory reporting obligations",
+        "Collaborate with local sexual assault service providers, law enforcement, and community partners to enhance program effectiveness and student resource access",
+        "Maintain trauma-informed, inclusive programs that address the needs of all students regardless of gender identity, sexual orientation, race, ethnicity, or disability status"
+      ],
+      "completeness": 100
+    },
+    {
+      "regulationId": "pennsylvania-student-consumer-protection",
+      "name": "Pennsylvania Student Consumer Protection Standards under 22 Pa",
+      "source": "enhanced",
+      "inRegistry": false,
+      "hasFullText": true,
+      "hasRequirements": true,
+      "auditScore": 95,
+      "statute": null,
+      "category": "Student Affairs",
+      "topic": "Student Services",
+      "summary": "Pennsylvania Student Consumer Protection Standards under 22 Pa. Code Chapter 40 establish comprehensive transparency and accountability requirements for higher education institutions. The regulation mandates accurate disclosure of program information, costs, and outcomes while prohibiting deceptive marketing practices. Institutions must maintain clear complaint resolution procedures, designate compliance officers, and provide detailed financial information including refund policies. Special provisions address online education, career programs, and institutional closure procedures. Enforcement includes monitoring, investigations, and progressive sanctions. Annual reporting and documentation requirements ensure ongoing compliance. These standards protect student consumers while maintaining educational quality and institutional integrity throughout Pennsylvania's higher education system.",
+      "requirements": "• Designate a qualified compliance officer with direct access to senior leadership and authority to oversee consumer protection compliance\n• Maintain current, accurate catalogs and websites with complete program information, requirements, graduation criteria, and time-to-completion estimates\n• Provide detailed cost breakdowns including tuition, mandatory fees, living expenses, and program-specific costs with functioning net price calculators\n• Establish clear, accessible student complaint resolution procedures with multiple review levels, reasonable timelines, and proper documentation\n• Ensure all marketing materials and recruitment practices contain truthful, accurate information about programs, outcomes, and institutional achievements\n• Implement comprehensive record-keeping systems maintaining student communications, financial transactions, and academic progress documentation for required retention periods\n• Provide equivalent support services and clear technology requirements for online and distance education students\n• Develop and maintain institutional closure and teach-out plans with appropriate notification procedures\n• Submit required annual compliance reports, student outcome data, and financial stability indicators to the Pennsylvania Department of Education",
+      "completeness": 100
+    },
+    {
+      "regulationId": "pennsylvania-uniform-crime-reporting-act",
+      "name": "Pennsylvania's Uniform Crime Reporting Act requires higher education institutions with sworn police departments to submit monthly crime statistics to state authorities within ten days of month-end, encompassing detailed incident data",
+      "source": "enhanced",
+      "inRegistry": false,
+      "hasFullText": true,
+      "hasRequirements": true,
+      "auditScore": 96,
+      "statute": "18 Pa.C.S. § 9101 et seq",
+      "category": "Campus Safety",
+      "topic": "Safety & Security",
+      "summary": "Pennsylvania's Uniform Crime Reporting Act requires higher education institutions with sworn police departments to submit monthly crime statistics to state authorities within ten days of month-end, encompassing detailed incident data.",
+      "requirements": "## Crime Data Reporting\n- Submit monthly UCR reports within 10 days of month conclusion per 18 Pa.C.S. § 9103\n- Report all Part I offenses occurring within institutional jurisdiction\n- Include arrest data for Part II offenses including drug, weapon, and liquor violations\n- Utilize NIBRS format for detailed incident reporting as of January 2021\n\n## Institutional Coverage\n- Applies to institutions operating certified police departments under 22 Pa. Code § 1-3\n- Campus security without arrest powers exempt from PUCRA requirements\n- Coordinate reporting with federal Clery Act obligations\n\n## Data Quality Standards\n- Provide geographic location details for each reported incident\n- Include victim demographics and offense circumstances\n- Document bias incidents and hate crime classifications per Act 16 of 2020\n- Maintain accuracy standards subject to Pennsylvania State Police audit",
+      "completeness": 100
+    }
+  ],
+  "nj_regulation_details": [
+    {
+      "regulationId": "new-jersey-campus-sex-assault-victim-bill-of-rights",
+      "name": "New Jersey's Campus Sexual Assault Victim Bill of Rights mandates comprehensive protections for sexual assault victims at higher education institutions",
+      "source": "enhanced",
+      "inRegistry": false,
+      "hasFullText": true,
+      "hasRequirements": true,
+      "auditScore": 95,
+      "statute": "N.J.S.A. 18A:61E-1 et seq",
+      "category": "Campus Safety",
+      "topic": "Safety & Security",
+      "summary": "New Jersey's Campus Sexual Assault Victim Bill of Rights mandates comprehensive protections for sexual assault victims at higher education institutions. The law requires colleges and universities to provide fair investigation procedures, support services including free counseling and medical care, trained personnel, confidentiality protections, and academic accommodations. Institutions must maintain clear policies, coordinate with law enforcement while respecting victim choice in reporting, and ensure disciplinary proceedings meet strict fairness standards within established timeframes.",
+      "completeness": 100
+    },
+    {
+      "regulationId": "new-jersey-hazing-prevention",
+      "name": "The New Jersey Anti-Hazing Law criminalizes hazing activities in educational institutions and student organizations, defining hazing as intentional actions causing mental or physical discomfort, embarrassment, or harassment",
+      "source": "enhanced",
+      "inRegistry": false,
+      "hasFullText": true,
+      "hasRequirements": true,
+      "auditScore": 95,
+      "statute": "N.J.S.A. 2C:40-3 et seq",
+      "category": "Campus Safety",
+      "topic": "Safety & Security",
+      "summary": "The New Jersey Anti-Hazing Law criminalizes hazing activities in educational institutions and student organizations, defining hazing as intentional actions causing mental or physical discomfort, embarrassment, or harassment. The law establishes criminal penalties ranging from disorderly persons offenses to third-degree crimes depending on severity. Educational institutions must implement anti-hazing policies, provide prevention education, investigate incidents, and maintain reporting procedures. The statute includes whistleblower protections, extends to off-campus activities, and explicitly states that consent is not a defense for hazing activities.",
+      "completeness": 100
+    },
+    {
+      "regulationId": "new-jersey-licensure-accreditation-standards",
+      "name": "N",
+      "source": "enhanced",
+      "inRegistry": false,
+      "hasFullText": true,
+      "hasRequirements": true,
+      "auditScore": 95,
+      "statute": "N.J.A.C. 9A:1-1 et seq",
+      "category": "Accreditation",
+      "topic": "Accreditation & Quality",
+      "summary": "N.J.A.C. 9A:1-1 establishes accreditation standards for New Jersey post-secondary institutions, requiring recognized accrediting agency approval, institutional stability, qualified faculty, adequate facilities, and financial viability. Institutions undergo comprehensive review cycles every ten years with interim monitoring. Standards address academic quality, student services, faculty requirements, financial accountability, and continuous improvement. Compliance monitoring includes annual reporting, site visits, and progressive sanctions for non-compliance, with appeals processes available.",
+      "completeness": 100
+    },
+    {
+      "regulationId": "new-jersey-tuition-aid-grant-program",
+      "name": "N",
+      "source": "enhanced",
+      "inRegistry": false,
+      "hasFullText": true,
+      "hasRequirements": true,
+      "auditScore": 95,
+      "statute": "N.J.A.C. 9A:9-2",
+      "category": "Financial Aid",
+      "topic": "Student Financial Services",
+      "summary": "N.J.A.C. 9A:9-2 governs New Jersey's Tuition Aid Grant Program compliance, requiring participating institutions to verify student eligibility, maintain detailed records, accurately calculate and disburse awards, and submit regular compliance reports. The regulation establishes residency requirements, academic progress standards, refund procedures, and documentation retention requirements. Institutions must undergo periodic audits and face penalties for non-compliance including program suspension.",
+      "completeness": 100
+    },
+    {
+      "regulationId": "new-jersey-uniform-crime-reporting",
+      "name": "N",
+      "source": "enhanced",
+      "inRegistry": false,
+      "hasFullText": true,
+      "hasRequirements": true,
+      "auditScore": 95,
+      "statute": "N.J.S.A. 52:17B-5",
+      "category": "Campus Safety",
+      "topic": "Safety & Security",
+      "summary": "N.J.S.A. 52:17B-5.1 requires New Jersey higher education institutions to report criminal incidents to state police using Uniform Crime Reporting standards. Institutions must designate trained officials to collect and submit crime data monthly, maintain public incident logs, and coordinate with local law enforcement. Reporting covers violent crimes, property crimes, drug offenses, and disciplinary violations occurring on campus and adjacent properties. Emergency incidents require 24-hour notification, with comprehensive annual reports due by March 1st.",
+      "completeness": 100
+    },
+    {
+      "regulationId": "new-jersey-veterans-benefits-compliance",
+      "name": "N",
+      "source": "enhanced",
+      "inRegistry": false,
+      "hasFullText": true,
+      "hasRequirements": true,
+      "auditScore": 95,
+      "statute": "N.J.S.A. 18A:62-6",
+      "category": "Veterans Services",
+      "topic": "Veterans Services",
+      "summary": "N.J.S.A. 18A:62-6 establishes tuition benefits for qualified New Jersey veterans and their dependents at state institutions of higher education. The program covers full tuition and fees at public institutions, with equivalent support at private colleges. Eligible participants include honorably discharged veterans who were New Jersey residents upon military entry, plus certain dependents of deceased or missing service members. Institutions must designate certified veterans' education officials, maintain comprehensive records, verify student eligibility and academic progress, coordinate with federal benefits, and provide veteran-supportive campus environments and services.",
+      "completeness": 100
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "regulationId": "drug-free-workplace-act",
+  "enhanced": {
+    "fullText": "The Drug-Free Workplace Act of 1988, codified at 41 U.S.C. §§ 8101-8106 (formerly 41 U.S.C. §§ 701-707), establishes mandatory requirements for federal contractors and grantees, including higher education institutions, to maintain drug-free work environments. This comprehensive federal mandate applies to any university or college receiving federal contracts valued at $25,000 or more, or any amount of federal grant funding.\n\nUnder 41 U.S.C. § 8102, covered institutions must provide formal certification of their commitment to maintaining a drug-free workplace. The statute requires six core compliance elements that universities must implement and maintain throughout the contract or grant period. First, institutions must publish and distribute a comprehensive drug-free workplace policy statement to all employees working on federally funded projects, explicitly prohibiting the unlawful manufacture, distribution, dispensing, possession, or use of controlled substances as defined under the Controlled Substances Act (21 U.S.C. § 812).\n\nImplementing regulations at 48 CFR 23.501-23.506 and 2 CFR 182.200-182.300 detail specific procedural requirements. Universities must establish ongoing drug-free awareness programs educating employees about workplace drug policies, available counseling and rehabilitation programs, and potential penalties. Unlike some federal drug policies, the Act specifically does not mandate or authorize drug testing of employees.\n\nCritical reporting obligations under 41 U.S.C. § 8104 require employees to notify their institution within five days of any criminal drug statute conviction occurring in the workplace. Universities must then notify the relevant federal agency within ten calendar days of learning about such convictions. Failure to meet this notification timeline constitutes a material breach of federal compliance.\n\nEnforcement mechanisms under 41 U.S.C. § 8105 authorize federal agencies to suspend payments, terminate contracts or grants, and debar institutions from future federal funding opportunities for up to five years. The Department of Education's regulations at 2 CFR 3485.300 specifically address enforcement procedures for educational grantees. Universities must impose appropriate sanctions on convicted employees, ranging from disciplinary action to termination, or require satisfactory completion of approved drug abuse assistance or rehabilitation programs.\n\nRecent interpretive guidance from the Office of Federal Contract Compliance Programs clarifies that remote work locations are considered part of the workplace when employees perform federally funded activities. This expansion significantly broadens universities' compliance monitoring obligations, particularly relevant given increased remote work arrangements post-2020.",
+    "summary": "The Drug-Free Workplace Act requires universities receiving $25,000+ in federal contracts or any federal grants to certify drug-free workplaces, publish prohibition policies, maintain awareness programs, report employee drug convictions within ten days, and impose appropriate sanctions or risk five-year debarment.",
+    "requirements": "## Policy Development and Distribution\n- Publish written drug-free workplace policy prohibiting controlled substance violations per 41 U.S.C. § 8102(a)(1)\n- Distribute policy to all employees working on federal contracts/grants\n- Specify consequences for policy violations and available rehabilitation resources\n\n## Employee Awareness and Training\n- Establish ongoing drug-free awareness program per 41 U.S.C. § 8102(a)(3)\n- Educate employees about drug abuse dangers and available counseling services\n- Conduct regular training sessions for federally funded project personnel\n\n## Conviction Reporting System\n- Require employees to report workplace drug convictions within 5 days per 41 U.S.C. § 8104(b)\n- Notify federal contracting/grant agency within 10 calendar days of learning about convictions\n- Maintain documentation of all reported incidents and agency notifications\n\n## Sanctions and Remedial Actions\n- Impose appropriate disciplinary measures on convicted employees per 41 U.S.C. § 8102(a)(6)\n- Require completion of approved drug abuse assistance programs as alternative to termination\n- Document all sanctions imposed and compliance with remedial requirements",
+    "reportingRequirements": "Universities must notify relevant federal agencies within 10 calendar days upon learning of employee drug conviction occurring in workplace per 41 U.S.C. § 8104. Annual certification renewals required for ongoing contracts. Event-triggered reporting includes immediate notification of policy violations and quarterly compliance attestations to contracting officers."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T18:06:36.414Z"
+  },
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "I-9 Form Audit",
+      "type": "audit",
+      "description": "I-9 Form Audit for Drug Free Workplace Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Background Check Policy Review",
+      "type": "review",
+      "description": "Background Check Policy Review for Drug Free Workplace Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Recruitment Hiring & Termination"
+  ]
+}

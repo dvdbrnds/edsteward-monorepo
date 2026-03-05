@@ -1,0 +1,34 @@
+{
+  "regulationId": "higher-education-act-state-authorization",
+  "enhanced": {
+    "fullText": "The Higher Education Act State Authorization requirement, codified at 20 U.S.C. §§ 1001-1002 and implemented through 34 CFR § 600.9, mandates that institutions of higher education obtain proper legal authorization from each state where they operate to maintain Title IV federal student aid eligibility. This comprehensive regulatory framework ensures institutional accountability and student protection across state boundaries.\n\nUnder 34 CFR § 600.9(a), institutions must demonstrate compliance with state legal authorization standards in every jurisdiction where they enroll students or maintain a physical presence. For distance education and correspondence programs, 34 CFR § 600.9(c) requires authorization in each state where students are enrolled, unless exempted by state law or covered under State Authorization Reciprocity Agreements (SARA) pursuant to 20 U.S.C. § 1099c.\n\nKey provisions include mandatory disclosure requirements under 34 CFR § 668.43(a)(5)(i), requiring institutions to provide enrolled and prospective students with accreditation documents and state authorization information upon request. Institutions must maintain current contact information for state complaint processes and regulatory agencies as specified in 34 CFR § 668.43(b).\n\nThe regulation's scope encompasses all Title IV-eligible institutions operating across state lines, including those offering online programs, maintaining branch campuses, or conducting educational activities in multiple states. Enforcement mechanisms include loss of Title IV eligibility, financial penalties, and program suspension as outlined in 34 CFR § 600.40.\n\nRecent amendments effective July 1, 2018, under 34 CFR § 600.9(f), strengthened disclosure requirements for distance education programs and clarified complaint resolution procedures. Institutions must now document state-specific complaint processes and provide individualized program disclosures to distance education students.\n\nNon-compliance penalties include immediate Title IV funding suspension, required teach-out plans under 34 CFR § 602.24, and potential institutional closure proceedings. The Department of Education conducts periodic compliance reviews and may impose provisional certification requirements for institutions with authorization deficiencies.",
+    "summary": "Federal regulation requiring higher education institutions to obtain proper state authorization in all jurisdictions where they operate or enroll students to maintain Title IV financial aid eligibility, with mandatory disclosure and complaint resolution procedures.",
+    "requirements": "## State Authorization Compliance\n- Obtain legal authorization in every state where institution operates or enrolls students per 34 CFR § 600.9(a)\n- Maintain SARA membership or individual state authorizations for distance education programs\n- Document authorization status changes within 30 days of occurrence\n\n## Disclosure Obligations\n- Provide accreditation and state authorization documents upon student request under 34 CFR § 668.43(a)(5)(i)\n- Maintain current state complaint contact information for all operational jurisdictions\n- Post individualized program disclosures for distance education offerings\n\n## Distance Education Requirements\n- Secure authorization in each state enrolling distance/correspondence students per 34 CFR § 600.9(c)\n- Document state-specific complaint resolution processes\n- Implement program-specific disclosure protocols for online students\n\n## Monitoring and Reporting\n- Conduct annual authorization status reviews for all operational states\n- Report authorization changes to Department of Education within required timeframes\n- Maintain compliance documentation for federal audit purposes",
+    "reportingRequirements": "Institutions must report state authorization changes to the Department of Education within 30 days of occurrence. Annual compliance certifications are due with institutional eligibility renewals. Event-triggered reporting required for authorization denials, revocations, or significant regulatory changes affecting Title IV eligibility status in any operational state."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T16:18:39.871Z"
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Compliance Review",
+      "type": "review",
+      "description": "Annual Compliance Review for Higher Education Act: State Authorization",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Program Integrity Rules"
+  ]
+}

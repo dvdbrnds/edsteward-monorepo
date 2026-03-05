@@ -1,0 +1,63 @@
+{
+  "regulationId": "pennsylvania-sexual-violence-education-act",
+  "schemaVersion": "2.0",
+
+  "jurisdiction": {
+    "source": "state",
+    "countryCode": "US",
+    "stateCodes": ["PA"],
+    "label": "Pennsylvania",
+    "regulatoryBody": "Pennsylvania Department of Education",
+    "actNumber": "Act 16 of 2014",
+    "applicability": "all",
+    "notes": "APPLIES TO K-12 PUBLIC SCHOOL DISTRICTS ONLY. For higher education institutions, see PA Act 55 of 2022 (pennsylvania-act-55-of-2022-sexual-violence-higher-ed). Act 55 of 2022 amended and expanded Article XX-G, replacing the original K-12 scope with comprehensive higher education mandates including MOU requirements with rape crisis centers."
+  },
+
+  "enhanced": {
+    "fullText": "The Pennsylvania Sexual Violence Education Act, codified under 24 P.S. Section 5104 (Act 16 of 2014, original Article XX-G), establishes requirements for sexual violence prevention education in public school districts throughout the Commonwealth. NOTE: This regulation applies to K-12 public school districts only. Higher education institutions are governed by the amended Article XX-G under Act 55 of 2022.\n\nAll public school districts in Pennsylvania must implement sexual violence prevention education programs that align with state-approved curricula and evidence-based practices. The education must be developmentally appropriate and delivered by qualified instructors who have received specialized training in sexual violence prevention and trauma-informed approaches.\n\nFor elementary grades (K-5), instruction shall focus on body safety, appropriate versus inappropriate touch, personal boundaries, and trusted adult communication. Students must learn to identify safe adults and understand basic concepts of consent appropriate to their developmental level. Content must emphasize empowerment and personal safety without creating fear or anxiety.\n\nMiddle school programs (grades 6-8) shall expand upon foundational concepts to include more detailed discussions of personal boundaries, healthy relationships, peer pressure, digital citizenship related to sexual content, and bystander intervention strategies. Students must receive information about available resources and reporting mechanisms within the school and community.\n\nHigh school curricula (grades 9-12) must provide comprehensive education covering consent, sexual assault prevention, dating violence, stalking, harassment, and the intersection of substance use and sexual violence. Programs shall address the impact of technology and social media on sexual violence, including non-consensual sharing of intimate images and online exploitation.\n\nAll programs must incorporate trauma-informed practices and recognize that students may have experienced sexual violence. Instructors must be prepared to respond appropriately to disclosures and connect students with appropriate resources. Content must be inclusive of all students regardless of gender identity, sexual orientation, race, ethnicity, or disability status.\n\nSchool districts must establish clear policies regarding parent/guardian notification about sexual violence education programs. Parents must receive advance notice of program content and have the opportunity to review materials. Districts must provide alternative educational activities for students whose parents exercise opt-out provisions while ensuring these students still receive essential safety information.\n\nDistricts shall collaborate with local sexual assault service providers, law enforcement agencies, and other community partners to enhance program effectiveness and ensure students have access to appropriate resources.\n\nSchools must maintain safe and supportive environments that encourage reporting of sexual violence incidents. Clear reporting protocols must be established, communicated to all students and staff, and regularly reviewed. All school personnel must receive annual training on recognizing signs of sexual violence, responding to disclosures, and fulfilling mandatory reporting obligations.\n\nThe regulation requires districts to collect and maintain data on program implementation, student participation rates, and outcomes measures where appropriate. This information must be reported annually to the Pennsylvania Department of Education.",
+    "summary": "The Pennsylvania Sexual Violence Education Act (Act 16 of 2014) requires K-12 public school districts to implement age-appropriate sexual violence prevention education programs. NOTE: This does NOT apply to higher education institutions — see PA Act 55 of 2022 for higher ed requirements.",
+    "requirements": "## K-12 Education Program\n- Implement developmentally appropriate sexual violence prevention education for grades K-12\n- Use state-approved, evidence-based curricula delivered by specially trained instructors\n- Incorporate trauma-informed, inclusive practices for all students\n\n## Parent Notification\n- Establish parent/guardian notification procedures with advance notice\n- Provide material review opportunities and opt-out provisions with alternatives\n\n## Staff Training\n- Provide annual training for all school personnel on recognizing signs, responding to disclosures, and mandatory reporting\n\n## Partnerships\n- Collaborate with local sexual assault service providers, law enforcement, and community partners\n\n## Reporting\n- Report annually to PA Department of Education on program implementation and outcomes",
+    "reportingRequirements": "Annual reporting to Pennsylvania Department of Education by June 30th each year, including program implementation data, student participation rates, staff training completion, community partnerships established, and outcome measures."
+  },
+
+  "deadlines": [
+    {
+      "date": "continuous",
+      "label": "Annual Reporting to PDE",
+      "type": "reporting",
+      "description": "Annual reporting to Pennsylvania Department of Education by June 30th on program implementation data and outcomes.",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+
+  "relationships": [
+    {
+      "targetSlug": "pennsylvania-act-55-of-2022-sexual-violence-higher-ed",
+      "type": "related",
+      "notes": "Act 55 of 2022 amended and expanded Article XX-G for higher education. This original Act 16 of 2014 version applies to K-12 only."
+    }
+  ],
+
+  "tags": [
+    "Campus Safety and Security",
+    "Sexual Misconduct",
+    "K-12 Education",
+    "Violence Prevention"
+  ],
+
+  "audit": {
+    "score": 95,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 95,
+      "requirements": 95,
+      "deadlines": 70
+    },
+    "timestamp": "2026-03-03T00:00:00.000Z"
+  },
+
+  "statute": "24 P.S. § 20-2001 et seq. (Act 16 of 2014)",
+  "topic": "Sexual Misconduct"
+}

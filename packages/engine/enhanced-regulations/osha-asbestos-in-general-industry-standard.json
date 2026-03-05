@@ -1,0 +1,50 @@
+{
+  "regulationId": "osha-asbestos-in-general-industry-standard",
+  "enhanced": {
+    "fullText": "The OSHA Asbestos in General Industry Standard, codified at 29 CFR § 1910.1001, establishes comprehensive workplace safety requirements for higher education institutions to protect employees from asbestos exposure during non-construction activities. This federal regulation, authorized under the Occupational Safety and Health Act of 1970 (29 U.S.C. § 651 et seq.), mandates that universities maintain airborne asbestos concentrations below 0.1 fiber per cubic centimeter of air as an eight-hour time-weighted average (TWA) and 1.0 fiber per cubic centimeter for 30-minute excursion limits.\n\nUniversities must conduct initial exposure monitoring in all work areas where employees may reasonably be expected to encounter asbestos at or above the permissible exposure limit (PEL). Under 29 CFR § 1910.1001(d), institutions must notify affected employees of monitoring results within 15 working days and post results in accessible locations for at least 30 days. Subsequent monitoring frequency depends on initial results: quarterly monitoring when exposure exceeds the PEL, semi-annually when between the action level (0.05 f/cc) and PEL, and annually when at or below the action level.\n\nThe regulation requires universities to establish regulated areas when airborne concentrations exceed or reasonably could exceed the PEL, implement engineering controls and work practices to reduce exposure, and provide appropriate respiratory protection when engineering controls are insufficient. Medical surveillance programs under 29 CFR § 1910.1001(l) are mandatory for employees exposed at or above the action level for 30 or more days per year, including initial examinations, annual pulmonary function tests, and chest X-rays.\n\nViolations can result in OSHA citations with penalties up to $15,625 per serious violation and $156,259 per willful or repeated violation under 29 U.S.C. § 666. The regulation applies to university operations including maintenance, custodial services, laboratory work, and facility management activities involving potential asbestos exposure, but excludes construction and demolition activities covered under 29 CFR § 1926.1101. Recent updates in 2019 clarified notification requirements and strengthened medical surveillance provisions for higher education facilities built before 1980.",
+    "summary": "OSHA's Asbestos Standard requires universities to maintain airborne asbestos levels below 0.1 f/cc TWA, conduct exposure monitoring, notify employees within 15 days, implement engineering controls, and provide medical surveillance for at-risk personnel.",
+    "requirements": "## Exposure Monitoring and Assessment\n- Conduct initial monitoring in areas where employees may be exposed at or above 0.05 f/cc action level\n- Perform quarterly monitoring when exposure exceeds PEL, semi-annual when between action level and PEL\n- Use NIOSH-approved sampling and analytical methods per 29 CFR § 1910.1001(d)\n\n## Employee Notification and Training\n- Notify employees of monitoring results within 15 working days\n- Post monitoring results in accessible locations for minimum 30 days\n- Provide annual asbestos awareness training for potentially exposed personnel\n\n## Medical Surveillance Program\n- Implement medical surveillance for employees exposed ≥ action level for 30+ days annually\n- Arrange initial medical examinations, annual pulmonary function tests, and chest X-rays\n- Maintain confidential medical records per 29 CFR § 1910.1020\n\n## Protective Measures and Controls\n- Establish regulated areas when airborne concentrations exceed or could exceed PEL\n- Implement engineering controls and work practices to minimize exposure\n- Provide appropriate respiratory protection when engineering controls insufficient",
+    "reportingRequirements": "Submit monitoring results to employees within 15 working days of receipt. Maintain exposure records for 30 years and medical surveillance records for duration of employment plus 30 years per 29 CFR § 1910.1020."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T01:19:34.700Z"
+  },
+  "deadlines": [
+    {
+      "date": "02-01",
+      "label": "OSHA 300 Log Posting",
+      "type": "posting",
+      "description": "OSHA 300 Log Posting for OSHA Asbestos in General Industry Standard",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Annual Safety Training",
+      "type": "training",
+      "description": "Annual Safety Training for OSHA Asbestos in General Industry Standard",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Hazardous Waste Manifest Submission",
+      "type": "filing",
+      "description": "Hazardous Waste Manifest Submission for OSHA Asbestos in General Industry Standard",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Environmental Health and Safety"
+  ]
+}

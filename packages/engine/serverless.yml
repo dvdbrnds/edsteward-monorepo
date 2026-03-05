@@ -1,0 +1,112 @@
+service: mcp-validation-engine
+
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: nodejs14.x
+  stage: ${opt:stage, 'dev'}
+  region: ${opt:region, 'us-east-1'}
+  environment:
+    REGULATIONS_TABLE: ${self:service}-${self:provider.stage}-regulations
+    VALIDATIONS_TABLE: ${self:service}-${self:provider.stage}-validations
+    BASELINES_BUCKET: ${self:service}-${self:provider.stage}-baselines
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource: 
+        - !GetAtt RegulationsTable.Arn
+        - !GetAtt ValidationsTable.Arn
+    - Effect: Allow
+      Action:
+        - s3:GetObject
+        - s3:PutObject
+        - s3:ListBucket
+      Resource:
+        - !GetAtt BaselinesBucket.Arn
+        - Fn::Join:
+          - ''
+          - - !GetAtt BaselinesBucket.Arn
+            - '/*'
+
+functions:
+  orchestrator:
+    handler: src/lambda/orchestrator/index.handler
+    events:
+      - http:
+          path: /validate
+          method: post
+          cors: true
+  
+  level1Validator:
+    handler: src/lambda/validators/level1/index.handler
+
+  level2Validator:
+    handler: src/lambda/validators/level2/index.handler
+  
+  level3Validator:
+    handler: src/lambda/validators/level3/index.handler
+  
+  level4Validator:
+    handler: src/lambda/validators/level4/index.handler
+  
+  dataCollector:
+    handler: src/lambda/datacollector/index.handler
+    events:
+      - http:
+          path: /regulations/collect-data
+          method: post
+          cors: true
+    timeout: 300 # 5 minutes
+    memorySize: 2048 # 2GB of memory
+    package:
+      include:
+        - src/lambda/datacollector/**
+
+resources:
+  Resources:
+    RegulationsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.REGULATIONS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: regulationId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: regulationId
+            KeyType: HASH
+    
+    ValidationsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:provider.environment.VALIDATIONS_TABLE}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+    
+    BaselinesBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${self:provider.environment.BASELINES_BUCKET}
+        AccessControl: Private
+        CorsConfiguration:
+          CorsRules:
+            - AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - GET
+              AllowedOrigins:
+                - '*'
+              MaxAge: 3000 

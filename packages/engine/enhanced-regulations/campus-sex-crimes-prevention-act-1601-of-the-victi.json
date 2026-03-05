@@ -1,0 +1,58 @@
+{
+  "regulationId": "campus-sex-crimes-prevention-act-1601-of-the-victi",
+  "enhanced": {
+    "fullText": "The Campus Sex Crimes Prevention Act, codified as Section 1601 of the Victims of Trafficking and Violence Protection Act of 2000 (Public Law 106-386), establishes critical safety protocols for institutions of higher education regarding registered sex offenders. This federal mandate, enforced under 42 U.S.C. § 14071(j), requires comprehensive coordination between educational institutions, state authorities, and local law enforcement agencies to enhance campus safety.\n\nUnder this regulation, any individual required to register as a sex offender under state law must provide written notification to state authorities when enrolling as a student or accepting employment at any institution of higher education. This notification requirement extends to any changes in enrollment or employment status, ensuring continuous monitoring of offender presence on campus. The notification must include the offender's current address, the institution's name and address, and specific details regarding their academic or employment status.\n\nInstitutions of higher education bear specific compliance obligations under 20 U.S.C. § 1092(f)(1)(I), which mandates that colleges and universities inform their campus communities about how to access information concerning registered sex offenders. This notification requirement is typically fulfilled through inclusion in the Annual Security Report mandated by the Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Act. The institution must provide clear, accessible information directing community members to state and local law enforcement agencies that maintain sex offender registries.\n\nState authorities play a crucial intermediary role by collecting notifications from registered offenders and transmitting this information to local law enforcement agencies with jurisdiction over the relevant educational institutions. This creates a multi-layered notification system ensuring appropriate authorities are aware of registered sex offenders' presence on or near campus.\n\nCompliance failures can result in significant penalties, including potential loss of federal funding under various Department of Education programs. The Department of Education's Office of Federal Student Aid monitors institutional compliance through program reviews and complaint investigations. Institutions may face enforcement actions ranging from corrective action plans to suspension of participation in federal student aid programs under 34 CFR § 668.14.\n\nRecent enforcement guidance from the Department of Education emphasizes that institutions must ensure their Annual Security Reports contain specific language directing community members to appropriate registry websites and local law enforcement contacts. The notification statement must be prominently displayed and easily accessible to students, faculty, staff, and prospective community members.\n\nInstitutions must also coordinate with local law enforcement to establish protocols for sharing relevant information while respecting privacy limitations and avoiding vigilantism. This includes ensuring that information dissemination complies with both federal requirements and applicable state privacy laws governing sex offender registry information.",
+    "summary": "Federal law requiring institutions of higher education to notify campus communities about accessing sex offender registry information and mandating registered offenders to report enrollment/employment status to state authorities.",
+    "requirements": "## Institutional Notification Obligations\n- Include statement in Annual Security Report directing community to sex offender registry information\n- Provide specific contact information for state and local law enforcement registry access\n- Ensure notification statement is prominently displayed and easily accessible\n- Update notification information annually or when registry access procedures change\n\n## Coordination with Law Enforcement\n- Establish protocols with local law enforcement for information sharing\n- Maintain current contact information for relevant registry authorities\n- Ensure compliance with state-specific registry access procedures\n\n## Offender Reporting Requirements\n- Registered sex offenders must notify state authorities of enrollment or employment\n- Notification required for any changes in enrollment or employment status\n- Written notification must include current address and institutional details\n\n## Compliance Monitoring\n- Review Annual Security Report language annually for accuracy\n- Coordinate with institutional legal counsel on notification procedures\n- Maintain documentation of compliance efforts for federal audits",
+    "reportingRequirements": "Annual inclusion of sex offender registry notification statement in Campus Security Report published by October 1st each year. No direct reporting to federal agencies required, but institutions must maintain compliance documentation for Department of Education program reviews."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T17:26:34.249Z"
+  },
+  "deadlines": [
+    {
+      "date": "10-01",
+      "label": "Annual Security Report Publication",
+      "type": "report",
+      "description": "Publish Annual Security Report containing CSCPA required statement by October 1",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "07-01",
+      "label": "Policy Annual Review",
+      "type": "review",
+      "description": "Conduct annual review of sex offender registry access and notification policies",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "08-15",
+      "label": "Law Enforcement Coordination Meeting",
+      "type": "meeting",
+      "description": "Annual meeting with local law enforcement to review sex offender notification procedures",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Website Information Verification",
+      "type": "verification",
+      "description": "Verify accuracy of sex offender registry links and information on institution website",
+      "isRecurring": true,
+      "recurrenceFrequency": "semi-annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Campus Sex Crimes Prevention Act (§ 1601 of the Victims of Trafficking and Violence Protection Act of 2000)"
+  ]
+}

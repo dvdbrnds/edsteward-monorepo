@@ -1,0 +1,1 @@
+MCP Engine starts all services in order: Registry API (3010), LLM Gateway (3002), Delivery System (3051), Frontend (3050)

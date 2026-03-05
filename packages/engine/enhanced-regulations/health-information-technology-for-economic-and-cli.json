@@ -1,0 +1,50 @@
+{
+  "regulationId": "health-information-technology-for-economic-and-cli",
+  "enhanced": {
+    "fullText": "The Health Information Technology for Economic and Clinical Health (HITECH) Act of 2009, enacted as Title XIII of the American Recovery and Reinvestment Act (Public Law 111-5, 123 Stat. 115), significantly strengthens HIPAA privacy and security protections for protected health information (PHI). For higher education institutions operating health plans, student health centers, or conducting health research, HITECH imposes enhanced compliance obligations and substantial penalties for violations.\n\nUnder 42 U.S.C. § 17921, HITECH extends HIPAA's reach by making business associates directly liable for compliance with HIPAA security and privacy rules, codified at 45 CFR Parts 160 and 164. Universities must ensure that contractors handling PHI, including cloud service providers and third-party administrators, execute compliant business associate agreements and maintain appropriate safeguards.\n\nSection 13402 of HITECH (42 U.S.C. § 17932) establishes mandatory breach notification requirements when unsecured PHI is compromised. Covered entities must notify affected individuals within 60 days of breach discovery, report to the Department of Health and Human Services within 60 days, and notify media outlets if breaches affect 500+ individuals in a state or jurisdiction. The notification requirements are detailed in 45 CFR § 164.404-414.\n\n'Unsecured PHI' is defined under 42 U.S.C. § 17938 as PHI not rendered unusable, unreadable, or indecipherable through NIST-approved encryption standards or destruction methods specified in HHS guidance. Universities must implement technical safeguards including encryption for PHI at rest and in transit.\n\nHITECH's enforcement provisions under 42 U.S.C. § 17935 authorize civil monetary penalties ranging from $100 to $50,000 per violation, with annual maximums reaching $1.5 million for identical violations. The HHS Office for Civil Rights conducts audits and investigations, with enhanced penalty authority for willful neglect violations.\n\nHigher education institutions must establish comprehensive risk assessment programs under 45 CFR § 164.308(a)(1), designate HIPAA security officers, implement workforce training programs, and maintain documentation demonstrating compliance efforts. Student health services, counseling centers, and research programs involving health data require particular attention to HITECH's enhanced requirements and potential state law obligations.",
+    "summary": "HITECH Act strengthens HIPAA protections, extending liability to business associates and mandating breach notifications. Universities with health operations must implement enhanced safeguards, encryption standards, and report PHI breaches within 60 days, facing penalties up to $1.5 million annually.",
+    "requirements": "## Administrative Safeguards\n- Designate HIPAA Security Officer responsible for developing and implementing security policies per 45 CFR § 164.308(a)(2)\n- Conduct annual risk assessments identifying PHI vulnerabilities and implementing corrective measures\n- Establish workforce training programs covering HIPAA and HITECH requirements\n- Implement access management procedures restricting PHI access to authorized personnel only\n\n## Physical and Technical Safeguards\n- Deploy NIST-approved encryption for PHI at rest and in transit per HHS guidance\n- Establish facility access controls and workstation security measures under 45 CFR § 164.310\n- Implement audit controls and integrity protections for electronic PHI systems\n- Maintain data backup and recovery procedures for PHI systems\n\n## Business Associate Management\n- Execute compliant business associate agreements with all third-party PHI handlers\n- Conduct due diligence assessments of business associate security practices\n- Monitor business associate compliance through periodic audits and certifications\n\n## Breach Response Procedures\n- Establish incident response team and breach assessment protocols\n- Develop notification templates and communication procedures for individuals, HHS, and media\n- Maintain breach documentation and reporting systems per 42 U.S.C. § 17932",
+    "reportingRequirements": "Breach notifications to affected individuals within 60 days of discovery per 42 U.S.C. § 17932. HHS breach reports within 60 days via HHS website portal. Media notification required for breaches affecting 500+ individuals in same state/jurisdiction. Annual summary reports to HHS for breaches under 500 individuals due by March 1st following calendar year."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T19:28:41.437Z"
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Privacy Assessment",
+      "type": "assessment",
+      "description": "Annual Privacy Assessment for Health Information Technology for Economic and Clinical Health (HITECH) Act of 2009",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Data Breach Notification (if applicable)",
+      "type": "notification",
+      "description": "Data Breach Notification (if applicable) for Health Information Technology for Economic and Clinical Health (HITECH) Act of 2009",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    },
+    {
+      "date": "12-31",
+      "label": "Security Awareness Training",
+      "type": "training",
+      "description": "Security Awareness Training for Health Information Technology for Economic and Clinical Health (HITECH) Act of 2009",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Privacy & Information Security"
+  ]
+}

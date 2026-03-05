@@ -1,0 +1,50 @@
+{
+  "regulationId": "osha-s-occupational-noise-exposure-standard",
+  "enhanced": {
+    "fullText": "The Occupational Safety and Health Administration's (OSHA) Occupational Noise Exposure Standard, codified at 29 CFR 1910.95, establishes comprehensive workplace noise exposure limits and protective measures under the authority of the Occupational Safety and Health Act of 1970 (29 USC 651 et seq.). This regulation is particularly relevant to higher education institutions operating laboratories, workshops, mechanical facilities, construction projects, and research facilities where noise exposure may exceed permissible limits.\n\nThe standard establishes two critical action levels based on 8-hour time-weighted average (TWA) noise exposures. The first action level occurs at 85 decibels (dB), triggering mandatory audiometric testing programs and employee notification requirements. The second action level, the Permissible Exposure Limit (PEL), is set at 90 dB TWA, requiring immediate implementation of hearing conservation programs, including engineering controls, administrative controls, and personal protective equipment.\n\nHigher education institutions must conduct initial noise exposure assessments in all potentially affected areas, including machine shops, HVAC facilities, research laboratories using high-noise equipment, and maintenance operations. When noise levels exceed 85 dB TWA, institutions must establish comprehensive hearing conservation programs pursuant to 29 CFR 1910.95(c). These programs must include annual audiometric examinations for exposed employees, baseline audiograms within six months of first exposure, and retention of audiometric records for the duration of employment plus 30 years as specified in 29 CFR 1910.1020.\n\nEngineering controls must be implemented to reduce noise exposure to or below 90 dB TWA where feasible, as mandated by 29 CFR 1910.95(b)(1). When engineering controls are insufficient, institutions must provide appropriate hearing protectors achieving adequate noise reduction ratings. Employee training programs must be conducted annually for all workers in hearing conservation programs, covering noise exposure effects, audiometric testing purposes, and proper use of hearing protection.\n\nViolations of noise exposure standards can result in OSHA citations with penalties up to $15,625 per serious violation and $156,259 for willful or repeated violations under current penalty structures. Universities must maintain detailed exposure monitoring records, audiometric test results, and hearing protector fit-testing documentation. The regulation requires immediate correction of standard threshold shifts exceeding 10 dB in either ear, with work restrictions or job modifications as necessary to prevent further hearing loss.",
+    "summary": "OSHA's Occupational Noise Exposure Standard (29 CFR 1910.95) requires higher education institutions to implement hearing conservation programs when workplace noise exceeds 85 dB TWA, including audiometric testing, exposure monitoring, and protective measures.",
+    "requirements": "## Noise Exposure Assessment\n- Conduct initial noise surveys in laboratories, workshops, and mechanical facilities\n- Perform monitoring when noise levels may exceed 85 dB TWA\n- Reassess exposures when workplace conditions change\n- Document all measurements per 29 CFR 1910.95(d)\n\n## Hearing Conservation Program\n- Establish program for employees exposed to 85+ dB TWA\n- Provide baseline and annual audiometric examinations\n- Maintain audiometric records for employment duration plus 30 years\n- Notify employees of standard threshold shifts within 21 days\n\n## Engineering and Administrative Controls\n- Implement feasible engineering controls to reduce noise below 90 dB TWA\n- Provide hearing protectors when controls are insufficient\n- Conduct annual training on noise hazards and protection methods\n- Ensure proper fit-testing and maintenance of protective equipment",
+    "reportingRequirements": "Annual audiometric examinations required for all hearing conservation program participants. Standard threshold shift notifications must be provided to affected employees within 21 days of detection per 29 CFR 1910.95(g)(8). No routine federal reporting required, but records must be available for OSHA inspection."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T01:33:26.766Z"
+  },
+  "deadlines": [
+    {
+      "date": "02-01",
+      "label": "OSHA 300 Log Posting",
+      "type": "posting",
+      "description": "OSHA 300 Log Posting for OSHA’s  Occupational Noise Exposure Standard",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Annual Safety Training",
+      "type": "training",
+      "description": "Annual Safety Training for OSHA’s  Occupational Noise Exposure Standard",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Hazardous Waste Manifest Submission",
+      "type": "filing",
+      "description": "Hazardous Waste Manifest Submission for OSHA’s  Occupational Noise Exposure Standard",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Environmental Health and Safety"
+  ]
+}

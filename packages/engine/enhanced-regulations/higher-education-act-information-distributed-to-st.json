@@ -1,0 +1,50 @@
+{
+  "regulationId": "higher-education-act-information-distributed-to-st",
+  "enhanced": {
+    "fullText": "The Higher Education Act (HEA) Information Distribution Requirements, codified at 20 U.S.C. § 1092 and implemented through 34 CFR § 668.41-668.49, mandate comprehensive annual disclosure obligations for all Title IV-eligible postsecondary institutions. This federal regulation serves as a cornerstone of consumer protection in higher education, ensuring prospective and enrolled students receive critical information necessary for informed educational decisions.\n\nUnder 20 U.S.C. § 1092(a)(1), institutions must annually distribute notices of availability covering seven distinct categories of information. First, financial assistance disclosures must detail all federal, state, local, private, and institutional aid programs, including eligibility requirements, application procedures, and award determination methods pursuant to 34 CFR § 668.42. Second, comprehensive institutional information must encompass cost of attendance calculations per 34 CFR § 668.43, including tuition, fees, room, board, books, supplies, transportation, and personal expenses, alongside refund policies under 34 CFR § 668.22.\n\nAcademic program descriptions, faculty qualifications, physical facilities, and services for disabled students must comply with Section 504 of the Rehabilitation Act and the Americans with Disabilities Act. Withdrawal procedures must align with 34 CFR § 668.22 Return to Title IV requirements. Third, student outcome data under 34 CFR § 668.45 requires disclosure of retention rates, graduation rates within 150% of normal program time, and transfer-out rates disaggregated by gender, race, ethnicity, and Federal Pell Grant recipient status.\n\nFourth, employment placement and graduate school enrollment data must be provided for degree or certificate programs designed to prepare students for gainful employment, as specified in 34 CFR § 668.412. Fifth, the annual security report mandated by the Jeanne Clery Disclosure of Campus Security Policy and Campus Crime Statistics Act (20 U.S.C. § 1092(f)) must include campus crime statistics, security policies, and procedures for reporting criminal actions.\n\nSixth, institutions with intercollegiate athletic programs must provide equity in athletics data per the EADA, detailing participation rates and financial support by gender under 20 U.S.C. § 1092(e). Seventh, FERPA notices under 20 U.S.C. § 1232g and 34 CFR Part 99 must inform students of their rights to inspect, review, and request amendment of education records.\n\nPer 34 CFR § 668.41(c), institutions may provide notices through direct distribution, posting on institutional websites with prominent links, or other electronic means ensuring reasonable access. All information must be made available to prospective students upon request under 20 U.S.C. § 1092(a)(4). Non-compliance may result in fine, limitation, suspension, or termination of Title IV program participation under 34 CFR § 668.83, with penalties up to $55,771 per violation as of 2023 adjustments under the Federal Civil Penalties Inflation Adjustment Act.",
+    "summary": "Federal law requires all Title IV-eligible institutions to annually distribute comprehensive disclosures to students covering financial aid, institutional information, student outcomes, employment data, campus security, athletics equity, and FERPA rights under 20 U.S.C. § 1092.",
+    "requirements": "## Annual Distribution Obligations\n- Provide notice of availability for all seven required disclosure categories to enrolled students by October 1st annually\n- Maintain current information on institutional websites with prominent accessibility\n- Respond to prospective student requests within reasonable timeframes\n\n## Required Disclosure Categories\n- Financial assistance programs and application procedures per 34 CFR § 668.42\n- Institutional costs, policies, programs, and accessibility services\n- Student retention, graduation, and transfer-out rates by demographic groups\n- Graduate employment and continuing education placement data\n\n## Distribution Methods\n- Electronic distribution through email, student portals, or website posting permitted under 34 CFR § 668.41(c)\n- Ensure reasonable access for all students including those with disabilities\n- Maintain documentation of distribution methods and timing for compliance audits",
+    "reportingRequirements": "Annual distribution deadline of October 1st for enrolled students. Clery Act security report due by October 1st annually. EADA athletics data submission to Department of Education by October 15th. Maintain prospective student request response procedures year-round per 20 U.S.C. § 1092(a)(4)."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T16:20:59.953Z"
+  },
+  "deadlines": [
+    {
+      "date": "10-01",
+      "label": "FISAP Annual Report",
+      "type": "filing",
+      "description": "FISAP Annual Report for Higher Education Act: Information Distributed to Students",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "06-30",
+      "label": "Annual Financial Aid Audit",
+      "type": "audit",
+      "description": "Annual Financial Aid Audit for Higher Education Act: Information Distributed to Students",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "07-01",
+      "label": "Gainful Employment Disclosure Update",
+      "type": "disclosure",
+      "description": "Gainful Employment Disclosure Update for Higher Education Act: Information Distributed to Students",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Financial Aid"
+  ]
+}

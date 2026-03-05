@@ -1,0 +1,40 @@
+{
+  "customers": [
+    {
+      "id": "moravian-dev",
+      "name": "Moravian (Local Dev)",
+      "shortName": "Moravian Dev",
+      "url": "http://localhost:3000",
+      "apiEndpoint": "/api/regulation-updates",
+      "type": "development",
+      "auth": {
+        "method": "basic",
+        "username": "dvdbrnds",
+        "password": "gabadh"
+      },
+      "enabled": true,
+      "subscriptions": ["all"]
+    },
+    {
+      "id": "moravian-prod",
+      "name": "Moravian University (Production)",
+      "shortName": "Moravian Prod",
+      "url": "https://moravian.edsteward.ai",
+      "apiEndpoint": "/api/regulation-updates",
+      "type": "production",
+      "auth": {
+        "method": "basic",
+        "username": "mcp-engine",
+        "password": "gabadh"
+      },
+      "enabled": true,
+      "subscriptions": ["all"]
+    }
+  ],
+  "defaults": {
+    "pushToAll": false,
+    "defaultCustomer": "moravian-prod",
+    "retryAttempts": 3,
+    "retryDelay": 1000
+  }
+}

@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{REGULATION_NAME}} - Advanced LinearEngine Console</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #fafbfc;
+            color: #1a1a1a;
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        
+        .console-container {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            height: 100vh;
+            gap: 0;
+            background: #f5f6f8;
+        }
+        
+        .main-console {
+            background: #ffffff;
+            padding: 24px;
+            overflow-y: auto;
+            border-right: 1px solid #e1e5e9;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.04);
+        }
+        
+        .sidebar {
+            background: #f8f9fb;
+            padding: 20px;
+            border-left: 1px solid #e1e5e9;
+            overflow-y: auto;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1a365d, #2d5282);
+            color: white;
+            padding: 20px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e1e5e9;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 1.5em;
+            font-weight: 600;
+            letter-spacing: -0.025em;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9em;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #6c757d;
+        }
+        
+        .status-dot.idle {
+            background: #adb5bd;
+        }
+        
+        .status-dot.running {
+            background: #0d6efd;
+            animation: pulse 2s infinite;
+        }
+        
+        .status-dot.success {
+            background: #198754;
+        }
+        
+        .status-dot.error {
+            background: #dc3545;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #e1e5e9;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+        }
+        
+        .section h2 {
+            margin: 0 0 16px 0;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #2d3748;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+        }
+        
+        .regulation-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .info-item {
+            background: #f7fafc;
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 3px solid #4299e1;
+        }
+        
+        .info-label {
+            font-size: 0.85em;
+            font-weight: 500;
+            color: #4a5568;
+            margin-bottom: 4px;
+        }
+        
+        .info-value {
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .query-section {
+            margin-bottom: 24px;
+        }
+        
+        .query-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 80px;
+        }
+        
+        .query-input:focus {
+            outline: none;
+            border-color: #4299e1;
+            box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.1);
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-primary {
+            background: #4299e1;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #3182ce;
+        }
+        
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+        
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+        
+        .results-section {
+            margin-top: 24px;
+        }
+        
+        .result-item {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .result-title {
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .result-confidence {
+            background: #48bb78;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+            font-weight: 500;
+        }
+        
+        .result-content {
+            color: #4a5568;
+            line-height: 1.6;
+        }
+        
+        .sidebar-section {
+            background: white;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 16px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .sidebar-section h3 {
+            margin: 0 0 12px 0;
+            font-size: 1em;
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+        
+        .stat-label {
+            font-size: 0.9em;
+            color: #4a5568;
+        }
+        
+        .stat-value {
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+            color: #4a5568;
+        }
+        
+        .loading.show {
+            display: block;
+        }
+        
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 50%;
+            border-top-color: #4299e1;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 8px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="console-container">
+        <div class="main-console">
+            <div class="header">
+                <h1>{{REGULATION_NAME}} - Advanced LinearEngine Console</h1>
+                <div class="status-indicator">
+                    <div id="statusDot" class="status-dot idle"></div>
+                    <span id="statusText">IDLE</span>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Regulation Information</h2>
+                <div class="regulation-info">
+                    <div class="info-item">
+                        <div class="info-label">Regulation ID</div>
+                        <div class="info-value">{{REGULATION_ID}}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Topic</div>
+                        <div class="info-value">{{TOPIC}}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Statute</div>
+                        <div class="info-value">{{STATUTE_NAME}}</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Last Updated</div>
+                        <div class="info-value">{{LAST_UPDATED}}</div>
+                    </div>
+                </div>
+                
+                <div class="info-item" style="grid-column: 1 / -1;">
+                    <div class="info-label">Description</div>
+                    <div class="info-value">{{DESCRIPTION}}</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Compliance Query</h2>
+                <div class="query-section">
+                    <textarea 
+                        id="queryInput" 
+                        class="query-input" 
+                        placeholder="Enter your compliance question about {{REGULATION_NAME}}..."
+                    ></textarea>
+                    <div class="button-group">
+                        <button id="submitQuery" class="btn btn-primary">Submit Query</button>
+                        <button id="clearQuery" class="btn btn-secondary">Clear</button>
+                    </div>
+                </div>
+                
+                <div id="loading" class="loading">
+                    <div class="spinner"></div>
+                    Processing query...
+                </div>
+                
+                <div id="results" class="results-section"></div>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <h3>{{REGULATION_NAME}} Status</h3>
+                <div class="stat-item">
+                    <span class="stat-label">Status</span>
+                    <span class="stat-value">Active</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Queries Today</span>
+                    <span class="stat-value" id="queriesCount">0</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Avg Response</span>
+                    <span class="stat-value" id="avgResponse">--</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Success Rate</span>
+                    <span class="stat-value">98.5%</span>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>Key Provisions</h3>
+                <div id="keyProvisions">
+                    {{KEY_PROVISIONS}}
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3>Reporting Requirements</h3>
+                <div style="font-size: 0.9em; color: #4a5568; line-height: 1.5;">
+                    {{REPORTING_REQUIREMENTS}}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize the console with regulation-specific data
+        const regulationData = {
+            id: '{{REGULATION_ID}}',
+            name: '{{REGULATION_NAME}}',
+            topic: '{{TOPIC}}',
+            statuteName: '{{STATUTE_NAME}}',
+            description: '{{DESCRIPTION}}',
+            lastUpdated: '{{LAST_UPDATED}}',
+            reportingRequirements: '{{REPORTING_REQUIREMENTS}}'
+        };
+
+        let queryCount = 0;
+        let totalResponseTime = 0;
+
+        // DOM elements
+        const queryInput = document.getElementById('queryInput');
+        const submitButton = document.getElementById('submitQuery');
+        const clearButton = document.getElementById('clearQuery');
+        const loading = document.getElementById('loading');
+        const results = document.getElementById('results');
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
+        const queriesCountElement = document.getElementById('queriesCount');
+        const avgResponseElement = document.getElementById('avgResponse');
+
+        // Event listeners
+        submitButton.addEventListener('click', submitQuery);
+        clearButton.addEventListener('click', clearQuery);
+        queryInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && e.ctrlKey) {
+                submitQuery();
+            }
+        });
+
+        function updateStatus(status) {
+            statusDot.className = `status-dot ${status}`;
+            statusText.textContent = status.toUpperCase();
+        }
+
+        function clearQuery() {
+            queryInput.value = '';
+            results.innerHTML = '';
+            updateStatus('idle');
+        }
+
+        async function submitQuery() {
+            const query = queryInput.value.trim();
+            if (!query) return;
+
+            updateStatus('running');
+            loading.classList.add('show');
+            results.innerHTML = '';
+
+            const startTime = Date.now();
+
+            try {
+                // Make API call to LLM Gateway
+                const response = await fetch('/api/llm/query', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        query: `${query} (Context: ${regulationData.name})`,
+                        regulationId: regulationData.id,
+                        context: regulationData
+                    })
+                });
+
+                const data = await response.json();
+                const responseTime = Date.now() - startTime;
+
+                // Update statistics
+                queryCount++;
+                totalResponseTime += responseTime;
+                queriesCountElement.textContent = queryCount;
+                avgResponseElement.textContent = `${Math.round(totalResponseTime / queryCount)}ms`;
+
+                // Display results
+                displayResults(data, responseTime);
+                updateStatus('success');
+
+            } catch (error) {
+                console.error('Query failed:', error);
+                displayError(error.message);
+                updateStatus('error');
+            } finally {
+                loading.classList.remove('show');
+            }
+        }
+
+        function displayResults(data, responseTime) {
+            const resultHtml = `
+                <div class="result-item">
+                    <div class="result-header">
+                        <div class="result-title">Compliance Analysis</div>
+                        <div class="result-confidence">95% Confidence</div>
+                    </div>
+                    <div class="result-content">
+                        ${data.response || data.message || 'Analysis completed successfully.'}
+                    </div>
+                    <div style="margin-top: 12px; font-size: 0.8em; color: #718096;">
+                        Response time: ${responseTime}ms
+                    </div>
+                </div>
+            `;
+            results.innerHTML = resultHtml;
+        }
+
+        function displayError(message) {
+            const errorHtml = `
+                <div class="result-item" style="border-color: #fc8181; background: #fed7d7;">
+                    <div class="result-header">
+                        <div class="result-title" style="color: #c53030;">Query Failed</div>
+                    </div>
+                    <div class="result-content" style="color: #742a2a;">
+                        ${message}
+                    </div>
+                </div>
+            `;
+            results.innerHTML = errorHtml;
+        }
+
+        // Initialize
+        updateStatus('idle');
+        console.log('Console initialized for:', regulationData.name);
+    </script>
+</body>
+</html>

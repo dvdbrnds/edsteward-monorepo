@@ -1,0 +1,153 @@
+[
+  {
+    "group": "Title IX",
+    "canonical": "REG-002",
+    "retire": [
+      "REG-003"
+    ],
+    "reason": "Already completed. REG-002 (id:57) is the consolidated Title IX record.",
+    "status": "DONE"
+  },
+  {
+    "group": "HIPAA / Health Insurance Portability",
+    "canonical": "REG-020",
+    "retire": [
+      "REG-021",
+      "REG-022"
+    ],
+    "reason": "REG-020 (HIPAA, id:217) has statute. REG-021 (id:333) has no statute. REG-022 (id:76) is Human Resources focus -- merge content into REG-020.",
+    "status": "PENDING"
+  },
+  {
+    "group": "EPCRA / Emergency Planning",
+    "canonical": "REG-019",
+    "retire": [
+      "REG-131"
+    ],
+    "reason": "Same statute (42 USC 11001-11050). REG-019 (id:62, riskScore:72) has higher risk than REG-131 (id:133, riskScore:52). Different categories but same law.",
+    "status": "PENDING"
+  },
+  {
+    "group": "Electronic Communications Privacy Act",
+    "canonical": "REG-028",
+    "retire": [
+      "REG-105"
+    ],
+    "reason": "Same statute. REG-028 (id:253, riskScore:68) has higher risk. REG-105 (id:229, riskScore:55) is the 1986 variant name.",
+    "status": "PENDING"
+  },
+  {
+    "group": "Equal Pay Act of 1963",
+    "canonical": "REG-076",
+    "retire": [
+      "REG-107"
+    ],
+    "reason": "Same statute (29 USC 206(d)). REG-076 (id:100, riskScore:60) has higher risk. REG-107 (id:111, riskScore:55) is name variant.",
+    "status": "PENDING"
+  },
+  {
+    "group": "Federal Unemployment Tax Act (FUTA)",
+    "canonical": "REG-151",
+    "retire": [
+      "REG-177"
+    ],
+    "reason": "Same statute (26 USC 3301-3311). REG-151 (id:36, riskScore:50) in Accounting. REG-177 (id:299, riskScore:48) in Wages. Merge content.",
+    "status": "PENDING"
+  },
+  {
+    "group": "Immigration and Nationality Act",
+    "canonical": "REG-154",
+    "retire": [
+      "REG-215"
+    ],
+    "reason": "Same statute (8 USC 1101-1537). REG-154 (id:225, riskScore:50) is primary. REG-215 (id:113, riskScore:45) is duplicate.",
+    "status": "PENDING"
+  },
+  {
+    "group": "Age Discrimination in Employment Act",
+    "canonical": "REG-238",
+    "retire": [
+      "REG-239"
+    ],
+    "reason": "Same statute (29 USC 621-634). REG-238 (id:108) and REG-239 (id:94) are name variants. Both riskScore:40.",
+    "status": "PENDING"
+  },
+  {
+    "group": "Cafeteria Plans / Section 125",
+    "canonical": "REG-167",
+    "retire": [
+      "REG-230"
+    ],
+    "reason": "Same statute (26 USC 125). REG-167 (id:295, riskScore:48) in Tax. REG-230 (id:120, riskScore:42) in Employee Benefits.",
+    "status": "PENDING"
+  },
+  {
+    "group": "HEA: Drug/Alcohol Abuse Prevention vs Drug Free Schools",
+    "canonical": "REG-023",
+    "retire": [
+      "REG-129"
+    ],
+    "reason": "Same statute (20 USC 1011i). REG-023 (id:63, riskScore:72) is primary HEA citation. REG-129 (id:61, riskScore:52) is the act name variant.",
+    "status": "PENDING"
+  },
+  {
+    "group": "HEA: Disclosure of Foreign Gifts",
+    "canonical": "REG-152",
+    "retire": [
+      "REG-246"
+    ],
+    "reason": "Same statute (20 USC 1011f). REG-152 (id:37) in Accounting. REG-246 (id:77) in Fundraising. Both cover foreign gift reporting.",
+    "status": "PENDING"
+  },
+  {
+    "group": "Clinical Trials / PHS Conflict of Interest",
+    "canonical": "REG-066",
+    "retire": [
+      "REG-080"
+    ],
+    "reason": "Same statute (42 CFR Part 50 Subpart F). REG-066 (id:283, riskScore:65) is primary. REG-080 (id:276, riskScore:58) is the clinical trials focus.",
+    "status": "PENDING"
+  },
+  {
+    "group": "HEA Public Law 110-315 subparts (REG-040, 043, 058, 137, 138)",
+    "canonical": null,
+    "retire": [],
+    "reason": "NOT DUPLICATES. These are distinct HEA provisions that share the parent statute but have different USC sections and compliance requirements. Keep all.",
+    "status": "NO_ACTION"
+  },
+  {
+    "group": "HEA 20 USC 1094 subparts (REG-056, 083, 084, 245)",
+    "canonical": null,
+    "retire": [],
+    "reason": "NOT DUPLICATES. Program Participation Agreements, Incentive Compensation, Misrepresentation, and Code of Conduct are distinct compliance areas under same USC section. Keep all.",
+    "status": "NO_ACTION"
+  },
+  {
+    "group": "HEA 20 USC 1001/1002 subparts (REG-074, 082, 085)",
+    "canonical": null,
+    "retire": [],
+    "reason": "NOT DUPLICATES. Financial Value Transparency, Credit Hour Definition, and State Authorization are distinct program integrity rules. Keep all.",
+    "status": "NO_ACTION"
+  },
+  {
+    "group": "HEA Public Law 110-315 + 20 USC 1092 (REG-046, 050)",
+    "canonical": null,
+    "retire": [],
+    "reason": "NOT DUPLICATES. Entrance/Exit Counseling vs Information Distributed to Students are distinct disclosure requirements. Keep both.",
+    "status": "NO_ACTION"
+  },
+  {
+    "group": "FCC Licensing (REG-108, 109, 110)",
+    "canonical": null,
+    "retire": [],
+    "reason": "NOT DUPLICATES. Cable Certification, Fixed Microwave, and Wireless are distinct FCC licensing categories under 47 USC 151. Keep all.",
+    "status": "NO_ACTION"
+  },
+  {
+    "group": "26 USC 170 (REG-198, 247, 248)",
+    "canonical": null,
+    "retire": [],
+    "reason": "NOT DUPLICATES. American Jobs Creation Act, IRS Substantiation/Disclosure, and Pension Protection Act are distinct laws referencing same IRC section. Keep all.",
+    "status": "NO_ACTION"
+  }
+]

@@ -1,0 +1,34 @@
+{
+  "regulationId": "fair-housing-act-section-6",
+  "enhanced": {
+    "fullText": "The Fair Housing Act's reasonable accommodation provisions, codified at 42 U.S.C. § 3604(f)(3)(B), mandate that higher education institutions providing housing accommodate disabled students by permitting assistance animals, even when institutional policies prohibit pets. This federal civil rights law extends beyond traditional housing to encompass university-owned dormitories, apartments, and other residential facilities.\n\nUnder the Joint Statement issued by HUD and DOJ, institutions must make reasonable accommodations in rules, policies, practices, or services when necessary to afford persons with disabilities equal opportunity to use and enjoy housing. For universities, this primarily manifests in assistance animal accommodations governed by 24 CFR § 100.204, which requires interactive processes to evaluate accommodation requests.\n\nThe regulation distinguishes between service animals under the ADA and assistance animals under the FHA. While service animals are limited to dogs and miniature horses trained for specific tasks per 28 CFR § 35.136, FHA assistance animals include emotional support animals and therapy animals that provide therapeutic benefit through companionship.\n\nUniversities must establish reasonable accommodation procedures including: written request protocols, disability verification requirements, and individualized assessments per HUD's guidance in FHEO-2020-01. Institutions cannot charge pet deposits or fees for assistance animals but may hold students liable for property damage beyond normal wear and tear.\n\nKey prohibited practices under 42 U.S.C. § 3604(f)(2) include: requiring specific training or certification for assistance animals, imposing breed or size restrictions, demanding detailed medical records, or establishing blanket policies against certain animal types. However, institutions may exclude animals posing direct threats to safety or causing substantial property damage after individualized assessment.\n\nViolations carry significant penalties under 42 U.S.C. § 3612, including monetary damages, injunctive relief, and civil penalties up to $21,039 for first violations and $52,596 for subsequent violations within seven years. HUD processes complaints within 100 days under 24 CFR § 103.230, while private parties may file federal court actions under 42 U.S.C. § 3613.\n\nRecent developments include HUD's January 2021 rule clarifying assistance animal definitions and verification requirements, emphasizing that housing providers cannot require specific documentation formats but may request reliable disability-related information from healthcare providers. The rule also addresses fraudulent emotional support animal documentation, permitting providers to reject unreliable documentation.\n\nUniversities must train housing staff on FHA requirements, establish clear policies distinguishing between service animals and assistance animals, and maintain documentation of accommodation decisions. Failure to comply exposes institutions to federal investigations, civil lawsuits, and potential loss of federal funding under Title IX coordination requirements at 34 CFR § 106.8.",
+    "summary": "The Fair Housing Act requires higher education institutions to provide reasonable accommodations for assistance animals in campus housing, including emotional support animals, even when policies prohibit pets. Universities must establish procedures for evaluating requests, cannot charge fees, and face significant federal penalties for violations.",
+    "requirements": "## Core Accommodation Obligations\n- Establish written procedures for assistance animal requests per 24 CFR § 100.204\n- Conduct individualized assessments of each accommodation request\n- Waive no-pet policies for verified assistance animals\n- Refrain from charging pet deposits or monthly fees for assistance animals\n\n## Verification and Documentation Standards\n- Accept reliable documentation from healthcare providers establishing disability-related need\n- Reject requests only when animals pose direct threat or cause substantial property damage\n- Prohibit requirements for specific training certifications or detailed medical records\n- Maintain confidentiality of disability-related information per FERPA requirements\n\n## Policy Development and Training\n- Distinguish between ADA service animals and FHA assistance animals in institutional policies\n- Train housing staff on reasonable accommodation procedures and FHA compliance\n- Develop appeals processes for denied accommodation requests\n- Establish protocols for addressing conflicts between roommates regarding assistance animals\n\n## Risk Management and Enforcement\n- Document accommodation decisions with written justifications for denials\n- Implement emergency procedures for animals posing immediate safety threats\n- Coordinate with disability services offices to ensure consistent accommodation practices",
+    "reportingRequirements": "The Fair Housing Act does not mandate routine reporting to federal agencies. However, universities must maintain accommodation request documentation for HUD complaint investigations and respond to formal complaints within timeframes specified in 24 CFR § 103.230. Institutions should report significant accommodation denials to legal counsel and document annual policy reviews."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T15:56:20.546Z"
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Compliance Review",
+      "type": "review",
+      "description": "Annual Compliance Review for Fair Housing Act, Section 6",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Disabilities"
+  ]
+}

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registry Connection Test</title>
+  <style>
+    body {
+      font-family: -apple-system, system-ui, sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    .status {
+      padding: 10px;
+      border-radius: 4px;
+      margin: 10px 0;
+    }
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    .pending {
+      background-color: #fff3cd;
+      color: #856404;
+    }
+    pre {
+      background-color: #f8f9fa;
+      padding: 10px;
+      border-radius: 4px;
+      overflow: auto;
+    }
+    button {
+      padding: 8px 16px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0069d9;
+    }
+  </style>
+</head>
+<body>
+  <h1>Registry Connection Test</h1>
+  
+  <div id="connection-status" class="status pending">Checking connection to registry...</div>
+  
+  <h2>Registry Health Check</h2>
+  <div id="health-status" class="status pending">Testing...</div>
+  
+  <h2>Regulations List</h2>
+  <div id="regulations-container">
+    <div class="status pending">Fetching regulations...</div>
+    <pre id="regulations-data"></pre>
+  </div>
+  
+  <h2>Manual Test</h2>
+  <button id="test-button">Test Connection</button>
+  
+  <script>
+    // Get DOM elements
+    const connectionStatus = document.getElementById('connection-status');
+    const healthStatus = document.getElementById('health-status');
+    const regulationsContainer = document.getElementById('regulations-container');
+    const regulationsData = document.getElementById('regulations-data');
+    const testButton = document.getElementById('test-button');
+    
+    // Registry API URL
+    const REGISTRY_URL = 'http://localhost:3010';
+    
+    // Show JSON data nicely formatted
+    function prettyJson(data) {
+      return JSON.stringify(data, null, 2);
+    }
+    
+    // Update status element
+    function updateStatus(element, isSuccess, message) {
+      element.textContent = message;
+      element.className = `status ${isSuccess ? 'success' : 'error'}`;
+    }
+    
+    // Test basic connection
+    async function testConnection() {
+      try {
+        const response = await fetch(`${REGISTRY_URL}/api/regulations`, {
+          mode: 'cors',
+          credentials: 'omit',
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+        if (response.ok) {
+          updateStatus(connectionStatus, true, '✅ Connected to registry at ' + REGISTRY_URL);
+          return true;
+        } else {
+          updateStatus(connectionStatus, false, 
+            `❌ Registry responded with ${response.status}: ${response.statusText}`);
+          return false;
+        }
+      } catch (error) {
+        updateStatus(connectionStatus, false, `❌ Failed to connect: ${error.message}`);
+        return false;
+      }
+    }
+    
+    // Get regulations
+    async function getRegulations() {
+      try {
+        const response = await fetch(`${REGISTRY_URL}/api/regulations`, {
+          mode: 'cors',
+          credentials: 'omit',
+          headers: {
+            'Accept': 'application/json'
+          }
+        });
+        if (response.ok) {
+          const data = await response.json();
+          regulationsContainer.innerHTML = 
+            `<div class="status success">✅ Retrieved ${data.length} regulations</div>`;
+          regulationsData.textContent = prettyJson(data);
+        } else {
+          regulationsContainer.innerHTML = 
+            `<div class="status error">❌ Failed to get regulations: ${response.status}</div>`;
+        }
+      } catch (error) {
+        regulationsContainer.innerHTML = 
+          `<div class="status error">❌ Error fetching regulations: ${error.message}</div>`;
+      }
+    }
+    
+    // Run all tests
+    async function runAllTests() {
+      // First test basic connection
+      const connected = await testConnection();
+      
+      if (connected) {
+        // If connected, check regulations endpoint
+        getRegulations();
+        
+        // Check health endpoint
+        try {
+          const response = await fetch(`${REGISTRY_URL}/health`);
+          if (response.ok) {
+            updateStatus(healthStatus, true, '✅ Health check passed');
+          } else {
+            updateStatus(healthStatus, false, `❌ Health check failed with status ${response.status}`);
+          }
+        } catch (error) {
+          updateStatus(healthStatus, false, `❌ Health check failed: ${error.message}`);
+        }
+      } else {
+        // If not connected, update all statuses
+        updateStatus(healthStatus, false, '❌ Cannot check health - connection failed');
+        regulationsContainer.innerHTML = 
+          `<div class="status error">❌ Cannot fetch regulations - connection failed</div>`;
+      }
+    }
+    
+    // Run tests when page loads
+    window.addEventListener('DOMContentLoaded', runAllTests);
+    
+    // Manual test button
+    testButton.addEventListener('click', runAllTests);
+  </script>
+</body>
+</html> 

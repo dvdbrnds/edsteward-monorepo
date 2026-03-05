@@ -1,0 +1,50 @@
+{
+  "regulationId": "hazardous-and-solid-waste-amendments-of-1984",
+  "enhanced": {
+    "fullText": "The Hazardous and Solid Waste Amendments of 1984 (HSWA), codified at 42 U.S.C. §§ 6921-6939g, significantly strengthened the Resource Conservation and Recovery Act (RCRA) by establishing comprehensive regulations for underground storage tanks (USTs) and restricting land disposal of hazardous wastes. For higher education institutions, HSWA compliance is critical given the prevalence of USTs for fuel storage, heating oil, and chemical storage across campus facilities.\n\nUnder 42 U.S.C. § 6991, institutions operating USTs containing petroleum or hazardous substances must comply with stringent technical standards outlined in 40 CFR Part 280. These requirements include leak detection systems, corrosion protection, spill and overfill prevention, and financial responsibility for cleanup costs. Universities must register all USTs with state regulatory agencies and implement comprehensive monitoring programs.\n\nThe land disposal restrictions (LDR) provisions under 42 U.S.C. §§ 6924(d)-(m) prohibit disposal of untreated hazardous wastes in landfills unless they meet treatment standards specified in 40 CFR Part 268. Research universities generating hazardous laboratory wastes must ensure proper treatment before disposal, with specific requirements for characteristic and listed wastes.\n\nHSWA expanded EPA's enforcement authority under 42 U.S.C. § 6928, allowing civil penalties up to $37,500 per day per violation for UST violations and up to $70,117 per day for hazardous waste violations. Criminal penalties include fines up to $50,000 per day and imprisonment for knowing violations. The Act also established corrective action requirements under 42 U.S.C. § 6924(u), mandating cleanup of contamination from solid waste management units.\n\nUniversities must maintain detailed records of waste generation, treatment, and disposal for at least three years under 40 CFR § 262.40. The 1984 amendments introduced the small quantity generator provisions, affecting many educational institutions generating between 100-1,000 kg of hazardous waste monthly. Recent updates include the 2016 Hazardous Waste Generator Improvements Rule, which consolidated regulations and enhanced emergency preparedness requirements.\n\nCompliance requires coordination between facilities management, environmental health and safety offices, and academic departments conducting research. Institutions must develop comprehensive waste management programs, conduct regular UST inspections, and maintain current permits and registrations to avoid significant penalties and environmental liability.",
+    "summary": "HSWA regulates underground storage tanks and hazardous waste land disposal at universities through technical standards, leak detection requirements, treatment mandates, and financial responsibility provisions under 42 U.S.C. §§ 6921-6939g.",
+    "requirements": "## Underground Storage Tank Management\n- Register all USTs containing petroleum/chemicals with state agencies per 40 CFR § 280.22\n- Install leak detection systems and corrosion protection on all tanks\n- Maintain financial responsibility insurance of $1 million per occurrence\n- Conduct monthly monitoring and annual inspections\n\n## Hazardous Waste Land Disposal\n- Treat characteristic and listed wastes per 40 CFR Part 268 standards before disposal\n- Obtain waste analysis and treatment certifications from disposal facilities\n- Implement land disposal restriction notifications for all shipments\n\n## Recordkeeping and Documentation\n- Maintain UST compliance records for facility lifetime per 40 CFR § 280.34\n- Retain hazardous waste manifests and treatment records for minimum 3 years\n- Document corrective action measures for any contamination incidents\n\n## Personnel Training\n- Train facilities staff on UST operation and emergency response procedures\n- Educate laboratory personnel on proper hazardous waste segregation and treatment requirements",
+    "reportingRequirements": "Annual UST compliance certifications due to state agencies by December 31st. Immediate notification required within 24 hours for suspected releases per 40 CFR § 280.50. Biennial hazardous waste reports due March 1st for large quantity generators under 40 CFR § 262.41."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T19:27:15.280Z"
+  },
+  "deadlines": [
+    {
+      "date": "02-01",
+      "label": "OSHA 300 Log Posting",
+      "type": "posting",
+      "description": "OSHA 300 Log Posting for Hazardous and Solid Waste Amendments of 1984",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Annual Safety Training",
+      "type": "training",
+      "description": "Annual Safety Training for Hazardous and Solid Waste Amendments of 1984",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Hazardous Waste Manifest Submission",
+      "type": "filing",
+      "description": "Hazardous Waste Manifest Submission for Hazardous and Solid Waste Amendments of 1984",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Environmental Health and Safety"
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "regulationId": "osha-asbestos-in-construction-standard",
+  "enhanced": {
+    "fullText": "The OSHA Asbestos in Construction Standard, codified at 29 CFR 1926.1101, establishes comprehensive requirements for protecting workers from asbestos exposure during construction activities at higher education institutions. This regulation, enacted under the authority of the Occupational Safety and Health Act of 1970 (29 U.S.C. § 651 et seq.), applies to all construction work performed on university campuses, including renovation, demolition, maintenance, and repair activities.\n\nThe standard sets a permissible exposure limit (PEL) of 0.1 fiber per cubic centimeter of air as an 8-hour time-weighted average, with an excursion limit of 1.0 f/cc averaged over 30 minutes. Universities must conduct initial exposure assessments before any construction work begins and implement periodic monitoring when employee exposure may reasonably exceed the PEL. Under 29 CFR 1926.1101(f), institutions must establish regulated areas when airborne concentrations exceed or can reasonably be expected to exceed the PEL.\n\nHigher education institutions must classify construction work into four categories based on potential exposure levels, ranging from Class I (removal of thermal system insulation) to Class IV (maintenance activities with minimal disturbance). Each classification requires specific work practices, protective equipment, and training protocols. Universities must provide annual training to all employees who may encounter asbestos-containing materials, documenting completion per 29 CFR 1926.1101(k)(9).\n\nThe regulation mandates medical surveillance programs for employees exposed above the action level (0.1 f/cc for 30 or more days per year). Institutions must maintain exposure records for 30 years and medical records for the duration of employment plus 30 years, as specified in 29 CFR 1910.1020. Notification requirements include posting warning signs in regulated areas and informing affected employees of monitoring results within five working days.\n\nViolations can result in penalties up to $15,625 for serious violations and $156,259 for willful or repeated violations under OSHA's current penalty structure. Recent amendments in 2019 strengthened requirements for negative exposure assessments and clarified competent person qualifications for asbestos-related construction activities on educational campuses.",
+    "summary": "OSHA's Asbestos in Construction Standard (29 CFR 1926.1101) requires universities to limit worker exposure to 0.1 f/cc during construction activities, implement protective measures, conduct monitoring, provide training, and maintain comprehensive records.",
+    "requirements": "## Exposure Monitoring and Assessment\n- Conduct initial exposure assessment before construction work begins\n- Perform daily monitoring when exposure may exceed PEL of 0.1 f/cc\n- Notify affected employees of monitoring results within 5 working days\n- Establish regulated areas when concentrations exceed or may exceed PEL\n\n## Work Classification and Practices\n- Classify all asbestos work into Classes I-IV based on exposure potential\n- Implement specific work practices and engineering controls for each class\n- Designate competent persons for all asbestos construction activities\n- Use HEPA filtration and negative pressure enclosures as required\n\n## Training and Medical Surveillance\n- Provide annual asbestos awareness training to potentially exposed employees\n- Implement medical surveillance for employees exceeding action level\n- Document all training completion and maintain records\n\n## Record Keeping and Compliance\n- Maintain exposure monitoring records for 30 years\n- Preserve medical surveillance records for employment duration plus 30 years\n- Post warning signs and labels in regulated areas per 29 CFR 1926.1101(k)",
+    "reportingRequirements": "Monitor airborne asbestos levels daily during construction activities. Notify potentially exposed employees of monitoring results within 5 working days. Submit medical surveillance records annually. Report work-related asbestos illnesses to OSHA within 24 hours per 29 CFR 1904.39."
+  },
+  "audit": {
+    "score": 93,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 90,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T16:14:38.540Z"
+  },
+  "deadlines": [
+    {
+      "date": "02-01",
+      "label": "OSHA 300 Log Posting",
+      "type": "posting",
+      "description": "OSHA 300 Log Posting for OSHA Asbestos in Construction Standard",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Annual Safety Training",
+      "type": "training",
+      "description": "Annual Safety Training for OSHA Asbestos in Construction Standard",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Hazardous Waste Manifest Submission",
+      "type": "filing",
+      "description": "Hazardous Waste Manifest Submission for OSHA Asbestos in Construction Standard",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Environmental Health and Safety"
+  ]
+}

@@ -1,0 +1,50 @@
+{
+  "regulationId": "toxic-substances-control-act",
+  "enhanced": {
+    "fullText": "The Toxic Substances Control Act (TSCA) of 1976, codified at 15 U.S.C. §§ 2601-2629, grants the Environmental Protection Agency comprehensive authority to regulate chemical substances that pose unreasonable risks to human health and the environment. Higher education institutions must comply with TSCA's stringent requirements, particularly regarding polychlorinated biphenyls (PCBs) commonly found in electrical equipment and transformers on university campuses.\n\nUnder 15 U.S.C. § 2605 and implementing regulations at 40 CFR Part 761, universities must identify, inventory, and properly manage PCB-containing equipment. The Act prohibits the manufacture, processing, distribution, and use of PCBs except in totally enclosed systems, with specific exceptions outlined in 40 CFR § 761.30. Educational institutions operating electrical transformers containing 50 ppm or greater PCB concentrations must register these units with EPA and comply with strict operational standards.\n\nKey compliance obligations include quarterly visual inspections documented per 40 CFR § 761.30(a)(1)(ix), proper marking with standardized PCB labels as specified in 40 CFR § 761.40, and maintenance of detailed inventory records. Universities must conduct annual electrical tests for PCB transformers and maintain inspection logs for EPA review. Storage of PCB waste must comply with 40 CFR § 761.65, requiring secure facilities meeting specific construction standards and regular monitoring protocols.\n\nDisposal requirements under 40 CFR Part 761 Subpart D mandate that PCB transformers be decontaminated or disposed of through EPA-approved methods within one year of removal from service. Universities must use authorized treatment and disposal facilities listed in EPA databases and maintain chain-of-custody documentation.\n\nViolations carry severe penalties under 15 U.S.C. § 2615, including civil penalties up to $37,500 per violation per day, with criminal sanctions for knowing or willful violations reaching $25,000 daily and potential imprisonment. Recent amendments through the Frank R. Lautenberg Chemical Safety for the 21st Century Act of 2016 strengthened EPA's enforcement authority and expanded reporting requirements for educational institutions managing chemical inventories exceeding threshold quantities.",
+    "summary": "TSCA requires higher education institutions to identify, inventory, mark, and quarterly inspect PCB transformers and electrical equipment, maintain detailed records, conduct proper disposal through EPA-approved facilities, and report violations.",
+    "requirements": "## PCB Equipment Management\n- Conduct comprehensive inventory of all electrical transformers and equipment per 40 CFR § 761.30\n- Test equipment for PCB concentrations and classify based on ppm levels\n- Mark all PCB transformers with standardized EPA labels per 40 CFR § 761.40\n- Register PCB transformers (≥500 ppm) with EPA regional office\n\n## Inspection and Maintenance\n- Perform quarterly visual inspections of PCB transformers documenting leaks or irregularities\n- Conduct annual electrical testing and maintain calibrated monitoring equipment\n- Document all inspection results in permanent records accessible for EPA review\n- Report any spills or releases immediately to EPA and state authorities\n\n## Storage and Disposal Compliance\n- Store PCB waste in EPA-compliant facilities meeting 40 CFR § 761.65 standards\n- Dispose of PCB equipment within one year through authorized treatment facilities\n- Maintain chain-of-custody documentation for all PCB waste shipments\n- Submit annual PCB activity reports to EPA regional administrator",
+    "reportingRequirements": "Annual PCB activity reports due July 1st to EPA regional office per 40 CFR § 761.180. Immediate spill reporting within 24 hours to National Response Center. Quarterly inspection logs maintained on-site for EPA review. PCB transformer registration updates required within 30 days of equipment changes."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-05T02:33:27.514Z"
+  },
+  "deadlines": [
+    {
+      "date": "02-01",
+      "label": "OSHA 300 Log Posting",
+      "type": "posting",
+      "description": "OSHA 300 Log Posting for Toxic Substances Control Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "01-31",
+      "label": "Annual Safety Training",
+      "type": "training",
+      "description": "Annual Safety Training for Toxic Substances Control Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    },
+    {
+      "date": "continuous",
+      "label": "Hazardous Waste Manifest Submission",
+      "type": "filing",
+      "description": "Hazardous Waste Manifest Submission for Toxic Substances Control Act",
+      "isRecurring": true,
+      "recurrenceFrequency": "as-needed"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Environmental Health and Safety"
+  ]
+}

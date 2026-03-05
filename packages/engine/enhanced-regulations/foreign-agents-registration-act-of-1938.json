@@ -1,0 +1,34 @@
+{
+  "regulationId": "foreign-agents-registration-act-of-1938",
+  "enhanced": {
+    "fullText": "The Foreign Agents Registration Act of 1938 (FARA), codified at 22 U.S.C. §§ 611-621, requires individuals and entities acting as agents of foreign principals in political or quasi-political capacities to register with the Department of Justice and make periodic public disclosures. For higher education institutions, FARA has significant implications for international partnerships, foreign-funded programs, and academic collaborations.\n\nUnder 22 U.S.C. § 611(c), a \"foreign principal\" includes foreign governments, political parties, corporations, associations, and individuals outside the United States. The Act defines an \"agent of a foreign principal\" in 22 U.S.C. § 611(c) as any person who acts within the United States as an agent, representative, employee, or servant of a foreign principal, or who agrees to act in such capacity for compensation or direction.\n\nHigher education institutions must carefully evaluate their international activities to determine FARA applicability. Key considerations include: foreign government funding for research programs, partnerships with foreign universities owned or controlled by foreign governments, hosting foreign government-sponsored cultural or educational programs, and employing individuals who simultaneously work for foreign educational institutions controlled by foreign governments.\n\nThe registration requirements under 22 U.S.C. § 612 mandate initial registration within 10 days of becoming an agent, using Form DOJ-61. Registrants must disclose the identity of foreign principals, nature of services provided, financial arrangements, and political activities undertaken. The FARA Registration Unit within the National Security Division's Counterespionage Section administers enforcement.\n\nSupplemental statements are required every six months under 22 U.S.C. § 612(b), detailing activities, receipts, and disbursements during the reporting period. Universities must also comply with 22 U.S.C. § 614, requiring dissemination notices on materials distributed on behalf of foreign principals.\n\nImportant exemptions exist under 22 U.S.C. § 613, including the academic exemption for scholastic, academic, or scientific pursuits, provided no political activities occur. However, this exemption has narrow application and requires careful legal analysis.\n\nViolations carry serious penalties under 22 U.S.C. § 618, including fines up to $10,000 and imprisonment up to five years. Civil penalties may also apply. Recent enforcement actions demonstrate increased DOJ scrutiny of educational institutions' international activities, particularly regarding Confucius Institutes and other foreign government-sponsored programs.\n\nThe Department of Justice issued updated guidance in 2019 clarifying FARA's application to academic institutions, emphasizing that the academic exemption does not apply to political activities or propaganda dissemination. Universities must implement robust compliance programs to identify potential FARA obligations and ensure timely registration when required.",
+    "summary": "FARA requires registration and periodic disclosure by agents of foreign principals engaged in political activities. Universities must evaluate international partnerships, foreign funding, and academic collaborations for potential FARA obligations, with strict penalties for non-compliance.",
+    "requirements": "## Registration Obligations\n- File initial registration (Form DOJ-61) within 10 days of becoming foreign agent per 22 U.S.C. § 612\n- Disclose foreign principal identity, financial arrangements, and services provided\n- Submit supplemental statements every six months detailing activities and finances\n\n## Compliance Assessment\n- Evaluate all foreign government partnerships and funding arrangements\n- Analyze foreign university collaborations for government control or influence\n- Review cultural and educational programs sponsored by foreign entities\n- Assess employee dual affiliations with foreign institutions\n\n## Documentation Requirements\n- Maintain records of all foreign principal communications and agreements\n- Include dissemination notices on materials distributed per 22 U.S.C. § 614\n- Document reliance on statutory exemptions, particularly academic exemption under 22 U.S.C. § 613\n\n## Ongoing Monitoring\n- Establish procedures to identify new FARA-triggering activities\n- Train relevant personnel on FARA compliance obligations\n- Coordinate with legal counsel for registration determinations",
+    "reportingRequirements": "Initial registration required within 10 days via Form DOJ-61. Supplemental statements due every six months by January 31 and July 31, filed electronically through DOJ FARA eFile system. Event-triggered amendments required within 10 days of material changes to foreign principal relationships or activities."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T19:07:31.994Z"
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Compliance Review",
+      "type": "review",
+      "description": "Annual Compliance Review for Foreign Agents Registration Act of 1938",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "International Activities and Programs"
+  ]
+}

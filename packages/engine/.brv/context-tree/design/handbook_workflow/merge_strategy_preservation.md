@@ -1,0 +1,1 @@
+Handbook update workflow initiated for BYTEROVER_MCP_HANDBOOK.md using merge strategy with manual content preservation. Backup: timestamp.

@@ -1,0 +1,34 @@
+{
+  "regulationId": "higher-education-act-textbook-information",
+  "enhanced": {
+    "fullText": "The Higher Education Act's Textbook Information provision, codified at 20 U.S.C. § 1015(b), mandates comprehensive disclosure requirements for course materials at institutions of higher education participating in federal student aid programs. This regulation, implemented through 34 C.F.R. § 668.41, requires institutions to provide detailed textbook and supplemental material information to enable students to make informed financial decisions regarding educational expenses.\n\nUnder 20 U.S.C. § 1015(b)(1), institutions must disclose, for each course listed in the institution's course schedule: (A) the International Standard Book Number (ISBN) and retail price information of required and recommended college textbooks and supplemental materials; (B) information on rental options, used book availability, and digital alternatives; and (C) the copyright dates of all required materials. This information must be made available to students during course registration periods and no later than the time of course enrollment.\n\nThe scope of coverage extends to all degree-granting institutions participating in Title IV federal student aid programs under 20 U.S.C. § 1001. Per 34 C.F.R. § 668.41(a), institutions must publish textbook information on their websites or course registration systems in a format that allows students to search and compare costs across multiple sections and instructors. The regulation specifically requires disclosure of both new and used prices when available, rental options, and any digital access codes or online components that may expire.\n\nInstitutions must also comply with 20 U.S.C. § 1015(b)(2), which requires faculty to provide textbook adoption information to campus bookstores and administrators as early as practicable, but no later than 60 days before the start of each academic term when feasible. This provision aims to maximize used book availability and reduce student costs.\n\nEnforcement mechanisms include monitoring by the Department of Education during program reviews and compliance audits. Violations may result in corrective action requirements, fine assessments under 34 C.F.R. § 668.83, or potential suspension from Title IV programs for severe or repeated non-compliance. Recent guidance from the Department emphasizes the importance of accurate pricing information and timely updates when material requirements change.\n\nThe regulation was strengthened by the Higher Education Opportunity Act of 2008, which added specific timing requirements and expanded disclosure obligations. Institutions must maintain documentation demonstrating compliance with disclosure timelines and accuracy of pricing information for federal audit purposes.",
+    "summary": "Requires higher education institutions to disclose ISBN numbers, retail prices, and availability information for all required and recommended textbooks and course materials to students during registration, implemented under 20 U.S.C. § 1015(b) and 34 C.F.R. § 668.41.",
+    "requirements": "## Course Material Disclosure\n- Provide ISBN and retail price information for all required and recommended textbooks per 20 U.S.C. § 1015(b)(1)\n- Include copyright dates, rental options, and digital alternatives\n- Display information on institutional websites or registration systems accessible to students\n\n## Faculty Coordination\n- Ensure faculty submit textbook adoption decisions at least 60 days before term start when feasible\n- Coordinate with campus bookstores to maximize used book availability\n- Document late submissions with justification for compliance records\n\n## Information Accessibility\n- Publish textbook data in searchable format allowing cost comparison across sections\n- Update pricing information regularly to maintain accuracy\n- Provide alternative format availability and digital access code requirements\n\n## Documentation and Compliance\n- Maintain records of disclosure timing and accuracy for federal audit purposes\n- Implement procedures for handling textbook changes after initial disclosure\n- Train staff on reporting requirements under 34 C.F.R. § 668.41",
+    "reportingRequirements": "No specific federal reporting deadlines required; institutions must maintain internal documentation of compliance with disclosure timing requirements and provide textbook information during each course registration period and no later than enrollment confirmation."
+  },
+  "audit": {
+    "score": 96,
+    "certainty": "A",
+    "scores": {
+      "content": 100,
+      "summary": 100,
+      "requirements": 100,
+      "deadlines": 70
+    },
+    "timestamp": "2025-12-04T20:29:07.408Z"
+  },
+  "deadlines": [
+    {
+      "date": "12-31",
+      "label": "Annual Compliance Review",
+      "type": "review",
+      "description": "Annual Compliance Review for Higher Education Act: Textbook Information",
+      "isRecurring": true,
+      "recurrenceFrequency": "annual"
+    }
+  ],
+  "relationships": [],
+  "tags": [
+    "Academic Programs"
+  ]
+}
