@@ -1,0 +1,19 @@
+{
+  "name": "edsteward-monorepo",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev:engine": "npm run dev --workspace=packages/engine",
+    "dev:app": "npm run dev --workspace=packages/app",
+    "dev": "concurrently \"npm run dev:engine\" \"npm run dev:app\"",
+    "start:engine": "npm run start --workspace=packages/engine",
+    "start:app": "npm run start --workspace=packages/app",
+    "build:app": "npm run build --workspace=packages/app",
+    "test:app": "npm run test --workspace=packages/app"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}
