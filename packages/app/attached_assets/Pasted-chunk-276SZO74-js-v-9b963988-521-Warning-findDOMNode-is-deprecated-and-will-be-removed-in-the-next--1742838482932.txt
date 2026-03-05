@@ -1,0 +1,43 @@
+chunk-276SZO74.js?v=9b963988:521 Warning: findDOMNode is deprecated and will be removed in the next major release. Instead, add a ref directly to the element you want to reference. Learn more about using refs safely here: https://reactjs.org/link/strict-mode-find-node
+    at ReactQuill2 (https://0946d31a-ffb8-475b-8d56-d2a637aaacb3-00-2ajakphckak65.janeway.repli…unner/workspace/node_modules/.vite/deps/react-quill.js?v=9b963988:11405:30)
+    at div
+    at https://0946d31a-ffb8-475b-8d56-d2a637aaacb3-00-2ajakphckak65.janeway.repli…unner/workspace/node_modules/.vite/deps/chunk-D3CTYCI6.js?v=9b963988:52:11
+    at https://0946d31a-ffb8-475b-8d56-d2a637aaacb3-00-2ajakphckak65.janeway.repli…unner/workspace/node_modules/.vite/deps/chunk-D3CTYCI6.js?v=9b963988:33:11
+    at https://0946d31a-ffb8-475b-8d56-d2a637aaacb3-00-2ajakphckak65.janeway.replit.dev/src/components/ui/form.tsx:127:9
+    at div
+    at https://0946d31a-ffb8-475b-8d56-d2a637aaacb3-00-2ajakphckak65.janeway.replit.dev/src/components/ui/form.tsx:71:6
+    at Controller (https://0946d31a-ffb8-475b-8d56-d2a637aaacb3-00-2ajakphckak65.janeway.repli…nner/workspace/node_modules/.vite/deps/chunk-BW5TH624.js?v=9b963988:313:35)
+    at FormField (https://0946d31a-ffb8-475b-8d56-d2a637aaacb3-00-2ajakphckak65.janeway.replit.dev/src/components/ui/form.tsx:32:6)
+    at form
+    at FormProvider (https://0946d31a-ffb8-475b-8d56-d2a637aaacb3-00-2ajakphckak65.janeway.repli…nner/workspace/node_modules/.vite/deps/chunk-BW5TH624.js?v=9b963988:102:11)
+    at div
+    at NoteSection (https://0946d31a-ffb8-475b-8d56-d2a637aaacb3-00-2ajakphckak65.janeway.replit.dev/src/components/regulations/note-section.tsx:40:31)
+    at div
+    at _c9 (https://0946d31a-ffb8-475b-8d56-d2a637aaacb3-00-2ajakphckak65.janeway.replit.dev/src/components/ui/card.tsx:106:12)
+    at div
+    at _c (https://0946d31a-ffb8-475b-8d56-d2a637aaacb3-00-2ajakphckak65.janeway.replit.dev/src/components/ui/card.tsx:20:11)
+    at div
+    at div
+    at div
+    at div
+    at main
+    at div
+    at RegulationDetailPage (https://0946d31a-ffb8-475b-8d56-d2a637aaacb3-00-2ajakphckak65.janeway.replit.dev/src/pages/RegulationDetailPage.tsx:96:32)
+    at ErrorBoundary (https://0946d31a-ffb8-475b-8d56-d2a637aaacb3-00-2ajakphckak65.janeway.replit.dev/src/components/ui/error-boundary.tsx:14:5)
+    at Route (https://0946d31a-ffb8-475b-8d56-d2a637aaacb3-00-2ajakphckak65.janeway.repli…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=9b963988:323:16)
+    at ProtectedRegulationRoute (https://0946d31a-ffb8-475b-8d56-d2a637aaacb3-00-2ajakphckak65.janeway.replit.dev/src/lib/protected-regulation-route.tsx:24:3)
+    at Switch (https://0946d31a-ffb8-475b-8d56-d2a637aaacb3-00-2ajakphckak65.janeway.repli…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=9b963988:379:17)
+    at div
+    at PageLayout (https://0946d31a-ffb8-475b-8d56-d2a637aaacb3-00-2ajakphckak65.janeway.replit.dev/src/components/layout/page-layout.tsx:18:30)
+    at ErrorBoundary (https://0946d31a-ffb8-475b-8d56-d2a637aaacb3-00-2ajakphckak65.janeway.replit.dev/src/components/ui/error-boundary.tsx:14:5)
+    at Router
+    at AuthProvider (https://0946d31a-ffb8-475b-8d56-d2a637aaacb3-00-2ajakphckak65.janeway.replit.dev/src/hooks/use-auth.tsx:26:32)
+    at QueryClientProvider (https://0946d31a-ffb8-475b-8d56-d2a637aaacb3-00-2ajakphckak65.janeway.repli…rkspace/node_modules/.vite/deps/@tanstack_react-query.js?v=9b963988:2805:3)
+    at ErrorBoundary (https://0946d31a-ffb8-475b-8d56-d2a637aaacb3-00-2ajakphckak65.janeway.replit.dev/src/components/ui/error-boundary.tsx:14:5)
+    at App
+react-quill.js?v=9b963988:4152 [Deprecation] Listener added for a 'DOMNodeInserted' mutation event. This event type is deprecated, and will be removed from this browser very soon. Usage of this event listener will cause performance issues today, and represents a large risk of future site breakage. Consider using MutationObserver instead. See https://chromestatus.com/feature/5083947249172480 for more information.
+evidence-files.tsx:59 Fetching evidence files for regulation: 4850
+evidence-files.tsx:66 Evidence files data: 
+Array(3)
+﻿
+

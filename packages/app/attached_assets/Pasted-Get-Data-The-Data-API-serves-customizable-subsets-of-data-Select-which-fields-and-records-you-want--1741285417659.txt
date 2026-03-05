@@ -1,0 +1,236 @@
+Get Data
+The Data API serves customizable subsets of data. Select which fields and records you want and choose how records are formatted and sorted.
+
+The Data API can be accessed using this template:
+https://apiprod.dol.gov/v4/get/<agency>/<endpoint>/json?X-API-KEY=<api_key>
+
+Example:
+Using Training Dataset (Industries) as an example, you would populate <agency> with trng, <endpoint> with training_dataset_industries, and <api_key> with your API key to get a 10 record data sample:
+
+https://apiprod.dol.gov/v4/get/trng/training_dataset_industries/csv?X-API-KEY=<api_key>
+
+For a complete list of agencies and endpoints, download our agency-endpoint table.
+
+Customize your data request
+You can customize your data request using optional API parameters. Default values are always applied if the user doesn’t specify parameters. The default parameters are described below.
+
+(1) Pick your preferred data format (json, xml, csv) – by default json is provided but you can substitute the word json with xml or csv in the request URL to change the format.
+
+https://apiprod.dol.gov/v4/get/<agency>/<endpoint>/xml?X-API-KEY=<api_key>
+
+https://apiprod.dol.gov/v4/get/<agency>/<endpoint>/csv?X-API-KEY=<api_key>
+
+(2) limit – add the "limit" parameter to your request to limit the number of records returned. You can receive up to 5 MB of data or 10,000 records per request, whichever limit you hit first.
+
+&limit=10000
+
+(3) offset – add the “offset” parameter to your request to offset the records returned. This parameter gets used in conjunction with the limit parameter when you need to make multiple API requests to get all of the records that you want.
+
+For example, if you want to get 20000 records with our max limit being 10000 records, you will need to make 2 API requests:
+
+&limit=10000 (gets you the first chunk of 10,000 records)
+
+&limit=10000&offset=10000 (gets you the second chunk of 10,000 records)
+
+(4) Subset fields – add the “fields” parameter to your request to limit the returned data to only those field you want. To do this, provide a comma separated list of variable names after the fields parameter.
+
+&fields=field1,field2,field3
+
+(5) Sort order– add the “sort” parameter to your request to ensure the returned data is ordered optimally. To do this, provide a sort direction (“asc” for ascending or “desc” for descending) after the sort parameter.
+
+&sort=asc
+
+(6) Sort by – add the “sort_by” parameter to your request and provide the variable name you want to sort by.
+
+&sort_by=field1
+
+(7) Subset records – add the “filter_object” parameter to your request and provide a json formatted filter string to ensure that only records meeting specific criteria are in the returned data. After the filter object parameter, identify the variable you want to filter on (field), the filtering action (operator) and the comparison criteria (value). The operators we support include eq (equals), neq (not equals), gt (greater than), lt (less than), in, not_in, and like.
+
+&filter_object = {"field":"back_wages", "operator":"gt", "value":"100000"}
+
+This filter will only return case data in which there were more than 100k in back wages.
+
+To apply a “filter_object” directly in the web browser you need to encode the special characters.
+
+Character:	{	}	"	SPACE	,	:
+Replace With:	%7B	%7D	%22	%20	%2C	%3A
+&filter_object=%7B%22field%22%3A%22back_wages%22%2C%20%22operator%22%3A%22gt%22%2C%20%22value%22%3A%22100000%22%7D
+
+For help building a customized request URL, including automated “filter_object” URL encoding, we recommend using the API Query Builder located on every dataset page you navigate to from the Data Catalog.
+
+picture of dataset
+
+Code:
+If you prefer to programmatically build your request, use the code examples below to learn how to customize your data requests. Each example will use our API training dataset called Training Dataset (Industries).
+
+Limit parameter - Return the maximum number of records (up to 10,000):
+
+Python
+R
+# Last updated on 11/15/2024 using Python 3.9.
+
+# Import libraries
+import requests, pandas as pd
+
+url = "https://apiprod.dol.gov/v4/get/trng/training_dataset_industries/json"
+
+params = {"X-API-KEY":"<YOUR_API_KEY>",
+         "limit":"10000",
+         "offset":"0",
+         "fields":None,
+         "sort":None,
+         "sort_by":None,
+         "filter_object":None
+}
+          
+request = requests.get(url, params=params)
+data_json = request.json()["data"]
+
+data = pd.DataFrame(data_json)
+
+
+Fields parameter - return only the industry and value fields:
+
+Python
+R
+# Last updated on 11/15/2024 using Python 3.9.
+
+# Import libraries
+import requests, pandas as pd
+
+url = "https://apiprod.dol.gov/v4/get/trng/training_dataset_industries/json"
+
+params = {"X-API-KEY":"<YOUR_API_KEY>",
+         "limit":"10000",
+         "offset":"0",
+         "fields":"industry,value",
+         "sort":None,
+         "sort_by":None,
+         "filter_object":None
+}
+          
+request = requests.get(url, params=params)
+data_json = request.json()["data"]
+
+data = pd.DataFrame(data_json)
+
+
+Sort and sort_by parameters – sort records in descending order by year:
+
+Python
+R
+# Last updated on 11/15/2024 using Python 3.9.
+
+# Import libraries
+import requests, pandas as pd
+
+url = "https://apiprod.dol.gov/v4/get/trng/training_dataset_industries/json"
+
+params = {"X-API-KEY":"<YOUR_API_KEY>",
+         "limit":"10000",
+         "offset":"0",
+         "fields":None,
+         "sort":"desc",
+         "sort_by":"year",
+         "filter_object":None
+}
+          
+request = requests.get(url, params=params)
+data_json = request.json()["data"]
+
+data = pd.DataFrame(data_json)
+
+
+Filter_object parameter - Subset dataset records:
+
+(a) Single condition filter
+
+Python
+R
+# Last updated on 11/15/2024 using Python 3.9.
+
+# Import libraries
+import requests, pandas as pd, json
+
+# Below are several individual filter examples that you can try out with the filter_object parameter.
+# create a filter condition
+def create_filter_condition(field, operator, value):
+    condition = {"field": field,"operator": operator,"value": value}
+    
+    return json.dumps(condition)
+
+# example: equals (eq) / not equals (neq) operator
+filter_1 = create_filter_condition("industry","eq","B")
+
+# example: greater than (gt) / less than (lt)
+filter_2 = create_filter_condition("value","gt","999")
+
+# example: in / not_in
+filter_3 = create_filter_condition("industry","in",["A","B","C"])
+
+# example: like
+filter_4 = create_filter_condition("industry","like","%A%")
+
+url = "https://apiprod.dol.gov/v4/get/trng/training_dataset_industries/json"
+
+params = {"X-API-KEY":"<YOUR_API_KEY>",
+         "limit":"10000",
+         "offset":"0",
+         "fields":None,
+         "sort":None,
+         "sort_by":None,
+         "filter_object":filter_1  # Swap filter_1 with any of the other filters (2-4) to see different results.
+}
+          
+request = requests.get(url, params=params)
+data_json = request.json()["data"]
+
+data = pd.DataFrame(data_json)
+
+
+(b) Multiple condition filter
+
+Python
+R
+# Last updated on 11/15/2024 using Python 3.9.
+
+# Import libraries
+import requests, pandas as pd, json
+
+# create a filter condition
+def create_filter_condition(field, operator, value):
+    condition = {"field": field,"operator": operator,"value": value}
+    
+    return json.dumps(condition)
+
+# combine multiple filter conditions
+def combine_filter_conditions(conditions=None, operator='and'):
+    conditions = "{" + f'"{operator}":' + f'{conditions}'.replace("'", "") + "}"
+    
+    return conditions
+
+# filter condition 1
+filter_1 = create_filter_condition("industry","eq","B")
+
+# filter condition 2
+filter_2 = create_filter_condition("year","eq","2020")
+
+# combine filters using the "and" operator
+combined_filter = combine_filter_conditions([filter_1,filter_2], operator="and")
+
+
+url = "https://apiprod.dol.gov/v4/get/trng/training_dataset_industries/json"
+
+params = {"X-API-KEY":"<YOUR_API_KEY>",
+         "limit":"10000",
+         "offset":"0",
+         "fields":None,
+         "sort":None,
+         "sort_by":None,
+         "filter_object":combined_filter
+}
+          
+request = requests.get(url, params=params)
+data_json = request.json()["data"]
+
+data = pd.DataFrame(data_json)

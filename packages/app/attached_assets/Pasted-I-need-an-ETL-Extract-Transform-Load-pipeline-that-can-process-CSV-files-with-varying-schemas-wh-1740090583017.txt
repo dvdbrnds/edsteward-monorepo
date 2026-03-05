@@ -1,0 +1,37 @@
+I need an ETL (Extract, Transform, Load) pipeline that can process CSV files with varying schemas while ensuring schema integrity. The pipeline should dynamically handle new columns and validate field mappings inline with the process. The key requirements are as follows:
+
+Core Features:
+Automatic Schema Adaptation:
+
+The ETL should automatically detect new columns in incoming CSV files and update the master schema accordingly.
+The schema should be flexible enough to accommodate any type of CSV structure.
+Field Matching & Validation:
+
+Implement a mapping validation tool that can match field names against predefined mappings.
+Use fuzzy matching or pattern recognition for column name variations (e.g., “Order Date” vs. “Date of Order”).
+Provide configurable validation rules for different data types and formats.
+Data Cleansing & Transformation:
+
+Standardize common data formats (dates, numbers, booleans, etc.).
+Handle missing values (either through imputation, default values, or flagging incomplete records).
+Ensure type consistency across multiple CSV imports.
+Error Handling & Logging:
+
+Log all errors and warnings related to schema mismatches, invalid data, or failed transformations.
+Store problematic records in a staging area for manual review.
+Performance Optimization:
+
+Support batch processing and parallel execution for handling large CSV files efficiently.
+Enable incremental data loading when possible to avoid reprocessing unchanged data.
+Storage & Output:
+
+Store the processed data in a structured format (such as a relational database, NoSQL database, or a data lake).
+Maintain referential integrity and enforce primary key constraints where applicable.
+Technical Considerations:
+The ETL should be built using Python (preferred), leveraging libraries such as Pandas for data processing and SQLAlchemy for database integration.
+It should be designed in a modular fashion so that new transformations and validations can be added easily.
+Include documentation or configuration options for customizing validation rules and field mappings.
+Deliverables:
+A working ETL script or application that meets the above requirements.
+Configuration files for defining field mappings, validation rules, and transformation settings.
+Sample test cases demonstrating how the ETL handles different CSV structures and errors.

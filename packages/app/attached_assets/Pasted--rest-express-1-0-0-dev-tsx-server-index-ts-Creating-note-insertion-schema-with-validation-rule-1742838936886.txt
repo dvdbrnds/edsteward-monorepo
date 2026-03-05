@@ -1,0 +1,99 @@
+
+> rest-express@1.0.0 dev
+> tsx server/index.ts
+
+Creating note insertion schema with validation rules
+Note insertion schema created successfully
+Note schema fields: [
+  'id',        'regulationId',
+  'userId',    'title',
+  'content',   'category',
+  'status',    'isPrivate',
+  'createdAt', 'updatedAt',
+  'enableRLS'
+]
+5:51:16 PM [express] Starting server initialization...
+5:51:17 PM [express] Database connection successful
+5:51:17 PM [express] Registering routes...
+5:51:17 PM [express] Routes registered successfully
+5:51:17 PM [express] Setting up Vite development server...
+5:51:17 PM [express] Vite setup complete
+5:51:17 PM [express] Server successfully started on port 5000
+5:51:17 PM [express] Starting server successfully, will initialize deadline checker in 30 seconds...
+5:51:17 PM [express] Server startup complete
+5:51:21 PM [express] GET /api/user 401 in 3ms
+5:51:21 PM [express] GET /api/regulations 401 in 1ms :: {"error":"Authentication required"}
+2025-03-24T17:51:21.289Z [WARNING] Unauthorized access attempt to regulations
+5:51:28 PM [express] GET /api/user 304 in 161ms :: {"id":6,"username":"dvdbrnds","password":"783782f…
+5:51:29 PM [express] GET /api/setup/status 200 in 169ms
+Fetching regulations from database...
+2025-03-24T17:51:29.342Z [INFO] Fetching regulations from storage
+2025-03-24T17:51:29.503Z [INFO] Fetching deadlines from storage
+5:51:29 PM [express] GET /api/deadlines 200 in 239ms :: [{"id":791,"regulationId":4461,"dueDate":"20…
+2025-03-24T17:51:29.583Z [INFO] Found 55 deadlines
+5:51:29 PM [express] GET /api/notifications 200 in 210ms
+5:51:29 PM [express] GET /api/user 304 in 152ms :: {"id":6,"username":"dvdbrnds","password":"783782f…
+Successfully fetched 358 regulations from database
+5:51:29 PM [express] GET /api/regulations 200 in 680ms :: [{"id":4850,"itemId":"PA-paDeptEd-17418130…
+2025-03-24T17:51:29.829Z [INFO] Found 358 regulations
+Fetching regulations from database...
+2025-03-24T17:51:30.131Z [INFO] Fetching regulations from storage
+Successfully fetched 358 regulations from database
+2025-03-24T17:51:30.599Z [INFO] Found 358 regulations
+5:51:30 PM [express] GET /api/regulations 304 in 649ms :: [{"id":4850,"itemId":"PA-paDeptEd-17418130…
+Looking up regulation with ID: 4850
+2025-03-24T17:51:30.984Z [INFO] Fetching deadlines from storage
+2025-03-24T17:51:30.989Z [INFO] Fetching regulation with ID: 4850
+5:51:31 PM [express] GET /api/setup/status 200 in 165ms
+5:51:31 PM [express] GET /api/deadlines 304 in 229ms :: [{"id":791,"regulationId":4461,"dueDate":"20…
+2025-03-24T17:51:31.062Z [INFO] Found 55 deadlines
+5:51:31 PM [express] GET /api/regulations/4850 304 in 312ms :: {"id":4850,"itemId":"PA-paDeptEd-1741…
+2025-03-24T17:51:31.146Z [INFO] Found regulation: default
+Fetching evidence files for regulation 4850
+Found 3 evidence files
+2025-03-24T17:51:31.565Z [INFO] Fetching notes for regulation 4850
+2025-03-24T17:51:31.643Z [INFO] Found 1 notes for regulation 4850
+2025-03-24T17:51:31.646Z [INFO] Successfully fetched 3 evidence files for regulation 4850
+5:51:31 PM [express] GET /api/regulations/4850/evidence 304 in 238ms :: [{"id":3,"regulationId":4850…
+5:51:31 PM [express] GET /api/notes/regulation/4850 304 in 239ms :: [{"id":13,"regulationId":4850,"u…
+5:51:47 PM [express] Initializing deadline notification checker...
+Logging auth event: {
+  level: 6,
+  message: 'User logged out',
+  userId: 6,
+  username: 'dvdbrnds',
+  metadata: undefined
+}
+2025-03-24T17:54:33.351Z [INFO] User logged out
+5:54:33 PM [express] POST /api/logout 200 in 568ms
+Looking up user with username: dvdbrnds
+User lookup result: Found user with ID 6
+Logging auth event: {
+  level: 6,
+  message: 'Login successful',
+  userId: 6,
+  username: 'dvdbrnds',
+  metadata: undefined
+}
+2025-03-24T17:54:51.006Z [INFO] Login successful
+Logging auth event: {
+  level: 6,
+  message: 'User logged in successfully',
+  userId: 6,
+  username: 'dvdbrnds',
+  metadata: undefined
+}
+2025-03-24T17:54:51.314Z [INFO] User logged in successfully
+5:54:51 PM [express] POST /api/login 200 in 585ms :: {"id":6,"username":"dvdbrnds","password":"78378…
+5:54:51 PM [express] GET /api/setup/status 200 in 161ms
+5:54:52 PM [express] GET /api/notifications 200 in 163ms
+2025-03-24T17:54:52.241Z [INFO] Fetching deadlines from storage
+2025-03-24T17:54:52.355Z [INFO] Found 55 deadlines
+5:54:52 PM [express] GET /api/deadlines 304 in 273ms :: [{"id":791,"regulationId":4461,"dueDate":"20…
+5:55:02 PM [express] GET /api/admin/twilio-config 200 in 161ms
+5:55:02 PM [express] GET /api/setup/status 200 in 164ms
+5:55:02 PM [express] GET /api/admin/email-config 200 in 162ms
+2025-03-24T17:55:04.144Z [INFO] Fetching all users
+5:55:04 PM [express] GET /api/admin/users 200 in 233ms :: [{"id":5,"username":"nasol@moravian.edu","…
+2025-03-24T17:55:04.224Z [INFO] Found 13 users
+5:55:04 PM [express] GET /api/admin/logs 200 in 158ms

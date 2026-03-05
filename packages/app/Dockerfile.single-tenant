@@ -1,0 +1,80 @@
+# Single-Tenant EdSteward Dockerfile
+FROM node:18-alpine AS base
+
+# Install dependencies only when needed
+FROM base AS deps
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+
+# Copy package files
+COPY package.json package-lock.json ./
+
+# Install dependencies
+RUN npm ci --only=production --legacy-peer-deps && npm cache clean --force
+
+# Rebuild the source code only when needed
+FROM base AS builder
+WORKDIR /app
+
+# Copy dependency files
+COPY package.json package-lock.json ./
+
+# Install all dependencies (including dev dependencies)
+RUN npm ci --legacy-peer-deps
+
+# Copy source code
+COPY . .
+
+# Build both frontend and backend
+RUN npm run build
+
+# Production image, copy all the files and run the app
+FROM base AS runner
+WORKDIR /app
+
+# Install wget for health checks and postgresql-client for database backups
+RUN apk add --no-cache wget postgresql-client
+
+# Create app user for security
+RUN addgroup --system --gid 1001 nodejs
+RUN adduser --system --uid 1001 nodejs
+
+# Copy built application
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/server ./server
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/package-lock.json ./package-lock.json
+COPY --from=builder /app/tsconfig.json ./tsconfig.json
+COPY --from=builder /app/shared ./shared
+COPY --from=builder /app/sql_dump ./sql_dump
+
+# Install ALL dependencies for production (server needs vite at runtime)
+RUN npm ci --legacy-peer-deps
+
+# Install build tools for native modules
+RUN apk add --no-cache python3 make g++
+
+# Rebuild native modules for Alpine
+RUN npm rebuild bcrypt --build-from-source
+
+# Create necessary directories (including backups for database backup feature)
+RUN mkdir -p ./uploads ./logs ./assets ./backups && chown nodejs:nodejs ./uploads ./logs ./assets ./backups
+
+# Set permissions
+USER nodejs
+
+# Expose port
+EXPOSE 3000
+
+# Environment variables
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV HOSTNAME=0.0.0.0
+ENV DOCKER_CONTAINER=true
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
+
+# Start the application with module resolution
+CMD ["npx", "tsx", "--tsconfig", "./tsconfig.json", "server/index.ts"]

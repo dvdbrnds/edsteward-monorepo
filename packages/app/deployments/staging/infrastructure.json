@@ -1,0 +1,14 @@
+{
+  "environment": "staging",
+  "createdAt": "2026-01-30T00:00:00Z",
+  "vpcId": "vpc-08e725354dc2ff83e",
+  "securityGroupId": "sg-093cef6f815e9cccf",
+  "albArn": "arn:aws:elasticloadbalancing:us-east-1:259661441422:loadbalancer/app/edsteward-staging-alb/714068035",
+  "albDns": "edsteward-staging-alb-714068035.us-east-1.elb.amazonaws.com",
+  "targetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:259661441422:targetgroup/edsteward-staging-tg-v2/317f9297d0e12c4b",
+  "clusterName": "edsteward-staging-cluster",
+  "serviceName": "edsteward-staging-service",
+  "taskFamily": "edsteward-staging-task",
+  "logGroup": "/ecs/edsteward-staging",
+  "subnets": ["subnet-0dd14e0f845d0ed6e", "subnet-04327a914c9ef541b"]
+}

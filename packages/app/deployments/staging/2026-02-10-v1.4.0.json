@@ -1,0 +1,11 @@
+{
+  "version": "v1.4.0",
+  "timestamp": "2026-02-10T20:45:00Z",
+  "deployer": "dvdbrnds",
+  "commitSha": "0d8198a",
+  "gitBranch": "main",
+  "taskDefinitionArn": "arn:aws:ecs:us-east-1:259661441422:task-definition/edsteward-staging-task:4",
+  "previousVersion": "v1.3.0",
+  "status": "success",
+  "environment": "staging"
+}

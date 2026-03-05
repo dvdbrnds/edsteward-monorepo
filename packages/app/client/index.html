@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" id="favicon-link" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Loading...</title>
+    
+    <!-- IMMEDIATE TITLE FIX - External script to avoid CSP issues -->
+    <script src="/title-setter.js"></script>
+    
+    <!-- MCP Engine Integration - Real-time regulation updates -->
+    <script src="/mcp-client.js"></script>
+    
+    <meta name="description" content="Compliance management platform for Moravian University" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="googlebot" content="noindex, nofollow" />
+    <meta name="bingbot" content="noindex, nofollow" />
+    <meta name="slurp" content="noindex, nofollow" />
+    <meta name="duckduckbot" content="noindex, nofollow" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

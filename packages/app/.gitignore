@@ -1,0 +1,84 @@
+node_modules
+dist
+.DS_Store
+server/public
+vite.config.ts.*
+
+# Environment files - NEVER commit secrets
+.env
+.env.local
+.env.*.local
+.env.production
+.env.staging
+.env.development
+!.env.example
+*/.env
+**/.env
+
+# AWS Task Definitions (may contain secrets)
+*-task-def.json
+*-task-definition.json
+task-definition*.json
+task-def*.json
+
+# Temporary deployment files
+service-status.json
+deployment-status.json
+failed-task.json
+temp-*.json
+
+# Archives
+*.tar.gz
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+.terraform.lock.hcl
+*.tfvars
+.terraformrc
+terraform.rc
+
+# Documentation - Protect critical files, allow temp/draft exclusions
+# NEVER ignore these critical documentation files
+!references/ARCHITECTURE.md
+!references/DEPLOYMENT_PIPELINE_DOCUMENTATION.md  
+!references/MULTI_TENANT_ARCHITECTURE.md
+!references/AUTHENTICATION_FIX_SUCCESS_SUMMARY.md
+
+# Allow ignoring temporary documentation
+references/temp/
+references/.drafts/
+references/**/*.tmp
+references/**/*.backup
+
+# MkDocs build artifacts
+site/
+docs/_build/
+# Large files and archives
+*.zip
+*.tar.gz
+*.tar
+
+# Node modules
+node_modules/
+admin-console/node_modules/
+
+# Coverage reports (too large)
+coverage/
+
+# ByteRover (decommissioned Jan 27, 2026)
+.brv/
+.clinerules/byterover-rules.md
+.kilocode/rules/byterover-rules.md
+.roo/rules/byterover-rules.md
+.windsurf/rules/byterover-rules.md
+.cursor/rules/byterover-rules.mdc
+.kiro/steering/byterover-rules.md
+.qoder/rules/byterover-rules.md
+.augment/rules/byterover-rules.md
+# Database backups
+backups/*.sql
+backups/*.sql.gz
+backups/*.json
+logs/pm2-*.log

@@ -1,0 +1,88 @@
+# Product Requirements Document (PRD)
+
+## 1. Overview
+The Regulatory Compliance App for Moravian University is a bespoke solution designed to streamline compliance tracking, reporting schedules, and regulatory notifications. The system will track regulatory requirements, issuing agencies or legal statutes, reporting processes, and reporting schedules while automating notifications for upcoming compliance actions. The application will be initially developed with a future phase planned to adapt the solution for other educational institutions.
+
+## 2. Objectives
+- Centralize regulatory compliance tracking for Moravian University.
+- Ensure timely compliance reporting through automated notifications.
+- Improve collaboration across university offices responsible for regulatory adherence.
+- Reduce the risk of non-compliance due to missed reporting deadlines.
+- Adopt an **iterative development approach**, focusing on delivering a **Minimum Viable Product (MVP)** with core features first, then expanding functionality over time.
+
+## 3. Key Features
+### 3.1 Regulatory Database
+- Store and manage regulations relevant to Moravian University.
+- Associate each regulation with the issuing agency or legal statute.
+- Classify regulations by category (e.g., financial, academic, HR, environmental, etc.).
+- **Flexible Schema:** Allow the addition of new fields for emerging regulatory agencies or new compliance requirements that do not fit existing categories.
+
+### 3.2 Reporting Process Management
+- Define reporting requirements for each regulation.
+- Identify responsible offices or personnel for compliance.
+- Store submission formats, required documents, and submission portals.
+
+### 3.3 Compliance Schedule & Notifications
+- Maintain a dynamic schedule of reporting deadlines.
+- Send automated reminders to responsible parties via email and SMS.
+- Escalate notifications for overdue compliance actions.
+- Enable role-based notification settings.
+- **Google Calendar Integration:** Automatically create calendar items for compliance officers to track deadlines.
+- **Twilio Integration:** Enable SMS alerts for critical compliance reminders.
+- **Customizable Notification Rules:** Admins can configure notification frequencies (e.g., weekly reminders, last-minute alerts) and users can adjust preferences based on priority.
+
+### 3.4 User Access & Roles
+- Admin: Full control over system configuration, regulation entry, and reporting schedules.
+- Compliance Officers: Manage reporting tasks and oversee compliance.
+- General Users: Receive notifications and submit compliance reports.
+- **Single Sign-On (SSO):** Support authentication via OKTA and SAML for seamless user access.
+
+### 3.5 Dashboard & Reporting
+- Overview of upcoming and overdue compliance actions.
+- Filter and search regulations by category, agency, or reporting period.
+- Generate compliance reports for internal audits.
+- **Audit Committee Reports:** Built-in reporting tools for administrators to generate and present compliance summaries for audit committees.
+- **Live Dashboard:** Real-time monitoring of compliance actions and deadlines.
+- **PDF & CSV Export:** Generate comprehensive compliance reports as downloadable PDFs and CSV files for further analysis and record-keeping.
+- **User Activity Logging & Audit Trails:** Track changes made to regulations, reporting submissions, and notifications.
+
+### 3.6 Admin Management Tools
+- Manage regulations, add new regulatory requirements, and modify existing ones.
+- Assign user roles and access permissions.
+- Monitor compliance performance and reporting trends.
+- **CSV Import:** Admins can import regulations in bulk via CSV upload.
+- **API Integrations:** Connect with regulatory agencies that provide compliance data via API to automate updates and ensure up-to-date compliance information.
+- **Task Delegation & Collaboration:** Enable compliance officers to assign tasks to team members and track progress.
+- **Role-Based Data Visibility:** Ensure that different departments see only the relevant regulations and reports.
+
+### 3.7 Regulation Expiration & Review Tracking
+- Track expiration dates for regulations and compliance policies.
+- Set automatic review reminders for outdated or revised compliance requirements.
+
+## 4. Technical Requirements
+- **Platform:** Mobile-first web-based application.
+- **Database:** Cloud-based relational database for regulation storage.
+- **Authentication:** Role-based access control with multi-factor authentication.
+- **Single Sign-On (SSO):** Support authentication via OKTA and SAML.
+- **Notifications:** Email, SMS (via Twilio), and Google Calendar event creation for compliance deadlines.
+- **APIs:** Integration capability for regulatory data imports and reporting portals.
+- **Scalability:** Database structure designed to accommodate evolving compliance needs with new regulatory fields and agencies.
+
+## 5. Future Phases
+- **Multi-Institution Adaptability:** Modify architecture to support multiple universities.
+- **Machine Learning Integration:** Predict compliance risks based on past actions.
+- **Mobile App Enhancement:** Optimize mobile experience and expand native app functionality.
+- **Third-Party Integration:** Connect with state/federal regulatory portals.
+- **AI-Powered Compliance Insights:** Utilize AI to detect regulatory gaps and provide proactive compliance recommendations.
+- **Accreditation Tracking:** Incorporate accreditation requirements to ensure compliance with institutional and programmatic accreditation bodies.
+
+## 6. Success Metrics
+- Reduction in missed regulatory deadlines.
+- Increased efficiency in compliance reporting.
+- User adoption and engagement metrics.
+- Positive feedback from compliance officers and university administrators.
+
+## 7. Timeline & Development Milestones
+- **Phase 1:** Develop Minimum Viable Product (MVP) with core features (3-6 months).
+- **Phase 2:** Implement additional features and user feedback incorporation (6-12 months).
+- **Phase 3:** Expansion to other institutions and AI enhancements (12+ months).

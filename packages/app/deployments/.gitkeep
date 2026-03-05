@@ -1,0 +1,2 @@
+# This directory contains deployment records for audit and rollback purposes.
+# JSON files in staging/ and production/ subdirectories track all deployments.

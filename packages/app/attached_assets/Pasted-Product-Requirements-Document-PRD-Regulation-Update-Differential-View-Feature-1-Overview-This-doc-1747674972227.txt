@@ -1,0 +1,241 @@
+Product Requirements Document (PRD)
+Regulation Update Differential View Feature
+1. Overview
+This document specifies requirements for integrating a new Regulation Update Differential View feature into the existing Compliance Tracker MCP system frontend. This feature will enable users to review incoming regulation changes with visual differentials, accept or reject updates on a per-regulation basis, and maintain version control with digital signatures.
+2. Integration with Existing System
+This feature will leverage the existing infrastructure from the Compliance Tracker MCP system:
+
+Existing Components to Utilize:
+
+Authentication system (Cognito integration)
+Frontend routing infrastructure
+Regulation storage and access mechanisms
+Version control foundation
+Existing UI layout and design system
+
+
+New Components to Build:
+
+Differential view display
+Change statistics calculation
+Update acceptance workflow
+Digital signature capture
+
+
+
+3. User Flow Integration
+The new feature will integrate with the existing user flows as follows:
+
+User receives notification of pending updates using the existing notification framework
+User navigates to the new Regulation Updates section from the main navigation
+User selects a regulation with pending changes to review
+System displays the new differential view for selected regulation
+User accepts/rejects/defers and the system captures the decision
+System returns user to the updates list
+
+4. Feature Requirements
+4.1 Differential View Component
+
+Core Functionality
+
+Display inline difference view showing:
+
+Added text in green
+Removed text with red strikethrough
+
+
+Calculate and display change statistics:
+
+Percentage of text added
+Percentage of text removed
+Percentage of text changed
+
+
+Navigation controls to move between changes
+
+
+Integration Points
+
+Connect to existing regulation data store
+Leverage existing text processing utilities if available
+Use application's typography and styling system
+
+
+Implementation Details
+
+Build as a React component that can be included in existing pages
+Implement text diffing algorithm (or utilize a library)
+Create DOM rendering for highlighted changes
+
+
+
+4.2 Acceptance Workflow Component
+
+Core Functionality
+
+Accept button: Applies changes and records signature
+Reject button: Logs rejection with reason
+Defer button: Keeps update in pending state
+Confirmation dialogs for each action
+Digital signature capture (username, timestamp)
+
+
+Integration Points
+
+Connect to existing user identity system
+Hook into version control system
+Update regulation status indicators
+
+
+Implementation Details
+
+Create React component for action buttons
+Implement modal dialogs for confirmations
+Use existing API endpoints for updating regulation status
+
+
+
+5. UI Design Integration
+5.1 Update List View
+Extend the existing regulations view with a new "Updates" tab or section:
++----------------------------------------------+
+| Regulations | Compliance | Updates (3) | ... |
++----------------------------------------------+
+| Pending Regulation Updates                   |
++----------------------------------------------+
+| Title                | Changes | Priority    |
++---------------------+----------+-------------+
+| HIPAA Section 164.3 | +2% -1%  | HIGH        |
+| FERPA Guidelines    | +15% -5% | MEDIUM      |
+| Title IX Compliance | +0% -3%  | LOW         |
++---------------------+----------+-------------+
+5.2 Differential View
+Create a new view that fits within the existing application layout:
++----------------------------------------------+
+| < Back to Updates | HIPAA Section 164.3      |
++----------------------------------------------+
+| Changes: +2% Added, -1% Removed, ~3% Changed |
++----------------------------------------------+
+| Protected health information means           |
+| individually identifiable health information |
+| +that is transmitted by electronic means,+   |
+| -transmitted or maintained in any form.-     |
+| +transmitted or maintained in any form or+   |
+| +medium.+                                    |
++----------------------------------------------+
+| [ Reject ] [ Defer ] [ Accept ]              |
++----------------------------------------------+
+6. Implementation Details
+6.1 New React Components to Create
+
+UpdatesList Component
+
+File: src/components/UpdatesList.jsx
+Purpose: Display all pending regulation updates
+Dependencies: Existing data fetching utilities
+
+
+DifferentialView Component
+
+File: src/components/DifferentialView.jsx
+Purpose: Show text differences with highlighting
+Dependencies: Text diffing library (recommend diff-match-patch or jsdiff)
+
+
+ChangeStatistics Component
+
+File: src/components/ChangeStatistics.jsx
+Purpose: Calculate and display change metrics
+Dependencies: Text analysis utilities
+
+
+AcceptanceActions Component
+
+File: src/components/AcceptanceActions.jsx
+Purpose: Provide action buttons and capture decisions
+Dependencies: Version control API
+
+
+
+6.2 API Integration
+
+Retrieve Updates API
+
+Endpoint: GET /api/v1/regulations/updates
+Integration: Add to existing API client in src/frontend-integration/api-client/index.js
+
+
+Accept Update API
+
+Endpoint: POST /api/v1/regulations/{id}/accept
+Integration: Add to existing API client in src/frontend-integration/api-client/versions.js
+
+
+Reject Update API
+
+Endpoint: POST /api/v1/regulations/{id}/reject
+Integration: Add to existing API client in src/frontend-integration/api-client/versions.js
+
+
+
+6.3 Route Integration
+Add new routes to the existing router configuration:
+javascript// Add to existing routes in src/router.js
+<Route path="/regulations/updates" element={<UpdatesList />} />
+<Route path="/regulations/updates/:id" element={<DifferentialView />} />
+7. Implementation Plan
+7.1 Phase 1: Core Components (1 week)
+
+Create UpdatesList component with basic listing functionality
+Implement DifferentialView with text highlighting
+Add routing for new components
+
+7.2 Phase 2: Workflow Integration (1 week)
+
+Implement change statistics calculation
+Create acceptance/rejection workflow
+Add digital signature capture
+
+7.3 Phase 3: Polish & Testing (1 week)
+
+Ensure proper styling integration with existing UI
+Add animations and transitions
+Implement comprehensive testing
+Optimize performance for large regulations
+
+8. Technical Considerations
+
+Text Diffing Implementation
+
+Use an established diffing library like diff-match-patch or jsdiff
+Implement caching for diff results to improve performance
+Handle large documents efficiently with virtualization
+
+
+Performance Optimization
+
+Use React memo and useMemo for expensive rendering operations
+Consider windowing techniques for very large regulation documents
+Implement progressive loading for regulation content
+
+
+Integration Testing
+
+Create tests that verify interaction with existing components
+Test rendering performance with large regulation texts
+Verify proper API integration
+
+
+
+9. Definition of Done
+The feature will be considered complete when:
+
+Users can see a list of regulations with pending updates
+Users can view differential display of changes with highlighted additions/removals
+Change statistics correctly show percentages of added/removed/changed content
+Users can accept/reject/defer updates with confirmation
+Digital signatures are properly captured and recorded
+All components are properly integrated with existing UI styling
+Performance is acceptable for regulations of all sizes
+
+This PRD focuses specifically on integrating the differential view feature into the existing Compliance Tracker MCP system without duplicating functionality, while ensuring the new components work seamlessly with the established codebase.RetryClaude can make mistakes. Please double-check responses. 3.7 Sonnet

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MCP Engine Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .status { padding: 10px; margin: 10px 0; border-radius: 5px; }
+        .connected { background: #d4edda; color: #155724; }
+        .disconnected { background: #f8d7da; color: #721c24; }
+        .connecting { background: #fff3cd; color: #856404; }
+        #messages { border: 1px solid #ccc; height: 300px; overflow-y: scroll; padding: 10px; }
+        button { padding: 10px 20px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🚀 MCP Engine WebSocket Test</h1>
+    
+    <div id="status" class="status disconnected">❌ Not Connected</div>
+    
+    <button onclick="connect()">Connect to MCP Engine</button>
+    <button onclick="sendTest()">Send Test Update</button>
+    <button onclick="clearMessages()">Clear Messages</button>
+    
+    <h3>Messages:</h3>
+    <div id="messages"></div>
+    
+    <script>
+        let ws = null;
+        const statusDiv = document.getElementById('status');
+        const messagesDiv = document.getElementById('messages');
+        
+        function addMessage(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const div = document.createElement('div');
+            div.innerHTML = `<strong>${timestamp}</strong>: ${message}`;
+            div.style.color = type === 'error' ? 'red' : type === 'success' ? 'green' : 'black';
+            messagesDiv.appendChild(div);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            console.log(`[${timestamp}] ${message}`);
+        }
+        
+        function connect() {
+            if (ws && ws.readyState === WebSocket.OPEN) {
+                addMessage('Already connected!', 'info');
+                return;
+            }
+            
+            statusDiv.textContent = '🟡 Connecting to MCP Engine...';
+            statusDiv.className = 'status connecting';
+            addMessage('Attempting to connect to ws://localhost:3003/regulation-updates');
+            
+            ws = new WebSocket('ws://localhost:3003/regulation-updates');
+            
+            ws.onopen = function() {
+                statusDiv.textContent = '✅ Connected to MCP Engine';
+                statusDiv.className = 'status connected';
+                addMessage('✅ Connected to MCP Engine WebSocket!', 'success');
+                
+                // Subscribe to REG-66
+                const subscribeMessage = {
+                    type: 'subscribe',
+                    regulationIds: ['REG-66']
+                };
+                ws.send(JSON.stringify(subscribeMessage));
+                addMessage('📋 Sent subscription for REG-66', 'success');
+            };
+            
+            ws.onmessage = function(event) {
+                const message = JSON.parse(event.data);
+                addMessage('📥 Received: ' + JSON.stringify(message, null, 2), 'success');
+                
+                if (message.type === 'regulation_updated') {
+                    addMessage('🚨 REGULATION UPDATE: ' + message.regulationId + ' version ' + message.version, 'success');
+                }
+            };
+            
+            ws.onclose = function(event) {
+                statusDiv.textContent = '❌ Disconnected from MCP Engine';
+                statusDiv.className = 'status disconnected';
+                addMessage('❌ WebSocket connection closed. Code: ' + event.code, 'error');
+            };
+            
+            ws.onerror = function(error) {
+                statusDiv.textContent = '❌ WebSocket Error';
+                statusDiv.className = 'status disconnected';
+                addMessage('❌ WebSocket error: ' + error, 'error');
+            };
+        }
+        
+        function sendTest() {
+            // Send a test update via HTTP to trigger WebSocket notification
+            fetch('http://localhost:3003/api/simulate-change/REG-66', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    changeType: 'MANUAL_TEST',
+                    mockData: {
+                        impact: 'high',
+                        message: 'Manual test from MCP test page'
+                    }
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                addMessage('📤 Sent test update: ' + JSON.stringify(data), 'info');
+            })
+            .catch(error => {
+                addMessage('❌ Failed to send test update: ' + error, 'error');
+            });
+        }
+        
+        function clearMessages() {
+            messagesDiv.innerHTML = '';
+        }
+        
+        // Auto-connect on page load
+        window.onload = function() {
+            addMessage('🚀 MCP Engine Test Page Loaded');
+            addMessage('Click "Connect to MCP Engine" to start WebSocket connection');
+        };
+    </script>
+</body>
+</html>

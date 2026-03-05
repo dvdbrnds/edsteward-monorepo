@@ -1,0 +1,51 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      target: development
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://neondb_owner:npg_a2BNKdZeg9FU@ep-summer-pine-ae88mdbc-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require
+      - DB_HOST=ep-summer-pine-ae88mdbc-pooler.c-2.us-east-2.aws.neon.tech
+      - DB_PORT=5432
+      - DB_NAME=neondb
+      - DB_USER=neondb_owner
+      - DB_PASSWORD=npg_a2BNKdZeg9FU
+      - DB_SSL=true
+      - SESSION_SECRET=dev-secret-key-for-local-development-only
+      - HOSTNAME=0.0.0.0
+      - PORT=3000
+      # SAML Authentication Configuration
+      - AUTH_SAML_ENABLED=true
+      - AUTH_SAML_ENTITY_ID=urn:edsteward:sp
+      - AUTH_SAML_SSO_URL=https://login.moravian.edu/app/moravian_edstewardlocaldevelopment_1/exk1dzve5y4scxwes0x8/sso/saml
+      - AUTH_ALLOW_SELF_REGISTRATION=true
+      - BASE_URL=http://localhost:3000
+      - SAML_SP_ENTITY_ID=urn:edsteward:sp
+      - SAML_CALLBACK_URL=http://localhost:3000/auth/saml/callback
+      - SAML_SLO_URL=http://localhost:3000/auth/saml/logout
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: npm run dev
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 2g
+        reservations:
+          memory: 512m
+    # Allow access from all local domains
+    extra_hosts:
+      - "edsteward.local:127.0.0.1"
+      - "admin.edsteward.local:127.0.0.1"
+      - "moravian.edsteward.local:127.0.0.1"

@@ -1,0 +1,69 @@
+{
+    "customer": {
+        "name": "Beta Test Company",
+        "domain": "betatest.com",
+        "subdomain": "beta",
+        "contact": {
+            "supportEmail": "support@betatest.com",
+            "adminEmail": "admin@betatest.com",
+            "organizationUrl": "https://betatest.com"
+        }
+    },
+    "aws": {
+        "region": "us-east-1",
+        "accountId": "259661441422",
+        "clusterName": "edsteward-beta-cluster",
+        "serviceName": "edsteward-beta-service",
+        "ecrRepository": "edsteward-multi-tenant",
+        "logGroup": "/aws/ecs/edsteward-beta"
+    },
+    "database": {
+        "type": "neon",
+        "connectionString": "postgresql://neondb_owner:npg_fHNv4k1VKwWd@ep-cool-grass-ae3mjdz3-pooler.c-2.us-east-2.aws.neon.tech/neondb?sslmode=require&channel_binding=require",
+        "name": "beta_edsteward"
+    },
+    "branding": {
+        "institutionName": "Beta Test Company",
+        "title": "Beta Test Compliance Portal",
+        "logoUrl": "/assets/beta-logo.svg",
+        "faviconUrl": "/assets/beta-favicon.ico",
+        "primaryColor": "#e11d48",
+        "secondaryColor": "#be185d",
+        "accentColor": "#f97316",
+        "loginScreenBackgroundColor": "#fef2f2",
+        "loginScreenAccentColor": "#e11d48",
+        "loginScreenTextColor": "#1f2937",
+        "loginScreenHeroColor": "#be185d"
+    },
+    "authentication": {
+        "samlEnabled": false,
+        "samlEntityId": "urn:edsteward:sp:beta",
+        "samlSsoUrl": "https://sso.betatest.com/saml",
+        "samlCertificate": "",
+        "usernamePasswordEnabled": true,
+        "allowSelfRegistration": true
+    },
+    "features": {
+        "maxUsers": 100,
+        "maxRegulations": 1000,
+        "apiAccess": true,
+        "customDomain": true,
+        "ssoEnabled": false
+    },
+    "environment": {
+        "nodeEnv": "production",
+        "port": 3000,
+        "multiTenant": false,
+        "sessionSecret": "beta-session-secret-change-this-in-production"
+    },
+    "deployment": {
+        "dockerImage": "edsteward-beta:latest",
+        "taskDefinitionFamily": "edsteward-beta",
+        "desiredCount": 1,
+        "cpu": 1024,
+        "memory": 2048,
+        "healthCheckPath": "/health",
+        "domainName": "beta.edsteward.ai",
+        "sslCertificateArn": "arn:aws:acm:us-east-1:259661441422:certificate/existing-beta-cert"
+    }
+}

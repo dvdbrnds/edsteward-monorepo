@@ -1,0 +1,67 @@
+# Development Dockerfile with hot reloading - OPTIMIZED
+FROM node:18-alpine AS development
+
+# Install development dependencies including build tools for native modules
+RUN apk add --no-cache \
+    git \
+    curl \
+    bash \
+    vim \
+    tini \
+    python3 \
+    make \
+    g++ \
+    libc6-compat
+
+WORKDIR /app
+
+# Copy package files first for better layer caching
+COPY package.json package-lock.json ./
+
+# Install all dependencies (including dev) - this layer will be cached
+RUN npm ci --legacy-peer-deps --no-audit --no-fund
+
+# Create necessary directories
+RUN mkdir -p /app/uploads /app/logs /app/dist
+
+# Create non-root user for security
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nextjs -u 1001 -G nodejs
+
+# Copy source code AFTER dependencies (for better caching)
+COPY . .
+
+# Change ownership of app directory
+RUN chown -R nextjs:nodejs /app
+USER nextjs
+
+# Expose ports
+EXPOSE 3000 5173
+
+# Add health check with faster intervals for development
+HEALTHCHECK --interval=15s --timeout=5s --start-period=20s --retries=2 \
+  CMD curl -f http://localhost:3000/api/health || exit 1
+
+# Use tini as init system for better signal handling
+ENTRYPOINT ["/sbin/tini", "--"]
+
+# Development command (will be overridden by docker-compose)
+CMD ["npm", "run", "dev"]
+
+# Production stage (for final build)
+FROM development AS production-ready
+
+# Switch back to root for build
+USER root
+
+# Build the application
+RUN npm run build
+
+# Switch back to nodejs user
+USER nextjs
+
+# Set production environment
+ENV NODE_ENV=production
+
+# Production command
+CMD ["npm", "start"] 

@@ -1,0 +1,69 @@
+{
+    "customer": {
+        "name": "{{CUSTOMER_NAME}}",
+        "domain": "{{CUSTOMER_DOMAIN}}",
+        "subdomain": "{{CUSTOMER_SUBDOMAIN}}",
+        "contact": {
+            "supportEmail": "{{SUPPORT_EMAIL}}",
+            "adminEmail": "{{ADMIN_EMAIL}}",
+            "organizationUrl": "{{ORGANIZATION_URL}}"
+        }
+    },
+    "aws": {
+        "region": "{{AWS_REGION}}",
+        "accountId": "{{AWS_ACCOUNT_ID}}",
+        "clusterName": "{{CLUSTER_NAME}}",
+        "serviceName": "{{SERVICE_NAME}}",
+        "ecrRepository": "{{ECR_REPOSITORY}}",
+        "logGroup": "{{LOG_GROUP}}"
+    },
+    "database": {
+        "type": "neon",
+        "connectionString": "{{DATABASE_URL}}",
+        "name": "{{DATABASE_NAME}}"
+    },
+    "branding": {
+        "institutionName": "{{INSTITUTION_NAME}}",
+        "title": "{{INSTITUTION_TITLE}}",
+        "logoUrl": "{{LOGO_URL}}",
+        "faviconUrl": "{{FAVICON_URL}}",
+        "primaryColor": "{{PRIMARY_COLOR}}",
+        "secondaryColor": "{{SECONDARY_COLOR}}",
+        "accentColor": "{{ACCENT_COLOR}}",
+        "loginScreenBackgroundColor": "{{LOGIN_BG_COLOR}}",
+        "loginScreenAccentColor": "{{LOGIN_ACCENT_COLOR}}",
+        "loginScreenTextColor": "{{LOGIN_TEXT_COLOR}}",
+        "loginScreenHeroColor": "{{LOGIN_HERO_COLOR}}"
+    },
+    "authentication": {
+        "samlEnabled": false,
+        "samlEntityId": "{{SAML_ENTITY_ID}}",
+        "samlSsoUrl": "{{SAML_SSO_URL}}",
+        "samlCertificate": "{{SAML_CERTIFICATE}}",
+        "usernamePasswordEnabled": true,
+        "allowSelfRegistration": false
+    },
+    "features": {
+        "maxUsers": 1000,
+        "maxRegulations": 10000,
+        "apiAccess": true,
+        "customDomain": true,
+        "ssoEnabled": false
+    },
+    "environment": {
+        "nodeEnv": "production",
+        "port": 3000,
+        "multiTenant": false,
+        "sessionSecret": "{{SESSION_SECRET}}"
+    },
+    "deployment": {
+        "dockerImage": "{{DOCKER_IMAGE}}",
+        "taskDefinitionFamily": "{{TASK_DEFINITION_FAMILY}}",
+        "desiredCount": 1,
+        "cpu": 1024,
+        "memory": 2048,
+        "healthCheckPath": "/health",
+        "domainName": "{{DOMAIN_NAME}}",
+        "sslCertificateArn": "{{SSL_CERTIFICATE_ARN}}"
+    }
+}

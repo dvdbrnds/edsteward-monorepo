@@ -1,0 +1,59 @@
+
+> rest-express@1.0.0 dev
+> tsx server/index.ts
+
+Creating note insertion schema with validation rules
+Note insertion schema created successfully
+Note schema fields: [
+  'id',        'regulationId',
+  'userId',    'title',
+  'content',   'category',
+  'status',    'isPrivate',
+  'createdAt', 'updatedAt',
+  'enableRLS'
+]
+9:02:17 PM [express] Starting server initialization...
+9:02:17 PM [express] Database connection successful
+9:02:17 PM [express] Registering routes...
+9:02:17 PM [express] Routes registered successfully
+9:02:17 PM [express] Setting up Vite development server...
+9:02:17 PM [express] Vite setup complete
+9:02:18 PM [express] Server successfully started on port 5000
+9:02:18 PM [express] Starting server successfully, will initialize deadline checker in 30 seconds...
+9:02:18 PM [express] Server startup complete
+9:02:22 PM [express] GET /api/user 401 in 2ms
+9:02:30 PM [express] GET /api/user 304 in 156ms :: {"id":6,"username":"dvdbrnds","password":"783782f…
+Fetching regulations from database...
+9:02:30 PM [express] GET /api/user 304 in 156ms :: {"id":6,"username":"dvdbrnds","password":"783782f…
+2025-03-24T21:02:30.813Z [INFO] Fetching regulations from storage
+9:02:30 PM [express] GET /api/setup/status 200 in 159ms
+2025-03-24T21:02:30.822Z [INFO] Fetching deadlines from storage
+9:02:30 PM [express] GET /api/notifications 200 in 165ms
+9:02:31 PM [express] GET /api/deadlines 304 in 485ms :: [{"id":791,"regulationId":4461,"dueDate":"20…
+2025-03-24T21:02:31.150Z [INFO] Found 55 deadlines
+9:02:31 PM [express] GET /api/setup/status 200 in 160ms
+9:02:31 PM [express] GET /api/notifications 200 in 160ms
+Successfully fetched 358 regulations from database
+2025-03-24T21:02:31.513Z [INFO] Fetching deadlines from storage
+9:02:31 PM [express] GET /api/regulations 304 in 879ms :: [{"id":4850,"itemId":"PA-paDeptEd-17418130…
+2025-03-24T21:02:31.528Z [INFO] Found 358 regulations
+2025-03-24T21:02:31.591Z [INFO] Found 55 deadlines
+9:02:31 PM [express] GET /api/deadlines 304 in 234ms :: [{"id":791,"regulationId":4461,"dueDate":"20…
+Fetching regulations from database...
+2025-03-24T21:02:31.893Z [INFO] Fetching regulations from storage
+Successfully fetched 358 regulations from database
+2025-03-24T21:02:32.353Z [INFO] Found 358 regulations
+9:02:32 PM [express] GET /api/regulations 304 in 628ms :: [{"id":4850,"itemId":"PA-paDeptEd-17418130…
+Looking up regulation with ID: 4850
+2025-03-24T21:02:42.546Z [INFO] Fetching regulation with ID: 4850
+9:02:42 PM [express] GET /api/setup/status 200 in 163ms
+9:02:43 PM [express] GET /api/regulations/4850 304 in 562ms :: {"id":4850,"itemId":"PA-paDeptEd-1741…
+2025-03-24T21:02:42.952Z [INFO] Found regulation: default
+Fetching evidence files for regulation 4850
+2025-03-24T21:02:43.334Z [INFO] Fetching notes for regulation 4850
+Found 3 evidence files
+2025-03-24T21:02:43.419Z [INFO] Found 1 notes for regulation 4850
+9:02:43 PM [express] GET /api/notes/regulation/4850 304 in 242ms :: [{"id":13,"regulationId":4850,"u…
+2025-03-24T21:02:43.428Z [INFO] Successfully fetched 3 evidence files for regulation 4850
+9:02:43 PM [express] GET /api/regulations/4850/evidence 304 in 243ms :: [{"id":3,"regulationId":4850…
+9:02:48 PM [express] Initializing deadline notification checker...

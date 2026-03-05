@@ -1,0 +1,59 @@
+version: '3.8'
+
+services:
+  admin-console:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      target: development
+    container_name: edsteward-admin-console
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - VITE_ADMIN_MODE=true
+      - VITE_API_URL=http://localhost:3000
+      - VITE_WS_URL=ws://localhost:3000
+      - VITE_APP_NAME=EdSteward Admin Console
+      - VITE_APP_VERSION=2.0.0
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - admin_logs:/app/logs
+    networks:
+      - admin_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  admin-redis:
+    image: redis:7-alpine
+    container_name: edsteward-admin-redis
+    ports:
+      - "6380:6379"
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - admin_redis_data:/data
+    networks:
+      - admin_network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  admin_logs:
+    driver: local
+  admin_redis_data:
+    driver: local
+
+networks:
+  admin_network:
+    driver: bridge
+    name: edsteward_admin_network 

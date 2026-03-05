@@ -1,0 +1,112 @@
+{
+  "// EdSteward Workspace Settings": "Docker-First Development Environment",
+  
+  "// CRITICAL: Always use Docker for development": true,
+  "// Run: ./dev.sh up (NEVER npm run dev on macOS)": true,
+  
+  "terminal.integrated.profiles.osx": {
+    "Docker Development": {
+      "path": "/bin/zsh",
+      "args": ["-c", "echo '🐳 EdSteward Docker Development Environment'; echo ''; echo 'Quick Commands:'; echo '  ./dev.sh up    - Start development'; echo '  ./dev.sh logs  - View logs'; echo '  ./dev.sh shell - Debug container'; echo ''; echo '⚠️  NEVER run npm run dev on macOS!'; echo '✅  Always use Docker development'; echo ''; exec zsh"]
+    }
+  },
+  
+  "terminal.integrated.defaultProfile.osx": "Docker Development",
+  
+  "// File associations": {},
+  "files.associations": {
+    "docker-compose.dev.yml": "yaml",
+    "Dockerfile.dev": "dockerfile",
+    "dev.sh": "shellscript"
+  },
+  
+  "// Editor settings": {},
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  
+  "// Docker-specific settings": {},
+  "docker.defaultRegistryPath": "",
+  
+  "// Task configuration": {},
+  "tasks.version": "2.0.0",
+  
+  "// Search settings": {},
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/coverage": true,
+    "**/dist": true,
+    "**/build": true,
+    "**/.git": true,
+    "**/uploads": true
+  },
+  
+  "// TypeScript settings": {},
+  "typescript.preferences.includePackageJsonAutoImports": "on",
+  "typescript.suggest.autoImports": true,
+  
+  "// ESLint settings": {},
+  "eslint.workingDirectories": ["./"],
+  "eslint.format.enable": true,
+  
+  "// Workspace specific notifications": {},
+  "workbench.startupEditor": "readme",
+  
+  "// Development reminders": {},
+  "window.title": "EdSteward (Docker Development) - ${activeEditorShort}${separator}${rootName}",
+  
+  "// Extension recommendations": {},
+  "extensions.recommendations": [
+    "ms-vscode.vscode-docker",
+    "ms-vscode.vscode-typescript-next",
+    "esbenp.prettier-vscode",
+    "bradlc.vscode-tailwindcss",
+    "ms-vscode.vscode-json"
+  ],
+  
+  "// Git settings": {},
+  "git.enabled": true,
+  "git.ignoreLimitWarning": true,
+  "git.autofetch": true,
+  
+  "// File watcher settings": {},
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/coverage/**": true,
+    "**/dist/**": true,
+    "**/build/**": true,
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/uploads/**": true
+  },
+  
+  "// Development workflow reminders": {},
+  "workbench.colorCustomizations": {
+    "statusBar.noFolderBackground": "#1f4e8c"
+  },
+  
+  "// Custom snippets enabled": {},
+  "editor.tabCompletion": "on",
+  "editor.wordBasedSuggestions": "matchingDocuments",
+  
+  "// Integrated terminal settings": {},
+  "terminal.integrated.env.osx": {
+    "EDSTEWARD_DEV_MODE": "docker",
+    "COMPOSE_FILE": "docker-compose.dev.yml"
+  },
+  
+  "// Debugging configuration": {},
+  "debug.allowBreakpointsEverywhere": true,
+  
+  "// Problems panel": {},
+  "problems.autoReveal": true,
+  
+  "// Explorer settings": {},
+  "explorer.confirmDragAndDrop": false,
+  "explorer.confirmDelete": false,
+  
+  "// Auto-save": {},
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 1000
+} 

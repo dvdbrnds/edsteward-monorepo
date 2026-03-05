@@ -1,0 +1,72 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "🐳 Debug: Docker Container",
+            "type": "node",
+            "request": "attach",
+            "port": 9229,
+            "address": "localhost",
+            "localRoot": "${workspaceFolder}",
+            "remoteRoot": "/app",
+            "protocol": "inspector",
+            "restart": true,
+            "sourceMaps": true,
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "console": "integratedTerminal",
+            "preLaunchTask": "🐳 Docker: Start Development",
+            "presentation": {
+                "group": "Docker",
+                "order": 1
+            },
+            "env": {
+                "NODE_ENV": "development"
+            }
+        },
+        {
+            "name": "🔍 Debug: Container Shell",
+            "type": "node",
+            "request": "launch",
+            "program": "docker",
+            "args": [
+                "exec",
+                "-it",
+                "edsteward-app-1",
+                "/bin/bash"
+            ],
+            "console": "externalTerminal",
+            "presentation": {
+                "group": "Docker",
+                "order": 2
+            }
+        },
+        {
+            "name": "📋 Debug: View Logs",
+            "type": "node",
+            "request": "launch",
+            "program": "${workspaceFolder}/dev.sh",
+            "args": [
+                "logs"
+            ],
+            "console": "integratedTerminal",
+            "presentation": {
+                "group": "Docker",
+                "order": 3
+            }
+        }
+    ],
+    "compounds": [
+        {
+            "name": "🚀 Start: Docker Development Environment",
+            "configurations": [
+                "🐳 Debug: Docker Container"
+            ],
+            "presentation": {
+                "group": "Docker",
+                "order": 1
+            }
+        }
+    ]
+}

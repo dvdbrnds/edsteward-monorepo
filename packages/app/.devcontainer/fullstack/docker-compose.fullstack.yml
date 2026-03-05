@@ -1,0 +1,100 @@
+version: '3.8'
+
+networks:
+  edsteward-fullstack:
+    driver: bridge
+
+volumes:
+  admin_redis_data:
+  admin_logs:
+
+services:
+  # Customer application
+  customer-app:
+    build:
+      context: ../..
+      dockerfile: Dockerfile.dev
+      target: development
+    container_name: edsteward-customer-app
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://neondb_owner:npg_foSr6ixkzw7W@ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech/neondb?sslmode=require
+      - DB_HOST=ep-weathered-term-a5rmi9cx-pooler.us-east-2.aws.neon.tech
+      - DB_PORT=5432
+      - DB_NAME=neondb
+      - DB_USER=neondb_owner
+      - DB_PASSWORD=npg_foSr6ixkzw7W
+      - DB_SSL=true
+      - SESSION_SECRET=dev-secret-key-for-local-development-only
+      - HOSTNAME=0.0.0.0
+      - PORT=3000
+    volumes:
+      - ../..:/app
+      - /app/node_modules
+    command: npm run dev
+    restart: unless-stopped
+    networks:
+      - edsteward-fullstack
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    extra_hosts:
+      - "edsteward.local:127.0.0.1"
+      - "admin.edsteward.local:127.0.0.1"  
+      - "moravian.edsteward.local:127.0.0.1"
+
+  # Admin console
+  admin-console:
+    build:
+      context: ../../admin-console
+      dockerfile: Dockerfile.dev
+      target: development
+    container_name: edsteward-admin-console
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=development
+      - VITE_ADMIN_MODE=true
+      - VITE_API_URL=http://customer-app:3000
+      - VITE_WS_URL=ws://customer-app:3000
+      - VITE_APP_NAME=EdSteward Admin Console
+      - VITE_APP_VERSION=2.0.0
+    volumes:
+      - ../../admin-console:/app
+      - /app/node_modules
+      - admin_logs:/app/logs
+    networks:
+      - edsteward-fullstack
+    restart: unless-stopped
+    depends_on:
+      - customer-app
+      - admin-redis
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Redis for admin console
+  admin-redis:
+    image: redis:7-alpine
+    container_name: edsteward-admin-redis
+    ports:
+      - "6380:6379"
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    volumes:
+      - admin_redis_data:/data
+    networks:
+      - edsteward-fullstack
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3 

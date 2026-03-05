@@ -1,0 +1,50 @@
+openapi: 3.0.0
+info:
+  title: Moravian University Compliance Platform API
+  version: '0.2.3'
+  description: |
+    API documentation for the Moravian University Compliance Platform
+    
+    ## Authentication
+    All endpoints require authentication unless explicitly marked as public.
+    Use session-based authentication via /auth/login endpoint.
+    
+    ## Error Responses
+    Standard error responses follow RFC 7807 problem details format.
+    
+paths:
+  /api/regulations/{id}:
+    get:
+      summary: Get regulation details
+      description: Retrieves detailed information about a specific regulation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Regulation'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Regulation not found
+
+components:
+  schemas:
+    Regulation:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        summary:
+          type: string
+          nullable: true
+        # ... other properties to be documented
